@@ -26,14 +26,14 @@ resource "aws_instance" "apex_db_instance" {
     tags = merge(
       local.tags,
       { "Name" = "${local.application_name}db-ec2-root" },
+      local.backup_schedule_tags
     )
   }
 
   tags = merge(
     local.tags,
     { "Name" = local.database_ec2_name },
-    { "instance-scheduling" = "skip-scheduling" },
-    { "snapshot-with-daily-7-day-retention" = "yes" }
+    { "instance-scheduling" = "skip-scheduling" }
   )
 }
 
@@ -63,14 +63,14 @@ resource "aws_vpc_security_group_ingress_rule" "db_ecs" {
   to_port                      = 1521
 }
 
-resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
-  security_group_id = aws_security_group.database.id
-  description       = "Allow MP VPC (OAS) to access database instance"
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
-  from_port         = 1521
-  ip_protocol       = "tcp"
-  to_port           = 1521
-}
+# resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
+#   security_group_id = aws_security_group.database.id
+#   description       = "Allow MP VPC (OAS) to access database instance"
+#   cidr_ipv4         = data.aws_vpc.shared.cidr_block
+#   from_port         = 1521
+#   ip_protocol       = "tcp"
+#   to_port           = 1521
+# }
 
 resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
   security_group_id            = aws_security_group.database.id
@@ -81,24 +81,24 @@ resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
   to_port                      = 22
 }
 
-resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
-  security_group_id = aws_security_group.database.id
-  description       = "Database listener port access to Workspaces"
-  cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr
-  from_port         = 1521
-  ip_protocol       = "tcp"
-  to_port           = 1521
-}
+# resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
+#   security_group_id = aws_security_group.database.id
+#   description       = "Database listener port access to Workspaces"
+#   cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr
+#   from_port         = 1521
+#   ip_protocol       = "tcp"
+#   to_port           = 1521
+# }
 
 # This is a temp rule whilst OAS resides in LZ
-resource "aws_vpc_security_group_ingress_rule" "oas_lz" {
-  security_group_id = aws_security_group.database.id
-  description       = "Allow OAS in LZ to access APEX"
-  cidr_ipv4         = local.application_data.accounts[local.environment].oas_lz_cidr
-  from_port         = 1521
-  ip_protocol       = "tcp"
-  to_port           = 1521
-}
+# resource "aws_vpc_security_group_ingress_rule" "oas_lz" {
+#   security_group_id = aws_security_group.database.id
+#   description       = "Allow OAS in LZ to access APEX"
+#   cidr_ipv4         = local.application_data.accounts[local.environment].oas_lz_cidr
+#   from_port         = 1521
+#   ip_protocol       = "tcp"
+#   to_port           = 1521
+# }
 
 resource "aws_vpc_security_group_egress_rule" "db_outbound" {
   security_group_id = aws_security_group.database.id
@@ -177,6 +177,7 @@ resource "aws_ebs_volume" "u01-orahome" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}db-ec2-u01-orahome" },
+    local.backup_schedule_tags
   )
 }
 resource "aws_volume_attachment" "u01-orahome" {
@@ -198,6 +199,7 @@ resource "aws_ebs_volume" "u02-oradata" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}db-ec2-u02-oradata" },
+    local.backup_schedule_tags
   )
 }
 
@@ -222,6 +224,7 @@ resource "aws_ebs_volume" "u03-redo" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}db-ec2-u03-redo" },
+    local.backup_schedule_tags
   )
 }
 resource "aws_volume_attachment" "u03-redo" {
@@ -243,6 +246,7 @@ resource "aws_ebs_volume" "u04-arch" {
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}db-ec2-u04-arch" },
+    local.backup_schedule_tags
   )
 }
 resource "aws_volume_attachment" "u04-arch" {
