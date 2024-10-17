@@ -26,4 +26,44 @@ locals {
   /* Environment Configuration */
   environment_configuration = local.environment_configurations[local.environment]
 
+  /* S3 - APC bucket locals */
+  apc_buckets = {
+    "mojap-derived-tables-replication" = {
+      force_destroy       = true
+      object_lock_enabled = false
+      acl                 = "private"
+      versioning = {
+        status = "Disabled"
+      }
+      bucket = "mojap-derived-tables-replication-${local.environment}"
+      server_side_encryption_configuration = {
+        rule = {
+          bucket_key_enabled = false
+
+          apply_server_side_encryption_by_default = {
+            sse_algorithm = "AES256"
+          }
+        }
+      }
+      public_access_block = {
+        block_public_acls       = true
+        block_public_policy     = true
+        ignore_public_acls      = true
+        restrict_public_buckets = true
+      }
+    }
+    "mlflow_buckets" = {
+      bucket = "mojap-compute-${local.environment}-mlflow"
+      force_destroy = true
+      server_side_encryption_configuration = {
+        rule = {
+          bucket_key_enabled = true
+          apply_server_side_encryption_by_default = {
+            kms_master_key_id = module.mlflow_s3_kms.key_arn
+            sse_algorithm     = "aws:kms"
+          }
+        }
+      }
+    }
+  }
 }
