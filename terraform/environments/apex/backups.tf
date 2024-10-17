@@ -81,9 +81,6 @@ resource "aws_backup_plan" "prod_apex" {
     # Backup hourly
     schedule = "cron(0 * * * ? *)"
 
-    # The amount of time in minutes to start and finish a backup
-    ## Start the backup within 10 minutes of the schedule
-    start_window = (10)
     ## Complete the backup within 30 minutes of starting
     completion_window = (30)
 
