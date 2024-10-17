@@ -90,7 +90,7 @@ resource "aws_sns_topic_policy" "sns_uat_policy" {
         "aws:SourceArn": "arn:aws:s3:::moj-log-files-uat"
        },
       "StringEquals": {
-        "AWS:SourceAccount": "data.aws_caller_identity.current.account_id"
+        "AWS:SourceAccount": "172753231260"
         }
       }
       }
