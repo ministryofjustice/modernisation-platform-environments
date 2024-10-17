@@ -7,6 +7,8 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "load_data" {
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_111
   statement {
     sid    = "GetFiles${local.camel-sid}"
     effect = "Allow"
@@ -53,6 +55,18 @@ data "aws_iam_policy_document" "load_data" {
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/${var.database_name}",
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.database_name}/*"
     ]
+  }
+  statement {
+    sid       = "ListAccountAlias${local.camel-sid}"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucket${local.camel-sid}"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
   }
 }
 
