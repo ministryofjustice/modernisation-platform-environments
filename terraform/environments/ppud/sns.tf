@@ -31,15 +31,56 @@ resource "aws_sns_topic" "cw_uat_alerts" {
   name  = "ppud-uat-cw-alerts"
 }
 
+/*
 resource "aws_sns_topic_policy" "sns_uat_policy" {
   count  = local.is-preproduction == true ? 1 : 0
   arn    = aws_sns_topic.cw_uat_alerts[0].arn
   policy = data.aws_iam_policy_document.sns_topic_policy_uat_ec2cw[0].json
 }
+*/
 
 resource "aws_sns_topic_subscription" "cw_uat_subscription" {
   count     = local.is-preproduction == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_uat_alerts[0].arn
   protocol  = "email"
   endpoint  = "PPUDAlerts@colt.net"
+}
+
+resource "aws_sns_topic_policy" "sns_uat_policy" {
+  count  = local.is-preproduction == true ? 1 : 0
+  arn    = aws_sns_topic.cw_uat_alerts[0].arn
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+       {
+      "Sid": "__default_statement_ID",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": [
+        "SNS:Publish",
+        "SNS:RemovePermission",
+        "SNS:SetTopicAttributes",
+        "SNS:DeleteTopic",
+        "SNS:ListSubscriptionsByTopic",
+        "SNS:GetTopicAttributes",
+        "SNS:Receive",
+        "SNS:AddPermission",
+        "SNS:Subscribe"
+      ],
+      "Resource": "aws_sns_topic.cw_uat_alerts[0].arn"
+    },
+    {
+      "Sid": "S3-to-Publish-SNS",
+      "Effect": "Allow",
+      "Principal": {
+          "Service": "s3.amazonaws.com"
+        },
+      "Action": "SNS:Publish",
+      "Resource": "aws_sns_topic.cw_uat_alerts[0].arn"
+      }
+    ]
+  })
 }
