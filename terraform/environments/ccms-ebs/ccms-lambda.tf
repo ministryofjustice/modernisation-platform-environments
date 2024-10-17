@@ -2,8 +2,8 @@
 
 resource "aws_s3_object" "lambda_layer_s3" {
   bucket = aws_s3_bucket.lambda_payment_load.bucket
-  key    = "lambda/layer.zip"
-  source = "lambda/layer.zip"
+  key    = "lambda/layerV2.zip"
+  source = "lambda/layerV2.zip"
 }
 
 # Lambda Layer
@@ -47,7 +47,7 @@ resource "aws_security_group" "lambda_security_group" {
 # Lambda Function
 resource "aws_lambda_function" "lambda_function" {
   function_name = "${local.application_name}-${local.environment}-payment-load"
-  filename      = "lambda/function.zip"
+  filename      = "lambda/functionV2.zip"
   handler       = "lambda_function.lambda_handler"
   runtime       = "python3.10"
   role          = aws_iam_role.lambda_execution_role.arn
@@ -89,14 +89,14 @@ resource "aws_lambda_permission" "allow_bucket" {
   source_arn    = aws_s3_bucket.lambda_payment_load.arn
 }
 
-resource "aws_s3_bucket_notification" "lambda_trigger" {
-  bucket = aws_s3_bucket.lambda_payment_load.id
+# resource "aws_s3_bucket_notification" "lambda_trigger" {
+#   bucket = aws_s3_bucket.lambda_payment_load.id
 
-  lambda_function {
-    lambda_function_arn = aws_lambda_function.lambda_function.arn
-    events              = ["s3:ObjectCreated:*"]
-    filter_suffix       = ".xlsx"
-  }
+#   lambda_function {
+#     lambda_function_arn = aws_lambda_function.lambda_function.arn
+#     events              = ["s3:ObjectCreated:*"]
+#     filter_suffix       = ".xlsx"
+#   }
 
-  depends_on = [aws_lambda_permission.allow_bucket]
-}
+#   depends_on = [aws_lambda_permission.allow_bucket]
+# }
