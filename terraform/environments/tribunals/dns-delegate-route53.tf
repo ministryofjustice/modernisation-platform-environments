@@ -3,9 +3,7 @@ locals {
   ec2_records = [
     "decisions",
     "asylumsupport.decisions",
-    "adminappeals.reports",
-    "charity.decisions",
-    "phl.decisions"
+    "adminappeals.reports"
   ]
 
   ec2_records_migrated = [
@@ -15,7 +13,9 @@ locals {
     "consumercreditappeals.decisions",
     "estateagentappeals.decisions",
     "siac.decisions",
-    "taxandchancery_ut.decisions"
+    "taxandchancery_ut.decisions",
+    "charity.decisions",
+    "phl.decisions"
   ]
 
   afd_records_migrated = [
