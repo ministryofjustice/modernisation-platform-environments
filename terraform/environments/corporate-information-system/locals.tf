@@ -52,7 +52,15 @@ CIS =
   )
 EOT
 
-sudo su - oracle -c "lsnrctl start LISTENER"
+# Start DB
+sqlplus / as sysdba << EOF
+shutdown abort;
+startup;
+exit;
+EOF"
+
+# Start Listener
+lsnrctl start LISTENER
 
 EOF
 }
