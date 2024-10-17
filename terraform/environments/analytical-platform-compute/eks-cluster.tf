@@ -104,13 +104,13 @@ module "eks" {
       min_size       = 1
       max_size       = 10
       desired_size   = 3
-      instance_types = ["t3.xlarge"]
+      instance_types = ["m6a.xlarge"]
     }
     airflow-high-memory = {
       min_size       = 0
       max_size       = 1
       desired_size   = 0
-      instance_types = ["r6i.8xlarge"]
+      instance_types = ["r7i.8xlarge"]
       labels = {
         high-memory = "true"
       }
