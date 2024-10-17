@@ -1,3 +1,10 @@
+resource "aws_s3_object" "aws_s3_object_pyzipfile_to_s3folder" {
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "${var.s3_pylib_dir_path}/glue_data_validation_lib.zip"
+  source = data.archive_file.archive_file_zip_py_files.output_path
+  acl    = "private"
+}
+
 resource "aws_s3_object" "dms_dv_rds_and_s3_parquet_write_v2" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "dms_dv_rds_and_s3_parquet_write_v2.py"
@@ -44,13 +51,13 @@ resource "aws_s3_object" "create_or_replace_dv_table" {
 
 resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
   name = "dms_data_validation"
-  # create_table_default_permission {
-  #   permissions = ["SELECT"]
+  create_table_default_permission {
+    permissions = ["SELECT"]
 
-  #   principal {
-  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
-  #   }
-  # }
+    principal {
+      data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+    }
+  }
 }
 
 # -------------------------------------------------------------------
@@ -99,6 +106,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--read_partition_size_mb"            = 128
     "--max_table_size_mb"                 = 4000
     "--parquet_tbl_folder_if_different"   = ""
+    "--extra-py-files"                   = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
     "--parquet_src_bucket_name"           = module.s3-dms-target-store-bucket.bucket.id
     "--parquet_output_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
@@ -285,6 +293,8 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
     "--rename_migrated_prq_tbl_folder"   = ""
     "--year_partition_bool"              = "false"
     "--month_partition_bool"             = "false"
+    "--extra-py-files"                   = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
+    # "--extra-py-files"                    = "s3://emds-dev-glue-job-store-20240917144028249000000003/reusable-pylib/glue_data_validation_lib.zip"
     "--rds_to_parquet_output_s3_bucket"  = module.s3-dms-target-store-bucket.bucket.id
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.rds_to_s3_parquet_migration.name}"
     "--enable-continuous-cloudwatch-log" = "true"
@@ -303,6 +313,7 @@ EOF
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_migration_monthly.py"
+  
   }
 
   tags = merge(
