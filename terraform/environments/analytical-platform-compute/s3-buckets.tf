@@ -37,11 +37,6 @@ module "mojap_derived_tables_replication_bucket" {
 
   acl = "private"
 
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-
   versioning = {
     status = "Disabled"
   }
@@ -78,11 +73,6 @@ module "apc_bucket_logs" {
   object_lock_enabled = false
 
   acl = "private"
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
 
   versioning = {
     status = "Disabled"
