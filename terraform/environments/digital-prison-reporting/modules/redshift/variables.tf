@@ -1,4 +1,6 @@
-variable "vpc" {}
+variable "vpc" {
+  type = string
+}
 
 variable "project_id" {
   type        = string
@@ -18,6 +20,7 @@ variable "cidr" {
 
 variable "redshift_ingress_sec_rules" {
   description = "A Map of map of security group Rules to associate with"
+  type        = map(map(any))
   default = {
     "redshift-tcp" = {
       "from_port" = 5439,
