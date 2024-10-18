@@ -57,7 +57,7 @@ module "mojap_derived_tables_replication_bucket" {
   }
 
   logging = {
-    target_bucket = "apc-bucket-logs-${local.environment}"
+    target_bucket = module.apc_bucket_logs.s3_bucket_id
     target_prefix = "mojap-derived-tables-replication/"
   }
 
