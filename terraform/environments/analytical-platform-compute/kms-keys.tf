@@ -275,6 +275,38 @@ module "mlflow_s3_kms" {
   tags = local.tags
 }
 
+module "mojap_derived_tables_replication_s3_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["s3/mojap_derived_tables_replication"]
+  description           = "mojap_derived_tables_replication S3 KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+}
+
+module "apc_bucket_logs_s3_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["s3/apc_bucket_logs"]
+  description           = "apc_bucket_logs S3 KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+}
+
 module "common_secrets_manager_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
