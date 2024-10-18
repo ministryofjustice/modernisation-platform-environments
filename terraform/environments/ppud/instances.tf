@@ -6,6 +6,8 @@
 #   Development Instances       #
 #################################
 
+# Web Server
+
 resource "aws_instance" "PPUDWEBSERVER2" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -28,6 +30,8 @@ resource "aws_instance" "PPUDWEBSERVER2" {
     backup      = true
   }
 }
+
+# Database Server
 
 resource "aws_instance" "s609693lo6vw100" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -52,6 +56,8 @@ resource "aws_instance" "s609693lo6vw100" {
   }
 }
 
+# Web Server
+
 resource "aws_instance" "s609693lo6vw101" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -74,6 +80,8 @@ resource "aws_instance" "s609693lo6vw101" {
     backup      = true
   }
 }
+
+# Secondary Doc Server
 
 resource "aws_instance" "s609693lo6vw102" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -98,6 +106,8 @@ resource "aws_instance" "s609693lo6vw102" {
   }
 }
 
+# Primary Doc Server
+
 resource "aws_instance" "s609693lo6vw103" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -120,6 +130,8 @@ resource "aws_instance" "s609693lo6vw103" {
     backup      = true
   }
 }
+
+# WAM Data Access Server
 
 resource "aws_instance" "s609693lo6vw104" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -144,6 +156,8 @@ resource "aws_instance" "s609693lo6vw104" {
   }
 }
 
+# WAM Portal Server
+
 resource "aws_instance" "s609693lo6vw105" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -166,6 +180,8 @@ resource "aws_instance" "s609693lo6vw105" {
     backup      = true
   }
 }
+
+# Development Server
 
 resource "aws_instance" "s609693lo6vw106" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -190,6 +206,8 @@ resource "aws_instance" "s609693lo6vw106" {
   }
 }
 
+# Development Server
+
 resource "aws_instance" "s609693lo6vw107" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -212,6 +230,8 @@ resource "aws_instance" "s609693lo6vw107" {
     backup      = true
   }
 }
+
+# Development Server
 
 resource "aws_instance" "s609693lo6vw108" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -236,6 +256,8 @@ resource "aws_instance" "s609693lo6vw108" {
   }
 }
 
+# Development Server
+
 resource "aws_instance" "s609693lo6vw109" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -259,6 +281,8 @@ resource "aws_instance" "s609693lo6vw109" {
   }
 }
 
+# Development Server
+
 resource "aws_instance" "s609693lo6vw110" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -267,7 +291,7 @@ resource "aws_instance" "s609693lo6vw110" {
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -283,6 +307,8 @@ resource "aws_instance" "s609693lo6vw110" {
   }
 }
 
+# PDF Conversion Test Server
+
 resource "aws_instance" "s609693lo6vw111" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -291,7 +317,7 @@ resource "aws_instance" "s609693lo6vw111" {
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Box-VW106[0].id]
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -304,6 +330,8 @@ resource "aws_instance" "s609693lo6vw111" {
     patch_group = "dev_win_patch"
   }
 }
+
+# CaR Bastion
 
 resource "aws_instance" "s609693lo6vw112" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -327,6 +355,8 @@ resource "aws_instance" "s609693lo6vw112" {
     backup      = true
   }
 }
+
+# Development Server
 
 resource "aws_instance" "s609693lo6vw113" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -355,6 +385,8 @@ resource "aws_instance" "s609693lo6vw113" {
 # Pre-Production (UAT Instances) 
 #################################
 
+# Web Server
+
 resource "aws_instance" "s618358rgvw023" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -377,6 +409,8 @@ resource "aws_instance" "s618358rgvw023" {
     backup      = true
   }
 }
+
+# UAT Doc Server
 
 resource "aws_instance" "s618358rgvw024" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -401,6 +435,8 @@ resource "aws_instance" "s618358rgvw024" {
   }
 }
 
+# WAM Sata Access Server
+
 resource "aws_instance" "s618358rgsw025" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -424,6 +460,8 @@ resource "aws_instance" "s618358rgsw025" {
   }
 }
 
+# WAN Portal Server
+
 resource "aws_instance" "s618358rgvw201" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -446,6 +484,8 @@ resource "aws_instance" "s618358rgvw201" {
     backup      = true
   }
 }
+
+# UAT Bridge Server
 
 resource "aws_instance" "S618358RGVW202" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -474,6 +514,8 @@ resource "aws_instance" "S618358RGVW202" {
 # Production Instances  #
 #########################
 
+# Web Server
+
 resource "aws_instance" "s618358rgvw019" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -496,6 +538,8 @@ resource "aws_instance" "s618358rgvw019" {
     is-production = true
   }
 }
+
+# Web Server
 
 resource "aws_instance" "s618358rgvw020" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -520,6 +564,8 @@ resource "aws_instance" "s618358rgvw020" {
   }
 }
 
+# Database Server
+
 resource "aws_instance" "s618358rgvw021" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -542,6 +588,8 @@ resource "aws_instance" "s618358rgvw021" {
     is-production = true
   }
 }
+
+# Primary Doc Server
 
 resource "aws_instance" "s618358rgvw022" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -566,6 +614,8 @@ resource "aws_instance" "s618358rgvw022" {
   }
 }
 
+# WAM Data Access Server
+
 resource "aws_instance" "s618358rgsw025p" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -588,6 +638,8 @@ resource "aws_instance" "s618358rgsw025p" {
     backup      = true
   }
 }
+
+# Secondary Doc Server
 
 resource "aws_instance" "s618358rgvw027" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -612,6 +664,8 @@ resource "aws_instance" "s618358rgvw027" {
   }
 }
 
+# WAM Portal Server
+
 resource "aws_instance" "s618358rgvw204" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -635,6 +689,8 @@ resource "aws_instance" "s618358rgvw204" {
   }
 }
 
+# UAT Bridge Server
+
 resource "aws_instance" "s618358rgvw205" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -657,6 +713,8 @@ resource "aws_instance" "s618358rgvw205" {
     is-production = true
   }
 }
+
+# Internal Mail Relay
 
 resource "aws_instance" "s266316rgsl200" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
@@ -682,6 +740,8 @@ resource "aws_instance" "s266316rgsl200" {
   }
 }
 
+# External non-CJSM Mail Relay
+
 resource "aws_instance" "s265903rgsl400-non-cjsm" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -706,6 +766,8 @@ resource "aws_instance" "s265903rgsl400-non-cjsm" {
   }
 }
 
+# External CJSM Mail Relay
+
 resource "aws_instance" "s265903rgsl401-cjsm" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
@@ -729,6 +791,8 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
     patch_group   = "prod_lin_patch"
   }
 }
+
+# Docker Build Server
 
 resource "aws_instance" "docker-build-server" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
