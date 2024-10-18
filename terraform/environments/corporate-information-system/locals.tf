@@ -30,7 +30,7 @@ exit;
 EOF" >> /tmp/oracle_startup.log 2>&1
 
 # Start Listener as oracle user
-sudo su - oracle -c 'lsnrctl start LISTENER'
+runuser -l oracle -c 'lsnrctl start LISTENER' >> /tmp/listener_startup.log 2>&1
 
 EOF
 }
