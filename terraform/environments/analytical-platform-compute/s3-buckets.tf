@@ -8,14 +8,14 @@ module "apc_buckets" {
 
   bucket                               = each.value.bucket
   force_destroy                        = each.value.force_destroy
-  object_lock_enabled                  = try(each.value.object_lock_enabled, null)
+  object_lock_enabled                  = try(each.value.object_lock_enabled, false)
   tags                                 = local.tags
   server_side_encryption_configuration = each.value.server_side_encryption_configuration
   attach_policy                        = can(each.value.policy)
   policy                               = try(each.value.policy, null)
   lifecycle_rule                       = try(each.value.lifecycle_rule, [])
-  versioning                           = try(each.value.versioning, null)
-  attach_public_policy                 = try(each.value.public_access_block, null)
+  versioning                           = try(each.value.versioning, {})
+  attach_public_policy                 = try(each.value.public_access_block, true)
   block_public_acls                    = try(each.value.public_access_block.block_public_acls, true)
   block_public_policy                  = try(each.value.public_access_block.block_public_policy, true)
   ignore_public_acls                   = try(each.value.public_access_block.ignore_public_acls, true)
