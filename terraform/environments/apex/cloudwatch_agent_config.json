@@ -90,6 +90,11 @@
             "file_path": "/home/oracle/logs/pmon_status_alert.log",
             "log_group_name": "APEX-EC2-database-pmon-status",
             "log_stream_name": "pmon-status-{instance_id}"
+          },
+          {
+            "file_path": "/home/oracle/logs/alert_log_check.txt",
+            "log_group_name": "APEX-EC2-database-alert",
+            "log_stream_name": "alertlog-{instance_id}"
           }
         ]
       }
