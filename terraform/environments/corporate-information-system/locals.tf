@@ -19,15 +19,18 @@ sed -i 's|cis.*legalservices.gov.uk:8080|${local.application_name_short}.${data.
 sed -i 's|cis.*legalservices.gov.uk|${local.application_name_short}.${data.aws_route53_zone.external.name}|' /oracle/software/product/10.2.0/network/admin/listener.ora
 sed -i 's|cis.*legalservices.gov.uk|${local.application_name_short}.${data.aws_route53_zone.external.name}|' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 
-# Set the Oracle environment variables and start DB as oracle user
-sudo su - oracle -c 'export PATH=/oracle/software/product/10.2.0/bin/:$PATH && sqlplus / as sysdba << EOF
+# Set the Oracle environment variables
+sudo su - oracle -c 'export PATH=/oracle/software/product/10.2.0/bin/:$PATH'
+
+# Start DB as oracle user
+runuser -l oracle -c "sqlplus / as sysdba <<EOF
 shutdown abort;
 startup;
 exit;
-EOF'
+EOF" >> /tmp/oracle_startup.log 2>&1
 
-# Start Listener as root user
-sudo lsnrctl start LISTENER
+# Start Listener as oracle user
+sudo su - oracle -c 'lsnrctl start LISTENER'
 
 EOF
 }
