@@ -39,6 +39,7 @@ resource "aws_db_subnet_group" "this" {
 resource "aws_rds_cluster" "this" {
   #checkov:skip=CKV2_AWS_8: "Ignore - Ensure that RDS clusters has backup plan of AWS Backup"
   #checkov:skip=CKV2_AWS_27: "Ignore - Ensure Postgres RDS as aws_rds_cluster has Query Logging enabled"
+  #checkov:skip=CKV_AWS_324: "Ensure that RDS Cluster log capture is enabled"
   count = local.create ? 1 : 0
 
   allocated_storage                   = var.allocated_storage
@@ -453,6 +454,7 @@ resource "aws_rds_cluster_activity_stream" "this" {
 ################################################################################
 
 resource "aws_secretsmanager_secret_rotation" "this" {
+  #checkov:skip=CKV_AWS_304: "Ensure Secrets Manager secrets should be rotated within 90 days"
   count = local.create && var.manage_master_user_password && var.manage_master_user_password_rotation ? 1 : 0
 
   secret_id          = aws_rds_cluster.this[0].master_user_secret[0].secret_arn
