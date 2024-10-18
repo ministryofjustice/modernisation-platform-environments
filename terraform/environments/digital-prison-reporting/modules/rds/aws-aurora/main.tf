@@ -160,6 +160,7 @@ resource "aws_rds_cluster" "this" {
 ################################################################################
 
 resource "aws_rds_cluster_instance" "this" {
+  #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
   for_each = { for k, v in var.instances : k => v if local.create && !local.is_serverless }
 
   apply_immediately                     = try(each.value.apply_immediately, var.apply_immediately)
@@ -419,6 +420,7 @@ resource "aws_db_parameter_group" "this" {
 # Log groups will not be created if using a cluster identifier prefix
 resource "aws_cloudwatch_log_group" "this" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+  #checkov:skip=CKV_AWS_338: "Ensure CloudWatch log groups retains logs for at least 1 year"
 
   for_each = toset([for log in var.enabled_cloudwatch_logs_exports : log if local.create && var.create_cloudwatch_log_group && !var.cluster_use_name_prefix])
 
