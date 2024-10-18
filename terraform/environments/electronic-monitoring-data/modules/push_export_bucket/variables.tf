@@ -1,3 +1,8 @@
+variable "core_shared_services_id" {
+  description = "The core shared services id"
+  type        = string
+}
+
 variable "destination_bucket_id" {
   description = "The id of the bucket data will be pushed to"
   type        = string
@@ -29,4 +34,9 @@ variable "logging_bucket" {
       policy = string
     })
   })
+}
+
+variable "production_dev" {
+  description = "The environment the lambda is being deployed to"
+  type        = string
 }

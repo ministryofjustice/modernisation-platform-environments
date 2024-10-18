@@ -92,8 +92,8 @@ module "push_lambda" {
   role_arn                = aws_iam_role.push_lambda.arn
   memory_size             = 1024
   timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
+  core_shared_services_id = var.core_shared_services_id
+  production_dev          = var.production_dev
   environment_variables = {
     DESTINATION_BUCKET = var.destination_bucket_id
   }
