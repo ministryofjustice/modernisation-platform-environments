@@ -52,8 +52,8 @@ locals {
         restrict_public_buckets = true
       }
     }
-    "mlflow_buckets" = {
-      bucket = "mojap-compute-${local.environment}-mlflow"
+    "mlflow_bucket" = {
+      bucket        = "mojap-compute-${local.environment}-mlflow"
       force_destroy = true
       server_side_encryption_configuration = {
         rule = {
