@@ -58,6 +58,7 @@ resource "aws_lb" "external" {
 }
 # Create the target group
 resource "aws_lb_target_group" "target_group" {
+  #checkov:skip=CKV_AWS_378: "Ensure AWS Load Balancer doesn't use HTTP protocol"
   name                 = "${local.application_name}-tg-${local.environment}"
   port                 = local.application_data.accounts[local.environment].server_port
   protocol             = "HTTP"

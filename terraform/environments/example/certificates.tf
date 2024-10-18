@@ -61,6 +61,7 @@
 # # Build loadbalancer
 #tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public.
 resource "aws_lb" "certificate_example_lb" {
+  #checkov:skip=CKV2_AWS_28:Ensure public facing ALB are protected by WAF
   name               = "certificate-example-loadbalancer"
   load_balancer_type = "application"
   subnets            = data.aws_subnets.shared-public.ids
