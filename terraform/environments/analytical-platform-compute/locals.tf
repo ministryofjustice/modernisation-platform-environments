@@ -51,6 +51,10 @@ locals {
         ignore_public_acls      = true
         restrict_public_buckets = true
       }
+      logging = {
+        target_bucket = "apc-bucket-logs-${local.environment}"
+        target_prefix = "mojap-derived-tables-replication/"
+      }
     }
     "mlflow_bucket" = {
       bucket        = "mojap-compute-${local.environment}-mlflow"
@@ -63,6 +67,30 @@ locals {
             sse_algorithm     = "aws:kms"
           }
         }
+      }
+    }
+    "apc_bucket_logs" = {
+      force_destroy       = false
+      object_lock_enabled = false
+      acl                 = "private"
+      versioning = {
+        status = "Disabled"
+      }
+      bucket = "apc-bucket-logs-${local.environment}"
+      server_side_encryption_configuration = {
+        rule = {
+          bucket_key_enabled = false
+
+          apply_server_side_encryption_by_default = {
+            sse_algorithm = "AES256"
+          }
+        }
+      }
+      public_access_block = {
+        block_public_acls       = true
+        block_public_policy     = true
+        ignore_public_acls      = true
+        restrict_public_buckets = true
       }
     }
   }
