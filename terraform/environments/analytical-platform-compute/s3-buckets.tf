@@ -15,7 +15,7 @@ module "apc_buckets" {
   policy                               = try(each.value.policy, null)
   lifecycle_rule                       = try(each.value.lifecycle_rule, [])
   versioning                           = try(each.value.versioning, {})
-  attach_public_policy                 = try(each.value.public_access_block, true)
+  attach_public_policy                 = true
   block_public_acls                    = try(each.value.public_access_block.block_public_acls, true)
   block_public_policy                  = try(each.value.public_access_block.block_public_policy, true)
   ignore_public_acls                   = try(each.value.public_access_block.ignore_public_acls, true)
