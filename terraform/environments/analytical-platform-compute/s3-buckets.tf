@@ -22,3 +22,18 @@ module "apc_buckets" {
   restrict_public_buckets              = try(each.value.public_access_block.restrict_public_buckets, true)
   acl                                  = try(each.value.acl, null)
 }
+
+moved {
+  from = module.mlflow_bucket.aws_s3_bucket.this[0]
+  to   = module.apc_buckets["mlflow_bucket"].aws_s3_bucket.this[0]
+}
+
+moved {
+  from = module.mlflow_bucket.aws_s3_bucket_public_access_block.this[0]
+  to   = module.apc_buckets["mlflow_bucket"].aws_s3_bucket_public_access_block.this[0]
+}
+
+moved {
+  from = module.mlflow_bucket.aws_s3_bucket_server_side_encryption_configuration.this[0]
+  to   = module.apc_buckets["mlflow_bucket"].aws_s3_bucket_server_side_encryption_configuration.this[0]
+}
