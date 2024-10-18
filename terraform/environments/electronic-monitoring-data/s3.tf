@@ -641,6 +641,24 @@ module "s3-mdss-specials-landing-bucket" {
   }
 }
 
+# ------------------------------------------------------------------------
+# Export buckets
+# ------------------------------------------------------------------------
+
+module "s3-p1-export-bucket" {
+  source = "./modules/push_export_bucket/"
+
+  destination_bucket_id = "tct-339712706964-prearrivals"
+  export_destination    = "p1"
+  local_bucket_prefix   = local.bucket_prefix
+  local_tags            = local.tags
+  logging_bucket        = module.s3-logging-bucket
+
+  providers = {
+    aws = aws
+  }
+}
+
 # ----------------------------------
 # Virus scanning buckets
 # ----------------------------------
