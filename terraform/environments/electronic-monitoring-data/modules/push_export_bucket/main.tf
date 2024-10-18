@@ -143,3 +143,14 @@ resource "aws_iam_role_policy_attachment" "push_lambda" {
   role       = aws_iam_role.push_lambda.name
   policy_arn = aws_iam_policy.push_lambda.arn
 }
+
+data "aws_iam_policy_document" "lambda_assume_role" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
