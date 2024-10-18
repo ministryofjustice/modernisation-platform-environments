@@ -34,7 +34,7 @@ resource "aws_security_group_rule" "egress_traffic_lb" {
 }
 
 # # Build loadbalancer
-# #tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public.
+#tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public.
 resource "aws_lb" "external" {
   name               = "${local.application_name}-loadbalancer"
   load_balancer_type = "application"
@@ -182,7 +182,8 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
 #################################################################################
 ######################### S3 Bucket required for logs  ##########################
 #################################################################################
-module "s3-bucket-lb" {                                                                                                           #tfsec:ignore:aws-s3-enable-versioning
+module "s3-bucket-lb" {
+  #tfsec:ignore:aws-s3-enable-versioning
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=568694e50e03630d99cb569eafa06a0b879a1239" #v7.1.0
 
   bucket_prefix      = "s3-bucket-example-lb"
