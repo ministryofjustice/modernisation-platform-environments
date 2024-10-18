@@ -9,60 +9,25 @@ locals {
 
 hostname ${local.application_name_short}
 
-# Use sed to replace the line in the file
+# Increase ssh session timeout
 sed -i 's/#ClientAliveInterval.*/ClientAliveInterval 1200/' /etc/ssh/sshd_config
 sed -i 's/#ClientAliveCountMax.*/ClientAliveCountMax 3/' /etc/ssh/sshd_config
-sed -i 's|cis.aws.tst.legalservices.gov.uk:8080|${local.application_name_short}.${data.aws_route53_zone.external.name}:8080|' /home/batman/bin/dkj-shell-funcs
 service sshd restart 
 
+# Changes to oracle files
+sed -i 's|cis.*legalservices.gov.uk:8080|${local.application_name_short}.${data.aws_route53_zone.external.name}:8080|' /home/batman/bin/dkj-shell-funcs
+sed -i 's|cis.*legalservices.gov.uk|${local.application_name_short}.${data.aws_route53_zone.external.name}|' /oracle/software/product/10.2.0/network/admin/listener.ora
+sed -i 's|cis.*legalservices.gov.uk|${local.application_name_short}.${data.aws_route53_zone.external.name}|' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 
-sudo su - oracle
-export PATH=/oracle/software/product/10.2.0/bin/:$PATH
-
-cat <<EOT > /oracle/software/product/10.2.0/network/admin/listener.ora
-SID_LIST_LISTENER =
-  (SID_LIST =
-    (SID_DESC =
-      (SID_NAME = PLSExtProc)
-      (ORACLE_HOME = /oracle/software/product/10.2.0)
-      (PROGRAM = extproc)
-    )
-    (SID_DESC =
-      (SID_NAME = CIS)
-      (ORACLE_HOME = /oracle/software/product/10.2.0)
-    )
-  )
-
-LISTENER =
-  (DESCRIPTION_LIST =
-    (DESCRIPTION =
-      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1))
-      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name_short}.${data.aws_route53_zone.external.name})(PORT = 1521))
-    )
-  )
-EOT
-
-cat <<EOT > /oracle/software/product/10.2.0/network/admin/tnsnames.ora
-CIS =
-  (DESCRIPTION =
-    (ADDRESS_LIST =
-      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name_short}.${data.aws_route53_zone.external.name})(PORT = 1521))
-    )
-    (CONNECT_DATA =
-      (SID = CIS)
-    )
-  )
-EOT
-
-# Start DB
-sqlplus / as sysdba << EOF
+# Set the Oracle environment variables and start DB as oracle user
+sudo su - oracle -c 'export PATH=/oracle/software/product/10.2.0/bin/:$PATH && sqlplus / as sysdba << EOF
 shutdown abort;
 startup;
 exit;
-EOF"
+EOF'
 
-# Start Listener
-lsnrctl start LISTENER
+# Start Listener as root user
+sudo lsnrctl start LISTENER
 
 EOF
 }
