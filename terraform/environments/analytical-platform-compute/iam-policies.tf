@@ -123,7 +123,7 @@ data "aws_iam_policy_document" "mlflow" {
     effect  = "Allow"
     actions = ["s3:ListBucket"]
     resources = [
-      module.apc_buckets["mlflow_bucket"].s3_bucket_arn,
+      module.mlflow_bucket.s3_bucket_arn,
       "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}"
     ]
   }
@@ -136,7 +136,7 @@ data "aws_iam_policy_document" "mlflow" {
       "s3:DeleteObject"
     ]
     resources = [
-      "${module.apc_buckets["mlflow_bucket"].s3_bucket_arn}/*",
+      "${module.mlflow_bucket.s3_bucket_arn}/*",
       "arn:aws:s3:::${local.environment_configuration.mlflow_s3_bucket_name}/*"
     ]
   }

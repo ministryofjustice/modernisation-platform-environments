@@ -25,4 +25,5 @@ locals {
 
   /* Environment Configuration */
   environment_configuration = local.environment_configurations[local.environment]
+
 }
