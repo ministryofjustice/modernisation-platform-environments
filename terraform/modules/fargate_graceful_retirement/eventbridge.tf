@@ -3,7 +3,6 @@ resource "aws_cloudwatch_event_rule" "ecs_restart_rule" {
   description = "Rule to catch AWS ECS Task Patching Retirement events"
   event_pattern = jsonencode({
     "source" : ["aws.health"],
-    "detail-type" : ["AWS Health Event"],
     "detail" : {
       "eventTypeCode" : ["AWS_ECS_TASK_PATCHING_RETIREMENT"]
     }

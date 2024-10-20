@@ -29,9 +29,20 @@ resource "aws_iam_role_policy" "step_function_policy" {
     ]
   })
 }
+
+resource "aws_cloudwatch_log_group" "log_group_for_sfn" {
+  name = "/aws/states/ecs_restart_state_machine"
+}
+
 resource "aws_sfn_state_machine" "ecs_restart_state_machine" {
   name     = "ecs_restart_state_machine"
   role_arn = aws_iam_role.step_function_role.arn
+
+  logging_configuration {
+    log_destination        = "${aws_cloudwatch_log_group.log_group_for_sfn.arn}:*"
+    include_execution_data = var.debug_logging ? true : false
+    level                  = var.debug_logging ? "ALL" : "ERROR"
+  }
 
   definition = jsonencode({
     Comment : "State Machine to handle ECS Task Patching Retirement",
