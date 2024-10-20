@@ -184,7 +184,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
 
 # S3 Bucket - R-sync
 module "s3-bucket-dbbackup" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.0"
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
