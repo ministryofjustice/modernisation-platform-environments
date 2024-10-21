@@ -50,15 +50,13 @@ locals {
 }
 
 module "athena_source" {
-  for_each = {
-    for config in local.flattened_athena_configs : config.key => config
-  }
+  for_each = local.flattened_athena_configs
 
   source = "../../grafana/athena-source"
 
-  name          = each.key
+  name          = each.value.key
   account_id    = each.value.account_id
-  athena_config = try(each.value.athena_config, {})
+  athena_config = try(each.value, {})
 }
 
 module "prometheus_push" {

@@ -60,11 +60,6 @@ data "grafana_data_source" "athena" {
     for name, config in var.aws_accounts : name => config if config.athena_enabled
   }
 
-  # for_each = {
-  #   for name, config  in var.accounts :
-  #   for name, athena_config in config : name => config if config.enabled
-  # }
-
   name = "${each.key}-athena"
 }
 
