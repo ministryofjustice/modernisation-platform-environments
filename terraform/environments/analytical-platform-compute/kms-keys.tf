@@ -305,6 +305,8 @@ module "apc_bucket_logs_s3_kms" {
   deletion_window_in_days = 7
 
   tags = local.tags
+
+  policy = data.aws_iam_policy_document.kms_key_policy.json
 }
 
 module "common_secrets_manager_kms" {

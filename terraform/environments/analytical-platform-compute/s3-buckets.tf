@@ -89,4 +89,6 @@ module "apc_bucket_logs" {
   }
 
   tags = local.tags
+
+  policy = data.aws_iam_policy_document.s3_server_access_logs_policy.json
 }
