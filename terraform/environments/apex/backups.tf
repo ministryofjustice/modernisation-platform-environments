@@ -63,7 +63,7 @@ resource "aws_backup_vault_policy" "apex" {
 
 resource "aws_backup_vault" "prod_apex" {
   count = local.environment == "production" ? 1 : 0
-  name = "${local.application_name}-production-backup-vault"
+  name  = "${local.application_name}-production-backup-vault"
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-production-backup-vault" },
