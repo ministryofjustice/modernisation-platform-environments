@@ -25,7 +25,8 @@ resource "aws_instance" "apex_db_instance" {
     volume_type           = "gp2"
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_name}db-ec2-root" }
+      { "Name" = "${local.application_name}db-ec2-root" },
+      { "backup" = "false" }
     )
   }
 
@@ -33,6 +34,7 @@ resource "aws_instance" "apex_db_instance" {
     local.tags,
     { "Name" = local.database_ec2_name },
     { "instance-scheduling" = "skip-scheduling" },
+    { "backup" = "false" },
     local.backup_schedule_tags
   )
 }
@@ -176,7 +178,8 @@ resource "aws_ebs_volume" "u01-orahome" {
   }
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}db-ec2-u01-orahome" }
+    { "Name" = "${local.application_name}db-ec2-u01-orahome" },
+    { "backup" = "false" }
   )
 }
 resource "aws_volume_attachment" "u01-orahome" {
@@ -197,7 +200,8 @@ resource "aws_ebs_volume" "u02-oradata" {
   }
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}db-ec2-u02-oradata" }
+    { "Name" = "${local.application_name}db-ec2-u02-oradata" },
+    { "backup" = "false" }
   )
 }
 
@@ -221,7 +225,8 @@ resource "aws_ebs_volume" "u03-redo" {
   }
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}db-ec2-u03-redo" }
+    { "Name" = "${local.application_name}db-ec2-u03-redo" },
+    { "backup" = "false" }
   )
 }
 resource "aws_volume_attachment" "u03-redo" {
@@ -242,7 +247,8 @@ resource "aws_ebs_volume" "u04-arch" {
   }
   tags = merge(
     local.tags,
-    { "Name" = "${local.application_name}db-ec2-u04-arch" }
+    { "Name" = "${local.application_name}db-ec2-u04-arch" },
+    { "backup" = "false" }
   )
 }
 resource "aws_volume_attachment" "u04-arch" {

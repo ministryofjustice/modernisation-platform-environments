@@ -148,19 +148,19 @@ resource "aws_launch_template" "ec2-launch-template" {
     resource_type = "instance"
     tags = merge(tomap({
       "Name" = "${var.app_name}-ecs-cluster"
-    }), var.tags_common)
+    }), var.tags_common, { "backup" = "false" })
   }
 
   tag_specifications {
     resource_type = "volume"
     tags = merge(tomap({
       "Name" = "${var.app_name}-ecs-cluster"
-    }), var.tags_common)
+    }), var.tags_common, { "backup" = "false" })
   }
 
   tags = merge(tomap({
     "Name" = "${var.app_name}-ecs-cluster-template"
-  }), var.tags_common)
+  }), var.tags_common, { "backup" = "false" })
 }
 
 # IAM Role, policy and instance profile (to attach the role to the EC2)
