@@ -28,12 +28,7 @@ resource "aws_iam_policy" "step_function_policy" {
       {
         Effect   = "Allow"
         Action   = "logs:*",
-        Resource = aws_cloudwatch_log_group.log_group_for_sfn.arn
-      },
-      {
-        Effect   = "Allow"
-        Action   = "logs:*",
-        Resource = "${aws_cloudwatch_log_group.log_group_for_sfn.arn}:*"
+        Resource = "*"
       }
     ]
   })
