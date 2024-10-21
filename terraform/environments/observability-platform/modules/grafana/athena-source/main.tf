@@ -8,16 +8,14 @@ data "grafana_data_source" "this" {
 }
 
 resource "grafana_data_source" "this" {
-  for_each = var.athena_config
-
   type = "athena"
-  name = "${local.name}-${each.key}"
+  name = "${var.athena_workgroup}-${var.athena_database}"
   json_data_encoded = jsonencode({
     defaultRegion = "eu-west-2"
     authType      = "ec2_iam_role"
     assumeRoleArn = "arn:aws:iam::${var.account_id}:role/observability-platform"
     externalId    = var.name
-    database      = each.value.database
-    workgroup     = each.value.workgroup
+    database      = var.athena_database
+    workgroup     = var.athena_workgroup
   })
 }

@@ -11,9 +11,10 @@ variable "athena_enabled" {
   default = false
 }
 
-variable "athena_config" {
-  type = map(object({
-    database  = string
-    workgroup = string
-  }))
+variable "athena_workgroup" {
+  type = string
+}
+
+variable "athena_database" {
+  type = string
 }
