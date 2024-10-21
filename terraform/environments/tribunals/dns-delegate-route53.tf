@@ -83,8 +83,8 @@ resource "aws_route53_record" "nginx_instances" {
   type     = "A"
 
   alias {
-    name                   = module.nginx_load_balancer[0].nginx_lb_arn
-    zone_id                = module.nginx_load_balancer[0].nginx_lb_zone_id
+    name                   = "tribunals-nginx-1184258455.eu-west-1.elb.amazonaws.com."
+    zone_id                = "Z32O12XQLNTSW2"
     evaluate_target_health = false
   }
 }
