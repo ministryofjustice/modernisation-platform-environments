@@ -50,11 +50,13 @@ locals {
 }
 
 module "athena_source" {
-  for_each = toset(local.flattened_athena_configs)
+  for_each = {
+    for config in local.flattened_athena_configs : config.key => config
+  }
 
   source = "../../grafana/athena-source"
 
-  name          = each.value.key
+  name          = each.key
   account_id    = each.value.account_id
   athena_config = try(each.value, {})
 }
