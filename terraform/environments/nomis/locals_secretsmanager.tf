@@ -32,6 +32,7 @@ locals {
       secrets = {
         passwords = { description = "weblogic passwords" }
         rms       = { description = "combined reporting secrets" }
+        rms_aws   = { description = "AWS hosted combined reporting secrets" }
       }
     }
   }
