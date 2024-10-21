@@ -2,13 +2,13 @@
   "accounts": {
     "development": {
       "example_var": "dev-data",
-      "ec2amiid": "ami-03d0d0eb244802768",
+      "ec2amiid": "ami-0670a3dc141371945",
       "ec2instancetype": "r5a.large",
       "bucketname": "laa-oracle-software",
       "orahomesize": "200",
-      "orahome_snapshot": "snap-000cca2e00ed8884c",
+      "orahome_snapshot": "snap-0a196b44746d537ff",
       "stageesize": "150",
-      "stage_snapshot": "snap-0d80891d0e25558d6",
+      "stage_snapshot": "snap-0be49537fb409437c",
       "managementcidr": "10.200.0.0/20",
       "outbound_access_cidr": "0.0.0.0/0",
       "inbound_cidr_lz": "10.202.0.0/20",
