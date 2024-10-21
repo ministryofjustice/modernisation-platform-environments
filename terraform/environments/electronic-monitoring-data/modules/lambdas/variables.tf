@@ -11,6 +11,13 @@ variable "filename" {
   default     = null
 }
 
+variable "image_name" {
+  description = "The name of the image function."
+  type        = string
+  nullable    = true
+  default     = null
+}
+
 variable "function_name" {
   description = "A unique name for your Lambda Function."
   type        = string
