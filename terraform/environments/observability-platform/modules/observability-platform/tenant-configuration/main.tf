@@ -41,7 +41,7 @@ locals {
     for env_name, env_data in var.aws_accounts : [
       for config_name, config_data in try(env_data.athena_config, {}) : {
         key        = "${env_name}-${config_name}"
-        account_id = var.environment_management.account_ids[env_name]
+        account_id = nonsensitive(var.environment_management.account_ids[env_name])
         database   = config_data.database
         workgroup  = config_data.workgroup
       }
@@ -55,7 +55,7 @@ module "athena_source" {
   source = "../../grafana/athena-source"
 
   name          = each.value.key
-  account_id    = nonsensitive(each.value.account_id)
+  account_id    = each.value.account_id
   athena_config = try(each.value, {})
 }
 
