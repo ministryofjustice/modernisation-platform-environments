@@ -26,6 +26,16 @@ resource "aws_iam_role_policy" "step_function_policy" {
         Action   = "lambda:InvokeFunction",
         Resource = [aws_lambda_function.ecs_restart_handler.arn, aws_lambda_function.calculate_wait_time.arn]
       },
+      {
+        Effect   = "Allow"
+        Action   = "logs:*",
+        Resource = aws_cloudwatch_log_group.log_group_for_sfn.arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = "logs:*",
+        Resource = "${aws_cloudwatch_log_group.log_group_for_sfn.arn}:*"
+      }
     ]
   })
 }
