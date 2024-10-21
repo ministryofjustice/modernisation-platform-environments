@@ -45,7 +45,7 @@ module "get_zipped_file" {
       "pre_signed_url_lambda_name" = module.unzipped_presigned_url.lambda_function_name
     }
   )
-  type = "EXPRESS"
+  type = "STANDARD"
 }
 
 # delete in a later PR
