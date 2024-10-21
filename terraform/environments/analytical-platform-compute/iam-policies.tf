@@ -298,7 +298,7 @@ data "aws_iam_policy_document" "kms_key_policy" {
       "kms:DescribeKey"
     ]
 
-    resources = ["*"]
+    resources = [module.apc_bucket_logs_s3_kms.key_arn]
   }
 }
 
@@ -317,14 +317,8 @@ data "aws_iam_policy_document" "s3_server_access_logs_policy" {
     ]
 
     resources = [
-      "arn:aws:s3:::apc-bucket-logs-${local.environment}/*"
+      "${module.apc_bucket_logs.s3_bucket_arn}/*"
     ]
-
-    condition {
-      test     = "ArnLike"
-      variable = "aws:SourceArn"
-      values   = ["arn:aws:s3:::apc-bucket-logs-${local.environment}"]
-    }
 
     condition {
       test     = "StringEquals"
