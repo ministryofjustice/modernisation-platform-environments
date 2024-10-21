@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "all_health_events" {
 }
 
 resource "aws_cloudwatch_log_resource_policy" "all_health_events" {
-  policy_document = data.aws_iam_policy_document.example_log_policy.json
+  policy_document = data.aws_iam_policy_document.all_health_events.json
   policy_name     = "all-health-events-log-publishing-policy"
 }
 
