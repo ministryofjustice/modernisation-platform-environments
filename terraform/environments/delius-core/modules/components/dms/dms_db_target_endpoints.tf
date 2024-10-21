@@ -16,7 +16,7 @@ resource "aws_dms_endpoint" "dms_user_target_endpoint_db" {
   certificate_arn = aws_dms_certificate.empty_oracle_wallet.certificate_arn
   # Ignore subsequent replacement with a valid wallet
   lifecycle {
-     ignore_changes = [certificate_arn]
+    ignore_changes = [certificate_arn]
   }
   depends_on = [aws_dms_certificate.empty_oracle_wallet]
 }
@@ -38,7 +38,7 @@ resource "aws_dms_endpoint" "dms_audit_target_endpoint_db" {
   certificate_arn = aws_dms_certificate.empty_oracle_wallet.certificate_arn
   # Ignore subsequent replacement with a valid wallet
   lifecycle {
-     ignore_changes = [certificate_arn]
+    ignore_changes = [certificate_arn]
   }
   depends_on = [aws_dms_certificate.empty_oracle_wallet]
 }

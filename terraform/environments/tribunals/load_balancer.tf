@@ -77,6 +77,8 @@ data "aws_instances" "tribunals_instance" {
   }
 }
 
+# Make sure that the ec2 instance tagged as 'tribunals-instance' exists
+# before adding aws_lb_target_group_attachment, otherwise terraform will fail
 resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
   for_each         = aws_lb_target_group.tribunals_target_group
   target_group_arn = each.value.arn
