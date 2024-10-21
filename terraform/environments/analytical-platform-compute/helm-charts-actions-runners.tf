@@ -135,3 +135,29 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr_pp" {
     )
   ]
 }
+
+# ---------------------------------------------------
+# EM test account
+# ---------------------------------------------------
+resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds_test" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
+  name       = "actions-runner-mojas-create-a-derived-table-emds-test"
+  repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
+  version    = "2.320.0-1"
+  chart      = "actions-runner"
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
+      {
+        github_organisation  = "moj-analytical-services"
+        github_repository    = "create-a-derived-table"
+        github_token         = data.aws_secretsmanager_secret_version.actions_runners_create_a_derived_table[0].secret_string
+        github_runner_labels = "electronic-monitoring-data-test"
+        eks_role_arn         = "arn:aws:iam::396913731313:role/emds-test-data-api-cross-account-role"
+      }
+    )
+  ]
+}
