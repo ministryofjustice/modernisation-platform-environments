@@ -40,6 +40,11 @@ resource "aws_iam_role_policy" "step_function_policy" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "step_function_policy_attachment" {
+  policy_arn = aws_iam_role_policy.step_function_policy.arn
+  role       = aws_iam_role.step_function_role.name
+}
+
 resource "aws_cloudwatch_log_group" "log_group_for_sfn" {
   name = "/aws/states/ecs_restart_state_machine"
 }
