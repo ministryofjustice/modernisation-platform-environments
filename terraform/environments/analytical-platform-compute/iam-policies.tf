@@ -280,3 +280,50 @@ module "analytical_platform_lake_formation_share_policy" {
 
   policy = data.aws_iam_policy_document.analytical_platform_share_policy.json
 }
+
+data "aws_iam_policy_document" "kms_key_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:GenerateDataKeyWithoutPlaintext",
+      "kms:DescribeKey"
+    ]
+
+    resources = [module.apc_bucket_logs_s3_kms.key_arn]
+  }
+}
+
+data "aws_iam_policy_document" "s3_server_access_logs_policy" {
+  statement {
+    sid    = "S3ServerAccessLogsPolicy"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "${module.apc_bucket_logs.s3_bucket_arn}/*"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
