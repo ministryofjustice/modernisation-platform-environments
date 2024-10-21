@@ -15,9 +15,8 @@ resource "aws_iam_role" "step_function_role" {
   })
 }
 
-resource "aws_iam_role_policy" "step_function_policy" {
+resource "aws_iam_policy" "step_function_policy" {
   name = "step_function_policy"
-  role = aws_iam_role.step_function_role.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -41,7 +40,7 @@ resource "aws_iam_role_policy" "step_function_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "step_function_policy_attachment" {
-  policy_arn = aws_iam_role_policy.step_function_policy.arn
+  policy_arn = aws_iam_policy.step_function_policy.arn
   role       = aws_iam_role.step_function_role.name
 }
 
