@@ -78,7 +78,7 @@ locals {
   app_db_password_name = "APP_APEX_DBPASSWORD_TAD"
   db_hostname          = "db.${local.application_name}"
 
-  backup_schedule_tags = local.environment == "production" ? { "snapshot-35-day-retention" = "yes" } : null
+  backup_schedule_tags       = local.environment == "production" ? { "snapshot-35-day-retention" = "yes" } : null
   database-instance-userdata = <<EOF
 #!/bin/bash
 cd /tmp

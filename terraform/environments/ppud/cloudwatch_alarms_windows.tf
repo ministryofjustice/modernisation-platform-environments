@@ -428,7 +428,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-signature-update-failed" {
   alarm_description   = "Monitors for windows defender malware signature update failed events"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance = each.key
+    Instance               = each.key
     MalwareSignatureFailed = "MalwareSignatureFailed"
   }
 }
@@ -450,7 +450,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-state-detected" {
   alarm_description   = "Monitors for windows defender malware state detected events"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance = each.key
+    Instance             = each.key
     MalwareStateDetected = "MalwareStateDetected"
   }
 }
@@ -472,7 +472,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-scan-failed" {
   alarm_description   = "Monitors for windows defender malware scan failed events"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance = each.key
+    Instance          = each.key
     MalwareScanFailed = "MalwareScanFailed"
   }
 }
@@ -494,7 +494,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-engine-update-failed" {
   alarm_description   = "Monitors for windows defender malware engine update events"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance = each.key
+    Instance            = each.key
     MalwareEngineFailed = "MalwareEngineFailed"
   }
 }
@@ -516,7 +516,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-engine-out-of-date" {
   alarm_description   = "Monitors for windows defender malware engine out of date events"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance = each.key
+    Instance               = each.key
     MalwareEngineOutofDate = "MalwareEngineOutofDate"
   }
 }
@@ -538,7 +538,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-behavior-detected" {
   alarm_description   = "Monitors for windows defender malware behavior detected events"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance = each.key
+    Instance                = each.key
     MalwareBehaviorDetected = "MalwareBehaviorDetected"
   }
 }
