@@ -81,7 +81,7 @@ resource "aws_iam_role" "api_gateway_role" {
 
 data "aws_iam_policy_document" "trigger_step_function_policy" {
   statement {
-    actions   = ["states:StartExecution"]
+    actions   = ["states:StartExecution", "states:StartSyncExecution"]
     effect    = "Allow"
     resources = [var.step_function.arn]
   }
