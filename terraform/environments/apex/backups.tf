@@ -57,13 +57,13 @@ resource "aws_backup_vault_policy" "apex" {
 }
 
 ############################################################################
-## This following is required for setting up hourly backup for production
+## This following is required for setting up backup for production
 ############################################################################
 
 
 resource "aws_backup_vault" "prod_apex" {
   count = local.environment == "production" ? 1 : 0
-  name = "${local.application_name}-production-backup-vault"
+  name  = "${local.application_name}-production-backup-vault"
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-production-backup-vault" },
@@ -72,14 +72,14 @@ resource "aws_backup_vault" "prod_apex" {
 
 resource "aws_backup_plan" "prod_apex" {
   count = local.environment == "production" ? 1 : 0
-  name  = "${local.application_name}-backup-hourly-retain-35-days"
+  name  = "${local.application_name}-backup-retain-35-days"
 
   rule {
-    rule_name         = "${local.application_name}-backup-hourly-retain-35-days"
+    rule_name         = "${local.application_name}-backup-retain-35-days"
     target_vault_name = aws_backup_vault.prod_apex[0].name
 
-    # Backup hourly
-    schedule = "cron(0 * * * ? *)"
+    # Backup every 6 hours on the hour
+    schedule = "cron(0 0,6,12,18 * * ? *)"
 
     lifecycle {
       delete_after = 35
@@ -108,7 +108,7 @@ resource "aws_backup_selection" "prod_apex" {
 
   condition {
     string_equals {
-      key   = "aws:ResourceTag/snapshot-with-hourly-35-day-retention"
+      key   = "aws:ResourceTag/snapshot-35-day-retention"
       value = "yes"
     }
     # TODO tags required to be confirmed

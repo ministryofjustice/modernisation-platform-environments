@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "cwa_vault" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::411213865113:root"]
+      identifiers = ["arn:aws:iam::${local.application_data.accounts[local.environment].lz_account_id}:root"]
     }
 
     actions = [

@@ -389,6 +389,9 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-prod" {
   restrict_public_buckets = true
 }
 
+# Removed S3 bucket notification pending AWS ticket resolution
+
+/*
 resource "aws_s3_bucket_notification" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-prod[0].id
@@ -399,28 +402,29 @@ resource "aws_s3_bucket_notification" "moj-log-files-prod" {
     filter_prefix = "alb-logs/"
   }
 }
+*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.moj-log-files-prod[0].id
   rule {
-      id     = "Move-to-IA-then-delete-moj-log-files-prod"
-      status = "Enabled"
-      abort_incomplete_multipart_upload {
+    id     = "Move-to-IA-then-delete-moj-log-files-prod"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
       days_after_initiation = 7
-      }
-      noncurrent_version_transition {
-        noncurrent_days = 30
-        storage_class   = "STANDARD_IA"
-      }
-      transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-      expiration {
-        days = 365
-      }
     }
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+    expiration {
+      days = 365
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "moj-log-files-prod" {
@@ -560,6 +564,9 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-uat" {
   restrict_public_buckets = true
 }
 
+# Removed S3 bucket notification pending AWS ticket resolution
+
+/*
 resource "aws_s3_bucket_notification" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-uat[0].id
@@ -570,28 +577,29 @@ resource "aws_s3_bucket_notification" "moj-log-files-uat" {
     filter_prefix = "alb-logs/"
   }
 }
+*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0
   bucket = aws_s3_bucket.moj-log-files-uat[0].id
   rule {
-      id     = "Move-to-IA-then-delete-moj-log-files-uat"
-      status = "Enabled"
-      abort_incomplete_multipart_upload {
+    id     = "Move-to-IA-then-delete-moj-log-files-uat"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
       days_after_initiation = 7
-      }
-      noncurrent_version_transition {
-        noncurrent_days = 30
-        storage_class   = "STANDARD_IA"
-      }
-      transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-      expiration {
-        days = 365
-      }
     }
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+    expiration {
+      days = 365
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "moj-log-files-uat" {
@@ -695,7 +703,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
           Service = "elasticloadbalancing.amazonaws.com"
         }
       }
-     ]
+    ]
   })
 }
 
@@ -737,23 +745,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
   count  = local.is-development == true ? 1 : 0
   bucket = aws_s3_bucket.moj-log-files-dev[0].id
   rule {
-      id     = "Move-to-IA-then-delete-moj-log-files-dev"
-      status = "Enabled"
-      abort_incomplete_multipart_upload {
+    id     = "Move-to-IA-then-delete-moj-log-files-dev"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
       days_after_initiation = 7
-      }
-      noncurrent_version_transition {
-        noncurrent_days = 30
-        storage_class   = "STANDARD_IA"
-      }
-      transition {
-        days          = 30
-        storage_class = "STANDARD_IA"
-      }
-      expiration {
-        days = 365
-      }
     }
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+    expiration {
+      days = 365
+    }
+  }
 }
 
 resource "aws_s3_bucket_policy" "moj-log-files-dev" {

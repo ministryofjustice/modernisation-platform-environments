@@ -637,6 +637,8 @@ module "glue_data_reconciliation_job" {
     "--dpr.reconciliation.datasource.glue.connection.name"        = aws_glue_connection.glue_nomis_connection[0].name
     "--dpr.reconciliation.datasource.source.schema.name"          = "OMS_OWNER"
     "--dpr.reconciliation.datasource.should.uppercase.tablenames" = "true"
+    "--dpr.reconciliation.fail.job.if.checks.fail"                = "true"
+    "--dpr.reconciliation.report.results.to.cloudwatch"           = "false"
   })
 }
 

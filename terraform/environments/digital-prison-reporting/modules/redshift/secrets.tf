@@ -17,6 +17,7 @@ resource "random_string" "unique_suffix" {
 
 resource "aws_secretsmanager_secret" "redshift_connection" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   description = "Redshift connect details"
   name        = "${var.project_id}-redshift-secret-${var.env}"
