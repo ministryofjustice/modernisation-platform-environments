@@ -33,3 +33,7 @@ data "dns_a_record_set" "datasync_activation_nlb" {
 data "aws_network_interface" "datasync_vpc_endpoint" {
   id = tolist(module.connected_vpc_endpoints.endpoints["datasync"].network_interface_ids)[0]
 }
+
+data "aws_ec2_transit_gateway" "moj_tgw" {
+  id = "tgw-026162f1ba39ce704"
+}
