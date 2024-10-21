@@ -50,7 +50,7 @@ locals {
 }
 
 module "athena_source" {
-  for_each = local.flattened_athena_configs
+  for_each = toset(local.flattened_athena_configs)
 
   source = "../../grafana/athena-source"
 
