@@ -55,7 +55,7 @@ module "athena_source" {
   source = "../../grafana/athena-source"
 
   name          = each.value.key
-  account_id    = each.value.account_id
+  account_id    = nonsensitive(each.value.account_id)
   athena_config = try(each.value, {})
 }
 
