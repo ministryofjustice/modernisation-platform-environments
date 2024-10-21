@@ -133,14 +133,15 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "ncr/TM-596/preprod-nomis-link-test"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment    = "preprod"
-          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-name       = "PPCNOM"
+          nomis-environment     = "preprod"
+          oracle-db-hostname-a  = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b  = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name        = "PPCNOM"
+          reporting-environment = "aws"
         })
       })
 
