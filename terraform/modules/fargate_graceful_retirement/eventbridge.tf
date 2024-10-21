@@ -31,46 +31,57 @@ resource "aws_cloudwatch_log_group" "all_health_events" {
   name = "/aws/health/all_health_events"
 }
 
-# create IAM role for CloudWatch Logs
-resource "aws_iam_role" "cloudwatch_logs_role" {
-  name = "cloudwatch_logs_role"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Principal = {
-          Service = "events.amazonaws.com"
-        },
-        Action = "sts:AssumeRole"
-      }
+data "aws_iam_policy_document" "all_health_events" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream"
     ]
-  })
+
+    resources = [
+      "${aws_cloudwatch_log_group.all_health_events.arn}:*"
+    ]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+        "delivery.logs.amazonaws.com"
+      ]
+    }
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:PutLogEvents"
+    ]
+
+    resources = [
+      "${aws_cloudwatch_log_group.all_health_events.arn}:*:*"
+    ]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+        "delivery.logs.amazonaws.com"
+      ]
+    }
+
+    condition {
+      test     = "ArnEquals"
+      values   = [aws_cloudwatch_event_rule.all_health_events.arn]
+      variable = "aws:SourceArn"
+    }
+  }
 }
 
-resource "aws_iam_role_policy" "cloudwatch_logs_policy" {
-  name = "cloudwatch_logs_policy"
-  role = aws_iam_role.cloudwatch_logs_role.id
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        Resource = "*"
-      }
-    ]
-  })
+resource "aws_cloudwatch_log_resource_policy" "all_health_events" {
+  policy_document = data.aws_iam_policy_document.example_log_policy.json
+  policy_name     = "all-health-events-log-publishing-policy"
 }
 
-# log all health events to cloudwatch logs
-resource "aws_cloudwatch_event_target" "log_all_health_events" {
-  rule     = aws_cloudwatch_event_rule.all_health_events.name
-  arn      = aws_cloudwatch_log_group.all_health_events.arn
-  role_arn = aws_iam_role.cloudwatch_logs_role.arn
+resource "aws_cloudwatch_event_target" "all_health_events" {
+  rule = aws_cloudwatch_event_rule.all_health_events.name
+  arn  = aws_cloudwatch_log_group.all_health_events.arn
 }
