@@ -27,6 +27,10 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
+    remotedesktop_gateways = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name]
+    ])
   }
   security_group_cidrs_preprod_prod = {
     icmp = flatten([
@@ -54,6 +58,10 @@ locals {
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
+    remotedesktop_gateways = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name]
     ])
   }
 
@@ -195,6 +203,20 @@ locals {
           to_port     = 0
           protocol    = -1
           self        = true
+        }
+        rdp_tcp_web = {
+          description = "3389: Allow RDP TCP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
+        }
+        rdp_udp_web = {
+          description = "3389: Allow RDP UDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
         }
       }
       egress = {
