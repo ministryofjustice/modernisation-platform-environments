@@ -281,7 +281,8 @@ module "analytical_platform_lake_formation_share_policy" {
   policy = data.aws_iam_policy_document.analytical_platform_share_policy.json
 }
 
-data "aws_iam_policy_document" "kms_key_policy" {
+data "aws_iam_policy_document" "apc_bucket_logs_kms_key_policy" {
+  #checkov:skip=CKV_AWS_356:resource "*" limited by condition
   statement {
     effect = "Allow"
 
@@ -298,11 +299,18 @@ data "aws_iam_policy_document" "kms_key_policy" {
       "kms:DescribeKey"
     ]
 
-    resources = [module.apc_bucket_logs_s3_kms.key_arn]
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "kms:ViaService"
+      values   = ["logging.s3.amazonaws.com"]
+    }
   }
 }
 
 data "aws_iam_policy_document" "s3_server_access_logs_policy" {
+  #checkov:skip=CKV_AWS_356:resource "*" limited by condition
   statement {
     sid    = "S3ServerAccessLogsPolicy"
     effect = "Allow"
@@ -317,7 +325,7 @@ data "aws_iam_policy_document" "s3_server_access_logs_policy" {
     ]
 
     resources = [
-      "${module.apc_bucket_logs.s3_bucket_arn}/*"
+      "*"
     ]
 
     condition {

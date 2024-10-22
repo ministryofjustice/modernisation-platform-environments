@@ -306,7 +306,7 @@ module "apc_bucket_logs_s3_kms" {
 
   tags = local.tags
 
-  policy = data.aws_iam_policy_document.kms_key_policy.json
+  policy = data.aws_iam_policy_document.apc_bucket_logs_kms_key_policy.json
 }
 
 module "common_secrets_manager_kms" {
