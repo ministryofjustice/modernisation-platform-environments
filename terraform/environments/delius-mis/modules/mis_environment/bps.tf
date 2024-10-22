@@ -1,10 +1,11 @@
+# checkov:skip=CKV2_AWS_5
 resource "aws_security_group" "bps" {
   name_prefix = "${var.env_name}-bps"
   vpc_id      = var.account_info.vpc_id
 }
 
 module "bps_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=49e289239aec2845924f00fc5969f35ae76122e2"
 
   count = var.bps_config.instance_count
 

@@ -10,7 +10,6 @@ locals {
     migration_environment_full_name        = "del-stage"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "stage"
-    legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     cloudwatch_alarm_schedule              = true
     cloudwatch_alarm_disable_time          = "20:45"
     cloudwatch_alarm_enable_time           = "06:15"
