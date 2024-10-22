@@ -27,7 +27,7 @@ resource "aws_instance" "cis_db_instance" {
   }
 
   metadata_options {
-    http_tokens = "optional"
+    http_tokens = "required"
   }
 
   tags = merge(
