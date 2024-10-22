@@ -358,6 +358,65 @@ chown oracle:dba /home/oracle/crecrontab.txt
 chmod 744 /home/oracle/crecrontab.txt
 su oracle -c "crontab /home/oracle/crecrontab.txt"
 
+# Create the custom CloudWatch metrics script
+cat <<'EOC4' > /var/cw-custom.sh
+#!/bin/bash
+
+# INSTANCE INFO
+INSTANCE_META=http://169.254.169.254/latest/meta-data
+INSTANCE_ID=$(curl $INSTANCE_META/instance-id)
+INSTANCE_TYPE=$(curl $INSTANCE_META/instance-type)
+IMAGE_ID=$(curl $INSTANCE_META/ami-id)
+REMOTE_VOLUME_DEV=/dev/xvdf
+REMOTE_VOLUME_PATH=/oracle/dbf
+REMOTE_VOLUME_FSTYPE=ext4
+
+# CLOUDWATCH NAMESPACE
+CLOUDWATCH_NAMESPACE=CustomScript
+
+# GET MEMORY USAGE (%)
+TOTAL_MEMORY=$(free -m | grep -i mem | awk '{print $2}')
+USED_MEMORY_MINUS_CACHED=$(free -m | grep -i mem | awk '{print $3-$7}')
+MEMORY_USAGE=$(expr $USED_MEMORY_MINUS_CACHED \* 100 / $TOTAL_MEMORY | awk '{printf "%.4f\t", substr($1,1)}')
+
+# GET DISK USAGE (%)
+DISK_USAGE=$(df | grep "$REMOTE_VOLUME_PATH" | awk '{printf "%.4f\t", substr($5, 1, length($5)-1)}')
+
+# SEND MEMORY USAGE
+/usr/local/bin/aws cloudwatch put-metric-data                                               \
+--metric-name mem_used_percent                                                              \
+--namespace "$CLOUDWATCH_NAMESPACE"                                                         \
+--dimensions ImageId="$IMAGE_ID",InstanceId="$INSTANCE_ID",InstanceType="$INSTANCE_TYPE"    \
+--value "$MEMORY_USAGE"                                                                     \
+--unit Percent
+
+# SEND DISK USAGE
+/usr/local/bin/aws cloudwatch put-metric-data                                                                                                                                   \
+--metric-name disk_used_percent                                                                                                                                                 \
+--namespace "$CLOUDWATCH_NAMESPACE"                                                                                                                                             \
+--dimensions path="$REMOTE_VOLUME_PATH",InstanceId="$INSTANCE_ID",ImageId="$IMAGE_ID",InstanceType="$INSTANCE_TYPE",device="$REMOTE_VOLUME_DEV",fstype="$REMOTE_VOLUME_FSTYPE"  \
+--value "$DISK_USAGE"                                                                                                                                                           \
+--unit Percent
+
+exit 0
+EOC4
+
+# Set permissions on the script
+chmod 700 /var/cw-custom.sh
+chown root:root /var/cw-custom.sh
+
+# Create the cron job to run the script every minute
+cat <<'EOC5' > /etc/cron.d/custom_cloudwatch_metrics
+*/1 * * * * root /var/cw-custom.sh
+EOC5
+
+# Set permissions on the cron job
+chmod 600 /etc/cron.d/custom_cloudwatch_metrics
+chown root:root /etc/cron.d/custom_cloudwatch_metrics
+
+# Ensure cron service is running (for Amazon Linux)
+service crond restart || systemctl restart crond
+
 ## Set permissions for CDC scripts
 chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sh
 chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
@@ -365,26 +424,15 @@ chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
 chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sql
 chmod 744 /home/oracle/scripts/cdc_simple_health_check.sql
 
-chown root:root /var/cw-custom.sh
-chmod 700 /var/cw-custom.sh
-
-# Create /etc/cron.d/custom_cloudwatch_metrics with the cron job
-cat <<EOC4 > /etc/cron.d/custom_cloudwatch_metrics
-*/1 * * * * root /var/cw-custom.sh
-EOC4
-
-chown root:root /etc/cron.d/custom_cloudwatch_metrics
-chmod 600 /etc/cron.d/custom_cloudwatch_metrics
-
 # alert_rota.sh - set permissions
 chown oracle:dba /home/oracle/scripts/alert_rota.sh
 chmod 644 /home/oracle/scripts/alert_rota.sh
 
 # Create /etc/cron.d/oracle_rotation with the cron jobs
-cat <<EOC5 > /etc/cron.d/oracle_rotation
+cat <<EOC7 > /etc/cron.d/oracle_rotation
 00 07 * * * oracle /home/oracle/scripts/alert_rota.sh $APPNAME
 * */6 * * * oracle /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/logs/cdc_check.log
-EOC5
+EOC7
 
 chown root:root /etc/cron.d/oracle_rotation
 chmod 644 /etc/cron.d/oracle_rotation
