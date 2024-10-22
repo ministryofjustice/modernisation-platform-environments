@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ $# -ne 2 ]; then
- echo "1st parameter is ENV, 2nd parameter is  % usage. 3rd parameter is the Slack URL to alert to"
+ echo "1st parameter is ENV, 2nd parameter is  % usage"
 else
 
 
