@@ -26,6 +26,7 @@
 
 server {
         listen 80;
+        listen 443;
 
         server_name tribunals.gov.uk;
 
@@ -33,13 +34,13 @@ server {
                  return 301 https://www.gov.uk/government/organisations/hm-courts-and-tribunals-service/about;
         }
         location ~* ^/financeandtax {
-                 return 301 http://taxandchancery_ut.decisions.tribunals.gov.uk;
+                 return 301 https://taxandchancery_ut.decisions.tribunals.gov.uk;
         }
         location ~* ^/tax/decisions {
-                 return 301 http://tax.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://tax.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/cms {
-                 return 301 http://claimsmanagement.decisions.tribunals.gov.uk;
+                 return 301 https://claimsmanagement.decisions.tribunals.gov.uk;
         }
         location ~* ^/ImmigrationAsylum/UTIAC {
                  return 301 https://www.gov.uk/guidance/immigration-and-asylum-daily-court-lists;
@@ -48,13 +49,13 @@ server {
                  return 301 https://www.gov.uk/guidance/immigration-and-asylum-daily-court-lists;
         }
         location ~* ^/SharedDocs {
-                 return 301 http://decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/images {
-                 return 301 http://decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* .(css|js|png|ico|gif|jpg|jpeg)$ {
-                 return 301 http://decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://decisions.tribunals.gov.uk/$request_uri;
         }
 }
 

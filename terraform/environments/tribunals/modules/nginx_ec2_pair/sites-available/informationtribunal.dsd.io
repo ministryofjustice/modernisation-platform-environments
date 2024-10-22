@@ -26,6 +26,7 @@
 
 server {
 	listen 80;
+	listen 443;
 
 	server_name informationtribunal.dsd.io;
 	
@@ -33,13 +34,13 @@ server {
 		 return 301 https://www.gov.uk/guidance/information-rights-appeal-against-the-commissioners-decision$request_uri;
 	}
 	location ~* ^/Public {
-		 return 301 http://informationrights.decisions.tribunals.gov.uk$request_uri;
+		 return 301 https://informationrights.decisions.tribunals.gov.uk$request_uri;
 	}
 	location ~* ^/admin {
-		return 301 http://www.google.com$request_uri;
+		return 301 https://www.google.com$request_uri;
 	}
         location ~* ^/DBFiles {
-                return 301 http://informationrights.decisions.tribunals.gov.uk$request_uri;
+                return 301 https://informationrights.decisions.tribunals.gov.uk$request_uri;
         }
 }
 

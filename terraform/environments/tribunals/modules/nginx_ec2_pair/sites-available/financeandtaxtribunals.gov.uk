@@ -26,6 +26,7 @@
 
 server {
         listen 80;
+        listen 443;
 
         server_name financeandtaxtribunals.gov.uk;
 
@@ -33,19 +34,19 @@ server {
                  return 301 http://hmctsformfinder.justice.gov.uk/HMCTS/GetForms.do?court_forms_category=Tax%20and%20Chancery%20Chamber%20(Upper%20Tribunal);
         }
         location ~* ^/aspx {
-                 return 301 http://financeandtax.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://financeandtax.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Decisions {
-                return 301 http://financeandtax.decisions.tribunals.gov.uk/$request_uri;
+                return 301 https://financeandtax.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* .(css|js|png|ico|gif|jpg|jpeg)$ {
-                 return 301 http://financeandtax.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://financeandtax.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Admin {
-                return 301 http://financeandtax.decisions.tribunals.gov.uk/$request_uri;
+                return 301 https://financeandtax.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/JudgmentFiles {
-                return 301 http://financeandtax.decisions.tribunals.gov.uk/$request_uri;
+                return 301 https://financeandtax.decisions.tribunals.gov.uk/$request_uri;
         }
 }
 

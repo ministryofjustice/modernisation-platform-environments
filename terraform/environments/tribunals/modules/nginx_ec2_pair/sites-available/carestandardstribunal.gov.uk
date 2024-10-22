@@ -26,6 +26,7 @@
 
 server {
         listen 80;
+        listen 443;
 
         server_name carestandardstribunal.gov.uk;
 
@@ -33,19 +34,19 @@ server {
                  return 301 https://www.gov.uk/guidance/appeal-to-the-care-standards-tribunal;
         }
         location ~* ^/Public {
-                 return 301 http://carestandards.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://carestandards.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/images {
-                 return 301 http://carestandards.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://carestandards.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* .(css|js|png|ico|gif|jpg|jpeg)$ {
-                 return 301 http://cicap.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://cicap.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Judgements {
-                return 301 http://carestandards.decisions.tribunals.gov.uk/$request_uri;
+                return 301 https://carestandards.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Admin {
-                return 301 http://carestandards.decisions.tribunals.gov.uk/$request_uri;
+                return 301 https://carestandards.decisions.tribunals.gov.uk/$request_uri;
         }
 }
 

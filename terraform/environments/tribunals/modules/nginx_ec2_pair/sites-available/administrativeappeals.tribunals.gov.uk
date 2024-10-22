@@ -26,6 +26,7 @@
 
 server {
         listen 80;
+        listen 443;
 
         server_name administrativeappeals.tribunals.gov.uk;
 
@@ -33,7 +34,7 @@ server {
                  return 301 https://www.gov.uk/courts-tribunals/upper-tribunal-administrative-appeals-chamber;
         }
         location ~* ^/Decisions {
-                 return 301 http://administrativeappeals.decisions.tribunals.gov.uk;
+                 return 301 https://administrativeappeals.decisions.tribunals.gov.uk;
         }
 }
 

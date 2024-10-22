@@ -26,6 +26,7 @@
 
 server {
 	listen 80;
+        listen 443;
 
         server_name informationtribunal.gov.uk;
 
@@ -33,19 +34,19 @@ server {
                  return 301 https://www.gov.uk/guidance/information-rights-appeal-against-the-commissioners-decision;
         }
         location ~* ^/Public {
-                 return 301 http://informationrights.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://informationrights.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/images {
-                 return 301 http://informationrights.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://informationrights.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* .(css|js|png|ico|gif|jpg|jpeg)$ {
-                 return 301 http://informationrights.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://informationrights.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/DBFiles {
-                return 301 http://informationrights.decisions.tribunals.gov.uk/$request_uri;
+                return 301 https://informationrights.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Admin {
-                return 301 http://informationrights.decisions.tribunals.gov.uk/$request_uri;
+                return 301 https://informationrights.decisions.tribunals.gov.uk/$request_uri;
         }
 }
 
