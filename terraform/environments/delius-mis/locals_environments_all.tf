@@ -39,30 +39,30 @@ locals {
   pagerduty_integration_key  = local.pagerduty_integration_keys[local.integration_key_lookup]
 
   domain_join_ports = [
-    { port = 25,  protocol = "tcp" },
-    { port = 53,  protocol = "tcp" },  # DNS
-    { port = 53,  protocol = "udp" },
-    { port = 67,  protocol = "udp" },
-    { port = 88,  protocol = "tcp" },  # Kerberos
-    { port = 88,  protocol = "udp" },
-    { port = 123,  protocol = "udp" }, # NTP
-    { port = 135, protocol = "tcp" },  # RPC
-    { port = 137-138,  protocol = "udp" },
-    { port = 139, protocol = "tcp" },
-    { port = 389, protocol = "tcp" }, # LDAP
-    { port = 389, protocol = "udp" },
-    { port = 445, protocol = "tcp" },  # SMB
-    { port = 445, protocol = "udp" },
-    { port = 464, protocol = "tcp" }, # Kerberos password change
-    { port = 464, protocol = "udp" },
-    { port = 636, protocol = "tcp" },  # LDAPS
-    { port = 1025-5000, protocol = "tcp" },
-    { port = 2535, protocol = "udp" },
-    { port = 3268-3269, protocol = "tcp" },
-    { port = 5722, protocol = "tcp" },
-    { port = 9389, protocol = "tcp" },
-    { port = 49152-65535, protocol = "tcp" },
-    { port = -1, protocol = "ICMP" }
+    { protocol = "tcp", from_port = 25, to_port = 25 },
+    { protocol = "tcp", from_port = 53, to_port = 53 },  # DNS
+    { protocol = "udp", from_port = 53, to_port = 53 },
+    { protocol = "udp", from_port = 67, to_port = 67 },
+    { protocol = "tcp", from_port = 88, to_port = 88 },  # Kerberos
+    { protocol = "udp", from_port = 88, to_port = 88 },
+    { protocol = "udp", from_port = 123, to_port = 123 }, # NTP
+    { protocol = "tcp", from_port = 135, to_port = 135 },  # RPC
+    { protocol = "udp", from_port = 137, to_port = 138 },  # NetBIOS
+    { protocol = "tcp", from_port = 139, to_port = 139 },  # NetBIOS
+    { protocol = "tcp", from_port = 389, to_port = 389 },  # LDAP
+    { protocol = "udp", from_port = 389, to_port = 389 },
+    { protocol = "tcp", from_port = 445, to_port = 445 },  # SMB
+    { protocol = "udp", from_port = 445, to_port = 445 },
+    { protocol = "tcp", from_port = 464, to_port = 464 },  # Kerberos password change
+    { protocol = "udp", from_port = 464, to_port = 464 },
+    { protocol = "tcp", from_port = 636, to_port = 636 },   # LDAPS
+    { protocol = "tcp", from_port = 1025, to_port = 5000 },
+    { protocol = "udp", from_port = 2535, to_port = 2535 },
+    { protocol = "tcp", from_port = 3268, to_port = 3269 },
+    { protocol = "tcp", from_port = 5722, to_port = 5722 },
+    { protocol = "tcp", from_port = 9389, to_port = 9389 },
+    { protocol = "tcp", from_port = 49152, to_port = 65535 },
+    { protocol = "icmp", from_port = -1, to_port = -1 }  # ICMP
   ]
 
 }
