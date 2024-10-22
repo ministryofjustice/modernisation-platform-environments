@@ -43,7 +43,7 @@ locals {
     standby_count          = 2
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
-      "/dev/sdc" = { label = "app", size = 200 } # /u02
+      "/dev/sdc" = { label = "app", size = 100 } # /u02
       "/dev/sde" = { label = "data" }            # DATA
       "/dev/sdf" = { label = "flash" }           # FLASH
       "/dev/sds" = { label = "swap" }
