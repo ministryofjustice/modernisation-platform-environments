@@ -118,6 +118,7 @@ sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/
 echo "Removing old SSH key"
 sed -i '/.*-general$/d' /home/ec2-user/.ssh/authorized_keys
 sed -i '/.*-general$/d' /root/.ssh/authorized_keys
+sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 ## Add custom metric script
 echo "Adding the custom metrics script for CloudWatch"
@@ -157,7 +158,7 @@ resource "aws_instance" "concurrent_manager" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.cm_userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   metadata_options {
     http_tokens = "optional"
   }
