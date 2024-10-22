@@ -5,11 +5,12 @@ tasks:
   - frequency: always
     type: powershell
     runAs: admin
+:q
     content: |-
       # Join computer to domain if not already joined
       if (! ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) ) {
         # Server is not joined to the domain
-        $domainJoinUserName = "Admin"
+        $domainJoinUserName = "${ad_domain_name}\Admin"
         $domainJoinPassword = ConvertTo-SecureString((Get-SECSecretValue -SecretId ${ad_password_secret_name}).SecretString) -AsPlainText -Force
         $domainJoinCredential = New-Object System.Management.Automation.PSCredential($domainJoinUserName, $domainJoinPassword)
         $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
