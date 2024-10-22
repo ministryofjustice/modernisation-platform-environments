@@ -322,16 +322,20 @@ module "apc_bucket_logs_s3_kms" {
 
       effect = "Allow"
 
-      principals = {
-        type        = "Service"
-        identifiers = ["logging.s3.amazonaws.com"]
-      }
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logging.s3.amazonaws.com"]
+        }
+      ]
 
-      conditions = {
-        test     = "StringEquals"
-        variable = "kms:ViaService"
-        values   = ["logging.s3.amazonaws.com"]
-      }
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["logging.s3.amazonaws.com"]
+        }
+      ]
     }
   ]
 }
