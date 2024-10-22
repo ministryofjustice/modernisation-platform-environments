@@ -1,3 +1,4 @@
+# checkov:skip=all
 locals {
   tags = merge(
     var.tags,

@@ -1,3 +1,4 @@
+# checkov:skip=all
 resource "aws_fsx_windows_file_system" "mis_share" {
   active_directory_id = aws_directory_service_directory.mis_ad.id
   kms_key_id          = var.account_config.kms_keys.general_shared

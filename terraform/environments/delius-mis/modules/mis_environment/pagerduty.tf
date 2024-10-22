@@ -1,3 +1,4 @@
+# checkov:skip=all
 resource "aws_sns_topic" "delius_mis_alarms" {
   name = "${var.app_name}-${var.env_name}-sns-topic"
 

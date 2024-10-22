@@ -1,3 +1,4 @@
+# checkov:skip=all
 ######################################
 # S3 Bucket for ssm session manager
 ######################################

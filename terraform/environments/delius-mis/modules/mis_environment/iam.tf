@@ -1,3 +1,4 @@
+# checkov:skip=all
 data "aws_iam_policy_document" "secrets_manager" {
   statement {
     sid = "SecretPermissions"

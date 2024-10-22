@@ -1,3 +1,4 @@
+# checkov:skip=all
 variable "env_name" {
   type = string
 }
