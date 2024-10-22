@@ -182,6 +182,10 @@ locals {
                 mod-platform-cur-reports = {
                   database  = "data"
                   workgroup = "mod-platform-cur-reports"
+                },
+                gary-test = {
+                  database  = "test-database"
+                  workgroup = "test-workgroup"
                 }
               }
             },
