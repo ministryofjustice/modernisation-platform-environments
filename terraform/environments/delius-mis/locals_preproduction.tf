@@ -5,7 +5,6 @@ locals {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.0.0/20"
     ad_domain_name                         = "delius-mis-preprod.internal"
-    ad_ip_list                             = ["10.27.1.113", "10.27.2.82"]
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"
