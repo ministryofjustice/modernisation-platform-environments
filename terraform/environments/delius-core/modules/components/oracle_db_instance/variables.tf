@@ -176,3 +176,9 @@ variable "sns_topic_arn" {
   description = "The ARN of the SNS topic"
   type        = string
 }
+
+variable "inline_ebs" {
+  default     = true
+  type        = bool
+  description = "Whether to create EBS volumes inline with the instance"
+}
