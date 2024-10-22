@@ -159,7 +159,7 @@ resource "aws_cloudwatch_metric_alarm" "EDWOradataQueueLengthOverThreshold" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   metric_name         = "VolumeQueueLength"
-  namespace           = "CustomScript"
+  namespace           = "AWS/EBS"
   period              = 60
   statistic           = "Average"
   threshold           = 3
