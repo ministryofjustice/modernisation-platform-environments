@@ -32,7 +32,7 @@ resource "aws_vpc_security_group_ingress_rule" "fleet_manager" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "domain_join" {
-  for_each                     = { for port in var.domain_join_ports : port.port => port }
+  for_each                     = { for port in var.domain_join_ports : "${port.protocol}_${port.port}" => port }
   from_port                    = each.value.port
   to_port                      = each.value.port
   ip_protocol                     = each.value.protocol
