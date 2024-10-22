@@ -1,4 +1,3 @@
-# checkov:skip=all
 # Oracle Database DBA Secret
 
 resource "aws_secretsmanager_secret" "database_dba_passwords" {

@@ -1,4 +1,3 @@
-# checkov:skip=all
 # Create s3 bucket for s3 keys
 module "s3_bucket_ssh_keys" {
 

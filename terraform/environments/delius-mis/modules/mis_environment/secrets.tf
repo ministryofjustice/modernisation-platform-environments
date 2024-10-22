@@ -1,4 +1,3 @@
-# checkov:skip=all
 #### This file can be used to store secrets specific to the member account ####
 #tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "ad_username" {

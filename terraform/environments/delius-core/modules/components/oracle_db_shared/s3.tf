@@ -1,4 +1,3 @@
-# checkov:skip=all
 data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
   count   = lookup(local.oracle_duplicate_map[var.env_name], "target_account_id", false) != false ? 1 : 0
   version = "2012-10-17"

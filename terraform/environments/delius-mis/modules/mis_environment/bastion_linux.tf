@@ -1,4 +1,3 @@
-# checkov:skip=all
 ##
 # Create bastion server from module
 ##

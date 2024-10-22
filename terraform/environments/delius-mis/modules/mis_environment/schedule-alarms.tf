@@ -1,4 +1,3 @@
-# checkov:skip=all
 module "schedule_alarms" {
   count = var.environment_config.cloudwatch_alarm_schedule ? 1 : 0
 

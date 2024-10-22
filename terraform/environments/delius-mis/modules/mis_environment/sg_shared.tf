@@ -1,4 +1,3 @@
-# checkov:skip=all
 # checkov:skip=CKV2_AWS_5
 resource "aws_security_group" "mis_ec2_shared" {
   name        = "${var.env_name}-mis-ec2-shared"

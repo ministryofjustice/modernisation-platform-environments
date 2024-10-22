@@ -1,4 +1,3 @@
-# checkov:skip=all
 # checkov:skip=CKV2_AWS_5
 resource "aws_security_group" "legacy" {
   name        = "${var.env_name}-allow-legacy-traffic"

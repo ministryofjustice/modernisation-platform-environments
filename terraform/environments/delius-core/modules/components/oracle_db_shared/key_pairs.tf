@@ -1,4 +1,3 @@
-# checkov:skip=all
 # Create SSM parameter to hold parameter with value to be manually added
 resource "aws_ssm_parameter" "ec2_user_ssh_key" {
   name        = "/${var.env_name}/oracle-${var.db_suffix}/ec2-user-ssh-key"

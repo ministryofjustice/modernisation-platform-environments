@@ -1,4 +1,3 @@
-# checkov:skip=all
 locals {
   db_public_key_data    = jsondecode(file("./db_users.json"))
   dsd_instance_policies = [for v in values(merge(module.oracle_db_shared["dsd-db"].instance_policies, var.dsd_db_config.instance_policies)) : v.arn]

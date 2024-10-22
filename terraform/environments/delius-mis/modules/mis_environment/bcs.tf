@@ -1,4 +1,3 @@
-# checkov:skip=all
 # checkov:skip=CKV2_AWS_5
 resource "aws_security_group" "bcs" {
   name_prefix = "${var.env_name}-bcs"

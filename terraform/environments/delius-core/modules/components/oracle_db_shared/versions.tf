@@ -1,4 +1,3 @@
-# checkov:skip=all
 terraform {
   required_providers {
     aws = {

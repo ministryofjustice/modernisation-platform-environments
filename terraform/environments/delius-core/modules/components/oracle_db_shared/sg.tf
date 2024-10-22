@@ -1,4 +1,3 @@
-# checkov:skip=all
 # checkov:skip=CKV2_AWS_5
 resource "aws_security_group" "db_ec2" {
   name        = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ec2-instance-sg"
