@@ -6,10 +6,6 @@ data "aws_ecs_task_definition" "latest_task_definition" {
   task_definition = "${aws_ecs_task_definition.ifs_task_definition.family}:${data.aws_ecs_task_definition.task_definitions.revision}"
 }
 
-data "aws_ssm_parameter" "ecs_optimized_ami" {
-  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized"
-}
-
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
 
