@@ -306,7 +306,34 @@ module "apc_bucket_logs_s3_kms" {
 
   tags = local.tags
 
-  policy = data.aws_iam_policy_document.apc_bucket_logs_kms_key_policy.json
+  key_statements = [
+    {
+      sid = "AllowLogging"
+
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:DescribeKey"
+      ]
+
+      resources = ["*"]
+
+      effect = "Allow"
+
+      principals = {
+        type        = "Service"
+        identifiers = ["logging.s3.amazonaws.com"]
+      }
+
+      conditions = {
+        test     = "StringEquals"
+        variable = "kms:ViaService"
+        values   = ["logging.s3.amazonaws.com"]
+      }
+    }
+  ]
 }
 
 module "common_secrets_manager_kms" {
