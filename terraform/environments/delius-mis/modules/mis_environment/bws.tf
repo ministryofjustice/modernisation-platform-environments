@@ -3,16 +3,6 @@ resource "aws_security_group" "bws" {
   vpc_id      = var.account_info.vpc_id
 }
 
-resource "aws_security_group_rule" "bws_outbound" {
-  for_each                 = { for port in var.domain_join_ports : port.port => port }
-  type                     = "egress"
-  from_port                = each.value.port
-  to_port                  = each.value.port
-  protocol                 = each.value.protocol
-  security_group_id        = aws_security_group.bws.id
-  source_security_group_id = aws_directory_service_directory.mis_ad.security_group_id
-}
-
 module "bws_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
 

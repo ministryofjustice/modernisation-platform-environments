@@ -39,14 +39,30 @@ locals {
   pagerduty_integration_key  = local.pagerduty_integration_keys[local.integration_key_lookup]
 
   domain_join_ports = [
+    { port = 25,  protocol = "tcp" },
     { port = 53,  protocol = "tcp" },  # DNS
+    { port = 53,  protocol = "udp" },
+    { port = 67,  protocol = "udp" },
     { port = 88,  protocol = "tcp" },  # Kerberos
+    { port = 88,  protocol = "udp" },
+    { port = 123,  protocol = "udp" }, # NTP
     { port = 135, protocol = "tcp" },  # RPC
+    { port = 137-138,  protocol = "udp" },
+    { port = 139, protocol = "tcp" },
+    { port = 389, protocol = "tcp" }, # LDAP
+    { port = 389, protocol = "udp" },
     { port = 445, protocol = "tcp" },  # SMB
-    { port = 389, protocol = "tcp" },  # LDAP
+    { port = 445, protocol = "udp" },
+    { port = 464, protocol = "tcp" }, # Kerberos password change
+    { port = 464, protocol = "udp" },
     { port = 636, protocol = "tcp" },  # LDAPS
-    { port = 464, protocol = "tcp" },  # Kerberos password change
-    { port = 123, protocol = "udp" }   # NTP
+    { port = 1025-5000, protocol = "tcp" },
+    { port = 2535, protocol = "udp" },
+    { port = 3268-3269, protocol = "tcp" },
+    { port = 5722, protocol = "tcp" },
+    { port = 9389, protocol = "tcp" },
+    { port = 49152-65535, protocol = "tcp" },
+    { port = -1, protocol = "ICMP" }
   ]
 
 }
