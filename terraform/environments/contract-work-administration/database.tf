@@ -99,6 +99,8 @@ echo "Adding disk space script"
 chmod 766 /home/oracle/scripts/disk_space.sh
 sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/oracle/scripts/disk_space.sh
 
+sed -i "/^mail.*tablespace.warning$/c\mailx -s \"\$ORACLE_SID on \$\{hostname\}: ${upper(local.application_data.accounts[local.environment].env_short)} CWA Tablespace Warning\" $SLACK_ALERT_URL < /tmp/tablespace.warning" /home/oracle/scripts/tablespace1.sh
+
 echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 cat <<EOT > /home/oracle/scripts/aws_ebs_backup.sh
@@ -116,8 +118,6 @@ su oracle -c "crontab -l > /home/oracle/oraclecrontab.txt"
 sed -i '/disk_space.sh/d' /home/oracle/oraclecrontab.txt
 echo "00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log" >> /home/oracle/oraclecrontab.txt
 echo "0,30 08-17 * * 1-5 /home/oracle/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} >/tmp/disk_space.trc 2>&1" >> /home/oracle/oraclecrontab.txt
-
-sed '/^mail.*tablespace.warning$/c\mailx -s "\$ORACLE_SID on \$\{hostname\}: ${upper(local.application_data.accounts[local.environment].env_short)} CWA Tablespace Warning" $SLACK_ALERT_URL < /tmp/tablespace.warning' /home/oracle/scripts/tablespace1.sh
 
 chown oracle:oinstall /home/oracle/oraclecrontab.txt
 chmod 744 /home/oracle/oraclecrontab.txt
