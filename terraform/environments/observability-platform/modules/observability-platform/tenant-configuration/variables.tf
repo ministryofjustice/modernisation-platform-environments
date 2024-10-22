@@ -18,6 +18,11 @@ variable "aws_accounts" {
     amazon_prometheus_query_enabled = optional(bool)
     amazon_prometheus_workspace_id  = optional(string)
     xray_enabled                    = optional(bool)
+    athena_enabled                  = optional(bool)
+    athena_config = optional(map(object({
+      database  = string
+      workgroup = string
+    })))
   }))
   default = {
     default = {
@@ -26,6 +31,7 @@ variable "aws_accounts" {
       amazon_prometheus_query_enabled = false
       amazon_prometheus_workspace_id  = ""
       xray_enabled                    = false
+      athena_enabled                  = false
     }
   }
 }

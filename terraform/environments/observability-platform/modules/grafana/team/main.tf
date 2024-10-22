@@ -55,6 +55,27 @@ resource "grafana_data_source_permission" "xray" {
   }
 }
 
+data "grafana_data_source" "athena" {
+  for_each = {
+    for name, config in var.aws_accounts : name => config if config.athena_enabled
+  }
+
+  name = "${each.key}-athena"
+}
+
+resource "grafana_data_source_permission" "athena" {
+  for_each = {
+    for name, config in var.aws_accounts : name => config if config.athena_enabled
+  }
+
+  datasource_uid = trimprefix(data.grafana_data_source.athena[each.key].id, "1:")
+
+  permissions {
+    team_id    = grafana_team.this.id
+    permission = "Query"
+  }
+}
+
 data "grafana_data_source" "amazon_prometheus" {
   for_each = {
     for name, account in var.aws_accounts : name => account if account.amazon_prometheus_query_enabled
