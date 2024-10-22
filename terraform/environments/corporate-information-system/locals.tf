@@ -14,6 +14,16 @@ sed -i 's/#ClientAliveInterval.*/ClientAliveInterval 1200/' /etc/ssh/sshd_config
 sed -i 's/#ClientAliveCountMax.*/ClientAliveCountMax 3/' /etc/ssh/sshd_config
 service sshd restart 
 
+# Add TCP keepalive time to sysctl.conf ---> keepalive solution
+echo "net.ipv4.tcp_keepalive_time = 300" >> /etc/sysctl.conf
+sysctl -p
+
+# Add SQLNET.EXPIRE_TIME to sqlnet.ora ---> keepalive solution
+echo "SQLNET.EXPIRE_TIME = 5" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
+
+# Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
+sed -i '/(DESCRIPTION =/a\\  (ENABLE=broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
+
 # Changes to oracle files
 sed -i 's|cis.*legalservices.gov.uk:8080|${local.application_name_short}.${data.aws_route53_zone.external.name}:8080|' /home/batman/bin/dkj-shell-funcs
 sed -i 's|cis.*legalservices.gov.uk|${local.application_name_short}.${data.aws_route53_zone.external.name}|' /oracle/software/product/10.2.0/network/admin/listener.ora
