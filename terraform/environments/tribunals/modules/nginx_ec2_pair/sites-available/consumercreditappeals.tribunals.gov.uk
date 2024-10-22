@@ -26,6 +26,7 @@
 
 server {
         listen 80;
+        listen 443;
 
         server_name consumercreditappeals.tribunals.gov.uk;
 
@@ -33,7 +34,7 @@ server {
                  return 301 https://www.gov.uk/courts-tribunals/upper-tribunal-tax-and-chancery-chamber;
         }
         location ~* ^/decisions.htm {
-                 return 301 http://consumercreditappeals.decisions.tribunals.gov.uk;
+                 return 301 https://consumercreditappeals.decisions.tribunals.gov.uk;
         }
 }
 
