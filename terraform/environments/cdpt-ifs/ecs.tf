@@ -265,7 +265,7 @@ resource "aws_iam_role_policy" "app_execution" {
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"] #local.application_data.accounts[local.environment].ami_image_id
+  image_id      = "resolve:ssm:/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
   instance_type = local.application_data.accounts[local.environment].instance_type
   key_name      = "${local.application_name}-ec2"
   ebs_optimized = true
