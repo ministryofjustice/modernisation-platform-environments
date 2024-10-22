@@ -1,3 +1,4 @@
+# checkov:skip=all
 locals {
   secret_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}"
 

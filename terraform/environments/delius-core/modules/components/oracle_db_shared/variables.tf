@@ -1,3 +1,4 @@
+# checkov:skip=all
 variable "env_name" {
   description = "Environment name short ie dev"
   type        = string

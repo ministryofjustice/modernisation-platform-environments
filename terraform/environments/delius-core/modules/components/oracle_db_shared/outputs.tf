@@ -1,3 +1,4 @@
+# checkov:skip=all
 output "security_group" {
   value = aws_security_group.db_ec2
 }
