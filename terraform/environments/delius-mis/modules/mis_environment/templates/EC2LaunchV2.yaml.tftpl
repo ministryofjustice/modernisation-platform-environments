@@ -5,7 +5,6 @@ tasks:
   - frequency: always
     type: powershell
     runAs: admin
-:q
     content: |-
       # Join computer to domain if not already joined
       if (! ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) ) {
