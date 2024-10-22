@@ -410,7 +410,7 @@ EOF
 
 resource "aws_iam_role" "edw_ec2_role" {
   name                = "${local.application_name}-ec2-instance-role"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
+  aws_iam_role_policy_attachments_exclusive = ["arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
   tags = merge(
     local.tags,
     {
