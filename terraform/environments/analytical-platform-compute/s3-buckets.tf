@@ -35,8 +35,6 @@ module "mojap_derived_tables_replication_bucket" {
 
   object_lock_enabled = false
 
-  acl = "private"
-
   versioning = {
     status = "Disabled"
   }
@@ -71,8 +69,6 @@ module "apc_bucket_logs" {
   force_destroy = false
 
   object_lock_enabled = false
-
-  acl = "private"
 
   versioning = {
     status = "Disabled"
