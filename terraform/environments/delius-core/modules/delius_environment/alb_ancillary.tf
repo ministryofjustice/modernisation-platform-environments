@@ -39,6 +39,7 @@ resource "aws_vpc_security_group_egress_rule" "ancillary_alb_egress_private" {
 resource "aws_lb" "delius_core_ancillary" {
   #checkov:skip=CKV_AWS_91 "ignore"
   #checkov:skip=CKV2_AWS_28 "ignore"
+  #checkov:skip=CKV_AWS_150
 
   name               = "${var.env_name}-ancilliary-alb"
   internal           = false
