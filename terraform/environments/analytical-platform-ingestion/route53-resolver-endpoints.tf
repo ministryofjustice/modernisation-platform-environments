@@ -2,7 +2,7 @@ module "connected_vpc_outbound_route53_resolver_endpoint" {
   source  = "terraform-aws-modules/route53/aws//modules/resolver-endpoints"
   version = "4.1.0"
 
-  name      = "${local.application_name}-${local.environment}-connected-outbound-route53-resolver-endpoint"
+  name      = "connected-vpc-outbound"
   vpc_id    = module.connected_vpc.vpc_id
   direction = "OUTBOUND"
   protocols = ["Do53"]
