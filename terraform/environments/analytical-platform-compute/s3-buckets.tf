@@ -29,7 +29,7 @@ module "mojap_derived_tables_replication_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.2.1"
 
-  bucket = "mojap-derived-tables-replication-${local.environment}"
+  bucket = "mojap-compute-${local.environment}-derived-tables-replication"
 
   force_destroy = true
 
@@ -57,14 +57,14 @@ module "mojap_derived_tables_replication_bucket" {
   tags = local.tags
 }
 
-module "apc_bucket_logs" {
+module "mojap_compute_logs_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.2.1"
 
-  bucket = "apc-bucket-logs-${local.environment}"
+  bucket = "mojap-compute-${local.environment}-logs"
 
   force_destroy = false
 
