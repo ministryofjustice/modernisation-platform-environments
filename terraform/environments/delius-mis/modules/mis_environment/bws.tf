@@ -1,4 +1,4 @@
-#checkov:skip=CKV2_AWS_5
+#checkov:skip=CKV2_AWS_5 "ignore"
 resource "aws_security_group" "bws" {
   name_prefix = "${var.env_name}-bws"
   vpc_id      = var.account_info.vpc_id

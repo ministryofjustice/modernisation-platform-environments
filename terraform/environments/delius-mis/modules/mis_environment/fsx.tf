@@ -19,7 +19,7 @@ resource "aws_fsx_windows_file_system" "mis_share" {
   )
 }
 
-#checkov:skip=CKV2_AWS_5
+#checkov:skip=CKV2_AWS_5 "ignore"
 resource "aws_security_group" "fsx" {
   name        = "${var.app_name}-${var.env_name}-fsx"
   description = "Security group for FSx"
