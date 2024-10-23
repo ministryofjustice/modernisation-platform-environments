@@ -99,12 +99,16 @@ resource "aws_s3_object" "sites_available" {
   bucket = aws_s3_bucket.nginx_config.id
   key    = "sites-available/${each.value}"
   source = "${path.module}/sites-available/${each.value}"
+  # Use md5 to detect changes in the sites-available folder
+  etag   = filemd5("${path.module}/sites-available/${each.value}")
 }
 
 resource "aws_s3_object" "nginx_conf" {
   bucket = aws_s3_bucket.nginx_config.id
   key    = "nginx.conf"
   source = "${path.module}/nginx-conf/nginx.conf"
+  # Use md5 to detect changes in the nginx.conf file
+  etag   = filemd5("${path.module}/nginx-conf/nginx.conf")
 }
 
 resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {

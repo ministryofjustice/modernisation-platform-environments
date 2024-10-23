@@ -280,3 +280,22 @@ module "analytical_platform_lake_formation_share_policy" {
 
   policy = data.aws_iam_policy_document.analytical_platform_share_policy.json
 }
+
+data "aws_iam_policy_document" "s3_server_access_logs_policy" {
+  #checkov:skip=CKV_AWS_356:resource "*" limited by condition
+  statement {
+    sid       = "S3ServerAccessLogsPolicy"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["*"]
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}

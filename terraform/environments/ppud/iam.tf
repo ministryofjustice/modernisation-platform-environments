@@ -251,16 +251,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
         "cloudwatch:EnableAlarmActions"
       ],
       "Resource": [
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-014bce95a85aaeede",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-00cbccc46d25e77c6",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-0dba6054c0f5f7a11",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-0b5ef7cb90938fb82",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-04bbb6312b86648be",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-00413756d2dfcf6d2",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-080498c4c9d25e6bd",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-029d2b17679dab982",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-70%-i-029d2b17679dab982",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-90%-i-029d2b17679dab982"
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:*"
       ]
    },
    {
