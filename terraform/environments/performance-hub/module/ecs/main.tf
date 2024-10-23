@@ -26,10 +26,6 @@ data "aws_lb_target_group" "target_group" {
   }
 }
 
-data "aws_ssm_parameter" "ecs_optimized_ami" {
-  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized"
-}
-
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   vpc_zone_identifier = sort(data.aws_subnets.shared-private.ids)
   desired_capacity    = var.ec2_desired_capacity
@@ -99,13 +95,12 @@ resource "aws_security_group" "cluster_ec2" {
 }
 
 # EC2 launch template - settings to use for new EC2s added to the group
-# Note - when updating this you will need to manually terminate the EC2s
+# Note - to force a new AMI you will need to manually terminate the EC2s
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix = "${var.app_name}-ec2-launch-template"
-  #image_id      = var.ami_image_id
-  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  image_id      = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized/image_id"
   instance_type = var.instance_type
   key_name      = var.key_name
   ebs_optimized = true
@@ -475,11 +470,11 @@ resource "aws_appautoscaling_policy" "scaling_policy_down" {
   ]
 }
 
-# Set up CloudWatch group and log stream and retain logs for 30 days
+# Set up CloudWatch group and log stream and retention
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
   name              = "${var.app_name}-ecs"
-  retention_in_days = 30
+  retention_in_days = 365
   tags = merge(
     var.tags_common,
     {

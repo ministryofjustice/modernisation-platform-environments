@@ -34,7 +34,7 @@ server {
                  return 301 https://www.gov.uk/apply-land-registration-tribunal/overview;
         }
         location ~* ^/public {
-                 return 301 https://landregistrationdivision.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://landregistrationdivision.decisions.tribunals.gov.uk/public/Search30May.aspx;
         }
         location ~* ^/Admin {
                 return 301 https://landregistrationdivision.decisions.tribunals.gov.uk/$request_uri;
