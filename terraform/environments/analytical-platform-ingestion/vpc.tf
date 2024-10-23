@@ -15,6 +15,66 @@ module "connected_vpc" {
   create_flow_log_cloudwatch_iam_role  = true
   flow_log_max_aggregation_interval    = 60
 
+  private_outbound_acl_rules = [
+    {
+      "cidr_block" : local.environment_configuration.connected_vpc_cidr,
+      "from_port" : 139,
+      "protocol" : "TCP",
+      "rule_action" : "allow",
+    },
+    {
+      "cidr_block" : local.environment_configuration.connected_vpc_cidr,
+      "from_port" : 445,
+      "protocol" : "TCP",
+      "rule_action" : "allow",
+    }
+  ]
+
+  private_inbound_acl_rules = [
+    {
+      "cidr_block" : local.environment_configuration.connected_vpc_cidr,
+      "to_port" : 139,
+      "protocol" : "TCP",
+      "rule_action" : "allow",
+    },
+    {
+      "cidr_block" : local.environment_configuration.connected_vpc_cidr,
+      "to_port" : 445,
+      "protocol" : "TCP",
+      "rule_action" : "allow",
+    }
+  ]
+
+  public_outbound_acl_rules = [
+    {
+      "cidr_block" : local.environment_configuration.connected_vpc_cidr,
+      "from_port" : 139,
+      "protocol" : "TCP",
+      "rule_action" : "allow",
+    },
+    {
+      "cidr_block" : local.environment_configuration.connected_vpc_cidr,
+      "from_port" : 445,
+      "protocol" : "TCP",
+      "rule_action" : "allow",
+    }
+  ]
+
+  public_inbound_acl_rules = [
+    {
+      "cidr_block" : local.environment_configuration.connected_vpc_cidr,
+      "to_port" : 139,
+      "protocol" : "TCP",
+      "rule_action" : "allow",
+    },
+    {
+      "cidr_block" : local.environment_configuration.connected_vpc_cidr,
+      "to_port" : 445,
+      "protocol" : "TCP",
+      "rule_action" : "allow",
+    }
+  ]
+
   tags = local.tags
 }
 
