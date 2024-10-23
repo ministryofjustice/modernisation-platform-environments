@@ -50,7 +50,7 @@ module "mojap_derived_tables_replication_bucket" {
   }
 
   logging = {
-    target_bucket = module.apc_bucket_logs.s3_bucket_id
+    target_bucket = module.mojap_compute_logs_bucket.s3_bucket_id
     target_prefix = "mojap-derived-tables-replication/"
   }
 
@@ -78,7 +78,7 @@ module "mojap_compute_logs_bucket" {
     rule = {
       bucket_key_enabled = true
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.apc_bucket_logs_s3_kms.key_arn
+        kms_master_key_id = module.mojap_compute_logs_s3_kms.key_arn
         sse_algorithm     = "aws:kms"
       }
     }
