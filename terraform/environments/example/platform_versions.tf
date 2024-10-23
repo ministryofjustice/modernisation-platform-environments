@@ -8,6 +8,10 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
+    external = {
+      source  = "hashicorp/external"
+      version = "~> 2.3.0" # Use the latest version or specify your desired version
+    }
     cloudinit = {
       source  = "hashicorp/cloudinit"
       version = "~> 2.3.0" # Use the latest version or specify your desired version

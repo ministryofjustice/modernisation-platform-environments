@@ -60,32 +60,32 @@
 
 # # Build loadbalancer
 #tfsec:ignore:aws-elb-alb-not-public as the external lb needs to be public.
-resource "aws_lb" "certificate_example_lb" {
-  #checkov:skip=CKV2_AWS_28:Ensure public facing ALB are protected by WAF
-  name               = "certificate-example-loadbalancer"
-  load_balancer_type = "application"
-  subnets            = data.aws_subnets.shared-public.ids
-  #checkov:skip=CKV_AWS_150:Short-lived example environment, hence no need for deletion protection
-  enable_deletion_protection = false
-  # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
-  idle_timeout               = 240
-  drop_invalid_header_fields = true
+# resource "aws_lb" "certificate_example_lb" {
+#   #checkov:skip=CKV2_AWS_28:Ensure public facing ALB are protected by WAF
+#   name               = "certificate-example-loadbalancer"
+#   load_balancer_type = "application"
+#   subnets            = data.aws_subnets.shared-public.ids
+#   #checkov:skip=CKV_AWS_150:Short-lived example environment, hence no need for deletion protection
+#   enable_deletion_protection = false
+#   # allow 60*4 seconds before 504 gateway timeout for long-running DB operations
+#   idle_timeout               = 240
+#   drop_invalid_header_fields = true
 
-  security_groups = [aws_security_group.certificate_example_load_balancer_sg.id]
+#   security_groups = [aws_security_group.certificate_example_load_balancer_sg.id]
 
-  access_logs {
-    bucket  = module.s3-bucket-lb.bucket.id
-    prefix  = "test-lb"
-    enabled = true
-  }
+#   access_logs {
+#     bucket  = module.s3-bucket-lb.bucket.id
+#     prefix  = "test-lb"
+#     enabled = true
+#   }
 
-  tags       = { Name = "${local.application_name}-external-loadbalancer" }
-  depends_on = [aws_security_group.certificate_example_load_balancer_sg]
-}
+#   tags       = { Name = "${local.application_name}-external-loadbalancer" }
+#   depends_on = [aws_security_group.certificate_example_load_balancer_sg]
+# }
 
-resource "aws_security_group" "certificate_example_load_balancer_sg" {
-  name        = "certificate-example-lb-sg"
-  description = "controls access to load balancer"
-  vpc_id      = data.aws_vpc.shared.id
-  tags        = { Name = lower(format("lb-sg-%s-%s-example", local.application_name, local.environment)) }
-}
+# resource "aws_security_group" "certificate_example_load_balancer_sg" {
+#   name        = "certificate-example-lb-sg"
+#   description = "controls access to load balancer"
+#   vpc_id      = data.aws_vpc.shared.id
+#   tags        = { Name = lower(format("lb-sg-%s-%s-example", local.application_name, local.environment)) }
+# }
