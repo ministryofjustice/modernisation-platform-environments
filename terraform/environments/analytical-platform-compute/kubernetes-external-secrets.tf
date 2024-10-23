@@ -60,7 +60,7 @@ resource "kubernetes_manifest" "ui_azure_external_secret" {
   }
 }
 
-resource "kubernetes_manifest" "actions_runners_github_app_secret" {
+resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_secret" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   manifest = {
