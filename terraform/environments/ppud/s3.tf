@@ -564,9 +564,6 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-uat" {
   restrict_public_buckets = true
 }
 
-# Removed S3 bucket notification pending AWS ticket resolution
-
-/*
 resource "aws_s3_bucket_notification" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-uat[0].id
@@ -577,7 +574,6 @@ resource "aws_s3_bucket_notification" "moj-log-files-uat" {
     filter_prefix = "alb-logs/"
   }
 }
-*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0
