@@ -1,10 +1,10 @@
 /* Airflow */
 
-data "aws_secretsmanager_secret_version" "actions_runners_airflow" {
-  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+# data "aws_secretsmanager_secret_version" "actions_runners_airflow" {
+#   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
-  secret_id = module.actions_runners_airflow_secret[0].secret_id
-}
+#   secret_id = module.actions_runners_airflow_secret[0].secret_id
+# }
 
 resource "helm_release" "actions_runner_mojas_airflow" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
@@ -12,7 +12,7 @@ resource "helm_release" "actions_runner_mojas_airflow" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.320.0-1"
+  version    = "2.320.0-2"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -21,7 +21,6 @@ resource "helm_release" "actions_runner_mojas_airflow" {
       {
         github_organisation  = "moj-analytical-services"
         github_repository    = "airflow"
-        github_token         = data.aws_secretsmanager_secret_version.actions_runners_airflow[0].secret_string
         github_runner_labels = "analytical-platform"
         eks_role_arn         = "arn:aws:iam::593291632749:role/data-iam-creator"
       }
