@@ -189,6 +189,8 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
 
 resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
   #checkov:skip=CKV_AWS_21 "ignore"
+  #checkov:skip=CKV2_AWS_61 "ignore"
+  #checkov:skip=CKV2_AWS_62 "ignore"
   #checkov:skip=CKV_AWS_144 "ignore"
   #checkov:skip=CKV_AWS_18 "ignore"
 

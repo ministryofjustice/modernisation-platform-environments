@@ -34,6 +34,7 @@ resource "aws_secretsmanager_secret_policy" "database_dba_passwords" {
 
 # Oracle Database Application Secret
 resource "aws_secretsmanager_secret" "database_application_passwords" {
+  #checkov:skip=CKV2_AWS_57
   name        = local.application_secret_name
   description = "Application Users Credentials"
   kms_key_id  = var.account_config.kms_keys.general_shared

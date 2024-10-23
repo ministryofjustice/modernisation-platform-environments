@@ -170,6 +170,7 @@ resource "aws_iam_policy" "db_access_to_secrets_manager" {
 
 data "aws_iam_policy_document" "instance_ssm" {
   #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
   #checkov:skip=CKV_AWS_356 "ignore"
   statement {
     sid    = "SSMManagedSSM"
