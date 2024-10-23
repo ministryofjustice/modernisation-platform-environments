@@ -308,8 +308,8 @@ module "mojap_compute_logs_s3_kms" {
 
   key_statements = [
     {
-      sid = "AllowLogging"
-
+      sid = "AllowS3Logging"
+      effect = "Allow" 
       actions = [
         "kms:Encrypt",
         "kms:Decrypt",
@@ -317,18 +317,13 @@ module "mojap_compute_logs_s3_kms" {
         "kms:GenerateDataKeyWithoutPlaintext",
         "kms:DescribeKey"
       ]
-
       resources = ["*"]
-
-      effect = "Allow"
-
       principals = [
         {
           type        = "Service"
           identifiers = ["logging.s3.amazonaws.com"]
         }
       ]
-
       conditions = [
         {
           test     = "StringEquals"
