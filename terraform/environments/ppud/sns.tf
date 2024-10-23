@@ -104,7 +104,7 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_uat_policy" {
           "Service" : "s3.amazonaws.com"
         },
         "Action" : "SNS:Publish",
-        "Resource" : "aws_sns_topic.s3_bucket_notifications_uat[0].arn",
+        "Resource" : "arn:aws:sns:eu-west-2:172753231260:s3_bucket_notifications_uat",
         "Condition" : {
           "ArnLike" : {
             "aws:SourceArn" : "arn:aws:s3:::moj-log-files-uat"
