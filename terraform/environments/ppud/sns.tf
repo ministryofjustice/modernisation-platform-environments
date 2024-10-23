@@ -31,14 +31,6 @@ resource "aws_sns_topic" "cw_uat_alerts" {
   name  = "ppud-uat-cw-alerts"
 }
 
-/*
-resource "aws_sns_topic_policy" "sns_uat_policy" {
-  count  = local.is-preproduction == true ? 1 : 0
-  arn    = aws_sns_topic.cw_uat_alerts[0].arn
-  policy = data.aws_iam_policy_document.sns_topic_policy_uat_ec2cw[0].json
-}
-*/
-
 resource "aws_sns_topic_subscription" "cw_uat_subscription" {
   count     = local.is-preproduction == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_uat_alerts[0].arn
@@ -76,21 +68,44 @@ resource "aws_sns_topic_policy" "sns_uat_policy" {
             "AWS:SourceOwner" : "data.aws_caller_identity.current.account_id"
           }
         }
-      },
+      }
+    ]
+  })
+}
+
+# Pre-production - S3 Bucket Notification
+
+resource "aws_sns_topic" "s3_bucket_notifications_uat" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
+  count = local.is-preproduction == true ? 1 : 0
+  name  = "s3_bucket_notifications_uat"
+}
+
+resource "aws_sns_topic_subscription" "s3_bucket_notifications_uat_subscription" {
+  count     = local.is-preproduction == true ? 1 : 0
+  topic_arn = aws_sns_topic.s3_bucket_notifications_uat[0].arn
+  protocol  = "email"
+  endpoint  = "PPUDAlerts@colt.net"
+}
+
+resource "aws_sns_topic_policy" "s3_bucket_notifications_uat_policy" {
+  count = local.is-preproduction == true ? 1 : 0
+  arn   = aws_sns_topic.s3_bucket_notifications_uat[0].arn
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
       {
-        "Sid" : "S3-to-Publish-SNS",
+        "Sid" : "s3_bucket_notifications_uat",
         "Effect" : "Allow",
         "Principal" : {
           "Service" : "s3.amazonaws.com"
         },
         "Action" : "SNS:Publish",
-        "Resource" : "aws_sns_topic.cw_uat_alerts[0].arn",
+        "Resource" : "aws_sns_topic.s3_bucket_notifications_uat[0].arn",
         "Condition" : {
           "ArnLike" : {
             "aws:SourceArn" : "arn:aws:s3:::moj-log-files-uat"
-          },
-          "StringEquals" : {
-            "AWS:SourceOwner" : "data.aws_caller_identity.current.account_id"
           }
         }
       }
