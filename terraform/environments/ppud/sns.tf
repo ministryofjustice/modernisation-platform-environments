@@ -84,13 +84,13 @@ resource "aws_sns_topic_policy" "sns_uat_policy" {
           "Service" : "s3.amazonaws.com"
         },
         "Action" : "SNS:Publish",
-        "Resource" : "aws_sns_topic.cw_uat_alerts[0].arn"
+        "Resource" : "aws_sns_topic.cw_uat_alerts[0].arn",
         "Condition" : {
           "ArnLike" : {
             "aws:SourceArn" : "arn:aws:s3:::moj-log-files-uat"
           },
           "StringEquals" : {
-            "AWS:SourceAccount" : "172753231260"
+            "AWS:SourceOwner" : "data.aws_caller_identity.current.account_id"
           }
         }
       }
