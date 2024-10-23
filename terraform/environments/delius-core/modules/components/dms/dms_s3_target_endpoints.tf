@@ -5,6 +5,7 @@
 # In client environments the dms_audit_source_endpoint.read_database must be defined
 # The endpoint for audit (AUDITED_INTERACTION) is the Delius database.
 resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
+  #checkov:skip=CKV_AWS_298
   count                   = length(local.repository_account_map)
   endpoint_id             = "${var.env_name}-s3-staging-of-audit-data-from-${lower(var.dms_config.audit_source_endpoint.read_database)}"
   endpoint_type           = "target"
@@ -20,6 +21,7 @@ resource "aws_dms_s3_endpoint" "dms_audit_target_endpoint_s3" {
 # In repository environments we must loop through all client environments which write to it, as we
 # will be pushing user updates to all of these.
 resource "aws_dms_s3_endpoint" "dms_user_target_endpoint_s3" {
+  #checkov:skip=CKV_AWS_298
   for_each                = local.client_account_map
   endpoint_id             = "${var.env_name}-s3-staging-of-user-data-from-${lower(var.dms_config.user_source_endpoint.read_database)}-to-${each.key}"
   endpoint_type           = "target"

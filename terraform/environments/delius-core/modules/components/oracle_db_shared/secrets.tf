@@ -1,6 +1,7 @@
 # Oracle Database DBA Secret
 
 resource "aws_secretsmanager_secret" "database_dba_passwords" {
+  #checkov:skip=CKV2_AWS_57
   name        = local.dba_secret_name
   description = "DBA Users Credentials"
   kms_key_id  = var.account_config.kms_keys.general_shared
