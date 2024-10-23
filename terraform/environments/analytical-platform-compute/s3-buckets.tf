@@ -68,6 +68,8 @@ module "mojap_compute_logs_bucket" {
 
   force_destroy = false
 
+  policy = data.aws_iam_policy_document.s3_server_access_logs_policy.json
+
   object_lock_enabled = false
 
   versioning = {
@@ -85,6 +87,4 @@ module "mojap_compute_logs_bucket" {
   }
 
   tags = local.tags
-
-  policy = data.aws_iam_policy_document.s3_server_access_logs_policy.json
 }
