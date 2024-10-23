@@ -94,9 +94,10 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_uat_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17",
+    ID = "s3_bucket_notifications_uat",
     Statement = [
       {
-        "Sid" : "s3_bucket_notifications_uat",
+        "Sid" : "s3_bucket_notifications_uat_iam_policy",
         "Effect" : "Allow",
         "Principal" : {
           "Service" : "s3.amazonaws.com"
