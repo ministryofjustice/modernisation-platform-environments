@@ -71,7 +71,7 @@ locals {
     # instance_type_defaults = {
     #   web = "m6i.xlarge" # 4 vCPUs, 16GB RAM x 2 instances
     #   boe = "m4.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
-    #   bods = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 1 instance, reduced RAM as Azure usage doesn't warrant higher RAM
+    #   bods = "r6i.2xlarge" # 8 vCPUs, 61GB RAM x 1 instance: RAM == production instance to allow load-testing in preprod
     # }
     ec2_instances = {
       pp-onr-bods-1 = merge(local.ec2_instances.bods, {
@@ -87,7 +87,7 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "m6i.2xlarge"
+          instance_type = "r6i.2xlarge"
         })
         cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
