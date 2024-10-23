@@ -264,7 +264,7 @@ class RDS_JDBC_CONNECTION():
                 .option("fetchSize", fetchSize)
                 .load())
 
-    def get_df_read_rds_db_tbl_int_pkey(self, 
+    def get_df_read_rds_db_tbl_int_pkey_v2(self, 
                                         in_table_name,
                                         jdbc_partition_column, 
                                         jdbc_partition_col_lowerbound,
