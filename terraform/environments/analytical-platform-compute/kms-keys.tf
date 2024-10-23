@@ -283,7 +283,7 @@ module "mojap_derived_tables_replication_s3_kms" {
   version = "3.1.1"
 
   aliases               = ["s3/mojap-derived-tables-replication"]
-  description           = "mojap_derived_tables_replication S3 KMS key"
+  description           = "mojap-derived-tables-replication S3 KMS key"
   enable_default_policy = true
 
   deletion_window_in_days = 7
