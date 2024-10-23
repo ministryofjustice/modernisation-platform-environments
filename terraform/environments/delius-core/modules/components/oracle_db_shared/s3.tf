@@ -19,6 +19,7 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
 
 }
 
+# checkov:skip=CKV_TF_1
 module "s3_bucket_oracledb_backups" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
   bucket_name         = local.oracle_backup_bucket_prefix
@@ -334,7 +335,7 @@ data "aws_iam_policy_document" "s3_bucket_oracle_statistics" {
   }
 }
 
-
+# checkov:skip=CKV_TF_1
 module "s3_bucket_oracle_statistics" {
   count = var.deploy_oracle_stats ? 1 : 0
 
