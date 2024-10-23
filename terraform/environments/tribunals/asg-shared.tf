@@ -149,17 +149,11 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
   )
 }
 
-data "aws_ssm_parameter" "ecs_optimized_ami" {
-  // This will find the latest AMI, but if it stops working, you need to find the latest AMI.
-  // Search in the console for "windows ecs optmized" and choose a "Windows_Server-2019-English-Core-ECS_Optimized" from the list
-  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized"
-}
-
 # Create the Launch Template and assign the instance profile
 # Comment out the aws_launch_template and aws_autoscaling_group if you ever need to delete and recreate the ec2 instance
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix            = "tribunals-all"
-  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  image_id               = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized/image_id"
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
