@@ -12,9 +12,9 @@ resource "grafana_data_source" "this" {
   name = "${var.athena_workgroup}-${var.athena_database}"
   json_data_encoded = jsonencode({
     defaultRegion = "eu-west-2"
+    catalog       = "AwsDataCatalog"
     authType      = "ec2_iam_role"
     assumeRoleArn = "arn:aws:iam::${var.account_id}:role/observability-platform"
-    externalId    = var.name
     database      = var.athena_database
     workgroup     = var.athena_workgroup
   })
