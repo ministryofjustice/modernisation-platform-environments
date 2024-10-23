@@ -81,6 +81,11 @@ resource "aws_sns_topic" "s3_bucket_notifications_uat" {
   name  = "s3_bucket_notifications_uat"
 }
 
+data "aws_sns_topic" "s3_bucket_notifications_uat" {
+  count = local.is-preproduction == true ? 1 : 0
+  name  = "s3_bucket_notifications_uat"
+}
+
 resource "aws_sns_topic_subscription" "s3_bucket_notifications_uat_subscription" {
   count     = local.is-preproduction == true ? 1 : 0
   topic_arn = aws_sns_topic.s3_bucket_notifications_uat[0].arn
@@ -104,7 +109,7 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_uat_policy" {
           "Service" : "s3.amazonaws.com"
         },
         "Action" : "SNS:Publish",
-        "Resource" : "arn:aws:sns:eu-west-2:172753231260:s3_bucket_notifications_uat",
+        "Resource" : "data.aws_sns_topic.s3_bucket_notifications_uat.arn",
         "Condition" : {
           "ArnLike" : {
             "aws:SourceArn" : "arn:aws:s3:::moj-log-files-uat"
