@@ -192,30 +192,6 @@ resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
 
   bucket = "${local.oracle_backup_bucket_prefix}-inventory"
 
-  lifecycle_rule = [
-    {
-      id      = "main"
-      enabled = "Enabled"
-      prefix  = ""
-
-      tags = {
-        rule      = "log"
-        autoclean = "true"
-      }
-
-      transition = [
-        {
-          days          = 90
-          storage_class = "STANDARD_IA"
-        }
-      ]
-
-      expiration = {
-        days = 365
-      }
-    }
-  ]
-
   tags = merge(
     var.tags,
     {
