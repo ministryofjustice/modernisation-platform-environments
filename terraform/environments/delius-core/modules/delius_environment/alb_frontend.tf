@@ -48,8 +48,8 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
 
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_frontend" {
-  # checkov:skip=CKV_AWS_91
-  # checkov:skip=CKV2_AWS_28
+  #checkov:skip=CKV_AWS_91
+  #checkov:skip=CKV2_AWS_28
 
   name               = "${var.app_name}-${var.env_name}-weblogic-alb"
   internal           = false
