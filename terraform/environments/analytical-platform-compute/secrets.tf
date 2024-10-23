@@ -128,7 +128,7 @@ module "actions_runners_token_apc_self_hosted_runners_secret" {
   version = "1.3.1"
 
   name        = "actions-runners/token/apc-self-hosted-runners"
-  description = "moj-data-platform-robot: https://github.com/settings/personal-access-tokens/2208432"
+  description = "moj-data-platform-robot: https://github.com/settings/personal-access-tokens/4281036"
   kms_key_id  = module.common_secrets_manager_kms.key_arn
 
   secret_string         = "CHANGEME"
@@ -137,7 +137,7 @@ module "actions_runners_token_apc_self_hosted_runners_secret" {
   tags = merge(
     local.tags,
     {
-      "expiry-date" = "2025-10-24"
+      "expiry-date" = "2025-10-23"
     }
   )
 }
