@@ -12,9 +12,9 @@ moved {
   to   = aws_secretsmanager_secret.database_dba_passwords
 }
 
-#checkov:skip=CKV_AWS_108 "ignore"
-#checkov:skip=CKV_AWS_356 "ignore"
 data "aws_iam_policy_document" "database_dba_passwords" {
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
   statement {
     sid    = "OemAWSAccountToReadTheSecret"
     effect = "Allow"

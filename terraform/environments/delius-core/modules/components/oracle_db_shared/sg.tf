@@ -1,5 +1,5 @@
-#checkov:skip=CKV2_AWS_5 "ignore"
 resource "aws_security_group" "db_ec2" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
   name        = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ec2-instance-sg"
   description = "Controls access to db ec2 instance"
   vpc_id      = var.account_config.shared_vpc_id

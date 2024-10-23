@@ -1,5 +1,5 @@
-#checkov:skip=CKV2_AWS_5 "ignore"
 resource "aws_security_group" "mis_ec2_shared" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
   name        = "${var.env_name}-mis-ec2-shared"
   description = "Security group to allow connectivity within MP"
   vpc_id      = var.account_info.vpc_id

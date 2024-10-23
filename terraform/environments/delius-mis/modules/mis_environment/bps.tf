@@ -1,5 +1,5 @@
-#checkov:skip=CKV2_AWS_5 "ignore"
 resource "aws_security_group" "bps" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
   name_prefix = "${var.env_name}-bps"
   vpc_id      = var.account_info.vpc_id
 }
