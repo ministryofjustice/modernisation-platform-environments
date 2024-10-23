@@ -117,3 +117,28 @@ module "ui_azure_tenant_secret" {
 
   tags = local.tags
 }
+
+module "actions_runners_github_app_secret" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.3.1"
+
+  name        = "actions-runners/github-app"
+  description = "https://github.com/organizations/moj-analytical-services/settings/apps/apc-self-hosted-runners"
+
+  secret_string = jsonencode({
+    "change-me" = "CHANGEME"
+  })
+  ignore_secret_changes = true
+
+  tags = merge(
+    local.tags,
+    {
+      "expiry-date" = "2025-07-31"
+    }
+  )
+}
