@@ -94,6 +94,7 @@ resource "aws_lb" "delius_microservices" {
   security_groups            = [aws_security_group.delius_microservices_service_nlb.id]
   subnets                    = var.account_config.private_subnet_ids
   enable_deletion_protection = false
+  drop_invalid_header_fields = true
   tags                       = var.tags
 }
 
