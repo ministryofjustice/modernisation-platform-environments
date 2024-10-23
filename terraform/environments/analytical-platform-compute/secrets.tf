@@ -129,16 +129,12 @@ module "actions_runners_github_app_secret" {
 
   name        = "actions-runners/github-app"
   description = "https://github.com/organizations/moj-analytical-services/settings/apps/apc-self-hosted-runners"
+  kms_key_id  = module.common_secrets_manager_kms.key_arn
 
   secret_string = jsonencode({
     "change-me" = "CHANGEME"
   })
   ignore_secret_changes = true
 
-  tags = merge(
-    local.tags,
-    {
-      "expiry-date" = "2025-07-31"
-    }
-  )
+  tags = local.tags
 }
