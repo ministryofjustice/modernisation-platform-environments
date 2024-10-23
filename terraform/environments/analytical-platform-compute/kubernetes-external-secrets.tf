@@ -85,7 +85,7 @@ resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_se
             "key" = module.actions_runners_token_apc_self_hosted_runners_secret[0].secret_id
           }
           "secretKey" = "token"
-        },
+        }
       ]
     }
   }
