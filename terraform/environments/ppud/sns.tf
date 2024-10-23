@@ -92,11 +92,12 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_uat_policy" {
   count = local.is-preproduction == true ? 1 : 0
   arn   = aws_sns_topic.s3_bucket_notifications_uat[0].arn
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    ID = "s3_bucket_notifications_uat",
-    Statement = [
-      {
+  policy = <<EOF
+  {
+  "Version": "2012-10-17",
+  "Id": "s3_bucket_notifications_uat",
+  "Statement": [
+     {
         "Sid" : "s3_bucket_notifications_uat_iam_policy",
         "Effect" : "Allow",
         "Principal" : {
@@ -110,6 +111,7 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_uat_policy" {
           }
         }
       }
-    ]
-  })
+     ]
+}
+EOF
 }
