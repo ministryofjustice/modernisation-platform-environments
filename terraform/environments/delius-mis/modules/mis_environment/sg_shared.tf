@@ -16,21 +16,21 @@ resource "aws_vpc_security_group_egress_rule" "http_s" {
   to_port           = each.key
 }
 
-# resource "aws_vpc_security_group_egress_rule" "fleet_manager" {
-#   security_group_id = aws_security_group.mis_ec2_shared.id
-#   cidr_ipv4         = "0.0.0.0/0"
-#   ip_protocol       = "tcp"
-#   from_port         = 3389
-#   to_port           = 3389
-# }
+resource "aws_vpc_security_group_egress_rule" "fleet_manager" {
+  security_group_id = aws_security_group.mis_ec2_shared.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "tcp"
+  from_port         = 3389
+  to_port           = 3389
+}
 
-# resource "aws_vpc_security_group_ingress_rule" "fleet_manager" {
-#   security_group_id = aws_security_group.mis_ec2_shared.id
-#   cidr_ipv4         = "0.0.0.0/0"
-#   ip_protocol       = "tcp"
-#   from_port         = 3389
-#   to_port           = 3389
-# }
+resource "aws_vpc_security_group_ingress_rule" "fleet_manager" {
+  security_group_id = aws_security_group.mis_ec2_shared.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "tcp"
+  from_port         = 3389
+  to_port           = 3389
+}
 
 resource "aws_vpc_security_group_egress_rule" "domain_join" {
   for_each                     = { for port in var.domain_join_ports : "${port.protocol}_${port.from_port}" => port }
