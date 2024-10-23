@@ -34,7 +34,7 @@ server {
                  return 301 https://www.gov.uk/criminal-injuries-compensation-tribunal;
         }
         location ~* ^/Public {
-                 return 301 https://cicap.decisions.tribunals.gov.uk/$request_uri/publicsearch.aspx;
+                 return 301 https://cicap.decisions.tribunals.gov.uk/Public/publicsearch.aspx;
         }
         location ~* ^/images {
                  return 301 https://cicap.decisions.tribunals.gov.uk/$request_uri;
