@@ -81,9 +81,10 @@ resource "aws_sns_topic" "s3_bucket_notifications_uat" {
   name  = "s3_bucket_notifications_uat"
 }
 
-data "aws_sns_topic" "s3_bucket_notifications_uat" {
-  count = local.is-preproduction == true ? 1 : 0
-  name  = "s3_bucket_notifications_uat"
+resource "aws_sns_topic_policy" "s3_bucket_notifications_uat" {
+  count  = local.is-preprdouction == true ? 1 : 0
+  arn    = aws_sns_topic.s3_bucket_notifications_uat[0].arn
+  policy = data.aws_iam_policy_document.sns_topic_policy_s3_notifications_uat[0].json
 }
 
 resource "aws_sns_topic_subscription" "s3_bucket_notifications_uat_subscription" {
@@ -93,30 +94,30 @@ resource "aws_sns_topic_subscription" "s3_bucket_notifications_uat_subscription"
   endpoint  = "PPUDAlerts@colt.net"
 }
 
-resource "aws_sns_topic_policy" "s3_bucket_notifications_uat_policy" {
-  count = local.is-preproduction == true ? 1 : 0
-    arn   = aws_sns_topic.s3_bucket_notifications_uat[0].arn
-
-    policy = jsonencode({
-    Version = "2012-10-17",
-    Id = "s3_bucket_notifications_uat",
-    Statement = [
-      {
-        "Sid" : "s3_bucket_notifications_uat_iam_policy",
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : "s3.amazonaws.com"
-        },
-        "Action" : "SNS:Publish",
-        "Resource" : "data.aws_sns_topic.s3_bucket_notifications_uat[0].arn",
-        "Condition" : {
-          "ArnLike" : {
-            "aws:SourceArn" : "arn:aws:s3:::moj-log-files-uat"
-          }
-        }
-      }
+data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_uat" {
+  count     = local.is-preproduction == true ? 1 : 0
+  policy_id = "s3_bucket_notifications_uat"
+  statement {
+    sid = "S3-Publish-SNS"
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    effect = "Allow"
+    actions = [
+      "SNS:Publish"
     ]
-  })
+
+     condition {
+      test     = "ArnLike"
+      variable = "AWS:SourceArn"
+      values   = ["arn:aws:s3:::moj-log-files-uat"]
+    }
+
+    resources = [
+      aws_sns_topic.s3_bucket_notifications_uat[0].arn
+    ]
+  }
 }
 
 # Development - S3 Bucket Notification
@@ -133,13 +134,6 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_dev" {
   policy = data.aws_iam_policy_document.sns_topic_policy_s3_notifications_dev[0].json
 }
 
-/*
-data "aws_sns_topic" "s3_bucket_notifications_dev" {
-  count = local.is-development == true ? 1 : 0
-  name  = "s3_bucket_notifications_dev"
-}
-*/
-
 resource "aws_sns_topic_subscription" "s3_bucket_notifications_dev_subscription" {
   count = local.is-development == true ? 1 : 0
   topic_arn = aws_sns_topic.s3_bucket_notifications_dev[0].arn
@@ -147,32 +141,28 @@ resource "aws_sns_topic_subscription" "s3_bucket_notifications_dev_subscription"
   endpoint  = "PPUDAlerts@colt.net"
 }
 
-
-
-/*
-resource "aws_sns_topic_policy" "s3_bucket_notifications_dev_policy" {
-  count = local.is-development == true ? 1 : 0
-    arn   = aws_sns_topic.s3_bucket_notifications_dev[0].arn
-
-    policy = jsonencode({
-    Version = "2012-10-17",
-    Id = "s3_bucket_notifications_dev",
-    Statement = [
-      {
-        "Sid" : "s3_bucket_notifications_dev_iam_policy",
-        "Effect" : "Allow",
-        "Principal" : {
-          "Service" : "s3.amazonaws.com"
-        },
-        "Action" : "SNS:Publish",
-        "Resource" : "data.aws_sns_topic.s3_bucket_notifications_dev[0].arn",
-        "Condition" : {
-          "ArnLike" : {
-            "aws:SourceArn" : "arn:aws:s3:::moj-log-files-dev"
-          }
-        }
-      }
+data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_dev" {
+  count     = local.is-development == true ? 1 : 0
+  policy_id = "s3_bucket_notifications_dev"
+  statement {
+    sid = "S3-Publish-SNS"
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    effect = "Allow"
+    actions = [
+      "SNS:Publish"
     ]
-  })
+
+     condition {
+      test     = "ArnLike"
+      variable = "AWS:SourceArn"
+      values   = ["arn:aws:s3:::moj-log-files-dev"]
+    }
+
+    resources = [
+      aws_sns_topic.s3_bucket_notifications_dev[0].arn
+    ]
+  }
 }
-*/
