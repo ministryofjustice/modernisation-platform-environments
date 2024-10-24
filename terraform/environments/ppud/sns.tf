@@ -127,10 +127,18 @@ resource "aws_sns_topic" "s3_bucket_notifications_dev" {
   name  = "s3_bucket_notifications_dev"
 }
 
+resource "aws_sns_topic_policy" "s3_bucket_notifications_dev" {
+  count  = local.is-development == true ? 1 : 0
+  arn    = aws_sns_topic.s3_bucket_notifications_dev[0].arn
+  policy = data.aws_iam_policy_document.sns_topic_policy_s3_notifications_dev[0].json
+}
+
+/*
 data "aws_sns_topic" "s3_bucket_notifications_dev" {
   count = local.is-development == true ? 1 : 0
   name  = "s3_bucket_notifications_dev"
 }
+*/
 
 resource "aws_sns_topic_subscription" "s3_bucket_notifications_dev_subscription" {
   count = local.is-development == true ? 1 : 0
@@ -139,6 +147,9 @@ resource "aws_sns_topic_subscription" "s3_bucket_notifications_dev_subscription"
   endpoint  = "PPUDAlerts@colt.net"
 }
 
+
+
+/*
 resource "aws_sns_topic_policy" "s3_bucket_notifications_dev_policy" {
   count = local.is-development == true ? 1 : 0
     arn   = aws_sns_topic.s3_bucket_notifications_dev[0].arn
@@ -164,3 +175,4 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_dev_policy" {
     ]
   })
 }
+*/
