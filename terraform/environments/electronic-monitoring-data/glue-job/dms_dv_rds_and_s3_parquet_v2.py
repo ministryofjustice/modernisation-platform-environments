@@ -143,7 +143,7 @@ def exclude_rds_matched_rows_from_parquet_df(df_prq_read_t2, df_rds_temp_t4, jdb
                     .select("L.*")
 
 def apply_rds_transforms(df_rds_temp: DataFrame,
-                         rds_db_name, 
+                         rds_jdbc_conn_obj, 
                          rds_tbl_name) -> DataFrame:
     trim_str_msg = ""
 
@@ -188,19 +188,19 @@ def apply_rds_transforms(df_rds_temp: DataFrame,
     if t2_rds_ts_col_msec_trimmed:
         df_rds_temp_t3 = df_rds_temp_t2.selectExpr(
                             *CustomPysparkMethods.get_nvl_select_list(df_rds_temp, 
-                                                                      rds_db_name, 
+                                                                      rds_jdbc_conn_obj, 
                                                                       rds_tbl_name)
                         )
     elif t1_rds_str_col_trimmed:
         df_rds_temp_t3 = df_rds_temp_t1.selectExpr(
                             *CustomPysparkMethods.get_nvl_select_list(df_rds_temp, 
-                                                                      rds_db_name, 
+                                                                      rds_jdbc_conn_obj, 
                                                                       rds_tbl_name)
                         )
     else:
         df_rds_temp_t3 = df_rds_temp.selectExpr(
                             *CustomPysparkMethods.get_nvl_select_list(df_rds_temp, 
-                                                                      rds_db_name, 
+                                                                      rds_jdbc_conn_obj, 
                                                                       rds_tbl_name))
     # -------------------------------------------------------
 
@@ -399,7 +399,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
 
             # TRANSFORM & CACHE - RDS - BATCH ROWS: START
             df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, 
-                                                                                rds_db_name, 
+                                                                                rds_jdbc_conn_obj, 
                                                                                 rds_tbl_name)
             additional_msg = trim_str_msg+trim_ts_ms_msg \
                                 if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
@@ -471,7 +471,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
 
                 # TRANSFORM & CACHE - RDS - BATCH ROWS: START
                 df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg = apply_rds_transforms(df_rds_temp, 
-                                                                                    rds_db_name, 
+                                                                                    rds_jdbc_conn_obj, 
                                                                                     rds_tbl_name)
                 additional_msg = trim_str_msg+trim_ts_ms_msg \
                                     if trim_str_msg+trim_ts_ms_msg != '' else additional_msg
