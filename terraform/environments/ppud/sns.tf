@@ -81,7 +81,7 @@ resource "aws_sns_topic" "s3_bucket_notifications_uat" {
   name  = "s3_bucket_notifications_uat"
 }
 
-data "aws_sns_topic" "data_s3_bucket_notifications_uat" {
+data "aws_sns_topic" "s3_bucket_notifications_uat" {
   count = local.is-preproduction == true ? 1 : 0
   name  = "s3_bucket_notifications_uat"
 }
@@ -108,7 +108,7 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_uat_policy" {
           "Service" : "s3.amazonaws.com"
         },
         "Action" : "SNS:Publish",
-        "Resource" : "data.aws_sns_topic.data_s3_bucket_notifications_uat[0].arn",
+        "Resource" : "data.aws_sns_topic.s3_bucket_notifications_uat[0].arn",
         "Condition" : {
           "ArnLike" : {
             "aws:SourceArn" : "arn:aws:s3:::moj-log-files-uat"
@@ -127,7 +127,7 @@ resource "aws_sns_topic" "s3_bucket_notifications_dev" {
   name  = "s3_bucket_notifications_dev"
 }
 
-data "aws_sns_topic" "s3_bucket_notifications_dev" {
+data "aws_sns_topic" "data_s3_bucket_notifications_dev" {
   count = local.is-development == true ? 1 : 0
   name  = "s3_bucket_notifications_dev"
 }
@@ -154,7 +154,7 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_dev_policy" {
           "Service" : "s3.amazonaws.com"
         },
         "Action" : "SNS:Publish",
-        "Resource" : "data.aws_sns_topic.s3_bucket_notifications_dev[0].arn",
+        "Resource" : "data.aws_sns_topic.data_s3_bucket_notifications_dev[0].arn",
         "Condition" : {
           "ArnLike" : {
             "aws:SourceArn" : "arn:aws:s3:::moj-log-files-dev"
