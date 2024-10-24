@@ -41,6 +41,7 @@ LOGGER = glueContext.get_logger()
 # ===============================================================================
 # NOTES-1:> If non-integer datatype or more than one value provided to 'rds_db_tbl_pkeys_col_list', the job fails.
 # NOTES-2:> 'parallel_jdbc_conn_num' value to be given is to be aligned with number of workers & executors.
+# NOTES-3:> 'rds_upperbound_factor' used to evaluate the number of rows to be processed for each batch iteration.
 # MANDATORY INPUTS: 'rds_db_tbl_pkeys_col_list', 'parquet_df_repartition_num'
 # DEFAULT INPUTS: {'rds_df_repartition_num': 0}, {'parallel_jdbc_conn_num': 4}
 
@@ -124,15 +125,17 @@ SELECT TC.TABLE_CATALOG, TC.TABLE_SCHEMA, TC.TABLE_NAME, COLUMN_NAME
 
 # ===============================================================================
 
-def exclude_rds_matched_rows_from_parquet_df(df_prq_read_t2, df_rds_temp_t4, jdbc_partition_column):
+def exclude_rds_matched_rows_from_parquet_df(df_prq_read_t2: DataFrame, 
+                                             df_rds_temp_t4: DataFrame, 
+                                             jdbc_partition_column) -> DataFrame:
     if args['prq_leftanti_join_rds'] == 'true':
-        return df_prq_read_t2.alias("L").join(
+        df = df_prq_read_t2.alias("L").join(
                                             df_rds_temp_t4.alias("R"), 
                                             on=df_rds_temp_t4.columns, 
                                             how='leftanti'
                 )
     else:
-        return df_prq_read_t2.alias("L").join(
+        df =  df_prq_read_t2.alias("L").join(
                                             df_rds_temp_t4.alias("R"), 
                                             on=jdbc_partition_column, 
                                             how='left'
@@ -141,6 +144,8 @@ def exclude_rds_matched_rows_from_parquet_df(df_prq_read_t2, df_rds_temp_t4, jdb
                                         for column in df_rds_temp_t4.columns
                                         if column != jdbc_partition_column]))\
                     .select("L.*")
+    return df
+
 
 def apply_rds_transforms(df_rds_temp: DataFrame,
                          rds_jdbc_conn_obj, 
@@ -205,6 +210,7 @@ def apply_rds_transforms(df_rds_temp: DataFrame,
     # -------------------------------------------------------
 
     return df_rds_temp_t3, trim_str_msg, trim_ts_ms_msg
+
 
 def process_dv_for_table(rds_jdbc_conn_obj, 
                          db_sch_tbl) -> DataFrame:
@@ -422,9 +428,10 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             # spark.catalog.clearCache() #>> which clears all cached RDDs/dataframes.
             # ---------------------------
 
-            df_prq_read_t2_filtered = df_prq_read_t2_filtered.repartition(parquet_df_repartition_num, 
-                                                                          jdbc_partition_column)
-            df_prq_read_t2 = df_prq_read_t2_filtered.cache()
+            df_prq_read_t2 = df_prq_read_t2_filtered.repartition(
+                                                        parquet_df_repartition_num, 
+                                                        jdbc_partition_column)
+            
             # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - END
 
             # ACTION
@@ -433,7 +440,9 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             total_rds_rows_fetched += rds_rows_read_count
 
             # ACTION
-            cumulative_matched_rows = df_rds_count - df_prq_read_t2.count()
+            df_prq_read_t2_count = df_prq_read_t2.count()
+            LOGGER.info(f"""{loop_count}-df_prq_read_t2_count = {df_prq_read_t2_count}""")
+            cumulative_matched_rows = df_rds_count - df_prq_read_t2_count
             LOGGER.info(f"""{loop_count}-cumulative_matched_rows = {cumulative_matched_rows}""")
 
             df_rds_temp_t4.unpersist(True)
@@ -489,10 +498,10 @@ def process_dv_for_table(rds_jdbc_conn_obj,
 
                 # df_prq_read_t2.unpersist() #>> This may not be required to update a cached dataframe <<
 
-                df_prq_read_t2_filtered = df_prq_read_t2_filtered.repartition(
-                                                int(parquet_df_repartition_num/2), 
-                                                jdbc_partition_column)
-                df_prq_read_t2 = df_prq_read_t2_filtered.cache()
+                df_prq_read_t2 = df_prq_read_t2_filtered.repartition(
+                                                            int(parquet_df_repartition_num/2), 
+                                                            jdbc_partition_column)
+                
                 # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
 
                 # ACTION
@@ -501,7 +510,9 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                 total_rds_rows_fetched += rds_rows_read_count
 
                 # ACTION
-                cumulative_matched_rows = df_rds_count - df_prq_read_t2.count()
+                df_prq_read_t2_count = df_prq_read_t2.count()
+                LOGGER.info(f"""{loop_count}-df_prq_read_t2_count = {df_prq_read_t2_count}""")
+                cumulative_matched_rows = df_rds_count - df_prq_read_t2_count
                 LOGGER.info(f"""{loop_count}-cumulative_matched_rows = {cumulative_matched_rows}""")
 
                 df_rds_temp_t4.unpersist(True)
@@ -509,7 +520,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
         LOGGER.info(f"""RDS-SQLServer-JDBC READ {rds_tbl_name}: Total batch iterations = {loop_count}""")
 
         # ACTION
-        total_row_differences = df_prq_read_t2.count()
+        total_row_differences = df_prq_read_t2_count
         df_prq_read_t2.unpersist(True)
 
         if total_row_differences == 0 and (total_rds_rows_fetched == cumulative_matched_rows):

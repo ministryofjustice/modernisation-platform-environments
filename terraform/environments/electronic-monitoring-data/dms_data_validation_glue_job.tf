@@ -179,9 +179,9 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
     "--prq_leftanti_join_rds"             = "false"
     "--parquet_df_repartition_num"        = 24
-    "--parallel_jdbc_conn_num"            = 3
-    "--rds_df_repartition_num"            = 16
-    "--rds_upperbound_factor"             = 3
+    "--parallel_jdbc_conn_num"            = 4
+    "--rds_df_repartition_num"            = 0
+    "--rds_upperbound_factor"             = 1
     "--rds_sqlserver_db"                  = ""
     "--rds_sqlserver_db_schema"           = "dbo"
     "--rds_sqlserver_db_table"            = ""
