@@ -389,7 +389,6 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-prod" {
   restrict_public_buckets = true
 }
 
-/*
 resource "aws_s3_bucket_notification" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-prod[0].id
@@ -400,7 +399,6 @@ resource "aws_s3_bucket_notification" "moj-log-files-prod" {
     filter_prefix = "alb-logs/"
   }
 }
-*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0
@@ -562,7 +560,6 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-uat" {
   restrict_public_buckets = true
 }
 
-/*
 resource "aws_s3_bucket_notification" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-uat[0].id
@@ -572,7 +569,6 @@ resource "aws_s3_bucket_notification" "moj-log-files-uat" {
     filter_prefix = "alb-logs/"
   }
 }
-*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0
@@ -867,7 +863,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "arn:aws:s3:::moj-log-files-dev/*"
         ]
         "Principal" : {
-          Service = "elasticloadbalancing.amazonaws.com"
+          "AWS": "arn:aws:iam::652711504416:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
         }
       }
     ]
