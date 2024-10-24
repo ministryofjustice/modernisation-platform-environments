@@ -736,6 +736,18 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-dev" {
   restrict_public_buckets = true
 }
 
+/*
+resource "aws_s3_bucket_notification" "moj-log-files-dev" {
+  count  = local.is-development == true ? 1 : 0 
+  bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  topic {
+    topic_arn = aws_sns_topic.s3_bucket_notifications_dev[0].arn
+    events        = ["s3:ObjectCreated:*"]
+    filter_prefix = "alb-logs/"
+  }
+}
+*/
+
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
   count  = local.is-development == true ? 1 : 0
   bucket = aws_s3_bucket.moj-log-files-dev[0].id
