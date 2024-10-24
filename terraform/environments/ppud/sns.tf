@@ -127,12 +127,10 @@ resource "aws_sns_topic" "s3_bucket_notifications_dev" {
   name  = "s3_bucket_notifications_dev"
 }
 
-/*
 data "aws_sns_topic" "s3_bucket_notifications_dev" {
   count = local.is-development == true ? 1 : 0
   name  = "s3_bucket_notifications_dev"
 }
-*/
 
 resource "aws_sns_topic_subscription" "s3_bucket_notifications_dev_subscription" {
   count = local.is-development == true ? 1 : 0
