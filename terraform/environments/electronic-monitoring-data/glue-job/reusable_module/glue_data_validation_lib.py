@@ -643,13 +643,11 @@ class CustomPysparkMethods:
         altered_schema_object = T.StructType([])
         rds_df_column_list = in_df_rds.schema.fields
 
-        logger_err_msg = f"""
-        Given transformed column '{colmn}' is not an existing RDS-DB-Table-Column! Exiting ...
-        """.strip()
-
         for colmn in in_transformed_column_list:
             if colmn not in rds_df_column_list:
-                SparkSession.LOGGER.error(logger_err_msg)
+                SparkSession.LOGGER.error(f"""
+                Given transformed column '{colmn}' is not an existing RDS-DB-Table-Column! Exiting ...
+                """.strip())
                 sys.exit(1)
 
         for field_obj in in_df_rds.schema.fields:
