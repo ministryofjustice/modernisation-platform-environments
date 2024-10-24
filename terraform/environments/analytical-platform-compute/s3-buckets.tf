@@ -25,7 +25,7 @@ module "mlflow_bucket" {
 data "aws_iam_policy_document" "s3_replication_policy" {
   #checkov:skip=CKV_AWS_356:resource "*" being applied to replication iam role only
   statement {
-    sid    = "Permissions on objects"
+    sid    = "AllowLakeFormationPrincipalsReplication"
     effect = "Allow"
     actions = [
       "s3:ReplicateTags",
