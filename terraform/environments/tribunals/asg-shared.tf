@@ -206,9 +206,18 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
       spot_allocation_strategy       = "lowest-price"  # Strategy for spot instances
     }
 
-    launch_template_specification {
+  launch_template {
       launch_template_id = aws_launch_template.tribunals-all-lt.id
       version            = "$Latest"
+
+      // Specify multiple instance types
+      overrides {
+        instance_type = "m5.4xlarge"  # First instance type
+      }
+
+      overrides {
+        instance_type = "m5.large"     # Second instance type
+      }
     }
   }
 
