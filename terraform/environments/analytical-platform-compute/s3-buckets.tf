@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "s3_replication_policy" {
       identifiers = ["arn:aws:iam::525294151996:role/service-role/s3replicate_role_for_lf-antfmoj-test"]
     }
     resources = [
-      "*"
+      "arn:aws:s3:::mojap-compute-${local.environment}-derived-tables-replication"
     ]
   }
 }
@@ -86,7 +86,7 @@ data "aws_iam_policy_document" "s3_server_access_logs_policy" {
     sid       = "S3ServerAccessLogsPolicy"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["*"]
+    resources = ["arn:aws:s3:::mojap-compute-${local.environment}-logs"]
     principals {
       type        = "Service"
       identifiers = ["logging.s3.amazonaws.com"]
