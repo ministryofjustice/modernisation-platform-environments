@@ -33,6 +33,8 @@ module "mojap_derived_tables_replication_bucket" {
 
   force_destroy = true
 
+  policy = data.aws_iam_policy_document.s3_replication_policy.json
+
   object_lock_enabled = false
 
   versioning = {
