@@ -39,7 +39,10 @@ LOGGER = glueContext.get_logger()
 # ===============================================================================
 
 # ===============================================================================
-
+# NOTES-1:> If non-integer datatype or more than one value provided to 'rds_db_tbl_pkeys_col_list', the job fails.
+# NOTES-2:> 'parallel_jdbc_conn_num' value to be given is to be aligned with number of workers & executors.
+# MANDATORY INPUTS: 'rds_db_tbl_pkeys_col_list', 'parquet_df_repartition_num'
+# DEFAULT INPUTS: {'rds_df_repartition_num': 0}, {'parallel_jdbc_conn_num': 4}
 
 # Organise capturing input parameters.
 DEFAULT_INPUTS_LIST = ["JOB_NAME",
@@ -121,6 +124,24 @@ SELECT TC.TABLE_CATALOG, TC.TABLE_SCHEMA, TC.TABLE_NAME, COLUMN_NAME
 
 # ===============================================================================
 
+def exclude_rds_matched_rows_from_parquet_df(df_prq_read_t2, df_rds_temp_t4, jdbc_partition_column):
+    if args['prq_leftanti_join_rds'] == 'true':
+        return df_prq_read_t2.alias("L").join(
+                                            df_rds_temp_t4.alias("R"), 
+                                            on=df_rds_temp_t4.columns, 
+                                            how='leftanti'
+                )
+    else:
+        return df_prq_read_t2.alias("L").join(
+                                            df_rds_temp_t4.alias("R"), 
+                                            on=jdbc_partition_column, 
+                                            how='left'
+                                        )\
+                    .where(" or ".join([f"L.{column} != R.{column}" 
+                                        for column in df_rds_temp_t4.columns
+                                        if column != jdbc_partition_column]))\
+                    .select("L.*")
+
 def apply_rds_transforms(df_rds_temp: DataFrame,
                          rds_db_name, 
                          rds_tbl_name) -> DataFrame:
@@ -190,6 +211,8 @@ def process_dv_for_table(rds_jdbc_conn_obj,
     given_rds_sqlserver_db_schema = args['rds_sqlserver_db_schema']
 
     rds_tbl_name = db_sch_tbl.split(f"_{given_rds_sqlserver_db_schema}_")[1]
+    qualified_tbl_name = f"""{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}"""
+    final_validation_msg = f"""{qualified_tbl_name} -- Validation Completed."""
 
     df_dv_output_schema = T.StructType(
         [T.StructField("run_datetime", T.TimestampType(), True),
@@ -199,8 +222,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
          T.StructField("full_table_name", T.StringType(), True),
          T.StructField("table_to_ap", T.StringType(), True)])
     
-    msg_prefix = f"""{rds_db_name}.{given_rds_sqlserver_db_schema}.{rds_tbl_name}"""
-    final_validation_msg = f"""{msg_prefix} -- Validation Completed."""
+    df_dv_output = CustomPysparkMethods.get_pyspark_empty_df(df_dv_output_schema)
 
     tbl_prq_s3_folder_path = CustomPysparkMethods.get_s3_table_folder_path(
                                 rds_jdbc_conn_obj, 
@@ -210,9 +232,11 @@ def process_dv_for_table(rds_jdbc_conn_obj,
     LOGGER.info(f"""tbl_prq_s3_folder_path = {tbl_prq_s3_folder_path}""")
     # -------------------------------------------------------
 
+    # VERIFY IF DMS-PARQUET-OUTPUT IS AVAILABLE. 
     if tbl_prq_s3_folder_path is not None:
         # -------------------------------------------------------
-
+        # VERIFY IF SOURCE-TABLE-PRIMARY-KEY IS GIVEN.
+        # IF NOT, TRY PULLING THE SAME INFO FROM THE PRE-DEFINED PYTHON DICT.
         if args.get('rds_db_tbl_pkeys_col_list', None) is None:
             try:
                 rds_db_tbl_pkeys_col_list = [column.strip() 
@@ -227,24 +251,47 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             LOGGER.info(f"""rds_db_tbl_pkeys_col_list = {rds_db_tbl_pkeys_col_list}""")
         # -------------------------------------------------------
 
-        df_dv_output = CustomPysparkMethods.get_pyspark_empty_df(df_dv_output_schema)
-
         rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df(rds_tbl_name)
+        # df_rds_columns_list = rds_db_table_empty_df.columns
+        
+        df_rds_dtype_dict = CustomPysparkMethods.get_dtypes_dict(rds_db_table_empty_df)
+        int_dtypes_colname_list = [colname for colname, dtype in df_rds_dtype_dict.items() 
+                                   if dtype in INT_DATATYPES_LIST]
 
+        if len(rds_db_tbl_pkeys_col_list) == 1 and \
+            (rds_db_tbl_pkeys_col_list[0] in int_dtypes_colname_list):
+
+            jdbc_partition_column = rds_db_tbl_pkeys_col_list[0]
+            pkey_max_value = rds_jdbc_conn_obj.get_rds_db_table_pkey_col_max_value(
+                                rds_tbl_name, 
+                                jdbc_partition_column
+                            )
+            LOGGER.info(f"""pkey_max_value = {pkey_max_value}""")
+        else:
+            LOGGER.error(f"""int_dtypes_colname_list = {int_dtypes_colname_list}""")
+            LOGGER.error(f"""PrimaryKey column(s) are more than one (OR) not an integer datatype column!""")
+            sys.exit(1)
+        # -------------------------------------------------------
+
+        # EVALUATE RDS-DATAFRAME ROW-COUNT
         df_rds_count = rds_jdbc_conn_obj.get_rds_db_table_row_count(
                                             rds_tbl_name, 
                                             rds_db_tbl_pkeys_col_list
                         )
         
+        # BUILD DATAFRAME-SCHEMA-OBJECT EXCLUDING NON-PRIMARY-KEY FIELDS
         prq_pk_schema = CustomPysparkMethods.get_rds_db_tbl_customized_cols_schema_object(
                             rds_db_table_empty_df, 
                             rds_db_tbl_pkeys_col_list
                         )
         
+        # EVALUATE PARQUET-DATAFRAME ROW-COUNT
         df_prq_count = CustomPysparkMethods.get_s3_parquet_df_v2(
                             tbl_prq_s3_folder_path, 
                             prq_pk_schema).count()
 
+        # IF ROW-COUNT MATCHING BETWEEN THE RDS AND PARQUET SOURCES THEN CONTINUE
+        # ELSE EXIT THE PROGRAM GRACEFULLY WITH RELEVANT MESSAGE LOGGED INTO OUTPUT DATAFRAME.
         if not (df_rds_count == df_prq_count):
             mismatch_validation_msg_1 = "MISMATCHED Dataframe(s) Row Count!"
             mismatch_validation_msg_2 = f"""'{rds_tbl_name} - {df_rds_count}:{df_prq_count} {mismatch_validation_msg_1}'"""
@@ -267,34 +314,17 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             LOGGER.info(f"""df_rds_count = df_prq_count = {df_rds_count}""")
         # -------------------------------------------------------
 
-        # df_rds_columns_list = rds_db_table_empty_df.columns
-        
-        df_rds_dtype_dict = CustomPysparkMethods.get_dtypes_dict(rds_db_table_empty_df)
-        int_dtypes_colname_list = [colname for colname, dtype in df_rds_dtype_dict.items() 
-                                   if dtype in INT_DATATYPES_LIST]
-        # -------------------------------------------------------
-
-        if len(rds_db_tbl_pkeys_col_list) == 1 and \
-            (rds_db_tbl_pkeys_col_list[0] in int_dtypes_colname_list):
-
-            jdbc_partition_column = rds_db_tbl_pkeys_col_list[0]
-            pkey_max_value = rds_jdbc_conn_obj.get_rds_db_table_pkey_col_max_value(
-                                rds_tbl_name, 
-                                jdbc_partition_column
-                            )
-        else:
-            LOGGER.error(f"""int_dtypes_colname_list = {int_dtypes_colname_list}""")
-            LOGGER.error(f"""PrimaryKey column(s) are more than one (OR) not an integer datatype column!""")
-            sys.exit(1)
-        # -------------------------------------------------------
-
+        # CREATE PARQUET-DATAFRAME USING RDS-DATAFRAME-SCHEMA.
         df_prq_full_read = CustomPysparkMethods.get_s3_parquet_df_v2(
                                 tbl_prq_s3_folder_path, 
                                 rds_db_table_empty_df.schema
                             )
-        msg_prefix = f"""df_prq_full_read-{rds_tbl_name}"""
-        LOGGER.info(f"""{msg_prefix}: READ PARTITIONS = {df_prq_full_read.rdd.getNumPartitions()}""")
+        msg_prefix = f"""
+        df_prq_full_read-{rds_tbl_name}: READ PARTITIONS = {df_prq_full_read.rdd.getNumPartitions()}
+        """.strip()
+        LOGGER.info(msg_prefix)
 
+        # APPLY TRANSFORMATIONS-1 ON PARQUET-DATAFRAME TO HANDLE NULL VALUES
         df_prq_read_t1 = df_prq_full_read.selectExpr(
                             *CustomPysparkMethods.get_nvl_select_list(
                                 rds_db_table_empty_df, 
@@ -302,6 +332,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                                 rds_tbl_name)
                         )
 
+        # APPLY REPARTITIONING ON PARQUET-DATAFRAME TO UNIFORMLY DISTRIBUTE DATA
         parquet_df_repartition_num = int(args['parquet_df_repartition_num'])
 
         msg_prefix = f"""df_prq_read_t1-{rds_tbl_name}"""
@@ -312,19 +343,19 @@ def process_dv_for_table(rds_jdbc_conn_obj,
         msg_prefix = f"""df_prq_read_t2-{rds_tbl_name}"""
         LOGGER.info(f"""{msg_prefix}: PARQUET-DF-Partitions = {df_prq_read_t2.rdd.getNumPartitions()}""")
         
+        # CACHE PARQUET-DATAFRAME TO RETAIN THE DAG STATE
         df_prq_read_t2 = df_prq_read_t2.cache()
         LOGGER.info(f"""{msg_prefix} Dataframe Cached into memory.""")
 
         # -------------------------------------------------------
 
+        # EVALUATE THE ROW-COUNT FOR EACH BATCH OF RDS-JDBC-READ ITERATION
         rds_rows_per_batch = int(df_rds_count/int(args['rds_upperbound_factor']))
         LOGGER.info(f"""rds_rows_per_batch = {rds_rows_per_batch}""")
 
-
-        LOGGER.info(f"""pkey_max_value = {pkey_max_value}""")
-
         # -------------------------------------------------------
 
+        # PREPARE LOGICAL VARIABLE(S) DECLARATION IN THE FOLLOWING WHILE-LOOP
         rds_df_repartition_num = int(args['rds_df_repartition_num'])
 
         rds_rows_read_count = 0
@@ -333,6 +364,8 @@ def process_dv_for_table(rds_jdbc_conn_obj,
         jdbc_partition_col_upperbound = 0
         additional_msg = ''
 
+        # WHILE-LOOP TO READ & TRANSFORM RDS-DATAFRAME AND
+        # EVALUATE REQUIRED STATS FROM COMPARING WITH THE CACHED PARQUET-DATAFRAME
         loop_count = 0
         while (jdbc_partition_col_upperbound+rds_rows_per_batch) <= pkey_max_value:
             loop_count += 1
@@ -348,20 +381,20 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             LOGGER.info(f"""{loop_count}-{msg_prefix}""")
             
 
-            # READ & REPARTITION - RDS - BATCH ROWS: START
-            df_rds_temp = rds_jdbc_conn_obj.get_df_read_rds_db_tbl_int_pkey(
+            # READ RDS-DATAFRAME (PARALLEL JDBC CONNECTIONS)
+            df_rds_temp = rds_jdbc_conn_obj.get_df_read_rds_db_tbl_pkey_between(
                                                 rds_tbl_name, 
                                                 jdbc_partition_column,
                                                 jdbc_partition_col_lowerbound,
-                                                jdbc_partition_col_upperbound
+                                                jdbc_partition_col_upperbound,
+                                                int(args['parallel_jdbc_conn_num'])
                             )
             msg_prefix = f"""READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}"""
             LOGGER.info(f"""{loop_count}-df_rds_temp-{db_sch_tbl}: {msg_prefix}""")
 
+            # REPARTITION RDS-DATAFRAME IF ENABLED
             if rds_df_repartition_num != 0:
                 df_rds_temp = df_rds_temp.repartition(rds_df_repartition_num, jdbc_partition_column)
-            # -------------------------------------------
-            # READ & REPARTITION - RDS - BATCH ROWS: END
 
 
             # TRANSFORM & CACHE - RDS - BATCH ROWS: START
@@ -376,22 +409,18 @@ def process_dv_for_table(rds_jdbc_conn_obj,
 
 
             # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
-            if args['prq_leftanti_join_rds'] == 'true':
-                df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
-                                            .join(df_rds_temp_t4.alias("R"), 
-                                                  on=df_rds_temp_t4.columns, 
-                                                  how='leftanti')
-            else:
-                df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
-                                            .join(df_rds_temp_t4.alias("R"), 
-                                                  on=jdbc_partition_column, how='left')\
-                                            .where(" or ".join([f"L.{column} != R.{column}" 
-                                                                for column in df_rds_temp_t4.columns
-                                                                if column != jdbc_partition_column]))\
-                                            .select("L.*")
+            df_prq_read_t2_filtered = exclude_rds_matched_rows_from_parquet_df(
+                                            df_prq_read_t2,
+                                            df_rds_temp_t4,
+                                            jdbc_partition_column)
             # --------------------------------------------
 
-            df_prq_read_t2.unpersist()
+            # df_prq_read_t2.unpersist() #>> This may not be required to update a cached dataframe <<
+
+            # ---------------------------
+            # sc._jsc.getPersistentRDDs() #>> which shows a list of cached RDDs/dataframes, and
+            # spark.catalog.clearCache() #>> which clears all cached RDDs/dataframes.
+            # ---------------------------
 
             df_prq_read_t2_filtered = df_prq_read_t2_filtered.repartition(parquet_df_repartition_num, 
                                                                           jdbc_partition_column)
@@ -424,11 +453,12 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                 LOGGER.info(f"""{loop_count}-{msg_prefix}""")
 
                 # READ - RDS - BATCH ROWS: START
-                df_rds_temp = rds_jdbc_conn_obj.get_df_read_rds_db_tbl_int_pkey(
+                df_rds_temp = rds_jdbc_conn_obj.get_df_read_rds_db_tbl_pkey_between(
                                                     rds_tbl_name, 
                                                     jdbc_partition_column,
                                                     jdbc_partition_col_lowerbound,
-                                                    jdbc_partition_col_upperbound
+                                                    jdbc_partition_col_upperbound,
+                                                    int(args['parallel_jdbc_conn_num'])
                                 )
                 
                 msg_prefix = f"""READ PARTITIONS = {df_rds_temp.rdd.getNumPartitions()}"""
@@ -450,25 +480,18 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                 # TRANSFORM & CACHE - RDS - BATCH ROWS: END
 
                 # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
-                if args['prq_leftanti_join_rds'] == 'true':
-                    df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
-                                                .join(df_rds_temp_t4.alias("R"), 
-                                                      on=df_rds_temp_t4.columns, 
-                                                      how='leftanti')
-                else:
-                    df_prq_read_t2_filtered = df_prq_read_t2.alias("L")\
-                                                .join(df_rds_temp_t4.alias("R"), 
-                                                      on=jdbc_partition_column, how='left')\
-                                                .where(" or ".join([f"L.{column} != R.{column}" 
-                                                                    for column in df_rds_temp_t4.columns
-                                                                    if column != jdbc_partition_column]))\
-                                                .select("L.*")
+                df_prq_read_t2_filtered = exclude_rds_matched_rows_from_parquet_df(
+                                                df_prq_read_t2,
+                                                df_rds_temp_t4,
+                                                jdbc_partition_column)
+
                 # --------------------------------------------
 
-                df_prq_read_t2.unpersist()
+                # df_prq_read_t2.unpersist() #>> This may not be required to update a cached dataframe <<
 
-                df_prq_read_t2_filtered = df_prq_read_t2_filtered.repartition(int(parquet_df_repartition_num/2), 
-                                                                              jdbc_partition_column)
+                df_prq_read_t2_filtered = df_prq_read_t2_filtered.repartition(
+                                                int(parquet_df_repartition_num/2), 
+                                                jdbc_partition_column)
                 df_prq_read_t2 = df_prq_read_t2_filtered.cache()
                 # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
 
@@ -524,7 +547,6 @@ def process_dv_for_table(rds_jdbc_conn_obj,
         # -----------------------------------------------------
 
     else:
-        df_dv_output = CustomPysparkMethods.get_pyspark_empty_df(df_dv_output_schema)
 
         df_temp_row = spark.sql(f"""select
                                     current_timestamp as run_datetime,
