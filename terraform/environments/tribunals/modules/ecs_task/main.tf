@@ -137,7 +137,7 @@ resource "aws_ecs_service" "ecs_service" {
   health_check_grace_period_seconds = 300
 
   ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
+    field = "instanceId"
     type  = "spread"
   }
 
@@ -171,7 +171,7 @@ resource "aws_ecs_service" "ecs_service_sftp" {
   health_check_grace_period_seconds = 300
 
   ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
+    field = "instanceId"
     type  = "spread"
   }
 

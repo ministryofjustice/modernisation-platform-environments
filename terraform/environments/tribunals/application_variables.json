@@ -15,7 +15,7 @@
       "server_port_1": "80",
       "task_definition_volume": "tribunals",
       "server_port": 8080,
-      "app_count": 1,
+      "app_count": 2,
       "appscaling_min_capacity": 1,
       "appscaling_max_capacity": 2,
       "ecs_scaling_cpu_threshold": 80,
