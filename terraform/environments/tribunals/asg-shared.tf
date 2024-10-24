@@ -201,7 +201,7 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   mixed_instances_policy {
     instances_distribution {
       on_demand_allocation_strategy = "prioritized"
-      on_demand_base_capacity       = 1  # Minimum number of on-demand instances
+      on_demand_base_capacity       = 0  # Minimum number of on-demand instances
       on_demand_percentage_above_base_capacity = 50  # Percentage of on-demand instances above base capacity
       spot_allocation_strategy       = "lowest-price"  # Strategy for spot instances
     }
