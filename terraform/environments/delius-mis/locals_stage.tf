@@ -4,13 +4,11 @@ locals {
   environment_config_stage = {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.160.32.0/20"
-    legacy_ad_domain_name                  = "delius-mis-stage.local"
-    legacy_ad_ip_list                      = ["10.160.35.243", "10.160.38.128"]
+    ad_domain_name                         = "delius-mis-stage.internal"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     migration_environment_full_name        = "del-stage"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "stage"
-    legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     cloudwatch_alarm_schedule              = true
     cloudwatch_alarm_disable_time          = "20:45"
     cloudwatch_alarm_enable_time           = "06:15"

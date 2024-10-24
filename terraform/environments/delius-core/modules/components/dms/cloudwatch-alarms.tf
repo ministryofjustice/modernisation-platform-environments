@@ -129,6 +129,7 @@ locals {
 # Non-Prod alerts channel: #delius-aws-oracle-dev-alerts
 # Prod alerts channel:     #delius-aws-oracle-prod-alerts
 module "pagerduty_core_alerts" {
+  #checkov:skip=CKV_TF_1
   depends_on = [
     aws_sns_topic.dms_alerting
   ]
