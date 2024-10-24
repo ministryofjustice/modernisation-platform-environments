@@ -13,7 +13,7 @@ locals {
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/preprod/ec2-user.pub")
     homepage_path                          = "/"
-    has_mis_environment                    = true
+    has_mis_environment                    = false
   }
 
   ldap_config_preprod = {
