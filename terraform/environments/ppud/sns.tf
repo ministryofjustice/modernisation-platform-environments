@@ -118,3 +118,49 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_uat_policy" {
     ]
   })
 }
+
+# Development - S3 Bucket Notification
+
+resource "aws_sns_topic" "s3_bucket_notifications_dev" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
+  count = local.is-development == true ? 1 : 0
+  name  = "s3_bucket_notifications_dev"
+}
+
+data "aws_sns_topic" "s3_bucket_notifications_dev" {
+  count = local.is-development == true ? 1 : 0
+  name  = "s3_bucket_notifications_dev"
+}
+
+resource "aws_sns_topic_subscription" "s3_bucket_notifications_dev_subscription" {
+  count = local.is-development == true ? 1 : 0
+  topic_arn = aws_sns_topic.s3_bucket_notifications_dev[0].arn
+  protocol  = "email"
+  endpoint  = "PPUDAlerts@colt.net"
+}
+
+resource "aws_sns_topic_policy" "s3_bucket_notifications_dev_policy" {
+  count = local.is-development == true ? 1 : 0
+    arn   = aws_sns_topic.s3_bucket_notifications_dev[0].arn
+
+    policy = jsonencode({
+    Version = "2012-10-17",
+    Id = "s3_bucket_notifications_dev",
+    Statement = [
+      {
+        "Sid" : "s3_bucket_notifications_dev_iam_policy",
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "s3.amazonaws.com"
+        },
+        "Action" : "SNS:Publish",
+        "Resource" : "data.aws_sns_topic.s3_bucket_notifications_dev[0].arn",
+        "Condition" : {
+          "ArnLike" : {
+            "aws:SourceArn" : "arn:aws:s3:::moj-log-files-dev"
+          }
+        }
+      }
+    ]
+  })
+}
