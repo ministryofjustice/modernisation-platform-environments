@@ -665,13 +665,12 @@ class CustomPysparkMethods:
         altered_schema_object = T.StructType([])
         rds_df_column_list = in_df_rds.columns
 
-        logger_err_msg = f"""
-        Given primary-key column '{colmn}' is not an existing RDS-DB-Table-Column!
-        rds_df_column_list = {rds_df_column_list}
-        """.strip()
         for colmn in in_customized_column_list:
             if colmn not in rds_df_column_list:
-                SparkSession.LOGGER.error(logger_err_msg)
+                SparkSession.LOGGER.error(f"""
+                Given primary-key column '{colmn}' is not an existing RDS-DB-Table-Column!
+                rds_df_column_list = {rds_df_column_list}
+                """.strip())
                 SparkSession.LOGGER.warn("Exiting ...")
                 sys.exit(1)
 
