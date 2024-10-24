@@ -180,7 +180,7 @@ locals {
               athena_enabled                  = true
               athena_config = {
                 mod-platform-cur-reports = {
-                  database  = "data"
+                  database  = "moj-cur-athena-db"
                   workgroup = "mod-platform-cur-reports"
                 }
               }
