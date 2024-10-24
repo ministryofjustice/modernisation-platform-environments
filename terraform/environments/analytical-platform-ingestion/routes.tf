@@ -1,5 +1,5 @@
-module "transit_gateway_routes" {
-  for_each = toset(module.vpc.private_route_table_ids)
+module "connected_vpc_transit_gateway_routes" {
+  for_each = toset(module.connected_vpc.private_route_table_ids)
 
   source = "./modules/routes"
 
