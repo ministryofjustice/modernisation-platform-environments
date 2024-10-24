@@ -62,8 +62,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_db_tbl_pkeys_col_list",
                        "rds_upperbound_factor",
                        "rds_df_repartition_num",
-                       "rds_df_trim_str_columns",
-                       "prq_leftanti_join_rds"
+                       "rds_df_trim_str_columns"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -126,25 +125,13 @@ SELECT TC.TABLE_CATALOG, TC.TABLE_SCHEMA, TC.TABLE_NAME, COLUMN_NAME
 # ===============================================================================
 
 def exclude_rds_matched_rows_from_parquet_df(df_prq_read_t2: DataFrame, 
-                                             df_rds_temp_t4: DataFrame, 
-                                             jdbc_partition_column) -> DataFrame:
-    if args['prq_leftanti_join_rds'] == 'true':
-        df = df_prq_read_t2.alias("L").join(
-                                            df_rds_temp_t4.alias("R"), 
-                                            on=df_rds_temp_t4.columns, 
-                                            how='leftanti'
-                )
-    else:
-        df =  df_prq_read_t2.alias("L").join(
-                                            df_rds_temp_t4.alias("R"), 
-                                            on=jdbc_partition_column, 
-                                            how='left'
-                                        )\
-                    .where(" or ".join([f"L.{column} != R.{column}" 
-                                        for column in df_rds_temp_t4.columns
-                                        if column != jdbc_partition_column]))\
-                    .select("L.*")
-    return df
+                                             df_rds_temp_t4: DataFrame
+                                             ) -> DataFrame:
+    return df_prq_read_t2.alias("L").join(
+                                        df_rds_temp_t4.alias("R"), 
+                                        on=df_rds_temp_t4.columns, 
+                                        how='leftanti'
+                                    )
 
 
 def apply_rds_transforms(df_rds_temp: DataFrame,
@@ -417,8 +404,8 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
             df_prq_read_t2_filtered = exclude_rds_matched_rows_from_parquet_df(
                                             df_prq_read_t2,
-                                            df_rds_temp_t4,
-                                            jdbc_partition_column)
+                                            df_rds_temp_t4
+                                        )
             # --------------------------------------------
 
             # df_prq_read_t2.unpersist() #>> This may not be required to update a cached dataframe <<
@@ -491,8 +478,8 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                 # REMOVE MATCHING RDS BATCH ROWS FROM CACHED PARQUET DATAFRAME - START
                 df_prq_read_t2_filtered = exclude_rds_matched_rows_from_parquet_df(
                                                 df_prq_read_t2,
-                                                df_rds_temp_t4,
-                                                jdbc_partition_column)
+                                                df_rds_temp_t4
+                                            )
 
                 # --------------------------------------------
 
