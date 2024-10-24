@@ -13,6 +13,13 @@ locals {
       isolated_vpc_enable_nat_gateway     = true
       isolated_vpc_one_nat_gateway_per_az = true
 
+      /* Transit Gateway */
+      transit_gateway_routes = [
+        /* MoJO DNS Resolver Service */
+        "10.180.80.5/32",
+        "10.180.81.5/32"
+      ]
+
       /* Observability Platform */
       observability_platform = "development"
 
@@ -50,6 +57,13 @@ locals {
       isolated_vpc_public_subnets         = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
       isolated_vpc_enable_nat_gateway     = true
       isolated_vpc_one_nat_gateway_per_az = true
+
+      /* Transit Gateway */
+      transit_gateway_routes = [
+        /* MoJO DNS Resolver Service */
+        "10.180.80.5/32",
+        "10.180.81.5/32"
+      ]
 
       /* Observability Platform */
       observability_platform = "production"

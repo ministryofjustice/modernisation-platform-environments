@@ -162,7 +162,7 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         shell: bash
         run: |
-          bash -x ${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh tfplan.json
+          bash ${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh tfplan.json
 
       - name: Create Plan PR message (Optional)
         if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
