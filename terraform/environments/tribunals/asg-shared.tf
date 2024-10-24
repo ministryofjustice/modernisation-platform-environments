@@ -198,10 +198,19 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   max_size            = 2
   min_size            = 1
   name                = local.app_name
-
-  launch_template {
-    id      = aws_launch_template.tribunals-all-lt.id
-    version = "$Latest"
+  mixed_instances_policy {
+    instances_distribution {
+      on_demand_allocation_strategy = "prioritized"
+      on_demand_base_capacity       = 1  # Minimum number of on-demand instances
+      on_demand_percentage_above_base_capacity = 50  # Percentage of on-demand instances above base capacity
+      spot_allocation_strategy       = "lowest-price"  # Strategy for spot instances
+    }
+    launch_template {
+      launch_template_specification {
+        launch_template_id = aws_launch_template.tribunals-all-lt.id
+        version            = "$Latest"
+      }
+    }
   }
 
   tag {
