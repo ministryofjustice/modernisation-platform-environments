@@ -23,6 +23,7 @@ module "mlflow_bucket" {
 }
 
 data "aws_iam_policy_document" "s3_replication_policy" {
+  #checkov:skip=CKV_AWS_356:resource "*" being applied to replication iam role only
   statement {
     sid    = "Permissions on objects"
     effect = "Allow"
@@ -36,7 +37,7 @@ data "aws_iam_policy_document" "s3_replication_policy" {
       identifiers = ["arn:aws:iam::525294151996:role/service-role/s3replicate_role_for_lf-antfmoj-test"]
     }
     resources = [
-      "arn:aws:s3:::mojap-compute-${local.environment}-derived-tables-replication/*"
+      "*"
     ]
   }
 }
