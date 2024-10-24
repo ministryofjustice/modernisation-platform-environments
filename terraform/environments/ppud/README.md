@@ -41,15 +41,17 @@ WAM – PROD
 
 ### **Incident contact details:**
 
-<PPUDAppSupportTeam@lumen.com>
+<PPUDApp@colt.net>
 
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
 ### **Service team contact:**
 
-<pankaj.pant@lumen.com>
-<david.savage@lumen.com>
-<helen.stimpson@lumen.com>
+<pankaj.pant@colt.net>
+<david.savage@colt.net>
+<helen.stimpson@colt.net>
+<kofi.owusu-nimoh@colt.net>
+<nick.buckingham@colt.net>
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 
