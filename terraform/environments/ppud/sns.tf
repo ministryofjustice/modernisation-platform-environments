@@ -127,10 +127,12 @@ resource "aws_sns_topic" "s3_bucket_notifications_dev" {
   name  = "s3_bucket_notifications_dev"
 }
 
-data "aws_sns_topic" "data_s3_bucket_notifications_dev" {
+/*
+data "aws_sns_topic" "s3_bucket_notifications_dev" {
   count = local.is-development == true ? 1 : 0
   name  = "s3_bucket_notifications_dev"
 }
+*/
 
 resource "aws_sns_topic_subscription" "s3_bucket_notifications_dev_subscription" {
   count = local.is-development == true ? 1 : 0
@@ -154,7 +156,7 @@ resource "aws_sns_topic_policy" "s3_bucket_notifications_dev_policy" {
           "Service" : "s3.amazonaws.com"
         },
         "Action" : "SNS:Publish",
-        "Resource" : "data.aws_sns_topic.data_s3_bucket_notifications_dev[0].arn",
+        "Resource" : "data.aws_sns_topic.s3_bucket_notifications_dev[0].arn",
         "Condition" : {
           "ArnLike" : {
             "aws:SourceArn" : "arn:aws:s3:::moj-log-files-dev"
