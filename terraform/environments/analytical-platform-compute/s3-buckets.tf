@@ -22,6 +22,25 @@ module "mlflow_bucket" {
   tags = local.tags
 }
 
+data "aws_iam_policy_document" "s3_replication_policy" {
+  statement {
+    sid    = "Permissions on objects"
+    effect = "Allow"
+    actions = [
+      "s3:ReplicateTags",
+      "s3:ReplicateDelete",
+      "s3:ReplicateObject"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::525294151996:role/service-role/s3replicate_role_for_lf-antfmoj-test"]
+    }
+    resources = [
+      "arn:aws:s3:::mojap-compute-${local.environment}-derived-tables-replication/*"
+    ]
+  }
+}
+
 module "mojap_derived_tables_replication_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -33,7 +52,8 @@ module "mojap_derived_tables_replication_bucket" {
 
   force_destroy = true
 
-  policy = data.aws_iam_policy_document.s3_replication_policy.json
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.s3_replication_policy.json
 
   object_lock_enabled = false
 
@@ -59,6 +79,25 @@ module "mojap_derived_tables_replication_bucket" {
   tags = local.tags
 }
 
+data "aws_iam_policy_document" "s3_server_access_logs_policy" {
+  #checkov:skip=CKV_AWS_356:resource "*" limited by condition
+  statement {
+    sid       = "S3ServerAccessLogsPolicy"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["*"]
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
 module "mojap_compute_logs_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -70,7 +109,8 @@ module "mojap_compute_logs_bucket" {
 
   force_destroy = false
 
-  policy = data.aws_iam_policy_document.s3_server_access_logs_policy.json
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.s3_server_access_logs_policy.json
 
   object_lock_enabled = false
 
