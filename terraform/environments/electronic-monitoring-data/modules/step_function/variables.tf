@@ -14,3 +14,9 @@ variable "variable_dictionary" {
   type     = map(any)
   nullable = false
 }
+
+variable "type" {
+  type     = string
+  nullable = true
+  default  = "STANDARD"
+}
