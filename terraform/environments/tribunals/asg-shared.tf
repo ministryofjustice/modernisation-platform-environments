@@ -193,15 +193,22 @@ resource "aws_launch_template" "tribunals-all-lt" {
 
 # # Finally, create the Auto scaling group for the launch template
 resource "aws_autoscaling_group" "tribunals-all-asg" {
-  vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_a.id]
-  desired_capacity    = 1
-  max_size            = 1
+  vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
+  desired_capacity    = 2
+  max_size            = 2
   min_size            = 1
   name                = local.app_name
-
-  launch_template {
-    id      = aws_launch_template.tribunals-all-lt.id
-    version = "$Latest"
+  mixed_instances_policy {
+    instances_distribution {
+      on_demand_allocation_strategy            = "prioritized"
+      on_demand_base_capacity                  = 1  # Minimum number of on-demand instances
+      on_demand_percentage_above_base_capacity = 50  # Percentage of on-demand instances above base capacity
+      spot_allocation_strategy                 = "lowest-price"  # Strategy for spot instances
+    }
+    launch_template {
+      id      = aws_launch_template.tribunals-all-lt.id
+      version = "$Latest"
+    }
   }
 
   tag {
