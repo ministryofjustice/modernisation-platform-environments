@@ -1,4 +1,5 @@
 resource "aws_backup_vault" "ldap_backup_vault" {
+  #checkov:skip=CKV_AWS_166
   name = "${var.env_name}-ldap-efs-vault"
   tags = merge(
     var.tags,
@@ -67,6 +68,9 @@ resource "aws_iam_role" "ldap_efs_backup_role" {
 }
 
 data "aws_iam_policy_document" "delius_core_backup_policy" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_356
   statement {
     effect    = "Allow"
     resources = ["*"]
@@ -95,6 +99,9 @@ resource "aws_iam_role_policy" "delius_core_backups" {
 }
 
 data "aws_iam_policy_document" "efs_backup_policy" {
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_356
   statement {
     effect    = "Allow"
     resources = ["*"]

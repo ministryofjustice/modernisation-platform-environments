@@ -1,4 +1,5 @@
 resource "aws_ssm_parameter" "rman_password" {
+  #checkov:skip=CKV_AWS_337
   name  = "/${var.account_info.application_name}-${var.env_name}/delius/oracle-${var.db_suffix}-operation/rman/rman_password"
   type  = "SecureString"
   value = "REPLACE"

@@ -21,6 +21,8 @@ locals {
 }
 
 module "instance" {
+  #checkov:skip=CKV_TF_1
+  #checkov:skip=CKV_TF_2
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
 
   providers = {

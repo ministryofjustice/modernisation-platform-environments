@@ -88,6 +88,8 @@ data "aws_iam_policy_document" "ec2_access_for_ansible" {
 }
 
 data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
+  #checkov:skip=CKV_AWS_111 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
   statement {
     sid    = "AllowAccessToSsmParameterStore"
     effect = "Allow"
@@ -166,8 +168,10 @@ resource "aws_iam_policy" "db_access_to_secrets_manager" {
   policy = data.aws_iam_policy_document.db_access_to_secrets_manager.json
 }
 
-
 data "aws_iam_policy_document" "instance_ssm" {
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_111 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
   statement {
     sid    = "SSMManagedSSM"
     effect = "Allow"

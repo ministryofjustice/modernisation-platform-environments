@@ -909,6 +909,34 @@ data "aws_iam_policy_document" "sns_topic_policy_uat_ec2cw" {
 }
 */
 
+## Development
+
+data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_dev" {
+  count     = local.is-development == true ? 1 : 0
+  policy_id = "s3_bucket_notifications_dev"
+  statement {
+    sid = "S3-Publish-SNS"
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    effect = "Allow"
+    actions = [
+      "SNS:Publish"
+    ]
+
+     condition {
+      test     = "ArnLike"
+      variable = "AWS:SourceArn"
+      values   = ["arn:aws:s3:::moj-log-files-dev"]
+    }
+
+    resources = [
+      aws_sns_topic.s3_bucket_notifications_dev[0].arn
+    ]
+  }
+}
+
 ####################################################
 # IAM User, Policy for MGN
 ####################################################

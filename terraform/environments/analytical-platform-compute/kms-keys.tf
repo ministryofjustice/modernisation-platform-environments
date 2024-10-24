@@ -308,8 +308,8 @@ module "mojap_compute_logs_s3_kms" {
 
   key_statements = [
     {
-      sid = "AllowS3Logging"
-      effect = "Allow" 
+      sid    = "AllowS3Logging"
+      effect = "Allow"
       actions = [
         "kms:Encrypt",
         "kms:Decrypt",

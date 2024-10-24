@@ -36,7 +36,7 @@ module "mojap_derived_tables_replication_bucket" {
   object_lock_enabled = false
 
   versioning = {
-    status = "Disabled"
+    status = "Enabled"
   }
 
   server_side_encryption_configuration = {
