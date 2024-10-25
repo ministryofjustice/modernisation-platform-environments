@@ -11,11 +11,20 @@ $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
 "Starting userdata execution" >> $logFile
 
-# Get the volumeid based on its tag
-$instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
-"Got instanceid " + $instanceid >> $logFile
+# Get instance ID and tags
+$instanceId = Invoke-RestMethod -Uri http://169.254.169.254/latest/meta-data/instance-id
+$tags = Get-EC2Tag -Filter @{Name="resource-id";Values=$instanceId}
 
-$volumeid = Get-EC2Volume -Filter @{ Name="tag:Name"; Values=$ebsVolumeTag } -Select Volumes.VolumeId
+# Determine if this is the primary or backup instance
+$isPrimary = $tags | Where-Object { $_.Key -eq "Role" -and $_.Value -eq "Primary" }
+
+if ($isPrimary) {
+    $ebsVolumeTag = "tribunals-all-storage"
+} else {
+    $ebsVolumeTag = "tribunals-backup-storage"
+}
+
+$volumeid = (Get-EC2Volume -Filter @{Name="tag:Name";Values=$ebsVolumeTag}).VolumeId
 "Got volumeid " + $volumeid >> $logFile
 
 if ([string]::IsNullorEmpty($volumeid)) {
@@ -69,7 +78,6 @@ if (Test-Path $linkPath) {
 "Set Environment variable to enable awslogs attribute" >> $logFile
 Import-Module ECSTools
 [Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
-
 "Link instance to shared tribunals cluster " + $ecsCluster >> $logFile
 Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
 
