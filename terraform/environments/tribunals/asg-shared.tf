@@ -159,7 +159,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
 # Comment out the aws_launch_template and aws_autoscaling_group if you ever need to delete and recreate the ec2 instance
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix            = "tribunals-all"
-  image_id               = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized/image_id"
+  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
@@ -200,7 +200,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
 
 resource "aws_launch_template" "tribunals-backup-lt" {
   name_prefix            = "tribunals-backup"
-  image_id               = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized/image_id"
+  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
@@ -239,41 +239,41 @@ resource "aws_launch_template" "tribunals-backup-lt" {
 }
 
 # # Finally, create the Auto scaling group for the launch template
-resource "aws_autoscaling_group" "tribunals-all-asg" {
-  vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
-  desired_capacity    = 1
-  max_size            = 1
-  min_size            = 1
-  name                = local.app_name
+# resource "aws_autoscaling_group" "tribunals-all-asg" {
+#   vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
+#   desired_capacity    = 1
+#   max_size            = 1
+#   min_size            = 1
+#   name                = local.app_name
 
-  launch_template {
-    id      = aws_launch_template.tribunals-all-lt.id
-    version = "$Latest"
-  }
+#   launch_template {
+#     id      = aws_launch_template.tribunals-all-lt.id
+#     version = "$Latest"
+#   }
 
-  tag {
-    key                 = "Name"
-    value               = "tribunals-instance"
-    propagate_at_launch = true
-  }
-}
+#   tag {
+#     key                 = "Name"
+#     value               = "tribunals-instance"
+#     propagate_at_launch = true
+#   }
+# }
 
-resource "aws_instance" "tribunals-backup" {
-  launch_template {
-    id      = aws_launch_template.tribunals-backup-lt.id
-    version = "$Latest"
-  }
+# resource "aws_instance" "tribunals-backup" {
+#   launch_template {
+#     id      = aws_launch_template.tribunals-backup-lt.id
+#     version = "$Latest"
+#   }
 
-  instance_initiated_shutdown_behavior = "stop"
+#   instance_initiated_shutdown_behavior = "stop"
 
-  tags = {
-    Name = "tribunals-backup-instance"
-  }
+#   tags = {
+#     Name = "tribunals-backup-instance"
+#   }
 
-  lifecycle {
-    ignore_changes = [user_data]
-  }
-}
+#   lifecycle {
+#     ignore_changes = [user_data]
+#   }
+# }
 
 ###########################################################################
 
