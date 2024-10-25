@@ -2,6 +2,7 @@
 # PPUD Internet Facing ALB
 
 resource "aws_lb" "PPUD-ALB" {
+  # checkov:skip=CKV_AWS_28: "ALB is already protected by WAF"
   count              = local.is-development == true ? 1 : 0
   name               = "PPUD-ALB"
   internal           = false
@@ -82,12 +83,17 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
 # WAM Internet Facing ALB
 
 resource "aws_lb" "WAM-ALB" {
+  # checkov:skip=CKV_AWS_28: "ALB is already protected by WAF"
   name               = local.application_data.accounts[local.environment].WAM_ALB
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.WAM-ALB.id]
   subnets            = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id]
-
+  access_logs {
+    bucket  = aws_s3_bucket.moj-log-files-dev[0].id
+    prefix  = "alb-logs"
+    enabled = true
+  }
   enable_deletion_protection = true
   drop_invalid_header_fields = true
 
