@@ -9,6 +9,7 @@ resource "aws_s3_bucket" "PPUD" {
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
   count  = local.is-production == true ? 1 : 0
   bucket = "${local.application_name}-ppud-files-${local.environment}"
 
@@ -116,6 +117,7 @@ resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
   bucket = local.application_data.accounts[local.environment].ssm_health_check_reports_s3
   tags = merge(
     local.tags,
@@ -172,6 +174,7 @@ resource "aws_s3_bucket" "moj-scripts" {
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-scripts"
   tags = merge(
@@ -268,6 +271,7 @@ resource "aws_s3_bucket" "MoJ-Release-Management" {
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-release-management"
   tags = merge(
@@ -287,6 +291,7 @@ resource "aws_s3_bucket_versioning" "MoJ-Release-Management" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Release-Management" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.MoJ-Release-Management[0].id
   rule {
@@ -362,6 +367,7 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
 resource "aws_s3_bucket" "moj-log-files-prod" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-log-files-prod"
   tags = merge(
@@ -389,6 +395,9 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-prod" {
   restrict_public_buckets = true
 }
 
+# S3 bucket notification is turned off as it isn't required. It can be re-enabled in future if required.
+
+/*
 resource "aws_s3_bucket_notification" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-prod[0].id
@@ -399,6 +408,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-prod" {
     filter_prefix = "alb-logs/"
   }
 }
+*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0
@@ -418,7 +428,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 365
+      days = 60
     }
   }
 }
@@ -533,6 +543,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
 resource "aws_s3_bucket" "moj-log-files-uat" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
   count  = local.is-preproduction == true ? 1 : 0
   bucket = "moj-log-files-uat"
   tags = merge(
@@ -560,6 +571,9 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-uat" {
   restrict_public_buckets = true
 }
 
+# S3 bucket notification is turned off as it isn't required. It can be re-enabled in future if required.
+
+/*
 resource "aws_s3_bucket_notification" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-uat[0].id
@@ -569,6 +583,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-uat" {
     filter_prefix = "alb-logs/"
   }
 }
+*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0
@@ -588,7 +603,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 365
+      days = 60
     }
   }
 }
@@ -705,6 +720,7 @@ resource "aws_s3_bucket" "moj-log-files-dev" {
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
   count  = local.is-development == true ? 1 : 0
   bucket = "moj-log-files-dev"
   tags = merge(
@@ -732,6 +748,9 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-dev" {
   restrict_public_buckets = true
 }
 
+# S3 bucket notification is turned off as it isn't required. It can be re-enabled in future if required.
+
+/*
 resource "aws_s3_bucket_notification" "moj-log-files-dev" {
   count  = local.is-development == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-dev[0].id
@@ -741,6 +760,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-dev" {
     filter_prefix = "alb-logs/"
   }
 }
+*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
   count  = local.is-development == true ? 1 : 0
@@ -760,7 +780,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 365
+      days = 60
     }
   }
 }
