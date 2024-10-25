@@ -638,22 +638,22 @@ if __name__ == "__main__":
     if args.get("rds_sqlserver_db_table", None) is None:
         LOGGER.error(f"""'rds_sqlserver_db_table' runtime input is missing! Exiting ...""")
         sys.exit(1)
+    else:
+        rds_sqlserver_db_table = args["rds_sqlserver_db_table"]
+        table_name_prefix = f"""{rds_db_name}_{rds_sqlserver_db_schema}"""
+        db_sch_tbl = f"""{table_name_prefix}_{rds_sqlserver_db_table}"""
     # -------------------------------------------------------
-
-    table_name_prefix = f"""{rds_db_name}_{rds_sqlserver_db_schema}"""
-    given_rds_sqlserver_table = args["rds_sqlserver_db_table"]
-    db_sch_tbl = f"""{table_name_prefix}_{given_rds_sqlserver_table}"""
     
     if db_sch_tbl not in rds_sqlserver_db_tbl_list:
         LOGGER.error(f"""'{db_sch_tbl}' - is not an existing table! Exiting ...""")
         sys.exit(1)
     else:
-        LOGGER.info(f""">> Given RDS SqlServer-DB Table: {given_rds_sqlserver_table} <<""")
+        LOGGER.info(f""">> Given RDS SqlServer-DB Table: {rds_sqlserver_db_table} <<""")
     # -------------------------------------------------------
 
     total_files, total_size = S3Methods.get_s3_folder_info(
                                 PRQ_FILES_SRC_S3_BUCKET_NAME, 
-                                f"{rds_db_name}/{rds_sqlserver_db_schema}/{given_rds_sqlserver_table}")
+                                f"{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}")
     total_size_mb = total_size/1024/1024
     LOGGER.warn(f""">> '{db_sch_tbl}' Size: {total_size_mb} MB <<""")
 
