@@ -14,6 +14,8 @@ resource "aws_vpc_endpoint_service_allowed_principal" "HomeOffice" {
 }
 
 resource "aws_lb" "ppud_internal_nlb" {
+  # checkov:skip=CKV2_AWS_28: "ALB is already protected by WAF"
+  # checkov:skip=CKV_AWS_152: "ALB target groups only have 2 targets so cross zone load balancing is not required"
   count                      = local.is-production == true ? 1 : 0
   name                       = "ppud-internal-nlb"
   internal                   = true
