@@ -395,6 +395,9 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-prod" {
   restrict_public_buckets = true
 }
 
+# S3 bucket notification is turned off as it isn't required. It can be re-enabled in future if required.
+
+/*
 resource "aws_s3_bucket_notification" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-prod[0].id
@@ -405,6 +408,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-prod" {
     filter_prefix = "alb-logs/"
   }
 }
+*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
   count  = local.is-production == true ? 1 : 0
@@ -424,7 +428,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 365
+      days = 60
     }
   }
 }
@@ -567,6 +571,9 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-uat" {
   restrict_public_buckets = true
 }
 
+# S3 bucket notification is turned off as it isn't required. It can be re-enabled in future if required.
+
+/*
 resource "aws_s3_bucket_notification" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-uat[0].id
@@ -576,6 +583,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-uat" {
     filter_prefix = "alb-logs/"
   }
 }
+*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0
@@ -595,7 +603,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 365
+      days = 60
     }
   }
 }
@@ -740,6 +748,9 @@ resource "aws_s3_bucket_public_access_block" "moj-log-files-dev" {
   restrict_public_buckets = true
 }
 
+# S3 bucket notification is turned off as it isn't required. It can be re-enabled in future if required.
+
+/*
 resource "aws_s3_bucket_notification" "moj-log-files-dev" {
   count  = local.is-development == true ? 1 : 0 
   bucket = aws_s3_bucket.moj-log-files-dev[0].id
@@ -749,6 +760,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-dev" {
     filter_prefix = "alb-logs/"
   }
 }
+*/
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
   count  = local.is-development == true ? 1 : 0
@@ -768,7 +780,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 365
+      days = 60
     }
   }
 }
