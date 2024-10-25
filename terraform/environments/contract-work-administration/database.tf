@@ -142,6 +142,10 @@ cat <<EOT > /etc/cron.d/custom_cloudwatch_metrics
 */1 * * * * root /var/cw-custom.sh > /dev/null 2>&1
 EOT
 
+## Additional DBA steps
+su oracle -c "sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/oracle/product/10.2.0/db_1/appsutil/CWA_cwa-db.xml"
+
+
 EOF
 
 }
@@ -187,7 +191,7 @@ resource "aws_instance" "database" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   metadata_options {
     http_tokens = "optional"
   }
