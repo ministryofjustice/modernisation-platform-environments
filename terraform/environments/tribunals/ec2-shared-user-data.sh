@@ -12,7 +12,8 @@ $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 "Starting userdata execution" >> $logFile
 
 # Get instance ID and tags
-$instanceId = Invoke-RestMethod -Uri http://169.254.169.254/latest/meta-data/instance-id
+$instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
+"Got instanceid " + $instanceid >> $logFile
 $tags = Get-EC2Tag -Filter @{Name="resource-id";Values=$instanceId}
 
 # Determine if this is the primary or backup instance
