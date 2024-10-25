@@ -99,64 +99,66 @@ if (-not $awsCliInstalled) {
     "AWS CLI is already installed." >> $monitorLogFile
 }
 
-$scriptContent = @'
+if ($isPrimary) {
+  $scriptContent = @'
 
-function GetEnvironmentName {
-  $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
-  $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
-  return $environmentName
+  function GetEnvironmentName {
+    $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
+    $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
+    return $environmentName
+  }
+
+  function MonitorAndSyncToS3 {
+    $environmentName = GetEnvironmentName
+    "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
+    "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    # Create a FileSystemWatcher object
+    $watcher = New-Object System.IO.FileSystemWatcher
+    $watcher.Path = "D:\storage\tribunals\"
+    $watcher.IncludeSubdirectories = $true
+    $watcher.EnableRaisingEvents = $true
+    
+    # Define the action to take when a file is created
+    $action = {
+        param($source, $event, $environmentName)
+        $filePath = $event.FullPath
+        $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
+        "A file was created at $filePath 's3://tribunals-ebs-backup-$environmentName/$relativePath'. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+        aws s3 cp $filePath "s3://tribunals-ebs-backup-$environmentName/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+      }
+
+      # Register the event
+      Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
+
+      # Keep the script running
+      while ($true) {
+          Start-Sleep -Seconds 10
+      }
+  }
+
+  function InitialSyncToS3 {
+    $environmentName = GetEnvironmentName
+    "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
+    "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-$environmentName >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  }
+
+  # Call the functions
+  InitialSyncToS3
+  MonitorAndSyncToS3
+  '@
+
+  Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
+
+  # Save the script to a file on the EC2 instance
+  $scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
+
+  $Action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-ExecutionPolicy Bypass -File "C:\MonitorAndSyncToS3.ps1"'
+
+  $Trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddMinutes(5))
+
+  Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName "MonitorAndSyncToS3" -Description "Monitor EBS Volume and copy newly added files to S3" -RunLevel Highest -User "SYSTEM" -Force
 }
-
-function MonitorAndSyncToS3 {
-  $environmentName = GetEnvironmentName
-  "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
-  "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-  # Create a FileSystemWatcher object
-  $watcher = New-Object System.IO.FileSystemWatcher
-  $watcher.Path = "D:\storage\tribunals\"
-  $watcher.IncludeSubdirectories = $true
-  $watcher.EnableRaisingEvents = $true
-  
-  # Define the action to take when a file is created
-  $action = {
-      param($source, $event, $environmentName)
-      $filePath = $event.FullPath
-      $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
-      "A file was created at $filePath 's3://tribunals-ebs-backup-$environmentName/$relativePath'. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-      aws s3 cp $filePath "s3://tribunals-ebs-backup-$environmentName/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    }
-
-    # Register the event
-    Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
-
-    # Keep the script running
-    while ($true) {
-        Start-Sleep -Seconds 10
-    }
-}
-
-function InitialSyncToS3 {
-  $environmentName = GetEnvironmentName
-  "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
-  "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-  aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-$environmentName >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-  "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-}
-
-# Call the functions
-InitialSyncToS3
-MonitorAndSyncToS3
-'@
-
-Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
-
-# Save the script to a file on the EC2 instance
-$scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
-
-$Action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-ExecutionPolicy Bypass -File "C:\MonitorAndSyncToS3.ps1"'
-
-$Trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddMinutes(5))
-
-Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName "MonitorAndSyncToS3" -Description "Monitor EBS Volume and copy newly added files to S3" -RunLevel Highest -User "SYSTEM" -Force
 
 </powershell>
