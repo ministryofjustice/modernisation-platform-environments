@@ -258,22 +258,22 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   }
 }
 
-# resource "aws_instance" "tribunals-backup" {
-#   launch_template {
-#     id      = aws_launch_template.tribunals-backup-lt.id
-#     version = "$Latest"
-#   }
+resource "aws_instance" "tribunals-backup" {
+  launch_template {
+    id      = aws_launch_template.tribunals-backup-lt.id
+    version = "$Latest"
+  }
 
-#   instance_initiated_shutdown_behavior = "stop"
+  instance_initiated_shutdown_behavior = "stop"
 
-#   tags = {
-#     Name = "tribunals-backup-instance"
-#   }
+  tags = {
+    Name = "tribunals-backup-instance"
+  }
 
-#   lifecycle {
-#     ignore_changes = [user_data]
-#   }
-# }
+  lifecycle {
+    ignore_changes = [user_data]
+  }
+}
 
 ###########################################################################
 
