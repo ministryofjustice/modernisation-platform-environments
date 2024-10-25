@@ -3,6 +3,7 @@
 #########################
 
 resource "aws_lb" "PPUD-internal-ALB" {
+  # checkov:skip=CKV_AWS_152: "ALB target groups only have 2 targets so cross zone load balancing is not required"
   count              = local.is-development == false ? 1 : 0
   name               = local.application_data.accounts[local.environment].PPUD_Internal_ALB
   internal           = true

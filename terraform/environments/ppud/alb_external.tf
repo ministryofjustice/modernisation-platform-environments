@@ -2,7 +2,8 @@
 # PPUD Internet Facing ALB
 
 resource "aws_lb" "PPUD-ALB" {
-  # checkov:skip=CKV_AWS_28: "ALB is already protected by WAF"
+  # checkov:skip=CKV2_AWS_28: "ALB is already protected by WAF"
+  # checkov:skip=CKV_AWS_152: "ALB target groups only have 2 targets so cross zone load balancing is not required"
   count              = local.is-development == true ? 1 : 0
   name               = "PPUD-ALB"
   internal           = false
@@ -83,7 +84,8 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
 # WAM Internet Facing ALB
 
 resource "aws_lb" "WAM-ALB" {
-  # checkov:skip=CKV_AWS_28: "ALB is already protected by WAF"
+  # checkov:skip=CKV2_AWS_28: "ALB is already protected by WAF"
+  # checkov:skip=CKV_AWS_152: "ALB target groups only have 2 targets so cross zone load balancing is not required"
   name               = local.application_data.accounts[local.environment].WAM_ALB
   internal           = false
   load_balancer_type = "application"
