@@ -38,12 +38,15 @@ LOGGER = glueContext.get_logger()
 
 # ===============================================================================
 
-# ===============================================================================
 # NOTES-1:> If non-integer datatype or more than one value provided to 'rds_db_tbl_pkeys_col_list', the job fails.
 # NOTES-2:> 'parallel_jdbc_conn_num' value to be given is to be aligned with number of workers & executors.
-# NOTES-3:> 'rds_upperbound_factor' used to evaluate the number of rows to be processed for each batch iteration.
+# NOTES-3:> 'rds_upperbound_factor' used to evaluate the number of rows to be processed for each rds-batch-read iteration.
+# NOTES-4:> PARQUET-READ-DATAFRAME partitions controlloed by the setting >> 'spark.sql.files.maxPartitionBytes=1g'
+# NOTES-5:> RDS-DB-READ-DATAFRAME partitions controlloed by the input >> 'parallel_jdbc_conn_num'
 # MANDATORY INPUTS: 'rds_db_tbl_pkeys_col_list', 'parquet_df_repartition_num'
 # DEFAULT INPUTS: {'rds_df_repartition_num': 0}, {'parallel_jdbc_conn_num': 4}
+
+# ===============================================================================
 
 # Organise capturing input parameters.
 DEFAULT_INPUTS_LIST = ["JOB_NAME",
@@ -436,6 +439,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
         
         # WHILE-ELSE - final leftover rows processed in this block.
         else:
+
             if jdbc_partition_col_upperbound < pkey_max_value:
                 loop_count += 1
 
@@ -481,8 +485,6 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                                                 df_rds_temp_t4
                                             )
 
-                # --------------------------------------------
-
                 # df_prq_read_t2.unpersist() #>> This may not be required to update a cached dataframe <<
 
                 df_prq_read_t2 = df_prq_read_t2_filtered.repartition(
@@ -501,14 +503,14 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                 LOGGER.info(f"""{loop_count}-df_prq_read_t2_count = {df_prq_read_t2_count}""")
                 cumulative_matched_rows = df_rds_count - df_prq_read_t2_count
                 LOGGER.info(f"""{loop_count}-cumulative_matched_rows = {cumulative_matched_rows}""")
+            # --------------------------------------------
 
-                df_rds_temp_t4.unpersist(True)
+            df_rds_temp_t4.unpersist(True)
 
         LOGGER.info(f"""RDS-SQLServer-JDBC READ {rds_tbl_name}: Total batch iterations = {loop_count}""")
 
         # ACTION
         total_row_differences = df_prq_read_t2_count
-        df_prq_read_t2.unpersist(True)
 
         if total_row_differences == 0 and (total_rds_rows_fetched == cumulative_matched_rows):
             df_temp_row = spark.sql(f"""select 
@@ -543,6 +545,8 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             LOGGER.warn(f"{rds_tbl_name}: Validation Failed - 2")
             df_dv_output = df_dv_output.union(df_subtract_temp)
         # -----------------------------------------------------
+
+        df_prq_read_t2.unpersist(True)
 
     else:
 
