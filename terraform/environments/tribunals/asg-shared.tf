@@ -159,7 +159,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
 # Comment out the aws_launch_template and aws_autoscaling_group if you ever need to delete and recreate the ec2 instance
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix            = "tribunals-all"
-  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  image_id               = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized/image_id"
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
@@ -190,6 +190,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
     tags = {
       Environment = local.environment
       Name        = "tribunals-instance"
+      Role        = "Primary"
     }
   }
 
@@ -199,7 +200,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
 
 resource "aws_launch_template" "tribunals-backup-lt" {
   name_prefix            = "tribunals-backup"
-  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  image_id               = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized/image_id"
   instance_type          = "m5.4xlarge"
   update_default_version = true
 
@@ -230,6 +231,7 @@ resource "aws_launch_template" "tribunals-backup-lt" {
     tags = {
       Environment = local.environment
       Name        = "tribunals-backup-instance"
+      Role        = "Backup"
     }
   }
 
