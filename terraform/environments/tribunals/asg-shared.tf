@@ -220,7 +220,7 @@ resource "aws_launch_template" "tribunals-backup-lt" {
   network_interfaces {
     device_index                = 0
     security_groups             = [aws_security_group.cluster_ec2.id]
-    subnet_id                   = data.aws_subnet.public_subnets_b.id
+    subnet_id                   = data.aws_subnets.shared-public.ids[1]
     delete_on_termination       = true
     associate_public_ip_address = true
   }
