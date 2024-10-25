@@ -83,13 +83,11 @@ job.init(args["JOB_NAME"], args)
 
 # ------------------------------
 
-# ------------------------------
-
 RDS_DB_HOST_ENDPOINT = args["rds_db_host_ep"]
-RDS_DB_PORT = 1433
-RDS_DB_INSTANCE_USER = "admin"
+RDS_DB_PORT = RDSConn_Constants.RDS_DB_PORT
+RDS_DB_INSTANCE_USER = RDSConn_Constants.RDS_DB_INSTANCE_USER
 RDS_DB_INSTANCE_PWD = args["rds_db_pwd"]
-RDS_DB_INSTANCE_DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+RDS_DB_INSTANCE_DRIVER = RDSConn_Constants.RDS_DB_INSTANCE_DRIVER
 
 PRQ_FILES_SRC_S3_BUCKET_NAME = args["parquet_src_bucket_name"]
 
@@ -120,10 +118,6 @@ SELECT TC.TABLE_CATALOG, TC.TABLE_SCHEMA, TC.TABLE_NAME, COLUMN_NAME
 --  ORDER BY TABLE_CATALOG, TABLE_SCHEMA, TABLE_NAME
 ;
 """
-
-# ===============================================================================
-# USER-DEFINED-FUNCTIONS
-# ----------------------
 
 # ===============================================================================
 
