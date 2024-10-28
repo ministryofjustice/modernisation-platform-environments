@@ -175,22 +175,22 @@ module "mojap_compute_logs_bucket_eu_west_1" {
 }
 
 moved {
-  from = module.mojap_compute_logs_bucket.aws_s3_bucket
-  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket.this[0]
+  to   = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket.this[0]
 }
 moved {
-  from = module.mojap_compute_logs_bucket.aws_s3_bucket_policy
-  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_policy
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket_policy.this[0]
+  to   = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_policy.this[0]
 }
 moved {
-  from = module.mojap_compute_logs_bucket.aws_s3_bucket_public_access_block
-  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_public_access_block
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket_public_access_block.this[0]
+  to   = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_public_access_block.this[0]
 }
 moved {
-  from = module.mojap_compute_logs_bucket.aws_s3_bucket_server_side_encryption_configuration
-  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_server_side_encryption_configuration
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket_server_side_encryption_configuration.this[0]
+  to   = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_server_side_encryption_configuration.this[0]
 }
 moved {
-  from = module.mojap_compute_logs_bucket.aws_s3_bucket_versioning
-  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_versioning
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket_versioning.this[0]
+  to   = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_versioning.this[0]
 }
