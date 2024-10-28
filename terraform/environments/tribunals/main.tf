@@ -733,11 +733,11 @@ module "nginx" {
 }
 
 module "nginx_load_balancer" {
-  count                         = local.is-production ? 1 : 0
-  source                        = "./modules/nginx_load_balancer"
-  nginx_lb_sg_id                = aws_security_group.nginx_lb_sg[0].id
-  nginx_instance_ids            = module.nginx[0].instance_ids
-  subnets_shared_public_ids     = data.aws_subnets.shared-public.ids
-  vpc_shared_id                 = data.aws_vpc.shared.id
-  external_acm_cert_arn         = aws_acm_certificate.external.arn
+  count                     = local.is-production ? 1 : 0
+  source                    = "./modules/nginx_load_balancer"
+  nginx_lb_sg_id            = aws_security_group.nginx_lb_sg[0].id
+  nginx_instance_ids        = module.nginx[0].instance_ids
+  subnets_shared_public_ids = data.aws_subnets.shared-public.ids
+  vpc_shared_id             = data.aws_vpc.shared.id
+  external_acm_cert_arn     = aws_acm_certificate.external.arn
 }
