@@ -155,125 +155,127 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
   name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized"
 }
 
-# Create the Launch Template and assign the instance profile
-# Comment out the aws_launch_template and aws_autoscaling_group if you ever need to delete and recreate the ec2 instance
-# resource "aws_launch_template" "tribunals-all-lt" {
-#   name_prefix            = "tribunals-all"
-#   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-#   instance_type          = "m5.4xlarge"
-#   update_default_version = true
+## Create the Launch Template and assign the instance profile
+## Comment out the aws_launch_template and aws_autoscaling_group if you ever need to delete and recreate the ec2 instance
 
-#   iam_instance_profile {
-#     name = aws_iam_instance_profile.ec2_instance_profile.name
-#   }
+resource "aws_launch_template" "tribunals-all-lt" {
+  name_prefix            = "tribunals-all"
+  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  instance_type          = "m5.4xlarge"
+  update_default_version = true
 
-#   block_device_mappings {
-#     device_name = "/dev/sda1"
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_instance_profile.name
+  }
 
-#     ebs {
-#       volume_size = 80
-#       volume_type = "gp2"
-#     }
-#   }
-#   ebs_optimized = true
+  block_device_mappings {
+    device_name = "/dev/sda1"
 
-#   network_interfaces {
-#     device_index                = 0
-#     security_groups             = [aws_security_group.cluster_ec2.id]
-#     subnet_id                   = data.aws_subnet.public_subnets_a.id
-#     delete_on_termination       = true
-#     associate_public_ip_address = true
-#   }
+    ebs {
+      volume_size = 80
+      volume_type = "gp2"
+    }
+  }
+  ebs_optimized = true
 
-#   tag_specifications {
-#     resource_type = "instance"
-#     tags = {
-#       Environment = local.environment
-#       Name        = "tribunals-instance"
-#       Role        = "Primary"
-#     }
-#   }
+  network_interfaces {
+    device_index                = 0
+    security_groups             = [aws_security_group.cluster_ec2.id]
+    subnet_id                   = data.aws_subnet.public_subnets_a.id
+    delete_on_termination       = true
+    associate_public_ip_address = true
+  }
 
-#   user_data = filebase64("ec2-shared-user-data.sh")
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Environment = local.environment
+      Name        = "tribunals-instance"
+      Role        = "Primary"
+    }
+  }
 
-# }
+  user_data = filebase64("ec2-shared-user-data.sh")
 
-# resource "aws_launch_template" "tribunals-backup-lt" {
-#   name_prefix            = "tribunals-backup"
-#   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-#   instance_type          = "m5.4xlarge"
-#   update_default_version = true
+}
 
-#   iam_instance_profile {
-#     name = aws_iam_instance_profile.ec2_instance_profile.name
-#   }
+resource "aws_launch_template" "tribunals-backup-lt" {
+  name_prefix            = "tribunals-backup"
+  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  instance_type          = "m5.4xlarge"
+  update_default_version = true
 
-#   block_device_mappings {
-#     device_name = "/dev/sda1"
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ec2_instance_profile.name
+  }
 
-#     ebs {
-#       volume_size = 80
-#       volume_type = "gp2"
-#     }
-#   }
-#   ebs_optimized = true
+  block_device_mappings {
+    device_name = "/dev/sda1"
 
-#   network_interfaces {
-#     device_index                = 0
-#     security_groups             = [aws_security_group.cluster_ec2.id]
-#     subnet_id                   = data.aws_subnets.shared-public.ids[1]
-#     delete_on_termination       = true
-#     associate_public_ip_address = true
-#   }
+    ebs {
+      volume_size = 80
+      volume_type = "gp2"
+    }
+  }
+  ebs_optimized = true
 
-#   tag_specifications {
-#     resource_type = "instance"
-#     tags = {
-#       Environment = local.environment
-#       Name        = "tribunals-backup-instance"
-#       Role        = "Backup"
-#     }
-#   }
+  network_interfaces {
+    device_index                = 0
+    security_groups             = [aws_security_group.cluster_ec2.id]
+    subnet_id                   = data.aws_subnets.shared-public.ids[1]
+    delete_on_termination       = true
+    associate_public_ip_address = true
+  }
 
-#   user_data = filebase64("ec2-shared-user-data.sh")
-# }
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Environment = local.environment
+      Name        = "tribunals-backup-instance"
+      Role        = "Backup"
+    }
+  }
+
+  user_data = filebase64("ec2-shared-user-data.sh")
+}
 
 # Finally, create the Auto scaling group for the launch template
-# resource "aws_autoscaling_group" "tribunals-all-asg" {
-#   vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
-#   desired_capacity    = 1
-#   max_size            = 1
-#   min_size            = 1
-#   name                = local.app_name
 
-#   launch_template {
-#     id      = aws_launch_template.tribunals-all-lt.id
-#     version = "$Latest"
-#   }
+resource "aws_autoscaling_group" "tribunals-all-asg" {
+  vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
+  desired_capacity    = 1
+  max_size            = 1
+  min_size            = 1
+  name                = local.app_name
 
-#   tag {
-#     key                 = "Name"
-#     value               = "tribunals-instance"
-#     propagate_at_launch = true
-#   }
-# }
+  launch_template {
+    id      = aws_launch_template.tribunals-all-lt.id
+    version = "$Latest"
+  }
 
-# resource "aws_instance" "tribunals-backup" {
-#   launch_template {
-#     id      = aws_launch_template.tribunals-backup-lt.id
-#     version = "$Latest"
-#   }
+  tag {
+    key                 = "Name"
+    value               = "tribunals-instance"
+    propagate_at_launch = true
+  }
+}
 
-#   instance_initiated_shutdown_behavior = "stop"
+resource "aws_instance" "tribunals-backup" {
+  launch_template {
+    id      = aws_launch_template.tribunals-backup-lt.id
+    version = "$Latest"
+  }
 
-#   tags = {
-#     Name = "tribunals-backup-instance"
-#   }
+  instance_initiated_shutdown_behavior = "stop"
 
-#   lifecycle {
-#     ignore_changes = [user_data]
-#   }
-# }
+  tags = {
+    Name = "tribunals-backup-instance"
+  }
+
+  lifecycle {
+    ignore_changes = [user_data]
+  }
+}
 
 ###########################################################################
 
