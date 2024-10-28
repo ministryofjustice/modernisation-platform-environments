@@ -36,9 +36,10 @@ module "send_database_to_ap" {
 
 
 module "get_zipped_file" {
-  source       = "./modules/step_function"
-  name         = "get_zipped_file"
-  iam_policies = tomap({ "trigger_unzip_lambda" = aws_iam_policy.trigger_unzip_lambda })
+  source              = "./modules/step_function"
+  name                = "get_zipped_file"
+  state_machine_type  = "EXPRESS"
+  iam_policies        = tomap({ "trigger_unzip_lambda" = aws_iam_policy.trigger_unzip_lambda })
   variable_dictionary = tomap(
     {
       "unzip_file_name"            = module.unzip_single_file.lambda_function_name,
