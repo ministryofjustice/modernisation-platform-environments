@@ -31,7 +31,7 @@ module "datasync_dom1_secret" {
   kms_key_id  = module.datasync_credentials_kms.key_arn
 
   ignore_secret_changes = true
-  secret_json           = jsonencode({
+  secret_string = jsonencode({
     username = "CHANGEME"
     password = "CHANGEME"
   })
