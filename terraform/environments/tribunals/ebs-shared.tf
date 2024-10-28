@@ -23,9 +23,8 @@ resource "aws_ebs_volume" "tribunals-backup-ebs" {
     }
   )
 }
-
-# resource "aws_volume_attachment" "tribunals-backup-ebs-attachment" {
-#   device_name = "/dev/sdf"
-#   volume_id   = aws_ebs_volume.tribunals-backup-ebs.id
-#   instance_id = aws_instance.tribunals-backup.id
-# }
+resource "aws_volume_attachment" "tribunals-backup-ebs-attachment" {
+  device_name = "/dev/sdf"
+  volume_id   = aws_ebs_volume.tribunals-backup-ebs.id
+  instance_id = aws_instance.tribunals-backup.id
+}

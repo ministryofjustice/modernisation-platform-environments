@@ -238,42 +238,42 @@ resource "aws_launch_template" "tribunals-backup-lt" {
   user_data = filebase64("ec2-shared-user-data.sh")
 }
 
-# # Finally, create the Auto scaling group for the launch template
-# resource "aws_autoscaling_group" "tribunals-all-asg" {
-#   vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
-#   desired_capacity    = 1
-#   max_size            = 1
-#   min_size            = 1
-#   name                = local.app_name
+# Finally, create the Auto scaling group for the launch template
+resource "aws_autoscaling_group" "tribunals-all-asg" {
+  vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
+  desired_capacity    = 1
+  max_size            = 1
+  min_size            = 1
+  name                = local.app_name
 
-#   launch_template {
-#     id      = aws_launch_template.tribunals-all-lt.id
-#     version = "$Latest"
-#   }
+  launch_template {
+    id      = aws_launch_template.tribunals-all-lt.id
+    version = "$Latest"
+  }
 
-#   tag {
-#     key                 = "Name"
-#     value               = "tribunals-instance"
-#     propagate_at_launch = true
-#   }
-# }
+  tag {
+    key                 = "Name"
+    value               = "tribunals-instance"
+    propagate_at_launch = true
+  }
+}
 
-# resource "aws_instance" "tribunals-backup" {
-#   launch_template {
-#     id      = aws_launch_template.tribunals-backup-lt.id
-#     version = "$Latest"
-#   }
+resource "aws_instance" "tribunals-backup" {
+  launch_template {
+    id      = aws_launch_template.tribunals-backup-lt.id
+    version = "$Latest"
+  }
 
-#   instance_initiated_shutdown_behavior = "stop"
+  instance_initiated_shutdown_behavior = "stop"
 
-#   tags = {
-#     Name = "tribunals-backup-instance"
-#   }
+  tags = {
+    Name = "tribunals-backup-instance"
+  }
 
-#   lifecycle {
-#     ignore_changes = [user_data]
-#   }
-# }
+  lifecycle {
+    ignore_changes = [user_data]
+  }
+}
 
 ###########################################################################
 
