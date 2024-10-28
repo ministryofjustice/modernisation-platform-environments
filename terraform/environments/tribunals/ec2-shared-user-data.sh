@@ -11,21 +11,11 @@ $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
 "Starting userdata execution" >> $logFile
 
-# Get instance ID and tags
+# Get the volumeid based on its tag
 $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
 "Got instanceid " + $instanceid >> $logFile
-$tags = Get-EC2Tag -Filter @{Name="resource-id";Values=$instanceId}
 
-# Determine if this is the primary or backup instance
-$isPrimary = $tags | Where-Object { $_.Key -eq "Role" -and $_.Value -eq "Primary" }
-
-if ($isPrimary) {
-    $ebsVolumeTag = "tribunals-all-storage"
-} else {
-    $ebsVolumeTag = "tribunals-backup-storage"
-}
-
-$volumeid = (Get-EC2Volume -Filter @{Name="tag:Name";Values=$ebsVolumeTag}).VolumeId
+$volumeid = Get-EC2Volume -Filter @{ Name="tag:Name"; Values=$ebsVolumeTag } -Select Volumes.VolumeId
 "Got volumeid " + $volumeid >> $logFile
 
 if ([string]::IsNullorEmpty($volumeid)) {
@@ -79,6 +69,7 @@ if (Test-Path $linkPath) {
 "Set Environment variable to enable awslogs attribute" >> $logFile
 Import-Module ECSTools
 [Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
+
 "Link instance to shared tribunals cluster " + $ecsCluster >> $logFile
 Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
 
@@ -100,66 +91,64 @@ if (-not $awsCliInstalled) {
     "AWS CLI is already installed." >> $monitorLogFile
 }
 
-if ($isPrimary) {
-  $scriptContent = @'
+$scriptContent = @'
 
-  function GetEnvironmentName {
-    $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
-    $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
-    return $environmentName
-  }
-
-  function MonitorAndSyncToS3 {
-    $environmentName = GetEnvironmentName
-    "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
-    "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    # Create a FileSystemWatcher object
-    $watcher = New-Object System.IO.FileSystemWatcher
-    $watcher.Path = "D:\storage\tribunals\"
-    $watcher.IncludeSubdirectories = $true
-    $watcher.EnableRaisingEvents = $true
-    
-    # Define the action to take when a file is created
-    $action = {
-        param($source, $event, $environmentName)
-        $filePath = $event.FullPath
-        $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
-        "A file was created at $filePath 's3://tribunals-ebs-backup-$environmentName/$relativePath'. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-        aws s3 cp $filePath "s3://tribunals-ebs-backup-$environmentName/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-      }
-
-      # Register the event
-      Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
-
-      # Keep the script running
-      while ($true) {
-          Start-Sleep -Seconds 10
-      }
-  }
-
-  function InitialSyncToS3 {
-    $environmentName = GetEnvironmentName
-    "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
-    "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-$environmentName >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-    "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
-  }
-
-  # Call the functions
-  InitialSyncToS3
-  MonitorAndSyncToS3
-  '@
-
-  Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
-
-  # Save the script to a file on the EC2 instance
-  $scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
-
-  $Action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-ExecutionPolicy Bypass -File "C:\MonitorAndSyncToS3.ps1"'
-
-  $Trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddMinutes(5))
-
-  Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName "MonitorAndSyncToS3" -Description "Monitor EBS Volume and copy newly added files to S3" -RunLevel Highest -User "SYSTEM" -Force
+function GetEnvironmentName {
+  $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
+  $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
+  return $environmentName
 }
+
+function MonitorAndSyncToS3 {
+  $environmentName = GetEnvironmentName
+  "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
+  "Script started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  # Create a FileSystemWatcher object
+  $watcher = New-Object System.IO.FileSystemWatcher
+  $watcher.Path = "D:\storage\tribunals\"
+  $watcher.IncludeSubdirectories = $true
+  $watcher.EnableRaisingEvents = $true
+  
+  # Define the action to take when a file is created
+  $action = {
+      param($source, $event, $environmentName)
+      $filePath = $event.FullPath
+      $relativePath = $filePath -replace '^D:\\storage\\tribunals\\', '' -replace '\\', '/'
+      "A file was created at $filePath 's3://tribunals-ebs-backup-$environmentName/$relativePath'. Uploading to S3..." >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+      aws s3 cp $filePath "s3://tribunals-ebs-backup-$environmentName/$relativePath" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+    }
+
+    # Register the event
+    Register-ObjectEvent -InputObject $watcher -EventName Created -Action $action
+
+    # Keep the script running
+    while ($true) {
+        Start-Sleep -Seconds 10
+    }
+}
+
+function InitialSyncToS3 {
+  $environmentName = GetEnvironmentName
+  "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
+  "Initial sync to S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  aws s3 sync D:\storage\tribunals\ s3://tribunals-ebs-backup-$environmentName >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  "Initial sync to S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+}
+
+# Call the functions
+InitialSyncToS3
+MonitorAndSyncToS3
+'@
+
+Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
+
+# Save the script to a file on the EC2 instance
+$scriptContent | Out-File -FilePath "C:\MonitorAndSyncToS3.ps1"
+
+$Action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-ExecutionPolicy Bypass -File "C:\MonitorAndSyncToS3.ps1"'
+
+$Trigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddMinutes(5))
+
+Register-ScheduledTask -Action $Action -Trigger $Trigger -TaskName "MonitorAndSyncToS3" -Description "Monitor EBS Volume and copy newly added files to S3" -RunLevel Highest -User "SYSTEM" -Force
 
 </powershell>
