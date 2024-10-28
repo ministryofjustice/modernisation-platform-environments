@@ -15,15 +15,6 @@ $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
 "Got instanceid " + $instanceid >> $logFile
 
-# Determine if this is the primary or backup instance
-$isPrimary = $tags | Where-Object { $_.Key -eq "Role" -and $_.Value -eq "Primary" }
-
-if ($isPrimary) {
-    $ebsVolumeTag = "tribunals-all-storage"
-} else {
-    $ebsVolumeTag = "tribunals-backup-storage"
-}
-
 $volumeid = Get-EC2Volume -Filter @{ Name="tag:Name"; Values=$ebsVolumeTag } -Select Volumes.VolumeId
 "Got volumeid " + $volumeid >> $logFile
 
