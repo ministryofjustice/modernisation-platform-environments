@@ -78,7 +78,7 @@ module "mojap_derived_tables_replication_bucket" {
   }
 
   logging = {
-    target_bucket = module.mojap_compute_logs_bucket.s3_bucket_id
+    target_bucket = module.mojap_compute_logs_bucket_eu_west_1.s3_bucket_id
     target_prefix = "mojap-derived-tables-replication/"
   }
 
@@ -112,6 +112,43 @@ module "mojap_compute_logs_bucket" {
   version = "4.2.1"
 
   bucket = "mojap-compute-${local.environment}-logs"
+
+  force_destroy = false
+
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.s3_server_access_logs_policy.json
+
+  object_lock_enabled = false
+
+  versioning = {
+    status = "Disabled"
+  }
+
+  server_side_encryption_configuration = {
+    rule = {
+      bucket_key_enabled = true
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.mojap_compute_logs_s3_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+
+  tags = local.tags
+}
+
+module "mojap_compute_logs_bucket_eu_west_1" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.2.1"
+
+  providers = {
+    aws = aws.analytical-platform-compute-eu-west-1
+  }
+
+  bucket = "mojap-compute-${local.environment}-logs-eu-west-1"
 
   force_destroy = false
 
