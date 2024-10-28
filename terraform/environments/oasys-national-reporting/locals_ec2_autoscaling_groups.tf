@@ -10,8 +10,8 @@ locals {
         vpc_zone_identifier = module.environment.subnets["private"].ids
       }
       autoscaling_schedules = {
-        scale_up   = { recurrence = "0 7 * * Mon-Sat" }
-        scale_down = { recurrence = "0 19 * * Mon-Sat", desired_capacity = 0 }
+        scale_up   = { recurrence = "0 7 * * Mon-Fri" }
+        scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
       }
     })
 
