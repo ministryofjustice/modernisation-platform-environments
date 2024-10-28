@@ -50,6 +50,10 @@ module "mojap_derived_tables_replication_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.2.1"
 
+  providers = {
+    aws = aws.analytical-platform-compute-eu-west-1
+  }
+
   bucket = "mojap-compute-${local.environment}-derived-tables-replication"
 
   force_destroy = true
