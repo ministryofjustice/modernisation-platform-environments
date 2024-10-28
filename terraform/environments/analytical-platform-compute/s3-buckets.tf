@@ -71,7 +71,7 @@ module "mojap_derived_tables_replication_bucket" {
     rule = {
       bucket_key_enabled = true
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.mojap_derived_tables_replication_eu_west_1_s3_kms.key_arn
+        kms_master_key_id = module.mojap_derived_tables_replication_s3_kms_eu_west_1.key_arn
         sse_algorithm     = "aws:kms"
       }
     }
