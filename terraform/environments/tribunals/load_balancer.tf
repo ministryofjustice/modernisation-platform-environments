@@ -70,16 +70,16 @@ resource "aws_lb_target_group" "tribunals_target_group" {
   }
 }
 
-data "aws_instances" "tribunals_instance" {
-  depends_on = [
-    aws_instance.tribunals-backup,
-    aws_autoscaling_group.tribunals-all-asg
-  ]
-  filter {
-    name   = "tag:Name"
-    values = ["tribunals-instance", "tribunals-backup-instance"]
-  }
-}
+# data "aws_instances" "tribunals_instance" {
+#   depends_on = [
+#     aws_instance.tribunals-backup,
+#     aws_autoscaling_group.tribunals-all-asg
+#   ]
+#   filter {
+#     name   = "tag:Name"
+#     values = ["tribunals-instance", "tribunals-backup-instance"]
+#   }
+# }
 
 # Make sure that the ec2 instance tagged as 'tribunals-instance' exists
 # before adding aws_lb_target_group_attachment, otherwise terraform will fail
