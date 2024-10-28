@@ -104,7 +104,7 @@ data "aws_iam_policy_document" "s3_server_access_logs_policy" {
   }
 }
 
-module "mojap_compute_logs_bucket" {
+module "mojap_compute_logs_bucket_eu_west_2" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -172,4 +172,25 @@ module "mojap_compute_logs_bucket_eu_west_1" {
   }
 
   tags = local.tags
+}
+
+moved {
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket
+  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket
+}
+moved {
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket_policy
+  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_policy
+}
+moved {
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket_public_access_block
+  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_public_access_block
+}
+moved {
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket_server_side_encryption_configuration
+  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_server_side_encryption_configuration
+}
+moved {
+  from = module.mojap_compute_logs_bucket.aws_s3_bucket_versioning
+  to = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_versioning
 }
