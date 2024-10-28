@@ -116,7 +116,7 @@ resource "aws_dms_replication_task" "business_interaction_outbound_replication" 
 # This table is used to ensure accurate replication of audited interaction records.
 resource "aws_dms_replication_task" "audited_interaction_checksum_outbound_replication" {
   count               = try(var.dms_config.audit_source_endpoint.read_database, null) == null ? 0 : 1
-  replication_task_id = "${var.env_name}-business-interaction-checksum-outbound-replication-task-for-${lower(var.dms_config.audit_source_endpoint.read_database)}"
+  replication_task_id = "${var.env_name}-audited-interaction-checksum-outbound-replication-task-for-${lower(var.dms_config.audit_source_endpoint.read_database)}"
   migration_type      = "cdc"
 
   table_mappings            = file("files/audited_interaction_checksum_outbound_table_mapping.json")

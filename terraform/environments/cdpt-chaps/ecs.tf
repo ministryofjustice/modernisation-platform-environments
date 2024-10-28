@@ -3,10 +3,6 @@ data "aws_ecs_task_definition" "task_definition" {
   depends_on      = [aws_ecs_task_definition.chaps_task_definition]
 }
 
-data "aws_ssm_parameter" "ecs_optimized_ami" {
-  name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized"
-}
-
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
 
@@ -81,7 +77,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
     {
       name      = "${local.application_name}-container"
       image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].environment_name}"
-      cpu       = 2048
+      cpu       = 1024
       memory    = 2048
       essential = true
       portMappings = [
@@ -147,6 +143,9 @@ resource "aws_ecs_service" "ecs_service" {
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
+
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent         = 200  
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.chaps.name
@@ -276,7 +275,7 @@ resource "aws_security_group" "cluster_ec2" {
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  image_id      = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized/image_id"
   instance_type = local.application_data.accounts[local.environment].instance_type
   key_name      = "${local.application_name}-ec2"
   ebs_optimized = true

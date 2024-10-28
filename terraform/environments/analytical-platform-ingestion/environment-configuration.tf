@@ -13,13 +13,20 @@ locals {
       isolated_vpc_enable_nat_gateway     = true
       isolated_vpc_one_nat_gateway_per_az = true
 
+      /* Transit Gateway */
+      transit_gateway_routes = [
+        /* MoJO DNS Resolver Service */
+        "10.180.80.5/32",
+        "10.180.81.5/32"
+      ]
+
       /* Observability Platform */
       observability_platform = "development"
 
       /* Image Versions */
-      scan_image_version     = "0.0.10"
-      transfer_image_version = "0.0.15"
-      notify_image_version   = "0.0.16"
+      scan_image_version     = "0.1.2"
+      transfer_image_version = "0.0.17"
+      notify_image_version   = "0.0.18"
 
       /* Target Buckets */
       target_buckets = ["mojap-land-dev"]
@@ -51,13 +58,20 @@ locals {
       isolated_vpc_enable_nat_gateway     = true
       isolated_vpc_one_nat_gateway_per_az = true
 
+      /* Transit Gateway */
+      transit_gateway_routes = [
+        /* MoJO DNS Resolver Service */
+        "10.180.80.5/32",
+        "10.180.81.5/32"
+      ]
+
       /* Observability Platform */
       observability_platform = "production"
 
       /* Image Versions */
-      scan_image_version     = "0.0.10"
-      transfer_image_version = "0.0.15"
-      notify_image_version   = "0.0.16"
+      scan_image_version     = "0.1.2"
+      transfer_image_version = "0.0.17"
+      notify_image_version   = "0.0.18"
 
       /* Target Buckets */
       target_buckets = ["mojap-land"]

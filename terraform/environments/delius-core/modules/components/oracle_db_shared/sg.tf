@@ -1,4 +1,5 @@
 resource "aws_security_group" "db_ec2" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
   name        = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ec2-instance-sg"
   description = "Controls access to db ec2 instance"
   vpc_id      = var.account_config.shared_vpc_id
@@ -74,6 +75,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ingress
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ssh_ingress_bastion" {
+  #checkov:skip=CKV_AWS_24
   security_group_id            = aws_security_group.db_ec2.id
   description                  = "bastion to testing db"
   from_port                    = 22
@@ -83,6 +85,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_security_group_ssh_ing
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_db" {
+  #checkov:skip=CKV_AWS_23
   ip_protocol       = "tcp"
   from_port         = local.db_port
   to_port           = local.db_tcps_port
@@ -103,6 +106,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_rman_db" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_agent" {
+  #checkov:skip=CKV_AWS_23
   ip_protocol       = "tcp"
   from_port         = 3872
   to_port           = 3872
@@ -111,6 +115,7 @@ resource "aws_vpc_security_group_ingress_rule" "delius_db_oem_agent" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_db_oem_upload" {
+  #checkov:skip=CKV_AWS_23
   ip_protocol       = "tcp"
   from_port         = 4903
   to_port           = 4903
@@ -119,6 +124,7 @@ resource "aws_vpc_security_group_egress_rule" "delius_db_oem_upload" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "delius_db_oem_console" {
+  #checkov:skip=CKV_AWS_23
   ip_protocol = "tcp"
   from_port   = 7803
   to_port     = 7803

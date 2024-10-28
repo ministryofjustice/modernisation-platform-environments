@@ -251,16 +251,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
         "cloudwatch:EnableAlarmActions"
       ],
       "Resource": [
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-014bce95a85aaeede",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-00cbccc46d25e77c6",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-0dba6054c0f5f7a11",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-0b5ef7cb90938fb82",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-04bbb6312b86648be",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-00413756d2dfcf6d2",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-080498c4c9d25e6bd",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-029d2b17679dab982",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-70%-i-029d2b17679dab982",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-90%-i-029d2b17679dab982"
+      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:*"
       ]
    },
    {
@@ -880,43 +871,6 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     ]
   }
 }
-
-## UAT
-/*
-
-data "aws_iam_policy_document" "sns_topic_policy_uat_ec2cw" {
-  count     = local.is-preproduction == true ? 1 : 0
-  policy_id = "SnsUATTopicId"
-  statement {
-    sid = "statement1"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    effect = "Allow"
-    actions = [
-      "SNS:GetTopicAttributes",
-      "SNS:SetTopicAttributes",
-      "SNS:AddPermission",
-      "SNS:DeleteTopic",
-      "SNS:Subscribe",
-      "SNS:ListSubscriptionsByTopic",
-      "SNS:Publish",
-      "SNS:Receive"
-    ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceOwner"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-
-    resources = [
-      aws_sns_topic.cw_uat_alerts[0].arn
-    ]
-  }
-}
-*/
 
 ####################################################
 # IAM User, Policy for MGN

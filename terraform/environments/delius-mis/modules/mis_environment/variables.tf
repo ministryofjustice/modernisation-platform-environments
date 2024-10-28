@@ -81,3 +81,8 @@ variable "pagerduty_integration_key" {
   type        = string
   default     = null
 }
+
+variable "domain_join_ports" {
+  description = "Ports required for domain join"
+  type        = any
+}

@@ -8,7 +8,7 @@ locals {
     metadata_endpoint_enabled    = var.metadata_options.http_endpoint
     metadata_options_http_tokens = var.metadata_options.http_tokens
     monitoring                   = var.monitoring
-    ebs_block_device_inline      = true
+    ebs_block_device_inline      = false
     vpc_security_group_ids       = var.security_group_ids
     private_dns_name_options = {
       enable_resource_name_dns_aaaa_record = false
@@ -21,6 +21,8 @@ locals {
 }
 
 module "instance" {
+  #checkov:skip=CKV_TF_1
+  #checkov:skip=CKV_TF_2
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
 
   providers = {

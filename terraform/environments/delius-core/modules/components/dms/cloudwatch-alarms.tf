@@ -70,8 +70,8 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   statistic           = "Average"
   metric_name         = "CDCLatencySource"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 10
-  evaluation_periods  = 2
+  threshold           = 15
+  evaluation_periods  = 3
   period              = 30
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.dms_alerting.arn]
@@ -92,8 +92,8 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   statistic           = "Average"
   metric_name         = "CDCLatencyTarget"
   comparison_operator = "GreaterThanThreshold"
-  threshold           = 10
-  evaluation_periods  = 2
+  threshold           = 15
+  evaluation_periods  = 3
   period              = 30
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.dms_alerting.arn]
@@ -129,6 +129,7 @@ locals {
 # Non-Prod alerts channel: #delius-aws-oracle-dev-alerts
 # Prod alerts channel:     #delius-aws-oracle-prod-alerts
 module "pagerduty_core_alerts" {
+  #checkov:skip=CKV_TF_1
   depends_on = [
     aws_sns_topic.dms_alerting
   ]

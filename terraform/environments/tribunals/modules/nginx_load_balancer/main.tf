@@ -44,7 +44,7 @@ variable "external_acm_cert_arn" {
 }
 
 resource "aws_lb_target_group_attachment" "nginx_lb_tg_attachment" {
-  for_each         = var.nginx_instance_ids
+  for_each = var.nginx_instance_ids
 
   target_group_arn = aws_lb_target_group.nginx_lb_tg.arn
   target_id        = each.value

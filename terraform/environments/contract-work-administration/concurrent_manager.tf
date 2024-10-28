@@ -63,7 +63,7 @@ do
 done
 
 echo "Updating /etc/rc.local file"
-cat <<EOT > etc/rc.local
+cat <<EOT > /etc/rc.local
 #!/bin/sh
 #
 # This script will be executed *after* all the other init scripts.
@@ -116,8 +116,8 @@ sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
-sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
-sed -i '/development-general$/d' /root/.ssh/authorized_keys
+sed -i '/.*-general$/d' /home/ec2-user/.ssh/authorized_keys
+sed -i '/.*-general$/d' /root/.ssh/authorized_keys
 sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 ## Add custom metric script
@@ -158,7 +158,7 @@ resource "aws_instance" "concurrent_manager" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.cm_userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   metadata_options {
     http_tokens = "optional"
   }

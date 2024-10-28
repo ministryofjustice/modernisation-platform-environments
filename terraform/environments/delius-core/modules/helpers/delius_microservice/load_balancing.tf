@@ -11,7 +11,7 @@ resource "random_id" "suffix" {
 ## ALB target group and listener rule
 resource "aws_lb_target_group" "frontend" {
   count = var.microservice_lb != null ? 1 : 0
-  # checkov:skip=CKV_AWS_261
+  #checkov:skip=CKV_AWS_261 "ignore"
   # https://github.com/hashicorp/terraform-provider-aws/issues/16889
   name                 = "${var.env_name}-${var.name}-${random_id.suffix.hex}"
   port                 = random_id.suffix.keepers.port
@@ -94,6 +94,7 @@ resource "aws_lb" "delius_microservices" {
   security_groups            = [aws_security_group.delius_microservices_service_nlb.id]
   subnets                    = var.account_config.private_subnet_ids
   enable_deletion_protection = false
+  drop_invalid_header_fields = true
   tags                       = var.tags
 }
 

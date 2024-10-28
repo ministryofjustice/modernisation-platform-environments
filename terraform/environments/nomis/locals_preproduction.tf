@@ -105,11 +105,11 @@ locals {
         })
       })
 
-      # NOT-ACTIVE (green deployment)
+      # NOT-ACTIVE (green deployment) - for testing Combined Reporting
       preprod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 0
+          desired_capacity = 1
+          max_size         = 1
 
           initial_lifecycle_hooks = {
             "ready-hook" = {
@@ -133,7 +133,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "ncr/TM-596/preprod-nomis-link-test"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {

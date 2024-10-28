@@ -34,7 +34,7 @@ server {
                  return 301 https://www.gov.uk/courts-tribunals/upper-tribunal-administrative-appeals-chamber;
         }
         location ~* ^/aspx {
-                 return 301 https://administrativeappeals.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 https://administrativeappeals.decisions.tribunals.gov.uk/Aspx/default.aspx;
         }
         location ~* ^/Decisions {
                 return 301 https://administrativeappeals.decisions.tribunals.gov.uk/$request_uri;

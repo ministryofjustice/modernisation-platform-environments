@@ -99,17 +99,3 @@ data "aws_secretsmanager_secret_version" "tribunals_admin_site_credentials_secre
   depends_on = [aws_secretsmanager_secret_version.tribunals_admin_site_credentials_current]
   secret_id  = data.aws_secretsmanager_secret.tribunals_admin_site_secret.id
 }
-
-resource "aws_secretsmanager_secret" "sftp_private_key" {
-  name                    = "private-key-sftp-upload"
-  recovery_window_in_days = 0
-}
-
-resource "aws_secretsmanager_secret_version" "sftp_private_key" {
-  secret_id     = aws_secretsmanager_secret.sftp_private_key.id
-  secret_string = <<EOF
-  {
-    "sftp_private_key": ""
-  }
-  EOF
-}

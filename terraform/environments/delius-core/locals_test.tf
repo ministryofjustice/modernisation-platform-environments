@@ -38,6 +38,9 @@ locals {
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
+
+    inline_ebs = true
+
     primary_instance_count = 1
     standby_count          = 0
     ebs_volumes = {
@@ -57,7 +60,7 @@ locals {
         iops       = 3000
         throughput = 125
         type       = "gp3"
-        total_size = 500
+        total_size = 1000
       }
       flash = {
         iops       = 3000
