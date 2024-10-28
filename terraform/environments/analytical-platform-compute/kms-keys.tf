@@ -275,7 +275,7 @@ module "mlflow_s3_kms" {
   tags = local.tags
 }
 
-module "mojap_derived_tables_replication_eu_west_1_s3_kms" {
+module "mojap_derived_tables_replication_s3_kms_eu_west_1" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
