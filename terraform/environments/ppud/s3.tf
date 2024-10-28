@@ -368,6 +368,7 @@ resource "aws_s3_bucket" "moj-log-files-prod" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   count  = local.is-production == true ? 1 : 0
   bucket = "moj-log-files-prod"
   tags = merge(
@@ -544,6 +545,7 @@ resource "aws_s3_bucket" "moj-log-files-uat" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
   # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   count  = local.is-preproduction == true ? 1 : 0
   bucket = "moj-log-files-uat"
   tags = merge(
@@ -883,7 +885,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "arn:aws:s3:::moj-log-files-dev/*"
         ]
         "Principal" : {
-          "AWS": "arn:aws:iam::652711504416:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
+          "AWS" : "arn:aws:iam::652711504416:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
         }
       }
     ]

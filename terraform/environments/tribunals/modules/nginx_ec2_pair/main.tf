@@ -23,7 +23,7 @@ variable "environment" {
 
 data "aws_ami" "latest_linux" {
   most_recent = true
-  owners = ["amazon"]
+  owners      = ["amazon"]
   filter {
     name   = "name"
     values = ["amzn2-ami-hvm-*-x86_64-gp2"]
@@ -43,7 +43,7 @@ resource "aws_instance" "nginx" {
   }
   vpc_security_group_ids = [aws_security_group.allow_ssm.id]
   iam_instance_profile   = aws_iam_instance_profile.nginx_profile.name
-    user_data = <<-EOF
+  user_data              = <<-EOF
               #!/bin/bash
 
               echo "installing Nginx"
@@ -73,9 +73,9 @@ resource "aws_security_group" "allow_ssm" {
   vpc_id      = var.vpc_shared_id
 
   ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    from_port = 0
+    to_port   = 0
+    protocol  = "-1"
     security_groups = [
       var.nginx_lb_sg_id
     ]
@@ -100,7 +100,7 @@ resource "aws_s3_object" "sites_available" {
   key    = "sites-available/${each.value}"
   source = "${path.module}/sites-available/${each.value}"
   # Use md5 to detect changes in the sites-available folder
-  etag   = filemd5("${path.module}/sites-available/${each.value}")
+  etag = filemd5("${path.module}/sites-available/${each.value}")
 }
 
 resource "aws_s3_object" "nginx_conf" {
@@ -108,7 +108,7 @@ resource "aws_s3_object" "nginx_conf" {
   key    = "nginx.conf"
   source = "${path.module}/nginx-conf/nginx.conf"
   # Use md5 to detect changes in the nginx.conf file
-  etag   = filemd5("${path.module}/nginx-conf/nginx.conf")
+  etag = filemd5("${path.module}/nginx-conf/nginx.conf")
 }
 
 resource "aws_iam_role_policy_attachment" "s3_policy_attachment" {

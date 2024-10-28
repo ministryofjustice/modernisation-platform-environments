@@ -20,7 +20,7 @@ and then uses the wait state to wait until that time before calling another lamb
 reccomended steps to gracefully replace the tasks.
 
 This is functionally equivalent to the manual steps outlined in the AWS documentation here:
-https://docs.aws.amazon.com/AmazonECS/latest/developerguide/prepare-task-retirement.html#prepare-task-retirement-change-time
+<https://docs.aws.amazon.com/AmazonECS/latest/developerguide/prepare-task-retirement.html#prepare-task-retirement-change-time>
 
 ## Usage
 
