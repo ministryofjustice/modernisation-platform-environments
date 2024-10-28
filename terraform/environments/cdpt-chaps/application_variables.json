@@ -44,9 +44,9 @@
       "db_snapshot_identifier": "arn:aws:rds:eu-west-2:613903586696:snapshot:chaps-prod-20-02-2024",
       "environment_name": "production",
       "app_count": 2,
-      "ec2_desired_capacity": 4,
-      "ec2_max_size": 4,
-      "ec2_min_size": 2,
+      "ec2_desired_capacity": 1,
+      "ec2_max_size": 3,
+      "ec2_min_size": 1,
       "instance_type": "t3.large",
       "container_port": 80,
       "client_id": "0a5da4a0-a108-4ca5-a45c-440b72b323e6"
