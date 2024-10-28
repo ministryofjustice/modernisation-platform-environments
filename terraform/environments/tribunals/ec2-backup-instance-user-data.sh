@@ -8,6 +8,8 @@ $ebsVolumeTag = "tribunals-backup-storage"
 $tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","hmlands","lands-chamber", "ftp-admin-appeals", "ftp-tax-tribunal", "ftp-tax-chancery", "ftp-sscs-venues", "ftp-siac", "ftp-primary-health", "ftp-estate-agents", "ftp-consumer-credit", "ftp-claims-management", "ftp-charity-tribunals"
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
+$environmentName = (Get-EC2Tag -Filter @{Name="resource-id";Values=$instanceId}).Value | Where-Object { $_.Key -eq "Environment" } | Select-Object -ExpandProperty Value
+$s3BucketName = "tribunals-ebs-backup-${environmentName}"
 
 "Starting userdata execution" >> $logFile
 
@@ -90,5 +92,55 @@ if (-not $awsCliInstalled) {
 } else {
     "AWS CLI is already installed." >> $monitorLogFile
 }
+
+# Initial sync from S3 to EBS
+"Starting initial sync from S3 to EBS at $(Get-Date)" >> $monitorLogFile
+foreach ($tribunal in $tribunalNames) {
+    $s3Path = "s3://${s3BucketName}/${tribunal}/"
+    $localPath = "${targetPath}${tribunal}"
+    
+    "Syncing ${s3Path} to ${localPath}" >> $monitorLogFile
+    & aws s3 sync $s3Path $localPath >> $monitorLogFile 2>&1
+    if ($LASTEXITCODE -eq 0) {
+        "Successfully synced ${tribunal}" >> $monitorLogFile
+    } else {
+        "Failed to sync ${tribunal}" >> $monitorLogFile
+    }
+}
+
+# Create and start a background job to monitor for changes
+$monitorScript = @"
+while (`$true) {
+    `$timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    "Monitor cycle starting at `$timestamp" >> "$monitorLogFile"
+    
+    foreach (`$tribunal in '$($tribunalNames -join "','")') {
+        `$s3Path = "s3://${s3BucketName}/`${tribunal}/"
+        `$localPath = "${targetPath}`${tribunal}"
+        
+        # Sync any changes from S3 to local
+        & aws s3 sync `$s3Path `$localPath --delete >> "$monitorLogFile" 2>&1
+        if (`$LASTEXITCODE -eq 0) {
+            "`$timestamp - Successfully synced `$tribunal from S3" >> "$monitorLogFile"
+        } else {
+            "`$timestamp - Failed to sync `$tribunal from S3" >> "$monitorLogFile"
+        }
+    }
+    
+    # Wait for 5 minutes before next sync
+    Start-Sleep -Seconds 300
+}
+"@
+
+# Save the monitor script
+$monitorScript | Out-File -FilePath $monitorScriptFile -Encoding UTF8
+
+# Start the monitor script as a background job
+Start-Job -ScriptBlock {
+    param($scriptPath)
+    PowerShell.exe -ExecutionPolicy Bypass -File $scriptPath
+} -ArgumentList $monitorScriptFile
+
+"Monitoring script started" >> $monitorLogFile
 
 </powershell>

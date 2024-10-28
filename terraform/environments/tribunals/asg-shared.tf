@@ -264,14 +264,12 @@ resource "aws_instance" "tribunals-backup" {
     version = "$Latest"
   }
 
+  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
+
   instance_initiated_shutdown_behavior = "stop"
 
   tags = {
     Name = "tribunals-backup-instance"
-  }
-
-  lifecycle {
-    ignore_changes = [user_data]
   }
 }
 
