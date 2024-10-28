@@ -272,7 +272,7 @@ resource "aws_security_group" "cluster_ec2" {
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = "resolve:ssm:/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id"
+  image_id      = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized/image_id"
   instance_type = local.application_data.accounts[local.environment].instance_type
   key_name      = "${local.application_name}-ec2"
   ebs_optimized = true
