@@ -2,6 +2,8 @@ import time
 import sys
 import boto3
 
+# import typing as RT
+
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from pyspark.sql import DataFrame
@@ -125,29 +127,6 @@ class RDS_JDBC_CONNECTION():
                                         "password": self.RDS_DB_INSTANCE_PWD,
                                         "driver": self.RDS_DB_INSTANCE_DRIVER})
 
-    def get_rds_dataframe_v2(self, 
-                             rds_db_table_name, 
-                             jdbc_partition_column, 
-                             pkey_min, 
-                             pkey_max) -> DataFrame:
-
-        query_str = f"""
-        SELECT *
-          FROM {self.rds_db_schema_name}.[{rds_db_table_name}]
-         WHERE {jdbc_partition_column} between {pkey_min} and {pkey_max}
-        """.strip()
-
-        self.LOGGER.info(f"""query_str-(SingleJDBCConn):> \n{query_str}""")
-
-        return (self.spark.read.format("jdbc")
-                .option("url", self.rds_jdbc_url_v2)
-                .option("driver", self.RDS_DB_INSTANCE_DRIVER)
-                .option("user", self.RDS_DB_INSTANCE_USER)
-                .option("password", self.RDS_DB_INSTANCE_PWD)
-                .option("dbtable", f"""({query_str}) as t""")
-                .load())
-
-
     def get_rds_db_table_row_count(self, 
                                    in_table_name, 
                                    in_pkeys_col_list) -> DataFrame:
@@ -165,7 +144,7 @@ class RDS_JDBC_CONNECTION():
                         .option("query", f"""{query_str}""")
                         .load()).collect()[0].row_count
 
-    def get_df_read_rds_db_tbl_int_pkey(self, 
+    def get_rds_df_read_tbl_pkey_parallel(self, 
                                         in_table_name,
                                         jdbc_partition_column, 
                                         jdbc_partition_col_upperbound, 
@@ -200,8 +179,7 @@ class RDS_JDBC_CONNECTION():
                     .option("numPartitions", numPartitions)
                     .load())
 
-
-    def get_df_jdbc_read_rds_partitions(self, 
+    def get_rds_df_jdbc_read_parallel(self, 
                                         rds_tbl_name, 
                                         rds_tbl_pkeys_list,
                                         jdbc_partition_column,
@@ -215,54 +193,58 @@ class RDS_JDBC_CONNECTION():
 
         jdbc_partition_col_upperbound = int(df_rds_count/jdbc_read_partitions_num)
 
-        df_rds_temp = self.get_df_read_rds_db_tbl_int_pkey(rds_tbl_name, 
+        df_rds_temp = self.get_rds_df_read_tbl_pkey_parallel(rds_tbl_name, 
                                                            jdbc_partition_column,
                                                            jdbc_partition_col_upperbound,
                                                            jdbc_read_partitions_num)
         return df_rds_temp
 
-    def get_rds_df_parallel_jdbc(self,
-                                 rds_db_table_name,
-                                 jdbc_partition_column,
-                                 jdbc_partition_col_upperbound,
-                                 jdbc_read_partitions_num,
-                                 jdbc_partition_col_lowerbound=0,
-                                 ) -> DataFrame:
-
-        numPartitions = jdbc_read_partitions_num
-        # Note: numPartitions is normally equal to number of executors defined.
-        # The maximum number of partitions that can be used for parallelism in table reading and writing.
-        # This also determines the maximum number of concurrent JDBC connections.
-
+    def get_rds_df_read_pkey_min_max_range(self, 
+                                       rds_db_table_name, 
+                                       jdbc_partition_column, 
+                                       pkey_min, 
+                                       pkey_max,
+                                       jdbc_read_partitions_num=None) -> DataFrame:
         self.LOGGER.info(
-            f"""jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
+            f"""jdbc_partition_col_lowerbound = {pkey_min}""")
         self.LOGGER.info(
-            f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
-
-        fetchSize = int((jdbc_partition_col_upperbound -
-                        jdbc_partition_col_lowerbound)/jdbc_read_partitions_num)
-        self.LOGGER.info(f"""fetchSize = {fetchSize}""")
-
+            f"""jdbc_partition_col_upperbound = {pkey_max}""")
+    
         query_str = f"""
         SELECT *
           FROM {self.rds_db_schema_name}.[{rds_db_table_name}]
-         WHERE {jdbc_partition_column} between {jdbc_partition_col_lowerbound} and {jdbc_partition_col_upperbound}
+         WHERE {jdbc_partition_column} between {pkey_min} and {pkey_max}
         """.strip()
 
-        self.LOGGER.info(f"""query_str-(ParallelJDBCConn):> \n{query_str}""")
+        if jdbc_read_partitions_num is None:
+            self.LOGGER.info(f"""query_str-(SingleJDBCConn):> \n{query_str}""")
 
-        return (self.spark.read.format("jdbc")
-                .option("url", self.rds_jdbc_url_v2)
-                .option("driver", self.RDS_DB_INSTANCE_DRIVER)
-                .option("user", self.RDS_DB_INSTANCE_USER)
-                .option("password", self.RDS_DB_INSTANCE_PWD)
-                .option("dbtable", f"""({query_str}) as t""")
-                .option("partitionColumn", jdbc_partition_column)
-                .option("lowerBound", jdbc_partition_col_lowerbound)
-                .option("upperBound", jdbc_partition_col_upperbound)
-                .option("numPartitions", numPartitions)
-                .option("fetchSize", fetchSize)
-                .load())
+            return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({query_str}) as t""")
+                    .load())
+        else:
+            numPartitions = jdbc_read_partitions_num
+            # Note: numPartitions is normally equal to number of executors defined.
+            # The maximum number of partitions that can be used for parallelism in table reading and writing.
+            # This also determines the maximum number of concurrent JDBC connections.
+
+            self.LOGGER.info(f"""query_str-(ParallelJDBCConn):> \n{query_str}""")
+
+            return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({query_str}) as t""")
+                    .option("partitionColumn", jdbc_partition_column)
+                    .option("lowerBound", pkey_min)
+                    .option("upperBound", pkey_max)
+                    .option("numPartitions", numPartitions)
+                    .load())
 
     def get_df_read_rds_db_tbl_pkey_between(self, 
                                         in_table_name,
@@ -344,7 +326,7 @@ class RDS_JDBC_CONNECTION():
         else:
             return None
 
-    def get_rds_db_table_pkey_col_max_value(self, 
+    def get_rds_db_tbl_pkey_col_max_value(self, 
                                             in_table_name,
                                             in_pkey_col_name) -> DataFrame:
         
@@ -418,14 +400,14 @@ class RDS_JDBC_CONNECTION():
 
 class AthenaMethods:
 
-    def __init__(self,
-                 ATHENA_CLIENT,
-                 ATHENA_RUN_OUTPUT_LOCATION):
-        self.ATHENA_CLIENT = ATHENA_CLIENT
+    ATHENA_CLIENT = boto3.client("athena", 
+                                 region_name='eu-west-2')
+
+    def __init__(self,ATHENA_RUN_OUTPUT_LOCATION):
         self.ATHENA_RUN_OUTPUT_LOCATION = ATHENA_RUN_OUTPUT_LOCATION
 
     def run_athena_query(self, sql_statement_str):
-        response = self.ATHENA_CLIENT.start_query_execution(
+        response = AthenaMethods.ATHENA_CLIENT.start_query_execution(
             QueryString=sql_statement_str,
             ResultConfiguration={"OutputLocation": self.ATHENA_RUN_OUTPUT_LOCATION}
         )
@@ -437,7 +419,7 @@ class AthenaMethods:
 
         while max_execution > 0 and state in ["RUNNING", "QUEUED"]:
             max_execution -= 1
-            response = self.ATHENA_CLIENT.get_query_execution(
+            response = AthenaMethods.ATHENA_CLIENT.get_query_execution(
                 QueryExecutionId=execution_id)
             if (
                 "QueryExecution" in response

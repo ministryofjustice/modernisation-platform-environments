@@ -162,7 +162,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                         LOGGER.error(f"""{RECORDED_PKEYS_LIST[rds_tbl_name]}: >> not an INT Datatype column <<""")
                         sys.exit(1)
 
-                    df_rds_temp = rds_jdbc_conn_obj.get_df_jdbc_read_rds_partitions(
+                    df_rds_temp = rds_jdbc_conn_obj.get_rds_df_jdbc_read_parallel(
                                                         rds_tbl_name, 
                                                         RECORDED_PKEYS_LIST[rds_tbl_name],
                                                         jdbc_partition_column,
@@ -191,7 +191,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                                     )
             LOGGER.info(f"""jdbc_partition_column = {jdbc_partition_column}""")
 
-            df_rds_temp = rds_jdbc_conn_obj.get_df_jdbc_read_rds_partitions(
+            df_rds_temp = rds_jdbc_conn_obj.get_rds_df_jdbc_read_parallel(
                                                 rds_tbl_name, 
                                                 rds_db_tbl_pkeys_col_list,
                                                 jdbc_partition_column,

@@ -22,7 +22,7 @@ from pyspark.sql import DataFrame
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
 
-from pyspark.storagelevel import StorageLevel
+# from pyspark.storagelevel import StorageLevel
 
 # ===============================================================================
 
@@ -31,9 +31,9 @@ sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.enabled", "true")
 sc._jsc.hadoopConfiguration().set("spark.memory.offHeap.size", "3g")
 sc._jsc.hadoopConfiguration().set("spark.dynamicAllocation.enabled", "true")
 
-glueContext = SparkSession.glueContext
 spark = SparkSession.spark
 
+glueContext = SparkSession.glueContext
 LOGGER = glueContext.get_logger()
 
 # ===============================================================================
@@ -252,7 +252,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             (rds_db_tbl_pkeys_col_list[0] in int_dtypes_colname_list):
 
             jdbc_partition_column = rds_db_tbl_pkeys_col_list[0]
-            pkey_max_value = rds_jdbc_conn_obj.get_rds_db_table_pkey_col_max_value(
+            pkey_max_value = rds_jdbc_conn_obj.get_rds_db_tbl_pkey_col_max_value(
                                 rds_tbl_name, 
                                 jdbc_partition_column
                             )
