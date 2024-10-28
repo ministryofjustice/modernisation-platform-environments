@@ -111,7 +111,7 @@ module "mojap_compute_logs_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.2.1"
 
-  bucket = "mojap-compute-${local.environment}-logs"
+  bucket = "mojap-compute-${local.environment}-logs-eu-west-2"
 
   force_destroy = false
 
