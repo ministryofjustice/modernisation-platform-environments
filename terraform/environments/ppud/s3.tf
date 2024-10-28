@@ -885,7 +885,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "arn:aws:s3:::moj-log-files-dev/*"
         ]
         "Principal" : {
-          "AWS": "arn:aws:iam::652711504416:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
+          "AWS" : "arn:aws:iam::652711504416:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
         }
       }
     ]

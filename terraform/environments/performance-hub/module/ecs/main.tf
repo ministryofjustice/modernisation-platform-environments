@@ -99,7 +99,7 @@ resource "aws_security_group" "cluster_ec2" {
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template" {
-  name_prefix = "${var.app_name}-ec2-launch-template"
+  name_prefix   = "${var.app_name}-ec2-launch-template"
   image_id      = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized/image_id"
   instance_type = var.instance_type
   key_name      = var.key_name
