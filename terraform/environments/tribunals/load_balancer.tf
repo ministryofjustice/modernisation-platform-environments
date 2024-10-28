@@ -71,6 +71,10 @@ resource "aws_lb_target_group" "tribunals_target_group" {
 }
 
 data "aws_instances" "tribunals_instance" {
+  depends_on = [
+    aws_instance.tribunals-backup,
+    aws_autoscaling_group.tribunals-all-asg
+  ]
   filter {
     name   = "tag:Name"
     values = ["tribunals-instance", "tribunals-backup-instance"]
