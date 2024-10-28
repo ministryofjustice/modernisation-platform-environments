@@ -85,13 +85,13 @@ module "mojap_derived_tables_replication_bucket" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "s3_server_access_logs_policy" {
+data "aws_iam_policy_document" "s3_server_access_logs_eu_west_2_policy" {
   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
   statement {
     sid       = "S3ServerAccessLogsPolicy"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::mojap-compute-${local.environment}-logs/*"]
+    resources = ["arn:aws:s3:::mojap-compute-${local.environment}-logs-eu-west-2/*"]
     principals {
       type        = "Service"
       identifiers = ["logging.s3.amazonaws.com"]
@@ -116,7 +116,7 @@ module "mojap_compute_logs_bucket_eu_west_2" {
   force_destroy = false
 
   attach_policy = true
-  policy        = data.aws_iam_policy_document.s3_server_access_logs_policy.json
+  policy        = data.aws_iam_policy_document.s3_server_access_logs_eu_west_2_policy.json
 
   object_lock_enabled = false
 
@@ -137,6 +137,25 @@ module "mojap_compute_logs_bucket_eu_west_2" {
   tags = local.tags
 }
 
+data "aws_iam_policy_document" "s3_server_access_logs_eu_west_1_policy" {
+  #checkov:skip=CKV_AWS_356:resource "*" limited by condition
+  statement {
+    sid       = "S3ServerAccessLogsPolicy"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = ["arn:aws:s3:::mojap-compute-${local.environment}-logs-eu-west-1/*"]
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
 module "mojap_compute_logs_bucket_eu_west_1" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -153,7 +172,7 @@ module "mojap_compute_logs_bucket_eu_west_1" {
   force_destroy = false
 
   attach_policy = true
-  policy        = data.aws_iam_policy_document.s3_server_access_logs_policy.json
+  policy        = data.aws_iam_policy_document.s3_server_access_logs_eu_west_1_policy.json
 
   object_lock_enabled = false
 
@@ -193,4 +212,9 @@ moved {
 moved {
   from = module.mojap_compute_logs_bucket.aws_s3_bucket_versioning.this[0]
   to   = module.mojap_compute_logs_bucket_eu_west_2.aws_s3_bucket_versioning.this[0]
+}
+
+moved {
+  from = aws_iam_policy_document.s3_server_access_logs_policy
+  to   = aws_iam_policy_document.s3_server_access_logs_eu_west_2_policy
 }
