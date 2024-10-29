@@ -327,7 +327,7 @@ if __name__ == "__main__":
                                             rds_sqlserver_db_table,
                                             date_partition_column_name,
                                             jdbc_partition_column,
-                                            args.get('rds_query_where_clause', '')
+                                            args.get('rds_query_where_clause', None)
                                         )
     LOGGER.info(f"""agg_row_dict_list:>\n{[agg_row_dict for agg_row_dict in agg_row_dict_list]}""")
 
@@ -364,7 +364,7 @@ if __name__ == "__main__":
         LOGGER.info(
             f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
 
-        if args.get('rds_query_where_clause', '') != '':
+        if args.get('rds_query_where_clause', None) is not None:
             df_rds_read = df_rds_read.where(f"""{args['rds_query_where_clause'].strip()}""")
         # ----------------------------------------------------
 
