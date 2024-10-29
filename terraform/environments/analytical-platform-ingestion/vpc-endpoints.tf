@@ -20,6 +20,16 @@ module "connected_vpc_endpoints" {
         local.tags,
         { Name = format("%s-datasync", "${local.application_name}-${local.environment}-connected") }
       )
+    },
+    ssm = {
+      service             = "ssm"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      security_group_ids  = [aws_security_group.connected_vpc_endpoints.id]
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ssm", "${local.application_name}-${local.environment}-connected") }
+      )
     }
   }
 }
