@@ -132,9 +132,9 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
-          user_data_raw = concat(local.ec2_autoscaling_groups.bods.config.user_data_raw.branch, [
-            "TM/TM-620/test-pagefile-change",
-          ])
+          user_data_raw = concat(local.ec2_autoscaling_groups.bods.config.user_data_raw, {
+            branch = "TM/TM-620/test-pagefile-change",
+          })
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
