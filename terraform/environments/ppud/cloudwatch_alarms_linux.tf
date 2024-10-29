@@ -156,6 +156,7 @@ resource "aws_cloudwatch_metric_alarm" "linux_system_health_check" {
 # Docker Service Status
 
 resource "aws_cloudwatch_metric_alarm" "service_status_docker_rgsl200" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-Docker-i-0f393d9ed4e53da68"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -175,6 +176,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_rgsl200" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_docker_401_cjsm" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-Docker-i-0e8e2a182917bcf26"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -194,6 +196,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_401_cjsm" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_docker_400_non_cjsm" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-Docker-i-01b4cc138ac95a506"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"

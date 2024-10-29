@@ -548,6 +548,7 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected" {
 # IIS Admin Service
 
 resource "aws_cloudwatch_metric_alarm" "service_status_iisadmin_rgvw019" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-IISAdmin-i-0dba6054c0f5f7a11"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -567,6 +568,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_iisadmin_rgvw019" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_iisadmin_rgvw020" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-IISAdmin-i-014bce95a85aaeede"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -588,6 +590,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_iisadmin_rgvw020" {
 # World Wide Web Publishing Service
 
 resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw019" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-WWW-Publishing-i-0dba6054c0f5f7a11"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -607,6 +610,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw019" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw020" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-WWW-Publishing-i-014bce95a85aaeede"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -626,6 +630,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw020" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw022" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-WWW-Publishing-i-029d2b17679dab982"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -645,6 +650,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw022" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgsw025" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-WWW-Publishing-i-00413756d2dfcf6d2"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -664,6 +670,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgsw025" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw027" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-WWW-Publishing-i-00cbccc46d25e77c6"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -683,6 +690,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw027" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw204" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-WWW-Publishing-i-0b5ef7cb90938fb82"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -702,6 +710,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw204" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw205" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-WWW-Publishing-i-04bbb6312b86648be"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -723,6 +732,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw205" {
 # Printer Spooler Service
 
 resource "aws_cloudwatch_metric_alarm" "service_status_printer_spooler_rgvw022" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-Printer-Spooler-i-029d2b17679dab982"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -742,6 +752,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_printer_spooler_rgvw022" 
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_printer_spooler_rgvw027" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-Printer-Spooler-i-00cbccc46d25e77c6"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -763,6 +774,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_printer_spooler_rgvw027" 
 # SQL Server, Writer and Agent Services and SQL Backup Status
 
 resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_rgvw021" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-SQL-Server-i-080498c4c9d25e6bd"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -782,6 +794,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_rgvw021" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_writer_rgvw021" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-SQL-Server-Writer-i-080498c4c9d25e6bd"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -801,6 +814,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_writer_rgvw021
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_agent_rgvw021" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-SQL-Server-Writer-i-080498c4c9d25e6bd"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -820,6 +834,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_agent_rgvw021"
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_backup_status_rgvw021" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-SQL-Server-Backup-Status-i-080498c4c9d25e6bd"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -840,6 +855,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_backup_status_
 # PPUD Live and Crawler Services
 
 resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw019" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-PPUD-Live-i-0dba6054c0f5f7a11"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -859,6 +875,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw019" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw020" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-PPUD-Live-i-014bce95a85aaeede"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -878,6 +895,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw020" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw022" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-PPUD-Live-i-029d2b17679dab982"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
@@ -897,6 +915,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw022" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "service_status_ppud_crawler_rgvw022" {
+  count               = local.is-production == true ? 1 : 0
   alarm_name          = "Service-Status-PPUD-Crawler-i-029d2b17679dab982"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
