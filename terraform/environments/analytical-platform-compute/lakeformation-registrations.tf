@@ -5,4 +5,9 @@ module "replicated_cadet_bucket" {
   data_locations = [module.mojap_compute_logs_bucket_eu_west_1.s3_bucket_arn]
   register       = true
   hybrid_mode    = false # will be managed exclusively in LakeFormation
+
+  providers = {
+    aws.source      = aws
+    aws.destination = aws
+  }
 }
