@@ -37,9 +37,9 @@ resource "aws_s3_object" "dms_dv_rds_and_s3_parquet_v2" {
 
 resource "aws_s3_object" "rds_to_s3_parquet_migration_monthly" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "rds_to_s3_parquet_migration_monthly.py"
-  source = "glue-job/rds_to_s3_parquet_migration_monthly.py"
-  etag   = filemd5("glue-job/rds_to_s3_parquet_migration_monthly.py")
+  key    = "rds_to_s3_parquet_partitionby_yyyy_mm.py"
+  source = "glue-job/rds_to_s3_parquet_partitionby_yyyy_mm.py"
+  etag   = filemd5("glue-job/rds_to_s3_parquet_partitionby_yyyy_mm.py")
 }
 
 resource "aws_s3_object" "rds_to_s3_parquet_migration" {
@@ -313,6 +313,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
     "--rename_migrated_prq_tbl_folder"   = ""
     "--year_partition_bool"              = "false"
     "--month_partition_bool"             = "false"
+    "--extra-py-files"                   = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
     "--rds_to_parquet_output_s3_bucket"  = module.s3-dms-target-store-bucket.bucket.id
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.rds_to_s3_parquet_migration.name}"
     "--enable-continuous-cloudwatch-log" = "true"
@@ -330,7 +331,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_migration_monthly.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_partitionby_yyyy_mm.py"
   }
 
   tags = merge(
