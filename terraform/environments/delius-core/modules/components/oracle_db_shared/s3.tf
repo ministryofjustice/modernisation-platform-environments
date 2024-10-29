@@ -284,6 +284,24 @@ data "aws_iam_policy_document" "oracledb_backups_inventory" {
       identifiers = ["s3.amazonaws.com"]
     }
   }
+
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey",
+      "s3:GetBucketLocation",
+    ]
+    resources = [
+      "arn:aws:kms:us-west-2:123456789012:key/12345678-1234-1234-1234-123456789012",
+    ]
+  }
 }
 
 
