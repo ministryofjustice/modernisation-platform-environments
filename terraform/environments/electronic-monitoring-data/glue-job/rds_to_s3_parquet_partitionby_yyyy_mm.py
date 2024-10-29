@@ -45,7 +45,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "script_bucket_name",
                        "rds_db_host_ep",
                        "rds_db_pwd",
-                       "default_jdbc_read_partition_num",
+                       "jdbc_read_partition_num",
                        "rds_to_parquet_output_s3_bucket",
                        "rds_sqlserver_db",
                        "rds_sqlserver_db_schema",
@@ -290,7 +290,7 @@ if __name__ == "__main__":
         rds_db_table_name = rename_output_table_folder
     # ------------------------------------------------
 
-    jdbc_read_partitions_num = int(args['default_jdbc_read_partition_num'])
+    jdbc_read_partitions_num = int(args['jdbc_read_partition_num'])
     LOGGER.info(f"""jdbc_read_partitions_num = {jdbc_read_partitions_num}""")
 
     rds_df_repartition_num = int(args['rds_df_repartition_num'])

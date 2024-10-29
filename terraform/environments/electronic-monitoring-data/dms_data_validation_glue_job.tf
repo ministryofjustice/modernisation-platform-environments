@@ -35,7 +35,7 @@ resource "aws_s3_object" "dms_dv_rds_and_s3_parquet_v2" {
 #   etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v4d.py")
 # }
 
-resource "aws_s3_object" "rds_to_s3_parquet_migration_monthly" {
+resource "aws_s3_object" "copy_rds_to_s3_parquet_partitionby_yyyy_mm" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "rds_to_s3_parquet_partitionby_yyyy_mm.py"
   source = "glue-job/rds_to_s3_parquet_partitionby_yyyy_mm.py"
@@ -289,13 +289,13 @@ EOF
 }
 
 
-resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
+resource "aws_glue_job" "copy_rds_to_s3_parquet_partitionby_yyyy_mm" {
   name              = "rds-to-s3-parquet-migration-monthly"
   description       = "Table migration Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
   glue_version      = "4.0"
   worker_type       = "G.1X"
-  number_of_workers = 5
+  number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
@@ -307,7 +307,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration_monthly" {
     "--rds_db_tbl_pkeys_col_list"        = ""
     "--date_partition_column_name"       = ""
     "--other_partitionby_columns"        = ""
-    "--default_jdbc_read_partition_num"  = 1
+    "--jdbc_read_partition_num"          = 1
     "--rds_df_repartition_num"           = 0
     "--coalesce_int"                     = 0
     "--rename_migrated_prq_tbl_folder"   = ""
