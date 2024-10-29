@@ -413,7 +413,7 @@ resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
 
 # Malware Event Signature Update Failed
 
-resource "aws_cloudwatch_metric_alarm" "malware-event-signature-update-failed" {
+resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "Malware-Event-Signature-Update-Failed-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -435,7 +435,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-signature-update-failed" {
 
 # Malware Event State Detected
 
-resource "aws_cloudwatch_metric_alarm" "malware-event-state-detected" {
+resource "aws_cloudwatch_metric_alarm" "malware_event_state_detected" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "Malware-Event-State-Detected-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -457,7 +457,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-state-detected" {
 
 # Malware Event Scan Failed
 
-resource "aws_cloudwatch_metric_alarm" "malware-event-scan-failed" {
+resource "aws_cloudwatch_metric_alarm" "malware_event_scan_failed" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "Malware-Event-Scan-Failed-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -479,7 +479,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-scan-failed" {
 
 # Malware Event Engine Update Failed
 
-resource "aws_cloudwatch_metric_alarm" "malware-event-engine-update-failed" {
+resource "aws_cloudwatch_metric_alarm" "malware_event_engine_update_failed" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "Malware-Event-Engine-Update-Failed-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -501,7 +501,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-engine-update-failed" {
 
 # Malware Event Engine Out of Date
 
-resource "aws_cloudwatch_metric_alarm" "malware-event-engine-out-of-date" {
+resource "aws_cloudwatch_metric_alarm" "malware_event_engine_out_of_date" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "Malware-Event-Engine-Out-Of-Date-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -523,7 +523,7 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-engine-out-of-date" {
 
 # Malware Event Behavior Detected
 
-resource "aws_cloudwatch_metric_alarm" "malware-event-behavior-detected" {
+resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
   alarm_name          = "Malware-Event-Engine-Behavior-Detected-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -540,5 +540,377 @@ resource "aws_cloudwatch_metric_alarm" "malware-event-behavior-detected" {
   dimensions = {
     Instance                = each.key
     MalwareBehaviorDetected = "MalwareBehaviorDetected"
+  }
+}
+
+# Service Status Alarms
+
+# IIS Admin Service
+
+resource "aws_cloudwatch_metric_alarm" "service_status_iisadmin_rgvw019" {
+  alarm_name          = "Service-Status-IISAdmin-i-0dba6054c0f5f7a11"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the iis admin service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-0dba6054c0f5f7a11"
+    Service    = "IISAdminService"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_iisadmin_rgvw020" {
+  alarm_name          = "Service-Status-IISAdmin-i-014bce95a85aaeede"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the iis admin service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-014bce95a85aaeede"
+    Service    = "IISAdminService"
+  }
+}
+
+# World Wide Web Publishing Service
+
+resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw019" {
+  alarm_name          = "Service-Status-WWW-Publishing-i-0dba6054c0f5f7a11"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-0dba6054c0f5f7a11"
+    Service    = "WorldWideWebPublishingService"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw020" {
+  alarm_name          = "Service-Status-WWW-Publishing-i-014bce95a85aaeede"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-014bce95a85aaeede"
+    Service    = "WorldWideWebPublishingService"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw022" {
+  alarm_name          = "Service-Status-WWW-Publishing-i-029d2b17679dab982"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-029d2b17679dab982"
+    Service    = "WorldWideWebPublishingService"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgsw025" {
+  alarm_name          = "Service-Status-WWW-Publishing-i-00413756d2dfcf6d2"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-00413756d2dfcf6d2"
+    Service    = "WorldWideWebPublishingService"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw027" {
+  alarm_name          = "Service-Status-WWW-Publishing-i-00cbccc46d25e77c6"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-00cbccc46d25e77c6"
+    Service    = "WorldWideWebPublishingService"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw204" {
+  alarm_name          = "Service-Status-WWW-Publishing-i-0b5ef7cb90938fb82"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-0b5ef7cb90938fb82"
+    Service    = "WorldWideWebPublishingService"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw205" {
+  alarm_name          = "Service-Status-WWW-Publishing-i-04bbb6312b86648be"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-04bbb6312b86648be"
+    Service    = "WorldWideWebPublishingService"
+  }
+}
+
+# Printer Spooler Service
+
+resource "aws_cloudwatch_metric_alarm" "service_status_printer_spooler_rgvw022" {
+  alarm_name          = "Service-Status-Printer-Spooler-i-029d2b17679dab982"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the printer spooler service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-029d2b17679dab982"
+    Service    = "PrintSpooler"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_printer_spooler_rgvw027" {
+  alarm_name          = "Service-Status-Printer-Spooler-i-00cbccc46d25e77c6"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the printer spooler service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-00cbccc46d25e77c6"
+    Service    = "PrintSpooler"
+  }
+}
+
+# SQL Server, Writer and Agent Services and SQL Backup Status
+
+resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_rgvw021" {
+  alarm_name          = "Service-Status-SQL-Server-i-080498c4c9d25e6bd"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the SQL server service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-080498c4c9d25e6bd"
+    Service    = "SQLServer(MSSQLSERVER)"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_writer_rgvw021" {
+  alarm_name          = "Service-Status-SQL-Server-Writer-i-080498c4c9d25e6bd"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the SQL server writer service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-080498c4c9d25e6bd"
+    Service    = "SQLServerVSSWriter"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_agent_rgvw021" {
+  alarm_name          = "Service-Status-SQL-Server-Writer-i-080498c4c9d25e6bd"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the SQL server agent service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-080498c4c9d25e6bd"
+    Service    = "SQLServerAgent(MSSQLSERVER)"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_backup_status_rgvw021" {
+  alarm_name          = "Service-Status-SQL-Server-Backup-Status-i-080498c4c9d25e6bd"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "Successful"
+  namespace           = "SQLBackupStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the SQL server backup status. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-080498c4c9d25e6bd"
+  }
+}
+
+# PPUD Live and Crawler Services
+
+resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw019" {
+  alarm_name          = "Service-Status-PPUD-Live-i-0dba6054c0f5f7a11"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the PPUD live service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-0dba6054c0f5f7a11"
+    Service    = "PPUDAutomatedProcessesLIVE"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw020" {
+  alarm_name          = "Service-Status-PPUD-Live-i-014bce95a85aaeede"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the PPUD live service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-014bce95a85aaeede"
+    Service    = "PPUDAutomatedProcessesLIVE"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw022" {
+  alarm_name          = "Service-Status-PPUD-Live-i-029d2b17679dab982"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the PPUD live service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-029d2b17679dab982"
+    Service    = "PPUDAutomatedProcessesLIVE"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_ppud_crawler_rgvw022" {
+  alarm_name          = "Service-Status-PPUD-Crawler-i-029d2b17679dab982"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the PPUD crawler service. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-029d2b17679dab982"
+    Service    = "PPUDPDFCrawlerP4Live"
   }
 }

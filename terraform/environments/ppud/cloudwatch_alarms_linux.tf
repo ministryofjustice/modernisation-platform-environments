@@ -152,3 +152,62 @@ resource "aws_cloudwatch_metric_alarm" "linux_system_health_check" {
     InstanceId = each.key
   }
 }
+
+# Docker Service Status
+
+resource "aws_cloudwatch_metric_alarm" "service_status_docker_rgsl200" {
+  alarm_name          = "Service-Status-Docker-i-0f393d9ed4e53da68"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the docker service status. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-0f393d9ed4e53da68"
+    Service    = "docker"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_docker_401_cjsm" {
+  alarm_name          = "Service-Status-Docker-i-0e8e2a182917bcf26"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the docker service status. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-0e8e2a182917bcf26"
+    Service    = "docker"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "service_status_docker_400_non_cjsm" {
+  alarm_name          = "Service-Status-Docker-i-01b4cc138ac95a506"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "IsRunning"
+  namespace           = "ServiceStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the docker service status. If the metric falls to 0 [not running] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-01b4cc138ac95a506"
+    Service    = "docker"
+  }
+}
