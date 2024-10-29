@@ -389,13 +389,16 @@ resource "aws_ssm_parameter" "weblogic_merge_oauth_url" {
 # # # # # # # # # # # 
 # container secrets #
 # # # # # # # # # # # 
-resource "aws_ssm_parameter" "weblogic_admin_password" {
-  name  = format("/%s-%s/ADMIN_PASSWORD", var.account_info.application_name, var.env_name)
-  type  = "SecureString"
-  value = "INITIAL_VALUE_OVERRIDDEN"
-  tags  = local.tags
-  lifecycle { ignore_changes = [ value ] }
-}
+
+# duplicate at the moment
+
+# resource "aws_ssm_parameter" "weblogic_admin_password" {
+#   name  = format("/%s-%s/ADMIN_PASSWORD", var.account_info.application_name, var.env_name)
+#   type  = "SecureString"
+#   value = "INITIAL_VALUE_OVERRIDDEN"
+#   tags  = local.tags
+#   lifecycle { ignore_changes = [ value ] }
+# }
 
 resource "aws_ssm_parameter" "weblogic_analytics_tag" {
   name  = format("/%s-%s/ANALYTICS_TAG", var.account_info.application_name, var.env_name)
