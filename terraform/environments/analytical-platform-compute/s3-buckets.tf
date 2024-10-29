@@ -25,7 +25,7 @@ module "mlflow_bucket" {
 data "aws_iam_policy_document" "s3_replication_policy" {
   #checkov:skip=CKV_AWS_356:resource "*" being applied to replication iam role only
   statement {
-    sid    = "AllowLakeFormationPrincipalsReplication"
+    sid    = "AllowReplicateObjectsInDestinationBucket"
     effect = "Allow"
     actions = [
       "s3:ReplicateTags",
@@ -36,10 +36,27 @@ data "aws_iam_policy_document" "s3_replication_policy" {
       type = "AWS"
       identifiers = [
         "arn:aws:iam::525294151996:role/service-role/s3replicate_role_for_lf-antfmoj-test",
-        "arn:aws:iam::525294151996:role/service-role/s3crr_role_for_lf-antfmoj-test_1"
+        "arn:aws:iam::525294151996:role/service-role/s3crr_role_for_lf-antfmoj-test_1",
+        "arn:aws:iam::${local.ap_data_prod_account_id}:role/mojap-data-production-cadet-to-apc-production-replication",
       ]
     }
     resources = ["arn:aws:s3:::mojap-compute-${local.environment}-derived-tables-replication/*"]
+  }
+  statement {
+    sid    = "AllowReplicateWithinDestinationBucket"
+    effect = "Allow"
+    actions = [
+      "s3:List*",
+      "s3:GetBucketVersioning",
+      "s3:PutBucketVersioning"
+    ]
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.ap_data_prod_account_id}:role/mojap-data-production-cadet-to-apc-production-replication",
+      ]
+    }
+    resources = ["arn:aws:s3:::mojap-compute-${local.environment}-derived-tables-replication"]
   }
 }
 
