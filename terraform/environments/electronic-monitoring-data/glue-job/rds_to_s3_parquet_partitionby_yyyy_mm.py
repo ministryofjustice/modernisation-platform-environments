@@ -412,9 +412,9 @@ if __name__ == "__main__":
         else:
             df_rds_write = df_rds_read.alias("df_rds_write")
 
-        write_rds_df_to_s3_parquet_v2(df_rds_write,
-                                      partition_by_cols,
-                                      prq_table_folder_path)
+        write_rds_df_to_s3_parquet(df_rds_write,
+                                   partition_by_cols,
+                                   prq_table_folder_path)
         
         LOGGER.info(f"""Partition - '{prq_table_folder_path}/{agg_row_year}/{agg_row_month}' writing completed.""")
     # -----------------------------------------------
