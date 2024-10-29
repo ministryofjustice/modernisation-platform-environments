@@ -118,7 +118,7 @@ tasks:
           $ErrorActionPreference = "Stop"
           # Step 1: Get the total size of the D:\ drive in MB
           $drive = Get-PSDrive -Name 'D'
-          $sizeBytes = $drive.Used + $drive.Free
+          $sizeBytes = ($drive.Used + $drive.Free) * 0.8
           $sizeMB = [uint32]($sizeBytes / 1MB)
 
           # Step 2: Define the registry path for paging file settings
