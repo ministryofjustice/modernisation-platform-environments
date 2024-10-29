@@ -4,10 +4,11 @@ module "replicated_cadet_bucket" {
   source         = "github.com/ministryofjustice/terraform-aws-analytical-platform-lakeformation?ref=0.5.0"
   data_locations = [module.mojap_compute_logs_bucket_eu_west_1.s3_bucket_arn]
   register       = true
+  share          = true
   hybrid_mode    = false # will be managed exclusively in LakeFormation
 
   providers = {
-    aws.source      = aws
+    aws.source      = aws.eu-west-1
     aws.destination = aws
   }
 }
