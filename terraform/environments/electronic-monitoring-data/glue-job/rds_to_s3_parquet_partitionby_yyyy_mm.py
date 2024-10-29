@@ -263,7 +263,7 @@ if __name__ == "__main__":
         LOGGER.info(f"""rds_db_tbl_pkeys_col_list = {rds_db_tbl_pkeys_col_list}""")
     # -----------------------------------------
     
-    rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df(rds_db_name)
+    rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df(rds_sqlserver_db_table)
 
     df_rds_dtype_dict = CustomPysparkMethods.get_dtypes_dict(rds_db_table_empty_df)
     int_dtypes_colname_list = [colname for colname, dtype in df_rds_dtype_dict.items()
