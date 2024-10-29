@@ -83,7 +83,7 @@ locals {
         cloudwatch_metric_alarms = null
       })
 
-      # IMPORTANT: this is just for testing at the moment
+      # TODO: this is just for testing, remove when not needed
       t2-rhel6-web-asg = merge(local.ec2_autoscaling_groups.boe_web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.boe_web.autoscaling_group, {
           desired_capacity = 0
@@ -124,7 +124,7 @@ locals {
         cloudwatch_metric_alarms = null
       })
 
-      # TODO: this is just for testing, remove when not needde
+      # TODO: this is just for testing, remove when not needed
       t2-tst-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
           desired_capacity = 0
@@ -133,11 +133,10 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
-          user_data_raw = base64encode(templatefile(
-            "./templates/user-data-onr-bods-pwsh-drive-init.yaml.tftpl", {
-              branch = "TM/TM-584/fix-path"
-            }
-          ))
+          # user_data_raw = base64encode(templatefile(
+          #   "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+          #   branch = "TM/TM-620/test-pagefile-change"
+          # }))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
@@ -157,7 +156,6 @@ locals {
       #     availability_zone = "eu-west-2a"
       #     user_data_raw = base64encode(templatefile(
       #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #         branch = "TM/TM-584/fix-path"
       #       }
       #     ))
       #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
