@@ -214,3 +214,25 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_400_non_cjsm" {
     Service    = "docker"
   }
 }
+
+# Port 25 Connectivity to CJSM mail relay or internal mail relay (rgsl200)
+
+resource "aws_cloudwatch_metric_alarm" "port_25_status_check_401_cjsm" {
+  count               = local.is-production == true ? 1 : 0
+  alarm_name          = "Port-25-Status-Check-i-0e8e2a182917bcf26"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "True"
+  namespace           = "PortStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the port 25 status check to smtp.cjsm.net . If the metric falls to 0 [unable to connect] then the alarm will trigger."
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance   = "i-0e8e2a182917bcf26"
+    Port       = "port-25"
+  }
+}
