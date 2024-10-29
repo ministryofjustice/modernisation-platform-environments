@@ -377,11 +377,13 @@ class RDS_JDBC_CONNECTION():
           FROM {self.rds_db_schema_name}.[{rds_db_table_name}]
         """.strip()
 
-        if rds_query_where_clause != '' or rds_query_where_clause is not None:
+        if rds_query_where_clause.strip() != '' or \
+            rds_query_where_clause is not None:
             query_str = query_str + \
                 f""" WHERE {rds_query_where_clause.strip()}"""
 
-        query_str = query_str + f""" GROUP BY YEAR({date_partition_col}), MONTH({date_partition_col})"""
+        query_str = query_str + \
+                    f""" GROUP BY YEAR({date_partition_col}), MONTH({date_partition_col})"""
 
         self.LOGGER.info(f"""query_str-(Aggregate):> \n{query_str}""")
 
