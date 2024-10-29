@@ -178,7 +178,7 @@ variable "sns_topic_arn" {
 }
 
 variable "inline_ebs" {
-  default     = true
+  default     = false
   type        = bool
   description = "Whether to create EBS volumes inline with the instance"
 }
