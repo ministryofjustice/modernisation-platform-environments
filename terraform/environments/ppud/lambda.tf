@@ -200,7 +200,7 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
   runtime                        = "python3.12"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
   reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
@@ -221,7 +221,7 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   runtime                        = "python3.12"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
   reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
