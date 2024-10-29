@@ -267,22 +267,23 @@ data "aws_iam_policy_document" "oracledb_backups_inventory" {
       values   = ["${module.s3_bucket_oracledb_backups.bucket.arn}"]
     }
 
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-server-side-encryption"
+      values   = ["aws:kms"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-server-side-encryption-aws-kms-key-id"
+      values   = [var.account_config.kms_keys.general_shared]
+    }
+
     principals {
       type        = "Service"
       identifiers = ["s3.amazonaws.com"]
     }
   }
-  # allow access to kms key
-  statement {
-    sid    = "AllowAccessToKMSKey"
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:Encrypt"
-    ]
-    resources = [var.account_config.kms_keys.general_shared]
-  }
-
 }
 
 
