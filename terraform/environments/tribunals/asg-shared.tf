@@ -264,14 +264,8 @@ resource "aws_instance" "tribunals-backup" {
     version = "$Latest"
   }
 
-  instance_initiated_shutdown_behavior = "stop"
-
   tags = {
     Name = "tribunals-backup-instance"
-  }
-
-  lifecycle {
-    ignore_changes = [user_data]
   }
 }
 
