@@ -91,4 +91,19 @@ if (-not $awsCliInstalled) {
     "AWS CLI is already installed." >> $monitorLogFile
 }
 
+# Ensure the target directory exists
+if (-not (Test-Path D:\storage\tribunals)) {
+    New-Item -ItemType Directory -Path D:\storage\tribunals
+}
+
+# Copy files from S3 to local directory
+aws s3 cp s3://tribunals-ebs-backup-development D:\storage\tribunals --recursive
+
+# Optional: Log the result
+if ($?) {
+    "Files copied successfully from S3 to D:\storage\tribunals" >> $logFile
+} else {
+    "Failed to copy files from S3" >> $logFile
+}
+
 </powershell>
