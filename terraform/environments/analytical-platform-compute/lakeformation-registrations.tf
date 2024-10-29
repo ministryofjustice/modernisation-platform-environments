@@ -10,7 +10,7 @@ module "replicated_cadet_bucket" {
   }]
 
   providers = {
-    aws.source      = aws.eu-west-1
+    aws.source      = aws.analytical-platform-compute-eu-west-1
     aws.destination = aws
   }
 }
