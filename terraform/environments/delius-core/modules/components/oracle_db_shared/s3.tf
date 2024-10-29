@@ -272,6 +272,17 @@ data "aws_iam_policy_document" "oracledb_backups_inventory" {
       identifiers = ["s3.amazonaws.com"]
     }
   }
+  # allow access to kms key
+  statement {
+    sid    = "AllowAccessToKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt"
+    ]
+    resources = [var.account_config.kms_keys.general_shared]
+  }
+
 }
 
 
@@ -298,6 +309,11 @@ resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
     bucket {
       format     = "CSV"
       bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn
+      encryption {
+        sse_kms {
+          key_id = var.account_config.kms_keys.general_shared
+        }
+      }
     }
   }
 }
