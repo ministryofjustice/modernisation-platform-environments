@@ -38,7 +38,6 @@ locals {
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
-    inline_ebs             = false
     primary_instance_count = 1
     standby_count          = 2
     ebs_volumes = {
