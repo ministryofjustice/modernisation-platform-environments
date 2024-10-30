@@ -46,11 +46,11 @@
 # }
 
 
-# Attach predefined IAM Policy to the Role for DMS S3 Endpoint
-resource "aws_iam_role_policy_attachment" "lakeformation_dataaccess_role_policy_attachment" {
-  role       = aws_iam_role.lakeformation_dataaccess_role.name
-  policy_arn = aws_iam_policy.lf_dataaccess_role_policy.arn
-}
+# # Attach predefined IAM Policy to the Role for DMS S3 Endpoint
+# resource "aws_iam_role_policy_attachment" "lakeformation_dataaccess_role_policy_attachment" {
+#   role       = aws_iam_role.lakeformation_dataaccess_role.name
+#   policy_arn = aws_iam_policy.lf_dataaccess_role_policy.arn
+# }
 
 # IAM role used to run the data validation glue job
 resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
