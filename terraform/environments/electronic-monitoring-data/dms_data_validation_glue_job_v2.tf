@@ -17,6 +17,8 @@ resource "aws_lakeformation_permissions" "aws_lf_permissions_data_location_acces
   data_location {
     arn =  module.s3-dms-data-validation-bucket.bucket.arn
   }
+
+  depends_on = [aws_lakeformation_resource.lf_register_dms_dv_glue_catalog_db_data_location]
 }
 
 resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
