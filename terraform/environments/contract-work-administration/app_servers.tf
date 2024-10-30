@@ -214,7 +214,7 @@ resource "aws_instance" "app1" {
 resource "aws_instance" "app2" {
   count                  = contains(["development2", "testing"], local.environment) ? 0 : 1
   ami                    = local.application_data.accounts[local.environment].app_ami_id
-  availability_zone      = "eu-west-2a"
+  availability_zone      = "eu-west-2b"
   instance_type          = local.application_data.accounts[local.environment].app_instance_type
   monitoring             = true
   vpc_security_group_ids = [aws_security_group.app.id]
