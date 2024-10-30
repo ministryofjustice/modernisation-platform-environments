@@ -141,7 +141,7 @@ resource "aws_instance" "s609693lo6vw104" {
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Server.id]
+  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -166,7 +166,7 @@ resource "aws_instance" "s609693lo6vw105" {
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Server.id]
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -445,7 +445,7 @@ resource "aws_instance" "s618358rgsw025" {
   instance_type          = "c5.4xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Server.id]
+  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -470,7 +470,7 @@ resource "aws_instance" "s618358rgvw201" {
   instance_type          = "c5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Server.id]
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -624,7 +624,7 @@ resource "aws_instance" "s618358rgsw025p" {
   instance_type          = "c5.4xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Server.id]
+  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
@@ -674,7 +674,7 @@ resource "aws_instance" "s618358rgvw204" {
   instance_type          = "c5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Server.id]
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
   metadata_options {
