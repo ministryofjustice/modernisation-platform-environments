@@ -11,6 +11,7 @@ locals {
     "--enable-job-insights"              = "true"
     "--continuous-log-logStreamPrefix"   = var.continuous_log_stream_prefix
     "--enable-continuous-log-filter"     = var.enable_continuous_log_filter
+    "--enable-spark-ui"                  = var.enable_spark_ui
   }
 
   tags = merge(
