@@ -105,6 +105,23 @@ resource "aws_lb_listener" "tribunals_lb" {
     }
   }
 }
+
+resource "aws_lb_listener" "tribunals_lb_http_redirect" {
+  load_balancer_arn = aws_lb.tribunals_lb.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
