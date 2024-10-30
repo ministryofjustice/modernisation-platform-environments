@@ -24,7 +24,7 @@
       "edw_sg_inbound_count": "1",
       "edw_management_cidr": "10.200.0.0/20",
       "edw_bastion_ssh_cidr": "10.202.0.0/20",
-      "mp_domain_name": "laa-development.modernisation-platform.service.justice.gov.uk",
+      "mp_domain_name": "modernisation-platform.service.justice.gov.uk",
       "lambda_function_inline_code_filename": "index.py",
       "lambda_function_name": "edw-system-root-password-rotation",
       "lambda_function_description": "Rotate AWS Secrets Manager Secret Value",
@@ -65,7 +65,10 @@
       "orahome_snapshot_id": "snap-0d993d189ad092cac",
       "oraarch_snapshot_id": "snap-0cf815da06fcc1115",
       "software_snapshot_id": "snap-05c64a90c08debf2a",
-      "oraredo_snapshot_id": "snap-09bdeb4217c0bdab0"
+      "oraredo_snapshot_id": "snap-09bdeb4217c0bdab0",
+      "old_mail_server_url": "mail.aws.dev.legalservices.gov.uk",
+      "old_domain_name": "dev.legalservices.gov.uk",
+      "laa_mail_relay_url": "laa-mail.laa-development.modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "example_var": "test-data"
