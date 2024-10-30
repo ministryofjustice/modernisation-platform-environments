@@ -7,12 +7,14 @@ data "archive_file" "archive_file_zip_py_files" {
 
 data "aws_iam_policy_document" "lakeformation_assume_role" {
   statement {
-    actions = ["sts:AssumeRole"]
+    effect = "Allow"
 
     principals {
       identifiers = ["lakeformation.amazonaws.com"]
       type        = "Service"
     }
+
+    actions = ["sts:AssumeRole"]
   }
 }
 
