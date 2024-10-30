@@ -5,7 +5,7 @@ locals {
     oidc_cluster_identifier = "placeholder2"
   }
   admin_roles = local.is-development ? "sandbox" : "data-eng"
-  suffix = local.is-production ? "" : "-test"
+  suffix      = local.is-production ? "" : "-test"
 }
 
 # Source Analytics DBT Secrets
@@ -113,7 +113,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
     }
     condition {
       test     = "StringEquals"
-      values   = ["system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-emds${local.}"]
+      values   = ["system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-emds${local.sufsfix}"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}:sub"
     }
     condition {
