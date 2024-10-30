@@ -69,7 +69,7 @@ sed -i '/^10.221/d' /etc/hosts
 sed -i '0,/infraedw/{/infraedw/d;}' /etc/hosts
 
 # Updating hostname file
-sed -i '1s/.*/edw/'/etc/hostname
+sed -i '1s/.*/edw/' /etc/hostname
 
 mkdir -p /stage/oracle/scripts
 
