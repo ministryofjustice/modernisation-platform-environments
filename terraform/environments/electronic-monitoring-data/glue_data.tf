@@ -1,22 +1,22 @@
 data "archive_file" "archive_file_zip_py_files" {
-  type        = "zip"
+  type = "zip"
   # source_file = "${path.module}/glue-job/reusable_module/glue_data_validation_lib.py"
-  source_dir = "${path.module}/glue-job/reusable_module"
+  source_dir  = "${path.module}/glue-job/reusable_module"
   output_path = "${path.module}/glue-job/glue_data_validation_lib.zip"
 }
 
-data "aws_iam_policy_document" "lakeformation_assume_role" {
-  statement {
-    effect = "Allow"
+# data "aws_iam_policy_document" "lakeformation_assume_role" {
+#   statement {
+#     effect = "Allow"
 
-    principals {
-      identifiers = ["lakeformation.amazonaws.com"]
-      type        = "Service"
-    }
+#     principals {
+#       identifiers = ["lakeformation.amazonaws.com"]
+#       type        = "Service"
+#     }
 
-    actions = ["sts:AssumeRole"]
-  }
-}
+#     actions = ["sts:AssumeRole"]
+#   }
+# }
 
 
 data "aws_iam_policy_document" "glue_assume_role" {

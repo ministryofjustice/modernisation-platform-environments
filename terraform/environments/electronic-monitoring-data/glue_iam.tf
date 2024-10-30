@@ -1,49 +1,49 @@
-resource "aws_iam_role" "lakeformation_dataaccess_role" {
-  name               = "lakeformation-dataaccess-role-tf"
-  assume_role_policy = data.aws_iam_policy_document.lakeformation_assume_role.json
-  # managed_policy_arns = [
-  #   "arn:aws:iam::aws:policy/service-role/AWSServiceRoleForLakeFormationDataAccess"
-  # ]
-  tags = merge(
-    local.tags,
-    {
-      Resource_Type = "Lake Formation Data-Access policies",
-    }
-  )
+# resource "aws_iam_role" "lakeformation_dataaccess_role" {
+#   name               = "lakeformation-dataaccess-role-tf"
+#   assume_role_policy = data.aws_iam_policy_document.lakeformation_assume_role.json
+#   # managed_policy_arns = [
+#   #   "arn:aws:iam::aws:policy/service-role/AWSServiceRoleForLakeFormationDataAccess"
+#   # ]
+#   tags = merge(
+#     local.tags,
+#     {
+#       Resource_Type = "Lake Formation Data-Access policies",
+#     }
+#   )
 
-}
+# }
 
 
-# Define S3 IAM policy for DMS S3 Endpoint
-resource "aws_iam_policy" "lf_dataaccess_role_policy" {
-  name = "lf-dataaccess-role-policy"
-  policy = jsonencode(
-    {
-      "Version" : "2012-10-17",
-      "Statement" : [
-          {
-            "Effect": "Allow",
-            "Action": [
-              "lakeformation:GrantPermissions",
-              "lakeformation:GetDataLakeSettings",
-              "lakeformation:PutDataLakeSettings",
-              "lakeformation:ListPermissions",
-              "lakeformation:ListResources"
-            ],
-            "Resource": "*"
-          },
-          {
-            "Effect": "Allow",
-            "Action": [
-              "s3:GetBucketLocation",
-              "s3:ListBucket"
-            ],
-            "Resource": "arn:aws:s3:::${module.s3-dms-data-validation-bucket.bucket.id}"
-          }
-      ]
-    }
-  )
-}
+# # Define S3 IAM policy for DMS S3 Endpoint
+# resource "aws_iam_policy" "lf_dataaccess_role_policy" {
+#   name = "lf-dataaccess-role-policy"
+#   policy = jsonencode(
+#     {
+#       "Version" : "2012-10-17",
+#       "Statement" : [
+#           {
+#             "Effect": "Allow",
+#             "Action": [
+#               "lakeformation:GrantPermissions",
+#               "lakeformation:GetDataLakeSettings",
+#               "lakeformation:PutDataLakeSettings",
+#               "lakeformation:ListPermissions",
+#               "lakeformation:ListResources"
+#             ],
+#             "Resource": "*"
+#           },
+#           {
+#             "Effect": "Allow",
+#             "Action": [
+#               "s3:GetBucketLocation",
+#               "s3:ListBucket"
+#             ],
+#             "Resource": "arn:aws:s3:::${module.s3-dms-data-validation-bucket.bucket.id}"
+#           }
+#       ]
+#     }
+#   )
+# }
 
 
 # Attach predefined IAM Policy to the Role for DMS S3 Endpoint
