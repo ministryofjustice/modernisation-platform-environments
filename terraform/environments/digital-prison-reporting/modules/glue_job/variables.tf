@@ -46,7 +46,7 @@ variable "bookmark" {
 variable "enable_spark_ui" {
   type        = string
   default     = "true"
-  description = "UI Enabled by defauled, override with False"  
+  description = "UI Enabled by default, override with False"  
 }
 
 variable "bookmark_options" {
