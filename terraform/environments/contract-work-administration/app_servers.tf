@@ -212,7 +212,7 @@ resource "aws_instance" "app1" {
 }
 
 resource "aws_instance" "app2" {
-  count                  = contains(["development", "testing"], local.environment) ? 0 : 1
+  count                  = contains(["development2", "testing"], local.environment) ? 0 : 1
   ami                    = local.application_data.accounts[local.environment].app_ami_id
   availability_zone      = "eu-west-2a"
   instance_type          = local.application_data.accounts[local.environment].app_instance_type
@@ -221,8 +221,8 @@ resource "aws_instance" "app2" {
   subnet_id              = data.aws_subnet.data_subnets_a.id
   iam_instance_profile   = aws_iam_instance_profile.cwa.id
   key_name               = aws_key_pair.cwa.key_name
-  #   user_data_base64            = base64encode(local.app_userdata)
-  #   user_data_replace_on_change = true
+  user_data_base64       = base64encode(local.app_userdata)
+  user_data_replace_on_change = true
 
   root_block_device {
     tags = merge(
@@ -404,7 +404,7 @@ resource "aws_volume_attachment" "app1" {
 }
 
 resource "aws_ebs_volume" "app2" {
-  count             = contains(["development", "testing"], local.environment) ? 0 : 1
+  count             = contains(["development2", "testing"], local.environment) ? 0 : 1
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_app_size
   type              = "gp2"
@@ -423,8 +423,9 @@ resource "aws_ebs_volume" "app2" {
 }
 
 resource "aws_volume_attachment" "app2" {
-  count       = contains(["development", "testing"], local.environment) ? 0 : 1
+  count       = contains(["development2", "testing"], local.environment) ? 0 : 1
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.app2[0].id
   instance_id = aws_instance.app2[0].id
 }
+
