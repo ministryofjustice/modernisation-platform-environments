@@ -35,7 +35,9 @@ data "aws_iam_policy_document" "load_data" {
       "athena:GetQueryResults",
       "athena:StopQueryExecution"
     ]
-    resources = [var.athena_workgroup.arn]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/primary",
+    ]
   }
   statement {
     sid    = "GluePermissionsForLoadAtriumUnstructured${local.camel-sid}"
