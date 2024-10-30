@@ -19,13 +19,6 @@ variable "source_data_bucket" {
   description = "source of the data in s3"
 }
 
-variable "athena_workgroup" {
-  type = object({
-    arn = string
-  })
-  description = "athena workgroup to use"
-}
-
 variable "secret_code" {
   type     = string
   nullable = false
