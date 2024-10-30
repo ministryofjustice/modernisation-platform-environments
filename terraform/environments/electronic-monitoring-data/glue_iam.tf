@@ -1,9 +1,9 @@
 resource "aws_iam_role" "lakeformation_dataaccess_role" {
   name               = "lakeformation-dataaccess-role-tf"
   assume_role_policy = data.aws_iam_policy_document.lakeformation_assume_role.json
-  # managed_policy_arns = [
-  #   "arn:aws:iam::aws:policy/service-role/AWSServiceRoleForLakeFormationDataAccess"
-  # ]
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSServiceRoleForLakeFormationDataAccess"
+  ]
   tags = merge(
     local.tags,
     {
