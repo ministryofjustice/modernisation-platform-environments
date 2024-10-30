@@ -6,6 +6,15 @@ resource "aws_s3_object" "aws_s3_object_pyzipfile_to_s3folder" {
   etag   = filemd5(data.archive_file.archive_file_zip_py_files.output_path)
 }
 
+resource "aws_lakeformation_permissions" "example" {
+  principal   = "arn:aws:iam::800964199911:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_83094e3f92a3fdb1"
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn = "arn:aws:s3:::emds-dev-dms-data-validation-20240917144028498200000007"
+  }
+}
+
 resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
   name = "dms_data_validation"
 
@@ -19,7 +28,7 @@ resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
 }
 
 resource "aws_glue_catalog_table" "glue_df_output" {
-  name          = "crawler_glue_df_output"
+  name          = "glue_df_output"
   database_name = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
 
   table_type = "EXTERNAL_TABLE"
