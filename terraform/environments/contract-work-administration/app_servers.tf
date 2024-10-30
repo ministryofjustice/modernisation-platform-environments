@@ -218,7 +218,7 @@ resource "aws_instance" "app2" {
   instance_type          = local.application_data.accounts[local.environment].app_instance_type
   monitoring             = true
   vpc_security_group_ids = [aws_security_group.app.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnets_b.id
   iam_instance_profile   = aws_iam_instance_profile.cwa.id
   key_name               = aws_key_pair.cwa.key_name
   user_data_base64       = base64encode(local.app_userdata)
@@ -413,7 +413,7 @@ resource "aws_ebs_volume" "app2" {
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
