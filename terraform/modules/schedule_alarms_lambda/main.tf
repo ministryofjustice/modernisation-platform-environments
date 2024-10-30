@@ -19,6 +19,7 @@ resource "aws_lambda_function" "alarm_scheduler" {
     variables = {
       LOG_LEVEL       = var.lambda_log_level
       SPECIFIC_ALARMS = tostring(join(",", var.alarm_list))
+      ALARM_PATTERNS  = tostring(join(",", var.alarm_patterns))
     }
   }
 
