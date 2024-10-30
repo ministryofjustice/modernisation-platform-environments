@@ -38,7 +38,7 @@ resource "aws_iam_policy" "lf_dataaccess_role_policy" {
               "s3:GetBucketLocation",
               "s3:ListBucket"
             ],
-            "Resource": "arn:aws:s3:::${module.s3-dms-data-validation-bucket.bucket.name}"
+            "Resource": "arn:aws:s3:::${module.s3-dms-data-validation-bucket.bucket.id}"
           }
       ]
     }
