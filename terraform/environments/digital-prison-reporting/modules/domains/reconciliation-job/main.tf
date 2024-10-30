@@ -26,6 +26,7 @@ module "glue_s3_data_reconciliation_job" {
   log_group_retention_in_days = var.log_group_retention_in_days
   connections                 = var.connections
   additional_secret_arns      = var.additional_secret_arns
+  enable_spark_ui             = var.enable_spark_ui
 
   tags = merge(
     var.tags,
