@@ -132,7 +132,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds_test" 
         github_organisation  = "moj-analytical-services"
         github_repository    = "create-a-derived-table"
         github_runner_labels = "electronic-monitoring-data-test"
-        eks_role_arn         = "arn:aws:iam::396913731313:role/test-data-api-cross-account-role"
+        eks_role_arn         = "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-test"]}:role/test-data-api-cross-account-role"
       }
     )
   ]
