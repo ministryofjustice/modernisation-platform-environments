@@ -76,7 +76,7 @@ resource "aws_security_group_rule" "PPUD-WEB-Portal-egress-2" {
   security_group_id = aws_security_group.PPUD-WEB-Portal.id
 }
 
-# WAM Server Group
+# WAM Data Access Server Group
 
 resource "aws_security_group" "WAM-Data-Access-Server" {
   vpc_id      = data.aws_vpc.shared.id
