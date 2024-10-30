@@ -408,7 +408,7 @@ resource "aws_volume_attachment" "app1" {
 
 resource "aws_ebs_volume" "app2" {
   count             = contains(["development2", "testing"], local.environment) ? 0 : 1
-  availability_zone = "eu-west-2a"
+  availability_zone = "eu-west-2b"
   size              = local.application_data.accounts[local.environment].ebs_app_size
   type              = "gp2"
   encrypted         = true
