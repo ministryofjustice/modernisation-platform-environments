@@ -218,11 +218,14 @@ resource "aws_instance" "app2" {
   instance_type          = local.application_data.accounts[local.environment].app_instance_type
   monitoring             = true
   vpc_security_group_ids = [aws_security_group.app.id]
-  subnet_id              = data.aws_subnet.data_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnets_a.id
   iam_instance_profile   = aws_iam_instance_profile.cwa.id
   key_name               = aws_key_pair.cwa.key_name
   user_data_base64       = base64encode(local.app_userdata)
   user_data_replace_on_change = true
+  metadata_options {
+    http_tokens = "optional"
+  }
 
   root_block_device {
     tags = merge(
