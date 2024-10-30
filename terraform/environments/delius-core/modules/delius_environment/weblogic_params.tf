@@ -73,6 +73,7 @@ locals {
   weblogic_ssm = {
     vars = [
       "PSR_SERVICE_URL",
+      "PREPARE_CASE_FOR_SENTENCE_URL",
       "TZ",
       "PDFCREATION_URL",
       "OFFENDER_SEARCH_API_URL",
@@ -106,6 +107,7 @@ locals {
       "LDAP_HOST",
       "MERGE_API_URL",
       "ELASTICSEARCH_URL",
+      "TRAINING_MODE_APP_NAME",
       "OAUTH_CLIENT_ID",
       "LDAP_PRINCIPAL",
       "OAUTH_CALLBACK_URL",
