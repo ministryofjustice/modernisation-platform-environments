@@ -10,8 +10,8 @@ resource "aws_lakeformation_resource" "lf_register_dms_dv_glue_catalog_db_data_l
   arn = module.s3-dms-data-validation-bucket.bucket.arn
 }
 
-resource "aws_lakeformation_permissions" "example" {
-  principal   = "arn:aws:iam::800964199911:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_83094e3f92a3fdb1"
+resource "aws_lakeformation_permissions" "aws_lf_permissions_data_location_access" {
+  principal   = aws_iam_role.lakeformation_dataaccess_role.arn
   permissions = ["DATA_LOCATION_ACCESS"]
 
   data_location {
