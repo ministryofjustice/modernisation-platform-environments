@@ -43,6 +43,12 @@ variable "bookmark" {
   description = "It can be enabled, disabled or paused."
 }
 
+variable "enable_spark_ui" {
+  type        = string
+  default     = "true"
+  description = "UI Enabled by default, override with False"  
+}
+
 variable "bookmark_options" {
   type = map(any)
 
