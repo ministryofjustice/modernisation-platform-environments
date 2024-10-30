@@ -1,3 +1,79 @@
+resource "aws_iam_role" "lakeformation_dataaccess_role" {
+  name               = "lakeformation-dataaccess-role-tf"
+  assume_role_policy = data.aws_iam_policy_document.lakeformation_assume_role.json
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AWSServiceRoleForLakeFormationDataAccess"
+  ]
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Lake Formation Data-Access policies",
+    }
+  )
+
+}
+
+
+# Define S3 IAM policy for DMS S3 Endpoint
+resource "aws_iam_policy" "lf_dataaccess_role_policy" {
+  name = "lf-dataaccess-role-policy"
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "glue:CreateDatabase",
+            "glue:DeleteDatabase",
+            "glue:GetDatabase",
+            "glue:GetTables",
+            "glue:CreateTable",
+            "glue:DeleteTable",
+            "glue:GetTable"
+          ],
+          "Resource" : [
+            "arn:aws:glue:eu-west-2:${local.env_account_id}:catalog",
+            "arn:aws:glue:eu-west-2:${local.env_account_id}:database/${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}",
+            "arn:aws:glue:eu-west-2:${local.env_account_id}:table/${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}/*",
+            "arn:aws:glue:eu-west-2:${local.env_account_id}:userDefinedFunction/${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}/*"
+          ]
+        },
+        {
+          "Action" : [
+            "s3:GetBucketLocation",
+            "s3:ListBucket"
+          ],
+          "Effect" : "Allow",
+          "Resource" : [
+            module.s3-dms-data-validation-bucket.bucket.arn
+          ],
+          "Sid" : "LFDataAccess"
+        },
+        {
+          "Action" : [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:DeleteObject"
+          ],
+          "Effect" : "Allow",
+          "Resource" : [
+            "${module.s3-dms-data-validation-bucket.bucket.arn}/*"
+          ],
+          "Sid" : "LFObjectActions"
+        }
+      ]
+    }
+  )
+}
+
+
+# Attach predefined IAM Policy to the Role for DMS S3 Endpoint
+resource "aws_iam_role_policy_attachment" "lakeformation_dataaccess_role_policy_attachment" {
+  role       = aws_iam_role.lakeformation_dataaccess_role.name
+  policy_arn = aws_iam_policy.lf_dataaccess_role_policy.arn
+}
+
 # IAM role used to run the data validation glue job
 resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
   name               = "dms-dv-glue-job-tf"

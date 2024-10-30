@@ -7,7 +7,7 @@ resource "aws_s3_object" "aws_s3_object_pyzipfile_to_s3folder" {
 }
 
 resource "aws_lakeformation_resource" "lf_register_dms_dv_glue_catalog_db_data_location" {
-  arn = "arn:aws:s3:::emds-dev-dms-data-validation-20240917144028498200000007"
+  arn = module.s3-dms-data-validation-bucket.bucket.arn
 }
 
 resource "aws_lakeformation_permissions" "example" {
@@ -31,67 +31,67 @@ resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
   }
 }
 
-resource "aws_glue_catalog_table" "glue_df_output" {
-  name          = "glue_df_output"
-  database_name = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+# resource "aws_glue_catalog_table" "glue_df_output" {
+#   name          = "glue_df_output"
+#   database_name = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
 
-  table_type = "EXTERNAL_TABLE"
+#   table_type = "EXTERNAL_TABLE"
 
-  parameters = {
-    EXTERNAL              = "TRUE"
-    classification        = "parquet"
-    "parquet.compression" = "SNAPPY"
-  }
+#   parameters = {
+#     EXTERNAL              = "TRUE"
+#     classification        = "parquet"
+#     "parquet.compression" = "SNAPPY"
+#   }
 
-  storage_descriptor {
-    location      = "s3://${module.s3-dms-data-validation-bucket.bucket.id}/${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}/glue_df_output"
-    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
-    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
+#   storage_descriptor {
+#     location      = "s3://${module.s3-dms-data-validation-bucket.bucket.id}/${aws_glue_catalog_database.dms_dv_glue_catalog_db.name}/glue_df_output"
+#     input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
+#     output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
 
-    ser_de_info {
-      name                  = "my-stream"
-      serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
+#     ser_de_info {
+#       name                  = "my-stream"
+#       serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
 
-      parameters = {
-        "serialization.format" = 1
-      }
-    }
+#       parameters = {
+#         "serialization.format" = 1
+#       }
+#     }
 
-    columns {
-      name = "run_datetime"
-      type = "timestamp"
-    }
+#     columns {
+#       name = "run_datetime"
+#       type = "timestamp"
+#     }
 
-    columns {
-      name = "json_row"
-      type = "string"
-    }
+#     columns {
+#       name = "json_row"
+#       type = "string"
+#     }
 
-    columns {
-      name    = "validation_msg"
-      type    = "string"
-      comment = ""
-    }
+#     columns {
+#       name    = "validation_msg"
+#       type    = "string"
+#       comment = ""
+#     }
 
-    columns {
-      name    = "my_bigint"
-      type    = "string"
-      comment = ""
-    }
+#     columns {
+#       name    = "my_bigint"
+#       type    = "string"
+#       comment = ""
+#     }
 
-  }
+#   }
 
-  partition_keys {
-    name = "database_name"
-    type = "string"
-  }
+#   partition_keys {
+#     name = "database_name"
+#     type = "string"
+#   }
 
-  partition_keys {
-    name = "full_table_name"
-    type = "string"
-  }
+#   partition_keys {
+#     name = "full_table_name"
+#     type = "string"
+#   }
 
-}
+# }
 
 
 resource "aws_cloudwatch_log_group" "dms_dv_rds_to_s3_parquet_v1" {
