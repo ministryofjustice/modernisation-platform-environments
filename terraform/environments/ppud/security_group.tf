@@ -138,68 +138,6 @@ resource "aws_security_group_rule" "WAM-Data-Access-Server-Egress-2" {
   security_group_id = aws_security_group.WAM-Data-Access-Server.id
 }
 
-/*
-resource "aws_security_group" "WAM-Data-Access-Server" {
-  vpc_id      = data.aws_vpc.shared.id
-  name        = "WAM-Server"
-  description = "WAM-Server for Dev, UAT & PROD"
-
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}"
-  }
-}
-
-resource "aws_security_group_rule" "WAM-Data-Access-Server-ingress" {
-  description       = "Rule to allow port 80 traffic inbound"
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.WAM-Data-Access-Server.id
-}
-
-resource "aws_security_group_rule" "WAM-Data-Access-Server-ingress-1" {
-  description       = "Rule to allow port 3389 traffic inbound"
-  type              = "ingress"
-  from_port         = 3389
-  to_port           = 3389
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.WAM-Data-Access-Server.id
-}
-
-resource "aws_security_group_rule" "WAM-Data-Access-Server-egress" {
-  description       = "Rule to allow all traffic outbound"
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "all"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.WAM-Data-Access-Server.id
-}
-
-resource "aws_security_group_rule" "WAM-Data-Access-Server-Egress-1" {
-  description       = "Rule to allow port 443 traffic outbound"
-  type              = "egress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.WAM-Data-Access-Server.id
-}
-
-resource "aws_security_group_rule" "WAM-Data-Access-Server-Egress-2" {
-  description       = "Rule to allow port 80 traffic outbound"
-  type              = "egress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.WAM-Data-Access-Server.id
-}
-*/
-
 resource "aws_security_group" "WAM-Portal" {
   vpc_id      = data.aws_vpc.shared.id
   name        = "WAM-Portal"
@@ -1187,3 +1125,66 @@ resource "aws_security_group_rule" "Dev-Box-VW108-Egress-2" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.Dev-Box-VW108[0].id
 }
+
+# WAM Server Group
+
+resource "aws_security_group" "WAM-Server-Group" {
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "WAM-Server"
+  description = "WAM-Server for Dev, UAT & PROD"
+
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "WAM-Server-Group-ingress" {
+  description       = "Rule to allow port 80 traffic inbound"
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.WAM-Server-Group.id
+}
+
+resource "aws_security_group_rule" "WAM-Server-Group-ingress-1" {
+  description       = "Rule to allow port 3389 traffic inbound"
+  type              = "ingress"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.WAM-Server-Group.id
+}
+
+resource "aws_security_group_rule" "WAM-Server-Group-egress" {
+  description       = "Rule to allow all traffic outbound"
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "all"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.WAM-Server-Group.id
+}
+
+resource "aws_security_group_rule" "WAM-Server-Group-Egress-1" {
+  description       = "Rule to allow port 443 traffic outbound"
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.WAM-Server-Group.id
+}
+
+resource "aws_security_group_rule" "WAM-Server-Group-Egress-2" {
+  description       = "Rule to allow port 80 traffic outbound"
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.WAM-Server-Group.id
+}
+*/
