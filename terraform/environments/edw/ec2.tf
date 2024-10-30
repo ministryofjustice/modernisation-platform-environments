@@ -16,6 +16,7 @@ echo "---install missing package and hostname change"
 sudo yum -y install libXp.i386
 sudo yum -y install sshpass
 echo "HOSTNAME=${local.application_name}.${data.aws_route53_zone.external.name}" >> /etc/sysconfig/network
+sed -i '/aws/d' /etc/sysconfig/network
 
 #### configure aws timesync (external ntp source)
 echo "---configure aws timesync (external ntp source)"
@@ -302,7 +303,7 @@ chown oracle:dba /var/opt/oracle/passwds.sql
 chmod 777 /var/opt/oracle/passwds.sql
 su oracle -l -c "cp /home/oracle/edwcreate/tnsnames.ora /oracle/software/product/10.2.0/network/admin"
 sed -i "s/tst/$ENV/g" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
-sed -i '0,/^edw$/s/^edw$/    (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
+sed -i "0,/edw\./s/^.*edw\..*$/    (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 sed -i "s/^\(define EDW_SYS=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
 sed -i "s/^\(define EDW_SYSTEM=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
 
