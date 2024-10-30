@@ -139,8 +139,11 @@ resource "aws_security_group_rule" "WAM-Server-Egress-2" {
 }
 
 resource "aws_security_group" "WAM-Data-Access-Server" {
+  lifecycle {
+    create_before_destroy = true
+  }
   vpc_id      = data.aws_vpc.shared.id
-  name        = "WAM-Server"
+  name        = "WAM-Data-Access-Server"
   description = "WAM-Server for Dev, UAT & PROD"
 
   tags = {
