@@ -324,11 +324,11 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
         "lambda:InvokeFunction"
       ],
       "Resource": [
-      "arn:aws:ssm:eu-west-2:075585660276:*",
-      "arn:aws:cloudwatch:eu-west-2:075585660276:*",
-      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
-      "arn:aws:lambda:eu-west-2:075585660276:*",
-      "arn:aws:ec2:eu-west-2:075585660276:*"
+      "arn:aws:ssm::${local.environment_management.account_ids["ppud-development"]}:*",
+      "arn:aws:cloudwatch::${local.environment_management.account_ids["ppud-development"]}:*",
+      "arn:aws:ssm::document/AWS-RunPowerShellScript",
+      "arn:aws:lambda::${local.environment_management.account_ids["ppud-development"]}:*",
+      "arn:aws:ec2::${local.environment_management.account_ids["ppud-development"]}:*"
       ]
    },
    {
@@ -343,8 +343,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
       "sqs:SendMessage"
       ],
     "Resource": [
-      "arn:aws:sqs:eu-west-2:075585660276:Lambda-Queue-DEV",
-      "arn:aws:sqs:eu-west-2:075585660276:Lambda-Deadletter-Queue-DEV"
+      "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Queue-DEV",
+      "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Deadletter-Queue-DEV"
     ]
    }
  ]
@@ -572,7 +572,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                "arn:aws:acm:eu-west-2:075585660276:certificate:*"
+                "arn:aws:acm:eu-west-2:075585660276:certificate/*"
             ]
         },
         {
@@ -679,7 +679,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                 "arn:aws:acm:eu-west-2:172753231260:certificate:*"
+                 "arn:aws:acm:eu-west-2:172753231260:certificate/*"
             ]
         },
         {
@@ -786,7 +786,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                 "arn:aws:acm:eu-west-2:817985104434:certificate:*"
+                 "arn:aws:acm:eu-west-2:817985104434:certificate/*"
             ]
         },
         {
