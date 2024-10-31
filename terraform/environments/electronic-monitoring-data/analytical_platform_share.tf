@@ -171,10 +171,26 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
     ]
   }
   statement {
-    actions   = ["s3:PutObject"]
+    actions   = ["s3:PutObject", "s3:GetBucketLocation"]
     resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
   }
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [
+      "${module.s3-data-bucket.bucket.id}/test.csv",
+      "${module.s3-data-bucket.bucket.id}/data",
+      "${module.s3-data-bucket.bucket.id}/not-data"
+    ]
+  }
 }
+
+
 
 # Lake Formation Data Access Attachement
 resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
