@@ -158,12 +158,12 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
-        })
-        user_data_raw = base64encode(templatefile(
-          "./templates/user-data-nart-client-pwsh.yaml.tftpl", {
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-nart-client-pwsh.yaml.tftpl", {
             branch = "TM/TM-587/nart-jumpserver"
-          }
-        ))
+            }
+          ))
+        })
         tags = merge(local.ec2_autoscaling_groups.jumpserver.tags, {
           oasys-national-reporting-environment = "t2"
           domain-name                          = "azure.noms.root"
