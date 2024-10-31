@@ -572,7 +572,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                "arn:aws:acm:eu-west-2:075585660276:certificate:*"
+                "arn:aws:acm:eu-west-2:075585660276:certificate/*"
             ]
         },
         {
@@ -679,7 +679,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                 "arn:aws:acm:eu-west-2:172753231260:certificate:*"
+                 "arn:aws:acm:eu-west-2:172753231260:certificate/*"
             ]
         },
         {
@@ -786,7 +786,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                 "arn:aws:acm:eu-west-2:817985104434:certificate:*"
+                 "arn:aws:acm:eu-west-2:817985104434:certificate/*"
             ]
         },
         {
