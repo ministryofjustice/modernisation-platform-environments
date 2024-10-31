@@ -188,15 +188,15 @@ resource "aws_ecs_service" "chaps_service" {
     type  = "spread"
   }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
-    container_name   = "chaps-container"
-    container_port   = local.application_data.accounts[local.environment].container_port
-  }
+#  load_balancer {
+#    target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
+#    container_name   = "chaps-container"
+#    container_port   = local.application_data.accounts[local.environment].container_port
+#  }
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
-    security_groups = [aws_security_group.ecs_service.id]
+    security_groups = [aws_security_group.chaps_service.id]
   }
 
   tags = merge(
@@ -240,7 +240,7 @@ resource "aws_ecs_service" "chapsdotnet_service" {
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
-    security_groups = [aws_security_group.ecs_service.id]
+    security_groups = [aws_security_group.chaps_service.id]
   }
 
   tags = merge(
@@ -539,7 +539,7 @@ resource "aws_iam_role_policy" "app_task" {
   EOF
 }
 
-resource "aws_security_group" "ecs_service" {
+resource "aws_security_group" "chaps_service" {
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
 
