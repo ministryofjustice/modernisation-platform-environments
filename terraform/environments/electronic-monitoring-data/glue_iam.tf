@@ -1,9 +1,7 @@
 # resource "aws_iam_role" "lakeformation_dataaccess_role" {
 #   name               = "lakeformation-dataaccess-role-tf"
 #   assume_role_policy = data.aws_iam_policy_document.lakeformation_assume_role.json
-#   # managed_policy_arns = [
-#   #   "arn:aws:iam::aws:policy/service-role/AWSServiceRoleForLakeFormationDataAccess"
-#   # ]
+#
 #   tags = merge(
 #     local.tags,
 #     {
@@ -14,7 +12,7 @@
 # }
 
 
-# # Define S3 IAM policy for DMS S3 Endpoint
+# # Define S3 IAM policy for LF
 # resource "aws_iam_policy" "lf_dataaccess_role_policy" {
 #   name = "lf-dataaccess-role-policy"
 #   policy = jsonencode(
@@ -35,6 +33,15 @@
 #           {
 #             "Effect": "Allow",
 #             "Action": [
+#               "iam:PutRolePolicy"
+#             ],
+#             "resources": [
+#               "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"
+#             ]
+#           },
+#           {
+#             "Effect": "Allow",
+#             "Action": [
 #               "s3:GetBucketLocation",
 #               "s3:ListBucket"
 #             ],
@@ -46,7 +53,7 @@
 # }
 
 
-# # Attach predefined IAM Policy to the Role for DMS S3 Endpoint
+# # Attach predefined IAM Policy to the Role for LF S3
 # resource "aws_iam_role_policy_attachment" "lakeformation_dataaccess_role_policy_attachment" {
 #   role       = aws_iam_role.lakeformation_dataaccess_role.name
 #   policy_arn = aws_iam_policy.lf_dataaccess_role_policy.arn
