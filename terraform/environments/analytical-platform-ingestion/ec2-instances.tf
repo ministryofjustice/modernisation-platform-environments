@@ -68,5 +68,12 @@ module "mojo_network_debug_instance" {
     SSMCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
   }
 
+  metadata_options = {
+    http_endpoint               = "enabled"
+    http_put_response_hop_limit = 1
+    http_tokens                 = "required"
+    instance_metadata_tags      = "enabled"
+  }
+
   tags = local.tags
 }

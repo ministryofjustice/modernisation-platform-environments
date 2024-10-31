@@ -30,6 +30,26 @@ module "connected_vpc_endpoints" {
         local.tags,
         { Name = format("%s-ssm", "${local.application_name}-${local.environment}-connected") }
       )
+    },
+    ssmmessages = {
+      service             = "ssmmessages"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      security_group_ids  = [aws_security_group.connected_vpc_endpoints.id]
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ssmmessages", "${local.application_name}-${local.environment}-connected") }
+      )
+    },
+    ec2messages = {
+      service             = "ec2messages"
+      service_type        = "Interface"
+      private_dns_enabled = true
+      security_group_ids  = [aws_security_group.connected_vpc_endpoints.id]
+      tags = merge(
+        local.tags,
+        { Name = format("%s-ec2messages", "${local.application_name}-${local.environment}-connected") }
+      )
     }
   }
 }
