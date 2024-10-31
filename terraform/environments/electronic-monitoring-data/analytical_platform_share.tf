@@ -183,9 +183,9 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
       "s3:ListMultipartUploadParts"
     ]
     resources = [
-      "${module.s3-data-bucket.bucket.id}/test.csv",
-      "${module.s3-data-bucket.bucket.id}/data",
-      "${module.s3-data-bucket.bucket.id}/not-data"
+      "${module.s3-data-bucket.bucket.arn}/test.csv",
+      "${module.s3-data-bucket.bucket.arn}/data/*",
+      "${module.s3-data-bucket.bucket.arn}/not-data/*"
     ]
   }
 }
