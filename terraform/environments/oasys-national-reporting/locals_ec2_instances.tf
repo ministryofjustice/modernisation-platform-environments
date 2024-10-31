@@ -197,7 +197,7 @@ locals {
         description            = "Windows Server 2012 R2 client testing for NART"
         instance-access-policy = "full"
         os-type                = "Windows"
-        server-type            = "OnrClient"
+        server-type            = "NartClient"
         update-ssm-agent       = "patchgroup1"
       }
       cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.windows

@@ -133,15 +133,38 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
-          # user_data_raw = base64encode(templatefile(
-          #   "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-          #   branch = "TM/TM-620/test-pagefile-change"
-          # }))
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+            branch = "TM/TM-587/nart-jumpserver"
+          }))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
         })
         tags = merge(local.ec2_autoscaling_groups.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+          domain-name                          = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
+
+      t2-tst-jump-asg = merge(local.ec2_autoscaling_groups.jumpserver, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.jumpserver.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.jumpserver.config, {
+          ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        user_data_raw = base64encode(templatefile(
+          "./templates/user-data-nart-client-pwsh.yaml.tftpl", {
+            branch = "TM/TM-587/nart-jumpserver"
+          }
+        ))
+        tags = merge(local.ec2_autoscaling_groups.jumpserver.tags, {
           oasys-national-reporting-environment = "t2"
           domain-name                          = "azure.noms.root"
         })
