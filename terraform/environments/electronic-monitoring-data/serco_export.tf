@@ -59,6 +59,10 @@ data "aws_iam_policy_document" "serco_export_s3_policy" {
     resources = [
       "${module.s3-serco-export-bucket.bucket.arn}/*"
     ]
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
     condition {
       test     = "IpAddress"
       variable = "aws:SourceIp"
@@ -106,7 +110,7 @@ module "serco_export_bastion" {
   }
 
   # s3 - used for logs and user ssh public keys
-  bucket_name   = "serco-export-bastion"
+  bucket_name   = "serco-exp-bastion"
   instance_name = "serco_export_bastion_linux"
   # public keys
   public_key_data = local.public_key_data.keys[local.environment]
