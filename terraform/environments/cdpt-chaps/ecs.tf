@@ -570,7 +570,7 @@ resource "aws_security_group" "ecs_service" {
 resource "aws_security_group" "chapsdotnet-service" {
   name_prefix = "chapsdotnet-service-sg-"
   description = "Allow traffic for chapsdotnet service"
-  vpc_id = data.aws_vpc.shared.ids
+  vpc_id = data.aws_vpc.shared.id
 
   ingress {
     from_port       = 5010
