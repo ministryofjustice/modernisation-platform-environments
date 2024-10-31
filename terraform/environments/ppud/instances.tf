@@ -339,7 +339,7 @@ resource "aws_instance" "s609693lo6vw112" {
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0be53fc5198dbd294"
   instance_type          = "m5.large"
-  vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
   source_dest_check      = false
   subnet_id              = data.aws_subnet.private_subnets_a.id
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
