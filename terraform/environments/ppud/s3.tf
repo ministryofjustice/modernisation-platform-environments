@@ -40,6 +40,7 @@ resource "aws_s3_bucket_versioning" "PPUD" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "PPUD" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.PPUD[0].id
   rule {
@@ -135,6 +136,7 @@ resource "aws_s3_bucket_versioning" "MoJ-Health-Check-Reports" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
   bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
   rule {
     id     = "Remove-Old-SSM-Health-Check-Reports"
@@ -211,6 +213,7 @@ resource "aws_s3_bucket_public_access_block" "moj-scripts" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-scripts" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.moj-scripts[0].id
   rule {
@@ -330,7 +333,6 @@ resource "aws_s3_bucket_public_access_block" "MoJ-Release-Management" {
   restrict_public_buckets = true
 }
 
-
 resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.MoJ-Release-Management[0].id
@@ -412,6 +414,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-prod" {
 */
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.moj-log-files-prod[0].id
   rule {
@@ -588,6 +591,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-uat" {
 */
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-uat" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
   count  = local.is-preproduction == true ? 1 : 0
   bucket = aws_s3_bucket.moj-log-files-uat[0].id
   rule {
@@ -765,6 +769,7 @@ resource "aws_s3_bucket_notification" "moj-log-files-dev" {
 */
 
 resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-dev" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
   count  = local.is-development == true ? 1 : 0
   bucket = aws_s3_bucket.moj-log-files-dev[0].id
   rule {
