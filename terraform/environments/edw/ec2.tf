@@ -304,8 +304,8 @@ chmod 777 /var/opt/oracle/passwds.sql
 su oracle -l -c "cp /home/oracle/edwcreate/tnsnames.ora /oracle/software/product/10.2.0/network/admin"
 sed -i "s/tst/$ENV/g" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 sed -i "0,/edw\./s/^.*edw\..*$/    (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
-sed -i '0,/edw\.aws/s/^.*edw\.aws.*$/    (ADDRESS = (PROTOCOL = tcp)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
-sed -i '0,/edw/s/^.*edw.*$/      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/listener.ora
+sed -i "0,/edw\.aws/s/^.*edw\.aws.*$/    (ADDRESS = (PROTOCOL = tcp)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
+sed -i "0,/edw/s/^.*edw.*$/      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/listener.ora
 sed -i "s/^\(define EDW_SYS=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
 sed -i "s/^\(define EDW_SYSTEM=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
 
