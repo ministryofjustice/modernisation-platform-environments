@@ -1,4 +1,5 @@
 resource "aws_vpc_endpoint_service" "HomeOffice" {
+  # checkov:skip=CKV_AWS_123: "VPC Endpoint has been configured to allow automatic acceptance from the Home Office"
   count                      = local.is-production == true ? 1 : 0
   acceptance_required        = false
   network_load_balancer_arns = [aws_lb.ppud_internal_nlb[0].arn]
