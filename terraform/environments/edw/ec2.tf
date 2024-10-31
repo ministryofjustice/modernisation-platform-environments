@@ -592,7 +592,7 @@ resource "aws_instance" "edw_db_instance" {
   metadata_options {
     http_endpoint               = "enabled"
     http_put_response_hop_limit = 2
-    http_tokens                 = "required"
+    http_tokens                 = "optional"
   }
 
   lifecycle {
