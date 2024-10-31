@@ -45,7 +45,7 @@ resource "aws_security_group" "db" {
     protocol        = "tcp"
     security_groups = [
       aws_security_group.ecs_service.id, 
-      aws_security_group.chapsdotnet_service_sg.id
+      aws_security_group.chapsdotnet_service.id
     ]
   }
   egress {
