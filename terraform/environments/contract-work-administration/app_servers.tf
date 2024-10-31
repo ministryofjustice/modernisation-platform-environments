@@ -128,11 +128,12 @@ chmod 700 /var/cw-custom.sh
 #  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
 
 ## Additional DBA Steps
+echo "Updating CWA_cwa-app1.xml"
 su applmgr -c "cp /CWA/app/appl/admin/CWA_cwa-app1.xml /CWA/app/appl/admin/CWA_cwa-app1.xml.tf_backup"
-su applmgr -c "sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml"
-su applmgr -c "sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml"
-su applmgr -c "sed -i 's/cwa.${local.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml"
-su applmgr -c "sed -i 's/db_admin@legalservices.gov.uk/db_admin@${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml"
+sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml
+sed -i 's/cwa.${local.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml
+sed -i 's/db_admin@legalservices.gov.uk/db_admin@${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml
 
 
 EOF
