@@ -135,7 +135,7 @@ locals {
 module "weblogic_ssm" {
   source           = "../helpers/ssm_params"
   application_name = "weblogic"
-  environment_name = var.env_name
+  environment_name = "delius-core-${var.env_name}"
   params_list = concat(local.weblogic_ssm.vars, local.weblogic_ssm.secrets)
 
 }
