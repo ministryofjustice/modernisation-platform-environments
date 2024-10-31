@@ -112,14 +112,16 @@ resource "aws_lb_listener" "tribunals_lb_http_redirect" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+        type = "redirect"
+        redirect {
+            host        = "#{host}"
+            path        = "/"
+            port        = "443"
+            protocol    = "HTTPS"
+            query       = "#{query}"
+            status_code = "HTTP_301"
+        }
     }
-  }
 }
 
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {
