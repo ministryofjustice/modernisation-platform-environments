@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "serco_export_s3_policy" {
     condition {
       test     = "IpAddress"
       variable = "aws:SourceIp"
-      values   = "2.31.200.13/32"
+      values   = ["2.31.200.13/32"]
     }
   }
 }
