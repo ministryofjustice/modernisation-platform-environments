@@ -83,7 +83,6 @@ chmod 700 /userdata/postbuild.sh
 sed -i 's/. \/CWA\/app\/appl\/APPSCWA_SERVER_HOSTNAME.env/. \/CWA\/app\/appl\/APPSCWA_${local.cm_hostname}.env/g' /userdata/postbuild.sh
 sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
 . /userdata/postbuild.sh
-su applmgr -c "cp /CWA/app/appl/admin/CWA_cwa-app2.xml /CWA/app/appl/admin/CWA_cwa-app2.xml.tf_backup"
 
 echo "mp-${local.environment}" > /etc/cwaenv
 sed -i '/^PS1=/d' /etc/bashrc
@@ -130,6 +129,9 @@ chmod 700 /var/cw-custom.sh
 
 ## Additional DBA Steps
 echo "Updating CWA_cwa-app2.xml"
+su applmgr -c "cp /CWA/app/appl/admin/CWA_cwa-app2.xml /CWA/app/appl/admin/CWA_cwa-app2.xml.tf_backup"
+echo "Adding a sleep..."
+sleep 5
 sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
 sed -i 's/cwa.${local.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
