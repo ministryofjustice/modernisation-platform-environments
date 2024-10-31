@@ -160,11 +160,36 @@ data "aws_iam_policy_document" "lake_formation_data_access" {
   }
 }
 
+# access glue tables and start athena queries
+data "aws_iam_policy_document" "unlimited_athena_query" {
+  statement {
+    actions = [
+      "athena:*"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
 # Lake Formation Data Access Attachement
 resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.lake_formation_data_access.arn
 }
+
+# Athena Access Attachement
+resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.unlimited_athena_query.arn
+}
+
+resource "aws_iam_policy" "unlimited_athena_query" {
+  name        = "${local.environment_shorthand}-unlimited-athena-query"
+  description = "Athena Access Policy"
+  policy      = data.aws_iam_policy_document.unlimited_athena_query.json
+}
+
 
 resource "aws_iam_policy" "lake_formation_data_access" {
   name        = "${local.environment_shorthand}-lake-formation-data-access"
