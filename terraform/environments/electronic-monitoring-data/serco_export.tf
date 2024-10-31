@@ -131,7 +131,7 @@ module "serco_export_bastion" {
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = "eu-west-2"
-  volume_size   = 5
+  volume_size   = 10
   # tags
   tags_common = local.tags
   tags_prefix = terraform.workspace
