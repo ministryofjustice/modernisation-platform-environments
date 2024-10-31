@@ -130,8 +130,8 @@ resource "aws_ecs_task_definition" "chapsdotnet_task_definition" {
   family                   = "chapsdotnet-family"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
-  execution_role_arn       = aws_iam_role.app_execution.policy_arn
-  task_role_arn            = aws_iam_role.app_task.policy_arn
+  execution_role_arn       = aws_iam_role.app_execution.arn
+  task_role_arn            = aws_iam_role.app_task.arn
   container_definitions    = jsonencode([
     {
       name         = "chapsdotnet-container"
@@ -568,6 +568,34 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+resource "aws_security_group" "chapsdotnet-service" {
+  name_prefix = "chapsdotnet-service-sg-"
+  description = "Allow traffic for chapsdotnet service"
+  vpc_id = data.aws_vpc.shared.ids
+
+  ingress {
+    from_port = 5010
+    to_port = 5010
+    protocol = "tcp"
+    security_groups - [module.lb_access_logs_enabled.security_group.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(
+    local.tags, 
+    {
+      Name = "chapsdotnet-service-sg"
+    }
+  )
+}
+
 
 # AWS EventBridge rule
 resource "aws_cloudwatch_event_rule" "ecs_events" {

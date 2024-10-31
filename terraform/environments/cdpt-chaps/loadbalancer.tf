@@ -23,7 +23,7 @@ resource "random_string" "chaps_target_group_name" {
 }
 
   resource "aws_lb_target_group" "chapsdotnet_target_group" {
-    name = "chapsdotnet_target_group"
+    name = "chapsdotnet-target-group"
     port = 5010
     protocol = "HTTP"
     vpc_id = data.aws_vpc.shared.id 
@@ -116,7 +116,7 @@ resource "aws_lb_listener" "https_listener" {
   certificate_arn   = aws_acm_certificate.external.arn
 
   default_action {
-    target_group_arn = aws_lb_target_group.chaps_target_group.id
+    target_group_arn = aws_lb_target_group.chapsdotnet_target_group.id
     type             = "forward"
   }
 }
