@@ -60,7 +60,7 @@ sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --u
 #configure variables
 export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
 export LOGS="${local.application_name}-EC2"
-export APPNAME="${local.application_name}"
+export APPNAME="${local.application_data.accounts[local.environment].edw_AppName}"
 export ENV="${local.application_data.accounts[local.environment].edw_environment}"
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
 export EFS="${aws_efs_file_system.edw.id}"

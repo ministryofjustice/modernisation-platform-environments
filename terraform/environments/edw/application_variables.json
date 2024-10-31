@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "edw_AppName": "EDW2",
+      "edw_AppName": "EDW",
       "edw_environment": "dev",
       "edw_region": "eu-west-2",
       "edw_ec2_ami_id": "ami-012aa1576af4948d1",
