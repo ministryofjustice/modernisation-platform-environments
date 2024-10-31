@@ -170,6 +170,10 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
       "*"
     ]
   }
+  statement {
+    actions   = ["s3:PutObject"]
+    resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
+  }
 }
 
 # Lake Formation Data Access Attachement
