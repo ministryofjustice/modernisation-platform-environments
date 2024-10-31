@@ -567,7 +567,7 @@ resource "aws_security_group" "ecs_service" {
   }
 }
 
-resource "aws_security_group" "chapsdotnet-service" {
+resource "aws_security_group" "chapsdotnet_service" {
   name_prefix = "chapsdotnet-service-sg-"
   description = "Allow traffic for chapsdotnet service"
   vpc_id = data.aws_vpc.shared.id
