@@ -5,13 +5,6 @@ module "weblogic" {
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   certificate_arn       = aws_acm_certificate.external.arn
 
-  # container_vars_default = {
-  #   "JDBC_URL" : aws_ssm_parameter.jdbc_url.arn,
-  #   "JDBC_PASSWORD" : aws_ssm_parameter.jdbc_password.arn,
-  #   "LDAP_PRINCIPAL" : aws_ssm_parameter.ldap_principal.arn,
-  #   "LDAP_CREDENTIAL" : aws_ssm_parameter.ldap_bind_password.arn
-  # }
-
   desired_count = 0
 
   container_secrets_env_specific = try(var.delius_microservice_configs.weblogic.container_secrets_env_specific, {})
