@@ -189,7 +189,7 @@ resource "aws_ecs_service" "chaps_service" {
   }
 
   load_balancer {
-    target_group_arn = aws_lb_target_group.chaps_target_group.arn
+    target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
     container_name   = "chaps-container"
     container_port   = local.application_data.accounts[local.environment].container_port
   }
