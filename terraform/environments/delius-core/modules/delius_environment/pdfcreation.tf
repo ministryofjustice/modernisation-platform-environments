@@ -65,5 +65,5 @@ module "ssm_params_pdf_creation" {
   source           = "../helpers/ssm_params"
   application_name = "pdf_creation"
   environment_name = var.env_name
-  params_list      = ["JAVA_TOOL_OPTIONS"]
+  params_secure    = ["JAVA_TOOL_OPTIONS"]
 }
