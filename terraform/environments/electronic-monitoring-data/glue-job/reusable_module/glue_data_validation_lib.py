@@ -21,10 +21,10 @@ class RDSConn_Constants:
 
 class Logical_Constants:
     NVL_DTYPE_DICT = {
-    'tinyint': 0, 'smallint': 0, 'int': 0, 'bigint': 0,
-    'double': 0, 'float': 0, 'string': "''", 'boolean': False,
-    'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')",
-    'date': "to_date('1900-01-01', 'yyyy-MM-dd')"}
+        'tinyint': 0, 'smallint': 0, 'int': 0, 'bigint': 0,
+        'double': 0, 'float': 0, 'string': "''", 'boolean': False,
+        'timestamp': "to_timestamp('1900-01-01', 'yyyy-MM-dd')",
+        'date': "to_date('1900-01-01', 'yyyy-MM-dd')"}
 
     INT_DATATYPES_LIST = ['tinyint', 'smallint', 'int', 'bigint']
 
@@ -122,42 +122,42 @@ class RDS_JDBC_CONNECTION():
 
     def get_rds_dataframe_v1(self, rds_db_table_name) -> DataFrame:
         return self.spark.read.jdbc(url=self.rds_jdbc_url_v2,
-                            table=f"""{self.rds_db_schema_name }.[{rds_db_table_name}]""",
-                            properties={"user": self.RDS_DB_INSTANCE_USER,
-                                        "password": self.RDS_DB_INSTANCE_PWD,
-                                        "driver": self.RDS_DB_INSTANCE_DRIVER})
+                                    table=f"""{self.rds_db_schema_name }.[{rds_db_table_name}]""",
+                                    properties={"user": self.RDS_DB_INSTANCE_USER,
+                                                "password": self.RDS_DB_INSTANCE_PWD,
+                                                "driver": self.RDS_DB_INSTANCE_DRIVER})
 
-    def get_rds_db_table_row_count(self, 
-                                   in_table_name, 
+    def get_rds_db_table_row_count(self,
+                                   in_table_name,
                                    in_pkeys_col_list) -> DataFrame:
-        
+
         query_str = f"""
         SELECT count({', '.join(in_pkeys_col_list)}) as row_count
         FROM {self.rds_db_schema_name}.[{in_table_name}]
         """.strip()
 
         return (self.spark.read.format("jdbc")
-                        .option("url", self.rds_jdbc_url_v2)
-                        .option("driver", self.RDS_DB_INSTANCE_DRIVER)
-                        .option("user", self.RDS_DB_INSTANCE_USER)
-                        .option("password", self.RDS_DB_INSTANCE_PWD)
-                        .option("query", f"""{query_str}""")
-                        .load()).collect()[0].row_count
+                .option("url", self.rds_jdbc_url_v2)
+                .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                .option("user", self.RDS_DB_INSTANCE_USER)
+                .option("password", self.RDS_DB_INSTANCE_PWD)
+                .option("query", f"""{query_str}""")
+                .load()).collect()[0].row_count
 
-    def get_rds_df_read_tbl_pkey_parallel(self, 
-                                        in_table_name,
-                                        jdbc_partition_column, 
-                                        jdbc_partition_col_upperbound, 
-                                        jdbc_read_partitions_num
-                                        ) -> DataFrame:
-        
+    def get_rds_df_read_tbl_pkey_parallel(self,
+                                          in_table_name,
+                                          jdbc_partition_column,
+                                          jdbc_partition_col_upperbound,
+                                          jdbc_read_partitions_num
+                                          ) -> DataFrame:
+
         numPartitions = jdbc_read_partitions_num
         # Note: numPartitions is normally equal to number of executors defined.
-        # The maximum number of partitions that can be used for parallelism in table reading and writing. 
-        # This also determines the maximum number of concurrent JDBC connections. 
+        # The maximum number of partitions that can be used for parallelism in table reading and writing.
+        # This also determines the maximum number of concurrent JDBC connections.
 
         # fetchSize = jdbc_rows_fetch_size
-        # The JDBC fetch size, which determines how many rows to fetch per round trip. 
+        # The JDBC fetch size, which determines how many rows to fetch per round trip.
         # This can help performance on JDBC drivers which default to low fetch size (e.g. Oracle with 10 rows).
         # Too Small: => frequent round trips to database
         # Too Large: => Consume a lot of memory
@@ -179,37 +179,39 @@ class RDS_JDBC_CONNECTION():
                     .option("numPartitions", numPartitions)
                     .load())
 
-    def get_rds_df_jdbc_read_parallel(self, 
-                                        rds_tbl_name, 
-                                        rds_tbl_pkeys_list,
-                                        jdbc_partition_column,
-                                        read_partitions,
-                                        total_files) -> DataFrame:
+    def get_rds_df_jdbc_read_parallel(self,
+                                      rds_tbl_name,
+                                      rds_tbl_pkeys_list,
+                                      jdbc_partition_column,
+                                      read_partitions,
+                                      total_files) -> DataFrame:
 
         jdbc_read_partitions_num = read_partitions \
-                                    if read_partitions > total_files else total_files
+            if read_partitions > total_files else total_files
 
-        df_rds_count = self.get_rds_db_table_row_count(rds_tbl_name, rds_tbl_pkeys_list)
+        df_rds_count = self.get_rds_db_table_row_count(
+            rds_tbl_name, rds_tbl_pkeys_list)
 
-        jdbc_partition_col_upperbound = int(df_rds_count/jdbc_read_partitions_num)
+        jdbc_partition_col_upperbound = int(
+            df_rds_count/jdbc_read_partitions_num)
 
-        df_rds_temp = self.get_rds_df_read_tbl_pkey_parallel(rds_tbl_name, 
-                                                           jdbc_partition_column,
-                                                           jdbc_partition_col_upperbound,
-                                                           jdbc_read_partitions_num)
+        df_rds_temp = self.get_rds_df_read_tbl_pkey_parallel(rds_tbl_name,
+                                                             jdbc_partition_column,
+                                                             jdbc_partition_col_upperbound,
+                                                             jdbc_read_partitions_num)
         return df_rds_temp
 
-    def get_rds_df_read_pkey_min_max_range(self, 
-                                       rds_db_table_name, 
-                                       jdbc_partition_column, 
-                                       pkey_min, 
-                                       pkey_max,
-                                       jdbc_read_partitions_num=None) -> DataFrame:
+    def get_rds_df_read_pkey_min_max_range(self,
+                                           rds_db_table_name,
+                                           jdbc_partition_column,
+                                           pkey_min,
+                                           pkey_max,
+                                           jdbc_read_partitions_num=None) -> DataFrame:
         self.LOGGER.info(
             f"""jdbc_partition_col_lowerbound = {pkey_min}""")
         self.LOGGER.info(
             f"""jdbc_partition_col_upperbound = {pkey_max}""")
-    
+
         query_str = f"""
         SELECT *
           FROM {self.rds_db_schema_name}.[{rds_db_table_name}]
@@ -232,7 +234,8 @@ class RDS_JDBC_CONNECTION():
             # The maximum number of partitions that can be used for parallelism in table reading and writing.
             # This also determines the maximum number of concurrent JDBC connections.
 
-            self.LOGGER.info(f"""query_str-(ParallelJDBCConn):> \n{query_str}""")
+            self.LOGGER.info(
+                f"""query_str-(ParallelJDBCConn):> \n{query_str}""")
 
             return (self.spark.read.format("jdbc")
                     .option("url", self.rds_jdbc_url_v2)
@@ -246,18 +249,18 @@ class RDS_JDBC_CONNECTION():
                     .option("numPartitions", numPartitions)
                     .load())
 
-    def get_df_read_rds_db_tbl_pkey_between(self, 
-                                        in_table_name,
-                                        jdbc_partition_column, 
-                                        jdbc_partition_col_lowerbound,
-                                        jdbc_partition_col_upperbound,
-                                        parallel_jdbc_conn_num
-                                        ) -> DataFrame:
-        
+    def get_df_read_rds_db_tbl_pkey_between(self,
+                                            in_table_name,
+                                            jdbc_partition_column,
+                                            jdbc_partition_col_lowerbound,
+                                            jdbc_partition_col_upperbound,
+                                            parallel_jdbc_conn_num
+                                            ) -> DataFrame:
+
         numPartitions = parallel_jdbc_conn_num
         # Note: numPartitions is normally equal to number of executors defined.
-        # The maximum number of partitions that can be used for parallelism in table reading and writing. 
-        # This also determines the maximum number of concurrent JDBC connections. 
+        # The maximum number of partitions that can be used for parallelism in table reading and writing.
+        # This also determines the maximum number of concurrent JDBC connections.
 
         query_str = f"""
         SELECT *
@@ -312,40 +315,42 @@ class RDS_JDBC_CONNECTION():
                 .option("query", f"""{query_str}""")
                 .load())
 
-    def get_jdbc_partition_column(self, 
-                                  rds_db_table_name, 
+    def get_jdbc_partition_column(self,
+                                  rds_db_table_name,
                                   rds_tbl_pkeys_list):
 
-        rds_db_table_empty_df = self.get_rds_db_table_empty_df(rds_db_table_name)
-        df_rds_dtype_dict = CustomPysparkMethods.get_dtypes_dict(rds_db_table_empty_df)
-        int_dtypes_colname_list = [colname for colname, dtype in df_rds_dtype_dict.items() 
-                                    if dtype in Logical_Constants.INT_DATATYPES_LIST]
+        rds_db_table_empty_df = self.get_rds_db_table_empty_df(
+            rds_db_table_name)
+        df_rds_dtype_dict = CustomPysparkMethods.get_dtypes_dict(
+            rds_db_table_empty_df)
+        int_dtypes_colname_list = [colname for colname, dtype in df_rds_dtype_dict.items()
+                                   if dtype in Logical_Constants.INT_DATATYPES_LIST]
 
         if rds_tbl_pkeys_list[0] in int_dtypes_colname_list:
             return rds_tbl_pkeys_list[0]
         else:
             return None
 
-    def get_rds_db_tbl_pkey_col_max_value(self, 
-                                            in_table_name,
-                                            in_pkey_col_name) -> DataFrame:
-        
+    def get_rds_db_tbl_pkey_col_max_value(self,
+                                          in_table_name,
+                                          in_pkey_col_name) -> DataFrame:
+
         query_str = f"""
         SELECT max({in_pkey_col_name}) as max_value
         FROM {self.rds_db_schema_name}.[{in_table_name}]
         """.strip()
 
         return (self.spark.read.format("jdbc")
-                        .option("url", self.rds_jdbc_url_v2)
-                        .option("driver", self.RDS_DB_INSTANCE_DRIVER)
-                        .option("user", self.RDS_DB_INSTANCE_USER)
-                        .option("password", self.RDS_DB_INSTANCE_PWD)
-                        .option("query", f"""{query_str}""")
-                        .load()).collect()[0].max_value
+                .option("url", self.rds_jdbc_url_v2)
+                .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                .option("user", self.RDS_DB_INSTANCE_USER)
+                .option("password", self.RDS_DB_INSTANCE_PWD)
+                .option("query", f"""{query_str}""")
+                .load()).collect()[0].max_value
 
-    def get_rds_df_between_pkey_ids(self, 
+    def get_rds_df_between_pkey_ids(self,
                                     in_table_name,
-                                    jdbc_partition_column, 
+                                    jdbc_partition_column,
                                     jdbc_partition_col_lowerbound,
                                     jdbc_partition_col_upperbound):
 
@@ -378,10 +383,11 @@ class RDS_JDBC_CONNECTION():
         """.strip()
 
         if rds_query_where_clause is not None:
-            query_str = query_str + f""" WHERE {rds_query_where_clause.strip()}"""
+            query_str = query_str + \
+                f""" WHERE {rds_query_where_clause.strip()}"""
 
         query_str = query_str + \
-                    f""" GROUP BY YEAR({date_partition_col}), MONTH({date_partition_col})"""
+            f""" GROUP BY YEAR({date_partition_col}), MONTH({date_partition_col})"""
 
         self.LOGGER.info(f"""query_str-(Aggregate):> \n{query_str}""")
 
@@ -393,6 +399,31 @@ class RDS_JDBC_CONNECTION():
                 .option("query", f"""{query_str}""")
                 .load()).collect()
 
+    def get_min_max_pkey_filter(self,
+                                rds_db_table_name,
+                                pkey_col_name,
+                                rds_query_where_clause=None):
+
+        query_str = f"""
+        SELECT min({pkey_col_name}) as min_value, max({pkey_col_name}) as max_value
+          FROM {self.rds_db_schema_name}.[{rds_db_table_name}]
+        """.strip()
+
+        if rds_query_where_clause is not None:
+            query_str = query_str + \
+                f""" WHERE {rds_query_where_clause.strip()}"""
+
+        self.LOGGER.info(
+            f"""query_str-(Optional-Where clause):> \n{query_str}""")
+
+        return (self.spark.read.format("jdbc")
+                .option("url", self.rds_jdbc_url_v2)
+                .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                .option("user", self.RDS_DB_INSTANCE_USER)
+                .option("password", self.RDS_DB_INSTANCE_PWD)
+                .option("query", f"""{query_str}""")
+                .load()).collect()[0]
+
 # ---------------------------------------------------------------------
 # PYTHON CLASS 'RDS_JDBC_CONNECTION' - END
 # ---------------------------------------------------------------------
@@ -400,16 +431,17 @@ class RDS_JDBC_CONNECTION():
 
 class AthenaMethods:
 
-    ATHENA_CLIENT = boto3.client("athena", 
+    ATHENA_CLIENT = boto3.client("athena",
                                  region_name='eu-west-2')
 
-    def __init__(self,ATHENA_RUN_OUTPUT_LOCATION):
+    def __init__(self, ATHENA_RUN_OUTPUT_LOCATION):
         self.ATHENA_RUN_OUTPUT_LOCATION = ATHENA_RUN_OUTPUT_LOCATION
 
     def run_athena_query(self, sql_statement_str):
         response = AthenaMethods.ATHENA_CLIENT.start_query_execution(
             QueryString=sql_statement_str,
-            ResultConfiguration={"OutputLocation": self.ATHENA_RUN_OUTPUT_LOCATION}
+            ResultConfiguration={
+                "OutputLocation": self.ATHENA_RUN_OUTPUT_LOCATION}
         )
         return response["QueryExecutionId"]
 
@@ -436,7 +468,7 @@ class AthenaMethods:
 
 
 class S3Methods:
-    
+
     S3_CLIENT = boto3.client("s3")
 
     @classmethod
@@ -466,9 +498,9 @@ class S3Methods:
     def get_list_of_db_tbl_prq_file_paths(cls, in_bucket_name, in_db_sch_tbl_path):
         temp_list = list()
         response = cls.S3_CLIENT.list_objects_v2(
-                                    Bucket=in_bucket_name,
-                                    Prefix=in_db_sch_tbl_path)
-        
+            Bucket=in_bucket_name,
+            Prefix=in_db_sch_tbl_path)
+
         for content in response.get('Contents', []):
             temp_list.append(content['Key'])
 
@@ -480,25 +512,26 @@ class CustomPysparkMethods:
     @staticmethod
     def get_pyspark_empty_df(in_empty_df_schema) -> DataFrame:
         return SparkSession.spark.createDataFrame(
-                                    SparkSession.sc.emptyRDD(), 
-                                    schema=in_empty_df_schema
-                )
+            SparkSession.sc.emptyRDD(),
+            schema=in_empty_df_schema
+        )
 
     @staticmethod
     def get_s3_table_folder_path(rds_jdbc_conn_obj,
                                  in_parquet_files_bucket_name,
                                  target_table_folder):
-        
+
         dir_path_str = f"{rds_jdbc_conn_obj.rds_db_name}/{rds_jdbc_conn_obj.rds_db_schema_name}/{target_table_folder}"
-        
+
         tbl_full_dir_path_str = f"s3://{in_parquet_files_bucket_name}/{dir_path_str}/"
 
         if S3Methods.check_s3_folder_path_if_exists(in_parquet_files_bucket_name, dir_path_str):
             return tbl_full_dir_path_str
         else:
-            SparkSession.LOGGER.info(f"{tbl_full_dir_path_str} -- Table-Folder-S3-Path Not Found !")
+            SparkSession.LOGGER.info(
+                f"{tbl_full_dir_path_str} -- Table-Folder-S3-Path Not Found !")
             return None
-        
+
     @staticmethod
     def resolve_args(args_list):
         SparkSession.LOGGER.info(f">> Resolving Argument Variables: START")
@@ -533,49 +566,52 @@ class CustomPysparkMethods:
     @staticmethod
     def get_s3_parquet_df_v1(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
         return SparkSession.spark.createDataFrame(
-                SparkSession.spark.read.parquet(in_s3_parquet_folder_path).rdd, in_rds_df_schema)
+            SparkSession.spark.read.parquet(in_s3_parquet_folder_path).rdd, in_rds_df_schema)
 
     @staticmethod
-    def get_s3_parquet_df_v2(in_s3_parquet_folder_path, 
+    def get_s3_parquet_df_v2(in_s3_parquet_folder_path,
                              in_rds_df_schema) -> DataFrame:
         return SparkSession.spark.read.schema(in_rds_df_schema).parquet(in_s3_parquet_folder_path)
 
     @staticmethod
     def get_s3_parquet_df_v3(in_s3_parquet_folder_path, in_rds_df_schema) -> DataFrame:
-        return SparkSession.spark.read.format("parquet").load(in_s3_parquet_folder_path, 
+        return SparkSession.spark.read.format("parquet").load(in_s3_parquet_folder_path,
                                                               schema=in_rds_df_schema)
 
     @staticmethod
     def rds_df_trim_str_columns(in_rds_df: DataFrame) -> DataFrame:
         return (in_rds_df.select(
                 *[F.trim(F.col(c[0])).alias(c[0]) if c[1] == 'string' else F.col(c[0])
-                for c in in_rds_df.dtypes])
+                  for c in in_rds_df.dtypes])
                 )
 
     @staticmethod
-    def rds_df_trim_str_columns_v2(in_rds_df: DataFrame, 
-                                in_rds_df_trim_str_col_list) -> DataFrame:
-        string_dtype_columns = [c[0] for c in in_rds_df.dtypes 
+    def rds_df_trim_str_columns_v2(in_rds_df: DataFrame,
+                                   in_rds_df_trim_str_col_list) -> DataFrame:
+        string_dtype_columns = [c[0] for c in in_rds_df.dtypes
                                 if c[1] == 'string']
         count = 0
         for trim_colmn in in_rds_df_trim_str_col_list:
             if trim_colmn in string_dtype_columns:
                 if count == 0:
-                    rds_df = in_rds_df.withColumn(trim_colmn, F.trim(F.col(trim_colmn)))
+                    rds_df = in_rds_df.withColumn(
+                        trim_colmn, F.trim(F.col(trim_colmn)))
                     count += 1
                 else:
-                    rds_df = rds_df.withColumn(trim_colmn, F.trim(F.col(trim_colmn)))
+                    rds_df = rds_df.withColumn(
+                        trim_colmn, F.trim(F.col(trim_colmn)))
             else:
-                SparkSession.LOGGER.warn(f"""rds_df_trim_str_columns: {trim_colmn} is not a string dtype column.""")
+                SparkSession.LOGGER.warn(
+                    f"""rds_df_trim_str_columns: {trim_colmn} is not a string dtype column.""")
         return rds_df
 
     @staticmethod
-    def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame, 
+    def rds_df_trim_microseconds_timestamp(in_rds_df: DataFrame,
                                            in_col_list) -> DataFrame:
         return (in_rds_df.select(
-                *[F.date_format(F.col(c[0]),'yyyy-MM-dd HH:mm:ss.SSS').alias(c[0]).cast('timestamp') 
-                if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
-                for c in in_rds_df.dtypes])
+                *[F.date_format(F.col(c[0]), 'yyyy-MM-dd HH:mm:ss.SSS').alias(c[0]).cast('timestamp')
+                  if c[1] == 'timestamp' and c[0] in in_col_list else F.col(c[0])
+                  for c in in_rds_df.dtypes])
                 )
 
     @staticmethod
@@ -586,41 +622,44 @@ class CustomPysparkMethods:
                 .rdd.map(lambda row: (row[key_col], row[value_col])).collectAsMap())
 
     @staticmethod
-    def get_nvl_select_list(in_rds_df: DataFrame, 
-                            rds_jdbc_conn_obj, 
+    def get_nvl_select_list(in_rds_df: DataFrame,
+                            rds_jdbc_conn_obj,
                             in_rds_tbl_name):
-        df_col_attr = rds_jdbc_conn_obj.get_rds_tbl_col_attributes(in_rds_tbl_name)
-        df_col_attr_dict = CustomPysparkMethods.get_rds_tbl_col_attr_dict(df_col_attr)
+        df_col_attr = rds_jdbc_conn_obj.get_rds_tbl_col_attributes(
+            in_rds_tbl_name)
+        df_col_attr_dict = CustomPysparkMethods.get_rds_tbl_col_attr_dict(
+            df_col_attr)
         df_col_dtype_dict = CustomPysparkMethods.get_dtypes_dict(in_rds_df)
 
         temp_select_list = list()
         for colmn in in_rds_df.columns:
             if df_col_attr_dict[colmn] == 'YES' and \
-            (not df_col_dtype_dict[colmn].startswith("decimal")) and \
-            (not df_col_dtype_dict[colmn].startswith("binary")):
-                
-                temp_select_list.append(f"""nvl({colmn}, {Logical_Constants.NVL_DTYPE_DICT[df_col_dtype_dict[colmn]]}) as {colmn}""")
+                (not df_col_dtype_dict[colmn].startswith("decimal")) and \
+                    (not df_col_dtype_dict[colmn].startswith("binary")):
+
+                temp_select_list.append(
+                    f"""nvl({colmn}, {Logical_Constants.NVL_DTYPE_DICT[df_col_dtype_dict[colmn]]}) as {colmn}""")
             else:
                 temp_select_list.append(colmn)
         return temp_select_list
 
     @staticmethod
-    def rds_df_strip_tbl_col_chars(in_rds_df: DataFrame, 
-                                in_transformed_colmn_list_1, 
-                                replace_substring) -> DataFrame:
+    def rds_df_strip_tbl_col_chars(in_rds_df: DataFrame,
+                                   in_transformed_colmn_list_1,
+                                   replace_substring) -> DataFrame:
         count = 0
         for transform_colmn in in_transformed_colmn_list_1:
             if count == 0:
-                rds_df = in_rds_df.withColumn(transform_colmn, 
-                                            F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
+                rds_df = in_rds_df.withColumn(transform_colmn,
+                                              F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
                 count += 1
             else:
-                rds_df = rds_df.withColumn(transform_colmn, 
-                                        F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
+                rds_df = rds_df.withColumn(transform_colmn,
+                                           F.regexp_replace(in_rds_df[transform_colmn], replace_substring, ""))
         return rds_df
 
     @staticmethod
-    def get_reordered_columns_schema_object(in_df_rds: DataFrame, 
+    def get_reordered_columns_schema_object(in_df_rds: DataFrame,
                                             in_transformed_column_list):
         altered_schema_object = T.StructType([])
         rds_df_column_list = in_df_rds.schema.fields
@@ -642,7 +681,7 @@ class CustomPysparkMethods:
         return altered_schema_object
 
     @staticmethod
-    def get_rds_db_tbl_customized_cols_schema_object(in_df_rds: DataFrame, 
+    def get_rds_db_tbl_customized_cols_schema_object(in_df_rds: DataFrame,
                                                      in_customized_column_list):
         altered_schema_object = T.StructType([])
         rds_df_column_list = in_df_rds.columns

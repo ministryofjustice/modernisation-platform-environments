@@ -496,7 +496,11 @@ if __name__ == "__main__":
 
     # rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 'min')
     # rds_jdbc_conn_obj.get_min_max_pkey(jdbc_partition_column, 'max')
-    agg_row_dict = rds_jdbc_conn_obj.get_min_max_pkey_v2(jdbc_partition_column)
+    agg_row_dict = rds_jdbc_conn_obj.get_min_max_pkey_filter(
+                                        rds_sqlserver_db_table, 
+                                        jdbc_partition_column,
+                                        args.get('rds_query_where_clause', None)
+                    )
     min_pkey = agg_row_dict['min_value']
     max_pkey = agg_row_dict['max_value']
     if jdbc_read_partitions_num == 1:
