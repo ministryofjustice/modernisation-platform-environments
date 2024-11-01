@@ -1,9 +1,10 @@
 locals {
   environment_map = {
-    "production"  = "prod"
-    "test"        = "test"
-    "development" = "dev"
-    "default"     = ""
+    "production"     = "prod"
+    "preproduction"  = "preprod"
+    "test"           = "test"
+    "development"    = "dev"
+    "default"        = ""
   }
   environment_shorthand = local.environment_map[local.environment]
 
@@ -660,6 +661,21 @@ module "s3-p1-export-bucket" {
     aws = aws
   }
 }
+
+module "s3-serco-export-bucket" {
+  source = "./modules/export_bucket_presigned_url/"
+
+  allowed_ips             = null
+  export_destination      = "serco-exports"
+  local_bucket_prefix     = local.bucket_prefix
+  local_tags              = local.tags
+  logging_bucket          = module.s3-logging-bucket
+
+  providers = {
+    aws = aws
+  }
+}
+
 
 # ----------------------------------
 # Virus scanning buckets
