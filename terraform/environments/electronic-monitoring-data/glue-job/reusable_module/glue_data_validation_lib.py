@@ -56,6 +56,10 @@ class RDS_JDBC_CONNECTION():
     spark = SparkSession.spark
     LOGGER = SparkSession.LOGGER
 
+    # Note:> All of 'partitionColumn', 'lowerBound', 'upperBound', and 'numPartitions' must be specified if one is specified.
+    # The partition column (specified in the 'partitionColumn' parameter) “must be a numeric, date, or timestamp column”.
+    # stride (the number of rows read per partition) => (upper bound - lower bound) / number of partitions
+
     def __init__(self,
                  RDS_DB_HOST_ENDPOINT,
                  RDS_DB_INSTANCE_PWD,
@@ -231,8 +235,7 @@ class RDS_JDBC_CONNECTION():
         else:
             numPartitions = jdbc_read_partitions_num
             # Note: numPartitions is normally equal to number of executors defined.
-            # The maximum number of partitions that can be used for parallelism in table reading and writing.
-            # This also determines the maximum number of concurrent JDBC connections.
+            # This also determines the maximum number of 'partitions' / concurrent JDBC connections.
 
             self.LOGGER.info(
                 f"""query_str-(ParallelJDBCConn):> \n{query_str}""")

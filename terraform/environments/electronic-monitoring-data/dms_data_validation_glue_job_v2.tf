@@ -343,7 +343,6 @@ resource "aws_glue_job" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
     "--rds_table_total_size_mb"              = 0
     "--rds_df_repartition_num"               = 0
     "--date_partition_column_name"           = ""
-    "--other_partitionby_columns"            = ""
     "--validation_sample_fraction_float"     = 0
     "--validation_sample_df_repartition_num" = 0
     "--jdbc_read_256mb_partitions"           = "false"
