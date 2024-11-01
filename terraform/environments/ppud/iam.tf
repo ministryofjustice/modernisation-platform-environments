@@ -311,18 +311,17 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda development"
   policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
+    "Version": "2012-10-17",
+    "Statement": [{
+        "Effect": "Allow",
+        "Action": [
            "ssm:SendCommand",
            "ssm:GetCommandInvocation",
            "ec2:DescribeInstances",
            "lambda:InvokeAsync",
            "lambda:InvokeFunction"
-        ]
-        Resource = [  
+        ],
+        "Resource": [  
            "arn:aws:ssm::${local.environment_management.account_ids["ppud-development"]}:*",
            "arn:aws:cloudwatch::${local.environment_management.account_ids["ppud-development"]}:*",
            "arn:aws:ssm::document/AWS-RunPowerShellScript",
@@ -331,8 +330,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
        ] 
       },
       {
-        Effect = "Allow"
-        Action = [
+        "Effect": "Allow",
+        "Action": [
            "sqs:ChangeMessageVisibility",
            "sqs:DeleteMessage",
            "sqs:GetQueueAttributes",
@@ -340,13 +339,12 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
            "sqs:ListQueueTags",
            "sqs:ReceiveMessage",
            "sqs:SendMessage"
-        ]
-        Resource = [  
+        ],
+        "Resource": [  
            "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Queue-DEV",
            "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Deadletter-Queue-DEV"
        ] 
-      }
-    ]
+    }]
   })
 }
 
