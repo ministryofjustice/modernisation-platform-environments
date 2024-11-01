@@ -251,9 +251,12 @@ resource "aws_ebs_volume" "concurrent_manager" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].concurrent_manager_snapshot_id # This is used for when data is being migrated
 
-  # lifecycle {
-  #   ignore_changes = [kms_key_id]
-  # }
+  lifecycle {
+    replace_triggered_by = [
+      aws_instance.concurrent_manager.id
+    ]
+    ignore_changes = [kms_key_id]
+  }
 
   tags = merge(
     local.tags,

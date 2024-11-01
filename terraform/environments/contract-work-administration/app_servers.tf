@@ -391,9 +391,12 @@ resource "aws_ebs_volume" "app1" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
 
-  # lifecycle {
-  #   ignore_changes = [kms_key_id]
-  # }
+  lifecycle {
+    replace_triggered_by = [
+      aws_instance.app1.id
+    ]
+    ignore_changes = [kms_key_id]
+  }
 
   tags = merge(
     local.tags,
