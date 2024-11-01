@@ -1,6 +1,9 @@
-data "aws_ecs_task_definition" "task_definition" {
-  task_definition = aws_ecs_task_definition.chaps_task_definition.family
-  depends_on      = [aws_ecs_task_definition.chaps_task_definition]
+data "aws_ecs_task_definition" "chaps_task_definition" {
+  task_definition = "chapsFamily"
+}
+
+data "aws_ecs_task_definition" "chapsdotnet_task_definition" {
+  task_definition = "chapsdotnet-family"
 }
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
@@ -153,9 +156,39 @@ resource "aws_ecs_task_definition" "chapsdotnet_task_definition" {
           awslogs-stream-prefix = "chapsdotnet"
         }
       }
+
+      environment = [
+        {
+          name  = "RDS_HOSTNAME"
+          value = "${aws_db_instance.database.address}"
+        },
+        {
+          name  = "RDS_USERNAME"
+          value = "${aws_db_instance.database.username}"
+        },
+        {
+          name  = "DB_NAME"
+          value = "${local.application_data.accounts[local.environment].db_name}"
+        },
+        {
+          name  = "CLIENT_ID"
+          value = "${local.application_data.accounts[local.environment].client_id}"
+        },
+        {
+          name  = "CurServer"
+          value = "${local.application_data.accounts[local.environment].env_name}"
+        }
+      ],
+      secrets = [
+        {
+          name : "RDS_PASSWORD",
+          valueFrom : aws_secretsmanager_secret_version.db_password.arn
+        }
+      ]
     }
   ])
 }
+  
 
 resource "aws_key_pair" "ec2-user" {
   key_name   = "${local.application_name}-ec2"
@@ -170,7 +203,7 @@ resource "aws_ecs_service" "chaps_service" {
 
   name                              = "chaps-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chaps_task_definition.family
+  task_definition                   = data.aws_ecs_task_definition.chaps_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
@@ -214,7 +247,7 @@ resource "aws_ecs_service" "chapsdotnet_service" {
 
   name                              = "chapsdotnet-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chapsdotnet_task_definition.arn
+  task_definition                   = data.aws_ecs_task_definition.chapsdotnet_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
