@@ -233,8 +233,8 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
 
     df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path)
 
-    rds_df_year_int_equals_to = args.get('rds_df_year_int_equals_to', 0)
-    rds_df_month_int_equals_to = args.get('rds_df_month_int_equals_to', 0)
+    rds_df_year_int_equals_to = int(args.get('rds_df_year_int_equals_to', 0))
+    rds_df_month_int_equals_to = int(args.get('rds_df_month_int_equals_to', 0))
     if rds_df_year_int_equals_to != 0:
         df_parquet_read = df_parquet_read.where(f"""year = {rds_df_year_int_equals_to}""")
     if rds_df_month_int_equals_to != 0:
