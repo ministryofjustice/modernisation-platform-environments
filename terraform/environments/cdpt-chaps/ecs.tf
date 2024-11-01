@@ -1,11 +1,11 @@
-data "aws_ecs_task_definition" "chaps_task_definition" {
-  task_definition = "chapsFamily"
-}
+#data "aws_ecs_task_definition" "chaps_task_definition" {
+#  task_definition = "chapsFamily"
+#}
 
-data "aws_ecs_task_definition" "chapsdotnet_task_definition" {
-  task_definition = "chapsdotnet-family"
-  depends_on = [aws_ecs_task_definition.chaps_task_definition]
-}
+#data "aws_ecs_task_definition" "chapsdotnet_task_definition" {
+#  task_definition = "chapsdotnet-family"
+#  depends_on = [aws_ecs_task_definition.chaps_task_definition]
+#}
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
