@@ -438,6 +438,8 @@ startup;
 exit;
 EOF"
 
+#comment to trigger rebuild of instance
+
 EOF
 }
 
