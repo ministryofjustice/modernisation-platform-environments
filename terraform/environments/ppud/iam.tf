@@ -324,7 +324,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
         "Resource": [  
            "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
            "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
-           "arn:aws:ssm:eu-west-2:document/AWS-RunPowerShellScript",
+           "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:document/AWS-RunPowerShellScript",
            "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
            "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
        ] 
