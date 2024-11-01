@@ -319,7 +319,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                 .selectExpr("json_row")
                                 .limit(100))
 
-        subtract_validation_msg = f"""'{rds_jdbc_conn_obj.rds_db_table_name}' - {df_prq_read_filtered_count}"""
+        subtract_validation_msg = f"""'{rds_db_table_name}' - {df_prq_read_filtered_count}"""
         df_subtract_temp = df_subtract_temp.selectExpr(
                                 "current_timestamp as run_datetime",
                                 "json_row",
@@ -328,7 +328,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                 f"""'{db_sch_tbl}' as full_table_name""",
                                 """'False' as table_to_ap"""
                             )
-        LOGGER.warn(f"{rds_jdbc_conn_obj.rds_db_table_name}: Validation Failed - 2")
+        LOGGER.warn(f"{rds_db_table_name}: Validation Failed - 2")
         df_dv_output = df_dv_output.union(df_subtract_temp)
     # -----------------------------------------------------
 
@@ -468,8 +468,8 @@ if __name__ == "__main__":
         sys.exit(1)
     # ----------------------------------------------------
 
-    rds_df_year_int_equals_to = args.get('rds_df_year_int_equals_to', 0)
-    rds_df_month_int_equals_to = args.get('rds_df_month_int_equals_to', 0)
+    rds_df_year_int_equals_to = int(args.get('rds_df_year_int_equals_to', 0))
+    rds_df_month_int_equals_to = int(args.get('rds_df_month_int_equals_to', 0))
     if args.get('rds_query_where_clause', '') != '':
         if rds_df_year_int_equals_to == 0 or rds_df_month_int_equals_to == 0:
             LOGGER.error(f"""The values for 'rds_df_year_int_equals_to' or 'rds_df_month_int_equals_to' not given""")
