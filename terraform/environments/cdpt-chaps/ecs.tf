@@ -4,6 +4,7 @@ data "aws_ecs_task_definition" "chaps_task_definition" {
 
 data "aws_ecs_task_definition" "chapsdotnet_task_definition" {
   task_definition = "chapsdotnet-family"
+  depends_on = [aws_ecs_task_definition.chaps_task_definition]
 }
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
@@ -203,7 +204,7 @@ resource "aws_ecs_service" "chaps_service" {
 
   name                              = "chaps-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = data.aws_ecs_task_definition.chaps_task_definition.arn
+  task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
@@ -247,7 +248,7 @@ resource "aws_ecs_service" "chapsdotnet_service" {
 
   name                              = "chapsdotnet-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = data.aws_ecs_task_definition.chapsdotnet_task_definition.arn
+  task_definition                   = task_definition = aws_ecs_task_definition.chapsdotnet_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
