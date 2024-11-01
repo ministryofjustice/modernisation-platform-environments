@@ -171,10 +171,6 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
     ]
   }
   statement {
-    actions   = ["s3:PutObject"]
-    resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
-  }
-  statement {
     actions   = ["s3:GetBucketLocation"]
     resources = [module.s3-athena-bucket.bucket.arn]
   }
@@ -189,7 +185,8 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
     resources = [
       "${module.s3-data-bucket.bucket.arn}/test.csv",
       "${module.s3-data-bucket.bucket.arn}/data/*",
-      "${module.s3-data-bucket.bucket.arn}/not-data/*"
+      "${module.s3-data-bucket.bucket.arn}/not-data/*",
+      "${module.s3-athena-bucket.bucket.arn}/*"
     ]
   }
 }
