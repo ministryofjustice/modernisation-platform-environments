@@ -647,7 +647,7 @@ module "s3-mdss-specials-landing-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-p1-export-bucket" {
-  source = "./modules/push_export_bucket/"
+  source = "./modules/export_bucket_push/"
 
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   destination_bucket_id   = "tct-339712706964-prearrivals"
