@@ -135,7 +135,6 @@ sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/
 sed -i 's/cwa.${local.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
 sed -i 's/db_admin@legalservices.gov.uk/db_admin@${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
 
-
 EOF
 
 }
@@ -252,9 +251,9 @@ resource "aws_ebs_volume" "concurrent_manager" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].concurrent_manager_snapshot_id # This is used for when data is being migrated
 
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  # lifecycle {
+  #   ignore_changes = [kms_key_id]
+  # }
 
   tags = merge(
     local.tags,

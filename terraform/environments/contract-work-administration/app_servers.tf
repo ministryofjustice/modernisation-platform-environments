@@ -113,7 +113,6 @@ sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_u
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
-
 ## Remove SSH key allowed
 echo "Removing old SSH key"
 sed -i '/.*-general$/d' /home/ec2-user/.ssh/authorized_keys
@@ -392,9 +391,9 @@ resource "aws_ebs_volume" "app1" {
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
 
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
+  # lifecycle {
+  #   ignore_changes = [kms_key_id]
+  # }
 
   tags = merge(
     local.tags,
