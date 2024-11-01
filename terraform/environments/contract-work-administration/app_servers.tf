@@ -113,7 +113,6 @@ sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_u
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
-
 ## Remove SSH key allowed
 echo "Removing old SSH key"
 sed -i '/.*-general$/d' /home/ec2-user/.ssh/authorized_keys
@@ -126,6 +125,14 @@ rm /var/cw-custom.sh
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-cw-custom.sh /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
 #  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+
+## Additional DBA Steps
+echo "Updating CWA_cwa-app1.xml"
+su - applmgr -c "cp /CWA/app/appl/admin/CWA_cwa-app1.xml /CWA/app/appl/admin/CWA_cwa-app1.xml.tf_backup"
+sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml
+sed -i 's/cwa.${local.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml
+sed -i 's/db_admin@legalservices.gov.uk/db_admin@${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app1.xml
 
 
 EOF
@@ -181,7 +188,7 @@ resource "aws_instance" "app1" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.app_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
   }
@@ -206,17 +213,20 @@ resource "aws_instance" "app1" {
 }
 
 resource "aws_instance" "app2" {
-  count                  = contains(["development", "testing"], local.environment) ? 0 : 1
+  count                  = contains(["development2", "testing"], local.environment) ? 0 : 1
   ami                    = local.application_data.accounts[local.environment].app_ami_id
   availability_zone      = "eu-west-2a"
   instance_type          = local.application_data.accounts[local.environment].app_instance_type
   monitoring             = true
   vpc_security_group_ids = [aws_security_group.app.id]
-  subnet_id              = data.aws_subnet.data_subnets_a.id
+  subnet_id              = data.aws_subnet.private_subnets_a.id
   iam_instance_profile   = aws_iam_instance_profile.cwa.id
   key_name               = aws_key_pair.cwa.key_name
-  #   user_data_base64            = base64encode(local.app_userdata)
-  #   user_data_replace_on_change = true
+  user_data_base64       = base64encode(local.app_userdata)
+  user_data_replace_on_change = false
+  metadata_options {
+    http_tokens = "optional"
+  }
 
   root_block_device {
     tags = merge(
@@ -382,6 +392,9 @@ resource "aws_ebs_volume" "app1" {
   snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
+    replace_triggered_by = [
+      aws_instance.app1.id
+    ]
     ignore_changes = [kms_key_id]
   }
 
@@ -398,13 +411,13 @@ resource "aws_volume_attachment" "app1" {
 }
 
 resource "aws_ebs_volume" "app2" {
-  count             = contains(["development", "testing"], local.environment) ? 0 : 1
+  count             = contains(["development2", "testing"], local.environment) ? 0 : 1
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_app_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  # snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -417,8 +430,9 @@ resource "aws_ebs_volume" "app2" {
 }
 
 resource "aws_volume_attachment" "app2" {
-  count       = contains(["development", "testing"], local.environment) ? 0 : 1
+  count       = contains(["development2", "testing"], local.environment) ? 0 : 1
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.app2[0].id
   instance_id = aws_instance.app2[0].id
 }
+
