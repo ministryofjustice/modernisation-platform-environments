@@ -314,7 +314,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
+        Effect = "Allow"
         Action = [
            "ssm:SendCommand",
            "ssm:GetCommandInvocation",
@@ -331,7 +331,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
        ] 
       },
       {
-        Effect = "Allow",
+        Effect = "Allow"
         Action = [
            "sqs:ChangeMessageVisibility",
            "sqs:DeleteMessage",
