@@ -44,7 +44,7 @@ resource "aws_security_group" "db" {
     to_port         = 1433
     protocol        = "tcp"
     security_groups = [
-      aws_security_group.chaps_service.id, 
+      aws_security_group.ecs_service.id, 
       aws_security_group.chapsdotnet_service.id
     ]
   }
