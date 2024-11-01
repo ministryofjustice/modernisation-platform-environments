@@ -17,7 +17,7 @@ sudo yum -y install libXp.i386
 sudo yum -y install sshpass
 
 hostname edw
-echo "HOSTNAME=${local.application_name}.${data.aws_route53_zone.external.name}" >> /etc/sysconfig/network
+echo "HOSTNAME=${local.application_name}" >> /etc/sysconfig/network
 sed -i '/aws/d' /etc/sysconfig/network
 /etc/init.d/network restart
 
