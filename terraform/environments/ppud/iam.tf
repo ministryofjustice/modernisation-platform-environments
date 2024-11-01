@@ -310,46 +310,44 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
   name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_dev"
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda development"
-  policy      = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Effect": "Allow",
-     "Action": [
-        "ssm:SendCommand",
-        "ssm:GetCommandInvocation",
-        "ec2:DescribeInstances",
-        "lambda:InvokeAsync",
-        "lambda:InvokeFunction"
-      ],
-      "Resource": [
-      "arn:aws:ssm::${local.environment_management.account_ids["ppud-development"]}:*",
-      "arn:aws:cloudwatch::${local.environment_management.account_ids["ppud-development"]}:*",
-      "arn:aws:ssm::document/AWS-RunPowerShellScript",
-      "arn:aws:lambda::${local.environment_management.account_ids["ppud-development"]}:*",
-      "arn:aws:ec2::${local.environment_management.account_ids["ppud-development"]}:*"
-      ]
-   },
-   {
-     "Effect": "Allow",
-     "Action": [
-      "sqs:ChangeMessageVisibility",
-      "sqs:DeleteMessage",
-      "sqs:GetQueueAttributes",
-      "sqs:GetQueueUrl",
-      "sqs:ListQueueTags",
-      "sqs:ReceiveMessage",
-      "sqs:SendMessage"
-      ],
-    "Resource": [
-      "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Queue-DEV",
-      "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Deadletter-Queue-DEV"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+           "ssm:SendCommand",
+           "ssm:GetCommandInvocation",
+           "ec2:DescribeInstances",
+           "lambda:InvokeAsync",
+           "lambda:InvokeFunction"
+        ]
+        Resource = [  
+           "arn:aws:ssm::${local.environment_management.account_ids["ppud-development"]}:*",
+           "arn:aws:cloudwatch::${local.environment_management.account_ids["ppud-development"]}:*",
+           "arn:aws:ssm::document/AWS-RunPowerShellScript",
+           "arn:aws:lambda::${local.environment_management.account_ids["ppud-development"]}:*",
+           "arn:aws:ec2::${local.environment_management.account_ids["ppud-development"]}:*"
+       ] 
+      },
+      {
+        Effect = "Allow",
+        Action = [
+           "sqs:ChangeMessageVisibility",
+           "sqs:DeleteMessage",
+           "sqs:GetQueueAttributes",
+           "sqs:GetQueueUrl",
+           "sqs:ListQueueTags",
+           "sqs:ReceiveMessage",
+           "sqs:SendMessage"
+        ]
+        Resource = [  
+           "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Queue-DEV",
+           "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Deadletter-Queue-DEV"
+       ] 
+      }
     ]
-   }
- ]
-}
-EOF
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev" {
