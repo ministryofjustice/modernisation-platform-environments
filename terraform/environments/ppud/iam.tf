@@ -341,8 +341,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
            "sqs:SendMessage"
         ],
         "Resource": [  
-           "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Queue-DEV",
-           "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:Lambda-Deadletter-Queue-DEV"
+           "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:*",
+           "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:*"
        ] 
     }]
   })
