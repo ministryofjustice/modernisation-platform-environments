@@ -67,6 +67,24 @@ resource "aws_s3_bucket_policy" "this" {
 
 data "aws_iam_policy_document" "this" {
   statement {
+    sid     = "EnforceTLSv12orHigher"
+    effect  = "Deny"
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.default.arn,
+      "${aws_s3_bucket.default.arn}/*"
+    ]
+    principals {
+      identifiers = ["*"]
+      type        = "AWS"
+    }
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = [1.2]
+    }
+  }
+  statement {
     sid     = "AllowedIPs"
     effect  = "Deny"
     actions = ["s3:GetObject"]
