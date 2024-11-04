@@ -130,7 +130,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   ])
 }
 
-resource "aws_ecs_task_definition" "chapsdotnet_task_definition" {
+resource "aws_ecs_task_definition" "chapsdotnet_task" {
   family                   = "chapsdotnet-family"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
