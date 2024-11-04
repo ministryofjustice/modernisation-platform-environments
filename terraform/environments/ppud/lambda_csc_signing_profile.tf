@@ -20,7 +20,7 @@ resource "aws_lambda_code_signing_config" "lambda_csc_dev" {
   description = "Lambda code signing configuration for development environment"
   allowed_publishers {
     signing_profile_version_arns = [
-      "arn:aws:signer:eu-west-2:075585660276:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002/AHvOa02ifI"
+      "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002/AHvOa02ifI"
     ]
   }
   policies {
