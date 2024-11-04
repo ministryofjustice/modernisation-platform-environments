@@ -101,7 +101,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v2" {
     "--parquet_tbl_folder_if_different"   = ""
     "--parquet_src_bucket_name"           = module.s3-dms-target-store-bucket.bucket.id
     "--parquet_output_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
-    "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_db_name"              = "rds_sqlserver_dms"
     "--glue_catalog_tbl_name"             = "glue_df_output"
     "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group_v2.name}"
     "--enable-continuous-cloudwatch-log"  = "true"
@@ -161,7 +161,7 @@ resource "aws_glue_job" "dms_dv_glue_job_v4d" {
     "--rds_df_trim_micro_sec_ts_col_list" = ""
     "--parquet_src_bucket_name"           = module.s3-dms-target-store-bucket.bucket.id
     "--parquet_output_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
-    "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_db_name"              = "rds_sqlserver_dms"
     "--glue_catalog_tbl_name"             = "glue_df_output"
     "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_cw_log_group.name}"
     "--enable-continuous-cloudwatch-log"  = "true"
@@ -228,7 +228,7 @@ resource "aws_glue_job" "rds_to_s3_parquet_migration" {
     "--rds_df_filter_month"                  = 0
     "--rds_to_parquet_output_s3_bucket"      = module.s3-dms-target-store-bucket.bucket.id
     "--dv_parquet_output_s3_bucket"          = module.s3-dms-data-validation-bucket.bucket.id
-    "--glue_catalog_db_name"                 = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_db_name"                 = "rds_sqlserver_dms"
     "--glue_catalog_tbl_name"                = "glue_df_output"
     "--continuous-log-logGroup"              = "/aws-glue/jobs/${aws_cloudwatch_log_group.rds_to_s3_parquet_migration.name}"
     "--enable-continuous-cloudwatch-log"     = "true"
@@ -379,7 +379,7 @@ resource "aws_glue_job" "catalog_dv_table_glue_job" {
   number_of_workers = 2
   default_arguments = {
     "--parquet_output_bucket_name"       = module.s3-dms-data-validation-bucket.bucket.id
-    "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_db_name"             = "rds_sqlserver_dms"
     "--glue_catalog_tbl_name"            = "glue_df_output"
     "--continuous-log-logGroup"          = aws_cloudwatch_log_group.dms_dv_cw_log_group.name
     "--enable-continuous-cloudwatch-log" = "true"

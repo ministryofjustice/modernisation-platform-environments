@@ -225,7 +225,7 @@ module "update_log_table" {
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
     S3_LOG_BUCKET = module.s3-dms-data-validation-bucket.bucket.id
-    DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    DATABASE_NAME = "rds_sqlserver_dms"
     TABLE_NAME    = "glue_df_output"
   }
 }
