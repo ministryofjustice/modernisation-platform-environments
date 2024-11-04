@@ -153,13 +153,14 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.jumpserver.config, {
-          ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
+          ami_name          = "hmpps_windows_server_2022_release_2024-*"
+          # ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
           user_data_raw = base64encode(templatefile(
-            "./templates/user-data-nart-client-pwsh.yaml.tftpl", {
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
             branch = "TM/TM-587/nart-jumpserver"
             }
           ))
