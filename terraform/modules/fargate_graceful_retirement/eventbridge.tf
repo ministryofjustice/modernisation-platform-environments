@@ -74,6 +74,15 @@ data "aws_iam_policy_document" "all_health_events" {
       variable = "aws:SourceArn"
     }
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "states:StartExecution"
+    ]
+    resources = [
+      aws_sfn_state_machine.ecs_restart_state_machine.arn
+    ]
+  }
 }
 
 resource "aws_cloudwatch_log_resource_policy" "all_health_events" {
