@@ -171,3 +171,8 @@ data "aws_iam_session_context" "whoami" {
 data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
+
+# always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
+}
