@@ -84,8 +84,8 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
       "s3:List*"
     ]
     resources = [
-      "${aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn}",
-      "${aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn}/*"
+      "${module.s3_bucket_oracledb_backups_inventory.bucket.arn}",
+      "${module.s3_bucket_oracledb_backups_inventory.bucket.arn}/*"
     ]
   }
 
@@ -186,27 +186,6 @@ resource "aws_iam_policy" "oracledb_backup_bucket_access" {
   policy      = data.aws_iam_policy_document.combined.json
 }
 
-
-resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
-  #checkov:skip=CKV_AWS_21 "ignore"
-  #checkov:skip=CKV2_AWS_61 "ignore"
-  #checkov:skip=CKV2_AWS_62 "ignore"
-  #checkov:skip=CKV_AWS_144 "ignore"
-  #checkov:skip=CKV_AWS_18 "ignore"
-
-  bucket = "${local.oracle_backup_bucket_prefix}-inventory"
-
-  tags = merge(
-    var.tags,
-    {
-      "Name" = "${local.oracle_backup_bucket_prefix}-inventory"
-    },
-    {
-      "Purpose" = "Inventory of Oracle DB Backup Pieces"
-    },
-  )
-}
-
 module "s3_bucket_oracledb_backups_inventory" {
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
   bucket_name         = "${local.oracle_backup_bucket_prefix}-inventory"
@@ -254,7 +233,7 @@ data "aws_iam_policy_document" "oracledb_backups_inventory" {
     sid       = "InventoryPolicy"
     effect    = "Allow"
     actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn}/*"]
+    resources = ["${module.s3_bucket_oracledb_backups_inventory.bucket.arn}/*"]
 
     condition {
       test     = "StringEquals"
