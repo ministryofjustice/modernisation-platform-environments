@@ -89,25 +89,6 @@ data "aws_iam_policy_document" "this" {
   }
 }
 
-resource "aws_lambda_permission" "allow_bucket" {
-  statement_id  = "AllowExecutionFromS3Bucket-${var.export_destination}"
-  action        = "lambda:InvokeFunction"
-  function_name = module.encrypt_zip_lambda.lambda_function_arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.this-bucket.bucket.arn
-}
-
-resource "aws_s3_bucket_notification" "bucket_notification" {
-  bucket = module.this-bucket.bucket.id
-
-  lambda_function {
-    lambda_function_arn = module.encrypt_zip_lambda.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-  }
-
-  depends_on = [aws_lambda_permission.allow_bucket]
-}
-
 #------------------------------------------------------------------------------
 # Encrypt lambda 
 #------------------------------------------------------------------------------
