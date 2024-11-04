@@ -560,30 +560,21 @@ if __name__ == "__main__":
     LOGGER.info(
         f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
 
-    partition_by_cols = list()
 
+    rds_read_columns = df_rds_read.columns
+    
     # Add 'YEAR', 'MONTH', 'DAY' columns to the dataframe.
     if date_partition_column_name is not None:
         LOGGER.info(f"""date_partition_column_name = {date_partition_column_name}""")
 
-        if args['year_partition_bool'] == 'true':
+        if args['year_partition_bool'] == 'true' and \
+            'year' not in rds_read_columns:
             df_rds_read = df_rds_read.withColumn("year", F.year(date_partition_column_name))
-            partition_by_cols.append("year")
-
-            if rds_df_year_int_equals_to != 0:
-                LOGGER.info(f"""rds_df_year_int_equals_to = {rds_df_year_int_equals_to}""")
-                df_rds_read = df_rds_read.where(f"""year = {rds_df_year_int_equals_to}""")
-            # ----------------------------------------------------------------------------
         # --------------------------------------------------------------------------------
 
-        if args['month_partition_bool'] == 'true':
+        if args['month_partition_bool'] == 'true' and \
+            'month' not in rds_read_columns:
             df_rds_read = df_rds_read.withColumn("month", F.month(date_partition_column_name))
-            partition_by_cols.append("month")
-
-            if rds_df_month_int_equals_to != 0:
-                LOGGER.info(f"""rds_df_month_int_equals_to = {rds_df_month_int_equals_to}""")
-                df_rds_read = df_rds_read.where(f"""month = {rds_df_month_int_equals_to}""")
-            # ----------------------------------------------------------------------------
         # --------------------------------------------------------------------------------
 
         # if args['day_partition_bool'] == 'true':
@@ -594,6 +585,30 @@ if __name__ == "__main__":
     else:
         LOGGER.warn(f""">> 'date_partition_column_name' input not given <<""")
     # ----------------------------------------------------
+    
+    partition_by_cols = list()
+
+    if 'year' in rds_read_columns:
+        partition_by_cols.append("year")
+        if rds_df_year_int_equals_to != 0:
+            LOGGER.info(f"""rds_df_year_int_equals_to = {rds_df_year_int_equals_to}""")
+            df_rds_read = df_rds_read.where(f"""year = {rds_df_year_int_equals_to}""")
+    else:
+        LOGGER.error(
+                f""">> 'year' column missing in 'df_rds_read'-dataframe <<""")
+        sys.exit(1)
+    # ----------------------------------------------------------------------------
+
+    if 'month' in rds_read_columns:
+        partition_by_cols.append("month")
+        if rds_df_month_int_equals_to != 0:
+            LOGGER.info(f"""rds_df_month_int_equals_to = {rds_df_month_int_equals_to}""")
+            df_rds_read = df_rds_read.where(f"""month = {rds_df_month_int_equals_to}""")
+    else:
+        LOGGER.error(
+                f""">> 'month' column missing in 'df_rds_read'-dataframe <<""")
+        sys.exit(1)
+    # ----------------------------------------------------------------------------
 
     rds_df_repartition_num = int(args['rds_df_repartition_num'])
 
