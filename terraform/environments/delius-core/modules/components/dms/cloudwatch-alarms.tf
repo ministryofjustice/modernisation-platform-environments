@@ -106,6 +106,16 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   tags = var.tags
 }
 
+resource "aws_dms_event_subscription" "dms_task_event_subscription" {
+  name       = "dms-task-event-alerts"
+  sns_topic_arn = aws_sns_topic.dms_alerting.arn
+  source_type   = "replication-task"
+
+  # We do not filter by event type or replication task as we wish
+  # to be notified by any event on any replication task
+  enabled = true
+}
+
 # Pager duty integration
 
 # Get the map of pagerduty integration keys from the modernisation platform account
