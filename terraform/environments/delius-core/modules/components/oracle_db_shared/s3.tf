@@ -207,37 +207,44 @@ resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
   )
 }
 
+module "s3_bucket_oracledb_backups_inventory" {
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  bucket_name         = "${local.oracle_backup_bucket_prefix}-inventory"
+  versioning_enabled  = false
+  ownership_controls  = "BucketOwnerEnforced"
+  replication_enabled = false
+  custom_kms_key      = var.account_config.kms_keys.general_shared
+  bucket_policy       = [data.aws_iam_policy_document.oracledb_backups_inventory.json]
 
-# encrypting s3 bucket with our shared key (trivy scan)
-resource "aws_s3_bucket_server_side_encryption_configuration" "oracledb_backups_inventory" {
-  bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
-  rule {
-    apply_server_side_encryption_by_default {
-      kms_master_key_id = var.account_config.kms_keys.general_shared
-      sse_algorithm     = "aws:kms"
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 90
+          storage_class = "STANDARD_IA"
+        }
+      ]
+
+      expiration = {
+        days = 365
+      }
     }
-  }
-}
+  ]
 
-resource "aws_s3_bucket_versioning" "s3_bucket_oracledb_backups_inventory" {
-
-  bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
-  versioning_configuration {
-    status = "Suspended"
-  }
-}
-
-
-data "aws_caller_identity" "current" {
-}
-
-resource "aws_s3_bucket_public_access_block" "oracledb_backups_inventory" {
-
-  bucket                  = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
-  block_public_acls       = true # Block public access to buckets and objects granted through *new* access control lists (ACLs)
-  ignore_public_acls      = true # Block public access to buckets and objects granted through any access control lists (ACLs)
-  block_public_policy     = true # Block public access to buckets and objects granted through new public bucket or access point policies
-  restrict_public_buckets = true # Block public and cross-account access to buckets and objects through any public bucket or access point policies
+  tags = var.tags
 }
 
 data "aws_iam_policy_document" "oracledb_backups_inventory" {
@@ -274,13 +281,6 @@ data "aws_iam_policy_document" "oracledb_backups_inventory" {
   }
 }
 
-
-resource "aws_s3_bucket_policy" "oracledb_backups_inventory_policy" {
-
-  bucket = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.id
-  policy = data.aws_iam_policy_document.oracledb_backups_inventory.json
-}
-
 resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
 
   bucket = module.s3_bucket_oracledb_backups.bucket.id
@@ -297,7 +297,7 @@ resource "aws_s3_bucket_inventory" "oracledb_backup_pieces" {
   destination {
     bucket {
       format     = "CSV"
-      bucket_arn = aws_s3_bucket.s3_bucket_oracledb_backups_inventory.arn
+      bucket_arn = module.s3_bucket_oracledb_backups_inventory.bucket.arn
     }
   }
 }

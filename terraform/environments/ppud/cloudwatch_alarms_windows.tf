@@ -571,8 +571,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_iisadmin_rgvw019" {
   alarm_description   = "This metric monitors the iis admin service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-0dba6054c0f5f7a11"
-    Service    = "IISAdminService"
+    Instance = "i-0dba6054c0f5f7a11"
+    Service  = "IISAdminService"
   }
 }
 
@@ -591,8 +591,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_iisadmin_rgvw020" {
   alarm_description   = "This metric monitors the iis admin service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-014bce95a85aaeede"
-    Service    = "IISAdminService"
+    Instance = "i-014bce95a85aaeede"
+    Service  = "IISAdminService"
   }
 }
 
@@ -613,8 +613,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw019" {
   alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-0dba6054c0f5f7a11"
-    Service    = "WorldWideWebPublishingService"
+    Instance = "i-0dba6054c0f5f7a11"
+    Service  = "WorldWideWebPublishingService"
   }
 }
 
@@ -633,8 +633,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw020" {
   alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-014bce95a85aaeede"
-    Service    = "WorldWideWebPublishingService"
+    Instance = "i-014bce95a85aaeede"
+    Service  = "WorldWideWebPublishingService"
   }
 }
 
@@ -653,8 +653,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw022" {
   alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-029d2b17679dab982"
-    Service    = "WorldWideWebPublishingService"
+    Instance = "i-029d2b17679dab982"
+    Service  = "WorldWideWebPublishingService"
   }
 }
 
@@ -673,8 +673,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgsw025" {
   alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-00413756d2dfcf6d2"
-    Service    = "WorldWideWebPublishingService"
+    Instance = "i-00413756d2dfcf6d2"
+    Service  = "WorldWideWebPublishingService"
   }
 }
 
@@ -693,8 +693,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw027" {
   alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-00cbccc46d25e77c6"
-    Service    = "WorldWideWebPublishingService"
+    Instance = "i-00cbccc46d25e77c6"
+    Service  = "WorldWideWebPublishingService"
   }
 }
 
@@ -713,8 +713,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw204" {
   alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-0b5ef7cb90938fb82"
-    Service    = "WorldWideWebPublishingService"
+    Instance = "i-0b5ef7cb90938fb82"
+    Service  = "WorldWideWebPublishingService"
   }
 }
 
@@ -733,8 +733,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_www_publishing_rgvw205" {
   alarm_description   = "This metric monitors the www publishing service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-04bbb6312b86648be"
-    Service    = "WorldWideWebPublishingService"
+    Instance = "i-04bbb6312b86648be"
+    Service  = "WorldWideWebPublishingService"
   }
 }
 
@@ -755,8 +755,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_printer_spooler_rgvw022" 
   alarm_description   = "This metric monitors the printer spooler service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-029d2b17679dab982"
-    Service    = "PrintSpooler"
+    Instance = "i-029d2b17679dab982"
+    Service  = "PrintSpooler"
   }
 }
 
@@ -775,8 +775,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_printer_spooler_rgvw027" 
   alarm_description   = "This metric monitors the printer spooler service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-00cbccc46d25e77c6"
-    Service    = "PrintSpooler"
+    Instance = "i-00cbccc46d25e77c6"
+    Service  = "PrintSpooler"
   }
 }
 
@@ -797,8 +797,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_rgvw021" {
   alarm_description   = "This metric monitors the SQL server service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-080498c4c9d25e6bd"
-    Service    = "SQLServer(MSSQLSERVER)"
+    Instance = "i-080498c4c9d25e6bd"
+    Service  = "SQLServer(MSSQLSERVER)"
   }
 }
 
@@ -817,8 +817,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_writer_rgvw021
   alarm_description   = "This metric monitors the SQL server writer service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-080498c4c9d25e6bd"
-    Service    = "SQLServerVSSWriter"
+    Instance = "i-080498c4c9d25e6bd"
+    Service  = "SQLServerVSSWriter"
   }
 }
 
@@ -837,8 +837,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_agent_rgvw021"
   alarm_description   = "This metric monitors the SQL server agent service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-080498c4c9d25e6bd"
-    Service    = "SQLServerAgent(MSSQLSERVER)"
+    Instance = "i-080498c4c9d25e6bd"
+    Service  = "SQLServerAgent(MSSQLSERVER)"
   }
 }
 
@@ -857,7 +857,7 @@ resource "aws_cloudwatch_metric_alarm" "service_status_sql_server_backup_status_
   alarm_description   = "This metric monitors the SQL server backup status. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-080498c4c9d25e6bd"
+    Instance = "i-080498c4c9d25e6bd"
   }
 }
 
@@ -878,8 +878,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw019" {
   alarm_description   = "This metric monitors the PPUD live service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-0dba6054c0f5f7a11"
-    Service    = "PPUDAutomatedProcessesLIVE"
+    Instance = "i-0dba6054c0f5f7a11"
+    Service  = "PPUDAutomatedProcessesLIVE"
   }
 }
 
@@ -898,8 +898,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw020" {
   alarm_description   = "This metric monitors the PPUD live service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-014bce95a85aaeede"
-    Service    = "PPUDAutomatedProcessesLIVE"
+    Instance = "i-014bce95a85aaeede"
+    Service  = "PPUDAutomatedProcessesLIVE"
   }
 }
 
@@ -918,8 +918,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_ppud_live_rgvw022" {
   alarm_description   = "This metric monitors the PPUD live service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-029d2b17679dab982"
-    Service    = "PPUDAutomatedProcessesLIVE"
+    Instance = "i-029d2b17679dab982"
+    Service  = "PPUDAutomatedProcessesLIVE"
   }
 }
 
@@ -938,8 +938,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_ppud_crawler_rgvw022" {
   alarm_description   = "This metric monitors the PPUD crawler service. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-029d2b17679dab982"
-    Service    = "PPUDPDFCrawlerP4Live"
+    Instance = "i-029d2b17679dab982"
+    Service  = "PPUDPDFCrawlerP4Live"
   }
 }
 
@@ -960,8 +960,8 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw019" {
   alarm_description   = "This metric monitors the port 25 status check to the internal mail relay (rgsl200). If the metric falls to 0 [unable to connect] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-0dba6054c0f5f7a11"
-    Port       = "Port-25"
+    Instance = "i-0dba6054c0f5f7a11"
+    Port     = "Port-25"
   }
 }
 
@@ -980,8 +980,8 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw020" {
   alarm_description   = "This metric monitors the port 25 status check to the internal mail relay (rgsl200). If the metric falls to 0 [unable to connect] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-0f393d9ed4e53da68"
-    Port       = "Port-25"
+    Instance = "i-0f393d9ed4e53da68"
+    Port     = "Port-25"
   }
 }
 
@@ -1000,8 +1000,8 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw022" {
   alarm_description   = "This metric monitors the port 25 status check to the internal mail relay (rgsl200). If the metric falls to 0 [unable to connect] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-029d2b17679dab982"
-    Port       = "Port-25"
+    Instance = "i-029d2b17679dab982"
+    Port     = "Port-25"
   }
 }
 
@@ -1020,7 +1020,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw027" {
   alarm_description   = "This metric monitors the port 25 status check to the internal mail relay (rgsl200). If the metric falls to 0 [unable to connect] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-00cbccc46d25e77c6"
-    Port       = "Port-25"
+    Instance = "i-00cbccc46d25e77c6"
+    Port     = "Port-25"
   }
 }
