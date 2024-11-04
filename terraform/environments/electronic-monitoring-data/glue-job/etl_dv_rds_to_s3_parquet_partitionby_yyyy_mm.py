@@ -46,7 +46,7 @@ LOGGER = glueContext.get_logger()
 #
 #
 # NOTES-1:> If non-integer datatype or more than one value provided to 'rds_db_tbl_pkeys_col_list', the job fails.
-# NOTES-2:> 'validation_only_run' SET TO 'true' if only data validation is to be done.
+# NOTES-2:> 'validation_only_run' is to be SET TO 'true' if only data validation is to be done.
 #           Also, to skip data validation when 'validation_only_run' is 'false' is by setting 'validation_sample_fraction_float' to 0.
 # NOTES-3:> 'rds_query_where_clause' optional input rds-db-table query filter clause & is only used while fetching minimum and maximum primary-key values.
 # NOTES-4:> 'year_partition_bool' and 'month_partition_bool' are to be set 'true' if the 'year', 'month' columns are missing in RDS-Dataframe.
@@ -99,8 +99,7 @@ OPTIONAL_INPUTS = [
     "rds_query_where_clause"
 ]
 
-AVAILABLE_ARGS_LIST = CustomPysparkMethods.resolve_args(
-    DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
+AVAILABLE_ARGS_LIST = CustomPysparkMethods.resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
 
 args = getResolvedOptions(sys.argv, AVAILABLE_ARGS_LIST)
 
@@ -203,8 +202,7 @@ def write_rds_df_to_s3_parquet(df_rds_write: DataFrame,
                                                 prq_table_folder_path):
 
         LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
-        glueContext.purge_s3_path(s3_table_folder_path, options={
-                                  "retentionPeriod": 0})
+        glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
     # --------------------------------------------------------------------
 
     # catalog_db, catalog_db_tbl = prq_table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
@@ -243,20 +241,16 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     df_dv_output = CustomPysparkMethods.get_pyspark_empty_df(df_dv_output_schema)
 
     s3_table_folder_path = f"""s3://{PARQUET_OUTPUT_S3_BUCKET_NAME}/{prq_table_folder_path}"""
-    LOGGER.info(
-        f"""Parquet Source being used for comparison: {s3_table_folder_path}""")
+    LOGGER.info(f"""Parquet Source being used for comparison: {s3_table_folder_path}""")
 
-    df_parquet_read = spark.read.schema(
-        df_rds_read.schema).parquet(s3_table_folder_path)
+    df_parquet_read = spark.read.schema(df_rds_read.schema).parquet(s3_table_folder_path)
 
     rds_df_year_int_equals_to = int(args.get('rds_df_year_int_equals_to', 0))
     rds_df_month_int_equals_to = int(args.get('rds_df_month_int_equals_to', 0))
     if rds_df_year_int_equals_to != 0:
-        df_parquet_read = df_parquet_read.where(
-            f"""year = {rds_df_year_int_equals_to}""")
+        df_parquet_read = df_parquet_read.where(f"""year = {rds_df_year_int_equals_to}""")
     if rds_df_month_int_equals_to != 0:
-        df_parquet_read = df_parquet_read.where(
-            f"""month = {rds_df_month_int_equals_to}""")
+        df_parquet_read = df_parquet_read.where(f"""month = {rds_df_month_int_equals_to}""")
 
     df_compare_columns_list = [col for col in df_parquet_read.columns
                                if col not in ['year', 'month', 'day']]
@@ -265,12 +259,12 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                 .select(*df_compare_columns_list)
 
     df_parquet_read_sample_t1 = df_parquet_read_sample.selectExpr(
-        *CustomPysparkMethods.get_nvl_select_list(
-            df_parquet_read_sample,
-            rds_jdbc_conn_obj,
-            rds_db_table_name
-        )
-    )
+                                                        *CustomPysparkMethods.get_nvl_select_list(
+                                                            df_parquet_read_sample,
+                                                            rds_jdbc_conn_obj,
+                                                            rds_db_table_name
+                                                        )
+                                )
 
     validation_sample_df_repartition_num = int(args['validation_sample_df_repartition_num'])
     if validation_sample_df_repartition_num != 0:
@@ -454,12 +448,10 @@ if __name__ == "__main__":
     # -------------------------------------------------------
 
     if db_sch_tbl not in rds_sqlserver_db_tbl_list:
-        LOGGER.error(
-            f"""'{db_sch_tbl}' - is not an existing table! Exiting ...""")
+        LOGGER.error(f"""'{db_sch_tbl}' - is not an existing table! Exiting ...""")
         sys.exit(1)
     else:
-        LOGGER.info(
-            f""">> Given RDS SqlServer-DB Table: {rds_sqlserver_db_table} <<""")
+        LOGGER.info(f""">> Given RDS SqlServer-DB Table: {rds_sqlserver_db_table} <<""")
     # -------------------------------------------------------
 
     if args.get('rds_db_tbl_pkeys_col_list', None) is None:
@@ -505,8 +497,7 @@ if __name__ == "__main__":
             args['month_partition_bool'] == 'true' or
             rds_df_year_int_equals_to != 0 or
             rds_df_month_int_equals_to != 0):
-        LOGGER.error(
-            f""">> 'date_partition_column_name' input not given ! <<""")
+        LOGGER.error(f""">> 'date_partition_column_name' input not given ! <<""")
         sys.exit(1)
 
     # Note:> 'rds_df_year_int_equals_to', 'rds_df_month_int_equals_to' are mandatory if 'rds_query_where_clause' is given
@@ -644,8 +635,10 @@ if __name__ == "__main__":
 
     validation_only_run = args['validation_only_run']
 
+    validation_sample_fraction_float = float(args.get('validation_sample_fraction_float', 0))
     if validation_only_run != "true":
-        df_rds_read = df_rds_read.cache()
+        if validation_sample_fraction_float != 0:
+            df_rds_read = df_rds_read.cache()
 
         # Note: If many small size parquet files are created for each partition,
         # consider using 'orderBy', 'coalesce' features appropriately before writing dataframe into S3 bucket.
@@ -661,8 +654,6 @@ if __name__ == "__main__":
     else:
         LOGGER.info(f"""** validation_only_run = '{validation_only_run}' **""")
     # -----------------------------------------------
-
-    validation_sample_fraction_float = float(args.get('validation_sample_fraction_float', 0))
 
     if validation_sample_fraction_float != 0:
         LOGGER.info(
