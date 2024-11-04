@@ -145,7 +145,7 @@ resource "aws_ecs_service" "ecs_service" {
   force_new_deployment              = true
 
   deployment_minimum_healthy_percent = 50
-  deployment_maximum_percent         = 200  
+  deployment_maximum_percent         = 200
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.chaps.name

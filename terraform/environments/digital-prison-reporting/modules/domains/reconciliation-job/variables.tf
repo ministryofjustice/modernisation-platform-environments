@@ -138,5 +138,5 @@ variable "job_schedule" {
 variable "enable_spark_ui" {
   type        = string
   default     = "true"
-  description = "UI Enabled by default, override with False"  
+  description = "UI Enabled by default, override with False"
 }

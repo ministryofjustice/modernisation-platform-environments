@@ -25,7 +25,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   timeout                        = 30
   reserved_concurrent_executions = 5
   code_signing_config_arn        = "arn:aws:lambda:eu-west-2:075585660276:code-signing-config:csc-0c7136ccff2de748f"
-  depends_on = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
   environment {
     variables = {
       EXPIRY_DAYS   = "45",
