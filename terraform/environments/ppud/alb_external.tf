@@ -83,6 +83,7 @@ resource "aws_lb_target_group_attachment" "PPUD-PORTAL-1" {
 
 # WAM Internet Facing ALB
 
+  #tfsec:ignore:Load-balancer-is-exposed-publicly "The load balancer is internet facing by design."
 resource "aws_lb" "WAM-ALB" {
   # checkov:skip=CKV2_AWS_28: "ALB is already protected by WAF"
   # checkov:skip=CKV_AWS_152: "ALB target groups only have 2 targets so cross zone load balancing is not required"
