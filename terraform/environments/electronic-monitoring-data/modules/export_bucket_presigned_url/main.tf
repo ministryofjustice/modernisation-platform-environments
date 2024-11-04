@@ -124,7 +124,7 @@ module "encrypt_zip_lambda" {
   function_name    = "push_data_export_to_${var.export_destination}"
   role_name        = aws_iam_role.encrypt_zip_lambda.name
   role_arn         = aws_iam_role.encrypt_zip_lambda.arn
-  handler          = "encrypt_zip_lambda.handler"
+  handler          = "encrypt_zip_file.handler"
   source_code_hash = data.archive_file.encrypt_zip_file.output_base64sha256
   timeout          = 900
   memory_size      = 1024
