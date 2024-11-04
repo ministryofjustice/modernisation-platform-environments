@@ -503,7 +503,7 @@ if __name__ == "__main__":
     if date_partition_column_name is None and (
             args['year_partition_bool'] == 'true' or
             args['month_partition_bool'] == 'true' or
-        rds_df_year_int_equals_to != 0 or
+            rds_df_year_int_equals_to != 0 or
             rds_df_month_int_equals_to != 0):
         LOGGER.error(
             f""">> 'date_partition_column_name' input not given ! <<""")
@@ -580,6 +580,7 @@ if __name__ == "__main__":
             partition_by_cols.append("year")
 
             if rds_df_year_int_equals_to != 0:
+                LOGGER.info(f"""rds_df_year_int_equals_to = {rds_df_year_int_equals_to}""")
                 df_rds_read = df_rds_read.where(f"""year = {rds_df_year_int_equals_to}""")
             # ----------------------------------------------------------------------------
         # --------------------------------------------------------------------------------
@@ -589,6 +590,7 @@ if __name__ == "__main__":
             partition_by_cols.append("month")
 
             if rds_df_month_int_equals_to != 0:
+                LOGGER.info(f"""rds_df_month_int_equals_to = {rds_df_month_int_equals_to}""")
                 df_rds_read = df_rds_read.where(f"""month = {rds_df_month_int_equals_to}""")
             # ----------------------------------------------------------------------------
         # --------------------------------------------------------------------------------
@@ -632,11 +634,13 @@ if __name__ == "__main__":
     # ---------------------------------------
 
     prq_table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_db_table_name}"""
+    LOGGER.info(f"""prq_table_folder_path = {prq_table_folder_path}""")
+
     total_files, total_size = S3Methods.get_s3_folder_info(PARQUET_OUTPUT_S3_BUCKET_NAME,
                                                            prq_table_folder_path)
-    msg_part_1 = f"""total_files={total_files}"""
-    msg_part_2 = f"""total_size_mb={total_size/1024/1024:.2f}"""
-    LOGGER.info(f"""'{prq_table_folder_path}': {msg_part_1}, {msg_part_2}""")
+    msg_part_1 = f"""> total_files={total_files}"""
+    msg_part_2 = f"""> total_size_mb={total_size/1024/1024:.2f}"""
+    LOGGER.info(f"""{msg_part_1}, {msg_part_2}""")
 
     validation_only_run = args['validation_only_run']
 
@@ -663,6 +667,7 @@ if __name__ == "__main__":
     if validation_sample_fraction_float != 0:
         LOGGER.info(
             f"""Validating {validation_sample_fraction_float}-sample rows from the migrated data.""")
+        # The below function runs a 'leftsemi' join between RDS-DB-Table Dataframe and the Parquet-Dataframe
         df_dv_output = compare_rds_parquet_samples(rds_jdbc_conn_obj,
                                                    rds_sqlserver_db_table,
                                                    df_rds_read,
