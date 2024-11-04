@@ -120,7 +120,7 @@ data "archive_file" "encrypt_zip_file" {
 
 module "encrypt_zip_lambda" {
   source           = "../lambdas"
-  filename         = "lambdas/get_metadata_from_rds.zip"
+  filename         = "lambdas/encrypt_zip_file.zip"
   function_name    = "push_data_export_to_${var.export_destination}"
   role_name        = aws_iam_role.encrypt_zip_lambda.name
   role_arn         = aws_iam_role.encrypt_zip_lambda.arn
