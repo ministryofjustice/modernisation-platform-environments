@@ -168,15 +168,15 @@ data "aws_iam_policy_document" "encrypt_zip_lambda" {
   }
 }
 
-resource "aws_iam_policy" "push_lambda" {
+resource "aws_iam_policy" "encrypt_zip_lambda" {
   name        = "${var.export_destination}_export_bucket_files_policy"
   description = "Policy for Lambda to create encrypted zip file"
-  policy      = data.aws_iam_policy_document.push_lambda.json
+  policy      = data.aws_iam_policy_document.encrypt_zip_lambda.json
 }
 
-resource "aws_iam_role_policy_attachment" "push_lambda" {
-  role       = aws_iam_role.push_lambda.name
-  policy_arn = aws_iam_policy.push_lambda.arn
+resource "aws_iam_role_policy_attachment" "encrypt_zip_lambda" {
+  role       = aws_iam_role.encrypt_zip_lambda.name
+  policy_arn = aws_iam_policy.encrypt_zip_lambda.arn
 }
 
 data "aws_iam_policy_document" "lambda_assume_role" {
