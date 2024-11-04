@@ -170,8 +170,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_rgsl200" {
   alarm_description   = "This metric monitors the docker service status. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-0f393d9ed4e53da68"
-    Service    = "docker"
+    Instance = "i-0f393d9ed4e53da68"
+    Service  = "docker"
   }
 }
 
@@ -190,8 +190,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_401_cjsm" {
   alarm_description   = "This metric monitors the docker service status. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-0e8e2a182917bcf26"
-    Service    = "docker"
+    Instance = "i-0e8e2a182917bcf26"
+    Service  = "docker"
   }
 }
 
@@ -210,8 +210,8 @@ resource "aws_cloudwatch_metric_alarm" "service_status_docker_400_non_cjsm" {
   alarm_description   = "This metric monitors the docker service status. If the metric falls to 0 [not running] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-01b4cc138ac95a506"
-    Service    = "docker"
+    Instance = "i-01b4cc138ac95a506"
+    Service  = "docker"
   }
 }
 
@@ -232,7 +232,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_401_cjsm" {
   alarm_description   = "This metric monitors the port 25 status check to smtp.cjsm.net . If the metric falls to 0 [unable to connect] then the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance   = "i-0e8e2a182917bcf26"
-    Port       = "port-25"
+    Instance = "i-0e8e2a182917bcf26"
+    Port     = "port-25"
   }
 }

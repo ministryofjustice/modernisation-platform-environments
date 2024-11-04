@@ -181,7 +181,7 @@ module "create_reload_diff_job" {
   region                       = var.account_region
   account                      = var.account_id
   log_group_retention_in_days  = var.glue_log_group_retention_in_days
-  enable_spark_ui               = var.enable_spark_ui
+  enable_spark_ui              = var.enable_spark_ui
 
   tags = merge(
     var.tags,
