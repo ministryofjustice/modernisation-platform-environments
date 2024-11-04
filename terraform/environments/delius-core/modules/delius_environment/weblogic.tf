@@ -5,7 +5,7 @@ module "weblogic" {
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   certificate_arn       = aws_acm_certificate.external.arn
 
-  desired_count = 0
+  desired_count = 1
 
   container_secrets_env_specific = try(var.delius_microservice_configs.weblogic.container_secrets_env_specific, {})
   container_vars_env_specific    = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
