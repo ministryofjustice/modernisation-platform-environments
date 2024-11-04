@@ -48,6 +48,7 @@ LOGGER = glueContext.get_logger()
 # NOTES-1:> If non-integer datatype or more than one value provided to 'rds_db_tbl_pkeys_col_list', the job fails.
 # NOTES-2:> 'validation_only_run' is to be SET TO 'true' if only data validation is to be done.
 #           Also, to skip data validation when 'validation_only_run' is 'false' is by setting 'validation_sample_fraction_float' to 0.
+# NOTES-2b:> The 'validation' logic in this script expects the 'parquet' source is partitioned on 'year', 'month' consecutively.
 # NOTES-3:> 'rds_query_where_clause' optional input rds-db-table query filter clause & is only used while fetching minimum and maximum primary-key values.
 # NOTES-4:> 'add_year_partition_bool' and 'add_month_partition_bool' are to be set 'true' if the 'year', 'month' columns are missing in RDS-Dataframe.
 #         > ALSO, based on the above settings RDS-Dataframe is repartitioned by 'year' followed by 'month' captured in 'partition_by_cols'.
