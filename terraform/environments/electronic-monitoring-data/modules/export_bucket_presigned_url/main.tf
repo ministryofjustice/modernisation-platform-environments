@@ -88,3 +88,104 @@ data "aws_iam_policy_document" "this" {
     }
   }
 }
+
+resource "aws_lambda_permission" "allow_bucket" {
+  statement_id  = "AllowExecutionFromS3Bucket-${var.export_destination}"
+  action        = "lambda:InvokeFunction"
+  function_name = module.encrypt_zip_lambda.lambda_function_arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = module.this-bucket.bucket.arn
+}
+
+resource "aws_s3_bucket_notification" "bucket_notification" {
+  bucket = module.this-bucket.bucket.id
+
+  lambda_function {
+    lambda_function_arn = module.encrypt_zip_lambda.lambda_function_arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [aws_lambda_permission.allow_bucket]
+}
+
+#------------------------------------------------------------------------------
+# Encrypt lambda 
+#------------------------------------------------------------------------------
+
+data "archive_file" "encrypt_zip_file" {
+  type        = "zip"
+  source_file = "lambdas/encrypt_zip_file.py"
+  output_path = "lambdas/encrypt_zip_file.zip"
+}
+
+module "encrypt_zip_lambda" {
+  source           = "./modules/lambdas"
+  filename         = "lambdas/get_metadata_from_rds.zip"
+  function_name    = "push_data_export_to_${var.export_destination}"
+  role_name        = aws_iam_role.encrypt_zip_lambda.name
+  role_arn         = aws_iam_role.encrypt_zip_lambda.arn
+  handler          = "encrypt_zip_lambda.handler"
+  source_code_hash = data.archive_file.encrypt_zip_file.output_base64sha256
+  timeout          = 900
+  memory_size      = 1024
+  runtime          = "python3.11"
+}
+
+# module "encrypt_zip_lambda" {
+#   source                  = "../lambdas"
+#   function_name           = "push_data_export_to_${var.export_destination}"
+#   image_name              = "push_data_export"
+#   is_image                = true
+#   role_name               = aws_iam_role.encrypt_zip_lambda.name
+#   role_arn                = aws_iam_role.encrypt_zip_lambda.arn
+#   memory_size             = 1024
+#   timeout                 = 900
+#   core_shared_services_id = var.core_shared_services_id
+#   production_dev          = var.production_dev
+# }
+
+#------------------------------------------------------------------------------
+# Encrypt lambda iam role
+#------------------------------------------------------------------------------
+
+resource "aws_iam_role" "encrypt_zip_lambda" {
+  name               = "${var.export_destination}_export_bucket_files"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "encrypt_zip_lambda" {
+  statement {
+    sid    = "S3PermissionsForExportBucket"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = [
+      "${module.this-bucket.bucket.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "push_lambda" {
+  name        = "${var.export_destination}_export_bucket_files_policy"
+  description = "Policy for Lambda to create encrypted zip file"
+  policy      = data.aws_iam_policy_document.push_lambda.json
+}
+
+resource "aws_iam_role_policy_attachment" "push_lambda" {
+  role       = aws_iam_role.push_lambda.name
+  policy_arn = aws_iam_policy.push_lambda.arn
+}
+
+data "aws_iam_policy_document" "lambda_assume_role" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
