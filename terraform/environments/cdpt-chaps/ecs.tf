@@ -248,7 +248,7 @@ resource "aws_ecs_service" "chapsdotnet_service" {
 
   name                              = "chapsdotnet-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chapsdotnet_task_definition.arn
+  task_definition                   = aws_ecs_task_definition.chapsdotnet_task.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
