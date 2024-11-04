@@ -153,7 +153,7 @@ locals {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.jumpserver.config, {
-          ami_name          = "mp_WindowsServer2022_2024-*"
+          ami_name          = "hmpps_windows_server_2019_release_2024-*"
           # ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
