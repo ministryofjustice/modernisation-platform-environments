@@ -110,7 +110,10 @@ resource "aws_dms_event_subscription" "dms_task_event_subscription" {
   name       = "dms-task-event-alerts"
   sns_topic_arn = aws_sns_topic.dms_alerting.arn
   source_type   = "replication-task"
-  event_categories = ["state change", "failure"]
+  # If this is production then we expect to see starting and stopping of replication tasks
+  # as this would not be normal behaviour.
+  # For non-production this will happen nightly due to automated stop/start
+  event_categories = var.dms_config.is-production ? ["state change", "failure"] : ["failure"]
   enabled = true
 }
 
