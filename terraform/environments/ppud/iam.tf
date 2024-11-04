@@ -361,9 +361,29 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
     "Version": "2012-10-17",
     "Statement": [{
         "Effect": "Allow",
-        "Action": [ "ssm:SendCommand" ],
-        "Resource": [ "arn:aws:ssm::${local.environment_management.account_ids["ppud-development"]}:*" ] 
-      }]
+        "Action": [ 
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
+        ],
+        "Resource": [ 
+          "arn:aws:ssm::${local.environment_management.account_ids["ppud-development"]}:*"
+        ] 
+    },   
+    {
+       "Effect": "Allow",
+        "Action": [
+           "sqs:ChangeMessageVisibility",
+           "sqs:DeleteMessage",
+           "sqs:GetQueueAttributes",
+           "sqs:GetQueueUrl",
+           "sqs:ListQueueTags",
+           "sqs:ReceiveMessage",
+           "sqs:SendMessage"
+        ],
+        "Resource": [  
+           "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:*"
+        ] 
+    }]
   })
 }
 

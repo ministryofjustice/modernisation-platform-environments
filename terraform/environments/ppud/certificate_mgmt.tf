@@ -102,7 +102,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   runtime                        = "python3.8"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:172753231260:code-signing-config:csc-0db408c5170a8eba6"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:172753231260:code-signing-config:csc-0db408c5170a8eba6"
   depends_on = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
   environment {
     variables = {
@@ -180,7 +180,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   runtime                        = "python3.8"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
   depends_on = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
   environment {
     variables = {
