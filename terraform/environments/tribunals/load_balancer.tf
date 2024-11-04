@@ -23,43 +23,37 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 resource "aws_security_group" "tribunals_lb_sc" {
   name        = "tribunals-load-balancer-sg"
-  description = "control access to the load balancer"
+  description = "Control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    description = "Allow HTTPS traffic from CloudFront"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = data.aws_ec2_managed_prefix_list.cloudfront.prefix_list_cidrs
-  }
-
-  ingress {
-    description = "Allow HTTP traffic from CloudFront"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = data.aws_ec2_managed_prefix_list.cloudfront.prefix_list_cidrs
-  }
-
-  ingress {
-    description = "Allow all traffic on HTTPS port 443"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "allow all traffic on HTTP port 80"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  dynamic "ingress" {
+    for_each = {
+      "cloudfront_https" = {
+        description     = "Allow HTTPS traffic from CloudFront"
+        from_port       = 443
+        to_port         = 443
+        protocol        = "tcp"
+        prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+      },
+      "cloudfront_http" = {
+        description     = "Allow HTTP traffic from CloudFront"
+        from_port       = 80
+        to_port         = 80
+        protocol        = "tcp"
+        prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+      }
+    }
+    content {
+      description     = lookup(ingress.value, "description", null)
+      from_port       = lookup(ingress.value, "from_port", null)
+      to_port         = lookup(ingress.value, "to_port", null)
+      protocol        = lookup(ingress.value, "protocol", null)
+      prefix_list_ids = lookup(ingress.value, "prefix_list_ids", null)
+    }
   }
 
   egress {
-    description = "allow all outbound traffic from the load balancer - needed due to dynamic port mapping on ec2 instance"
+    description = "Allow all outbound traffic from the load balancer"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
