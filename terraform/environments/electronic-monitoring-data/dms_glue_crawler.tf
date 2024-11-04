@@ -21,16 +21,16 @@ resource "aws_glue_connection" "glue_rds_sqlserver_db_connection" {
   )
 }
 
-resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
-  name = "rds_sqlserver_dms"
-  # create_table_default_permission {
-  #   permissions = ["SELECT"]
+# resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
+#   name = "rds_sqlserver_dms"
+#   # create_table_default_permission {
+#   #   permissions = ["SELECT"]
 
-  #   principal {
-  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
-  #   }
-  # }
-}
+#   #   principal {
+#   #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+#   #   }
+#   # }
+# }
 
 resource "aws_glue_crawler" "rds_sqlserver_db_glue_crawler" {
   name          = "rds-sqlserver-${aws_db_instance.database_2022.identifier}-tf"
