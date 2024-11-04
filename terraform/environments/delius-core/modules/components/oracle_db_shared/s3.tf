@@ -208,7 +208,7 @@ resource "aws_s3_bucket" "s3_bucket_oracledb_backups_inventory" {
 }
 
 module "s3_bucket_oracledb_backups_inventory" {
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.0"
   bucket_name         = "${local.oracle_backup_bucket_prefix}-inventory"
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
