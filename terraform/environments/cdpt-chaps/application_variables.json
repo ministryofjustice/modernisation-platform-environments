@@ -15,7 +15,8 @@
       "ec2_min_size": 1,
       "instance_type": "t3.large",
       "container_port": 80,
-      "client_id": "aa335a21-40a9-45a0-b0ef-16d65584b024"
+      "client_id": "aa335a21-40a9-45a0-b0ef-16d65584b024",
+      "create_chapsdotnet": "false"
     },
     "preproduction": {
       "db_instance_class": "db.t3.2xlarge",
