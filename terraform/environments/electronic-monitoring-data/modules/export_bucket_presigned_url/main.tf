@@ -61,15 +61,11 @@ module "this-bucket" {
 }
 
 resource "aws_s3_bucket_policy" "this" {
-  count = var.allowed_ips != null ? 1 : 0
-
   bucket = module.this-bucket.bucket.id
-  policy = data.aws_iam_policy_document.this[0].json
+  policy = data.aws_iam_policy_document.this.json
 }
 
 data "aws_iam_policy_document" "this" {
-  count = var.allowed_ips != null ? 1 : 0
-
   statement {
     sid     = "AllowedIPs"
     effect  = "Deny"
