@@ -80,7 +80,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   container_definitions    = jsonencode([
     {
       name         = "chaps-container"
-      image        = "${local.ecr_url}:${local.application_data.accounts[local.environment].environment_name}"
+      image        = "${local.ecr_url}:chaps-${local.application_data.accounts[local.environment].environment_name}"
       cpu          = 1024
       memory       = 2048
       essential    = true
@@ -139,7 +139,7 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
   container_definitions    = jsonencode([
     {
       name         = "chapsdotnet-container"
-      image        = "${local.ecr_url}:${local.application_data.accounts[local.environment].environment_name}"
+      image        = "${local.ecr_url}:chapsdotnet-${local.application_data.accounts[local.environment].environment_name}"
       cpu          = 1024
       memory       = 2048
       essential    = true
