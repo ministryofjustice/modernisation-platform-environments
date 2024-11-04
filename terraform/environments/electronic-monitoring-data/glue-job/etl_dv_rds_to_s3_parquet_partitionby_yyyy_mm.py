@@ -491,14 +491,6 @@ if __name__ == "__main__":
 
     rds_df_year_int_equals_to = int(args.get('rds_df_year_int_equals_to', 0))
     rds_df_month_int_equals_to = int(args.get('rds_df_month_int_equals_to', 0))
-    date_partition_column_name = args.get('date_partition_column_name', None)
-    if date_partition_column_name is None and (
-            args['year_partition_bool'] == 'true' or
-            args['month_partition_bool'] == 'true' or
-            rds_df_year_int_equals_to != 0 or
-            rds_df_month_int_equals_to != 0):
-        LOGGER.error(f""">> 'date_partition_column_name' input not given ! <<""")
-        sys.exit(1)
 
     # Note:> 'rds_df_year_int_equals_to', 'rds_df_month_int_equals_to' are mandatory if 'rds_query_where_clause' is given
     # Note:> 'rds_df_year_int_equals_to', 'rds_df_month_int_equals_to' used in RDS-DB-Table and Parquet Dataframe(s) filetrs.
@@ -560,9 +552,11 @@ if __name__ == "__main__":
     LOGGER.info(
         f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
 
-
     rds_read_columns = df_rds_read.columns
-    
+    LOGGER.info(f"""rds_read_columns = {rds_read_columns}""")
+
+    date_partition_column_name = args.get('date_partition_column_name', None)
+
     # Add 'YEAR', 'MONTH', 'DAY' columns to the dataframe.
     if date_partition_column_name is not None:
         LOGGER.info(f"""date_partition_column_name = {date_partition_column_name}""")
@@ -585,7 +579,7 @@ if __name__ == "__main__":
     else:
         LOGGER.warn(f""">> 'date_partition_column_name' input not given <<""")
     # ----------------------------------------------------
-    
+
     partition_by_cols = list()
 
     if 'year' in rds_read_columns:
@@ -594,8 +588,7 @@ if __name__ == "__main__":
             LOGGER.info(f"""rds_df_year_int_equals_to = {rds_df_year_int_equals_to}""")
             df_rds_read = df_rds_read.where(f"""year = {rds_df_year_int_equals_to}""")
     else:
-        LOGGER.error(
-                f""">> 'year' column missing in 'df_rds_read'-dataframe <<""")
+        LOGGER.error(f""">> 'year' column missing in 'df_rds_read'-dataframe <<""")
         sys.exit(1)
     # ----------------------------------------------------------------------------
 
@@ -605,8 +598,7 @@ if __name__ == "__main__":
             LOGGER.info(f"""rds_df_month_int_equals_to = {rds_df_month_int_equals_to}""")
             df_rds_read = df_rds_read.where(f"""month = {rds_df_month_int_equals_to}""")
     else:
-        LOGGER.error(
-                f""">> 'month' column missing in 'df_rds_read'-dataframe <<""")
+        LOGGER.error(f""">> 'month' column missing in 'df_rds_read'-dataframe <<""")
         sys.exit(1)
     # ----------------------------------------------------------------------------
 
