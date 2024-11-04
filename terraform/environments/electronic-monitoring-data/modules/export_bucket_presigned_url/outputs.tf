@@ -1,4 +1,7 @@
-output "bucket" {
-  value = module.this-bucket.default
-  description = "Direct aws_s3_bucket resource with all attributes"
+output "bucket_id" {
+  value = module.this-bucket.bucket.id
+}
+
+output "bucket_arn" {
+  value = module.this-bucket.bucket.arn
 }

@@ -154,7 +154,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
       "s3:PutObject"
     ]
     resources = [
-      "${module.s3-serco-export-bucket.bucket.arn}/*"
+      "${module.s3-serco-export-bucket.bucket_arn}/*"
     ]
   }
 }
