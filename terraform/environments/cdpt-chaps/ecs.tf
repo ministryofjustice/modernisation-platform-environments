@@ -131,6 +131,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
 }
 
 resource "aws_ecs_task_definition" "chapsdotnet_task" {
+  count = local.application_data.accounts[local.environment].create_chapsdotnet ? 1 : 0
   family                   = "chapsdotnet-family"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
@@ -242,6 +243,7 @@ resource "aws_ecs_service" "chaps_service" {
 }
 
 resource "aws_ecs_service" "chapsdotnet_service" {
+  count = local.application_data.accounts[local.environment].create_chapsdotnet ? 1 : 0
   depends_on = [
     aws_lb_listener.https_listener
   ]
