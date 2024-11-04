@@ -86,7 +86,7 @@ resource "aws_kms_key_policy" "kms_key_policy" {
 }
 
 resource "aws_kms_key" "this_log_key" {
-  description         = "KMS key for encrypting Step Functions logs"
+  description         = "KMS key for encrypting Step Function ${var.name} logs"
   enable_key_rotation = true
 }
 
