@@ -71,8 +71,8 @@ data "aws_iam_policy_document" "this" {
     effect  = "Deny"
     actions = ["s3:*"]
     resources = [
-      aws_s3_bucket.default.arn,
-      "${aws_s3_bucket.default.arn}/*"
+      module.this-bucket.bucket.arn,
+      "${module.this-bucket.bucket.arn}/*"
     ]
     principals {
       identifiers = ["*"]
