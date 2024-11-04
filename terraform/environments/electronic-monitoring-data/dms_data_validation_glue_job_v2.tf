@@ -351,8 +351,8 @@ resource "aws_glue_job" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
     "--jdbc_read_2gb_partitions"             = "false"
     "--jdbc_read_partition_num"              = 1
     "--rename_migrated_prq_tbl_folder"       = ""
-    "--year_partition_bool"                  = "false"
-    "--month_partition_bool"                 = "false"
+    "--add_year_partition_bool"              = "false"
+    "--add_month_partition_bool"             = "false"
     "--validation_only_run"                  = "false"
     "--rds_df_year_int_equals_to"            = 0
     "--rds_df_month_int_equals_to"           = 0

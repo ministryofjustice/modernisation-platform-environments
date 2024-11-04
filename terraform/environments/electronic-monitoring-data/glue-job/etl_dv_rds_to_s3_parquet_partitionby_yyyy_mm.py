@@ -49,7 +49,7 @@ LOGGER = glueContext.get_logger()
 # NOTES-2:> 'validation_only_run' is to be SET TO 'true' if only data validation is to be done.
 #           Also, to skip data validation when 'validation_only_run' is 'false' is by setting 'validation_sample_fraction_float' to 0.
 # NOTES-3:> 'rds_query_where_clause' optional input rds-db-table query filter clause & is only used while fetching minimum and maximum primary-key values.
-# NOTES-4:> 'year_partition_bool' and 'month_partition_bool' are to be set 'true' if the 'year', 'month' columns are missing in RDS-Dataframe.
+# NOTES-4:> 'add_year_partition_bool' and 'add_month_partition_bool' are to be set 'true' if the 'year', 'month' columns are missing in RDS-Dataframe.
 #         > ALSO, based on the above settings RDS-Dataframe is repartitioned by 'year' followed by 'month' captured in 'partition_by_cols'.
 # NOTES-5:> 'jdbc_read_partition_num' OR 'rds_table_total_size_mb' WITH ANY OF THE BELOW INPUTS DEFINES JDBC-READ PARTITIONS / PARALLEL CONNECTIONS
 #        >> 'jdbc_read_256mb_partitions', jdbc_read_512mb_partitions', 'jdbc_read_1gb_partitions', 'jdbc_read_2gb_partitions' <<
@@ -59,7 +59,7 @@ LOGGER = glueContext.get_logger()
 # MANDATORY INPUTS: 'rds_db_tbl_pkeys_col_list',
 # CONDITIONAL INPUTS:
 #   1. 'date_partition_column_name' MANDATORY IF 'rds_df_year_int_equals_to' OR 'rds_df_month_int_equals_to' are NON-ZERO
-#   2. 'date_partition_column_name' MANDATORY IF 'year_partition_bool' OR 'month_partition_bool' are set to 'true'
+#   2. 'date_partition_column_name' MANDATORY IF 'add_year_partition_bool' OR 'add_month_partition_bool' are set to 'true'
 # DEFAULT INPUTS: {'rds_df_year_int_equals_to': 0}, {'rds_df_month_int_equals_to': 0}
 
 # ===============================================================================
@@ -84,8 +84,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_db_tbl_pkeys_col_list",
                        "rds_df_repartition_num",
                        "rds_table_total_size_mb",
-                       "year_partition_bool",
-                       "month_partition_bool",
+                       "add_year_partition_bool",
+                       "add_month_partition_bool",
                        "validation_only_run",
                        "validation_sample_fraction_float",
                        "validation_sample_df_repartition_num",
@@ -553,7 +553,7 @@ if __name__ == "__main__":
         f"""df_rds_read-{db_sch_tbl}: READ PARTITIONS = {df_rds_read.rdd.getNumPartitions()}""")
 
     rds_read_columns = df_rds_read.columns
-    LOGGER.info(f"""rds_read_columns = {rds_read_columns}""")
+    LOGGER.info(f"""1. rds_read_columns = {rds_read_columns}""")
 
     date_partition_column_name = args.get('date_partition_column_name', None)
 
@@ -561,12 +561,12 @@ if __name__ == "__main__":
     if date_partition_column_name is not None:
         LOGGER.info(f"""date_partition_column_name = {date_partition_column_name}""")
 
-        if args['year_partition_bool'] == 'true' and \
+        if args['add_year_partition_bool'] == 'true' and \
             'year' not in rds_read_columns:
             df_rds_read = df_rds_read.withColumn("year", F.year(date_partition_column_name))
         # --------------------------------------------------------------------------------
 
-        if args['month_partition_bool'] == 'true' and \
+        if args['add_month_partition_bool'] == 'true' and \
             'month' not in rds_read_columns:
             df_rds_read = df_rds_read.withColumn("month", F.month(date_partition_column_name))
         # --------------------------------------------------------------------------------
@@ -579,6 +579,9 @@ if __name__ == "__main__":
     else:
         LOGGER.warn(f""">> 'date_partition_column_name' input not given <<""")
     # ----------------------------------------------------
+
+    rds_read_columns = df_rds_read.columns
+    LOGGER.info(f"""2. rds_read_columns = {rds_read_columns}""")
 
     partition_by_cols = list()
 
