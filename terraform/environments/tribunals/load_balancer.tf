@@ -127,3 +127,53 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
   resource_arn = aws_lb.tribunals_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
 }
+
+resource "aws_cloudfront_distribution" "tribunals_distribution" {
+  origin {
+    domain_name = aws_lb.tribunals_lb.dns_name
+    origin_id   = "tribunalsLB"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols = ["TLSv1.2"]
+    }
+  }
+
+  default_cache_behavior {
+    target_origin_id = "tribunalsLB"
+
+    viewer_protocol_policy = "redirect-to-https"  // Redirect HTTP to HTTPS
+
+    allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods = ["GET", "HEAD"]
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "CloudFront distribution for tribunals load balancer"
+  price_class         = "PriceClass_All"
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+}
