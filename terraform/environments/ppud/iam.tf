@@ -368,7 +368,26 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
         "Resource": [ 
           "arn:aws:ssm::${local.environment_management.account_ids["ppud-development"]}:*"
         ] 
-    },   
+    },
+    {
+        "Effect": "Allow",
+        "Action": [ 
+           "ec2:DescribeInstances"
+        ],
+        "Resource": [ 
+           "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ] 
+    },
+    {
+        "Effect": "Allow",
+        "Action": [ 
+           "lambda:InvokeAsync",
+           "lambda:InvokeFunction"
+        ],
+        "Resource": [ 
+           "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
+        ] 
+    },
     {
        "Effect": "Allow",
         "Action": [
@@ -585,7 +604,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
             "Sid":"LambdaCertificateExpiryPolicy1",
             "Effect": "Allow",
             "Action": "logs:CreateLogGroup",
-            "Resource": "arn:aws:logs:eu-west-2:075585660276:*"
+            "Resource": "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy2",
@@ -595,7 +614,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs:eu-west-2:075585660276:log-group:/aws/lambda/handle-expiring-certificates:*"
+                "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
             ]
         },
         {
@@ -608,7 +627,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                "arn:aws:acm:eu-west-2:075585660276:certificate/*"
+                "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:certificate/*"
             ]
         },
         {
@@ -616,7 +635,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
             "Effect": "Allow",
             "Action": "SNS:Publish",
             "Resource": [
-                "arn:aws:sns:eu-west-2:075585660276:*"
+                "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
             ]
         },
                {
@@ -624,7 +643,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
             "Resource": [
-                "arn:aws:cloudwatch:eu-west-2:075585660276:*"
+                "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
             ]
         },
                {
@@ -640,8 +659,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "sqs:SendMessage"
               ],
             "Resource": [
-            "arn:aws:sqs:eu-west-2:075585660276:Lambda-Queue-DEV",
-            "arn:aws:sqs:eu-west-2:075585660276:Lambda-Deadletter-Queue-DEV"
+            "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
             ]
         }
     ]
