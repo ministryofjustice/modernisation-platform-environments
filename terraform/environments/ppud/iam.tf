@@ -305,6 +305,7 @@ resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_dev" {
 EOF
 }
 
+/*
 resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
   count       = local.is-development == true ? 1 : 0
   name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_dev"
@@ -347,6 +348,25 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
     }]
   })
 }
+*/
+
+# Temporary IAM policy created to isolate parsing error seen during upload
+
+resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_dev"
+  path        = "/"
+  description = "IAM policy created to isloate parsing error seen during upload"
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [{
+        "Effect": "Allow",
+        "Action": [ "ssm:SendCommand" ],
+        "Resource": [ "arn:aws:ssm::${local.environment_management.account_ids["ppud-development"]}:*" ] 
+      }]
+  })
+}
+
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev" {
   count      = local.is-development == true ? 1 : 0
