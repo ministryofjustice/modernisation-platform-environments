@@ -17,13 +17,33 @@ resource "aws_lb" "tribunals_lb" {
   internal                   = false
 }
 
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
 resource "aws_security_group" "tribunals_lb_sc" {
   name        = "tribunals-load-balancer-sg"
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow all traffic on HTTPS port 443"
+    description = "Allow HTTPS traffic from CloudFront"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = data.aws_ec2_managed_prefix_list.cloudfront.prefix_list_id
+  }
+
+  ingress {
+    description = "Allow HTTP traffic from CloudFront"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = data.aws_ec2_managed_prefix_list.cloudfront.prefix_list_id
+  }
+
+  ingress {
+    description = "Allow all traffic on HTTPS port 443"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
