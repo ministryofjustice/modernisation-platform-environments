@@ -596,8 +596,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
   name        = "aws_iam_policy_for_terraform_aws_lambda_role_certificate_expiry_dev"
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role certificate expiry development"
-  policy      = <<EOF
-{
+  policy      = jsonencode ({
     "Version": "2012-10-17",
     "Statement": [
         {
@@ -659,12 +658,11 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "sqs:SendMessage"
               ],
             "Resource": [
-            "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
+                "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
             ]
         }
     ]
-}
-EOF
+})
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev" {
