@@ -1,6 +1,7 @@
 locals {
   account_map = {
     "electronic-monitoring-data-production" : "prod",
+    "electronic-monitoring-data-preproduction" : "prod",
     "electronic-monitoring-data-development" : "dev"
     "electronic-monitoring-data-test" : "dev"
   }
