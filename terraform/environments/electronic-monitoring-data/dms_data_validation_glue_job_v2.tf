@@ -353,7 +353,7 @@ resource "aws_glue_job" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
     "--rename_migrated_prq_tbl_folder"       = ""
     "--add_year_partition_bool"              = "false"
     "--add_month_partition_bool"             = "false"
-    "--validation_only_run"                  = "false"
+    "--validation_only_run"                  = "true"
     "--rds_df_year_int_equals_to"            = 0
     "--rds_df_month_int_equals_to"           = 0
     "--extra-py-files"                       = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
@@ -418,7 +418,7 @@ resource "aws_glue_job" "parquet_resize_or_partitionby_yyyy_mm_dd" {
     "--s3_prq_write_table_folder"        = ""
     "--primarykey_column"                = ""
     "--date_partition_column"            = ""
-    "--s3_prq_read_where_clause"         = ""
+    "--s3_prq_df_read_where_clause"      = ""
     "--year_int_equals_to"               = 0
     "--month_int_equals_to"              = 0
     "--prq_df_repartition_int"           = 0

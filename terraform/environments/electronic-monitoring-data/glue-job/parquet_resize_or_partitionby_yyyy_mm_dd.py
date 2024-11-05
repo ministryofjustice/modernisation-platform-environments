@@ -49,10 +49,6 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "s3_prq_read_db_folder",
                        "s3_prq_read_db_schema_folder",
                        "s3_prq_read_table_folder",
-                       "s3_prq_read_where_clause",
-                       "date_partition_column",
-                       "year_int_equals_to",
-                       "month_int_equals_to",
                        "add_year_partition_bool",
                        "add_month_partition_bool",
                        "s3_prq_write_table_folder",
@@ -61,7 +57,11 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        ]
 
 OPTIONAL_INPUTS = [
-    "primarykey_column"
+    "date_partition_column",
+    "s3_prq_df_read_where_clause",
+    "primarykey_column",
+    "year_int_equals_to",
+    "month_int_equals_to"
 ]
 
 AVAILABLE_ARGS_LIST = CustomPysparkMethods.resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -142,7 +142,21 @@ if __name__ == "__main__":
             if 'year' not in df_parquet_read_columns_list:
                 df_parquet_read = df_parquet_read.withColumn("year", F.year(date_partition_column))
             partition_by_cols.append("year")
+
+        if args.get("add_month_partition_bool", "false") == "true":
+            if 'month' not in df_parquet_read_columns_list:
+                df_parquet_read = df_parquet_read.withColumn("month", F.month(date_partition_column))
+            partition_by_cols.append("month")
+
+        # if args.get("add_day_partition_bool", "false") == "true":
+        #     if 'day' not in df_parquet_read_columns_list:
+        #         df_parquet_read = df_parquet_read.withColumn("day", F.dayofmonth(date_partition_column))
+        #     partition_by_cols.append("day")
+        
+    else:
+         LOGGER.warn(f""">> 'date_partition_column' input not given ! << """)
     # ----------------------------------
+    LOGGER.info(f"""partition_by_cols = {partition_by_cols}""")
 
     year_int_equals_to = int(args.get('year_int_equals_to', 0))
     if year_int_equals_to != 0:
@@ -153,13 +167,6 @@ if __name__ == "__main__":
             f"""/year={year_int_equals_to}"""
     # ----------------------------------
 
-    if date_partition_column is not None:
-        if args.get("add_month_partition_bool", "false") == "true":
-            if 'month' not in df_parquet_read_columns_list:
-                df_parquet_read = df_parquet_read.withColumn("month", F.month(date_partition_column))
-            partition_by_cols.append("month")
-    # -----------------------------------
-
     rds_df_month_int_equals_to = int(args.get('rds_df_month_int_equals_to', 0))
     if rds_df_month_int_equals_to != 0:
         df_parquet_read = df_parquet_read.where(f"""month = {rds_df_month_int_equals_to}""")
@@ -168,15 +175,6 @@ if __name__ == "__main__":
         output_partition_path = output_partition_path + \
             f"""/month={rds_df_month_int_equals_to}"""
     # --------------------------------------------------
-
-    # if date_partition_column is not None:
-    #     if args.get("add_day_partition_bool", "false") == "true":
-    #         if 'day' not in df_parquet_read_columns_list:
-    #             df_parquet_read = df_parquet_read.withColumn("day", F.dayofmonth(date_partition_column))
-    #         partition_by_cols.append("day")
-    # -----------------------------------
-
-    LOGGER.info(f"""partition_by_cols = {partition_by_cols}""")
 
     s3_prq_read_where_clause = args.get('s3_prq_read_where_clause', '').strip()
     if s3_prq_read_where_clause != '':
