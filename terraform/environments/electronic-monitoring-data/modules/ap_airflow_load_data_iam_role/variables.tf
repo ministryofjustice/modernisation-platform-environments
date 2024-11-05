@@ -1,3 +1,8 @@
+variable "environment" {
+  type        = string
+  description = "The account environment"
+}
+
 variable "name" {
   type        = string
   description = "name of the pipeline"
