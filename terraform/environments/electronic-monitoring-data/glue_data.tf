@@ -5,18 +5,6 @@ data "archive_file" "archive_file_zip_py_files" {
   output_path = "${path.module}/glue-job/glue_data_validation_lib.zip"
 }
 
-# data "aws_iam_policy_document" "lakeformation_assume_role" {
-#   statement {
-#     effect = "Allow"
-
-#     principals {
-#       identifiers = ["lakeformation.amazonaws.com"]
-#       type        = "Service"
-#     }
-
-#     actions = ["sts:AssumeRole"]
-#   }
-# }
 
 
 data "aws_iam_policy_document" "glue_assume_role" {
