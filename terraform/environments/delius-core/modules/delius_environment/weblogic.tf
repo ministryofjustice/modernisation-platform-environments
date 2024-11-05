@@ -23,7 +23,7 @@ module "weblogic" {
   microservice_lb   = aws_lb.delius_core_frontend
 
   name                       = "weblogic"
-  container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.delius_microservice_configs.weblogic.image_tag}"
+  container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
   platform_vars              = var.platform_vars
   tags                       = var.tags
   db_ingress_security_groups = []
