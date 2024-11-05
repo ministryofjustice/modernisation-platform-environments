@@ -170,6 +170,10 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
           value = "${local.application_data.accounts[local.environment].TenantId}"
         },
         {
+          name = "CallbackPath"
+          value = "/signin-oidc"
+        },
+        {
           name  = "RDS_HOSTNAME"
           value = "${aws_db_instance.database.address}"
         },
