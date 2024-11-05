@@ -81,7 +81,7 @@ sed -i '0,/infraedw/{/infraedw/d;}' /etc/hosts
 # Updating hostname file
 sed -i '1s/.*/edw/' /etc/hostname
 
-mkdir -p /stage/oracle/scripts
+mkdir -p /home/oracle/scripts
 
 # Disable firewall
 sudo /etc/init.d/iptables stop
@@ -110,27 +110,27 @@ log_group_name = $APPNAME-OracleAlerts
 log_stream_name = {instance_id}
 
 [rman_backup_log_errors]
-file = /stage/oracle/backup_logs/*_RMAN_disk_*.log
+file = /home/oracle/backup_logs/*_RMAN_disk_*.log
 log_group_name = $APPNAME-RMan
 log_stream_name = {instance_id}
 
 [rman_arch_backup_log_errors]
-file = /stage/oracle/backup_logs/*_RMAN_disk_ARCH_*.log
+file = /home/oracle/backup_logs/*_RMAN_disk_ARCH_*.log
 log_group_name = $APPNAME-RManArch
 log_stream_name = {instance_id}
 
 [db_tablespace_space_alerts]
-file = /stage/oracle/scripts/logs/freespace_alert.log
+file = /home/oracle/scripts/logs/freespace_alert.log
 log_group_name = $APPNAME-TBSFreespace
 log_stream_name = {instance_id}
 
 [db_PMON_status_alerts]
-file = /stage/oracle/scripts/logs/pmon_status_alert.log
+file = /home/oracle/scripts/logs/pmon_status_alert.log
 log_group_name = $APPNAME-PMONstatus
 log_stream_name = {instance_id}
 
 [db_CDC_status_alerts]
-file = /stage/oracle/scripts/logs/cdc_check.log
+file = /home/oracle/scripts/logs/cdc_check.log
 log_group_name = $APPNAME-CDCstatus
 log_stream_name = {instance_id}
 EOC2
@@ -247,10 +247,10 @@ su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion 
 /oracle/software/oraInventory/orainstRoot.sh -silent
 /oracle/software/product/10.2.0/root.sh -silent
 
-# Update oracle login script
-echo "export ORACLE_SID=EDW" >> /stage/oracle/.bash_profile
-echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
-echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
+# # Update oracle login script
+# echo "export ORACLE_SID=EDW" >> /stage/oracle/.bash_profile
+# echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
+# echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
 
 #Update URL in bash profile
 sed -i '/ORACLE_HOST/c\export ORACLE_HOST=${local.application_name}.${data.aws_route53_zone.external.name}' /home/oracle/.bash_profile
@@ -317,8 +317,6 @@ grep -qxF "SQLNET.INBOUND_CONNECT_TIMEOUT = 0" /oracle/software/product/10.2.0/n
 # Add inbound connection timeout option to listener
 grep -qxF "INBOUND_CONNECT_TIMEOUT_LISTENER = 0" /oracle/software/product/10.2.0/network/admin/listener.ora || echo "INBOUND_CONNECT_TIMEOUT_LISTENER = 0" >> /oracle/software/product/10.2.0/network/admin/listener.ora
 
-
-
 mkdir -p /var/opt/oracle
 chown oracle:dba /var/opt/oracle
 chown -R oracle:dba /home/oracle/edwcreate
@@ -358,7 +356,7 @@ su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -w
 /oracle/software/product/10.2.0_owb/root.sh -silent
 
 # configure environment
-echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
+# echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
 
 #### setup_backups:
 
@@ -373,8 +371,7 @@ chmod -R 740 /home/oracle/backup*
 
 # Create /etc/cron.d/backup_cron with the cron jobs
 cat <<EOC3 > /etc/cron.d/backup_cron
-00 07 * * * /home/oracle/scripts/alert_rota.sh $APPNAME
-0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
+0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh EDW $APPNAME
 0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
@@ -413,7 +410,7 @@ chmod 644 /home/oracle/scripts/alert_rota.sh
 
 # Create /etc/cron.d/oracle_rotation with the cron jobs
 cat <<EOC5 > /etc/cron.d/oracle_rotation
-00 07 * * * oracle /home/oracle/scripts/alert_rota.sh $APPNAME
+00 07 * * * /home/oracle/scripts/alert_rota.sh $APPNAME
 * */6 * * * oracle /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/logs/cdc_check.log
 EOC5
 
@@ -426,7 +423,7 @@ chown oracle:dba /home/oracle/crecrontab.txt
 chmod 777 /home/oracle/crecrontab.txt
 su oracle -c "crontab /home/oracle/crecrontab.txt"
 
-# Download CDC scripts from S3 and set permissions
+# set permissions for CDC scripts
 chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sh
 chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
 
