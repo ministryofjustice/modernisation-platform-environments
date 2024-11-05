@@ -189,6 +189,17 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
       "${module.s3-athena-bucket.bucket.arn}/*"
     ]
   }
+
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [
+      module.s3-athena-bucket.bucket.arn
+    ]
+  }
   statement {
     effect = "Allow"
     actions = [
