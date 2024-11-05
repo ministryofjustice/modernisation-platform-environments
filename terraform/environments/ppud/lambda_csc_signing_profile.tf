@@ -46,7 +46,7 @@ resource "aws_lambda_code_signing_config" "lambda_csc_uat" {
   description = "Lambda code signing configuration for uat environment"
   allowed_publishers {
     signing_profile_version_arns = [
-      "arn:aws:signer:eu-west-2:172753231260:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002/ZYACVFPo1R"
+      "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002/ZYACVFPo1R"
     ]
   }
   policies {
