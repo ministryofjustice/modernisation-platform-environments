@@ -23,7 +23,7 @@ resource "random_string" "chaps_target_group_name" {
 }
 
   resource "aws_lb_target_group" "chapsdotnet_target_group" {
-    name = "chapsdotnet-target-group"
+    name_prefix = "chapsdotnet-target-group"
     port = 8080
     protocol = "HTTP"
     vpc_id = data.aws_vpc.shared.id 
