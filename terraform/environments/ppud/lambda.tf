@@ -30,7 +30,7 @@ resource "aws_lambda_function" "terraform_lambda_func_stop" {
   runtime                        = "python3.9"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
@@ -49,7 +49,7 @@ resource "aws_lambda_function" "terraform_lambda_func_start" {
   runtime                        = "python3.9"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_to_lambda_role]
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
@@ -200,7 +200,7 @@ resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
   runtime                        = "python3.12"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
@@ -221,7 +221,7 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
   runtime                        = "python3.12"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
@@ -324,7 +324,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_prod[0].function_name
   principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:*"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_prod" {
@@ -338,7 +338,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_prod
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
@@ -450,7 +450,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_prod[0].function_name
   principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:*"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod" {
@@ -464,7 +464,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
