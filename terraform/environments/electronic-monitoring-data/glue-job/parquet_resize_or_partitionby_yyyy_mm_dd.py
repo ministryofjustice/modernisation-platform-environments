@@ -5,10 +5,7 @@ import sys
 # from logging import getLogger
 # import pandas as pd
 
-from glue_data_validation_lib import RDSConn_Constants
 from glue_data_validation_lib import SparkSession
-from glue_data_validation_lib import Logical_Constants
-from glue_data_validation_lib import RDS_JDBC_CONNECTION
 from glue_data_validation_lib import S3Methods
 from glue_data_validation_lib import CustomPysparkMethods
 
