@@ -202,6 +202,7 @@ resource "aws_iam_role" "glue_mig_and_val_iam_role" {
     create_before_destroy = false
   }
 }
+
 # IAM role used to run the data validation glue job
 resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
   name               = "dms-dv-glue-job-tf"
