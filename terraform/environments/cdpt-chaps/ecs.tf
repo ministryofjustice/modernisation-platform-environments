@@ -609,8 +609,8 @@ resource "aws_security_group" "chapsdotnet_service" {
   vpc_id = data.aws_vpc.shared.id
 
   ingress {
-    from_port       = 5010
-    to_port         = 5010
+    from_port       = 8080
+    to_port         = 8080
     protocol        = "tcp"
     security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
