@@ -2,7 +2,7 @@ locals {
   db_userdata = <<-EOF
 #!/bin/bash
 
-# #Disable requiretty
+# Disable requiretty
 sed -i 's/^\(Defaults\s*requiretty\)/#\1/' /etc/sudoers
 
 # Redirect all output to a log file and enable debugging
@@ -11,11 +11,12 @@ set -x
 
 #### USERDATA ######
 
-#### install missing package and hostname change
-echo "---install missing package and hostname change"
+#### install missing packages
+echo "---install missing package "
 sudo yum -y install libXp.i386
 sudo yum -y install sshpass
 
+# Hostname change
 hostname edw
 echo "HOSTNAME=${local.application_name}" >> /etc/sysconfig/network
 sed -i '/aws/d' /etc/sysconfig/network
@@ -27,20 +28,28 @@ search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal
 nameserver ${local.dns_resolver_ip}" > /etc/resolv.conf
 chattr +i /etc/resolv.conf
 
-#### configure aws timesync (external ntp source)
+# DOESNT WORK IN LZ, DO WE WANT IN MP???
+#### adjust the NTP (Network Time Protocol) settings to use the AWS time sync service as the time source
 echo "---configure aws timesync (external ntp source)"
 AwsTimeSync(){
     local RHEL=$1
     local SOURCE=169.254.169.123
 
-    NtpD(){
-        local CONF=/etc/ntp.conf
-        sed -i 's/server \\S/#server \\S/g' $CONF && \
-        sed -i "20i\server $SOURCE prefer iburst" $CONF
+
+  NtpD(){
+    local CONF=/etc/ntp.conf
+    # Check if the server line already exists
+    if ! grep -q "server 169.254.169.123" $CONF; then
+        sed -i 's/server \S/#server \S/g' $CONF && \
+        sed -i "20i\server 169.254.169.123 prefer iburst" $CONF
         /etc/init.d/ntpd status >/dev/null 2>&1 \
             && /etc/init.d/ntpd restart || /etc/init.d/ntpd start
         ntpq -p
-    }
+    else
+        echo "NTP server 169.254.169.123 is already configured."
+    fi
+}
+    
     ChronyD(){
         local CONF=/etc/chrony.conf
         sed -i 's/server \\S/#server \\S/g' $CONF && \
@@ -66,9 +75,9 @@ wget -O awscliv2.zip "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
 unzip -o awscliv2.zip
 sudo ./aws/install --bin-dir /usr/local/bin --install-dir /usr/local/aws-cli --update
 
-#configure variables
+# Configure variables
 export ip4=$(/sbin/ip -o -4 addr list eth0 | awk '{print $4}' | cut -d/ -f1)
-export LOGS="${local.application_name}-EC2"
+export LOGS="${local.application_data.accounts[local.environment].edw_AppName}-EC2"
 export APPNAME="${local.application_data.accounts[local.environment].edw_AppName}"
 export ENV="${local.application_data.accounts[local.environment].edw_environment}"
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
@@ -77,6 +86,8 @@ export host="$ip4 $APPNAME-$ENV infraedw"
 echo $host >>/etc/hosts
 sed -i '/^10.221/d' /etc/hosts
 sed -i '0,/infraedw/{/infraedw/d;}' /etc/hosts
+
+mkdir -p /home/oracle/scripts
 
 # Updating hostname file
 sed -i '1s/.*/edw/' /etc/hostname
@@ -103,6 +114,11 @@ mkdir -p /tmp/cwlogs
 cat > /tmp/cwlogs/logstreams.conf <<-EOC2
 [general]
 state_file = /var/awslogs/agent-state
+
+[cfn-init]
+file = /var/log/cfn-init.log
+log_group_name = $APPNAME-CfnInit
+log_stream_name = {instance_id}
 
 [oracle_alert_log_errors]
 file = /oracle/software/product/10.2.0/admin/$APPNAME/bdump/alert_$APPNAME.log
@@ -135,18 +151,22 @@ log_group_name = $APPNAME-CDCstatus
 log_stream_name = {instance_id}
 EOC2
 
+sudo chmod 755 /home/oracle/backup_logs
+sudo chmod 755 /home/oracle/scripts/logs
+sudo chmod 755 /etc/awslogs
+sudo chmod 755 /tmp/cwlogs
+
 ##### METADATA #####
 
 # #### Install_aws_logging
-
+#  Very difficult to install aws logs due to outdated system so logstream does not work
 # echo "---Install_aws_logging"
-
 # #Install AWS logs
-
 # Does not work in LZ, need to fix in next ticket
 # echo "---Install AWS logging"
-# sudo yum install wget openssl-devel bzip2-devel libffi-devel -y
-# wget https://amazoncloudwatch-agent.s3.amazonaws.com/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+# sudo yum install wget openssl-devel bzip2-devel libffi-devel python-pip libpython-dev python-devel libpython-dev which initscripts cronie -y
+# curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O
+# curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/AgentDependencies.tar.gz -O
 # sudo yum update rpm
 
 #### setup_file_systems
@@ -188,30 +208,30 @@ echo "---setup_oracle_db_software"
 # Install wget / unzip
 yum install -y unzip
 
-# #### Create DBA user (only if it doesn't already exist)
-# # Check if the dba group exists
-# if ! getent group dba > /dev/null; then
-#     echo "Creating group 'dba'..."
-#     groupadd dba
-# else
-#     echo "Group 'dba' already exists."
-# fi
+#### Create DBA user (only if it doesn't already exist)
+# Check if the dba group exists
+if ! getent group dba > /dev/null; then
+    echo "Creating group 'dba'..."
+    groupadd dba
+else
+    echo "Group 'dba' already exists."
+fi
 
-# # Check if the oinstall group exists
-# if ! getent group oinstall > /dev/null; then
-#     echo "Creating group 'oinstall'..."
-#     groupadd oinstall
-# else
-#     echo "Group 'oinstall' already exists."
-# fi
+# Check if the oinstall group exists
+if ! getent group oinstall > /dev/null; then
+    echo "Creating group 'oinstall'..."
+    groupadd oinstall
+else
+    echo "Group 'oinstall' already exists."
+fi
 
-# # Check if the oracle user exists
-# if ! id -u oracle > /dev/null 2>&1; then
-#     echo "Creating user 'oracle'..."
-#     useradd -d /stage/oracle -g dba -G oinstall oracle
-# else
-#     echo "User 'oracle' already exists."
-# fi
+# Check if the oracle user exists
+if ! id -u oracle > /dev/null 2>&1; then
+    echo "Creating user 'oracle'..."
+    useradd -d /home/oracle -g dba -G oinstall oracle
+else
+    echo "User 'oracle' already exists."
+fi
 
 #setup oracle user access
 echo "---setup oracle user access"
@@ -219,7 +239,6 @@ cp -fr /home/ec2-user/.ssh /home/oracle/
 chown -R oracle:dba /home/oracle/.ssh
 
 # Create directories and set ownership
-echo "---set ownership"
 chown -R oracle:dba /oracle
 
 # Check if swap file already exists
@@ -241,16 +260,11 @@ fi
 chmod 777 /run/cfn-init/db-install-10g.rsp
 
 # Run installer and post install
-export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
-su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
+# export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
+# su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
 
-/oracle/software/oraInventory/orainstRoot.sh -silent
-/oracle/software/product/10.2.0/root.sh -silent
-
-# # Update oracle login script
-# echo "export ORACLE_SID=EDW" >> /stage/oracle/.bash_profile
-# echo "export ORACLE_HOME=/oracle/software/product/10.2.0" >> /stage/oracle/.bash_profile
-# echo "export PATH=\$ORACLE_HOME/bin:\$PATH"           >> /stage/oracle/.bash_profile
+# /oracle/software/oraInventory/orainstRoot.sh -silent
+# /oracle/software/product/10.2.0/root.sh -silent
 
 #Update URL in bash profile
 sed -i '/ORACLE_HOST/c\export ORACLE_HOST=${local.application_name}.${data.aws_route53_zone.external.name}' /home/oracle/.bash_profile
@@ -258,8 +272,8 @@ sed -i '/ORACLE_HOST/c\export ORACLE_HOST=${local.application_name}.${data.aws_r
 # patch the database to 10.2.0.4
 chown oracle:dba /home/oracle/patchset.rsp
 chmod 777 /home/oracle/patchset.rsp
-su oracle -c "/stage/patches/10204/Disk1/runInstaller -silent -responseFile /home/oracle/patchset.rsp"
-/oracle/software/product/10.2.0/root.sh -silent
+# su oracle -c "/stage/patches/10204/Disk1/runInstaller -silent -responseFile /home/oracle/patchset.rsp"
+# /oracle/software/product/10.2.0/root.sh -silent
 
 # Create a blank database
 chown oracle:dba /run/cfn-init/edw_warehouse.dbt
@@ -305,6 +319,7 @@ else
     fi
 fi
 
+#### Prevent timeout on DB
 # Add TCP keepalive time to sysctl.conf ---> keepalive solution
 echo "net.ipv4.tcp_keepalive_time = 300" >> /etc/sysctl.conf
 sysctl -p
@@ -323,7 +338,12 @@ chown -R oracle:dba /home/oracle/edwcreate
 chmod -R 777 /home/oracle/edwcreate
 chown oracle:dba /var/opt/oracle/passwds.sql
 chmod 777 /var/opt/oracle/passwds.sql
-su oracle -l -c "cp /home/oracle/edwcreate/tnsnames.ora /oracle/software/product/10.2.0/network/admin"
+if [ ! -f /oracle/software/product/10.2.0/network/admin/tnsnames.ora ]; then
+    su oracle -l -c "cp /home/oracle/edwcreate/tnsnames.ora /oracle/software/product/10.2.0/network/admin"
+    echo "tnsnames.ora copied successfully."
+else
+    echo "tnsnames.ora already exists. Skipping copy."
+fi
 sed -i "s/tst/$ENV/g" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 sed -i "0,/edw\./s/^.*edw\..*$/    (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 sed -i "0,/edw\.aws/s/^.*edw\.aws.*$/    (ADDRESS = (PROTOCOL = tcp)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
@@ -336,27 +356,18 @@ chmod -R 700 /home/oracle/scripts/
 chown oracle:dba /home/oracle
 chmod -R 777 /home/oracle
 
-#### Setup_owb
-# Create directories for OWB setup (already created in ami)
-mkdir -p /stage/owb/owb101
-mkdir -p /stage/owb/owb104
-mkdir -p /stage/owb/owb105
-
 # Set permissions for staging directory
 chmod -R 777 /stage/owb/
 
-# Install OWB components
-su oracle -l -c "/stage/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /stage/owb/owb.rsp"
-/oracle/software/product/10.2.0_owb/root.sh -silent
+# # Install OWB components
+# su oracle -l -c "/stage/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /stage/owb/owb.rsp"
+# /oracle/software/product/10.2.0_owb/root.sh -silent
 
-su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb104.rsp"
-/oracle/software/product/10.2.0_owb/root.sh -silent
+# su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb104.rsp"
+# /oracle/software/product/10.2.0_owb/root.sh -silent
 
-su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
-/oracle/software/product/10.2.0_owb/root.sh -silent
-
-# configure environment
-# echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stage/oracle/.bash_profile
+# su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
+# /oracle/software/product/10.2.0_owb/root.sh -silent
 
 #### setup_backups:
 
