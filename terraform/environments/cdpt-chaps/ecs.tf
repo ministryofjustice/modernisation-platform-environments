@@ -271,7 +271,7 @@ resource "aws_ecs_service" "chapsdotnet_service" {
   load_balancer {
     target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
     container_name   = "chapsdotnet-container"
-    container_port   = 5010
+    container_port   = 8080
   }
 
   network_configuration {
