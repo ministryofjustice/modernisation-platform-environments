@@ -183,9 +183,7 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
       "s3:ListMultipartUploadParts"
     ]
     resources = [
-      "${module.s3-data-bucket.bucket.arn}/test.csv",
-      "${module.s3-data-bucket.bucket.arn}/data/*",
-      "${module.s3-data-bucket.bucket.arn}/not-data/*",
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
       "${module.s3-athena-bucket.bucket.arn}/*"
     ]
   }
@@ -198,7 +196,7 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
     ]
     resources = [
       module.s3-athena-bucket.bucket.arn,
-      module.s3-data-bucket.bucket.arn
+      module.s3-create-a-derived-table-bucket.bucket.arn
     ]
   }
   statement {

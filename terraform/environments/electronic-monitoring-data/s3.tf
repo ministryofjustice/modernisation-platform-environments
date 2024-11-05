@@ -1133,3 +1133,107 @@ resource "aws_s3_bucket_policy" "data_store" {
   bucket = aws_s3_bucket.data_store.id
   policy = data.aws_iam_policy_document.data_store_deny_all.json
 }
+
+
+
+module "s3-create-a-derived-table-bucket" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
+
+  bucket_name        = "${local.bucket_prefix}-cadt"
+  versioning_enabled = true
+
+  # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
+  ownership_controls = "BucketOwnerEnforced"
+  acl                = "private"
+
+  # Refer to the below section "Replication" before enabling replication
+  replication_enabled = false
+  # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
+  # replication_region                       = "eu-west-2"
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+
+  log_buckets = tomap({
+    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
+    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
+    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
+  })
+  log_prefix                = "logs/cadt-store/"
+  log_partition_date_source = "EventTime"
+
+  lifecycle_rule = [
+    {
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
+
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
+
+      transition = [
+        {
+          days          = 365
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 700
+          storage_class = "GLACIER"
+        }
+      ]
+
+      expiration = {
+        days = 1000
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 30
+          storage_class = "STANDARD_IA"
+          }, {
+          days          = 90
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 365
+      }
+    }
+  ]
+
+  tags = local.tags
+}
+
+## temp set up for old s3 bucket
+#trivy:ignore:AVD-AWS-0088
+#trivy:ignore:AVD-AWS-0090
+#trivy:ignore:AVD-AWS-0132
+#trivy:ignore:s3-bucket-logging
+#tfsec:ignore:aws-s3-enable-bucket-logging
+#tfsec:ignore:aws-s3-enable-versioning
+resource "aws_s3_bucket" "data_store" {
+  #checkov:skip=CKV_AWS_145
+  #checkov:skip=CKV_AWS_144
+  #checkov:skip=CKV2_AWS_65
+  #checkov:skip=CKV2_AWS_62
+  #checkov:skip=CKV_AWS_18
+  #checkov:skip=CKV2_AWS_61
+  bucket_prefix = "em-data-store-"
+  #checkov:skip=CKV_AWS_21:Legacy bucket to be deleted
+  force_destroy = false
+  tags = {
+    "application"            = "electronic-monitoring-data"
+    "business-unit"          = "HMPPS"
+    "environment-name"       = "electronic-monitoring-data-production"
+    "infrastructure-support" = "dataengineering@digital.justice.gov.uk"
+    "is-production"          = "true"
+    "owner"                  = "Data engineering: dataengineering@digital.justice.gov.uk"
+    "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+  }
+}
