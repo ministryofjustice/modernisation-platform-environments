@@ -160,6 +160,11 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
       }
 
       environment = [
+
+        {
+          name  = "Instance"
+          value = "https://login.microsoftonline.com/"
+        },
         {
           name  = "RDS_HOSTNAME"
           value = "${aws_db_instance.database.address}"
