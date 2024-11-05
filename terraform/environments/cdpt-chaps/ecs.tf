@@ -166,6 +166,10 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
           value = "https://login.microsoftonline.com/"
         },
         {
+          name = "TenantId"
+          value = "${local.application_data.accounts[local.environment].TenantId}"
+        },
+        {
           name  = "RDS_HOSTNAME"
           value = "${aws_db_instance.database.address}"
         },
