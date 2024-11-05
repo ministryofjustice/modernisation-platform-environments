@@ -389,3 +389,70 @@ EOF
   )
 
 }
+
+
+resource "aws_cloudwatch_log_group" "parquet_resize_or_partitionby_yyyy_mm_dd" {
+  name              = "parquet-resize-or-partitionby-yyyy-mm-dd"
+  retention_in_days = 14
+}
+
+resource "aws_s3_object" "parquet_resize_or_partitionby_yyyy_mm_dd" {
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "parquet_resize_or_partitionby_yyyy_mm_dd.py"
+  source = "glue-job/parquet_resize_or_partitionby_yyyy_mm_dd.py"
+  etag   = filemd5("glue-job/parquet_resize_or_partitionby_yyyy_mm_dd.py")
+}
+
+resource "aws_glue_job" "parquet_resize_or_partitionby_yyyy_mm_dd" {
+  name              = "rparquet-resize-or-partitionby-yyyy-mm-dd"
+  description       = "Table migration & validation Glue-Job (PySpark)."
+  role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 5
+  default_arguments = {
+    "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
+    "--s3_prq_read_db_folder"            = ""
+    "--s3_prq_read_db_schema_folder"     = "dbo"
+    "--s3_prq_read_table_folder"         = ""
+    "--s3_prq_write_table_folder"        = ""
+    "--primarykey_column"                = ""
+    "--date_partition_column"            = ""
+    "--s3_prq_read_where_clause"         = ""
+    "--year_int_equals_to"               = 0
+    "--month_int_equals_to"              = 0
+    "--prq_df_repartition_int"           = 0
+    "--coalesce_int"                     = 0
+    "--add_year_partition_bool"          = "true"
+    "--add_month_partition_bool"         = "true"
+    "--extra-py-files"                   = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
+    "--s3_prq_read_bucket_name"          = module.s3-dms-target-store-bucket.bucket.id
+    "--s3_prq_write_bucket_name"         = module.s3-dms-target-store-bucket.bucket.id
+    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.parquet_resize_or_partitionby_yyyy_mm_dd.name}"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = "true"
+    "--enable-auto-scaling"              = "true"
+    "--conf"                             = <<EOF
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.sources.partitionOverwriteMode=dynamic 
+--conf spark.sql.parquet.aggregatePushdown=true 
+--conf spark.sql.files.maxPartitionBytes=512m 
+EOF
+
+  }
+
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  command {
+    python_version  = "3"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/parquet_resize_or_partitionby_yyyy_mm_dd.py"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
+}
