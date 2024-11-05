@@ -46,6 +46,16 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
     ]
     resources = ["*"]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:GenerateDataKey",
+      "kms:Decrypt"
+    ]
+    resources = [
+      aws_kms_key.this_log_key.id
+    ]
+  }
 }
 
 resource "aws_iam_policy" "step_function_base_permissions" {
