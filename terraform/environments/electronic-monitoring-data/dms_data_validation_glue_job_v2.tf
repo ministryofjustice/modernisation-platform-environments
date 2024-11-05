@@ -404,12 +404,12 @@ resource "aws_s3_object" "parquet_resize_or_partitionby_yyyy_mm_dd" {
 }
 
 resource "aws_glue_job" "parquet_resize_or_partitionby_yyyy_mm_dd" {
-  name              = "rparquet-resize-or-partitionby-yyyy-mm-dd"
+  name              = "parquet-resize-or-partitionby-yyyy-mm-dd"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
   glue_version      = "4.0"
   worker_type       = "G.1X"
-  number_of_workers = 5
+  number_of_workers = 4
   default_arguments = {
     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
     "--s3_prq_read_db_folder"            = ""
