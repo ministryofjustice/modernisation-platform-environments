@@ -35,15 +35,16 @@ resource "random_string" "chaps_target_group_name" {
     }
 
     health_check {
+      path                = "/health"
+      port                = "8080"
       healthy_threshold   = "5"
       interval            = "30"
       protocol            = "HTTP"
       unhealthy_threshold = "2"
       matcher             = "200-499"
       timeout             = "5"
-    }
 
-        lifecycle {
+    lifecycle {
     create_before_destroy = true
     ignore_changes        = [name]
   }
@@ -120,3 +121,14 @@ resource "aws_lb_listener" "https_listener" {
     type             = "forward"
   }
 }
+
+health_check {
+  path = "/health"
+  port = "8080"
+  protocol = "HTTP"
+  interval = 30
+  timeout = 5
+  healthy_threshold = 2
+  unhealthy_threshold = 2
+}
+
