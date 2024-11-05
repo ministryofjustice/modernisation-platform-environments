@@ -1209,31 +1209,3 @@ module "s3-create-a-derived-table-bucket" {
 
   tags = local.tags
 }
-
-## temp set up for old s3 bucket
-#trivy:ignore:AVD-AWS-0088
-#trivy:ignore:AVD-AWS-0090
-#trivy:ignore:AVD-AWS-0132
-#trivy:ignore:s3-bucket-logging
-#tfsec:ignore:aws-s3-enable-bucket-logging
-#tfsec:ignore:aws-s3-enable-versioning
-resource "aws_s3_bucket" "data_store" {
-  #checkov:skip=CKV_AWS_145
-  #checkov:skip=CKV_AWS_144
-  #checkov:skip=CKV2_AWS_65
-  #checkov:skip=CKV2_AWS_62
-  #checkov:skip=CKV_AWS_18
-  #checkov:skip=CKV2_AWS_61
-  bucket_prefix = "em-data-store-"
-  #checkov:skip=CKV_AWS_21:Legacy bucket to be deleted
-  force_destroy = false
-  tags = {
-    "application"            = "electronic-monitoring-data"
-    "business-unit"          = "HMPPS"
-    "environment-name"       = "electronic-monitoring-data-production"
-    "infrastructure-support" = "dataengineering@digital.justice.gov.uk"
-    "is-production"          = "true"
-    "owner"                  = "Data engineering: dataengineering@digital.justice.gov.uk"
-    "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
-  }
-}
