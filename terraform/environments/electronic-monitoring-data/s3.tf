@@ -1,13 +1,4 @@
 locals {
-  environment_map = {
-    "production"    = "prod"
-    "preproduction" = "preprod"
-    "test"          = "test"
-    "development"   = "dev"
-    "default"       = ""
-  }
-  environment_shorthand = local.environment_map[local.environment]
-
   bucket_prefix = "emds-${local.environment_shorthand}"
 }
 
