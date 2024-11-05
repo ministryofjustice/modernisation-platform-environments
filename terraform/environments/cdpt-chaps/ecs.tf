@@ -146,7 +146,7 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
       essential    = true
       portMappings = [
         {
-          containerPort = 5010
+          containerPort = 8080
           protocol      = "tcp"
         }
       ]
