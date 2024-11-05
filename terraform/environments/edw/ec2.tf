@@ -177,6 +177,7 @@ mkdir -p /stage
 mkdir -p /oracle/ar
 mkdir --p /oracle/software
 mkdir -p /oracle/temp_undo
+mkdir -p /backups
 
 # Mount all file systems in fstab
 mount -a
@@ -187,30 +188,30 @@ echo "---setup_oracle_db_software"
 # Install wget / unzip
 yum install -y unzip
 
-#### Create DBA user (only if it doesn't already exist)
-# Check if the dba group exists
-if ! getent group dba > /dev/null; then
-    echo "Creating group 'dba'..."
-    groupadd dba
-else
-    echo "Group 'dba' already exists."
-fi
+# #### Create DBA user (only if it doesn't already exist)
+# # Check if the dba group exists
+# if ! getent group dba > /dev/null; then
+#     echo "Creating group 'dba'..."
+#     groupadd dba
+# else
+#     echo "Group 'dba' already exists."
+# fi
 
-# Check if the oinstall group exists
-if ! getent group oinstall > /dev/null; then
-    echo "Creating group 'oinstall'..."
-    groupadd oinstall
-else
-    echo "Group 'oinstall' already exists."
-fi
+# # Check if the oinstall group exists
+# if ! getent group oinstall > /dev/null; then
+#     echo "Creating group 'oinstall'..."
+#     groupadd oinstall
+# else
+#     echo "Group 'oinstall' already exists."
+# fi
 
-# Check if the oracle user exists
-if ! id -u oracle > /dev/null 2>&1; then
-    echo "Creating user 'oracle'..."
-    useradd -d /stage/oracle -g dba -G oinstall oracle
-else
-    echo "User 'oracle' already exists."
-fi
+# # Check if the oracle user exists
+# if ! id -u oracle > /dev/null 2>&1; then
+#     echo "Creating user 'oracle'..."
+#     useradd -d /stage/oracle -g dba -G oinstall oracle
+# else
+#     echo "User 'oracle' already exists."
+# fi
 
 #setup oracle user access
 echo "---setup oracle user access"
@@ -304,6 +305,20 @@ else
     fi
 fi
 
+# Add TCP keepalive time to sysctl.conf ---> keepalive solution
+echo "net.ipv4.tcp_keepalive_time = 300" >> /etc/sysctl.conf
+sysctl -p
+# Add SQLNET.EXPIRE_TIME to sqlnet.ora ---> keepalive solution
+grep -qxF "SQLNET.EXPIRE_TIME = 5" /oracle/software/product/10.2.0/network/admin/sqlnet.
+# Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
+sed -i '/(DESCRIPTION =/a\\  (ENABLE=broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
+# Add inbound connection timeout option to sqlnet
+grep -qxF "SQLNET.INBOUND_CONNECT_TIMEOUT = 0" /oracle/software/product/10.2.0/network/admin/sqlnet.ora || echo "SQLNET.INBOUND_CONNECT_TIMEOUT = 0" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
+# Add inbound connection timeout option to listener
+grep -qxF "INBOUND_CONNECT_TIMEOUT_LISTENER = 0" /oracle/software/product/10.2.0/network/admin/listener.ora || echo "INBOUND_CONNECT_TIMEOUT_LISTENER = 0" >> /oracle/software/product/10.2.0/network/admin/listener.ora
+
+
+
 mkdir -p /var/opt/oracle
 chown oracle:dba /var/opt/oracle
 chown -R oracle:dba /home/oracle/edwcreate
@@ -317,11 +332,6 @@ sed -i "0,/edw\.aws/s/^.*edw\.aws.*$/    (ADDRESS = (PROTOCOL = tcp)(HOST = ${lo
 sed -i "0,/EDW/s/^.*EDW.*$/      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/listener.ora
 sed -i "s/^\(define EDW_SYS=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
 sed -i "s/^\(define EDW_SYSTEM=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
-
-# Add SQLNET.EXPIRE_TIME to sqlnet.ora ---> keepalive solution
-echo "SQLNET.EXPIRE_TIME = 5" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
-# Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
-sed -i '/(DESCRIPTION =/a\\  (ENABLE=broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 
 chown -R oracle:dba /home/oracle/scripts/
 chmod -R 700 /home/oracle/scripts/
@@ -354,7 +364,6 @@ echo "export OMB_path=/oracle/software/product/10.2.0_owb/owb/bin/unix" >> /stag
 
 # setup efs backup mount point
 mkdir -p /home/oracle/backup_logs/
-mkdir -p /backups
 mkdir -p /backups/$APPNAME_RMAN
 chmod 777 /backups/$APPNAME_RMAN
 sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh
@@ -364,8 +373,9 @@ chmod -R 740 /home/oracle/backup*
 
 # Create /etc/cron.d/backup_cron with the cron jobs
 cat <<EOC3 > /etc/cron.d/backup_cron
-0 */3 * * * oracle /home/oracle/backup_scripts/rman_arch_backup_v2_1.sh $APPNAME
-0 06 * * 01 oracle /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
+00 07 * * * /home/oracle/scripts/alert_rota.sh $APPNAME
+0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
+0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
 EOC3
@@ -422,10 +432,6 @@ chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
 
 chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sql
 chmod 744 /home/oracle/scripts/cdc_simple_health_check.sql
-
-# Add TCP keepalive time to sysctl.conf ---> keepalive solution
-echo "net.ipv4.tcp_keepalive_time = 300" >> /etc/sysctl.conf
-sysctl -p
 
 #Update send mail URL 
 echo "Update Sendmail configurations"
