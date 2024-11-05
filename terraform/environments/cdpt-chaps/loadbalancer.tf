@@ -54,8 +54,6 @@ resource "random_string" "chaps_target_group_name" {
   }
 }
 
-
-
 resource "aws_security_group" "chaps_lb_sc" {
   name        = "load balancer security group"
   description = "control access to the load balancer"
@@ -121,14 +119,3 @@ resource "aws_lb_listener" "https_listener" {
     type             = "forward"
   }
 }
-
-health_check {
-  path = "/health"
-  port = "8080"
-  protocol = "HTTP"
-  interval = 30
-  timeout = 5
-  healthy_threshold = 2
-  unhealthy_threshold = 2
-}
-
