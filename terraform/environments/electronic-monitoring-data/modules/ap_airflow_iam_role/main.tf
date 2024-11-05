@@ -1,9 +1,9 @@
 locals {
   account_map = {
-    "electronic-monitoring-data-production" : "prod",
-    "electronic-monitoring-data-preproduction" : "prod",
-    "electronic-monitoring-data-test" : "dev",
-    "electronic-monitoring-data-development" : "dev",
+    "electronic-monitoring-data-production"    = "prod"
+    "electronic-monitoring-data-preproduction" = "prod"
+    "electronic-monitoring-data-test"          = "dev"
+    "electronic-monitoring-data-development"   = "dev"
   }
   role_name = "airflow-${local.account_map[data.aws_iam_account_alias.current.account_alias]}-${var.role_name_suffix}"
 }
