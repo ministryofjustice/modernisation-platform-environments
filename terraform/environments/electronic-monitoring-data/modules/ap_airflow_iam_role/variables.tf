@@ -1,3 +1,8 @@
+variable "environment" {
+  type     = string
+  nullable = false
+}
+
 variable "role_name_suffix" {
   type     = string
   nullable = false
