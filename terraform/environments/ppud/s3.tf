@@ -114,6 +114,8 @@ resource "aws_s3_bucket_policy" "PPUD" {
 # S3 Bucket for Patch Manager / SSM Health Check Reports
 
   #tfsec:ignore:AWS0088 "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption."
+  #tfsec:ignore:AVD-AWS-0088
+  #tfsec:ignore:AVD-AWS-0132
 resource "aws_s3_bucket" "MoJ-Health-Check-Reports" {
   # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
