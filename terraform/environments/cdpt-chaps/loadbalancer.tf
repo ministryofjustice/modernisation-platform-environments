@@ -43,6 +43,7 @@ resource "random_string" "chaps_target_group_name" {
       unhealthy_threshold = "2"
       matcher             = "200-499"
       timeout             = "5"
+    }
 
     lifecycle {
     create_before_destroy = true
