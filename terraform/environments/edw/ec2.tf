@@ -82,6 +82,7 @@ export APPNAME="${local.application_data.accounts[local.environment].edw_AppName
 export ENV="${local.application_data.accounts[local.environment].edw_environment}"
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
 export EFS="${aws_efs_file_system.edw.id}"
+export SECRET=`/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db-master-password2.id} { --query SecretString --output text`
 export host="$ip4 $APPNAME-$ENV infraedw"
 echo $host >>/etc/hosts
 sed -i '/^10.221/d' /etc/hosts
@@ -151,7 +152,6 @@ log_group_name = $APPNAME-CDCstatus
 log_stream_name = {instance_id}
 EOC2
 
-sudo chmod 755 /home/oracle/backup_logs
 sudo chmod 755 /home/oracle/scripts/logs
 sudo chmod 755 /etc/awslogs
 sudo chmod 755 /tmp/cwlogs
@@ -258,12 +258,6 @@ chown -R oracle:dba /home/oracle/edwcreate
 chmod -R 777 /home/oracle/edwcreate
 chown oracle:dba /var/opt/oracle/passwds.sql
 chmod 777 /var/opt/oracle/passwds.sql
-if [ ! -f /oracle/software/product/10.2.0/network/admin/tnsnames.ora ]; then
-    su oracle -l -c "cp /home/oracle/edwcreate/tnsnames.ora /oracle/software/product/10.2.0/network/admin"
-    echo "tnsnames.ora copied successfully."
-else
-    echo "tnsnames.ora already exists. Skipping copy."
-fi
 sed -i "s/tst/$ENV/g" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 sed -i "0,/edw\./s/^.*edw\..*$/    (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 sed -i "0,/edw\.aws/s/^.*edw\.aws.*$/    (ADDRESS = (PROTOCOL = tcp)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
@@ -283,8 +277,8 @@ chmod -R 777 /stage/owb/
 
 # setup efs backup mount point
 mkdir -p /home/oracle/backup_logs/
-mkdir -p /backups/$APPNAME_RMAN
-chmod 777 /backups/$APPNAME_RMAN
+sudo mkdir -p /backups/$APPNAME_RMAN
+chmod 777 /backups/EDW_RMAN
 sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh
 sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_full_backup.sh
 chown -R oracle:dba /home/oracle/backup*
@@ -292,6 +286,7 @@ chmod -R 740 /home/oracle/backup*
 
 # Create /etc/cron.d/backup_cron with the cron jobs
 cat <<EOC3 > /etc/cron.d/backup_cron
+0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
 0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
 0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
@@ -335,10 +330,6 @@ cat /etc/cron.d/oracle_rotation >> /home/oracle/crecrontab.txt
 chown oracle:dba /home/oracle/crecrontab.txt
 chmod 777 /home/oracle/crecrontab.txt
 su oracle -c "crontab /home/oracle/crecrontab.txt"
-
-# set permissions for CDC scripts
-chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sh
-chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
 
 #Update send mail URL 
 echo "Update Sendmail configurations"
