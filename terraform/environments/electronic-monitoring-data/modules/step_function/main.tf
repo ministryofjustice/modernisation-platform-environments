@@ -6,6 +6,11 @@ resource "aws_sfn_state_machine" "this" {
   role_arn   = aws_iam_role.step_function_role.arn
   definition = templatefile("step_function_definitions/${var.name}.json.tmpl", var.variable_dictionary)
   type       = var.type
+  logging_configuration {
+    log_destination        = "${aws_cloudwatch_log_group.this_log_group.arn}:*"
+    include_execution_data = true
+    level                  = "ALL"
+  }
 }
 
 resource "aws_iam_role" "step_function_role" {
@@ -35,6 +40,7 @@ data "aws_iam_policy_document" "assume_step_function" {
   }
 }
 
+# tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "step_function_base_permissions" {
   statement {
     effect    = "Allow"
@@ -46,6 +52,30 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
     actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
     resources = [aws_kms_key.this_log_key.arn]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogDelivery",
+      "logs:CreateLogStream",
+      "logs:GetLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:ListLogDeliveries",
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies",
+      "logs:DescribeLogGroups",
+    ]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:PutDestination",
+      "logs:PutDestinationPolicy",
+      "logs:PutLogEvents"
+    ]
+    resources = ["${aws_cloudwatch_log_group.this_log_group.arn}:*"]
+  }
 }
 
 resource "aws_iam_policy" "step_function_base_permissions" {
@@ -53,6 +83,7 @@ resource "aws_iam_policy" "step_function_base_permissions" {
   policy = data.aws_iam_policy_document.step_function_base_permissions.json
 }
 
+# tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "this_log_key_document" {
   statement {
     sid    = "EnableIAMUserPermissions"
