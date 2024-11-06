@@ -19,7 +19,7 @@ echo "net.ipv4.tcp_keepalive_time = 120" >> /etc/sysctl.conf
 sysctl -p
 
 # Add SQLNET.EXPIRE_TIME to sqlnet.ora ---> keepalive solution
-echo "SQLNET.EXPIRE_TIME = 1" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
+echo "SQLNET.EXPIRE_TIME = 2" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
 
 # Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
 sed -i '/(DESCRIPTION =/a\\  (ENABLE=broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
