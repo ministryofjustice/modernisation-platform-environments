@@ -14,8 +14,6 @@ locals {
   is-test          = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
   is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
 
-  count = local.is-production || local.is-development ? 1 : 0
-  
   # Merge tags from the environment json file with additional ones
   tags = merge(
     jsondecode(data.http.environments_file.response_body).tags,
@@ -27,8 +25,8 @@ locals {
   environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
   environment_map = {
     "production"    = "prod"
-    # "preproduction" = "preprod"
-    # "test"          = "test"
+    "preproduction" = "preprod"
+    "test"          = "test"
     "development"   = "dev"
     "default"       = ""
   }
