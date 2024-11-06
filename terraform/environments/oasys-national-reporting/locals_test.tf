@@ -147,6 +147,29 @@ locals {
         })
         cloudwatch_metric_alarms = null
       })
+
+      # TODO: this is just for testing, remove when not needed
+      t2-client-asg = merge(local.ec2_instances.jumpserver, {
+        autoscaling_group = merge(local.ec2_instances.jumpserver.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_instances.jumpserver.config, {
+          instance_profile_policies = concat(local.ec2_instances.jumpserver.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-658/onr-client-3-1"
+          }))
+        })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          instance_type = "m4.large"
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          oasys-national-reporting-environment = "t2"
+        })
+        cloudwatch_metric_alarms = null
+      })
     }
 
     ec2_instances = {
