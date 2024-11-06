@@ -15,11 +15,11 @@ sed -i 's/#ClientAliveCountMax.*/ClientAliveCountMax 3/' /etc/ssh/sshd_config
 service sshd restart 
 
 # Add TCP keepalive time to sysctl.conf ---> keepalive solution
-echo "net.ipv4.tcp_keepalive_time = 300" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_keepalive_time = 120" >> /etc/sysctl.conf
 sysctl -p
 
 # Add SQLNET.EXPIRE_TIME to sqlnet.ora ---> keepalive solution
-echo "SQLNET.EXPIRE_TIME = 5" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
+echo "SQLNET.EXPIRE_TIME = 1" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
 
 # Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
 sed -i '/(DESCRIPTION =/a\\  (ENABLE=broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
