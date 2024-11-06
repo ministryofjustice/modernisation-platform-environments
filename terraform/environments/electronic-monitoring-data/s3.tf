@@ -377,7 +377,7 @@ module "s3-dms-premigrate-assess-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-json-directory-structure-bucket" {
-  count = is-preproduction ? 0 : 1
+  count = local.is-preproduction ? 0 : 1
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 

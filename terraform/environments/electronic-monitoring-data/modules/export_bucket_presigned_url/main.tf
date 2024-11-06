@@ -63,11 +63,13 @@ module "this-bucket" {
         identifiers = ["*"]
         type        = "AWS"
       }
-      conditions = {
-        test     = "NotIpAddress"
-        variable = "aws:SourceIp"
-        values   = var.allowed_ips
-      }
+      conditions = [
+        {
+          test     = "NotIpAddress"
+          variable = "aws:SourceIp"
+          values   = var.allowed_ips
+        }
+      ]
     }
   ]
   tags = merge(
