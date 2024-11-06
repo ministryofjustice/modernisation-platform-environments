@@ -140,3 +140,8 @@ module "weblogic_ssm" {
   params_secure    = local.weblogic_ssm.secrets
 }
 
+data "aws_ssm_parameter" "weblogic_ssm" {
+  for_each = toset(local.weblogic_ssm.vars)
+  name     = "/delius-core-${var.env_name}/weblogic/${each.key}"
+}
+
