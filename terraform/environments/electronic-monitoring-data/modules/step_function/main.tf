@@ -54,10 +54,16 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
   statement {
     effect = "Allow"
     actions = [
-      "logs:CreateLogGroup",
+      "logs:CreateLogDelivery",
       "logs:CreateLogStream",
+      "logs:GetLogDelivery",
+      "logs:UpdateLogDelivery",
+      "logs:DeleteLogDelivery",
+      "logs:ListLogDeliveries",
       "logs:PutLogEvents",
-      "logs:DescribeLogStreams"
+      "logs:PutResourcePolicy",
+      "logs:DescribeResourcePolicies",
+      "logs:DescribeLogGroups"
     ]
     resources = [aws_cloudwatch_log_group.this_log_group.arn]
   }
