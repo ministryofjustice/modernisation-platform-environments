@@ -32,13 +32,13 @@ locals {
 
     ec2_instances = {
       test-oem-a = merge(local.ec2_instances.oem, {
-        config = merge(local.ec2_instances.oem.config, {
-          availability_zone = "eu-west-2a"
-        })
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.oem.cloudwatch_metric_alarms,
           local.cloudwatch_metric_alarms_endpoint_monitoring
         )
+        config = merge(local.ec2_instances.oem.config, {
+          availability_zone = "eu-west-2a"
+        })
         instance = merge(local.ec2_instances.oem.instance, {
           disable_api_termination = true
         })
