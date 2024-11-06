@@ -231,15 +231,15 @@ resource "aws_ecs_service" "chaps_service" {
     weight            = 1
   }
 
-  ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
-    type  = "spread"
-  }
+  # ordered_placement_strategy {
+  #   field = "attribute:ecs.availability-zone"
+  #   type  = "spread"
+  # }
 
-  ordered_placement_strategy {
-    type  = "spread"
-    field = "instanceId"
-  }
+  # ordered_placement_strategy {
+  #   type  = "spread"
+  #   field = "instanceId"
+  # }
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
@@ -275,15 +275,15 @@ resource "aws_ecs_service" "chapsdotnet_service" {
     weight            = 1
   }
 
-  ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
-    type  = "spread"
-  }
+  # ordered_placement_strategy {
+  #   field = "attribute:ecs.availability-zone"
+  #   type  = "spread"
+  # }
 
-  ordered_placement_strategy {
-    type  = "spread"
-    field = "instanceId"
-  }
+  # ordered_placement_strategy {
+  #   type  = "spread"
+  #   field = "instanceId"
+  # }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
