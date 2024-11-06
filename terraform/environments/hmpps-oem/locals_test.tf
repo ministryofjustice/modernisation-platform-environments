@@ -6,7 +6,8 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty = "hmpps-oem-test"
+          pagerduty = "hmpps-oem-test",
+          nomis     = "nomis-test",
         }
       }
     }
@@ -36,21 +37,13 @@ locals {
           availability_zone = "eu-west-2a"
         })
         cloudwatch_metric_alarms = merge(local.ec2_instances.oem.cloudwatch_metric_alarms, {
-          "endpoint-down_c-t3.test.nomis.service.justice.gov.uk" = {
-            comparison_operator = "GreaterThanOrEqualToThreshold"
-            evaluation_periods  = "1"
-            datapoints_to_alarm = "1"
-            metric_name         = "collectd_endpoint_status_value"
-            namespace           = "CWAgent"
-            period              = "60"
-            statistic           = "Maximum"
-            threshold           = "1"
-            alarm_description   = "Triggers if curl returns error for given endpoint from this EC2"
+          "endpoint-cert-expires-soon" = module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-expires-soon
+          "endpoint-down_c-t3.test.nomis.service.justice.gov.uk" = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["nomis"].ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint_down, {
             dimensions = {
               type          = "exitcode"
               type_instance = "c-t3.test.nomis.service.justice.gov.uk"
             }
-          }
+          })
         })
         instance = merge(local.ec2_instances.oem.instance, {
           disable_api_termination = true
