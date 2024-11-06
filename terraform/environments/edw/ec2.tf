@@ -208,53 +208,8 @@ echo "---setup_oracle_db_software"
 # Install wget / unzip
 yum install -y unzip
 
-# #### Create DBA user (only if it doesn't already exist)
-# # Check if the dba group exists
-# if ! getent group dba > /dev/null; then
-#     echo "Creating group 'dba'..."
-#     groupadd dba
-# else
-#     echo "Group 'dba' already exists."
-# fi
-
-# # Check if the oinstall group exists
-# if ! getent group oinstall > /dev/null; then
-#     echo "Creating group 'oinstall'..."
-#     groupadd oinstall
-# else
-#     echo "Group 'oinstall' already exists."
-# fi
-
-# # Check if the oracle user exists
-# if ! id -u oracle > /dev/null 2>&1; then
-#     echo "Creating user 'oracle'..."
-#     useradd -d /home/oracle -g dba -G oinstall oracle
-# else
-#     echo "User 'oracle' already exists."
-# fi
-
-# #setup oracle user access
-# echo "---setup oracle user access"
-# cp -fr /home/ec2-user/.ssh /home/oracle/
-# chown -R oracle:dba /home/oracle/.ssh
-
 # Create directories and set ownership
 chown -R oracle:dba /oracle
-
-# Check if swap file already exists
-if [ ! -f /swapfile ]; then
-    echo "---Swap file does not exist. Creating swap space."
-    
-    # Create swap space
-    dd if=/dev/zero of=/swapfile bs=1024M count=9
-    chmod 600 /swapfile
-    mkswap /swapfile
-    swapon /swapfile
-    
-    echo "---Swap space created and activated."
-else
-    echo "---Swap file already exists. Skipping creation."
-fi
 
 #Update URL in bash profile
 sed -i '/ORACLE_HOST/c\export ORACLE_HOST=${local.application_name}.${data.aws_route53_zone.external.name}' /home/oracle/.bash_profile
@@ -263,45 +218,26 @@ sed -i '/ORACLE_HOST/c\export ORACLE_HOST=${local.application_name}.${data.aws_r
 chown oracle:dba /run/cfn-init/edw_warehouse.dbt
 chmod 777 /run/cfn-init/edw_warehouse.dbt
 
-# # Check if the Oracle SID is already running or if the database already exists
-# if ! ps -ef | grep "[o]ra_pmon_$APPNAME" > /dev/null; then
-#     echo "Database does not exist. Creating a new database..."
-    
-#     su oracle -l -c "dbca -silent -createDatabase \
-#         -templateName /run/cfn-init/edw_warehouse.dbt \
-#         -gdbname $APPNAME \
-#         -sid $APPNAME \
-#         -responseFile NO_VALUE \
-#         -characterSet WE8ISO8859P1 \
-#         -sysPassword '"$SECRET"' \
-#         -systemPassword '"$SECRET"' \
-#         -databaseType DATA_WAREHOUSING \
-#         -datafileDestination '/oracle/dbf/' \
-#         -MEMORYPERCENTAGE 70"
-# else
-#     echo "Database with SID $APPNAME already exists. Skipping database creation."
-# fi
+# Check if the listener configuration file exists
+if [ ! -f "/run/cfn-init/netca.rsp" ]; then
+    echo "Listener response file does not exist. Skipping listener creation."
+else
+    # Check if the listener is already running
+    if ! su oracle -l -c "lsnrctl status" | grep -q "Listener" ; then
+        echo "Listener is not running. Creating listener and starting it..."
 
-# # Check if the listener configuration file exists
-# if [ ! -f "/run/cfn-init/netca.rsp" ]; then
-#     echo "Listener response file does not exist. Skipping listener creation."
-# else
-#     # Check if the listener is already running
-#     if ! su oracle -l -c "lsnrctl status" | grep -q "Listener" ; then
-#         echo "Listener is not running. Creating listener and starting it..."
+        # Ensure the response file has correct permissions
+        chmod 777 /run/cfn-init/netca.rsp
 
-#         # Ensure the response file has correct permissions
-#         chmod 777 /run/cfn-init/netca.rsp
+        # Create the listener
+        su oracle -l -c "netca /silent /responseFile /run/cfn-init/netca.rsp"
 
-#         # Create the listener
-#         su oracle -l -c "netca /silent /responseFile /run/cfn-init/netca.rsp"
-
-#         # Start the listener
-#         su oracle -l -c "lsnrctl start"
-#     else
-#         echo "Listener is already running. Skipping listener creation and start."
-#     fi
-# fi
+        # Start the listener
+        su oracle -l -c "lsnrctl start"
+    else
+        echo "Listener is already running. Skipping listener creation and start."
+    fi
+fi
 
 #### Prevent timeout on DB
 # Add TCP keepalive time to sysctl.conf ---> keepalive solution
@@ -389,7 +325,6 @@ chmod 644 /home/oracle/scripts/alert_rota.sh
 # Create /etc/cron.d/oracle_rotation with the cron jobs
 cat <<EOC5 > /etc/cron.d/oracle_rotation
 00 07 * * * /home/oracle/scripts/alert_rota.sh $APPNAME
-* */6 * * * oracle /home/oracle/scripts/cdc_simple_health_check.sh >> /home/oracle/scripts/logs/cdc_check.log
 EOC5
 
 chown root:root /etc/cron.d/oracle_rotation
@@ -404,9 +339,6 @@ su oracle -c "crontab /home/oracle/crecrontab.txt"
 # set permissions for CDC scripts
 chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sh
 chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
-
-chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sql
-chmod 744 /home/oracle/scripts/cdc_simple_health_check.sql
 
 #Update send mail URL 
 echo "Update Sendmail configurations"
