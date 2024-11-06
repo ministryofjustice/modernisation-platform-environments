@@ -93,8 +93,9 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       logConfiguration = {
         logDriver = "awslogs",
         options   = {
-          awslogs-group         = "${local.application_name}-service-ecs",
-          awslogs-region        = "eu-west-2"
+          awslogs-group         = "chaps-service-ecs",
+          awslogs-region        = "eu-west-2",
+          awslogs-stream-prefix = "chaps"
         }
       }
       environment = [
@@ -153,7 +154,8 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
         logDriver = "awslogs",
         options = {
           awslogs-group         = "chapsdotnet-service-ecs",
-          awslogs-region        = "eu-west-2"
+          awslogs-region        = "eu-west-2",
+          awslogs-stream-prefix = "chapsdotnet"
         }
       }
 
@@ -234,11 +236,10 @@ resource "aws_ecs_service" "chaps_service" {
     type  = "spread"
   }
 
-#  load_balancer {
-#    target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
-#    container_name   = "chaps-container"
-#    container_port   = local.application_data.accounts[local.environment].container_port
-#  }
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "instanceId"
+  }
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
@@ -277,6 +278,11 @@ resource "aws_ecs_service" "chapsdotnet_service" {
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
     type  = "spread"
+  }
+
+  ordered_placement_strategy {
+    type  = "spread"
+    field = "instanceId"
   }
 
   load_balancer {
