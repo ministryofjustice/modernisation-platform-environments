@@ -17,9 +17,7 @@ locals {
       transit_gateway_routes = [
         /* MoJO DNS Resolver Service */
         "10.180.80.5/32",
-        "10.180.81.5/32",
-        /* ALL TRAFFIC YOLO */
-        "0.0.0.0/0"
+        "10.180.81.5/32"
       ]
 
       /* Observability Platform */
