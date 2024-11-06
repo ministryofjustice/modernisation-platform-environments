@@ -703,10 +703,10 @@ resource "aws_cloudwatch_log_group" "chapsdotnet_cloudwatch_group" {
 
 resource "aws_cloudwatch_log_stream" "chaps_cloudwatch_stream" {
   name           = "chaps-service-ecs-log-stream"
-  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+  log_group_name = aws_cloudwatch_log_group.chaps_cloudwatch_group.name
 }
 
 resource "aws_cloudwatch_log_stream" "chapsdotnet_cloudwatch_stream" {
   name           = "chapsdotnet-service-ecs-log-stream"
-  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+  log_group_name = aws_cloudwatch_log_group.chapsdotnet_cloudwatch_group.name
 }
