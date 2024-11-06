@@ -38,7 +38,7 @@ locals {
         })
         cloudwatch_metric_alarms = merge(local.ec2_instances.oem.cloudwatch_metric_alarms, {
           "endpoint-cert-expires-soon" = module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-cert-expires-soon"]
-          "endpoint-down_c-t3.test.nomis.service.justice.gov.uk" = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["pagerduty"].ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+          "endpoint-down_c-t3.test.nomis.service.justice.gov.uk" = merge(module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["nomis"].ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
             dimensions = {
               type          = "exitcode"
               type_instance = "c-t3.test.nomis.service.justice.gov.uk"
