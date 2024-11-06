@@ -54,53 +54,26 @@ module "this-bucket" {
     }
   ]
 
+  bucket_policy_v2 = [
+    {
+      sid     = "AllowedIPs"
+      effect  = "Deny"
+      actions = ["s3:GetObject"]
+      principals = {
+        identifiers = ["*"]
+        type        = "AWS"
+      }
+      condition = {
+        test     = "NotIpAddress"
+        variable = "aws:SourceIp"
+        values   = var.allowed_ips
+      }
+    }
+  ]
   tags = merge(
     var.local_tags,
     { export_destination = var.export_destination }
   )
-}
-
-resource "aws_s3_bucket_policy" "this" {
-  bucket = module.this-bucket.bucket.id
-  policy = data.aws_iam_policy_document.this.json
-}
-
-data "aws_iam_policy_document" "this" {
-  statement {
-    sid     = "EnforceTLSv12orHigher"
-    effect  = "Deny"
-    actions = ["s3:*"]
-    resources = [
-      module.this-bucket.bucket.arn,
-      "${module.this-bucket.bucket.arn}/*"
-    ]
-    principals {
-      identifiers = ["*"]
-      type        = "AWS"
-    }
-    condition {
-      test     = "NumericLessThan"
-      variable = "s3:TlsVersion"
-      values   = [1.2]
-    }
-  }
-  statement {
-    sid     = "AllowedIPs"
-    effect  = "Deny"
-    actions = ["s3:GetObject"]
-    resources = [
-      "${module.this-bucket.bucket.arn}/*"
-    ]
-    principals {
-      identifiers = ["*"]
-      type        = "AWS"
-    }
-    condition {
-      test     = "NotIpAddress"
-      variable = "aws:SourceIp"
-      values   = var.allowed_ips
-    }
-  }
 }
 
 #------------------------------------------------------------------------------
