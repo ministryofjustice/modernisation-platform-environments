@@ -288,7 +288,7 @@ chmod -R 740 /home/oracle/backup*
 # Create /etc/cron.d/backup_cron with the cron jobs
 cat <<EOC3 > /etc/cron.d/backup_cron
 0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
-0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
+*/10 * * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
 0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
