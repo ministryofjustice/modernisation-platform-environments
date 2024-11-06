@@ -46,8 +46,8 @@ locals {
             statistic           = "Maximum"
             threshold           = "1"
             alarm_description   = "Triggers if curl returns error for given endpoint from this EC2"
-            split_by_dimension  = {
-              dimension_name   = type_instance
+            split_by_dimension = {
+              dimension_name   = "type_instance"
               dimension_values = ["c-t3.test.nomis.service.justice.gov.uk"]
             }
           }
