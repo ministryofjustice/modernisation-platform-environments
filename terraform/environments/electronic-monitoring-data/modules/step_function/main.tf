@@ -64,17 +64,11 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
       "logs:PutResourcePolicy",
       "logs:DescribeResourcePolicies",
       "logs:DescribeLogGroups",
-    ]
-    resources = ["*"]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
       "logs:PutDestination",
       "logs:PutDestinationPolicy",
       "logs:PutLogEvents"
     ]
-    resources = ["${aws_cloudwatch_log_group.this_log_group.arn}:*"]
+    resources = ["*"]
   }
 }
 
