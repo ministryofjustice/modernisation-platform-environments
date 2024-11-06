@@ -41,7 +41,7 @@ locals {
       }
     })
 
-    jumpserver = merge(local.ec2_instance.jumpservers, {
+    jumpserver = merge(local.ec2_instances.jumpservers, {
       autoscaling_group = {
         desired_capacity    = 1
         max_size            = 1
