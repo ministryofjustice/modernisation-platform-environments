@@ -46,6 +46,7 @@ resource "aws_secretsmanager_secret_version" "dbt_secrets" {
   depends_on = [aws_secretsmanager_secret.dbt_secrets]
 }
 
+#tfsec:ignore:aws-ssm-secret-use-customer-key
 resource "aws_secretsmanager_secret" "dbt_secrets" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
@@ -162,9 +163,24 @@ data "aws_iam_policy_document" "lake_formation_data_access" {
 
 # access glue tables and start athena queries
 data "aws_iam_policy_document" "unlimited_athena_query" {
+  #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  #checkov:skip=CKV_AWS_356:Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions
   statement {
     actions = [
-      "athena:*"
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+    ]
+  }
+  statement {
+    actions = [
+      "athena:ListWorkGroups"
     ]
     resources = [
       "*"
