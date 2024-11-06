@@ -22,6 +22,8 @@ resource "aws_glue_connection" "glue_rds_sqlserver_db_connection" {
 }
 
 resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
+  count = local.gluejob_count
+
   name = "rds_sqlserver_dms"
   # create_table_default_permission {
   #   permissions = ["SELECT"]
@@ -33,9 +35,11 @@ resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
 }
 
 resource "aws_glue_crawler" "rds_sqlserver_db_glue_crawler" {
+  count = local.gluejob_count
+
   name          = "rds-sqlserver-${aws_db_instance.database_2022.identifier}-tf"
   role          = aws_iam_role.dms_dv_glue_job_iam_role.arn
-  database_name = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db.name
+  database_name = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db[count.index].name
   description   = "Crawler to fetch database names"
   #   table_prefix  = "your_table_prefix"
 
@@ -56,10 +60,12 @@ resource "aws_glue_crawler" "rds_sqlserver_db_glue_crawler" {
 }
 
 resource "aws_glue_trigger" "rds_sqlserver_db_glue_trigger" {
-  name = aws_glue_crawler.rds_sqlserver_db_glue_crawler.name
+  count = local.gluejob_count
+
+  name = aws_glue_crawler.rds_sqlserver_db_glue_crawler[count.index].name
   type = "ON_DEMAND"
 
   actions {
-    crawler_name = aws_glue_crawler.rds_sqlserver_db_glue_crawler.name
+    crawler_name = aws_glue_crawler.rds_sqlserver_db_glue_crawler[count.index].name
   }
 }

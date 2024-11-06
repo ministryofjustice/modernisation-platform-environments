@@ -43,6 +43,8 @@ resource "aws_s3_object" "create_or_replace_dv_table" {
 # -------------------------------------------------------------------
 
 resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
+  count = local.gluejob_count
+
   name = "dms_data_validation"
   # create_table_default_permission {
   #   permissions = ["SELECT"]
@@ -371,6 +373,8 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 
 resource "aws_glue_job" "catalog_dv_table_glue_job" {
+  count = local.gluejob_count
+
   name              = "catalog-dv-table-glue-job"
   description       = "Python script uses Boto3-Athena-Client to run sql-statements"
   role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
@@ -379,7 +383,7 @@ resource "aws_glue_job" "catalog_dv_table_glue_job" {
   number_of_workers = 2
   default_arguments = {
     "--parquet_output_bucket_name"       = module.s3-dms-data-validation-bucket.bucket.id
-    "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db[count.index].name
     "--glue_catalog_tbl_name"            = "glue_df_output"
     "--continuous-log-logGroup"          = aws_cloudwatch_log_group.dms_dv_cw_log_group.name
     "--enable-continuous-cloudwatch-log" = "true"

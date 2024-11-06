@@ -20,6 +20,8 @@ resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v1" {
 }
 
 resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v1" {
+  count = local.gluejob_count
+
   name              = "dms-dv-rds-to-s3-parquet_v1"
   description       = "DMS Data Validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
@@ -44,7 +46,7 @@ resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v1" {
     "--extra-py-files"                    = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
     "--parquet_src_bucket_name"           = module.s3-dms-target-store-bucket.bucket.id
     "--parquet_output_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
-    "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db[count.index].name
     "--glue_catalog_tbl_name"             = "glue_df_output"
     "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_rds_to_s3_parquet_v1.name}"
     "--enable-continuous-cloudwatch-log"  = "true"
@@ -95,6 +97,8 @@ resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v2" {
 }
 
 resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v2" {
+  count = local.gluejob_count
+
   name              = "dms-dv-rds-to-s3-parquet-v2"
   description       = "DMS Data Validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
@@ -118,7 +122,7 @@ resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v2" {
     "--extra-py-files"                    = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
     "--parquet_src_bucket_name"           = module.s3-dms-target-store-bucket.bucket.id
     "--parquet_output_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
-    "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db[count.index].name
     "--glue_catalog_tbl_name"             = "glue_df_output"
     "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_rds_to_s3_parquet_v2.name}"
     "--enable-continuous-cloudwatch-log"  = "true"
@@ -163,6 +167,8 @@ resource "aws_s3_object" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
 }
 
 resource "aws_glue_job" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
+  count = local.gluejob_count
+
   name              = "etl-rds-to-s3-parquet-partitionby-yyyy-mm"
   description       = "Table migration Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
@@ -230,6 +236,8 @@ resource "aws_s3_object" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
 }
 
 resource "aws_glue_job" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
+  count = local.gluejob_count
+
   name              = "etl-dv-rds-to-s3-parquet-partitionby-yyyy-mm"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
@@ -264,7 +272,7 @@ resource "aws_glue_job" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
     "--extra-py-files"                       = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
     "--rds_to_parquet_output_s3_bucket"      = module.s3-dms-target-store-bucket.bucket.id
     "--dv_parquet_output_s3_bucket"          = module.s3-dms-data-validation-bucket.bucket.id
-    "--glue_catalog_db_name"                 = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_db_name"                 = aws_glue_catalog_database.dms_dv_glue_catalog_db[count.index].name
     "--glue_catalog_tbl_name"                = "glue_df_output"
     "--continuous-log-logGroup"              = "/aws-glue/jobs/${aws_cloudwatch_log_group.etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm.name}"
     "--enable-continuous-cloudwatch-log"     = "true"
@@ -309,6 +317,8 @@ resource "aws_s3_object" "parquet_resize_or_partitionby_yyyy_mm_dd" {
 }
 
 resource "aws_glue_job" "parquet_resize_or_partitionby_yyyy_mm_dd" {
+  count = local.gluejob_count
+  
   name              = "parquet-resize-or-partitionby-yyyy-mm-dd"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
