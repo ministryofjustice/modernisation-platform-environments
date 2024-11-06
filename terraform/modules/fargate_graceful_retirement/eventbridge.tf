@@ -35,36 +35,16 @@ data "aws_iam_policy_document" "all_health_events" {
   statement {
     effect = "Allow"
     actions = [
-      "logs:CreateLogStream"
-    ]
-
-    resources = [
-      "${aws_cloudwatch_log_group.all_health_events.arn}:*"
-    ]
-
-    principals {
-      type = "Service"
-      identifiers = [
-        "events.amazonaws.com",
-        "delivery.logs.amazonaws.com"
-      ]
-    }
-  }
-  statement {
-    effect = "Allow"
-    actions = [
+      "logs:CreateLogStream",
       "logs:PutLogEvents"
     ]
 
-    resources = [
-      "${aws_cloudwatch_log_group.all_health_events.arn}:*:*"
-    ]
+    resources = [aws_cloudwatch_log_group.all_health_events.arn]
 
     principals {
       type = "Service"
       identifiers = [
-        "events.amazonaws.com",
-        "delivery.logs.amazonaws.com"
+        "events.amazonaws.com"
       ]
     }
 
@@ -74,16 +54,26 @@ data "aws_iam_policy_document" "all_health_events" {
       variable = "aws:SourceArn"
     }
   }
+
   statement {
     effect = "Allow"
     actions = [
       "states:StartExecution"
     ]
+
     resources = [
       aws_sfn_state_machine.ecs_restart_state_machine.arn
     ]
+
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com"
+      ]
+    }
   }
 }
+
 
 resource "aws_cloudwatch_log_resource_policy" "all_health_events" {
   policy_document = data.aws_iam_policy_document.all_health_events.json
