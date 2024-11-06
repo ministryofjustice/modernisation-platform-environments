@@ -46,7 +46,7 @@ module "weblogic" {
 
 
   container_vars_default = {
-    for name in local.weblogic_ssm.vars : name => module.weblogic_ssm.arn_map[name]
+    for name in local.weblogic_ssm.vars : name => data.aws_ssm_parameter.weblogic_ssm[name].value
   }
 
   container_secrets_default = {
