@@ -328,6 +328,34 @@ locals {
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
+      ec2_instance_cwagent_collectd_endpoint_monitoring = {
+        "endpoint-down" = {
+          comparison_operator = "GreaterThanOrEqualToThreshold"
+          evaluation_periods  = "1"
+          datapoints_to_alarm = "1"
+          metric_name         = "collectd_endpoint_status_value"
+          namespace           = "CWAgent"
+          period              = "60"
+          statistic           = "Maximum"
+          threshold           = "1"
+          alarm_description   = "Triggers if curl returns error for given endpoint from this EC2"
+          alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+          ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+        }
+        "endpoint-cert-expires-soon" = {
+          comparison_operator = "LessThanThreshold"
+          evaluation_periods  = "1"
+          datapoints_to_alarm = "1"
+          metric_name         = "collectd_endpoint_cert_expiry_value"
+          namespace           = "AWS/CertificateManager"
+          period              = "86400"
+          statistic           = "Minimum"
+          threshold           = "14"
+          alarm_description   = "Triggers if collectd-endpoint-monitoring detects an endpoint with a certificate due to expire shortly. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340266"
+          alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+          ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+        }
+      }
     }
     lb = {
       unhealthy-load-balancer-host = {
