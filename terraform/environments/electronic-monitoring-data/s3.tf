@@ -379,7 +379,7 @@ module "s3-dms-premigrate-assess-bucket" {
 module "s3-json-directory-structure-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
-  bucket_prefix      = "${local.bucket_prefix}-json-dir-structure-"
+  bucket_prefix      = local.is-preproduction ? "emds-p-prod-json-directory-structure-" : "${local.bucket_prefix}-json-directory-structure-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
@@ -638,7 +638,7 @@ module "s3-mdss-specials-landing-bucket" {
 # ------------------------------------------------------------------------
 
 module "s3-p1-export-bucket" {
-  source = "./modules/push_export_bucket/"
+  source = "./modules/export_bucket_push/"
 
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   destination_bucket_id   = "tct-339712706964-prearrivals"
@@ -652,6 +652,21 @@ module "s3-p1-export-bucket" {
     aws = aws
   }
 }
+
+module "s3-serco-export-bucket" {
+  source = "./modules/export_bucket_presigned_url/"
+
+  allowed_ips             = null
+  export_destination      = "serco-historic"
+  local_bucket_prefix     = local.bucket_prefix
+  local_tags              = local.tags
+  logging_bucket          = module.s3-logging-bucket
+
+  providers = {
+    aws = aws
+  }
+}
+
 
 # ----------------------------------
 # Virus scanning buckets

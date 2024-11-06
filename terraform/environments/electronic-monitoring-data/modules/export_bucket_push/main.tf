@@ -135,7 +135,7 @@ data "aws_iam_policy_document" "push_lambda" {
 
 resource "aws_iam_policy" "push_lambda" {
   name        = "${var.export_destination}_export_bucket_files_policy"
-  description = "Policy for Lambda to create presigned url for unzipped file from S3"
+  description = "Policy for Lambda to push file from source to destination S3 location"
   policy      = data.aws_iam_policy_document.push_lambda.json
 }
 

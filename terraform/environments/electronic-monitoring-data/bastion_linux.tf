@@ -147,6 +147,16 @@ data "aws_iam_policy_document" "zip_s3_policy" {
       "${module.s3-unzipped-files-bucket.bucket.arn}/*"
     ]
   }
+  statement {
+    sid    = "AllowPutSercoExportStore"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "${module.s3-serco-export-bucket.bucket_arn}/*"
+    ]
+  }
 }
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
