@@ -1,6 +1,7 @@
 locals {
 
-  endpoint_down_alarm = module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"]
+  endpoint_down_alarm              = module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"]
+  endpoint_cert_expires_soon_alarm = module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-cert-expires-soon"]
 
   # these should match the alarms configured in ansible collectd-endpoint-monitoring role on the given EC2
   cloudwatch_metric_alarms_endpoint_status_environment_specific = {
@@ -8,6 +9,8 @@ locals {
     }
 
     "test" = {
+      "endpoint-cert-expires-soon" = local.endpoint_cert_expires_soon_alarm
+
       "endpoint-down-nomis-t1" = merge(local.endpoint_down_alarm, {
         dimensions = {
           type          = "exitcode"
@@ -59,6 +62,8 @@ locals {
     }
 
     "preproduction" = {
+      "endpoint-cert-expires-soon" = local.endpoint_cert_expires_soon_alarm
+
       "endpoint-down-nomis-pp" = merge(local.endpoint_down_alarm, {
         dimensions = {
           type          = "exitcode"
@@ -157,6 +162,8 @@ locals {
 
 
     "production" = {
+      "endpoint-cert-expires-soon" = local.endpoint_cert_expires_soon_alarm
+
       "endpoint-down-nomis" = merge(local.endpoint_down_alarm, {
         dimensions = {
           type          = "exitcode"
@@ -293,9 +300,5 @@ locals {
     }
   }
 
-  cloudwatch_metric_alarms_endpoint_monitoring = merge(
-    local.cloudwatch_metric_alarms_endpoint_status_environment_specific[local.environment], {
-      "endpoint-cert-expires-soon" = module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-cert-expires-soon"]
-    }
-  )
+  cloudwatch_metric_alarms_endpoint_monitoring = local.cloudwatch_metric_alarms_endpoint_status_environment_specific[local.environment]
 }
