@@ -208,35 +208,35 @@ echo "---setup_oracle_db_software"
 # Install wget / unzip
 yum install -y unzip
 
-#### Create DBA user (only if it doesn't already exist)
-# Check if the dba group exists
-if ! getent group dba > /dev/null; then
-    echo "Creating group 'dba'..."
-    groupadd dba
-else
-    echo "Group 'dba' already exists."
-fi
+# #### Create DBA user (only if it doesn't already exist)
+# # Check if the dba group exists
+# if ! getent group dba > /dev/null; then
+#     echo "Creating group 'dba'..."
+#     groupadd dba
+# else
+#     echo "Group 'dba' already exists."
+# fi
 
-# Check if the oinstall group exists
-if ! getent group oinstall > /dev/null; then
-    echo "Creating group 'oinstall'..."
-    groupadd oinstall
-else
-    echo "Group 'oinstall' already exists."
-fi
+# # Check if the oinstall group exists
+# if ! getent group oinstall > /dev/null; then
+#     echo "Creating group 'oinstall'..."
+#     groupadd oinstall
+# else
+#     echo "Group 'oinstall' already exists."
+# fi
 
-# Check if the oracle user exists
-if ! id -u oracle > /dev/null 2>&1; then
-    echo "Creating user 'oracle'..."
-    useradd -d /home/oracle -g dba -G oinstall oracle
-else
-    echo "User 'oracle' already exists."
-fi
+# # Check if the oracle user exists
+# if ! id -u oracle > /dev/null 2>&1; then
+#     echo "Creating user 'oracle'..."
+#     useradd -d /home/oracle -g dba -G oinstall oracle
+# else
+#     echo "User 'oracle' already exists."
+# fi
 
-#setup oracle user access
-echo "---setup oracle user access"
-cp -fr /home/ec2-user/.ssh /home/oracle/
-chown -R oracle:dba /home/oracle/.ssh
+# #setup oracle user access
+# echo "---setup oracle user access"
+# cp -fr /home/ec2-user/.ssh /home/oracle/
+# chown -R oracle:dba /home/oracle/.ssh
 
 # Create directories and set ownership
 chown -R oracle:dba /oracle
@@ -256,68 +256,52 @@ else
     echo "---Swap file already exists. Skipping creation."
 fi
 
-# Run Oracle installer
-chmod 777 /run/cfn-init/db-install-10g.rsp
-
-# Run installer and post install
-# export ORA_DISABLED_CVU_CHECKS=CHECK_RUN_LEVEL
-# su oracle -c "/stage/databases/database/runInstaller -silent -waitforcompletion -ignoreSysPrereqs -ignorePrereq -responseFile /run/cfn-init/db-install-10g.rsp"
-
-# /oracle/software/oraInventory/orainstRoot.sh -silent
-# /oracle/software/product/10.2.0/root.sh -silent
-
 #Update URL in bash profile
 sed -i '/ORACLE_HOST/c\export ORACLE_HOST=${local.application_name}.${data.aws_route53_zone.external.name}' /home/oracle/.bash_profile
 
-# patch the database to 10.2.0.4
-chown oracle:dba /home/oracle/patchset.rsp
-chmod 777 /home/oracle/patchset.rsp
-# su oracle -c "/stage/patches/10204/Disk1/runInstaller -silent -responseFile /home/oracle/patchset.rsp"
-# /oracle/software/product/10.2.0/root.sh -silent
-
-# Create a blank database
+# Update permissions
 chown oracle:dba /run/cfn-init/edw_warehouse.dbt
 chmod 777 /run/cfn-init/edw_warehouse.dbt
 
-# Check if the Oracle SID is already running or if the database already exists
-if ! ps -ef | grep "[o]ra_pmon_$APPNAME" > /dev/null; then
-    echo "Database does not exist. Creating a new database..."
+# # Check if the Oracle SID is already running or if the database already exists
+# if ! ps -ef | grep "[o]ra_pmon_$APPNAME" > /dev/null; then
+#     echo "Database does not exist. Creating a new database..."
     
-    su oracle -l -c "dbca -silent -createDatabase \
-        -templateName /run/cfn-init/edw_warehouse.dbt \
-        -gdbname $APPNAME \
-        -sid $APPNAME \
-        -responseFile NO_VALUE \
-        -characterSet WE8ISO8859P1 \
-        -sysPassword '"$SECRET"' \
-        -systemPassword '"$SECRET"' \
-        -databaseType DATA_WAREHOUSING \
-        -datafileDestination '/oracle/dbf/' \
-        -MEMORYPERCENTAGE 70"
-else
-    echo "Database with SID $APPNAME already exists. Skipping database creation."
-fi
+#     su oracle -l -c "dbca -silent -createDatabase \
+#         -templateName /run/cfn-init/edw_warehouse.dbt \
+#         -gdbname $APPNAME \
+#         -sid $APPNAME \
+#         -responseFile NO_VALUE \
+#         -characterSet WE8ISO8859P1 \
+#         -sysPassword '"$SECRET"' \
+#         -systemPassword '"$SECRET"' \
+#         -databaseType DATA_WAREHOUSING \
+#         -datafileDestination '/oracle/dbf/' \
+#         -MEMORYPERCENTAGE 70"
+# else
+#     echo "Database with SID $APPNAME already exists. Skipping database creation."
+# fi
 
-# Check if the listener configuration file exists
-if [ ! -f "/run/cfn-init/netca.rsp" ]; then
-    echo "Listener response file does not exist. Skipping listener creation."
-else
-    # Check if the listener is already running
-    if ! su oracle -l -c "lsnrctl status" | grep -q "Listener" ; then
-        echo "Listener is not running. Creating listener and starting it..."
+# # Check if the listener configuration file exists
+# if [ ! -f "/run/cfn-init/netca.rsp" ]; then
+#     echo "Listener response file does not exist. Skipping listener creation."
+# else
+#     # Check if the listener is already running
+#     if ! su oracle -l -c "lsnrctl status" | grep -q "Listener" ; then
+#         echo "Listener is not running. Creating listener and starting it..."
 
-        # Ensure the response file has correct permissions
-        chmod 777 /run/cfn-init/netca.rsp
+#         # Ensure the response file has correct permissions
+#         chmod 777 /run/cfn-init/netca.rsp
 
-        # Create the listener
-        su oracle -l -c "netca /silent /responseFile /run/cfn-init/netca.rsp"
+#         # Create the listener
+#         su oracle -l -c "netca /silent /responseFile /run/cfn-init/netca.rsp"
 
-        # Start the listener
-        su oracle -l -c "lsnrctl start"
-    else
-        echo "Listener is already running. Skipping listener creation and start."
-    fi
-fi
+#         # Start the listener
+#         su oracle -l -c "lsnrctl start"
+#     else
+#         echo "Listener is already running. Skipping listener creation and start."
+#     fi
+# fi
 
 #### Prevent timeout on DB
 # Add TCP keepalive time to sysctl.conf ---> keepalive solution
@@ -359,16 +343,6 @@ chmod -R 777 /home/oracle
 # Set permissions for staging directory
 chmod -R 777 /stage/owb/
 
-# # Install OWB components
-# su oracle -l -c "/stage/owb/owb101/Disk1/runInstaller -silent -ignoreSysPrereqs -ignorePrereq -waitforcompletion -responseFile /stage/owb/owb.rsp"
-# /oracle/software/product/10.2.0_owb/root.sh -silent
-
-# su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb104.rsp"
-# /oracle/software/product/10.2.0_owb/root.sh -silent
-
-# su oracle -l -c "/oracle/software/product/10.2.0/oui/bin/runInstaller -silent -waitforcompletion -responseFile /stage/owb/owb105.rsp"
-# /oracle/software/product/10.2.0_owb/root.sh -silent
-
 #### setup_backups:
 
 # setup efs backup mount point
@@ -382,7 +356,7 @@ chmod -R 740 /home/oracle/backup*
 
 # Create /etc/cron.d/backup_cron with the cron jobs
 cat <<EOC3 > /etc/cron.d/backup_cron
-0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh EDW $APPNAME
+0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
 0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
@@ -396,13 +370,6 @@ yes | cp -f /etc/cron.d/backup_cron /home/oracle/crecrontab.txt
 chown oracle:dba /home/oracle/crecrontab.txt
 chmod 744 /home/oracle/crecrontab.txt
 su oracle -c "crontab /home/oracle/crecrontab.txt"
-
-## Set permissions for CDC scripts
-chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sh
-chmod 744 /home/oracle/scripts/cdc_simple_health_check.sh
-
-chown oracle:dba /home/oracle/scripts/cdc_simple_health_check.sql
-chmod 744 /home/oracle/scripts/cdc_simple_health_check.sql
 
 chown root:root /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
