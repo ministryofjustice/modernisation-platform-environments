@@ -348,7 +348,7 @@ locals {
         evaluation_periods  = "1"
         datapoints_to_alarm = "1"
         metric_name         = "collectd_endpoint_cert_expiry_value"
-        namespace           = "AWS/CertificateManager"
+        namespace           = "CWAgent"
         period              = "86400"
         statistic           = "Minimum"
         threshold           = "14"
