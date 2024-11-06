@@ -23,7 +23,7 @@ resource "aws_efs_mount_target" "this" {
 }
 
 # module for efs access point
-resource "aws_efs_access_point" "efs_access_point" {
+resource "aws_efs_access_point" "this" {
   file_system_id = aws_efs_file_system.this.id
   root_directory {
     path = "/"
@@ -34,6 +34,11 @@ resource "aws_efs_access_point" "efs_access_point" {
       Name = "${var.account_info.application_name}-${var.env_name}-efs-access-point"
     }
   )
+}
+
+moved {
+  from = aws_efs_access_point.ldap
+  to   = aws_efs_access_point.this
 }
 
 # Security Group
