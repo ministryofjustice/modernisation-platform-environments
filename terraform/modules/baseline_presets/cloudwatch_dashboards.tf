@@ -921,8 +921,8 @@ locals {
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_filesystems_check.endpoint-down,
-        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_filesystems_check.endpoint-cert-expires-soon,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-down,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-expires-soon,
       ]
     }
 
