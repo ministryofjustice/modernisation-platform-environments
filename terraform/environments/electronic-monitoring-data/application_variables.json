@@ -49,7 +49,9 @@
       "enable_airflow_secret": true
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "example_var": "preproduction-data",
+      "enable_dbt_k8s_secrets": true,
+      "enable_airflow_secret": true
     },
     "production": {
       "example_var": "production-data",
