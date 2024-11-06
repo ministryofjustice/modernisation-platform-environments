@@ -692,11 +692,21 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
 
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
-  name              = "${local.application_name}-ecs"
+  name              = "chaps-service-ecs"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_group" "cloudwatch_group" {
+  name              = "chapsdotnet-service-ecs"
   retention_in_days = 30
 }
 
 resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
-  name           = "${local.application_name}-log-stream"
+  name           = "chaps-service-ecs-log-stream"
+  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+}
+
+resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
+  name           = "chapsdotnet-service-ecs-log-stream"
   log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
 }

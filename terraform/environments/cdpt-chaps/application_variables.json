@@ -17,7 +17,7 @@
       "container_port": 80,
       "client_id": "aa335a21-40a9-45a0-b0ef-16d65584b024",
       "dotnet_client_id": "37156e23-43dd-4325-ae36-f998ce4c32ff",
-      "create_chapsdotnet": "false",
+      "create_chapsdotnet": "true",
       "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
       "CallbackPath": "/signin-oidc"
     },
