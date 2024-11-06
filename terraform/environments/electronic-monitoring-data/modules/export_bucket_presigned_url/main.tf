@@ -54,7 +54,8 @@ module "this-bucket" {
     }
   ]
 
-  bucket_policy_v2 = [
+  # Add IP restricted access if IP's specified
+  bucket_policy_v2 = var.allowed_ips != null ? [
     {
       sid     = "AllowedIPs"
       effect  = "Deny"
@@ -71,7 +72,18 @@ module "this-bucket" {
         }
       ]
     }
+  ] : [    
+    {
+      sid     = "AllowedIPs"
+      effect  = "Deny"
+      actions = ["s3:GetObject"]
+      principals = {
+        identifiers = ["*"]
+        type        = "AWS"
+      }
+    }
   ]
+
   tags = merge(
     var.local_tags,
     { export_destination = var.export_destination }
