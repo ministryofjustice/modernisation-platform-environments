@@ -81,6 +81,7 @@ module "this-bucket" {
         identifiers = ["*"]
         type        = "AWS"
       }
+      conditions = []
     }
   ]
 
