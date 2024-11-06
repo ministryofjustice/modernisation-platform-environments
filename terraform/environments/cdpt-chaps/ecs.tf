@@ -187,7 +187,7 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
         },
         {
           name  = "CLIENT_ID"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = "${local.application_data.accounts[local.environment].dotnet_client_id}"
         },
         {
           name  = "CurServer"
