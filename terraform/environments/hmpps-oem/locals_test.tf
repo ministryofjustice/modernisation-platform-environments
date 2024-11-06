@@ -35,6 +35,23 @@ locals {
         config = merge(local.ec2_instances.oem.config, {
           availability_zone = "eu-west-2a"
         })
+        cloudwatch_metric_alarms = merge(local.ec2_instances.oem.cloudwatch_metric_alarms, {
+          endpoint-status = {
+            comparison_operator = "GreaterThanOrEqualToThreshold"
+            evaluation_periods  = "1"
+            datapoints_to_alarm = "1"
+            metric_name         = "collectd_endpoint_status_value"
+            namespace           = "CWAgent"
+            period              = "60"
+            statistic           = "Maximum"
+            threshold           = "1"
+            alarm_description   = "Triggers if curl returns error for given endpoint from this EC2"
+            split_by_dimension  = {
+              dimension_name   = type_instance
+              dimension_values = ["c-t3.test.nomis.service.justice.gov.uk"]
+            }
+          }
+        })
         instance = merge(local.ec2_instances.oem.instance, {
           disable_api_termination = true
         })
