@@ -150,7 +150,7 @@ locals {
 
       # TODO: this is just for testing, remove when not needed
       t2-client-asg = merge(local.ec2_instances.jumpserver, {
-        autoscaling_group = merge(local.ec2_instances.jumpserver.autoscaling_group, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.jumpserver.autoscaling_group, {
           desired_capacity = 0
         })
         config = merge(local.ec2_instances.jumpserver.config, {
