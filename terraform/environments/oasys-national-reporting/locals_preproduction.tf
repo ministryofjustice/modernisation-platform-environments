@@ -95,7 +95,6 @@ locals {
           oasys-national-reporting-environment = "pp"
           domain-name                          = "azure.hmpp.root"
         })
-        cloudwatch_metric_alarms = null
       })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
