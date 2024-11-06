@@ -93,9 +93,8 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       logConfiguration = {
         logDriver = "awslogs",
         options   = {
-          awslogs-group         = "${local.application_name}-ecs",
-          awslogs-region        = "eu-west-2",
-          awslogs-stream-prefix = "chaps"
+          awslogs-group         = "${local.application_name}-service-ecs",
+          awslogs-region        = "eu-west-2"
         }
       }
       environment = [
@@ -153,9 +152,8 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
       logConfiguration = {
         logDriver = "awslogs",
         options = {
-          awslogs-group         = "${local.application_name}-ecs",
-          awslogs-region        = "eu-west-2",
-          awslogs-stream-prefix = "chapsdotnet"
+          awslogs-group         = "chapsdotnet-service-ecs",
+          awslogs-region        = "eu-west-2"
         }
       }
 
