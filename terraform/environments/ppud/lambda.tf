@@ -254,7 +254,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev"
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
+  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
   }
@@ -380,7 +380,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev"
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
+  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
   }
