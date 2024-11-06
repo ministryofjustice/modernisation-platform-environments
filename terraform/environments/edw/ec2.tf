@@ -83,6 +83,7 @@ export ENV="${local.application_data.accounts[local.environment].edw_environment
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
 export EFS="${aws_efs_file_system.edw.id}"
 export SECRET=`/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db-master-password2.id} { --query SecretString --output text`
+echo "export SECRET=\"$SECRET\"" >> /etc/profile
 export host="$ip4 $APPNAME-$ENV infraedw"
 echo $host >>/etc/hosts
 sed -i '/^10.221/d' /etc/hosts
@@ -192,12 +193,12 @@ $EFS.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,har
 EOT
 
 # Create file systems 
-mkdir -p /oracle/dbf
-mkdir -p /stage
-mkdir -p /oracle/ar
-mkdir --p /oracle/software
-mkdir -p /oracle/temp_undo
-mkdir -p /backups
+sudo mkdir -p /oracle/dbf
+sudo mkdir -p /stage
+sudo mkdir -p /oracle/ar
+sudo mkdir --p /oracle/software
+sudo mkdir -p /oracle/temp_undo
+sudo mkdir -p /backups
 
 # Mount all file systems in fstab
 mount -a
@@ -252,7 +253,7 @@ grep -qxF "SQLNET.INBOUND_CONNECT_TIMEOUT = 0" /oracle/software/product/10.2.0/n
 # Add inbound connection timeout option to listener
 grep -qxF "INBOUND_CONNECT_TIMEOUT_LISTENER = 0" /oracle/software/product/10.2.0/network/admin/listener.ora || echo "INBOUND_CONNECT_TIMEOUT_LISTENER = 0" >> /oracle/software/product/10.2.0/network/admin/listener.ora
 
-mkdir -p /var/opt/oracle
+sudo mkdir -p /var/opt/oracle
 chown oracle:dba /var/opt/oracle
 chown -R oracle:dba /home/oracle/edwcreate
 chmod -R 777 /home/oracle/edwcreate
@@ -262,8 +263,8 @@ sed -i "s/tst/$ENV/g" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 sed -i "0,/edw\./s/^.*edw\..*$/    (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 sed -i "0,/edw\.aws/s/^.*edw\.aws.*$/    (ADDRESS = (PROTOCOL = tcp)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 sed -i "0,/EDW/s/^.*EDW.*$/      (ADDRESS = (PROTOCOL = TCP)(HOST = ${local.application_name}.${data.aws_route53_zone.external.name})(PORT = 1521))/" /oracle/software/product/10.2.0/network/admin/listener.ora
-sed -i "s/^\(define EDW_SYS=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
-sed -i "s/^\(define EDW_SYSTEM=\).*/\1$SECRET/" /var/opt/oracle/passwds.sql
+sed -i "s/^\(define EDW_SYS=\).*/\1$(echo $SECRET | sed 's/[&/\]/\\&/g')/" /var/opt/oracle/passwds.sql
+sed -i "s/^\(define EDW_SYSTEM=\).*/\1$(echo $SECRET | sed 's/[&/\]/\\&/g')/" /var/opt/oracle/passwds.sql
 
 chown -R oracle:dba /home/oracle/scripts/
 chmod -R 700 /home/oracle/scripts/
@@ -276,7 +277,7 @@ chmod -R 777 /stage/owb/
 #### setup_backups:
 
 # setup efs backup mount point
-mkdir -p /home/oracle/backup_logs/
+sudo mkdir -p /home/oracle/backup_logs/
 sudo mkdir -p /backups/$APPNAME_RMAN
 chmod 777 /backups/EDW_RMAN
 sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh
