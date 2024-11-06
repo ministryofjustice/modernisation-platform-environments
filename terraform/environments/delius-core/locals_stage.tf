@@ -109,16 +109,6 @@ locals {
       container_cpu    = 2048
       container_memory = 4096
     }
-
-    pdf_creation = {
-      image_tag      = "6.2.0.3"
-      container_port = 80
-    }
-
-    newtech = {
-      image_tag      = "6.2.0.3"
-      container_port = 80
-    }
   }
 
   bastion_config_stage = {
