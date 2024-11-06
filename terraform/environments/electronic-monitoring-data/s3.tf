@@ -656,7 +656,7 @@ module "s3-p1-export-bucket" {
 module "s3-serco-export-bucket" {
   source = "./modules/export_bucket_presigned_url/"
 
-  allowed_ips             = ["2.31.200.13/32"]
+  allowed_ips             = null
   export_destination      = "serco-historic"
   local_bucket_prefix     = local.bucket_prefix
   local_tags              = local.tags
