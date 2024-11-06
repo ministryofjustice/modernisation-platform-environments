@@ -63,7 +63,7 @@ module "this-bucket" {
         identifiers = ["*"]
         type        = "AWS"
       }
-      condition = {
+      conditions = {
         test     = "NotIpAddress"
         variable = "aws:SourceIp"
         values   = var.allowed_ips
