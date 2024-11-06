@@ -40,6 +40,7 @@ data "aws_iam_policy_document" "assume_step_function" {
   }
 }
 
+# tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "step_function_base_permissions" {
   statement {
     effect    = "Allow"
@@ -65,7 +66,7 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
       "logs:DescribeResourcePolicies",
       "logs:DescribeLogGroups"
     ]
-    resources = [aws_cloudwatch_log_group.this_log_group.arn]
+    resources = ["*"]
   }
 }
 
@@ -74,6 +75,7 @@ resource "aws_iam_policy" "step_function_base_permissions" {
   policy = data.aws_iam_policy_document.step_function_base_permissions.json
 }
 
+# tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "this_log_key_document" {
   statement {
     sid    = "EnableIAMUserPermissions"
