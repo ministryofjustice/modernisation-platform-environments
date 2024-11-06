@@ -47,6 +47,7 @@ locals {
             threshold           = "1"
             alarm_description   = "Triggers if curl returns error for given endpoint from this EC2"
             dimensions = {
+              type          = "exitcode"
               type_instance = "c-t3.test.nomis.service.justice.gov.uk"
             }
           }
