@@ -51,6 +51,16 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
     actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
     resources = [aws_kms_key.this_log_key.arn]
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:DescribeLogStreams"
+    ]
+    resources = [aws_cloudwatch_log_group.this_log_group.arn]
+  }
 }
 
 resource "aws_iam_policy" "step_function_base_permissions" {
