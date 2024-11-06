@@ -36,7 +36,7 @@ locals {
           availability_zone = "eu-west-2a"
         })
         cloudwatch_metric_alarms = merge(local.ec2_instances.oem.cloudwatch_metric_alarms, {
-          endpoint-status = {
+          "endpoint-down_c-t3.test.nomis.service.justice.gov.uk" = {
             comparison_operator = "GreaterThanOrEqualToThreshold"
             evaluation_periods  = "1"
             datapoints_to_alarm = "1"
@@ -46,9 +46,8 @@ locals {
             statistic           = "Maximum"
             threshold           = "1"
             alarm_description   = "Triggers if curl returns error for given endpoint from this EC2"
-            split_by_dimension = {
-              dimension_name   = "type_instance"
-              dimension_values = ["c-t3.test.nomis.service.justice.gov.uk"]
+            dimensions = {
+              type_instance = "c-t3.test.nomis.service.justice.gov.uk"
             }
           }
         })
