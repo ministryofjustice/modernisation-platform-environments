@@ -6,6 +6,11 @@ resource "aws_sfn_state_machine" "this" {
   role_arn   = aws_iam_role.step_function_role.arn
   definition = templatefile("step_function_definitions/${var.name}.json.tmpl", var.variable_dictionary)
   type       = var.type
+  logging_configuration {
+    log_destination        = "${aws_cloudwatch_log_group.this_log_group.arn}:*"
+    include_execution_data = true
+    level                  = "ALL"
+  }
 }
 
 resource "aws_iam_role" "step_function_role" {
