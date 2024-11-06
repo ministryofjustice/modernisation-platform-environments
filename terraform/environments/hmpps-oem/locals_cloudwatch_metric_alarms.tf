@@ -57,6 +57,88 @@ locals {
     }
 
     "preproduction" = {
+      "endpoint-down-nomis-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "c.pp-nomis.az.justice.gov.uk"
+        }
+      })
+      "endpoint-down-nomis-lsast" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "c.lsast-nomis.az.justice.gov.uk"
+        }
+      })
+      "endpoint-down-oasys-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "pp-oasys.az.justice.gov.uk"
+        }
+      })
+      "endpoint-down-onr-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "onr.pp-oasys.az.justice.gov.uk"
+        }
+      })
+      "endpoint-down-csr-r1-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "r1.pp.csr.service.justice.gov.uk"
+        }
+      })
+      "endpoint-down-csr-r2-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "r2.pp.csr.service.justice.gov.uk"
+        }
+      })
+      "endpoint-down-csr-r3-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "r3.pp.csr.service.justice.gov.uk"
+        }
+      })
+      "endpoint-down-csr-r4-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "r4.pp.csr.service.justice.gov.uk"
+        }
+      })
+      "endpoint-down-csr-r5-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "r5.pp.csr.service.justice.gov.uk"
+        }
+      })
+      "endpoint-down-csr-r6-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "r6.pp.csr.service.justice.gov.uk"
+        }
+      })
+      "endpoint-down-csr-traina" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "traina.csr.service.justice.gov.uk"
+        }
+      })
+      "endpoint-down-cafmwebx-pp" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "cafmwebx.pp.planetfm.service.justice.gov.uk"
+        }
+        alarm_actions = [] # TODO: remove when IP allow listing fixed
+        ok_actions    = []
+      })
+      "endpoint-down-hpa-preprod" = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-down"], {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "hpa-preprod.service.hmpps.dsd.io"
+        }
+        alarm_actions = [] # TODO: remove when IP allow listing fixed
+        ok_actions    = []
+      })
     }
 
     "production" = {
