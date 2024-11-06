@@ -76,6 +76,7 @@ locals {
     ec2_instances = {
       pp-onr-bods-1 = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2024-10-02T00-00-37.793Z"
           availability_zone = "eu-west-2a"
           user_data_raw = base64encode(templatefile(
             "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
