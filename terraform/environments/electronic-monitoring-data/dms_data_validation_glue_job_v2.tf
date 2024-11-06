@@ -20,6 +20,8 @@ resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v1" {
 }
 
 resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v1" {
+  count = local.gluejob_count
+
   name              = "dms-dv-rds-to-s3-parquet_v1"
   description       = "DMS Data Validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
@@ -95,6 +97,8 @@ resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v2" {
 }
 
 resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v2" {
+  count = local.gluejob_count
+
   name              = "dms-dv-rds-to-s3-parquet-v2"
   description       = "DMS Data Validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
@@ -163,6 +167,8 @@ resource "aws_s3_object" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
 }
 
 resource "aws_glue_job" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
+  count = local.gluejob_count
+
   name              = "etl-rds-to-s3-parquet-partitionby-yyyy-mm"
   description       = "Table migration Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
@@ -230,6 +236,8 @@ resource "aws_s3_object" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
 }
 
 resource "aws_glue_job" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
+  count = local.gluejob_count
+
   name              = "etl-dv-rds-to-s3-parquet-partitionby-yyyy-mm"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
@@ -309,6 +317,8 @@ resource "aws_s3_object" "parquet_resize_or_partitionby_yyyy_mm_dd" {
 }
 
 resource "aws_glue_job" "parquet_resize_or_partitionby_yyyy_mm_dd" {
+  count = local.gluejob_count
+  
   name              = "parquet-resize-or-partitionby-yyyy-mm-dd"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
