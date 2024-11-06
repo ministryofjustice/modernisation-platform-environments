@@ -159,7 +159,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
        "logs:PutLogEvents"
      ],
      "Resource": [
-         "arn:aws:logs::${local.environment_management.account_ids["ppud-production"]}:*"
+         "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
      ]
     },
    {
@@ -169,7 +169,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
         "ec2:Stop*"
       ],
       "Resource": [
-          "arn:aws:ec2::${local.environment_management.account_ids["ppud-production"]}:*"
+          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
       ]
    },
    {
@@ -184,7 +184,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
       "sqs:SendMessage"
       ],
     "Resource": [
-     "arn:aws:sqs::${local.environment_management.account_ids["ppud-production"]}:*"
+     "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
     ]
    }]
  })
@@ -237,7 +237,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
        "logs:PutLogEvents"
      ],
      "Resource": [
-         "arn:aws:logs::${local.environment_management.account_ids["ppud-production"]}:*"
+         "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
      ]
     },
    {
@@ -247,7 +247,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
         "cloudwatch:EnableAlarmActions"
       ],
       "Resource": [
-      "arn:aws:cloudwatch::${local.environment_management.account_ids["ppud-production"]}:alarm:*"
+      "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
       ]
    },
    {
@@ -262,7 +262,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
       "sqs:SendMessage"
       ],
     "Resource": [
-     "arn:aws:sqs::${local.environment_management.account_ids["ppud-production"]}:*"
+     "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
     ]
    }]
  })
@@ -319,7 +319,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
     {
         "Effect": "Allow",
         "Action": [ 
-           "ec2:DescribeInstances"
+           "ec2:DescribeInstances",
+           "ssm:SendCommand",
+				   "ssm:GetCommandInvocation"
         ],
         "Resource": [ 
            "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
@@ -400,26 +402,31 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_uat" {
           "ssm:GetCommandInvocation"
         ],
         "Resource": [ 
-          "arn:aws:ssm::${local.environment_management.account_ids["ppud-preproduction"]}:*"
+          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*",
+          "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
         ] 
     },
     {
         "Effect": "Allow",
         "Action": [ 
-           "ec2:DescribeInstances"
+           "ec2:DescribeInstances",
+           "ssm:SendCommand",
+				   "ssm:GetCommandInvocation"
         ],
         "Resource": [ 
-           "arn:aws:ec2::${local.environment_management.account_ids["ppud-preproduction"]}:*"
+           "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
         ] 
     },
     {
         "Effect": "Allow",
         "Action": [ 
            "lambda:InvokeAsync",
-           "lambda:InvokeFunction"
+           "lambda:InvokeFunction",
+           "ssm:SendCommand",
+				   "ssm:GetCommandInvocation"
         ],
         "Resource": [ 
-           "arn:aws:lambda::${local.environment_management.account_ids["ppud-preproduction"]}:*"
+           "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
         ] 
     },
     {
@@ -434,7 +441,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_uat" {
            "sqs:SendMessage"
         ],
         "Resource": [  
-           "arn:aws:sqs::${local.environment_management.account_ids["ppud-preproduction"]}:*"
+           "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
         ] 
     }]
   })
@@ -484,26 +491,31 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_prod" 
           "ssm:GetCommandInvocation"
         ],
         "Resource": [ 
-          "arn:aws:ssm::${local.environment_management.account_ids["ppud-production"]}:*"
+          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*",
+          "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
         ] 
     },
     {
         "Effect": "Allow",
         "Action": [ 
-           "ec2:DescribeInstances"
+           "ec2:DescribeInstances",
+           "ssm:SendCommand",
+           "ssm:GetCommandInvocation"
         ],
         "Resource": [ 
-           "arn:aws:ec2::${local.environment_management.account_ids["ppud-production"]}:*"
+           "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         ] 
     },
     {
         "Effect": "Allow",
         "Action": [ 
            "lambda:InvokeAsync",
-           "lambda:InvokeFunction"
+           "lambda:InvokeFunction",
+           "ssm:SendCommand",
+           "ssm:GetCommandInvocation"
         ],
         "Resource": [ 
-           "arn:aws:lambda::${local.environment_management.account_ids["ppud-production"]}:*"
+           "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         ] 
     },
     {
@@ -518,7 +530,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_prod" 
            "sqs:SendMessage"
         ],
         "Resource": [  
-           "arn:aws:sqs::${local.environment_management.account_ids["ppud-production"]}:*"
+           "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         ] 
     }]
   })
@@ -566,7 +578,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
             "Sid":"LambdaCertificateExpiryPolicy1",
             "Effect": "Allow",
             "Action": "logs:CreateLogGroup",
-            "Resource": "arn:aws:logs::${local.environment_management.account_ids["ppud-development"]}:*"
+            "Resource": "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy2",
@@ -576,7 +588,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs::${local.environment_management.account_ids["ppud-development"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
+                "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
             ]
         },
         {
@@ -589,7 +601,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                "arn:aws:acm::${local.environment_management.account_ids["ppud-development"]}:certificate/*"
+                "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:certificate/*"
             ]
         },
         {
@@ -597,7 +609,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
             "Effect": "Allow",
             "Action": "SNS:Publish",
             "Resource": [
-                "arn:aws:sns::${local.environment_management.account_ids["ppud-development"]}:*"
+                "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
             ]
         },
                {
@@ -605,7 +617,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
             "Resource": [
-                "arn:aws:cloudwatch::${local.environment_management.account_ids["ppud-development"]}:*"
+                "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
             ]
         },
                {
@@ -621,7 +633,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
                 "sqs:SendMessage"
               ],
             "Resource": [
-                "arn:aws:sqs::${local.environment_management.account_ids["ppud-development"]}:*"
+                "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
             ]
         }]
 })
@@ -669,7 +681,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
             "Sid":"LambdaCertificateExpiryPolicy1",
             "Effect": "Allow",
             "Action": "logs:CreateLogGroup",
-            "Resource": "arn:aws:logs::${local.environment_management.account_ids["ppud-preproduction"]}:*"
+            "Resource": "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy2",
@@ -679,7 +691,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs::${local.environment_management.account_ids["ppud-preproduction"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
+                "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
             ]
         },
         {
@@ -692,7 +704,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                 "arn:aws:acm::${local.environment_management.account_ids["ppud-preproduction"]}:certificate/*"
+                 "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:certificate/*"
             ]
         },
         {
@@ -700,7 +712,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
             "Effect": "Allow",
             "Action": "SNS:Publish",
             "Resource": [
-                "arn:aws:sns::${local.environment_management.account_ids["ppud-preproduction"]}:*"
+                "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
             ]
         },
                {
@@ -708,7 +720,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
             "Resource": [
-                "arn:aws:cloudwatch::${local.environment_management.account_ids["ppud-preproduction"]}:*"
+                "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
             ]
         },
            {
@@ -724,7 +736,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
                 "sqs:SendMessage"
               ],
             "Resource": [
-            "arn:aws:sqs::${local.environment_management.account_ids["ppud-preproduction"]}:*"
+            "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
             ]
         }]
 })
@@ -773,7 +785,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
             "Sid":"LambdaCertificateExpiryPolicy1",
             "Effect": "Allow",
             "Action": "logs:CreateLogGroup",
-            "Resource": "arn:aws:logs::${local.environment_management.account_ids["ppud-production"]}:*"
+            "Resource": "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         },
         {
             "Sid":"LambdaCertificateExpiryPolicy2",
@@ -783,7 +795,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs::${local.environment_management.account_ids["ppud-production"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
+                "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
             ]
         },
         {
@@ -796,7 +808,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
                 "acm:ListTagsForCertificate"
             ],
             "Resource": [
-                 "arn:aws:acm::${local.environment_management.account_ids["ppud-production"]}:certificate/*"
+                 "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:certificate/*"
             ]
         },
         {
@@ -804,7 +816,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
             "Effect": "Allow",
             "Action": "SNS:Publish",
             "Resource": [
-                "arn:aws:sns::${local.environment_management.account_ids["ppud-production"]}:*"
+                "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
             ]
         },
                {
@@ -812,7 +824,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
             "Effect": "Allow",
             "Action": "cloudwatch:ListMetrics",
             "Resource": [
-                "arn:aws:cloudwatch::${local.environment_management.account_ids["ppud-production"]}:*"
+                "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
             ]
         },
            {
@@ -828,7 +840,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
                 "sqs:SendMessage"
               ],
             "Resource": [
-            "arn:aws:sqs::${local.environment_management.account_ids["ppud-production"]}:Lambda-Queue-Production"
+            "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:Lambda-Queue-Production"
             ]
         }
     ]
@@ -974,7 +986,7 @@ resource "aws_iam_policy" "aws_signer_policy_prod" {
           "lambda:PutFunctionCodeSigningConfig",
           "lambda:InvokeFunction"
         ],
-        Resource = "arn:aws:lambda::${local.environment_management.account_ids["ppud-production"]}:function:*" # Grant access to all Lambda functions in the account
+        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:function:*" # Grant access to all Lambda functions in the account
       },
       {
         Effect = "Allow",
@@ -1035,7 +1047,7 @@ resource "aws_iam_policy" "aws_signer_policy_uat" {
           "lambda:PutFunctionCodeSigningConfig",
           "lambda:InvokeFunction"
         ],
-        Resource = "arn:aws:lambda::${local.environment_management.account_ids["ppud-preproduction"]}:function:*" # Grant access to all Lambda functions in the account
+        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:function:*" # Grant access to all Lambda functions in the account
       },
       {
         Effect = "Allow",
@@ -1096,7 +1108,7 @@ resource "aws_iam_policy" "aws_signer_policy_dev" {
           "lambda:PutFunctionCodeSigningConfig",
           "lambda:InvokeFunction"
         ],
-        Resource = "arn:aws:lambda::${local.environment_management.account_ids["ppud-development"]}:function:*" # Grant access to all Lambda functions in the account
+        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:function:*" # Grant access to all Lambda functions in the account
       },
       {
         Effect = "Allow",
