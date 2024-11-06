@@ -1,13 +1,4 @@
 locals {
-  environment_map = {
-    "production"     = "prod"
-    "preproduction"  = "preprod"
-    "test"           = "test"
-    "development"    = "dev"
-    "default"        = ""
-  }
-  environment_shorthand = local.environment_map[local.environment]
-
   bucket_prefix = "emds-${local.environment_shorthand}"
 }
 
@@ -388,7 +379,7 @@ module "s3-dms-premigrate-assess-bucket" {
 module "s3-json-directory-structure-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
-  bucket_prefix      = "${local.bucket_prefix}-json-directory-structure-"
+  bucket_prefix      = "${local.bucket_prefix}-json-dir-structure-"
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:

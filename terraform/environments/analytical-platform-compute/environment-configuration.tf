@@ -1,6 +1,6 @@
 locals {
   ap_data_prod_account_id = local.environment_management.account_ids["analytical-platform-data-production"]
-  
+
   environment_configurations = {
     development = {
       /* VPC */

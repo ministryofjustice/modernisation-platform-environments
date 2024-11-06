@@ -5,6 +5,7 @@ resource "aws_sfn_state_machine" "this" {
   name       = var.name
   role_arn   = aws_iam_role.step_function_role.arn
   definition = templatefile("step_function_definitions/${var.name}.json.tmpl", var.variable_dictionary)
+  type       = var.type
 }
 
 resource "aws_iam_role" "step_function_role" {
@@ -13,8 +14,7 @@ resource "aws_iam_role" "step_function_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "this_attachment" {
-  for_each = var.iam_policies
-
+  for_each   = var.iam_policies
   role       = aws_iam_role.step_function_role.name
   policy_arn = each.value.arn
 }
@@ -23,7 +23,6 @@ resource "aws_iam_role_policy_attachment" "base_perms_attached" {
   role       = aws_iam_role.step_function_role.name
   policy_arn = aws_iam_policy.step_function_base_permissions.arn
 }
-
 
 data "aws_iam_policy_document" "assume_step_function" {
   statement {
@@ -38,12 +37,14 @@ data "aws_iam_policy_document" "assume_step_function" {
 
 data "aws_iam_policy_document" "step_function_base_permissions" {
   statement {
-    effect = "Allow"
-    actions = [
-      "sns:Publish",
-      "sqs:SendMessage"
-    ]
+    effect    = "Allow"
+    actions   = ["sns:Publish", "sqs:SendMessage"]
     resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["kms:GenerateDataKey", "kms:Decrypt"]
+    resources = [aws_kms_key.this_log_key.arn]
   }
 }
 
@@ -72,21 +73,19 @@ data "aws_iam_policy_document" "this_log_key_document" {
       identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
     }
     actions = [
-      "kms:*",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:GenerateDataKey",
+      "kms:DescribeKey"
     ]
     resources = ["*"]
   }
 }
 
-
-resource "aws_kms_key_policy" "kms_key_policy" {
-  key_id = aws_kms_key.this_log_key.id
-  policy = data.aws_iam_policy_document.this_log_key_document.json
-}
-
 resource "aws_kms_key" "this_log_key" {
-  description         = "KMS key for encrypting Step Functions logs"
+  description         = "KMS key for encrypting Step Function ${var.name} logs"
   enable_key_rotation = true
+  policy              = data.aws_iam_policy_document.this_log_key_document.json
 }
 
 resource "aws_cloudwatch_log_group" "this_log_group" {

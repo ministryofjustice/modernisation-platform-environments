@@ -35,4 +35,7 @@ locals {
   application_test_url = "https://edw.laa-development.modernisation-platform.service.justice.gov.uk/edw/"
 
   ecs_target_capacity = 100
+
+  vpc_cidr_block  = data.aws_vpc.shared.cidr_block
+  dns_resolver_ip = cidrhost(local.vpc_cidr_block, 2)
 }

@@ -9,6 +9,8 @@ data "aws_iam_policy_document" "test_ap_airflow" {
 
 module "test_ap_airflow" {
   source              = "./modules/ap_airflow_iam_role"
+
+  environment         = local.environment
   role_name_suffix    = "test-cross-account-access"
   role_description    = ""
   iam_policy_document = data.aws_iam_policy_document.test_ap_airflow.json
@@ -19,7 +21,9 @@ module "test_ap_airflow" {
 module "load_unstructured_atrium_database" {
   count              = local.is-production ? 1 : 0
   source             = "./modules/ap_airflow_load_data_iam_role"
+
   name               = "unstructured-atrium-database"
+  environment        = local.environment
   database_name      = "g4s-atrium-unstructured"
   path_to_data       = "/g4s/atrium_unstructured"
   source_data_bucket = module.s3-json-directory-structure-bucket.bucket
