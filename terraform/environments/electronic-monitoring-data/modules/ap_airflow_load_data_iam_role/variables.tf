@@ -24,6 +24,11 @@ variable "source_data_bucket" {
   description = "source of the data in s3"
 }
 
+variable "athena_dump_bucket" {
+  type        = object({ arn = string })
+  description = "bucket to dump athena queries into"
+}
+
 variable "secret_code" {
   type     = string
   nullable = false
