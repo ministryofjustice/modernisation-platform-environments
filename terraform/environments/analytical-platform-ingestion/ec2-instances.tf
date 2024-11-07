@@ -42,6 +42,7 @@ module "datasync_instance" {
   )
 }
 
+/* This instance is temporary and will be retired when we're satisfied with DataSync end-to-end */
 module "mojo_network_debug_instance" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 

@@ -192,6 +192,7 @@ moved {
   to   = module.datasync_instance_security_group
 }
 
+/* This security group is temporary and will be retired when we're satisfied with DataSync end-to-end */
 module "mojo_network_debug_security_group" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 

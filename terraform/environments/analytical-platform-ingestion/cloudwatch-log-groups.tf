@@ -9,12 +9,12 @@ module "transfer_structured_logs" {
   retention_in_days = 400
 }
 
-module "mojo_debug_logs" {
+module "connected_vpc_route53_resolver_logs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
   version = "5.6.0"
 
-  name              = "/aws/route53/mojo-debug"
+  name              = "/aws/route53-resolver/connected-vpc"
   retention_in_days = 400
 }

@@ -21,6 +21,7 @@ module "connected_vpc_endpoints" {
         { Name = format("%s-datasync", "${local.application_name}-${local.environment}-connected") }
       )
     },
+    /*  These VPC endpoints (ssm, ssmmessages and ec2messages) are temporary and will be retired when we're satisfied with DataSync end-to-end */
     ssm = {
       service             = "ssm"
       service_type        = "Interface"
