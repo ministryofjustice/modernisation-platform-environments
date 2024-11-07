@@ -4,6 +4,7 @@ resource "aws_sns_topic" "dms_alerting" {
   kms_master_key_id = var.account_config.kms_keys.general_shared
 
   http_success_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  http_success_feedback_sample_rate = 100
   http_failure_feedback_role_arn = aws_iam_role.sns_logging_role.arn
 }
 
