@@ -39,7 +39,7 @@
       "docker_image_tag": "test",
       "maat_api_end_point": "http://maat-cd-api.aws.uat.legalservices.gov.uk/maatApi/laaStatus",
       "maat_db_url": "rds.maat.aws.uat.legalservices.gov.uk:1521:MAATDB",
-      "maat_libra_wsdl_url": "https://laa-infox-test.apps.live.cloud-platform.service.justice.gov.uk/infoX/gateway",
+      "maat_libra_wsdl_url": "http://infox.aws.uat.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
       "ec2_max_size": 6,
       "ec2_min_size": 2,
