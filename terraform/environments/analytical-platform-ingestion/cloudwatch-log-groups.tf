@@ -2,7 +2,7 @@ module "transfer_structured_logs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
-  version = "5.6.0"
+  version = "5.6.1"
 
   name              = "/aws/transfer-structured-logs"
   kms_key_id        = module.transfer_logs_kms.key_arn
@@ -13,7 +13,7 @@ module "connected_vpc_route53_resolver_logs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
-  version = "5.6.0"
+  version = "5.6.1"
 
   name              = "/aws/route53-resolver/connected-vpc"
   retention_in_days = 400
