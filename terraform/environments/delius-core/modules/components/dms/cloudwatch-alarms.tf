@@ -203,12 +203,6 @@ resource "aws_iam_role_policy_attachment" "lambda_logging" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "sns_publish" {
-  role       = aws_iam_role.lambda_sns_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSNSPolicy"
-}
-
-
 resource "local_file" "lambda_handler_py" {
   filename = "${path.module}/lambda_function_payload_logger.py"
   content  = <<EOF
