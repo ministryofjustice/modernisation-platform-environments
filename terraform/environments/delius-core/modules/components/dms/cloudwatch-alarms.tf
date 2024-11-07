@@ -2,6 +2,32 @@
 resource "aws_sns_topic" "dms_alerting" {
   name              = "delius-dms-alerting"
   kms_master_key_id = var.account_config.kms_keys.general_shared
+
+  http_success_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  http_failure_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+}
+
+resource "aws_iam_role" "sns_logging_role" {
+  name = "sns-logging-role"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "sns.amazonaws.com"
+        },
+        "Effect": "Allow",
+        "Sid": ""
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_sns_policy" {
+  role       = aws_iam_role.sns_logging_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonSNSRole"
 }
 
 # Create a map of all possible replication tasks, so those that exist may have alarms applied to them.
