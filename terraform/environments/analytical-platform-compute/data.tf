@@ -55,6 +55,11 @@ data "aws_iam_roles" "eks_sso_access_role" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
+data "aws_iam_roles" "data_engineering_sso_role" {
+  name_regex  = "AWSReservedSSO_modernisation-platform-data-eng_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
 data "http" "prometheus_operator_crds" {
   for_each = {
     alertmanagerconfigs = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml"
