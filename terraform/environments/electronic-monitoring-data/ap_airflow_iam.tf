@@ -29,6 +29,7 @@ module "load_unstructured_atrium_database" {
   source_data_bucket = module.s3-json-directory-structure-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
 }
 
 module "load_cap_dw_database" {
@@ -42,6 +43,7 @@ module "load_cap_dw_database" {
   source_data_bucket = module.s3-dms-target-store-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
 }
 
 module "load_alcohol_monitoring_database" {
@@ -55,4 +57,5 @@ module "load_alcohol_monitoring_database" {
   source_data_bucket = module.s3-dms-target-store-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
 }

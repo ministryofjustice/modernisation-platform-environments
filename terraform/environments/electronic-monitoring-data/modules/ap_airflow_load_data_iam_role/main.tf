@@ -18,13 +18,19 @@ data "aws_iam_policy_document" "load_data" {
       "s3:DeleteObject",
       "s3:GetObjectAttributes"
     ]
-    resources = ["${var.source_data_bucket.arn}/${var.path_to_data}*"]
+    resources = [
+      "${var.source_data_bucket.arn}${var.path_to_data}/*",
+      "${var.athena_dump_bucket.arn}${var.path_to_data}/*"
+    ]
   }
   statement {
-    sid       = "ListDataBucket${local.camel-sid}"
-    effect    = "Allow"
-    actions   = ["s3:ListBucket"]
-    resources = [var.source_data_bucket.arn]
+    sid     = "ListDataBucket${local.camel-sid}"
+    effect  = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = [
+      var.source_data_bucket.arn,
+      var.athena_dump_bucket.arn
+    ]
   }
   statement {
     sid    = "AthenaPermissionsForLoadData${local.camel-sid}"
@@ -73,7 +79,7 @@ data "aws_iam_policy_document" "load_data" {
 }
 
 module "load_unstructured_atrium_database" {
-  source              = "../ap_airflow_iam_role"
+  source = "../ap_airflow_iam_role"
 
   environment         = var.environment
   role_name_suffix    = "load-${var.name}"
