@@ -1,6 +1,6 @@
 # SNS topic for monitoring to send alarms to
-resource "aws_sns_topic" "dms_alerting" {
-  name              = "delius-dms-alerting"
+resource "aws_sns_topic" "dms_alerts_topic" {
+  name              = "delius-dms-alerts-topic"
   kms_master_key_id = var.account_config.kms_keys.general_shared
 
   http_success_feedback_role_arn = aws_iam_role.sns_logging_role.arn
@@ -101,8 +101,8 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   evaluation_periods  = 3
   period              = 120
   actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.dms_alerts.arn]
-  ok_actions          = [aws_sns_topic.dms_alerts.arn]
+  alarm_actions       = [aws_sns_topic.dms_alerts_topic.arn]
+  ok_actions          = [aws_sns_topic.dms_alerts_topic.arn]
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
@@ -123,25 +123,14 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   evaluation_periods  = 3
   period              = 120
   actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.dms_alerts.arn]
-  ok_actions          = [aws_sns_topic.dms_alerts.arn]
+  alarm_actions       = [aws_sns_topic.dms_alerts_topic.arn]
+  ok_actions          = [aws_sns_topic.dms_alerts_topic.arn]
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
     ReplicationTaskIdentifier = split(":", each.value.replication_task_arn)[length(split(":", each.value.replication_task_arn)) - 1]
   }
   tags = var.tags
-}
-
-resource "aws_dms_event_subscription" "dms_task_event_subscription" {
-  name       = "dms-task-event-alerts"
-  sns_topic_arn = aws_sns_topic.dms_alerts.arn
-  source_type   = "replication-task"
-  # If this is production then we expect to see starting and stopping of replication tasks
-  # as this would not be normal behaviour.
-  # For non-production this will happen nightly due to automated stop/start
-  event_categories = var.dms_config.is-production ? ["state change", "failure"] : ["failure"]
-  enabled = true
 }
 
 # Pager duty integration
@@ -169,97 +158,133 @@ locals {
 module "pagerduty_core_alerts" {
   #checkov:skip=CKV_TF_1
   depends_on = [
-    aws_sns_topic.dms_alerting
+    aws_sns_topic.dms_alerts_topic
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.dms_alerting.name]
+  sns_topics                = [aws_sns_topic.dms_alerts_topic.name]
   pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
 }
 
+resource "aws_iam_role" "lambda_put_metric_data_role" {
+  name = "lambda-put-metric-data-role"
 
-# DEBUG BELOW - WRITE MESSAGE PAYLOAD
-
-# Step 1: Create an IAM Role for the Lambda function with necessary permissions
-resource "aws_iam_role" "lambda_sns_role" {
-  name = "lambda-sns-role"
   assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    Version = "2012-10-17",
+    Statement = [
       {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-          "Service": "lambda.amazonaws.com"
-        },
-        "Effect": "Allow",
-        "Sid": ""
+        Action    = "sts:AssumeRole",
+        Effect    = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
       }
     ]
   })
 }
 
-# Attach policies for Lambda logging and SNS access
-resource "aws_iam_role_policy_attachment" "lambda_logging" {
-  role       = aws_iam_role.lambda_sns_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+resource "aws_iam_policy" "lambda_put_metric_data_policy" {
+  name = "lambda-put-metric-data-policy"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "cloudwatch:PutMetricData"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
 }
 
-resource "local_file" "lambda_handler_py" {
-  filename = "${path.module}/lambda_function_payload_logger.py"
-  content  = <<EOF
-import json
+resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_policy_attach" {
+  role       = aws_iam_role.lambda_put_metric_data_role.name
+  policy_arn = aws_iam_policy.lambda_put_metric_data_policy.arn
+}
 
-def lambda_handler(event, context):
-    print("Received handler event: " + json.dumps(event, indent=2))
-    return {
-        'statusCode': 200,
-        'body': 'Success'
-    }
+resource "local_file" "lambda_dms_replication_metric_py" {
+  filename = "${path.module}/lambda_dms_replication_metric.py"
+  content  = <<EOF
+  import boto3
+
+  def lambda_handler(event, context):
+      cloudwatch = boto3.client('cloudwatch')
+      cloudwatch.put_metric_data(
+          Namespace='CustomDMSMetrics',
+          MetricData=[
+              {
+                  'MetricName': 'DMSReplicationEvent',
+                  'Dimensions': [
+                      {'Name': 'Service', 'Value': 'DMS'}
+                  ],
+                  'Value': 1,  # Trigger threshold
+                  'Unit': 'Count'
+              }
+          ]
+      )
 EOF
 }
 
-data "archive_file" "lambda_zip" {
+data "archive_file" "lambda_dms_replication_metric_zip" {
   type        = "zip"
-  source_file = local_file.lambda_handler_py.filename
-  output_path = "${path.module}/lambda_function_payload_logger.zip"
+  source_file = local_file.lambda_dms_replication_metric_py.filename
+  output_path = "${path.module}/lambda_dms_replication_metric.zip"
 }
 
-
-# Step 2: Create the Lambda function to process SNS messages
-resource "aws_lambda_function" "sns_handler" {
-  filename         = data.archive_file.lambda_zip.output_path
-  function_name    = "SnsPayloadLogger"
-  role             = aws_iam_role.lambda_sns_role.arn
-  handler          = "lambda_function_payload_logger.lambda_handler"
-  runtime          = "python3.8"
-
-  # Environment variables (optional)
+resource "aws_lambda_function" "dms_replication_metric_publisher" {
+  function_name = "dms-replication-metric-publisher"
+  role          = aws_iam_role.lambda_put_metric_data_role.arn
+  handler       = "lambda_dms_replication_metric.lambda_handler"
+  runtime       = "python3.8"
+  filename      = data.archive_file.lambda_dms_replication_metric_zip.output_path
   environment {
     variables = {
-      LOG_LEVEL = "INFO"
+      METRIC_NAMESPACE = "CustomDMSMetrics",
+      METRIC_NAME      = "DMSReplicationEvent"
     }
   }
+
+  depends_on = [data.archive_file.lambda_dms_replication_metric_zip]
 }
 
-# Step 3: Create the SNS topic
-resource "aws_sns_topic" "dms_alerts" {
-  name = "dms-alerts-topic"
+resource "aws_cloudwatch_metric_alarm" "dms_replication_alarm" {
+  alarm_name          = "DMSReplicationEventAlarm"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "1"
+  metric_name         = "DMSReplicationEvent"
+  namespace           = "CustomDMSMetrics"
+  period              = "60"
+  statistic           = "Sum"
+  threshold           = 1
+  alarm_description   = "Alarm when DMSReplicationEvent metric is >= 1"
+
+  alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
 }
 
-# Step 4: Subscribe the Lambda function to the SNS topic
-resource "aws_sns_topic_subscription" "sns_lambda_subscription" {
-  topic_arn = aws_sns_topic.dms_alerts.arn
+# SNS Topic for DMS replication events
+# This is NOT the same as for DMS Cloudwatch Alarms (dms_alerting)
+# and is used to trigger the Lamda function if an event happens during
+# DMS Replication (Events are NOT detected by CloudWatch Alarms)
+resource "aws_sns_topic" "dms_events_topic" {
+  name = "dms_events_topic"
+}
+
+resource "aws_sns_topic_subscription" "dms_events_lambda_subscription" {
+  topic_arn = aws_sns_topic.dms_events_topic.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.sns_handler.arn
-
-  # Grant SNS permission to invoke the Lambda function
-  depends_on = [aws_lambda_permission.allow_sns_invoke]
+  endpoint  = aws_lambda_function.dms_replication_metric_publisher.arn
 }
 
-# Step 5: Grant SNS permission to invoke the Lambda function
-resource "aws_lambda_permission" "allow_sns_invoke" {
-  statement_id  = "AllowSNSInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.sns_handler.function_name
-  principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.dms_alerts.arn
+
+resource "aws_dms_event_subscription" "dms_task_event_subscription" {
+  name       = "dms-task-event-alerts"
+  sns_topic_arn = aws_sns_topic.dms_events_topic.arn
+  source_type   = "replication-task"
+  # If this is production then we expect to see starting and stopping of replication tasks
+  # as this would not be normal behaviour.
+  # For non-production this will happen nightly due to automated stop/start
+  event_categories = var.dms_config.is-production ? ["state change", "failure"] : ["failure"]
+  enabled = true
 }
