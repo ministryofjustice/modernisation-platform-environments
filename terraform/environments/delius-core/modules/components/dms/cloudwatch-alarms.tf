@@ -101,8 +101,8 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   evaluation_periods  = 3
   period              = 120
   actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.dms_alerting.arn]
-  ok_actions          = [aws_sns_topic.dms_alerting.arn]
+  alarm_actions       = [aws_sns_topic.dms_alerts.arn]
+  ok_actions          = [aws_sns_topic.dms_alerts.arn]
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
@@ -123,8 +123,8 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   evaluation_periods  = 3
   period              = 120
   actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.dms_alerting.arn]
-  ok_actions          = [aws_sns_topic.dms_alerting.arn]
+  alarm_actions       = [aws_sns_topic.dms_alerts.arn]
+  ok_actions          = [aws_sns_topic.dms_alerts.arn]
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
@@ -135,7 +135,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
 
 resource "aws_dms_event_subscription" "dms_task_event_subscription" {
   name       = "dms-task-event-alerts"
-  sns_topic_arn = aws_sns_topic.dms_alerting.arn
+  sns_topic_arn = aws_sns_topic.dms_alerts.arn
   source_type   = "replication-task"
   # If this is production then we expect to see starting and stopping of replication tasks
   # as this would not be normal behaviour.
@@ -174,4 +174,104 @@ module "pagerduty_core_alerts" {
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.dms_alerting.name]
   pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
+}
+
+
+# DEBUG BELOW - WRITE MESSAGE PAYLOAD
+
+# Step 1: Create an IAM Role for the Lambda function with necessary permissions
+resource "aws_iam_role" "lambda_sns_role" {
+  name = "lambda-sns-role"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "lambda.amazonaws.com"
+        },
+        "Effect": "Allow",
+        "Sid": ""
+      }
+    ]
+  })
+}
+
+# Attach policies for Lambda logging and SNS access
+resource "aws_iam_role_policy_attachment" "lambda_logging" {
+  role       = aws_iam_role.lambda_sns_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "sns_publish" {
+  role       = aws_iam_role.lambda_sns_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSNSPolicy"
+}
+
+
+resource "local_file" "lambda_handler_py" {
+  filename = "${path.module}/lambda_function_payload_logger.py"
+  content  = <<EOF
+import json
+
+def lambda_handler(event, context):
+    print("Received event: " + json.dumps(event, indent=2))
+    return {
+        'statusCode': 200,
+        'body': 'Success'
+    }
+EOF
+}
+
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_file = local_file.lambda_handler_py.filename
+  output_path = "${path.module}/lambda_function_payload_logger.zip"
+}
+
+
+# Step 2: Create the Lambda function to process SNS messages
+resource "aws_lambda_function" "sns_handler" {
+  filename         = data.archive_file.lambda_zip.output_path
+  function_name    = "SnsPayloadLogger"
+  role             = aws_iam_role.lambda_sns_role.arn
+  handler          = "index.lambda_handler"
+  runtime          = "python3.8"
+
+  # Environment variables (optional)
+  environment {
+    variables = {
+      LOG_LEVEL = "INFO"
+    }
+  }
+}
+
+# Sample Python code for the Lambda function:
+# def lambda_handler(event, context):
+#     import json
+#     print("Received event:", json.dumps(event, indent=2))
+#     return {"statusCode": 200, "body": "Success"}
+
+# Step 3: Create the SNS topic
+resource "aws_sns_topic" "dms_alerts" {
+  name = "dms-alerts-topic"
+}
+
+# Step 4: Subscribe the Lambda function to the SNS topic
+resource "aws_sns_topic_subscription" "sns_lambda_subscription" {
+  topic_arn = aws_sns_topic.dms_alerts.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.sns_handler.arn
+
+  # Grant SNS permission to invoke the Lambda function
+  depends_on = [aws_lambda_permission.allow_sns_invoke]
+}
+
+# Step 5: Grant SNS permission to invoke the Lambda function
+resource "aws_lambda_permission" "allow_sns_invoke" {
+  statement_id  = "AllowSNSInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.sns_handler.function_name
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.dms_alerts.arn
 }
