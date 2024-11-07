@@ -209,7 +209,7 @@ resource "local_file" "lambda_handler_py" {
 import json
 
 def lambda_handler(event, context):
-    print("Received event: " + json.dumps(event, indent=2))
+    print("Received handler event: " + json.dumps(event, indent=2))
     return {
         'statusCode': 200,
         'body': 'Success'
@@ -239,12 +239,6 @@ resource "aws_lambda_function" "sns_handler" {
     }
   }
 }
-
-# Sample Python code for the Lambda function:
-# def lambda_handler(event, context):
-#     import json
-#     print("Received event:", json.dumps(event, indent=2))
-#     return {"statusCode": 200, "body": "Success"}
 
 # Step 3: Create the SNS topic
 resource "aws_sns_topic" "dms_alerts" {
