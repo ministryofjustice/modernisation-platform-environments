@@ -204,7 +204,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logging" {
 }
 
 resource "local_file" "lambda_handler_py" {
-  filename = "${path.module}/lambda_function_payload_logger.py"
+  filename = "${path.module}/index.py"
   content  = <<EOF
 import json
 
