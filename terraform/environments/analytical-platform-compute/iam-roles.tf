@@ -335,6 +335,7 @@ module "quicksight_vpc_connection_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.46.0"
 
+  create_role       = true
   role_name_prefix  = "quicksight-vpc-connection"
   role_requires_mfa = false
 
