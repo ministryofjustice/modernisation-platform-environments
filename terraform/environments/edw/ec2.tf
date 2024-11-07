@@ -70,7 +70,6 @@ export ENV="${local.application_data.accounts[local.environment].edw_environment
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
 export EFS="${aws_efs_file_system.edw.id}"
 export SECRET=`/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db-master-password2.id} { --query SecretString --output text`
-echo "export SECRET=\"$SECRET\"" >> /etc/profile
 export host="$ip4 $APPNAME-$ENV infraedw"
 echo $host >>/etc/hosts
 sed -i '/^10.221/d' /etc/hosts
