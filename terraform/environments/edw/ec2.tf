@@ -28,46 +28,33 @@ search ${data.aws_route53_zone.external.name} eu-west-2.compute.internal
 nameserver ${local.dns_resolver_ip}" > /etc/resolv.conf
 chattr +i /etc/resolv.conf
 
-# DOESNT WORK IN LZ, DO WE WANT IN MP???
 #### adjust the NTP (Network Time Protocol) settings to use the AWS time sync service as the time source
 echo "---configure aws timesync (external ntp source)"
-AwsTimeSync(){
-    local RHEL=$1
-    local SOURCE=169.254.169.123
 
+# Install chrony if not installed
+if ! yum list installed chrony &>/dev/null; then
+  sudo yum install -y chrony
+fi
 
-  NtpD(){
-    local CONF=/etc/ntp.conf
-    # Check if the server line already exists
-    if ! grep -q "server 169.254.169.123" $CONF; then
-        sed -i 's/server \S/#server \S/g' $CONF && \
-        sed -i "20i\server 169.254.169.123 prefer iburst" $CONF
-        /etc/init.d/ntpd status >/dev/null 2>&1 \
-            && /etc/init.d/ntpd restart || /etc/init.d/ntpd start
-        ntpq -p
-    else
-        echo "NTP server 169.254.169.123 is already configured."
-    fi
-}
-    
-    ChronyD(){
-        local CONF=/etc/chrony.conf
-        sed -i 's/server \\S/#server \\S/g' $CONF && \
-        sed -i "7i\server $SOURCE prefer iburst" $CONF
-        systemctl status chronyd >/dev/null 2>&1 \
-            && systemctl restart chronyd || systemctl start chronyd
-        chronyc sources
-    }
-    case $RHEL in
-        5)
-            NtpD
-            ;;
-        7)
-            ChronyD
-            ;;
-    esac
-}
-AwsTimeSync $(cat /etc/redhat-release | cut -d. -f1 | awk '{print $NF}')
+# Check if the chrony.conf file exists and is properly configured
+if ! grep -q "server 169.254.169.123" /etc/chrony.conf; then
+  sudo bash -c 'cat << EOC9 > /etc/chrony.conf
+server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4
+# Record the rate at which the system clock gains/losses time.
+driftfile /var/lib/chrony/drift
+# Enable kernel RTC synchronization.
+rtcsync
+# In first three updates step the system clock instead of slew
+# if the adjustment is larger than 1.0 seconds.
+makestep 1.0 3
+logdir /var/log/chrony
+# Select which information is logged
+log measurements statistics tracking
+EOC9'
+fi
+
+# Start chronyd service
+sudo /etc/init.d/chronyd start
 
 #### Install AWS cli
 echo "---Installing AWS cli"
@@ -340,11 +327,11 @@ sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_u
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
-sudo su - oracle -c "sqlplus / as sysdba << EOF
+sudo su - oracle -c "sqlplus / as sysdba << EOC6
 shutdown abort;
 startup;
 exit;
-EOF"
+EOC6"
 
 EOF
 }
