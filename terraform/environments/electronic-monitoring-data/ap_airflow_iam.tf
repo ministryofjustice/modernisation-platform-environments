@@ -35,7 +35,7 @@ module "load_cap_dw_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
-  name               = "load-cap-dw"
+  name               = "cap-dw"
   environment        = local.environment
   database_name      = "g4s-cap-dw"
   path_to_data       = "/g4s_cap_dw"
