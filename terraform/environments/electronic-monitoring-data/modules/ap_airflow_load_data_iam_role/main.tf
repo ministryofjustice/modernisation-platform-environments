@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "load_data" {
       "athena:StopQueryExecution"
     ]
     resources = [
-      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/primary",
+      "arn:aws:athena:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:workgroup/${data.aws_caller_identity.current.id}-default",
     ]
   }
   statement {
