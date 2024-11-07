@@ -204,7 +204,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logging" {
 }
 
 resource "local_file" "lambda_handler_py" {
-  filename = "${path.module}/index.py"
+  filename = "${path.module}/lambda_function_payload_logger.py"
   content  = <<EOF
 import json
 
@@ -229,7 +229,7 @@ resource "aws_lambda_function" "sns_handler" {
   filename         = data.archive_file.lambda_zip.output_path
   function_name    = "SnsPayloadLogger"
   role             = aws_iam_role.lambda_sns_role.arn
-  handler          = "index.lambda_handler"
+  handler          = "lambda_function_payload_logger.lambda_handler"
   runtime          = "python3.8"
 
   # Environment variables (optional)
