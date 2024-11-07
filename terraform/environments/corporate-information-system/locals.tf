@@ -11,7 +11,7 @@ hostname ${local.application_name_short}
 
 # Increase ssh session timeout
 sed -i 's/#ClientAliveInterval.*/ClientAliveInterval 1200/' /etc/ssh/sshd_config
-sed -i 's/#ClientAliveCountMax.*/ClientAliveCountMax 3/' /etc/ssh/sshd_config
+sed -i 's/#ClientAliveCountMax.*/ClientAliveCountMax 5/' /etc/ssh/sshd_config
 service sshd restart 
 
 # Add TCP keepalive time to sysctl.conf ---> keepalive solution
