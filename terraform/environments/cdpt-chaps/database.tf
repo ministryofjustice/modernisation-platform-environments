@@ -43,10 +43,7 @@ resource "aws_security_group" "db" {
     from_port       = 1433
     to_port         = 1433
     protocol        = "tcp"
-    security_groups = [
-      aws_security_group.ecs_service.id, 
-      aws_security_group.chapsdotnet_service.id
-    ]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
   egress {
     from_port   = 0
