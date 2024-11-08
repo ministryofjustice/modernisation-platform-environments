@@ -6,8 +6,9 @@ data "aws_route53_zone" "application_zone" {
 }
 
 data "aws_route53_zone" "selected" {
+  provider     = aws.core-network-services
   name         = "modernisation-platform.service.justice.gov.uk."
-  private_zone = true  # Set to true if it's a Private Hosted Zone
+  private_zone = false  # Set to true if it's a Private Hosted Zone
 }
 
 data "aws_instances" "chaps_instances" {
