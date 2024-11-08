@@ -81,9 +81,6 @@ resource "aws_instance" "defect_dojo" {
   tags = {
     Name = "Defect-Dojo"
   }
-  lifecycle {
-  replace_triggered_by = [aws_instance.defect_dojo.user_data]
-}
 }
 
 
