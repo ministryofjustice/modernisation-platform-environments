@@ -76,19 +76,6 @@ resource "aws_instance" "defect_dojo" {
               # Update and install dependencies
               apt-get update
               apt-get upgrade
-              apt-get install -y docker.io docker-compose
-
-              # Start Docker
-              systemctl start docker
-              systemctl enable docker
-
-              # Clone DefectDojo Docker repo
-              git clone https://github.com/DefectDojo/django-DefectDojo.git /opt/defectdojo
-              cd /opt/defectdojo
-              
-
-              # Run DefectDojo using Docker Compose
-              docker-compose up -d
               EOF
 
   tags = {
