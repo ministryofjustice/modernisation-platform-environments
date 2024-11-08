@@ -270,9 +270,9 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_alarm" {
 resource "aws_sns_topic" "dms_events_topic" {
   name = "dms_events_topic"
 
-  http_success_feedback_role_arn = aws_iam_role.sns_logging_role.arn
-  http_success_feedback_sample_rate = 100
-  http_failure_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  lambda_success_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  lambda_success_feedback_sample_rate = 100
+  lambda_failure_feedback_role_arn = aws_iam_role.sns_logging_role.arn
 }
 
 resource "aws_sns_topic_subscription" "dms_events_lambda_subscription" {
