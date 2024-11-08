@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "load_data" {
     ]
     resources = [
       "${var.source_data_bucket.arn}${var.path_to_data}/*",
-      "${var.athena_dump_bucket.arn}${var.path_to_data}/*"
+      "${var.athena_dump_bucket.arn}/output${var.path_to_data}/*"
     ]
   }
   statement {
