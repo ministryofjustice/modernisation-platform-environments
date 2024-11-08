@@ -12,7 +12,6 @@ variable "zone_id" {
 variable "subdomain_name" {
   description = "The subdomain to assign to the chaps EC2 instance (e.g., cdpt-chaps.hq-development)"
   type        = string
-  default 
 }
 
 variable "environment" {
