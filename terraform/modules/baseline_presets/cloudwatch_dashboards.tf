@@ -450,7 +450,7 @@ locals {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "EC2 Endpoint Monitoring endpoint-status"
+          title   = "endpoint-status"
           stat    = "Maximum"
           yAxis = {
             left = {
@@ -468,7 +468,7 @@ locals {
           view    = "bar"
           stacked = false
           region  = "eu-west-2"
-          title   = "EC2 Endpoint Monitoring endpoint-cert-days-to-expiry"
+          title   = "endpoint-cert-days-to-expiry"
           stat    = "Minimum"
           yAxis = {
             left = {
