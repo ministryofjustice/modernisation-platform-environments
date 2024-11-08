@@ -10,7 +10,7 @@ data "aws_route53_zone" "selected" {
   private_zone = false  # Set to true if it's a Private Hosted Zone
 }
 
-data "aws_instance" "chaps-instances" {
+data "aws_instances" "chaps-instances" {
   filter {
     name   = "tag:Name"
     values = ["cdpt-chaps-cluster-scaling-group"] 
