@@ -195,6 +195,7 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
+      "s3:DeleteObject",
       "s3:ListBucket",
       "s3:ListBucketMultipartUploads",
       "s3:ListMultipartUploadParts"
