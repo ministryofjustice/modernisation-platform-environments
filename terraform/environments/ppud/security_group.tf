@@ -969,6 +969,17 @@ resource "aws_security_group" "docker-build-server" {
   ingress = []
 }
 
+resource "aws_security_group_rule" "docker-build-server-Ingress" {
+  description       = "Rule to allow port 25 traffic inbound"
+  count             = local.is-production == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 25
+  to_port           = 25
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.docker-build-server[0].id
+}
+
 resource "aws_security_group_rule" "docker-build-server-Egress" {
   description       = "Rule to allow port 443 traffic outbound"
   count             = local.is-production == true ? 1 : 0
@@ -997,6 +1008,17 @@ resource "aws_security_group_rule" "docker-build-server-Egress-2" {
   type              = "egress"
   from_port         = 80
   to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.docker-build-server[0].id
+}
+
+resource "aws_security_group_rule" "docker-build-server-Egress-3" {
+  description       = "Rule to allow port 25 traffic outbound"
+  count             = local.is-production == true ? 1 : 0
+  type              = "egress"
+  from_port         = 25
+  to_port           = 25
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.docker-build-server[0].id
