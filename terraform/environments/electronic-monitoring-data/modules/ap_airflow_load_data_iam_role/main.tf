@@ -21,6 +21,8 @@ data "aws_iam_policy_document" "load_data" {
     ]
     resources = [
       "${var.source_data_bucket.arn}${var.path_to_data}/*",
+      "${var.source_data_bucket.arn}/staging${var.path_to_data}/*",
+      "${var.cadt_bucket.arn}/staging${var.path_to_data}/*",
       "${var.athena_dump_bucket.arn}/output/*"
     ]
   }
@@ -30,7 +32,8 @@ data "aws_iam_policy_document" "load_data" {
     actions = ["s3:ListBucket"]
     resources = [
       var.source_data_bucket.arn,
-      var.athena_dump_bucket.arn
+      var.athena_dump_bucket.arn,
+      var.cadt_bucket.arn
     ]
   }
   statement {
