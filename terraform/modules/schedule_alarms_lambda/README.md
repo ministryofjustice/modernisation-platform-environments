@@ -39,6 +39,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_alarm_list"></a> [alarm\_list](#input\_alarm\_list) | List of specific alarms to manage (empty list means all alarms) | `list(string)` | `[]` | no |
+| <a name="input_alarm_patterns"></a> [alarm\_patterns](#input\_alarm\_patterns) | List of alarm name patterns to match (e.g., ['alarm-name-\*', '\*-other-alarm']). Uses [fnmatch](https://docs.python.org/3/library/fnmatch.html). | `list(string)` | `[]` | no |
 | <a name="input_disable_weekend"></a> [disable\_weekend](#input\_disable\_weekend) | Whether to disable alarms for the entire weekend | `bool` | `true` | no |
 | <a name="input_end_time"></a> [end\_time](#input\_end\_time) | End time for enabling alarms (HH:MM) | `string` | `"06:15"` | no |
 | <a name="input_lambda_function_name"></a> [lambda\_function\_name](#input\_lambda\_function\_name) | Name of the Lambda function | `string` | n/a | yes |

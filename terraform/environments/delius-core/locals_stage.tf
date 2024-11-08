@@ -35,8 +35,6 @@ locals {
     instance_type  = "r7i.2xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
 
-    inline_ebs = true
-
     primary_instance_count = 1
     standby_count          = 0
 
@@ -84,14 +82,14 @@ locals {
 
   delius_microservices_configs_stage = {
     weblogic = {
-      image_tag        = "5.7.6"
+      image_tag        = "6.2.0.3"
       container_port   = 8080
       container_memory = 4096
       container_cpu    = 2048
     }
 
     weblogic_eis = {
-      image_tag        = "5.7.6"
+      image_tag        = "6.2.0.3"
       container_port   = 8080
       container_memory = 2048
       container_cpu    = 1024
@@ -110,16 +108,6 @@ locals {
       slapd_log_level  = "conns,config,stats,stats2"
       container_cpu    = 2048
       container_memory = 4096
-    }
-
-    pdf_creation = {
-      image_tag      = "5.7.6"
-      container_port = 80
-    }
-
-    newtech = {
-      image_tag      = "5.7.6"
-      container_port = 80
     }
   }
 

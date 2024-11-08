@@ -38,7 +38,6 @@ locals {
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
-    inline_ebs             = false
     primary_instance_count = 1
     standby_count          = 2
     ebs_volumes = {
@@ -77,14 +76,14 @@ locals {
 
   delius_microservices_configs_dev = {
     weblogic = {
-      image_tag        = "5.7.6"
+      image_tag        = "6.2.0.3"
       container_port   = 8080
       container_memory = 4096
       container_cpu    = 2048
     }
 
     weblogic_eis = {
-      image_tag        = "5.7.6"
+      image_tag        = "6.2.0.3"
       container_port   = 8080
       container_memory = 2048
       container_cpu    = 1024
@@ -103,16 +102,6 @@ locals {
       slapd_log_level  = "stats"
       container_cpu    = 512
       container_memory = 1024
-    }
-
-    pdf_creation = {
-      image_tag      = "2021-06-24.995.8c1da2c"
-      container_port = 8080
-    }
-
-    newtech = {
-      image_tag      = "2024-05-28.10054.9e25657"
-      container_port = 80
     }
   }
 

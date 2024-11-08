@@ -280,3 +280,32 @@ module "analytical_platform_lake_formation_share_policy" {
 
   policy = data.aws_iam_policy_document.analytical_platform_share_policy.json
 }
+
+data "aws_iam_policy_document" "quicksight_vpc_connection" {
+  statement {
+    sid    = "QuickSightVPCConnection"
+    effect = "Allow"
+    actions = [
+      "ec2:CreateNetworkInterface",
+      "ec2:ModifyNetworkInterfaceAttribute",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeSecurityGroups"
+    ]
+    resources = ["*"]
+  }
+}
+
+module "quicksight_vpc_connection_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.46.0"
+
+  name_prefix = "quicksight-vpc-connection"
+
+  policy = data.aws_iam_policy_document.quicksight_vpc_connection.json
+
+  tags = local.tags
+}

@@ -38,11 +38,15 @@ resource "aws_security_group" "db" {
   name        = "${local.application_name}-db-sg"
   description = "Allow DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
+  
   ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    security_groups = [
+      aws_security_group.ecs_service.id, 
+      aws_security_group.chapsdotnet_service.id
+    ]
   }
   egress {
     from_port   = 0
