@@ -119,7 +119,7 @@ data "aws_route53_zone" "selected" {
  # Route 53 A record for the EC2 private IP
 resource "aws_route53_record" "a_record" {
   zone_id = data.aws_route53_zone.selected.zone_id
-  name    = var.subdomain_name
+  name    = local.application_data.accounts[local.environment].subdomain_name
   type    = "A"
   ttl     = "300"
 
