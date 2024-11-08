@@ -110,3 +110,18 @@ resource "aws_route53_record" "external_prod" {
     evaluate_target_health = true
   }
 }
+
+data "aws_route53_zone" "selected" {
+ name = var.domain_name
+ private_zone = true
+}
+
+ # Route 53 A record for the EC2 private IP
+resource "aws_route53_record" "a_record" {
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = var.subdomain_name
+  type    = "A"
+  ttl     = "300"
+
+  records = [data.aws_instances.chaps_instances[*].private_ip]
+}
