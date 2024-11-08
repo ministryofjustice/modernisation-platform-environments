@@ -255,7 +255,7 @@ resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publis
   function_name = aws_lambda_function.dms_replication_metric_publisher.function_name
   principal     = "sns.amazonaws.com"
 
-  source_arn    = aws_sns_topic.dms_alerts_topic.arn
+  source_arn    = aws_sns_topic.dms_events_topic.arn
 }
 
 
