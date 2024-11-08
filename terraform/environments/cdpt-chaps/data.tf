@@ -6,7 +6,7 @@ data "aws_route53_zone" "application_zone" {
 }
 
 data "aws_route53_zone" "selected" {
-  name         = var.domain_name
+  name         = "modernisation-platform.service.justice.gov.uk"
   private_zone = false  # Set to true if it's a Private Hosted Zone
 }
 
