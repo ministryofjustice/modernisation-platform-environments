@@ -11,7 +11,8 @@ module "efs" {
   tags                            = var.tags
   enable_platform_backups         = var.enable_platform_backups
 
-  vpc_id     = var.account_config.shared_vpc_id
-  subnet_ids = var.account_config.private_subnet_ids
-  vpc_cidr   = var.account_config.shared_vpc_cidr
+  vpc_id       = var.account_config.shared_vpc_id
+  subnet_ids   = var.account_config.private_subnet_ids
+  vpc_cidr     = var.account_config.shared_vpc_cidr
+  account_info = var.account_info
 }

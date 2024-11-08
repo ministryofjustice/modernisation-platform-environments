@@ -15,18 +15,17 @@ locals {
 
       /* Transit Gateway */
       transit_gateway_routes = [
-        /* MoJO DNS Resolver Service */
-        "10.180.80.5/32",
-        "10.180.81.5/32"
+        /* Send all traffic not destined for local down to the transit gateway */
+        "10.0.0.0/8"
       ]
 
       /* Observability Platform */
       observability_platform = "development"
 
       /* Image Versions */
-      scan_image_version     = "0.1.2"
-      transfer_image_version = "0.0.17"
-      notify_image_version   = "0.0.18"
+      scan_image_version     = "0.1.3"
+      transfer_image_version = "0.0.18"
+      notify_image_version   = "0.0.19"
 
       /* Target Buckets */
       target_buckets = ["mojap-land-dev"]
@@ -60,18 +59,17 @@ locals {
 
       /* Transit Gateway */
       transit_gateway_routes = [
-        /* MoJO DNS Resolver Service */
-        "10.180.80.5/32",
-        "10.180.81.5/32"
+        /* Send all traffic not destined for local down to the transit gateway */
+        "10.0.0.0/8"
       ]
 
       /* Observability Platform */
       observability_platform = "production"
 
       /* Image Versions */
-      scan_image_version     = "0.1.2"
-      transfer_image_version = "0.0.17"
-      notify_image_version   = "0.0.18"
+      scan_image_version     = "0.1.3"
+      transfer_image_version = "0.0.18"
+      notify_image_version   = "0.0.19"
 
       /* Target Buckets */
       target_buckets = ["mojap-land"]

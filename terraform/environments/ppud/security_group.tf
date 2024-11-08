@@ -141,6 +141,8 @@ resource "aws_security_group_rule" "WAM-Data-Access-Server-Egress-2" {
   security_group_id = aws_security_group.WAM-Data-Access-Server.id
 }
 
+# WAM Portal Group
+
 resource "aws_security_group" "WAM-Portal" {
   vpc_id      = data.aws_vpc.shared.id
   name        = "WAM-Portal"
@@ -169,6 +171,16 @@ resource "aws_security_group_rule" "WAM-Portal-ingress-1" {
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.WAM-Portal.id
+}
+
+resource "aws_security_group_rule" "WAM-Portal-ingress-2" {
+  description              = "Rule to allow port 443 traffic inbound"
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.WAM-ALB.id
+  security_group_id        = aws_security_group.WAM-Portal.id
 }
 
 resource "aws_security_group_rule" "WAM-Portal-egress" {
@@ -957,6 +969,17 @@ resource "aws_security_group" "docker-build-server" {
   ingress = []
 }
 
+resource "aws_security_group_rule" "docker-build-server-Ingress" {
+  description       = "Rule to allow port 25 traffic inbound"
+  count             = local.is-production == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 25
+  to_port           = 25
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.docker-build-server[0].id
+}
+
 resource "aws_security_group_rule" "docker-build-server-Egress" {
   description       = "Rule to allow port 443 traffic outbound"
   count             = local.is-production == true ? 1 : 0
@@ -990,64 +1013,13 @@ resource "aws_security_group_rule" "docker-build-server-Egress-2" {
   security_group_id = aws_security_group.docker-build-server[0].id
 }
 
-# WAM Server Group
-
-resource "aws_security_group" "WAM-Server-Group" {
-  vpc_id      = data.aws_vpc.shared.id
-  name        = "WAM-Server"
-  description = "WAM-Server for Dev, UAT & PROD"
-
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}"
-  }
-}
-
-resource "aws_security_group_rule" "WAM-Server-Group-ingress" {
-  description       = "Rule to allow port 80 traffic inbound"
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.WAM-Server-Group.id
-}
-
-resource "aws_security_group_rule" "WAM-Server-Group-ingress-1" {
-  description       = "Rule to allow port 3389 traffic inbound"
-  type              = "ingress"
-  from_port         = 3389
-  to_port           = 3389
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.WAM-Server-Group.id
-}
-
-resource "aws_security_group_rule" "WAM-Server-Group-egress" {
-  description       = "Rule to allow all traffic outbound"
+resource "aws_security_group_rule" "docker-build-server-Egress-3" {
+  description       = "Rule to allow port 25 traffic outbound"
+  count             = local.is-production == true ? 1 : 0
   type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "all"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.WAM-Server-Group.id
-}
-
-resource "aws_security_group_rule" "WAM-Server-Group-Egress-1" {
-  description       = "Rule to allow port 443 traffic outbound"
-  type              = "egress"
-  from_port         = 443
-  to_port           = 443
+  from_port         = 25
+  to_port           = 25
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.WAM-Server-Group.id
-}
-
-resource "aws_security_group_rule" "WAM-Server-Group-Egress-2" {
-  description       = "Rule to allow port 80 traffic outbound"
-  type              = "egress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.WAM-Server-Group.id
+  security_group_id = aws_security_group.docker-build-server[0].id
 }

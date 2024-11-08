@@ -9,7 +9,7 @@ resource "aws_efs_file_system" "this" {
 
   tags = merge(
     var.tags,
-    { Name = var.name },
+    { Name = "${var.account_info.application_name}-${var.env_name}-${var.name}" },
     var.enable_platform_backups != null ? { "backup" = var.enable_platform_backups ? "true" : "false" } : {}
   )
 }
@@ -23,7 +23,7 @@ resource "aws_efs_mount_target" "this" {
 }
 
 # module for efs access point
-resource "aws_efs_access_point" "ldap" {
+resource "aws_efs_access_point" "this" {
   file_system_id = aws_efs_file_system.this.id
   root_directory {
     path = "/"
@@ -31,9 +31,14 @@ resource "aws_efs_access_point" "ldap" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.env_name}-${var.name}-efs-access-point"
+      Name = "${var.account_info.application_name}-${var.env_name}-efs-access-point"
     }
   )
+}
+
+moved {
+  from = aws_efs_access_point.ldap
+  to   = aws_efs_access_point.this
 }
 
 # Security Group
