@@ -249,6 +249,16 @@ resource "aws_lambda_function" "dms_replication_metric_publisher" {
   depends_on = [data.archive_file.lambda_dms_replication_metric_zip]
 }
 
+resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publisher_handler" {
+  statement_id  = "AllowSNSInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.dms_replication_metric_publisher.function_name
+  principal     = "sns.amazonaws.com"
+
+  source_arn    = aws_sns_topic.dms_alerts_topic.arn
+}
+
+
 resource "aws_cloudwatch_metric_alarm" "dms_replication_alarm" {
   alarm_name          = "DMSReplicationEventAlarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
