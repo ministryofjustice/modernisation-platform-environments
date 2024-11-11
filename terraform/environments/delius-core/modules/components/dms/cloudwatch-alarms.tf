@@ -225,7 +225,7 @@ EOF
 
 data "archive_file" "lambda_dms_replication_metric_zip" {
   type        = "zip"
-  source_file = "${path.module}/lambda/dms_replication_metric.py"
+  source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/lambda/dms_replication_metric.zip"
   excludes    = ["lambda_dms_replication_metric.zip"]
 }
