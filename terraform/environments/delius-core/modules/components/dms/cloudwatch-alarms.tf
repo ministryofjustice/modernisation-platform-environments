@@ -226,7 +226,8 @@ EOF
 data "archive_file" "lambda_dms_replication_metric_zip" {
   type        = "zip"
   source_file = "${path.module}/lambda/dms_replication_metric.py"
-  output_path = "${path.module}/lambda_dms_replication_metric.zip"
+  output_path = "${path.module}/lambda/dms_replication_metric.zip"
+  excludes    = ["lambda_dms_replication_metric.zip"]
 }
 
 resource "aws_lambda_function" "dms_replication_metric_publisher" {
