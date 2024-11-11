@@ -1,6 +1,7 @@
 import boto3
 import json
 import logging
+import re
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -12,12 +13,12 @@ def lambda_handler(event, context):
 
         message = json.loads(record['Sns']['Message'])
 
-        event_type = message.get("EventType")
-        status = message.get("status")
+        event_message = message.get("Event Message")
 
         logger.info("SNS Message: %s",message)
 
-        if event_type == "replication-task-state-change" and status == "STARTED":
+        if re.search(r"^Replication task has started.$",event_message):
+            logger.info("Task started")
             cloudwatch.put_metric_data(
                 Namespace='CustomDMSMetrics',
                 MetricData=[
@@ -31,7 +32,8 @@ def lambda_handler(event, context):
                     }
                 ]
             )
-        elif event_type == "failure":
+        elif re.search(r"^Replication task has failed..*$",event_message):
+            logger.info("Task failed")
             cloudwatch.put_metric_data(
                 Namespace='CustomDMSMetrics',
                 MetricData=[
