@@ -116,8 +116,8 @@ resource "aws_route53_record" "a_records" {
   count    = length(data.aws_instances.chaps_instances.private_ips) 
   zone_id  = data.aws_route53_zone.inner.zone_id
   provider = aws.core-vpc
-  name     = "chaps-instance-${count.index + 1}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  name     = "chaps-instance-${count.index + 1}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
   ttl      = 300
-  records  = data.aws_instances.chaps_instances.private_ips
+  records  = [data.aws_instances.chaps_instances.private_ips[count.index]]
 }
