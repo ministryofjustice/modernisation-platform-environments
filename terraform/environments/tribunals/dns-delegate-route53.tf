@@ -64,19 +64,19 @@ resource "aws_route53_record" "ec2_instances" {
   records  = ["34.243.192.28"]
 }
 
-resource "aws_route53_record" "ec2_instances_migrated" {
-  count    = local.is-production ? length(local.ec2_records_migrated) : 0
-  provider = aws.core-network-services
-  zone_id  = local.production_zone_id
-  name     = local.ec2_records_migrated[count.index]
-  type     = "A"
+# resource "aws_route53_record" "ec2_instances_migrated" {
+#   count    = local.is-production ? length(local.ec2_records_migrated) : 0
+#   provider = aws.core-network-services
+#   zone_id  = local.production_zone_id
+#   name     = local.ec2_records_migrated[count.index]
+#   type     = "A"
 
-  alias {
-    name                   = aws_lb.tribunals_lb.dns_name
-    zone_id                = aws_lb.tribunals_lb.zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = aws_lb.tribunals_lb.dns_name
+#     zone_id                = aws_lb.tribunals_lb.zone_id
+#     evaluate_target_health = true
+#   }
+# }
 
 resource "aws_route53_record" "sftp_external_services_prod" {
   count           = local.is-production ? length(local.ec2_records_migrated) : 0
@@ -89,16 +89,16 @@ resource "aws_route53_record" "sftp_external_services_prod" {
   ttl             = 60
 }
 
-# 'CNAME' records for all www legacy services which have been migrated to the Modernisation Platform
-resource "aws_route53_record" "afd_instances_migrated" {
-  count    = local.is-production ? length(local.afd_records_migrated) : 0
-  provider = aws.core-network-services
-  zone_id  = local.production_zone_id
-  name     = local.afd_records_migrated[count.index]
-  type     = "CNAME"
-  ttl      = 300
-  records  = [aws_lb.tribunals_lb.dns_name]
-}
+# # 'CNAME' records for all www legacy services which have been migrated to the Modernisation Platform
+# resource "aws_route53_record" "afd_instances_migrated" {
+#   count    = local.is-production ? length(local.afd_records_migrated) : 0
+#   provider = aws.core-network-services
+#   zone_id  = local.production_zone_id
+#   name     = local.afd_records_migrated[count.index]
+#   type     = "CNAME"
+#   ttl      = 300
+#   records  = [aws_lb.tribunals_lb.dns_name]
+# }
 
 # 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
 # This includes the empty name for the root domain
