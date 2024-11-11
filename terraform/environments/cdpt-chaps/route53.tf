@@ -111,12 +111,13 @@ resource "aws_route53_record" "external_prod" {
   }
 }
 
- # Route 53 A record for the EC2 private IP
-resource "aws_route53_record" "a_record" {
-  zone_id = data.aws_route53_zone.inner.zone_id
+ # Route 53 A records for each EC2 instance
+resource "aws_route53_record" "a_records" {
+  count    = length(data.aws_instances.chaps_instances.private_ips) 
+  zone_id  = data.aws_route53_zone.inner.zone_id
   provider = aws.core-vpc
-  name    = local.application_data.accounts[local.environment].subdomain_name
-  type    = "A"
-  ttl     = 300
-  records = data.aws_instances.chaps_instances.private_ips
+  name     = "chaps-instance-${count.index + 1}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  type     = "A"
+  ttl      = 300
+  records  = data.aws_instances.chaps_instances.private_ips
 }
