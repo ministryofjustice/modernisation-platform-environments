@@ -24,3 +24,8 @@ output "chaps_route53_A_record" {
   description = "details of the CHAPS DNS record"
   value = [for record in aws_route53_record.a_records : record.fqdn]
 }
+
+output "platform_data_inner" {
+  description = "details of the platform_data inner DNS record"
+  value = aws_route53_record.a_records.fqdn
+}
