@@ -8,7 +8,7 @@ data "aws_route53_zone" "application_zone" {
 data "aws_route53_zone" "selected" {
   provider     = aws.core-network-services
   name         = "modernisation-platform.service.justice.gov.uk."
-  private_zone = true
+  private_zone = false
 }
 
 data "aws_instances" "chaps_instances" {
