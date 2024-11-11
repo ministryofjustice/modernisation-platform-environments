@@ -210,32 +210,38 @@ resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_logging_attach
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "local_file" "lambda_dms_replication_metric_py" {
-  filename = "${path.module}/lambda_dms_replication_metric.py"
-  content  = <<EOF
-  import boto3
+# resource "local_file" "lambda_dms_replication_metric_py" {
+#   filename = "${path.module}/lambda_dms_replication_metric.py"
+#   content  = <<EOF
+#   import boto3
 
-  def lambda_handler(event, context):
-      cloudwatch = boto3.client('cloudwatch')
-      cloudwatch.put_metric_data(
-          Namespace='CustomDMSMetrics',
-          MetricData=[
-              {
-                  'MetricName': 'DMSReplicationEvent',
-                  'Dimensions': [
-                      {'Name': 'Service', 'Value': 'DMS'}
-                  ],
-                  'Value': 1,  # Trigger threshold
-                  'Unit': 'Count'
-              }
-          ]
-      )
-EOF
-}
+#   def lambda_handler(event, context):
+#       cloudwatch = boto3.client('cloudwatch')
+#       cloudwatch.put_metric_data(
+#           Namespace='CustomDMSMetrics',
+#           MetricData=[
+#               {
+#                   'MetricName': 'DMSReplicationEvent',
+#                   'Dimensions': [
+#                       {'Name': 'Service', 'Value': 'DMS'}
+#                   ],
+#                   'Value': 1,  # Trigger threshold
+#                   'Unit': 'Count'
+#               }
+#           ]
+#       )
+# EOF
+# }
+
+# data "archive_file" "lambda_dms_replication_metric_zip" {
+#   type        = "zip"
+#   source_file = local_file.lambda_dms_replication_metric_py.filename
+#   output_path = "${path.module}/lambda_dms_replication_metric.zip"
+# }
 
 data "archive_file" "lambda_dms_replication_metric_zip" {
   type        = "zip"
-  source_file = local_file.lambda_dms_replication_metric_py.filename
+  source_file = "${path.module}/lambda/dms_replication_metric.py"
   output_path = "${path.module}/lambda_dms_replication_metric.zip"
 }
 
