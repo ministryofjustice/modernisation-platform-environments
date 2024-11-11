@@ -204,6 +204,12 @@ resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_policy_attach"
   policy_arn = aws_iam_policy.lambda_put_metric_data_policy.arn
 }
 
+# Allow Cloudwatch Logging
+resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_logging_attach" {
+  role       = aws_iam_role.lambda_put_metric_data_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 resource "local_file" "lambda_dms_replication_metric_py" {
   filename = "${path.module}/lambda_dms_replication_metric.py"
   content  = <<EOF
