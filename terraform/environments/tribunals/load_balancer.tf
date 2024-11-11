@@ -9,7 +9,6 @@ locals {
 }
 
 resource "aws_lb" "tribunals_lb" {
-  enable_deletion_protection = false
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
