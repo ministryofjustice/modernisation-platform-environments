@@ -33,6 +33,10 @@ resource "aws_security_group" "tribunals_lb_sc" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_security_group_rule" "lb_cloudfront_ingress_https" {
