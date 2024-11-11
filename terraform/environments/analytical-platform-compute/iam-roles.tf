@@ -314,7 +314,7 @@ module "analytical_platform_data_eng_dba_service_role" {
 
   allow_self_assume_role = false
   trusted_role_arns = [
-    format("arn:aws:iam::%s:root", local.environment_management.account_ids[local.analytical_platform_environment])
+    formatlist("arn:aws:iam::%s:root", [local.environment_management.account_ids[local.analytical_platform_environment], local.environment_management.account_ids["analytical-platform-management-production"]]),
 
   ]
   create_role       = true
