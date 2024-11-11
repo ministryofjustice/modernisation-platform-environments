@@ -240,9 +240,6 @@ resource "aws_lambda_function" "dms_replication_metric_publisher" {
       METRIC_NAMESPACE = "CustomDMSMetrics",
       METRIC_NAME      = "DMSReplicationEvent"
     }
-  depends_on = [
-    archive_file.lambda_dms_replication_metric_zip
-  ]
   }
 
   depends_on = [data.archive_file.lambda_dms_replication_metric_zip]
