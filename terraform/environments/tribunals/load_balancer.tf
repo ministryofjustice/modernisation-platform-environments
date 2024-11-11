@@ -9,6 +9,7 @@ locals {
 }
 
 resource "aws_lb" "tribunals_lb" {
+  enable_deletion_protection = false
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
@@ -58,6 +59,15 @@ resource "aws_security_group" "tribunals_lb_sc" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  depends_on = [
+    aws_lb.tribunals_lb,
+    aws_security_group.ecs_service
+  ]
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 
