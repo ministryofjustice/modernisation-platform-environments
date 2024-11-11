@@ -118,5 +118,6 @@ resource "aws_route53_record" "a_record" {
   name    = local.application_data.accounts[local.environment].subdomain_name
   type    = "A"
   ttl     = 300
-  records = flatten(data.aws_instances.chaps_instances[*].private_ips)
+  #records = flatten(data.aws_instances.chaps_instances[*].private_ips)
+  records = [10.26.49.29, 10.26.49.29, 10.26.48.214, 10.26.48.214]
 }
