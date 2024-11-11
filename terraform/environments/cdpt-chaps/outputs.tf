@@ -10,3 +10,8 @@ output "chapsdotnet_task_definition" {
 output "debug_client_id" {
   value = local.application_data.accounts[local.environment].client_id
 }
+
+output "chaps_instances_details" {
+  description = "Details of the fetched chaps instances"
+  value = data.aws_instances.chaps_instances
+}

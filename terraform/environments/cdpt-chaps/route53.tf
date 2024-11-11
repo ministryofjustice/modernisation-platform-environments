@@ -119,5 +119,5 @@ resource "aws_route53_record" "a_record" {
   type    = "A"
   ttl     = 300
 
-  records = data.aws_instances.chaps_instances.private_ips
+  records = data.aws_instances.chaps_instances[*].private_ips
 }
