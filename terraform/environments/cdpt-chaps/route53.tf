@@ -114,6 +114,7 @@ resource "aws_route53_record" "external_prod" {
  # Route 53 A record for the EC2 private IP
 resource "aws_route53_record" "a_record" {
   zone_id = data.aws_route53_zone.selected.zone_id
+  provider = aws.core-vpc
   name    = local.application_data.accounts[local.environment].subdomain_name
   type    = "A"
   ttl     = 300
