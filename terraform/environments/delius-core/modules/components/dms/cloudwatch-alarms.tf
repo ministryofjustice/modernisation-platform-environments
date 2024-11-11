@@ -227,13 +227,13 @@ data "archive_file" "lambda_dms_replication_metric_zip" {
   type        = "zip"
   source_dir  = "${path.module}/lambda"
   output_path = "${path.module}/lambda/dms_replication_metric.zip"
-  excludes    = ["lambda_dms_replication_metric.zip"]
+  excludes    = ["dms_replication_metric.zip"]
 }
 
 resource "aws_lambda_function" "dms_replication_metric_publisher" {
   function_name = "dms-replication-metric-publisher"
   role          = aws_iam_role.lambda_put_metric_data_role.arn
-  handler       = "lambda_dms_replication_metric.lambda_handler"
+  handler       = "dms_replication_metric.lambda_handler"
   runtime       = "python3.8"
   filename      = data.archive_file.lambda_dms_replication_metric_zip.output_path
   source_code_hash = data.archive_file.lambda_dms_replication_metric_zip.output_base64sha256
