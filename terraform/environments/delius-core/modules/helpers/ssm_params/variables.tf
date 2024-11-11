@@ -8,7 +8,12 @@ variable "application_name" {
 
 }
 
-variable "params_list" {
-  type = list(string)
+variable "params_plain" {
+  type    = list(string)
+  default = []
+}
 
+variable "params_secure" {
+  type    = list(string)
+  default = []
 }

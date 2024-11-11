@@ -10,7 +10,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_dev[0].function_name
   principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:075585660276:alarm:*"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
@@ -24,12 +24,12 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   runtime                        = "python3.8"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:075585660276:code-signing-config:csc-0c7136ccff2de748f"
-  depends_on = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
   environment {
     variables = {
       EXPIRY_DAYS   = "45",
-      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:075585660276:ec2_cloudwatch_alarms"
+      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:ec2_cloudwatch_alarms"
     }
   }
   dead_letter_config {
@@ -88,7 +88,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_uat[0].function_name
   principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:172753231260:alarm:*"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
@@ -102,12 +102,12 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   runtime                        = "python3.8"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:172753231260:code-signing-config:csc-0db408c5170a8eba6"
-  depends_on = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
   environment {
     variables = {
       EXPIRY_DAYS   = "45",
-      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:172753231260:ppud-uat-cw-alerts"
+      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:ppud-uat-cw-alerts"
     }
   }
   dead_letter_config {
@@ -166,7 +166,7 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_prod[0].function_name
   principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:*"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
@@ -180,12 +180,12 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   runtime                        = "python3.8"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:817985104434:code-signing-config:csc-0bafee04a642a41c1"
-  depends_on = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
   environment {
     variables = {
       EXPIRY_DAYS   = "45",
-      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:817985104434:ppud-prod-cw-alerts"
+      SNS_TOPIC_ARN = "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:ppud-prod-cw-alerts"
     }
   }
   dead_letter_config {

@@ -1,3 +1,6 @@
+#####################
+# AWS Secrets Manager
+#####################
 
 # Firstly create a random generated password to use in secrets.
 
@@ -12,6 +15,8 @@ resource "random_password" "password" {
 # Creating a AWS secret versions for AWS managed AD
 
 resource "aws_secretsmanager_secret" "secretdirectoryservice" {
+  # checkov:skip=CKV_AWS_149: "Secrets manager secrets are encrypted by an AWS managed key by default, a customer managed key is not required."
+  # checkov:skip=CKV2_AWS_57: "Secrets manager uses an AWS managed key which is automatically rotated every 365 days."
   name                    = "AWSADPASS"
   recovery_window_in_days = 0
 }

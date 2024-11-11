@@ -4,6 +4,44 @@ data "aws_iam_session_context" "current" {
   arn = data.aws_caller_identity.current.arn
 }
 
+# Shared VPC and Subnets
+data "aws_vpc" "shared" {
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+data "aws_subnets" "shared_private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
+  }
+}
+
+data "aws_subnet" "shared_private_subnets_a" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}a"
+  }
+}
+
+data "aws_subnet" "shared_private_subnets_b" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}b"
+  }
+}
+
+data "aws_subnet" "shared_private_subnets_c" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}c"
+  }
+}
+
 data "aws_ssoadmin_instances" "main" {
   provider = aws.sso-readonly
 }
@@ -12,34 +50,13 @@ data "aws_ec2_transit_gateway" "moj_tgw" {
   id = "tgw-026162f1ba39ce704"
 }
 
-/* TODO: Unhardcode aws_ec2_transit_gateway.moj_tgw
-data "aws_ram_resource_share" "moj_tgw" {
-  filter {
-    name   = "resourceType"
-    values = ["ec2:TransitGateway"]
-  }
-}
-
-data "aws_arn" "moj_tgw" {
-  arn = data.aws_ram_resource_share.moj_tgw.resource_arns[0]
-}
-
-TODO: revisit this to unhardcode the tgw ID above
-data "aws_ram_resource_share" "tgw_moj" {
-  name           = "tgw-moj"
-  resource_owner = "OTHER-ACCOUNTS"
-}
-
-data "aws_ec2_transit_gateway" "pttp" {
-  filter {
-    name   = "owner-id"
-    values = [data.aws_ram_resource_share.tgw_moj.resource_arns]
-  }
-}
-*/
-
 data "aws_iam_roles" "eks_sso_access_role" {
   name_regex  = "AWSReservedSSO_${local.environment_configuration.eks_sso_access_role}_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
+data "aws_iam_roles" "data_engineering_sso_role" {
+  name_regex  = "AWSReservedSSO_modernisation-platform-data-eng_.*"
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 

@@ -142,6 +142,9 @@ cat <<EOT > /etc/cron.d/custom_cloudwatch_metrics
 */1 * * * * root /var/cw-custom.sh > /dev/null 2>&1
 EOT
 
+## Additional DBA steps
+su oracle -c "sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/oracle/product/10.2.0/db_1/appsutil/CWA_cwa-db.xml"
+
 EOF
 
 }

@@ -3,7 +3,7 @@ output "chaps_task_definition" {
 }
 
 output "chapsdotnet_task_definition" {
-  value = length(aws_ecs_task_definition.chapsdotnet_task) > 0 ? aws_ecs_task_definition.chapsdotnet_task[0].arn : null
+  value       = length(aws_ecs_task_definition.chapsdotnet_task) > 0 ? aws_ecs_task_definition.chapsdotnet_task[0].arn : null
   description = "The ARN of the chapsdotnet task definition, if it exists."
 }
 

@@ -49,7 +49,6 @@ module "oracle_db_primary" {
 
   ebs_volumes       = var.db_config.ebs_volumes
   ebs_volume_config = var.db_config.ebs_volume_config
-  inline_ebs        = var.db_config.inline_ebs
 
   env_name           = var.env_name
   environment_config = var.environment_config
@@ -101,8 +100,6 @@ module "oracle_db_standby" {
 
   ebs_volumes       = var.db_config.ebs_volumes
   ebs_volume_config = var.db_config.ebs_volume_config
-
-  inline_ebs = var.db_config.inline_ebs
 
   env_name           = var.env_name
   environment_config = var.environment_config

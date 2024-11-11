@@ -10,6 +10,10 @@ module "connected_vpc" {
   private_subnets = local.environment_configuration.connected_vpc_private_subnets
   public_subnets  = local.environment_configuration.connected_vpc_public_subnets
 
+  /* NAT gateway is temporary and will be retired when we're satisfied with DataSync end-to-end */
+  enable_nat_gateway = true
+  single_nat_gateway = true
+
   enable_flow_log                      = true
   create_flow_log_cloudwatch_log_group = true
   create_flow_log_cloudwatch_iam_role  = true
