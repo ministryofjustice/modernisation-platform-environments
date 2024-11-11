@@ -441,6 +441,45 @@ locals {
       }
     }
 
+    ec2_instance_cwagent_collectd_endpoint_monitoring = {
+      endpoint-status = {
+        type            = "metric"
+        alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_endpoint_status_value\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "endpoint-status"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "exitcode"
+            }
+          }
+        }
+      }
+      endpoint-cert-days-to-expiry = {
+        type            = "metric"
+        alarm_threshold = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-expires-soon.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_endpoint_cert_expiry_value\"','Minimum'),MIN,ASC)"
+        properties = {
+          view    = "bar"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "endpoint-cert-days-to-expiry"
+          stat    = "Minimum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "days"
+            }
+          }
+        }
+      }
+    }
+
     lb = {
       load-balancer-requests = {
         type       = "metric"
@@ -875,6 +914,15 @@ locals {
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_filesystems_check.filesystems-check-error,
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_filesystems_check.filesystems-check-metric-not-updated,
+      ]
+    }
+    ec2_instance_endpoint_monitoring = {
+      header_markdown = "## Endpoint Monitoring via EC2 collectd"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-status,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-days-to-expiry,
       ]
     }
 

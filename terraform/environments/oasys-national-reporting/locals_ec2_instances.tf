@@ -15,7 +15,7 @@ locals {
         ]
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
-          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+          "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
             branch = "main"
           }
         ))

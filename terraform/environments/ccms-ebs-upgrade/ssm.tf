@@ -7,9 +7,17 @@ resource "aws_ssm_document" "create_backup_snapshots" {
 }
 
 resource "aws_ssm_document" "oracle_lms_cpuq" {
-  name            = "Oracle-lms-cpuq"
+  name            = "CCMS-Oracle-lms-cpuq"
   document_type   = "Command"
   document_format = "YAML"
 
-  content = file("ssm_oracle_lms_cpuq.yaml")
+  content = file("ssm-oracle-lms-cpuq.yaml")
+}
+
+resource "aws_ssm_document" "system_update" {
+  name            = "CCMS-System-Update"
+  document_type   = "Command"
+  document_format = "YAML"
+
+  content = file("ssm-document-system-update.yaml")
 }

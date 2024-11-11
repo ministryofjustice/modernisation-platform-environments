@@ -13,7 +13,7 @@ resource "aws_cloudwatch_event_rule" "ecs_restart_rule" {
 resource "aws_cloudwatch_event_target" "step_function_target" {
   rule     = aws_cloudwatch_event_rule.ecs_restart_rule.name
   arn      = aws_sfn_state_machine.ecs_restart_state_machine.arn
-  role_arn = aws_iam_role.step_function_role.arn
+  role_arn = aws_iam_role.eventbridge_execution_role.arn
 }
 
 
@@ -84,4 +84,41 @@ resource "aws_cloudwatch_log_resource_policy" "all_health_events" {
 resource "aws_cloudwatch_event_target" "all_health_events" {
   rule = aws_cloudwatch_event_rule.all_health_events.name
   arn  = aws_cloudwatch_log_group.all_health_events.arn
+}
+
+
+resource "aws_iam_role" "eventbridge_execution_role" {
+  name = "eventbridge_execution_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "events.amazonaws.com"
+        }
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy" "eventbridge_execution_role_policy" {
+  name = "eventbridge_execution_role_policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "logs:*",
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = "states:StartExecution",
+        Resource = aws_sfn_state_machine.ecs_restart_state_machine.arn
+      }
+    ]
+  })
 }
