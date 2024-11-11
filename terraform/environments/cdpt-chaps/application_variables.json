@@ -38,7 +38,7 @@
       "instance_type": "t3.large",
       "container_port": 80,
       "client_id": "2e2cc8ad-7b64-41b9-93a1-c16b9a00b34f",
-      "subdomain_name": "cdpt-chaps.hq-preproduction"
+      "subdomain_name": "cdpt-chaps"
     },
     "production": {
       "db_instance_class": "db.t3.2xlarge",

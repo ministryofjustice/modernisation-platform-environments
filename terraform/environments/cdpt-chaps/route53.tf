@@ -118,6 +118,5 @@ resource "aws_route53_record" "a_record" {
   name    = local.application_data.accounts[local.environment].subdomain_name
   type    = "A"
   ttl     = 300
-
-  records = flatten(data.aws_instances.chaps_instances[*].private_ips)
+  resource_records = flatten(data.aws_instances.chaps_instances[*].private_ips)
 }
