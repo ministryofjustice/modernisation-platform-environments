@@ -22,7 +22,7 @@ locals {
     { "source-code" = "https://github.com/ministryofjustice/modernisation-platform-environments" }
   )
 
-  environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
+  environment = trimprefix(terraform.workspace, "${var.networking[0].application}-")
   environment_map = {
     "production"    = "prod"
     "preproduction" = "preprod"

@@ -22,30 +22,30 @@ resource "random_string" "chaps_target_group_name" {
   special = false
 }
 
-  resource "aws_lb_target_group" "chapsdotnet_target_group" {
-    name_prefix = "dotnet"
-    port = 8080
-    protocol = "HTTP"
-    vpc_id = data.aws_vpc.shared.id 
-    target_type = "ip"
-    deregistration_delay = 30
+resource "aws_lb_target_group" "chapsdotnet_target_group" {
+  name_prefix          = "dotnet"
+  port                 = 8080
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "ip"
+  deregistration_delay = 30
 
-    stickiness {
-      type = "lb_cookie"
-    }
+  stickiness {
+    type = "lb_cookie"
+  }
 
-    health_check {
-      path                = "/health"
-      port                = "8080"
-      healthy_threshold   = "5"
-      interval            = "30"
-      protocol            = "HTTP"
-      unhealthy_threshold = "2"
-      matcher             = "200-499"
-      timeout             = "5"
-    }
+  health_check {
+    path                = "/health"
+    port                = "8080"
+    healthy_threshold   = "5"
+    interval            = "30"
+    protocol            = "HTTP"
+    unhealthy_threshold = "2"
+    matcher             = "200-499"
+    timeout             = "5"
+  }
 
-    lifecycle {
+  lifecycle {
     create_before_destroy = true
     ignore_changes        = [name]
   }

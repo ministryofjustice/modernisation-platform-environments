@@ -77,13 +77,13 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
-  container_definitions    = jsonencode([
+  container_definitions = jsonencode([
     {
-      name         = "chaps-container"
-      image        = "${local.ecr_url}:chaps-${local.application_data.accounts[local.environment].environment_name}"
-      cpu          = 1024
-      memory       = 2048
-      essential    = true
+      name      = "chaps-container"
+      image     = "${local.ecr_url}:chaps-${local.application_data.accounts[local.environment].environment_name}"
+      cpu       = 1024
+      memory    = 2048
+      essential = true
       portMappings = [
         {
           containerPort = local.application_data.accounts[local.environment].container_port
@@ -92,7 +92,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       ]
       logConfiguration = {
         logDriver = "awslogs",
-        options   = {
+        options = {
           awslogs-group         = aws_cloudwatch_log_group.chaps_cloudwatch_group.name,
           awslogs-region        = "eu-west-2",
           awslogs-stream-prefix = "chaps"
@@ -131,19 +131,19 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
 }
 
 resource "aws_ecs_task_definition" "chapsdotnet_task" {
-  count = local.application_data.accounts[local.environment].create_chapsdotnet ? 1 : 0
+  count                    = local.application_data.accounts[local.environment].create_chapsdotnet ? 1 : 0
   family                   = "chapsdotnet-family"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
-  container_definitions    = jsonencode([
+  container_definitions = jsonencode([
     {
-      name         = "chapsdotnet-container"
-      image        = "${local.ecr_url}:chapsdotnet-${local.application_data.accounts[local.environment].environment_name}"
-      cpu          = 1024
-      memory       = 2048
-      essential    = true
+      name      = "chapsdotnet-container"
+      image     = "${local.ecr_url}:chapsdotnet-${local.application_data.accounts[local.environment].environment_name}"
+      cpu       = 1024
+      memory    = 2048
+      essential = true
       portMappings = [
         {
           containerPort = 8080
@@ -166,11 +166,11 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
           value = "https://login.microsoftonline.com/"
         },
         {
-          name = "TenantId"
+          name  = "TenantId"
           value = "${local.application_data.accounts[local.environment].TenantId}"
         },
         {
-          name = "CallbackPath"
+          name  = "CallbackPath"
           value = "/signin-oidc"
         },
         {
@@ -203,7 +203,7 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
     }
   ])
 }
-  
+
 
 resource "aws_key_pair" "ec2-user" {
   key_name   = "${local.application_name}-ec2"
@@ -268,7 +268,7 @@ resource "aws_ecs_service" "chapsdotnet_service" {
   force_new_deployment              = true
 
   deployment_minimum_healthy_percent = 50
-  deployment_maximum_percent         = 200  
+  deployment_maximum_percent         = 200
 
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.chaps.name
@@ -605,10 +605,10 @@ resource "aws_security_group" "ecs_service" {
   }
 
   ingress {
-    description     = "Allow HTTP traffic from chapsdotnet container"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
+    description = "Allow HTTP traffic from chapsdotnet container"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
 
@@ -624,7 +624,7 @@ resource "aws_security_group" "ecs_service" {
 resource "aws_security_group" "chapsdotnet_service" {
   name_prefix = "chapsdotnet-service-sg-"
   description = "Allow traffic for chapsdotnet service"
-  vpc_id = data.aws_vpc.shared.id
+  vpc_id      = data.aws_vpc.shared.id
 
   ingress {
     from_port       = 8080
@@ -641,7 +641,7 @@ resource "aws_security_group" "chapsdotnet_service" {
   }
 
   tags = merge(
-    local.tags, 
+    local.tags,
     {
       Name = "chapsdotnet-service-sg"
     }
