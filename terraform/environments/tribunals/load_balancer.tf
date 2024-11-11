@@ -11,10 +11,33 @@ locals {
 resource "aws_lb" "tribunals_lb" {
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
-  # security_groups            = [aws_security_group.tribunals_lb_sc.id]
+  security_groups            = [aws_security_group.tribunals_lb_sg_2.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+}
+
+resource "aws_security_group" "tribunals_lb_sg_2" {
+  name        = "tribunals-load-balancer-sg-2"
+  description = "Control access to the load balancer"
+  vpc_id      = data.aws_vpc.shared.id
+
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Basic ingress rule for CloudFront
+  ingress {
+    description     = "Allow HTTPS from CloudFront"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+  }
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
