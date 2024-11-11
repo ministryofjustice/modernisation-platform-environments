@@ -182,7 +182,8 @@ if __name__ == "__main__":
 
     rds_db_select_query_str = f"""
     SELECT {rds_db_tbl_pkey_column}, 
-    LOWER(SUBSTRING(CONVERT(VARCHAR(66), HASHBYTES('SHA2_256', CONCAT({', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash
+    LOWER(SUBSTRING(CONVERT(VARCHAR(66), 
+    HASHBYTES('SHA2_256', CONCAT({', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash
     FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
     """.strip()
 
@@ -195,13 +196,12 @@ if __name__ == "__main__":
 
         rds_db_query_sample_row = f"""
     SELECT TOP 1 {rds_db_tbl_pkey_column}, 
-    SUBSTRING(CONVERT(VARCHAR(66), HASHBYTES('SHA2_256', CONCAT({', '.join(all_columns_except_pkey)})), 1), 3, 66) AS RowHash
+    SUBSTRING(CONVERT(VARCHAR(66), 
+    HASHBYTES('SHA2_256', CONCAT({', '.join(all_columns_except_pkey)})), 1), 3, 66) AS RowHash
     FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
     """.strip()
     
-        rds_db_query_sample_row_df = rds_jdbc_conn_obj.get_rds_db_query_empty_df(
-                                                        rds_db_query_sample_row
-                                        )
+        rds_db_query_sample_row_df = rds_jdbc_conn_obj.get_rds_db_query_df(rds_db_query_sample_row)
         LOGGER.info(f"""rds_db_query_sample_row_df-schema: \n{rds_db_query_sample_row_df.columns}""")
 
         existing_parquet_table_df = CustomPysparkMethods.get_s3_parquet_df_v2(
@@ -229,6 +229,9 @@ if __name__ == "__main__":
         if df_rds_table_count == existing_parquet_count_pkey:
             LOGGER.warn(f"""df_rds_table_count = existing_parquet_table_df_count = {df_rds_table_count}""")
             sys.exit(f"""Both df_rds_table_count and existing_parquet_table_df_count are matching. Nothing to move, exiting ...""")
+        elif existing_parquet_count_pkey > df_rds_table_count:
+            LOGGER.warn(f"""existing_parquet_table_df_count > df_rds_table_count""")
+            sys.exit(f"""This scenario cannot be possible & needs further investigation, exiting ...""")            
         # --------------------
 
         where_clause_exp_str = f"""{rds_db_tbl_pkey_column} > {existing_parquet_max_pkey}""".strip()

@@ -355,7 +355,7 @@ class RDS_JDBC_CONNECTION():
                 .option("query", f"""{query_str}""")
                 .load())
 
-    def get_rds_db_query_empty_df(self, rds_db_query) -> DataFrame:
+    def get_rds_db_query_df(self, rds_db_query) -> DataFrame:
 
         return (self.spark.read.format("jdbc")
                 .option("url", self.rds_jdbc_url_v2)
