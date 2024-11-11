@@ -111,25 +111,25 @@ resource "aws_iam_role_policy" "app_task" {
   EOF
 }
 
-resource "aws_security_group" "ecs_service" {
-  name_prefix = "ecs-service-sg-"
-  vpc_id      = data.aws_vpc.shared.id
+# resource "aws_security_group" "ecs_service" {
+#   name_prefix = "ecs-service-sg-"
+#   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   from_port       = 80
-  #   to_port         = 80
-  #   protocol        = "tcp"
-  #   description     = "Allow traffic on port 80 from load balancer"
-  #   security_groups = [aws_security_group.tribunals_lb_sc.id]
-  # }
+#   # ingress {
+#   #   from_port       = 80
+#   #   to_port         = 80
+#   #   protocol        = "tcp"
+#   #   description     = "Allow traffic on port 80 from load balancer"
+#   #   security_groups = [aws_security_group.tribunals_lb_sc.id]
+#   # }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
 resource "aws_security_group" "ecs_service_sftp" {
   name_prefix = "ecs-service-sg-sftp-"
