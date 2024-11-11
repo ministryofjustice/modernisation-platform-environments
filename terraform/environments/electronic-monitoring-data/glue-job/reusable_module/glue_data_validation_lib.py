@@ -133,12 +133,17 @@ class RDS_JDBC_CONNECTION():
 
     def get_rds_db_table_row_count(self,
                                    in_table_name,
-                                   in_pkeys_col_list) -> DataFrame:
-
-        query_str = f"""
-        SELECT count({', '.join(in_pkeys_col_list)}) as row_count
-        FROM {self.rds_db_schema_name}.[{in_table_name}]
-        """.strip()
+                                   in_pkeys_columns) -> DataFrame:
+        if isinstance(in_pkeys_columns, list):
+            query_str = f"""
+            SELECT count({', '.join(in_pkeys_columns)}) as row_count
+            FROM {self.rds_db_schema_name}.[{in_table_name}]
+            """.strip()
+        else:
+            query_str = f"""
+            SELECT count(in_pkeys_columns) as row_count
+            FROM {self.rds_db_schema_name}.[{in_table_name}]
+            """.strip()            
 
         return (self.spark.read.format("jdbc")
                 .option("url", self.rds_jdbc_url_v2)

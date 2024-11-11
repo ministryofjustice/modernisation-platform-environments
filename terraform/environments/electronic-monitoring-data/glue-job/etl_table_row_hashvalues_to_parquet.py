@@ -202,7 +202,7 @@ if __name__ == "__main__":
         rds_db_query_sample_row_df = rds_jdbc_conn_obj.get_rds_db_query_empty_df(
                                                         rds_db_query_sample_row
                                         )
-        LOGGER.info(f"""rds_db_query_sample_row_df-schema: \n{rds_db_query_sample_row_df.schema}""")
+        LOGGER.info(f"""rds_db_query_sample_row_df-schema: \n{rds_db_query_sample_row_df.columns}""")
 
         existing_parquet_table_df = CustomPysparkMethods.get_s3_parquet_df_v2(
                                                             hashed_rows_prq_fulls3path, 
@@ -210,8 +210,8 @@ if __name__ == "__main__":
                                     )
         
         existing_parquet_table_df_agg = existing_parquet_table_df.agg(
-                                            F.max(f"{rds_db_tbl_pkey_column}").alias(f"max_{rds_db_tbl_pkey_column}"),
-                                            F.count(f"{rds_db_tbl_pkey_column}").alias(f"count_{rds_db_tbl_pkey_column}")
+                                            F.max(rds_db_tbl_pkey_column).alias(f"max_{rds_db_tbl_pkey_column}"),
+                                            F.count(rds_db_tbl_pkey_column).alias(f"count_{rds_db_tbl_pkey_column}")
                                             )
         existing_parquet_agg_dict = existing_parquet_table_df_agg.collect()[0]
         existing_parquet_max_pkey = existing_parquet_agg_dict[f"max_{rds_db_tbl_pkey_column}"]
