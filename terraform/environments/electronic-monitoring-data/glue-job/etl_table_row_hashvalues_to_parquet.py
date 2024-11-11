@@ -169,12 +169,13 @@ if __name__ == "__main__":
                                if col != rds_db_tbl_pkey_column]
     LOGGER.info(f""">> all_columns_except_pkey = {all_columns_except_pkey} <<""")
 
+    prq_bucket_parent_folder = f"""{HASHED_OUTPUT_S3_BUCKET_NAME}/{RDS_DB_TABLE_HASHED_ROWS_PARENT_DIR}"""
     prq_table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}"""
     if S3Methods.check_s3_folder_path_if_exists(
                     HASHED_OUTPUT_S3_BUCKET_NAME,
                     f'''{RDS_DB_TABLE_HASHED_ROWS_PARENT_DIR}/{prq_table_folder_path}'''
         ):
-        hashed_rows_prq_fulls3path = f'''s3://{HASHED_OUTPUT_S3_BUCKET_NAME}/{{RDS_DB_TABLE_HASHED_ROWS_PARENT_DIR}}/{prq_table_folder_path}'''
+        hashed_rows_prq_fulls3path = f'''s3://{prq_bucket_parent_folder}/{prq_table_folder_path}'''
     else:
         hashed_rows_prq_fulls3path = ""
     # --------------------------------
@@ -291,7 +292,7 @@ if __name__ == "__main__":
     LOGGER.info(f"""hashed_rows_prq_df - sorted within partitions on pkey.""")
 
     write_parquet_to_s3(hashed_rows_prq_df_sorted, 
-                        f'''s3://{HASHED_OUTPUT_S3_BUCKET_NAME}/{RDS_DB_TABLE_HASHED_ROWS_PARENT_DIR}/{prq_table_folder_path}''')
+                        f'''s3://{prq_bucket_parent_folder}/{prq_table_folder_path}''')
     # --------------------------------
 
     job.commit()
