@@ -154,7 +154,6 @@ locals {
     }
 
     schedule_alarms = {
-      alarm_list = []
       alarm_patterns = [
         "public-https-*-https-unhealthy-load-balancer-host",
       ]
