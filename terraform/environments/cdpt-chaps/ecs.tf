@@ -164,7 +164,7 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
       environment = [
         {
           name = "CHAPS_PRIVATE_IP"
-          value = data.aws_instances.chaps_instances[0]
+          value = data.aws_instances.chaps_instances
         },
         {
           name  = "Instance"
