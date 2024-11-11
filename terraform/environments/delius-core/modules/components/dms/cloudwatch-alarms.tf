@@ -240,7 +240,7 @@ resource "aws_lambda_function" "dms_replication_metric_publisher" {
   environment {
     variables = {
       METRIC_NAMESPACE = "CustomDMSMetrics",
-      METRIC_NAME      = "DMSReplicationEvent"
+      METRIC_NAME      = "DMSReplicationFailure"
     }
   }
 
@@ -258,15 +258,15 @@ resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publis
 
 
 resource "aws_cloudwatch_metric_alarm" "dms_replication_alarm" {
-  alarm_name          = "DMSReplicationEventAlarm"
+  alarm_name          = "DMSReplicationFailureAlarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
-  metric_name         = "DMSReplicationEvent"
+  metric_name         = "DMSReplicationFailure"
   namespace           = "CustomDMSMetrics"
   period              = "60"
   statistic           = "Sum"
   threshold           = 1
-  alarm_description   = "Alarm when DMSReplicationEvent metric is >= 1"
+  alarm_description   = "Alarm when DMSReplicationFailure metric is >= 1"
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
 }
