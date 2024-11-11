@@ -71,6 +71,7 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
   retention_in_days = "7"
 }
 
+#noinspection HILUnresolvedReference
 resource "aws_ecs_task_definition" "chaps_task_definition" {
   family                   = "chapsFamily"
   requires_compatibilities = ["EC2"]
@@ -102,23 +103,23 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.database.address}"
+          value = aws_db_instance.database.address
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.database.username}"
+          value = aws_db_instance.database.username
         },
         {
           name  = "DB_NAME"
-          value = "${local.application_data.accounts[local.environment].db_name}"
+          value = local.application_data.accounts[local.environment].db_name
         },
         {
           name  = "CLIENT_ID"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         },
         {
           name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].env_name}"
+          value = local.application_data.accounts[local.environment].env_name
         }
       ],
       secrets = [
@@ -171,7 +172,7 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
         },
         {
           name = "TenantId"
-          value = "${local.application_data.accounts[local.environment].TenantId}"
+          value = local.application_data.accounts[local.environment].TenantId
         },
         {
           name = "CallbackPath"
@@ -179,23 +180,23 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
         },
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.database.address}"
+          value = aws_db_instance.database.address
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.database.username}"
+          value = aws_db_instance.database.username
         },
         {
           name  = "DB_NAME"
-          value = "${local.application_data.accounts[local.environment].db_name}"
+          value = local.application_data.accounts[local.environment].db_name
         },
         {
           name  = "CLIENT_ID"
-          value = "${local.application_data.accounts[local.environment].dotnet_client_id}"
+          value = local.application_data.accounts[local.environment].dotnet_client_id
         },
         {
           name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].env_name}"
+          value = local.application_data.accounts[local.environment].env_name
         }
       ],
       secrets = [

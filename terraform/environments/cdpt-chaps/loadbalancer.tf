@@ -69,7 +69,7 @@ resource "aws_security_group" "chaps_lb_sc" {
   }
 
   ingress {
-    description     = "Allow traffic fromt load balancer to chapsdotnet container"
+    description     = "Allow traffic from load balancer to chapsdotnet container"
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
