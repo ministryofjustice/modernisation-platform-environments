@@ -52,7 +52,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db",
                        "rds_sqlserver_db_schema",
                        "rds_sqlserver_db_table",
-                       "rds_db_tbl_pkey_column"
+                       "rds_db_tbl_pkey_column",
+                       "rds_db_table_hashed_rows_parent_dir"
                        ]
 
 OPTIONAL_INPUTS = [
