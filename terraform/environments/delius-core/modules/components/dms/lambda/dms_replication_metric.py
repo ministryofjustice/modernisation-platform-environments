@@ -15,7 +15,7 @@ def lambda_handler(event, context):
         event_type = message.get("EventType")
         status = message.get("status")
 
-        logger.info("SNS Message: %",message)
+        logger.info("SNS Message: %s",message)
 
         if event_type == "replication-task-state-change" and status == "STARTED":
             cloudwatch.put_metric_data(
