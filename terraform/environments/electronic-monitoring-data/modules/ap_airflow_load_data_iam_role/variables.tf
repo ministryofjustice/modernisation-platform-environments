@@ -1,3 +1,8 @@
+variable "environment" {
+  type        = string
+  description = "The account environment"
+}
+
 variable "name" {
   type        = string
   description = "name of the pipeline"
@@ -19,11 +24,9 @@ variable "source_data_bucket" {
   description = "source of the data in s3"
 }
 
-variable "athena_workgroup" {
-  type = object({
-    arn = string
-  })
-  description = "athena workgroup to use"
+variable "athena_dump_bucket" {
+  type        = object({ arn = string })
+  description = "bucket to dump athena queries into"
 }
 
 variable "secret_code" {
@@ -34,4 +37,9 @@ variable "secret_code" {
 variable "oidc_arn" {
   type     = string
   nullable = false
+}
+
+variable "cadt_bucket" {
+  type        = object({ arn = string })
+  description = "bucket for cadt"
 }

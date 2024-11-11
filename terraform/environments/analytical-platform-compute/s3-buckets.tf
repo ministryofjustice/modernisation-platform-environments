@@ -28,6 +28,7 @@ data "aws_iam_policy_document" "s3_replication_policy" {
     sid    = "AllowReplicateObjectsInDestinationBucket"
     effect = "Allow"
     actions = [
+      "s3:ObjectOwnerOverrideToBucketOwner",
       "s3:ReplicateTags",
       "s3:ReplicateDelete",
       "s3:ReplicateObject"

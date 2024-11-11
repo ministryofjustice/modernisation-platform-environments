@@ -259,7 +259,6 @@ module "lake_formation_share_role" {
   tags = local.tags
 }
 
-
 module "analytical_platform_ui_service_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -328,4 +327,21 @@ module "analytical_platform_data_eng_dba_service_role" {
   ]
   number_of_custom_role_policy_arns = 2
 
+}
+
+module "quicksight_vpc_connection_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.46.0"
+
+  create_role       = true
+  role_name_prefix  = "quicksight-vpc-connection"
+  role_requires_mfa = false
+
+  trusted_role_services = ["quicksight.amazonaws.com"]
+
+  custom_role_policy_arns = [module.quicksight_vpc_connection_iam_policy.arn]
+
+  tags = local.tags
 }

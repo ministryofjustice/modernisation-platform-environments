@@ -53,3 +53,9 @@ variable "alarm_list" {
   type        = list(string)
   default     = []
 }
+
+variable "alarm_patterns" {
+  description = "List of alarm name patterns to match (e.g., ['alarm-name-*', '*-other-alarm'])"
+  type        = list(string)
+  default     = []
+}

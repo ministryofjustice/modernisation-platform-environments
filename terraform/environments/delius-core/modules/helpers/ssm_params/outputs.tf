@@ -1,3 +1,6 @@
 output "arn_map" {
-  value = { for key, value in aws_ssm_parameter.this : key => value.arn }
+  value = merge(
+    { for key, value in aws_ssm_parameter.secure : key => value.arn },
+    { for key, value in aws_ssm_parameter.plain : key => value.arn }
+  )
 }

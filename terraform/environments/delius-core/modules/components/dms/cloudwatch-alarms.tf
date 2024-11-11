@@ -72,7 +72,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   comparison_operator = "GreaterThanThreshold"
   threshold           = 15
   evaluation_periods  = 3
-  period              = 30
+  period              = 120
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.dms_alerting.arn]
   ok_actions          = [aws_sns_topic.dms_alerting.arn]
@@ -94,7 +94,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   comparison_operator = "GreaterThanThreshold"
   threshold           = 15
   evaluation_periods  = 3
-  period              = 30
+  period              = 120
   actions_enabled     = true
   alarm_actions       = [aws_sns_topic.dms_alerting.arn]
   ok_actions          = [aws_sns_topic.dms_alerting.arn]

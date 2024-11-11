@@ -21,6 +21,7 @@ locals {
   baseline_presets_all_environments = {
     options = {
       cloudwatch_dashboard_default_widget_groups = [
+        "ec2_instance_endpoint_monitoring",
         "custom",
         "network_lb",
         "lb",

@@ -127,6 +127,14 @@ rm /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
 #  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
 
+## Additional DBA Steps
+echo "Updating CWA_cwa-app2.xml"
+su - applmgr -c "cp /CWA/app/appl/admin/CWA_cwa-app2.xml /CWA/app/appl/admin/CWA_cwa-app2.xml.tf_backup"
+sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/cwa.${local.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/db_admin@legalservices.gov.uk/db_admin@${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+
 EOF
 
 }
@@ -158,7 +166,7 @@ resource "aws_instance" "concurrent_manager" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.cm_userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   metadata_options {
     http_tokens = "optional"
   }
@@ -244,6 +252,9 @@ resource "aws_ebs_volume" "concurrent_manager" {
   snapshot_id       = local.application_data.accounts[local.environment].concurrent_manager_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
+    replace_triggered_by = [
+      aws_instance.concurrent_manager.id
+    ]
     ignore_changes = [kms_key_id]
   }
 
