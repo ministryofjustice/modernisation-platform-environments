@@ -141,7 +141,7 @@ class RDS_JDBC_CONNECTION():
             """.strip()
         else:
             query_str = f"""
-            SELECT count(in_pkeys_columns) as row_count
+            SELECT count({in_pkeys_columns}) as row_count
             FROM {self.rds_db_schema_name}.[{in_table_name}]
             """.strip()            
 
