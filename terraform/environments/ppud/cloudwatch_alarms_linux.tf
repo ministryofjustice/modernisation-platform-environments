@@ -44,6 +44,32 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_root_volume" {
   }
 }
 
+# Low Disk Alarm for Linux instance with additional log partition
+
+resource "aws_cloudwatch_metric_alarm" "low_disk_space_log_volume" {
+  count               = local.is-production == true ? 1 : 0
+  alarm_name          = "Low-Disk-Space-Log-Volume-i-0f393d9ed4e53da68"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = "5"
+  datapoints_to_alarm = "5"
+  metric_name         = "disk_used_percent"
+  namespace           = "CWAgent"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "90"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 10% for 5 minutes, the alarm will trigger"
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    InstanceId   = "i-0f393d9ed4e53da68"
+    path         = "/archive"
+    ImageId      = "ami-0f43890c2b4907c29"
+    InstanceType = "m5.large"
+    device       = "nvme1n1p1"
+    fstype       = "xfs"
+  }
+}
+
 # High CPU Utilization Alarm
 
 resource "aws_cloudwatch_metric_alarm" "linux_cpu" {
