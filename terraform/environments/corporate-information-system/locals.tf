@@ -24,7 +24,7 @@ echo "SQLNET.EXPIRE_TIME = 2" >> /oracle/software/product/10.2.0/network/admin/s
 # Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
 sed -i '/(DESCRIPTION =/a\\  (ENABLE=broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 
-# Changes to oracle files
+# Changes to oracle files - cis.laa-development.modernisation-platform.service.justice.gov.uk CIS DB without Volumes - 11-Sept-2024
 sed -i 's|cis.*legalservices.gov.uk:8080|${local.application_name_short}.${data.aws_route53_zone.external.name}:8080|' /home/batman/bin/dkj-shell-funcs
 sed -i 's|cis.*legalservices.gov.uk|${local.application_name_short}.${data.aws_route53_zone.external.name}|' /oracle/software/product/10.2.0/network/admin/listener.ora
 sed -i 's|cis.*legalservices.gov.uk|${local.application_name_short}.${data.aws_route53_zone.external.name}|' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
