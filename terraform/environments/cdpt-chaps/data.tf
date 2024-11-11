@@ -7,8 +7,8 @@ data "aws_route53_zone" "application_zone" {
 
 data "aws_instances" "chaps_instances" {
   filter {
-    name   = "tag:Environment"
-    values = [local.application_data.accounts[local.environment].environment_name] 
+    name   = "tag:Name"
+    values = ["cdpt-chaps-cluster-scaling-group"] 
   }
 
   filter {
