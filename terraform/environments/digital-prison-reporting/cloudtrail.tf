@@ -12,7 +12,7 @@ resource "aws_cloudtrail" "trail" {
   s3_key_prefix                 = "cloud_trail"
   include_global_service_events = true
   enable_log_file_validation    = true
-  tr
+  kms_key_id                    = aws_kms_key.cloudtrail.key_id   # Get KEY ID from Resource
 
   event_selector {
     read_write_type           = "All"
