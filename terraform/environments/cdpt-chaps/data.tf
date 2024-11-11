@@ -17,5 +17,8 @@ data "aws_instances" "chaps_instances" {
     values = [local.application_data.accounts[local.environment].environment_name] 
   }
 
-  instance_state = "running"
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
+  }
 }
