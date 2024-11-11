@@ -919,12 +919,12 @@ variable "schedule_alarms_lambda" {
   description = ""
   type = object({
     function_name    = string,
-    lambda_log_level = optional(string)
+    lambda_log_level = optional(string, "INFO")
     alarm_list       = optional(list(string))
     alarm_patterns   = optional(list(string))
-    disable_weekend  = optional(bool)
-    start_time       = optional(string)
-    end_time         = optional(string)
+    disable_weekend  = optional(bool, true)
+    start_time       = optional(string, "06:15")
+    end_time         = optional(string, "22:45")
     tags             = optional(map(string), {})
   })
 }
