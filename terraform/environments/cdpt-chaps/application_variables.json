@@ -20,7 +20,7 @@
       "create_chapsdotnet": "true",
       "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
       "CallbackPath": "/signin-oidc",
-      "subdomain_name": "cdpt-chaps.hq-development"
+      "subdomain_name": "cdpt-chaps"
     },
     "preproduction": {
       "db_instance_class": "db.t3.2xlarge",
