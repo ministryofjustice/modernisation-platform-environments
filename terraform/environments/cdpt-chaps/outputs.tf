@@ -27,5 +27,5 @@ output "chaps_route53_A_record" {
 
 output "platform_data_inner" {
   description = "details of the platform_data inner DNS record"
-  value = aws_route53_record.a_records.fqdn
+  value = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
 }
