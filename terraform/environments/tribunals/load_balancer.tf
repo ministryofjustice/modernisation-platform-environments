@@ -1,12 +1,12 @@
-# locals {
-#   target_group_arns = { for k, v in aws_lb_target_group.tribunals_target_group : k => v.arn }
+locals {
+  target_group_arns = { for k, v in aws_lb_target_group.tribunals_target_group : k => v.arn }
 
-#   # Create a mapping between listener headers and target group ARNs
-#   listener_header_to_target_group = {
-#     for k, v in var.services :
-#     v.name_prefix => aws_lb_target_group.tribunals_target_group[k].arn
-#   }
-# }
+  # Create a mapping between listener headers and target group ARNs
+  listener_header_to_target_group = {
+    for k, v in var.services :
+    v.name_prefix => aws_lb_target_group.tribunals_target_group[k].arn
+  }
+}
 
 # resource "aws_lb" "tribunals_lb" {
 #   name                       = "tribunals-lb"
@@ -82,28 +82,28 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 #   description       = "Allow HTTP traffic from CloudFront"
 # }
 
-# resource "aws_lb_target_group" "tribunals_target_group" {
-#   for_each             = var.services
-#   name                 = "${each.value.module_key}-tg"
-#   port                 = each.value.port
-#   protocol             = "HTTP"
-#   vpc_id               = data.aws_vpc.shared.id
-#   target_type          = "instance"
-#   deregistration_delay = 30
+resource "aws_lb_target_group" "tribunals_target_group" {
+  for_each             = var.services
+  name                 = "${each.value.module_key}-tg"
+  port                 = each.value.port
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "instance"
+  deregistration_delay = 30
 
-#   stickiness {
-#     type = "lb_cookie"
-#   }
+  stickiness {
+    type = "lb_cookie"
+  }
 
-#   health_check {
-#     healthy_threshold   = "3"
-#     interval            = "15"
-#     protocol            = "HTTP"
-#     unhealthy_threshold = "3"
-#     matcher             = "200-499"
-#     timeout             = "10"
-#   }
-# }
+  health_check {
+    healthy_threshold   = "3"
+    interval            = "15"
+    protocol            = "HTTP"
+    unhealthy_threshold = "3"
+    matcher             = "200-499"
+    timeout             = "10"
+  }
+}
 
 data "aws_instances" "tribunals_instance" {
   filter {
@@ -114,12 +114,12 @@ data "aws_instances" "tribunals_instance" {
 
 # Make sure that the ec2 instance tagged as 'tribunals-instance' exists
 # before adding aws_lb_target_group_attachment, otherwise terraform will fail
-# resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
-#   for_each         = aws_lb_target_group.tribunals_target_group
-#   target_group_arn = each.value.arn
-#   target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
-#   port             = each.value.port
-# }
+resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
+  for_each         = aws_lb_target_group.tribunals_target_group
+  target_group_arn = each.value.arn
+  target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
+  port             = each.value.port
+}
 
 # resource "aws_lb_listener" "tribunals_lb" {
 #   depends_on = [
