@@ -8,17 +8,14 @@ data "aws_route53_zone" "application_zone" {
 data "aws_route53_zone" "selected" {
   provider     = aws.core-network-services
   name         = "modernisation-platform.service.justice.gov.uk."
-  private_zone = false  # Set to true if it's a Private Hosted Zone
+  private_zone = true
 }
 
 data "aws_instances" "chaps_instances" {
   filter {
-    name   = "tag:Name"
-    values = ["cdpt-chaps-cluster-scaling-group"] 
+    name   = "tag:Environment"
+    values = [local.application_data.accounts[local.environment].environment_name] 
   }
 
-  filter {
-    name = "instance-state-name"
-    values = ["running"]
-  }
+  instance_state = "running"
 }

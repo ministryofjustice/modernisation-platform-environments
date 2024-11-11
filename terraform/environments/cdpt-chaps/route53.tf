@@ -116,7 +116,7 @@ resource "aws_route53_record" "a_record" {
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = local.application_data.accounts[local.environment].subdomain_name
   type    = "A"
-  ttl     = "300"
+  ttl     = 300
 
-  records = data.aws_instances.chaps_instances.instances[*].private_ip
+  records = data.aws_instances.chaps_instances.private_ips
 }
