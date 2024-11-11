@@ -160,11 +160,10 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
           awslogs-stream-prefix = "chapsdotnet"
         }
       }
-
       environment = [
         {
-          name = "CHAPS_PRIVATE_IP"
-          value = join(",", data.aws_instances.chaps_instances.private_ips)
+          name = "CHAPS_DNS"
+          value = "chaps-instance-${count.index + 1}-${local.environment}.modernisation-platform.service.justice.gov.uk"
         },
         {
           name  = "Instance"
