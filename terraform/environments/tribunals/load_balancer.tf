@@ -11,7 +11,7 @@ locals {
 resource "aws_lb" "tribunals_lb" {
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tribunals_lb_sc.id]
+  # security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
@@ -21,43 +21,43 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
-resource "aws_security_group" "tribunals_lb_sc" {
-  name        = "tribunals-load-balancer-sg"
-  description = "Control access to the load balancer"
-  vpc_id      = data.aws_vpc.shared.id
+# resource "aws_security_group" "tribunals_lb_sc" {
+#   name        = "tribunals-load-balancer-sg"
+#   description = "Control access to the load balancer"
+#   vpc_id      = data.aws_vpc.shared.id
 
-  egress {
-    description = "Allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+#   egress {
+#     description = "Allow all outbound traffic"
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
 
-  lifecycle {
-    create_before_destroy = true
-  }
-}
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
-resource "aws_security_group_rule" "lb_cloudfront_ingress_https" {
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-  security_group_id = aws_security_group.tribunals_lb_sc.id
-  description       = "Allow HTTPS traffic from CloudFront"
-}
+# resource "aws_security_group_rule" "lb_cloudfront_ingress_https" {
+#   type              = "ingress"
+#   from_port         = 443
+#   to_port           = 443
+#   protocol          = "tcp"
+#   prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+#   security_group_id = aws_security_group.tribunals_lb_sc.id
+#   description       = "Allow HTTPS traffic from CloudFront"
+# }
 
-resource "aws_security_group_rule" "lb_cloudfront_ingress_http" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-  security_group_id = aws_security_group.tribunals_lb_sc.id
-  description       = "Allow HTTP traffic from CloudFront"
-}
+# resource "aws_security_group_rule" "lb_cloudfront_ingress_http" {
+#   type              = "ingress"
+#   from_port         = 80
+#   to_port           = 80
+#   protocol          = "tcp"
+#   prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+#   security_group_id = aws_security_group.tribunals_lb_sc.id
+#   description       = "Allow HTTP traffic from CloudFront"
+# }
 
 resource "aws_lb_target_group" "tribunals_target_group" {
   for_each             = var.services
