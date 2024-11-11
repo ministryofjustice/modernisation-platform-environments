@@ -171,3 +171,18 @@ data "aws_iam_session_context" "whoami" {
 data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
+
+# Route53 DNS data
+data "aws_route53_zone" "external" {
+  provider = aws.core-vpc
+
+  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk."
+  private_zone = false
+}
+
+data "aws_route53_zone" "inner" {
+  provider = aws.core-vpc
+
+  name         = "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal."
+  private_zone = true
+}
