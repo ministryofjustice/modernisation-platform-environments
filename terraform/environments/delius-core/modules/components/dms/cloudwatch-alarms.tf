@@ -235,6 +235,7 @@ resource "aws_lambda_function" "dms_replication_metric_publisher" {
   handler       = "lambda_dms_replication_metric.lambda_handler"
   runtime       = "python3.8"
   filename      = data.archive_file.lambda_dms_replication_metric_zip.output_path
+  source_code_hash = data.archive_file.lambda_dms_replication_metric_zip.output_base64sha256
   environment {
     variables = {
       METRIC_NAMESPACE = "CustomDMSMetrics",
