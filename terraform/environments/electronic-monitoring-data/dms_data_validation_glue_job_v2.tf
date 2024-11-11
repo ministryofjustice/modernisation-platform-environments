@@ -318,7 +318,7 @@ resource "aws_s3_object" "parquet_resize_or_partitionby_yyyy_mm_dd" {
 
 resource "aws_glue_job" "parquet_resize_or_partitionby_yyyy_mm_dd" {
   count = local.gluejob_count
-  
+
   name              = "parquet-resize-or-partitionby-yyyy-mm-dd"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn

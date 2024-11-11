@@ -72,7 +72,7 @@ module "this-bucket" {
         }
       ]
     }
-  ] : [    
+    ] : [
     {
       sid     = "AllowedIPs"
       effect  = "Deny"

@@ -656,11 +656,11 @@ module "s3-p1-export-bucket" {
 module "s3-serco-export-bucket" {
   source = "./modules/export_bucket_presigned_url/"
 
-  allowed_ips             = null
-  export_destination      = "serco-historic"
-  local_bucket_prefix     = local.bucket_prefix
-  local_tags              = local.tags
-  logging_bucket          = module.s3-logging-bucket
+  allowed_ips         = null
+  export_destination  = "serco-historic"
+  local_bucket_prefix = local.bucket_prefix
+  local_tags          = local.tags
+  logging_bucket      = module.s3-logging-bucket
 
   providers = {
     aws = aws
