@@ -264,7 +264,6 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   alarm_description   = "Alarm when Any DMS Replication Task has Stopped or Failed"
   actions_enabled     = true
   treat_missing_data  = "ignore"
-  threshold_metric_id = "m1"
 
   # Defining the metric query to sum across all dimensions (replication tasks)
   metric_query {
