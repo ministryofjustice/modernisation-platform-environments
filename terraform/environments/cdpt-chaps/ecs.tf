@@ -636,6 +636,13 @@ resource "aws_security_group" "chapsdotnet_service" {
     protocol        = "tcp"
     security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
+  
+  ingress {
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
 
   egress {
     from_port   = 0
