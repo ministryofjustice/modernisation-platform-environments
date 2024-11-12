@@ -136,7 +136,7 @@ resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runne
           "remoteRef" = {
             "key"              = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
             "property"         = "private_key"
-            "decodingStrategy" = "base64"
+            "decodingStrategy" = "Base64"
           }
           "secretKey" = "private-key"
         },
