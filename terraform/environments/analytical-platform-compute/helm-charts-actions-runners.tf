@@ -13,8 +13,8 @@ resource "helm_release" "actions_runner_mojas_airflow" {
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "airflow"
         github_runner_labels       = "analytical-platform"
@@ -39,8 +39,8 @@ resource "helm_release" "actions_runner_mojas_airflow_create_a_pipeline" {
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow-create-a-pipeline/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "airflow-create-a-pipeline"
         github_runner_labels       = "analytical-platform"
@@ -64,8 +64,8 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table" {
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "analytical-platform"
@@ -88,8 +88,8 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_non_spot" {
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "analytical-platform-non-spot"
@@ -116,8 +116,8 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr" {
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "digital-prison-reporting"
@@ -140,8 +140,8 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr_pp" {
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "digital-prison-reporting-pp"
@@ -164,8 +164,8 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds_test" 
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "electronic-monitoring-data-test"
