@@ -91,7 +91,18 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
           hostPort      = local.application_data.accounts[local.environment].container_port
           protocol      = "tcp"
         }
-      ]
+      ],
+      healthCheck = {
+        path        = "/"
+        command     = [
+          "CMD-SHELL",
+          "curl -f http://localhost:${local.application_data.accounts[local.environment].container_port}/ || exit 1"
+        ]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      },
       logConfiguration = {
         logDriver = "awslogs",
         options = {
@@ -235,16 +246,6 @@ resource "aws_ecs_service" "chaps_service" {
     weight            = 1
   }
 
-  # ordered_placement_strategy {
-  #   field = "attribute:ecs.availability-zone"
-  #   type  = "spread"
-  # }
-
-  # ordered_placement_strategy {
-  #   type  = "spread"
-  #   field = "instanceId"
-  # }
-
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
     security_groups = [aws_security_group.ecs_service.id]
@@ -278,16 +279,6 @@ resource "aws_ecs_service" "chapsdotnet_service" {
     capacity_provider = aws_ecs_capacity_provider.chaps.name
     weight            = 1
   }
-
-  # ordered_placement_strategy {
-  #   field = "attribute:ecs.availability-zone"
-  #   type  = "spread"
-  # }
-
-  # ordered_placement_strategy {
-  #   type  = "spread"
-  #   field = "instanceId"
-  # }
 
   load_balancer {
     target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
@@ -601,14 +592,6 @@ resource "aws_security_group" "ecs_service" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [module.lb_access_logs_enabled.security_group.id]
-  }
-
-  ingress {
     description = "Allow HTTP traffic from chapsdotnet container"
     from_port   = 80
     to_port     = 80
@@ -617,10 +600,11 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow traffic to chapsdotnet container"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
 }
 
@@ -631,6 +615,7 @@ resource "aws_security_group" "chapsdotnet_service" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
+    description = "Allow HTTP traffic from load balancer"
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
@@ -638,6 +623,7 @@ resource "aws_security_group" "chapsdotnet_service" {
   }
   
   ingress {
+    description = "Allow HTTP traffic from chaps container"
     from_port = 80
     to_port = 80
     protocol = "tcp"
@@ -645,12 +631,13 @@ resource "aws_security_group" "chapsdotnet_service" {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow traffic to chaps container"
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
-
+  
   tags = merge(
     local.tags,
     {
