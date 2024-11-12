@@ -163,7 +163,7 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
       environment = [
         {
           name = "CHAPS_DNS"
-          value = "chaps-instance-${count.index + 1}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+          value = join(",", aws_route53_record.a_records[*].fqdn)
         },
         {
           name  = "Instance"
