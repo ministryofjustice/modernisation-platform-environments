@@ -373,22 +373,22 @@ EOF
 }
 
 
-resource "aws_cloudwatch_log_group" "etl_table_row_hashvalues_to_parquet" {
-  name              = "etl-table-row-hashvalues-to-parquet"
+resource "aws_cloudwatch_log_group" "etl_table_rows_hashvalue_to_parquet" {
+  name              = "etl-table-rows-hashvalue-to-parquet"
   retention_in_days = 14
 }
 
-resource "aws_s3_object" "etl_table_row_hashvalues_to_parquet" {
+resource "aws_s3_object" "etl_table_rows_hashvalue_to_parquet" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "etl_table_row_hashvalues_to_parquet.py"
-  source = "glue-job/etl_table_row_hashvalues_to_parquet.py"
-  etag   = filemd5("glue-job/etl_table_row_hashvalues_to_parquet.py")
+  key    = "etl_table_rows_hashvalue_to_parquet.py"
+  source = "glue-job/etl_table_rows_hashvalue_to_parquet.py"
+  etag   = filemd5("glue-job/etl_table_rows_hashvalue_to_parquet.py")
 }
 
-resource "aws_glue_job" "etl_table_row_hashvalues_to_parquet" {
+resource "aws_glue_job" "etl_table_rows_hashvalue_to_parquet" {
   count = local.gluejob_count
 
-  name              = "etl-table-row-hashvalues-to-parquet"
+  name              = "etl-table-rows-hashvalue-to-parquet"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
   glue_version      = "4.0"
@@ -408,7 +408,7 @@ resource "aws_glue_job" "etl_table_row_hashvalues_to_parquet" {
     "--extra-py-files"                      = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
     "--hashed_output_s3_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
     "--glue_catalog_db_name"                = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
-    "--continuous-log-logGroup"             = "/aws-glue/jobs/${aws_cloudwatch_log_group.etl_table_row_hashvalues_to_parquet.name}"
+    "--continuous-log-logGroup"             = "/aws-glue/jobs/${aws_cloudwatch_log_group.etl_table_rows_hashvalue_to_parquet.name}"
     "--enable-continuous-cloudwatch-log"    = "true"
     "--enable-continuous-log-filter"        = "true"
     "--enable-metrics"                      = "true"
@@ -425,7 +425,7 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_table_row_hashvalues_to_parquet.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_table_rows_hashvalue_to_parquet.py"
   }
 
   tags = merge(

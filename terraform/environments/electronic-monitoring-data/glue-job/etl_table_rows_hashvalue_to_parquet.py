@@ -171,6 +171,7 @@ if __name__ == "__main__":
 
     prq_bucket_parent_folder = f"""{HASHED_OUTPUT_S3_BUCKET_NAME}/{RDS_DB_TABLE_HASHED_ROWS_PARENT_DIR}"""
     prq_table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}"""
+    
     if S3Methods.check_s3_folder_path_if_exists(
                     HASHED_OUTPUT_S3_BUCKET_NAME,
                     f'''{RDS_DB_TABLE_HASHED_ROWS_PARENT_DIR}/{prq_table_folder_path}'''
@@ -292,7 +293,7 @@ if __name__ == "__main__":
             f"""hashed_rows_prq_df: Repartitioned -> {hashed_rows_prq_df.rdd.getNumPartitions()} partitions.""")
     
     hashed_rows_prq_df_sorted = hashed_rows_prq_df.sortWithinPartitions(f"{rds_db_tbl_pkey_column}")
-    LOGGER.info(f"""hashed_rows_prq_df - sorted within partitions on pkey.""")
+    LOGGER.info(f"""hashed_rows_prq_df - sorted within partitions on '{rds_db_tbl_pkey_column}'.""")
 
     write_parquet_to_s3(hashed_rows_prq_df_sorted, 
                         f'''s3://{prq_bucket_parent_folder}/{prq_table_folder_path}''')
