@@ -291,18 +291,15 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
     namespace   = "CustomDMSMetrics"
     period      = 60
     stat        = "Sum"
+    return_data = "false"
   }
 
   # Metric math expression to sum the metric across all dimensions
   metric_query {
-    id         = "e1"
-    expression = "SUM(METRICS('CustomDMSMetrics', 'DMSReplicationStopped', {}, 60))"
-    label      = "TotalDMSReplicationStoppedAcrossAllDimensions"
-  }
-
-  # Use the expression query result as the metric for the alarm
-  alarm_rule {
-    metric_query_id = "e1"
+    id          = "e1"
+    expression  = "SUM(METRICS('CustomDMSMetrics', 'DMSReplicationStopped', {}, 60))"
+    label       = "TotalDMSReplicationStoppedAcrossAllDimensions"
+    return_data = "false"
   }
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
