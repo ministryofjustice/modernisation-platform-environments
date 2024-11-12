@@ -638,6 +638,22 @@ resource "aws_security_group" "chapsdotnet_service" {
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
   
+  egress {
+    description = "Allow traffic to DB on port 1433"
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+  
+  egress {
+    description = "Allow all within VPC"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+  
   tags = merge(
     local.tags,
     {
