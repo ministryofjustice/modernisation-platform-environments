@@ -37,7 +37,7 @@ def lambda_handler(event, context):
         #  DMS-EVENT-0078: A replication task has failed.
         stopped_replication = ["DMS-EVENT-0079","DMS-EVENT-0091","DMS-EVENT-0092","DMS-EVENT-0078"]
 
-        if dms_event_id in running_replication:
+        if dms_event_id.group(1) in running_replication:
             logger.info("Task started")
             cloudwatch.put_metric_data(
                 Namespace='CustomDMSMetrics',
@@ -53,7 +53,7 @@ def lambda_handler(event, context):
                     }
                 ]
             )
-        elif dms_event_id in stopped_replication:
+        elif dms_event_id.group(1) in stopped_replication:
             logger.info("Task failed")
             cloudwatch.put_metric_data(
                 Namespace='CustomDMSMetrics',
