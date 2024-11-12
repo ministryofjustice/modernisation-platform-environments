@@ -12,35 +12,57 @@ def lambda_handler(event, context):
     for record in event['Records']:
 
         message = json.loads(record['Sns']['Message'])
-
-        event_message = message.get("Event Message")
-
         logger.info("SNS Message: %s",message)
 
-        if re.search(r"^Replication task has started.$",event_message):
+        event_message = message.get("Event Message")
+        event_source  = message.get("Event Source")
+        source_id     = message.get("SourceId")
+
+        dms_event_id  = re.search(r"#(DMS-EVENT-\d+) $",message.get("Event ID"))
+
+        # DMS Event IDs are documented at https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Events.html
+        #
+        # Those relevant for this metric are:
+        #
+        # Running Replication:
+        #  DMS-EVENT-0069: The replication task has started.
+        #  DMS-EVENT-0081: A reload of table details has been requested.
+        #  DMS-EVENT-0093: Reading resumed.
+        running_replication = ["DMS-EVENT-0069","DMS-EVENT-0081","DMS-EVENT-0093"]
+        #
+        # Stopped Replication:
+        #  DMS-EVENT-0079: The replication task has stopped.
+        #  DMS-EVENT-0091: Reading paused, swap files limit reached.
+        #  DMS-EVENT-0092: Reading paused, disk usage limit reached.
+        #  DMS-EVENT-0078: A replication task has failed.
+        stopped_replication = ["DMS-EVENT-0079","DMS-EVENT-0091","DMS-EVENT-0092","DMS-EVENT-0078"]
+
+        if dms_event_id in running_replication:
             logger.info("Task started")
             cloudwatch.put_metric_data(
                 Namespace='CustomDMSMetrics',
                 MetricData=[
                     {
-                        'MetricName': 'DMSReplicationFailure',
+                        'MetricName': 'DMSReplicationStopped',
                         'Dimensions': [
-                            {'Name': 'Service', 'Value': 'DMS'}
+                            {'Name': 'EventSource', 'Value': event_source},
+                            {'Name': 'SourceId',    'Value': source_id}
                         ],
                         'Value': 0,  # Reset Below Trigger threshold (Task Started)
                         'Unit': 'Count'
                     }
                 ]
             )
-        elif re.search(r"^Replication task has failed..*$",event_message):
+        elif dms_event_id in stopped_replication:
             logger.info("Task failed")
             cloudwatch.put_metric_data(
                 Namespace='CustomDMSMetrics',
                 MetricData=[
                     {
-                        'MetricName': 'DMSReplicationFailure',
+                        'MetricName': 'DMSReplicationStopped',
                         'Dimensions': [
-                            {'Name': 'Service', 'Value': 'DMS'}
+                            {'Name': 'EventSource', 'Value': event_source},
+                            {'Name': 'SourceId',    'Value': source_id}
                         ],
                         'Value': 1,  # Trigger threshold (Task Failed)
                         'Unit': 'Count'
