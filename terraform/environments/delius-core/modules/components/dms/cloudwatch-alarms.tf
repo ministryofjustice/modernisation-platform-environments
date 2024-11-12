@@ -301,7 +301,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
     id          = "e1"
     expression  = "SUM(METRICS('CustomDMSMetrics', 'DMSReplicationStopped', {}, 60))"
     label       = "TotalDMSReplicationStoppedAcrossAllDimensions"
-    return_data = "false"
+    return_data = "true"
   }
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
