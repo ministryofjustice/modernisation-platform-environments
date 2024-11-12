@@ -1,6 +1,11 @@
 module "schedule_alarms_lambda" {
   source = "../schedule_alarms_lambda"
 
+  count = (
+    var.schedule_alarms_lambda.alarm_list != [] ||
+    var.schedule_alarms_lambda.alarm_patterns != []
+  ) ? 1 : 0
+
   lambda_function_name = var.schedule_alarms_lambda.function_name
   lambda_log_level     = var.schedule_alarms_lambda.lambda_log_level
 
