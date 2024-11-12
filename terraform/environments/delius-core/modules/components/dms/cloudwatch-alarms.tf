@@ -256,21 +256,61 @@ resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publis
   source_arn    = aws_sns_topic.dms_events_topic.arn
 }
 
+
+# CloudWatch won't aggregate across dimensions for custom metrics (it will do so for some metrics published by other services, like EC2).
+# resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
+#   alarm_name          = "DMSReplicationStoppedAlarm"
+#   comparison_operator = "GreaterThanThreshold"
+#   evaluation_periods  = 1
+#   metric_name         = "DMSReplicationStopped"
+#   namespace           = "CustomDMSMetrics"
+#   period              = 60
+#   statistic           = "Sum"
+#   threshold           = 0
+#   treat_missing_data  = "ignore"
+#   alarm_description   = "Alarm when Any DMS Replication Task has Stopped or Failed"
+#   actions_enabled     = true
+  
+#   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
+# }
+
+
+# Define a CloudWatch metric alarm with a metric math expression
 resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   alarm_name          = "DMSReplicationStoppedAlarm"
+  alarm_description   = "Alarm when Stopped Replication Task across all Dimensions (tasks)"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
-  metric_name         = "DMSReplicationStopped"
-  namespace           = "CustomDMSMetrics"
-  period              = 60
-  statistic           = "Sum"
   threshold           = 0
   treat_missing_data  = "ignore"
-  alarm_description   = "Alarm when Any DMS Replication Task has Stopped or Failed"
-  actions_enabled     = true
-  
+
+  # Query for the custom metric across all dimensions
+  metric_query {
+    id          = "m1"
+    metric_name = "DMSReplicationStopped"
+    namespace   = "CustomDMSMetrics"
+    period      = 60
+    stat        = "Sum"
+  }
+
+  # Metric math expression to sum the metric across all dimensions
+  metric_query {
+    id         = "e1"
+    expression = "SUM(METRICS('CustomDMSMetrics', 'DMSReplicationStopped', {}, 60))"
+    label      = "TotalDMSReplicationStoppedAcrossAllDimensions"
+  }
+
+  # Use the expression query result as the metric for the alarm
+  alarm_rule {
+    metric_query_id = "e1"
+  }
+
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
 }
+
+
+
+
 
 # SNS Topic for DMS replication events
 # This is NOT the same as for DMS Cloudwatch Alarms (dms_alerting)
