@@ -260,29 +260,15 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   alarm_name          = "DMSReplicationStoppedAlarm"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
+  metric_name         = "DMSReplicationStopped"
+  namespace           = "CustomDMSMetrics"
+  period              = 60
+  statistic           = "Sum"
   threshold           = 0
+  treat_missing_data  = "ignore"
   alarm_description   = "Alarm when Any DMS Replication Task has Stopped or Failed"
   actions_enabled     = true
-  treat_missing_data  = "ignore"
-
-  # Defining the metric query to sum across all dimensions (replication tasks)
-  metric_query {
-    id          = "m1"
-    expression  = "SUM(m2)"
-    label       = "Sum of Stopped Replication Tasks across all defined Tasks"
-    return_data = true
-  }
-
-  metric_query {
-    id = "m2"
-    metric {
-      namespace   = "CustomDMSMetrics"
-      metric_name = "DMSReplicationStopped"
-      period      = 60
-      stat        = "Maximum"
-    }
-  }
-
+  
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
 }
 
