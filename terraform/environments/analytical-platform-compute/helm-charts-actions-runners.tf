@@ -13,8 +13,6 @@ resource "helm_release" "actions_runner_mojas_airflow" {
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow/values.yml.tftpl",
       {
-        # github_app_application_id  = data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string["app_id"]
-        # github_app_installation_id = data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string["installation_id"]
         github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["app_id"]
         github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app.secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
