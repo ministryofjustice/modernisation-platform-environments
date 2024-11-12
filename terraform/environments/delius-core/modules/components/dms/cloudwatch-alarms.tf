@@ -256,17 +256,17 @@ resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publis
   source_arn    = aws_sns_topic.dms_events_topic.arn
 }
 
-
-resource "aws_cloudwatch_metric_alarm" "dms_replication_alarm" {
-  alarm_name          = "DMSReplicationFailureAlarm"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "1"
-  metric_name         = "DMSReplicationFailure"
+resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
+  alarm_name          = "DMSReplicationStoppedAlarm"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  metric_name         = "DMSReplicationStopped"
   namespace           = "CustomDMSMetrics"
-  period              = "60"
-  statistic           = "Sum"
-  threshold           = 1
-  alarm_description   = "Alarm when DMSReplicationFailure metric is >= 1"
+  period              = 60
+  statistic           = "Maximum"
+  threshold           = 0
+  treat_missing_data  = "missing"
+  alarm_description   = "Alarm when Any DMS Replication Task has Stopped or Failed"
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
 }
