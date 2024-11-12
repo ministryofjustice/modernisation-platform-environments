@@ -265,7 +265,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   period              = 300
   statistic           = "Maximum"
   threshold           = 0
-  treat_missing_data  = "notBreaching"
+  treat_missing_data  = "ignore"
   alarm_description   = "Alarm when Any DMS Replication Task has Stopped or Failed"
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
