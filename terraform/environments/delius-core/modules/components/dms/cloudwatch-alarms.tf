@@ -290,7 +290,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
     metric_name = "DMSReplicationStopped"
     namespace   = "CustomDMSMetrics"
     period      = 60
-    stat        = "Sum"
+    statistic   = "Sum"
     return_data = "false"
   }
 
