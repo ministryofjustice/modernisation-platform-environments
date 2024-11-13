@@ -220,6 +220,26 @@ class RDS_JDBC_CONNECTION():
                     .load())
 
 
+    def get_rds_df_query_min_max_count(self, 
+                                       rds_table_name,
+                                       table_pkey_column) -> DataFrame:
+
+        query_str = f"""
+        SELECT min({table_pkey_column}) as min_value,
+               max({table_pkey_column}) as max_value,
+               count({table_pkey_column}) as count_value
+        FROM {self.rds_db_schema_name}.[{rds_table_name}]
+        """.strip()
+
+        return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({query_str}) as t""")
+                    .load())
+
+
     def get_rds_df_jdbc_read_parallel(self,
                                       rds_tbl_name,
                                       rds_tbl_pkeys_list,

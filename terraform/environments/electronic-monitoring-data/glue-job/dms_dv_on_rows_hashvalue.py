@@ -152,14 +152,44 @@ if __name__ == "__main__":
          T.StructField("RowHash", T.StringType(), False)]
          )
 
+    # --------------------------------------------------------------------------------------
+
     rds_hashed_rows_prq_df = CustomPysparkMethods.get_s3_parquet_df_v2(
                                     rds_hashed_rows_fulls3path, 
                                     hashed_table_schema
                                 )
-    rds_hashed_rows_prq_df_count = rds_hashed_rows_prq_df.count()
+
+    rds_hashed_rows_prq_df_agg = rds_hashed_rows_prq_df.agg(
+                                        F.min(TABLE_PKEY_COLUMN).alias(f"min_{TABLE_PKEY_COLUMN}"),
+                                        F.max(TABLE_PKEY_COLUMN).alias(f"max_{TABLE_PKEY_COLUMN}"),
+                                        F.count(TABLE_PKEY_COLUMN).alias(f"count_{TABLE_PKEY_COLUMN}")
+                                        )
+    rds_hashed_rows_prq_agg_dict = rds_hashed_rows_prq_df_agg.collect()[0]
+    rds_hashed_rows_prq_min_pkey = rds_hashed_rows_prq_agg_dict[f"min_{TABLE_PKEY_COLUMN}"]
+    rds_hashed_rows_prq_max_pkey = rds_hashed_rows_prq_agg_dict[f"max_{TABLE_PKEY_COLUMN}"]
+    rds_hashed_rows_prq_count = rds_hashed_rows_prq_agg_dict[f"count_{TABLE_PKEY_COLUMN}"]
+
+    LOGGER.info(f""">> rds_hashed_rows_prq_min_pkey = {rds_hashed_rows_prq_min_pkey} <<""")
+    LOGGER.info(f""">> rds_hashed_rows_prq_max_pkey = {rds_hashed_rows_prq_max_pkey} <<""")
+    LOGGER.info(f""">> rds_hashed_rows_prq_count = {rds_hashed_rows_prq_count} <<""")
+    # --------------------------------------------------------------------------------------
 
     dms_table_output_prq_df = spark.read.parquet(dms_output_fulls3path)
-    dms_table_output_prq_df_count = dms_table_output_prq_df.count()
+
+    dms_table_output_prq_df_agg = dms_table_output_prq_df.agg(
+                                        F.min(TABLE_PKEY_COLUMN).alias(f"min_{TABLE_PKEY_COLUMN}"),
+                                        F.max(TABLE_PKEY_COLUMN).alias(f"max_{TABLE_PKEY_COLUMN}"),
+                                        F.count(TABLE_PKEY_COLUMN).alias(f"count_{TABLE_PKEY_COLUMN}")
+                                        )
+    dms_table_output_prq_agg_dict = dms_table_output_prq_df_agg.collect()[0]
+    dms_table_output_prq_min_pkey = dms_table_output_prq_agg_dict[f"min_{TABLE_PKEY_COLUMN}"]
+    dms_table_output_prq_max_pkey = dms_table_output_prq_agg_dict[f"max_{TABLE_PKEY_COLUMN}"]
+    dms_table_output_prq_count = dms_table_output_prq_agg_dict[f"count_{TABLE_PKEY_COLUMN}"]
+
+    LOGGER.info(f""">> dms_table_output_prq_min_pkey = {dms_table_output_prq_min_pkey} <<""")
+    LOGGER.info(f""">> dms_table_output_prq_max_pkey = {dms_table_output_prq_max_pkey} <<""")
+    LOGGER.info(f""">> dms_table_output_prq_count = {dms_table_output_prq_count} <<""")
+    # --------------------------------------------------------------------------------------
 
     rds_jdbc_conn_obj = RDS_JDBC_CONNECTION(RDS_DB_HOST_ENDPOINT,
                                             RDS_DB_INSTANCE_PWD,
@@ -167,18 +197,49 @@ if __name__ == "__main__":
                                             RDS_DB_SCHEMA_FOLDER)
 
     # EVALUATE RDS-DATAFRAME ROW-COUNT
-    df_rds_count = rds_jdbc_conn_obj.get_rds_db_table_row_count(
+    rds_jdbc_min_max_count_df_agg = rds_jdbc_conn_obj.get_rds_df_query_min_max_count(
                                         TABLE_TO_BE_VALIDATED, 
                                         TABLE_PKEY_COLUMN
-                    )
-    if rds_hashed_rows_prq_df_count != df_rds_count:
-        error_msg = f"""rds_hashed_rows_prq_df_count ({rds_hashed_rows_prq_df_count}) != df_rds_count ({df_rds_count})"""
+                                    )
+
+    rds_jdbc_agg_dict = rds_jdbc_min_max_count_df_agg.collect()[0]
+    rds_jdbc_min_pkey = rds_jdbc_agg_dict[f"min_value"]
+    rds_jdbc_max_pkey = rds_jdbc_agg_dict[f"max_value"]
+    rds_jdbc_count_pkey = rds_jdbc_agg_dict[f"count_value"]
+
+    LOGGER.info(f""">> rds_jdbc_min_pkey = {rds_jdbc_min_pkey} <<""")
+    LOGGER.info(f""">> rds_jdbc_max_pkey = {rds_jdbc_max_pkey} <<""")
+    LOGGER.info(f""">> rds_jdbc_count_pkey = {rds_jdbc_count_pkey} <<""")
+    # --------------------------------------------------------------------------------------
+    
+    if rds_hashed_rows_prq_count != rds_jdbc_count_pkey:
+        error_msg = f"""rds_hashed_rows_prq_count ({rds_hashed_rows_prq_count}) != rds_jdbc_count_pkey ({rds_jdbc_count_pkey})"""
         sys.exit(f"""Row Count Mismatch: \n{error_msg}""")     
         # ------------------------------------------------
         #     
-        if rds_hashed_rows_prq_df_count != dms_table_output_prq_df_count:
-            error_msg = f"""rds_hashed_rows_prq_df_count ({rds_hashed_rows_prq_df_count}) != dms_table_output_prq_df_count ({dms_table_output_prq_df_count})"""
+        if rds_hashed_rows_prq_count != dms_table_output_prq_count:
+            error_msg = f"""rds_hashed_rows_prq_count ({rds_hashed_rows_prq_count}) != dms_table_output_prq_count ({dms_table_output_prq_count})"""
             sys.exit(f"""Row Count Mismatch: \n{error_msg}""")
+    # --------------------
+
+    if rds_hashed_rows_prq_min_pkey != rds_jdbc_min_pkey:
+        error_msg = f"""rds_hashed_rows_prq_min_pkey ({rds_hashed_rows_prq_min_pkey}) != rds_jdbc_min_pkey ({rds_jdbc_min_pkey})"""
+        sys.exit(f"""{TABLE_TO_BE_VALIDATED} Min({TABLE_PKEY_COLUMN}) Mismatch: \n{error_msg}""")     
+        # ------------------------------------------------
+        #     
+        if rds_hashed_rows_prq_min_pkey != dms_table_output_prq_min_pkey:
+            error_msg = f"""rds_hashed_rows_prq_min_pkey ({rds_hashed_rows_prq_min_pkey}) != dms_table_output_prq_min_pkey ({dms_table_output_prq_min_pkey})"""
+            sys.exit(f"""{TABLE_TO_BE_VALIDATED} Min({TABLE_PKEY_COLUMN}) Mismatch: \n{error_msg}""")
+    # --------------------
+
+    if rds_hashed_rows_prq_max_pkey != rds_jdbc_max_pkey:
+        error_msg = f"""rds_hashed_rows_prq_max_pkey ({rds_hashed_rows_prq_max_pkey}) != rds_jdbc_max_pkey ({rds_jdbc_max_pkey})"""
+        sys.exit(f"""{TABLE_TO_BE_VALIDATED} Max({TABLE_PKEY_COLUMN}) Mismatch: \n{error_msg}""")     
+        # ------------------------------------------------
+        #     
+        if rds_hashed_rows_prq_max_pkey != dms_table_output_prq_max_pkey:
+            error_msg = f"""rds_hashed_rows_prq_max_pkey ({rds_hashed_rows_prq_max_pkey}) != dms_table_output_prq_max_pkey ({dms_table_output_prq_max_pkey})"""
+            sys.exit(f"""{TABLE_TO_BE_VALIDATED} Max({TABLE_PKEY_COLUMN}) Mismatch: \n{error_msg}""")
     # --------------------
 
     all_columns_except_pkey = [col for col in dms_table_output_prq_df.columns 
