@@ -918,7 +918,7 @@ variable "s3_buckets" {
 variable "schedule_alarms_lambda" {
   description = ""
   type = object({
-    function_name    = string,
+    function_name    = optional(string, null)
     lambda_log_level = optional(string, "INFO")
     alarm_list       = optional(list(string), [])
     alarm_patterns   = optional(list(string), [])
@@ -927,6 +927,7 @@ variable "schedule_alarms_lambda" {
     end_time         = optional(string, "22:45")
     tags             = optional(map(string), {})
   })
+  default = {}
 }
 
 variable "secretsmanager_secrets" {
