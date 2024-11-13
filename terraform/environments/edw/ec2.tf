@@ -385,7 +385,7 @@ resource "aws_iam_instance_profile" "edw_ec2_instance_profile" {
 ####### DB Policy #######
 
 resource "aws_iam_policy" "edw_ec2_role_policy" {
-  name = "${local.application_name}-ec2-policy"
+  name = "${local.application_name}-ec2-policy2"
   path = "/"
   tags = merge(
     local.tags,
