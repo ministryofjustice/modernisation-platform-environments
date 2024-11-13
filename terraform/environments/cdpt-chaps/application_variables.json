@@ -17,10 +17,8 @@
       "container_port": 80,
       "client_id": "aa335a21-40a9-45a0-b0ef-16d65584b024",
       "dotnet_client_id": "37156e23-43dd-4325-ae36-f998ce4c32ff",
-      "create_chapsdotnet": "true",
       "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
-      "CallbackPath": "/signin-oidc",
-      "subdomain_name": "cdpt-chaps"
+      "CallbackPath": "/signin-oidc"
     },
     "preproduction": {
       "db_instance_class": "db.t3.2xlarge",
@@ -37,8 +35,7 @@
       "ec2_min_size": 2,
       "instance_type": "t3.large",
       "container_port": 80,
-      "client_id": "2e2cc8ad-7b64-41b9-93a1-c16b9a00b34f",
-      "subdomain_name": "cdpt-chaps"
+      "client_id": "2e2cc8ad-7b64-41b9-93a1-c16b9a00b34f"
     },
     "production": {
       "db_instance_class": "db.t3.2xlarge",
@@ -55,8 +52,7 @@
       "ec2_min_size": 2,
       "instance_type": "t3.large",
       "container_port": 80,
-      "client_id": "0a5da4a0-a108-4ca5-a45c-440b72b323e6",
-      "subdomain_name": "correspondence-handling-and-processing"
+      "client_id": "0a5da4a0-a108-4ca5-a45c-440b72b323e6"
     }
   }
 }

@@ -111,13 +111,3 @@ resource "aws_route53_record" "external_prod" {
   }
 }
 
- # Route 53 A records for each EC2 instance
-resource "aws_route53_record" "a_records" {
-  count    = length(data.aws_instances.chaps_instances.private_ips) 
-  zone_id  = data.aws_route53_zone.inner.zone_id
-  provider = aws.core-vpc
-  name     = "chaps-instance-${count.index + 1}"
-  type     = "A"
-  ttl      = 300
-  records  = [data.aws_instances.chaps_instances.private_ips[count.index]]
-}

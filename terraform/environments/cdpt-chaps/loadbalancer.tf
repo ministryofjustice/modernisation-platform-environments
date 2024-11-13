@@ -85,27 +85,6 @@ resource "aws_security_group" "chaps_lb_sc" {
   }
 }
 
-resource "aws_security_group" "chaps_target_sc" {
-  name        = "target security group"
-  description = "allow health check traffic from load balancer"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    description     = "allow traffic from load balancer"
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    security_groups = [module.lb_access_logs_enabled.security_group.id]
-  }
-
-  egress {
-    description = "Open all outbound ports"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
 
 resource "aws_lb_listener" "https_listener" {
   #checkov:skip=CKV_AWS_103
