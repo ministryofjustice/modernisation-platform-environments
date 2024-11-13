@@ -21,12 +21,12 @@ module "share_api_data_marts" {
     register      = true
     share         = true
     hybrid_mode   = false # will be managed exclusively in LakeFormation
-    principal     = module.front_end_assumable_role.role_arn
+    principal     = module.front_end_assumable_role.iam_role_arn
   }]
 
   databases_to_share = [{
     name      = "api_data_marts"
-    principal = module.front_end_assumable_role.role_arn
+    principal = module.front_end_assumable_role.iam_role_arn
   }]
 
   providers = {
