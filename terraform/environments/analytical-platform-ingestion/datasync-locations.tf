@@ -10,6 +10,15 @@ resource "aws_datasync_location_smb" "dom1_hq_pgo_shared_group_sis_case_manageme
   tags = local.tags
 }
 
+resource "aws_datasync_location_s3" "mojap_land_dom1_hq_pgo_shared_group_sis_case_management_investigations" {
+  s3_bucket_arn = "arn:aws:s3:::${local.environment_configuration.datasync_target_buckets[0]}"
+  subdirectory  = "/datasync/dom1/data/hq/pgo/shared/group/sis-case-management/investigations/"
+
+  s3_config {
+    bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
+  }
+}
+
 resource "aws_datasync_location_smb" "dom1_hq_pgo_shared_group_sis_case_management_itas" {
   server_hostname = "dom1.infra.int"
   subdirectory    = "/data/hq/PGO/Shared/Group/SIS Case Management/ITAS/"
@@ -20,4 +29,13 @@ resource "aws_datasync_location_smb" "dom1_hq_pgo_shared_group_sis_case_manageme
   agent_arns = [aws_datasync_agent.main.arn]
 
   tags = local.tags
+}
+
+resource "aws_datasync_location_s3" "mojap_land_dom1_hq_pgo_shared_group_sis_case_management_itas" {
+  s3_bucket_arn = "arn:aws:s3:::${local.environment_configuration.datasync_target_buckets[0]}"
+  subdirectory  = "/datasync/dom1/data/hq/pgo/shared/group/sis-case-management/itas/"
+
+  s3_config {
+    bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
+  }
 }
