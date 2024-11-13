@@ -596,7 +596,8 @@ resource "aws_security_group" "ecs_service" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    //cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    security_groups = [aws_security_group.chapsdotnet_service.id]
   }
 
   egress {
@@ -605,6 +606,14 @@ resource "aws_security_group" "ecs_service" {
     to_port         = 80
     protocol        = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+  
+  egress {
+    description = "Allow traffic to chapsdotnet service security group"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    security_groups = [aws_security_group.chapsdotnet_service.id]
   }
 }
 
@@ -627,7 +636,7 @@ resource "aws_security_group" "chapsdotnet_service" {
     from_port = 80
     to_port = 80
     protocol = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    security_groups = [aws_security_group.ecs_service.id]
   }
 
   egress {
@@ -635,7 +644,7 @@ resource "aws_security_group" "chapsdotnet_service" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    security_groups = [aws_security_group.ecs_service.id]
   }
   
   egress {
