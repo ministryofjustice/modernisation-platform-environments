@@ -11,7 +11,7 @@ locals {
 resource "aws_lb" "tribunals_lb" {
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tribunals_lb_sc.id, aws_security_group.tribunals_lb_sg_cloudfront.id]
+  security_groups            = [aws_security_group.tribunals_lb_sg_cloudfront.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
@@ -126,6 +126,27 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   condition {
     host_header {
       values = ["*${each.key}.*"]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "cloudfront_check" {
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = 1
+
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access Denied"
+      status_code  = "403"
+    }
+  }
+
+  condition {
+    http_header {
+      http_header_name = "X-Custom-Header"
+      values           = ["tribunals-origin"]
     }
   }
 }
