@@ -231,9 +231,14 @@ fi
 echo "net.ipv4.tcp_keepalive_time = 300" >> /etc/sysctl.conf
 sysctl -p
 # Add SQLNET.EXPIRE_TIME to sqlnet.ora ---> keepalive solution
-grep -qxF "SQLNET.EXPIRE_TIME = 1" /oracle/software/product/10.2.0/network/admin/sqlnet.ora
+# Check if SQLNET.EXPIRE_TIME exists in the file and update it, otherwise add it
+if grep -q "^SQLNET.EXPIRE_TIME" /oracle/software/product/10.2.0/network/admin/sqlnet.ora; then
+    # If the line exists, update it to "SQLNET.EXPIRE_TIME = 1"
+    sed -i 's/^SQLNET\.EXPIRE_TIME.*/SQLNET.EXPIRE_TIME = 1/' /oracle/software/product/10.2.0/network/admin/sqlnet.ora
+else
+    # If the line does not exist, append it to the end of the file
+    echo "SQLNET.EXPIRE_TIME = 1" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
 # Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
-sed -i '/(ENABLE *= *broken)/d' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 grep -q '(ENABLE *= *broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora || sed -i '/(DESCRIPTION =/a\\  (ENABLE = broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
 # Add inbound connection timeout option to sqlnet
 grep -qxF "SQLNET.INBOUND_CONNECT_TIMEOUT = 0" /oracle/software/product/10.2.0/network/admin/sqlnet.ora || echo "SQLNET.INBOUND_CONNECT_TIMEOUT = 0" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
