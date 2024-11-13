@@ -158,7 +158,21 @@ resource "aws_s3_bucket_policy" "lb_logs" {
         Principal = {
           AWS = "arn:aws:iam::${data.aws_elb_service_account.main.id}:root"
         }
-        Action = "s3:PutObject"
+        Action = [
+          "s3:PutObject"
+        ]
+        Resource = [
+          "${aws_s3_bucket.lb_logs.arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
+        Action = [
+          "s3:PutObject"
+        ]
         Resource = [
           "${aws_s3_bucket.lb_logs.arn}/*"
         ]
