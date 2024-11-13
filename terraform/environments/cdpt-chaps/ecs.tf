@@ -156,7 +156,18 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
           containerPort = 80
           protocol      = "tcp"
         }
+      ]      
+      healthCheck = {
+      path        = "/"
+      command     = [
+        "CMD-SHELL",
+        "curl -f http://localhost:8080/ || exit 1"
       ]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      },
       logConfiguration = {
         logDriver = "awslogs",
         options = {
@@ -586,23 +597,15 @@ resource "aws_iam_role_policy" "app_task" {
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
-
+  
   ingress {
-    description = "Allow HTTP traffic from chapsdotnet container"
+    description = "Allow all HTTP traffic"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
-
-/*  egress {
-    description = "Allow traffic to chapsdotnet container"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
-  }*/
-
+  
   egress {
     description = "Allow all traffic"
     from_port   = 0
@@ -611,6 +614,8 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+
 resource "aws_security_group" "chapsdotnet_service" {
   name_prefix = "chapsdotnet-service-sg-"
   description = "Allow traffic for chapsdotnet service"
