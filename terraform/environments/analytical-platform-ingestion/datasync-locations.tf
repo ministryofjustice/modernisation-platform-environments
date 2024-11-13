@@ -12,7 +12,7 @@ resource "aws_datasync_location_smb" "dom1_hq_pgo_shared_group_sis_case_manageme
 
 resource "aws_datasync_location_s3" "dom1_hq_pgo_shared_group_sis_case_management_investigations" {
   s3_bucket_arn = module.datasync_bucket.s3_bucket_arn
-  subdirectory  = "/dom1/data/hq/pgo/shared/group/sis-case-management/investigations/"
+  subdirectory  = "datasync/dom1/data/hq/pgo/shared/group/sis-case-management/investigations/"
 
   s3_config {
     bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
@@ -35,7 +35,7 @@ resource "aws_datasync_location_smb" "dom1_hq_pgo_shared_group_sis_case_manageme
 
 resource "aws_datasync_location_s3" "dom1_hq_pgo_shared_group_sis_case_management_itas" {
   s3_bucket_arn = module.datasync_bucket.s3_bucket_arn
-  subdirectory  = "/dom1/data/hq/pgo/shared/group/sis-case-management/itas/"
+  subdirectory  = "datasync/dom1/data/hq/pgo/shared/group/sis-case-management/itas/"
 
   s3_config {
     bucket_access_role_arn = module.datasync_iam_role.iam_role_arn

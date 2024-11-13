@@ -11,7 +11,7 @@ resource "aws_datasync_task" "dom1_hq_pgo_shared_group_sis_case_management_inves
     s3_destination {
       bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
       s3_bucket_arn          = module.datasync_bucket.s3_bucket_arn
-      subdirectory           = "reports/dom1/hq/pgo/shared/group/sis-case-management/investigations/"
+      subdirectory           = "datasync/reports/dom1/hq/pgo/shared/group/sis-case-management/investigations/"
     }
   }
 
