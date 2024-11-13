@@ -88,7 +88,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "s3:ReplicateDelete"
     ]
     resources = [
-      for item in local.environment_configuration.datasync_target_buckets : "arn:aws:s3:::${item}"
+      for item in local.environment_configuration.datasync_target_buckets : "arn:aws:s3:::${item}/*"
     ]
   }
   statement {
