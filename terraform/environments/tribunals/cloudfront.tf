@@ -52,22 +52,22 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
-# resource "aws_security_group_rule" "lb_cloudfront_ingress_https" {
-#   type              = "ingress"
-#   from_port         = 443
-#   to_port           = 443
-#   protocol          = "tcp"
-#   prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-#   security_group_id = aws_security_group.tribunals_lb_sc.id
-#   description       = "Allow HTTPS traffic from CloudFront"
-# }
+resource "aws_security_group_rule" "lb_cloudfront_ingress_https" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+  security_group_id = aws_security_group.tribunals_lb_sg_cloudfront.id
+  description       = "Allow HTTPS traffic from CloudFront"
+}
 
-# resource "aws_security_group_rule" "lb_cloudfront_ingress_http" {
-#   type              = "ingress"
-#   from_port         = 80
-#   to_port           = 80
-#   protocol          = "tcp"
-#   prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-#   security_group_id = aws_security_group.tribunals_lb_sc.id
-#   description       = "Allow HTTP traffic from CloudFront"
-# }
+resource "aws_security_group_rule" "lb_cloudfront_ingress_http" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+  security_group_id = aws_security_group.tribunals_lb_sg_cloudfront.id
+  description       = "Allow HTTP traffic from CloudFront"
+}
