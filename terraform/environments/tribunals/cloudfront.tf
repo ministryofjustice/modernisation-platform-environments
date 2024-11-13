@@ -31,7 +31,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   }
 
   default_cache_behavior {
-    target_origin_id = "tribunalsLB"
+    target_origin_id = "tribunalsOrigin"
 
     viewer_protocol_policy = "redirect-to-https" // Redirect HTTP to HTTPS
 
