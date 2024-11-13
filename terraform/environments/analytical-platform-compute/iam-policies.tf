@@ -198,29 +198,18 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:DescribeResource",
       "lakeformation:GetDataAccess",
     ]
-    resources = [
-      "arn:aws:lakeformation:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"
-    ]
+    resources = ["arn:aws:lakeformation:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"]
   }
-
   statement {
-    effect = "Allow"
-    actions = [
-      "iam:PutRolePolicy"
-    ]
-    resources = [
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"
-    ]
+    effect    = "Allow"
+    actions   = ["iam:PutRolePolicy"]
+    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"]
   }
   # Needed for LakeFormationAdmin to check the presense of the Lake Formation Service Role
   statement {
-    effect = "Allow"
-    actions = [
-      "iam:CreateServiceLinkedRole"
-    ]
-    resources = [
-      "*"
-    ]
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["*"]
     condition {
       test     = "StringEquals"
       variable = "iam:AWSServiceName"
@@ -243,9 +232,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "s3:*",
       "quicksight:*"
     ]
-    resources = [
-      "*"
-    ]
+    resources = ["*"]
   }
   statement {
     effect = "Allow"
@@ -253,11 +240,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "ram:CreateResourceShare",
       "ram:DeleteResourceShare"
     ]
-    resources = [
-      "arn:aws:ram:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:resource-share/*"
-    ]
+    resources = ["arn:aws:ram:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:resource-share/*"]
   }
-
   statement {
     effect = "Allow"
     actions = [
@@ -282,6 +266,11 @@ module "analytical_platform_lake_formation_share_policy" {
 }
 
 data "aws_iam_policy_document" "quicksight_vpc_connection" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  #checkov:skip=CKV_AWS_111:Policy suggested by AWS documentation
+  #checkov:skip=CKV_AWS_356:Policy suggested by AWS documentation
+
   statement {
     sid    = "QuickSightVPCConnection"
     effect = "Allow"
