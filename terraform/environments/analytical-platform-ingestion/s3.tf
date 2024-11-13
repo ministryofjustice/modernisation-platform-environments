@@ -183,12 +183,21 @@ module "datasync_bucket" {
         status                    = "Enabled"
         delete_marker_replication = true
 
+        source_selection_criteria = {
+          sse_kms_encrypted_objects = {
+            enabled = true
+          }
+        }
+
         destination = {
           account_id    = "593291632749" // TODO: replace with local.environment_management account ID
           bucket        = "arn:aws:s3:::${local.environment_configuration.datasync_target_buckets[0]}"
           storage_class = "STANDARD"
           access_control_translation = {
             owner = "Destination"
+          }
+          encryption_configuration = {
+            replica_kms_key_id = "arn:aws:kms:eu-west-1:593291632749:key/2855ac30-4e14-482e-85ca-53258e01f64c"
           }
           metrics = {
             status  = "Enabled"

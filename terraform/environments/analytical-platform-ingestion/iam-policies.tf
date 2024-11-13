@@ -92,6 +92,15 @@ data "aws_iam_policy_document" "datasync_replication" {
     ]
   }
   statement {
+    sid    = "DestinationBucketKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = ["arn:aws:kms:eu-west-1:593291632749:key/2855ac30-4e14-482e-85ca-53258e01f64c"]
+  }
+  statement {
     sid    = "SourceBucketKMSKey"
     effect = "Allow"
     actions = [
