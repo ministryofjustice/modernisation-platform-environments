@@ -47,20 +47,6 @@ resource "aws_security_group" "tribunals_lb_sc" {
   }
 }
 
-resource "aws_security_group" "tribunals_lb_sg_cloudfront" {
-  name        = "tribunals-load-balancer-sg-cf"
-  description = "control access to the load balancer using cloudfront"
-  vpc_id      = data.aws_vpc.shared.id
-
-  egress {
-    description = "allow all outbound traffic from the load balancer - needed due to dynamic port mapping on ec2 instance"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_lb_target_group" "tribunals_target_group" {
   for_each             = var.services
   name                 = "${each.value.module_key}-tg"
