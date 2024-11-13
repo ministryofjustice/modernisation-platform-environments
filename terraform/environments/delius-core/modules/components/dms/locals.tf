@@ -41,4 +41,15 @@ locals {
   dms_s3_writer_role_name = "${var.env_name}-dms-s3-writer-role"
   dms_s3_reader_role_name = "${var.env_name}-dms-s3-reader-role"
 
+  replication_task_names = concat(
+    try([aws_dms_replication_task.user_inbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.business_interaction_inbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_inbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_checksum_inbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_id],[])
+  )
+
 }
