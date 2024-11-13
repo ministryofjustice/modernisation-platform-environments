@@ -98,7 +98,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "kms:Encrypt",
       "kms:GenerateDataKey"
     ]
-    resources = ["arn:aws:kms:eu-west-1:593291632749:key/2855ac30-4e14-482e-85ca-53258e01f64c"]
+    resources = [local.environment_configuration.mojap_land_kms_key]
   }
   statement {
     sid    = "SourceBucketKMSKey"

@@ -190,14 +190,14 @@ module "datasync_bucket" {
         }
 
         destination = {
-          account_id    = "593291632749" // TODO: replace with local.environment_management account ID
+          account_id    = local.environment_management.account_ids["analytical-plaform-data-production"]
           bucket        = "arn:aws:s3:::${local.environment_configuration.datasync_target_buckets[0]}"
           storage_class = "STANDARD"
           access_control_translation = {
             owner = "Destination"
           }
           encryption_configuration = {
-            replica_kms_key_id = "arn:aws:kms:eu-west-1:593291632749:key/2855ac30-4e14-482e-85ca-53258e01f64c"
+            replica_kms_key_id = local.environment_configuration.mojap_land_kms_key
           }
           metrics = {
             status  = "Enabled"
