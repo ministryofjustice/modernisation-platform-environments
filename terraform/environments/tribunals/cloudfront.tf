@@ -57,7 +57,10 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   price_class     = "PriceClass_All"
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = false
+    acm_certificate_arn           = aws_acm_certificate.cloudfront.arn
+    ssl_support_method           = "sni-only"
+    minimum_protocol_version     = "TLSv1.2_2021"
   }
 
   restrictions {
@@ -96,4 +99,47 @@ resource "aws_security_group" "tribunals_lb_sg_cloudfront" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+# New certificate for CloudFront (in us-east-1)
+resource "aws_acm_certificate" "cloudfront" {
+  provider = aws.us-east-1  # Important: use us-east-1 provider
+  
+  domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  validation_method         = "DNS"
+  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+
+  tags = {
+    Environment = local.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+# Validation records for the CloudFront certificate
+resource "aws_route53_record" "cloudfront_validation" {
+  provider = aws.us-east-1
+  for_each = {
+    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
+}
+
+# Certificate validation
+resource "aws_acm_certificate_validation" "cloudfront" {
+  provider                = aws.us-east-1
+  certificate_arn         = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [for record in aws_route53_record.cloudfront_validation : record.fqdn]
 }
