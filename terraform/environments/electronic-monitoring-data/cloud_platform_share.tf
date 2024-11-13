@@ -1,4 +1,4 @@
-module "front_end_assumable_role" {
+module "cmt_front_end_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
@@ -9,7 +9,9 @@ module "front_end_assumable_role" {
 
   create_role = true
 
-  role_name = "read_emds_data"
+  role_name = "cmt_read_emds_data_${local.environment_shorthand}"
+
+  tags = local.tags
 }
 
 module "share_api_data_marts" {
@@ -21,12 +23,12 @@ module "share_api_data_marts" {
     register      = true
     share         = true
     hybrid_mode   = false # will be managed exclusively in LakeFormation
-    principal     = module.front_end_assumable_role.iam_role_arn
+    principal     = module.cmt_front_end_assumable_role.iam_role_arn
   }]
 
   databases_to_share = [{
     name      = "api_data_marts"
-    principal = module.front_end_assumable_role.iam_role_arn
+    principal = module.cmt_front_end_assumable_role.iam_role_arn
   }]
 
   providers = {
