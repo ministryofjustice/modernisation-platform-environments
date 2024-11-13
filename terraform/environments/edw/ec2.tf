@@ -183,7 +183,7 @@ EOT
 sudo mkdir -p /oracle/dbf
 sudo mkdir -p /stage
 sudo mkdir -p /oracle/ar
-sudo mkdir --p /oracle/software
+sudo mkdir -p /oracle/software
 sudo mkdir -p /oracle/temp_undo
 sudo mkdir -p /backups
 
