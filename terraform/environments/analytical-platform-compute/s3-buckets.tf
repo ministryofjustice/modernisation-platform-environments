@@ -3,7 +3,7 @@ module "mlflow_bucket" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   bucket = "mojap-compute-${local.environment}-mlflow"
 
@@ -66,7 +66,7 @@ module "mojap_derived_tables_replication_bucket" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   providers = {
     aws = aws.analytical-platform-compute-eu-west-1
@@ -127,7 +127,7 @@ module "mojap_compute_logs_bucket_eu_west_2" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   bucket = "mojap-compute-${local.environment}-logs-eu-west-2"
 
@@ -179,7 +179,7 @@ module "mojap_compute_logs_bucket_eu_west_1" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   providers = {
     aws = aws.analytical-platform-compute-eu-west-1

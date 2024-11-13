@@ -29,10 +29,10 @@ locals {
       eks_cluster_version = "1.31"
       eks_node_version    = "1.25.0-388e1050"
       eks_cluster_addon_versions = {
-        coredns                = "v1.11.3-eksbuild.1"
-        kube_proxy             = "v1.31.0-eksbuild.5"
-        aws_ebs_csi_driver     = "v1.35.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.7-eksbuild.1"
+        coredns                = "v1.11.3-eksbuild.2"
+        kube_proxy             = "v1.31.1-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.36.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.8-eksbuild.1"
         aws_guardduty_agent    = "v1.7.1-eksbuild.2"
         eks_pod_identity_agent = "v1.3.2-eksbuild.2"
         vpc_cni                = "v1.18.5-eksbuild.1"
@@ -86,7 +86,7 @@ locals {
         aws_efs_csi_driver     = "v2.0.7-eksbuild.1"
         aws_guardduty_agent    = "v1.7.1-eksbuild.2"
         eks_pod_identity_agent = "v1.3.2-eksbuild.2"
-        vpc_cni                = "v1.18.5-eksbuild.1"
+        vpc_cni                = "v1.18.6-eksbuild.1"
       }
 
       /* Observability Platform */
