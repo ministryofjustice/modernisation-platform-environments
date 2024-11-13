@@ -39,8 +39,8 @@ module "load_orca_database" {
 
   name               = "orca"
   environment        = local.environment
-  database_name      = "capita-orca"
-  path_to_data       = "/capita_orca"
+  database_name      = "civica-orca"
+  path_to_data       = "/civica_orca"
   source_data_bucket = module.s3-dms-target-store-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
