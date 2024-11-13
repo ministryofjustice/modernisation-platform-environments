@@ -15,6 +15,12 @@ resource "aws_lb" "tribunals_lb" {
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+
+  access_logs {
+    bucket  = aws_s3_bucket.lb_logs.id
+    prefix  = "alb-logs"
+    enabled = true
+  }
 }
 
 resource "aws_security_group" "tribunals_lb_sc" {

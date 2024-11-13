@@ -33,18 +33,18 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   default_cache_behavior {
     target_origin_id = "tribunalsOrigin"
 
-    viewer_protocol_policy = "redirect-to-https" // Redirect HTTP to HTTPS
-
-    allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods  = ["GET", "HEAD"]
-
     forwarded_values {
       query_string = false
+      headers      = ["Host"]
 
       cookies {
         forward = "none"
       }
     }
+
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods       = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods        = ["GET", "HEAD"]
 
     min_ttl     = 0
     default_ttl = 86400
