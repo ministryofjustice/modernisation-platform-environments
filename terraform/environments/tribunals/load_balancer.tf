@@ -112,11 +112,29 @@ resource "aws_lb_listener" "tribunals_lb" {
   }
 }
 
+# resource "aws_lb_listener_rule" "tribunals_lb_rule" {
+#   for_each = local.listener_header_to_target_group
+
+#   listener_arn = aws_lb_listener.tribunals_lb.arn
+#   priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
+
+#   action {
+#     type             = "forward"
+#     target_group_arn = each.value
+#   }
+
+#   condition {
+#     host_header {
+#       values = ["*${each.key}.*"]
+#     }
+#   }
+# }
+
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(local.listener_header_to_target_group), each.key) + 2
+  priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
 
   action {
     type             = "forward"
@@ -124,29 +142,17 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   }
 
   condition {
-    host_header {
-      values = ["*${each.key}.*"]
-    }
-  }
-}
-
-resource "aws_lb_listener_rule" "cloudfront_check" {
-  listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 1
-
-  action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "Access Denied"
-      status_code  = "403"
+    # Check for CloudFront header
+    http_header {
+      http_header_name = "X-Custom-Header"
+      values           = ["tribunals-origin"]
     }
   }
 
   condition {
-    http_header {
-      http_header_name = "X-Custom-Header"
-      values           = ["tribunals-origin"]
+    # Original host header check
+    host_header {
+      values = ["*${each.key}.*"]
     }
   }
 }
