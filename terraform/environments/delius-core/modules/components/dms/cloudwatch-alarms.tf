@@ -284,31 +284,15 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   threshold           = 0
   treat_missing_data  = "ignore"
 
-  # Query for the custom metric across all dimensions
   metric_query {
     id          = "m1"
-    metric {
-      metric_name = "DMSReplicationStopped"
-      namespace   = "CustomDMSMetrics"
-      period      = 60
-      stat   = "Sum"
-    }
-    return_data = "false"
-  }
-
-  # Metric math expression to sum the metric across all dimensions
-  metric_query {
-    id          = "e1"
-    expression  = "SUM(METRICS('CustomDMSMetrics', 'DMSReplicationStopped', {}, 60))"
-    label       = "TotalDMSReplicationStoppedAcrossAllDimensions"
-    return_data = "true"
+    expression  = "SEARCH('{CustomDMSMetrics, DMSReplicationStopped}', 'Sum', 60)"
+    label       = "Sum of DMSReplicationStopped across all task dimensions"
+    return_data = true
   }
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
 }
-
-
-
 
 
 # SNS Topic for DMS replication events
