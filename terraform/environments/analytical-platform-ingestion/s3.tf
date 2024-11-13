@@ -171,6 +171,47 @@ module "datasync_bucket" {
 
   force_destroy = true
 
+  versioning = {
+    enabled = true
+  }
+
+  replication_configuration = {
+    role = module.datasync_replication_iam_role.iam_role_arn
+    rules = [
+      {
+        id                        = "datasync-replication"
+        status                    = "Enabled"
+        delete_marker_replication = true
+
+        source_selection_criteria = {
+          sse_kms_encrypted_objects = {
+            enabled = true
+          }
+        }
+
+        destination = {
+          account_id    = local.environment_management.account_ids["analytical-platform-data-production"]
+          bucket        = "arn:aws:s3:::${local.environment_configuration.datasync_target_buckets[0]}"
+          storage_class = "STANDARD"
+          access_control_translation = {
+            owner = "Destination"
+          }
+          encryption_configuration = {
+            replica_kms_key_id = local.environment_configuration.mojap_land_kms_key
+          }
+          metrics = {
+            status  = "Enabled"
+            minutes = 15
+          }
+          replication_time = {
+            status  = "Enabled"
+            minutes = 15
+          }
+        }
+      }
+    ]
+  }
+
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
