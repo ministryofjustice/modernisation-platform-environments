@@ -646,11 +646,11 @@ resource "aws_security_group" "chapsdotnet_service" {
   }
   
   egress {
-    description = "Allow all within VPC"
+    description = "Allow all traffic"
     from_port       = 0
     to_port         = 0
     protocol        = "-1"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+    cidr_blocks = ["0.0.0.0/0"]
   }
   
   tags = merge(
