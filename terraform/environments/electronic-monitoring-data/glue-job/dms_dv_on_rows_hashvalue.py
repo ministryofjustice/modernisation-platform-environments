@@ -147,6 +147,9 @@ if __name__ == "__main__":
           LOGGER.error(f'''>> {dms_output_fulls3path} << Path Not Available !!''')
           sys.exit(1)
 
+    LOGGER.info(f""">> rds_hashed_rows_fulls3path = {rds_hashed_rows_fulls3path} <<""")
+    LOGGER.info(f""">> dms_output_fulls3path = {dms_output_fulls3path} <<""")
+
     hashed_table_schema = T.StructType(
         [T.StructField(f"{TABLE_PKEY_COLUMN}", T.IntegerType(), False),
          T.StructField("RowHash", T.StringType(), False)]
