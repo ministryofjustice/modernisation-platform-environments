@@ -25,7 +25,7 @@ module "datasync_iam_role" {
 
   create_role = true
 
-  role_name         = "datasync"
+  role_name_prefix  = "datasync"
   role_requires_mfa = false
 
   trusted_role_services = ["datasync.amazonaws.com"]

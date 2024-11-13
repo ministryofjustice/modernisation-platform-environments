@@ -17,6 +17,8 @@ resource "aws_datasync_location_s3" "dom1_hq_pgo_shared_group_sis_case_managemen
   s3_config {
     bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
   }
+
+  tags = local.tags
 }
 
 resource "aws_datasync_location_smb" "dom1_hq_pgo_shared_group_sis_case_management_itas" {
@@ -38,4 +40,6 @@ resource "aws_datasync_location_s3" "dom1_hq_pgo_shared_group_sis_case_managemen
   s3_config {
     bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
   }
+
+  tags = local.tags
 }
