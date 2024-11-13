@@ -132,7 +132,7 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
 
 resource "aws_lb_listener_rule" "cloudfront_check" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = 0
+  priority     = 1
 
   action {
     type = "fixed-response"
