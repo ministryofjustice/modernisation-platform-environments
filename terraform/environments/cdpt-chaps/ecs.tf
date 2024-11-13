@@ -106,10 +106,6 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
       }
       environment = [
         {
-          name = "CHAPS_DNS"
-          value = "chaps-instance-${count.index + 1}.hq-development.modernisation-platform.internal"
-        },
-        {
           name  = "Instance"
           value = "https://login.microsoftonline.com/"
         },
