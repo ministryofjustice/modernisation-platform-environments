@@ -12,14 +12,21 @@ locals {
 
 resource "aws_cloudfront_distribution" "tribunals_distribution" {
   origin {
-    domain_name = aws_lb.tribunals_lb.dns_name
-    origin_id   = "tribunalsLB"
+    domain_name = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    origin_id   = "tribunalsOrigin"
 
     custom_origin_config {
       http_port              = 80
       https_port             = 443
       origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
+      origin_keepalive_timeout = 60
+      origin_read_timeout     = 60
+    }
+
+    custom_header {
+      name  = "X-Custom-Header"
+      value = "tribunals-origin"
     }
   }
 
