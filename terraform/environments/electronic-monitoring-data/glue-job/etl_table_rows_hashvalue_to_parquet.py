@@ -249,7 +249,7 @@ if __name__ == "__main__":
         LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
         rds_db_query_filtered_str = rds_db_select_query_str + f""" WHERE {where_clause_exp_str}"""
-        LOGGER.info(f"""rds_db_query_filtered_str = {rds_db_query_filtered_str}""")
+        LOGGER.info(f"""rds_db_query_filtered_str > \n{rds_db_query_filtered_str}""")
 
         hashed_rows_prq_df = rds_jdbc_conn_obj.get_rds_df_read_query_pkey_parallel(
                                                         rds_db_query_filtered_str,
@@ -272,7 +272,7 @@ if __name__ == "__main__":
         LOGGER.info(f"""jdbc_partition_col_lowerbound = {jdbc_partition_col_lowerbound}""")
         LOGGER.info(f"""jdbc_partition_col_upperbound = {jdbc_partition_col_upperbound}""")
 
-        LOGGER.info(f"""rds_db_select_query_str = {rds_db_select_query_str}""")
+        LOGGER.info(f"""rds_db_select_query_str > \n{rds_db_select_query_str}""")
 
         hashed_rows_prq_df = rds_jdbc_conn_obj.get_rds_df_read_query_pkey_parallel(
                                                         rds_db_select_query_str,
