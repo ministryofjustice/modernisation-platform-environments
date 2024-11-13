@@ -287,16 +287,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
 
   metric_query {
     id          = "m1"
-    metric_name = "CustomDMSMetrics"
-    namespace   = "DMSReplicationStopped"
-    period      = 60
-    stat        = "Sum"
-    return_data = false
-  }
-
-  metric_query {
-    id          = "e1"
-    expression  = "m1"
+    expression  = "SEARCH('{CustomDMSMetrics, DMSReplicationStopped}', 'Sum', 60)"
     label       = "Sum of DMSReplicationStopped across all task dimensions"
     return_data = true
   }
