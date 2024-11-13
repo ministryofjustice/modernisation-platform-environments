@@ -26,6 +26,18 @@ module "transfer_server_iam_policy" {
 
 data "aws_iam_policy_document" "datasync" {
   statement {
+    sid    = "AllowKMS"
+    effect = "Allow"
+    actions = [
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Encrypt",
+      "kms:DescribeKey",
+      "kms:Decrypt",
+    ]
+    resources = [module.transfer_logs_kms.key_arn]
+  }
+  statement {
     sid    = "AllowS3BucketActions"
     effect = "Allow"
     actions = [
@@ -33,9 +45,7 @@ data "aws_iam_policy_document" "datasync" {
       "s3:ListBucket",
       "s3:ListBucketMultipartUploads"
     ]
-    resources = [
-      for item in local.environment_configuration.datasync_target_buckets : "arn:aws:s3:::${item}"
-    ]
+    resources = [module.datasync_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "AllowS3ObjectActions"
@@ -51,9 +61,7 @@ data "aws_iam_policy_document" "datasync" {
       "s3:PutObject",
       "s3:PutObjectTagging"
     ]
-    resources = [
-      for item in local.environment_configuration.datasync_target_buckets : "arn:aws:s3:::${item}"
-    ]
+    resources = ["${module.datasync_bucket.s3_bucket_arn}/*"]
   }
 }
 
