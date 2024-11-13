@@ -159,7 +159,7 @@ locals {
           ])
           user_data_raw = base64encode(templatefile(
             "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-              branch = "TM/TM-658/onr-client-3-1"
+              branch = "TM/TM-659/make-user-data-scripts-idempotent"
           }))
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
