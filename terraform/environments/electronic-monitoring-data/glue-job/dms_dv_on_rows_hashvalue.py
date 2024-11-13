@@ -263,15 +263,18 @@ if __name__ == "__main__":
     if unmatched_hashvalues_df_count != 0:
         LOGGER.warn(f"""unmatched_hashvalues_df_count> {unmatched_hashvalues_df_count}: Row differences found!""")
 
-        df_subtract_temp = (unmatched_hashvalues_df
-                                .selectExpr(f"L.{TABLE_PKEY_COLUMN} as {TABLE_PKEY_COLUMN}", 
+        unmatched_hashvalues_df_select = unmatched_hashvalues_df.selectExpr(
+                                            f"L.{TABLE_PKEY_COLUMN} as {TABLE_PKEY_COLUMN}", 
                                             "L.RowHash as rds_row_hash", 
-                                            "R.RowHash as dms_output_row_hash")
+                                            "R.RowHash as dms_output_row_hash"
+                                        ).limit(10)
+
+        df_subtract_temp = (unmatched_hashvalues_df
                                 .withColumn('json_row', 
                                             F.to_json(F.struct(*[F.col(c) 
-                                                                 for c in unmatched_hashvalues_df.columns])))
+                                                                 for c in unmatched_hashvalues_df_select.columns])))
                                 .selectExpr("json_row")
-                                .limit(100))
+                            )
 
         subtract_validation_msg = f"""'{TABLE_TO_BE_VALIDATED}' - {unmatched_hashvalues_df_count}"""
         df_subtract_temp = df_subtract_temp.selectExpr(
