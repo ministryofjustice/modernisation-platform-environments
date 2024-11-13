@@ -629,7 +629,7 @@ resource "aws_security_group" "chapsdotnet_service" {
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
 
-  egress {
+/*  egress {
     description = "Allow traffic to chaps container"
     from_port       = 80
     to_port         = 80
@@ -643,7 +643,7 @@ resource "aws_security_group" "chapsdotnet_service" {
     to_port         = 1433
     protocol        = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
-  }
+  }*/
   
   egress {
     description = "Allow all traffic"
