@@ -69,7 +69,8 @@ export APPNAME="${local.application_data.accounts[local.environment].edw_AppName
 export ENV="${local.application_data.accounts[local.environment].edw_environment}"
 export REGION="${local.application_data.accounts[local.environment].edw_region}"
 export EFS="${aws_efs_file_system.edw.id}"
-export SECRET=`/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db-master-password2.id} { --query SecretString --output text`
+export SECRET=`/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.db-master-password2.id} --query SecretString --output text`
+export SECRET_EC2=`/usr/local/bin/aws --region ${local.application_data.accounts[local.environment].edw_region} secretsmanager get-secret-value --secret-id ${aws_secretsmanager_secret.edw_db_ec2_root_secret.id} --query SecretString --output text`
 export host="$ip4 $APPNAME-$ENV infraedw"
 echo $host >>/etc/hosts
 sed -i '/^10.221/d' /etc/hosts
@@ -265,6 +266,9 @@ chmod -R 777 /home/oracle
 
 # Set permissions for staging directory
 chmod -R 777 /stage/owb/
+
+# Replace the secret in the rootrotate.sh script
+sed -i "s|--secret-id .* --query|--secret-id $SECRET_EC2 --query|g" /root/scripts/rootrotate.sh
 
 #### setup_backups:
 
