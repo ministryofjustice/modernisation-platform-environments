@@ -18,15 +18,15 @@ module "test_ap_airflow" {
   oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
 }
 
-module "load_unstructured_atrium_database" {
+module "load_alcohol_monitoring_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
-  name               = "unstructured-atrium-database"
+  name               = "alcohol-monitoring"
   environment        = local.environment
-  database_name      = "g4s-atrium-unstructured"
-  path_to_data       = "/g4s/atrium_unstructured"
-  source_data_bucket = module.s3-json-directory-structure-bucket.bucket
+  database_name      = "capita-alcohol-monitoring"
+  path_to_data       = "/capita_alcohol_monitoring"
+  source_data_bucket = module.s3-dms-target-store-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
@@ -48,15 +48,30 @@ module "load_cap_dw_database" {
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
 }
 
-module "load_alcohol_monitoring_database" {
+module "load_emsys_mvp_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
-  name               = "alcohol-monitoring"
+  name               = "emsys-mvp"
   environment        = local.environment
-  database_name      = "capita-alcohol-monitoring"
-  path_to_data       = "/capita_alcohol_monitoring"
+  database_name      = "g4s-emsys-mvp"
+  path_to_data       = "/g4s_emsys_mvp"
   source_data_bucket = module.s3-dms-target-store-bucket.bucket
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+}
+
+module "load_unstructured_atrium_database" {
+  count  = local.is-production ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  name               = "unstructured-atrium-database"
+  environment        = local.environment
+  database_name      = "g4s-atrium-unstructured"
+  path_to_data       = "/g4s/atrium_unstructured"
+  source_data_bucket = module.s3-json-directory-structure-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket
