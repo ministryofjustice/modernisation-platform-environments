@@ -335,19 +335,19 @@ locals {
 }
 
 // Create one Route 53 record for each entry in the services variable list of tribunals
-# resource "aws_route53_record" "external_services" {
-#   for_each = local.is-production ? {} : var.services
-#   provider = aws.core-vpc
-#   zone_id  = data.aws_route53_zone.external.zone_id
-#   name     = "${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-#   type     = "A"
+resource "aws_route53_record" "external_services" {
+  for_each = local.is-production ? {} : var.services
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${each.value.name_prefix}.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
-#   alias {
-#     name                   = aws_cloudfront_distribution.tribunals_distribution.domain_name
-#     zone_id                = aws_cloudfront_distribution.tribunals_distribution.hosted_zone_id
-#     evaluate_target_health = true
-#   }
-# }
+  alias {
+    name                   = aws_cloudfront_distribution.tribunals_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.tribunals_distribution.hosted_zone_id
+    evaluate_target_health = true
+  }
+}
 
 resource "aws_route53_record" "sftp_external_services" {
   for_each        = local.is-production ? {} : var.sftp_services

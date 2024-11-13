@@ -8,14 +8,14 @@ locals {
   }
 }
 
-# resource "aws_lb" "tribunals_lb" {
-#   name                       = "tribunals-lb"
-#   load_balancer_type         = "application"
-#   security_groups            = [aws_security_group.tribunals_lb_sg_2.id]
-#   subnets                    = data.aws_subnets.shared-public.ids
-#   enable_deletion_protection = false
-#   internal                   = false
-# }
+resource "aws_lb" "tribunals_lb" {
+  name                       = "tribunals-lb"
+  load_balancer_type         = "application"
+  security_groups            = [aws_security_group.tribunals_lb_sg_2.id]
+  subnets                    = data.aws_subnets.shared-public.ids
+  enable_deletion_protection = false
+  internal                   = false
+}
 
 resource "aws_security_group" "tribunals_lb_sg_2" {
   name        = "tribunals-load-balancer-sg-2"
@@ -44,43 +44,43 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
 }
 
-# resource "aws_security_group" "tribunals_lb_sc" {
-#   name        = "tribunals-load-balancer-sg"
-#   description = "Control access to the load balancer"
-#   vpc_id      = data.aws_vpc.shared.id
+resource "aws_security_group" "tribunals_lb_sc" {
+  name        = "tribunals-load-balancer-sg"
+  description = "Control access to the load balancer"
+  vpc_id      = data.aws_vpc.shared.id
 
-#   egress {
-#     description = "Allow all outbound traffic"
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+  egress {
+    description = "Allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-#   lifecycle {
-#     create_before_destroy = true
-#   }
-# }
+  lifecycle {
+    create_before_destroy = true
+  }
+}
 
-# resource "aws_security_group_rule" "lb_cloudfront_ingress_https" {
-#   type              = "ingress"
-#   from_port         = 443
-#   to_port           = 443
-#   protocol          = "tcp"
-#   prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-#   security_group_id = aws_security_group.tribunals_lb_sc.id
-#   description       = "Allow HTTPS traffic from CloudFront"
-# }
+resource "aws_security_group_rule" "lb_cloudfront_ingress_https" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+  security_group_id = aws_security_group.tribunals_lb_sc.id
+  description       = "Allow HTTPS traffic from CloudFront"
+}
 
-# resource "aws_security_group_rule" "lb_cloudfront_ingress_http" {
-#   type              = "ingress"
-#   from_port         = 80
-#   to_port           = 80
-#   protocol          = "tcp"
-#   prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-#   security_group_id = aws_security_group.tribunals_lb_sc.id
-#   description       = "Allow HTTP traffic from CloudFront"
-# }
+resource "aws_security_group_rule" "lb_cloudfront_ingress_http" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+  security_group_id = aws_security_group.tribunals_lb_sc.id
+  description       = "Allow HTTP traffic from CloudFront"
+}
 
 resource "aws_lb_target_group" "tribunals_target_group" {
   for_each             = var.services
@@ -121,94 +121,95 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
   port             = each.value.port
 }
 
-# resource "aws_lb_listener" "tribunals_lb" {
-#   depends_on = [
-#     aws_acm_certificate_validation.external
-#   ]
-#   certificate_arn   = aws_acm_certificate.external.arn
-#   load_balancer_arn = aws_lb.tribunals_lb.arn
-#   port              = 443
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+resource "aws_lb_listener" "tribunals_lb" {
+  depends_on = [
+    aws_acm_certificate_validation.external
+  ]
+  certificate_arn   = aws_acm_certificate.external.arn
+  load_balancer_arn = aws_lb.tribunals_lb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
-#   default_action {
-#     type = "fixed-response"
-#     fixed_response {
-#       content_type = "text/plain"
-#       message_body = "No matching rule found"
-#       status_code  = "404"
-#     }
-#   }
-# }
-# resource "aws_lb_listener_rule" "tribunals_lb_rule" {
-#   for_each = local.listener_header_to_target_group
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "No matching rule found"
+      status_code  = "404"
+    }
+  }
+}
 
-#   listener_arn = aws_lb_listener.tribunals_lb.arn
-#   priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
+resource "aws_lb_listener_rule" "tribunals_lb_rule" {
+  for_each = local.listener_header_to_target_group
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = each.value
-#   }
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
 
-#   condition {
-#     host_header {
-#       values = ["*${each.key}.*"]
-#     }
-#   }
-# }
+  action {
+    type             = "forward"
+    target_group_arn = each.value
+  }
 
-# resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
-#   resource_arn = aws_lb.tribunals_lb.arn
-#   web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
-# }
+  condition {
+    host_header {
+      values = ["*${each.key}.*"]
+    }
+  }
+}
 
-# resource "aws_cloudfront_distribution" "tribunals_distribution" {
-#   origin {
-#     domain_name = aws_lb.tribunals_lb.dns_name
-#     origin_id   = "tribunalsLB"
+resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
+  resource_arn = aws_lb.tribunals_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
+}
 
-#     custom_origin_config {
-#       http_port              = 80
-#       https_port             = 443
-#       origin_protocol_policy = "https-only"
-#       origin_ssl_protocols = ["TLSv1.2"]
-#     }
-#   }
+resource "aws_cloudfront_distribution" "tribunals_distribution" {
+  origin {
+    domain_name = aws_lb.tribunals_lb.dns_name
+    origin_id   = "tribunalsLB"
 
-#   default_cache_behavior {
-#     target_origin_id = "tribunalsLB"
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols = ["TLSv1.2"]
+    }
+  }
 
-#     viewer_protocol_policy = "redirect-to-https"  // Redirect HTTP to HTTPS
+  default_cache_behavior {
+    target_origin_id = "tribunalsLB"
 
-#     allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-#     cached_methods = ["GET", "HEAD"]
+    viewer_protocol_policy = "redirect-to-https"  // Redirect HTTP to HTTPS
 
-#     forwarded_values {
-#       query_string = false
+    allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods = ["GET", "HEAD"]
 
-#       cookies {
-#         forward = "none"
-#       }
-#     }
+    forwarded_values {
+      query_string = false
 
-#     min_ttl                = 0
-#     default_ttl            = 86400
-#     max_ttl                = 31536000
-#   }
+      cookies {
+        forward = "none"
+      }
+    }
 
-#   enabled             = true
-#   is_ipv6_enabled     = true
-#   comment             = "CloudFront distribution for tribunals load balancer"
-#   price_class         = "PriceClass_All"
+    min_ttl                = 0
+    default_ttl            = 86400
+    max_ttl                = 31536000
+  }
 
-#   viewer_certificate {
-#     cloudfront_default_certificate = true
-#   }
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "CloudFront distribution for tribunals load balancer"
+  price_class         = "PriceClass_All"
 
-#   restrictions {
-#     geo_restriction {
-#       restriction_type = "none"
-#     }
-#   }
-# }
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+    }
+  }
+}

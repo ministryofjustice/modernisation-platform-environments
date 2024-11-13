@@ -256,22 +256,22 @@ resource "aws_security_group" "cluster_ec2" {
 }
 
 # Add security group rules separately
-# resource "aws_security_group_rule" "cluster_ec2_from_lb" {
-#   type                     = "ingress"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = "-1"
-#   source_security_group_id = aws_security_group.tribunals_lb_sc.id
-#   security_group_id        = aws_security_group.cluster_ec2.id
-#   description             = "Allow traffic from main load balancer"
-# }
+resource "aws_security_group_rule" "cluster_ec2_from_lb" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.tribunals_lb_sc.id
+  security_group_id        = aws_security_group.cluster_ec2.id
+  description             = "Allow traffic from main load balancer"
+}
 
-# resource "aws_security_group_rule" "cluster_ec2_from_lb_sftp" {
-#   type                     = "ingress"
-#   from_port                = 0
-#   to_port                  = 0
-#   protocol                 = "-1"
-#   source_security_group_id = aws_security_group.tribunals_lb_sc_sftp.id
-#   security_group_id        = aws_security_group.cluster_ec2.id
-#   description             = "Allow traffic from SFTP load balancer"
-# }
+resource "aws_security_group_rule" "cluster_ec2_from_lb_sftp" {
+  type                     = "ingress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.tribunals_lb_sc_sftp.id
+  security_group_id        = aws_security_group.cluster_ec2.id
+  description             = "Allow traffic from SFTP load balancer"
+}
