@@ -789,7 +789,7 @@ module "s3_glue_job_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-glue-jobs-${local.environment}"
+      name          = "${local.project}-glue-jobs-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -807,7 +807,7 @@ module "s3_raw_archive_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-raw-archive-${local.env}-s3"
+      name          = "${local.project}-raw-archive-${local.env}-s3"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -824,7 +824,7 @@ module "s3_raw_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-raw-zone-${local.env}"
+      name          = "${local.project}-raw-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -842,7 +842,7 @@ module "s3_structured_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-structured-zone-${local.env}"
+      name          = "${local.project}-structured-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -860,7 +860,7 @@ module "s3_curated_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-curated-zone-${local.env}"
+      name          = "${local.project}-curated-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -878,7 +878,7 @@ module "s3_temp_reload_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-temp-reload-${local.env}"
+      name          = "${local.project}-temp-reload-${local.env}"
       Resource_Type = "S3 Bucket",
       Jira          = "DPR2-46"
     }
@@ -897,7 +897,7 @@ module "s3_domain_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-${local.env}"
+      name          = "${local.project}-domain-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -917,7 +917,7 @@ module "s3_schema_registry_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-schema-registry-${local.env}"
+      name          = "${local.project}-schema-registry-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -935,7 +935,7 @@ module "s3_domain_config_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-config-${local.env}"
+      name          = "${local.project}-domain-config-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -953,7 +953,7 @@ module "s3_violation_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-violation-${local.environment}"
+      name          = "${local.project}-violation-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -980,7 +980,7 @@ module "s3_artifacts_store" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-artifact-store-${local.environment}"
+      name          = "${local.project}-artifact-store-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -1002,7 +1002,7 @@ module "s3_working_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-working-${local.environment}"
+      name          = "${local.project}-working-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -1471,7 +1471,7 @@ module "s3_application_tf_state" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-terraform-state-${local.environment}"
+      name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
