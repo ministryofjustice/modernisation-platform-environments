@@ -274,22 +274,26 @@ resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publis
 #   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
 # }
 
+# Fetch all DMS replication tasks
+data "aws_dms_replication_tasks" "all_tasks" {}
 
 # Define a CloudWatch metric alarm with a metric math expression
 resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
-  alarm_name          = "DMSReplicationStoppedAlarm"
-  alarm_description   = "Alarm when Stopped Replication Task across all Dimensions (tasks)"
+  for_each            = { for task in data.aws_dms_replication_tasks.all_tasks.replication_tasks : task.replication_task_id => task }
+  alarm_name          = "DMSReplicationStoppedAlarm_${each.key}"
+  alarm_description   = "Alarm when Stopped Replication Task for ${each.key}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   threshold           = 0
   period              = 60
+  statistic           = "Maximum"
   treat_missing_data  = "ignore"
 
-  metric_query {
-    id          = "m1"
-    expression  = "SEARCH('{CustomDMSMetrics, DMSReplicationStopped}', 'Sum', 60)"
-    label       = "Sum of DMSReplicationStopped across all task dimensions"
-    return_data = true
+  metric_name = "DMSReplicationStopped"
+  namespace   = "CustomDMSMetrics"
+  dimensions = {
+    SourceId   = each.key
+    EventSouce = "replication-task"
   }
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
