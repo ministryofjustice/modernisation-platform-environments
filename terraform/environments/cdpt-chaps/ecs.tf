@@ -238,7 +238,8 @@ resource "aws_ecs_service" "chaps_service" {
 
   name                              = "chaps-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
+  //task_definition                 = aws_ecs_task_definition.chaps_task_definition.arn
+  task_definition                   = "${aws_ecs_task_definition.chaps_task_definition.family}:${aws_ecs_task_definition.chapsdotnet_task.revision}"
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
@@ -273,7 +274,8 @@ resource "aws_ecs_service" "chapsdotnet_service" {
 
   name                              = "chapsdotnet-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chapsdotnet_task[0].arn
+  // task_definition                = aws_ecs_task_definition.chapsdotnet_task[0].arn
+  task_definition                   = "${aws_ecs_task_definition.chapsdotnet_task.family}:${aws_ecs_task_definition.chapsdotnet_task.revision}"
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
@@ -297,7 +299,7 @@ resource "aws_ecs_service" "chapsdotnet_service" {
     security_groups = [aws_security_group.chapsdotnet_service.id, 
                        aws_security_group.ecs_service.id]
   }
-
+  
   tags = merge(
     local.tags,
     {
