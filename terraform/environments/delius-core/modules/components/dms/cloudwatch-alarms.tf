@@ -279,7 +279,7 @@ data "aws_dms_replication_task" "all_tasks" {}
 
 # Define a CloudWatch metric alarm with a metric math expression
 resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
-  for_each            = { for task in data.aws_dms_replication_tasks.all_tasks.replication_tasks : task.replication_task_id => task }
+  for_each            = { for task in data.aws_dms_replication_task.all_tasks.replication_tasks : task.replication_task_id => task }
   alarm_name          = "DMSReplicationStoppedAlarm_${each.key}"
   alarm_description   = "Alarm when Stopped Replication Task for ${each.key}"
   comparison_operator = "GreaterThanThreshold"
