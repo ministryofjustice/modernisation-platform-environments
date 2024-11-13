@@ -78,8 +78,7 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       essential = true
       portMappings = [
         {
-          containerPort = local.application_data.accounts[local.environment].container_port
-          hostPort      = local.application_data.accounts[local.environment].container_port
+          containerPort = 80
           protocol      = "tcp"
         }
       ],
