@@ -275,7 +275,7 @@ resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publis
 # }
 
 # Fetch all DMS replication tasks
-data "aws_dms_replication_tasks" "all_tasks" {}
+data "aws_dms_replication_task" "all_tasks" {}
 
 # Define a CloudWatch metric alarm with a metric math expression
 resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
