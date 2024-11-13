@@ -264,7 +264,7 @@ if __name__ == "__main__":
         LOGGER.warn(f"""unmatched_hashvalues_df_count> {unmatched_hashvalues_df_count}: Row differences found!""")
 
         df_subtract_temp = (unmatched_hashvalues_df
-                                .selectExpr(f"{TABLE_PKEY_COLUMN}", 
+                                .selectExpr(f"L.{TABLE_PKEY_COLUMN} as {TABLE_PKEY_COLUMN}", 
                                             "L.RowHash as rds_row_hash", 
                                             "R.RowHash as dms_output_row_hash")
                                 .withColumn('json_row', 
@@ -299,5 +299,5 @@ if __name__ == "__main__":
     write_parquet_to_s3(df_dv_output, RDS_DATABASE_FOLDER, db_sch_tbl)
 
     unmatched_hashvalues_df.unpersist()
-    
+
     job.commit()
