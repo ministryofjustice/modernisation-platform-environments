@@ -41,6 +41,8 @@ LOGGER = glueContext.get_logger()
 
 # Organise capturing input parameters.
 DEFAULT_INPUTS_LIST = ["JOB_NAME",
+                       "rds_db_host_ep",
+                       "rds_db_pwd",
                        "script_bucket_name",
                        "rds_hashed_rows_prq_bucket",
                        "rds_hashed_rows_prq_parent_dir",
