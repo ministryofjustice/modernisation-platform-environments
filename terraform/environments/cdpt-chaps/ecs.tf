@@ -1,12 +1,3 @@
-#data "aws_ecs_task_definition" "chaps_task_definition" {
-#  task_definition = "chapsFamily"
-#}
-
-#data "aws_ecs_task_definition" "chapsdotnet_task_definition" {
-#  task_definition = "chapsdotnet-family"
-#  depends_on = [aws_ecs_task_definition.chaps_task_definition]
-#}
-
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
 
@@ -248,7 +239,8 @@ resource "aws_ecs_service" "chaps_service" {
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
-    security_groups = [aws_security_group.ecs_service.id]
+    security_groups = [aws_security_group.ecs_service.id,
+                       aws_security_group.chapsdotnet_service.id]
   }
 
   tags = merge(
@@ -288,7 +280,8 @@ resource "aws_ecs_service" "chapsdotnet_service" {
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
-    security_groups = [aws_security_group.chapsdotnet_service.id]
+    security_groups = [aws_security_group.chapsdotnet_service.id, 
+                       aws_security_group.ecs_service.id]
   }
 
   tags = merge(
