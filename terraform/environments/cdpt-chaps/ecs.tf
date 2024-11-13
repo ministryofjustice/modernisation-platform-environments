@@ -152,6 +152,10 @@ resource "aws_ecs_task_definition" "chapsdotnet_task" {
         {
           containerPort = 8080
           protocol      = "tcp"
+        },
+        {
+          containerPort = 80
+          protocol      = "tcp"
         }
       ]
       logConfiguration = {
