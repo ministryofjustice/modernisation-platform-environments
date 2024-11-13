@@ -269,7 +269,7 @@ if __name__ == "__main__":
                                             "R.RowHash as dms_output_row_hash"
                                         ).limit(10)
 
-        df_subtract_temp = (unmatched_hashvalues_df
+        df_subtract_temp = (unmatched_hashvalues_df_select
                                 .withColumn('json_row', 
                                             F.to_json(F.struct(*[F.col(c) 
                                                                  for c in unmatched_hashvalues_df_select.columns])))
