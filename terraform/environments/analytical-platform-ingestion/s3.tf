@@ -190,7 +190,7 @@ module "datasync_bucket" {
         }
 
         destination = {
-          account_id    = local.environment_management.account_ids["analytical-plaform-data-production"]
+          account_id    = local.environment_management.account_ids["analytical-platform-data-production"]
           bucket        = "arn:aws:s3:::${local.environment_configuration.datasync_target_buckets[0]}"
           storage_class = "STANDARD"
           access_control_translation = {
