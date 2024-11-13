@@ -48,6 +48,10 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   }
 }
 
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
 # resource "aws_security_group_rule" "lb_cloudfront_ingress_https" {
 #   type              = "ingress"
 #   from_port         = 443
