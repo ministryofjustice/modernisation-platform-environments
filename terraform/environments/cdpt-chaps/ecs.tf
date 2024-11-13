@@ -233,7 +233,7 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
-    security_groups = [aws_security_group.ecs_service.id]
+    security_groups = [aws_security_group.chaps_combined_ecs_service.id]
    }
   
   load_balancer {
