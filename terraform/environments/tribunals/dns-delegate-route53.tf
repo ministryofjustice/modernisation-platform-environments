@@ -89,7 +89,7 @@ resource "aws_route53_record" "sftp_external_services_prod" {
   ttl             = 60
 }
 
-# # 'CNAME' records for all www legacy services which have been migrated to the Modernisation Platform
+# 'CNAME' records for all www legacy services which have been migrated to the Modernisation Platform
 resource "aws_route53_record" "afd_instances_migrated" {
   count    = local.is-production ? length(local.afd_records_migrated) : 0
   provider = aws.core-network-services

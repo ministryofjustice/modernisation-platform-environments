@@ -11,33 +11,10 @@ locals {
 resource "aws_lb" "tribunals_lb" {
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tribunals_lb_sg_2.id]
+  security_groups            = [aws_security_group.tribunals_lb_sg.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
-}
-
-resource "aws_security_group" "tribunals_lb_sg_2" {
-  name        = "tribunals-load-balancer-sg-2"
-  description = "Control access to the load balancer"
-  vpc_id      = data.aws_vpc.shared.id
-
-  egress {
-    description = "Allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Basic ingress rule for CloudFront
-  ingress {
-    description     = "Allow HTTPS from CloudFront"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-  }
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
@@ -46,40 +23,32 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 resource "aws_security_group" "tribunals_lb_sc" {
   name        = "tribunals-load-balancer-sg"
-  description = "Control access to the load balancer"
+  description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
+  ingress {
+    description = "allow all traffic on HTTPS port 443"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "allow all traffic on HTTP port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
-    description = "Allow all outbound traffic"
+    description = "allow all outbound traffic from the load balancer - needed due to dynamic port mapping on ec2 instance"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_security_group_rule" "lb_cloudfront_ingress_https" {
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-  security_group_id = aws_security_group.tribunals_lb_sc.id
-  description       = "Allow HTTPS traffic from CloudFront"
-}
-
-resource "aws_security_group_rule" "lb_cloudfront_ingress_http" {
-  type              = "ingress"
-  from_port         = 80
-  to_port           = 80
-  protocol          = "tcp"
-  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-  security_group_id = aws_security_group.tribunals_lb_sc.id
-  description       = "Allow HTTP traffic from CloudFront"
 }
 
 resource "aws_lb_target_group" "tribunals_target_group" {
@@ -162,54 +131,4 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
 resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
   resource_arn = aws_lb.tribunals_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
-}
-
-resource "aws_cloudfront_distribution" "tribunals_distribution" {
-  origin {
-    domain_name = aws_lb.tribunals_lb.dns_name
-    origin_id   = "tribunalsLB"
-
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols = ["TLSv1.2"]
-    }
-  }
-
-  default_cache_behavior {
-    target_origin_id = "tribunalsLB"
-
-    viewer_protocol_policy = "redirect-to-https"  // Redirect HTTP to HTTPS
-
-    allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods = ["GET", "HEAD"]
-
-    forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
-    }
-
-    min_ttl                = 0
-    default_ttl            = 86400
-    max_ttl                = 31536000
-  }
-
-  enabled             = true
-  is_ipv6_enabled     = true
-  comment             = "CloudFront distribution for tribunals load balancer"
-  price_class         = "PriceClass_All"
-
-  viewer_certificate {
-    cloudfront_default_certificate = true
-  }
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
 }
