@@ -282,6 +282,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   threshold           = 0
+  period              = 60
   treat_missing_data  = "ignore"
 
   metric_query {
