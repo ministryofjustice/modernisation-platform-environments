@@ -170,12 +170,12 @@ if __name__ == "__main__":
                                         TABLE_PKEY_COLUMN
                     )
     if rds_hashed_rows_prq_df_count != df_rds_count:
-        error_msg = f"""rds_hashed_rows_prq_df_count ({rds_hashed_rows_prq_df_count}) != df_rds_count ({df_rds_count})""")
+        error_msg = f"""rds_hashed_rows_prq_df_count ({rds_hashed_rows_prq_df_count}) != df_rds_count ({df_rds_count})"""
         sys.exit(f"""Row Count Mismatch: \n{error_msg}""")     
         # ------------------------------------------------
         #     
         if rds_hashed_rows_prq_df_count != dms_table_output_prq_df_count:
-            error_msg = f"""rds_hashed_rows_prq_df_count ({rds_hashed_rows_prq_df_count}) != dms_table_output_prq_df_count ({dms_table_output_prq_df_count})""")
+            error_msg = f"""rds_hashed_rows_prq_df_count ({rds_hashed_rows_prq_df_count}) != dms_table_output_prq_df_count ({dms_table_output_prq_df_count})"""
             sys.exit(f"""Row Count Mismatch: \n{error_msg}""")
     # --------------------
 
