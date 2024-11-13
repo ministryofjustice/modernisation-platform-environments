@@ -28,7 +28,8 @@ locals {
       notify_image_version   = "0.0.19"
 
       /* Target Buckets */
-      target_buckets = ["mojap-land-dev"]
+      target_buckets          = ["mojap-land-dev"]
+      datasync_target_buckets = ["mojap-land-dev"]
 
       /* Transfer Server */
       transfer_server_hostname   = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
@@ -72,7 +73,8 @@ locals {
       notify_image_version   = "0.0.19"
 
       /* Target Buckets */
-      target_buckets = ["mojap-land"]
+      target_buckets          = ["mojap-land"]
+      datasync_target_buckets = ["mojap-land"]
 
       /* Transfer Server */
       transfer_server_hostname   = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
