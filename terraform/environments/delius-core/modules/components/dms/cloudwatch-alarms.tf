@@ -210,12 +210,12 @@ resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_logging_attach
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "local_file" "lambda_dms_replication_metric_py" {
-  filename = "${path.module}/lambda_dms_replication_metric.py"
-  content  = <<EOF
-  Cannot delete this resource as it causes an error
-EOF
-}
+# resource "local_file" "lambda_dms_replication_metric_py" {
+#   filename = "${path.module}/lambda_dms_replication_metric.py"
+#   content  = <<EOF
+#   Cannot delete this resource as it causes an error
+# EOF
+# }
 
 # data "archive_file" "lambda_dms_replication_metric_zip" {
 #   type        = "zip"
