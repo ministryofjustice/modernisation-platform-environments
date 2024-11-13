@@ -49,7 +49,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "dms_prq_output_bucket",
                        "rds_database_folder",
                        "rds_db_schema_folder",
-                       "table_to_be_validated"
+                       "table_to_be_validated",
                        "table_pkey_column",
                        "glue_catalog_db_name",
                        "glue_catalog_tbl_name",
@@ -211,7 +211,7 @@ if __name__ == "__main__":
     LOGGER.info(f""">> rds_jdbc_max_pkey = {rds_jdbc_max_pkey} <<""")
     LOGGER.info(f""">> rds_jdbc_count_pkey = {rds_jdbc_count_pkey} <<""")
     # --------------------------------------------------------------------------------------
-    
+
     if rds_hashed_rows_prq_count != rds_jdbc_count_pkey:
         error_msg = f"""rds_hashed_rows_prq_count ({rds_hashed_rows_prq_count}) != rds_jdbc_count_pkey ({rds_jdbc_count_pkey})"""
         sys.exit(f"""Row Count Mismatch: \n{error_msg}""")     
