@@ -230,6 +230,17 @@ resource "aws_security_group" "cluster_ec2" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
+    description = "Cluster EC2 ingress rule"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    security_groups = [
+      aws_security_group.tribunals_lb_sc.id,
+      aws_security_group.tribunals_lb_sc_sftp.id
+    ]
+  }
+
+  ingress {
     protocol    = "tcp"
     description = "Allow traffic from bastion"
     from_port   = 0
@@ -253,25 +264,4 @@ resource "aws_security_group" "cluster_ec2" {
       Name = "tribunals-cluster-ec2-security-group"
     }
   )
-}
-
-# Add security group rules separately
-resource "aws_security_group_rule" "cluster_ec2_from_lb" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.tribunals_lb_sc.id
-  security_group_id        = aws_security_group.cluster_ec2.id
-  description             = "Allow traffic from main load balancer"
-}
-
-resource "aws_security_group_rule" "cluster_ec2_from_lb_sftp" {
-  type                     = "ingress"
-  from_port                = 0
-  to_port                  = 0
-  protocol                 = "-1"
-  source_security_group_id = aws_security_group.tribunals_lb_sc_sftp.id
-  security_group_id        = aws_security_group.cluster_ec2.id
-  description             = "Allow traffic from SFTP load balancer"
 }
