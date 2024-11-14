@@ -95,7 +95,7 @@ module "get_file_keys_for_table" {
   role_arn           = aws_iam_role.get_file_keys_for_table.arn
   role_name          = aws_iam_role.get_file_keys_for_table.name
   handler            = "get_file_keys_for_table.handler"
-  source_code_hash   = data.archive_file.send_table_to_ap.output_base64sha256
+  source_code_hash   = data.archive_file.get_file_keys_for_table.output_base64sha256
   layers             = null
   timeout            = 900
   memory_size        = 1024
