@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "datasync" {
       "kms:DescribeKey",
       "kms:Decrypt",
     ]
-    resources = [module.transfer_logs_kms.key_arn]
+    resources = [module.s3_datasync_kms.key_arn]
   }
   statement {
     sid    = "AllowS3BucketActions"
