@@ -69,7 +69,7 @@ data "aws_iam_policy_document" "ext_2024_target_bucket_policy" {
     ]
     resources = [
       "arn:aws:s3:::mojap-ingestion-${local.environment}-ext-2024-target/*",
-      "arn:aws:s3:::mojap-ingestion-${local.environment}-ext-2024-target/"
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-ext-2024-target"
     ]
   }
 }
@@ -89,8 +89,8 @@ module "ext_2024_target_bucket" {
   versioning = {
     enabled = true
   }
-  # attach_policy = true
-  # policy        = data.aws_iam_policy_document.ext_2024_target_bucket_policy.json
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.ext_2024_target_bucket_policy.json
 
   server_side_encryption_configuration = {
     rule = {
