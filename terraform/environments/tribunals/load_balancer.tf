@@ -11,16 +11,10 @@ locals {
 resource "aws_lb" "tribunals_lb" {
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
-  security_groups            = [aws_security_group.tribunals_lb_sg_cloudfront.id]
+  security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
-
-  access_logs {
-    bucket  = aws_s3_bucket.lb_logs.id
-    prefix  = "alb-logs"
-    enabled = true
-  }
 }
 
 resource "aws_security_group" "tribunals_lb_sc" {
