@@ -81,7 +81,7 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
           protocol      = "tcp"
         },
         {
-          containerPort = 80
+          containerPort = 8181
           protocol      = "tcp"
         }
       ]      
