@@ -77,45 +77,6 @@ module "create_athena_table" {
   }
 }
 
-
-# ------------------------------------------------------
-# Send Metadata to AP
-# ------------------------------------------------------
-
-
-data "archive_file" "send_metadata_to_ap" {
-  type        = "zip"
-  source_file = "${local.lambda_path}/send_metadata_to_ap.py"
-  output_path = "${local.lambda_path}/send_metadata_to_ap.zip"
-}
-
-module "send_metadata_to_ap" {
-  source             = "./modules/lambdas"
-  filename           = "${local.lambda_path}/send_metadata_to_ap.zip"
-  function_name      = "send_metadata_to_ap"
-  role_arn           = aws_iam_role.send_metadata_to_ap.arn
-  role_name          = aws_iam_role.send_metadata_to_ap.name
-  handler            = "send_metadata_to_ap.handler"
-  source_code_hash   = data.archive_file.send_metadata_to_ap.output_base64sha256
-  layers             = null
-  timeout            = 900
-  memory_size        = 1024
-  runtime            = "python3.11"
-  security_group_ids = null
-  subnet_ids         = data.aws_subnets.shared-public.ids
-  environment_variables = {
-    METADATA_BUCKET_NAME = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
-
-  }
-}
-resource "aws_lambda_permission" "send_metadata_to_ap" {
-  statement_id  = "AllowS3ObjectMetaInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = module.send_metadata_to_ap.lambda_function_arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-metadata-bucket.bucket.arn
-}
-
 # ------------------------------------------------------
 # get file keys for table
 # ------------------------------------------------------
@@ -145,41 +106,6 @@ module "get_file_keys_for_table" {
     PARQUET_BUCKET_NAME = module.s3-dms-target-store-bucket.bucket.id
   }
 }
-
-
-
-# ------------------------------------------------------
-# Send table to AP 
-# ------------------------------------------------------
-
-
-data "archive_file" "send_table_to_ap" {
-  type        = "zip"
-  source_file = "${local.lambda_path}/send_table_to_ap.py"
-  output_path = "${local.lambda_path}/send_table_to_ap.zip"
-}
-
-module "send_table_to_ap" {
-  source             = "./modules/lambdas"
-  filename           = "${local.lambda_path}/send_table_to_ap.zip"
-  function_name      = "send_table_to_ap"
-  role_arn           = aws_iam_role.send_table_to_ap.arn
-  role_name          = aws_iam_role.send_table_to_ap.name
-  handler            = "send_table_to_ap.handler"
-  source_code_hash   = data.archive_file.send_table_to_ap.output_base64sha256
-  layers             = null
-  timeout            = 900
-  memory_size        = 1024
-  runtime            = "python3.11"
-  security_group_ids = null
-  subnet_ids         = null
-  environment_variables = {
-    AP_DESTINATION_BUCKET = local.land_bucket
-  }
-  reserved_concurrent_executions = 100
-}
-
-
 
 # ------------------------------------------------------
 # Get Tables from DB
