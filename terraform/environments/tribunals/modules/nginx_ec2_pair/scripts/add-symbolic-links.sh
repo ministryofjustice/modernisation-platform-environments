@@ -41,3 +41,4 @@ sudo ln -s /etc/nginx/sites-available/transporttribunal.gov.uk /etc/nginx/sites-
 sudo ln -s /etc/nginx/sites-available/tribunals.gov.uk /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/yjbpublications.justice.gov.uk /etc/nginx/sites-enabled/
 sudo ln -s /etc/nginx/sites-available/landregistrationdivision.tribunals.hmcts-development.modernisation-platform.service.justice.gov.uk /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/administrativeappeals.decisions.tribunals.gov.uk /etc/nginx/sites-enabled/
