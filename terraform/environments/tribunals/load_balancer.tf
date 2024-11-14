@@ -28,21 +28,21 @@ resource "aws_security_group" "tribunals_lb_sc" {
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  # ingress {
-  #   description = "allow all traffic on HTTPS port 443"
-  #   from_port   = 443
-  #   to_port     = 443
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  ingress {
+    description = "allow all traffic on HTTPS port 443"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-  # ingress {
-  #   description = "allow all traffic on HTTP port 80"
-  #   from_port   = 80
-  #   to_port     = 80
-  #   protocol    = "tcp"
-  #   cidr_blocks = ["0.0.0.0/0"]
-  # }
+  ingress {
+    description = "allow all traffic on HTTP port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   egress {
     description = "allow all outbound traffic from the load balancer - needed due to dynamic port mapping on ec2 instance"
@@ -112,23 +112,23 @@ resource "aws_lb_listener" "tribunals_lb" {
   }
 }
 
-# resource "aws_lb_listener_rule" "tribunals_lb_rule" {
-#   for_each = local.listener_header_to_target_group
+resource "aws_lb_listener_rule" "tribunals_lb_rule" {
+  for_each = local.listener_header_to_target_group
 
-#   listener_arn = aws_lb_listener.tribunals_lb.arn
-#   priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = each.value
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = each.value
+  }
 
-#   condition {
-#     host_header {
-#       values = ["*${each.key}.*"]
-#     }
-#   }
-# }
+  condition {
+    host_header {
+      values = ["*${each.key}.*"]
+    }
+  }
+}
 
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
