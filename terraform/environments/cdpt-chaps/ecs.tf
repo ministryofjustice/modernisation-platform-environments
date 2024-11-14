@@ -79,10 +79,6 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
         {
           containerPort = 8080
           protocol      = "tcp"
-        },
-        {
-          containerPort = 8181
-          protocol      = "tcp"
         }
       ]      
       healthCheck = {
