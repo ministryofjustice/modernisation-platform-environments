@@ -1,5 +1,18 @@
 locals {
   bucket_prefix = "emds-${local.environment_shorthand}"
+
+  mdss_supplier_account_mapping = {
+    "production" = null
+    "preproduction" = {
+      "account_number" = 173142358744
+      "role_name" = "juniper-dt-lambda-role"
+    }
+    "test" = {
+      "account_number" = 173142358744
+      role_name = "dev-dt-lambda-role"
+    }
+    "development" = null
+  }
 }
 
 # ------------------------------------------------------------------------
@@ -591,12 +604,14 @@ module "s3-fms-specials-landing-bucket-iam-user" {
 module "s3-mdss-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed             = "mdss"
-  local_bucket_prefix   = local.bucket_prefix
-  local_tags            = local.tags
-  logging_bucket        = module.s3-logging-bucket
-  order_type            = "general"
-  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
+  data_feed  = "mdss"
+  order_type = "general"
+
+  cross_account_access_role = local.mdss_supplier_account_mapping[local.environment]
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  logging_bucket            = module.s3-logging-bucket
+  s3_trigger_lambda_arn     = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -606,12 +621,14 @@ module "s3-mdss-general-landing-bucket" {
 module "s3-mdss-ho-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed             = "mdss"
-  local_bucket_prefix   = local.bucket_prefix
-  local_tags            = local.tags
-  logging_bucket        = module.s3-logging-bucket
-  order_type            = "ho"
-  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
+  data_feed  = "mdss"
+  order_type = "ho"
+
+  cross_account_access_role = local.mdss_supplier_account_mapping[local.environment]
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  logging_bucket            = module.s3-logging-bucket
+  s3_trigger_lambda_arn     = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
@@ -621,12 +638,14 @@ module "s3-mdss-ho-landing-bucket" {
 module "s3-mdss-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed             = "mdss"
-  local_bucket_prefix   = local.bucket_prefix
-  local_tags            = local.tags
-  logging_bucket        = module.s3-logging-bucket
-  order_type            = "specials"
-  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
+  data_feed  = "mdss"
+  order_type = "specials"
+
+  cross_account_access_role = local.mdss_supplier_account_mapping[local.environment]
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  logging_bucket            = module.s3-logging-bucket
+  s3_trigger_lambda_arn     = module.process_landing_bucket_files.lambda_function_arn
 
   providers = {
     aws = aws
