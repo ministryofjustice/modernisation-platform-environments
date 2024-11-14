@@ -168,6 +168,7 @@ locals {
         tags = merge(local.ec2_instances.jumpserver.tags, {
           oasys-national-reporting-environment = "t2"
           domain-name                          = "azure.noms.root"
+          server-type                          = "NartClient"
         })
         cloudwatch_metric_alarms = null
       })
