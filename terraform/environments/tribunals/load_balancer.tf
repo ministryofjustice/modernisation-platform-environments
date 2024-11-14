@@ -86,6 +86,21 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
   port             = each.value.port
 }
 
+resource "aws_lb_listener" "tribunals_lb_http" {
+  load_balancer_arn = aws_lb.tribunals_lb.arn
+  port              = 80
+  protocol          = "HTTP"
+
+  default_action {
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
 resource "aws_lb_listener" "tribunals_lb" {
   depends_on = [
     aws_acm_certificate_validation.external
