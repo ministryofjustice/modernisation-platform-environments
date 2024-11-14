@@ -1,4 +1,4 @@
-ata "aws_iam_policy_document" "datasync_cloudwatch_logs" {
+data "aws_iam_policy_document" "datasync_cloudwatch_logs" {
   statement {
     sid    = "AllowDataSync"
     effect = "Allow"
