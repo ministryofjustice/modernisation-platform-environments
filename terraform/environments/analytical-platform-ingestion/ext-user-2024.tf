@@ -89,8 +89,8 @@ module "ext_2024_target_bucket" {
   versioning = {
     enabled = true
   }
-  attach_policy = true
-  policy        = data.aws_iam_policy_document.ext_2024_target_bucket_policy.json
+  # attach_policy = true
+  # policy        = data.aws_iam_policy_document.ext_2024_target_bucket_policy.json
 
   server_side_encryption_configuration = {
     rule = {
