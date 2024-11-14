@@ -4,7 +4,7 @@ resource "helm_release" "kyverno" {
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
-  version    = "3.2.7"
+  version    = "3.3.3"
   namespace  = kubernetes_namespace.kyverno.metadata[0].name
   values = [
     templatefile(
@@ -71,7 +71,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "65.2.0"
+  version    = "66.1.1"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -96,7 +96,7 @@ resource "helm_release" "cluster_autoscaler" {
   name       = "cluster-autoscaler"
   repository = "https://kubernetes.github.io/autoscaler"
   chart      = "cluster-autoscaler"
-  version    = "9.43.0"
+  version    = "9.43.2"
   namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
 
   values = [
@@ -119,7 +119,7 @@ resource "helm_release" "karpenter_crd" {
   name       = "karpenter-crd"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter-crd"
-  version    = "1.0.6"
+  version    = "1.0.8"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -141,7 +141,7 @@ resource "helm_release" "karpenter" {
   name       = "karpenter"
   repository = "oci://public.ecr.aws/karpenter"
   chart      = "karpenter"
-  version    = "1.0.6"
+  version    = "1.0.8"
   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
   values = [
@@ -283,7 +283,7 @@ resource "helm_release" "external_secrets" {
   name       = "external-secrets"
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
-  version    = "0.10.4"
+  version    = "0.10.5"
   namespace  = kubernetes_namespace.external_secrets.metadata[0].name
   values = [
     templatefile(
@@ -310,7 +310,7 @@ resource "helm_release" "keda" {
   name       = "keda"
   repository = "https://kedacore.github.io/charts"
   chart      = "keda"
-  version    = "2.15.1"
+  version    = "2.16.0"
   namespace  = kubernetes_namespace.keda.metadata[0].name
   values = [
     templatefile(
