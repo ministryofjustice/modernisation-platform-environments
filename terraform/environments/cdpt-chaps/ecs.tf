@@ -85,7 +85,7 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
       path        = "/"
       command     = [
         "CMD-SHELL",
-        "curl -f http://localhost:8080/ || exit 1"
+        "curl -k -f https://localhost:8080/ || exit 1"
       ]
         interval    = 30
         timeout     = 5
