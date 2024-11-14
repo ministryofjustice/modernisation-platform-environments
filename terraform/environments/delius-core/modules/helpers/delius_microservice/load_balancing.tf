@@ -150,7 +150,7 @@ resource "aws_lb_listener" "services" {
 resource "aws_route53_record" "services_nlb_r53_record" {
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone_info.zone_id
-  name     = "${var.name}.service.${var.env_name}"
+  name     = "${var.name}.service.${var.env_name}.${var.account_config.dns_suffix}"
   type     = "A"
   alias {
     evaluate_target_health = false
