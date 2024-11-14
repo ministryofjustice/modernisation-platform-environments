@@ -119,6 +119,35 @@ module "s3_bold_egress_kms" {
   deletion_window_in_days = 7
 }
 
+module "s3_ext_2024_egress_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.0"
+
+  aliases               = ["s3/ext-2024-egress"]
+  description           = "Used in the External 2024 Egress Solution"
+  enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowReadOnlyRole"
+      actions = [
+        "kms:Encrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/read-only"] # placeholder -- will change
+        }
+      ]
+    }
+  ]
+  deletion_window_in_days = 7
+}
+
 module "quarantined_sns_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 

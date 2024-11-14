@@ -161,6 +161,32 @@ module "bold_egress_bucket" {
   }
 }
 
+#tfsec:ignore:avd-aws-0088 - The bucket policy is attached to the bucket
+#tfsec:ignore:avd-aws-0132 - The bucket policy is attached to the bucket
+module "ext_2024_egress_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.1.2"
+
+  bucket = "mojap-ingestion-${local.environment}-ext-2024-egress"
+
+  force_destroy = true
+
+  versioning = {
+    enabled = true
+  }
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.s3_bold_egress_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+}
+
 module "datasync_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
