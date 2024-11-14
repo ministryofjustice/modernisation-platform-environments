@@ -88,8 +88,8 @@ module "weblogic_eis" {
   platform_vars = var.platform_vars
   tags          = var.tags
 
-  ignore_changes_service_task_definition = false
-  force_new_deployment                   = true
+  ignore_changes_service_task_definition = true
+  force_new_deployment                   = false
 
   providers = {
     aws.core-vpc              = aws.core-vpc
