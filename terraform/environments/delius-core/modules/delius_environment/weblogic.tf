@@ -30,8 +30,8 @@ module "weblogic" {
 
   cluster_security_group_id = aws_security_group.cluster.id
 
-  ignore_changes_service_task_definition = true
-  force_new_deployment                   = false
+  ignore_changes_service_task_definition = false
+  force_new_deployment                   = true
 
   providers = {
     aws.core-vpc              = aws.core-vpc
