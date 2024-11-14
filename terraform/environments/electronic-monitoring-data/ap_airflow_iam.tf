@@ -21,7 +21,7 @@ module "test_ap_airflow" {
 module "load_alcohol_monitoring_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
-
+  
   name               = "alcohol-monitoring"
   environment        = local.environment
   database_name      = "capita-alcohol-monitoring"
@@ -190,7 +190,7 @@ module "load_unstructured_atrium_database" {
   name               = "unstructured-atrium-database"
   environment        = local.environment
   database_name      = "g4s-atrium-unstructured"
-  path_to_data       = "/g4s/atrium_unstructured"
+  path_to_data       = "/load/g4s_atrium_unstructured/structure"
   source_data_bucket = module.s3-json-directory-structure-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
