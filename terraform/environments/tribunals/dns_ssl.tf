@@ -36,7 +36,7 @@ resource "aws_route53_record" "cert_validation" {
   records         = [each.value.value]
   ttl             = 300
   type            = each.value.type
-  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
+  zone_id         =   
 }
 
 // sub-domain validation only required for non-production sites
@@ -343,8 +343,8 @@ resource "aws_route53_record" "external_services" {
   type     = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.tribunals_distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.tribunals_distribution.hosted_zone_id
+    name                   = aws_lb.tribunals_lb.dns_name
+    zone_id                = aws_lb.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
