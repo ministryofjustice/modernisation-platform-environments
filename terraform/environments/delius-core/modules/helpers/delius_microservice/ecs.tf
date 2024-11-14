@@ -1,6 +1,6 @@
 module "container_definition" {
   source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v4.3.0"
-  name                     = var.name
+  name                     = "${var.env_name}-${var.name}"
   image                    = var.container_image
   memory                   = var.container_memory
   cpu                      = var.container_cpu

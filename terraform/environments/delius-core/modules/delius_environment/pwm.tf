@@ -88,8 +88,10 @@ module "pwm" {
     "SECURITY_KEY" = "${base64encode(uuid())}",
     "JAVA_OPTS"    = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
   }
-  container_vars_env_specific            = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
-  ignore_changes_service_task_definition = true
+  container_vars_env_specific = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
+
+  ignore_changes_service_task_definition = false
+  force_new_deployment                   = true
 
   providers = {
     aws.core-vpc              = aws.core-vpc
