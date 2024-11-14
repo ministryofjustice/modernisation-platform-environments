@@ -4,7 +4,15 @@ resource "aws_datasync_task" "dom1_hq_pgo_shared_group_sis_case_management_inves
   destination_location_arn = aws_datasync_location_s3.dom1_hq_pgo_shared_group_sis_case_management_investigations.arn
   cloudwatch_log_group_arn = module.datasync_task_logs.cloudwatch_log_group_arn
 
+  options {
+    gid               = "NONE"
+    uid               = "NONE"
+    posix_permissions = "NONE"
+    log_level         = "NONE"
+  }
+
   task_report_config {
+    report_overrides {}
     report_level         = "SUCCESSES_AND_ERRORS"
     output_type          = "STANDARD"
     s3_object_versioning = "INCLUDE"
