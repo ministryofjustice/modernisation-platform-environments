@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "ext_2024_target_bucket_policy" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam:::${local.environment_management.account_ids[terraform.workspace]}:role/transfer"]
+      identifiers = ["arn:aws:iam::471112983409:role/transfer"]
     }
     actions = [
       "s3:GetObject",
