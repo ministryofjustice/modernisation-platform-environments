@@ -81,7 +81,7 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
           protocol      = "tcp"
         }
       ]      
-      healthCheck = {
+      /*healthCheck = {
       path        = "/"
       command     = [
         "CMD-SHELL",
@@ -91,7 +91,7 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
         timeout     = 5
         retries     = 3
         startPeriod = 60
-      },
+      },*/
       logConfiguration = {
         logDriver = "awslogs",
         options = {
@@ -153,7 +153,7 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
           protocol      = "tcp"
         }
       ],
-      healthCheck = {
+      /*healthCheck = {
         path        = "/"
         command     = [
           "CMD-SHELL",
@@ -163,7 +163,7 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
         timeout     = 5
         retries     = 3
         startPeriod = 60
-      }
+      }*/
       logConfiguration = {
         logDriver = "awslogs",
         options = {
