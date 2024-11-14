@@ -924,7 +924,7 @@ variable "schedule_alarms_lambda" {
     alarm_patterns   = optional(list(string), [])
     disable_weekend  = optional(bool, true)
     start_time       = optional(string, "06:15")
-    end_time         = optional(string, "22:45")
+    end_time         = optional(string, "20:45")
     tags             = optional(map(string), {})
   })
   default = {}
