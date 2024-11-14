@@ -160,7 +160,7 @@ module "datasync_instance_security_group" {
 
   vpc_id = module.connected_vpc.vpc_id
 
-  ingress_with_cidr_blocks = [
+  egress_with_cidr_blocks = [
     {
       from_port   = 445
       to_port     = 445
