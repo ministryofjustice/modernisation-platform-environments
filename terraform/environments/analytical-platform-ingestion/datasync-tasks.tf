@@ -8,7 +8,7 @@ resource "aws_datasync_task" "dom1_hq_pgo_shared_group_sis_case_management_inves
     gid               = "NONE"
     uid               = "NONE"
     posix_permissions = "NONE"
-    log_level         = "NONE"
+    log_level         = "TRANSFER"
   }
 
   task_report_config {
