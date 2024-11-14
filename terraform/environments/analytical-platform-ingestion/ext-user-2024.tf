@@ -17,7 +17,7 @@ module "ext_2024_egress_bucket" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.s3_bold_egress_kms.key_arn
+        kms_master_key_id = module.s3_ext_2024_egress_kms.key_arn
         sse_algorithm     = "aws:kms"
       }
     }
@@ -53,7 +53,7 @@ module "s3_ext_2024_egress_kms" {
   deletion_window_in_days = 7
 }
 
-data "aws_iam_policy_document" "ext_2024_landing_bucket_policy" {
+data "aws_iam_policy_document" "ext_2024_target_bucket_policy" {
   statement {
     sid    = "LandingPermissions"
     effect = "Allow"
@@ -68,21 +68,21 @@ data "aws_iam_policy_document" "ext_2024_landing_bucket_policy" {
       "s3:PutObjectTagging"
     ]
     resources = [
-      "arn:aws:s3:::mojap-ingestion-${local.environment}-ext-2024-landing/*",
-      "arn:aws:s3:::mojap-ingestion-${local.environment}-ext-2024-landing/"
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-ext-2024-target/*",
+      "arn:aws:s3:::mojap-ingestion-${local.environment}-ext-2024-target/"
     ]
   }
 }
 
 #tfsec:ignore:avd-aws-0088 - The bucket policy is attached to the bucket
 #tfsec:ignore:avd-aws-0132 - The bucket policy is attached to the bucket
-module "ext_2024_land_bucket" {
+module "ext_2024_target_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 
-  bucket = "mojap-ingestion-${local.environment}-ext-2024-landing"
+  bucket = "mojap-ingestion-${local.environment}-ext-2024-target"
 
   force_destroy = true
 
@@ -90,7 +90,7 @@ module "ext_2024_land_bucket" {
     enabled = true
   }
   attach_policy = true
-  policy        = data.aws_iam_policy_document.ext_2024_landing_bucket_policy.json
+  policy        = data.aws_iam_policy_document.ext_2024_target_bucket_policy.json
 
   server_side_encryption_configuration = {
     rule = {
