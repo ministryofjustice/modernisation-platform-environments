@@ -5,6 +5,8 @@ metadata:
   name: general-spot
 spec:
   disruption:
+    budgets:
+      - nodes: "0"
     consolidationPolicy: WhenEmpty
     consolidateAfter: 5m
   template:

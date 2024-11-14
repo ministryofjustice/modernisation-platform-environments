@@ -5,6 +5,8 @@ metadata:
   name: airflow-high-memory
 spec:
   disruption:
+    budgets:
+      - nodes: "0"
     consolidationPolicy: WhenEmpty
     consolidateAfter: 5m
   template:
