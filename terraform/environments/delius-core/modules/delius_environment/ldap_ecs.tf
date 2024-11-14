@@ -61,8 +61,7 @@ module "ldap_ecs" {
   account_info = var.account_info
 
   ignore_changes_service_task_definition = false
-  force_new_deployment                   = true
-
+  force_new_deployment                   = false
 
   extra_task_exec_role_policies = {
     efs = data.aws_iam_policy_document.ldap_efs_access_policy
