@@ -76,7 +76,7 @@ locals {
       notify_image_version   = "0.0.19"
 
       /* Target Buckets */
-      target_buckets          = ["mojap-land"]
+      target_buckets          = ["mojap-land", "mojap-ingestion-${local.environment}-ext-2024-landing"]
       datasync_target_buckets = ["mojap-land"]
 
       /* Target KMS */
