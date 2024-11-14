@@ -68,6 +68,11 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
+  
+  memory = 2048
+  cpu    = 1024
+  essential = true
+  
   container_definitions = jsonencode([
     {
       name      = "chapsdotnet-container"
