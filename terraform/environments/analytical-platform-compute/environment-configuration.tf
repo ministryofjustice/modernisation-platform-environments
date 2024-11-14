@@ -27,8 +27,7 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
       eks_cluster_version = "1.31"
-      # eks_node_version    = "1.26.2-360b7a38"
-      eks_node_version = "1.25.0-388e1050"
+      eks_node_version    = "1.26.2-360b7a38"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.3-eksbuild.2"
         kube_proxy             = "v1.31.1-eksbuild.2"
