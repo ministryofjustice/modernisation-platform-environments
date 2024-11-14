@@ -72,8 +72,8 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
     {
       name      = "chapsdotnet-container"
       image     = "${local.ecr_url}:chapsdotnet-${local.application_data.accounts[local.environment].environment_name}"
-      cpu       = 1024
-      memory    = 2048
+      cpu       = 512
+      memory    = 1024
       essential = true
       portMappings = [
         {
@@ -148,8 +148,8 @@ resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
     {
       name      = "chaps-container"
       image     = "${local.ecr_url}:chaps-${local.application_data.accounts[local.environment].environment_name}"
-      cpu       = 1024
-      memory    = 2048
+      cpu       = 512
+      memory    = 1024
       essential = true
       portMappings = [
         {
