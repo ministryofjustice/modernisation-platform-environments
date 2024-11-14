@@ -2,6 +2,7 @@ resource "aws_datasync_task" "dom1_hq_pgo_shared_group_sis_case_management_inves
   name                     = "dom1-hq-pgo-shared-group-sis-case-management-investigations"
   source_location_arn      = aws_datasync_location_smb.dom1_hq_pgo_shared_group_sis_case_management_investigations.arn
   destination_location_arn = aws_datasync_location_s3.dom1_hq_pgo_shared_group_sis_case_management_investigations.arn
+  cloudwatch_log_group_arn = module.datasync_task_logs.cloudwatch_log_group_arn
 
   task_report_config {
     report_level         = "SUCCESSES_AND_ERRORS"
