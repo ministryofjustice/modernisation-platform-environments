@@ -118,10 +118,11 @@ data "aws_iam_policy_document" "zip_s3_policy" {
     ]
   }
   statement {
-    sid    = "AllowReadDataStore"
+    sid    = "AllowReadAndPutDataStore"
     effect = "Allow"
     actions = [
       "s3:GetObject",
+      "s3:PutObject"
     ]
     resources = [
       "${module.s3-data-bucket.bucket.arn}/*",
@@ -190,7 +191,7 @@ module "zip_bastion" {
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = "eu-west-2"
-  volume_size   = 96
+  volume_size   = 250
   # tags
   tags_common = local.tags
   tags_prefix = terraform.workspace
