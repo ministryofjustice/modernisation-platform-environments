@@ -245,6 +245,7 @@ if __name__ == "__main__":
             sys.exit(f"""{TABLE_TO_BE_VALIDATED} Max({TABLE_PKEY_COLUMN}) Mismatch: \n{error_msg}""")
     # --------------------
 
+    # skip_columns = [f'{rds_db_tbl_pkey_column}', 'SmallDateTimeCol', 'DateTime2Col']
     all_columns_except_pkey = [col for col in dms_table_output_prq_df.columns 
                                if col != TABLE_PKEY_COLUMN]
     LOGGER.info(f""">> all_columns_except_pkey = {all_columns_except_pkey} <<""")

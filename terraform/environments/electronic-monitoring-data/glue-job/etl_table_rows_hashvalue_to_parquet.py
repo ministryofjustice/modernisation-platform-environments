@@ -166,6 +166,8 @@ if __name__ == "__main__":
     LOGGER.info(f""">> rds_db_tbl_pkey_column = {rds_db_tbl_pkey_column} <<""")
 
     rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df(rds_sqlserver_db_table)
+
+    # skip_columns = [f'{rds_db_tbl_pkey_column}', 'SmallDateTimeCol', 'DateTime2Col']
     all_columns_except_pkey = list()
 
     for e in rds_db_table_empty_df.schema.fields:
