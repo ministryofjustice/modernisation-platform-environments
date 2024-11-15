@@ -57,8 +57,9 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   price_class     = "PriceClass_All"
 
   viewer_certificate {
-    cloudfront_default_certificate = true
-    minimum_protocol_version       = "TLSv1.2_2021"
+    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   restrictions {
@@ -66,6 +67,20 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
       restriction_type = "none"
     }
   }
+}
+
+resource "aws_acm_certificate" "cloudfront" {
+  provider                  = aws.us-east-1
+  domain_name               = "modernisation-platform.service.justice.gov.uk"
+  validation_method         = "DNS"
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_acm_certificate_validation" "cloudfront_cert_validation" {
+  provider        = aws.us-east-1
+  certificate_arn = aws_acm_certificate.cloudfront.arn
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
