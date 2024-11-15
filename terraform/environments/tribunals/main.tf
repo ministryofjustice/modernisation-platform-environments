@@ -695,7 +695,7 @@ module "ftp_admin_appeals" {
 }
 
 resource "aws_security_group" "nginx_lb_sg" {
-  count       = local.is-production ? 1 : 0
+  count       = local.is-production ? 0 : 1
   name        = "nginx-lb-sg"
   description = "Allow all web access to nginx load balancer"
   vpc_id      = data.aws_vpc.shared.id
