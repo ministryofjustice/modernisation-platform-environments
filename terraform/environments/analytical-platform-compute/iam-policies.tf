@@ -316,7 +316,6 @@ data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_format
     effect = "Allow"
     actions = [
       "s3:ListBucket",
-      "s3:GetBucketLocation",
     ]
     resources = ["arn:aws:s3:::mojap-derived-tables"]
   }
