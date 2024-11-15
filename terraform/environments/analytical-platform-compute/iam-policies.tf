@@ -320,18 +320,6 @@ data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_format
     resources = ["arn:aws:s3:::mojap-derived-tables"]
   }
   statement {
-    sid = "AwsSseS3KmsSourceAccount"
-    effect = "Allow"
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey"
-    ]
-    resources = ["arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/${local.ap_data_prod_s3_kms_key_id}"]
-  }
-  statement {
     sid = "AllowLakeFormationCloudWatchLogs"
     effect = "Allow"
     actions = [

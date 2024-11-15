@@ -1,6 +1,4 @@
 locals {
-  ap_data_prod_s3_kms_key_id = "df8888e3-4080-4c2b-a71e-1425e72f98e4"
-
   environment_configurations = {
     development = {
       /* VPC */
