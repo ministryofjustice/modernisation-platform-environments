@@ -50,12 +50,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-10-b"
           description      = "RDS Session Host and CAFM App Server/PFME Licence Server"
           pre-migration    = "PDFAW0010"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
 
       pd-cafm-a-11-a = merge(local.ec2_instances.app, {
@@ -75,12 +75,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-11-a"
           description      = "RDS session host and app server"
           pre-migration    = "PDFWA0011"
           update-ssm-agent = "patchgroup1"
-        }
+        })
       })
 
       pd-cafm-a-12-b = merge(local.ec2_instances.app, {
@@ -100,12 +100,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-12-b"
           description      = "RDS session host and app Server"
           pre-migration    = "PDFAW0012"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
 
       pd-cafm-a-13-a = merge(local.ec2_instances.app, {
@@ -125,12 +125,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-13-a"
           description      = "RDS session host and App Server"
           pre-migration    = "PDFAW0013"
           update-ssm-agent = "patchgroup1"
-        }
+        })
       })
 
       # database servers
@@ -228,12 +228,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.2xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-36-b"
           description      = "CAFM Asset Management"
           pre-migration    = "PDFWW00036"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
 
       pd-cafm-w-37-a = merge(local.ec2_instances.web, {
@@ -265,12 +265,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.2xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-37-a"
           description      = "CAFM Assessment Management"
           pre-migration    = "PFWW00037"
           update-ssm-agent = "patchgroup1"
-        }
+        })
       })
 
       pd-cafm-w-38-b = merge(local.ec2_instances.web, {
@@ -290,12 +290,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.large"
         })
-        tags = {
+        tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-38-b"
           description      = "CAFM Web Training"
           pre-migration    = "PDFWW3QCP660001"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
     }
 
