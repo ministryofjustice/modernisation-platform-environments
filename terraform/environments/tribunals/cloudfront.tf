@@ -1,16 +1,25 @@
 locals {
     loadbalancer_ingress_rules = {
-        "lb_ingress" = {
-        description     = "Loadbalancer ingress rule from CloudFront"
-        from_port       = 443
-        to_port         = 443
-        protocol        = "tcp"
-        prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+        "lb_ingress_https" = {
+            description     = "Loadbalancer ingress rule from CloudFront HTTPS"
+            from_port       = 443
+            to_port         = 443
+            protocol        = "tcp"
+            prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
+        }
+        "lb_ingress_http" = {
+            description     = "Loadbalancer ingress rule from CloudFront HTTP"
+            from_port       = 80
+            to_port         = 80
+            protocol        = "tcp"
+            prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
         }
     }
 }
 
 resource "aws_cloudfront_distribution" "tribunals_distribution" {
+
+  aliases = ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   origin {
     domain_name = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
     origin_id   = "tribunalsOrigin"
@@ -18,7 +27,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "https-only"
+      origin_protocol_policy = "match-viewer"
       origin_ssl_protocols   = ["TLSv1.2"]
       origin_keepalive_timeout = 60
       origin_read_timeout     = 60
@@ -46,8 +55,9 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     allowed_methods       = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods        = ["GET", "HEAD"]
 
-    min_ttl     = 0
+    compress    = true
     default_ttl = 86400
+    min_ttl     = 0
     max_ttl     = 31536000
   }
 
@@ -80,6 +90,19 @@ resource "aws_acm_certificate" "cloudfront" {
   }
   lifecycle {
     create_before_destroy = true
+  }
+}
+
+resource "aws_route53_record" "cloudfront_alias" {
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
+
+  alias {
+    name                   = aws_cloudfront_distribution.tribunals_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.tribunals_distribution.hosted_zone_id
+    evaluate_target_health = false
   }
 }
 
