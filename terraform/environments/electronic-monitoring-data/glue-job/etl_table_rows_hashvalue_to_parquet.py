@@ -161,13 +161,24 @@ if __name__ == "__main__":
     else:
         LOGGER.info(f""">> Given RDS SqlServer-DB Table: {rds_sqlserver_db_table} <<""")
     # -------------------------------------------------------
+
     rds_db_tbl_pkey_column = args['rds_db_tbl_pkey_column']
     LOGGER.info(f""">> rds_db_tbl_pkey_column = {rds_db_tbl_pkey_column} <<""")
 
     rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df(rds_sqlserver_db_table)
-    all_columns_except_pkey = [col for col in rds_db_table_empty_df.columns 
-                               if col != rds_db_tbl_pkey_column]
+    all_columns_except_pkey = list()
+
+    for e in rds_db_table_empty_df.schema.fields:
+        if e.name == rds_db_tbl_pkey_column:
+            continue
+        
+        if e.dataType.simpleString() == 'timestamp':
+            all_columns_except_pkey.append(f"CONVERT(VARCHAR, {e.name}, 120)") # YYYY-MM-DD HH:MM:SS
+        else:
+            all_columns_except_pkey.append(f"{e.name}")
+
     LOGGER.info(f""">> all_columns_except_pkey = {all_columns_except_pkey} <<""")
+    # -------------------------------------------------------
 
     prq_bucket_parent_folder = f"""{HASHED_OUTPUT_S3_BUCKET_NAME}/{RDS_DB_TABLE_HASHED_ROWS_PARENT_DIR}"""
     prq_table_folder_path = f"""{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}"""
@@ -184,7 +195,7 @@ if __name__ == "__main__":
     rds_db_select_query_str = f"""
     SELECT {rds_db_tbl_pkey_column}, 
     LOWER(SUBSTRING(CONVERT(VARCHAR(66), 
-    HASHBYTES('SHA2_256', CONCAT({', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash
+    HASHBYTES('SHA2_256', CONCAT_WS('', {', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash
     FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
     """.strip()
 
@@ -195,14 +206,12 @@ if __name__ == "__main__":
     if hashed_rows_prq_fulls3path != "":
         LOGGER.info(f"""An existing parquet-table-folder-path found.\n{hashed_rows_prq_fulls3path}""")
 
-        rds_db_query_sample_row = f"""
-    SELECT TOP 1 {rds_db_tbl_pkey_column}, 
-    SUBSTRING(CONVERT(VARCHAR(66), 
-    HASHBYTES('SHA2_256', CONCAT({', '.join(all_columns_except_pkey)})), 1), 3, 66) AS RowHash
-    FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
-    """.strip()
+        rds_db_query_sample_row_str = rds_db_select_query_str.replace(
+                                    f"SELECT {rds_db_tbl_pkey_column}", 
+                                    f"SELECT TOP 1 {rds_db_tbl_pkey_column}")
     
-        rds_db_query_sample_row_df = rds_jdbc_conn_obj.get_rds_db_query_df(rds_db_query_sample_row)
+        rds_db_query_sample_row_df = rds_jdbc_conn_obj.get_rds_db_query_df(
+                                                        rds_db_query_sample_row_str)
         LOGGER.info(f"""rds_db_query_sample_row_df-schema: \n{rds_db_query_sample_row_df.columns}""")
 
         existing_parquet_table_df = CustomPysparkMethods.get_s3_parquet_df_v2(
@@ -211,28 +220,46 @@ if __name__ == "__main__":
                                     )
         
         existing_parquet_table_df_agg = existing_parquet_table_df.agg(
+                                            F.min(rds_db_tbl_pkey_column).alias(f"min_{rds_db_tbl_pkey_column}"),
                                             F.max(rds_db_tbl_pkey_column).alias(f"max_{rds_db_tbl_pkey_column}"),
                                             F.count(rds_db_tbl_pkey_column).alias(f"count_{rds_db_tbl_pkey_column}")
-                                            )
+                                        )
         existing_parquet_agg_dict = existing_parquet_table_df_agg.collect()[0]
+        existing_parquet_min_pkey = existing_parquet_agg_dict[f"min_{rds_db_tbl_pkey_column}"]
         existing_parquet_max_pkey = existing_parquet_agg_dict[f"max_{rds_db_tbl_pkey_column}"]
         existing_parquet_count_pkey = existing_parquet_agg_dict[f"count_{rds_db_tbl_pkey_column}"]
 
+        LOGGER.info(f"""existing_parquet_min_pkey = {existing_parquet_min_pkey}""")
         LOGGER.info(f"""existing_parquet_max_pkey = {existing_parquet_max_pkey}""")
         LOGGER.info(f"""existing_parquet_count_pkey = {existing_parquet_count_pkey}""")
 
-        df_rds_table_count = rds_jdbc_conn_obj.get_rds_db_table_row_count(
-                                                rds_sqlserver_db_table, 
-                                                rds_db_tbl_pkey_column
-                                )
-        LOGGER.info(f"""df_rds_table_count = {df_rds_table_count}""")
+        # df_rds_table_count = rds_jdbc_conn_obj.get_rds_db_table_row_count(
+        #                                         rds_sqlserver_db_table, 
+        #                                         rds_db_tbl_pkey_column
+        #                         )
+        rds_jdbc_min_max_count_df_agg = rds_jdbc_conn_obj.get_rds_df_query_min_max_count(
+                                            rds_sqlserver_db_table, 
+                                            rds_db_tbl_pkey_column
+                                        )
 
-        if df_rds_table_count == existing_parquet_count_pkey:
-            LOGGER.warn(f"""df_rds_table_count = existing_parquet_table_df_count = {df_rds_table_count}""")
-            sys.exit(f"""Both df_rds_table_count and existing_parquet_table_df_count are matching. Nothing to move, exiting ...""")
-        elif existing_parquet_count_pkey > df_rds_table_count:
+        rds_jdbc_agg_dict = rds_jdbc_min_max_count_df_agg.collect()[0]
+        rds_jdbc_min_pkey = rds_jdbc_agg_dict[f"min_{rds_db_tbl_pkey_column}"]
+        rds_jdbc_max_pkey = rds_jdbc_agg_dict[f"max_{rds_db_tbl_pkey_column}"]
+        rds_jdbc_count_pkey = rds_jdbc_agg_dict[f"count_{rds_db_tbl_pkey_column}"]
+
+        LOGGER.info(f"""rds_jdbc_min_pkey = {rds_jdbc_min_pkey}""")
+        LOGGER.info(f"""rds_jdbc_max_pkey = {rds_jdbc_max_pkey}""")
+        LOGGER.info(f"""rds_jdbc_count_pkey = {rds_jdbc_count_pkey}""")
+
+        if rds_jdbc_count_pkey == existing_parquet_count_pkey:
+            LOGGER.warn(f"""rds_jdbc_count_pkey = existing_parquet_table_df_count = {rds_jdbc_count_pkey}""")
+            sys.exit(f"""Both rds_jdbc_count_pkey and existing_parquet_table_df_count are matching. Nothing to move, exiting ...""")
+        elif existing_parquet_count_pkey > rds_jdbc_count_pkey:
             LOGGER.warn(f"""existing_parquet_table_df_count > df_rds_table_count""")
-            sys.exit(f"""This scenario cannot be possible & needs further investigation, exiting ...""")            
+            sys.exit(f"""This scenario cannot be possible & needs further investigation, exiting ...""")
+        elif existing_parquet_min_pkey != rds_jdbc_min_pkey:
+            LOGGER.warn(f"""existing_parquet_min_pkey != rds_jdbc_min_pkey""")
+            sys.exit(f"""This scenario cannot be possible & needs further investigation, exiting ...""")      
         # --------------------
 
         where_clause_exp_str = f"""{rds_db_tbl_pkey_column} > {existing_parquet_max_pkey}""".strip()
