@@ -332,8 +332,8 @@ locals {
     ec2_instance_cwagent_collectd_endpoint_monitoring = {
       "endpoint-down" = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "1"
-        datapoints_to_alarm = "1"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
         metric_name         = "collectd_endpoint_status_value"
         namespace           = "CWAgent"
         period              = "60"
