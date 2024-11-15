@@ -90,16 +90,15 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
   dynamic "rule" {
     for_each = var.override_expiration_rules
     content {
-      # Unique rule ID derived from bucket name and prefix
-      id     = "${var.name}-${replace(rule.value.prefix, "/", "-")}"
+      # Generate rule ID without worrying about trailing slashes in the prefix
+      id     = "${var.name}-${rule.value.prefix}"
       status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
 
-      # Filter to apply the rule only to objects with the specified prefix
       filter {
-        prefix = rule.value.prefix
+        # Append '/' directly in the filter block to ensure proper prefix format
+        prefix = "${rule.value.prefix}/"
       }
 
-      # Expiration configuration for the specified prefix
       expiration {
         days = rule.value.days
       }

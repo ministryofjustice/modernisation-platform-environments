@@ -996,14 +996,14 @@ module "s3_working_bucket" {
   enable_lifecycle            = true
   enable_lifecycle_expiration = true
   lifecycle_category          = "long_term"
-  
+
   override_expiration_rules = [
     {
-      prefix = "reports/"
+      prefix = "reports"
       days   = 2
     },
     {
-      prefix = "dpr/"
+      prefix = "dpr"
       days   = 2
     }
   ]
