@@ -69,10 +69,15 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   }
 }
 
+// Create a new certificate for the CloudFront distribution because it needs to be in us-east-1
 resource "aws_acm_certificate" "cloudfront" {
   provider                  = aws.us-east-1
   domain_name               = "modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
+  subject_alternative_names = ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  tags = {
+    Environment = local.environment
+  }
   lifecycle {
     create_before_destroy = true
   }
