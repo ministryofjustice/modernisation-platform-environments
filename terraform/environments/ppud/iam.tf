@@ -881,8 +881,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
       "SNS:ListSubscriptions",
       "SNS:ListSubscriptionsByTopic",
       "SNS:ListTopics",
-      "SNS:Publish",
-      "SNS:Receive"
+      "SNS:Publish"
     ]
 
     condition {
