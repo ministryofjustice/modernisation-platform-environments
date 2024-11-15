@@ -1,12 +1,5 @@
 locals {
     loadbalancer_ingress_rules = {
-        "lb_ingress_https" = {
-            description     = "Loadbalancer ingress rule from CloudFront HTTPS"
-            from_port       = 443
-            to_port         = 443
-            protocol        = "tcp"
-            prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-        }
         "lb_ingress_http" = {
             description     = "Loadbalancer ingress rule from CloudFront HTTP"
             from_port       = 80
