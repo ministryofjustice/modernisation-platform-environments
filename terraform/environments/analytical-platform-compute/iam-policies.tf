@@ -303,7 +303,7 @@ data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_format
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   statement {
-    sid = "AllowS3ReadWriteAPDataProdDerivedTables"
+    sid    = "AllowS3ReadWriteAPDataProdDerivedTables"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -312,7 +312,7 @@ data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_format
     resources = ["arn:aws:s3:::mojap-derived-tables/prod/*"]
   }
   statement {
-    sid = "AllowS3AccessAPDataProdDerivedTablesBucket"
+    sid    = "AllowS3AccessAPDataProdDerivedTablesBucket"
     effect = "Allow"
     actions = [
       "s3:ListBucket",
@@ -320,7 +320,7 @@ data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_format
     resources = ["arn:aws:s3:::mojap-derived-tables"]
   }
   statement {
-    sid = "AllowLakeFormationCloudWatchLogs"
+    sid    = "AllowLakeFormationCloudWatchLogs"
     effect = "Allow"
     actions = [
       "logs:CreateLogStream",

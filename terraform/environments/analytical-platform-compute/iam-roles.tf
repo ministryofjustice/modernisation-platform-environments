@@ -375,7 +375,7 @@ data "aws_iam_policy_document" "custom_lake_formation_trust_policy" {
       "sts:SetContext"
     ]
     principals {
-      type = "AWS"
+      type = "Service"
       identifiers = [
         "glue.amazonaws.com",
         "lakeformation.amazonaws.com"
