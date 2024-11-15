@@ -299,11 +299,11 @@ module "quicksight_vpc_connection_iam_policy" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "data_account_mojap_derived_bucket_lake_formation_policy" {
+data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_formation_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   statement {
-    sid    = "AllowS3ReadWriteAPDataProdDerivedTables"
+    sid = "AllowS3ReadWriteAPDataProdDerivedTables"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -312,7 +312,7 @@ data "aws_iam_policy_document" "data_account_mojap_derived_bucket_lake_formation
     resources = ["arn:aws:s3:::mojap-derived-tables/prod/*"]
   }
   statement {
-    sid    = "AllowS3AccessAPDataProdDerivedTablesBucket"
+    sid = "AllowS3AccessAPDataProdDerivedTablesBucket"
     effect = "Allow"
     actions = [
       "s3:ListBucket",
@@ -321,7 +321,7 @@ data "aws_iam_policy_document" "data_account_mojap_derived_bucket_lake_formation
     resources = ["arn:aws:s3:::mojap-derived-tables"]
   }
   statement {
-    sid    = "AwsSseS3KmsSourceAccount"
+    sid = "AwsSseS3KmsSourceAccount"
     effect = "Allow"
     actions = [
       "kms:Encrypt",
@@ -333,7 +333,7 @@ data "aws_iam_policy_document" "data_account_mojap_derived_bucket_lake_formation
     resources = ["arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/${local.ap_data_prod_s3_kms_key_id}"]
   }
   statement {
-    sid    = "AllowLakeFormationCloudWatchLogs"
+    sid = "AllowLakeFormationCloudWatchLogs"
     effect = "Allow"
     actions = [
       "logs:CreateLogStream",
@@ -347,7 +347,7 @@ data "aws_iam_policy_document" "data_account_mojap_derived_bucket_lake_formation
   }
 }
 
-module "data_account_mojap_derived_bucket_lake_formation_policy" {
+module "data_production_mojap_derived_bucket_lake_formation_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -356,5 +356,5 @@ module "data_account_mojap_derived_bucket_lake_formation_policy" {
 
   name_prefix = "analytical-platform-data-bucket-lake-formation-policy"
 
-  policy = data.aws_iam_policy_document.data_account_mojap_derived_bucket_lake_formation_policy.json
+  policy = data.aws_iam_policy_document.data_production_mojap_derived_bucket_lake_formation_policy.json
 }
