@@ -45,7 +45,7 @@ module "s3_ext_2024_egress_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/read-only"] # placeholder -- will change
+          identifiers = ["arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/security-read-only"]
         }
       ]
     }
