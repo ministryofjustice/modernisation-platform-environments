@@ -152,7 +152,7 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
       essential = true
       portMappings = [
         {
-          containerPort = 8181
+          containerPort = 80
           protocol      = "tcp"
         }
       ],
