@@ -133,6 +133,7 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
 
 resource "aws_s3_bucket" "lb_logs" {
   bucket = "tribunals-lb-logs-${local.environment}"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_versioning" "lb_logs" {
