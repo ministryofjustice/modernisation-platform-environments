@@ -872,10 +872,15 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     actions = [
       "SNS:GetTopicAttributes",
       "SNS:SetTopicAttributes",
+      "SNS:GetSubscriptionAttributes",
+      "SNS:SetSubscriptionAttributes",
       "SNS:AddPermission",
       "SNS:DeleteTopic",
       "SNS:Subscribe",
+      "SNS:Unsubscribe",
+      "SNS:ListSubscriptions",
       "SNS:ListSubscriptionsByTopic",
+      "SNS:ListTopics",
       "SNS:Publish",
       "SNS:Receive"
     ]
@@ -889,7 +894,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     resources = [
       aws_sns_topic.cw_alerts[0].arn
     ]
-  }
+   } 
 }
 
 ####################################################
