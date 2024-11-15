@@ -23,6 +23,14 @@ resource "aws_sns_topic_subscription" "cw_subscription" {
   #  endpoint  = aws_secretsmanager_secret_version.support_email_account[0].secret_string
 }
 
+# SMS topic subscription to be implemented temporarily over the Christmas period
+resource "aws_sns_topic_subscription" "cw_sms_subscription" {
+  count     = local.is-production == true ? 1 : 0
+  topic_arn = aws_sns_topic.cw_alerts[0].arn
+  protocol  = "sms"
+  endpoint  = "+447903642202"
+}
+
 # PreProduction - Cloud Watch
 
 resource "aws_sns_topic" "cw_uat_alerts" {
