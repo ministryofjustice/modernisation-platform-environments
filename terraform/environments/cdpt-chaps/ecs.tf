@@ -62,7 +62,7 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
   retention_in_days = "7"
 }
 
-resource "aws_ecs_task_definition" "chap_yarp_task_definition" {
+resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
   family                   = "chaps-yarp-family"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
@@ -217,7 +217,7 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
   depends_on                        = [aws_lb_listener.https_listener]
   name                              = "chaps-yarp-combined-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chap_yarp_task_definition.arn
+  task_definition                   = data.aws_ecs_task_definition.latest.task_definition
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true

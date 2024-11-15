@@ -16,3 +16,7 @@ data "aws_instances" "chaps_instances" {
     values = ["running"]
   }
 }
+
+data "aws_ecs_task_definition" "latest" {
+    task_definition = aws_ecs_task_definition.chaps_yarp_task_definition.family
+}
