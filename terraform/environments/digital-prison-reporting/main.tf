@@ -995,9 +995,18 @@ module "s3_working_bucket" {
   create_notification_queue   = false # For SQS Queue
   enable_lifecycle            = true
   enable_lifecycle_expiration = true
-  expiration_days             = 2
-  expiration_prefix_redshift  = "reports/"
-  expiration_prefix_athena    = "dpr/"
+  lifecycle_category          = "long_term"
+  
+  override_expiration_rules = [
+    {
+      prefix = "reports/"
+      days   = 2
+    },
+    {
+      prefix = "dpr/"
+      days   = 2
+    }
+  ]
 
   tags = merge(
     local.all_tags,
