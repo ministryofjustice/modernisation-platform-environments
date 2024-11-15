@@ -298,3 +298,63 @@ module "quicksight_vpc_connection_iam_policy" {
 
   tags = local.tags
 }
+
+data "aws_iam_policy_document" "data_account_mojap_derived_bucket_lake_formation_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  statement {
+    sid    = "AllowS3ReadWriteAPDataProdDerivedTables"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = ["arn:aws:s3:::mojap-derived-tables/prod/*"]
+  }
+  statement {
+    sid    = "AllowS3AccessAPDataProdDerivedTablesBucket"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+    ]
+    resources = ["arn:aws:s3:::mojap-derived-tables"]
+  }
+  statement {
+    sid    = "AwsSseS3KmsSourceAccount"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/${local.ap_data_prod_s3_kms_key_id}"]
+  }
+  statement {
+    sid    = "AllowLakeFormationCloudWatchLogs"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*",
+      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*:log-stream:*"
+    ]
+  }
+}
+
+module "data_account_mojap_derived_bucket_lake_formation_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.46.0"
+
+  name_prefix = "analytical-platform-data-bucket-lake-formation-policy"
+
+  policy = data.aws_iam_policy_document.data_account_mojap_derived_bucket_lake_formation_policy.json
+}
