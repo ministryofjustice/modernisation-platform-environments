@@ -130,51 +130,50 @@ resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
 }
 
 ## Create S3 Bucket for Load Balancer logging ##
+resource "aws_s3_bucket" "lb_logs" {
+  bucket = "tribunals-lb-logs-${local.environment}"
+  force_destroy = true
+}
 
-# resource "aws_s3_bucket" "lb_logs" {
-#   bucket = "tribunals-lb-logs-${local.environment}"
-#   force_destroy = true
-# }
+resource "aws_s3_bucket_versioning" "lb_logs" {
+  bucket = aws_s3_bucket.lb_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
-# resource "aws_s3_bucket_versioning" "lb_logs" {
-#   bucket = aws_s3_bucket.lb_logs.id
-#   versioning_configuration {
-#     status = "Enabled"
-#   }
-# }
+resource "aws_s3_bucket_policy" "lb_logs" {
+  bucket = aws_s3_bucket.lb_logs.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_elb_service_account.main.id}:root"
+        }
+        Action = [
+          "s3:PutObject"
+        ]
+        Resource = [
+          "${aws_s3_bucket.lb_logs.arn}/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
+        }
+        Action = [
+          "s3:PutObject"
+        ]
+        Resource = [
+          "${aws_s3_bucket.lb_logs.arn}/*"
+        ]
+      }
+    ]
+  })
+}
 
-# resource "aws_s3_bucket_policy" "lb_logs" {
-#   bucket = aws_s3_bucket.lb_logs.id
-#   policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Effect = "Allow"
-#         Principal = {
-#           AWS = "arn:aws:iam::${data.aws_elb_service_account.main.id}:root"
-#         }
-#         Action = [
-#           "s3:PutObject"
-#         ]
-#         Resource = [
-#           "${aws_s3_bucket.lb_logs.arn}/*"
-#         ]
-#       },
-#       {
-#         Effect = "Allow"
-#         Principal = {
-#           Service = "logdelivery.elasticloadbalancing.amazonaws.com"
-#         }
-#         Action = [
-#           "s3:PutObject"
-#         ]
-#         Resource = [
-#           "${aws_s3_bucket.lb_logs.arn}/*"
-#         ]
-#       }
-#     ]
-#   })
-# }
-
-# # Get the AWS account ID for the ALB service account
-# data "aws_elb_service_account" "main" {}
+# Get the AWS account ID for the ALB service account
+data "aws_elb_service_account" "main" {}
