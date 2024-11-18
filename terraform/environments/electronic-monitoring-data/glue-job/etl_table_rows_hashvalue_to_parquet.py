@@ -245,9 +245,9 @@ if __name__ == "__main__":
                                         )
 
         rds_jdbc_agg_dict = rds_jdbc_min_max_count_df_agg.collect()[0]
-        rds_jdbc_min_pkey = rds_jdbc_agg_dict[f"min_{rds_db_tbl_pkey_column}"]
-        rds_jdbc_max_pkey = rds_jdbc_agg_dict[f"max_{rds_db_tbl_pkey_column}"]
-        rds_jdbc_count_pkey = rds_jdbc_agg_dict[f"count_{rds_db_tbl_pkey_column}"]
+        rds_jdbc_min_pkey = rds_jdbc_agg_dict[f"min_value"]
+        rds_jdbc_max_pkey = rds_jdbc_agg_dict[f"max_value"]
+        rds_jdbc_count_pkey = rds_jdbc_agg_dict[f"count_value"]
 
         LOGGER.info(f"""rds_jdbc_min_pkey = {rds_jdbc_min_pkey}""")
         LOGGER.info(f"""rds_jdbc_max_pkey = {rds_jdbc_max_pkey}""")
