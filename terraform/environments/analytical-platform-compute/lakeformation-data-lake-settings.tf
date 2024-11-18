@@ -19,6 +19,6 @@ resource "aws_lakeformation_data_lake_settings" "ireland" {
     module.analytical_platform_data_eng_dba_service_role.iam_role_arn,
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.data_engineering_sso_role.names)}",
     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform_sandbox_role.names)}",
-    data.aws_iam_role.github_actions_role.arn
+     data.aws_iam_role.github_actions_role.arn
   ]
 }
