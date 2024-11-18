@@ -263,6 +263,8 @@ module "analytical_platform_lake_formation_share_policy" {
   name_prefix = "analytical-platform-lake-formation-sharing-policy"
 
   policy = data.aws_iam_policy_document.analytical_platform_share_policy.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "quicksight_vpc_connection" {
@@ -344,4 +346,6 @@ module "data_production_mojap_derived_bucket_lake_formation_policy" {
   name_prefix = "analytical-platform-data-bucket-lake-formation-policy"
 
   policy = data.aws_iam_policy_document.data_production_mojap_derived_bucket_lake_formation_policy.json
+
+  tags = local.tags
 }
