@@ -7,7 +7,7 @@ module "aws_cloudwatch_metrics_pod_identity" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks-pod-identity/aws"
-  version = "1.5.0"
+  version = "1.7.0"
 
   name = "aws-cloudwatch-metrics"
 
