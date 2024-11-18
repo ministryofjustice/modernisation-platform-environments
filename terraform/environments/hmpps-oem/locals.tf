@@ -32,6 +32,7 @@ locals {
         "ec2_instance_oracle_db_with_backup",
         "ec2_instance_textfile_monitoring",
         "ec2_windows",
+        "ssm_command",
       ]
       cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
       enable_backup_plan_daily_and_weekly         = true
@@ -105,6 +106,7 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
         ]
       }
       "nomis-combined-reporting-${local.environment}" = {
