@@ -13,7 +13,9 @@
       "ebs_sdh_snapshot": "snap-032650fbb7a97032f",
       "sdhsize": "200",
       "ebs_sdi_snapshot": "snap-04d4a697cc1e66d09",
-      "sdisize": "150"
+      "sdisize": "150",
+      "s3fs_ami_id": "ami-0a6006bac3b9bb8d3",
+      "s3fsinstancetype": "t3a.small",
     },
     "test": {
       "example_var": "test-data"
