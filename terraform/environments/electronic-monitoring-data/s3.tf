@@ -5,11 +5,11 @@ locals {
     "production" = null
     "preproduction" = {
       "account_number" = 173142358744
-      "role_name" = "juniper-dt-lambda-role"
+      "role_name"      = "juniper-dt-lambda-role"
     }
     "test" = {
       "account_number" = 173142358744
-      role_name = "dev-dt-lambda-role"
+      role_name        = "dev-dt-lambda-role"
     }
     "development" = null
   }
