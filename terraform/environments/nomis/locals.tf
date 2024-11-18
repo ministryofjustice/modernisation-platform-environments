@@ -48,6 +48,7 @@ locals {
       enable_resource_explorer = true
     }
 
-    security_groups = local.security_groups
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.ssm
+    security_groups          = local.security_groups
   }
 }

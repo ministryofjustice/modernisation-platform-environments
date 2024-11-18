@@ -388,5 +388,21 @@ locals {
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
+
+    ssm = {
+      failed-ssm-command = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "24"
+        datapoints_to_alarm = "1"
+        metric_name         = "SSMCommandFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if there has been a failed scheduled SSM command. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5291475023"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
   }
 }
