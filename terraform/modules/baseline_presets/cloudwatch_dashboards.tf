@@ -800,7 +800,7 @@ locals {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "SSM command-faileds-count"
+          title   = "SSM command-failed-count"
           stat    = "Sum"
           yAxis = {
             left = {
