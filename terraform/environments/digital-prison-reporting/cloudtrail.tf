@@ -13,7 +13,7 @@ resource "aws_cloudtrail" "trail" {
   include_global_service_events = true
   enable_log_file_validation    = true
 
-  kms_key_id                    = aws_kms_key.cloudtrail.key_id   # Get KEY ID from Resource
+  kms_key_id = aws_kms_key.cloudtrail.key_id # Get KEY ID from Resource
 
 
   event_selector {
