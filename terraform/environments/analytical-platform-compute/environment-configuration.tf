@@ -1,6 +1,4 @@
 locals {
-  ap_data_prod_account_id = local.environment_management.account_ids["analytical-platform-data-production"]
-
   environment_configurations = {
     development = {
       /* VPC */
@@ -39,7 +37,7 @@ locals {
       }
 
       /* Data Engineering Airflow */
-      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.ap_data_prod_account_id}:role/airflow-dev-execution-role"
+      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-development"
@@ -93,7 +91,7 @@ locals {
       observability_platform = "development"
 
       /* Data Engineering Airflow */
-      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.ap_data_prod_account_id}:role/airflow-dev-execution-role"
+      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-test"
@@ -140,7 +138,7 @@ locals {
       }
 
       /* Data Engineering Airflow */
-      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.ap_data_prod_account_id}:role/airflow-prod-execution-role"
+      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-prod-execution-role"
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"

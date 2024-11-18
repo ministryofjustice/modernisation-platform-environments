@@ -342,3 +342,34 @@ module "quicksight_vpc_connection_iam_role" {
 
   tags = local.tags
 }
+
+module "lake_formation_to_data_production_mojap_derived_tables_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "lake-formation-data-production-data-access"
+
+  # number_of_custom_role_policy_arns = 1
+
+  custom_role_policy_arns = [
+    module.data_production_mojap_derived_bucket_lake_formation_policy.arn,
+  ]
+
+  trusted_role_actions = [
+    "sts:AssumeRole",
+    "sts:SetContext"
+  ]
+
+  trusted_role_services = [
+    "glue.amazonaws.com",
+    "lakeformation.amazonaws.com"
+  ]
+
+  tags = local.tags
+}
