@@ -86,19 +86,6 @@ resource "aws_acm_certificate" "cloudfront" {
   }
 }
 
-resource "aws_route53_record" "cloudfront_alias" {
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type     = "A"
-
-  alias {
-    name                   = aws_cloudfront_distribution.tribunals_distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.tribunals_distribution.hosted_zone_id
-    evaluate_target_health = false
-  }
-}
-
 resource "aws_acm_certificate_validation" "cloudfront_cert_validation" {
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront.arn
