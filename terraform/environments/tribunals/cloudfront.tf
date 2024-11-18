@@ -25,7 +25,13 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
     forwarded_values {
       query_string = true
-      headers      = ["Host", "Origin", "X-Forwarded-For", "X-Forwarded-Proto"]
+      headers      = [
+        "Host",
+        "Origin",
+        "X-Forwarded-For",
+        "X-Forwarded-Proto",
+        "X-Requested-With"
+      ]
 
       cookies {
         forward = "none"
@@ -33,13 +39,13 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     }
 
     viewer_protocol_policy = "redirect-to-https"
-    allowed_methods       = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods        = ["GET", "HEAD"]
-
-    compress    = true
-    default_ttl = 86400
-    min_ttl     = 0
-    max_ttl     = 31536000
+    allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods         = ["GET", "HEAD"]
+    compress               = true
+    default_ttl            = 0
+    min_ttl                = 0
+    max_ttl                = 31536000
+    smooth_streaming       = false
   }
 
   enabled         = true
