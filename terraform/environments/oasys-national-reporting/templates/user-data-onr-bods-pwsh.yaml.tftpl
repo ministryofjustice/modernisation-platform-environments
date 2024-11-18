@@ -132,12 +132,20 @@ tasks:
           $GitBranch = "${branch}"
           $Script = "Invoke-UserDataScript.ps1"
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
-          # Disable script scanning if not Server 2012 R2
-          # $osVersion = (Get-WmiObject -Class Win32_OperatingSystem).Version
-          # if ($osVersion -notlike "6.3*") {
-          #   Set-MpPreference -DisableScriptScanning $true
-          # }
-          Set-MpPreference -DisableScriptScanning $true
+          # Disable IO AV protection if not Server 2012 R2
+          $osVersion = (Get-WmiObject -Class Win32_OperatingSystem).Version
+          if ($osVersion -notlike "6.3*") {
+            Set-MpPreference -DisableIOAVProtection $true
+          }
           Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
           . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch
           Exit $LASTEXITCODE
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          # Enable IO AV protection if not Server 2012 R2
+          $osVersion = (Get-WmiObject -Class Win32_OperatingSystem).Version
+          if ($osVersion -notlike "6.3*") {
+            Set-MpPreference -DisableIOAVProtection $false
+          }
