@@ -339,7 +339,7 @@ module "data_production_mojap_derived_bucket_lake_formation_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.46.0"
+  version = "5.48.0"
 
   name_prefix = "analytical-platform-data-bucket-lake-formation-policy"
 

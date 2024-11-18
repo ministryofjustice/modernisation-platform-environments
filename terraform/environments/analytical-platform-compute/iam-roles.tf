@@ -348,12 +348,12 @@ module "lake_formation_to_data_production_mojap_derived_tables_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.46.0"
+  version = "5.48.0"
 
   create_role       = true
   role_requires_mfa = false
 
-  role_name_prefix = "lf-data-prod-mojap-derived-"
+  role_name_prefix = "lake-formation-data-prod-mojap-derived-"
 
   # number_of_custom_role_policy_arns = 1
 
@@ -361,25 +361,15 @@ module "lake_formation_to_data_production_mojap_derived_tables_role" {
     module.data_production_mojap_derived_bucket_lake_formation_policy.arn,
   ]
 
-  create_custom_role_trust_policy = true
-  custom_role_trust_policy        = data.aws_iam_policy_document.custom_lake_formation_trust_policy.json
+  trusted_role_actions = [
+    "sts:AssumeRole",
+    "sts:SetContext"
+  ]
+
+  trusted_role_services = [
+    "glue.amazonaws.com",
+    "lakeformation.amazonaws.com"
+  ]
 
   tags = local.tags
-}
-
-data "aws_iam_policy_document" "custom_lake_formation_trust_policy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "sts:AssumeRole",
-      "sts:SetContext"
-    ]
-    principals {
-      type = "Service"
-      identifiers = [
-        "glue.amazonaws.com",
-        "lakeformation.amazonaws.com"
-      ]
-    }
-  }
 }
