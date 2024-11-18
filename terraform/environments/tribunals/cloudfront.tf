@@ -1,17 +1,4 @@
-locals {
-    loadbalancer_ingress_rules = {
-        "lb_ingress_http" = {
-            description     = "Loadbalancer ingress rule from CloudFront HTTP"
-            from_port       = 80
-            to_port         = 80
-            protocol        = "tcp"
-            prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
-        }
-    }
-}
-
 resource "aws_cloudfront_distribution" "tribunals_distribution" {
-
   aliases = ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   origin {
     domain_name = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
@@ -91,26 +78,25 @@ resource "aws_acm_certificate_validation" "cloudfront_cert_validation" {
   certificate_arn = aws_acm_certificate.cloudfront.arn
 }
 
-data "aws_ec2_managed_prefix_list" "cloudfront" {
-  name = "com.amazonaws.global.cloudfront.origin-facing"
-}
-
 resource "aws_security_group" "tribunals_lb_sg_cloudfront" {
   name        = "tribunals-load-balancer-sg-cf"
   description = "control access to the load balancer using cloudfront"
   vpc_id      = data.aws_vpc.shared.id
 
-  dynamic "ingress" {
-    for_each = local.loadbalancer_ingress_rules
-    content {
-      description     = lookup(ingress.value, "description", null)
-      from_port       = lookup(ingress.value, "from_port", null)
-      to_port         = lookup(ingress.value, "to_port", null)
-      protocol        = lookup(ingress.value, "protocol", null)
-      cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
-      security_groups = lookup(ingress.value, "security_groups", null)
-      prefix_list_ids = lookup(ingress.value, "prefix_list_ids", null)
-    }
+  ingress {
+    description = "allow all traffic on HTTPS port 443"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "allow all traffic on HTTP port 80"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
