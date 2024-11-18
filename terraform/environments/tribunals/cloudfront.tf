@@ -30,13 +30,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
         "Origin",
         "X-Forwarded-For",
         "X-Forwarded-Proto",
-        "X-Requested-With",
-        "X-AspNet-Version",
-        "X-Powered-By",
-        "Accept",
-        "Accept-Encoding",
-        "User-Agent",
-        "Referer"
+        "X-Requested-With"
       ]
 
       cookies {
