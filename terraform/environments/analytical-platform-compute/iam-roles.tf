@@ -353,7 +353,7 @@ module "lake_formation_to_data_production_mojap_derived_tables_role" {
   create_role       = true
   role_requires_mfa = false
 
-  role_name_prefix = "lake-formation-data-prod-mojap-derived-"
+  role_name_prefix = "lakeformation-data-prod-mojap-derived-"
 
   # number_of_custom_role_policy_arns = 1
 
