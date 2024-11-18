@@ -2,13 +2,13 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
   aliases = ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   origin {
-    domain_name = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    domain_name = aws_lb.tribunals_lb.dns_name
     origin_id   = "tribunalsOrigin"
 
     custom_origin_config {
       http_port              = 80
       https_port             = 443
-      origin_protocol_policy = "match-viewer"
+      origin_protocol_policy = "https-only"
       origin_ssl_protocols   = ["TLSv1.2"]
       origin_keepalive_timeout = 60
       origin_read_timeout     = 60
@@ -25,7 +25,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
     forwarded_values {
       query_string = true
-      headers      = ["Host", "Origin"]
+      headers      = ["Host", "Origin", "X-Forwarded-For", "X-Forwarded-Proto"]
 
       cookies {
         forward = "none"
@@ -89,19 +89,11 @@ resource "aws_security_group" "tribunals_lb_sg_cloudfront" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "allow all traffic on HTTPS port 443"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    description = "allow all traffic on HTTP port 80"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    description     = "Allow CloudFront traffic on HTTPS port 443"
+    from_port       = 443
+    to_port         = 443
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.cloudfront.id]
   }
 
   egress {
