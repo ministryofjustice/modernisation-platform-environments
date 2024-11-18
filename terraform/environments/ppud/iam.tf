@@ -859,6 +859,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expi
 
 ## Production
 
+/*
 data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
   count     = local.is-production == true ? 1 : 0
   policy_id = "SnsTopicId"
@@ -895,6 +896,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     ]
   }
 }
+*/
 
 ####################################################
 # IAM User, Policy for MGN
