@@ -466,6 +466,7 @@ locals {
         expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_endpoint_cert_expiry_value\"','Minimum'),MIN,ASC)"
         properties = {
           view    = "bar"
+          period  = 3600
           stacked = false
           region  = "eu-west-2"
           title   = "endpoint-cert-days-to-expiry"
@@ -781,6 +782,7 @@ locals {
         expression = "SORT(SEARCH('{CustomMetrics, DocumentName} MetricName=\"SSMCommandSuccessCount\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
+          period  = 3600
           stacked = true
           region  = "eu-west-2"
           title   = "SSM command-success-count"
@@ -798,6 +800,7 @@ locals {
         expression = "SORT(SEARCH('{CustomMetrics, DocumentName} MetricName=\"SSMCommandFailedCount\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
+          period  = 3600
           stacked = true
           region  = "eu-west-2"
           title   = "SSM command-failed-count"
@@ -815,6 +818,7 @@ locals {
         expression = "SORT(SEARCH('{CustomMetrics, DocumentName} MetricName=\"SSMCommandIgnoreCount\"','Sum'),SUM,DESC)"
         properties = {
           view    = "timeSeries"
+          period  = 3600
           stacked = true
           region  = "eu-west-2"
           title   = "SSM command-ignore-count"
