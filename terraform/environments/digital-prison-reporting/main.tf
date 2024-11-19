@@ -1000,11 +1000,11 @@ module "s3_working_bucket" {
   override_expiration_rules = [
     {
       prefix = "reports"
-      days   = 2
+      days   = 7
     },
     {
       prefix = "dpr"
-      days   = 2
+      days   = 7
     }
   ]
 
