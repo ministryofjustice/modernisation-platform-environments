@@ -10,18 +10,21 @@ locals {
     web = {
       secrets = {
         passwords = { description = "Web Passwords" }
+        config    = { description = "BODS Configuration" }
       }
     }
 
     bip = {
       secrets = {
         passwords = { description = "BIP Passwords" }
+        config    = { description = "BODS Configuration" }
       }
     }
 
     bods = {
       secrets = {
         passwords = { description = "BODS Passwords" }
+        config    = { description = "BODS Configuration" }
       }
     }
   }
