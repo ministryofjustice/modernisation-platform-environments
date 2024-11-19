@@ -831,45 +831,58 @@ locals {
           }
         }
       }
-
-      ssm-command-invocation-status = {
-        type = "metric"
+    }
+    github = {
+      github-actions-run-success-count-by-repo = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsSuccessCount\"','Sum'),SUM,DESC)"
         properties = {
-          view    = "singleValue"
+          view    = "timeSeries"
+          period  = 3600
           stacked = true
           region  = "eu-west-2"
-          title   = "SSM CommandInvocation Failures - Per Account"
-          stat    = "Maximum"
-          period  = 300
-          metrics = [
-            [{ "expression" : "REMOVE_EMPTY(SEARCH('{CustomMetrics, Account} FailedSSMCommandInvocations', 'Sum', 300))", "label" : "Failed Invocations - ", "id" : "q1" }]
-          ]
+          title   = "GitHub actions-run-success-count-by-repo"
+          stat    = "Sum"
           yAxis = {
             left = {
               showUnits = false,
-              label     = "failed invocations"
+              label     = "count"
             }
           }
         }
       }
-    }
-    github = {
-      github-failed-workflow-runs = {
-        type = "metric"
+      github-actions-run-failed-count-by-repo = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsFailedCount\"','Sum'),SUM,DESC)"
         properties = {
-          view    = "singleValue"
+          view    = "timeSeries"
+          period  = 3600
           stacked = true
           region  = "eu-west-2"
-          title   = "GitHub Failed Workflow Runs - Per Repository"
-          stat    = "Maximum"
-          period  = 300
-          metrics = [
-            [{ "expression" : "REMOVE_EMPTY(SEARCH('{CustomMetrics, Repository} FailedGitHubWorkflowRuns', 'Sum', 300))", "label" : "Failed Runs - ", "id" : "q1" }]
-          ]
+          title   = "GitHub actions-run-failed-count-by-repo"
+          stat    = "Sum"
           yAxis = {
             left = {
               showUnits = false,
-              label     = "failed runs"
+              label     = "count"
+            }
+          }
+        }
+      }
+      github-actions-run-failed-count-by-workflow = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, WorkflowName} MetricName=\"GitHubActionRunsFailedCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 3600
+          stacked = true
+          region  = "eu-west-2"
+          title   = "GitHub actions-run-failed-count-by-workflow"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
             }
           }
         }
@@ -1024,13 +1037,14 @@ locals {
         local.cloudwatch_dashboard_widgets.ssm.ssm-command-ignore-count,
       ]
     }
-    custom = {
-      header_markdown = "## Custom Metrics"
+    github_workflows = {
+      header_markdown = "## GitHub Workflow Metrics"
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ssm.ssm-command-invocation-status,
-        local.cloudwatch_dashboard_widgets.github.github-failed-workflow-runs,
+        local.cloudwatch_dashboard_widgets.github.github-actions-run-success-count-by-repo,
+        local.cloudwatch_dashboard_widgets.github.github-actions-run-failed-count-by-repo,
+        local.cloudwatch_dashboard_widgets.github.github-actions-run-failed-count-by-workflow,
       ]
     }
   }
