@@ -45,7 +45,6 @@ def lambda_handler(event, context):
                     {
                         'MetricName': 'DMSReplicationStopped',
                         'Dimensions': [
-                            {'Name': 'EventSource', 'Value': event_source},
                             {'Name': 'SourceId',    'Value': source_id}
                         ],
                         'Value': 0,  # Reset Below Trigger threshold (Task Started)
@@ -61,7 +60,6 @@ def lambda_handler(event, context):
                     {
                         'MetricName': 'DMSReplicationStopped',
                         'Dimensions': [
-                            {'Name': 'EventSource', 'Value': event_source},
                             {'Name': 'SourceId',    'Value': source_id}
                         ],
                         'Value': 1,  # Trigger threshold (Task Failed)

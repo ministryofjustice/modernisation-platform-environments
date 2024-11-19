@@ -258,53 +258,6 @@ resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publis
   source_arn    = aws_sns_topic.dms_events_topic.arn
 }
 
-# Define a CloudWatch metric alarm with a metric math expression.
-# Because the Lambda function is only called intermittently when a DMS Replication
-# Event is fired (i.e. it may be very infrequent), we use the FILL function
-# to interpolate between data points - we assume the metric stays in the
-# same state unless an event fires which causes it be changed.
-# We loop through all Replication Tasks and create a separate alarm for each one.
-# The SNS topic dms_alerts_topic is used to handle state changes into our out
-# of the alarm state.   This is the same topic as used for the standard
-# CDC Latency alarms.
-# resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
-#   for_each            = toset(local.replication_task_names)
-#   alarm_name          = "DMSReplicationStoppedAlarm_${each.key}"
-#   alarm_description   = "Alarm when Stopped Replication Task for ${each.key}"
-#   comparison_operator = "GreaterThanThreshold"
-#   evaluation_periods  = 1
-#   threshold           = 0
-#   treat_missing_data  = "notBreaching"
-#   datapoints_to_alarm = 1
-
-#   metric_query {
-#       id          = "e1"
-#       expression  = "FILL(m1,REPEAT)"
-#       label       = "DMSReplicationStoppedInterpolated"
-#       return_data = "true"
-#     }
-
-#   metric_query {
-#     id = "m1"
-
-#     metric {
-#       metric_name = "DMSReplicationStopped"
-#       namespace   = "CustomDMSMetrics"
-#       period      = 60
-#       stat        = "Maximum"
-
-#       dimensions = {
-#         SourceId    = each.key
-#         EventSource = "replication-task"
-#       }
-#     }
-#   }
-
-#   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
-#   ok_actions    = [aws_sns_topic.dms_alerts_topic.arn]
-# }
-
-
 resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   for_each            = toset(local.replication_task_names)
   alarm_name          = "DMSReplicationStoppedAlarm_${each.key}"
@@ -321,7 +274,6 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
 
   dimensions = {
       SourceId = each.key
-      EventSource = "replication-task"
     }
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
