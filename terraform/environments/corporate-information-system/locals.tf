@@ -53,15 +53,15 @@ yum update -y
 amazon-linux-extras install epel -y
 yum install s3fs-fuse -y
 cd /
-mkdir -pm 774 /s3xfer/S3/laa-ccms-inbound-${tostring(local.application_data.accounts[local.environment])}
-mkdir -pm 774 /s3xfer/S3/laa-ccms-outbound-${tostring(local.application_data.accounts[local.environment])}
-mkdir -pm 774 /s3xfer/S3/laa-cis-inbound-${tostring(local.application_data.accounts[local.environment])}
-mkdir -pm 774 /s3xfer/S3/laa-cis-outbound-${tostring(local.application_data.accounts[local.environment])}
+mkdir -pm 774 /s3xfer/S3/laa-ccms-inbound-${local.environment}
+mkdir -pm 774 /s3xfer/S3/laa-ccms-outbound-${local.environment}
+mkdir -pm 774 /s3xfer/S3/laa-cis-inbound-${local.environment}
+mkdir -pm 774 /s3xfer/S3/laa-cis-outbound-${local.environment}
 mkdir -m 774 cdstemp
-echo 's3fs#laa-ccms-outbound-${tostring(local.application_data.accounts[local.environment])} /s3xfer/S3/laa-ccms-outbound-${tostring(local.application_data.accounts[local.environment])} fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab
-echo 's3fs#laa-ccms-inbound-${tostring(local.application_data.accounts[local.environment])} /s3xfer/S3/laa-ccms-inbound-${tostring(local.application_data.accounts[local.environment])} fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab
-echo 's3fs#laa-cis-outbound-${tostring(local.application_data.accounts[local.environment])} /s3xfer/S3/laa-cis-outbound-${tostring(local.application_data.accounts[local.environment])} fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab
-echo 's3fs#laa-cis-inbound-${tostring(local.application_data.accounts[local.environment])} /s3xfer/S3/laa-cis-inbound-${tostring(local.application_data.accounts[local.environment])} fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab
+echo 's3fs#laa-ccms-outbound-${local.environment} /s3xfer/S3/laa-ccms-outbound-${local.environment} fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab
+echo 's3fs#laa-ccms-inbound-${local.environment} /s3xfer/S3/laa-ccms-inbound-${local.environment} fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab
+echo 's3fs#laa-cis-outbound-${local.environment} /s3xfer/S3/laa-cis-outbound-${local.environment} fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab
+echo 's3fs#laa-cis-inbound-${local.environment} /s3xfer/S3/laa-cis-inbound-${local.environment} fuse _netdev,allow_other,iam_role=auto 0 0' >> /etc/fstab
 echo 's3fs#cds-central-print-temp /cdstemp fuse default_acl=bucket-owner-full-control,allow_other,use_cache=/tmp,endpoint=eu-west-2,uid=502,mp_umask=002,multireq_max=5,iam_role=' >> /etc/fstab
 mount -a
 
