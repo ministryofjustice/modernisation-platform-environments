@@ -1,3 +1,12 @@
+variable "cross_account_access_role" {
+  description = "An object containing the cross account number and role name."
+  type = object({
+    account_number = string
+    role_name      = string
+  })
+  default = null
+}
+
 variable "data_feed" {
   description = "The data feed the bucket relates to"
   type        = string

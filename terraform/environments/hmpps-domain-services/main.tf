@@ -177,6 +177,14 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "s3_buckets", {}),
   )
 
+  schedule_alarms_lambda = merge(
+    {
+      function_name = "schedule-alarms"
+    },
+    lookup(local.baseline_all_environments, "schedule_alarms", {}),
+    lookup(local.baseline_environment_specific, "schedule_alarms", {}),
+  )
+
   secretsmanager_secrets = merge(
     module.baseline_presets.secretsmanager_secrets,
     lookup(local.baseline_all_environments, "secretsmanager_secrets", {}),

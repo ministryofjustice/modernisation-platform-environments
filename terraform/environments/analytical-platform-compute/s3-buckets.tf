@@ -3,7 +3,7 @@ module "mlflow_bucket" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   bucket = "mojap-compute-${local.environment}-mlflow"
 
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "s3_replication_policy" {
       identifiers = [
         "arn:aws:iam::525294151996:role/service-role/s3replicate_role_for_lf-antfmoj-test",
         "arn:aws:iam::525294151996:role/service-role/s3crr_role_for_lf-antfmoj-test_1",
-        "arn:aws:iam::${local.ap_data_prod_account_id}:role/mojap-data-production-cadet-to-apc-production-replication",
+        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-cadet-to-apc-production-replication",
       ]
     }
     resources = ["arn:aws:s3:::mojap-compute-${local.environment}-derived-tables-replication/*"]
@@ -54,7 +54,7 @@ data "aws_iam_policy_document" "s3_replication_policy" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::${local.ap_data_prod_account_id}:role/mojap-data-production-cadet-to-apc-production-replication",
+        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-cadet-to-apc-production-replication",
       ]
     }
     resources = ["arn:aws:s3:::mojap-compute-${local.environment}-derived-tables-replication"]
@@ -66,7 +66,7 @@ module "mojap_derived_tables_replication_bucket" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   providers = {
     aws = aws.analytical-platform-compute-eu-west-1
@@ -127,7 +127,7 @@ module "mojap_compute_logs_bucket_eu_west_2" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   bucket = "mojap-compute-${local.environment}-logs-eu-west-2"
 
@@ -179,7 +179,7 @@ module "mojap_compute_logs_bucket_eu_west_1" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.2.1"
+  version = "4.2.2"
 
   providers = {
     aws = aws.analytical-platform-compute-eu-west-1

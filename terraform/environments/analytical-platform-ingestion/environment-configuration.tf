@@ -28,7 +28,11 @@ locals {
       notify_image_version   = "0.0.19"
 
       /* Target Buckets */
-      target_buckets = ["mojap-land-dev"]
+      target_buckets          = ["mojap-land-dev"]
+      datasync_target_buckets = ["mojap-land-dev"]
+
+      /* Target KMS */
+      mojap_land_kms_key = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/8c53fbac-3106-422a-8f3d-409bb3b0c94d"
 
       /* Transfer Server */
       transfer_server_hostname   = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
@@ -72,7 +76,11 @@ locals {
       notify_image_version   = "0.0.19"
 
       /* Target Buckets */
-      target_buckets = ["mojap-land"]
+      target_buckets          = ["mojap-land", "mojap-ingestion-${local.environment}-ext-2024-target"]
+      datasync_target_buckets = ["mojap-land"]
+
+      /* Target KMS */
+      mojap_land_kms_key = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
 
       /* Transfer Server */
       transfer_server_hostname   = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
@@ -83,6 +91,20 @@ locals {
           cidr_blocks           = ["194.74.29.178/32"]
           egress_bucket         = module.bold_egress_bucket.s3_bucket_id
           egress_bucket_kms_key = module.s3_bold_egress_kms.key_arn
+        }
+        "darren-brooke" = {
+          ssh_key               = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDAxeaj85/JshqYMQ1B97TtHyy81oF3L33s89NWCIiHSM/Hql6aFfxCCivsN4Y1OZic8S5drgxe7MdETaWeEKfaWIMgqESGOw5yhCuNSEvt896cc0hSU8/ZwUZrTzYfiCAwqBQHI13JBAP7VcWBR6v6CYQL8JB7lSEvq7vY2BJJ4N9HchlXBHvxHHOu7Y6+ta7BrODvCc0zLHWANE65U4DmZpXmwHHsBao4cOUIlrBIDIAGtXAJB/L+cByH2OPMsRPhUe2UMfTgRHCJdekics/7DzrR+hhZRnHM9du52TFT89eAKpQGpp0wEkFoYKntXesGFr1R/uhRtqzanzBggXIv db@ubuntu"
+          cidr_blocks           = ["54.37.241.156/30"]
+          egress_bucket         = module.ext_2024_egress_bucket.s3_bucket_id
+          egress_bucket_kms_key = module.s3_ext_2024_egress_kms.key_arn
+
+        }
+        "aaron-willetts" = {
+          ssh_key               = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAtHz+QozotArRIjRcmD4GDdiQLtXPTX+GGAXqpeqpBZ aaron@kali"
+          cidr_blocks           = ["167.71.136.237/32"]
+          egress_bucket         = module.ext_2024_egress_bucket.s3_bucket_id
+          egress_bucket_kms_key = module.s3_ext_2024_egress_kms.key_arn
+
         }
       }
 

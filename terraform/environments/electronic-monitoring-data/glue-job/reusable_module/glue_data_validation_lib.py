@@ -133,12 +133,17 @@ class RDS_JDBC_CONNECTION():
 
     def get_rds_db_table_row_count(self,
                                    in_table_name,
-                                   in_pkeys_col_list) -> DataFrame:
-
-        query_str = f"""
-        SELECT count({', '.join(in_pkeys_col_list)}) as row_count
-        FROM {self.rds_db_schema_name}.[{in_table_name}]
-        """.strip()
+                                   in_pkeys_columns) -> DataFrame:
+        if isinstance(in_pkeys_columns, list):
+            query_str = f"""
+            SELECT count({', '.join(in_pkeys_columns)}) as row_count
+            FROM {self.rds_db_schema_name}.[{in_table_name}]
+            """.strip()
+        else:
+            query_str = f"""
+            SELECT count({in_pkeys_columns}) as row_count
+            FROM {self.rds_db_schema_name}.[{in_table_name}]
+            """.strip()            
 
         return (self.spark.read.format("jdbc")
                 .option("url", self.rds_jdbc_url_v2)
@@ -182,6 +187,58 @@ class RDS_JDBC_CONNECTION():
                     .option("upperBound", jdbc_partition_col_upperbound)
                     .option("numPartitions", numPartitions)
                     .load())
+
+    def get_rds_df_read_query_pkey_parallel(self,
+                                          in_db_query,
+                                          jdbc_partition_column,
+                                          jdbc_partition_col_lowerbound,
+                                          jdbc_partition_col_upperbound,
+                                          jdbc_read_partitions_num
+                                          ) -> DataFrame:
+
+        numPartitions = jdbc_read_partitions_num
+        # Note: numPartitions is normally equal to number of executors defined.
+        # The maximum number of partitions that can be used for parallelism in table reading and writing.
+        # This also determines the maximum number of concurrent JDBC connections.
+
+        # fetchSize = jdbc_rows_fetch_size
+        # The JDBC fetch size, which determines how many rows to fetch per round trip.
+        # This can help performance on JDBC drivers which default to low fetch size (e.g. Oracle with 10 rows).
+        # Too Small: => frequent round trips to database
+        # Too Large: => Consume a lot of memory
+
+        return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({in_db_query}) as t""")
+                    .option("partitionColumn", jdbc_partition_column)
+                    .option("lowerBound", jdbc_partition_col_lowerbound)
+                    .option("upperBound", jdbc_partition_col_upperbound)
+                    .option("numPartitions", numPartitions)
+                    .load())
+
+
+    def get_rds_df_query_min_max_count(self, 
+                                       rds_table_name,
+                                       table_pkey_column) -> DataFrame:
+
+        query_str = f"""
+        SELECT min({table_pkey_column}) as min_value,
+               max({table_pkey_column}) as max_value,
+               count({table_pkey_column}) as count_value
+        FROM {self.rds_db_schema_name}.[{rds_table_name}]
+        """.strip()
+
+        return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({query_str}) as t""")
+                    .load())
+
 
     def get_rds_df_jdbc_read_parallel(self,
                                       rds_tbl_name,
@@ -316,6 +373,16 @@ class RDS_JDBC_CONNECTION():
                 .option("user", self.RDS_DB_INSTANCE_USER)
                 .option("password", self.RDS_DB_INSTANCE_PWD)
                 .option("query", f"""{query_str}""")
+                .load())
+
+    def get_rds_db_query_df(self, rds_db_query) -> DataFrame:
+
+        return (self.spark.read.format("jdbc")
+                .option("url", self.rds_jdbc_url_v2)
+                .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                .option("user", self.RDS_DB_INSTANCE_USER)
+                .option("password", self.RDS_DB_INSTANCE_PWD)
+                .option("query", f"""{rds_db_query}""")
                 .load())
 
     def get_jdbc_partition_column(self,

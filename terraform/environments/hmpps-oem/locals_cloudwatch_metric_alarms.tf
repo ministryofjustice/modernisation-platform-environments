@@ -59,6 +59,13 @@ locals {
           type_instance = "hmppgw1.justice.gov.uk"
         }
       })
+
+      "endpoint-down-hmpps-domain-rdgateway-test" = merge(local.endpoint_down_alarm, {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "rdgateway1.test.hmpps-domain.service.justice.gov.uk"
+        }
+      })
     }
 
     "preproduction" = {
@@ -68,6 +75,13 @@ locals {
         dimensions = {
           type          = "exitcode"
           type_instance = "c.pp-nomis.az.justice.gov.uk"
+        }
+      })
+
+      "endpoint-down-nomis-reporting-pp" = merge(local.endpoint_down_alarm, {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "reporting.pp-nomis.az.justice.gov.uk"
         }
       })
 
@@ -146,8 +160,13 @@ locals {
           type          = "exitcode"
           type_instance = "cafmwebx.pp.planetfm.service.justice.gov.uk"
         }
-        alarm_actions = [] # TODO: remove when IP allow listing fixed
-        ok_actions    = []
+      })
+
+      "endpoint-down-cafmtx-pp" = merge(local.endpoint_down_alarm, {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "cafmtx.pp.planetfm.service.justice.gov.uk"
+        }
       })
 
       "endpoint-down-hpa-preprod" = merge(local.endpoint_down_alarm, {
@@ -155,8 +174,13 @@ locals {
           type          = "exitcode"
           type_instance = "hpa-preprod.service.hmpps.dsd.io"
         }
-        alarm_actions = [] # TODO: remove when IP allow listing fixed
-        ok_actions    = []
+      })
+
+      "endpoint-down-hmpps-domain-rdgateway-preproduction" = merge(local.endpoint_down_alarm, {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "rdgateway1.preproduction.hmpps-domain.service.justice.gov.uk"
+        }
       })
     }
 
@@ -183,8 +207,6 @@ locals {
           type          = "exitcode"
           type_instance = "oasys.az.justice.gov.uk"
         }
-        alarm_actions = [] # TODO: remove when IP allow listing fixed
-        ok_actions    = []
       })
 
       "endpoint-down-oasys-training" = merge(local.endpoint_down_alarm, {
@@ -257,13 +279,18 @@ locals {
         }
       })
 
+      "endpoint-down-cafmtx" = merge(local.endpoint_down_alarm, {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "cafmtx.planetfm.service.justice.gov.uk"
+        }
+      })
+
       "endpoint-down-cafmwebx2" = merge(local.endpoint_down_alarm, {
         dimensions = {
           type          = "exitcode"
           type_instance = "cafmwebx2.az.justice.gov.uk"
         }
-        alarm_actions = [] # TODO: remove when IP allow listing fixed
-        ok_actions    = []
       })
 
       "endpoint-down-cafmtrainweb" = merge(local.endpoint_down_alarm, {
@@ -278,8 +305,6 @@ locals {
           type          = "exitcode"
           type_instance = "www.offloc.service.justice.gov.uk"
         }
-        alarm_actions = [] # TODO: remove when IP allow listing fixed
-        ok_actions    = []
       })
 
       "endpoint-down-hpa" = merge(local.endpoint_down_alarm, {
@@ -287,14 +312,19 @@ locals {
           type          = "exitcode"
           type_instance = "hpa.service.hmpps.dsd.io"
         }
-        alarm_actions = [] # TODO: remove when IP allow listing fixed
-        ok_actions    = []
       })
 
       "endpoint-down-hmpps-az-gw1-rdgateway" = merge(local.endpoint_down_alarm, {
         dimensions = {
           type          = "exitcode"
           type_instance = "hmpps-az-gw1.justice.gov.uk"
+        }
+      })
+
+      "endpoint-down-hmpps-domain-rdgateway" = merge(local.endpoint_down_alarm, {
+        dimensions = {
+          type          = "exitcode"
+          type_instance = "rdgateway1.hmpps-domain.service.justice.gov.uk"
         }
       })
     }

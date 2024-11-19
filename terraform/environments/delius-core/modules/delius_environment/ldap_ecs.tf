@@ -23,7 +23,9 @@ module "ldap_ecs" {
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
-  desired_count = var.ldap_config.desired_count
+  desired_count                      = var.ldap_config.desired_count
+  deployment_minimum_healthy_percent = 0
+  deployment_maximum_percent         = 200
 
   container_port_config = [
     {
@@ -59,7 +61,7 @@ module "ldap_ecs" {
   account_info = var.account_info
 
   ignore_changes_service_task_definition = false
-
+  force_new_deployment                   = false
 
   extra_task_exec_role_policies = {
     efs = data.aws_iam_policy_document.ldap_efs_access_policy

@@ -372,7 +372,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 resource "aws_glue_job" "catalog_dv_table_glue_job" {
   count = local.gluejob_count
-  
+
   name              = "catalog-dv-table-glue-job"
   description       = "Python script uses Boto3-Athena-Client to run sql-statements"
   role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn

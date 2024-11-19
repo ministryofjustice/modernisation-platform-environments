@@ -332,8 +332,8 @@ locals {
     ec2_instance_cwagent_collectd_endpoint_monitoring = {
       "endpoint-down" = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "1"
-        datapoints_to_alarm = "1"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
         metric_name         = "collectd_endpoint_status_value"
         namespace           = "CWAgent"
         period              = "60"
@@ -384,6 +384,22 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "Triggers if the number of unhealthy network loadbalancer hosts in the target table group is at least one for 3 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340278"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+
+    ssm = {
+      failed-ssm-command = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "24"
+        datapoints_to_alarm = "1"
+        metric_name         = "SSMCommandFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if there has been a failed scheduled SSM command. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5291475023"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }

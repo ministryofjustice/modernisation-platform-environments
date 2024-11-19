@@ -38,7 +38,7 @@ module "ecs_service" {
   source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v4.3.0"
   container_definitions = nonsensitive(module.container_definition.json_encoded_list)
   cluster_arn           = var.ecs_cluster_arn
-  name                  = var.name
+  name                  = "${var.env_name}-${var.name}"
 
   task_cpu    = var.container_cpu
   task_memory = var.container_memory
