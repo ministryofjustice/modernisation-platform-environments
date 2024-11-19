@@ -7,13 +7,6 @@ locals {
       }
     }
 
-    web = {
-      secrets = {
-        passwords = { description = "Web Passwords" }
-        config    = { description = "BODS Configuration" }
-      }
-    }
-
     bip = {
       secrets = {
         passwords = { description = "BIP Passwords" }
