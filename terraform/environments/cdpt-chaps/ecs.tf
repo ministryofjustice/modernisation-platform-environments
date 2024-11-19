@@ -475,7 +475,12 @@ resource "aws_iam_role_policy" "app_execution" {
               "logs:CreateLogStream",
               "logs:PutLogEvents",
               "logs:DescribeLogStreams",
-              "secretsmanager:GetSecretValue"
+              "secretsmanager:GetSecretValue",
+              "ec2:CreateNetworkInterface",
+              "ec2:DeleteNetworkInterface",
+              "ec2:AttachNetworkInterface",
+              "ec2:DetachNetworkInterface",
+              "ec2:DescribeNetworkInterfaces"
            ],
            "Resource": "*",
            "Effect": "Allow"
