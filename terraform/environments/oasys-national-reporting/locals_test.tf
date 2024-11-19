@@ -406,7 +406,6 @@ locals {
     secretsmanager_secrets = {
       "/sap/bods/t2"             = local.secretsmanager_secrets.bods
       "/sap/bip/t2"              = local.secretsmanager_secrets.bip
-      "/sap/web/t2"              = local.secretsmanager_secrets.web
       "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
     }

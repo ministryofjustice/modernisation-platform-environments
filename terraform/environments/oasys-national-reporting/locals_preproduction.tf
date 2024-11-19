@@ -291,7 +291,6 @@ locals {
     secretsmanager_secrets = {
       "/sap/bods/pp"             = local.secretsmanager_secrets.bods
       "/sap/bip/pp"              = local.secretsmanager_secrets.bip
-      "/sap/web/pp"              = local.secretsmanager_secrets.web
       "/oracle/database/PPBOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PPBOAUD" = local.secretsmanager_secrets.db
     }
