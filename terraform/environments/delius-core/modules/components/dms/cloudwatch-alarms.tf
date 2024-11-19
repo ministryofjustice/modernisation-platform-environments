@@ -283,20 +283,32 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 1
   threshold           = 0
-  period              = 60
-  statistic           = "Maximum"
   treat_missing_data  = "ignore"
 
-  metric_name = "DMSReplicationStopped"
-  namespace   = "CustomDMSMetrics"
-  dimensions = {
-    SourceId   = each.key
-    EventSouce = "replication-task"
-  }
+  metric_query {
+      id          = "e1"
+      expression  = "FILL(m1,REPEAT)"
+      label       = "DMSReplicationStoppedInterpolated"
+      return_data = "true"
+    }
+
+  metric_query {
+    id = "m1"
+
+    metric {
+      metric_name = "DMSReplicationStopped"
+      namespace   = "CustmDMSMetrics"
+      period      = 60
+      stat        = "Maximum"
+
+      dimensions = {
+        SourceId    = each.key
+        EventSource = "replication-task"
+      }
+    }
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
 }
-
 
 # SNS Topic for DMS replication events
 # This is NOT the same as for DMS Cloudwatch Alarms (dms_alerting)
