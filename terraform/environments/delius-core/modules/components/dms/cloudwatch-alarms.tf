@@ -310,6 +310,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   }
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
+  ok_actions    = [aws_sns_topic.dms_alerts_topic.arn]
 }
 
 # SNS Topic for DMS replication events
