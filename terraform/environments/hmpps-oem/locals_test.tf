@@ -2,6 +2,10 @@ locals {
 
   baseline_presets_test = {
     options = {
+      cloudwatch_dashboard_default_widget_groups = flatten([
+        local.cloudwatch_dashboard_default_widget_groups,
+        "github_workflows", # metrics are only pushed into test account
+      ])
       enable_ec2_delius_dba_secrets_access = true
 
       sns_topics = {
