@@ -284,6 +284,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   evaluation_periods  = 1
   threshold           = 0
   treat_missing_data  = "notBreaching"
+  datapoints_to_alarm = 1
 
   metric_query {
       id          = "e1"
