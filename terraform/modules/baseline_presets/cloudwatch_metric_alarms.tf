@@ -403,6 +403,20 @@ locals {
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
+      ssm-command-metrics-missing = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "SSMCommandFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if there are missing SSM command metrics. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295505553"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
     }
 
     github = {
@@ -423,13 +437,13 @@ locals {
         comparison_operator = "LessThanOrEqualToThreshold"
         evaluation_periods  = "3"
         datapoints_to_alarm = "3"
-        metric_name         = "SSMCommandFailedCount"
+        metric_name         = "GitHubActionRunsFailedCount"
         namespace           = "CustomMetrics"
         period              = "3600"
         statistic           = "SampleCount"
         threshold           = "0"
         treat_missing_data  = "breaching"
-        alarm_description   = "Triggers if there has been no SSM command metrics published. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295702082"
+        alarm_description   = "Triggers if there are missing github action metrics. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295702082"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
