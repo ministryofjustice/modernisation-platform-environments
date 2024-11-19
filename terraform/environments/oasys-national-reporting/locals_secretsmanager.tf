@@ -10,7 +10,7 @@ locals {
     bip = {
       secrets = {
         passwords = { description = "BIP Passwords" }
-        config    = { description = "BODS Configuration" }
+        config    = { description = "BIP Configuration" }
       }
     }
 
