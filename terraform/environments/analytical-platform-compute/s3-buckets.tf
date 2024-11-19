@@ -100,7 +100,10 @@ module "mojap_derived_tables_replication_bucket" {
     target_prefix = "mojap-derived-tables-replication/"
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    { "backup" = "false" }
+  )
 }
 
 data "aws_iam_policy_document" "s3_server_access_logs_eu_west_2_policy" {
@@ -152,7 +155,10 @@ module "mojap_compute_logs_bucket_eu_west_2" {
     }
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    { "backup" = "false" }
+  )
 }
 
 data "aws_iam_policy_document" "s3_server_access_logs_eu_west_1_policy" {
@@ -208,7 +214,10 @@ module "mojap_compute_logs_bucket_eu_west_1" {
     }
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    { "backup" = "false" }
+  )
 }
 
 moved {
