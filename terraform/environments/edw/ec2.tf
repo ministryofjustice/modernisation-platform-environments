@@ -311,7 +311,7 @@ chmod 600 /etc/cron.d/custom_cloudwatch_metrics
 
 # alert_rota.sh - set permissions
 chown oracle:dba /home/oracle/scripts/alert_rota.sh
-chmod 644 /home/oracle/scripts/alert_rota.sh
+chmod 755 /home/oracle/scripts/alert_rota.sh
 
 # Create /etc/cron.d/oracle_rotation with the cron jobs
 cat <<EOC5 > /etc/cron.d/oracle_rotation
