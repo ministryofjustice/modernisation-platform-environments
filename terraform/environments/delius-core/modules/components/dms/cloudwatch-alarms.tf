@@ -306,6 +306,7 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
         EventSource = "replication-task"
       }
     }
+  }
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
 }
