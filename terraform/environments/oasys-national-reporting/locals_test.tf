@@ -252,7 +252,6 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bods/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/web/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
@@ -407,7 +406,6 @@ locals {
     secretsmanager_secrets = {
       "/sap/bods/t2"             = local.secretsmanager_secrets.bods
       "/sap/bip/t2"              = local.secretsmanager_secrets.bip
-      "/sap/web/t2"              = local.secretsmanager_secrets.web
       "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
     }
