@@ -404,5 +404,35 @@ locals {
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
+
+    github = {
+      failed-github-action-run = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "1"
+        metric_name         = "GitHubActionRunsFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if there has been a failed github action. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295898661"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      github-action-metrics-missing = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "SSMCommandFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if there has been no SSM command metrics published. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295702082"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
   }
 }

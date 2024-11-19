@@ -19,6 +19,8 @@ locals {
   # please keep resources in alphabetical order
   baseline_test = {
 
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.github
+
     ec2_autoscaling_groups = {
       test-oem = merge(local.ec2_instances.oem, {
         autoscaling_group = {
