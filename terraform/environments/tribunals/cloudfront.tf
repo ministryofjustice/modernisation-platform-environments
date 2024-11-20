@@ -23,8 +23,26 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   default_cache_behavior {
     target_origin_id = "tribunalsOrigin"
 
-    cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+    forwarded_values {
+      query_string = true
+      headers      = [
+        "Host",
+        "Origin",
+        "X-Forwarded-For",
+        "X-Forwarded-Proto",
+        "X-Requested-With"
+      ]
+
+      cookies {
+        forward = "whitelist"
+        whitelisted_names = [
+          "ASP.NET_SessionId",
+          "__RequestVerificationToken",
+          "VIEWSTATE",
+          "EVENTVALIDATION"
+        ]
+      }
+    }
 
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
