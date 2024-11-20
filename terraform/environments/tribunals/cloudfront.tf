@@ -1,6 +1,6 @@
 resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
-  aliases = ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  aliases = local.is-production ? ["*.decisions.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   origin {
     domain_name = aws_lb.tribunals_lb.dns_name
     origin_id   = "tribunalsOrigin"
