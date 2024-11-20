@@ -219,11 +219,6 @@ variable "source_password" {
   default     = ""
 }
 
-variable "source_rds_is_multi_az" {
-  description = "Create backup database in separate availability zone"
-  default     = "false"
-}
-
 variable "source_storage_encrypted" {
   type        = bool
   description = "Encrypt storage or leave unencrypted"
