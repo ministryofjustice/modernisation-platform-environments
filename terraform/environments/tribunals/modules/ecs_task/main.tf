@@ -147,15 +147,6 @@ resource "aws_ecs_service" "ecs_service" {
     container_port   = var.server_port
   }
 
-  deployment_circuit_breaker {
-    enable   = true
-    rollback = true
-  }
-
-  deployment_minimum_healthy_percent = 0
-  deployment_maximum_percent         = 100
-  force_new_deployment               = true
-
   depends_on = [
     aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
   ]
