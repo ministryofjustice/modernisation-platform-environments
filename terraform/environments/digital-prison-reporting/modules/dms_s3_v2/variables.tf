@@ -264,6 +264,12 @@ variable "source_address" {
   type        = string
 }
 
+variable "source_ssl_mode" {
+  default     = "none"
+  description = "SSL mode to use for the connection. Valid values are none, require, verify-ca, verify-full"
+  type        = string
+}
+
 variable "bucket_name" {
   type    = string
   default = ""
