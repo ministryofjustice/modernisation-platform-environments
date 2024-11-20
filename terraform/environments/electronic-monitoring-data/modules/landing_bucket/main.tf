@@ -60,7 +60,6 @@ module "this-bucket" {
       sid    = "CrossAccountAccess"
       effect = "Allow"
       actions = [
-        "kms:Decrypt",
         "s3:PutObject",
         "s3:PutObjectAcl",
       ]
