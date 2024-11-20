@@ -25,7 +25,6 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
     cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
-    response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id
 
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
@@ -61,10 +60,6 @@ data "aws_cloudfront_cache_policy" "caching_disabled" {
 
 data "aws_cloudfront_origin_request_policy" "all_viewer" {
   name = "Managed-AllViewer"
-}
-
-data "aws_cloudfront_response_headers_policy" "security_headers" {
-  name = "Managed-SecurityHeadersPolicy"
 }
 
 // Create a new certificate for the CloudFront distribution because it needs to be in us-east-1
