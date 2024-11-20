@@ -50,7 +50,7 @@ module "mojap_compute_logs_bucket_eu_west_2" {
 
   bucket = "mojap-compute-${local.environment}-logs-eu-west-2"
 
-  force_destroy = true
+  force_destroy = false
 
   attach_policy = true
   policy        = data.aws_iam_policy_document.s3_server_access_logs_eu_west_2_policy.json
@@ -109,7 +109,7 @@ module "mojap_compute_logs_bucket_eu_west_1" {
 
   bucket = "mojap-compute-${local.environment}-logs-eu-west-1"
 
-  force_destroy = true
+  force_destroy = false
 
   attach_policy = true
   policy        = data.aws_iam_policy_document.s3_server_access_logs_eu_west_1_policy.json
