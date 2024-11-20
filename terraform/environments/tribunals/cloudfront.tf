@@ -67,7 +67,6 @@ resource "aws_cloudfront_origin_request_policy" "custom_policy" {
     header_behavior = "whitelist"
     headers {
       items = [
-        "Authorization",
         "Host",
         "Origin",
         "Referer",
