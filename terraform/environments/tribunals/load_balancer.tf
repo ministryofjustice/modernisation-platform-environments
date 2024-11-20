@@ -105,6 +105,7 @@ resource "aws_lb_listener" "tribunals_lb" {
     }
   }
 }
+
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
