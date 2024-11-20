@@ -658,7 +658,7 @@ data "aws_iam_policy_document" "format_json_fms_data_policy_document" {
       "s3:PutObjectTagging",
     ]
     resources = [
-      "${module.s3-raw-formatted-bucket.bucket.arn}/*",
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/*",
     ]
   }
 }
