@@ -72,8 +72,8 @@ resource "aws_route53_record" "ec2_instances_migrated" {
   type     = "A"
 
   alias {
-    name                   = aws_lb.tribunals_lb.dns_name
-    zone_id                = aws_lb.tribunals_lb.zone_id
+    name                   = aws_cloudfront_distribution.tribunals_distribution.domain_name
+    zone_id                = aws_cloudfront_distribution.tribunals_distribution.hosted_zone_id
     evaluate_target_health = true
   }
 }
