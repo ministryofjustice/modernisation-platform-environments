@@ -73,6 +73,7 @@ resource "aws_cloudfront_origin_request_policy" "custom_policy" {
         "User-Agent",
         "X-Forwarded-For",
         "X-Forwarded-Host",
+        "X-Forwarded-Proto",
         "X-Requested-With"
       ]
     }
