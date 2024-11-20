@@ -9,9 +9,12 @@ locals {
     }
     "test" = {
       "account_number" = 173142358744
-      role_name = "dev-dt-lambda-role"
+      role_name = "dev-datatransfer-lambda-role"
     }
-    "development" = null
+    "development" = {
+      "account_number" = 173142358744
+      role_name = "dev-datatransfer-lambda-role"
+    }
   }
 }
 
