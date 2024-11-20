@@ -24,7 +24,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     target_origin_id = "tribunalsOrigin"
 
     cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
-    origin_request_policy_id = aws_cloudfront_origin_request_policy.custom_policy.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
     response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id
 
     viewer_protocol_policy = "redirect-to-https"
@@ -52,36 +52,6 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     geo_restriction {
       restriction_type = "none"
     }
-  }
-}
-
-resource "aws_cloudfront_origin_request_policy" "custom_policy" {
-  name    = "CustomOriginRequestPolicy"
-  comment = "Policy for handling authentication headers"
-
-  cookies_config {
-    cookie_behavior = "all"
-  }
-
-  headers_config {
-    header_behavior = "whitelist"
-    headers {
-      items = [
-        "Authorization",
-        "Host",
-        "Origin",
-        "Referer",
-        "User-Agent",
-        "X-Forwarded-For",
-        "X-Forwarded-Host",
-        "X-Forwarded-Proto",
-        "X-Requested-With"
-      ]
-    }
-  }
-
-  query_strings_config {
-    query_string_behavior = "all"
   }
 }
 
