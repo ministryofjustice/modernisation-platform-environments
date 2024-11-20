@@ -109,7 +109,7 @@ log_group_name = $APPNAME-CfnInit
 log_stream_name = {instance_id}
 
 [oracle_alert_log_errors]
-file = bdu$APPNAME/bdump/alert_$APPNAME.log
+file = /oracle/software/product/10.2.0/admin/$APPNAME/bdump/alert_$APPNAME.log
 log_group_name = $APPNAME-OracleAlerts
 log_stream_name = {instance_id}
 
