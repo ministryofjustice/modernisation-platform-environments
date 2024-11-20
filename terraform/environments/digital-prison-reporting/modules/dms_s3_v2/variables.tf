@@ -39,16 +39,6 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
-
-variable "availability_zones" {
-  default = [
-    {
-      0 = "eu-west-2a"
-    }
-  ]
-}
-
-
 variable "subnet_ids" {
   description = "An List of VPC subnet IDs to use in the subnet group"
   type        = list(string)
