@@ -57,8 +57,8 @@ module "this-bucket" {
   # Optionally add cross account access to bucket policy.
   bucket_policy_v2 = var.cross_account_access_role != null ? [
     {
-      sid     = "CrossAccountAccess"
-      effect  = "Allow"
+      sid    = "CrossAccountAccess"
+      effect = "Allow"
       actions = [
         "s3:PutObject",
         "s3:PutObjectAcl"
@@ -68,7 +68,7 @@ module "this-bucket" {
         type        = "AWS"
       }
     }
-    ] : []
+  ] : []
 
   tags = merge(
     var.local_tags,

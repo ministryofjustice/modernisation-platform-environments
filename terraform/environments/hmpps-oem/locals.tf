@@ -18,21 +18,23 @@ locals {
   }
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
 
+  cloudwatch_dashboard_default_widget_groups = [
+    "network_lb",
+    "lb",
+    "ec2",
+    "ec2_linux",
+    "ec2_autoscaling_group_linux",
+    "ec2_instance_linux",
+    "ec2_instance_oracle_db_with_backup",
+    "ec2_instance_textfile_monitoring",
+    "ec2_windows",
+    "ssm_command",
+    "github_workflows",
+  ]
+
   baseline_presets_all_environments = {
     options = {
-      cloudwatch_dashboard_default_widget_groups = [
-        "ec2_instance_endpoint_monitoring",
-        "custom",
-        "network_lb",
-        "lb",
-        "ec2",
-        "ec2_linux",
-        "ec2_autoscaling_group_linux",
-        "ec2_instance_linux",
-        "ec2_instance_oracle_db_with_backup",
-        "ec2_instance_textfile_monitoring",
-        "ec2_windows",
-      ]
+      cloudwatch_dashboard_default_widget_groups  = local.cloudwatch_dashboard_default_widget_groups
       cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
@@ -84,7 +86,6 @@ locals {
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.custom,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
@@ -105,6 +106,7 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
         ]
       }
       "nomis-combined-reporting-${local.environment}" = {

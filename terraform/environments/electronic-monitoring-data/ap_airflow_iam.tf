@@ -21,7 +21,7 @@ module "test_ap_airflow" {
 module "load_alcohol_monitoring_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
-  
+
   name               = "alcohol-monitoring"
   environment        = local.environment
   database_name      = "capita-alcohol-monitoring"
