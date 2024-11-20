@@ -23,26 +23,8 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   default_cache_behavior {
     target_origin_id = "tribunalsOrigin"
 
-    forwarded_values {
-      query_string = true
-      headers      = [
-        "Host",
-        "Origin",
-        "X-Forwarded-For",
-        "X-Forwarded-Proto",
-        "X-Requested-With"
-      ]
-
-      cookies {
-        forward = "whitelist"
-        whitelisted_names = [
-          "ASP.NET_SessionId",
-          "__RequestVerificationToken",
-          "VIEWSTATE",
-          "EVENTVALIDATION"
-        ]
-      }
-    }
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
 
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
@@ -70,27 +52,14 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
       restriction_type = "none"
     }
   }
+}
 
-  ordered_cache_behavior {
-    path_pattern     = "*.js"
-    allowed_methods  = ["GET", "HEAD", "OPTIONS"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = "tribunalsOrigin"
+data "aws_cloudfront_cache_policy" "caching_disabled" {
+  name = "Managed-CachingDisabled"
+}
 
-    forwarded_values {
-      query_string = false
-      headers      = ["Origin"]
-      cookies {
-        forward = "none"
-      }
-    }
-
-    min_ttl                = 0
-    default_ttl            = 86400
-    max_ttl                = 31536000
-    compress               = true
-    viewer_protocol_policy = "redirect-to-https"
-  }
+data "aws_cloudfront_origin_request_policy" "all_viewer" {
+  name = "Managed-AllViewer"
 }
 
 // Create a new certificate for the CloudFront distribution because it needs to be in us-east-1
