@@ -5,7 +5,7 @@ locals {
     "production" = null
     "preproduction" = {
       "account_number" = 173142358744
-      "role_name" = "juniper-dt-lambda-role"
+      "role_name" = "juniper-datatransfer-lambda-role"
     }
     "test" = {
       "account_number" = 173142358744
