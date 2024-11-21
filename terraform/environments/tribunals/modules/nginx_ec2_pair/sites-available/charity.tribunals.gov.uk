@@ -26,7 +26,6 @@
 
 server {
         listen 80;
-        listen 443;
 
         server_name charity.tribunals.gov.uk;
 
@@ -34,7 +33,7 @@ server {
                  return 301 https://www.gov.uk/guidance/appeal-against-a-charity-commission-decision-about-your-charity;
         }
         location ~* ^/decisions.htm {
-                 return 301 https://charity.decisions.tribunals.gov.uk;
+                 return 301 http://charity.decisions.tribunals.gov.uk;
         }
 }
 

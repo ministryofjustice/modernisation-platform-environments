@@ -1,6 +1,0 @@
-server {
-    listen 80;
-    listen [::]:80;
-    server_name landregistrationdivision.decisions.tribunals.gov.uk;
-    return 301 https://$server_name$request_uri;
-}

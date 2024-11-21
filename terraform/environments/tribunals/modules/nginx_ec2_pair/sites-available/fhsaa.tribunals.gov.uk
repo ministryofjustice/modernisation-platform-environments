@@ -26,7 +26,6 @@
 
 server {
         listen 80;
-        listen 443;
 
         server_name fhsaa.tribunals.gov.uk;
 
@@ -34,7 +33,7 @@ server {
                  return 301 https://www.gov.uk/guidance/appeal-to-the-primary-health-lists-tribunal;
         }
         location ~* ^/decisions.htm {
-                 return 301 https://phl.decisions.tribunals.gov.uk;
+                 return 301 http://phl.decisions.tribunals.gov.uk;
         }
 }
 

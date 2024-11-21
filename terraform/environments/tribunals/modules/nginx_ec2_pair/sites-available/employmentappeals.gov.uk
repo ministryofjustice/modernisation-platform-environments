@@ -26,7 +26,6 @@
 
 server {
         listen 80;
-        listen 443;
 
         server_name employmentappeals.gov.uk;
 
@@ -34,22 +33,22 @@ server {
                  return 301 https://www.gov.uk/courts-tribunals/employment-appeal-tribunal;
         }
         location ~* ^/Public {
-                 return 301 https://employmentappeals.decisions.tribunals.gov.uk/Public/Search.aspx;
+                 return 301 http://employmentappeals.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/images {
-                 return 301 https://employmentappeals.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 http://employmentappeals.decisions.tribunals.gov.uk/$request_uri;
         }
 	location ~* ^/Judgments/tips.htm {
-                 return 301 https://employmentappeals.decisions.tribunals.gov.uk/Judgments/tips.htm;
+                 return 301 http://employmentappeals.decisions.tribunals.gov.uk/Judgments/tips.htm;
         }
         location ~* ^/login.aspx {
-                 return 301 https://employmentappeals.decisions.tribunals.gov.uk/secure;
+                 return 301 http://employmentappeals.decisions.tribunals.gov.uk/secure;
         }
         location ~* .(css|js|png|ico|gif|jpg|jpeg)$ {
-                 return 301 https://cicap.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 http://cicap.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Secure {
-                return 301 https://employmentappeals.decisions.tribunals.gov.uk/$request_uri;
+                return 301 http://employmentappeals.decisions.tribunals.gov.uk/$request_uri;
         }
 }
 
