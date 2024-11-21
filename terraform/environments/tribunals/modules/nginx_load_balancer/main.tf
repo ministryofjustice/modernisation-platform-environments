@@ -12,7 +12,8 @@ resource "aws_lb_target_group" "nginx_lb_tg" {
   protocol = "HTTP"
   vpc_id   = var.vpc_shared_id
   health_check {
-    matcher = "301"
+    matcher = "301,302"
+    path    = "/"
   }
 }
 
