@@ -1,5 +1,5 @@
 module "dms_task" {
-  source = "./modules/dms"
+  source = "./modules/dms_s3_v2"
 
   for_each = toset(local.is-production ? [
     "g4s_cap_dw",

@@ -1260,9 +1260,59 @@ module "dms_nomis_ingestor" {
   )
 }
 
+module "dms_fake_data_ingestor" {
+  source                       = "./modules/dms_dps"
+  setup_dms_instance           = local.setup_fake_data_dms_instance
+  enable_replication_task      = local.enable_fake_data_replication_task # Disable Replication Task
+  name                         = "${local.project}-dms-fake-data-ingestor-${local.env}"
+  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
+  source_engine_name           = "postgres"
+  source_db_name               = "db59b5cf9e5de6b794"
+  source_app_username          = "cp9Zr5bLim"
+  source_app_password          = "whkthrI65zpcFEe5"
+  source_address               = "cloud-platform-59b5cf9e5de6b794.cdwm328dlye6.eu-west-2.rds.amazonaws.com"
+  source_db_port               = 5432
+  vpc                          = data.aws_vpc.shared.id
+  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
+  project_id                   = local.project
+  env                          = local.environment
+  dms_source_name              = "postgres"
+  dms_target_name              = "kinesis"
+  short_name                   = "fake-data"
+  migration_type               = "full-load-and-cdc"
+  replication_instance_version = "3.4.7" # Rollback
+  replication_instance_class   = "dms.t3.medium"
+  subnet_ids = [
+    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
+  ]
+
+  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
+  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
+
+  kinesis_settings = {
+    "include_null_and_empty"         = "true"
+    "partition_include_schema_table" = "true"
+    "include_partition_value"        = "true"
+    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
+  }
+
+  availability_zones = {
+    0 = "eu-west-2a"
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name            = "${local.project}-dms-fake-data-ingestor-${local.env}"
+      Resource_Type   = "DMS Replication"
+      Postgres_Source = "DPS"
+    }
+  )
+}
+
 # DMS Nomis Data Collector
 module "dms_nomis_to_s3_ingestor" {
-  source                       = "./modules/dms"
+  source                       = "./modules/dms_s3_v2"
   setup_dms_instance           = true
   enable_replication_task      = true
   name                         = "${local.project}-dms-nomis-ingestor-s3-target-${local.env}"
