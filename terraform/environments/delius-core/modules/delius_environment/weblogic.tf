@@ -30,6 +30,11 @@ module "weblogic" {
   tags                       = var.tags
   db_ingress_security_groups = []
 
+  container_cpu                      = var.delius_microservice_configs.weblogic.container_cpu
+  container_memory                   = var.delius_microservice_configs.weblogic.container_memory
+  deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = 100
+
   ecs_service_ingress_security_group_ids = []
   ecs_service_egress_security_group_ids = [
     {
