@@ -62,7 +62,7 @@ module "ecs_service" {
 
   efs_volumes = var.efs_volumes
 
-  security_groups = [aws_security_group.ecs_service.id]
+  security_groups = [aws_security_group.ecs_service.id, var.cluster_security_group_id]
 
   subnets = var.account_config.private_subnet_ids
 
