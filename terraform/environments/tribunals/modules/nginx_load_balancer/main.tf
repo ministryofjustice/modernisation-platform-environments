@@ -2,7 +2,7 @@ resource "aws_lb" "nginx_lb" {
   name               = "tribunals-nginx"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [var.nginx_lb_sg_id]
+  security_groups    = [var.cloudfront_nginx_lb_sg_id]
   subnets            = var.subnets_shared_public_ids
 }
 
@@ -33,6 +33,10 @@ variable "nginx_lb_sg_id" {
   type = string
 }
 
+variable "cloudfront_nginx_lb_sg_id" {
+  type = string
+}
+
 variable "subnets_shared_public_ids" {
 }
 
@@ -54,7 +58,7 @@ resource "aws_lb_target_group_attachment" "nginx_lb_tg_attachment" {
 
 resource "aws_lb_listener" "nginx_lb_listener" {
   load_balancer_arn = aws_lb.nginx_lb.arn
-  port              = "8080"
+  port              = "80"
   protocol          = "HTTP"
 
   default_action {
