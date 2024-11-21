@@ -275,26 +275,6 @@ module "mlflow_s3_kms" {
   tags = local.tags
 }
 
-module "mojap_derived_tables_replication_s3_kms_eu_west_1" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
-
-  providers = {
-    aws = aws.analytical-platform-compute-eu-west-1
-  }
-
-  aliases               = ["s3/mojap-derived-tables-replication-eu-west-1"]
-  description           = "mojap-derived-tables-replication S3 KMS key"
-  enable_default_policy = true
-
-  deletion_window_in_days = 7
-
-  tags = local.tags
-}
-
 module "mojap_compute_logs_s3_kms_eu_west_2" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
