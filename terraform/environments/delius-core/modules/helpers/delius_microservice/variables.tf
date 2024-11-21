@@ -496,12 +496,6 @@ variable "redeploy_on_apply" {
   default     = false
 }
 
-variable "force_new_deployment" {
-  description = "Force a new deployment"
-  type        = bool
-  default     = false
-}
-
 variable "ecs_service_ingress_security_group_ids" {
   description = "Security group ids to allow ingress to the ECS service"
   type = list(object({

@@ -22,6 +22,8 @@ module "weblogic" {
   health_check_path = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
   microservice_lb   = aws_lb.delius_core_frontend
 
+  target_group_protocol_version = "HTTP1"
+
   name                       = "weblogic"
   container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
   platform_vars              = var.platform_vars
@@ -49,8 +51,7 @@ module "weblogic" {
 
   cluster_security_group_id = aws_security_group.cluster.id
 
-  ignore_changes_service_task_definition = false
-  force_new_deployment                   = false
+  ignore_changes_service_task_definition = true
 
   providers = {
     aws.core-vpc              = aws.core-vpc
