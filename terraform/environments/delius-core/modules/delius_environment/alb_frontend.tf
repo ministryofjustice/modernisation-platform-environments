@@ -30,8 +30,6 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
 resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_ecs_cluster" {
   security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
   description                  = "egress from delius core frontend alb to ecs cluster"
-  from_port                    = 0
-  to_port                      = 0
   ip_protocol                  = "-1"
   referenced_security_group_id = aws_security_group.cluster.id
 }
