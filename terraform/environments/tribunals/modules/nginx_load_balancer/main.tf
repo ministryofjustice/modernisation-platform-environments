@@ -8,7 +8,7 @@ resource "aws_lb" "nginx_lb" {
 
 resource "aws_lb_target_group" "nginx_lb_tg" {
   name     = "tribunals-nginx"
-  port     = 8080
+  port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_shared_id
   health_check {
