@@ -10,6 +10,14 @@
         "Payload.$": "$",
         "FunctionName": "${unzip_file_name}"
       },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
       "Next": "CreatePreSignedUrl"
     },
     "CreatePreSignedUrl": {
@@ -20,6 +28,14 @@
         "Payload.$": "$",
         "FunctionName": "${pre_signed_url_lambda_name}"
       },
+      "Retry": [
+        {
+          "ErrorEquals": ["States.TaskFailed", "Lambda.ServiceException", "Lambda.AWSLambdaException", "Lambda.SdkClientException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
       "End": true
     }
   }

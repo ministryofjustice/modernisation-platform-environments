@@ -441,6 +441,46 @@ locals {
       }
     }
 
+    ec2_instance_cwagent_collectd_endpoint_monitoring = {
+      endpoint-status = {
+        type            = "metric"
+        alarm_threshold = 1
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_endpoint_status_value\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "endpoint-status"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "exitcode"
+            }
+          }
+        }
+      }
+      endpoint-cert-days-to-expiry = {
+        type            = "metric"
+        alarm_threshold = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-expires-soon.threshold
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_endpoint_cert_expiry_value\"','Minimum'),MIN,ASC)"
+        properties = {
+          view    = "bar"
+          period  = 3600
+          stacked = false
+          region  = "eu-west-2"
+          title   = "endpoint-cert-days-to-expiry"
+          stat    = "Minimum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "days"
+            }
+          }
+        }
+      }
+    }
+
     lb = {
       load-balancer-requests = {
         type       = "metric"
@@ -737,44 +777,112 @@ locals {
       }
     }
     ssm = {
-      ssm-command-invocation-status = {
-        type = "metric"
+      ssm-command-success-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, DocumentName} MetricName=\"SSMCommandSuccessCount\"','Sum'),SUM,DESC)"
         properties = {
-          view    = "singleValue"
+          view    = "timeSeries"
+          period  = 3600
           stacked = true
           region  = "eu-west-2"
-          title   = "SSM CommandInvocation Failures - Per Account"
-          stat    = "Maximum"
-          period  = 300
-          metrics = [
-            [{ "expression" : "REMOVE_EMPTY(SEARCH('{CustomMetrics, Account} FailedSSMCommandInvocations', 'Sum', 300))", "label" : "Failed Invocations - ", "id" : "q1" }]
-          ]
+          title   = "SSM command-success-count"
+          stat    = "Sum"
           yAxis = {
             left = {
               showUnits = false,
-              label     = "failed invocations"
+              label     = "count"
+            }
+          }
+        }
+      }
+      ssm-command-failed-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, DocumentName} MetricName=\"SSMCommandFailedCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 3600
+          stacked = true
+          region  = "eu-west-2"
+          title   = "SSM command-failed-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
+            }
+          }
+        }
+      }
+      ssm-command-ignore-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, DocumentName} MetricName=\"SSMCommandIgnoreCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 3600
+          stacked = true
+          region  = "eu-west-2"
+          title   = "SSM command-ignore-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
             }
           }
         }
       }
     }
     github = {
-      github-failed-workflow-runs = {
-        type = "metric"
+      github-actions-run-success-count-by-repo = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsSuccessCount\"','Sum'),SUM,DESC)"
         properties = {
-          view    = "singleValue"
+          view    = "timeSeries"
+          period  = 3600
           stacked = true
           region  = "eu-west-2"
-          title   = "GitHub Failed Workflow Runs - Per Repository"
-          stat    = "Maximum"
-          period  = 300
-          metrics = [
-            [{ "expression" : "REMOVE_EMPTY(SEARCH('{CustomMetrics, Repository} FailedGitHubWorkflowRuns', 'Sum', 300))", "label" : "Failed Runs - ", "id" : "q1" }]
-          ]
+          title   = "GitHub actions-run-success-count-by-repo"
+          stat    = "Sum"
           yAxis = {
             left = {
               showUnits = false,
-              label     = "failed runs"
+              label     = "count"
+            }
+          }
+        }
+      }
+      github-actions-run-failed-count-by-repo = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsFailedCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 3600
+          stacked = true
+          region  = "eu-west-2"
+          title   = "GitHub actions-run-failed-count-by-repo"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
+            }
+          }
+        }
+      }
+      github-actions-run-failed-count-by-workflow = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, WorkflowName} MetricName=\"GitHubActionRunsFailedCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 3600
+          stacked = true
+          region  = "eu-west-2"
+          title   = "GitHub actions-run-failed-count-by-workflow"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
             }
           }
         }
@@ -877,6 +985,15 @@ locals {
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_filesystems_check.filesystems-check-metric-not-updated,
       ]
     }
+    ec2_instance_endpoint_monitoring = {
+      header_markdown = "## Endpoint Monitoring via EC2 collectd"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-status,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-days-to-expiry,
+      ]
+    }
 
     lb = {
       header_markdown = "## Application ELB"
@@ -910,13 +1027,24 @@ locals {
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-peak-packets-per-second,
       ]
     }
-    custom = {
-      header_markdown = "## Custom Metrics"
+    ssm_command = {
+      header_markdown = "## SSM Command Metrics"
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ssm.ssm-command-invocation-status,
-        local.cloudwatch_dashboard_widgets.github.github-failed-workflow-runs,
+        local.cloudwatch_dashboard_widgets.ssm.ssm-command-success-count,
+        local.cloudwatch_dashboard_widgets.ssm.ssm-command-failed-count,
+        local.cloudwatch_dashboard_widgets.ssm.ssm-command-ignore-count,
+      ]
+    }
+    github_workflows = {
+      header_markdown = "## GitHub Workflow Metrics"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.github.github-actions-run-success-count-by-repo,
+        local.cloudwatch_dashboard_widgets.github.github-actions-run-failed-count-by-repo,
+        local.cloudwatch_dashboard_widgets.github.github-actions-run-failed-count-by-workflow,
       ]
     }
   }

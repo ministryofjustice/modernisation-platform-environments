@@ -204,3 +204,48 @@ resource "aws_kms_key" "operational_db" {
     }
   )
 }
+
+### CLOUDTRAIL KMS
+resource "aws_kms_key" "cloudtrail" {
+  #checkov:skip=CKV_AWS_33
+  #checkov:skip=CKV_AWS_227
+  #checkov:skip=CKV_AWS_7
+
+  description         = "Encryption key for cloudtrail"
+  enable_key_rotation = true
+  key_usage           = "ENCRYPT_DECRYPT"
+  policy              = data.aws_iam_policy_document.cloudtrail-kms.json
+  is_enabled          = true
+
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-cloudtrail-kms"
+    }
+  )
+}
+
+data "aws_iam_policy_document" "cloudtrail-kms" {
+  statement {
+    #checkov:skip=CKV_AWS_111
+    #checkov:skip=CKV_AWS_109
+    #checkov:skip=CKV_AWS_358
+    #checkov:skip=CKV_AWS_107
+    #checkov:skip=CKV_AWS_1
+    #checkov:skip=CKV_AWS_356
+    #checkov:skip=CKV_AWS_283
+    #checkov:skip=CKV_AWS_49
+    #checkov:skip=CKV_AWS_108
+    #checkov:skip=CKV_AWS_110   
+
+    effect    = "Allow"
+    actions   = ["kms:*"]
+    resources = ["*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+  }
+}

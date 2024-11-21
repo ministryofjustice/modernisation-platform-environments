@@ -2,6 +2,10 @@ locals {
 
   baseline_presets_test = {
     options = {
+      cloudwatch_dashboard_default_widget_groups = flatten([
+        local.cloudwatch_dashboard_default_widget_groups,
+        "github_workflows", # metrics are only pushed into test account
+      ])
       enable_ec2_delius_dba_secrets_access = true
 
       sns_topics = {
@@ -14,6 +18,8 @@ locals {
 
   # please keep resources in alphabetical order
   baseline_test = {
+
+    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.github
 
     ec2_autoscaling_groups = {
       test-oem = merge(local.ec2_instances.oem, {
@@ -32,6 +38,10 @@ locals {
 
     ec2_instances = {
       test-oem-a = merge(local.ec2_instances.oem, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.oem.cloudwatch_metric_alarms,
+          local.cloudwatch_metric_alarms_endpoint_monitoring
+        )
         config = merge(local.ec2_instances.oem.config, {
           availability_zone = "eu-west-2a"
         })

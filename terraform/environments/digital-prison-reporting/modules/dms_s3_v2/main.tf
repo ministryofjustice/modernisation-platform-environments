@@ -131,11 +131,12 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
   password      = var.source_app_password
   port          = var.source_db_port
   server_name   = var.source_address
-  ssl_mode      = "none"
+  ssl_mode      = var.source_ssl_mode
   username      = var.source_app_username
 
   postgres_settings {
     map_boolean_as_boolean = true
+    heartbeat_enable       = true
   }
 
   extra_connection_attributes = var.extra_attributes

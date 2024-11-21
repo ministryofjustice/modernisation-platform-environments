@@ -1,7 +1,11 @@
-data "aws_ecs_task_definition" "task_definition" {
-  task_definition = aws_ecs_task_definition.chaps_task_definition.family
-  depends_on      = [aws_ecs_task_definition.chaps_task_definition]
-}
+#data "aws_ecs_task_definition" "chaps_task_definition" {
+#  task_definition = "chapsFamily"
+#}
+
+#data "aws_ecs_task_definition" "chapsdotnet_task_definition" {
+#  task_definition = "chapsdotnet-family"
+#  depends_on = [aws_ecs_task_definition.chaps_task_definition]
+#}
 
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
@@ -75,8 +79,8 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   task_role_arn            = aws_iam_role.app_task.arn
   container_definitions = jsonencode([
     {
-      name      = "${local.application_name}-container"
-      image     = "${local.ecr_url}:${local.application_data.accounts[local.environment].environment_name}"
+      name      = "chaps-container"
+      image     = "${local.ecr_url}:chaps-${local.application_data.accounts[local.environment].environment_name}"
       cpu       = 1024
       memory    = 2048
       essential = true
@@ -89,9 +93,9 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       logConfiguration = {
         logDriver = "awslogs",
         options = {
-          awslogs-group         = "${local.application_name}-ecs",
+          awslogs-group         = aws_cloudwatch_log_group.chaps_cloudwatch_group.name,
           awslogs-region        = "eu-west-2",
-          awslogs-stream-prefix = local.application_name
+          awslogs-stream-prefix = "chaps"
         }
       }
       environment = [
@@ -126,20 +130,95 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
   ])
 }
 
+resource "aws_ecs_task_definition" "chapsdotnet_task" {
+  count                    = local.application_data.accounts[local.environment].create_chapsdotnet ? 1 : 0
+  family                   = "chapsdotnet-family"
+  requires_compatibilities = ["EC2"]
+  network_mode             = "awsvpc"
+  execution_role_arn       = aws_iam_role.app_execution.arn
+  task_role_arn            = aws_iam_role.app_task.arn
+  container_definitions = jsonencode([
+    {
+      name      = "chapsdotnet-container"
+      image     = "${local.ecr_url}:chapsdotnet-${local.application_data.accounts[local.environment].environment_name}"
+      cpu       = 1024
+      memory    = 2048
+      essential = true
+      portMappings = [
+        {
+          containerPort = 8080
+          protocol      = "tcp"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs",
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.chapsdotnet_cloudwatch_group.name,
+          awslogs-region        = "eu-west-2",
+          awslogs-stream-prefix = "chapsdotnet"
+        }
+      }
+
+      environment = [
+
+        {
+          name  = "Instance"
+          value = "https://login.microsoftonline.com/"
+        },
+        {
+          name  = "TenantId"
+          value = "${local.application_data.accounts[local.environment].TenantId}"
+        },
+        {
+          name  = "CallbackPath"
+          value = "/signin-oidc"
+        },
+        {
+          name  = "RDS_HOSTNAME"
+          value = "${aws_db_instance.database.address}"
+        },
+        {
+          name  = "RDS_USERNAME"
+          value = "${aws_db_instance.database.username}"
+        },
+        {
+          name  = "DB_NAME"
+          value = "${local.application_data.accounts[local.environment].db_name}"
+        },
+        {
+          name  = "CLIENT_ID"
+          value = "${local.application_data.accounts[local.environment].dotnet_client_id}"
+        },
+        {
+          name  = "CurServer"
+          value = "${local.application_data.accounts[local.environment].env_name}"
+        }
+      ],
+      secrets = [
+        {
+          name : "RDS_PASSWORD",
+          valueFrom : aws_secretsmanager_secret_version.db_password.arn
+        }
+      ]
+    }
+  ])
+}
+
+
 resource "aws_key_pair" "ec2-user" {
   key_name   = "${local.application_name}-ec2"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDmRtGHtGEQN/zg8Di50nphpu9IQAujIlDjX+Xp1pi7ojxxpQ2V2ag/EacncsvfIMOb2dDavnV8ysx2iw/RTH9+qPAwdnCPrJ4oKagE5PU6tR4TZhQTjZshomP692U6Hy6LbSknxVnC7mPiaOtPLdF4Dcguv6yrSlO7UNdV83sTSl2bDbkQ+OW5x0CwH1IdOcuo+Mxq5fHPUxW+JKD5reYoqo0cL2++zavX60KyQgRWLOdHPPP9Jqs5lEGrKMXo1ECTWpdK6Gn/vfZBA5d4VZ1hiBe7DRPoEzjE6R5evMRQEnmn3Y8RJhX7qRPbwGsNlWiAFwR951f8B+yiEygSbw3ckr16iGdj6fRYBVTHdE3+AQt6hvNAFDMituUXQqfzDFnR9IXF0TRNNTHPSL5Mt+u+P2D3ElDbJGZwr9HTZTiLr94XCZSdv7FESisBSWSkEXBCKMSkpAXhw4z0zW0nPQicrZ72d5SQ5vmTb82/cES3sQ6WtBI9RuzfEP9qtGtmACq0pUFLM319QZiWyZRbmWqRSub5WwsWba407KnIQM9m6cwfB41CfOt95ziAGGEc3b6dB9CzOs6hb/S14Ufu2CNJWR6zZS1PamXioagpDhlv8BziMGhZge8jF46RlsSz3DgMfs188VF/7qVNaPneBOtbURqUR5QZueoYfrW9OzGZAQ== andrew.pepler@MJ003740"
   tags       = local.tags
 }
 
-resource "aws_ecs_service" "ecs_service" {
+resource "aws_ecs_service" "chaps_service" {
   depends_on = [
     aws_lb_listener.https_listener
   ]
 
-  name                              = var.networking[0].application
+  name                              = "chaps-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chaps_task_definition.family
+  task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
@@ -152,16 +231,15 @@ resource "aws_ecs_service" "ecs_service" {
     weight            = 1
   }
 
-  ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
-    type  = "spread"
-  }
+  # ordered_placement_strategy {
+  #   field = "attribute:ecs.availability-zone"
+  #   type  = "spread"
+  # }
 
-  load_balancer {
-    target_group_arn = aws_lb_target_group.chaps_target_group.arn
-    container_name   = "${local.application_name}-container"
-    container_port   = local.application_data.accounts[local.environment].container_port
-  }
+  # ordered_placement_strategy {
+  #   type  = "spread"
+  #   field = "instanceId"
+  # }
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
@@ -171,10 +249,61 @@ resource "aws_ecs_service" "ecs_service" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}"
+      Name = "chaps-service"
     }
   )
 }
+
+resource "aws_ecs_service" "chapsdotnet_service" {
+  count = local.application_data.accounts[local.environment].create_chapsdotnet ? 1 : 0
+  depends_on = [
+    aws_lb_listener.https_listener
+  ]
+
+  name                              = "chapsdotnet-service"
+  cluster                           = aws_ecs_cluster.ecs_cluster.id
+  task_definition                   = aws_ecs_task_definition.chapsdotnet_task[0].arn
+  desired_count                     = local.application_data.accounts[local.environment].app_count
+  health_check_grace_period_seconds = 60
+  force_new_deployment              = true
+
+  deployment_minimum_healthy_percent = 50
+  deployment_maximum_percent         = 200
+
+  capacity_provider_strategy {
+    capacity_provider = aws_ecs_capacity_provider.chaps.name
+    weight            = 1
+  }
+
+  # ordered_placement_strategy {
+  #   field = "attribute:ecs.availability-zone"
+  #   type  = "spread"
+  # }
+
+  # ordered_placement_strategy {
+  #   type  = "spread"
+  #   field = "instanceId"
+  # }
+
+  load_balancer {
+    target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
+    container_name   = "chapsdotnet-container"
+    container_port   = 8080
+  }
+
+  network_configuration {
+    subnets         = data.aws_subnets.shared-private.ids
+    security_groups = [aws_security_group.chapsdotnet_service.id]
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "chapsdotnet-service"
+    }
+  )
+}
+
 
 resource "aws_ecs_capacity_provider" "chaps" {
   name = "${local.application_name}-ecs-capacity-provider"
@@ -475,6 +604,14 @@ resource "aws_security_group" "ecs_service" {
     security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
 
+  ingress {
+    description = "Allow HTTP traffic from chapsdotnet container"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -482,6 +619,35 @@ resource "aws_security_group" "ecs_service" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
+
+resource "aws_security_group" "chapsdotnet_service" {
+  name_prefix = "chapsdotnet-service-sg-"
+  description = "Allow traffic for chapsdotnet service"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    security_groups = [module.lb_access_logs_enabled.security_group.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "chapsdotnet-service-sg"
+    }
+  )
+}
+
 
 # AWS EventBridge rule
 resource "aws_cloudwatch_event_rule" "ecs_events" {
@@ -526,12 +692,22 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
 }
 
 # Set up CloudWatch group and log stream and retain logs for 30 days
-resource "aws_cloudwatch_log_group" "cloudwatch_group" {
-  name              = "${local.application_name}-ecs"
+resource "aws_cloudwatch_log_group" "chaps_cloudwatch_group" {
+  name              = "chaps-service-ecs"
   retention_in_days = 30
 }
 
-resource "aws_cloudwatch_log_stream" "cloudwatch_stream" {
-  name           = "${local.application_name}-log-stream"
-  log_group_name = aws_cloudwatch_log_group.cloudwatch_group.name
+resource "aws_cloudwatch_log_group" "chapsdotnet_cloudwatch_group" {
+  name              = "chapsdotnet-service-ecs"
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_stream" "chaps_cloudwatch_stream" {
+  name           = "chaps-service-ecs-log-stream"
+  log_group_name = aws_cloudwatch_log_group.chaps_cloudwatch_group.name
+}
+
+resource "aws_cloudwatch_log_stream" "chapsdotnet_cloudwatch_stream" {
+  name           = "chapsdotnet-service-ecs-log-stream"
+  log_group_name = aws_cloudwatch_log_group.chapsdotnet_cloudwatch_group.name
 }

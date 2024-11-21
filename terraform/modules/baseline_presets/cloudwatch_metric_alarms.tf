@@ -329,6 +329,35 @@ locals {
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
+    ec2_instance_cwagent_collectd_endpoint_monitoring = {
+      "endpoint-down" = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "collectd_endpoint_status_value"
+        namespace           = "CWAgent"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if curl returns error for given endpoint from this EC2"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      "endpoint-cert-expires-soon" = {
+        comparison_operator = "LessThanThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        metric_name         = "collectd_endpoint_cert_expiry_value"
+        namespace           = "CWAgent"
+        period              = "86400"
+        statistic           = "Minimum"
+        threshold           = "14"
+        alarm_description   = "Triggers if collectd-endpoint-monitoring detects an endpoint with a certificate due to expire shortly. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340266"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+
     lb = {
       unhealthy-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -355,6 +384,66 @@ locals {
         statistic           = "Average"
         threshold           = "1"
         alarm_description   = "Triggers if the number of unhealthy network loadbalancer hosts in the target table group is at least one for 3 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340278"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+
+    ssm = {
+      failed-ssm-command = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "24"
+        datapoints_to_alarm = "1"
+        metric_name         = "SSMCommandFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if there has been a failed scheduled SSM command. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5291475023"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      ssm-command-metrics-missing = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "SSMCommandFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if there are missing SSM command metrics. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295505553"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+
+    github = {
+      failed-github-action-run = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "1"
+        metric_name         = "GitHubActionRunsFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if there has been a failed github action. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295898661"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      github-action-metrics-missing = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "GitHubActionRunsFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if there are missing github action metrics. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295702082"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }

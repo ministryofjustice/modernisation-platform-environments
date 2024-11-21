@@ -68,3 +68,8 @@ variable "enable_platform_backups" {
   type        = bool
   default     = null
 }
+
+variable "account_info" {
+  description = "Account info to pass to the instance"
+  type        = any
+}

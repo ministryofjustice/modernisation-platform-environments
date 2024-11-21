@@ -153,6 +153,12 @@ locals {
       })
     }
 
+    schedule_alarms = {
+      alarm_patterns = [
+        "public-https-*-https-unhealthy-load-balancer-host",
+      ]
+    }
+
     route53_zones = {
       "preproduction.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [

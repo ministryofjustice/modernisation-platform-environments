@@ -21,13 +21,13 @@ locals {
     encrypted                   = true
     migration_source_account_id = "205048117103"
     migration_lambda_role       = "ldap-data-migration-lambda-role"
-    efs_throughput_mode         = "bursting"
+    efs_throughput_mode         = "elastic"
     efs_provisioned_throughput  = null
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
     tls_port                    = 636
-    desired_count               = 0
+    desired_count               = 1
   }
 
 
@@ -82,14 +82,14 @@ locals {
 
   delius_microservices_configs_stage = {
     weblogic = {
-      image_tag        = "5.7.6"
+      image_tag        = "6.2.0.3"
       container_port   = 8080
       container_memory = 4096
       container_cpu    = 2048
     }
 
     weblogic_eis = {
-      image_tag        = "5.7.6"
+      image_tag        = "6.2.0.3"
       container_port   = 8080
       container_memory = 2048
       container_cpu    = 1024
@@ -108,16 +108,6 @@ locals {
       slapd_log_level  = "conns,config,stats,stats2"
       container_cpu    = 2048
       container_memory = 4096
-    }
-
-    pdf_creation = {
-      image_tag      = "5.7.6"
-      container_port = 80
-    }
-
-    newtech = {
-      image_tag      = "5.7.6"
-      container_port = 80
     }
   }
 

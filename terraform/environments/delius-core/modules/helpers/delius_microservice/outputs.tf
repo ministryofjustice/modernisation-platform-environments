@@ -44,3 +44,7 @@ output "nlb_target_group_arn_map" {
     for k, v in aws_lb_target_group.service : k => v.arn
   }
 }
+
+output "nlb_service_r53_record" {
+  value = aws_route53_record.services_nlb_r53_record.fqdn
+}

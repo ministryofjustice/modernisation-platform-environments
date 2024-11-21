@@ -82,14 +82,14 @@ locals {
   delius_microservices_configs_preprod = {
 
     weblogic = {
-      image_tag        = "5.7.6"
+      image_tag        = "6.2.0.3"
       container_port   = 8080
       container_memory = 4096
       container_cpu    = 2048
     }
 
     weblogic_eis = {
-      image_tag        = "5.7.6"
+      image_tag        = "6.2.0.3"
       container_port   = 8080
       container_memory = 2048
       container_cpu    = 1024
@@ -108,16 +108,6 @@ locals {
       slapd_log_level  = "conns,config,stats,stats2"
       container_cpu    = 2048
       container_memory = 4096
-    }
-
-    pdf_creation = {
-      image_tag      = "5.7.6"
-      container_port = 80
-    }
-
-    newtech = {
-      image_tag      = "5.7.6"
-      container_port = 80
     }
   }
 

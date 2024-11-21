@@ -8,7 +8,7 @@ locals {
   db_name                 = "MODNDA"
 
   frontend_url            = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  frontend_image_tag      = "5.7.6"
+  frontend_image_tag      = "6.2.0.3"
   frontend_container_port = 8080
 
   delius_environments_per_account = {

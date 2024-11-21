@@ -1,6 +1,4 @@
 locals {
-  ap_data_prod_account_id = local.environment_management.account_ids["analytical-platform-data-production"]
-
   environment_configurations = {
     development = {
       /* VPC */
@@ -27,19 +25,19 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
       eks_cluster_version = "1.31"
-      eks_node_version    = "1.25.0-388e1050"
+      eks_node_version    = "1.26.2-360b7a38"
       eks_cluster_addon_versions = {
-        coredns                = "v1.11.3-eksbuild.1"
-        kube_proxy             = "v1.31.0-eksbuild.5"
-        aws_ebs_csi_driver     = "v1.35.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.7-eksbuild.1"
+        coredns                = "v1.11.3-eksbuild.2"
+        kube_proxy             = "v1.31.2-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.36.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.9-eksbuild.1"
         aws_guardduty_agent    = "v1.7.1-eksbuild.2"
         eks_pod_identity_agent = "v1.3.2-eksbuild.2"
-        vpc_cni                = "v1.18.5-eksbuild.1"
+        vpc_cni                = "v1.19.0-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
-      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.ap_data_prod_account_id}:role/airflow-dev-execution-role"
+      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-development"
@@ -78,22 +76,22 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.31"
-      eks_node_version    = "1.25.0-388e1050"
+      eks_node_version    = "1.26.2-360b7a38"
       eks_cluster_addon_versions = {
-        coredns                = "v1.11.3-eksbuild.1"
-        kube_proxy             = "v1.31.0-eksbuild.5"
-        aws_ebs_csi_driver     = "v1.35.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.7-eksbuild.1"
+        coredns                = "v1.11.3-eksbuild.2"
+        kube_proxy             = "v1.31.2-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.36.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.9-eksbuild.1"
         aws_guardduty_agent    = "v1.7.1-eksbuild.2"
         eks_pod_identity_agent = "v1.3.2-eksbuild.2"
-        vpc_cni                = "v1.18.5-eksbuild.1"
+        vpc_cni                = "v1.19.0-eksbuild.1"
       }
 
       /* Observability Platform */
       observability_platform = "development"
 
       /* Data Engineering Airflow */
-      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.ap_data_prod_account_id}:role/airflow-dev-execution-role"
+      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-test"
@@ -128,19 +126,19 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.31"
-      eks_node_version    = "1.25.0-388e1050"
+      eks_node_version    = "1.26.2-360b7a38"
       eks_cluster_addon_versions = {
-        coredns                = "v1.11.3-eksbuild.1"
-        kube_proxy             = "v1.31.0-eksbuild.5"
-        aws_ebs_csi_driver     = "v1.35.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.7-eksbuild.1"
+        coredns                = "v1.11.3-eksbuild.2"
+        kube_proxy             = "v1.31.2-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.36.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.0.9-eksbuild.1"
         aws_guardduty_agent    = "v1.7.1-eksbuild.2"
         eks_pod_identity_agent = "v1.3.2-eksbuild.2"
-        vpc_cni                = "v1.18.5-eksbuild.1"
+        vpc_cni                = "v1.19.0-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
-      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.ap_data_prod_account_id}:role/airflow-prod-execution-role"
+      data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-prod-execution-role"
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"

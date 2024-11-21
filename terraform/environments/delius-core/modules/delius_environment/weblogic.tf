@@ -5,7 +5,7 @@ module "weblogic" {
   alb_security_group_id = aws_security_group.delius_frontend_alb_security_group.id
   certificate_arn       = aws_acm_certificate.external.arn
 
-  desired_count = 0
+  desired_count = 1
 
   container_secrets_env_specific = try(var.delius_microservice_configs.weblogic.container_secrets_env_specific, {})
   container_vars_env_specific    = try(var.delius_microservice_configs.weblogic.container_vars_env_specific, {})
@@ -23,14 +23,34 @@ module "weblogic" {
   microservice_lb   = aws_lb.delius_core_frontend
 
   name                       = "weblogic"
-  container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-ecr-repo:${var.delius_microservice_configs.weblogic.image_tag}"
+  container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic.image_tag}"
   platform_vars              = var.platform_vars
   tags                       = var.tags
   db_ingress_security_groups = []
 
+  ecs_service_ingress_security_group_ids = []
+  ecs_service_egress_security_group_ids = [
+    {
+      ip_protocol = "tcp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "udp"
+      port        = 389
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    },
+    {
+      ip_protocol = "tcp"
+      port        = 1521
+      cidr_ipv4   = var.account_config.shared_vpc_cidr
+    }
+  ]
+
   cluster_security_group_id = aws_security_group.cluster.id
 
-  ignore_changes_service_task_definition = true
+  ignore_changes_service_task_definition = false
+  force_new_deployment                   = false
 
   providers = {
     aws.core-vpc              = aws.core-vpc
@@ -43,14 +63,14 @@ module "weblogic" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
-
-
   container_vars_default = {
-    for name in local.weblogic_ssm.vars : name => module.weblogic_ssm.arn_map[name]
+    for name in local.weblogic_ssm.vars : name => data.aws_ssm_parameter.weblogic_ssm[name].value
   }
 
-  container_secrets_default = {
+  container_secrets_default = merge({
     for name in local.weblogic_ssm.secrets : name => module.weblogic_ssm.arn_map[name]
-  }
-
+    }, {
+    "JDBC_PASSWORD" = module.oracle_db_shared.database_application_passwords_secret_arn
+    }
+  )
 }

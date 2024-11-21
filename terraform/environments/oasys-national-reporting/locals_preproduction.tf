@@ -76,6 +76,7 @@ locals {
     ec2_instances = {
       pp-onr-bods-1 = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2024-10-02T00-00-37.793Z"
           availability_zone = "eu-west-2a"
           user_data_raw = base64encode(templatefile(
             "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
@@ -94,7 +95,6 @@ locals {
           oasys-national-reporting-environment = "pp"
           domain-name                          = "azure.hmpp.root"
         })
-        cloudwatch_metric_alarms = null
       })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
@@ -135,7 +135,6 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bods/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pp/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/web/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
@@ -292,7 +291,6 @@ locals {
     secretsmanager_secrets = {
       "/sap/bods/pp"             = local.secretsmanager_secrets.bods
       "/sap/bip/pp"              = local.secretsmanager_secrets.bip
-      "/sap/web/pp"              = local.secretsmanager_secrets.web
       "/oracle/database/PPBOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PPBOAUD" = local.secretsmanager_secrets.db
     }

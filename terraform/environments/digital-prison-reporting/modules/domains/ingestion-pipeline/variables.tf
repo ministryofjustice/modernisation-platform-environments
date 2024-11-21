@@ -229,6 +229,21 @@ variable "retention_curated_num_workers" {
   }
 }
 
+variable "glue_s3_max_attempts" {
+  description = "The maximum number of attempts when making requests to S3"
+  type        = number
+}
+
+variable "glue_s3_retry_min_wait_millis" {
+  description = "The minimum wait duration in millis before a request to S3 is retried"
+  type        = number
+}
+
+variable "glue_s3_retry_max_wait_millis" {
+  description = "The maximum wait duration in millis before a request to S3 is retried"
+  type        = number
+}
+
 variable "tags" {
   type        = map(string)
   default     = {}

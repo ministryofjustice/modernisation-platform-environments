@@ -66,6 +66,10 @@ locals {
 
     ec2_instances = {
       dev-oem-a = merge(local.ec2_instances.oem, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.oem.cloudwatch_metric_alarms,
+          local.cloudwatch_metric_alarms_endpoint_monitoring
+        )
         config = merge(local.ec2_instances.oem.config, {
           ami_name          = "hmpps_ol_8_5_oracledb_19c_release_2023-12-07T12-10-49.620Z"
           availability_zone = "eu-west-2a"
