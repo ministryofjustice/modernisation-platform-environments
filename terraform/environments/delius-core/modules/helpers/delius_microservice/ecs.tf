@@ -1,5 +1,5 @@
 module "container_definition" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v4.3.0"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=ignore-changes"
   name                     = var.name
   image                    = var.container_image
   memory                   = var.container_memory
@@ -35,7 +35,7 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v4.3.0"
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=ignore-changes"
   container_definitions = nonsensitive(module.container_definition.json_encoded_list)
   cluster_arn           = var.ecs_cluster_arn
   name                  = "${var.env_name}-${var.name}"
