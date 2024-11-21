@@ -97,7 +97,7 @@ resource "aws_route53_record" "afd_instances_migrated" {
   name     = local.afd_records_migrated[count.index]
   type     = "CNAME"
   ttl      = 300
-  records  = [aws_lb.tribunals_lb.dns_name]
+  records  = [aws_cloudfront_distribution.tribunals_distribution.domain_name]
 }
 
 # 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
