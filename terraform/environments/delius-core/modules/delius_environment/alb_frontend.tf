@@ -17,15 +17,6 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
 }
 
-resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_allowlist" {
-  security_group_id = aws_security_group.delius_frontend_alb_security_group.id
-  description       = "access into delius core frontend alb over http (will redirect)"
-  from_port         = "80"
-  to_port           = "80"
-  ip_protocol       = "tcp"
-  cidr_ipv4         = "81.134.202.29/32" # MoJ Digital VPN
-}
-
 resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_https_global_protect_allowlist" {
   for_each          = toset(local.moj_ips)
   security_group_id = aws_security_group.delius_frontend_alb_security_group.id
@@ -36,15 +27,14 @@ resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress
   cidr_ipv4         = each.key # Global Protect VPN
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "delius_core_frontend_alb_ingress_http_global_protect_allowlist" {
-#   for_each          = toset(local.moj_ips)
-#   security_group_id = aws_security_group.delius_frontend_alb_security_group.id
-#   description       = "access into delius core frontend alb over http (will redirect)"
-#   from_port         = "80"
-#   to_port           = "80"
-#   ip_protocol       = "tcp"
-#   cidr_ipv4         = each.key # Global Protect VPN
-# }
+resource "aws_vpc_security_group_egress_rule" "delius_core_frontend_alb_egress_to_ecs_cluster" {
+  security_group_id            = aws_security_group.delius_frontend_alb_security_group.id
+  description                  = "egress from delius core frontend alb to ecs cluster"
+  from_port                    = 0
+  to_port                      = 0
+  ip_protocol                  = "-1"
+  referenced_security_group_id = aws_security_group.cluster.id
+}
 
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "delius_core_frontend" {
@@ -152,4 +142,3 @@ resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
     }
   }
 }
-
