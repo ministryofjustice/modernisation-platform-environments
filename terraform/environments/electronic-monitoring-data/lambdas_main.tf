@@ -326,3 +326,19 @@ module "virus_scan_file" {
     PROCESSED_BUCKET_NAME        = module.s3-data-bucket.bucket.id
   }
 }
+
+#-----------------------------------------------------------------------------------
+# Process json files
+#-----------------------------------------------------------------------------------
+
+module "format_json_fms_data" {
+  source                  = "./modules/lambdas"
+  function_name           = "format_json_fms_data"
+  is_image                = true
+  role_name               = aws_iam_role.format_json_fms_data.name
+  role_arn                = aws_iam_role.format_json_fms_data.arn
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+}

@@ -631,3 +631,45 @@ resource "aws_iam_role_policy_attachment" "virus_scan_file_policy_attachment" {
   role       = aws_iam_role.virus_scan_file.name
   policy_arn = aws_iam_policy.virus_scan_file.arn
 }
+
+#-----------------------------------------------------------------------------------
+# Load FMS JSON data
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "format_json_fms_data" {
+  name               = "format_json_fms_data"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "format_json_fms_data_policy_document" {
+  statement {
+    sid    = "S3PermissionsForGetUnformattedJSONFiles"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "S3PermissionsForPutFormattedJSONFiles"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+    ]
+    resources = [
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "format_json_fms_data" {
+  name        = "format-json-fms-data"
+  description = "Policy for Lambda to virus scan and move files"
+  policy      = data.aws_iam_policy_document.format_json_fms_data_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "format_json_fms_data_policy_attachment" {
+  role       = aws_iam_role.format_json_fms_data.name
+  policy_arn = aws_iam_policy.format_json_fms_data.arn
+}
