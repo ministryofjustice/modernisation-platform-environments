@@ -71,7 +71,7 @@ module "weblogic" {
   container_secrets_default = merge({
     for name in local.weblogic_ssm.secrets : name => module.weblogic_ssm.arn_map[name]
     }, {
-    "JDBC_PASSWORD" = module.oracle_db_shared.database_application_passwords_secret_arn
+    "JDBC_PASSWORD" = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::"
     }
   )
 }
