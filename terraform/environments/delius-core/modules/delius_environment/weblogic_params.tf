@@ -135,13 +135,13 @@ locals {
 module "weblogic_ssm" {
   source           = "../helpers/ssm_params"
   application_name = "weblogic"
-  environment_name = "delius-core-${var.env_name}"
+  environment_name = "${var.account_info.application_name}-${var.env_name}"
   params_plain     = local.weblogic_ssm.vars
   params_secure    = local.weblogic_ssm.secrets
 }
 
 data "aws_ssm_parameter" "weblogic_ssm" {
   for_each = toset(local.weblogic_ssm.vars)
-  name     = "/delius-core-${var.env_name}/weblogic/${each.key}"
+  name     = "/${var.account_info.application_name}-${var.env_name}/weblogic/${each.key}"
 }
 
