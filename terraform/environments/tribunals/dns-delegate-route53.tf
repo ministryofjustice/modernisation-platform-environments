@@ -103,19 +103,19 @@ resource "aws_route53_record" "afd_instances_migrated" {
 # 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
 # This includes the empty name for the root domain
 # The target ALB is in eu-west-1 zone which has a fixed zone id of "Z32O12XQLNTSW2"
-resource "aws_route53_record" "nginx_instances" {
-  count    = local.is-production ? 0 : length(local.nginx_records)
-  provider = aws.core-vpc
-  zone_id  = data.aws_route53_zone.external.zone_id
-  name     = local.nginx_records[count.index]
-  type     = "A"
+# resource "aws_route53_record" "nginx_instances" {
+#   count    = local.is-production ? 0 : length(local.nginx_records)
+#   provider = aws.core-vpc
+#   zone_id  = data.aws_route53_zone.external.zone_id
+#   name     = local.nginx_records[count.index]
+#   type     = "A"
 
-  alias {
-    name                   = module.nginx_load_balancer[0].nginx_lb_dns_name
-    zone_id                = module.nginx_load_balancer[0].nginx_lb_zone_id
-    evaluate_target_health = false
-  }
-}
+#   alias {
+#     name                   = module.nginx_load_balancer[0].nginx_lb_dns_name
+#     zone_id                = module.nginx_load_balancer[0].nginx_lb_zone_id
+#     evaluate_target_health = false
+#   }
+# }
 
 # 'A' records for tribunals www. URLs redirects to existing entries - subtract the "www."
 resource "aws_route53_record" "www_instances" {
