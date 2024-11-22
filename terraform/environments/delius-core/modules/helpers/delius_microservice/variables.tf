@@ -622,3 +622,9 @@ variable "system_controls" {
   type        = list(any)
   default     = []
 }
+
+variable "pin_task_definition_revision" {
+  type        = number
+  description = "The revision of the task definition to use"
+  default     = 0
+}
