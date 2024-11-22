@@ -386,10 +386,7 @@ module "analytical_platform_cadet_runner" {
   role_requires_mfa      = false
   role_name              = "analytical-platform-cadet-runner-assumable"
 
-  custom_role_policy_arns = [
-    module.analytical_platform_lake_formation_share_policy.arn,
-    "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
-  ]
-  number_of_custom_role_policy_arns = 2
+  custom_role_policy_arns = [module.analytical_platform_cadet_runner_compute_policy.arn]
+  # number_of_custom_role_policy_arns = 1
 
 }
