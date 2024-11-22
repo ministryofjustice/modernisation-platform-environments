@@ -282,7 +282,7 @@ module "mojap_compute_athena_s3_kms_eu_west_2" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.1"
 
-  aliases               = ["s3/mlflow"]
+  aliases               = ["s3/mojap-compute-athena-query-results-eu-west-2"]
   description           = "Mojap Athena query bucket S3 KMS key for eu-west-2"
   enable_default_policy = true
 
