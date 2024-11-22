@@ -168,7 +168,7 @@ module "mojap_compute_athena_query_results_bucket_eu_west_2" {
 
   bucket = "mojap-compute-${local.environment}-athena-query-results-eu-west-2"
 
-  force_destroy = false
+  force_destroy = true
 
   attach_policy = true
   policy        = data.aws_iam_policy_document.athena_query_results_policy_eu_west_2.json
