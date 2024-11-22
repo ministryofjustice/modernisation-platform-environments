@@ -42,6 +42,7 @@ variable "options" {
     enable_s3_db_backup_bucket                   = optional(bool, false)           # create db-backup S3 buckets
     enable_s3_shared_bucket                      = optional(bool, false)           # create devtest and preprodprod S3 bucket for sharing between accounts
     enable_s3_software_bucket                    = optional(bool, false)           # create software S3 bucket in test account for image builder/configuration-management
+    enable_ssm_command_monitoring                = optional(bool, false)           # create SNS topic and alarms for SSM command monitoring
     enable_vmimport                              = optional(bool, false)           # create role for vm imports
     route53_resolver_rules                       = optional(map(list(string)), {}) # create route53 resolver rules; list of map keys to filter local.route53_resolver_rules_all
     iam_service_linked_roles                     = optional(list(string))          # create iam service linked roles; list of map keys to filter local.iam_service_linked_roles; default is to create all
