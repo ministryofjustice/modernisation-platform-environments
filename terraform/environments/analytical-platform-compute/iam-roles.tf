@@ -381,7 +381,7 @@ module "analytical_platform_cadet_runner" {
   version = "5.48.0"
 
   allow_self_assume_role = false
-  trusted_role_arns      = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-management-production"]}:role/create-a-derived-table"]
+  trusted_role_arns      = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"]
   create_role            = true
   role_requires_mfa      = false
   role_name              = "analytical-platform-cadet-runner-assumable"
