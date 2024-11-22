@@ -349,3 +349,73 @@ module "data_production_mojap_derived_bucket_lake_formation_policy" {
 
   tags = local.tags
 }
+
+data "aws_iam_policy_document" "analytical_platform_cadet_runner_compute_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  statement {
+    sid    = "AthenaAccess"
+    effect = "Allow"
+    actions = [
+      "athena:List*",
+      "athena:Get*",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:eu-west-2:${data.aws_caller_identity.current.account_id}:datacatalog/*",
+      "arn:aws:athena:eu-west-2:${data.aws_caller_identity.current.account_id}:workgroup/*"
+    ]
+  }
+  statement {
+    sid    = "GlueAccess"
+    effect = "Allow"
+    actions = [
+      "glue:Get*",
+      "glue:DeleteTable",
+      "glue:DeleteTableVersion",
+      "glue:DeleteSchema",
+      "glue:DeletePartition",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:UpdateSchema",
+      "glue:UpdatePartition",
+      "glue:UpdateDatabase",
+      "glue:CreateTable",
+      "glue:CreateSchema",
+      "glue:CreatePartition",
+      "glue:CreatePartitionIndex",
+      "glue:BatchCreatePartition",
+      "glue:CreateDatabase"
+    ]
+    resources = [
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:schema/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetPartition"
+    ]
+    resources = ["arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:*"]
+  }
+}
+
+module "analytical_platform_cadet_runner_compute_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.48.0"
+
+  name_prefix = "analytical-platform-cadet-runner-compute-policy"
+
+  policy = data.aws_iam_policy_document.analytical_platform_cadet_runner_compute_policy.json
+
+  tags = local.tags
+}
