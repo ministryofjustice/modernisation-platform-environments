@@ -19,7 +19,7 @@ module "weblogic" {
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
   env_name        = var.env_name
 
-  pin_task_definition_revision = var.delius_microservice_configs.weblogic.task_definition_revision
+  pin_task_definition_revision = try(var.delius_microservice_configs.weblogic.task_definition_revision, 0)
 
   alb_health_check = {
     path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
