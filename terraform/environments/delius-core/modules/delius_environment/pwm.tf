@@ -72,6 +72,7 @@ module "pwm" {
   container_secrets_default = {
     "CONFIG_PASSWORD" : nonsensitive(aws_ssm_parameter.delius_core_pwm_config_password.arn),
     "LDAP_PASSWORD" : nonsensitive(aws_ssm_parameter.ldap_admin_password.arn),
+    "SECURITY_KEY" : nonsensitive(aws_ssm_parameter.security_key.arn),
     "SES_JSON" : nonsensitive(aws_ssm_parameter.pwm_ses_smtp_user.arn)
   }
 
@@ -85,8 +86,7 @@ module "pwm" {
       email_from_address = "no-reply@${aws_ses_domain_identity.pwm.domain}"
       email_smtp_address = "email-smtp.eu-west-2.amazonaws.com"
     })),
-    "SECURITY_KEY" = "${base64encode(uuid())}",
-    "JAVA_OPTS"    = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
+    "JAVA_OPTS" = "-Xmx${floor(var.delius_microservice_configs.pwm.container_memory * 0.75)}m -Xms${floor(var.delius_microservice_configs.pwm.container_memory * 0.25)}m"
   }
   container_vars_env_specific = try(var.delius_microservice_configs.pwm.container_vars_env_specific, {})
 
@@ -119,8 +119,18 @@ module "pwm" {
   enable_platform_backups = var.enable_platform_backups
 }
 
+resource "aws_ssm_parameter" "security_key" {
+  name  = "/${var.env_name}/pwm/security_key"
+  type  = "SecureString"
+  value = random_id.security_key.hex
+}
 
-
+resource "random_id" "security_key" {
+  keepers = {
+    image_tag = var.delius_microservice_configs.pwm.image_tag
+  }
+  byte_length = 32
+}
 
 #############
 # SES
