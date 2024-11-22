@@ -189,5 +189,8 @@ module "mojap_compute_athena_query_results_bucket_eu_west_2" {
     }
   }
 
-  tags = local.tags
+  tags = merge(
+    local.tags,
+    { "backup" = "false" }
+  )
 }
