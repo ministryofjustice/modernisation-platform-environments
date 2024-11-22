@@ -546,12 +546,15 @@ module "s3-data-bucket" {
 module "s3-fms-general-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed             = "fms"
-  local_bucket_prefix   = local.bucket_prefix
-  local_tags            = local.tags
-  logging_bucket        = module.s3-logging-bucket
-  order_type            = "general"
-  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
+  data_feed  = "fms"
+  order_type = "general"
+
+  core_shared_services_id  = local.environment_management.account_ids["core-shared-services-production"]
+  local_bucket_prefix      = local.bucket_prefix
+  local_tags               = local.tags
+  logging_bucket           = module.s3-logging-bucket
+  production_dev           = local.is-production ? "prod" : "dev"
+  received_files_bucket_id = module.s3-received-files-bucket.bucket.id
 
   providers = {
     aws = aws
@@ -561,11 +564,12 @@ module "s3-fms-general-landing-bucket" {
 module "s3-fms-general-landing-bucket-iam-user" {
   source = "./modules/landing_bucket_iam_user_access/"
 
-  data_feed                 = "fms"
+  data_feed  = "fms"
+  order_type = "general"
+
   landing_bucket_arn        = module.s3-fms-general-landing-bucket.bucket_arn
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
-  order_type                = "general"
   rotation_lambda           = module.rotate_iam_key
   rotation_lambda_role_name = aws_iam_role.rotate_iam_keys.name
 }
@@ -573,12 +577,15 @@ module "s3-fms-general-landing-bucket-iam-user" {
 module "s3-fms-specials-landing-bucket" {
   source = "./modules/landing_bucket/"
 
-  data_feed             = "fms"
-  local_bucket_prefix   = local.bucket_prefix
-  local_tags            = local.tags
-  logging_bucket        = module.s3-logging-bucket
-  order_type            = "specials"
-  s3_trigger_lambda_arn = module.process_landing_bucket_files.lambda_function_arn
+  data_feed  = "fms"
+  order_type = "specials"
+
+  core_shared_services_id  = local.environment_management.account_ids["core-shared-services-production"]
+  local_bucket_prefix      = local.bucket_prefix
+  local_tags               = local.tags
+  logging_bucket           = module.s3-logging-bucket
+  production_dev           = local.is-production ? "prod" : "dev"
+  received_files_bucket_id = module.s3-received-files-bucket.bucket.id
 
   providers = {
     aws = aws
@@ -588,11 +595,12 @@ module "s3-fms-specials-landing-bucket" {
 module "s3-fms-specials-landing-bucket-iam-user" {
   source = "./modules/landing_bucket_iam_user_access/"
 
-  data_feed                 = "fms"
+  data_feed  = "fms"
+  order_type = "specials"
+
   landing_bucket_arn        = module.s3-fms-specials-landing-bucket.bucket_arn
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
-  order_type                = "specials"
   rotation_lambda           = module.rotate_iam_key
   rotation_lambda_role_name = aws_iam_role.rotate_iam_keys.name
 }
@@ -607,11 +615,13 @@ module "s3-mdss-general-landing-bucket" {
   data_feed  = "mdss"
   order_type = "general"
 
+  core_shared_services_id   = local.environment_management.account_ids["core-shared-services-production"]
   cross_account_access_role = local.mdss_supplier_account_mapping[local.environment]
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
   logging_bucket            = module.s3-logging-bucket
-  s3_trigger_lambda_arn     = module.process_landing_bucket_files.lambda_function_arn
+  production_dev            = local.is-production ? "prod" : "dev"
+  received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
 
   providers = {
     aws = aws
@@ -624,11 +634,13 @@ module "s3-mdss-ho-landing-bucket" {
   data_feed  = "mdss"
   order_type = "ho"
 
+  core_shared_services_id   = local.environment_management.account_ids["core-shared-services-production"]
   cross_account_access_role = local.mdss_supplier_account_mapping[local.environment]
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
   logging_bucket            = module.s3-logging-bucket
-  s3_trigger_lambda_arn     = module.process_landing_bucket_files.lambda_function_arn
+  production_dev            = local.is-production ? "prod" : "dev"
+  received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
 
   providers = {
     aws = aws
@@ -641,11 +653,13 @@ module "s3-mdss-specials-landing-bucket" {
   data_feed  = "mdss"
   order_type = "specials"
 
+  core_shared_services_id   = local.environment_management.account_ids["core-shared-services-production"]
   cross_account_access_role = local.mdss_supplier_account_mapping[local.environment]
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
   logging_bucket            = module.s3-logging-bucket
-  s3_trigger_lambda_arn     = module.process_landing_bucket_files.lambda_function_arn
+  production_dev            = local.is-production ? "prod" : "dev"
+  received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
 
   providers = {
     aws = aws

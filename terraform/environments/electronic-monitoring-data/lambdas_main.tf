@@ -255,25 +255,6 @@ module "rotate_iam_key" {
 }
 
 #-----------------------------------------------------------------------------------
-# Process landing bucket files
-#-----------------------------------------------------------------------------------
-
-module "process_landing_bucket_files" {
-  source                  = "./modules/lambdas"
-  function_name           = "process_landing_bucket_files"
-  is_image                = true
-  role_name               = aws_iam_role.process_landing_bucket_files.name
-  role_arn                = aws_iam_role.process_landing_bucket_files.arn
-  memory_size             = 1024
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-  environment_variables = {
-    DESTINATION_BUCKET = module.s3-received-files-bucket.bucket.id
-  }
-}
-
-#-----------------------------------------------------------------------------------
 # Virus scanning - definition upload
 #-----------------------------------------------------------------------------------
 
