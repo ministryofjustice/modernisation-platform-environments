@@ -190,8 +190,8 @@ resource "aws_glue_job" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
     "--rds_df_repartition_num"           = 0
     "--coalesce_int"                     = 0
     "--rename_migrated_prq_tbl_folder"   = ""
-    "--year_partition_bool"              = "false"
-    "--month_partition_bool"             = "false"
+    "--year_partition_bool"              = "true"
+    "--month_partition_bool"             = "true"
     "--extra-py-files"                   = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
     "--rds_to_parquet_output_s3_bucket"  = module.s3-dms-target-store-bucket.bucket.id
     "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.etl_rds_to_s3_parquet_partitionby_yyyy_mm.name}"
@@ -493,6 +493,77 @@ EOF
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_on_rows_hashvalue.py"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
+}
+
+
+
+resource "aws_cloudwatch_log_group" "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm" {
+  name              = "etl-rds-tbl-hash-rows-to-s3-prq-partitionby-yyyy-mm"
+  retention_in_days = 14
+}
+
+resource "aws_s3_object" "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm" {
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.py"
+  source = "glue-job/etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.py"
+  etag   = filemd5("glue-job/etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.py")
+}
+
+resource "aws_glue_job" "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm" {
+  count = local.gluejob_count
+
+  name              = "etl-rds-tbl-hash-rows-to-s3-prq-partitionby-yyyy-mm"
+  description       = "Table migration & validation Glue-Job (PySpark)."
+  role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.2X"
+  number_of_workers = 4
+  default_arguments = {
+    "--script_bucket_name"                  = module.s3-glue-job-script-bucket.bucket.id
+    "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022.endpoint)[0]
+    "--rds_db_pwd"                          = aws_db_instance.database_2022.password
+    "--rds_sqlserver_db"                    = ""
+    "--rds_sqlserver_db_schema"             = "dbo"
+    "--rds_sqlserver_db_table"              = ""
+    "--rds_db_tbl_pkey_column"              = ""
+    "--date_partition_column_name"          = ""
+    "--parallel_jdbc_conn_num"              = 1
+    "--rds_yyyy_mm_df_repartition_num"      = 0
+    "--year_partition_bool"                 = "true"
+    "--month_partition_bool"                 = "true"
+    "--rds_db_table_hashed_rows_parent_dir" = "rds_tables_rows_hashed"
+    "--rds_query_where_clause"              = ""
+    "--coalesce_int"                        = 0
+    "--extra-py-files"                      = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
+    "--hashed_output_s3_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
+    "--glue_catalog_db_name"                = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--continuous-log-logGroup"             = "/aws-glue/jobs/${aws_cloudwatch_log_group.etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.name}"
+    "--enable-continuous-cloudwatch-log"    = "true"
+    "--enable-continuous-log-filter"        = "true"
+    "--enable-metrics"                      = "true"
+    "--enable-auto-scaling"                 = "true"
+    "--conf"                                = <<EOF
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.sources.partitionOverwriteMode=dynamic 
+--conf spark.sql.parquet.aggregatePushdown=true 
+--conf spark.sql.files.maxPartitionBytes=256m 
+EOF
+
+  }
+
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  command {
+    python_version  = "3"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.py"
   }
 
   tags = merge(
