@@ -107,6 +107,7 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 module "process_landing_bucket_files" {
   source                  = "../lambdas"
   function_name           = "process_landing_bucket_files_${var.data_feed}_${var.order_type}"
+  image_name              = "process_landing_bucket_files"
   is_image                = true
   role_name               = aws_iam_role.process_landing_bucket_files.name
   role_arn                = aws_iam_role.process_landing_bucket_files.arn
