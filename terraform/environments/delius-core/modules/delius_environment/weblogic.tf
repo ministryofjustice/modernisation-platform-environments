@@ -30,6 +30,11 @@ module "weblogic" {
   tags                       = var.tags
   db_ingress_security_groups = []
 
+  container_cpu                      = var.delius_microservice_configs.weblogic.container_cpu
+  container_memory                   = var.delius_microservice_configs.weblogic.container_memory
+  deployment_maximum_percent         = 200
+  deployment_minimum_healthy_percent = 100
+
   ecs_service_ingress_security_group_ids = []
   ecs_service_egress_security_group_ids = [
     {
@@ -51,7 +56,7 @@ module "weblogic" {
 
   cluster_security_group_id = aws_security_group.cluster.id
 
-  ignore_changes_service_task_definition = true
+  ignore_changes_service_task_definition = false
 
   providers = {
     aws.core-vpc              = aws.core-vpc
@@ -71,7 +76,7 @@ module "weblogic" {
   container_secrets_default = merge({
     for name in local.weblogic_ssm.secrets : name => module.weblogic_ssm.arn_map[name]
     }, {
-    "JDBC_PASSWORD" = module.oracle_db_shared.database_application_passwords_secret_arn
+    "JDBC_PASSWORD" = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::"
     }
   )
 }

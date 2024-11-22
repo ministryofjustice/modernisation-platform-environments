@@ -61,7 +61,7 @@ module "this-bucket" {
       effect = "Allow"
       actions = [
         "s3:PutObject",
-        "s3:PutObjectAcl"
+        "s3:PutObjectAcl",
       ]
       principals = {
         identifiers = ["arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"]

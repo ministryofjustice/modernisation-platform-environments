@@ -199,11 +199,11 @@ module "load_unstructured_atrium_database" {
 }
 
 
-module "load_fms_database" {
+module "load_fms" {
   count  = local.is-test ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
-  name               = "serco-fms-database"
+  name               = "fms"
   environment        = local.environment
   database_name      = "serco-fms"
   path_to_data       = "/serco/fms"
