@@ -24,6 +24,25 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     }
   }
 
+  origin {
+    domain_name = module.nginx_load_balancer[0].nginx_lb_dns_name
+    origin_id   = "nginxOrigin"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+      origin_keepalive_timeout = 60
+      origin_read_timeout     = 60
+    }
+
+    custom_header {
+      name  = "X-Custom-Header"
+      value = "tribunals-origin"
+    }
+  }
+
   default_cache_behavior {
     target_origin_id = "tribunalsOrigin"
 
@@ -38,6 +57,24 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     min_ttl                = 0
     max_ttl                = 31536000
     smooth_streaming       = false
+  }
+
+  ordered_cache_behavior {
+    path_pattern     = "/*"
+    target_origin_id = "nginxOrigin"
+    
+    cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods         = ["GET", "HEAD"]
+
+    # Only apply this behavior when the host header matches specific patterns
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.router.arn
+    }
   }
 
   enabled         = true
@@ -56,6 +93,39 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
       restriction_type = "none"
     }
   }
+}
+
+# CloudFront function to route based on hostname
+resource "aws_cloudfront_function" "router" {
+  name    = "router"
+  runtime = "cloudfront-js-1.0"
+  code    = <<-EOT
+    function handler(event) {
+      var request = event.request;
+      var headers = request.headers;
+      var host = headers.host.value;
+      
+      // List of domains that should go to nginxOrigin
+      var nginxDomains = [
+        'charity.hmcts-development.modernisation-platform.service.justice.gov.uk'
+      ];
+      
+      // Check if the host matches any nginx domains
+      var useNginx = nginxDomains.some(function(domain) {
+        return host.endsWith(domain);
+      });
+      
+      // If not a nginx domain, skip this cache behavior
+      if (!useNginx) {
+        return {
+          statusCode: 403,
+          statusDescription: 'Forbidden'
+        };
+      }
+      
+      return request;
+    }
+  EOT
 }
 
 data "aws_cloudfront_cache_policy" "caching_disabled" {
