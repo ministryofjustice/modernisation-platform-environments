@@ -65,6 +65,8 @@ locals {
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      "10.40.40.0/24", # pp oasys
+      "10.40.37.0/24", # pp prison nomis
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
       module.ip_addresses.moj_cidr.aws_data_engineering_stage,
     ])
@@ -111,6 +113,8 @@ locals {
     oracle_db = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      "10.40.6.0/24", # prod oasys
+      "10.40.3.0/24", # prod prison nomis
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_studio_hosting_cidrs.prod,
