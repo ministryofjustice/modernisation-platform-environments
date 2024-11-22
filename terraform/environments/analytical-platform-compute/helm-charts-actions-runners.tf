@@ -68,7 +68,6 @@ resource "helm_release" "actions_runner_ct_tact_list" {
         github_organisation        = "moj-analytical-services"
         github_repository          = "ct-tact-list"
         github_runner_labels       = "analytical-platform"
-        eks_role_arn               = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/data-iam-creator"
       }
     )
   ]
