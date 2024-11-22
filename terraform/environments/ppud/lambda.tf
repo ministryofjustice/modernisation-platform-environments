@@ -236,11 +236,11 @@ resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_dev" {
   count         = local.is-development == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
+  statement_id  = "AllowCloudWatchAccess"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_dev[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
+  principal     = "cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {

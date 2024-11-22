@@ -1172,15 +1172,34 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [{
+      "Sid" : "CloudwatchMetricPolicy",
       "Effect" : "Allow",
       "Action" : [
-        "cloudwatch:GetMetricData"
+        "cloudwatch:GetMetricData",
+        "cloudwatch:ListMetrics"
       ],
       "Resource" : [
         "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
       ]
       },
       {
+          "Sid" : "SQSPolicy",
+          "Effect" : "Allow",
+          "Action" : [
+            "sqs:ChangeMessageVisibility",
+            "sqs:DeleteMessage",
+            "sqs:GetQueueAttributes",
+            "sqs:GetQueueUrl",
+            "sqs:ListQueueTags",
+            "sqs:ReceiveMessage",
+            "sqs:SendMessage"
+          ],
+          "Resource" : [
+            "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:Lambda-Queue-Production"
+          ]
+      },
+      {
+        "Sid" : "SESPolicy",
         "Effect" : "Allow",
         "Action" : [
           "ses:SendEmail"
