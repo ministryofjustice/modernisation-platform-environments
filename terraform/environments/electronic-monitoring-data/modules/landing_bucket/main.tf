@@ -54,6 +54,8 @@ module "this-bucket" {
     }
   ]
 
+  # custom_kms_key = module.kms_key.key_arn
+
   # Optionally add cross account access to bucket policy.
   bucket_policy_v2 = var.cross_account_access_role != null ? [
     {
@@ -69,6 +71,44 @@ module "this-bucket" {
       }
     }
   ] : []
+
+  tags = merge(
+    var.local_tags,
+    { order_type = var.order_type },
+    { data_feed = var.data_feed }
+  )
+}
+
+#-----------------------------------------------------------------------------------
+# KMS 
+#-----------------------------------------------------------------------------------
+
+module "kms_key" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["s3/landing_bucket_${var.data_feed}_${var.order_type}"]
+  description           = "${var.data_feed} ${var.order_type} landing bucket KMS key"
+  enable_default_policy = true
+
+  # # Policy
+  # key_owners         = ["arn:aws:iam::012345678901:role/owner"]
+  # key_administrators = ["arn:aws:iam::012345678901:role/admin"]
+  # key_users          = ["arn:aws:iam::012345678901:role/user"]
+  # key_service_users  = ["arn:aws:iam::012345678901:role/ec2-role"]
+
+  # Grants
+  grants = {
+    process_files_lambda = {
+      grantee_principal = module.process_landing_bucket_files.lambda_function_arn
+      operations        = ["Decrypt"]
+      }
+    }
+
+  deletion_window_in_days = 7
 
   tags = merge(
     var.local_tags,
