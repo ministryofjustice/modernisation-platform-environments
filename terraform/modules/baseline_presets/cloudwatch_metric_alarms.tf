@@ -28,7 +28,7 @@ locals {
         datapoints_to_alarm = "1"
         metric_name         = "DaysToExpiry"
         namespace           = "AWS/CertificateManager"
-        period              = "86400"
+        period              = "7200"
         statistic           = "Minimum"
         threshold           = "14"
         alarm_description   = "Triggers if an ACM certificate has not automatically renewed and is expiring soon. Automatic renewal should happen 60 days prior to expiration. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340266"
@@ -339,7 +339,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if curl returns error for given endpoint from this EC2"
+        alarm_description   = "Triggers if curl returns error for given endpoint from this EC2. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295505478"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
@@ -352,7 +352,7 @@ locals {
         period              = "86400"
         statistic           = "Minimum"
         threshold           = "14"
-        alarm_description   = "Triggers if collectd-endpoint-monitoring detects an endpoint with a certificate due to expire shortly. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340266"
+        alarm_description   = "Triggers if collectd-endpoint-monitoring detects an endpoint with a certificate due to expire shortly. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5303664662"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
