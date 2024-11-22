@@ -61,7 +61,7 @@ module "pwm" {
   target_group_protocol_version = "HTTP1"
 
   alb_health_check = {
-    path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    path                 = "/"
     healthy_threshold    = 5
     interval             = 30
     protocol             = "HTTP"
