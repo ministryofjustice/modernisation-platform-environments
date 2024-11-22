@@ -230,14 +230,11 @@ locals {
           self        = true
         }
         http8080 = {
-          description = "Allow http8080 ingress"
-          from_port   = 0
-          to_port     = 8080
-          protocol    = "tcp"
-          cidr_blocks = flatten([
-            local.security_group_cidrs.https_internal,
-            local.security_group_cidrs.https_external,
-          ])
+          description     = "Allow http8080 ingress"
+          from_port       = 0
+          to_port         = 8080
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.https_internal
           security_groups = ["private_lb", "public_lb"]
         }
       }
