@@ -52,6 +52,7 @@ output "cloudwatch_metric_alarms_by_sns_topic" {
       for namespace_key, namespace_value in local.cloudwatch_metric_alarms : namespace_key => {
         for alarm_key, alarm_value in namespace_value : alarm_key => merge(alarm_value, {
           alarm_actions = [sns_key]
+          ok_actions    = [sns_key]
         })
       }
     }
