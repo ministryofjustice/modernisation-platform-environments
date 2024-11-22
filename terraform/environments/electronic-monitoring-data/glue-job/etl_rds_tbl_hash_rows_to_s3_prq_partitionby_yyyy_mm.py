@@ -266,10 +266,13 @@ if __name__ == "__main__":
     # ---------------------------------------
 
     all_columns_except_pkey = list()
-    conversion_col_list = list(
-                            TBL_COLS_CONVERT_FMT_DICT[
-                                f"{rds_sqlserver_db_table}"].keys()
-                            )
+    conversion_col_list = list()
+    if TBL_COLS_CONVERT_FMT_DICT.get(
+        f"{rds_sqlserver_db_table}", None) is not None:
+        conversion_col_list = list(
+                                TBL_COLS_CONVERT_FMT_DICT[
+                                    f"{rds_sqlserver_db_table}"].keys()
+                                )
     for e in rds_db_table_empty_df.schema.fields:
         if e.name == rds_db_tbl_pkey_column:
             continue
