@@ -2,7 +2,7 @@ resource "aws_lb" "nginx_lb" {
   name               = "tribunals-nginx"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [var.cloudfront_nginx_lb_sg_id]
+  security_groups    = [var.nginx_lb_sg_id]
   subnets            = var.subnets_shared_public_ids
 }
 
@@ -30,10 +30,6 @@ variable "nginx_instance_ids" {
 }
 
 variable "nginx_lb_sg_id" {
-  type = string
-}
-
-variable "cloudfront_nginx_lb_sg_id" {
   type = string
 }
 
