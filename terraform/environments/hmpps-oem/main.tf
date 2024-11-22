@@ -74,6 +74,7 @@ module "baseline" {
   )
 
   cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms_baseline,
     lookup(local.baseline_all_environments, "cloudwatch_metric_alarms", {}),
     lookup(local.baseline_environment_specific, "cloudwatch_metric_alarms", {}),
   )
