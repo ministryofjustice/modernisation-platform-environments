@@ -323,7 +323,8 @@ if __name__ == "__main__":
     SELECT {rds_db_tbl_pkey_column}, 
     LOWER(SUBSTRING(CONVERT(VARCHAR(66), 
     HASHBYTES('SHA2_256', CONCAT_WS('', {', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash,
-    {date_partition_column_name}
+    YEAR({date_partition_column_name}) AS year,
+    MONTH({date_partition_column_name}) AS month
     FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
     """.strip()
 
