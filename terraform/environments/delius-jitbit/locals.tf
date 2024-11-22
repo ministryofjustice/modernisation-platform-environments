@@ -41,7 +41,7 @@ locals {
     module.ip_addresses.moj_cidr.ark_dc_external_internet,
     module.ip_addresses.moj_cidr.vodafone_dia_networks,
     module.ip_addresses.moj_cidr.palo_alto_primsa_access_corporate,
-    module.ip_addresses.moj_cidr.digital_prisons,
+    module.ip_addresses.moj_cidr.mojo_azure_landing_zone_egress,
     [
       # Route53 Healthcheck Access Cidrs
       # London Region not support yet, so metrics are not yet publised, can be enabled at later stage for Route53 endpoint monitor
