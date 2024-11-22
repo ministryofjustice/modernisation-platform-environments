@@ -103,7 +103,7 @@ module "kms_key" {
   # Grants
   grants = {
     process_files_lambda = {
-      grantee_principal = module.process_landing_bucket_files.lambda_function_arn
+      grantee_principal = aws_iam_role.process_landing_bucket_files.arn
       operations        = ["Decrypt"]
       }
     }
