@@ -217,12 +217,6 @@ variable "platform_vars" {
   })
 }
 
-variable "health_check_grace_period_seconds" {
-  description = "The amount of time, in seconds, that Amazon ECS waits before unhealthy instances are shut down."
-  type        = number
-  default     = 60
-}
-
 variable "ecs_cluster_arn" {
   description = "The ARN of the ECS cluster"
   type        = string
@@ -374,18 +368,6 @@ variable "alb_security_group_id" {
   description = "The security group ID of the ALB"
   type        = string
   default     = null
-}
-
-variable "health_check_path" {
-  description = "The health check path for the alb target group"
-  type        = string
-  default     = "/"
-}
-
-variable "health_check_interval" {
-  description = "The health check interval for the alb target group"
-  type        = string
-  default     = "300"
 }
 
 variable "alb_stickiness_enabled" {
@@ -581,7 +563,7 @@ variable "extra_task_exec_role_policies" {
   default     = {}
 }
 
-variable "health_check" {
+variable "container_health_check" {
   description = "The health check configuration for the container"
   type = object({
     command     = list(string)
@@ -591,6 +573,30 @@ variable "health_check" {
     startPeriod = number
   })
   default = null
+}
+
+variable "alb_health_check" {
+  description = "The health check configuration for the ALB"
+  type = object({
+    path                 = string
+    interval             = number
+    timeout              = number
+    healthy_threshold    = number
+    unhealthy_threshold  = number
+    matcher              = string
+    protocol             = string
+    grace_period_seconds = number
+  })
+  default = {
+    path                 = "/"
+    interval             = 30
+    timeout              = 5
+    healthy_threshold    = 5
+    unhealthy_threshold  = 5
+    matcher              = "200-499"
+    protocol             = "HTTP"
+    grace_period_seconds = 120
+  }
 }
 
 variable "nlb_ingress_security_group_ids" {

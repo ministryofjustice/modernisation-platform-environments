@@ -19,8 +19,20 @@ module "weblogic" {
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
   env_name        = var.env_name
 
-  health_check_path = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
-  microservice_lb   = aws_lb.delius_core_frontend
+  pin_task_definition_revision = "9"
+
+  alb_health_check = {
+    path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    healthy_threshold    = 5
+    interval             = 30
+    protocol             = "HTTP"
+    unhealthy_threshold  = 5
+    matcher              = "200-499"
+    timeout              = 5
+    grace_period_seconds = 300
+  }
+
+  microservice_lb = aws_lb.delius_core_frontend
 
   target_group_protocol_version = "HTTP1"
 

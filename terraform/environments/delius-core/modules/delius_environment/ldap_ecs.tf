@@ -51,7 +51,7 @@ module "ldap_ecs" {
   container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-openldap-ecr-repo:${var.delius_microservice_configs.ldap.image_tag}"
   account_config  = var.account_config
 
-  health_check = {
+  container_health_check = {
     command     = ["CMD-SHELL", "ldapsearch -x -H ldap://localhost:389 -b '' -s base '(objectclass=*)' namingContexts"]
     interval    = 30
     retries     = 3
