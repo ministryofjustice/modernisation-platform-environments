@@ -504,7 +504,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
   handler                        = "send_cpu_graph_dev.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev]
   reserved_concurrent_executions = 5
  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
   dead_letter_config {
