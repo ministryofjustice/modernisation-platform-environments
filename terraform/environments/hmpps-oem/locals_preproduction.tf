@@ -6,7 +6,16 @@ locals {
 
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty = "hmpps-oem-preproduction"
+          azure-fixngo-pagerduty              = "az-noms-production-1-alerts"
+          corporate-staff-rostering-pagerduty = "corporate-staff-rostering-preproduction"
+          dso-pipelines-pagerduty             = "dso-pipelines"
+          hmpps-domain-services-pagerduty     = "hmpps-domain-services-preproduction"
+          nomis-combined-reporting-pagerduty  = "nomis-combined-reporting-preproduction"
+          nomis-pagerduty                     = "nomis-preproduction"
+          oasys-national-reporting-pagerduty  = "oasys-national-reporting-preproduction"
+          oasys-pagerduty                     = "oasys-preproduction"
+          pagerduty                           = "hmpps-oem-preproduction"
+          planetfm-pagerduty                  = "planetfm-preproduction"
         }
       }
     }
