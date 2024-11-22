@@ -234,7 +234,10 @@ locals {
           from_port       = 0
           to_port         = 8080
           protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.https_internal
+          cidr_blocks = flatten([ # both internal and external seem to be required
+            local.security_group_cidrs.https_internal,
+            local.security_group_cidrs.https_external,
+          ])
           security_groups = ["private_lb", "public_lb"]
         }
       }
