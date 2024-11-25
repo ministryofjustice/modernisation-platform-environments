@@ -9,7 +9,7 @@ You can run this locally, or with [GitHub Codespaces](https://docs.github.com/en
 
 ## GitHub Codespaces
 
-To launch a GitHub Codespace, use the button below:
+To launch a GitHub Codespace, use the button below
 
 [![Open in Codespace](https://github.com/codespaces/badge.svg)](https://codespaces.new/ministryofjustice/modernisation-platform-environments)
 
@@ -27,6 +27,8 @@ To launch a GitHub Codespace, use the button below:
   - Dev Containers Extention
 
 ### Steps
+
+[![Open in Dev Container](https://raw.githubusercontent.com/ministryofjustice/.devcontainer/refs/heads/main/contrib/badge.svg)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/ministryofjustice/modernisation-platform-environments)
 
 1. Ensure prerequisites are met
 
