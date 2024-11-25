@@ -14,7 +14,6 @@ module "appeals" {
   app_name                     = "appeals"
   app_url                      = "administrativeappeals"
   module_name                  = "appeals"
-  sql_migration_path           = "../scripts/administrative_appeals"
   app_db_name                  = "ossc"
   app_db_login_name            = "ossc-app"
   app_source_db_name           = "Ossc"
@@ -54,7 +53,6 @@ module "ahmlr" {
   app_name                     = "hmlands"
   app_url                      = "landregistrationdivision"
   module_name                  = "ahmlr"
-  sql_migration_path           = "../scripts/ahmlr"
   app_db_name                  = "hmlands"
   app_db_login_name            = "hmlands-app"
   app_source_db_name           = "hmlands"
@@ -94,7 +92,6 @@ module "care_standards" {
   app_name                     = "care-standards"
   module_name                  = "care_standards"
   app_url                      = "carestandards"
-  sql_migration_path           = "../scripts/care_standards"
   app_db_name                  = "carestandards"
   app_db_login_name            = "carestandards-app"
   app_source_db_name           = "carestandards"
@@ -134,7 +131,6 @@ module "cicap" {
   app_name                     = "cicap"
   app_url                      = "cicap"
   module_name                  = "cicap"
-  sql_migration_path           = "../scripts/cicap"
   app_db_name                  = "cicap"
   app_db_login_name            = "cicap-app"
   app_source_db_name           = "cicap"
@@ -174,7 +170,6 @@ module "employment_appeals" {
   app_name           = "employment-appeals"
   app_url            = "employmentappeals"
   module_name        = "employment_appeals"
-  sql_migration_path = "../scripts/employment_appeals"
   app_db_name        = "eat"
   app_db_login_name  = "eat-app"
   app_source_db_name = "eat"
@@ -215,7 +210,6 @@ module "finance_and_tax" {
   app_name           = "finance-and-tax"
   app_url            = "financeandtax"
   module_name        = "finance_and_tax"
-  sql_migration_path = "../scripts/finance_and_tax"
   app_db_name        = "ftt"
   app_db_login_name  = "ftt-app"
   app_source_db_name = "ftt"
@@ -256,7 +250,6 @@ module "immigration_services" {
   app_name           = "immigration-services"
   app_url            = "immigrationservices"
   module_name        = "immigration_services"
-  sql_migration_path = "../scripts/immigration_services"
   app_db_name        = "imset"
   app_db_login_name  = "imset-app"
   app_source_db_name = "imset"
@@ -297,7 +290,6 @@ module "information_tribunal" {
   app_name           = "information-tribunal"
   app_url            = "informationrights"
   module_name        = "information_tribunal"
-  sql_migration_path = "../scripts/information_tribunal"
   app_db_name        = "it"
   app_db_login_name  = "it-app"
   app_source_db_name = "it"
@@ -338,7 +330,6 @@ module "lands_tribunal" {
   app_name           = "lands-chamber"
   app_url            = "landschamber"
   module_name        = "lands_tribunal"
-  sql_migration_path = "../scripts/lands_chamber"
   app_db_name        = "lands"
   app_db_login_name  = "lands-app"
   app_source_db_name = "lands"
@@ -379,7 +370,6 @@ module "transport" {
   app_name           = "transport"
   app_url            = "transportappeals"
   module_name        = "transport"
-  sql_migration_path = "../scripts/transport"
   app_db_name        = "transport"
   app_db_login_name  = "transport-app"
   app_source_db_name = "Transport"
@@ -409,6 +399,46 @@ module "transport" {
   aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   target_group_attachment_port = var.services["transport"].port
+  target_group_arns            = local.target_group_arns
+  target_group_arns_sftp       = local.target_group_arns_sftp
+  new_db_password              = random_password.app_new_password.result
+}
+
+module "asylum_support" {
+  is_ftp_app         = false
+  source             = "./modules/tribunal"
+  app_name           = "asylum-support"
+  app_url            = "asylumsupport"
+  module_name        = "asylum_support"
+  app_db_name        = "asadj"
+  app_db_login_name  = "asadj-app"
+  app_source_db_name = "asadj"
+  app_rds_url        = aws_db_instance.rdsdb.address
+  app_rds_user       = local.rds_user
+  app_rds_port       = local.rds_port
+  app_rds_password   = local.rds_password
+
+  app_source_db_url            = local.source_db_url
+  app_source_db_user           = local.source_db_user
+  app_source_db_password       = local.source_db_password
+  environment                  = local.environment
+  application_data             = local.application_data.accounts[local.environment]
+  tags                         = local.tags
+  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
+  task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
+  appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
+  appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
+  ecs_scaling_cpu_threshold    = local.application_data.accounts[local.environment].ecs_scaling_cpu_threshold
+  ecs_scaling_mem_threshold    = local.application_data.accounts[local.environment].ecs_scaling_mem_threshold
+  app_count                    = local.application_data.accounts[local.environment].app_count
+  server_port                  = local.application_data.accounts[local.environment].server_port_1
+  cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
+  cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
+  vpc_shared_id                = data.aws_vpc.shared.id
+  subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
+  aws_acm_certificate_external = aws_acm_certificate.external
+  documents_location           = "Judgments"
+  target_group_attachment_port = var.services["asylumsupport"].port
   target_group_arns            = local.target_group_arns
   target_group_arns_sftp       = local.target_group_arns_sftp
   new_db_password              = random_password.app_new_password.result

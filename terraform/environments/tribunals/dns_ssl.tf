@@ -104,6 +104,11 @@ variable "services" {
       module_key  = "transportappeals"
       port        = 49109
     },
+    "asylumsupport" = {
+      name_prefix = "asylumsupport"
+      module_key  = "asylumsupport"
+      port        = 49120
+    },
     "charity_tribunal_decisions" = {
       name_prefix = "charity"
       module_key  = "charity"
@@ -165,7 +170,6 @@ variable "web_app_services" {
       port                = 49100
       app_db_name         = "ossc"
       sql_setup_path      = "/db_setup_scripts/administrative_appeals"
-      sql_post_setup_path = "/db_post_setup_scripts/administrative_appeals"
     },
     "ahmlr" = {
       name_prefix         = "landregistrationdivision"
@@ -173,7 +177,6 @@ variable "web_app_services" {
       port                = 49101
       app_db_name         = "hmlands"
       sql_setup_path      = "/db_setup_scripts/ahmlr"
-      sql_post_setup_path = "/db_post_setup_scripts/ahmlr"
     }
     "care_standards" = {
       name_prefix         = "carestandards"
@@ -181,7 +184,6 @@ variable "web_app_services" {
       port                = 49102
       app_db_name         = "carestandards"
       sql_setup_path      = "/db_setup_scripts/care_standards"
-      sql_post_setup_path = "/db_post_setup_scripts/care_standards"
     },
     "cicap" = {
       name_prefix         = "cicap"
@@ -189,7 +191,6 @@ variable "web_app_services" {
       port                = 49103
       app_db_name         = "cicap"
       sql_setup_path      = "/db_setup_scripts/cicap"
-      sql_post_setup_path = "/db_post_setup_scripts/cicap"
     },
     "employment_appeals" = {
       name_prefix         = "employmentappeals"
@@ -197,7 +198,6 @@ variable "web_app_services" {
       port                = 49104
       app_db_name         = "eat"
       sql_setup_path      = "/db_setup_scripts/employment_appeals"
-      sql_post_setup_path = "/db_post_setup_scripts/employment_appeals"
     },
     "finance_and_tax" = {
       name_prefix         = "financeandtax"
@@ -205,7 +205,6 @@ variable "web_app_services" {
       port                = 49105
       app_db_name         = "ftt"
       sql_setup_path      = "/db_setup_scripts/finance_and_tax"
-      sql_post_setup_path = "/db_post_setup_scripts/finance_and_tax"
     },
     "immigration_services" = {
       name_prefix         = "immigrationservices"
@@ -213,7 +212,6 @@ variable "web_app_services" {
       port                = 49106
       app_db_name         = "imset"
       sql_setup_path      = "/db_setup_scripts/immigration_services"
-      sql_post_setup_path = "/db_post_setup_scripts/immigration_services"
     },
     "information_tribunal" = {
       name_prefix         = "informationrights"
@@ -221,7 +219,6 @@ variable "web_app_services" {
       port                = 49107
       app_db_name         = "it"
       sql_setup_path      = "/db_setup_scripts/information_tribunal"
-      sql_post_setup_path = "/db_post_setup_scripts/information_tribunal"
     },
     "lands_tribunal" = {
       name_prefix         = "landschamber"
@@ -229,7 +226,6 @@ variable "web_app_services" {
       port                = 49108
       app_db_name         = "lands"
       sql_setup_path      = "/db_setup_scripts/lands_chamber"
-      sql_post_setup_path = "/db_post_setup_scripts/lands_chamber"
     },
     "transport" = {
       name_prefix         = "transportappeals"
@@ -237,7 +233,13 @@ variable "web_app_services" {
       port                = 49109
       app_db_name         = "transport"
       sql_setup_path      = "/db_setup_scripts/transport"
-      sql_post_setup_path = "/db_post_setup_scripts/transport"
+    },
+    "asylum_support" = {
+      name_prefix         = "asylumsupport"
+      module_key          = "asylum_support"
+      port                = 49120
+      app_db_name         = "asadj"
+      sql_setup_path      = "/db_setup_scripts/asylum_support"
     }
   }
 }
