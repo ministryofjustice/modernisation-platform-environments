@@ -193,7 +193,7 @@ class RDS_JDBC_CONNECTION():
                                           jdbc_partition_column,
                                           jdbc_partition_col_lowerbound,
                                           jdbc_partition_col_upperbound,
-                                          jdbc_read_partitions_num
+                                          jdbc_read_partitions_num=1
                                           ) -> DataFrame:
 
         numPartitions = jdbc_read_partitions_num
@@ -217,6 +217,16 @@ class RDS_JDBC_CONNECTION():
                     .option("lowerBound", jdbc_partition_col_lowerbound)
                     .option("upperBound", jdbc_partition_col_upperbound)
                     .option("numPartitions", numPartitions)
+                    .load())
+
+    def get_rds_df_read_query(self, in_db_query) -> DataFrame:
+
+        return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({in_db_query}) as t""")
                     .load())
 
 

@@ -539,7 +539,7 @@ resource "aws_glue_job" "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm" {
     "--parallel_jdbc_conn_num"              = 1
     "--rds_yyyy_mm_df_repartition_num"      = 0
     "--year_partition_bool"                 = "true"
-    "--month_partition_bool"                 = "true"
+    "--month_partition_bool"                = "true"
     "--rds_db_table_hashed_rows_parent_dir" = "rds_tables_rows_hashed"
     "--rds_query_where_clause"              = ""
     "--coalesce_int"                        = 0
@@ -564,6 +564,68 @@ EOF
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.py"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
+}
+
+resource "aws_cloudwatch_log_group" "etl_rds_sqlserver_query_to_s3_parquet" {
+  name              = "etl-rds-sqlserver-query-to-s3-parquet"
+  retention_in_days = 14
+}
+
+resource "aws_s3_object" "etl_rds_sqlserver_query_to_s3_parquet" {
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "etl_rds_sqlserver_query_to_s3_parquet.py"
+  source = "glue-job/etl_rds_sqlserver_query_to_s3_parquet.py"
+  etag   = filemd5("glue-job/etl_rds_sqlserver_query_to_s3_parquet.py")
+}
+
+resource "aws_glue_job" "etl_rds_sqlserver_query_to_s3_parquet" {
+  count = local.gluejob_count
+
+  name              = "etl-rds-sqlserver-query-to-s3-parquet"
+  description       = "DMS Data Validation Glue-Job (PySpark)."
+  role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 4
+  default_arguments = {
+    "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
+    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
+    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+    "--jdbc_read_partitions_num"         = ""
+    "--rds_sqlserver_db"                 = ""
+    "--rds_sqlserver_db_schema"          = "dbo"
+    "--rds_sqlserver_db_table"           = ""
+    "--rds_db_tbl_pkey_column"           = ""
+    "--rds_df_repartition_num"           = 0
+    "--rename_migrated_prq_tbl_folder"   = ""
+    "--extra-py-files"                   = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
+    "--rds_to_parquet_output_s3_bucket"  = module.s3-dms-target-store-bucket.bucket.id
+    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.etl_rds_sqlserver_query_to_s3_parquet.name}"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = "true"
+    "--enable-auto-scaling"              = "true"
+    "--conf"                             = <<EOF
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.parquet.aggregatePushdown=true 
+--conf spark.sql.files.maxPartitionBytes=128m 
+EOF
+
+  }
+
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  command {
+    python_version  = "3"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_sqlserver_query_to_s3_parquet.py"
   }
 
   tags = merge(
