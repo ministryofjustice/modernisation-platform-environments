@@ -94,21 +94,9 @@ module "kms_key" {
   description           = "${var.data_feed} ${var.order_type} landing bucket KMS key"
   enable_default_policy = true
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid       = "AllowProcessLandingBucketLambdaFunctionDecrypt",
-        Effect    = "Allow",
-        Principal = { AWS = aws_iam_role.process_landing_bucket_files.arn },
-        Action    = [
-          "kms:Decrypt",
-          "kms:DescribeKey",
-        ],
-        Resource  = "*"
-      }
-    ]
-  })
+  # key_owners         = ["arn:aws:iam::012345678901:role/owner"]
+  # key_administrators = ["arn:aws:iam::012345678901:role/admin"]
+  key_users          = [aws_iam_role.process_landing_bucket_files.arn]
 
   # Grant external account role, specific operations when using encryption context.
   grants = var.cross_account_access_role != null ? {
