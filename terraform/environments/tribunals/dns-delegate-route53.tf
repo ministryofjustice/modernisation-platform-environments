@@ -72,8 +72,8 @@ resource "aws_route53_record" "ec2_instances_migrated" {
   type     = "A"
 
   alias {
-    name                   = aws_cloudfront_distribution.tribunals_distribution.domain_name
-    zone_id                = aws_cloudfront_distribution.tribunals_distribution.hosted_zone_id
+    name                   = aws_lb.tribunals_lb.dns_name
+    zone_id                = aws_lb.tribunals_lb.zone_id
     evaluate_target_health = true
   }
 }
@@ -97,7 +97,7 @@ resource "aws_route53_record" "afd_instances_migrated" {
   name     = local.afd_records_migrated[count.index]
   type     = "CNAME"
   ttl      = 300
-  records  = [aws_cloudfront_distribution.tribunals_distribution.domain_name]
+  records  = [aws_lb.tribunals_lb.dns_name]
 }
 
 # 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account

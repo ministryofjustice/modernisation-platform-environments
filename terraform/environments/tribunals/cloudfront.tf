@@ -1,62 +1,62 @@
-resource "aws_cloudfront_distribution" "tribunals_distribution" {
+# resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
-  aliases = local.is-production ? [
-    "*.decisions.tribunals.gov.uk",
-    "*.venues.tribunals.gov.uk",
-    "*.reports.tribunals.gov.uk"
-  ] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
-  origin {
-    domain_name = aws_lb.tribunals_lb.dns_name
-    origin_id   = "tribunalsOrigin"
+#   aliases = local.is-production ? [
+#     "*.decisions.tribunals.gov.uk",
+#     "*.venues.tribunals.gov.uk",
+#     "*.reports.tribunals.gov.uk"
+#   ] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+#   origin {
+#     domain_name = aws_lb.tribunals_lb.dns_name
+#     origin_id   = "tribunalsOrigin"
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
-      origin_keepalive_timeout = 60
-      origin_read_timeout     = 60
-    }
+#     custom_origin_config {
+#       http_port              = 80
+#       https_port             = 443
+#       origin_protocol_policy = "https-only"
+#       origin_ssl_protocols   = ["TLSv1.2"]
+#       origin_keepalive_timeout = 60
+#       origin_read_timeout     = 60
+#     }
 
-    custom_header {
-      name  = "X-Custom-Header"
-      value = "tribunals-origin"
-    }
-  }
+#     custom_header {
+#       name  = "X-Custom-Header"
+#       value = "tribunals-origin"
+#     }
+#   }
 
-  default_cache_behavior {
-    target_origin_id = "tribunalsOrigin"
+#   default_cache_behavior {
+#     target_origin_id = "tribunalsOrigin"
 
-    cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+#     cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
+#     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
 
-    viewer_protocol_policy = "redirect-to-https"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods         = ["GET", "HEAD"]
-    compress               = true
-    default_ttl            = 0
-    min_ttl                = 0
-    max_ttl                = 31536000
-    smooth_streaming       = false
-  }
+#     viewer_protocol_policy = "redirect-to-https"
+#     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+#     cached_methods         = ["GET", "HEAD"]
+#     compress               = true
+#     default_ttl            = 0
+#     min_ttl                = 0
+#     max_ttl                = 31536000
+#     smooth_streaming       = false
+#   }
 
-  enabled         = true
-  is_ipv6_enabled = true
-  comment         = "CloudFront distribution for tribunals load balancer"
-  price_class     = "PriceClass_All"
+#   enabled         = true
+#   is_ipv6_enabled = true
+#   comment         = "CloudFront distribution for tribunals load balancer"
+#   price_class     = "PriceClass_All"
 
-  viewer_certificate {
-    acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
-    ssl_support_method       = "sni-only"
-    minimum_protocol_version = "TLSv1.2_2021"
-  }
+#   viewer_certificate {
+#     acm_certificate_arn      = aws_acm_certificate.cloudfront.arn
+#     ssl_support_method       = "sni-only"
+#     minimum_protocol_version = "TLSv1.2_2021"
+#   }
 
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-}
+#   restrictions {
+#     geo_restriction {
+#       restriction_type = "none"
+#     }
+#   }
+# }
 
 data "aws_cloudfront_cache_policy" "caching_disabled" {
   name = "Managed-CachingDisabled"
