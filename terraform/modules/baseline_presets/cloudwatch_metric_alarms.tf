@@ -466,7 +466,7 @@ locals {
     var.options.enable_ssm_command_monitoring ? {
       "failed-ssm-command-${var.environment.account_name}" = local.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].ssm.failed-ssm-command
     } : {},
-    var.options.enable_ssm_command_monitoring ? {
+    var.options.enable_ssm_missing_metric_monitoring ? {
       "ssm-command-metrics-missing-${var.environment.account_name}" = local.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].ssm.ssm-command-metrics-missing
     } : {},
   )

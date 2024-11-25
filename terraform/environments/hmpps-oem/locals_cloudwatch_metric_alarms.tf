@@ -25,7 +25,6 @@ locals {
       csr-r4-pp          = ["r4.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
       csr-r5-pp          = ["r5.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
       csr-r6-pp          = ["r6.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      hpa-preprod        = ["hpa-preprod.service.hmpps.dsd.io", true, "azure-fixngo-pagerduty"]
       nomis-lsast        = ["c.lsast-nomis.az.justice.gov.uk", true, "nomis-pagerduty"]
       nomis-pp           = ["c.pp-nomis.az.justice.gov.uk", true, "nomis-pagerduty"]
       nomis-reporting-pp = ["reporting.pp-nomis.az.justice.gov.uk", true, "nomis-combined-reporting-pagerduty"]
