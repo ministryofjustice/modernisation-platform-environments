@@ -182,7 +182,7 @@ resource "aws_route53_record" "cloudfront_cert_validation" {
   records         = [each.value.value]
   ttl             = 300
   type            = each.value.type
-  zone_id         = data.aws_route53_zone.production_zone.zone_id
+  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
