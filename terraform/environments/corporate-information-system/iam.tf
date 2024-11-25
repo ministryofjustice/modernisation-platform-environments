@@ -74,44 +74,44 @@ resource "aws_iam_role_policy" "cis_s3fs_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        "Action": [
-            "s3:*"
+        "Action" : [
+          "s3:*"
         ],
-        "Resource": [
-            "arn:aws:s3:::laa-software-bucket2",
-            "arn:aws:s3:::laa-software-bucket2/*",
-            "arn:aws:s3:::laa-software-library",
-            "arn:aws:s3:::laa-software-library/*",
-            "arn:aws:s3:::laa-cis-inbound-production",
-            "arn:aws:s3:::laa-cis-inbound-production/*",
-            "arn:aws:s3:::laa-cis-outbound-production",
-            "arn:aws:s3:::laa-cis-outbound-production/*",
-            "arn:aws:s3:::laa-ccms-outbound-production",
-            "arn:aws:s3:::laa-ccms-outbound-production/*",
-            "arn:aws:s3:::laa-ccms-inbound-production",
-            "arn:aws:s3:::laa-ccms-inbound-production/*"
+        "Resource" : [
+          "arn:aws:s3:::laa-software-bucket2",
+          "arn:aws:s3:::laa-software-bucket2/*",
+          "arn:aws:s3:::laa-software-library",
+          "arn:aws:s3:::laa-software-library/*",
+          "arn:aws:s3:::laa-cis-inbound-production",
+          "arn:aws:s3:::laa-cis-inbound-production/*",
+          "arn:aws:s3:::laa-cis-outbound-production",
+          "arn:aws:s3:::laa-cis-outbound-production/*",
+          "arn:aws:s3:::laa-ccms-outbound-production",
+          "arn:aws:s3:::laa-ccms-outbound-production/*",
+          "arn:aws:s3:::laa-ccms-inbound-production",
+          "arn:aws:s3:::laa-ccms-inbound-production/*"
         ],
-        "Effect": "Allow"
-        },
-        {
-          "Action": [
-              "logs:CreateLogGroup",
-              "logs:CreateLogStream",
-              "logs:DescribeLogStreams",
-              "logs:PutRetentionPolicy",
-              "logs:PutLogEvents",
-              "ec2:DescribeInstances"
-          ],
-          "Resource": "*",
-          "Effect": "Allow"
-        },
-        {
-          "Action": [
-              "ec2:CreateTags"
-          ],
-          "Resource": "*",
-          "Effect": "Allow"
-        }
+        "Effect" : "Allow"
+      },
+      {
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:DescribeLogStreams",
+          "logs:PutRetentionPolicy",
+          "logs:PutLogEvents",
+          "ec2:DescribeInstances"
+        ],
+        "Resource" : "*",
+        "Effect" : "Allow"
+      },
+      {
+        "Action" : [
+          "ec2:CreateTags"
+        ],
+        "Resource" : "*",
+        "Effect" : "Allow"
+      }
     ]
   })
 }
