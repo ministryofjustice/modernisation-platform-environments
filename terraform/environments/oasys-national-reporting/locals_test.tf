@@ -166,6 +166,12 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
+        ebs_volumes = {                               # Direct assignment instead of merging
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "xvdk" = { type = "gp3", size = 128 }      # D:/ Temp
+          "xvdl" = { type = "gp3", size = 128 }      # E:/ App
+          "xvdm" = { type = "gp3", size = 700 }      # F:/ Storage
+        }
         cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "t2"
