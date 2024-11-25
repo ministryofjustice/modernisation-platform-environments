@@ -137,6 +137,7 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
   postgres_settings {
     map_boolean_as_boolean = true
     heartbeat_enable       = true
+    heartbeat_frequency    = var.postgres_source_heartbeat_frequency
   }
 
   extra_connection_attributes = var.extra_attributes

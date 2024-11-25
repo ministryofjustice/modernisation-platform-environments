@@ -205,6 +205,12 @@ variable "dms_target_endpoint" {
   default = ""
 }
 
+variable "postgres_source_heartbeat_frequency" {
+  description = "(Optional) Sets the WAL heartbeat frequency (in minutes). Default value is 5."
+  type    = number
+  default = 5
+}
+
 #--------------------------------------------------------------
 # DMS Endpoint
 #--------------------------------------------------------------

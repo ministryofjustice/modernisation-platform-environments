@@ -230,3 +230,9 @@ variable "source_username" {
   description = "Username to access the source database"
   default     = ""
 }
+
+variable "postgres_source_heartbeat_frequency" {
+  description = "(Optional) Sets the WAL heartbeat frequency (in minutes). Default value is 5."
+  type    = number
+  default = 5
+}
