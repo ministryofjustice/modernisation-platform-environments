@@ -62,6 +62,7 @@ locals {
           "aws_accounts" = {
             "digital-prison-reporting-development" = {
               cloudwatch_enabled              = true
+              cloudwatch_custom_namespaces    = "DPRAgentCustomMetrics,DPRDataReconciliationCustom"
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
@@ -69,6 +70,7 @@ locals {
             },
             "digital-prison-reporting-preproduction" = {
               cloudwatch_enabled              = true
+              cloudwatch_custom_namespaces    = "DPRAgentCustomMetrics,DPRDataReconciliationCustom"
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
@@ -76,6 +78,7 @@ locals {
             },
             "digital-prison-reporting-test" = {
               cloudwatch_enabled              = true
+              cloudwatch_custom_namespaces    = "DPRAgentCustomMetrics,DPRDataReconciliationCustom"
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
@@ -154,6 +157,7 @@ locals {
           "aws_accounts" = {
             "digital-prison-reporting-production" = {
               cloudwatch_enabled              = true
+              cloudwatch_custom_namespaces    = "DPRAgentCustomMetrics,DPRDataReconciliationCustom"
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
