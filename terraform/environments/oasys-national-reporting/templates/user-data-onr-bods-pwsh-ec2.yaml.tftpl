@@ -8,15 +8,15 @@ tasks:
     inputs:
       initialize: devices
       devices:
-      - device: /dev/nvme1n1
+      - device: xvdk
         name: Temp
         letter: D
         partition: gpt
-      - device: /dev/nvme2n1
+      - device: xvdl
         name: App
         letter: E
         partition: gpt
-      - device: /dev/nvme3n1
+      - device: xvdm
         name: Storage
         letter: F
         partition: gpt
