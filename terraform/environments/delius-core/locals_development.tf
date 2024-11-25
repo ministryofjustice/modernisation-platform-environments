@@ -76,10 +76,11 @@ locals {
 
   delius_microservices_configs_dev = {
     weblogic = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 4096
-      container_cpu    = 2048
+      image_tag                = "6.2.0.3"
+      container_port           = 8080
+      container_memory         = 4096
+      container_cpu            = 2048
+      task_definition_revision = 9
     }
 
     weblogic_eis = {
@@ -129,6 +130,6 @@ locals {
     user_target_endpoint = {
       write_database = "DMDNDA"
     }
-    is-production = local.is-production
+    is-production = false
   }
 }

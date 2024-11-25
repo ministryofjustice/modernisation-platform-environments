@@ -1,10 +1,12 @@
 
 variable "account_region" {
+  type        = string
   description = "Current AWS Region."
   default     = "eu-west-2"
 }
 
 variable "account_id" {
+  type        = string
   description = "AWS Account ID."
   default     = ""
 }
@@ -20,6 +22,7 @@ variable "dms_target_endpoint" {
 }
 
 variable "name" {
+  type        = string
   description = "DMS Replication name."
 }
 
@@ -77,14 +80,6 @@ variable "migration_type" {
   default     = ""
 }
 
-variable "availability_zones" {
-  default = [
-    {
-      0 = "eu-west-2a"
-    }
-  ]
-}
-
 variable "rename_rule_source_schema" {
   description = "The source schema we will rename to a target output 'space'"
   type        = string
@@ -110,14 +105,17 @@ variable "vpc" {
 }
 
 variable "availability_zone" {
+  type    = string
   default = null
 }
 
 variable "create" {
+  type    = bool
   default = true
 }
 
 variable "create_iam_roles" {
+  type    = bool
   default = true
 }
 
@@ -130,11 +128,13 @@ variable "iam_role_permissions_boundary" {
 # Used in tagginga and naming the resources
 
 variable "stack_name" {
+  type        = string
   description = "The name of our application"
   default     = "dblink"
 }
 
 variable "owner" {
+  type        = string
   description = "A group email address to be used in tags"
   default     = "autobots@ga.gov.au"
 }
@@ -144,21 +144,25 @@ variable "owner" {
 #--------------------------------------------------------------
 
 variable "replication_instance_maintenance_window" {
+  type        = string
   description = "Maintenance window for the replication instance"
   default     = "sun:10:30-sun:14:30"
 }
 
 variable "replication_instance_storage" {
+  type        = string
   description = "Size of the replication instance in GB"
   default     = "10"
 }
 
 variable "replication_instance_version" {
+  type        = string
   description = "Engine version of the replication instance"
   default     = "3.4.6"
 }
 
 variable "replication_instance_class" {
+  type        = string
   description = "Instance class of replication instance"
   default     = "dms.t2.micro"
 }
@@ -180,6 +184,7 @@ variable "dms_log_retention_in_days" {
 #--------------------------------------------------------------
 
 variable "identifier" {
+  type        = string
   default     = "rds"
   description = "Name of the database in the RDS"
 }
@@ -189,6 +194,7 @@ variable "identifier" {
 #--------------------------------------------------------------
 
 variable "database_subnet_cidr" {
+  type        = list(string)
   default     = ["10.26.25.208/28", "10.26.25.224/28", "10.26.25.240/28"]
   description = "List of subnets to be used for databases"
 }

@@ -57,8 +57,15 @@ variable "short_name" {
 }
 
 variable "source_address" {
+  type        = string
   default     = ""
   description = "Default Source Address"
+}
+
+variable "source_ssl_mode" {
+  default     = "none"
+  description = "SSL mode to use for the connection. Valid values are none, require, verify-ca, verify-full"
+  type        = string
 }
 
 variable "bucket_name" {
@@ -66,10 +73,12 @@ variable "bucket_name" {
 }
 
 variable "create" {
+  type    = bool
   default = true
 }
 
 variable "create_iam_roles" {
+  type    = bool
   default = true
 }
 
@@ -82,11 +91,13 @@ variable "iam_role_permissions_boundary" {
 # Used in tagginga and naming the resources
 
 variable "stack_name" {
+  type        = string
   description = "The name of our application"
   default     = "dblink"
 }
 
 variable "owner" {
+  type        = string
   description = "A group email address to be used in tags"
   default     = "autobots@ga.gov.au"
 }
@@ -96,6 +107,7 @@ variable "owner" {
 #--------------------------------------------------------------
 
 variable "identifier" {
+  type        = string
   default     = "rds"
   description = "Name of the database in the RDS"
 }
@@ -105,49 +117,40 @@ variable "identifier" {
 #--------------------------------------------------------------
 
 variable "target_backup_retention_period" {
+  type        = string
   # Days
   default     = "30"
   description = "Retention of RDS backups"
 }
 
 variable "target_backup_window" {
+  type        = string
   default     = "14:00-17:00"
   description = "RDS backup window"
 }
 
 variable "target_db_port" {
+  type        = number
   description = "The port the Application Server will access the database on"
   default     = 5432
 }
 
 variable "target_engine_version" {
+  type        = string
   description = "Engine version"
   default     = "9.3.14"
 }
 
 variable "target_instance_class" {
+  type        = string
   default     = "db.t2.micro"
   description = "Instance class"
 }
 
 variable "target_maintenance_window" {
+  type        = string
   default     = "Mon:00:00-Mon:03:00"
   description = "RDS maintenance window"
-}
-
-variable "target_rds_is_multi_az" {
-  description = "Create backup database in separate availability zone"
-  default     = "false"
-}
-
-variable "target_storage" {
-  default     = "10"
-  description = "Storage size in GB"
-}
-
-variable "target_storage_encrypted" {
-  description = "Encrypt storage or leave unencrypted"
-  default     = false
 }
 
 #variable "target_username" {
@@ -159,69 +162,71 @@ variable "target_storage_encrypted" {
 #--------------------------------------------------------------
 
 variable "source_app_password" {
+  type        = string
   description = "Password for the endpoint to access the source database"
 }
 
 variable "source_app_username" {
+  type        = string
   description = "Username for the endpoint to access the source database"
 }
 
 variable "source_db_name" {
+  type        = string
   description = "Name of the Source database"
   default     = "oracle"
 }
 
 variable "source_db_port" {
+  type        = number
   description = "The port the Application Server will access the database on"
   default     = null
 }
 
 variable "source_engine" {
+  type        = string
   default     = "oracle-se2"
   description = "Engine type, example values mysql, postgres"
 }
 
 variable "source_engine_name" {
+  type        = string
   default     = ""
   description = "Engine name for DMS"
 }
 
 variable "source_engine_version" {
+  type        = string
   description = "Engine version"
   default     = "12.1.0.2.v8"
 }
 
 variable "source_instance_class" {
+  type        = string
   default     = "db.t2.micro"
   description = "Instance class"
 }
 
 variable "source_maintenance_window" {
+  type        = string
   default     = "Mon:00:00-Mon:03:00"
   description = "RDS maintenance window"
 }
 
 variable "source_password" {
+  type        = string
   description = "Password of the source database"
   default     = ""
 }
 
-variable "source_rds_is_multi_az" {
-  description = "Create backup database in separate availability zone"
-  default     = "false"
-}
-
-variable "source_storage" {
-  default     = "10"
-  description = "Storage size in GB"
-}
-
 variable "source_storage_encrypted" {
+  type        = bool
   description = "Encrypt storage or leave unencrypted"
   default     = false
 }
 
 variable "source_username" {
+  type        = string
   description = "Username to access the source database"
   default     = ""
 }
