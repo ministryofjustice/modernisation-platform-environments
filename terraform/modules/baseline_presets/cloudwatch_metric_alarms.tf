@@ -449,4 +449,25 @@ locals {
       }
     }
   }
+
+  cloudwatch_metric_alarms_by_sns_topic = {
+    for sns_key, sns_value in local.sns_topics : sns_key => {
+      for namespace_key, namespace_value in local.cloudwatch_metric_alarms : namespace_key => {
+        for alarm_key, alarm_value in namespace_value : alarm_key => merge(alarm_value, {
+          alarm_actions = [sns_key]
+          ok_actions    = [sns_key]
+        })
+      }
+    }
+  }
+
+  # alarms added via baseline. Put SSM command alerts in dso-pipelines so it doesn't clutter main application alerts
+  cloudwatch_metric_alarms_baseline = merge(
+    var.options.enable_ssm_command_monitoring ? {
+      "failed-ssm-command-${var.environment.account_name}" = local.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].ssm.failed-ssm-command
+    } : {},
+    var.options.enable_ssm_missing_metric_monitoring ? {
+      "ssm-command-metrics-missing-${var.environment.account_name}" = local.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].ssm.ssm-command-metrics-missing
+    } : {},
+  )
 }

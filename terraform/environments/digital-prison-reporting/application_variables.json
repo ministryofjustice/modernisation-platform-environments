@@ -94,10 +94,7 @@
       "setup_sonatype_secrets": true,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
-      "dps_domains": [
-        "dps-activities",
-        "dps-case-notes"
-      ],
+      "dps_domains": ["dps-activities", "dps-case-notes"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -272,10 +269,7 @@
       "setup_sonatype_secrets": false,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
-      "dps_domains": [
-        "dps-activities",
-        "dps-case-notes"
-      ],
+      "dps_domains": ["dps-activities", "dps-case-notes"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -452,10 +446,7 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
-      "dps_domains": [
-        "dps-activities",
-        "dps-case-notes"
-      ],
+      "dps_domains": ["dps-activities", "dps-case-notes"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -648,10 +639,7 @@
       "setup_sonatype_secrets": false,
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
-      "dps_domains": [
-        "dps-activities",
-        "dps-case-notes"
-      ],
+      "dps_domains": ["dps-activities", "dps-case-notes"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {

@@ -10,12 +10,12 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
     origin_id   = "tribunalsOrigin"
 
     custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+      http_port                = 80
+      https_port               = 443
+      origin_protocol_policy   = "https-only"
+      origin_ssl_protocols     = ["TLSv1.2"]
       origin_keepalive_timeout = 60
-      origin_read_timeout     = 60
+      origin_read_timeout      = 60
     }
 
     custom_header {
@@ -27,7 +27,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   default_cache_behavior {
     target_origin_id = "tribunalsOrigin"
 
-    cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
+    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
 
     viewer_protocol_policy = "redirect-to-https"

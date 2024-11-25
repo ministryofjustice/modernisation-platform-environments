@@ -1,5 +1,5 @@
 module "container_definition" {
-  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=main"
+  source                   = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//container?ref=v5.0.0"
   name                     = var.name
   image                    = var.container_image
   memory                   = var.container_memory
@@ -9,7 +9,7 @@ module "container_definition" {
 
   environment = local.calculated_container_vars_list
 
-  health_check = var.health_check
+  health_check = var.container_health_check
 
   secrets       = local.calculated_container_secrets_list
   port_mappings = var.container_port_config
@@ -35,13 +35,15 @@ module "ecs_policies" {
 }
 
 module "ecs_service" {
-  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=main"
+  source                = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//service?ref=v5.0.0"
   container_definitions = nonsensitive(module.container_definition.json_encoded_list)
   cluster_arn           = var.ecs_cluster_arn
   name                  = "${var.env_name}-${var.name}"
 
   task_cpu    = var.container_cpu
   task_memory = var.container_memory
+
+  pin_task_definition_revision = var.pin_task_definition_revision
 
   desired_count                      = var.desired_count
   deployment_maximum_percent         = var.deployment_maximum_percent
@@ -51,7 +53,7 @@ module "ecs_service" {
   task_role_arn      = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_role.name}"
   task_exec_role_arn = "arn:aws:iam::${var.account_info.id}:role/${module.ecs_policies.task_exec_role.name}"
 
-  health_check_grace_period_seconds = var.health_check_grace_period_seconds
+  health_check_grace_period_seconds = var.alb_health_check.grace_period_seconds
 
   service_load_balancers = var.microservice_lb != null ? concat([{
     target_group_arn = aws_lb_target_group.frontend[0].arn
@@ -67,8 +69,6 @@ module "ecs_service" {
   subnets = var.account_config.private_subnet_ids
 
   enable_execute_command = true
-
-  ignore_changes = var.ignore_changes_service_task_definition
 
   tags = var.tags
 }

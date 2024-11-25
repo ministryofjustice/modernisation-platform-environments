@@ -54,14 +54,22 @@ module "pwm" {
 
   platform_vars = var.platform_vars
 
-  container_image       = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management:${var.delius_microservice_configs.pwm.image_tag}"
-  account_config        = var.account_config
-  health_check_path     = "/"
-  health_check_interval = "15"
-  account_info          = var.account_info
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-password-management:${var.delius_microservice_configs.pwm.image_tag}"
+  account_config  = var.account_config
+  account_info    = var.account_info
 
-  target_group_protocol_version     = "HTTP1"
-  health_check_grace_period_seconds = 10
+  target_group_protocol_version = "HTTP1"
+
+  alb_health_check = {
+    path                 = "/"
+    healthy_threshold    = 5
+    interval             = 30
+    protocol             = "HTTP"
+    unhealthy_threshold  = 5
+    matcher              = "200-499"
+    timeout              = 10
+    grace_period_seconds = 180
+  }
 
   container_cpu                      = var.delius_microservice_configs.pwm.container_cpu
   container_memory                   = var.delius_microservice_configs.pwm.container_memory
