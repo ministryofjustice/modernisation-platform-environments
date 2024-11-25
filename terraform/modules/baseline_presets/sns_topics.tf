@@ -6,8 +6,14 @@
 #   from the modernisation platform managed pagerduty_integration_keys
 
 locals {
+
+  pagerduty_integrations = merge(
+    var.options.enable_ssm_command_monitoring ? { dso-pipelines-pagerduty = "dso-pipelines" } : {},
+    var.options.sns_topics.pagerduty_integrations
+  )
+
   sns_topics_pagerduty_integrations = {
-    for key, value in var.options.sns_topics.pagerduty_integrations : key => {
+    for key, value in local.pagerduty_integrations : key => {
       display_name      = "Pager duty integration for ${value}"
       kms_master_key_id = "general"
       subscriptions = {

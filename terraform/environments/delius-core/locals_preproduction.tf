@@ -140,7 +140,8 @@ locals {
     user_target_endpoint = {
       write_database = "PRENDA"
     }
-    is-production = local.is-production
+    # Auditing from the Pre-Prod environment is considered production data
+    is-production = true
   }
 
 }

@@ -130,6 +130,6 @@ locals {
     user_target_endpoint = {
       write_database = "DMDNDA"
     }
-    is-production = local.is-production
+    is-production = false
   }
 }
