@@ -100,14 +100,18 @@ module "kms_key" {
   # key_users          = ["arn:aws:iam::012345678901:role/user"]
   # key_service_users  = ["arn:aws:iam::012345678901:role/ec2-role"]
 
-  # Grants
-  grants = {
+  # Grant external account role, specific operations when using encryption context.
+  grants = var.cross_account_access_role != null ? {
     process_files_lambda = {
-      grantee_principal = aws_iam_role.process_landing_bucket_files.arn
-      operations        = ["Decrypt"]
+      grantee_principal = "arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"
+      operations        = ["Decrypt", "GenerateDataKey"]
+      constraints = {
+        encryption_context_equals = {
+          feed = "${var.data_feed}_${var.order_type}"
+        }
       }
     }
-
+  } : {}
   deletion_window_in_days = 7
 
   tags = merge(
