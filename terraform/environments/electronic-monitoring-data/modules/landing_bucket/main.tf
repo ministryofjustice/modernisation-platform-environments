@@ -54,8 +54,6 @@ module "this-bucket" {
     }
   ]
 
-  # custom_kms_key = module.kms_key.key_arn
-
   # Optionally add cross account access to bucket policy.
   bucket_policy_v2 = var.cross_account_access_role != null ? [
     {
@@ -80,7 +78,7 @@ module "this-bucket" {
 }
 
 #-----------------------------------------------------------------------------------
-# KMS 
+# KMS - customer managed key for use with cross account data
 #-----------------------------------------------------------------------------------
 
 module "kms_key" {
@@ -92,13 +90,14 @@ module "kms_key" {
 
   aliases               = ["s3/landing_bucket_${var.data_feed}_${var.order_type}"]
   description           = "${var.data_feed} ${var.order_type} landing bucket KMS key"
-  enable_default_policy = true
 
-  # key_owners         = ["arn:aws:iam::012345678901:role/owner"]
-  # key_administrators = ["arn:aws:iam::012345678901:role/admin"]
-  key_users          = [aws_iam_role.process_landing_bucket_files.arn]
+  # Give full access to key for root account, and lambda role ability to use.
+  enable_default_policy = true
+  key_users             = [aws_iam_role.process_landing_bucket_files.arn]
 
   # Grant external account role, specific operations when using encryption context.
+  # To view grants need to use cli
+  # aws kms list-grants --region=eu-west-2 --key-id <key id>
   grants = var.cross_account_access_role != null ? {
     cross_account_access_role = {
       grantee_principal = "arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"
