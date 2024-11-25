@@ -95,21 +95,20 @@ module "kms_key" {
   enable_default_policy = true
   key_users             = [aws_iam_role.process_landing_bucket_files.arn]
 
-  # Grant external account role, specific operations when using encryption context.
-  # To view grants need to use cli
+  deletion_window_in_days = 7
+
+  # Grant external account role specific operations.
+  # To view grants, need to use cli:
   # aws kms list-grants --region=eu-west-2 --key-id <key id>
   grants = var.cross_account_access_role != null ? {
     cross_account_access_role = {
       grantee_principal = "arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"
-      operations        = ["Encrypt", "GenerateDataKey"]
-      constraints = {
-        encryption_context_equals = {
-          feed = "${var.data_feed}_${var.order_type}"
-        }
-      }
+      operations = [
+        "Encrypt",
+        "GenerateDataKey",
+      ]
     }
   } : {}
-  deletion_window_in_days = 7
 
   tags = merge(
     var.local_tags,
