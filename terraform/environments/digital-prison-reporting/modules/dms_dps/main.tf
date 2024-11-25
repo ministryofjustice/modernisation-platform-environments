@@ -82,7 +82,6 @@ resource "aws_dms_endpoint" "source" {
   extra_connection_attributes = var.extra_attributes
 
   postgres_settings {
-    map_boolean_as_boolean = true
     heartbeat_enable       = true
     heartbeat_frequency    = 5
   }
