@@ -7,7 +7,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   ] : [
     "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
     "charity.tribunals.gov.uk",
-    ]
+  ]
   origin {
     domain_name = aws_lb.tribunals_lb.dns_name
     origin_id   = "tribunalsOrigin"
@@ -182,7 +182,7 @@ resource "aws_route53_record" "cloudfront_cert_validation" {
   records         = [each.value.value]
   ttl             = 300
   type            = each.value.type
-  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
+  zone_id         = data.aws_route53_zone.production_zone.zone_id
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
