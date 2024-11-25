@@ -6,7 +6,7 @@ variable "buckets_to_protect" {
     To enable for all buckets, list all bucket names here.
   EOF
   type        = string
-  default     = "tests3scanningkf,macie-test-results-22032024,mytestbucket976858"
+  default     = "s3-security-testing-bucket20240703070028039800000001,macie-test-results-cooker"
 }
 
 # Define the list of buckets to protect
