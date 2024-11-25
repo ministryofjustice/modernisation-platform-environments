@@ -94,7 +94,7 @@ locals {
         ]
       }
       "hmpps-oem-${local.environment}" = {
-        account_name   = "self"
+        account_name   = null
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
