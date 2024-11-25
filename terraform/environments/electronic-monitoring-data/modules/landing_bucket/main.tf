@@ -94,17 +94,27 @@ module "kms_key" {
   description           = "${var.data_feed} ${var.order_type} landing bucket KMS key"
   enable_default_policy = true
 
-  # # Policy
-  # key_owners         = ["arn:aws:iam::012345678901:role/owner"]
-  # key_administrators = ["arn:aws:iam::012345678901:role/admin"]
-  # key_users          = ["arn:aws:iam::012345678901:role/user"]
-  # key_service_users  = ["arn:aws:iam::012345678901:role/ec2-role"]
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid       = "AllowProcessLandingBucketLambdaFunctionDecrypt",
+        Effect    = "Allow",
+        Principal = { AWS = aws_iam_role.process_landing_bucket_files.arn },
+        Action    = [
+          "kms:Decrypt",
+          "kms:DescribeKey",
+        ],
+        Resource  = "*"
+      }
+    ]
+  })
 
   # Grant external account role, specific operations when using encryption context.
   grants = var.cross_account_access_role != null ? {
-    process_files_lambda = {
+    cross_account_access_role = {
       grantee_principal = "arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"
-      operations        = ["Decrypt", "GenerateDataKey"]
+      operations        = ["Encrypt", "GenerateDataKey"]
       constraints = {
         encryption_context_equals = {
           feed = "${var.data_feed}_${var.order_type}"
@@ -197,6 +207,17 @@ data "aws_iam_policy_document" "process_landing_bucket_files_s3_policy_document"
     ]
     resources = [
       "arn:aws:s3:::${var.received_files_bucket_id}/*",
+    ]
+  }
+
+  statement {
+    sid    = "KMSDecryptObjects"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+    ]
+    resources = [
+      module.kms_key.key_arn,
     ]
   }
 }
