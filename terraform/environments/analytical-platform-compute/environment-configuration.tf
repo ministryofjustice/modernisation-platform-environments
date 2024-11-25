@@ -38,9 +38,6 @@ locals {
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-development"
 
-      /* Observability Platform */
-      observability_platform = "development"
-
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
 
@@ -78,9 +75,6 @@ locals {
         eks_pod_identity_agent = "v1.3.2-eksbuild.2"
         vpc_cni                = "v1.19.0-eksbuild.1"
       }
-
-      /* Observability Platform */
-      observability_platform = "development"
 
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
@@ -131,9 +125,6 @@ locals {
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"
-
-      /* Observability Platform */
-      observability_platform = "production"
 
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
