@@ -111,7 +111,7 @@ resource "aws_route53_record" "nginx_instances" {
   type     = "A"
 
   alias {
-    name                   = module.nginx_load_balancer[0].nginx_lb_arn
+    name                   = module.nginx_load_balancer[0].nginx_lb_dns_name
     zone_id                = module.nginx_load_balancer[0].nginx_lb_zone_id
     evaluate_target_health = false
   }
