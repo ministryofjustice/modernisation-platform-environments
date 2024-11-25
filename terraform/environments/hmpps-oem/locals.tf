@@ -19,6 +19,7 @@ locals {
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
 
   cloudwatch_dashboard_default_widget_groups = [
+    "ec2_instance_endpoint_monitoring",
     "network_lb",
     "lb",
     "ec2",
@@ -72,6 +73,16 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
         ]
       }
+      "endpoints-and-pipelines" = {
+        account_name   = "hmpps-oem-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_endpoint_monitoring,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.github_workflows,
+        ]
+      }
       "hmpps-domain-services-${local.environment}" = {
         account_name   = "hmpps-domain-services-${local.environment}"
         periodOverride = "auto"
@@ -83,7 +94,7 @@ locals {
         ]
       }
       "hmpps-oem-${local.environment}" = {
-        account_name   = "hmpps-oem-${local.environment}"
+        account_name   = "self"
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
