@@ -1,7 +1,34 @@
 # SNS topic for monitoring to send alarms to
-resource "aws_sns_topic" "dms_alerting" {
-  name              = "delius-dms-alerting"
+resource "aws_sns_topic" "dms_alerts_topic" {
+  name              = "delius-dms-alerts-topic"
   kms_master_key_id = var.account_config.kms_keys.general_shared
+
+  http_success_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  http_success_feedback_sample_rate = 100
+  http_failure_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+}
+
+resource "aws_iam_role" "sns_logging_role" {
+  name = "sns-logging-role"
+
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "sns.amazonaws.com"
+        },
+        "Effect": "Allow",
+        "Sid": ""
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_sns_policy" {
+  role       = aws_iam_role.sns_logging_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonSNSRole"
 }
 
 # Create a map of all possible replication tasks, so those that exist may have alarms applied to them.
@@ -74,8 +101,8 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_source" {
   evaluation_periods  = 3
   period              = 120
   actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.dms_alerting.arn]
-  ok_actions          = [aws_sns_topic.dms_alerting.arn]
+  alarm_actions       = [aws_sns_topic.dms_alerts_topic.arn]
+  ok_actions          = [aws_sns_topic.dms_alerts_topic.arn]
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
@@ -96,8 +123,8 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   evaluation_periods  = 3
   period              = 120
   actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.dms_alerting.arn]
-  ok_actions          = [aws_sns_topic.dms_alerting.arn]
+  alarm_actions       = [aws_sns_topic.dms_alerts_topic.arn]
+  ok_actions          = [aws_sns_topic.dms_alerts_topic.arn]
   dimensions = {
     ReplicationInstanceIdentifier = aws_dms_replication_instance.dms_replication_instance.replication_instance_id
     # We only need to final element of the replication task ID (after the last :)
@@ -131,9 +158,153 @@ locals {
 module "pagerduty_core_alerts" {
   #checkov:skip=CKV_TF_1
   depends_on = [
-    aws_sns_topic.dms_alerting
+    aws_sns_topic.dms_alerts_topic
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.dms_alerting.name]
+  sns_topics                = [aws_sns_topic.dms_alerts_topic.name]
   pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
+}
+
+
+# Raising a Cloudwatch Alarm on a DMS Replication Task Event is not directly possible using the 
+# Cloudwatch Alarm Integration in PagerDuty as the JSON payload is different.   Therefore, as
+# workaround for this we create a custom Cloudwatch Metric which is populated by the replication event and
+# create a Cloudwatch Alarm on this Metric in the usual way to allow for raising alarms.
+
+# Create Role which allows Lamdba to put a custom cloudwatch metric
+resource "aws_iam_role" "lambda_put_metric_data_role" {
+  name = "lambda-put-metric-data-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action    = "sts:AssumeRole",
+        Effect    = "Allow",
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "lambda_put_metric_data_policy" {
+  name = "lambda-put-metric-data-policy"
+  
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "cloudwatch:PutMetricData"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_policy_attach" {
+  role       = aws_iam_role.lambda_put_metric_data_role.name
+  policy_arn = aws_iam_policy.lambda_put_metric_data_policy.arn
+}
+
+# Allow Cloudwatch Logging
+resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_logging_attach" {
+  role       = aws_iam_role.lambda_put_metric_data_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# Creates a ZIP file containing the contents of the lambda directory which
+# contains a Python script to calculate and put the custom metric
+data "archive_file" "lambda_dms_replication_metric_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda"
+  output_path = "${path.module}/lambda/dms_replication_metric.zip"
+  excludes    = ["dms_replication_metric.zip"]
+}
+
+# Define a Lambda Function using the python script in the ZIP file -
+# we define the namespace of the custom metric (CustomDMSMetrics)
+# and the Metric Name (DMSReplication Failure).   The value of this
+# metric is 0 if the replication task is not stopped (normal state),
+# and 1 if not (whether it has been stopped manually or has failed)
+resource "aws_lambda_function" "dms_replication_metric_publisher" {
+  function_name = "dms-replication-metric-publisher"
+  role          = aws_iam_role.lambda_put_metric_data_role.arn
+  handler       = "dms_replication_metric.lambda_handler"
+  runtime       = "python3.8"
+  filename      = data.archive_file.lambda_dms_replication_metric_zip.output_path
+  source_code_hash = data.archive_file.lambda_dms_replication_metric_zip.output_base64sha256
+  environment {
+    variables = {
+      METRIC_NAMESPACE = "CustomDMSMetrics",
+      METRIC_NAME      = "DMSReplicationFailure"
+    }
+  }
+
+  depends_on = [data.archive_file.lambda_dms_replication_metric_zip]
+}
+
+# Set Lambda function to allow the Replication Events call this functions
+resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publisher_handler" {
+  statement_id  = "AllowSNSInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.dms_replication_metric_publisher.function_name
+  principal     = "sns.amazonaws.com"
+
+  source_arn    = aws_sns_topic.dms_events_topic.arn
+}
+
+resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
+  for_each            = toset(local.replication_task_names)
+  alarm_name          = "DMSReplicationStoppedAlarm_${each.key}"
+  alarm_description   = "Alarm when Stopped Replication Task for ${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  treat_missing_data  = "ignore"
+  datapoints_to_alarm = 1
+  namespace           = "CustomDMSMetrics"
+  metric_name         = "DMSReplicationStopped"
+  statistic           = "Maximum"
+  period              = "60"
+
+  dimensions = {
+      SourceId = each.key
+    }
+
+  alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
+  ok_actions    = [aws_sns_topic.dms_alerts_topic.arn]
+}
+
+
+
+# SNS Topic for DMS replication events
+# This is NOT the same as for DMS Cloudwatch Alarms (dms_alerting)
+# and is used to trigger the Lamda function if an event happens during
+# DMS Replication (Events are NOT detected by CloudWatch Alarms)
+resource "aws_sns_topic" "dms_events_topic" {
+  name = "delius-dms-events-topic"
+
+  lambda_success_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  lambda_success_feedback_sample_rate = 100
+  lambda_failure_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+}
+
+resource "aws_sns_topic_subscription" "dms_events_lambda_subscription" {
+  topic_arn = aws_sns_topic.dms_events_topic.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.dms_replication_metric_publisher.arn
+}
+
+# We handle State Change and Failure DMS Events
+resource "aws_dms_event_subscription" "dms_task_event_subscription" {
+  name       = "dms-task-event-alerts"
+  sns_topic_arn = aws_sns_topic.dms_events_topic.arn
+  source_type   = "replication-task"
+  event_categories = ["state change", "failure"]
+  enabled = true
 }

@@ -140,6 +140,7 @@ locals {
     user_target_endpoint = {
       write_database = "STGNDA"
     }
-    is-production = local.is-production
+    # Auditing from the Stage environment is considered production data
+    is-production = true
   }
 }
