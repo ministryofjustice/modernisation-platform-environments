@@ -142,9 +142,9 @@ data "aws_cloudfront_origin_request_policy" "all_viewer" {
 // Create a new certificate for the CloudFront distribution because it needs to be in us-east-1
 resource "aws_acm_certificate" "cloudfront" {
   provider                  = aws.us-east-1
-  domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "modernisation-platform.service.justice.gov.uk"
+  domain_name               = local.is-production ? "*.decisions.tribunals.gov.uk" : "*.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   validation_method         = "DNS"
-  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk"] : ["charity.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk", "*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? ["*.venues.tribunals.gov.uk", "*.reports.tribunals.gov.uk"] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -156,6 +156,27 @@ resource "aws_acm_certificate" "cloudfront" {
 resource "aws_acm_certificate_validation" "cloudfront_cert_validation" {
   provider        = aws.us-east-1
   certificate_arn = aws_acm_certificate.cloudfront.arn
+  validation_record_fqdns = [for record in aws_route53_record.cloudfront_cert_validation : record.fqdn]
+}
+
+// Route53 DNS records for certificate validation
+resource "aws_route53_record" "cloudfront_cert_validation" {
+  provider = aws.core-network-services
+
+  for_each = {
+    for dvo in aws_acm_certificate.cloudfront.domain_validation_options : dvo.domain_name => {
+      name  = dvo.resource_record_name
+      type  = dvo.resource_record_type
+      value = dvo.resource_record_value
+    }
+  }
+
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.value]
+  ttl             = 300
+  type            = each.value.type
+  zone_id         = local.is-production ? data.aws_route53_zone.production_zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
