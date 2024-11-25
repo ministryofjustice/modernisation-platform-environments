@@ -46,7 +46,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
     # - Transitions objects to STANDARD_IA after 30 days (cost-effective storage for infrequent access).
     # - Deletes objects after 90 days.
     dynamic "transition" {
-      for_each = var.lifecycle_category == "short_term" ? [ { days = 30, storage_class = "STANDARD_IA" } ] : []
+      for_each = var.lifecycle_category == "short_term" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []
       content {
         days          = transition.value.days
         storage_class = transition.value.storage_class
@@ -54,8 +54,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
     }
 
     dynamic "expiration" {
-      for_each = var.lifecycle_category == "short_term" ? [ { days = 90 } ] : (
-                var.lifecycle_category == "temporary" ? [ { days = 30 } ] : [])
+      for_each = var.lifecycle_category == "short_term" ? [{ days = 90 }] : (
+      var.lifecycle_category == "temporary" ? [{ days = 30 }] : [])
       content {
         days = expiration.value.days
       }

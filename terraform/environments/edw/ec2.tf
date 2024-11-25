@@ -347,7 +347,7 @@ EOF
 ####### IAM role #######
 
 resource "aws_iam_role" "edw_ec2_role" {
-  name                = "${local.application_name}-ec2-instance-role"
+  name = "${local.application_name}-ec2-instance-role"
   tags = merge(
     local.tags,
     {
