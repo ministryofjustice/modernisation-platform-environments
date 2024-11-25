@@ -16,7 +16,7 @@ locals {
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
           "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-            branch = "main"
+            branch = "TM/TM-660/onr-bods-second-server"
           }
         ))
       }
