@@ -51,6 +51,7 @@ locals {
       enable_s3_shared_bucket                     = true
       enable_s3_software_bucket                   = true
       enable_ssm_command_monitoring               = true
+      enable_ssm_missing_metric_monitoring        = true
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }
