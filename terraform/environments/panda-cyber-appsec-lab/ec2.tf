@@ -1,7 +1,7 @@
 # Kali Linux Instance
 resource "aws_instance" "kali_linux" {
   ami                         = "ami-0f398bcc12f72f967" // aws-marketplace/kali-last-snapshot-amd64-2024.2.0-804fcc46-63fc-4eb6-85a1-50e66d6c7215
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   instance_type               = "t2.micro"
   subnet_id                   = module.vpc.private_subnets.0
   vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]
@@ -54,7 +54,7 @@ resource "aws_instance" "kali_linux" {
 # Defect Dojo Instance
 resource "aws_instance" "defect_dojo" {
   ami                         = "ami-0e8d228ad90af673b"
-  associate_public_ip_address = true
+  associate_public_ip_address = false
   instance_type               = "t2.micro"
   subnet_id                   = module.vpc.private_subnets.0
   vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]

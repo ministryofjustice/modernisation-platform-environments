@@ -21,6 +21,8 @@ data "aws_iam_policy_document" "load_data" {
     ]
     resources = [
       "${var.source_data_bucket.arn}${var.path_to_data}/*",
+      "${var.source_data_bucket.arn}/staging${var.path_to_data}/*",
+      "${var.cadt_bucket.arn}/staging${var.path_to_data}/*",
       "${var.athena_dump_bucket.arn}/output/*"
     ]
   }
@@ -30,7 +32,8 @@ data "aws_iam_policy_document" "load_data" {
     actions = ["s3:ListBucket"]
     resources = [
       var.source_data_bucket.arn,
-      var.athena_dump_bucket.arn
+      var.athena_dump_bucket.arn,
+      var.cadt_bucket.arn
     ]
   }
   statement {
@@ -57,12 +60,14 @@ data "aws_iam_policy_document" "load_data" {
       "glue:DeleteTable",
       "glue:CreateDatabase",
       "glue:DeleteDatabase",
-      "glue:UpdateTable"
+      "glue:UpdateTable",
+      "glue:GetPartition",
+      "glue:GetPartitions"
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/${local.snake-database}",
-      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${local.snake-database}/*"
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/${local.snake-database}*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${local.snake-database}*/*"
     ]
   }
   statement {

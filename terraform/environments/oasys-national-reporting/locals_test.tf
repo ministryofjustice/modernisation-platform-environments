@@ -133,10 +133,10 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
-          # user_data_raw = base64encode(templatefile(
-          #   "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-          #   branch = "TM/TM-620/test-pagefile-change"
-          # }))
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+            branch = "TM/TM-660/onr-bods-second-server"
+          }))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
@@ -151,26 +151,22 @@ locals {
 
     ec2_instances = {
 
-      # t2-onr-bods-1 = merge(local.ec2_instances.bods, {
-      #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2a"
-      #     user_data_raw = base64encode(templatefile(
-      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #       }
-      #     ))
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-      #       "Ec2SecretPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bods.instance, {
-      #     instance_type = "m4.xlarge"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      #   tags = merge(local.ec2_instances.bods.tags, {
-      #     oasys-national-reporting-environment = "t2"
-      #     domain-name                          = "azure.noms.root"
-      #   })
-      # })
+      t2-onr-bods-1 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type = "m4.xlarge"
+        })
+        cloudwatch_metric_alarms = null
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+          domain-name                          = "azure.noms.root"
+        })
+      })
 
       # Pending sorting out cluster install of Bods in  modernisation-platform-configuration-management repo
       # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
@@ -252,7 +248,6 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bods/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/web/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
@@ -407,7 +402,6 @@ locals {
     secretsmanager_secrets = {
       "/sap/bods/t2"             = local.secretsmanager_secrets.bods
       "/sap/bip/t2"              = local.secretsmanager_secrets.bip
-      "/sap/web/t2"              = local.secretsmanager_secrets.web
       "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
     }

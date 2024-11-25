@@ -38,3 +38,8 @@ variable "oidc_arn" {
   type     = string
   nullable = false
 }
+
+variable "cadt_bucket" {
+  type        = object({ arn = string })
+  description = "bucket for cadt"
+}

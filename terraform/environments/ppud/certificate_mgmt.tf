@@ -103,7 +103,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   timeout                        = 30
   reserved_concurrent_executions = 5
   code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
-  depends_on = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
   environment {
     variables = {
       EXPIRY_DAYS   = "45",
@@ -181,7 +181,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   timeout                        = 30
   reserved_concurrent_executions = 5
   code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
-  depends_on = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
   environment {
     variables = {
       EXPIRY_DAYS   = "45",

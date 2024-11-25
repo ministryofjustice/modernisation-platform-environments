@@ -199,11 +199,11 @@ module "mojo_network_debug_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "5.2.0"
 
-  name        = "mojo-network-debug"
-  vpc_id      = module.connected_vpc.vpc_id
+  name   = "mojo-network-debug"
+  vpc_id = module.connected_vpc.vpc_id
 
-  egress_cidr_blocks  = ["0.0.0.0/0"]
-  egress_rules        = ["all-all"]
+  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_rules       = ["all-all"]
 
   tags = local.tags
 }

@@ -74,6 +74,7 @@ module "baseline" {
   )
 
   cloudwatch_metric_alarms = merge(
+    module.baseline_presets.cloudwatch_metric_alarms_baseline,
     lookup(local.baseline_all_environments, "cloudwatch_metric_alarms", {}),
     lookup(local.baseline_environment_specific, "cloudwatch_metric_alarms", {}),
   )
@@ -175,6 +176,11 @@ module "baseline" {
     module.baseline_presets.s3_buckets,
     lookup(local.baseline_all_environments, "s3_buckets", {}),
     lookup(local.baseline_environment_specific, "s3_buckets", {}),
+  )
+
+  schedule_alarms_lambda = merge(
+    lookup(local.baseline_all_environments, "schedule_alarms", {}),
+    lookup(local.baseline_environment_specific, "schedule_alarms", {}),
   )
 
   secretsmanager_secrets = merge(

@@ -18,21 +18,24 @@ locals {
   }
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
 
+  cloudwatch_dashboard_default_widget_groups = [
+    "ec2_instance_endpoint_monitoring",
+    "network_lb",
+    "lb",
+    "ec2",
+    "ec2_linux",
+    "ec2_autoscaling_group_linux",
+    "ec2_instance_linux",
+    "ec2_instance_oracle_db_with_backup",
+    "ec2_instance_textfile_monitoring",
+    "ec2_windows",
+    "ssm_command",
+    "github_workflows",
+  ]
+
   baseline_presets_all_environments = {
     options = {
-      cloudwatch_dashboard_default_widget_groups = [
-        "ec2_instance_endpoint_monitoring",
-        "custom",
-        "network_lb",
-        "lb",
-        "ec2",
-        "ec2_linux",
-        "ec2_autoscaling_group_linux",
-        "ec2_instance_linux",
-        "ec2_instance_oracle_db_with_backup",
-        "ec2_instance_textfile_monitoring",
-        "ec2_windows",
-      ]
+      cloudwatch_dashboard_default_widget_groups  = local.cloudwatch_dashboard_default_widget_groups
       cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
@@ -47,6 +50,7 @@ locals {
       enable_s3_db_backup_bucket                  = true
       enable_s3_shared_bucket                     = true
       enable_s3_software_bucket                   = true
+      enable_ssm_command_monitoring               = true
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }
@@ -69,6 +73,16 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
         ]
       }
+      "endpoints-and-pipelines" = {
+        account_name   = "hmpps-oem-${local.environment}"
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_endpoint_monitoring,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.github_workflows,
+        ]
+      }
       "hmpps-domain-services-${local.environment}" = {
         account_name   = "hmpps-domain-services-${local.environment}"
         periodOverride = "auto"
@@ -80,17 +94,37 @@ locals {
         ]
       }
       "hmpps-oem-${local.environment}" = {
-        account_name   = "hmpps-oem-${local.environment}"
+        account_name   = null
         periodOverride = "auto"
         start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.custom,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
-        ]
+        widget_groups = [{
+          header_markdown = "## EC2 Oracle Enterprise Management"
+          width           = 8
+          height          = 8
+          add_ebs_widgets = {
+            iops       = true
+            throughput = true
+          }
+          search_filter = {
+            ec2_tag = [
+              { tag_name = "server-type", tag_value = "hmpps-oem" },
+            ]
+          }
+          widgets = [
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_linux.free-disk-space-low,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-error,
+            module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run,
+          ]
+        }]
       }
       "nomis-${local.environment}" = {
         account_name   = "nomis-${local.environment}"
@@ -105,6 +139,7 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
         ]
       }
       "nomis-combined-reporting-${local.environment}" = {

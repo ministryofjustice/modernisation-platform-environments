@@ -76,3 +76,9 @@ data "http" "prometheus_operator_crds" {
 
   url = each.value
 }
+
+data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_runners_github_app" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  secret_id = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
+}

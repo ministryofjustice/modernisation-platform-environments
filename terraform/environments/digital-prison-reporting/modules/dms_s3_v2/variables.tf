@@ -39,16 +39,6 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
-
-variable "availability_zones" {
-  default = [
-    {
-      0 = "eu-west-2a"
-    }
-  ]
-}
-
-
 variable "subnet_ids" {
   description = "An List of VPC subnet IDs to use in the subnet group"
   type        = list(string)
@@ -271,6 +261,12 @@ variable "short_name" {
 variable "source_address" {
   default     = ""
   description = "Default Source Address"
+  type        = string
+}
+
+variable "source_ssl_mode" {
+  default     = "none"
+  description = "SSL mode to use for the connection. Valid values are none, require, verify-ca, verify-full"
   type        = string
 }
 

@@ -37,3 +37,7 @@ data "aws_network_interface" "datasync_vpc_endpoint" {
 data "aws_ec2_transit_gateway" "moj_tgw" {
   id = "tgw-026162f1ba39ce704"
 }
+
+data "aws_secretsmanager_secret_version" "datasync_dom1" {
+  secret_id = module.datasync_dom1_secret.secret_id
+}

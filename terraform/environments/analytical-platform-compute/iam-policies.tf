@@ -18,7 +18,7 @@ module "eks_cluster_logs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.46.0"
+  version = "5.48.0"
 
   name_prefix = "eks-cluster-logs-kms-access"
 
@@ -45,7 +45,7 @@ module "karpenter_sqs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.46.0"
+  version = "5.48.0"
 
   name_prefix = "karpenter-sqs-kms-access"
 
@@ -71,7 +71,7 @@ module "amazon_prometheus_proxy_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.46.0"
+  version = "5.48.0"
 
   name_prefix = "amazon-prometheus-proxy"
 
@@ -98,7 +98,7 @@ module "managed_prometheus_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.46.0"
+  version = "5.48.0"
 
   name_prefix = "managed-prometheus-kms-access"
 
@@ -147,7 +147,7 @@ module "mlflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.46.0"
+  version = "5.48.0"
 
   name_prefix = "mlflow"
 
@@ -168,7 +168,7 @@ module "gha_mojas_airflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.46.0"
+  version = "5.48.0"
 
   name_prefix = "github-actions-mojas-airflow"
 
@@ -198,29 +198,18 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:DescribeResource",
       "lakeformation:GetDataAccess",
     ]
-    resources = [
-      "arn:aws:lakeformation:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"
-    ]
+    resources = ["arn:aws:lakeformation:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:catalog:${data.aws_caller_identity.current.account_id}"]
   }
-
   statement {
-    effect = "Allow"
-    actions = [
-      "iam:PutRolePolicy"
-    ]
-    resources = [
-      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"
-    ]
+    effect    = "Allow"
+    actions   = ["iam:PutRolePolicy"]
+    resources = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/lakeformation.amazonaws.com/AWSServiceRoleForLakeFormationDataAccess"]
   }
   # Needed for LakeFormationAdmin to check the presense of the Lake Formation Service Role
   statement {
-    effect = "Allow"
-    actions = [
-      "iam:CreateServiceLinkedRole"
-    ]
-    resources = [
-      "*"
-    ]
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = ["*"]
     condition {
       test     = "StringEquals"
       variable = "iam:AWSServiceName"
@@ -243,9 +232,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "s3:*",
       "quicksight:*"
     ]
-    resources = [
-      "*"
-    ]
+    resources = ["*"]
   }
   statement {
     effect = "Allow"
@@ -253,11 +240,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "ram:CreateResourceShare",
       "ram:DeleteResourceShare"
     ]
-    resources = [
-      "arn:aws:ram:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:resource-share/*"
-    ]
+    resources = ["arn:aws:ram:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:resource-share/*"]
   }
-
   statement {
     effect = "Allow"
     actions = [
@@ -274,14 +258,21 @@ module "analytical_platform_lake_formation_share_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.46.0"
+  version = "5.48.0"
 
   name_prefix = "analytical-platform-lake-formation-sharing-policy"
 
   policy = data.aws_iam_policy_document.analytical_platform_share_policy.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "quicksight_vpc_connection" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  #checkov:skip=CKV_AWS_111:Policy suggested by AWS documentation
+  #checkov:skip=CKV_AWS_356:Policy suggested by AWS documentation
+
   statement {
     sid    = "QuickSightVPCConnection"
     effect = "Allow"
@@ -301,11 +292,130 @@ module "quicksight_vpc_connection_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.46.0"
+  version = "5.48.0"
 
   name_prefix = "quicksight-vpc-connection"
 
   policy = data.aws_iam_policy_document.quicksight_vpc_connection.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_formation_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  statement {
+    sid    = "AllowS3ReadWriteAPDataProdDerivedTables"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = ["arn:aws:s3:::mojap-derived-tables/prod/*"]
+  }
+  statement {
+    sid    = "AllowS3AccessAPDataProdDerivedTablesBucket"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+    ]
+    resources = ["arn:aws:s3:::mojap-derived-tables"]
+  }
+  statement {
+    sid    = "AllowLakeFormationCloudWatchLogs"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*",
+      "arn:aws:logs:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:log-group:/aws-lakeformation-acceleration/*:log-stream:*"
+    ]
+  }
+}
+
+module "data_production_mojap_derived_bucket_lake_formation_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.48.0"
+
+  name_prefix = "analytical-platform-data-bucket-lake-formation-policy"
+
+  policy = data.aws_iam_policy_document.data_production_mojap_derived_bucket_lake_formation_policy.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "analytical_platform_cadet_runner_compute_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  statement {
+    sid    = "AthenaAccess"
+    effect = "Allow"
+    actions = [
+      "athena:List*",
+      "athena:Get*",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:eu-west-2:${data.aws_caller_identity.current.account_id}:datacatalog/*",
+      "arn:aws:athena:eu-west-2:${data.aws_caller_identity.current.account_id}:workgroup/*"
+    ]
+  }
+  statement {
+    sid    = "GlueAccess"
+    effect = "Allow"
+    actions = [
+      "glue:Get*",
+      "glue:DeleteTable",
+      "glue:DeleteTableVersion",
+      "glue:DeleteSchema",
+      "glue:DeletePartition",
+      "glue:DeleteDatabase",
+      "glue:UpdateTable",
+      "glue:UpdateSchema",
+      "glue:UpdatePartition",
+      "glue:UpdateDatabase",
+      "glue:CreateTable",
+      "glue:CreateSchema",
+      "glue:CreatePartition",
+      "glue:CreatePartitionIndex",
+      "glue:BatchCreatePartition",
+      "glue:CreateDatabase"
+    ]
+    resources = [
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:schema/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:table/*/*",
+      "arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:catalog"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+      "glue:GetDatabase",
+      "glue:GetPartition"
+    ]
+    resources = ["arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:*"]
+  }
+}
+
+module "analytical_platform_cadet_runner_compute_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.48.0"
+
+  name_prefix = "analytical-platform-cadet-runner-compute-policy"
+
+  policy = data.aws_iam_policy_document.analytical_platform_cadet_runner_compute_policy.json
 
   tags = local.tags
 }

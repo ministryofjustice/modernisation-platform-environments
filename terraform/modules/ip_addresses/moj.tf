@@ -27,7 +27,6 @@ locals {
     mojo_arkf_internet_egress_exponential_e = "51.149.249.32/29"
     mojo_arkf_internet_egress_vodafone      = "194.33.248.0/29"
 
-
     ark_dc_external_internet = [
       "195.59.75.0/24",
       "194.33.192.0/25",
@@ -42,7 +41,7 @@ locals {
       "194.33.218.0/24"
     ]
 
-    digital_prisons = [
+    mojo_azure_landing_zone_egress = [
       "20.49.214.199/32",
       "20.49.214.228/32",
       "20.26.11.71/32",
@@ -52,7 +51,6 @@ locals {
     palo_alto_primsa_access_corporate   = "128.77.75.64/26"
     palo_alto_primsa_access_third_party = "128.77.75.0/25"
     palo_alto_primsa_access_residents   = "128.77.75.128/26"
-
 
     ark_dc_external_internet = [
       "195.59.75.0/24",
@@ -92,6 +90,7 @@ locals {
       local.moj_cidr.mojo_arkf_internet_egress_exponential_e,
       local.moj_cidr.mojo_arkf_internet_egress_vodafone,
       local.moj_cidr.ark_dc_external_internet,
+      local.moj_cidr.mojo_azure_landing_zone_egress
     ])
 
     trusted_moj_enduser_internal = [

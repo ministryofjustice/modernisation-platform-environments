@@ -28,7 +28,11 @@ locals {
       notify_image_version   = "0.0.19"
 
       /* Target Buckets */
-      target_buckets = ["mojap-land-dev"]
+      target_buckets          = ["mojap-land-dev"]
+      datasync_target_buckets = ["mojap-land-dev"]
+
+      /* Target KMS */
+      mojap_land_kms_key = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/8c53fbac-3106-422a-8f3d-409bb3b0c94d"
 
       /* Transfer Server */
       transfer_server_hostname   = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
@@ -72,7 +76,11 @@ locals {
       notify_image_version   = "0.0.19"
 
       /* Target Buckets */
-      target_buckets = ["mojap-land"]
+      target_buckets          = ["mojap-land", "mojap-ingestion-${local.environment}-ext-2024-target"]
+      datasync_target_buckets = ["mojap-land"]
+
+      /* Target KMS */
+      mojap_land_kms_key = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
 
       /* Transfer Server */
       transfer_server_hostname   = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
