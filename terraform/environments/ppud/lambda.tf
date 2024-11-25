@@ -488,11 +488,11 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
 
 resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_graph_dev" {
   count         = local.is-development == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
+  statement_id  = "AllowAccesstoCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_send_cpu_graph_dev[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
+  principal     = "cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
@@ -507,9 +507,9 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev]
   reserved_concurrent_executions = 5
  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
-  }
+ # dead_letter_config {
+ #   target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+ # }
   tracing_config {
     mode = "Active"
   }
