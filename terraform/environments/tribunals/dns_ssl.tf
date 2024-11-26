@@ -311,6 +311,7 @@ locals {
     information_tribunal        = module.information_tribunal
     lands_tribunal              = module.lands_tribunal
     transport                   = module.transport
+    asylum_support              = module.asylum_support
     charity_tribunal_decisions  = module.charity_tribunal_decisions
     claims_management_decisions = module.claims_management_decisions
     consumer_credit_appeals     = module.consumer_credit_appeals
