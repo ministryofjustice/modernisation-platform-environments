@@ -10,7 +10,7 @@ locals {
   # Add priority mappings
   listener_rule_priorities = {
     for k, v in var.services : v.name_prefix => (
-      index(keys(var.services), k) + 1) * 10
+      index(keys(var.services), k) + 1)
   }
 }
 
