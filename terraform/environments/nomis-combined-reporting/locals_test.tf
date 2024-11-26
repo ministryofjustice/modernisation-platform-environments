@@ -119,6 +119,8 @@ locals {
     secretsmanager_secrets = {
       "/oracle/database/T1BIPSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T1BIPAUD" = local.secretsmanager_secrets.db
+      "/oracle/database/T1BISYS"  = local.secretsmanager_secrets.db
+      "/oracle/database/T1BIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/t1"               = local.secretsmanager_secrets.bip
       "/sap/bods/t1"              = local.secretsmanager_secrets.bods
     }
