@@ -41,8 +41,8 @@ resource "aws_db_instance" "database_2022" {
 
   multi_az = false
 
-  db_subnet_group_name   = aws_db_subnet_group.db.id
-  vpc_security_group_ids = [aws_security_group.db.id]
+  db_subnet_group_name   = aws_db_subnet_group.db[0].id
+  vpc_security_group_ids = [aws_security_group.db[0].id]
   port                   = 1433
 
   auto_minor_version_upgrade = true
@@ -50,7 +50,7 @@ resource "aws_db_instance" "database_2022" {
   maintenance_window         = "Mon:00:00-Mon:03:00"
   deletion_protection        = false
 
-  option_group_name = aws_db_option_group.sqlserver_backup_restore_2022.name
+  option_group_name = aws_db_option_group.sqlserver_backup_restore_2022[0].name
 
   iam_database_authentication_enabled = false
 
@@ -139,7 +139,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_glue_access" {
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id = aws_security_group.d[0].id
+  referenced_security_group_id = aws_security_group.db[0].id
 }
 
 resource "aws_vpc_security_group_egress_rule" "db_glue_access" {

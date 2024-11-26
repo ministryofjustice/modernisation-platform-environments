@@ -47,7 +47,7 @@ module "rds_bastion" {
 resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
   count = local.create_rds_instance
 
-  security_group_id = module.rds_bastion.bastion_security_group
+  security_group_id = module.rds_bastion[0].bastion_security_group
   description       = "EC2 MSSQL Access"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -58,7 +58,7 @@ resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
 resource "aws_vpc_security_group_egress_rule" "vpc_access" {
   count = local.create_rds_instance
 
-  security_group_id = module.rds_bastion.bastion_security_group
+  security_group_id = module.rds_bastion[0].bastion_security_group
   description       = "Reach vpc endpoints"
   ip_protocol       = "tcp"
   from_port         = 443
@@ -69,12 +69,12 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
   count = local.create_rds_instance
 
-  security_group_id            = aws_security_group.db.id
+  security_group_id            = aws_security_group.db[0].id
   description                  = "EC2 instance connection to RDS"
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id = module.rds_bastion.bastion_security_group
+  referenced_security_group_id = module.rds_bastion[0].bastion_security_group
 }
 
 data "aws_iam_policy_document" "ec2_s3_policy" {
@@ -104,7 +104,7 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
   count = local.create_rds_instance
 
   name   = "ec2-s3-policy"
-  role   = module.rds_bastion.bastion_iam_role.name
+  role   = module.rds_bastion[0].bastion_iam_role.name
   policy = data.aws_iam_policy_document.ec2_s3_policy.json
 }
 
@@ -112,7 +112,7 @@ resource "aws_iam_policy_attachment" "ssm-attachments-rds" {
   count = local.create_rds_instance
 
   name       = "ssm-attach-instance-role-bastion-rds"
-  roles      = [module.rds_bastion.bastion_iam_role.name]
+  roles      = [module.rds_bastion[0].bastion_iam_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
