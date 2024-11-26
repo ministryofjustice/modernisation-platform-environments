@@ -918,13 +918,12 @@ variable "s3_buckets" {
 variable "schedule_alarms_lambda" {
   description = ""
   type = object({
-    function_name    = optional(string, null)
     lambda_log_level = optional(string, "INFO")
     alarm_list       = optional(list(string), [])
     alarm_patterns   = optional(list(string), [])
     disable_weekend  = optional(bool, true)
-    start_time       = optional(string, "06:15")
-    end_time         = optional(string, "20:45")
+    start_time       = optional(string, "19:45") # when to disable alarm
+    end_time         = optional(string, "06:15") # when to re-enable alarm
     tags             = optional(map(string), {})
   })
   default = {}
