@@ -134,23 +134,23 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
 resource "aws_vpc_security_group_ingress_rule" "db_glue_access" {
   count = local.create_rds_instance
 
-  security_group_id            = aws_security_group.db.id
+  security_group_id            = aws_security_group.db[0].id
   description                  = "glue"
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.d[0].id
 }
 
 resource "aws_vpc_security_group_egress_rule" "db_glue_access" {
   count = local.create_rds_instance
 
-  security_group_id            = aws_security_group.db.id
+  security_group_id            = aws_security_group.db[0].id
   description                  = "glue"
   ip_protocol                  = "tcp"
   from_port                    = 0
   to_port                      = 65535
-  referenced_security_group_id = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.db[0].id
 }
 
 resource "aws_db_subnet_group" "db" {
@@ -178,7 +178,7 @@ resource "aws_db_option_group" "sqlserver_backup_restore_2022" {
 
     option_settings {
       name  = "IAM_ROLE_ARN"
-      value = aws_iam_role.s3_database_backups_role.arn
+      value = aws_iam_role.s3_database_backups_role[0].arn
     }
   }
 
@@ -243,9 +243,9 @@ data "aws_iam_policy_document" "rds_data_store_access" {
   }
 }
 
-resource "aws_iam_role_policy" "this_transfer_workflow" {
+resource "aws_iam_role_policy" "s3_database_backups" {
   count = local.create_rds_instance
 
-  role   = aws_iam_role.s3_database_backups_role.name
+  role   = aws_iam_role.s3_database_backups_role[0].name
   policy = data.aws_iam_policy_document.rds_data_store_access.json
 }
