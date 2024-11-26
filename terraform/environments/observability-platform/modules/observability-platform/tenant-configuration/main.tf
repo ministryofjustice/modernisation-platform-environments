@@ -31,9 +31,10 @@ module "amazon_prometheus_query_source" {
 
   source = "../../grafana/amazon-prometheus-query-source"
 
-  name                           = each.key
-  account_id                     = var.environment_management.account_ids[each.key]
-  amazon_prometheus_workspace_id = each.value.amazon_prometheus_workspace_id
+  name                               = each.key
+  account_id                         = var.environment_management.account_ids[each.key]
+  amazon_prometheus_workspace_region = try(each.value.amazon_prometheus_workspace_region, "eu-west-2")
+  amazon_prometheus_workspace_id     = each.value.amazon_prometheus_workspace_id
 }
 
 locals {
