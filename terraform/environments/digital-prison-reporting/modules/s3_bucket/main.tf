@@ -37,45 +37,51 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
 
   bucket = aws_s3_bucket.storage[0].id
 
-  # Main lifecycle rule for standard categories (short_term, long_term, temporary)
-  rule {
-    id     = var.name
-    status = var.enable_lifecycle ? "Enabled" : "Disabled"
+  # Main lifecycle rule for standard categories (short_term, long_term, temporary, standard)
+  dynamic "rule" {
+    for_each = var.enable_lifecycle ? [1] : []
+    content {
+      id     = var.name
+      status = "Enabled"
 
-    # Short-Term Retention Policy
-    # - Transitions objects to STANDARD_IA after 30 days (cost-effective storage for infrequent access).
-    # - Deletes objects after 90 days.
-    dynamic "transition" {
-      for_each = var.enable_lifecycle && var.lifecycle_category == "short_term" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []
-      content {
-        days          = transition.value.days
-        storage_class = transition.value.storage_class
+      # Short-Term Retention Policy
+      dynamic "transition" {
+        for_each = var.lifecycle_category == "short_term" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []
+        content {
+          days          = transition.value.days
+          storage_class = transition.value.storage_class
+        }
       }
-    }
 
-    dynamic "expiration" {
-      for_each = var.enable_lifecycle && var.lifecycle_category == "short_term" ? [{ days = 90 }] : (
-                 var.enable_lifecycle && var.lifecycle_category == "temporary" ? [{ days = 30 }] : [])
-      content {
-        days = expiration.value.days
+      # Standard Retention Policy: Move to STANDARD_IA after 30 days and remain there indefinitely
+      dynamic "transition" {
+        for_each = var.lifecycle_category == "standard" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []
+        content {
+          days          = transition.value.days
+          storage_class = transition.value.storage_class
+        }
       }
-    }
 
-    # Long-Term Retention Policy
-    # - Transitions objects to progressively cheaper storage classes:
-    #   - STANDARD_IA after 60 days.
-    #   - GLACIER after 180 days.
-    #   - DEEP_ARCHIVE after 365 days.
-    # - Does not delete objects (no expiration).
-    dynamic "transition" {
-      for_each = var.enable_lifecycle && var.lifecycle_category == "long_term" ? [
-        { days = 60, storage_class = "STANDARD_IA" },
-        { days = 180, storage_class = "GLACIER" },
-        { days = 365, storage_class = "DEEP_ARCHIVE" }
-      ] : []
-      content {
-        days          = transition.value.days
-        storage_class = transition.value.storage_class
+      # Expiration logic for short-term and temporary categories
+      dynamic "expiration" {
+        for_each = var.lifecycle_category == "short_term" ? [{ days = 90 }] : (
+                   var.lifecycle_category == "temporary" ? [{ days = 30 }] : [])
+        content {
+          days = expiration.value.days
+        }
+      }
+
+      # Long-Term Retention Policy
+      dynamic "transition" {
+        for_each = var.lifecycle_category == "long_term" ? [
+          { days = 30, storage_class = "STANDARD_IA" },
+          { days = 180, storage_class = "GLACIER" },
+          { days = 365, storage_class = "DEEP_ARCHIVE" }
+        ] : []
+        content {
+          days          = transition.value.days
+          storage_class = transition.value.storage_class
+        }
       }
     }
   }

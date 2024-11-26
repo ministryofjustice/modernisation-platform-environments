@@ -123,7 +123,7 @@ variable "override_expiration_rules" {
 
 variable "lifecycle_category" {
   type    = string
-  default = "long_term" # Options: "short_term", "long_term", "temporary"
+  default = "standard" # Options: "short_term", "long_term", "temporary", "standard"
 }
 
 variable "enable_lifecycle_expiration" {
