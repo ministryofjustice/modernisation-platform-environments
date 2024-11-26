@@ -73,7 +73,7 @@ resource "aws_security_group" "db" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mp" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id = aws_security_group.db.id
   description       = "Default SQL Server port 1433 access for Matt Price"
@@ -85,7 +85,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mp" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id = aws_security_group.db.id
   description       = "Default SQL Server port 1433 access for Matt Heery"
@@ -96,7 +96,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
   cidr_ipv4 = "152.37.111.98/32"
 }
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id = aws_security_group.db.id
   description       = "PF ip"
@@ -108,7 +108,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id = aws_security_group.db.id
   description       = "Default SQL Server port 1433 access for MK"
@@ -120,7 +120,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id = aws_security_group.db.id
   description       = "Default SQL Server port 1433 access for Lee Broadhurst"
