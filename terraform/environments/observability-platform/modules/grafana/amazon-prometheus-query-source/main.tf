@@ -1,6 +1,6 @@
 locals {
   name = "${var.name}-amp"
-  url  = "https://aps-workspaces.eu-west-2.amazonaws.com/workspaces/${var.amazon_prometheus_workspace_id}/"
+  url  = "https://aps-workspaces.${var.amazon_prometheus_workspace_region}.amazonaws.com/workspaces/${var.amazon_prometheus_workspace_id}/"
 }
 
 resource "grafana_data_source" "this" {
