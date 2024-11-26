@@ -431,7 +431,7 @@ module "copy_apdp_cadet_metadata_to_compute_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.48.0"
 
-  name_prefix = "copy-ap-cadet-metadata-to-compute-"
+  name_prefix = "copy-apdp-cadet-metadata-to-compute-"
 
   policy = data.aws_iam_policy_document.copy_apdp_cadet_metadata_to_compute_policy.json
 
