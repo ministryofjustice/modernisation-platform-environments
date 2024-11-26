@@ -116,7 +116,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_and_s3_parquet_write_v2.py"
@@ -177,7 +177,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_and_s3_parquet_write_v4d.py"
@@ -244,7 +244,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_migration.py"
@@ -299,7 +299,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_migration_monthly.py"
@@ -354,7 +354,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/resizing_parquet_files.py"

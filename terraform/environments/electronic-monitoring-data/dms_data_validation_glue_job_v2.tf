@@ -61,7 +61,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_to_s3_parquet_v1.py"
@@ -138,7 +138,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_to_s3_parquet_v2.py"
@@ -207,7 +207,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_to_s3_parquet_partitionby_yyyy_mm.py"
@@ -288,7 +288,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm.py"
@@ -357,7 +357,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/parquet_resize_or_partitionby_yyyy_mm_dd.py"
@@ -422,7 +422,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_table_rows_hashvalue_to_parquet.py"
@@ -489,7 +489,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_on_rows_hashvalue.py"

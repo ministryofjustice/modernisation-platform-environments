@@ -21,7 +21,7 @@ module "dms_task" {
   database_name = each.key
 
   # DMS Source Endpoint Inputs
-  rds_db_security_group_id = aws_security_group.db.id
+  rds_db_security_group_id = aws_security_group.db[0].id
   rds_db_server_name       = split(":", aws_db_instance.database_2022[0].endpoint)[0]
   rds_db_instance_port     = aws_db_instance.database_2022[0].port
   rds_db_username          = aws_db_instance.database_2022[0].username
