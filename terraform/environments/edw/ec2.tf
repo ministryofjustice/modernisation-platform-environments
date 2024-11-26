@@ -249,7 +249,8 @@ else
 fi
 
 # Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
-sed -i '/(DESCRIPTION =/a\\  (ENABLE=broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
+grep -q '(ENABLE = broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora || sed -i '/(DESCRIPTION =/a\\  (ENABLE = broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
+
 
 sudo mkdir -p /var/opt/oracle
 chown oracle:dba /var/opt/oracle
@@ -292,6 +293,7 @@ cat <<EOC3 > /etc/cron.d/backup_cron
 0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
+# 0 7 * * 1 /home/oracle/scripts/maat_05365_ware_db_changes.sh
 EOC3
 
 chown root:root /etc/cron.d/backup_cron
