@@ -127,20 +127,6 @@ locals {
         "analytical-platform" = {
           identity_centre_team = "analytical-platform"
           aws_accounts = {
-            "analytical-platform-ingestion-development" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = true
-              athena_enabled                  = false
-            },
-            "analytical-platform-ingestion-production" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = true
-              athena_enabled                  = false
-            },
             "analytical-platform-compute-development" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
@@ -165,11 +151,60 @@ locals {
               xray_enabled                    = true
               athena_enabled                  = false
             },
+            "analytical-platform-ingestion-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = true
+              athena_enabled                  = false
+            },
+            "analytical-platform-ingestion-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = true
+              athena_enabled                  = false
+            },
+            "analytical-platform-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            }
             "analytical-platform-production" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = true
               amazon_prometheus_workspace_id  = "ws-a7b353be-244a-47e7-8054-436b41c050d932"
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "analytical-platform-data-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "analytical-platform-data-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "analytical-platform-landing-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "analytical-platform-management-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
               xray_enabled                    = false
               athena_enabled                  = false
             }
@@ -179,6 +214,13 @@ locals {
           "identity_centre_team" = "data-engineering",
           "aws_accounts" = {
             "analytical-platform-data-engineering-sandboxa" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "analytical-platform-data-engineering-production" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
