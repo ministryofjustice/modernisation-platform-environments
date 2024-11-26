@@ -460,7 +460,7 @@ if __name__ == "__main__":
             print_existing_s3parquet_stats(prq_table_folder_path)
             LOGGER.info(f"""> Starting validation: {temp_msg}""")
             df_dv_output = compare_rds_parquet_samples(rds_jdbc_conn_obj,
-                                                       rds_db_table_name,
+                                                       rds_sqlserver_db_table,
                                                        df_rds_query_read,
                                                        rds_db_tbl_pkey_column,
                                                        prq_table_folder_path,
@@ -479,7 +479,7 @@ if __name__ == "__main__":
         if validation_sample_fraction_float != 0:
             LOGGER.info(f"""> Starting validation: {temp_msg}""")
             df_dv_output = compare_rds_parquet_samples(rds_jdbc_conn_obj,
-                                                       rds_db_table_name,
+                                                       rds_sqlserver_db_table,
                                                        df_rds_query_read,
                                                        rds_db_tbl_pkey_column,
                                                        prq_table_folder_path,

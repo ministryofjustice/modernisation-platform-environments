@@ -705,10 +705,8 @@ class CustomPysparkMethods:
     def get_nvl_select_list(in_rds_df: DataFrame,
                             rds_jdbc_conn_obj,
                             in_rds_tbl_name):
-        df_col_attr = rds_jdbc_conn_obj.get_rds_tbl_col_attributes(
-            in_rds_tbl_name)
-        df_col_attr_dict = CustomPysparkMethods.get_rds_tbl_col_attr_dict(
-            df_col_attr)
+        df_col_attr = rds_jdbc_conn_obj.get_rds_tbl_col_attributes(in_rds_tbl_name)
+        df_col_attr_dict = CustomPysparkMethods.get_rds_tbl_col_attr_dict(df_col_attr)
         df_col_dtype_dict = CustomPysparkMethods.get_dtypes_dict(in_rds_df)
 
         temp_select_list = list()
