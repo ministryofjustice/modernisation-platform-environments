@@ -19,9 +19,6 @@ locals {
         "10.0.0.0/8"
       ]
 
-      /* Observability Platform */
-      observability_platform = "development"
-
       /* Image Versions */
       scan_image_version     = "0.1.3"
       transfer_image_version = "0.0.18"
@@ -66,9 +63,6 @@ locals {
         /* Send all traffic not destined for local down to the transit gateway */
         "10.0.0.0/8"
       ]
-
-      /* Observability Platform */
-      observability_platform = "production"
 
       /* Image Versions */
       scan_image_version     = "0.1.3"
