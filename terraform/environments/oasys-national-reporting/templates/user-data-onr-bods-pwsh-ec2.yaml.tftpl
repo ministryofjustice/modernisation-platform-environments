@@ -6,24 +6,24 @@ version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is r
 tasks:
   - task: executeScript
     inputs:
-      frequency: once
-      type: powershell
-      runAs: admin
-      content: |-
-        # Initialize all offline disks
-        $offlineDisks = Get-Disk | Where-Object IsOffline -Eq $true
-        foreach ($disk in $offlineDisks) {
+      - frequency: once
+        type: powershell
+        runAs: admin
+        content: |-
+          # Initialize all offline disks
+          $offlineDisks = Get-Disk | Where-Object IsOffline -Eq $true
+          foreach ($disk in $offlineDisks) {
           Initialize-Disk -Number $disk.Number -PartitionStyle GPT
-        }
-        # Create partitions and assign drive letters
-        $letters = @('D', 'E', 'F')
-        $labels  = @('Temp', 'App', 'Storage')
-        $disks = Get-Disk | Where-Object PartitionStyle -Eq 'GPT' | Where-Object IsSystem -Eq $false
-        for ($i = 0; $i -lt $disks.Count; $i++) {
+          }
+          # Create partitions and assign drive letters
+          $letters = @('D', 'E', 'F')
+          $labels  = @('Temp', 'App', 'Storage')
+          $disks = Get-Disk | Where-Object PartitionStyle -Eq 'GPT' | Where-Object IsSystem -Eq $false
+          for ($i = 0; $i -lt $disks.Count; $i++) {
           $partition = New-Partition -DiskNumber $disks[$i].Number -UseMaximumSize
           Format-Volume -Partition $partition -FileSystem NTFS -NewFileSystemLabel $labels[$i] -Confirm:$false
           Assign-Partition -Partition $partition -DriveLetter $letters[$i]
-        }
+          }
   - task: executeScript
     inputs:
       - frequency: once
@@ -125,17 +125,3 @@ tasks:
             choco install awscli -y
           }
           Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
-      - frequency: once
-        type: powershell
-        runAs: admin
-        content: |-
-          # Run UserData powershell from modernisation-platform-configuration-management repo
-          $ErrorActionPreference = "Stop"
-          Write-Output "Downloading and running Run-GitScript.ps1"
-          Set-Location -Path ([System.IO.Path]::GetTempPath())
-          $GitBranch = "${branch}"
-          $Script = "Invoke-UserDataScript.ps1"
-          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
-          Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
-          . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch
-          Exit $LASTEXITCODE

@@ -166,6 +166,10 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
+        "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+        "xvdk" = { type = "gp3", size = 128 } # D:/ Temp
+        "xvdl" = { type = "gp3", size = 128 } # E:/ App
+        "xvdm" = { type = "gp3", size = 700 } # F:/ Storage
         cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "t2"
@@ -173,27 +177,33 @@ locals {
         })
       })
 
-      t2-onr-bods-2 = merge(local.ec2_instances.bods, {
-        config = merge(local.ec2_instances.bods.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-          user_data_raw = base64encode(templatefile(
-            "./templates/user-data-test.yaml.tftpl", {
-              branch   = "main"
-            }
-          ))
-        })
-        instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "m4.xlarge"
-        })
-        cloudwatch_metric_alarms = null
-        tags = merge(local.ec2_instances.bods.tags, {
-          oasys-national-reporting-environment = "t2"
-          domain-name                          = "azure.noms.root"
-        })
-      })
+      # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2a"
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/user-data-test.yaml.tftpl", {
+      #         branch   = "main"
+      #       }
+      #     ))
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #         ebs_volumes = {
+      #   "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+      #   "xvdk" = { type = "gp3", size = 128 } # D:/ Temp
+      #   "xvdl" = { type = "gp3", size = 128 } # E:/ App
+      #   "xvdm" = { type = "gp3", size = 700 } # F:/ Storage
+      # }
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #     domain-name                          = "azure.noms.root"
+      #   })
+      # })
 
       # Pending sorting out cluster install of Bods in  modernisation-platform-configuration-management repo
       # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
