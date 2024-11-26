@@ -196,7 +196,7 @@ resource "aws_lb_target_group_attachment" "WAM-Portal-production" {
 
 resource "aws_lb_target_group" "WAM-Target-Group-Dev" {
   count    = local.is-development == true ? 1 : 0
-  name     = "WAM"
+  name     = "WAM-Dev"
   port     = 443
   protocol = "HTTPS"
   vpc_id   = data.aws_vpc.shared.id
@@ -219,7 +219,7 @@ resource "aws_lb_target_group" "WAM-Target-Group-Dev" {
 
 resource "aws_lb_target_group" "WAM-Target-Group-Preprod" {
   count    = local.is-preproduction == true ? 1 : 0
-  name     = "WAM"
+  name     = "WAM-Preprod"
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
@@ -242,7 +242,7 @@ resource "aws_lb_target_group" "WAM-Target-Group-Preprod" {
 
 resource "aws_lb_target_group" "WAM-Target-Group-Prod" {
   count    = local.is-production == true ? 1 : 0
-  name     = "WAM"
+  name     = "WAM-Prod"
   port     = 80
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id
