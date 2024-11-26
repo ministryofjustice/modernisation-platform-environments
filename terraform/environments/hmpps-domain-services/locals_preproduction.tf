@@ -154,7 +154,6 @@ locals {
     }
 
     schedule_alarms_lambda = {
-      function_name = "schedule-alarms"
       alarm_patterns = [
         "public-https-*-unhealthy-load-balancer-host",
       ]
