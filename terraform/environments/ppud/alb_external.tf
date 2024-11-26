@@ -117,7 +117,7 @@ resource "aws_lb_listener" "WAM-Front-End-DEV" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
+    target_group_arn = aws_lb_target_group.WAM-Target-Group-Dev[0].arn
   }
 }
 
@@ -131,7 +131,7 @@ resource "aws_lb_listener" "WAM-Front-End-Preprod" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
+    target_group_arn = aws_lb_target_group.WAM-Target-Group-Preprod[0].arn
   }
 }
 
@@ -145,7 +145,7 @@ resource "aws_lb_listener" "WAM-Front-End-Prod" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
+    target_group_arn = aws_lb_target_group.WAM-Target-Group-Prod[0].arn
   }
 }
 
@@ -174,14 +174,14 @@ resource "aws_lb_target_group" "WAM-Target-Group" {
 
 resource "aws_lb_target_group_attachment" "WAM-Portal-development" {
   count            = local.is-development == true ? 1 : 0
-  target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
+  target_group_arn = aws_lb_target_group.WAM-Target-Group-Dev[0].arn
   target_id        = aws_instance.s609693lo6vw105[0].id
   port             = 80
 }
 
 resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
   count            = local.is-preproduction == true ? 1 : 0
-  target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
+  target_group_arn = aws_lb_target_group.WAM-Target-Group-Preprod[0].arn
   target_id        = aws_instance.s618358rgvw201[0].id
   port             = 80
 }
@@ -189,7 +189,7 @@ resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
 
 resource "aws_lb_target_group_attachment" "WAM-Portal-production" {
   count            = local.is-production == true ? 1 : 0
-  target_group_arn = aws_lb_target_group.WAM-Target-Group.arn
+  target_group_arn = aws_lb_target_group.WAM-Target-Group-Prod[0].arn
   target_id        = aws_instance.s618358rgvw204[0].id
   port             = 80
 }
@@ -197,7 +197,7 @@ resource "aws_lb_target_group_attachment" "WAM-Portal-production" {
 resource "aws_lb_target_group" "WAM-Target-Group-Dev" {
   count    = local.is-development == true ? 1 : 0
   name     = "WAM-Dev"
-  port     = 443
+  port     = 80
   protocol = "HTTPS"
   vpc_id   = data.aws_vpc.shared.id
 
@@ -206,7 +206,7 @@ resource "aws_lb_target_group" "WAM-Target-Group-Dev" {
     path                = "/"
     interval            = 30
     protocol            = "HTTPS"
-    port                = 443
+    port                = 80
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2
