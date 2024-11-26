@@ -14,6 +14,9 @@ locals {
   is-test          = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-test"
   is-development   = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-development"
 
+  is-dev-or-prod = local.is-development || local.is-production ? 1 : 0
+
+
   # Merge tags from the environment json file with additional ones
   tags = merge(
     jsondecode(data.http.environments_file.response_body).tags,

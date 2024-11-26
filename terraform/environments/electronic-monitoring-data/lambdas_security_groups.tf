@@ -17,7 +17,9 @@ resource "aws_vpc_security_group_egress_rule" "lambda_all_outbound" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "lambda_to_rds_sg_rule" {
-  security_group_id = aws_security_group.db.id
+  count = local.create_rds_instance
+
+  security_group_id = aws_security_group.db[0].id
 
   referenced_security_group_id = aws_security_group.lambda_db_security_group.id
   ip_protocol                  = "tcp"

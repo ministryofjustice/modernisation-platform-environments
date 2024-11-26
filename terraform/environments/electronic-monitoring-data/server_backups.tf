@@ -1,3 +1,7 @@
+locals {
+  create_rds_instance = local.is-development || local.is-production ? 1 : 0
+}
+
 #------------------------------------------------------------------------------
 # Secret generation for database access.
 #------------------------------------------------------------------------------
@@ -19,7 +23,7 @@ resource "random_password" "random_password" {
 # RDS SQL server 2022 database
 #------------------------------------------------------------------------------
 resource "aws_db_instance" "database_2022" {
-  #   count = local.is-production ? 1 : 0
+  count = local.create_rds_instance
 
   identifier    = "database-v2022"
   license_model = "license-included"
@@ -31,14 +35,14 @@ resource "aws_db_instance" "database_2022" {
   instance_class = "db.m5.large"
 
   storage_type          = "gp2"
-  allocated_storage     = 2100
-  max_allocated_storage = 2500
+  allocated_storage     = local.is-production ? 2100 : 10
+  max_allocated_storage = local.is-production ? 2500 : 11
   storage_encrypted     = true
 
   multi_az = false
 
-  db_subnet_group_name   = aws_db_subnet_group.db.id
-  vpc_security_group_ids = [aws_security_group.db.id]
+  db_subnet_group_name   = aws_db_subnet_group.db[0].id
+  vpc_security_group_ids = [aws_security_group.db[0].id]
   port                   = 1433
 
   auto_minor_version_upgrade = true
@@ -46,7 +50,7 @@ resource "aws_db_instance" "database_2022" {
   maintenance_window         = "Mon:00:00-Mon:03:00"
   deletion_protection        = false
 
-  option_group_name = aws_db_option_group.sqlserver_backup_restore_2022.name
+  option_group_name = aws_db_option_group.sqlserver_backup_restore_2022[0].name
 
   iam_database_authentication_enabled = false
 
@@ -59,6 +63,8 @@ resource "aws_db_instance" "database_2022" {
 # Security group and subnets for accessing database
 #------------------------------------------------------------------------------
 resource "aws_security_group" "db" {
+  count = local.create_rds_instance
+
   name        = "database-security-group"
   description = "Allow DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
@@ -67,7 +73,9 @@ resource "aws_security_group" "db" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mp" {
-  security_group_id = aws_security_group.db.id
+  count = local.create_rds_instance
+
+  security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for Matt Price"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -77,9 +85,9 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mp" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
-  count = local.is-development ? 1 : 0
+  count = local.create_rds_instance
 
-  security_group_id = aws_security_group.db.id
+  security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for Matt Heery"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -88,7 +96,9 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
   cidr_ipv4 = "152.37.111.98/32"
 }
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
-  security_group_id = aws_security_group.db.id
+  count = local.create_rds_instance
+
+  security_group_id = aws_security_group.db[0].id
   description       = "PF ip"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -98,8 +108,9 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
+  count = local.create_rds_instance
 
-  security_group_id = aws_security_group.db.id
+  security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for MK"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -109,9 +120,9 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
-  count = local.is-development ? 1 : 0
+  count = local.create_rds_instance
 
-  security_group_id = aws_security_group.db.id
+  security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for Lee Broadhurst"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -121,26 +132,30 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_glue_access" {
+  count = local.create_rds_instance
 
-  security_group_id            = aws_security_group.db.id
+  security_group_id            = aws_security_group.db[0].id
   description                  = "glue"
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.db[0].id
 }
 
 resource "aws_vpc_security_group_egress_rule" "db_glue_access" {
+  count = local.create_rds_instance
 
-  security_group_id            = aws_security_group.db.id
+  security_group_id            = aws_security_group.db[0].id
   description                  = "glue"
   ip_protocol                  = "tcp"
   from_port                    = 0
   to_port                      = 65535
-  referenced_security_group_id = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.db[0].id
 }
 
 resource "aws_db_subnet_group" "db" {
+  count = local.create_rds_instance
+
   name       = "db-subnet-group"
   subnet_ids = data.aws_subnets.shared-public.ids
 
@@ -151,6 +166,8 @@ resource "aws_db_subnet_group" "db" {
 # Option group configuration for database
 #------------------------------------------------------------------------------
 resource "aws_db_option_group" "sqlserver_backup_restore_2022" {
+  count = local.create_rds_instance
+
   name                     = "sqlserver-v2022"
   option_group_description = "SQL server backup restoration using engine 16.x"
   engine_name              = "sqlserver-se"
@@ -161,7 +178,7 @@ resource "aws_db_option_group" "sqlserver_backup_restore_2022" {
 
     option_settings {
       name  = "IAM_ROLE_ARN"
-      value = aws_iam_role.s3_database_backups_role.arn
+      value = aws_iam_role.s3_database_backups_role[0].arn
     }
   }
 
@@ -189,6 +206,8 @@ data "aws_iam_policy_document" "rds-s3-access-policy" {
 }
 
 resource "aws_iam_role" "s3_database_backups_role" {
+  count = local.create_rds_instance
+
   name               = "s3-database-backups-role"
   assume_role_policy = data.aws_iam_policy_document.rds-s3-access-policy.json
 
@@ -224,7 +243,9 @@ data "aws_iam_policy_document" "rds_data_store_access" {
   }
 }
 
-resource "aws_iam_role_policy" "this_transfer_workflow" {
-  role   = aws_iam_role.s3_database_backups_role.name
+resource "aws_iam_role_policy" "s3_database_backups" {
+  count = local.create_rds_instance
+
+  role   = aws_iam_role.s3_database_backups_role[0].name
   policy = data.aws_iam_policy_document.rds_data_store_access.json
 }

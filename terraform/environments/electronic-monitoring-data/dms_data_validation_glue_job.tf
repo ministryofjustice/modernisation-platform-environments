@@ -85,8 +85,8 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 #   number_of_workers = 8
 #   default_arguments = {
 #     "--script_bucket_name"                = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                        = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                  = ""
 #     "--rds_sqlserver_db_schema"           = "dbo"
 #     "--rds_exclude_db_tbls"               = ""
@@ -116,7 +116,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_and_s3_parquet_write_v2.py"
@@ -146,8 +146,8 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 #   number_of_workers = 5
 #   default_arguments = {
 #     "--script_bucket_name"                = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                        = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                    = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                        = aws_db_instance.database_2022[0].password
 #     "--prq_leftanti_join_rds"             = "false"
 #     "--parquet_df_repartition_num"        = 32
 #     "--parallel_jdbc_conn_num"            = 4
@@ -177,7 +177,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_and_s3_parquet_write_v4d.py"
@@ -202,8 +202,8 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 #   number_of_workers = 5
 #   default_arguments = {
 #     "--script_bucket_name"                   = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                           = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                       = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                           = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                     = ""
 #     "--rds_sqlserver_db_schema"              = "dbo"
 #     "--rds_sqlserver_db_table"               = ""
@@ -244,7 +244,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_migration.py"
@@ -270,8 +270,8 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 #   number_of_workers = 5
 #   default_arguments = {
 #     "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
-#     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
-#     "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+#     "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022[0].endpoint)[0]
+#     "--rds_db_pwd"                       = aws_db_instance.database_2022[0].password
 #     "--rds_sqlserver_db"                 = ""
 #     "--rds_sqlserver_db_schema"          = "dbo"
 #     "--rds_sqlserver_db_table"           = ""
@@ -299,7 +299,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/rds_to_s3_parquet_migration_monthly.py"
@@ -354,7 +354,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/resizing_parquet_files.py"

@@ -47,17 +47,20 @@ resource "aws_security_group_rule" "dms_tcp_outbound" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "dms_db_ob_access" {
+  count = local.create_rds_instance
 
   security_group_id            = aws_security_group.dms_ri_security_group.id
   description                  = "dms_rds_db_outbound"
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.db[0].id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "dms_to_rds_sg_rule" {
-  security_group_id = aws_security_group.db.id
+  count = local.create_rds_instance
+  
+  security_group_id = aws_security_group.db[0].id
 
   referenced_security_group_id = aws_security_group.dms_ri_security_group.id
   ip_protocol                  = "tcp"
@@ -113,7 +116,9 @@ resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_inbound" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_db_inbound" {
-  security_group_id = aws_security_group.db.id
+  count = local.create_rds_instance
+
+  security_group_id = aws_security_group.db[0].id
 
   referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
   ip_protocol                  = "tcp"
