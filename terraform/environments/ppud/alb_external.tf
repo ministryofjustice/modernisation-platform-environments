@@ -149,6 +149,7 @@ resource "aws_lb_listener" "WAM-Front-End-Prod" {
   }
 }
 
+/*
 resource "aws_lb_target_group" "WAM-Target-Group" {
   name     = "WAM"
   port     = 80
@@ -170,7 +171,7 @@ resource "aws_lb_target_group" "WAM-Target-Group" {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
 }
-
+*/
 
 resource "aws_lb_target_group_attachment" "WAM-Portal-development" {
   count            = local.is-development == true ? 1 : 0
