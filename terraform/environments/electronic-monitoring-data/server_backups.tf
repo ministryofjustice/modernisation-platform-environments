@@ -75,7 +75,7 @@ resource "aws_security_group" "db" {
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mp" {
   count = local.create_rds_instance
 
-  security_group_id = aws_security_group.db.id
+  security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for Matt Price"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -87,7 +87,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mp" {
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
   count = local.create_rds_instance
 
-  security_group_id = aws_security_group.db.id
+  security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for Matt Heery"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -98,7 +98,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mh" {
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
   count = local.create_rds_instance
 
-  security_group_id = aws_security_group.db.id
+  security_group_id = aws_security_group.db[0].id
   description       = "PF ip"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -110,7 +110,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_pf" {
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
   count = local.create_rds_instance
 
-  security_group_id = aws_security_group.db.id
+  security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for MK"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -122,7 +122,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_mk" {
 resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
   count = local.create_rds_instance
 
-  security_group_id = aws_security_group.db.id
+  security_group_id = aws_security_group.db[0].id
   description       = "Default SQL Server port 1433 access for Lee Broadhurst"
   ip_protocol       = "tcp"
   from_port         = 1433
