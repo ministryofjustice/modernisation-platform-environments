@@ -130,3 +130,9 @@ variable "enable_lifecycle_expiration" {
   description = "Enable item expiration - requires 'enable_lifecycle' and 'override_expiration_rules' to be defined/enabled."
   default     = false
 }
+
+variable "enable_intelligent_tiering" {
+  description = "Enable Intelligent-Tiering storage class for S3 bucket"
+  type        = bool
+  default     = false
+}
