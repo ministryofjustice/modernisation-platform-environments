@@ -181,7 +181,7 @@ resource "aws_lb_target_group_attachment" "WAM-Portal-development" {
 
 resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
   count            = local.is-preproduction == true ? 1 : 0
-  target_group_arn = aws_lb_target_group.WAM-Target-GroupPreprod[0].arn
+  target_group_arn = aws_lb_target_group.WAM-Target-Group-Preprod[0].arn
   target_id        = aws_instance.s618358rgvw201[0].id
   port             = 80
 }
