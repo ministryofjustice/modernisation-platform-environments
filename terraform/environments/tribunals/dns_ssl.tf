@@ -104,7 +104,7 @@ variable "services" {
       module_key  = "transportappeals"
       port        = 49109
     },
-    "asylumsupport" = {
+    "asylum_support" = {
       name_prefix = "asylumsupport"
       module_key  = "asylumsupport"
       port        = 49120
