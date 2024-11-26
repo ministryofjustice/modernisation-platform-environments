@@ -1,5 +1,5 @@
 ##################################
-### S3 for Backup Lambda
+### S3 for Provisioning Scripts
 ##################################
 
 resource "aws_s3_bucket" "scripts" {
@@ -16,6 +16,21 @@ resource "aws_s3_bucket_public_access_block" "scripts" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_ownership_controls" "scripts" {
+  bucket = aws_s3_bucket.scripts.id
+  rule {
+    object_ownership = "ObjectWriter"
+  }
+}
+
+resource "aws_s3_bucket_acl" "scripts" {
+  bucket = aws_s3_bucket.scripts.id
+  acl    = "private"
+  depends_on = [
+    aws_s3_bucket_ownership_controls.scripts
+  ]
 }
 
 resource "aws_s3_bucket_versioning" "scripts" {
