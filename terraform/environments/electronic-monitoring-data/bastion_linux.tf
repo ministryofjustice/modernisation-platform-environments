@@ -2,8 +2,14 @@ locals {
   public_key_data = jsondecode(file("${path.module}/bastion_linux.json"))
 }
 
+#------------------------------------------------------------------------------
+# EC2 linux bastion - RDS instance
+#------------------------------------------------------------------------------
+
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "rds_bastion" {
+  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=95ed3c3"
 
   providers = {
@@ -39,6 +45,8 @@ module "rds_bastion" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
+  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+
   security_group_id = module.rds_bastion.bastion_security_group
   description       = "EC2 MSSQL Access"
   ip_protocol       = "tcp"
@@ -48,6 +56,8 @@ resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "vpc_access" {
+  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+
   security_group_id = module.rds_bastion.bastion_security_group
   description       = "Reach vpc endpoints"
   ip_protocol       = "tcp"
@@ -57,6 +67,8 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
+  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+
   security_group_id            = aws_security_group.db.id
   description                  = "EC2 instance connection to RDS"
   ip_protocol                  = "tcp"
@@ -89,14 +101,26 @@ data "aws_iam_policy_document" "ec2_s3_policy" {
 }
 
 resource "aws_iam_role_policy" "ec2_s3_policy" {
+  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+
   name   = "ec2-s3-policy"
   role   = module.rds_bastion.bastion_iam_role.name
   policy = data.aws_iam_policy_document.ec2_s3_policy.json
 }
 
-resource "aws_iam_policy_attachment" "ssm-attachments" {
-  name       = "ssm-attach-instance-role"
-  roles      = [module.rds_bastion.bastion_iam_role.name, module.zip_bastion.bastion_iam_role.name]
+resource "aws_iam_policy_attachment" "ssm-attachments-rds" {
+  name       = "ssm-attach-instance-role-bastion-rds"
+  roles      = [module.rds_bastion.bastion_iam_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+#------------------------------------------------------------------------------
+# EC2 linux bastion - zip files
+#------------------------------------------------------------------------------
+
+resource "aws_iam_policy_attachment" "ssm-attachments-zip" {
+  name       = "ssm-attach-instance-role-bastion-zip"
+  roles      = [module.zip_bastion.bastion_iam_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
