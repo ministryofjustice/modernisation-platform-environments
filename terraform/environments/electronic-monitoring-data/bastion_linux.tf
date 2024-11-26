@@ -8,7 +8,7 @@ locals {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "rds_bastion" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=95ed3c3"
 
@@ -45,7 +45,7 @@ module "rds_bastion" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id = module.rds_bastion.bastion_security_group
   description       = "EC2 MSSQL Access"
@@ -56,7 +56,7 @@ resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "vpc_access" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id = module.rds_bastion.bastion_security_group
   description       = "Reach vpc endpoints"
@@ -67,7 +67,7 @@ resource "aws_vpc_security_group_egress_rule" "vpc_access" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id            = aws_security_group.db.id
   description                  = "EC2 instance connection to RDS"
@@ -101,7 +101,7 @@ data "aws_iam_policy_document" "ec2_s3_policy" {
 }
 
 resource "aws_iam_role_policy" "ec2_s3_policy" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   name   = "ec2-s3-policy"
   role   = module.rds_bastion.bastion_iam_role.name
@@ -109,6 +109,8 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
 }
 
 resource "aws_iam_policy_attachment" "ssm-attachments-rds" {
+  count = local.create_rds_instance
+
   name       = "ssm-attach-instance-role-bastion-rds"
   roles      = [module.rds_bastion.bastion_iam_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"

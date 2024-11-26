@@ -1,3 +1,7 @@
+locals = {
+  create_rds_instance = local.is-development || local.is-production ? 1 : 0
+}
+
 #------------------------------------------------------------------------------
 # Secret generation for database access.
 #------------------------------------------------------------------------------
@@ -19,7 +23,7 @@ resource "random_password" "random_password" {
 # RDS SQL server 2022 database
 #------------------------------------------------------------------------------
 resource "aws_db_instance" "database_2022" {
-  count = local.is-dev-or-prod
+  count = local.create_rds_instance
 
   identifier    = "database-v2022"
   license_model = "license-included"
@@ -59,7 +63,7 @@ resource "aws_db_instance" "database_2022" {
 # Security group and subnets for accessing database
 #------------------------------------------------------------------------------
 resource "aws_security_group" "db" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   name        = "database-security-group"
   description = "Allow DB inbound traffic"
@@ -128,7 +132,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_glue_access" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id            = aws_security_group.db.id
   description                  = "glue"
@@ -139,7 +143,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_glue_access" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "db_glue_access" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   security_group_id            = aws_security_group.db.id
   description                  = "glue"
@@ -150,7 +154,7 @@ resource "aws_vpc_security_group_egress_rule" "db_glue_access" {
 }
 
 resource "aws_db_subnet_group" "db" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   name       = "db-subnet-group"
   subnet_ids = data.aws_subnets.shared-public.ids
@@ -162,7 +166,7 @@ resource "aws_db_subnet_group" "db" {
 # Option group configuration for database
 #------------------------------------------------------------------------------
 resource "aws_db_option_group" "sqlserver_backup_restore_2022" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   name                     = "sqlserver-v2022"
   option_group_description = "SQL server backup restoration using engine 16.x"
@@ -202,7 +206,7 @@ data "aws_iam_policy_document" "rds-s3-access-policy" {
 }
 
 resource "aws_iam_role" "s3_database_backups_role" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   name               = "s3-database-backups-role"
   assume_role_policy = data.aws_iam_policy_document.rds-s3-access-policy.json
@@ -240,7 +244,7 @@ data "aws_iam_policy_document" "rds_data_store_access" {
 }
 
 resource "aws_iam_role_policy" "this_transfer_workflow" {
-  count = aws_db_instance.database_2022.id != "" ? 1 : 0
+  count = local.create_rds_instance
 
   role   = aws_iam_role.s3_database_backups_role.name
   policy = data.aws_iam_policy_document.rds_data_store_access.json
