@@ -850,12 +850,13 @@ module "s3_structured_bucket" {
 
 # S3 Curated
 module "s3_curated_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-curated-zone-${local.env}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
+  source                      = "./modules/s3_bucket"
+  create_s3                   = local.setup_buckets
+  name                        = "${local.project}-curated-zone-${local.env}"
+  custom_kms_key              = local.s3_kms_arn
+  create_notification_queue   = false # For SQS Queue
+  enable_lifecycle            = false
+  enable_intelligent_tiering  = true
 
   tags = merge(
     local.all_tags,
