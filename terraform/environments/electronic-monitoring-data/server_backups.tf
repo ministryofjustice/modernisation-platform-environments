@@ -1,4 +1,4 @@
-locals = {
+locals {
   create_rds_instance = local.is-development || local.is-production ? 1 : 0
 }
 
