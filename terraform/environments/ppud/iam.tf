@@ -1179,7 +1179,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
         "cloudwatch:ListMetrics"
       ],
       "Resource" : [
-        "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
       ]
       },
       {
@@ -1205,7 +1205,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
           "ses:SendEmail"
         ],
         "Resource" : [
-          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
         ]
     }]
   })
