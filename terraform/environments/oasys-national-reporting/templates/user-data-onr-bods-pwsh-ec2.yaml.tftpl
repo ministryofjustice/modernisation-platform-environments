@@ -22,7 +22,7 @@ tasks:
           for ($i = 0; $i -lt $disks.Count; $i++) {
           $partition = New-Partition -DiskNumber $disks[$i].Number -UseMaximumSize
           Format-Volume -Partition $partition -FileSystem NTFS -NewFileSystemLabel $labels[$i] -Confirm:$false
-          Assign-Partition -Partition $partition -DriveLetter $letters[$i]
+          Set-Partition -Partition $partition -NewDriveLetter $letters[$i]
           }
   - task: executeScript
     inputs:
