@@ -31,8 +31,8 @@ resource "aws_db_instance" "database_2022" {
   instance_class = "db.m5.large"
 
   storage_type          = "gp2"
-  allocated_storage     = 2100
-  max_allocated_storage = 2500
+  allocated_storage     = local.is-production ? 2100 : 10
+  max_allocated_storage = local.is-production ? 2500 : 11
   storage_encrypted     = true
 
   multi_az = false
