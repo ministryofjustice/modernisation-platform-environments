@@ -28,20 +28,22 @@ locals {
               athena_enabled                  = false
             },
             "analytical-platform-compute-development" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = true
-              amazon_prometheus_workspace_id  = "ws-bfdd5d7a-5571-4686-bfd4-43ab07cf8d54ba"
-              xray_enabled                    = true
-              athena_enabled                  = false
+              cloudwatch_enabled                 = true
+              prometheus_push_enabled            = false
+              amazon_prometheus_query_enabled    = true
+              amazon_prometheus_workspace_region = "eu-west-2"
+              amazon_prometheus_workspace_id     = "ws-bfdd5d7a-5571-4686-bfd4-43ab07cf8d54ba"
+              xray_enabled                       = true
+              athena_enabled                     = false
             },
             "analytical-platform-compute-test" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = true
-              amazon_prometheus_workspace_id  = "ws-a9d7f576-58b7-4748-b4c1-b02bbdc54a2922"
-              xray_enabled                    = true
-              athena_enabled                  = false
+              cloudwatch_enabled                 = true
+              prometheus_push_enabled            = false
+              amazon_prometheus_query_enabled    = true
+              amazon_prometheus_workspace_region = "eu-west-2"
+              amazon_prometheus_workspace_id     = "ws-a9d7f576-58b7-4748-b4c1-b02bbdc54a2922"
+              xray_enabled                       = true
+              athena_enabled                     = false
             }
           }
         },
@@ -128,28 +130,31 @@ locals {
           identity_centre_team = "analytical-platform"
           aws_accounts = {
             "analytical-platform-compute-development" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = true
-              amazon_prometheus_workspace_id  = "ws-bfdd5d7a-5571-4686-bfd4-43ab07cf8d54ba"
-              xray_enabled                    = true
-              athena_enabled                  = false
+              cloudwatch_enabled                 = true
+              prometheus_push_enabled            = false
+              amazon_prometheus_query_enabled    = true
+              amazon_prometheus_workspace_region = "eu-west-2"
+              amazon_prometheus_workspace_id     = "ws-bfdd5d7a-5571-4686-bfd4-43ab07cf8d54ba"
+              xray_enabled                       = true
+              athena_enabled                     = false
             },
             "analytical-platform-compute-production" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = true
-              amazon_prometheus_workspace_id  = "ws-257796b7-4aa4-4c18-b906-6dd21e95d7b73e"
-              xray_enabled                    = true
-              athena_enabled                  = false
+              cloudwatch_enabled                 = true
+              prometheus_push_enabled            = false
+              amazon_prometheus_query_enabled    = true
+              amazon_prometheus_workspace_region = "eu-west-2"
+              amazon_prometheus_workspace_id     = "ws-257796b7-4aa4-4c18-b906-6dd21e95d7b73e"
+              xray_enabled                       = true
+              athena_enabled                     = false
             },
             "analytical-platform-compute-test" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = true
-              amazon_prometheus_workspace_id  = "ws-a9d7f576-58b7-4748-b4c1-b02bbdc54a2922"
-              xray_enabled                    = true
-              athena_enabled                  = false
+              cloudwatch_enabled                 = true
+              prometheus_push_enabled            = false
+              amazon_prometheus_query_enabled    = true
+              amazon_prometheus_workspace_region = "eu-west-2"
+              amazon_prometheus_workspace_id     = "ws-a9d7f576-58b7-4748-b4c1-b02bbdc54a2922"
+              xray_enabled                       = true
+              athena_enabled                     = false
             },
             "analytical-platform-ingestion-development" = {
               cloudwatch_enabled              = true
