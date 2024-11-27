@@ -121,7 +121,7 @@ resource "aws_route53_record" "nginx_instances" {
 }
 
 resource "aws_route53_record" "nginx_instances_pre_migration" {
-  count    = local.is-production ? length(local.nginx_records) : 0
+  count    = local.is-production ? length(local.nginx_records_pre_migration) : 0
   provider = aws.core-network-services
   zone_id  = local.production_zone_id
   name     = local.nginx_records_pre_migration[count.index]
