@@ -489,7 +489,7 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
 resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_send_cpu_graph_dev" {
   count         = local.is-development == true ? 1 : 0
   statement_id  = "AllowAccesstoCloudWatch"
-  action        = "cloudwatch:GetMetricData"
+  action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_send_cpu_graph_dev[0].function_name
   principal     = "cloudwatch.amazonaws.com"
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
