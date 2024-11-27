@@ -13,6 +13,20 @@ locals {
   # please keep resources in alphabetical order
   baseline_test = {
 
+    acm_certificates = {
+      nomis_combined_reporting_wildcard_cert = {
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name              = "modernisation-platform.service.justice.gov.uk"
+        subject_alternate_names = [
+          "test.reporting.nomis.service.justice.gov.uk",
+          "*.test.reporting.nomis.service.justice.gov.uk",
+        ]
+        tags = {
+          description = "Wildcard certificate for the test environment"
+        }
+      }
+    }
+
     ec2_instances = {
       t1-ncr-cms-1 = merge(local.ec2_instances.bip_cms, {
         config = merge(local.ec2_instances.bip_cms.config, {
@@ -138,27 +152,27 @@ locals {
             ]
           })
         }
-        listeners = merge(local.lbs.public.listeners, {
-          https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
-            rules = {
-              web = {
-                priority = 200
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t1-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "t1.test.reporting.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          })
-        })
+        #        listeners = merge(local.lbs.public.listeners, {
+        #          https = merge(local.lbs.public.listeners.https, {
+        #            alarm_target_group_names = []
+        #            rules = {
+        #              web = {
+        #                priority = 200
+        #                actions = [{
+        #                  type              = "forward"
+        #                  target_group_name = "t1-http-7777"
+        #                }]
+        #                conditions = [{
+        #                  host_header = {
+        #                    values = [
+        #                      "t1.test.reporting.nomis.service.justice.gov.uk",
+        #                    ]
+        #                  }
+        #                }]
+        #              }
+        #            }
+        #          })
+        #        })
       })
     }
 
