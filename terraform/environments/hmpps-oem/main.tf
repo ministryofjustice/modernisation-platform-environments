@@ -179,8 +179,8 @@ module "baseline" {
   )
 
   schedule_alarms_lambda = merge(
-    lookup(local.baseline_all_environments, "schedule_alarms", {}),
-    lookup(local.baseline_environment_specific, "schedule_alarms", {}),
+    lookup(local.baseline_all_environments, "schedule_alarms_lambda", {}),
+    lookup(local.baseline_environment_specific, "schedule_alarms_lambda", {}),
   )
 
   secretsmanager_secrets = merge(

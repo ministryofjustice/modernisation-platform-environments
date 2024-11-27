@@ -193,7 +193,7 @@ class RDS_JDBC_CONNECTION():
                                           jdbc_partition_column,
                                           jdbc_partition_col_lowerbound,
                                           jdbc_partition_col_upperbound,
-                                          jdbc_read_partitions_num
+                                          jdbc_read_partitions_num=1
                                           ) -> DataFrame:
 
         numPartitions = jdbc_read_partitions_num
@@ -217,6 +217,16 @@ class RDS_JDBC_CONNECTION():
                     .option("lowerBound", jdbc_partition_col_lowerbound)
                     .option("upperBound", jdbc_partition_col_upperbound)
                     .option("numPartitions", numPartitions)
+                    .load())
+
+    def get_rds_df_read_query(self, in_db_query) -> DataFrame:
+
+        return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({in_db_query}) as t""")
                     .load())
 
 
@@ -695,10 +705,8 @@ class CustomPysparkMethods:
     def get_nvl_select_list(in_rds_df: DataFrame,
                             rds_jdbc_conn_obj,
                             in_rds_tbl_name):
-        df_col_attr = rds_jdbc_conn_obj.get_rds_tbl_col_attributes(
-            in_rds_tbl_name)
-        df_col_attr_dict = CustomPysparkMethods.get_rds_tbl_col_attr_dict(
-            df_col_attr)
+        df_col_attr = rds_jdbc_conn_obj.get_rds_tbl_col_attributes(in_rds_tbl_name)
+        df_col_attr_dict = CustomPysparkMethods.get_rds_tbl_col_attr_dict(df_col_attr)
         df_col_dtype_dict = CustomPysparkMethods.get_dtypes_dict(in_rds_df)
 
         temp_select_list = list()

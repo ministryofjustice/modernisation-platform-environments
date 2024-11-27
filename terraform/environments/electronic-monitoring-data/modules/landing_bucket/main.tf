@@ -78,6 +78,46 @@ module "this-bucket" {
 }
 
 #-----------------------------------------------------------------------------------
+# KMS - customer managed key for use with cross account data
+#-----------------------------------------------------------------------------------
+
+module "kms_key" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["s3/landing_bucket_${var.data_feed}_${var.order_type}"]
+  description           = "${var.data_feed} ${var.order_type} landing bucket KMS key"
+
+  # Give full access to key for root account, and lambda role ability to use.
+  enable_default_policy = true
+  key_users             = [aws_iam_role.process_landing_bucket_files.arn]
+
+  deletion_window_in_days = 7
+
+  # Grant external account role specific operations.
+  # To view grants, need to use cli:
+  # aws kms list-grants --region=eu-west-2 --key-id <key id>
+  grants = var.cross_account_access_role != null ? {
+    cross_account_access_role = {
+      grantee_principal = "arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"
+      operations = [
+        "Encrypt",
+        "GenerateDataKey",
+      ]
+    }
+  } : {}
+
+  tags = merge(
+    var.local_tags,
+    { order_type = var.order_type },
+    { data_feed = var.data_feed }
+  )
+}
+
+#-----------------------------------------------------------------------------------
 # Process landing bucket files - lambda triggers
 #-----------------------------------------------------------------------------------
 
@@ -153,6 +193,17 @@ data "aws_iam_policy_document" "process_landing_bucket_files_s3_policy_document"
     ]
     resources = [
       "arn:aws:s3:::${var.received_files_bucket_id}/*",
+    ]
+  }
+
+  statement {
+    sid    = "KMSDecryptObjects"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+    ]
+    resources = [
+      module.kms_key.key_arn,
     ]
   }
 }
