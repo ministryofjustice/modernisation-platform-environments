@@ -166,6 +166,8 @@ locals {
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
           { name = "db", type = "CNAME", ttl = "3600", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "web", type = "CNAME", ttl = "3600", records = ["t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
+          { name = "etl", type = "CNAME", ttl = "3600", records = ["t1-ncr-etl-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
         ]
         lb_alias_records = [
           { name = "t1", type = "A", lbs_map_key = "public" },
