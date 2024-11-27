@@ -7,7 +7,6 @@ locals {
 
   baseline_presets_test = {
     options = {
-      enable_observability_platform_monitoring = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "nomis-test"

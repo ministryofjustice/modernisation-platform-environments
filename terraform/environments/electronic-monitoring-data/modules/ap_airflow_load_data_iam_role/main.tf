@@ -50,7 +50,7 @@ data "aws_iam_policy_document" "load_data" {
     ]
   }
   statement {
-    sid    = "GluePermissionsForLoadAtriumUnstructured${local.camel-sid}"
+    sid    = "GluePermissionsForLoad${local.camel-sid}"
     effect = "Allow"
     actions = [
       "glue:GetTable",
