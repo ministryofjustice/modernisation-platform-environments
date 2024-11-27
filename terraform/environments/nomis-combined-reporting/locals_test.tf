@@ -152,27 +152,27 @@ locals {
             ]
           })
         }
-        #        listeners = merge(local.lbs.public.listeners, {
-        #          https = merge(local.lbs.public.listeners.https, {
-        #            alarm_target_group_names = []
-        #            rules = {
-        #              web = {
-        #                priority = 200
-        #                actions = [{
-        #                  type              = "forward"
-        #                  target_group_name = "t1-http-7777"
-        #                }]
-        #                conditions = [{
-        #                  host_header = {
-        #                    values = [
-        #                      "t1.test.reporting.nomis.service.justice.gov.uk",
-        #                    ]
-        #                  }
-        #                }]
-        #              }
-        #            }
-        #          })
-        #        })
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
       })
     }
 
