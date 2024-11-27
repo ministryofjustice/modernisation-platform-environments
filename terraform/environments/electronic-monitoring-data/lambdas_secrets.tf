@@ -12,5 +12,5 @@ resource "aws_secretsmanager_secret_version" "db_glue_connection" {
       "engine"   = "sqlserver",
       "port"     = aws_db_instance.database_2022[0].port
     }
-  ) : ""
+  ) : jsonencode({"no db for environment" = "nothing to see here"})
 }
