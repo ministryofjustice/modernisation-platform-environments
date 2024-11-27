@@ -71,6 +71,9 @@ locals {
             "Ec2T1ReportingPolicy",
           ])
         })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.large"
+        })
         user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
             branch = "TM-739/ncr/t1-build"
