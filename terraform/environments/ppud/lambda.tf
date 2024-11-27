@@ -486,7 +486,7 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
 # Lambda Function to graph CPU Utilization - DEV
 ################################################
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_graph_dev" {
+resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_send_cpu_graph_dev" {
   count         = local.is-development == true ? 1 : 0
   statement_id  = "AllowAccesstoCloudWatch"
   action        = "lambda:InvokeFunction"
@@ -513,6 +513,10 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
   tracing_config {
     mode = "Active"
   }
+   layers = [
+    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-numpy:8", #Publically available ARN for numpy package
+    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-pillow:1" #Publically available ARN for pillow package
+  ]
 }
 
 # Archive the zip file

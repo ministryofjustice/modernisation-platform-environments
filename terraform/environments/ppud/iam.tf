@@ -1176,11 +1176,24 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
       "Effect" : "Allow",
       "Action" : [
         "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
         "cloudwatch:ListMetrics"
       ],
       "Resource" : [
         "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
       ]
+      },
+      {
+        "Sid" : "LogPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
       },
       {
         "Sid" : "SQSPolicy",
