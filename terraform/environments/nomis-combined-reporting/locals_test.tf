@@ -100,6 +100,10 @@ locals {
       })
     }
 
+    efs = {
+      t1-ncr-sap-share = local.efs.sap_share
+    }
+
     iam_policies = {
       Ec2T1DatabasePolicy = {
         description = "Permissions required for T1 Database EC2s"
