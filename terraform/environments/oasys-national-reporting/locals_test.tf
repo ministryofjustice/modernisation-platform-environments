@@ -134,8 +134,9 @@ locals {
             "Ec2SecretPolicy",
           ])
           user_data_raw = base64encode(templatefile(
-            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-            branch = "TM/TM-660/onr-bods-second-server"
+            "./templates/user-data-onr-bods-pwsh-ec2.yaml.tftpl", {
+            # branch = "TM/TM-660/onr-bods-second-server"
+            branch = "main"
           }))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
@@ -166,12 +167,6 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
-         ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "xvdk" = { type = "gp3", size = 128 } # D:/ Temp
-          "xvdl" = { type = "gp3", size = 128 } # E:/ App
-          "xvdm" = { type = "gp3", size = 700 } # F:/ Storage
-         }
         cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "t2"
@@ -194,12 +189,6 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
-        ebs_volumes = {
-          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "xvdk" = { type = "gp3", size = 128 } # D:/ Temp
-          "xvdl" = { type = "gp3", size = 128 } # E:/ App
-          "xvdm" = { type = "gp3", size = 700 } # F:/ Storage
-        }
         cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "t2"
