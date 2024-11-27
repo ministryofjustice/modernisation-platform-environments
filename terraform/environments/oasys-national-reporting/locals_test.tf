@@ -167,6 +167,13 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
+        # TODO: remove these when this is rebuilt after testing
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "xvdk" = { type = "gp3", size = 128 } # D:/ Temp
+          "xvdl" = { type = "gp3", size = 128 } # E:/ App
+          "xvdm" = { type = "gp3", size = 700 } # F:/ Storage
+        }
         cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "t2"
@@ -189,6 +196,13 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
+        # TODO: remove these when this is rebuilt after testing
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "xvdk" = { type = "gp3", size = 128 } # D:/ Temp
+          "xvdl" = { type = "gp3", size = 128 } # E:/ App
+          "xvdm" = { type = "gp3", size = 700 } # F:/ Storage
+        }
         cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "t2"
