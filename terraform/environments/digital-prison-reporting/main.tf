@@ -856,7 +856,7 @@ module "s3_curated_bucket" {
   custom_kms_key              = local.s3_kms_arn
   create_notification_queue   = false # For SQS Queue
   enable_lifecycle            = true
-  enable_intelligent_tiering  = false
+  enable_intelligent_tiering  = false 
 
   tags = merge(
     local.all_tags,
