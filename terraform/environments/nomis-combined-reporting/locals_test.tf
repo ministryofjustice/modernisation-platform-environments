@@ -63,6 +63,24 @@ locals {
           instance-scheduling                  = "skip-scheduling"
         })
       })
+
+      t1-ncr-web-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
+            branch = "TM-739/ncr/t1-build"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
     }
 
     iam_policies = {
@@ -108,14 +126,46 @@ locals {
         instance_target_groups = {}
         listeners              = {}
       })
+
+      public = merge(local.lbs.public, {
+        instance_target_groups = {
+          t1-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "t1-ncr-web-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
     }
 
     route53_zones = {
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
           { name = "db", type = "CNAME", ttl = "3600", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "web", type = "CNAME", ttl = "3600", records = ["t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "etl", type = "CNAME", ttl = "3600", records = ["t1-ncr-etl-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
+        ]
+        lb_alias_records = [
+          { name = "t1", type = "A", lbs_map_key = "public" },
         ]
       }
     }
