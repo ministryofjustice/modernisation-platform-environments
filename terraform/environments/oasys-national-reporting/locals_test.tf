@@ -168,15 +168,9 @@ locals {
         })
       })
 
-      # Pending sorting out cluster install of Bods in  modernisation-platform-configuration-management repo
       # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
       #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2b"
-      #     user_data_raw = base64encode(templatefile(
-      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #         branch   = "main"
-      #       }
-      #     ))
+      #     availability_zone = "eu-west-2a"
       #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
       #       "Ec2SecretPolicy",
       #     ])
@@ -184,10 +178,14 @@ locals {
       #   instance = merge(local.ec2_instances.bods.instance, {
       #     instance_type = "m4.xlarge"
       #   })
+      #   user_data_raw = base64encode(templatefile(
+      #      "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #      branch = "TM/TM-660/onr-bods-second-server"
+      #    }))
       #   cloudwatch_metric_alarms = null
       #   tags = merge(local.ec2_instances.bods.tags, {
       #     oasys-national-reporting-environment = "t2"
-      #     domain-name = "azure.noms.root"
+      #     domain-name                          = "azure.noms.root"
       #   })
       # })
 
