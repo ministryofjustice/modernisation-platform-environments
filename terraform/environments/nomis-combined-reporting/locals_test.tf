@@ -131,36 +131,34 @@ locals {
       })
 
       public = merge(local.lbs.public, {
-        instance_target_groups = {}
-        listeners              = {}
-        #  instance_target_groups = {
-        #    t1-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
-        #      attachments = [
-        #        { ec2_instance_name = "t1-ncr-web-1" },
-        #      ]
-        #    })
-        #  }
-        #  listeners = merge(local.lbs.public.listeners, {
-        #    https = merge(local.lbs.public.listeners.https, {
-        #      alarm_target_group_names = []
-        #      rules = {
-        #        web = {
-        #          priority = 200
-        #          actions = [{
-        #            type              = "forward"
-        #            target_group_name = "t1-http-7777"
-        #          }]
-        #          conditions = [{
-        #            host_header = {
-        #              values = [
-        #                "t1.test.reporting.nomis.service.justice.gov.uk",
-        #              ]
-        #            }
-        #          }]
-        #        }
-        #      }
-        #    })
-        #  })
+        instance_target_groups = {
+          t1-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "t1-ncr-web-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
       })
     }
 
@@ -169,9 +167,9 @@ locals {
         records = [
           { name = "db", type = "CNAME", ttl = "3600", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
-        # lb_alias_records = [    
-        #   { name = "t1", type = "A", lbs_map_key = "public" },
-        # ]
+        lb_alias_records = [
+          { name = "t1", type = "A", lbs_map_key = "public" },
+        ]
       }
     }
 
