@@ -1,3 +1,7 @@
+locals {
+  call-center-users = ["call-center-migration-user", "david.sibley"]
+}
+
 resource "aws_s3_bucket" "call_center" {
   bucket_prefix = "call-center-migration"
   tags          = local.tags
@@ -30,10 +34,11 @@ resource "aws_iam_role_policy_attachments_exclusive" "call_center_transfer_loggi
 }
 
 resource "aws_transfer_user" "call_center" {
+  for_each  = toset(local.call-center-users)
   role      = aws_iam_role.call_center_transfer_user.arn
   server_id = aws_transfer_server.call_center.id
-  user_name = "call-center-migration"
-  tags      = local.tags
+  user_name = each.key
+  tags      = merge(local.tags, { Name = each.key })
 }
 
 resource "aws_iam_role" "call_center_transfer_user" {
