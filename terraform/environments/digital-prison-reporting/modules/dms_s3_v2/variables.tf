@@ -291,7 +291,7 @@ variable "source_engine" {
 variable "source_engine_name" {
   default     = ""
   type        = string
-  description = "Engine name for DMS"
+  description = "Type of engine for the source endpoint. Example valid values are postgres, oracle"
 }
 
 
