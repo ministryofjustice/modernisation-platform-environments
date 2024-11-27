@@ -23,6 +23,17 @@ module "ldap_ecs" {
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
+  container_vars_default = {
+    for name in local.ldap_ssm.vars : name => data.aws_ssm_parameter.ldap_ssm[name].value
+  }
+
+  container_secrets_default = merge({
+    for name in local.ldap_ssm.secrets : name => module.ldap_ssm.arn_map[name]
+    }, {
+    "JDBC_PASSWORD" = "${module.oracle_db_shared.database_application_passwords_secret_arn}:delius_pool::"
+    }
+  )
+
   desired_count                      = var.ldap_config.desired_count
   deployment_minimum_healthy_percent = 0
   deployment_maximum_percent         = 200
