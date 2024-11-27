@@ -513,6 +513,10 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
   tracing_config {
     mode = "Active"
   }
+   layers = [
+    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-numpy:8", #Publically available ARN for numpy package
+    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-pillow:1" #Publically available ARN for pillow package
+  ]
 }
 
 # Archive the zip file
