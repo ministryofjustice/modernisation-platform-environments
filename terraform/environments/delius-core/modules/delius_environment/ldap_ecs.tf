@@ -7,29 +7,30 @@ module "ldap_ecs" {
   container_cpu    = var.delius_microservice_configs.ldap.container_cpu
   container_memory = var.delius_microservice_configs.ldap.container_memory
 
-  container_vars_default = {
-    "LDAP_HOST"          = "0.0.0.0",
-    "SLAPD_LOG_LEVEL"    = var.delius_microservice_configs.ldap.slapd_log_level,
-    "LDAP_PORT"          = "389",
-    "DELIUS_ENVIRONMENT" = "delius-core-${var.env_name}"
-  }
-
   container_vars_env_specific = try(var.delius_microservice_configs.ldap.container_vars_env_specific, {})
 
-  container_secrets_default = {
-    "BIND_PASSWORD"         = aws_ssm_parameter.ldap_bind_password.arn,
-    "MIGRATION_S3_LOCATION" = aws_ssm_parameter.ldap_seed_uri.arn,
-    "RBAC_TAG"              = aws_ssm_parameter.ldap_rbac_version.arn
-  }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
-  container_vars_default = {
-    for name in local.ldap_ssm.vars : name => data.aws_ssm_parameter.ldap_ssm[name].value
-  }
+  container_vars_default = merge({
+      for name in local.ldap_ssm.vars : name => data.aws_ssm_parameter.ldap_ssm[name].value
+    },
+    {
+      "LDAP_HOST"          = "0.0.0.0",
+      "SLAPD_LOG_LEVEL"    = var.delius_microservice_configs.ldap.slapd_log_level,
+      "LDAP_PORT"          = "389",
+      "DELIUS_ENVIRONMENT" = "delius-core-${var.env_name}"
+    }
+  )
 
-  container_secrets_default = {
-    for name in local.ldap_ssm.secrets : name => module.ldap_ssm.arn_map[name]
-  }
+  container_secrets_default = merge({
+      for name in local.ldap_ssm.secrets : name => module.ldap_ssm.arn_map[name]
+    },
+    {
+      "BIND_PASSWORD"         = aws_ssm_parameter.ldap_bind_password.arn,
+      "MIGRATION_S3_LOCATION" = aws_ssm_parameter.ldap_seed_uri.arn,
+      "RBAC_TAG"              = aws_ssm_parameter.ldap_rbac_version.arn
+    }
+  )
 
   desired_count                      = var.ldap_config.desired_count
   deployment_minimum_healthy_percent = 0
