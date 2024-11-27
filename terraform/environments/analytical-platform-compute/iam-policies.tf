@@ -422,6 +422,21 @@ data "aws_iam_policy_document" "copy_apdp_cadet_metadata_to_compute_policy" {
       "${module.mojap_compute_athena_query_results_bucket_eu_west_2.s3_bucket_arn}/*"
     ]
   }
+  statement {
+    sid    = "AlterLFTags"
+    effect = "Allow"
+    actions = [
+      "lakeformation:AddLFTagsToResource",
+      "lakeformation:RemoveLFTagsFromResource",
+      "lakeformation:GetResourceLFTags",
+      "lakeformation:ListLFTags",
+      "lakeformation:GetLFTag",
+      "lakeformation:SearchTablesByLFTags",
+      "lakeformation:SearchDatabasesByLFTags",
+    ]
+    resources = ["*"]
+  }
+
 }
 
 module "copy_apdp_cadet_metadata_to_compute_policy" {
