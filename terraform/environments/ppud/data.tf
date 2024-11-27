@@ -50,13 +50,3 @@ data "aws_acm_certificate" "WAM_PROD_ALB" {
   domain   = "wam.ppud.justice.gov.uk"
   statuses = ["ISSUED"]
 }
-
-# Klayers account ID - used by lambda layer ARNs
-data "aws_ssm_parameter" "klayers_account" {
-  name           = "klayers-account"
-  with_decryption = true
-}
-
-output "klayers_account" {
-  value = data.aws_ssm_parameter.klayers_account.value
-}
