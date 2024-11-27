@@ -4,12 +4,7 @@ Import-Module ECSTools
 [Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
 [Environment]::SetEnvironmentVariable("ECS_ENABLE_TASK_IAM_ROLE", "true", "Machine")
 
-Initialize-ECSAgent –Cluster ${cluster_name} -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]' -EnableTaskENI
-
-# Install SSM Agent 
-$SSM_AGENT_MSI = "https://s3.amazonaws.com/amazon-ssm-us-west-2/latest/windows_amd64/AmazonSSMAgentSetup.msi"
-Invoke-WebRequest -Uri $SSM_AGENT_MSI -OutFile "C:\\SSMAgent.msi"
-Start-Process -FilePath "msiexec.exe" -ArgumentList "/i C:\\SSMAgent.msi /quiet" -Wait
+Initialize-ECSAgent –Cluster cdpt-chaps-ecs-cluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]' -EnableTaskENI
 
 # Start SSM Agent service
 Start-Service AmazonSSMAgent

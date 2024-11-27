@@ -16,6 +16,7 @@ module "dms_endpoints" {
   source_app_username       = var.source_app_username
   source_app_password       = var.source_app_password
   source_address            = var.source_address
+  source_ssl_mode           = var.source_ssl_mode
   source_db_port            = var.source_db_port
   extra_attributes          = var.extra_attributes
   bucket_name               = var.bucket_name

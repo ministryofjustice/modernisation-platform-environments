@@ -472,8 +472,8 @@ resource "aws_iam_role" "redshift-spectrum-role" {
 }
 
 data "aws_iam_policy_document" "redshift_spectrum" {
-  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
-  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+  #checkov:skip=CKV_AWS_356:"Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_111:"Ensure IAM policies does not allow write access without constraints"
   statement {
     actions = [
       "glue:BatchCreatePartition",
@@ -557,12 +557,15 @@ data "aws_iam_policy_document" "domain_builder_publish" {
       "dynamodb:DeleteItem"
     ]
     resources = [
-      "*"
+      "arn:aws:dynamodb:${local.current_account_region}:${local.current_account_id}:table/*"
     ]
   }
 }
 
 resource "aws_iam_policy" "domain_builder_publish_policy" {
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+
   name        = "${local.project}-domain-builder-publish-policy"
   description = "Additional policy to allow execution of query publish in Athena"
   policy      = data.aws_iam_policy_document.domain_builder_publish.json
@@ -901,6 +904,8 @@ data "aws_iam_policy_document" "step_function_execution_assume_policy_document" 
 }
 
 data "aws_iam_policy_document" "step_function_execution_policy_document" {
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  #checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
   statement {
     actions = [
       "states:StartExecution"

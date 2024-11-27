@@ -1,4 +1,5 @@
 resource "aws_dms_replication_instance" "dms_replication_instance" {
+  #checkov:skip=CKV_AWS_222
   allocated_storage            = 30
   apply_immediately            = true
   auto_minor_version_upgrade   = false

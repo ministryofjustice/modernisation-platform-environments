@@ -23,7 +23,9 @@ module "ldap_ecs" {
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
-  desired_count = 1
+  desired_count                      = var.ldap_config.desired_count
+  deployment_minimum_healthy_percent = 0
+  deployment_maximum_percent         = 200
 
   container_port_config = [
     {
@@ -49,7 +51,7 @@ module "ldap_ecs" {
   container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-openldap-ecr-repo:${var.delius_microservice_configs.ldap.image_tag}"
   account_config  = var.account_config
 
-  health_check = {
+  container_health_check = {
     command     = ["CMD-SHELL", "ldapsearch -x -H ldap://localhost:389 -b '' -s base '(objectclass=*)' namingContexts"]
     interval    = 30
     retries     = 3
@@ -58,8 +60,7 @@ module "ldap_ecs" {
   }
   account_info = var.account_info
 
-  ignore_changes_service_task_definition = false
-
+  ignore_changes_service_task_definition = true
 
   extra_task_exec_role_policies = {
     efs = data.aws_iam_policy_document.ldap_efs_access_policy

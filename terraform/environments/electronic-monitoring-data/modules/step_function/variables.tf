@@ -10,12 +10,13 @@ variable "iam_policies" {
   nullable = false
 }
 
-variable "env_account_id" {
-  type     = string
-  nullable = false
-}
-
 variable "variable_dictionary" {
   type     = map(any)
   nullable = false
+}
+
+variable "type" {
+  type     = string
+  nullable = true
+  default  = "STANDARD"
 }

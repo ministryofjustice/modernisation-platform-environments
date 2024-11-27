@@ -33,6 +33,19 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.syscon,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_autoscaling_groups = {
       dev-base-ol85 = merge(local.ec2_autoscaling_groups.base, {
         config = merge(local.ec2_autoscaling_groups.base.config, {
@@ -109,6 +122,7 @@ locals {
       })
 
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
+        autoscaling_schedules = {} # disable overnight scale down
       })
 
       dev-nomis-web19c-b = merge(local.ec2_autoscaling_groups.web19c, {

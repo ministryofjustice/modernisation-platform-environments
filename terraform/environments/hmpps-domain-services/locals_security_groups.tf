@@ -6,6 +6,13 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers,
       module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers,
     ])
+    enduserclient_internal = [
+      "10.0.0.0/8"
+    ]
+    enduserclient_public = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+      module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
+    ])
     rd_session_hosts = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -16,6 +23,13 @@ locals {
     domain_controllers = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers,
       module.ip_addresses.mp_cidrs.ad_fixngo_hmpp_domain_controllers,
+    ])
+    enduserclient_internal = [
+      "10.0.0.0/8"
+    ]
+    enduserclient_public = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+      module.ip_addresses.mp_cidrs.live_eu_west_nat,
     ])
     rd_session_hosts = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
@@ -28,14 +42,7 @@ locals {
     preproduction = local.security_group_cidrs_preprod_prod
     production    = local.security_group_cidrs_preprod_prod
   }
-  security_group_cidrs = merge(local.security_group_cidrs_by_environment[local.environment], {
-    enduserclient_internal = [
-      "10.0.0.0/8"
-    ]
-    enduserclient_public = flatten([
-      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
-    ])
-  })
+  security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
     rds-ec2s = {

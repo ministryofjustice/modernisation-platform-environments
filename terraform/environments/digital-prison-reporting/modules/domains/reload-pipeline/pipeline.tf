@@ -78,6 +78,9 @@ module "reload_pipeline" {
               "--dpr.file.transfer.source.bucket" : var.s3_raw_bucket_id,
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.datastorage.retry.maxAttempts" : tostring(var.glue_s3_max_attempts),
+              "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
+              "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
@@ -118,6 +121,9 @@ module "reload_pipeline" {
               "--dpr.file.transfer.destination.bucket" : var.s3_temp_reload_bucket_id,
               "--dpr.file.transfer.retention.period.amount" : "0",
               "--dpr.file.transfer.delete.copied.files" : "false",
+              "--dpr.datastorage.retry.maxAttempts" : tostring(var.glue_s3_max_attempts),
+              "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
+              "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
@@ -227,6 +233,9 @@ module "reload_pipeline" {
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.retention.period.amount" : "0",
               "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.datastorage.retry.maxAttempts" : tostring(var.glue_s3_max_attempts),
+              "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
+              "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
@@ -244,6 +253,9 @@ module "reload_pipeline" {
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.retention.period.amount" : "0",
               "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.datastorage.retry.maxAttempts" : tostring(var.glue_s3_max_attempts),
+              "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
+              "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
@@ -261,6 +273,9 @@ module "reload_pipeline" {
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.retention.period.amount" : "0",
               "--dpr.file.transfer.delete.copied.files" : "true",
+              "--dpr.datastorage.retry.maxAttempts" : tostring(var.glue_s3_max_attempts),
+              "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
+              "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
@@ -276,6 +291,66 @@ module "reload_pipeline" {
               "--dpr.file.deletion.buckets" : var.s3_raw_bucket_id,
               "--dpr.config.key" : var.domain
             }
+          },
+          "Next" : "Run Compaction Job on Structured Zone"
+        },
+        "Run Compaction Job on Structured Zone" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_maintenance_compaction_job,
+            "Arguments" : {
+              "--dpr.maintenance.root.path" : var.s3_structured_path,
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            },
+            "NumberOfWorkers" : var.compaction_structured_num_workers,
+            "WorkerType" : var.compaction_structured_worker_type
+          },
+          "Next" : "Run Vacuum Job on Structured Zone"
+        },
+        "Run Vacuum Job on Structured Zone" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_maintenance_retention_job,
+            "Arguments" : {
+              "--dpr.maintenance.root.path" : var.s3_structured_path,
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            },
+            "NumberOfWorkers" : var.retention_structured_num_workers,
+            "WorkerType" : var.retention_structured_worker_type
+          },
+          "Next" : "Run Compaction Job on Curated Zone"
+        },
+        "Run Compaction Job on Curated Zone" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_maintenance_compaction_job,
+            "Arguments" : {
+              "--dpr.maintenance.root.path" : var.s3_curated_path,
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            },
+            "NumberOfWorkers" : var.compaction_curated_num_workers,
+            "WorkerType" : var.compaction_curated_worker_type
+          },
+          "Next" : "Run Vacuum Job on Curated Zone"
+        },
+        "Run Vacuum Job on Curated Zone" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_maintenance_retention_job,
+            "Arguments" : {
+              "--dpr.maintenance.root.path" : var.s3_curated_path,
+              "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+              "--dpr.config.key" : var.domain
+            },
+            "NumberOfWorkers" : var.retention_curated_num_workers,
+            "WorkerType" : var.retention_curated_worker_type
           },
           "Next" : "Resume DMS Replication Task"
         },

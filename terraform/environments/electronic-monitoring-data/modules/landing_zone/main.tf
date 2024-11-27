@@ -1,3 +1,13 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 2.7.0"
+    }
+  }
+}
+
+
 data "aws_iam_policy_document" "transfer_assume_role" {
   statement {
     effect = "Allow"
@@ -10,6 +20,8 @@ data "aws_iam_policy_document" "transfer_assume_role" {
     actions = ["sts:AssumeRole"]
   }
 }
+
+
 
 #------------------------------------------------------------------------------
 # S3 bucket for landing Supplier data
@@ -26,95 +38,42 @@ resource "random_string" "this" {
   special = false
 }
 
-resource "aws_s3_bucket" "landing_bucket" {
-  bucket = "${var.supplier}-${random_string.this.result}"
-
-  tags = merge(
-    var.local_tags,
+#tfsec:ignore:aws-s3-enable-versioning
+module "landing-bucket" {
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0"
+  bucket_name         = "${var.supplier}-${random_string.this.result}"
+  replication_enabled = false
+  providers = {
+    # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
+    # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
+    # Platform team to add a new provider for the additional Region.
+    # Leave this provider block in even if you are not using replication
+    aws.bucket-replication = aws
+  }
+  versioning_enabled = false
+  lifecycle_rule = [
     {
-      supplier = var.supplier,
-    },
-  )
-}
+      id      = "main"
+      enabled = "Enabled"
+      prefix  = ""
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "landing_bucket" {
-  bucket = aws_s3_bucket.landing_bucket.id
+      tags = {
+        rule      = "log"
+        autoclean = "true"
+      }
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      expiration = {
+        days = 14
+      }
+
+      noncurrent_version_expiration = {
+        days = 21
+      }
     }
-  }
-}
+  ]
 
-resource "aws_s3_bucket_public_access_block" "landing_bucket" {
-  bucket                  = aws_s3_bucket.landing_bucket.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
+  tags = merge(var.local_tags, { resource-type = "landing-bucket" })
 
-resource "aws_s3_bucket_policy" "landing_bucket" {
-  bucket = aws_s3_bucket.landing_bucket.id
-  policy = data.aws_iam_policy_document.landing_bucket.json
-}
-
-data "aws_iam_policy_document" "landing_bucket" {
-  statement {
-    sid = "EnforceTLSv12orHigher"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    effect  = "Deny"
-    actions = ["s3:*"]
-    resources = [
-      aws_s3_bucket.landing_bucket.arn,
-      "${aws_s3_bucket.landing_bucket.arn}/*"
-    ]
-    condition {
-      test     = "NumericLessThan"
-      variable = "s3:TlsVersion"
-      values   = [1.2]
-    }
-  }
-}
-
-resource "aws_s3_bucket_versioning" "landing_bucket" {
-  bucket = aws_s3_bucket.landing_bucket.id
-  versioning_configuration {
-    status = "Disabled"
-  }
-}
-
-resource "aws_s3_bucket_logging" "landing_bucket" {
-  bucket = aws_s3_bucket.landing_bucket.id
-
-  target_bucket = module.log_bucket.bucket_id
-  target_prefix = "log/"
-
-  target_object_key_format {
-    partitioned_prefix {
-      partition_date_source = "EventTime"
-    }
-  }
-}
-
-#------------------------------------------------------------------------------
-# S3 bucket for landing bucket logs
-#------------------------------------------------------------------------------
-
-module "log_bucket" {
-  source = "../s3_log_bucket"
-
-  source_bucket = aws_s3_bucket.landing_bucket
-  account_id    = var.account_id
-
-  local_tags = var.local_tags
-  tags = {
-    supplier = var.supplier
-  }
 }
 
 #------------------------------------------------------------------------------
@@ -300,6 +259,7 @@ resource "aws_iam_role" "this_transfer_workflow" {
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
 }
 
+#tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "this_transfer_workflow" {
   statement {
     sid    = "AllowCopyReadSource"
@@ -308,7 +268,7 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
       "s3:GetObject",
       "s3:GetObjectTagging"
     ]
-    resources = ["${aws_s3_bucket.landing_bucket.arn}/*"]
+    resources = ["${module.landing-bucket.bucket.arn}/*"]
   }
   statement {
     sid    = "AllowCopyWriteDestination"
@@ -326,7 +286,7 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
       "s3:ListBucket"
     ]
     resources = [
-      aws_s3_bucket.landing_bucket.arn,
+      module.landing-bucket.bucket.arn,
       var.data_store_bucket.arn
     ]
   }
@@ -339,7 +299,7 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
     ]
     resources = [
       "${var.data_store_bucket.arn}/*",
-      "${aws_s3_bucket.landing_bucket.arn}/*",
+      "${module.landing-bucket.bucket.arn}/*",
     ]
     # condition {}
   }
@@ -350,7 +310,7 @@ data "aws_iam_policy_document" "this_transfer_workflow" {
       "s3:DeleteObject",
       "s3:DeleteObjectVersion"
     ]
-    resources = ["${aws_s3_bucket.landing_bucket.arn}/*"]
+    resources = ["${module.landing-bucket.bucket.arn}/*"]
   }
 }
 
@@ -371,7 +331,7 @@ module "landing_zone_users" {
 
   for_each = { for idx, item in var.user_accounts : idx => item }
 
-  landing_bucket  = aws_s3_bucket.landing_bucket
+  landing_bucket  = module.landing-bucket.bucket
   local_tags      = var.local_tags
   ssh_keys        = each.value.ssh_keys
   supplier        = var.supplier

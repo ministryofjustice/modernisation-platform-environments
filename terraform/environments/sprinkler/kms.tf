@@ -30,6 +30,7 @@ data "aws_iam_policy_document" "sprinkler_ebs_encryption_policy_doc" {
 
   # checkov:skip=CKV_AWS_109: "Key policy requires asterisk resource"
   # checkov:skip=CKV_AWS_111: "Key policy requires asterisk resource"
+  # checkov:skip=CKV_AWS_356
 
   # Allow root users full management access to key
   statement {

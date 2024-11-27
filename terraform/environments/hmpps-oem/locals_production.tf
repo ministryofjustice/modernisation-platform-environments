@@ -4,7 +4,16 @@ locals {
     options = {
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty = "hmpps-oem-production"
+          azure-fixngo-pagerduty              = "az-noms-production-1-alerts"
+          corporate-staff-rostering-pagerduty = "corporate-staff-rostering-production"
+          dso-pipelines-pagerduty             = "dso-pipelines"
+          hmpps-domain-services-pagerduty     = "hmpps-domain-services-production"
+          nomis-combined-reporting-pagerduty  = "nomis-combined-reporting-production"
+          nomis-pagerduty                     = "nomis-production"
+          oasys-national-reporting-pagerduty  = "oasys-national-reporting-production"
+          oasys-pagerduty                     = "oasys-production"
+          pagerduty                           = "hmpps-oem-production"
+          planetfm-pagerduty                  = "planetfm-production"
         }
       }
     }
@@ -15,6 +24,10 @@ locals {
 
     ec2_instances = {
       prod-oem-a = merge(local.ec2_instances.oem, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.oem.cloudwatch_metric_alarms,
+          local.cloudwatch_metric_alarms_endpoint_monitoring
+        )
         config = merge(local.ec2_instances.oem.config, {
           availability_zone = "eu-west-2a"
         })

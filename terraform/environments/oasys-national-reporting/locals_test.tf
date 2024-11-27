@@ -83,7 +83,7 @@ locals {
         cloudwatch_metric_alarms = null
       })
 
-      # IMPORTANT: this is just for testing at the moment
+      # TODO: this is just for testing, remove when not needed
       t2-rhel6-web-asg = merge(local.ec2_autoscaling_groups.boe_web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.boe_web.autoscaling_group, {
           desired_capacity = 0
@@ -124,95 +124,114 @@ locals {
         cloudwatch_metric_alarms = null
       })
 
+      # TODO: this is just for testing, remove when not needed
       t2-tst-bods-asg = merge(local.ec2_autoscaling_groups.bods, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
           desired_capacity = 0
         })
-        config = merge(local.ec2_instances.bods.config, {
-          user_data_raw = base64encode(templatefile(
-            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-              branch   = "TM/TM-494/ips-install"
-              hostname = "t2-tst-bods-asg" # 15 characters max, only alphanumeric characters and hyphens, must not be just numbers.
-            }
-          ))
+        config = merge(local.ec2_autoscaling_groups.bods.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+            branch = "TM/TM-660/onr-bods-second-server"
+          }))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
+          instance_type = "m4.xlarge"
+        })
+        tags = merge(local.ec2_autoscaling_groups.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+          domain-name                          = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
+    }
+
+    ec2_instances = {
+
+      t2-onr-bods-1 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
         cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "t2"
-        })
-      })
-    }
-
-    ec2_instances = {
-      t2-onr-bods-1-a = merge(local.ec2_instances.bods, {
-        config = merge(local.ec2_instances.bods.config, {
-          ami_name          = "hmpps_windows_server_2019_release_2024-05-02T00-00-37.552Z"
-          ami_owner         = "self" # remove this if this is ever rebuilt, you can reference AMI direct from core-shared-services-production
-          availability_zone = "eu-west-2a"
-        })
-        instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "m4.xlarge"
-        })
-        # volumes are a direct copy of BODS in NCR
-        ebs_volumes = merge(local.ec2_instances.bods.ebs_volumes, {
-          "/dev/sda1" = { type = "gp3", size = 100 }
-          "/dev/sdb"  = { type = "gp3", size = 100 }
-          "/dev/sdc"  = { type = "gp3", size = 100 }
-          "/dev/sds"  = { type = "gp3", size = 100 }
-        })
-        tags = merge(local.ec2_instances.bods.tags, {
-          domain-name = "azure.noms.root"
+          domain-name                          = "azure.noms.root"
         })
       })
 
-      t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
-        config = merge(local.ec2_instances.boe_app.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = setunion(local.ec2_instances.boe_app.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.boe_app.instance, {
-          instance_type = "m4.xlarge"
-        })
-        tags = merge(local.ec2_instances.boe_app.tags, {
-          oasys-national-reporting-environment = "t2"
-        })
-      })
+      # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2a"
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #   user_data_raw = base64encode(templatefile(
+      #      "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #      branch = "TM/TM-660/onr-bods-second-server"
+      #    }))
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #     domain-name                          = "azure.noms.root"
+      #   })
+      # })
 
-      # NOTE: currently using a Rhel 6 instance for onr-web instances, not Rhel 7 & independent Tomcat install
-      t2-onr-web-1-a = merge(local.ec2_instances.boe_web, {
-        config = merge(local.ec2_instances.boe_web.config, {
-          ami_name          = "base_rhel_6_10_*"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = setunion(local.ec2_instances.boe_web.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.boe_web.instance, {
-          instance_type                = "m4.large"
-          metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
-        })
-        tags = merge(local.ec2_instances.boe_web.tags, {
-          ami                                  = "base_rhel_6_10"
-          oasys-national-reporting-environment = "t2"
-        })
-      })
-      t2-onr-client-a = merge(local.ec2_instances.jumpserver, {
-        config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
-          availability_zone = "eu-west-2a"
-        })
-        tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.noms.root"
-        })
-      })
+      # NOTE: These are all BOE 3.1 instances and are not currently needed
+      # t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
+      #   config = merge(local.ec2_instances.boe_app.config, {
+      #     availability_zone = "eu-west-2a"
+      #     instance_profile_policies = setunion(local.ec2_instances.boe_app.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.boe_app.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #   tags = merge(local.ec2_instances.boe_app.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #   })
+      # })
+
+      # # NOTE: currently using a Rhel 6 instance for onr-web instances, not Rhel 7 & independent Tomcat install
+      # t2-onr-web-1-a = merge(local.ec2_instances.boe_web, {
+      #   config = merge(local.ec2_instances.boe_web.config, {
+      #     ami_name          = "base_rhel_6_10_*"
+      #     availability_zone = "eu-west-2a"
+      #     instance_profile_policies = setunion(local.ec2_instances.boe_web.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.boe_web.instance, {
+      #     instance_type                = "m4.large"
+      #     metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
+      #   })
+      #   tags = merge(local.ec2_instances.boe_web.tags, {
+      #     ami                                  = "base_rhel_6_10"
+      #     oasys-national-reporting-environment = "t2"
+      #   })
+      # })
+      # t2-onr-client-a = merge(local.ec2_instances.jumpserver, {
+      #   config = merge(local.ec2_instances.jumpserver.config, {
+      #     ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
+      #     availability_zone = "eu-west-2a"
+      #   })
+      #   tags = merge(local.ec2_instances.jumpserver.tags, {
+      #     domain-name = "azure.noms.root"
+      #   })
+      # })
     }
 
     iam_policies = {
@@ -226,9 +245,8 @@ locals {
               "secretsmanager:PutSecretValue",
             ]
             resources = [
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-boe/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-bods/t2/*",
-              "arn:aws:secretsmanager:*:*:secret:/ec2/onr-web/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/t2/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/t2/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
@@ -236,153 +254,153 @@ locals {
       }
     }
 
-    lbs = {
-      public = merge(local.lbs.public, {
-        instance_target_groups = {
-          t2-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
-            attachments = [
-              { ec2_instance_name = "t2-onr-bods-1-a" },
-            ]
-          })
-        }
-        listeners = merge(local.lbs.public.listeners, {
-          https = merge(local.lbs.public.listeners.https, {
-            alarm_target_group_names = []
-            rules = {
-              t2-onr-bods-http28080 = {
-                priority = 100
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-onr-bods-http28080"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "t2-bods.test.reporting.oasys.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          })
-        })
-      })
+    # lbs = {
+    #   public = merge(local.lbs.public, {
+    #     instance_target_groups = {
+    #       t2-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
+    #         attachments = [
+    #           { ec2_instance_name = "t2-onr-bods-1" },
+    #         ]
+    #       })
+    #     }
+    #     listeners = merge(local.lbs.public.listeners, {
+    #       https = merge(local.lbs.public.listeners.https, {
+    #         alarm_target_group_names = []
+    #         rules = {
+    #           t2-onr-bods-http28080 = {
+    #             priority = 100
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "t2-onr-bods-http28080"
+    #             }]
+    #             conditions = [{
+    #               host_header = {
+    #                 values = [
+    #                   "t2-bods.test.reporting.oasys.service.justice.gov.uk",
+    #                 ]
+    #               }
+    #             }]
+    #           }
+    #         }
+    #       })
+    #     })
+    #   })
 
-      private = {
-        enable_cross_zone_load_balancing = true
-        enable_delete_protection         = false
-        idle_timeout                     = 3600
-        internal_lb                      = true
-        load_balancer_type               = "application"
-        security_groups                  = ["lb"]
-        subnets                          = module.environment.subnets["private"].ids
+    #   private = {
+    #     drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
+    #     enable_cross_zone_load_balancing = true
+    #     enable_delete_protection         = false
+    #     idle_timeout                     = 3600
+    #     internal_lb                      = true
+    #     load_balancer_type               = "application"
+    #     security_groups                  = ["lb"]
+    #     subnets                          = module.environment.subnets["private"].ids
 
-        instance_target_groups = {
-          t2-onr-web-1-a = {
-            port     = 7777
-            protocol = "HTTP"
-            health_check = {
-              enabled             = true
-              healthy_threshold   = 3
-              interval            = 30
-              matcher             = "200-399"
-              path                = "/"
-              port                = 7777
-              timeout             = 5
-              unhealthy_threshold = 5
-            }
-            stickiness = {
-              enabled = true
-              type    = "lb_cookie"
-            }
-            attachments = [
-              { ec2_instance_name = "t2-onr-web-1-a" },
-            ]
-          }
-        }
+    #     instance_target_groups = {
+    #       t2-onr-web-1-a = {
+    #         port     = 7777
+    #         protocol = "HTTP"
+    #         health_check = {
+    #           enabled             = true
+    #           healthy_threshold   = 3
+    #           interval            = 30
+    #           matcher             = "200-399"
+    #           path                = "/"
+    #           port                = 7777
+    #           timeout             = 5
+    #           unhealthy_threshold = 5
+    #         }
+    #         stickiness = {
+    #           enabled = true
+    #           type    = "lb_cookie"
+    #         }
+    #         attachments = [
+    #           { ec2_instance_name = "t2-onr-web-1-a" },
+    #         ]
+    #       }
+    #     }
 
-        listeners = {
-          http = {
-            port     = 7777
-            protocol = "HTTP"
+    #     listeners = {
+    #       http = {
+    #         port     = 7777
+    #         protocol = "HTTP"
 
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
-            rules = {
-              t2-onr-web-1-a = {
-                priority = 4000
+    #         default_action = {
+    #           type = "fixed-response"
+    #           fixed_response = {
+    #             content_type = "text/plain"
+    #             message_body = "Not implemented"
+    #             status_code  = "501"
+    #           }
+    #         }
+    #         rules = {
+    #           t2-onr-web-1-a = {
+    #             priority = 4000
 
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-onr-web-1-a"
-                }]
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "t2-onr-web-1-a"
+    #             }]
 
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "t2-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          }
-          https = {
-            certificate_names_or_arns = ["oasys_national_reporting_wildcard_cert"]
-            port                      = 443
-            protocol                  = "HTTPS"
-            ssl_policy                = "ELBSecurityPolicy-2016-08"
+    #             conditions = [{
+    #               host_header = {
+    #                 values = [
+    #                   "t2-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+    #                 ]
+    #               }
+    #             }]
+    #           }
+    #         }
+    #       }
+    #       https = {
+    #         certificate_names_or_arns = ["oasys_national_reporting_wildcard_cert"]
+    #         port                      = 443
+    #         protocol                  = "HTTPS"
+    #         ssl_policy                = "ELBSecurityPolicy-2016-08"
 
-            default_action = {
-              type = "fixed-response"
-              fixed_response = {
-                content_type = "text/plain"
-                message_body = "Not implemented"
-                status_code  = "501"
-              }
-            }
+    #         default_action = {
+    #           type = "fixed-response"
+    #           fixed_response = {
+    #             content_type = "text/plain"
+    #             message_body = "Not implemented"
+    #             status_code  = "501"
+    #           }
+    #         }
 
-            rules = {
-              t2-onr-web-1-a = {
-                priority = 4580
+    #         rules = {
+    #           t2-onr-web-1-a = {
+    #             priority = 4580
 
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-onr-web-1-a"
-                }]
+    #             actions = [{
+    #               type              = "forward"
+    #               target_group_name = "t2-onr-web-1-a"
+    #             }]
 
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "t2-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-            }
-          }
-        }
-      }
-    }
+    #             conditions = [{
+    #               host_header = {
+    #                 values = [
+    #                   "t2-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+    #                 ]
+    #               }
+    #             }]
+    #           }
+    #         }
+    #       }
+    #     }
+    #   }
+    # }
 
     route53_zones = {
       "test.reporting.oasys.service.justice.gov.uk" = {
-        lb_alias_records = [
-          { name = "t2-bods", type = "A", lbs_map_key = "public" }
-        ],
+        # lb_alias_records = [
+        #   { name = "t2-bods", type = "A", lbs_map_key = "public" }
+        # ],
       }
     }
 
     secretsmanager_secrets = {
-      "/ec2/onr-bods/t2"         = local.secretsmanager_secrets.bods
-      "/ec2/onr-boe/t2"          = local.secretsmanager_secrets.boe_app
-      "/ec2/onr-web/t2"          = local.secretsmanager_secrets.boe_web
+      "/sap/bods/t2"             = local.secretsmanager_secrets.bods
+      "/sap/bip/t2"              = local.secretsmanager_secrets.bip
       "/oracle/database/T2BOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T2BOAUD" = local.secretsmanager_secrets.db
     }

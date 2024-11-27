@@ -1,7 +1,8 @@
 locals {
   account_id         = data.aws_caller_identity.current.account_id
   delius_account_id  = var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]
-  oracle_port        = "1521"
+  db_port            = 1521
+  db_tcps_port       = 1522
   dms_audit_username = "delius_audit_dms_pool"
 
   # Although it is recommended to use bucket_prefix rather than bucket_name when creating an S3 bucket
@@ -39,5 +40,16 @@ locals {
   # We define an S3 writer role for each Delius environment (rather than for the account)
   dms_s3_writer_role_name = "${var.env_name}-dms-s3-writer-role"
   dms_s3_reader_role_name = "${var.env_name}-dms-s3-reader-role"
+
+  replication_task_names = concat(
+    try([aws_dms_replication_task.user_inbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.business_interaction_inbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_inbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_checksum_inbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_outbound_replication[0].replication_task_id],[]),
+    try([aws_dms_replication_task.audited_interaction_checksum_outbound_replication[0].replication_task_id],[])
+  )
 
 }

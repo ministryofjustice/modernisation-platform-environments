@@ -28,17 +28,18 @@ locals {
     efs_backup_retention_period = "30"
     port                        = 389
     tls_port                    = 636
+    desired_count               = 1
   }
 
   db_config_dev = {
-    instance_type  = "r7i.large"
+    instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {
       "business_unit_kms_key_access" = aws_iam_policy.business_unit_kms_key_access
     }
-
-    standby_count = 2
+    primary_instance_count = 1
+    standby_count          = 2
     ebs_volumes = {
       "/dev/sdb" = { label = "app", size = 200 } # /u01
       "/dev/sdc" = { label = "app", size = 100 } # /u02
@@ -75,14 +76,15 @@ locals {
 
   delius_microservices_configs_dev = {
     weblogic = {
-      image_tag        = "5.7.6"
-      container_port   = 8080
-      container_memory = 4096
-      container_cpu    = 2048
+      image_tag                = "6.2.0.3"
+      container_port           = 8080
+      container_memory         = 4096
+      container_cpu            = 2048
+      task_definition_revision = 9
     }
 
     weblogic_eis = {
-      image_tag        = "5.7.6"
+      image_tag        = "6.2.0.3"
       container_port   = 8080
       container_memory = 2048
       container_cpu    = 1024
@@ -102,16 +104,6 @@ locals {
       container_cpu    = 512
       container_memory = 1024
     }
-
-    pdf_creation = {
-      image_tag      = "2021-06-24.995.8c1da2c"
-      container_port = 8080
-    }
-
-    newtech = {
-      image_tag      = "2024-05-28.10054.9e25657"
-      container_port = 80
-    }
   }
 
   bastion_config_dev = {
@@ -122,6 +114,7 @@ locals {
   }
 
   dms_config_dev = {
+    deploy_dms                 = true
     replication_instance_class = "dms.t3.small"
     engine_version             = "3.5.2"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
@@ -137,6 +130,6 @@ locals {
     user_target_endpoint = {
       write_database = "DMDNDA"
     }
-    is-production = local.is-production
+    is-production = false
   }
 }

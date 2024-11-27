@@ -47,6 +47,9 @@ data "aws_iam_policy_document" "ldap_datasync_role_assume" {
 }
 
 data "aws_iam_policy_document" "ldap_datasync_role_access" {
+  #checkov:skip=CKV_AWS_109
+  #checkov:skip=CKV_AWS_111
+  #checkov:skip=CKV_AWS_356
   statement {
     effect = "Allow"
     actions = [
@@ -115,6 +118,7 @@ locals {
 
 
 module "s3_bucket_ldap_data_refresh" {
+  #checkov:skip=CKV_TF_1
   source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
   bucket_name         = "${var.env_name}-ldap-data-refresh-incoming"
   versioning_enabled  = false

@@ -11,6 +11,13 @@ variable "filename" {
   default     = null
 }
 
+variable "image_name" {
+  description = "The name of the image function."
+  type        = string
+  nullable    = true
+  default     = null
+}
+
 variable "function_name" {
   description = "A unique name for your Lambda Function."
   type        = string
@@ -93,11 +100,6 @@ variable "reserved_concurrent_executions" {
   default     = 10
 }
 
-variable "env_account_id" {
-  description = "The account number of the aws account"
-  type        = number
-}
-
 variable "core_shared_services_id" {
   description = "The account number of the core shared services account"
   type        = number
@@ -124,4 +126,10 @@ variable "function_tag" {
   type        = string
   nullable    = true
   default     = null
+}
+
+variable "ephemeral_storage_size" {
+  description = "Size in MB of lambda ephemeral storage"
+  type        = number
+  default     = 512
 }

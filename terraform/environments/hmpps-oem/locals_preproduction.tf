@@ -2,9 +2,20 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
+      enable_ec2_delius_dba_secrets_access = true
+
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty = "hmpps-oem-preproduction"
+          azure-fixngo-pagerduty              = "az-noms-production-1-alerts"
+          corporate-staff-rostering-pagerduty = "corporate-staff-rostering-preproduction"
+          dso-pipelines-pagerduty             = "dso-pipelines"
+          hmpps-domain-services-pagerduty     = "hmpps-domain-services-preproduction"
+          nomis-combined-reporting-pagerduty  = "nomis-combined-reporting-preproduction"
+          nomis-pagerduty                     = "nomis-preproduction"
+          oasys-national-reporting-pagerduty  = "oasys-national-reporting-preproduction"
+          oasys-pagerduty                     = "oasys-preproduction"
+          pagerduty                           = "hmpps-oem-preproduction"
+          planetfm-pagerduty                  = "planetfm-preproduction"
         }
       }
     }
@@ -16,6 +27,10 @@ locals {
     ec2_instances = {
 
       preprod-oem-a = merge(local.ec2_instances.oem, {
+        cloudwatch_metric_alarms = merge(
+          local.ec2_instances.oem.cloudwatch_metric_alarms,
+          local.cloudwatch_metric_alarms_endpoint_monitoring
+        )
         config = merge(local.ec2_instances.oem.config, {
           availability_zone = "eu-west-2a"
         })

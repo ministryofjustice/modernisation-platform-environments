@@ -31,6 +31,7 @@ variable "ldap_config" {
     efs_backup_retention_period = string
     port                        = optional(number)
     tls_port                    = optional(number)
+    desired_count               = number
   })
   default = {
     name                        = "default_name"
@@ -43,6 +44,7 @@ variable "ldap_config" {
     efs_backup_retention_period = "default_efs_backup_retention_period"
     port                        = 389
     tls_port                    = 636
+    desired_count               = 0
   }
 }
 

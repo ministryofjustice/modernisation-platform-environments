@@ -1,8 +1,9 @@
 locals {
   lower_env_cloudfront_url = "${local.application_name}.${data.aws_route53_zone.external.name}"
   # TODO: The production CloudFront FQDN is to be determined
-  prod_fqdn        = data.aws_route53_zone.production_network_services.name
-  cloudfront_alias = local.environment == "production" ? local.prod_fqdn : local.lower_env_cloudfront_url
+  prod_fqdn         = data.aws_route53_zone.production_network_services.name
+  cloudfront_alias  = local.environment == "production" ? local.prod_fqdn : local.lower_env_cloudfront_url
+  cloudfront_domain = local.environment == "production" ? data.aws_route53_zone.production_network_services.name : local.application_data.accounts[local.environment].acm_cert_domain_name
 
   custom_header = "X-Custom-Header-LAA-${upper(local.application_name)}"
 
@@ -96,11 +97,11 @@ locals {
     type   = dvo.resource_record_type
     }
   }
-  cloudfront_domain_name_main   = [for k, v in local.cloudfront_domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_name_main   = [for k, v in local.cloudfront_domain_types : v.name if k == local.cloudfront_domain]
   cloudfront_domain_name_sub    = [for k, v in local.cloudfront_domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
-  cloudfront_domain_record_main = [for k, v in local.cloudfront_domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_record_main = [for k, v in local.cloudfront_domain_types : v.record if k == local.cloudfront_domain]
   cloudfront_domain_record_sub  = [for k, v in local.cloudfront_domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
-  cloudfront_domain_type_main   = [for k, v in local.cloudfront_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_type_main   = [for k, v in local.cloudfront_domain_types : v.type if k == local.cloudfront_domain]
   cloudfront_domain_type_sub    = [for k, v in local.cloudfront_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 }
 
@@ -292,7 +293,7 @@ resource "aws_route53_record" "cloudfront-prod" {
 }
 
 resource "aws_acm_certificate" "cloudfront" {
-  domain_name               = local.environment == "production" ? data.aws_route53_zone.production_network_services.name : local.application_data.accounts[local.environment].acm_cert_domain_name
+  domain_name               = local.cloudfront_domain
   validation_method         = "DNS"
   provider                  = aws.us-east-1
   subject_alternative_names = local.environment == "production" ? null : [local.lower_env_cloudfront_url]
@@ -301,6 +302,18 @@ resource "aws_acm_certificate" "cloudfront" {
   lifecycle {
     prevent_destroy = false
   }
+}
+
+resource "aws_route53_record" "cloudfront_external_validation_prod" {
+  provider = aws.core-network-services
+
+  count           = local.environment == "production" ? 1 : 0
+  allow_overwrite = true
+  name            = local.cloudfront_domain_name_main[0]
+  records         = local.cloudfront_domain_record_main
+  ttl             = 60
+  type            = local.cloudfront_domain_type_main[0]
+  zone_id         = data.aws_route53_zone.production_network_services.zone_id
 }
 
 resource "aws_route53_record" "cloudfront_external_validation" {
@@ -330,7 +343,6 @@ resource "aws_route53_record" "cloudfront_external_validation_subdomain" {
 resource "aws_acm_certificate_validation" "cloudfront" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.cloudfront.arn
-  validation_record_fqdns = [local.cloudfront_domain_name_main[0], local.cloudfront_domain_name_sub[0]]
+  validation_record_fqdns = local.environment == "production" ? [local.cloudfront_domain_name_main[0]] : [local.cloudfront_domain_name_main[0], local.cloudfront_domain_name_sub[0]]
 }
-
 

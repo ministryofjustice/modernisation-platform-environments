@@ -1,5 +1,6 @@
 # Create s3 bucket for s3 keys
 module "s3_bucket_ssh_keys" {
+  #checkov:skip=CKV_TF_1
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 

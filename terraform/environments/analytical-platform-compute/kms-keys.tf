@@ -3,7 +3,7 @@ module "vpc_flow_logs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases                 = ["vpc/flow-logs"]
   description             = "VPC flow logs KMS key"
@@ -45,7 +45,7 @@ module "managed_prometheus_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases                 = ["amp/default"]
   description             = "AMP KMS key"
@@ -91,7 +91,7 @@ module "managed_prometheus_logs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases                 = ["amp/logs"]
   description             = "AMP logs KMS key"
@@ -133,7 +133,7 @@ module "eks_cluster_logs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases                 = ["eks/cluster-logs"]
   description             = "EKS cluster logs KMS key"
@@ -175,7 +175,7 @@ module "eks_ebs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases                 = ["eks/ebs"]
   description             = "EKS EBS KMS key"
@@ -232,7 +232,7 @@ module "mlflow_auth_rds_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["rds/mlflow-auth"]
   description           = "MLflow Auth RDS KMS key"
@@ -248,7 +248,7 @@ module "mlflow_rds_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["rds/mlflow"]
   description           = "MLflow RDS KMS key"
@@ -264,7 +264,7 @@ module "mlflow_s3_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["s3/mlflow"]
   description           = "MLflow S3 KMS key"
@@ -275,12 +275,120 @@ module "mlflow_s3_kms" {
   tags = local.tags
 }
 
+module "mojap_compute_athena_s3_kms_eu_west_2" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["s3/mojap-compute-athena-query-results-eu-west-2"]
+  description           = "Mojap Athena query bucket S3 KMS key for eu-west-2"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+}
+
+module "mojap_compute_logs_s3_kms_eu_west_2" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["s3/mojap-compute-logs-eu-west-2"]
+  description           = "mojap-compute-logs eu-west-2 S3 KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+
+  key_statements = [
+    {
+      sid    = "AllowS3Logging"
+      effect = "Allow"
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:DescribeKey"
+      ]
+      resources = ["*"]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logging.s3.amazonaws.com"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["logging.s3.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+}
+
+module "mojap_compute_logs_s3_kms_eu_west_1" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  providers = {
+    aws = aws.analytical-platform-compute-eu-west-1
+  }
+
+  aliases               = ["s3/mojap-compute-logs-eu-west-1"]
+  description           = "mojap-compute-logs eu-west-1 S3 KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+
+  key_statements = [
+    {
+      sid    = "AllowS3Logging"
+      effect = "Allow"
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:GenerateDataKey",
+        "kms:GenerateDataKeyWithoutPlaintext",
+        "kms:DescribeKey"
+      ]
+      resources = ["*"]
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["logging.s3.amazonaws.com"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["logging.s3.amazonaws.com"]
+        }
+      ]
+    }
+  ]
+}
+
 module "common_secrets_manager_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["secretsmanager/common"]
   description           = "Common Secrets Manager KMS key"
@@ -296,7 +404,7 @@ module "karpenter_sqs_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["sqs/karpenter"]
   description           = "Karpenter SQS KMS key"
@@ -329,7 +437,7 @@ module "ui_rds_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["rds/ui"]
   description           = "UI RDS KMS key"
@@ -347,7 +455,7 @@ module "actions_runner_cache_efs_kms" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["efs/actions-runner-cache"]
   description           = "Actions Runner Cache EFS KMS key"

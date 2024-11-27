@@ -32,6 +32,7 @@ module "cloudwatch_dashboard" {
 
   dashboard_name = each.key
   accountId      = lookup(each.value, "account_name", null) == null ? null : var.environment.account_ids[lookup(each.value, "account_name", null)]
+  ec2_instances  = module.ec2_instance
   periodOverride = lookup(each.value, "periodOverride", null)
   start          = lookup(each.value, "start", null)
   widget_groups  = lookup(each.value, "widget_groups", [])

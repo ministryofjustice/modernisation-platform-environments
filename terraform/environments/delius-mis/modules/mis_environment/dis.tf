@@ -1,10 +1,11 @@
 resource "aws_security_group" "dis" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
   name_prefix = "${var.env_name}-dis"
   vpc_id      = var.account_info.vpc_id
 }
 
 module "dis_instance" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=49e289239aec2845924f00fc5969f35ae76122e2"
 
   count = var.dis_config.instance_count
 
@@ -12,7 +13,7 @@ module "dis_instance" {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
   }
 
-  name = "${var.env_name}-dis-${count.index + 1}"
+  name = "${var.app_name}-${var.env_name}-dis-${count.index + 1}"
 
   ami_name  = var.dis_config.ami_name
   ami_owner = "self"
@@ -39,10 +40,10 @@ module "dis_instance" {
     templatefile(
       "${path.module}/templates/EC2LaunchV2.yaml.tftpl",
       {
-        ad_username_secret_name = aws_secretsmanager_secret.ad_username.name
-        ad_password_secret_name = aws_secretsmanager_secret.ad_password.name
-        ad_domain_name          = var.environment_config.legacy_ad_domain_name
-        ad_ip_list              = var.environment_config.legacy_ad_ip_list
+        #ad_username_secret_name = aws_secretsmanager_secret.ad_username.name
+        ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
+        ad_domain_name          = var.environment_config.ad_domain_name
+        ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
       }
     )
   )

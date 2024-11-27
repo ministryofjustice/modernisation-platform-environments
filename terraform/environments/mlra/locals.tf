@@ -31,20 +31,18 @@ locals {
   }))
 
   maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
-  ga_4_tag_id_secret_name2    = "APP_MLRA_GOOGLE_ANALYTICS_4_TAG_ID"
   gtm_id_secret_name          = "APP_MLRA_GOOGLE_TAG_MANAGER_ID"
   task_definition = templatefile("task_definition.json", {
-    app_name                  = local.application_name
-    ecr_url                   = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
-    docker_image_tag          = local.application_data.accounts[local.environment].docker_image_tag
-    region                    = local.application_data.accounts[local.environment].region
-    maat_api_end_point        = local.application_data.accounts[local.environment].maat_api_end_point
-    maat_db_url               = local.application_data.accounts[local.environment].maat_db_url
-    maat_libra_wsdl_url       = local.application_data.accounts[local.environment].maat_libra_wsdl_url
-    sentry_env                = local.environment
-    db_secret_arn             = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"
-    google_analytics_4_tag_id = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.ga_4_tag_id_secret_name2}"
-    google_tag_manager_id     = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.gtm_id_secret_name}"
+    app_name              = local.application_name
+    ecr_url               = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
+    docker_image_tag      = local.application_data.accounts[local.environment].docker_image_tag
+    region                = local.application_data.accounts[local.environment].region
+    maat_api_end_point    = local.application_data.accounts[local.environment].maat_api_end_point
+    maat_db_url           = local.application_data.accounts[local.environment].maat_db_url
+    maat_libra_wsdl_url   = local.application_data.accounts[local.environment].maat_libra_wsdl_url
+    sentry_env            = local.environment
+    db_secret_arn         = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"
+    google_tag_manager_id = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.gtm_id_secret_name}"
   })
   ecs_target_capacity = 100
 

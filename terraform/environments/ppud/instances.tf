@@ -1,238 +1,16 @@
+########################################
+# EC2 Instances and EIPs for Mail Relays
+########################################
+
 #################################
 #   Development Instances       #
 #################################
 
-resource "aws_instance" "s609693lo6vw109" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-013198324453e6dc3"
-  instance_type          = "m5.large"
-  vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
-  source_dest_check      = false
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw109"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
-
-resource "aws_instance" "s609693lo6vw112" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0be53fc5198dbd294"
-  instance_type          = "m5.large"
-  vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
-  source_dest_check      = false
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw112"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
-
-resource "aws_instance" "s609693lo6vw105" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0edd8d3e58d106f40"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw105"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
-
-resource "aws_instance" "s609693lo6vw104" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0f115a52a37278d93"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw104"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
-
-resource "aws_instance" "s609693lo6vw100" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0fbad994892c0f0c4"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw100"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
-
-resource "aws_instance" "s609693lo6vw101" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-07315ed3a1b524be8"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
-  subnet_id              = data.aws_subnet.private_subnets_b.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw101"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
-
-resource "aws_instance" "s609693lo6vw103" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-09bf383e2d58df1c7"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_b.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw103"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
-
-resource "aws_instance" "s609693lo6vw110" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0c261875f6ed81278"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_b.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw110"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
-
-resource "aws_instance" "s609693lo6vw106" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-0f9ea6b08039bb33b"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Box-VW106[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_b.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw106"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
-
-resource "aws_instance" "s609693lo6vw111" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-005cac270289ea0de"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Box-VW106[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_b.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw111"
-    patch_group = "dev_win_patch"
-  }
-}
-
-resource "aws_instance" "s609693lo6vw107" {
-  count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-04682227c9aa18702"
-  instance_type          = "m5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Box-VW107[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_b.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name        = "s609693lo6vw107"
-    patch_group = "dev_win_patch"
-    backup      = true
-  }
-}
+# Web Server
 
 resource "aws_instance" "PPUDWEBSERVER2" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0852d4d5313264225"
   instance_type          = "m5.large"
@@ -253,7 +31,61 @@ resource "aws_instance" "PPUDWEBSERVER2" {
   }
 }
 
+# Database Server
+
+resource "aws_instance" "s609693lo6vw100" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0fbad994892c0f0c4"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-Database-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw100"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
+# Web Server
+
+resource "aws_instance" "s609693lo6vw101" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-07315ed3a1b524be8"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.PPUD-WEB-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw101"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
+# Secondary Doc Server
+
 resource "aws_instance" "s609693lo6vw102" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0640473a9b0267bac"
   instance_type          = "m5.large"
@@ -274,13 +106,142 @@ resource "aws_instance" "s609693lo6vw102" {
   }
 }
 
+# Primary Doc Server
+
+resource "aws_instance" "s609693lo6vw103" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-09bf383e2d58df1c7"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw103"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
+# WAM Data Access Server
+
+resource "aws_instance" "s609693lo6vw104" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0f115a52a37278d93"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw104"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
+# WAM Portal Server
+
+resource "aws_instance" "s609693lo6vw105" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0edd8d3e58d106f40"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw105"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
+# Development Server
+
+resource "aws_instance" "s609693lo6vw106" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0f9ea6b08039bb33b"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw106"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
+# Development Server
+
+resource "aws_instance" "s609693lo6vw107" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-04682227c9aa18702"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw107"
+    patch_group = "dev_win_patch"
+    backup      = true
+  }
+}
+
+# Development Server
+
 resource "aws_instance" "s609693lo6vw108" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
   ami                    = "ami-0e0b7dbcff71ddd9c"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Box-VW108[0].id]
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
@@ -295,20 +256,18 @@ resource "aws_instance" "s609693lo6vw108" {
   }
 }
 
+# Development Server
 
-#################################
-# Pre-Production (UAT Instances) #
-#################################
-
-
-resource "aws_instance" "s618358rgvw201" {
-  count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-0d1cb68fb6c1f131b"
-  instance_type          = "c5.large"
+resource "aws_instance" "s609693lo6vw109" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-013198324453e6dc3"
+  instance_type          = "m5.large"
+  vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
   source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
 
   metadata_options {
     http_tokens   = "required"
@@ -316,20 +275,24 @@ resource "aws_instance" "s618358rgvw201" {
   }
 
   tags = {
-    Name        = "s618358rgvw201"
-    patch_group = "uat_win_patch"
+    Name        = "s609693lo6vw109"
+    patch_group = "dev_win_patch"
     backup      = true
   }
 }
 
-resource "aws_instance" "S618358RGVW202" {
-  count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-0df4dcc477ff0fa3f"
+# Development Server
+
+resource "aws_instance" "s609693lo6vw110" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-09b8ade582b84853a"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -337,20 +300,25 @@ resource "aws_instance" "S618358RGVW202" {
   }
 
   tags = {
-    Name        = "S618358RGVW202"
-    patch_group = "uat_win_patch"
+    Name        = "s609693lo6vw110"
+    patch_group = "dev_win_patch"
+    e_volume    = "yes"
     backup      = true
   }
 }
 
-resource "aws_instance" "s618358rgsw025" {
-  count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-0ad4be40d57ecc994"
-  instance_type          = "c5.4xlarge"
+# PDF Conversion Test Server
+
+resource "aws_instance" "s609693lo6vw111" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-005cac270289ea0de"
+  instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
     http_tokens   = "required"
@@ -358,20 +326,48 @@ resource "aws_instance" "s618358rgsw025" {
   }
 
   tags = {
-    Name        = "s618358rgsw025"
-    patch_group = "uat_win_patch"
+    Name        = "s609693lo6vw111"
+    patch_group = "dev_win_patch"
+  }
+}
+
+# CaR Bastion
+
+resource "aws_instance" "s609693lo6vw112" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-0be53fc5198dbd294"
+  instance_type          = "m5.large"
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  source_dest_check      = false
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s609693lo6vw112"
+    patch_group = "dev_win_patch"
     backup      = true
   }
 }
 
-resource "aws_instance" "s618358rgvw024" {
-  count                  = local.is-preproduction == true ? 1 : 0
-  ami                    = "ami-06bc4f0d8d949ba24"
-  instance_type          = "m6i.2xlarge"
+# Development Server
+
+resource "aws_instance" "s609693lo6vw113" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-development == true ? 1 : 0
+  ami                    = "ami-04ffd273077ba2a8c"
+  instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
-  subnet_id              = data.aws_subnet.data_subnets_a.id
+  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
     http_tokens   = "required"
@@ -379,13 +375,21 @@ resource "aws_instance" "s618358rgvw024" {
   }
 
   tags = {
-    Name        = "s618358rgvw024"
-    patch_group = "uat_win_patch"
+    Name        = "s609693lo6vw113"
+    patch_group = "dev_win_patch"
     backup      = true
   }
 }
+
+#################################
+# Pre-Production (UAT Instances) 
+#################################
+
+# Web Server
 
 resource "aws_instance" "s618358rgvw023" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0f073b401ba3f1cff"
   instance_type          = "c5.large"
@@ -406,12 +410,115 @@ resource "aws_instance" "s618358rgvw023" {
   }
 }
 
+# UAT Doc Server
+
+resource "aws_instance" "s618358rgvw024" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-06bc4f0d8d949ba24"
+  instance_type          = "m6i.2xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
+  subnet_id              = data.aws_subnet.data_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s618358rgvw024"
+    patch_group = "uat_win_patch"
+    backup      = true
+  }
+}
+
+# WAM Sata Access Server
+
+resource "aws_instance" "s618358rgsw025" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0ad4be40d57ecc994"
+  instance_type          = "c5.4xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Data-Access-Server.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s618358rgsw025"
+    patch_group = "uat_win_patch"
+    backup      = true
+  }
+}
+
+# WAN Portal Server
+
+resource "aws_instance" "s618358rgvw201" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0d1cb68fb6c1f131b"
+  instance_type          = "c5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "s618358rgvw201"
+    patch_group = "uat_win_patch"
+    backup      = true
+  }
+}
+
+# UAT Bridge Server
+
+resource "aws_instance" "S618358RGVW202" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-preproduction == true ? 1 : 0
+  ami                    = "ami-0df4dcc477ff0fa3f"
+  instance_type          = "m5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name        = "S618358RGVW202"
+    patch_group = "uat_win_patch"
+    backup      = true
+  }
+}
+
 #########################
 # Production Instances  #
 #########################
 
+# Web Server
 
 resource "aws_instance" "s618358rgvw019" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-01d04f2e4f8cea4dd"
   instance_type          = "c5.xlarge"
@@ -432,7 +539,11 @@ resource "aws_instance" "s618358rgvw019" {
   }
 }
 
+# Web Server
+
 resource "aws_instance" "s618358rgvw020" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0e49fc9838fdf33c4"
   instance_type          = "c5.xlarge"
@@ -453,7 +564,11 @@ resource "aws_instance" "s618358rgvw020" {
   }
 }
 
+# Database Server
+
 resource "aws_instance" "s618358rgvw021" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-05ddec53aa481cbc3"
   instance_type          = "m5.2xlarge"
@@ -474,7 +589,11 @@ resource "aws_instance" "s618358rgvw021" {
   }
 }
 
+# Primary Doc Server
+
 resource "aws_instance" "s618358rgvw022" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-02f8251c8cdf2464f"
   instance_type          = "m5.xlarge"
@@ -495,71 +614,11 @@ resource "aws_instance" "s618358rgvw022" {
   }
 }
 
-resource "aws_instance" "s618358rgvw027" {
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0e203fec985af6465"
-  instance_type          = "m5.xlarge"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_c.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name          = "s618358rgvw027"
-    patch_group   = "prod_win_patch"
-    is-production = true
-  }
-}
-
-resource "aws_instance" "s618358rgvw204" {
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0e8380f304bd2caab"
-  instance_type          = "c5.xlarge"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name          = "s618358rgvw204"
-    patch_group   = "prod_win_patch"
-    is-production = true
-  }
-}
-
-resource "aws_instance" "s618358rgvw205" {
-  count                  = local.is-production == true ? 1 : 0
-  ami                    = "ami-0b6b39448c2d727c3"
-  instance_type          = "c5.large"
-  source_dest_check      = false
-  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
-  subnet_id              = data.aws_subnet.private_subnets_a.id
-
-  metadata_options {
-    http_tokens   = "required"
-    http_endpoint = "enabled"
-  }
-
-  tags = {
-    Name          = "s618358rgvw205"
-    patch_group   = "prod_win_patch"
-    is-production = true
-  }
-}
-
+# WAM Data Access Server
 
 resource "aws_instance" "s618358rgsw025p" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0b8f6843db88aa8a6"
   instance_type          = "c5.4xlarge"
@@ -580,7 +639,86 @@ resource "aws_instance" "s618358rgsw025p" {
   }
 }
 
+# Secondary Doc Server
+
+resource "aws_instance" "s618358rgvw027" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0e203fec985af6465"
+  instance_type          = "m5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_c.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name          = "s618358rgvw027"
+    patch_group   = "prod_win_patch"
+    is-production = true
+  }
+}
+
+# WAM Portal Server
+
+resource "aws_instance" "s618358rgvw204" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0e8380f304bd2caab"
+  instance_type          = "c5.xlarge"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.WAM-Portal.id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name          = "s618358rgvw204"
+    patch_group   = "prod_win_patch"
+    is-production = true
+  }
+}
+
+# UAT Bridge Server
+
+resource "aws_instance" "s618358rgvw205" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
+  count                  = local.is-production == true ? 1 : 0
+  ami                    = "ami-0b6b39448c2d727c3"
+  instance_type          = "c5.large"
+  source_dest_check      = false
+  iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.Bridge-Server[0].id]
+  subnet_id              = data.aws_subnet.private_subnets_a.id
+
+  metadata_options {
+    http_tokens   = "required"
+    http_endpoint = "enabled"
+  }
+
+  tags = {
+    Name          = "s618358rgvw205"
+    patch_group   = "prod_win_patch"
+    is-production = true
+  }
+}
+
+# Internal Mail Relay
+
 resource "aws_instance" "s266316rgsl200" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
   instance_type          = "m5.large"
@@ -602,8 +740,11 @@ resource "aws_instance" "s266316rgsl200" {
   }
 }
 
+# External non-CJSM Mail Relay
 
 resource "aws_instance" "s265903rgsl400-non-cjsm" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
   instance_type          = "m5.large"
@@ -625,7 +766,11 @@ resource "aws_instance" "s265903rgsl400-non-cjsm" {
   }
 }
 
+# External CJSM Mail Relay
+
 resource "aws_instance" "s265903rgsl401-cjsm" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-0f43890c2b4907c29"
   instance_type          = "m5.large"
@@ -647,7 +792,11 @@ resource "aws_instance" "s265903rgsl401-cjsm" {
   }
 }
 
+# Docker Build Server
+
 resource "aws_instance" "docker-build-server" {
+  # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
+  # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-production == true ? 1 : 0
   ami                    = "ami-050d499cfdd1ff7d4"
   instance_type          = "m5.large"

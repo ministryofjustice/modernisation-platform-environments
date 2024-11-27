@@ -49,7 +49,7 @@ resource "aws_iam_role" "dms_s3_writer_role" {
 
 resource "aws_iam_policy" "dms_s3_bucket_writer_policy" {
   count = length(keys(local.bucket_map)) > 0 ? 1 : 0
-  name  = "dms-s3-bucket-writer-policy"
+  name  = "${local.dms_s3_writer_role_name}-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -101,7 +101,7 @@ resource "aws_iam_role" "dms_s3_reader_role" {
 
 # The reader role only provides access to the local bucket, not those in other accounts
 resource "aws_iam_policy" "dms_s3_bucket_reader_policy" {
-  name = "dms-s3-bucket-reader-policy"
+  name = "${local.dms_s3_reader_role_name}-policy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

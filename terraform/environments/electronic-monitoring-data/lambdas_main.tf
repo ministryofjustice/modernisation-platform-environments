@@ -35,9 +35,8 @@ module "get_metadata_from_rds_lambda" {
   subnet_ids         = data.aws_subnets.shared-public.ids
   environment_variables = {
     SECRET_NAME           = aws_secretsmanager_secret.db_glue_connection.name
-    METADATA_STORE_BUCKET = module.metadata-s3-bucket.bucket.id
+    METADATA_STORE_BUCKET = module.s3-metadata-bucket.bucket.id
   }
-  env_account_id = local.env_account_id
 }
 
 
@@ -73,50 +72,9 @@ module "create_athena_table" {
   runtime            = "python3.11"
   security_group_ids = [aws_security_group.lambda_db_security_group.id]
   subnet_ids         = data.aws_subnets.shared-public.ids
-  env_account_id     = local.env_account_id
   environment_variables = {
-    S3_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
+    S3_BUCKET_NAME = module.s3-dms-target-store-bucket.bucket.id
   }
-}
-
-
-# ------------------------------------------------------
-# Send Metadata to AP
-# ------------------------------------------------------
-
-
-data "archive_file" "send_metadata_to_ap" {
-  type        = "zip"
-  source_file = "${local.lambda_path}/send_metadata_to_ap.py"
-  output_path = "${local.lambda_path}/send_metadata_to_ap.zip"
-}
-
-module "send_metadata_to_ap" {
-  source             = "./modules/lambdas"
-  filename           = "${local.lambda_path}/send_metadata_to_ap.zip"
-  function_name      = "send_metadata_to_ap"
-  role_arn           = aws_iam_role.send_metadata_to_ap.arn
-  role_name          = aws_iam_role.send_metadata_to_ap.name
-  handler            = "send_metadata_to_ap.handler"
-  source_code_hash   = data.archive_file.send_metadata_to_ap.output_base64sha256
-  layers             = null
-  timeout            = 900
-  memory_size        = 1024
-  runtime            = "python3.11"
-  security_group_ids = null
-  subnet_ids         = data.aws_subnets.shared-public.ids
-  env_account_id     = local.env_account_id
-  environment_variables = {
-    METADATA_BUCKET_NAME = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
-
-  }
-}
-resource "aws_lambda_permission" "send_metadata_to_ap" {
-  statement_id  = "AllowS3ObjectMetaInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = module.send_metadata_to_ap.lambda_function_arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.metadata-s3-bucket.bucket.arn
 }
 
 # ------------------------------------------------------
@@ -137,49 +95,15 @@ module "get_file_keys_for_table" {
   role_arn           = aws_iam_role.get_file_keys_for_table.arn
   role_name          = aws_iam_role.get_file_keys_for_table.name
   handler            = "get_file_keys_for_table.handler"
-  source_code_hash   = data.archive_file.send_table_to_ap.output_base64sha256
+  source_code_hash   = data.archive_file.get_file_keys_for_table.output_base64sha256
   layers             = null
   timeout            = 900
   memory_size        = 1024
   runtime            = "python3.11"
   security_group_ids = [aws_security_group.lambda_db_security_group.id]
   subnet_ids         = data.aws_subnets.shared-public.ids
-  env_account_id     = local.env_account_id
   environment_variables = {
-    PARQUET_BUCKET_NAME = aws_s3_bucket.dms_target_ep_s3_bucket.id
-  }
-}
-
-
-
-# ------------------------------------------------------
-# Send table to AP 
-# ------------------------------------------------------
-
-
-data "archive_file" "send_table_to_ap" {
-  type        = "zip"
-  source_file = "${local.lambda_path}/send_table_to_ap.py"
-  output_path = "${local.lambda_path}/send_table_to_ap.zip"
-}
-
-module "send_table_to_ap" {
-  source             = "./modules/lambdas"
-  filename           = "${local.lambda_path}/send_table_to_ap.zip"
-  function_name      = "send_table_to_ap"
-  role_arn           = aws_iam_role.send_table_to_ap.arn
-  role_name          = aws_iam_role.send_table_to_ap.name
-  handler            = "send_table_to_ap.handler"
-  source_code_hash   = data.archive_file.send_table_to_ap.output_base64sha256
-  layers             = null
-  timeout            = 900
-  memory_size        = 1024
-  runtime            = "python3.11"
-  security_group_ids = null
-  subnet_ids         = null
-  env_account_id     = local.env_account_id
-  environment_variables = {
-    AP_DESTINATION_BUCKET = local.land_bucket
+    PARQUET_BUCKET_NAME = module.s3-dms-target-store-bucket.bucket.id
   }
 }
 
@@ -208,7 +132,6 @@ module "query_output_to_list" {
   runtime               = "python3.11"
   security_group_ids    = null
   subnet_ids            = null
-  env_account_id        = local.env_account_id
   environment_variables = null
 }
 
@@ -224,11 +147,10 @@ module "update_log_table" {
   role_arn                = aws_iam_role.update_log_table.arn
   memory_size             = 1024
   timeout                 = 899
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
-    S3_LOG_BUCKET = aws_s3_bucket.dms_dv_parquet_s3_bucket.id
+    S3_LOG_BUCKET = module.s3-dms-data-validation-bucket.bucket.id
     DATABASE_NAME = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
     TABLE_NAME    = "glue_df_output"
   }
@@ -246,14 +168,13 @@ module "output_file_structure_as_json_from_zip" {
   role_arn                = aws_iam_role.extract_metadata_from_atrium_unstructured.arn
   memory_size             = 1024
   timeout                 = 900
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   security_group_ids      = [aws_security_group.lambda_db_security_group.id]
   subnet_ids              = data.aws_subnets.shared-public.ids
   environment_variables = {
-    OUTPUT_BUCKET = module.json-directory-structure-bucket.bucket.id
-    SOURCE_BUCKET = aws_s3_bucket.data_store.id
+    OUTPUT_BUCKET = module.s3-json-directory-structure-bucket.bucket.id
+    SOURCE_BUCKET = module.s3-data-bucket.bucket.id
   }
 }
 
@@ -269,36 +190,17 @@ module "load_unstructured_structure" {
   role_arn                = aws_iam_role.load_json_table.arn
   memory_size             = 2048
   timeout                 = 900
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
     DLT_PROJECT_DIR : "/tmp"
     DLT_DATA_DIR : "/tmp"
     DLT_PIPELINE_DIR : "/tmp"
-    JSON_BUCKET_NAME        = module.json-directory-structure-bucket.bucket.id
-    ATHENA_DUMP_BUCKET_NAME = module.athena-s3-bucket.bucket.id
+    JSON_BUCKET_NAME        = module.s3-json-directory-structure-bucket.bucket.id
+    ATHENA_DUMP_BUCKET_NAME = module.s3-athena-bucket.bucket.id
   }
 }
 
-
-#-----------------------------------------------------------------------------------
-# Load json data from S3 to Athena
-#-----------------------------------------------------------------------------------
-
-module "load_g4s_atrium_unstructured" {
-  source                  = "./modules/unzipped_structure_extract"
-  iam_role                = aws_iam_role.load_json_table
-  memory_size             = 2048
-  timeout                 = 900
-  function_tag            = "v0.0.0-605c1f8"
-  dataset_name            = "g4s_atrium_unstructured"
-  env_account_id          = local.env_account_id
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-  json_bucket_name        = module.json-directory-structure-bucket.bucket.id
-  athena_bucket_name      = module.athena-s3-bucket.bucket.id
-}
 
 #-----------------------------------------------------------------------------------
 # Unzip single file
@@ -312,12 +214,11 @@ module "unzip_single_file" {
   role_arn                = aws_iam_role.unzip_single_file.arn
   memory_size             = 2048
   timeout                 = 900
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
-    BUCKET_NAME        = aws_s3_bucket.data_store.id
-    EXPORT_BUCKET_NAME = module.unzipped-s3-data-store.bucket.id
+    BUCKET_NAME        = module.s3-data-bucket.bucket.id
+    EXPORT_BUCKET_NAME = module.s3-unzipped-files-bucket.bucket.id
   }
 }
 
@@ -333,10 +234,92 @@ module "unzipped_presigned_url" {
   role_arn                = aws_iam_role.unzipped_presigned_url.arn
   memory_size             = 2048
   timeout                 = 900
-  env_account_id          = local.env_account_id
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
 }
 
+#-----------------------------------------------------------------------------------
+# Rotate IAM keys
+#-----------------------------------------------------------------------------------
 
+module "rotate_iam_key" {
+  source                  = "./modules/lambdas"
+  function_name           = "rotate_iam_key"
+  is_image                = true
+  role_name               = aws_iam_role.rotate_iam_keys.name
+  role_arn                = aws_iam_role.rotate_iam_keys.arn
+  memory_size             = 2048
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+}
 
+#-----------------------------------------------------------------------------------
+# Virus scanning - definition upload
+#-----------------------------------------------------------------------------------
+
+module "virus_scan_definition_upload" {
+  source                  = "./modules/lambdas"
+  function_name           = "definition-upload"
+  is_image                = true
+  ecr_repo_name           = "analytical-platform-ingestion-scan"
+  function_tag            = "0.1.0"
+  role_name               = aws_iam_role.virus_scan_definition_upload.name
+  role_arn                = aws_iam_role.virus_scan_definition_upload.arn
+  memory_size             = 2048
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  environment_variables = {
+    MODE                         = "definition-upload",
+    CLAMAV_DEFINITON_BUCKET_NAME = module.s3-clamav-definitions-bucket.bucket.id
+  }
+}
+
+resource "aws_lambda_permission" "virus_scan_definition_upload_allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = module.virus_scan_definition_upload.lambda_function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.definition_update.arn
+}
+
+#-----------------------------------------------------------------------------------
+# Virus scanning - file scan
+#-----------------------------------------------------------------------------------
+
+module "virus_scan_file" {
+  source                  = "./modules/lambdas"
+  function_name           = "scan"
+  is_image                = true
+  ecr_repo_name           = "analytical-platform-ingestion-scan"
+  function_tag            = "0.1.0"
+  role_name               = aws_iam_role.virus_scan_file.name
+  role_arn                = aws_iam_role.virus_scan_file.arn
+  ephemeral_storage_size  = 10240
+  memory_size             = 2048
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  environment_variables = {
+    MODE                         = "scan",
+    CLAMAV_DEFINITON_BUCKET_NAME = module.s3-clamav-definitions-bucket.bucket.id
+    LANDING_BUCKET_NAME          = module.s3-received-files-bucket.bucket.id
+    QUARANTINE_BUCKET_NAME       = module.s3-quarantine-files-bucket.bucket.id
+    PROCESSED_BUCKET_NAME        = module.s3-data-bucket.bucket.id
+  }
+}
+
+#-----------------------------------------------------------------------------------
+# Process json files
+#-----------------------------------------------------------------------------------
+
+module "format_json_fms_data" {
+  source                  = "./modules/lambdas"
+  function_name           = "format_json_fms_data"
+  is_image                = true
+  role_name               = aws_iam_role.format_json_fms_data.name
+  role_arn                = aws_iam_role.format_json_fms_data.arn
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+}

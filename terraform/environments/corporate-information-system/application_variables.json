@@ -1,7 +1,21 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "app_ami_id": "ami-0b2fcbd185872a43f",
+      "ec2instancetype": "m4.2xlarge",
+      "cis_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDOP7IqwGdkp9hyFBXLSn1qCUhIdvTIBuCop/z1uZXdpDix4oxNb1fpuRusMm+l50dLIqCLKS11d5XOWgE5vem5PyGWLI21iqEt+oJFY8NDFs93rEU/og7wVoAmJ5Jfih2kIp8GDvxvhHJh/E4Gom11XKkL2FOwWAT6Dh2WaFppj2T2P1QzBHhpvcx4XJWHtbeq3xdN/vVqlw8JpXK/xNcrKnlW91dM04etKy/+dVqUCsjKGOEBEv4bclwRaEEq2AVwqeUnutLoJH4G8z4KhesCijronfGdF+9DlCUObCF54scHBn/WnTiz1adjyYXG8FcONLHhSdMU30pjegUW57Cx vladimirs.kovalovs@L0854",
+      "managementcidr": "10.200.0.0/20",
+      "testenvcidr": "10.203.0.0/20",
+      "ebs_sdf_snapshot": "snap-03f6e3e1792369657",
+      "sdfsize": "1296",
+      "ebs_sdg_snapshot": "snap-098fb54a3d82d0456",
+      "sdgsize": "1000",
+      "ebs_sdh_snapshot": "snap-032650fbb7a97032f",
+      "sdhsize": "200",
+      "ebs_sdi_snapshot": "snap-04d4a697cc1e66d09",
+      "sdisize": "150",
+      "s3fs_ami_id": "ami-0a6006bac3b9bb8d3",
+      "s3fsinstancetype": "t3a.small"
     },
     "test": {
       "example_var": "test-data"

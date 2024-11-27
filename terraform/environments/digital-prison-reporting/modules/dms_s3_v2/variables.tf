@@ -39,16 +39,6 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
-
-variable "availability_zones" {
-  default = [
-    {
-      0 = "eu-west-2a"
-    }
-  ]
-}
-
-
 variable "subnet_ids" {
   description = "An List of VPC subnet IDs to use in the subnet group"
   type        = list(string)
@@ -274,6 +264,12 @@ variable "source_address" {
   type        = string
 }
 
+variable "source_ssl_mode" {
+  default     = "none"
+  description = "SSL mode to use for the connection. Valid values are none, require, verify-ca, verify-full"
+  type        = string
+}
+
 variable "bucket_name" {
   type    = string
   default = ""
@@ -295,7 +291,7 @@ variable "source_engine" {
 variable "source_engine_name" {
   default     = ""
   type        = string
-  description = "Engine name for DMS"
+  description = "Type of engine for the source endpoint. Example valid values are postgres, oracle"
 }
 
 

@@ -13,6 +13,7 @@
 # Note that we use a fixed bucket_name rather than the bucket_prefix since it is complicated
 # to identify the names of buckets in other accounts if they contain random suffixes
 module "s3_bucket_dms_destination" {
+  #checkov:skip=CKV_TF_1
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
@@ -66,7 +67,7 @@ module "s3_bucket_dms_destination" {
         autoclean = "true"
       }
 
-      noncurrent_version_transition = [
+      transition = [
         {
           days          = 90
           storage_class = "STANDARD_IA"
@@ -76,7 +77,7 @@ module "s3_bucket_dms_destination" {
         }
       ]
 
-      noncurrent_version_expiration = {
+      expiration = {
         days = 730
       }
     }
