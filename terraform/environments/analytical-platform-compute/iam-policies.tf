@@ -396,6 +396,7 @@ data "aws_iam_policy_document" "analytical_platform_cadet_runner_compute_policy"
     ]
   }
   statement {
+    sid    = "GlueFetchMetadataAccess"
     effect = "Allow"
     actions = [
       "glue:GetTable",
@@ -403,6 +404,23 @@ data "aws_iam_policy_document" "analytical_platform_cadet_runner_compute_policy"
       "glue:GetPartition"
     ]
     resources = ["arn:aws:glue:eu-west-2:${data.aws_caller_identity.current.account_id}:*"]
+  }
+  statement {
+    sid    = "AthenaQueryBucketAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts",
+      "s3:AbortMultipartUpload",
+      "s3:PutObject"
+    ]
+    resources = [
+      module.mojap_compute_athena_query_results_bucket_eu_west_2.s3_bucket_arn,
+      "${module.mojap_compute_athena_query_results_bucket_eu_west_2.s3_bucket_arn}/*"
+    ]
   }
 }
 
