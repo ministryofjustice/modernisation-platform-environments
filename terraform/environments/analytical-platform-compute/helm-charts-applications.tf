@@ -1,3 +1,4 @@
+/*
 resource "helm_release" "ui" {
   /* https://github.com/ministryofjustice/analytical-platform-ui */
   name       = "ui"
@@ -15,3 +16,4 @@ resource "helm_release" "ui" {
     )
   ]
 }
+*/
