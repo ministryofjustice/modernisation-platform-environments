@@ -32,15 +32,15 @@ locals {
   ]
 
   nginx_records = [
+  ]
+
+  nginx_records_pre_migration = [
     "",
     "adjudicationpanel",
     "charity",
     "consumercreditappeals",
     "estateagentappeals",
-    "fhsaa"
-  ]
-
-  nginx_records_pre_migration = [
+    "fhsaa",
     "siac"
   ]
 
