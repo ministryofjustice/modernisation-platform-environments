@@ -177,7 +177,7 @@ resource "aws_lb_target_group_attachment" "WAM-Portal-development" {
   count            = local.is-development == true ? 1 : 0
   target_group_arn = aws_lb_target_group.WAM-Target-Group-Dev[0].arn
   target_id        = aws_instance.s609693lo6vw105[0].id
-  port             = 80
+  port             = 443
 }
 
 resource "aws_lb_target_group_attachment" "WAM-Portal-preproduction" {
@@ -198,7 +198,7 @@ resource "aws_lb_target_group_attachment" "WAM-Portal-production" {
 resource "aws_lb_target_group" "WAM-Target-Group-Dev" {
   count    = local.is-development == true ? 1 : 0
   name     = "WAM-Dev"
-  port     = 80
+  port     = 443
   protocol = "HTTPS"
   vpc_id   = data.aws_vpc.shared.id
 
@@ -207,7 +207,7 @@ resource "aws_lb_target_group" "WAM-Target-Group-Dev" {
     path                = "/"
     interval            = 30
     protocol            = "HTTPS"
-    port                = 80
+    port                = 443
     timeout             = 5
     healthy_threshold   = 5
     unhealthy_threshold = 2

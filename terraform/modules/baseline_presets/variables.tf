@@ -37,7 +37,6 @@ variable "options" {
     enable_ec2_session_manager_cloudwatch_logs   = optional(bool, false)           # create SSM doc and log group for session manager logs
     enable_ec2_ssm_agent_update                  = optional(bool, false)           # create SSM association for auto-update of SSM agent. update-ssm-agent tag needs to be set on EC2s also
     enable_ec2_user_keypair                      = optional(bool, false)           # create secret and key-pair for ec2-user
-    enable_observability_platform_monitoring     = optional(bool, false)           # create role for observability platform monitroing
     enable_s3_bucket                             = optional(bool, false)           # create s3-bucket S3 bucket for general use
     enable_s3_db_backup_bucket                   = optional(bool, false)           # create db-backup S3 buckets
     enable_s3_shared_bucket                      = optional(bool, false)           # create devtest and preprodprod S3 bucket for sharing between accounts
