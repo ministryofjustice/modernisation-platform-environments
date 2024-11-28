@@ -152,7 +152,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
             }
             text_transformation {
               priority = 0
-              type     = "NONE"
+              type     = "LOWERCASE"
             }
           }
         }
