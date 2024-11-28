@@ -200,7 +200,7 @@ module "load_unstructured_atrium_database" {
 
 
 module "load_fms" {
-  count  = local.is-test ? 1 : 0
+  count  = local.is-test || local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
   name               = "fms"

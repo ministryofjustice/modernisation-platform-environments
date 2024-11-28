@@ -1176,11 +1176,47 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
       "Effect" : "Allow",
       "Action" : [
         "cloudwatch:GetMetricData",
+        "cloudwatch:GetMetricStatistics",
         "cloudwatch:ListMetrics"
       ],
       "Resource" : [
-        "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
       ]
+      },
+      {
+	      "Sid"     : "S3BucketPolicy",
+        "Effect"  : "Allow",
+        "Action"  : [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        "Resource" : [
+           "arn:aws:s3:::moj-lambda-layers-dev",
+		       "arn:aws:s3:::moj-lambda-layers-dev/*"
+        ]
+      },
+      {
+	      "Sid"     : "SSMPolicy",
+        "Effect"  : "Allow",
+        "Action"  : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+           "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:parameter/klayers-account"
+        ]
+      },
+      {
+        "Sid" : "LogPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
       },
       {
         "Sid" : "SQSPolicy",
@@ -1205,7 +1241,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
           "ses:SendEmail"
         ],
         "Resource" : [
-          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
         ]
     }]
   })
@@ -1215,4 +1252,18 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_get_m
   count      = local.is-development == true ? 1 : 0
   role       = aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].name
   policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_get_metric_data_dev[0].arn
+}
+
+resource "aws_iam_policy_attachment" "attach_lambda_read_only_access" {
+  count      = local.is-development == true ? 1 : 0
+  name       = "lambda-read-only-access-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambda_ReadOnlyAccess"
+}
+
+resource "aws_iam_policy_attachment" "attach_ses_full_access" {
+  count      = local.is-development == true ? 1 : 0
+  name       = "ses-full-access-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
 }
