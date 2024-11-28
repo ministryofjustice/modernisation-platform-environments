@@ -87,25 +87,6 @@ locals {
               athena_enabled                  = false
             }
           }
-        },
-        "digital-studio-operations" = {
-          "identity_centre_team" = "studio-webops"
-          "aws_accounts" = {
-            "nomis-test" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = false
-              athena_enabled                  = false
-            }
-            "oasys-test" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = false
-              athena_enabled                  = false
-            }
-          }
         }
       }
       grafana_version                 = "10.4"
@@ -265,25 +246,6 @@ locals {
             "digital-prison-reporting-test" = {
               cloudwatch_enabled              = true
               cloudwatch_custom_namespaces    = "DPRAgentCustomMetrics,DPRDataReconciliationCustom"
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = false
-              athena_enabled                  = false
-            }
-          }
-        },
-        "digital-studio-operations" = {
-          "identity_centre_team" = "studio-webops"
-          "aws_accounts" = {
-            "nomis-test" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = false
-              athena_enabled                  = false
-            }
-            "oasys-test" = {
-              cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
