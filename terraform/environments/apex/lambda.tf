@@ -214,6 +214,7 @@ resource "aws_lambda_layer_version" "backup_lambda" {
   s3_key           = "nodejs.zip"
   source_code_hash = local.hash_value
 # Since the nodejs.zip file has been added manually to the s3 bucket the source_code_hash would have to be computed and added manually as well anytime there's a change to nodejs.zip
+# This command allows you to retrieve the hash - openssl dgst -sha256 -binary nodejs.zip | base64  
   compatible_runtimes = ["nodejs18.x"]
   depends_on          = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 }
