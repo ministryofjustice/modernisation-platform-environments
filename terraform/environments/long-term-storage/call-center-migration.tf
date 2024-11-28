@@ -1,7 +1,3 @@
-locals {
-  call-center-users = ["call-center-migration-user", "david.sibley"]
-}
-
 resource "aws_s3_bucket" "call_center" {
   bucket_prefix = "call-center-migration"
   tags          = local.tags
@@ -31,14 +27,6 @@ resource "aws_iam_role" "call_center_transfer_logging" {
 resource "aws_iam_role_policy_attachments_exclusive" "call_center_transfer_logging_policy" {
   policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
   role_name   = aws_iam_role.call_center_transfer_logging.name
-}
-
-resource "aws_transfer_user" "call_center" {
-  for_each  = toset(local.call-center-users)
-  role      = aws_iam_role.call_center_transfer_user.arn
-  server_id = aws_transfer_server.call_center.id
-  user_name = each.key
-  tags      = merge(local.tags, { Name = each.key })
 }
 
 resource "aws_iam_role" "call_center_transfer_user" {
