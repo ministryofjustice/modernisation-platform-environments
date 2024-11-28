@@ -514,11 +514,11 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
     mode = "Active"
   }
    layers = [
-    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-numpy:8", #Publically available ARN for numpy package
-    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-pillow:1" #Publically available ARN for pillow package
-#  "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev.value}:layer:Klayers-p312-numpy:8",
-#  "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev.value}:layer:Klayers-p312-pillow:1",
-#   aws_lambda_layer_version.lambda_layer_matplotlib_dev[0].arn 
+#    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-numpy:8", #Publically available ARN for numpy package
+#    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-pillow:1" #Publically available ARN for pillow package
+     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev.value}:layer:Klayers-p312-numpy:8",
+     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev.value}:layer:Klayers-p312-pillow:1",
+     aws_lambda_layer_version.lambda_layer_matplotlib_dev[0].arn 
   ]
 }
 
@@ -533,7 +533,6 @@ data "archive_file" "zip_the_send_cpu_graph_code_dev" {
 
 # Lambda Layer for Matplotlib
 
-/*
 resource "aws_lambda_layer_version" "lambda_layer_matplotlib_dev" {
   count               = local.is-development == true ? 1 : 0
   layer_name          = "matplotlib-layer"
@@ -542,4 +541,3 @@ resource "aws_lambda_layer_version" "lambda_layer_matplotlib_dev" {
   filename            = "/lambda_layers/matplotlib-layer.zip"
   compatible_runtimes = ["python3.12"]
 }
-*/

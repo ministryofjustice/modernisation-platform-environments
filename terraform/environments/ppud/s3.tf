@@ -360,7 +360,7 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
           "AWS" : [
             "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
             "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/lambda_role_cloudwatch_get_metric_data_dev"
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/PPUD_Lambda_Function_Role_Cloudwatch_Get_Metric_Data_Dev"
           ]
         }
       }
