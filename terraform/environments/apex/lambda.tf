@@ -108,15 +108,11 @@ resource "aws_s3_bucket" "backup_lambda" {
 
 resource "aws_s3_object" "provision_files" {
   bucket       = aws_s3_bucket.backup_lambda.id
-  for_each     = tomap({
-    "dbsnapshot.zip"      = local.create_db_snapshots_script_prefix
-    "deletesnapshots.zip" = local.delete_db_snapshots_script_prefix
-    "dbconnect.zip"       = local.db_connect_script_prefix
-  })
-  key          = each.key
-  source       = "/tmp/${each.key}"
+  for_each     = toset(["${local.create_db_snapshots_script_prefix}.zip", "${local.delete_db_snapshots_script_prefix}.zip", "${local.db_connect_script_prefix}.zip"])
+  key          = each.value
+  source       = "/tmp/${each.value}"
   content_type = "application/zip"
-  source_hash  = filemd5("/tmp/${each.key}")
+  source_hash  = filemd5("/tmp/${each.value}")
 }
 
 # This delays the creation of resource 
