@@ -34,6 +34,6 @@ module "ldap_ssm" {
 }
 
 data "aws_ssm_parameter" "ldap_ssm" {
-  for_each = module.ldap_ssm.param_names # use module call to avoid retrieval before secret creation
+  for_each = toset(module.ldap_ssm.param_names) # use module call to avoid retrieval before secret creation
   name     = "/${var.account_info.application_name}-${var.env_name}/ldap/${each.key}"
 }
