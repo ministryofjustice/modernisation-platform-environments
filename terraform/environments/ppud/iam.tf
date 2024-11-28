@@ -1184,6 +1184,29 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
       ]
       },
       {
+	      "Sid"     : "S3BucketPolicy",
+        "Effect"  : "Allow",
+        "Action"  : [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        "Resource" : [
+           "arn:aws:s3:::moj-lambda-layers-dev",
+		       "arn:aws:s3:::moj-lambda-layers-dev/*"
+        ]
+      },
+      {
+	      "Sid"     : "SSMPolicy",
+        "Effect"  : "Allow",
+        "Action"  : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+           "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:parameter/klayers-account"
+        ]
+      },
+      {
         "Sid" : "LogPolicy",
         "Effect" : "Allow",
         "Action" : [
