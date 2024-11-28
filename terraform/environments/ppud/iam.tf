@@ -66,7 +66,7 @@ resource "aws_iam_policy_attachment" "CloudWatchAgentServerPolicy" {
 }
 
 #####################################
-# IAM Policy for Prodcution S3 access
+# IAM Policy for Production S3 access
 #####################################
 
 resource "aws_iam_policy" "production-s3-access" {
@@ -1182,6 +1182,29 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
       "Resource" : [
         "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
       ]
+      },
+      {
+	      "Sid"     : "S3BucketPolicy",
+        "Effect"  : "Allow",
+        "Action"  : [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        "Resource" : [
+           "arn:aws:s3:::moj-release-management",
+		       "arn:aws:s3:::moj-release-management/*"
+        ]
+      },
+      {
+	      "Sid"     : "SSMPolicy",
+        "Effect"  : "Allow",
+        "Action"  : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+           "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:parameter/klayers-account"
+        ]
       },
       {
         "Sid" : "LogPolicy",
