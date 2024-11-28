@@ -7,7 +7,7 @@ output "arn_map" {
 
 output "param_names" {
   value = concat(
-    module.ldap_ssm.params_plain,
-    module.ldap_ssm.params_secure
+    var.params_plain,
+    var.params_secure
   )
 }
