@@ -241,7 +241,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
 
             select_compare_columns = [col for col in df_rds_temp.columns 
                                         if col not in given_skip_columns_comparison_list]
-            LOGGER.warn(f""">> Only the below selected columns are compared \{select_compare_columns}<<""")
+            LOGGER.warn(f""">> Only the below selected columns are compared \n{select_compare_columns}<<""")
             skip_columns_msg = f"""; columns_skipped = {given_skip_columns_comparison_list}"""
 
         final_select_columns = df_rds_temp.columns if select_compare_columns is None \
@@ -534,7 +534,7 @@ if __name__ == "__main__":
 
             total_files, total_size = S3Methods.get_s3_folder_info(
                                         PRQ_FILES_SRC_S3_BUCKET_NAME, 
-                                        f"{rds_db_name}/{rds_sqlserver_db_schema}/{rds_tbl_name}")
+                                        f"{rds_db_name}/{rds_sqlserver_db_schema}/{rds_tbl_name}/")
             total_size_mb = total_size/1024/1024
             # -------------------------------------------------------
 
