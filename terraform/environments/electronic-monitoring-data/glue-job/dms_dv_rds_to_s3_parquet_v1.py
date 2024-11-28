@@ -57,7 +57,7 @@ OPTIONAL_INPUTS = [
     "rds_select_db_tbls",
     "rds_exclude_db_tbls",
     "rds_db_tbl_pkeys_col_list",
-    "rds_df_trim_micro_sec_ts_col_list",
+    "skip_columns_comparison",
     "parquet_tbl_folder_if_different"
 ]
 
@@ -136,7 +136,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                                                         rds_tbl_name
                                     )
     # -------------------------------------------------------
-    
+
     pkey_partion_read_used = False
     if tbl_prq_s3_folder_path is not None:
         
@@ -229,6 +229,25 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             LOGGER.info(f"""df_rds_temp-{rds_tbl_name}: RE-PARTITIONS-3 = {df_prq_temp.rdd.getNumPartitions()}""")
         # -------------------------------------------------------
 
+
+        select_compare_columns = None
+        skip_columns_msg = ""
+        skip_columns_comparison = args.get("skip_columns_comparison", None)
+        if skip_columns_comparison is not None:
+            given_skip_columns_comparison_str = args["skip_columns_comparison"]
+            given_skip_columns_comparison_list = [f"""{col.strip().strip("'").strip('"')}"""
+                                                    for col in given_skip_columns_comparison_str.split(",")]
+            LOGGER.warn(f""">> given_skip_columns_comparison_list = {given_skip_columns_comparison_list}<<""")
+
+            select_compare_columns = [col for col in df_rds_temp.columns 
+                                        if col not in given_skip_columns_comparison_list]
+            LOGGER.warn(f""">> Only the below selected columns are compared \{select_compare_columns}<<""")
+            skip_columns_msg = f"""; columns_skipped = {given_skip_columns_comparison_list}"""
+
+        final_select_columns = df_rds_temp.columns if select_compare_columns is None \
+                                                    else select_compare_columns
+        
+        df_rds_temp = df_rds_temp.select(*final_select_columns)
         df_rds_temp_t1 = df_rds_temp.selectExpr(
                                         *CustomPysparkMethods.get_nvl_select_list(
                                                                 df_rds_temp, 
@@ -249,34 +268,8 @@ def process_dv_for_table(rds_jdbc_conn_obj,
             trim_str_msg = "; [str column(s) - extra spaces trimmed]"
             t2_rds_str_col_trimmed = True
         # -------------------------------------------------------
-
-        trim_ts_ms_msg = ""
-        t3_rds_ts_col_msec_trimmed = False
-        if args.get("rds_df_trim_micro_sec_ts_col_list", None) is not None:
-
-            msg_prefix = f"""Given -> rds_df_trim_micro_sec_ts_col_list = {given_rds_df_trim_micro_seconds_col_list}"""
-            given_rds_df_trim_micro_seconds_col_str = args["rds_df_trim_micro_sec_ts_col_list"]
-            given_rds_df_trim_micro_seconds_col_list = [f"""{col.strip().strip("'").strip('"')}"""
-                                                        for col in given_rds_df_trim_micro_seconds_col_str.split(",")]
-            LOGGER.info(f"""{msg_prefix}, {type(given_rds_df_trim_micro_seconds_col_list)}""")
-
-            if t2_rds_str_col_trimmed == True:
-                df_rds_temp_t3 = CustomPysparkMethods.rds_df_trim_microseconds_timestamp(
-                                                        df_rds_temp_t2, 
-                                                        given_rds_df_trim_micro_seconds_col_list)
-            else:
-                df_rds_temp_t3 = CustomPysparkMethods.rds_df_trim_microseconds_timestamp(
-                                                        df_rds_temp_t1, 
-                                                        given_rds_df_trim_micro_seconds_col_list)
-            # -------------------------------------------------------
-
-            trim_ts_ms_msg = "; [timestamp column(s) - micro-seconds trimmed]"
-            t3_rds_ts_col_msec_trimmed = True
-        # -------------------------------------------------------
-
-        if t3_rds_ts_col_msec_trimmed:
-            df_rds_temp_t4 = df_rds_temp_t3
-        elif t2_rds_str_col_trimmed:
+        
+        if t2_rds_str_col_trimmed:
             df_rds_temp_t4 = df_rds_temp_t2
         else:
             df_rds_temp_t4 = df_rds_temp_t1
@@ -284,6 +277,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
 
         df_rds_temp_t5 = df_rds_temp_t4.cache()
 
+        df_prq_temp = df_prq_temp.select(*final_select_columns)
         df_prq_temp_t1 = df_prq_temp.selectExpr(
                                         *CustomPysparkMethods.get_nvl_select_list(
                                                 df_rds_temp, 
@@ -296,6 +290,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
         df_prq_temp_count = df_prq_temp_t1.count()
         # -------------------------------------------------------
 
+        validated_msg = f"""{rds_tbl_name} - Validated.\n{skip_columns_msg}\n{trim_str_msg}"""
         if df_rds_temp_count == df_prq_temp_count:
 
             df_rds_prq_subtract_t1 = df_rds_temp_t5.subtract(df_prq_temp_t1)
@@ -305,7 +300,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                 df_temp = df_dv_output.selectExpr(
                                         "current_timestamp as run_datetime",
                                         "'' as json_row",
-                                        f"""'{rds_tbl_name} - Validated.\n{trim_str_msg}\n{trim_ts_ms_msg}' as validation_msg""",
+                                        f"""'{validated_msg}' as validation_msg""",
                                         f"""'{rds_db_name}' as database_name""",
                                         f"""'{db_sch_tbl}' as full_table_name""",
                                         """'False' as table_to_ap"""
@@ -314,7 +309,10 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                 df_dv_output = df_dv_output.union(df_temp)
             else:
                 df_subtract_temp = (df_rds_prq_subtract_t1
-                           .withColumn('json_row', F.to_json(F.struct(*[F.col(c) for c in df_rds_temp.columns])))
+                           .withColumn('json_row', 
+                                       F.to_json(
+                                           F.struct(*[F.col(c) 
+                                                      for c in df_rds_temp.columns])))
                            .selectExpr("json_row")
                            .limit(100))
 
@@ -322,7 +320,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                 df_subtract_temp = df_subtract_temp.selectExpr(
                                         "current_timestamp as run_datetime",
                                         "json_row",
-                                        f""""{subtract_validation_msg} - Dataframe(s)-Subtract Non-Zero Row Count!" as validation_msg""",
+                                        f""""{subtract_validation_msg}: - Rows not matched!" as validation_msg""",
                                         f"""'{rds_db_name}' as database_name""",
                                         f"""'{db_sch_tbl}' as full_table_name""",
                                         """'False' as table_to_ap"""
