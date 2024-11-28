@@ -350,7 +350,7 @@ module "data_production_mojap_derived_bucket_lake_formation_policy" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "analytical_platform_cadet_runner_compute_policy" {
+data "aws_iam_policy_document" "copy_apdp_cadet_metadata_to_compute_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   statement {
@@ -422,18 +422,33 @@ data "aws_iam_policy_document" "analytical_platform_cadet_runner_compute_policy"
       "${module.mojap_compute_athena_query_results_bucket_eu_west_2.s3_bucket_arn}/*"
     ]
   }
+  statement {
+    sid    = "AlterLFTags"
+    effect = "Allow"
+    actions = [
+      "lakeformation:AddLFTagsToResource",
+      "lakeformation:RemoveLFTagsFromResource",
+      "lakeformation:GetResourceLFTags",
+      "lakeformation:ListLFTags",
+      "lakeformation:GetLFTag",
+      "lakeformation:SearchTablesByLFTags",
+      "lakeformation:SearchDatabasesByLFTags",
+    ]
+    resources = ["*"]
+  }
+
 }
 
-module "analytical_platform_cadet_runner_compute_policy" {
+module "copy_apdp_cadet_metadata_to_compute_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.48.0"
 
-  name_prefix = "analytical-platform-cadet-runner-compute-policy"
+  name_prefix = "copy-apdp-cadet-metadata-to-compute-"
 
-  policy = data.aws_iam_policy_document.analytical_platform_cadet_runner_compute_policy.json
+  policy = data.aws_iam_policy_document.copy_apdp_cadet_metadata_to_compute_policy.json
 
   tags = local.tags
 }
