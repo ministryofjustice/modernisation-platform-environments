@@ -108,11 +108,15 @@ resource "aws_s3_bucket" "backup_lambda" {
 
 resource "aws_s3_object" "provision_files" {
   bucket       = aws_s3_bucket.backup_lambda.id
-  for_each     = fileset("./zipfiles/", "**")
-  key          = each.value
-  source       = "./zipfiles/${each.value}"
+  for_each     = tomap({
+    "dbsnapshot.zip"      = local.create_db_snapshots_script_prefix
+    "deletesnapshots.zip" = local.delete_db_snapshots_script_prefix
+    "dbconnect.zip"       = local.db_connect_script_prefix
+  })
+  key          = each.key
+  source       = "/tmp/${each.key}"
   content_type = "application/zip"
-  source_hash  = filemd5("./zipfiles/${each.value}")
+  source_hash  = filemd5("/tmp/${each.key}")
 }
 
 # This delays the creation of resource 
@@ -161,19 +165,19 @@ resource "aws_s3_bucket_versioning" "backup_lambda" {
 data "archive_file" "create_db_snapshots" {
   type        = "zip"
   source_file = "scripts/${local.create_db_snapshots_script_prefix}.js"
-  output_path = "zipfiles/${local.create_db_snapshots_script_prefix}.zip"
+  output_path = "/tmp/${local.create_db_snapshots_script_prefix}.zip"
 }
 
 data "archive_file" "delete_db_snapshots" {
   type        = "zip"
   source_file = "scripts/${local.delete_db_snapshots_script_prefix}.py"
-  output_path = "zipfiles/${local.delete_db_snapshots_script_prefix}.zip"
+  output_path = "/tmp/${local.delete_db_snapshots_script_prefix}.zip"
 }
 
 data "archive_file" "connect_db" {
   type        = "zip"
   source_file = "scripts/${local.db_connect_script_prefix}.js"
-  output_path = "zipfiles/${local.db_connect_script_prefix}.zip"
+  output_path = "/tmp/${local.db_connect_script_prefix}.zip"
 }
 
 
