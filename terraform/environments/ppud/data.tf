@@ -50,3 +50,15 @@ data "aws_acm_certificate" "WAM_PROD_ALB" {
   domain   = "wam.ppud.justice.gov.uk"
   statuses = ["ISSUED"]
 }
+
+# Klayers Account ID - used by lambda layer ARNs - https://github.com/keithrozario/Klayers?tab=readme-ov-file
+data "aws_ssm_parameter" "klayers_account_dev" {
+  count           = local.is-development == true ? 1 : 0
+  name            = "klayers-account"
+  with_decryption = true
+}
+
+output "klayers_account_dev" {
+  value = data.aws_ssm_parameter.klayers_account_dev[0].value
+  description = "The Klayers AWS account ID"
+}
