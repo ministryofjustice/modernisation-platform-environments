@@ -359,7 +359,8 @@ resource "aws_s3_bucket_policy" "MoJ-Release-Management" {
         "Principal" : {
           "AWS" : [
             "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role",
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role"
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-preproduction"]}:role/ec2-iam-role",
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/lambda_role_cloudwatch_get_metric_data_dev"
           ]
         }
       }
