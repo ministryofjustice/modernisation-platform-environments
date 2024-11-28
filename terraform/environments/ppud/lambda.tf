@@ -538,6 +538,6 @@ resource "aws_lambda_layer_version" "lambda_layer_matplotlib_dev" {
   layer_name          = "matplotlib-layer"
   description         = "matplotlib-layer for python 3.12"
   s3_bucket           = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  filename            = "/lambda_layers/matplotlib-layer.zip"
+  s3_key              = "matplotlib-layer.zip"
   compatible_runtimes = ["python3.12"]
 }
