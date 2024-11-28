@@ -70,8 +70,8 @@ data "aws_iam_policy_document" "regenerate_jsonl_policies" {
     ]
 
     resources = [
-      "${module.extract_metadata_from_atrium_unstructured.arn}:*",
-      module.extract_metadata_from_atrium_unstructured.arn,
+      "${module.extract_metadata_from_atrium_unstructured.lambda_function_arn}:*",
+      module.extract_metadata_from_atrium_unstructured.lambda_function_arn,
     ]
   }
   statement {
