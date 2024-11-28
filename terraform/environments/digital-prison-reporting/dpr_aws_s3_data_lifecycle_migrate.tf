@@ -1,6 +1,6 @@
 # Domain Builder Backend Lambda function
 module "aws_s3_data_migrate" {
-  source = "../modules/lambdas/generic"
+  source = "./modules/lambdas/generic"
 
   enable_lambda = local.enable_s3_data_migrate_lambda
   name          = local.lambda_s3_data_migrate_name
