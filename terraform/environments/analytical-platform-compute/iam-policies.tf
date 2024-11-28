@@ -426,11 +426,13 @@ data "aws_iam_policy_document" "copy_apdp_cadet_metadata_to_compute_policy" {
     sid    = "AlterLFTags"
     effect = "Allow"
     actions = [
+      "lakeformation:ListLFTags",
+      "lakeformation:GetLFTag",
+      "lakeformation:CreateLFTag",
+      "lakeformation:UpdateLFTag",
       "lakeformation:AddLFTagsToResource",
       "lakeformation:RemoveLFTagsFromResource",
       "lakeformation:GetResourceLFTags",
-      "lakeformation:ListLFTags",
-      "lakeformation:GetLFTag",
       "lakeformation:SearchTablesByLFTags",
       "lakeformation:SearchDatabasesByLFTags",
     ]
