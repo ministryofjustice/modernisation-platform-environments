@@ -918,7 +918,7 @@ resource "aws_s3_bucket" "moj-lambda-layers-dev" {
   )
 }
 
-resource "aws_s3_bucket_versioning" "moj-log-files-dev" {
+resource "aws_s3_bucket_versioning" "moj-lambda-layers-dev" {
   count  = local.is-development == true ? 1 : 0
   bucket = aws_s3_bucket.moj-lambda-layers-dev[0].id
   versioning_configuration {
