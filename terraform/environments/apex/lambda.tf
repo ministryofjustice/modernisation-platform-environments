@@ -2,6 +2,7 @@ locals {
   create_db_snapshots_script_prefix = "dbsnapshot"
   delete_db_snapshots_script_prefix = "deletesnapshots"
   db_connect_script_prefix          = "dbconnect"
+  hash_value                        = "U0hBMjU2KG5vZGVqcy56aXApPSA2M2ZlM2U4YjU4NWMxZWYyYzFjY2U2ODIxYzlmZTZmNWI0MGJiOTViNTBjMmJmMjA5YzVmZmYwMDlkYTNmOTJlCg=="
 }
 
 resource "aws_ssm_parameter" "ssh_key" {
@@ -97,6 +98,11 @@ resource "aws_iam_role_policy_attachment" "backup_lambda" {
 ##################################
 ### S3 for Backup Lambda
 ##################################
+
+data "aws_s3_object" "nodejs_zip" {
+  bucket = aws_s3_bucket.backup_lambda.id
+  key    = "nodejs.zip"
+}
 
 resource "aws_s3_bucket" "backup_lambda" {
   bucket = "${local.application_name}-${local.environment}-backup-lambda"
@@ -206,8 +212,8 @@ resource "aws_lambda_layer_version" "backup_lambda" {
   license_info     = "Apache-2.0"
   s3_bucket        = aws_s3_bucket.backup_lambda.id
   s3_key           = "nodejs.zip"
-  source_code_hash = filebase64sha256("zipfiles/nodejs.zip")
-
+  source_code_hash = local.hash_value
+# Since the nodejs.zip file has been added manually to the s3 bucket the source_code_hash would have to be computed and added manually as well anytime there's a change to nodejs.zip
   compatible_runtimes = ["nodejs18.x"]
   depends_on          = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 }
