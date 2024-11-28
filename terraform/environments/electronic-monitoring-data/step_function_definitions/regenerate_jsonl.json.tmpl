@@ -1,0 +1,16 @@
+{
+  "QueryLanguage": "JSONata",
+  "Comment": "An example of the Listing with listObjectsV2",
+  "StartAt": "ListObjectsAtrium",
+  "TimeoutSeconds": 3600,
+  "States": {
+    "ListObjectsAtrium": {
+      "Type": "Task",
+      "Arguments": {
+        "Bucket": "${source_bucket_name}/g4s/atrium_unstructured/2024-02-16/"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:s3:listObjectsV2",
+      "End": true
+    }
+  }
+}
