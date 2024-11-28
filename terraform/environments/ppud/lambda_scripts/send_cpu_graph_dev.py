@@ -1,5 +1,7 @@
 import boto3
 import datetime
+import os
+os.environ['MPLCONFIGDIR'] = "/tmp/graph"
 import matplotlib.pyplot as plt
 import io
 import base64
