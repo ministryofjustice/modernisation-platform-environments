@@ -37,7 +37,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
-            branch = "TM-739/ncr/t1-build"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
@@ -73,7 +73,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "T1 NCR DATABASE"
           nomis-combined-reporting-environment = "t1"
-          oracle-sids                          = "T1BIPSYS T1BIPAUD"
+          oracle-sids                          = "T1BIPSYS T1BIPAUD T1BISYS T1BIAUD"
           instance-scheduling                  = "skip-scheduling"
         })
       })
@@ -90,7 +90,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
-            branch = "TM-739/ncr/t1-build"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_instances.bip_web.tags, {
