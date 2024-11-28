@@ -2,7 +2,7 @@ locals {
   create_db_snapshots_script_prefix = "dbsnapshot"
   delete_db_snapshots_script_prefix = "deletesnapshots"
   db_connect_script_prefix          = "dbconnect"
-  hash_value                        = "U0hBMjU2KG5vZGVqcy56aXApPSA2M2ZlM2U4YjU4NWMxZWYyYzFjY2U2ODIxYzlmZTZmNWI0MGJiOTViNTBjMmJmMjA5YzVmZmYwMDlkYTNmOTJlCg=="
+  hash_value                        = "Y/4+i1hcHvLBzOaCHJ/m9bQLuVtQwr8gnF//AJ2j+S4="
 }
 
 resource "aws_ssm_parameter" "ssh_key" {
