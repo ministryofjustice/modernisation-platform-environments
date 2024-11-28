@@ -21,7 +21,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 
   rule {
     name     = "common-rule-set"
-    priority = 1
+    priority = 2
 
     override_action {
       none {}
@@ -61,7 +61,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 
   rule {
     name     = "AllowSpecificIPsForAdminAndSecurePaths"
-    priority = 2
+    priority = 3
 
     action {
       allow {}
@@ -122,7 +122,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 
   rule {
     name     = "BlockNonAllowedIPsForAdminAndSecurePaths"
-    priority = 3
+    priority = 4
 
     action {
       block {
@@ -152,7 +152,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
             }
             text_transformation {
               priority = 0
-              type     = "LOWERCASE"
+              type     = "NONE"
             }
           }
         }
@@ -162,6 +162,56 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "BlockNonAllowedIPsMetrics"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "BlockCareStandardsAdmin"
+    priority = 1
+
+    action {
+      block {
+        custom_response {
+          response_code            = 403
+          custom_response_body_key = "CustomResponseBodyKey1"
+        }
+      }
+    }
+    statement {
+      or_statement {
+        statement {
+          byte_match_statement {
+            field_to_match {
+              uri_path {}
+            }
+            positional_constraint = "CONTAINS"
+            search_string         = "carestandards.decisions.tribunals.gov.uk/admin"
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+        statement {
+          byte_match_statement {
+            field_to_match {
+              uri_path {}
+            }
+            positional_constraint = "CONTAINS"
+            search_string         = "carestandards.tribunals.hmcts-preproduction.modernisation-platform.service.justice.gov.uk/admin"
+            text_transformation {
+              priority = 0
+              type     = "LOWERCASE"
+            }
+          }
+        }
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "CareStandardsBlockMetrics"
       sampled_requests_enabled   = true
     }
   }
