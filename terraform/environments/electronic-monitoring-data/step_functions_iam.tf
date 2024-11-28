@@ -56,3 +56,42 @@ resource "aws_iam_policy" "trigger_unzip_lambda" {
   name   = "trigger_unzip_lambda"
   policy = data.aws_iam_policy_document.trigger_unzip_lambda.json
 }
+
+# ------------------------------------------
+# Regenerate JSONL data
+# ------------------------------------------
+
+data "aws_iam_policy_document" "regenerate_jsonl_policies" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "lambda:InvokeFunction",
+    ]
+
+    resources = [
+      "${module.extract_metadata_from_atrium_unstructured.lambda_function_arn}:*",
+      module.extract_metadata_from_atrium_unstructured.lambda_function_arn,
+    ]
+  }
+  statement {
+    sid    = "S3PermissionsForFindingTargetZips"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+      "s3:GetObjectV2",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "${module.s3-data-bucket.bucket.arn}/*",
+      module.s3-data-bucket.bucket.arn
+    ]
+  }
+}
+
+resource "aws_iam_policy" "regenerate_jsonl_policy" {
+  name        = "RegenerateJsonlPolicy"
+  description = "Policy to allow invoking a specific lambda on specific resources"
+  policy      = data.aws_iam_policy_document.regenerate_jsonl_policies
+}
