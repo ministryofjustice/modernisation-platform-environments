@@ -34,6 +34,7 @@ module "ldap_ssm" {
 }
 
 data "aws_ssm_parameter" "ldap_ssm" {
+  count = length(module.ldap_ssm.param_names) > 0 ? 1 : 0 # ensures it doesn't try retrieve values until the module creates all params
   for_each = toset(local.ldap_ssm.vars)
   name     = "/${var.account_info.application_name}-${var.env_name}/ldap/${each.key}"
 }
