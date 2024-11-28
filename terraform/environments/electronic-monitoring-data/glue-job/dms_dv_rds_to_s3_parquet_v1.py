@@ -300,7 +300,7 @@ def process_dv_for_table(rds_jdbc_conn_obj,
                 df_temp = df_dv_output.selectExpr(
                                         "current_timestamp as run_datetime",
                                         "'' as json_row",
-                                        f"""'{validated_msg}' as validation_msg""",
+                                        f""""{validated_msg}" as validation_msg""",
                                         f"""'{rds_db_name}' as database_name""",
                                         f"""'{db_sch_tbl}' as full_table_name""",
                                         """'False' as table_to_ap"""
