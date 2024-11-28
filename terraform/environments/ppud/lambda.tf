@@ -516,8 +516,8 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
    layers = [
 #    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-numpy:8", #Publically available ARN for numpy package
 #    "arn:aws:lambda:eu-west-2:770693421928:layer:Klayers-p312-pillow:1" #Publically available ARN for pillow package
-     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev.value}:layer:Klayers-p312-numpy:8",
-     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev.value}:layer:Klayers-p312-pillow:1",
+     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-numpy:8",
+     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-pillow:1",
      aws_lambda_layer_version.lambda_layer_matplotlib_dev[0].arn 
   ]
 }
