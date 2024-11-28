@@ -436,6 +436,7 @@ locals {
   lambda_s3_data_migrate_code_s3_key    = "build-artifacts/dpr-operations/py_files/dpr-s3-data-lifecycle-migration-lambda.py"
   lambda_s3_data_migrate_handler        = "dpr-s3-data-lifecycle-migration-lambda.lambda_handler"
   lambda_s3_data_migrate_runtime        = "python3.11"
+  lambda_dbuilder_tracing               = "PassThrough"
   lambda_s3_data_migrate_policies       = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
