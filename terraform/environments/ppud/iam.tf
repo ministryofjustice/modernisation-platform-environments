@@ -1192,8 +1192,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
           "s3:DeleteObject"
         ],
         "Resource" : [
-           "arn:aws:s3:::moj-release-management",
-		       "arn:aws:s3:::moj-release-management/*"
+           "arn:aws:s3:::moj-lambda-layers-dev",
+		       "arn:aws:s3:::moj-lambda-layers-dev/*"
         ]
       },
       {
