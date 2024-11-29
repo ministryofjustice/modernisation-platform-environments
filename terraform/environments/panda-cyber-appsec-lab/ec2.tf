@@ -2,7 +2,7 @@
 resource "aws_instance" "kali_linux" {
   ami                         = "ami-0f398bcc12f72f967" // aws-marketplace/kali-last-snapshot-amd64-2024.2.0-804fcc46-63fc-4eb6-85a1-50e66d6c7215
   associate_public_ip_address = true
-  instance_type               = "t2.micro"
+  instance_type               = "t3.micro"
   subnet_id                   = module.vpc.private_subnets.0
   vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
@@ -22,29 +22,39 @@ resource "aws_instance" "kali_linux" {
   }
   user_data = <<-EOF
               #!/bin/bash
-
-              # Update and install dependencies
-              apt-get update -y
-              apt-get upgrade -y
-              apt-get install -y wget git kali-linux-default
-
-              # Ensure 'kali' user exists
-              id -u kali &>/dev/null || useradd -m -s /bin/bash kali
-
-              # Download and install the SSM agent
+              apt-get update
+              apt-get install -y wget
               wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
               dpkg -i amazon-ssm-agent.deb
               systemctl enable amazon-ssm-agent
               systemctl start amazon-ssm-agent
-
-              # Create and set permissions for the tooling directory
-              mkdir -p /home/kali/tooling
-              chown -R kali:kali /home/kali
-
-              # Clone the repository as 'kali' user
-              sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
-             
               EOF
+
+  # user_data = <<-EOF
+  #             #!/bin/bash
+
+  #             # Update and install dependencies
+  #             apt-get update -y
+  #             apt-get upgrade -y
+  #             apt-get install -y wget git kali-linux-default
+
+  #             # Ensure 'kali' user exists
+  #             id -u kali &>/dev/null || useradd -m -s /bin/bash kali
+
+  #             # Download and install the SSM agent
+  #             wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
+  #             dpkg -i amazon-ssm-agent.deb
+  #             systemctl enable amazon-ssm-agent
+  #             systemctl start amazon-ssm-agent
+
+  #             # Create and set permissions for the tooling directory
+  #             mkdir -p /home/kali/tooling
+  #             chown -R kali:kali /home/kali
+
+  #             # Clone the repository as 'kali' user
+  #             sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
+             
+  #             EOF
 
   tags = {
     Name = "Terraform-Kali-Linux"
