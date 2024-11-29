@@ -5,7 +5,7 @@ module "cmt_front_end_assumable_role" {
   version = "5.48.0"
   
   trusted_role_arns = [
-    "arn:aws:sts::754256621582:assumed-role/cloud-platform-irsa-6ab6c596b45e90b3-live/aws-sdk-java-1732878337600"
+    "arn:aws:sts::754256621582:role/cloud-platform-irsa-6ab6c596b45e90b3-live"
   ]
 
   create_role = true
