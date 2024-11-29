@@ -22,28 +22,29 @@ resource "aws_instance" "kali_linux" {
   }
   user_data = <<-EOF
               #!/bin/bash
+              set -e
+              exec > >(tee /var/log/user-data.log | logger -t user-data) 2>&1
 
-              # Update and install dependencies
+              # Update system packages
               apt-get update -y
               apt-get upgrade -y
-              apt-get install -y wget git kali-linux-default
 
-              # Ensure 'kali' user exists
-              id -u kali &>/dev/null || useradd -m -s /bin/bash kali
+              # Install wget and git
+              apt-get install -y wget git
 
-              # Download and install the SSM agent
-              wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
-              dpkg -i amazon-ssm-agent.deb
-              systemctl enable amazon-ssm-agent
-              systemctl start amazon-ssm-agent
+              # Create tooling directory under kali's home
+              if id "kali" &>/dev/null; then
+                  mkdir -p /home/kali/tooling
+                  chown -R kali:kali /home/kali
+                  echo "Tooling directory created and ownership set for kali user."
+              else
+                  echo "User 'kali' does not exist. Exiting."
+                  exit 1
+              fi
 
-              # Create and set permissions for the tooling directory
-              mkdir -p /home/kali/tooling
-              chown -R kali:kali /home/kali
-
-              # Clone the repository as 'kali' user
+              # Clone the repository
               sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
-             
+          
               EOF
 
   tags = {
