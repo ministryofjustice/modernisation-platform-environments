@@ -215,7 +215,7 @@ if __name__ == "__main__":
     # -----------------------------------------------
 
     total_files, total_size = S3Methods.get_s3_folder_info(PARQUET_WRITE_S3_BUCKET_NAME,
-                                                           output_partition_path)
+                                                           f"{output_partition_path}/")
     msg_part_1 = f"""total_files={total_files}"""
     msg_part_2 = f"""total_size_mb={total_size/1024/1024:.2f}"""
     LOGGER.info(f"""'{PRQ_WRITE_TABLE_FOLDER_PATH}': {msg_part_1}, {msg_part_2}""")
