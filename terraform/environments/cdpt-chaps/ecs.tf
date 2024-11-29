@@ -105,8 +105,8 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
       }
       environment = [
         {
-          "name": "ECS_CONTAINER_METADATA_URI_V4",
-          "value": "ECS_CONTAINER_METADATA_URI_V4"
+          "name": "ECS_CONTAINER_METADATA_URI",
+          "value": "ECS_CONTAINER_METADATA_URI"
         },
         {
           name  = "Instance"
