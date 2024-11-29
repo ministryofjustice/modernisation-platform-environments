@@ -10,7 +10,6 @@ module "aws_s3_data_migrate" {
   runtime       = local.lambda_s3_data_migrate_runtime
   policies      = local.lambda_s3_data_migrate_policies
   tracing       = local.lambda_s3_data_migrate_tracing
-  timeout       = 60
 
   log_retention_in_days = local.lambda_log_retention_in_days
 
