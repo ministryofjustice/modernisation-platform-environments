@@ -48,6 +48,11 @@ module "alfresco_sfs_ecs" {
     }
   ]
 
+  microservice_lb                    = aws_lb.alfresco_sfs
+  microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
+
+  alb_listener_rule_host_header = "alf-sfs.${var.env_name}.${var.account_config.dns_suffix}"
+
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
   cluster_security_group_id = aws_security_group.cluster.id
 
@@ -187,40 +192,48 @@ data "aws_iam_policy_document" "alfresco_efs_access_policy" {
   }
 }
 
+resource "aws_security_group" "alfresco_sfs_alb" {
+  name        = "${var.env_name}-alfresco-sfs-alb"
+  description = "controls access to and from alfresco sfs load balancer"
+  vpc_id      = var.account_config.shared_vpc_id
+  tags        = local.tags
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "alfresco_sfs_alb" {
+  for_each          = toset([var.account_info.cp_cidr, var.account_config.shared_vpc_cidr])
+  security_group_id = aws_security_group.ancillary_alb_security_group.id
+  description       = "Access into alb over https"
+  from_port         = "443"
+  to_port           = "443"
+  ip_protocol       = "tcp"
+  cidr_ipv4         = each.key
+}
+
+resource "aws_vpc_security_group_egress_rule" "alfresco_sfs_alb" {
+  security_group_id = aws_security_group.ancillary_alb_security_group.id
+  description       = "egress from alb to ecs cluster"
+  ip_protocol       = "-1"
+  cidr_ipv4         = [var.account_config.shared_vpc_cidr]
+}
+
 # internal application load balancer
 resource "aws_lb" "alfresco_sfs" {
   name               = "${var.app_name}-${var.env_name}-alfresco-sfs-alb"
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.delius_core_alfresco_sfs_alb_security_group.id]
+  security_groups    = [aws_security_group.alfresco_sfs_alb.id]
   subnets            = var.account_config.private_subnet_ids
 
   enable_deletion_protection = false
   drop_invalid_header_fields = true
 }
 
-resource "aws_acm_certificate" "alfresco_sfs" {
-  domain_name       = "alfresco-sfs.${var.env_name}.${var.account_config.internal_dns_suffix}"
-  validation_method = "DNS"
 
-  tags = var.tags
-}
-
-resource "aws_route53_record" "alfresco_sfs" {
-  zone_id = var.account_config.route53_inner_zone.zone_id
-  name    = "alfresco-sfs.${var.env_name}.${var.account_config.internal_dns_suffix}"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.delius_core_alfresco_sfs.dns_name
-    zone_id                = aws_lb.delius_core_alfresco_sfs.zone_id
-    evaluate_target_health = true
-  }
-}
-
-
-resource "aws_lb_listener" "delius_core_alfresco_sfs_listener_https" {
-  load_balancer_arn = aws_lb.delius_core_alfresco_sfs.id
+resource "aws_lb_listener" "alfresco_sfs_listener_https" {
+  load_balancer_arn = aws_lb.alfresco_sfs.id
   port              = 443
   protocol          = "HTTPS"
   certificate_arn   = local.certificate_arn
@@ -228,7 +241,6 @@ resource "aws_lb_listener" "delius_core_alfresco_sfs_listener_https" {
 
   default_action {
     type = "fixed-response"
-
     fixed_response {
       content_type = "text/plain"
       status_code  = "404"
