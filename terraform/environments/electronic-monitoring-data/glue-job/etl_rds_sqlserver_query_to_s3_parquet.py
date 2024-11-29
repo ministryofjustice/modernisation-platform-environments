@@ -188,7 +188,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     LOGGER.info(f"""Rows sample taken = {df_parquet_read_sample.count()}""")
 
     if df_prq_read_filtered_count == 0:
-        temp_msg = f"""{validation_sample_fraction_float}-Sample Rows Validated."""
+        temp_msg = f"""{validation_sample_fraction_float} - Sample Rows Validated."""
         df_temp_row = spark.sql(f"""select 
                                     current_timestamp() as run_datetime, 
                                     '' as json_row,

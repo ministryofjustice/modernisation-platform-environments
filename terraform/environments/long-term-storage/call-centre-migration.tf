@@ -1,3 +1,14 @@
+resource "aws_kms_key" "call_centre" {
+  enable_key_rotation     = true
+  rotation_period_in_days = 90
+  tags                    = local.tags
+}
+
+resource "aws_kms_key_policy" "call_centre" {
+  key_id = aws_kms_key.call_centre.id
+  policy = data.aws_iam_policy_document.call_centre_kms_policy.json
+}
+
 resource "aws_s3_bucket" "call_centre" {
   bucket_prefix = "call-centre-migration"
   tags          = local.tags
@@ -6,6 +17,16 @@ resource "aws_s3_bucket" "call_centre" {
 resource "aws_s3_bucket_policy" "call_centre" {
   bucket = aws_s3_bucket.call_centre.id
   policy = data.aws_iam_policy_document.call_centre_bucket_policy.json
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "call_centre" {
+  bucket = aws_s3_bucket.call_centre.id
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.call_centre.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
 }
 
 resource "aws_transfer_server" "call_centre" {

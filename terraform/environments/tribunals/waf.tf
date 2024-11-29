@@ -167,56 +167,6 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
       sampled_requests_enabled   = true
     }
   }
-
-  rule {
-    name     = "BlockCareStandardsAdmin"
-    priority = 1
-
-    action {
-      block {
-        custom_response {
-          response_code            = 403
-          custom_response_body_key = "CustomResponseBodyKey1"
-        }
-      }
-    }
-    statement {
-      or_statement {
-        statement {
-          byte_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            positional_constraint = "CONTAINS"
-            search_string         = "carestandards.decisions.tribunals.gov.uk/admin"
-            text_transformation {
-              priority = 0
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          byte_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            positional_constraint = "CONTAINS"
-            search_string         = "carestandards.tribunals.hmcts-preproduction.modernisation-platform.service.justice.gov.uk/admin"
-            text_transformation {
-              priority = 0
-              type     = "LOWERCASE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "CareStandardsBlockMetrics"
-      sampled_requests_enabled   = true
-    }
-  }
 }
 
 resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
@@ -225,10 +175,10 @@ resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
   scope    = "CLOUDFRONT"
 
   regular_expression {
-    regex_string = "^/admin(/.*)?$"
+    regex_string = "(?i)^/admin(/.*)?$"
   }
 
   regular_expression {
-    regex_string = "^/secure(/.*)?$"
+    regex_string = "(?i)^/secure(/.*)?$"
   }
 }
