@@ -234,6 +234,37 @@ locals {
       # })
     }
 
+    fsx_windows = {
+      t2-bods-windows-share = {
+        preferred_subnet_id = data.aws_subnet.private_subnets_a.id
+        deployment_type     = "MULTI_AZ_1"
+        security_groups     = ["bods"]
+        skip_final_backup   = true
+        storage_capacity    = 128
+        throughput_capacity = 8
+
+        subnets = [
+          {
+            name = "private"
+            availability_zones = ["eu-west-2a", "eu-west-2b"]
+          }
+        ]
+
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.mp_ip.ad-azure-dc-a,
+            module.ip_addresses.mp_ip.ad-azure-dc-b,  
+          ]
+          domain_name = "azure.noms.root"
+          username    = "svc_join_domain"
+          password_secret_name = "/sap/bods/t2/passwords" 
+        }
+        tags = {
+          backup = "false"         
+        }
+      }    
+    }
+
     iam_policies = {
       Ec2SecretPolicy = {
         description = "Permissions required for secret value access by instances"
