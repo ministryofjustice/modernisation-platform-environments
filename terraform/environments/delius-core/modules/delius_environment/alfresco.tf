@@ -53,6 +53,17 @@ module "alfresco_sfs_ecs" {
 
   alb_listener_rule_host_header = "alf-sfs.${var.env_name}.${var.account_config.dns_suffix}"
 
+  alb_health_check = {
+    path                 = "/"
+    healthy_threshold    = 5
+    interval             = 30
+    protocol             = "HTTP"
+    unhealthy_threshold  = 5
+    matcher              = "200-499"
+    timeout              = 10
+    grace_period_seconds = 180
+  }
+
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
   cluster_security_group_id = aws_security_group.cluster.id
 
@@ -78,7 +89,8 @@ module "alfresco_sfs_ecs" {
 
   log_error_pattern       = "%${join("|", local.ldap_formatted_error_codes)}%"
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
-  enable_platform_backups = var.enable_platform_backups
+  enable_platform_backups = false
+  frontend_lb_arn_suffix  = aws_lb.alfresco_sfs.arn_suffix
 
   efs_volumes = [
     {
