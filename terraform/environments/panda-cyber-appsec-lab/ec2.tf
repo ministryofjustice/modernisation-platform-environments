@@ -26,25 +26,34 @@ resource "aws_instance" "kali_linux" {
               exec > >(tee /var/log/user-data.log | logger -t user-data) 2>&1
 
               # Update system packages
+              echo "Updating and upgrading system packages..."
               apt-get update -y
               apt-get upgrade -y
 
-              # Install wget and git
-              apt-get install -y wget git
+              # Install necessary tools and Kali default tools
+              echo "Installing wget, git, and kali-linux-default tools..."
+              apt-get install -y wget git kali-linux-default
 
-              # Create tooling directory under kali's home
+              # Check if 'kali' user exists
               if id "kali" &>/dev/null; then
+                  echo "User 'kali' exists. Proceeding to create tooling directory..."
+                  
+                  # Create tooling directory and set ownership
                   mkdir -p /home/kali/tooling
                   chown -R kali:kali /home/kali
-                  echo "Tooling directory created and ownership set for kali user."
+                  echo "Tooling directory created under /home/kali and ownership set."
+
+                  # Clone the repository as 'kali' user
+                  echo "Cloning gotestwaf repository into /home/kali/tooling..."
+                  sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
+                  echo "Repository cloned successfully."
               else
                   echo "User 'kali' does not exist. Exiting."
                   exit 1
               fi
 
-              # Clone the repository
-              sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
-          
+              echo "User data script completed successfully."
+
               EOF
 
   tags = {
