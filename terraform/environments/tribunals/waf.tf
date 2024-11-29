@@ -225,10 +225,10 @@ resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
   scope    = "CLOUDFRONT"
 
   regular_expression {
-    regex_string = "^/admin(/.*)?$"
+    regex_string = "(?i)^/admin(/.*)?$"
   }
 
   regular_expression {
-    regex_string = "^/secure(/.*)?$"
+    regex_string = "(?i)^/secure(/.*)?$"
   }
 }
