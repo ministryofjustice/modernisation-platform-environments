@@ -14,6 +14,12 @@ module "aws_s3_data_migrate" {
 
   log_retention_in_days = local.lambda_log_retention_in_days
 
+  # Set timeout to the maximum of 900 seconds (15 minutes)
+  timeout       = 900
+
+  # Optional: Adjust memory size if needed
+  memory_size   = 512  
+
   vpc_settings = {
     subnet_ids         = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
     security_group_ids = [aws_security_group.lambda_generic[0].id, ]
