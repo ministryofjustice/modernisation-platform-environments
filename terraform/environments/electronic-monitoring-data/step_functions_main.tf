@@ -38,7 +38,7 @@ module "regenerate_jsonl" {
   name         = "regenerate_jsonl"
   iam_policies = tomap({ "regenerate_jsonl_policy" = aws_iam_policy.regenerate_jsonl_policy })
   variable_dictionary = tomap({
-    "source_bucket_name"           = module.s3-data-bucket.bucket_name
+    "source_bucket_name"           = module.s3-data-bucket.bucket.arn
     "atrium_directory"             = "g4s/atrium_unstructured/"
   })
 
