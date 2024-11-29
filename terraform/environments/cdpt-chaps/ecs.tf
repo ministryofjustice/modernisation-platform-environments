@@ -536,7 +536,12 @@ resource "aws_iam_role_policy" "app_task" {
           "logs:PutLogEvents",
           "ecr:*",
           "iam:*",
-          "ec2:*"
+          "ec2:*",
+          "ecs:DescribeTasks",
+          "ecs:ListTasks",
+          "ecs:DescribeContainerInstances",
+          "ecs:ListContainerInstances",
+          "ecs:DescribeClusters"
         ],
        "Resource": "*"
      }
