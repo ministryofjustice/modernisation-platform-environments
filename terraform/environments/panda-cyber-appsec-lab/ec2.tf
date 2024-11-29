@@ -44,13 +44,18 @@ resource "aws_instance" "kali_linux" {
               # Install kali-linux-default tools
               apt-get install -y kali-linux-default
 
-              # switch user to kali and make tooling directory
-              cd /home/kali
-              su - kali -c "mkdir -p /home/kali/tooling && echo 'Tooling directory created by kali user!' > /home/kali/tooling/info.txt"
-  
-              # clone https://github.com/wallarm/gotestwaf.git
-              cd tooling
-              git clone https://github.com/wallarm/gotestwaf.git
+              # Install git
+              apt-get install -y git
+              
+
+              # Create the directory if it doesn't exist
+              mkdir -p /home/kali/tooling
+
+              # Change ownership of the directory to 'kali' user
+              chown -R kali:kali /home/kali
+
+              # Clone the repository into the directory
+              sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
 
               EOF
 
