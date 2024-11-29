@@ -22,6 +22,7 @@ resource "aws_instance" "kali_linux" {
   }
   user_data = <<-EOF
               #!/bin/bash
+              
               set -e
               exec > >(tee /var/log/user-data.log | logger -t user-data) 2>&1
 
