@@ -3,7 +3,7 @@ module "alfresco_efs" {
 
   name           = "alfresco"
   env_name       = var.env_name
-  creation_token = "${var.env_name}-ldap"
+  creation_token = "${var.env_name}-sfs"
 
   kms_key_arn                     = var.account_config.kms_keys.general_shared
   throughput_mode                 = "elastic"
