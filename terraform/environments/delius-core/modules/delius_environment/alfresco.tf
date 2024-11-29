@@ -3,7 +3,7 @@ module "alfresco_efs" {
 
   name           = "alfresco"
   env_name       = var.env_name
-  creation_token = "${var.env_name}-sfs"
+  creation_token = "${var.env_name}-ldap"
 
   kms_key_arn                     = var.account_config.kms_keys.general_shared
   throughput_mode                 = "elastic"
@@ -48,25 +48,6 @@ module "alfresco_sfs_ecs" {
     }
   ]
 
-  microservice_lb                    = aws_lb.alfresco_sfs
-  microservice_lb_https_listener_arn = aws_lb_listener.alfresco_sfs_listener_https.arn
-
-  alb_listener_rule_host_header = "alf-sfs.${var.env_name}.${var.account_config.dns_suffix}"
-
-  target_group_protocol_version = "HTTP1"
-
-
-  alb_health_check = {
-    path                 = "/"
-    healthy_threshold    = 5
-    interval             = 30
-    protocol             = "HTTP"
-    unhealthy_threshold  = 5
-    matcher              = "200-499"
-    timeout              = 10
-    grace_period_seconds = 180
-  }
-
   ecs_cluster_arn           = module.ecs.ecs_cluster_arn
   cluster_security_group_id = aws_security_group.cluster.id
 
@@ -92,8 +73,7 @@ module "alfresco_sfs_ecs" {
 
   log_error_pattern       = "%${join("|", local.ldap_formatted_error_codes)}%"
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
-  enable_platform_backups = false
-  frontend_lb_arn_suffix  = aws_lb.alfresco_sfs.arn_suffix
+  enable_platform_backups = var.enable_platform_backups
 
   efs_volumes = [
     {
@@ -204,61 +184,5 @@ data "aws_iam_policy_document" "alfresco_efs_access_policy" {
       module.ldap.efs_fs_arn
     ]
     effect = "Allow"
-  }
-}
-
-resource "aws_security_group" "alfresco_sfs_alb" {
-  name        = "${var.env_name}-alfresco-sfs-alb"
-  description = "controls access to and from alfresco sfs load balancer"
-  vpc_id      = var.account_config.shared_vpc_id
-  tags        = local.tags
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_vpc_security_group_ingress_rule" "alfresco_sfs_alb" {
-  for_each          = toset([var.account_info.cp_cidr, var.account_config.shared_vpc_cidr])
-  security_group_id = aws_security_group.alfresco_sfs_alb.id
-  description       = "Access into alb over https"
-  from_port         = "443"
-  to_port           = "443"
-  ip_protocol       = "tcp"
-  cidr_ipv4         = each.key
-}
-
-resource "aws_vpc_security_group_egress_rule" "alfresco_sfs_alb" {
-  security_group_id = aws_security_group.alfresco_sfs_alb.id
-  description       = "egress from alb to ecs cluster"
-  ip_protocol       = "-1"
-  cidr_ipv4         = var.account_config.shared_vpc_cidr
-}
-
-# internal application load balancer
-resource "aws_lb" "alfresco_sfs" {
-  name               = "${var.app_name}-${var.env_name}-alfresco-sfs-alb"
-  internal           = true
-  load_balancer_type = "application"
-  security_groups    = [aws_security_group.alfresco_sfs_alb.id]
-  subnets            = var.account_config.private_subnet_ids
-
-  enable_deletion_protection = false
-  drop_invalid_header_fields = true
-}
-
-
-resource "aws_lb_listener" "alfresco_sfs_listener_https" {
-  load_balancer_arn = aws_lb.alfresco_sfs.id
-  port              = 443
-  protocol          = "HTTPS"
-  certificate_arn   = local.certificate_arn
-  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-
-  default_action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "404"
-    }
   }
 }
