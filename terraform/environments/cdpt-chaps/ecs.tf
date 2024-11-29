@@ -552,15 +552,8 @@ resource "aws_security_group" "chaps_combined_ecs_service" {
     protocol        = "tcp"
     security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
+ 
 
-  ingress {
-    description = "Allow HTTP traffic between chaps and chapsdotnet containers in the same task "
-    from_port   = 80
-    to_port     = 8080
-    protocol    = "tcp"
-    source_security_group_id = aws_security_group.chaps_combined_ecs_service.id # Refers to itself to allow traffic within the same task
-  }
-  
   # Allow all outbound traffic for both containers
   egress {
     description = "Allow all traffic"
@@ -569,6 +562,16 @@ resource "aws_security_group" "chaps_combined_ecs_service" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_security_group_rule" "self_referencing_ingress" {
+  description = "Allow HTTP traffic between chaps and chapsdotnet containers in the same task"
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 8080
+  protocol          = "tcp"
+  security_group_id = aws_security_group.chaps_combined_ecs_service.id
+  source_security_group_id = aws_security_group.chaps_combined_ecs_service.id
 }
 
 # AWS EventBridge rule
