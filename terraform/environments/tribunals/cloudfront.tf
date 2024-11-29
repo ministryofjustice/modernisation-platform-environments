@@ -1,5 +1,7 @@
 resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
+  # web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
+
   aliases = local.is-production ? [
     "*.decisions.tribunals.gov.uk",
     "*.venues.tribunals.gov.uk",
