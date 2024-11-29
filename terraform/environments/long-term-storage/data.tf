@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "aws_transfer_assume_role_policy" {
     }
     actions = ["sts:AssumeRole"]
     condition {
-      test     = "stringEquals"
+      test     = "StringEquals"
       values   = [data.aws_caller_identity.current.account_id]
       variable = "aws:SourceAccount"
     }
