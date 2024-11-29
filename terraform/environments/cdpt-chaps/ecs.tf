@@ -558,7 +558,7 @@ resource "aws_security_group" "chaps_combined_ecs_service" {
     from_port   = 80
     to_port     = 8080
     protocol    = "tcp"
-    security_groups = [aws_security_group.chaps_combined_ecs_service.id] # Refers to itself to allow traffic within the same task
+    source_security_group_id = aws_security_group.chaps_combined_ecs_service.id # Refers to itself to allow traffic within the same task
   }
   
   # Allow all outbound traffic for both containers
