@@ -65,7 +65,7 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
 resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
   family                   = "chaps-yarp-family"
   requires_compatibilities = ["EC2"]
-  network_mode             = "awsvpc"
+  network_mode             = "bridge"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
   memory                   = 2300
@@ -160,7 +160,7 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
         path        = "/"
         command     = [
           "CMD-SHELL",
-          "curl -f http://localhost:8181/ || exit 1"
+          "curl -f http://localhost:80/ || exit 1"
         ]
         interval    = 30
         timeout     = 5
@@ -552,7 +552,24 @@ resource "aws_security_group" "chaps_combined_ecs_service" {
     protocol        = "tcp"
     security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
+
+  ingress {
+    description = "Allow HTTP traffic between chaps and chapsdotnet containers"
+    from_port   = 80
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["172.19.80.0/20"] #this is the subnet of the chaps_nat_network 
+  }
   
+  ingress {
+    description = "Allow HTTP traffic between chapsdotnet adn chaps containers"
+    from_port   = 8080
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["172.19.80.0/20"] 
+  }
+  
+  # Allow all outbound traffic for both containers
   egress {
     description = "Allow all traffic"
     from_port   = 0
