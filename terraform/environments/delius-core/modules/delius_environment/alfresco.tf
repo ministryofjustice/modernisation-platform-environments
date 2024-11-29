@@ -216,7 +216,7 @@ resource "aws_security_group" "alfresco_sfs_alb" {
 
 resource "aws_vpc_security_group_ingress_rule" "alfresco_sfs_alb" {
   for_each          = toset([var.account_info.cp_cidr, var.account_config.shared_vpc_cidr])
-  security_group_id = aws_security_group.ancillary_alb_security_group.id
+  security_group_id = aws_security_group.alfresco_sfs_alb.id
   description       = "Access into alb over https"
   from_port         = "443"
   to_port           = "443"
@@ -225,7 +225,7 @@ resource "aws_vpc_security_group_ingress_rule" "alfresco_sfs_alb" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "alfresco_sfs_alb" {
-  security_group_id = aws_security_group.ancillary_alb_security_group.id
+  security_group_id = aws_security_group.alfresco_sfs_alb.id
   description       = "egress from alb to ecs cluster"
   ip_protocol       = "-1"
   cidr_ipv4         = var.account_config.shared_vpc_cidr
