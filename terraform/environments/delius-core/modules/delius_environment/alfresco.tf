@@ -53,6 +53,9 @@ module "alfresco_sfs_ecs" {
 
   alb_listener_rule_host_header = "alf-sfs.${var.env_name}.${var.account_config.dns_suffix}"
 
+  target_group_protocol_version = "HTTP1"
+
+
   alb_health_check = {
     path                 = "/"
     healthy_threshold    = 5
