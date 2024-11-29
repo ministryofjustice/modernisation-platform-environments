@@ -5,10 +5,12 @@ module "cmt_front_end_assumable_role" {
   version = "5.48.0"
   
   trusted_role_arns = [
+    "arn:aws:iam::754256621582:role/cloud-platform-irsa-6ab6c596b45e90b3-live",
     "arn:aws:sts::754256621582:role/cloud-platform-irsa-6ab6c596b45e90b3-live"
   ]
 
   create_role = true
+  role_requires_mfa = false
 
   role_name = "cmt_read_emds_data_${local.environment_shorthand}"
 
