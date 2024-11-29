@@ -228,7 +228,7 @@ resource "aws_vpc_security_group_egress_rule" "alfresco_sfs_alb" {
   security_group_id = aws_security_group.ancillary_alb_security_group.id
   description       = "egress from alb to ecs cluster"
   ip_protocol       = "-1"
-  cidr_ipv4         = [var.account_config.shared_vpc_cidr]
+  cidr_ipv4         = var.account_config.shared_vpc_cidr
 }
 
 # internal application load balancer
