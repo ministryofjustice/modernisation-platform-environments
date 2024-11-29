@@ -19,7 +19,7 @@ class SQLServer_Extract_Transform:
         ,[IsPublicHoliday]
         ,[RowVersion]
         ,CAST(StartTime as varchar(8)) as StartTime
-        ,CAST(EndTime as varchar(12)) as EndTime
+        ,CAST(EndTime as varchar(8)) as EndTime
         ,[SegmentCategoryLookupID]
         ,[ParentCurfewSegmentID]
         ,[TravelTimeBefore]
