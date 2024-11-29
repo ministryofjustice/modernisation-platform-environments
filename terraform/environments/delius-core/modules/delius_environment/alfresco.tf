@@ -234,7 +234,7 @@ resource "aws_vpc_security_group_egress_rule" "alfresco_sfs_alb" {
 # internal application load balancer
 resource "aws_lb" "alfresco_sfs" {
   name               = "${var.app_name}-${var.env_name}-alfresco-sfs-alb"
-  internal           = false
+  internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alfresco_sfs_alb.id]
   subnets            = var.account_config.private_subnet_ids
