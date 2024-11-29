@@ -554,17 +554,17 @@ resource "aws_security_group" "chaps_combined_ecs_service" {
   }
 
   ingress {
-    description = "Allow HTTP traffic between chaps and chapsdotnet containers"
+    description = "Allow HTTP traffic between chaps and chapsdotnet containers on :80 "
     from_port   = 80
-    to_port     = 8080
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["172.19.80.0/20"] #this is the subnet of the chaps_nat_network 
   }
   
   ingress {
-    description = "Allow HTTP traffic between chapsdotnet adn chaps containers"
+    description = "Allow HTTP traffic between chapsdotnet adn chaps containers on :8080"
     from_port   = 8080
-    to_port     = 80
+    to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["172.19.80.0/20"] 
   }
