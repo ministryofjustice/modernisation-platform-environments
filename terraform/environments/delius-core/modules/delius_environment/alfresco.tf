@@ -49,7 +49,7 @@ module "alfresco_sfs_ecs" {
   ]
 
   microservice_lb                    = aws_lb.alfresco_sfs
-  microservice_lb_https_listener_arn = aws_lb_listener.ancillary_https.arn
+  microservice_lb_https_listener_arn = aws_lb_listener.alfresco_sfs_listener_https.arn
 
   alb_listener_rule_host_header = "alf-sfs.${var.env_name}.${var.account_config.dns_suffix}"
 
