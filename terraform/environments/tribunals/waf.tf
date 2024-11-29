@@ -122,51 +122,51 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
     content      = "<h1>Secure Page</h1> <h3>This area of the website now requires elevated security.</h3> <br> <h3>If you believe you should be able to access this page please send an email to: - dts-legacy-apps-support-team@hmcts.net</h3>"
   }
 
-  rule {
-    name     = "BlockNonAllowedIPsForAdminAndSecurePaths"
-    priority = 4
+  # rule {
+  #   name     = "BlockNonAllowedIPsForAdminAndSecurePaths"
+  #   priority = 4
 
-    action {
-      block {
-        custom_response {
-          response_code            = 403
-          custom_response_body_key = "CustomResponseBodyKey1"
-        }
-      }
-    }
+  #   action {
+  #     block {
+  #       custom_response {
+  #         response_code            = 403
+  #         custom_response_body_key = "CustomResponseBodyKey1"
+  #       }
+  #     }
+  #   }
 
-    statement {
-      and_statement {
-        statement {
-          not_statement {
-            statement {
-              ip_set_reference_statement {
-                arn = aws_wafv2_ip_set.allowed_ip_set.arn
-              }
-            }
-          }
-        }
-        statement {
-          regex_pattern_set_reference_statement {
-            arn = aws_wafv2_regex_pattern_set.blocked_paths.arn
-            field_to_match {
-              uri_path {}
-            }
-            text_transformation {
-              priority = 0
-              type     = "NONE"
-            }
-          }
-        }
-      }
-    }
+  #   statement {
+  #     and_statement {
+  #       statement {
+  #         not_statement {
+  #           statement {
+  #             ip_set_reference_statement {
+  #               arn = aws_wafv2_ip_set.allowed_ip_set.arn
+  #             }
+  #           }
+  #         }
+  #       }
+  #       statement {
+  #         regex_pattern_set_reference_statement {
+  #           arn = aws_wafv2_regex_pattern_set.blocked_paths.arn
+  #           field_to_match {
+  #             uri_path {}
+  #           }
+  #           text_transformation {
+  #             priority = 0
+  #             type     = "NONE"
+  #           }
+  #         }
+  #       }
+  #     }
+  #   }
 
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "BlockNonAllowedIPsMetrics"
-      sampled_requests_enabled   = true
-    }
-  }
+  #   visibility_config {
+  #     cloudwatch_metrics_enabled = true
+  #     metric_name                = "BlockNonAllowedIPsMetrics"
+  #     sampled_requests_enabled   = true
+  #   }
+  # }
 
   rule {
     name     = "BlockCareStandardsAdmin"
@@ -219,15 +219,15 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
   }
 }
 
-resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
-  name  = "blocked-paths"
-  scope = "CLOUDFRONT"
+# resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
+#   name  = "blocked-paths"
+#   scope = "CLOUDFRONT"
 
-  regular_expression {
-    regex_string = "^/admin(/.*)?$"
-  }
+#   regular_expression {
+#     regex_string = "^/admin(/.*)?$"
+#   }
 
-  regular_expression {
-    regex_string = "^/secure(/.*)?$"
-  }
-}
+#   regular_expression {
+#     regex_string = "^/secure(/.*)?$"
+#   }
+# }
