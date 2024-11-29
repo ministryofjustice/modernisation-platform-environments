@@ -18,7 +18,7 @@ locals {
     subnet_set                    = local.subnet_set
     data_subnet_ids               = data.aws_subnets.shared-data.ids
     data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
-    route53_inner_zone_info       = data.aws_route53_zone.inner
+    route53_inner_zone            = data.aws_route53_zone.inner
     route53_network_services_zone = data.aws_route53_zone.network-services
     route53_external_zone         = data.aws_route53_zone.external
     shared_vpc_id                 = data.aws_vpc.shared.id
