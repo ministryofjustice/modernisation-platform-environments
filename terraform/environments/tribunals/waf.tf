@@ -221,7 +221,7 @@
 
 resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
   name  = "blocked-paths"
-  scope = "CLOUDFRONT"
+  scope = "REGIONAL"
 
   regular_expression {
     regex_string = "^/admin(/.*)?$"
