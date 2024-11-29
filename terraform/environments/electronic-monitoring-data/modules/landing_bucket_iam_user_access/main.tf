@@ -96,8 +96,8 @@ module "secrets_manager" {
   enable_rotation     = true
   rotation_lambda_arn = var.rotation_lambda.lambda_function_arn
   rotation_rules = {
-    # Schedule: Runs at 10:00 AM on the second Tuesday of February, May, August, and November
-    schedule_expression = "rate(0 10 ? 2,5,8,11 TUE#2 *)"
+    # Runs at 10:00 AM on the second Tuesday of Feb, May, Aug, Nov.
+    schedule_expression = "cron(0 10 ? FEB,MAY,AUG,NOV TUE#2 *)"
   }
 
   tags = merge(
