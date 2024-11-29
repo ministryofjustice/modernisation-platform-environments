@@ -93,5 +93,5 @@ data "aws_iam_policy_document" "regenerate_jsonl_policies" {
 resource "aws_iam_policy" "regenerate_jsonl_policy" {
   name        = "RegenerateJsonlPolicy"
   description = "Policy to allow invoking a specific lambda on specific resources"
-  policy      = data.aws_iam_policy_document.regenerate_jsonl_policies
+  policy      = data.aws_iam_policy_document.regenerate_jsonl_policies.json
 }
