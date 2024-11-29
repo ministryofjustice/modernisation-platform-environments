@@ -4,7 +4,7 @@ module "cmt_front_end_assumable_role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
 
   trusted_role_arns = [
-    "arn:aws:iam::754256621582:root"
+    "arn:aws:sts::754256621582:assumed-role/cloud-platform-irsa-6ab6c596b45e90b3-live/aws-sdk-java-1732878337600"
   ]
 
   create_role = true
