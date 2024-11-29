@@ -96,8 +96,10 @@ module "secrets_manager" {
   enable_rotation     = true
   rotation_lambda_arn = var.rotation_lambda.lambda_function_arn
   rotation_rules = {
-    automatically_after_days = 84
+    # Schedule: Runs at 10:00 AM on the second Tuesday of February, May, August, and November
+    schedule_expression = "rate(0 10 ? 2,5,8,11 TUE#2 *)"
   }
+
   tags = merge(
     var.local_tags,
     { order_type = var.order_type },
