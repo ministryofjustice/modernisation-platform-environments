@@ -1,7 +1,8 @@
 resource "aws_wafv2_ip_set" "allowed_ip_set" {
-  provider  = aws.us-east-1
+  # provider  = aws.us-east-1
   name      = "allowed-ip-set"
-  scope     = "CLOUDFRONT"
+  # scope     = "CLOUDFRONT"
+  scope = "REGIONAL"
   addresses = [
     "20.26.11.71/32", "20.26.11.108/32", "20.49.214.199/32",
     "20.49.214.228/32", "51.149.249.0/29", "51.149.249.32/29",
@@ -13,9 +14,10 @@ resource "aws_wafv2_ip_set" "allowed_ip_set" {
 }
 
 resource "aws_wafv2_web_acl" "tribunals_web_acl" {
-  provider = aws.us-east-1
+  # provider = aws.us-east-1
   name     = "tribunals-web-acl"
-  scope    = "CLOUDFRONT"
+  # scope    = "CLOUDFRONT"
+  scope = "REGIONAL"
 
   default_action {
     allow {}
@@ -170,9 +172,10 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 }
 
 resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
-  provider = aws.us-east-1
+  # provider = aws.us-east-1
   name     = "blocked-paths"
-  scope    = "CLOUDFRONT"
+  # scope    = "CLOUDFRONT"
+  scope = "REGIONAL"
 
   regular_expression {
     regex_string = "(?i)^/admin(/.*)?$"
