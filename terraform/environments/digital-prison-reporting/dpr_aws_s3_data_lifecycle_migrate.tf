@@ -18,7 +18,7 @@ module "aws_s3_data_migrate" {
   timeout       = 900
 
   # Optional: Adjust memory size if needed
-  memory_size   = 512  
+  memory_size   = 2048  
 
   vpc_settings = {
     subnet_ids         = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
