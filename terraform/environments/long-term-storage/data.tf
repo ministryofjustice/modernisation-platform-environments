@@ -88,7 +88,7 @@ data "aws_iam_policy_document" "call_centre_kms_policy" {
       variable = "kms:CallerAccount"
     }
     condition {
-      test     = "StringEquals"
+      test     = "StringLike"
       values   = ["transfer.amazonaws.com", "s3.amazonaws.com"]
       variable = "kms:ViaService"
     }
