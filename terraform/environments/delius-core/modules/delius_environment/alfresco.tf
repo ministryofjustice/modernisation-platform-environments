@@ -186,3 +186,52 @@ data "aws_iam_policy_document" "alfresco_efs_access_policy" {
     effect = "Allow"
   }
 }
+
+# internal application load balancer
+resource "aws_lb" "alfresco_sfs" {
+  name               = "${var.app_name}-${var.env_name}-alfresco-sfs-alb"
+  internal           = false
+  load_balancer_type = "application"
+  security_groups    = [aws_security_group.delius_core_alfresco_sfs_alb_security_group.id]
+  subnets            = var.account_config.private_subnet_ids
+
+  enable_deletion_protection = false
+  drop_invalid_header_fields = true
+}
+
+resource "aws_acm_certificate" "alfresco_sfs" {
+  domain_name       = "alfresco-sfs.${var.env_name}.${var.account_config.internal_dns_suffix}"
+  validation_method = "DNS"
+
+  tags = var.tags
+}
+
+resource "aws_route53_record" "alfresco_sfs" {
+  zone_id = var.account_config.route53_inner_zone.zone_id
+  name    = "alfresco-sfs.${var.env_name}.${var.account_config.internal_dns_suffix}"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.delius_core_alfresco_sfs.dns_name
+    zone_id                = aws_lb.delius_core_alfresco_sfs.zone_id
+    evaluate_target_health = true
+  }
+}
+
+
+resource "aws_lb_listener" "delius_core_alfresco_sfs_listener_https" {
+  load_balancer_arn = aws_lb.delius_core_alfresco_sfs.id
+  port              = 443
+  protocol          = "HTTPS"
+  certificate_arn   = local.certificate_arn
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "404"
+    }
+  }
+}
