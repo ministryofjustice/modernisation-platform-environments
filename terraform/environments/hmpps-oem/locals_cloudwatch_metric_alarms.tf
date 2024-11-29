@@ -26,13 +26,13 @@ locals {
     }
 
     preproduction = {
-      # corporate-staff-rostering
-      csr-r1-pp  = ["r1.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r2-pp  = ["r2.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r3-pp  = ["r3.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r4-pp  = ["r4.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r5-pp  = ["r5.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
-      csr-r6-pp  = ["r6.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
+      # corporate-staff-rostering - alarms disabled on request from Glenn
+      #csr-r1-pp  = ["r1.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
+      #csr-r2-pp  = ["r2.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
+      #csr-r3-pp  = ["r3.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
+      #csr-r4-pp  = ["r4.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
+      #csr-r5-pp  = ["r5.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
+      #csr-r6-pp  = ["r6.pp.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
       csr-traina = ["traina.csr.service.justice.gov.uk", false, "corporate-staff-rostering-pagerduty"]
 
       # hmpps-domain-services
@@ -51,9 +51,9 @@ locals {
       # oasys-national-reporting
       onr-pp = ["onr.pp-oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
 
-      # planetfm
-      cafmtx-pp   = ["cafmtx.pp.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
-      cafmwebx-pp = ["cafmwebx.pp.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
+      # planetfm - alarms disabled on request from Glenn
+      #cafmtx-pp   = ["cafmtx.pp.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
+      #cafmwebx-pp = ["cafmwebx.pp.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
     }
 
     production = {
