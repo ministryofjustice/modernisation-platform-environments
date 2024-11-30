@@ -1,0 +1,22 @@
+# This is an EC2Launch V2 type user-data script
+# https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-task-configuration
+# See C:\ProgramData\Amazon\EC2Launch\log for logs
+# See C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch* for script output
+version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is running
+tasks:
+  - task: intializeVolumes
+    inputs:
+      initialize: devices
+      devices:
+      - device: xvdd
+        name: Temp
+        letter: D
+        partition: gpt
+      - device: xvde
+        name: App
+        letter: E
+        partition: gpt
+      - device: xvdf
+        name: Storage
+        letter: F
+        partition: gpt
