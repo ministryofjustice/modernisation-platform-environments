@@ -171,6 +171,7 @@ locals {
       aws-case = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
           ami_name = "Windows_Server-2019-English-Full-Base-2024.09.11"
+          ami_owner = "801119661308"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
