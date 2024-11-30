@@ -168,19 +168,19 @@ locals {
         })
       })
 
-      aws-case = merge(local.ec2_instances.bods, {
-        config = merge(local.ec2_instances.bods.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-          user_data_raw = base64encode(templatefile(
-            "./templates/aws-support-ticket.yaml.tftpl", {
-              branch = "main"
-            }))
-        })
-        cloudwatch_metric_alarms = null
-      })
+      # aws-case = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2a"
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/aws-support-ticket.yaml.tftpl", {
+      #         branch = "main"
+      #       }))
+      #   })
+      #   cloudwatch_metric_alarms = null
+      # })
 
       # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
       #   config = merge(local.ec2_instances.bods.config, {
