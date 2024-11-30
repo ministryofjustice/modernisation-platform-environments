@@ -175,7 +175,9 @@ locals {
             "Ec2SecretPolicy",
           ])
           user_data_raw = base64encode(templatefile(
-            "./templates/aws-support-ticket.yaml.tftpl"))
+            "./templates/aws-support-ticket.yaml.tftpl", {
+              branch = "main"
+            }))
         })
         cloudwatch_metric_alarms = null
       })
