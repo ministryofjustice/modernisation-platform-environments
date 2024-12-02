@@ -35,7 +35,7 @@ resource "null_resource" "create_athena_table_layer_zip" {
 }
 
 resource "aws_lambda_layer_version" "create_athena_table_layer" {
-  s3_bucket           = module.s3-lambda-layer-bucket.bucket
+  s3_bucket           = module.s3-lambda-bucket.bucket
   s3_key              = var.local.create_athena_table_layer.layer_zip_name
   layer_name          = local.create_athena_table_layer.layer_name
   compatible_runtimes = ["python3.11"]
@@ -62,7 +62,7 @@ locals {
 }
 
 resource "aws_lambda_layer_version" "mojap_metadata_layer" {
-  s3_bucket           = module.s3-lambda-layer-bucket.bucket
+  s3_bucket           = module.s3-lambda-bucket.bucket
   s3_key              = local.mojap_metadata.layer_zip_name
   layer_name          = local.mojap_metadata.layer_name
   compatible_runtimes = ["python3.11"]
