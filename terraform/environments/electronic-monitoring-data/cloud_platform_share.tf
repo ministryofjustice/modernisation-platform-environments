@@ -1,3 +1,32 @@
+locals {
+  # Setting the IAM name that our Cloud Platform API will use to connect to this role
+  
+  iam-dev     = local.environment_shorthand == "dev"     ? var.cloud-platform-iam-dev     : ""
+  iam-test    = local.environment_shorthand == "test"    ? var.cloud-platform-iam-preprod : ""
+  iam-preprod = local.environment_shorthand == "preprod" ? var.cloud-platform-iam-preprod : ""
+  iam-prod    = local.environment_shorthand == "prod"    ? var.cloud-platform-iam-prod    : ""
+
+  resolved-cloud-platform-iam-role = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
+}
+
+variable "cloud-platform-iam-dev" {
+  type        = string
+  description = "IAM role that our API in Cloud Platform will use to connect to this role."
+  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-6ab6c596b45e90b3-live"
+}
+
+variable "cloud-platform-iam-preprod" {
+  type        = string
+  description = "IAM role that our API in Cloud Platform will use to connect to this role."
+  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-bca231f5681d29c6-live"
+}
+
+variable "cloud-platform-iam-prod" {
+  type        = string
+  description = "IAM role that our API in Cloud Platform will use to connect to this role."
+  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-7a81f92a48491ef0-live"
+}
+
 module "cmt_front_end_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -5,8 +34,7 @@ module "cmt_front_end_assumable_role" {
   version = "5.48.0"
   
   trusted_role_arns = [
-    "arn:aws:iam::754256621582:role/cloud-platform-irsa-6ab6c596b45e90b3-live",
-    "arn:aws:sts::754256621582:role/cloud-platform-irsa-6ab6c596b45e90b3-live"
+    local.resolved-cloud-platform-iam-role
   ]
 
   create_role = true
