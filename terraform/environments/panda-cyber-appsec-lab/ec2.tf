@@ -7,7 +7,7 @@ resource "aws_instance" "kali_linux" {
   vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
   ebs_optimized               = true
-  
+
   metadata_options {
     http_tokens = "required"
   }

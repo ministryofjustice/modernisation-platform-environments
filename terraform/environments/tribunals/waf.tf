@@ -1,7 +1,7 @@
 resource "aws_wafv2_ip_set" "allowed_ip_set" {
-  provider  = aws.us-east-1
-  name      = "allowed-ip-set"
-  scope     = "CLOUDFRONT"
+  provider = aws.us-east-1
+  name     = "allowed-ip-set"
+  scope    = "CLOUDFRONT"
   addresses = [
     "20.26.11.71/32", "20.26.11.108/32", "20.49.214.199/32",
     "20.49.214.228/32", "51.149.249.0/29", "51.149.249.32/29",
