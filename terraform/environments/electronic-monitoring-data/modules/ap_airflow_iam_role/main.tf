@@ -33,14 +33,6 @@ data "aws_iam_policy_document" "oidc_assume_role_policy" {
   }
 }
 
-resource "aws_iam_role" "role_ap_airflow" {
-  name                  = local.role_name
-  description           = var.role_description
-  assume_role_policy    = data.aws_iam_policy_document.oidc_assume_role_policy.json
-  force_detach_policies = true
-  max_session_duration  = var.max_session_duration
-}
-
 # -----------------------------
 # define the role
 # -----------------------------
@@ -50,6 +42,7 @@ resource "aws_iam_role" "role_ap_airflow" {
   description           = var.role_description
   assume_role_policy    = data.aws_iam_policy_document.oidc_assume_role_policy.json
   force_detach_policies = true
+  max_session_duration  = var.max_session_duration
 }
 
 resource "aws_iam_policy" "role_ap_airflow" {
