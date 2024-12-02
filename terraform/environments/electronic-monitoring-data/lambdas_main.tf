@@ -16,8 +16,9 @@ data "archive_file" "get_metadata_from_rds" {
 
 #checkov:skip=CKV_AWS_272
 module "get_metadata_from_rds_lambda" {
+  s3_bucket     = module.s3-lambda-bucket.bucket
   source        = "./modules/lambdas"
-  filename      = "${local.lambda_path}/get_metadata_from_rds.zip"
+  filename      = "get_metadata_from_rds.zip"
   function_name = "get-metadata-from-rds"
   role_arn      = aws_iam_role.get_metadata_from_rds.arn
   role_name     = aws_iam_role.get_metadata_from_rds.name
@@ -53,8 +54,9 @@ data "archive_file" "create_athena_table" {
 }
 
 module "create_athena_table" {
-  source   = "./modules/lambdas"
-  filename = "${local.lambda_path}/create_athena_table.zip"
+  s3_bucket = module.s3-lambda-bucket.bucket
+  source    = "./modules/lambdas"
+  filename  = "${local.lambda_path}/create_athena_table.zip"
 
   function_name = "create_athena_table"
   role_arn      = aws_iam_role.create_athena_table_lambda.arn

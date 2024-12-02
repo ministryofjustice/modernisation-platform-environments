@@ -5,6 +5,8 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 resource "aws_sqs_queue" "lambda_dlq" {
   name              = "${var.function_name}-dlq"
   kms_master_key_id = aws_kms_key.lambda_env_key.id
@@ -141,10 +143,29 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
+# Create a null_resource to zip the file and upload it to S3
+resource "null_resource" "zip_and_upload" {
+  count = var.is_image ? 0 : 1
+  provisioner "local-exec" {
+    command = <<EOT
+      zip -j ${var.filename}.zip ${var.filename}
+      aws s3 cp ${var.filename}.zip s3://${var.s3_bucket}/${var.filename}
+    EOT
+    environment = {
+      AWS_DEFAULT_REGION = data.aws_region.current.name
+    }
+  }
+
+  triggers = {
+    source_file_hash = filesha256(var.filename)
+  }
+}
 
 resource "aws_lambda_function" "this" {
   #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
   # Zip File config
+  s3_bucket        = var.is_image ? null : var.s3_bucket
+  s3_key           = var.is_image ? null : var.filename
   filename         = var.is_image ? null : var.filename
   handler          = var.is_image ? null : var.handler
   layers           = var.is_image ? null : var.layers

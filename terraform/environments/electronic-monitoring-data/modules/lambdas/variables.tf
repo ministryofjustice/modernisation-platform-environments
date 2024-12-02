@@ -133,3 +133,11 @@ variable "ephemeral_storage_size" {
   type        = number
   default     = 512
 }
+
+variable "s3_bucket" {
+  description = "The name of the S3 bucket where the Lambda layer code is stored"
+  type        = string
+  nullable    = true
+  default     = null
+}
+

@@ -17,8 +17,26 @@ locals {
   }
 }
 
+resource "null_resource" "create_athena_table_layer_zip" {
+  provisioner "local-exec" {
+    command = <<EOT
+      pip install -r ${local.create_athena_table_layer.requirements_path} -t python
+      zip -r ${local.create_athena_table_layer.layer_zip_path} python
+      aws s3 cp ${local.create_athena_table_layer.layer_zip_path} s3://${module.s3_lambda_layer_bucket.bucket}/${local.create_athena_table_layer.layer_zip_name}
+    EOT
+    environment = {
+      AWS_DEFAULT_REGION = data.aws_region.current.name
+    }
+  }
+
+  triggers = {
+    requirements_hash = filesha256(local.create_athena_table_layer.requirements_path)
+  }
+}
+
 resource "aws_lambda_layer_version" "create_athena_table_layer" {
-  filename            = local.create_athena_table_layer.layer_zip_path
+  s3_bucket           = module.s3-lambda-layer-bucket.bucket
+  s3_key              = var.local.create_athena_table_layer.layer_zip_name
   layer_name          = local.create_athena_table_layer.layer_name
   compatible_runtimes = ["python3.11"]
   source_code_hash    = filesha1(local.create_athena_table_layer.layer_zip_path)
@@ -44,8 +62,26 @@ locals {
 }
 
 resource "aws_lambda_layer_version" "mojap_metadata_layer" {
-  filename            = local.mojap_metadata.layer_zip_path
+  s3_bucket           = module.s3-lambda-layer-bucket.bucket
+  s3_key              = local.mojap_metadata.layer_zip_name
   layer_name          = local.mojap_metadata.layer_name
   compatible_runtimes = ["python3.11"]
   source_code_hash    = filesha1(local.mojap_metadata.layer_zip_path)
+}
+
+resource "null_resource" "mojap_metadata_layer_zip" {
+  provisioner "local-exec" {
+    command = <<EOT
+      pip install -r ${local.mojap_metadata_layer.requirements_path} -t python
+      zip -r ${local.mojap_metadata_layer.layer_zip_path} python
+      aws s3 cp ${local.mojap_metadata_layer.layer_zip_path} s3://${module.s3_lambda_layer_bucket.bucket}/${local.create_athena_table_layer.layer_zip_name}
+    EOT
+    environment = {
+      AWS_DEFAULT_REGION = data.aws_region.current.name
+    }
+  }
+
+  triggers = {
+    requirements_hash = filesha256(local.mojap_metadata_layer.requirements_path)
+  }
 }
