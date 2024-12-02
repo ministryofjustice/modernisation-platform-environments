@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_event_rule" "ecs_restart_rule" {
-  name        = "ecs_task_retirement_rul"
+  name        = "ecs_task_retirement_rule"
   description = "Rule to catch AWS ECS Task Patching Retirement events"
 
   event_pattern = jsonencode({
@@ -121,4 +121,9 @@ resource "aws_iam_policy" "eventbridge_execution_role_policy" {
       }
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "eventbridge_execution_role_policy" {
+  policy_arn = aws_iam_policy.eventbridge_execution_role_policy.arn
+  role       = aws_iam_role.eventbridge_execution_role.name
 }
