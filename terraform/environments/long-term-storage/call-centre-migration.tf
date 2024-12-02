@@ -36,10 +36,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "call_centre" {
 }
 
 resource "aws_secretsmanager_secret" "call_centre" {
-  description = "Secret containing key-value pairs for AWS Transfer connector."
-  name        = "aws/transfer/${aws_transfer_server.call_centre.id}/call-centre"
-  recovery_window_in_days = 0
-  tags = local.tags
+  description                    = "Secret containing key-value pairs for AWS Transfer connector."
+  force_overwrite_replica_secret = true
+  name                           = "aws/transfer/${aws_transfer_server.call_centre.id}/call-centre"
+  recovery_window_in_days        = 0
+  tags                           = local.tags
 }
 
 resource "aws_transfer_server" "call_centre" {
