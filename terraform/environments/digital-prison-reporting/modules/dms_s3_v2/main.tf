@@ -169,7 +169,6 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
 
   max_file_size           = 120000
   cdc_max_batch_interval  = 10
-  cdc_inserts_and_updates = true
 
   tags = merge(
     var.tags,
