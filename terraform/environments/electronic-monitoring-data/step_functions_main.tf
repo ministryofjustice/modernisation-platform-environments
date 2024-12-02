@@ -1,18 +1,4 @@
 # ------------------------------------------
-# Fake Athena Layer
-# ------------------------------------------
-
-module "athena_layer" {
-  source       = "./modules/step_function"
-  name         = "athena_layer"
-  iam_policies = tomap({ "lambda_invoke_policy" = aws_iam_policy.lambda_invoke_policy })
-  variable_dictionary = tomap({
-    get_metadata_lambda_arn = module.get_metadata_from_rds_lambda.lambda_function_arn
-    create_athena_table     = module.create_athena_table.lambda_function_arn
-  })
-}
-
-# ------------------------------------------
 # Unzip Files
 # ------------------------------------------
 
