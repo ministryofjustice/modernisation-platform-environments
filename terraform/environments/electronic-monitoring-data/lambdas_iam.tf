@@ -397,3 +397,68 @@ resource "aws_iam_role_policy_attachment" "format_json_fms_data_policy_attachmen
   role       = aws_iam_role.format_json_fms_data.name
   policy_arn = aws_iam_policy.format_json_fms_data.arn
 }
+
+#-----------------------------------------------------------------------------------
+# Calculate Checksum Algorithim
+#-----------------------------------------------------------------------------------
+
+
+resource "aws_iam_role" "calculate_checksum_lambda" {
+  name               = "calculate-checksum-lambda-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "calculate_checksum_lambda" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+      "s3:PutObjectAcl",
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:GetObjectTagging",
+      "s3:GetObjectAttributes",
+      "s3:GetObjectVersionAttributes",
+      "s3:ListBucket"
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "calculate_checksum_lambda" {
+  name   = "calculate_checksum-lambda-iam-policy"
+  role   = aws_iam_role.calculate_checksum_lambda.id
+  policy = data.aws_iam_policy_document.calculate_checksum_lambda.json
+}
+
+#-----------------------------------------------------------------------------------
+# summarise zip
+#-----------------------------------------------------------------------------------
+
+
+resource "aws_iam_role" "summarise_zip_lambda" {
+  name               = "summarise-zip-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "summarise_zip_lambda" {
+  statement {
+    sid    = "S3Permissions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "summarise_zip_lambda" {
+  name   = "summarise-zip-iam-policy"
+  role   = aws_iam_role.summarise_zip_lambda.id
+  policy = data.aws_iam_policy_document.summarise_zip_lambda.json
+}
+
