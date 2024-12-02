@@ -88,10 +88,10 @@ locals {
       # oasys-national-reporting
       onr = ["onr.oasys.az.justice.gov.uk", true, "oasys-national-reporting-pagerduty"]
 
-      # planetfm
-      cafmtrainweb = ["cafmtrainweb.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
-      cafmtx       = ["cafmtx.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
-      cafmwebx2    = ["cafmwebx2.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
+      # planetfm - alarms disabled on request from Glenn
+      #cafmtrainweb = ["cafmtrainweb.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
+      #cafmtx       = ["cafmtx.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
+      #cafmwebx2    = ["cafmwebx2.planetfm.service.justice.gov.uk", true, "planetfm-pagerduty"]
     }
   }
 
