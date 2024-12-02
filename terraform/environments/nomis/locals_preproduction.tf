@@ -40,6 +40,20 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.xtag,
+          local.cloudwatch_dashboard_widget_groups.asg,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_autoscaling_groups = {
       # ACTIVE (blue deployment)
       lsast-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
@@ -92,11 +106,11 @@ locals {
         })
       })
 
-      # NOT-ACTIVE (green deployment)
+      # NOT-ACTIVE (green deployment) - for testing Combined Reporting
       preprod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 0
+          desired_capacity = 1
+          max_size         = 1
 
           initial_lifecycle_hooks = {
             "ready-hook" = {
@@ -124,10 +138,11 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment    = "preprod"
-          oracle-db-hostname-a = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
-          oracle-db-name       = "PPCNOM"
+          nomis-environment     = "preprod"
+          oracle-db-hostname-a  = "ppnomis-a.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b  = "ppnomis-b.preproduction.nomis.service.justice.gov.uk"
+          oracle-db-name        = "PPCNOM"
+          reporting-environment = "aws"
         })
       })
 

@@ -1,4 +1,5 @@
 resource "aws_security_group" "legacy" {
+  #checkov:skip=CKV2_AWS_5 "ignore"
   name        = "${var.env_name}-allow-legacy-traffic"
   description = "Security group to allow connectivity with resources in legacy environments. To be removed once all components have been migrated"
   vpc_id      = var.account_info.vpc_id

@@ -17,7 +17,7 @@ locals {
     ordered_subnets               = [local.ordered_subnet_ids]
     data_subnet_ids               = data.aws_subnets.shared-data.ids
     data_subnet_a_id              = data.aws_subnet.data_subnets_a.id
-    route53_inner_zone_info       = data.aws_route53_zone.inner
+    route53_inner_zone            = data.aws_route53_zone.inner
     route53_network_services_zone = data.aws_route53_zone.network-services
     route53_external_zone         = data.aws_route53_zone.external
     shared_vpc_id                 = data.aws_vpc.shared.id
@@ -26,7 +26,8 @@ locals {
       general_shared = data.aws_kms_key.general_shared.arn
       rds_shared     = data.aws_kms_key.rds_shared.arn
     }
-    dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    dns_suffix          = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+    internal_dns_suffix = "${local.application_name}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.internal"
   }
 
   platform_vars = {
@@ -55,4 +56,5 @@ locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   integration_key_lookup     = local.is-production ? "delius_core_prod_alarms" : "delius_core_nonprod_alarms"
   pagerduty_integration_key  = local.pagerduty_integration_keys[local.integration_key_lookup]
+
 }

@@ -93,9 +93,54 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
   )
 }
 
-# RDS database
+# RDS database with snapshot
 
 resource "aws_db_instance" "appdb1" {
+  allocated_storage           = var.allocated_storage
+  db_name                     = upper(var.application_name)
+  identifier                  = "${var.identifier_name}-with-snapshot"
+  engine                      = var.engine
+  engine_version              = var.engine_version
+  instance_class              = var.instance_class
+  allow_major_version_upgrade = var.allow_major_version_upgrade
+  auto_minor_version_upgrade  = var.auto_minor_version_upgrade
+  storage_type                = var.storage_type
+  backup_retention_period     = var.backup_retention_period
+  backup_window               = var.backup_window
+  maintenance_window          = var.maintenance_window
+  character_set_name          = var.character_set_name
+  availability_zone           = var.availability_zone
+  multi_az                    = var.multi_az
+  username                    = var.username
+  password                    = random_password.rds_password.result
+  vpc_security_group_ids      = [aws_security_group.laalz-secgroup.id, aws_security_group.vpc-secgroup.id]
+  skip_final_snapshot         = false
+  final_snapshot_identifier   = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
+  parameter_group_name        = aws_db_parameter_group.appdbparametergroup19.name
+  option_group_name           = aws_db_option_group.appdboptiongroup19.name
+  db_subnet_group_name        = aws_db_subnet_group.appdbsubnetgroup.name
+  license_model               = var.license_model
+  deletion_protection         = var.deletion_protection
+  copy_tags_to_snapshot       = true
+  storage_encrypted           = true
+  apply_immediately           = true
+  snapshot_identifier         = var.rds_snapshot_arn
+  kms_key_id                  = var.rds_kms_key_arn
+  tags = merge(
+    var.tags,
+    { "Name" = "${var.application_name}-${var.environment}-database-with-snapshot" },
+    { "instance-scheduling" = "skip-scheduling" }
+  )
+
+  timeouts {
+    create = "60m"
+    delete = "2h"
+  }
+}
+
+# RDS database without snapshot
+
+resource "aws_db_instance" "appdb2" {
   allocated_storage           = var.allocated_storage
   db_name                     = upper(var.application_name)
   identifier                  = var.identifier_name
@@ -124,11 +169,10 @@ resource "aws_db_instance" "appdb1" {
   copy_tags_to_snapshot       = true
   storage_encrypted           = true
   apply_immediately           = true
-  # snapshot_identifier         = var.rds_snapshot_arn
-  kms_key_id = var.rds_kms_key_arn
+  kms_key_id                  = var.rds_kms_key_arn
   tags = merge(
     var.tags,
-    { "Name" = "${var.application_name}-${var.environment}-database" },
+    { "Name" = "${var.application_name}-${var.environment}-database-without-snapshot" },
     { "instance-scheduling" = "skip-scheduling" }
   )
 
@@ -202,6 +246,10 @@ resource "aws_security_group" "vpc-secgroup" {
   }
 }
 
-output "rds_endpoint" {
+output "rds_endpoint_with_snapshot" {
   value = aws_db_instance.appdb1.address
+}
+
+output "rds_endpoint" {
+  value = aws_db_instance.appdb2.address
 }

@@ -4,12 +4,15 @@ locals {
   environment_config_dev = {
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     legacy_counterpart_vpc_cidr            = "10.162.32.0/20"
-    legacy_ad_domain_name                  = "delius-mis-dev.local"
-    legacy_ad_ip_list                      = ["10.162.36.235", "10.162.35.251"]
+    ad_domain_name                         = "delius-mis-dev.internal"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/${terraform.workspace}/ec2-user.pub")
     migration_environment_full_name        = "dmd-mis-dev"
     migration_environment_abbreviated_name = "dmd"
     migration_environment_short_name       = "mis-dev"
+    cloudwatch_alarm_schedule              = true
+    cloudwatch_alarm_disable_time          = "20:45"
+    cloudwatch_alarm_enable_time           = "06:15"
+    cloudwatch_alarm_disable_weekend       = true
   }
 
   bastion_config_dev = {
@@ -198,7 +201,7 @@ locals {
 
   # base config for each database
   base_db_config_dev = {
-    instance_type  = "t3.large"
+    instance_type  = "m7i.large"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-01-31T16-06-00.575Z"
 
     instance_policies = {

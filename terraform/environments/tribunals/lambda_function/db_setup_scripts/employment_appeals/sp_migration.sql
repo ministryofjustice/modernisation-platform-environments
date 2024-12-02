@@ -1421,3 +1421,137 @@ and j.id = @id
 
 go
 
+USE [EAT]
+GO
+/****** Object:  Table [dbo].[ValidUsers]    Script Date: 09/26/2024 09:27:12 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[ValidUsers](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[UserName] [varchar](50) NOT NULL,
+	[Password] [varchar](50) NOT NULL,
+ CONSTRAINT [PK_ValidUsers] PRIMARY KEY NONCLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[test]    Script Date: 09/26/2024 09:27:12 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[test](
+	[col1] [datetime] NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[level2juri]    Script Date: 09/26/2024 09:27:12 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[level2juri](
+	[id] [varchar](255) NULL,
+	[title] [varchar](255) NULL,
+	[parent_id] [varchar](255) NULL,
+	[obsolete] [varchar](255) NULL,
+	[rank] [varchar](255) NULL
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[jurisdiction_level2]    Script Date: 09/26/2024 09:27:12 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[jurisdiction_level2](
+	[id] [int] NOT NULL,
+	[title] [varchar](255) NOT NULL,
+	[parent_id] [int] NOT NULL,
+	[obsolete] [bit] NOT NULL,
+	[rank] [int] NOT NULL
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[jurisdiction_level1]    Script Date: 09/26/2024 09:27:12 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[jurisdiction_level1](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[title] [varchar](50) NOT NULL,
+	[obsolete] [bit] NOT NULL
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[judgment_jurisdictions]    Script Date: 09/26/2024 09:27:12 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+CREATE TABLE [dbo].[judgment_jurisdictions](
+	[id] [int] NOT NULL,
+	[jurisdiction] [int] NOT NULL,
+	[primary_jurisdiction] [bit] NOT NULL
+) ON [PRIMARY]
+GO
+/****** Object:  Table [dbo].[Judgment]    Script Date: 09/26/2024 09:27:12 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[Judgment](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[eatnum] [varchar](80) NOT NULL,
+	[judge] [varchar](100) NOT NULL,
+	[appellant] [varchar](400) NOT NULL,
+	[respondent] [varchar](400) NOT NULL,
+	[date] [datetime] NOT NULL,
+	[upload_date] [datetime] NOT NULL,
+	[uploaded_by] [varchar](50) NOT NULL,
+	[filename] [varchar](150) NOT NULL,
+	[STARRED] [char](1) NOT NULL,
+ CONSTRAINT [PK_Judgment2] PRIMARY KEY CLUSTERED 
+(
+	[id] ASC
+)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO
+/****** Object:  Table [dbo].[causelist]    Script Date: 09/26/2024 09:27:12 ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+SET ANSI_PADDING ON
+GO
+CREATE TABLE [dbo].[causelist](
+	[id] [int] IDENTITY(1,1) NOT NULL,
+	[title] [varchar](200) NOT NULL,
+	[date] [datetime] NOT NULL,
+	[upload_date] [varchar](50) NOT NULL,
+	[uploaded_by] [varchar](50) NOT NULL,
+	[filename] [varchar](100) NOT NULL
+) ON [PRIMARY]
+GO
+SET ANSI_PADDING OFF
+GO

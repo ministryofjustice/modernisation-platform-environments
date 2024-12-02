@@ -28,7 +28,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/github-actions/terraform-static-analysis@9fc6d8a5d34d3ea803d123ced4f24d9e26751c66 # v18.1.4
+        uses: ministryofjustice/github-actions/terraform-static-analysis@ccf9e3a4a828df1ec741f6c8e6ed9d0acaef3490 # v18.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -39,6 +39,7 @@ jobs:
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
           tfsec_trivy: trivy
+          use_trivy_ecr_database: true
 
   terraform-static-analysis-full-scan:
     permissions:
@@ -55,7 +56,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/github-actions/terraform-static-analysis@9fc6d8a5d34d3ea803d123ced4f24d9e26751c66 # v18.1.4
+        uses: ministryofjustice/github-actions/terraform-static-analysis@ccf9e3a4a828df1ec741f6c8e6ed9d0acaef3490 # v18.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -68,6 +69,7 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
+          use_trivy_ecr_database: true
 
   terraform-static-analysis-scheduled-scan:
     name: Terraform Static Analysis - scheduled scan of all directories
@@ -79,7 +81,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run Analysis
-        uses: ministryofjustice/github-actions/terraform-static-analysis@9fc6d8a5d34d3ea803d123ced4f24d9e26751c66 # v18.1.4
+        uses: ministryofjustice/github-actions/terraform-static-analysis@ccf9e3a4a828df1ec741f6c8e6ed9d0acaef3490 # v18.5.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -91,3 +93,4 @@ jobs:
           checkov_exclude: CKV_GIT_1,CKV_AWS_126,CKV2_AWS_38,CKV2_AWS_39
           tflint_exclude: terraform_unused_declarations
           tflint_call_module_type: none
+          use_trivy_ecr_database: true

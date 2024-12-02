@@ -1,11 +1,9 @@
-// DEV + PRE-PRODUCTION DNS CONFIGURATION
-
 // ACM Public Certificate
 resource "aws_acm_certificate" "external" {
-  domain_name       = "modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.is-production ? "wardship-agreements-register.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? null : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   tags = {
     Environment = local.environment
   }
@@ -15,24 +13,36 @@ resource "aws_acm_certificate" "external" {
   }
 }
 
+// Validate Cert based on external route53 fqdn
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
 }
 
-// Route53 DNS records for certificate validation
-resource "aws_route53_record" "external_validation" {
+// Non production zone for validation is network-services (production is application zone)
+resource "aws_route53_record" "cert_validation" {
+
   provider = aws.core-network-services
 
+  for_each = {
+    for dvo in aws_acm_certificate.external.domain_validation_options : dvo.domain_name => {
+      name  = dvo.resource_record_name
+      type  = dvo.resource_record_type
+      value = dvo.resource_record_value
+    }
+  }
   allow_overwrite = true
-  name            = local.domain_name_main[0]
-  records         = local.domain_record_main
-  ttl             = 60
-  type            = local.domain_type_main[0]
-  zone_id         = data.aws_route53_zone.network-services.zone_id
+  name            = each.value.name
+  records         = [each.value.value]
+  ttl             = 300
+  type            = each.value.type
+  zone_id         = local.is-production ? data.aws_route53_zone.application_zone.zone_id : data.aws_route53_zone.network-services.zone_id
 }
 
+// sub-domain validation only required for non-production sites
 resource "aws_route53_record" "external_validation_subdomain" {
+
+  count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
 
   allow_overwrite = true
@@ -44,12 +54,13 @@ resource "aws_route53_record" "external_validation_subdomain" {
 }
 
 // Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
-
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+// Provider, zone and name dependent on production or non-production environment
+resource "aws_route53_record" "external-prod" {
+  count    = local.is-production ? 1 : 0
+  provider = aws.core-network-services
+  zone_id  = data.aws_route53_zone.application_zone.zone_id
+  name     = "wardship-agreements-register.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = aws_lb.wardship_lb.dns_name
@@ -58,50 +69,12 @@ resource "aws_route53_record" "external" {
   }
 }
 
-// PRODUCTION DNS CONFIGURATION
-
-// ACM Public Certificate
-resource "aws_acm_certificate" "external_prod" {
-  count = local.is-production ? 1 : 0
-
-  domain_name       = "wardship-agreements-register.service.justice.gov.uk"
-  validation_method = "DNS"
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-resource "aws_acm_certificate_validation" "external_prod" {
-  count = local.is-production ? 1 : 0
-
-  certificate_arn         = aws_acm_certificate.external_prod[0].arn
-  validation_record_fqdns = [aws_route53_record.external_validation_prod[0].fqdn]
-  timeouts {
-    create = "10m"
-  }
-}
-
-// Route53 DNS record for certificate validation
-resource "aws_route53_record" "external_validation_prod" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
-
-  allow_overwrite = true
-  name            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_name
-  records         = [tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_value]
-  type            = tolist(aws_acm_certificate.external_prod[0].domain_validation_options)[0].resource_record_type
-  zone_id         = data.aws_route53_zone.application_zone.zone_id
-  ttl             = 60
-}
-
-// Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "external_prod" {
-  count    = local.is-production ? 1 : 0
-  provider = aws.core-network-services
-
-  zone_id = data.aws_route53_zone.application_zone.zone_id
-  name    = "wardship-agreements-register.service.justice.gov.uk"
-  type    = "A"
+resource "aws_route53_record" "external" {
+  count    = local.is-production ? 0 : 1
+  provider = aws.core-vpc
+  zone_id  = data.aws_route53_zone.external.zone_id
+  name     = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
 
   alias {
     name                   = aws_lb.wardship_lb.dns_name

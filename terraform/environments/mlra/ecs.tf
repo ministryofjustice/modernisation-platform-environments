@@ -10,7 +10,6 @@ module "mlra-ecs" {
   vpc_all                     = local.vpc_all
   app_name                    = local.application_name
   container_instance_type     = local.application_data.accounts[local.environment].container_instance_type
-  ami_image_id                = local.application_data.accounts[local.environment].ami_image_id
   instance_type               = local.application_data.accounts[local.environment].instance_type
   user_data                   = local.user_data
   key_name                    = local.application_data.accounts[local.environment].key_name
@@ -35,9 +34,7 @@ module "mlra-ecs" {
   region                      = local.application_data.accounts[local.environment].region
   account_number              = local.environment_management.account_ids[terraform.workspace]
   maatdb_password_secret_name = local.maatdb_password_secret_name
-  ga_4_tag_id_secret_name2    = local.ga_4_tag_id_secret_name2
   gtm_id_secret_name          = local.gtm_id_secret_name
   ecs_target_capacity         = local.ecs_target_capacity
   environment                 = local.environment
-
 }

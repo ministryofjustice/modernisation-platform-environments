@@ -7,7 +7,7 @@ module "weblogic_eis" {
 
   container_vars_default = {
     "LDAP_PORT" : var.ldap_config.port,
-    "LDAP_HOST" : module.ldap.nlb_dns_name,
+    "LDAP_HOST" : module.ldap_ecs.nlb_dns_name,
     "AWS_XRAY_TRACING_NAME" : "weblogic-eis",
     "COOKIE_SECURE" : "true",
     "DELIUS_API_URL" : "todo",
@@ -43,8 +43,8 @@ module "weblogic_eis" {
   container_secrets_default = {
     "JDBC_URL" : aws_ssm_parameter.jdbc_url.arn,
     "JDBC_PASSWORD" : aws_ssm_parameter.jdbc_password.arn,
-    "LDAP_PRINCIPAL" : module.ldap.delius_core_ldap_principal_arn,
-    "LDAP_CREDENTIAL" : module.ldap.delius_core_ldap_bind_password_arn,
+    "LDAP_PRINCIPAL" : aws_ssm_parameter.ldap_principal.arn,
+    "LDAP_CREDENTIAL" : aws_ssm_parameter.ldap_bind_password.arn,
     "MERGE_SECRET" : data.aws_ssm_parameter.delius_core_merge_api_client_secret.arn,
     "PDFCREATION_SECRET" : data.aws_ssm_parameter.pdfcreation_secret.arn,
     "USERMANAGEMENT_SECRET" : data.aws_ssm_parameter.usermanagement_secret.arn
@@ -68,9 +68,16 @@ module "weblogic_eis" {
   container_memory = var.delius_microservice_configs.weblogic_eis.container_memory
   container_cpu    = var.delius_microservice_configs.weblogic_eis.container_cpu
 
-  health_check_path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
-  health_check_grace_period_seconds = 600
-  health_check_interval             = 30
+  alb_health_check = {
+    path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    healthy_threshold    = 5
+    interval             = 30
+    protocol             = "HTTP"
+    unhealthy_threshold  = 5
+    matcher              = "200-499"
+    timeout              = 10
+    grace_period_seconds = 300
+  }
 
   db_ingress_security_groups = []
 

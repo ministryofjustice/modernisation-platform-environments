@@ -2,15 +2,14 @@ version: 1.0
 tasks:
 - task: executeScript
   inputs:
-  - frequency: once
+  - frequency: always
     type: powershell
     runAs: admin
     content: |-
       # Join computer to domain if not already joined
       if (! ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) ) {
-        Set-DnsClientServerAddress Ethernet -ServerAddresses ("${ad_ip_list[0]}","${ad_ip_list[1]}")
         # Server is not joined to the domain
-        $domainJoinUserName = (Get-SECSecretValue -SecretId ${ad_username_secret_name}).SecretString
+        $domainJoinUserName = "${ad_domain_name}\Admin"
         $domainJoinPassword = ConvertTo-SecureString((Get-SECSecretValue -SecretId ${ad_password_secret_name}).SecretString) -AsPlainText -Force
         $domainJoinCredential = New-Object System.Management.Automation.PSCredential($domainJoinUserName, $domainJoinPassword)
         $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token

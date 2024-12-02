@@ -1,4 +1,5 @@
 module "s3_bucket_migration" {
+  #checkov:skip=CKV_TF_1
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 
@@ -60,7 +61,7 @@ module "s3_bucket_migration" {
       principals = {
         type = "AWS"
         identifiers = [
-          module.ldap_ecs_policies.task_role.arn
+          var.task_role_arn
         ]
       }
     }
@@ -100,6 +101,7 @@ module "s3_bucket_migration" {
 
 # Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
+  #checkov:skip=CKV_TF_1
 
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
 

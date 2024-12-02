@@ -3,7 +3,7 @@ data "aws_availability_zones" "available" {}
 data "aws_prefix_list" "s3" {
   name = "com.amazonaws.eu-west-2.s3"
 
-  depends_on = [module.vpc_endpoints]
+  depends_on = [module.isolated_vpc_endpoints]
 }
 
 data "aws_secretsmanager_secret_version" "slack_token" {
@@ -16,4 +16,28 @@ data "aws_secretsmanager_secret_version" "govuk_notify_api_key" {
 
 data "aws_secretsmanager_secret_version" "govuk_notify_templates" {
   secret_id = aws_secretsmanager_secret.govuk_notify_templates.id
+}
+
+data "aws_ssm_parameter" "datasync_ami" {
+  name = "/aws/service/datasync/ami"
+}
+
+data "external" "external_ip" {
+  program = ["bash", "${path.module}/scripts/get-ip-address.sh"]
+}
+
+data "dns_a_record_set" "datasync_activation_nlb" {
+  host = module.datasync_activation_nlb.dns_name
+}
+
+data "aws_network_interface" "datasync_vpc_endpoint" {
+  id = tolist(module.connected_vpc_endpoints.endpoints["datasync"].network_interface_ids)[0]
+}
+
+data "aws_ec2_transit_gateway" "moj_tgw" {
+  id = "tgw-026162f1ba39ce704"
+}
+
+data "aws_secretsmanager_secret_version" "datasync_dom1" {
+  secret_id = module.datasync_dom1_secret.secret_id
 }

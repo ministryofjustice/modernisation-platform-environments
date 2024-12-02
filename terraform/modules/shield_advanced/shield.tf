@@ -24,7 +24,7 @@ locals {
   shield_protections = {
     for k, v in local.shield_protections_json : k => jsondecode(v)
     if !(contains(var.excluded_protections, k)) &&
-       !can(regex("eipalloc", jsondecode(v)["ResourceArn"]))
+    !can(regex("eipalloc", jsondecode(v)["ResourceArn"]))
   }
 }
 
@@ -89,4 +89,16 @@ resource "aws_wafv2_web_acl" "main" {
       }
     }
   }
+}
+
+resource "aws_cloudwatch_log_group" "waf" {
+  count             = var.enable_logging ? 1 : 0
+  name              = "aws-waf-logs-${data.external.shield_waf.result["name"]}"
+  retention_in_days = var.log_retention_in_days
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "waf" {
+  count                   = var.enable_logging ? 1 : 0
+  log_destination_configs = try([aws_cloudwatch_log_group.waf[0].arn], [])
+  resource_arn            = aws_wafv2_web_acl.main.arn
 }

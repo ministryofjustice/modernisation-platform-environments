@@ -3,7 +3,7 @@ module "vpc_endpoints_security_group" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.1.2"
+  version = "5.2.0"
 
   name        = "${module.vpc.name}-vpc-endpoints"
   description = "VPC endpoints security group"
@@ -21,7 +21,7 @@ module "rds_security_group" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.1.2"
+  version = "5.2.0"
 
   name = "rds"
 
@@ -35,6 +35,23 @@ module "rds_security_group" {
       cidr_blocks = join(",", module.vpc.private_subnets_cidr_blocks)
     },
   ]
+
+  tags = local.tags
+}
+
+module "quicksight_shared_vpc_security_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.2.0"
+
+  name = "quicksight-shared-vpc"
+
+  vpc_id = data.aws_vpc.shared.id
+
+  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_rules       = ["all-all"]
 
   tags = local.tags
 }

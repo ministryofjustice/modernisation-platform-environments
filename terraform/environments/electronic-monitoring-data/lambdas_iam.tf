@@ -7,16 +7,6 @@ resource "aws_iam_role" "create_athena_table_lambda" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_vpc_access_execution" {
-  role       = aws_iam_role.create_athena_table_lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.create_athena_table_lambda.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
 resource "aws_iam_role_policy_attachment" "get_glue_connections_and_tables" {
   role       = aws_iam_role.create_athena_table_lambda.name
   policy_arn = aws_iam_policy.get_glue_connections_and_tables.arn
@@ -83,7 +73,7 @@ data "aws_iam_policy_document" "get_s3_output" {
       "s3:ListObjects"
     ]
     resources = [
-      "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*"
+      "${module.s3-dms-target-store-bucket.bucket.arn}/*"
     ]
   }
   statement {
@@ -92,7 +82,7 @@ data "aws_iam_policy_document" "get_s3_output" {
       "s3:ListBucket"
     ]
     resources = [
-      aws_s3_bucket.dms_target_ep_s3_bucket.arn
+      module.s3-dms-target-store-bucket.bucket.arn
     ]
   }
 }
@@ -146,7 +136,7 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
       "s3:PutObjectAcl"
     ]
     resources = [
-      "${module.metadata-s3-bucket.bucket.arn}/*"
+      "${module.s3-metadata-bucket.bucket.arn}/*"
     ]
   }
   statement {
@@ -155,168 +145,9 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
       "s3:ListBucket"
     ]
     resources = [
-      module.metadata-s3-bucket.bucket.arn
+      module.s3-metadata-bucket.bucket.arn
     ]
   }
-}
-
-
-
-# ------------------------------------------------
-# Write Metadata to AP
-# ------------------------------------------------
-
-locals {
-  metadata_ap_bucket = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
-}
-
-resource "aws_iam_role" "send_metadata_to_ap" {
-  name               = "send_metadata_to_ap"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_lambda_vpc_access_execution" {
-  role       = aws_iam_role.send_metadata_to_ap.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.send_metadata_to_ap.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
-
-resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_write_meta_to_s3" {
-  role       = aws_iam_role.send_metadata_to_ap.name
-  policy_arn = aws_iam_policy.get_meta_from_s3.arn
-}
-
-resource "aws_iam_policy" "get_meta_from_s3" {
-  name   = "get_meta_from_s3"
-  policy = data.aws_iam_policy_document.get_meta_from_s3.json
-}
-
-resource "aws_iam_policy" "write_to_ap_s3" {
-  name   = "write_to_ap_s3"
-  policy = data.aws_iam_policy_document.write_to_ap_s3.json
-}
-
-resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_write_to_ap_s3" {
-  role       = aws_iam_role.send_metadata_to_ap.name
-  policy_arn = aws_iam_policy.write_to_ap_s3.arn
-}
-
-data "aws_iam_policy_document" "get_meta_from_s3" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:ListObjects",
-      "s3:GetObject"
-    ]
-    resources = [
-      "${module.metadata-s3-bucket.bucket.arn}/*"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket"
-    ]
-    resources = [
-      module.metadata-s3-bucket.bucket.arn
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "write_to_ap_s3" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket"
-    ]
-    resources = [
-      "arn:aws:s3:::${local.metadata_ap_bucket}"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl"
-    ]
-    resources = [
-      "arn:aws:s3:::${local.metadata_ap_bucket}/electronic_monitoring/*"
-    ]
-  }
-}
-
-# ------------------------------------------
-# Send table to AP
-# ------------------------------------------
-
-resource "aws_iam_role" "send_table_to_ap" {
-  name               = "send_table_to_ap"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-resource "aws_iam_role_policy_attachment" "send_table_to_ap_lambda_vpc_access_execution" {
-  role       = aws_iam_role.send_table_to_ap.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "send_table_to_ap_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.send_table_to_ap.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
-
-locals {
-  land_bucket = local.is-production ? "mojap-land" : "mojap-land-dev"
-}
-
-data "aws_iam_policy_document" "get_parquet_files" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket",
-    ]
-    resources = [
-      aws_s3_bucket.dms_target_ep_s3_bucket.arn,
-      "${aws_s3_bucket.dms_target_ep_s3_bucket.arn}/*",
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket"
-    ]
-    resources = [
-      "arn:aws:s3:::${local.land_bucket}"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl"
-    ]
-    resources = [
-      "arn:aws:s3:::${local.land_bucket}/electronic_monitoring/load/*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "get_parquet_files" {
-  name   = "get_parquet_files"
-  policy = data.aws_iam_policy_document.get_parquet_files.json
-}
-
-resource "aws_iam_role_policy_attachment" "send_table_to_ap_get_parquet_files" {
-  role       = aws_iam_role.send_table_to_ap.name
-  policy_arn = aws_iam_policy.get_parquet_files.arn
 }
 
 # ------------------------------------------------
@@ -326,11 +157,6 @@ resource "aws_iam_role_policy_attachment" "send_table_to_ap_get_parquet_files" {
 resource "aws_iam_role" "query_output_to_list" {
   name               = "query_output_to_list"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-resource "aws_iam_role_policy_attachment" "query_output_to_list_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.query_output_to_list.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
 }
 
 
@@ -343,21 +169,11 @@ resource "aws_iam_role" "get_file_keys_for_table" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_lambda_vpc_access_execution" {
-  role       = aws_iam_role.get_file_keys_for_table.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "get_file_keys_for_table_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.get_file_keys_for_table.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
 data "aws_iam_policy_document" "list_target_s3_bucket" {
   statement {
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = [aws_s3_bucket.dms_target_ep_s3_bucket.arn]
+    resources = [module.s3-dms-target-store-bucket.bucket.arn]
   }
 }
 
@@ -379,11 +195,6 @@ resource "aws_iam_role" "update_log_table" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-resource "aws_iam_role_policy_attachment" "update_log_table_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.update_log_table.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
 data "aws_iam_policy_document" "get_log_s3_files" {
   statement {
     effect = "Allow"
@@ -395,8 +206,8 @@ data "aws_iam_policy_document" "get_log_s3_files" {
       "s3:DeleteObject"
     ]
     resources = [
-      aws_s3_bucket.dms_dv_parquet_s3_bucket.arn,
-      "${aws_s3_bucket.dms_dv_parquet_s3_bucket.arn}/*"
+      module.s3-dms-data-validation-bucket.bucket.arn,
+      "${module.s3-dms-data-validation-bucket.bucket.arn}/*"
     ]
   }
 }
@@ -430,8 +241,8 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*",
-      aws_s3_bucket.data_store.arn
+      "${module.s3-data-bucket.bucket.arn}/*",
+      module.s3-data-bucket.bucket.arn
     ]
   }
   statement {
@@ -443,8 +254,8 @@ data "aws_iam_policy_document" "extract_metadata_from_atrium_unstructured_s3_pol
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${module.json-directory-structure-bucket.bucket.arn}/*",
-      module.json-directory-structure-bucket.bucket.arn
+      "${module.s3-json-directory-structure-bucket.bucket.arn}/*",
+      module.s3-json-directory-structure-bucket.bucket.arn
     ]
   }
 }
@@ -460,22 +271,12 @@ resource "aws_iam_role_policy_attachment" "extract_metadata_from_atrium_unstruct
   policy_arn = aws_iam_policy.extract_metadata_from_atrium_unstructured_s3_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "extract_metadata_from_atrium_unstructured_vpc_access_execution" {
-  role       = aws_iam_role.extract_metadata_from_atrium_unstructured.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "extract_metadata_from_atrium_unstructured_sqs_queue_access_execution" {
-  role       = aws_iam_role.extract_metadata_from_atrium_unstructured.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
 resource "aws_lambda_permission" "s3_allow_output_file_structure_as_json_from_zip" {
   statement_id  = "AllowOutputFileStructureAsJsonFromZipExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
   function_name = module.output_file_structure_as_json_from_zip.lambda_function_arn
   principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.data_store.arn
+  source_arn    = module.s3-data-bucket.bucket.arn
 }
 
 
@@ -501,12 +302,12 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${module.json-directory-structure-bucket.bucket.arn}/*",
-      module.json-directory-structure-bucket.bucket.arn,
-      "${module.athena-s3-bucket.bucket.arn}/*",
-      module.athena-s3-bucket.bucket.arn,
-      module.metadata-s3-bucket.bucket.arn,
-      "${module.metadata-s3-bucket.bucket.arn}/*",
+      "${module.s3-json-directory-structure-bucket.bucket.arn}/*",
+      module.s3-json-directory-structure-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
+      module.s3-athena-bucket.bucket.arn,
+      module.s3-metadata-bucket.bucket.arn,
+      "${module.s3-metadata-bucket.bucket.arn}/*",
     ]
   }
   statement {
@@ -558,17 +359,6 @@ resource "aws_iam_role_policy_attachment" "load_json_table_s3_policy_policy_atta
   policy_arn = aws_iam_policy.load_json_table.arn
 }
 
-resource "aws_iam_role_policy_attachment" "load_json_table_vpc_access_execution" {
-  role       = aws_iam_role.load_json_table.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "load_json_table_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.load_json_table.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
-
 # ------------------------------------------
 # unzip fip
 # ------------------------------------------
@@ -589,8 +379,8 @@ data "aws_iam_policy_document" "place_unzipped_file_s3_policy_document" {
       "s3:GetBucketLocation"
     ]
     resources = [
-      "${module.unzipped-s3-data-store.bucket.arn}/*",
-      module.unzipped-s3-data-store.bucket.arn,
+      "${module.s3-unzipped-files-bucket.bucket.arn}/*",
+      module.s3-unzipped-files-bucket.bucket.arn,
     ]
   }
 }
@@ -604,7 +394,7 @@ data "aws_iam_policy_document" "get_zip_file_s3_policy_document" {
       "s3:GetObjectAttributes",
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*.zip",
+      "${module.s3-data-bucket.bucket.arn}/*.zip",
     ]
   }
 }
@@ -618,7 +408,7 @@ data "aws_iam_policy_document" "list_data_store_bucket_s3_policy_document" {
       "s3:GetBucketLocation",
     ]
     resources = [
-      aws_s3_bucket.data_store.arn,
+      module.s3-data-bucket.bucket.arn,
     ]
   }
 }
@@ -657,16 +447,6 @@ resource "aws_iam_role_policy_attachment" "place_unzip_single_file_s3_policy_pol
   policy_arn = aws_iam_policy.place_unzip_single_file.arn
 }
 
-resource "aws_iam_role_policy_attachment" "unzip_single_file_vpc_access_execution" {
-  role       = aws_iam_role.unzip_single_file.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-resource "aws_iam_role_policy_attachment" "unzip_single_file_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.unzip_single_file.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
-}
-
 # ----------------------------
 # unzipped_presigned_url
 # ----------------------------
@@ -685,8 +465,8 @@ data "aws_iam_policy_document" "get_unzipped_presigned_url_file_s3_policy_docume
       "s3:GetObject"
     ]
     resources = [
-      "${module.unzipped-s3-data-store.bucket.arn}/*",
-      module.unzipped-s3-data-store.bucket.arn,
+      "${module.s3-unzipped-files-bucket.bucket.arn}/*",
+      module.s3-unzipped-files-bucket.bucket.arn,
     ]
   }
 }
@@ -703,13 +483,141 @@ resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_s3_policy_poli
   policy_arn = aws_iam_policy.unzipped_presigned_url_s3.arn
 }
 
+#-----------------------------------------------------------------------------------
+# Rotate IAM keys
+#-----------------------------------------------------------------------------------
 
-resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_vpc_access_execution" {
-  role       = aws_iam_role.unzipped_presigned_url.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+resource "aws_iam_role" "rotate_iam_keys" {
+  name               = "rotate-iam-keys-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-resource "aws_iam_role_policy_attachment" "unzipped_presigned_url_lambda_sqs_queue_access_execution" {
-  role       = aws_iam_role.unzipped_presigned_url.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+#-----------------------------------------------------------------------------------
+# Virus scanning - definition upload
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "virus_scan_definition_upload" {
+  name               = "virus_scan_definition_upload"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "virus_scan_definition_upload_policy_document" {
+  statement {
+    sid    = "AllowS3"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = ["${module.s3-clamav-definitions-bucket.bucket.arn}/*"]
+  }
+}
+
+resource "aws_iam_policy" "virus_scan_definition_upload" {
+  name        = "virus-scan-definitions-upload-policy"
+  description = "Policy for Lambda to get and upload latest clamav virus definitions"
+  policy      = data.aws_iam_policy_document.virus_scan_definition_upload_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "virus_scan_definition_upload_policy_attachment" {
+  role       = aws_iam_role.virus_scan_definition_upload.name
+  policy_arn = aws_iam_policy.virus_scan_definition_upload.arn
+}
+
+#-----------------------------------------------------------------------------------
+# Virus scanning - file scanning
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "virus_scan_file" {
+  name               = "virus_scan_file"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "virus_scan_file_policy_document" {
+  statement {
+    sid    = "S3PermissionsForScanDefinitionsBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = ["${module.s3-clamav-definitions-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "S3PermissionsForReceivedBucket"
+    effect = "Allow"
+    actions = [
+      "s3:CopyObject",
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:GetObjectTagging",
+    ]
+    resources = ["${module.s3-received-files-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "S3PermissionsForQuarantineAndProcessedBucket"
+    effect = "Allow"
+    actions = [
+      "s3:CopyObject",
+      "s3:PutObject",
+      "s3:GetObjectTagging",
+      "s3:PutObjectTagging",
+    ]
+    resources = [
+      "${module.s3-quarantine-files-bucket.bucket.arn}/*",
+      "${module.s3-data-bucket.bucket.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "virus_scan_file" {
+  name        = "virus-scan-file-policy"
+  description = "Policy for Lambda to virus scan and move files"
+  policy      = data.aws_iam_policy_document.virus_scan_file_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "virus_scan_file_policy_attachment" {
+  role       = aws_iam_role.virus_scan_file.name
+  policy_arn = aws_iam_policy.virus_scan_file.arn
+}
+
+#-----------------------------------------------------------------------------------
+# Load FMS JSON data
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "format_json_fms_data" {
+  name               = "format_json_fms_data"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "format_json_fms_data_policy_document" {
+  statement {
+    sid    = "S3PermissionsForGetUnformattedJSONFiles"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "S3PermissionsForPutFormattedJSONFiles"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+    ]
+    resources = [
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "format_json_fms_data" {
+  name        = "format-json-fms-data"
+  description = "Policy for Lambda to virus scan and move files"
+  policy      = data.aws_iam_policy_document.format_json_fms_data_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "format_json_fms_data_policy_attachment" {
+  role       = aws_iam_role.format_json_fms_data.name
+  policy_arn = aws_iam_policy.format_json_fms_data.arn
 }

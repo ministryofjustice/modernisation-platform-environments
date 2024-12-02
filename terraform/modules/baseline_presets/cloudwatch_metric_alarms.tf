@@ -329,6 +329,35 @@ locals {
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
+    ec2_instance_cwagent_collectd_endpoint_monitoring = {
+      "endpoint-down" = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "collectd_endpoint_status_value"
+        namespace           = "CWAgent"
+        period              = "60"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if curl returns error for given endpoint from this EC2. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295505478"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      "endpoint-cert-expires-soon" = {
+        comparison_operator = "LessThanThreshold"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
+        metric_name         = "collectd_endpoint_cert_expiry_value"
+        namespace           = "CWAgent"
+        period              = "7200"
+        statistic           = "Minimum"
+        threshold           = "14"
+        alarm_description   = "Triggers if collectd-endpoint-monitoring detects an endpoint with a certificate due to expire shortly. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5303664662"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+    }
+
     lb = {
       unhealthy-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -347,8 +376,8 @@ locals {
     network_lb = {
       unhealthy-network-load-balancer-host = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
-        datapoints_to_alarm = "3"
+        evaluation_periods  = "1"
+        datapoints_to_alarm = "1"
         metric_name         = "UnHealthyHostCount"
         namespace           = "AWS/NetworkELB"
         period              = "60"
@@ -359,99 +388,86 @@ locals {
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
-    ebs = {
-      volume_disk_iops_reached = {
+
+    ssm = {
+      failed-ssm-command = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
-        metric_name         = "ebs_volume_disk_iops"
-        period              = "60"
-        namespace           = "AWS/EBS"
+        evaluation_periods  = "24"
+        datapoints_to_alarm = "1"
+        metric_name         = "SSMCommandFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
         statistic           = "Maximum"
-        threshold           = "14400"
-        treat_missing_data  = "notBreaching"
-        alarm_description   = "Triggers if Volume disk IOPS limit is greater than or equal to 90%"
+        threshold           = "1"
+        alarm_description   = "Triggers if there has been a failed scheduled SSM command. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5291475023"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
-        metric_query = {
-          id          = "e3"
-          expression  = "e1+e2"
-          label       = "Total IOPs"
-          return_data = "true"
-        }
-        metric_query = {
-          id         = "e1"
-          expression = "m1/PERIOD(m1)"
-          label      = "Read IOPs"
-          metric = {
-            metric_name = "VolumeReadOps"
-            namespace   = "AWS/EBS"
-            period      = 60
-            stat        = "Max"
-            dimensions = {
-              VolumeId = "*"
-            }
-          }
-        }
-        metric_query = {
-          id         = "e2"
-          expression = "m2/PERIOD(m2)"
-          label      = "Write IOPs"
-          metric = {
-            metric_name = "VolumeWriteOps"
-            namespace   = "AWS/EBS"
-            period      = 60
-            stat        = "Max"
-            dimensions = {
-              VolumeId = "*"
-            }
-          }
-        }
       }
-      volume_disk_throughput_reached = {
-        comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "5"
-        datapoints_to_alarm = "5"
-        metric_name         = "ebs_volume_disk_throughput"
-        period              = "60"
-        namespace           = "AWS/EBS"
-        statistic           = "Maximum"
-        threshold           = "900"
-        treat_missing_data  = "notBreaching"
-        alarm_description   = "Triggers if Volume disk throughput limit is greater than or equal to 90%"
+      ssm-command-metrics-missing = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "SSMCommandFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if there are missing SSM command metrics. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295505553"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
-        metric_query = {
-          id          = "e1"
-          expression  = "((m1+m2)/1048576)/PERIOD(m1)"
-          label       = "Total Throughput (MiB/s)"
-          return_data = true
-        }
-        metric_query = {
-          id = "m1"
-          metric = {
-            metric_name = "VolumeReadOps"
-            namespace   = "AWS/EBS"
-            period      = 60
-            stat        = "Sum"
-            dimensions = {
-              VolumeId = "*"
-            }
-          }
-        }
-        metric_query = {
-          id = "m2"
-          metric = {
-            metric_name = "VolumeWriteOps"
-            namespace   = "AWS/EBS"
-            period      = 60
-            stat        = "Sum"
-            dimensions = {
-              VolumeId = "*"
-            }
-          }
-        }
+      }
+    }
+
+    github = {
+      failed-github-action-run = {
+        comparison_operator = "GreaterThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "1"
+        metric_name         = "GitHubActionRunsFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "Maximum"
+        threshold           = "1"
+        alarm_description   = "Triggers if there has been a failed github action. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295898661"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
+      }
+      github-action-metrics-missing = {
+        comparison_operator = "LessThanOrEqualToThreshold"
+        evaluation_periods  = "3"
+        datapoints_to_alarm = "3"
+        metric_name         = "GitHubActionRunsFailedCount"
+        namespace           = "CustomMetrics"
+        period              = "3600"
+        statistic           = "SampleCount"
+        threshold           = "0"
+        treat_missing_data  = "breaching"
+        alarm_description   = "Triggers if there are missing github action metrics. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295702082"
+        alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
+        ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
     }
   }
+
+  cloudwatch_metric_alarms_by_sns_topic = {
+    for sns_key, sns_value in local.sns_topics : sns_key => {
+      for namespace_key, namespace_value in local.cloudwatch_metric_alarms : namespace_key => {
+        for alarm_key, alarm_value in namespace_value : alarm_key => merge(alarm_value, {
+          alarm_actions = [sns_key]
+          ok_actions    = [sns_key]
+        })
+      }
+    }
+  }
+
+  # alarms added via baseline. Put SSM command alerts in dso-pipelines so it doesn't clutter main application alerts
+  cloudwatch_metric_alarms_baseline = merge(
+    var.options.enable_ssm_command_monitoring ? {
+      "failed-ssm-command-${var.environment.account_name}" = local.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].ssm.failed-ssm-command
+    } : {},
+    var.options.enable_ssm_missing_metric_monitoring ? {
+      "ssm-command-metrics-missing-${var.environment.account_name}" = local.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].ssm.ssm-command-metrics-missing
+    } : {},
+  )
 }

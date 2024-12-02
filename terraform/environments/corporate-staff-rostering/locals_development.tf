@@ -159,13 +159,5 @@ locals {
         }
       }
     }
-
-    secretsmanager_secrets = {
-      "/activedirectory/devtest/aws-lambda" = {
-        secrets = {
-          passwords = { description = "active directory lambda service account" }
-        }
-      }
-    }
   }
 }

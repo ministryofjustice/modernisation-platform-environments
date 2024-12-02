@@ -34,3 +34,4 @@ variable "user_accounts" {
 variable "vpc_id" {
   description = "The vpc used for the SFTP server"
 }
+

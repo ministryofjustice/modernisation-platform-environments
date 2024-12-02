@@ -1,8 +1,3 @@
-variable "ami_image_id" {
-  type        = string
-  description = "EC2 AMI image to run in the ECS cluster"
-}
-
 variable "app_count" {
   type        = string
   description = "Number of docker containers to run"
@@ -167,11 +162,6 @@ variable "account_number" {
 variable "maatdb_password_secret_name" {
   type        = string
   description = "Parameter store secret name containing the MAATDB database password"
-}
-
-variable "ga_4_tag_id_secret_name2" {
-  type        = string
-  description = "Parameter store secret name containing the Google Analytics 4 Tag Id - version 2 updated value"
 }
 
 variable "gtm_id_secret_name" {

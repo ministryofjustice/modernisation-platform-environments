@@ -49,7 +49,7 @@ resource "aws_security_group" "tribunals_lb_sc" {
 
 resource "aws_lb_target_group" "tribunals_target_group" {
   for_each             = var.services
-  name                 = "${each.value.name_prefix}-tg"
+  name                 = "${each.value.module_key}-tg"
   port                 = each.value.port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -77,6 +77,8 @@ data "aws_instances" "tribunals_instance" {
   }
 }
 
+# Make sure that the ec2 instance tagged as 'tribunals-instance' exists
+# before adding aws_lb_target_group_attachment, otherwise terraform will fail
 resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
   for_each         = aws_lb_target_group.tribunals_target_group
   target_group_arn = each.value.arn
@@ -86,7 +88,7 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
 
 resource "aws_lb_listener" "tribunals_lb" {
   depends_on = [
-    aws_acm_certificate.external
+    aws_acm_certificate_validation.external
   ]
   certificate_arn   = aws_acm_certificate.external.arn
   load_balancer_arn = aws_lb.tribunals_lb.arn
@@ -103,6 +105,7 @@ resource "aws_lb_listener" "tribunals_lb" {
     }
   }
 }
+
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
@@ -119,9 +122,4 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
       values = ["*${each.key}.*"]
     }
   }
-}
-
-resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
-  resource_arn = aws_lb.tribunals_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
 }

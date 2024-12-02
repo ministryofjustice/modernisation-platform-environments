@@ -30,3 +30,21 @@ output "rds_endpoint" {
 output "rds_port" {
   value = var.create_rds ? aws_db_instance.this[0].port : null
 }
+
+output "nlb_arn" {
+  value = aws_lb.delius_microservices.arn
+}
+
+output "nlb_dns_name" {
+  value = aws_lb.delius_microservices.dns_name
+}
+
+output "nlb_target_group_arn_map" {
+  value = {
+    for k, v in aws_lb_target_group.service : k => v.arn
+  }
+}
+
+output "nlb_service_r53_record" {
+  value = aws_route53_record.services_nlb_r53_record.fqdn
+}

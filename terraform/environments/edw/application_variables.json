@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-      "edw_AppName": "EDW2",
+      "edw_AppName": "EDW",
       "edw_environment": "dev",
       "edw_region": "eu-west-2",
       "edw_ec2_ami_id": "ami-012aa1576af4948d1",
@@ -65,7 +65,10 @@
       "orahome_snapshot_id": "snap-0d993d189ad092cac",
       "oraarch_snapshot_id": "snap-0cf815da06fcc1115",
       "software_snapshot_id": "snap-05c64a90c08debf2a",
-      "oraredo_snapshot_id": "snap-09bdeb4217c0bdab0"
+      "oraredo_snapshot_id": "snap-09bdeb4217c0bdab0",
+      "old_mail_server_url": "mail.aws.dev.legalservices.gov.uk",
+      "old_domain_name": "dev.legalservices.gov.uk",
+      "laa_mail_relay_url": "laa-mail.laa-development.modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "example_var": "test-data"

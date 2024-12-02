@@ -148,30 +148,46 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
   name        = "aws_iam_policy_for_terraform_aws_lambda_role"
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role"
-  policy      = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Effect": "Allow",
-     "Action": [
-       "logs:CreateLogGroup",
-       "logs:CreateLogStream",
-       "logs:PutLogEvents"
-     ],
-     "Resource": "arn:aws:logs:*:*:*"
-    },
-   {
-     "Effect": "Allow",
-     "Action": [
-        "ec2:Start*",
-        "ec2:Stop*"
-      ],
-      "Resource": "*"
-   }
- ]
-}
-EOF
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:Start*",
+          "ec2:Stop*"
+        ],
+        "Resource" : [
+          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+        ]
+    }]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_to_lambda_role" {
@@ -209,41 +225,47 @@ resource "aws_iam_policy" "iam_policy_for_lambda_alarm_suppression" {
   name        = "aws_iam_policy_for_terraform_aws_lambda_role_alarm_suppression"
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role alarm suppression"
-  policy      = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Effect": "Allow",
-     "Action": [
-       "logs:CreateLogGroup",
-       "logs:CreateLogStream",
-       "logs:PutLogEvents"
-     ],
-     "Resource": "arn:aws:logs:*:*:*"
-    },
-   {
-     "Effect": "Allow",
-     "Action": [
-        "cloudwatch:DisableAlarmActions",
-        "cloudwatch:EnableAlarmActions"
-      ],
-      "Resource": [
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-014bce95a85aaeede",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-00cbccc46d25e77c6",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-0dba6054c0f5f7a11",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-0b5ef7cb90938fb82",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-04bbb6312b86648be",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-00413756d2dfcf6d2",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-080498c4c9d25e6bd",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-i-029d2b17679dab982",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-70%-i-029d2b17679dab982",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:alarm:CPU-High-90%-i-029d2b17679dab982"
-      ]
-   }
- ]
-}
-EOF
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "logs:CreateLogGroup",
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Resource" : [
+            "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+          ]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "cloudwatch:DisableAlarmActions",
+            "cloudwatch:EnableAlarmActions"
+          ],
+          "Resource" : [
+            "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
+          ]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "sqs:ChangeMessageVisibility",
+            "sqs:DeleteMessage",
+            "sqs:GetQueueAttributes",
+            "sqs:GetQueueUrl",
+            "sqs:ListQueueTags",
+            "sqs:ReceiveMessage",
+            "sqs:SendMessage"
+          ],
+          "Resource" : [
+            "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+          ]
+      }]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression" {
@@ -281,31 +303,60 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
   name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_dev"
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda development"
-  policy      = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Effect": "Allow",
-     "Action": [
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Effect" : "Allow",
+      "Action" : [
         "ssm:SendCommand",
-        "ssm:GetCommandInvocation",
-        "ec2:DescribeInstances",
-        "lambda:InvokeAsync",
-        "lambda:InvokeFunction"
+        "ssm:GetCommandInvocation"
       ],
-      "Resource": [
-      "arn:aws:ssm:eu-west-2:075585660276:*",
-      "arn:aws:cloudwatch:eu-west-2:075585660276:*",
-      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
-      "arn:aws:lambda:eu-west-2:075585660276:*",
-      "arn:aws:ec2:eu-west-2:075585660276:*"
+      "Resource" : [
+        "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
+        "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
       ]
-   }
- ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeInstances",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
+        ],
+        "Resource" : [
+          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeAsync",
+          "lambda:InvokeFunction",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
+        ],
+        "Resource" : [
+          "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+    }]
+  })
 }
-EOF
-}
+
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev" {
   count      = local.is-development == true ? 1 : 0
@@ -342,30 +393,58 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_uat" {
   name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_uat"
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda uat"
-  policy      = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Effect": "Allow",
-     "Action": [
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Effect" : "Allow",
+      "Action" : [
         "ssm:SendCommand",
-        "ssm:GetCommandInvocation",
-        "ec2:DescribeInstances",
-        "lambda:InvokeAsync",
-        "lambda:InvokeFunction"
+        "ssm:GetCommandInvocation"
       ],
-      "Resource": [
-      "arn:aws:ssm:eu-west-2:172753231260:*",
-      "arn:aws:cloudwatch:eu-west-2:172753231260:*",
-      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
-      "arn:aws:lambda:eu-west-2:172753231260:*",
-      "arn:aws:ec2:eu-west-2:172753231260:*"
+      "Resource" : [
+        "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*",
+        "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
       ]
-   }
- ]
-}
-EOF
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeInstances",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
+        ],
+        "Resource" : [
+          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeAsync",
+          "lambda:InvokeFunction",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
+        ],
+        "Resource" : [
+          "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
+    }]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat" {
@@ -403,30 +482,58 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_prod" 
   name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_prod"
   path        = "/"
   description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda prod"
-  policy      = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Effect": "Allow",
-     "Action": [
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Effect" : "Allow",
+      "Action" : [
         "ssm:SendCommand",
-        "ssm:GetCommandInvocation",
-        "ec2:DescribeInstances",
-        "lambda:InvokeAsync",
-        "lambda:InvokeFunction"
+        "ssm:GetCommandInvocation"
       ],
-      "Resource": [
-      "arn:aws:ssm:eu-west-2:817985104434:*",
-      "arn:aws:cloudwatch:eu-west-2:817985104434:*",
-      "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript",
-      "arn:aws:lambda:eu-west-2:817985104434:*",
-      "arn:aws:ec2:eu-west-2:817985104434:*"
+      "Resource" : [
+        "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*",
+        "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
       ]
-   }
- ]
-}
-EOF
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeInstances",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
+        ],
+        "Resource" : [
+          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeAsync",
+          "lambda:InvokeFunction",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
+        ],
+        "Resource" : [
+          "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+        ]
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+        ]
+    }]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod" {
@@ -435,12 +542,324 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invok
   policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_prod[0].arn
 }
 
+###########################################################
+# IAM Role & Policy for Lambda Certificate Expiration - DEV
+###########################################################
+
+resource "aws_iam_role" "lambda_role_certificate_expiry_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Certificate_Expiry_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_certificate_expiry_dev"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role certificate expiry development"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy1",
+        "Effect" : "Allow",
+        "Action" : "logs:CreateLogGroup",
+        "Resource" : "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy2",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
+        ]
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy3",
+        "Effect" : "Allow",
+        "Action" : [
+          "acm:DescribeCertificate",
+          "acm:GetCertificate",
+          "acm:ListCertificates",
+          "acm:ListTagsForCertificate"
+        ],
+        "Resource" : [
+          "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:certificate/*"
+        ]
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy4",
+        "Effect" : "Allow",
+        "Action" : "SNS:Publish",
+        "Resource" : [
+          "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy5",
+        "Effect" : "Allow",
+        "Action" : "cloudwatch:ListMetrics",
+        "Resource" : [
+          "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy6",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev" {
+  count      = local.is-development == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_certificate_expiry_dev[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_dev[0].arn
+}
+
+###########################################################
+# IAM Role & Policy for Lambda Certificate Expiration - UAT
+###########################################################
+
+resource "aws_iam_role" "lambda_role_certificate_expiry_uat" {
+  count              = local.is-preproduction == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Certificate_Expiry_UAT"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_certificate_expiry_uat"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role certificate expiry uat"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy1",
+        "Effect" : "Allow",
+        "Action" : "logs:CreateLogGroup",
+        "Resource" : "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy2",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
+        ]
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy3",
+        "Effect" : "Allow",
+        "Action" : [
+          "acm:DescribeCertificate",
+          "acm:GetCertificate",
+          "acm:ListCertificates",
+          "acm:ListTagsForCertificate"
+        ],
+        "Resource" : [
+          "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:certificate/*"
+        ]
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy4",
+        "Effect" : "Allow",
+        "Action" : "SNS:Publish",
+        "Resource" : [
+          "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy5",
+        "Effect" : "Allow",
+        "Action" : "cloudwatch:ListMetrics",
+        "Resource" : [
+          "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
+      },
+      {
+        "Sid" : "LambdaCertificateExpiryPolicy6",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat" {
+  count      = local.is-preproduction == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_certificate_expiry_uat[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_uat[0].arn
+}
+
+############################################################
+# IAM Role & Policy for Lambda Certificate Expiration - PROD
+############################################################
+
+resource "aws_iam_role" "lambda_role_certificate_expiry_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Certificate_Expiry_PROD"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_certificate_expiry_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_certificate_expiry_prod"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role certificate expiry prod"
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Sid" : "LambdaCertificateExpiryPolicy1",
+          "Effect" : "Allow",
+          "Action" : "logs:CreateLogGroup",
+          "Resource" : "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+        },
+        {
+          "Sid" : "LambdaCertificateExpiryPolicy2",
+          "Effect" : "Allow",
+          "Action" : [
+            "logs:CreateLogStream",
+            "logs:PutLogEvents"
+          ],
+          "Resource" : [
+            "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:log-group:/aws/lambda/handle-expiring-certificates:*"
+          ]
+        },
+        {
+          "Sid" : "LambdaCertificateExpiryPolicy3",
+          "Effect" : "Allow",
+          "Action" : [
+            "acm:DescribeCertificate",
+            "acm:GetCertificate",
+            "acm:ListCertificates",
+            "acm:ListTagsForCertificate"
+          ],
+          "Resource" : [
+            "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:certificate/*"
+          ]
+        },
+        {
+          "Sid" : "LambdaCertificateExpiryPolicy4",
+          "Effect" : "Allow",
+          "Action" : "SNS:Publish",
+          "Resource" : [
+            "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+          ]
+        },
+        {
+          "Sid" : "LambdaCertificateExpiryPolicy5",
+          "Effect" : "Allow",
+          "Action" : "cloudwatch:ListMetrics",
+          "Resource" : [
+            "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+          ]
+        },
+        {
+          "Sid" : "LambdaCertificateExpiryPolicy6",
+          "Effect" : "Allow",
+          "Action" : [
+            "sqs:ChangeMessageVisibility",
+            "sqs:DeleteMessage",
+            "sqs:GetQueueAttributes",
+            "sqs:GetQueueUrl",
+            "sqs:ListQueueTags",
+            "sqs:ReceiveMessage",
+            "sqs:SendMessage"
+          ],
+          "Resource" : [
+            "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:Lambda-Queue-Production"
+          ]
+        }
+      ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_certificate_expiry_prod[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_prod[0].arn
+}
+
 ###################
 # SNS IAM Policies
 ###################
 
 ## Production
 
+/*
 data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
   count     = local.is-production == true ? 1 : 0
   policy_id = "SnsTopicId"
@@ -454,12 +873,16 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     actions = [
       "SNS:GetTopicAttributes",
       "SNS:SetTopicAttributes",
+      "SNS:GetSubscriptionAttributes",
+      "SNS:SetSubscriptionAttributes",
       "SNS:AddPermission",
       "SNS:DeleteTopic",
       "SNS:Subscribe",
+      "SNS:Unsubscribe",
+      "SNS:ListSubscriptions",
       "SNS:ListSubscriptionsByTopic",
-      "SNS:Publish",
-      "SNS:Receive"
+      "SNS:ListTopics",
+      "SNS:Publish"
     ]
 
     condition {
@@ -473,41 +896,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     ]
   }
 }
-
-## UAT
-
-data "aws_iam_policy_document" "sns_topic_policy_uat_ec2cw" {
-  count     = local.is-preproduction == true ? 1 : 0
-  policy_id = "SnsUATTopicId"
-  statement {
-    sid = "statement1"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    effect = "Allow"
-    actions = [
-      "SNS:GetTopicAttributes",
-      "SNS:SetTopicAttributes",
-      "SNS:AddPermission",
-      "SNS:DeleteTopic",
-      "SNS:Subscribe",
-      "SNS:ListSubscriptionsByTopic",
-      "SNS:Publish",
-      "SNS:Receive"
-    ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceOwner"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-
-    resources = [
-      aws_sns_topic.cw_uat_alerts[0].arn
-    ]
-  }
-}
+*/
 
 ####################################################
 # IAM User, Policy for MGN
@@ -567,3 +956,312 @@ data "aws_iam_policy_document" "email" {
     resources = ["*"]
   }
 }
+
+############################################################
+# IAM Role & Policy for Lambda Signing Configuration - PROD
+############################################################
+
+resource "aws_iam_role" "aws_signer_role_prod" {
+  count = local.is-production == true ? 1 : 0
+  name  = "Signer-Role-For-Lambda-Production"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "signer.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_policy" "aws_signer_policy_prod" {
+  count = local.is-production == true ? 1 : 0
+  name  = "Signer-Policy-For-Lambda-Production"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "lambda:UpdateFunctionCodeSigningConfig",
+          "lambda:GetFunctionCodeSigningConfig",
+          "lambda:PutFunctionCodeSigningConfig",
+          "lambda:InvokeFunction"
+        ],
+        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:function:*" # Grant access to all Lambda functions in the account
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "signer:StartSigningJob",
+          "signer:DescribeSigningJob",
+          "signer:PutSigningProfile",
+          "signer:GetSigningProfile",
+          "signer:ListSigningJobs"
+        ],
+        Resource = [
+          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002",
+          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002/HzoPedNoUr"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.aws_signer_role_prod[0].name
+  policy_arn = aws_iam_policy.aws_signer_policy_prod[0].arn
+}
+
+############################################################
+# IAM Role & Policy for Lambda Signing Configuration - UAT
+############################################################
+
+resource "aws_iam_role" "aws_signer_role_uat" {
+  count = local.is-preproduction == true ? 1 : 0
+  name  = "Signer-Role-For-Lambda-UAT"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "signer.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_policy" "aws_signer_policy_uat" {
+  count = local.is-preproduction == true ? 1 : 0
+  name  = "Signer-Policy-For-Lambda-UAT"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "lambda:UpdateFunctionCodeSigningConfig",
+          "lambda:GetFunctionCodeSigningConfig",
+          "lambda:PutFunctionCodeSigningConfig",
+          "lambda:InvokeFunction"
+        ],
+        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:function:*" # Grant access to all Lambda functions in the account
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "signer:StartSigningJob",
+          "signer:DescribeSigningJob",
+          "signer:PutSigningProfile",
+          "signer:GetSigningProfile",
+          "signer:ListSigningJobs"
+        ],
+        Resource = [
+          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002",
+          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002/ZYACVFPo1R"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_uat" {
+  count      = local.is-preproduction == true ? 1 : 0
+  role       = aws_iam_role.aws_signer_role_uat[0].name
+  policy_arn = aws_iam_policy.aws_signer_policy_uat[0].arn
+}
+
+############################################################
+# IAM Role & Policy for Lambda Signing Configuration - DEV
+############################################################
+
+resource "aws_iam_role" "aws_signer_role_dev" {
+  count = local.is-development == true ? 1 : 0
+  name  = "Signer-Role-For-Lambda-Dev"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "signer.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_policy" "aws_signer_policy_dev" {
+  count = local.is-development == true ? 1 : 0
+  name  = "Signer-Policy-For-Lambda-Development"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "lambda:UpdateFunctionCodeSigningConfig",
+          "lambda:GetFunctionCodeSigningConfig",
+          "lambda:PutFunctionCodeSigningConfig",
+          "lambda:InvokeFunction"
+        ],
+        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:function:*" # Grant access to all Lambda functions in the account
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "signer:StartSigningJob",
+          "signer:DescribeSigningJob",
+          "signer:PutSigningProfile",
+          "signer:GetSigningProfile",
+          "signer:ListSigningJobs"
+        ],
+        Resource = [
+          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002",
+          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002/AHvOa02ifI"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_dev" {
+  count      = local.is-development == true ? 1 : 0
+  role       = aws_iam_role.aws_signer_role_dev[0].name
+  policy_arn = aws_iam_policy.aws_signer_policy_dev[0].arn
+}
+
+#############################################
+# IAM Role & Policy for Send CPU graph - DEV
+#############################################
+
+resource "aws_iam_role" "lambda_role_cloudwatch_get_metric_data_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Get_Metric_Data_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_get_metric_data_dev"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role cloudwatch get_metric_data development"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Sid" : "CloudwatchMetricPolicy",
+      "Effect" : "Allow",
+      "Action" : [
+        "cloudwatch:*"
+      ],
+      "Resource" : [
+        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+      ]
+      },
+      {
+	      "Sid"     : "S3BucketPolicy",
+        "Effect"  : "Allow",
+        "Action"  : [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        "Resource" : [
+           "arn:aws:s3:::moj-lambda-layers-dev",
+		       "arn:aws:s3:::moj-lambda-layers-dev/*"
+        ]
+      },
+      {
+	      "Sid"     : "SSMPolicy",
+        "Effect"  : "Allow",
+        "Action"  : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+           "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:parameter/klayers-account"
+        ]
+      },
+      {
+        "Sid" : "LogPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      },
+      {
+        "Sid" : "SQSPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:Lambda-Queue-Production"
+        ]
+      },
+      {
+        "Sid" : "SESPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "ses:*"
+        ],
+        "Resource" : [
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
+        ]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev" {
+  count      = local.is-development == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_get_metric_data_dev[0].arn
+}
+
+#resource "aws_iam_policy_attachment" "attach_lambda_read_only_access" {
+#  count      = local.is-development == true ? 1 : 0
+#  name       = "lambda-read-only-access-iam-attachment"
+#  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
+#  policy_arn = "arn:aws:iam::aws:policy/AWSLambda_ReadOnlyAccess"
+#}
+
+#resource "aws_iam_policy_attachment" "attach_ses_full_access" {
+#  count      = local.is-development == true ? 1 : 0
+#  name       = "ses-full-access-iam-attachment"
+#  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
+#  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+#}

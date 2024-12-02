@@ -9,12 +9,12 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.planetfm-development}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.planetfm-test}:role/EC2HmppsDomainSecretsRole",
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-development}:role/LambdaFunctionADObjectCleanUp",
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/LambdaFunctionADObjectCleanUp",
       "arn:aws:iam::${module.environment.account_ids.core-shared-services-production}:role/ad-fixngo-ec2-nonlive-role",
       "arn:aws:iam::${module.environment.account_ids.nomis-development}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-test}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-data-hub-test}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-development}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-test}:role/EC2HmppsDomainSecretsRole",
     ]
     preproduction = []
     production = [
@@ -24,13 +24,13 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-production}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.planetfm-preproduction}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.planetfm-production}:role/EC2HmppsDomainSecretsRole",
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-preproduction}:role/LambdaFunctionADObjectCleanUp",
-      "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-production}:role/LambdaFunctionADObjectCleanUp",
       "arn:aws:iam::${module.environment.account_ids.core-shared-services-production}:role/ad-fixngo-ec2-live-role",
       "arn:aws:iam::${module.environment.account_ids.nomis-preproduction}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-production}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-data-hub-preproduction}:role/EC2HmppsDomainSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-data-hub-production}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-preproduction}:role/EC2HmppsDomainSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.oasys-national-reporting-production}:role/EC2HmppsDomainSecretsRole",
     ]
   }
 

@@ -73,6 +73,12 @@ resource "aws_security_group" "dms_s3_target_sec_group" {
     protocol    = "tcp"
     cidr_blocks = var.vpc_cidr
   }
+  ingress {
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = var.vpc_cidr
+  }
   egress {
     from_port   = 0
     to_port     = 0
@@ -125,11 +131,18 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
   password      = var.source_app_password
   port          = var.source_db_port
   server_name   = var.source_address
-  ssl_mode      = "none"
+  ssl_mode      = var.source_ssl_mode
   username      = var.source_app_username
 
-  postgres_settings {
-    map_boolean_as_boolean = true
+  dynamic postgres_settings {
+    for_each = var.source_engine_name == "postgres" ? [1]: []
+
+    content {
+      map_boolean_as_boolean       = true
+      fail_tasks_on_lob_truncation = true
+      heartbeat_enable             = true
+      heartbeat_frequency          = 5
+    }
   }
 
   extra_connection_attributes = var.extra_attributes

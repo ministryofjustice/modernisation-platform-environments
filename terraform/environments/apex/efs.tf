@@ -46,8 +46,7 @@ resource "aws_efs_file_system" "efs" {
 
   tags = merge(
     local.tags,
-    { "Name" = "mp-${local.application_name}-efs" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+    { "Name" = "mp-${local.application_name}-efs" }
   )
 
   lifecycle_policy {

@@ -50,12 +50,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-10-b"
           description      = "RDS Session Host and CAFM App Server/PFME Licence Server"
           pre-migration    = "PDFAW0010"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
 
       pd-cafm-a-11-a = merge(local.ec2_instances.app, {
@@ -75,12 +75,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-11-a"
           description      = "RDS session host and app server"
           pre-migration    = "PDFWA0011"
           update-ssm-agent = "patchgroup1"
-        }
+        })
       })
 
       pd-cafm-a-12-b = merge(local.ec2_instances.app, {
@@ -100,12 +100,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-12-b"
           description      = "RDS session host and app Server"
           pre-migration    = "PDFAW0012"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
 
       pd-cafm-a-13-a = merge(local.ec2_instances.app, {
@@ -125,12 +125,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-13-a"
           description      = "RDS session host and App Server"
           pre-migration    = "PDFAW0013"
           update-ssm-agent = "patchgroup1"
-        }
+        })
       })
 
       # database servers
@@ -202,7 +202,19 @@ locals {
       pd-cafm-w-36-b = merge(local.ec2_instances.web, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.web.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows, {
+            "cpu-utilization-high" = {
+              alarm_description   = "CPU Utilization is above 75% or above for 15 minutes"
+              comparison_operator = "GreaterThanOrEqualToThreshold"
+              evaluation_periods  = "15"
+              datapoints_to_alarm = "15"
+              metric_name         = "CPUUtilization"
+              namespace           = "AWS/EC2"
+              period              = "60"
+              statistic           = "Maximum"
+              threshold           = "75"
+            }
+          }
         )
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-36-b"
@@ -210,24 +222,36 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 28 }
+          "/dev/sdb"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
-          instance_type           = "t3.xlarge"
+          instance_type           = "t3.2xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-36-b"
           description      = "CAFM Asset Management"
           pre-migration    = "PDFWW00036"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
 
       pd-cafm-w-37-a = merge(local.ec2_instances.web, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.web.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows, {
+            "cpu-utilization-high" = {
+              alarm_description   = "CPU Utilization is above 75% or above for 15 minutes"
+              comparison_operator = "GreaterThanOrEqualToThreshold"
+              evaluation_periods  = "15"
+              datapoints_to_alarm = "15"
+              metric_name         = "CPUUtilization"
+              namespace           = "AWS/EC2"
+              period              = "60"
+              statistic           = "Maximum"
+              threshold           = "75"
+            }
+          }
         )
         config = merge(local.ec2_instances.web.config, {
           ami_name          = "pd-cafm-w-37-a"
@@ -235,18 +259,18 @@ locals {
         })
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-          "/dev/sdb"  = { type = "gp3", size = 28 }
+          "/dev/sdb"  = { type = "gp3", size = 128 }
         }
         instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
-          instance_type           = "t3.xlarge"
+          instance_type           = "t3.2xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-37-a"
           description      = "CAFM Assessment Management"
           pre-migration    = "PFWW00037"
           update-ssm-agent = "patchgroup1"
-        }
+        })
       })
 
       pd-cafm-w-38-b = merge(local.ec2_instances.web, {
@@ -266,12 +290,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.large"
         })
-        tags = {
+        tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-38-b"
           description      = "CAFM Web Training"
           pre-migration    = "PDFWW3QCP660001"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
     }
 

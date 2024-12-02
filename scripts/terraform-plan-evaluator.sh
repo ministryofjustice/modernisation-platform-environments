@@ -33,12 +33,11 @@ RESOURCES_TO_CHECK_FOR=(
 resourcesFound=false
 
 for resource in "${RESOURCES_TO_CHECK_FOR[@]}"; do
+  echo "Checking for resource: ${resource}"
   checkForResource=$(jq -r --arg resourceType "${resource}" '.resource_changes[] | select(.type == $resourceType) | .change.actions[] | select(. != "no-op" and . != "read")' "${TERRAFORM_PLAN}")
   if [[ -n "${checkForResource}" ]]; then
     echo "Resource ${resource} found in plan"
     resourcesFound=true
-  else
-    echo "Resource ${resource} not found in plan"
   fi
 done
 

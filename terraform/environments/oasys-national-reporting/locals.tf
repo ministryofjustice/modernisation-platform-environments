@@ -26,6 +26,7 @@ locals {
         "ec2_linux",
         "ec2_instance_linux",
         "ec2_windows",
+        "ssm_command",
       ]
       cloudwatch_metric_alarms_default_actions   = ["pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters = ["hmpps-oem-${local.environment}"]
@@ -37,9 +38,11 @@ locals {
       enable_ec2_session_manager_cloudwatch_logs = true
       enable_ec2_ssm_agent_update                = true
       enable_ec2_user_keypair                    = true
+      enable_hmpps_domain                        = true
       enable_image_builder                       = true
       enable_s3_bucket                           = true
       enable_s3_shared_bucket                    = true
+      enable_ssm_command_monitoring              = true
       s3_iam_policies                            = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }

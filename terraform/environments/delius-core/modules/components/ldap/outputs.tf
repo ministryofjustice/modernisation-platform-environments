@@ -1,15 +1,15 @@
-output "nlb_dns_name" {
-  value = module.nlb.dns_name
+output "efs_sg_id" {
+  value = module.efs.sg_id
 }
 
-output "delius_core_ldap_principal_arn" {
-  value = aws_ssm_parameter.delius_core_ldap_principal.arn
+output "efs_fs_id" {
+  value = module.efs.fs_id
 }
 
-output "delius_core_ldap_bind_password_arn" {
-  value = aws_ssm_parameter.delius_core_ldap_bind_password.arn
+output "efs_fs_arn" {
+  value = module.efs.fs_arn
 }
 
-output "security_group_id" {
-  value = aws_security_group.ldap.id
+output "efs_access_point_id" {
+  value = module.efs.access_point_id
 }

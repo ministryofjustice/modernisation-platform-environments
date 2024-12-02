@@ -7,21 +7,17 @@ locals {
       }
     }
 
-    boe_web = {
+    bip = {
       secrets = {
-        passwords = { description = "Web Passwords" }
-      }
-    }
-
-    boe_app = {
-      secrets = {
-        passwords = { description = "BOE Passwords" }
+        passwords = { description = "BIP Passwords" }
+        config    = { description = "BIP Configuration" }
       }
     }
 
     bods = {
       secrets = {
         passwords = { description = "BODS Passwords" }
+        config    = { description = "BODS Configuration" }
       }
     }
   }

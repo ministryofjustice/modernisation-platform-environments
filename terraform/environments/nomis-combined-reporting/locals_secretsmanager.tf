@@ -1,19 +1,36 @@
 locals {
 
   secretsmanager_secrets = {
-    bip_app = {
+    bip = {
       secrets = {
-        passwords = { description = "BIP Passwords" }
-      }
-    }
-    bip_web = {
-      secrets = {
-        passwords = { description = "Web Passwords" }
+        passwords = {
+          description = "BIP Passwords"
+          tags = {
+            instance-access-policy = "full"
+          }
+        }
+        config = {
+          description = "BIP Configuration"
+          tags = {
+            instance-access-policy = "limited"
+          }
+        }
       }
     }
     bods = {
       secrets = {
-        passwords = { description = "ETL Passwords" }
+        passwords = {
+          description = "BODS Passwords"
+          tags = {
+            instance-access-policy = "full"
+          }
+        }
+        config = {
+          description = "BODS Configuration"
+          tags = {
+            instance-access-policy = "limited"
+          }
+        }
       }
     }
     db = {

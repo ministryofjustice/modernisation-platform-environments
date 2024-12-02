@@ -1,6 +1,7 @@
 # Oracle Database DBA Secret
 
 resource "aws_secretsmanager_secret" "database_dba_passwords" {
+  #checkov:skip=CKV2_AWS_57
   name        = local.dba_secret_name
   description = "DBA Users Credentials"
   kms_key_id  = var.account_config.kms_keys.general_shared
@@ -13,6 +14,8 @@ moved {
 }
 
 data "aws_iam_policy_document" "database_dba_passwords" {
+  #checkov:skip=CKV_AWS_108 "ignore"
+  #checkov:skip=CKV_AWS_356 "ignore"
   statement {
     sid    = "OemAWSAccountToReadTheSecret"
     effect = "Allow"
@@ -32,6 +35,7 @@ resource "aws_secretsmanager_secret_policy" "database_dba_passwords" {
 
 # Oracle Database Application Secret
 resource "aws_secretsmanager_secret" "database_application_passwords" {
+  #checkov:skip=CKV2_AWS_57
   name        = local.application_secret_name
   description = "Application Users Credentials"
   kms_key_id  = var.account_config.kms_keys.general_shared

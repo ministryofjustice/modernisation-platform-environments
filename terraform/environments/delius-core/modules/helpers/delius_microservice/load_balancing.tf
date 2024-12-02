@@ -11,7 +11,7 @@ resource "random_id" "suffix" {
 ## ALB target group and listener rule
 resource "aws_lb_target_group" "frontend" {
   count = var.microservice_lb != null ? 1 : 0
-  # checkov:skip=CKV_AWS_261
+  #checkov:skip=CKV_AWS_261 "ignore"
   # https://github.com/hashicorp/terraform-provider-aws/issues/16889
   name                 = "${var.env_name}-${var.name}-${random_id.suffix.hex}"
   port                 = random_id.suffix.keepers.port
@@ -28,13 +28,13 @@ resource "aws_lb_target_group" "frontend" {
   }
 
   health_check {
-    path                = var.health_check_path
-    healthy_threshold   = "5"
-    interval            = var.health_check_interval
-    protocol            = "HTTP"
-    unhealthy_threshold = "5"
-    matcher             = "200-499"
-    timeout             = "5"
+    path                = var.alb_health_check.path
+    healthy_threshold   = var.alb_health_check.healthy_threshold
+    interval            = var.alb_health_check.interval
+    protocol            = var.alb_health_check.protocol
+    unhealthy_threshold = var.alb_health_check.unhealthy_threshold
+    matcher             = var.alb_health_check.matcher
+    timeout             = var.alb_health_check.timeout
   }
 
   lifecycle {
@@ -94,6 +94,7 @@ resource "aws_lb" "delius_microservices" {
   security_groups            = [aws_security_group.delius_microservices_service_nlb.id]
   subnets                    = var.account_config.private_subnet_ids
   enable_deletion_protection = false
+  drop_invalid_header_fields = true
   tags                       = var.tags
 }
 
@@ -148,12 +149,34 @@ resource "aws_lb_listener" "services" {
 
 resource "aws_route53_record" "services_nlb_r53_record" {
   provider = aws.core-vpc
-  zone_id  = var.account_config.route53_inner_zone_info.zone_id
-  name     = "${var.name}.service.${var.env_name}.${var.account_config.dns_suffix}"
+  zone_id  = var.account_config.route53_inner_zone.zone_id
+  name     = "${var.name}.service.${var.env_name}"
   type     = "A"
   alias {
     evaluate_target_health = false
     name                   = aws_lb.delius_microservices.dns_name
     zone_id                = aws_lb.delius_microservices.zone_id
   }
+}
+
+resource "aws_vpc_security_group_ingress_rule" "nlb_custom_rules" {
+  for_each                     = { for index, rule in var.nlb_ingress_security_group_ids : index => rule }
+  security_group_id            = aws_security_group.delius_microservices_service_nlb.id
+  description                  = "custom rule"
+  from_port                    = each.value.port
+  to_port                      = each.value.port
+  ip_protocol                  = each.value.ip_protocol
+  cidr_ipv4                    = each.value.cidr_ipv4
+  referenced_security_group_id = each.value.referenced_security_group_id
+}
+
+resource "aws_vpc_security_group_egress_rule" "nlb_custom_rules" {
+  for_each                     = { for index, rule in var.nlb_egress_security_group_ids : index => rule }
+  security_group_id            = aws_security_group.delius_microservices_service_nlb.id
+  description                  = "custom rule"
+  from_port                    = each.value.port
+  to_port                      = each.value.port
+  ip_protocol                  = each.value.ip_protocol
+  cidr_ipv4                    = each.value.cidr_ipv4
+  referenced_security_group_id = each.value.referenced_security_group_id
 }

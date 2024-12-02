@@ -7,7 +7,6 @@ locals {
 
   baseline_presets_test = {
     options = {
-      enable_observability_platform_monitoring = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "nomis-test"
@@ -36,7 +35,19 @@ locals {
       }
     }
 
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.ebs
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.xtag,
+          local.cloudwatch_dashboard_widget_groups.asg,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
 
     ec2_autoscaling_groups = {
       # NOT-ACTIVE (blue deployment)

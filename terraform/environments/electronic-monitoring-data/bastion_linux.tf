@@ -4,7 +4,7 @@ locals {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "rds_bastion" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=95ed3c3"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -73,7 +73,7 @@ data "aws_iam_policy_document" "ec2_s3_policy" {
       "s3:ListBucket",
     ]
     resources = [
-      aws_s3_bucket.data_store.arn,
+      module.s3-data-bucket.bucket.arn,
     ]
   }
   statement {
@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "ec2_s3_policy" {
       "s3:GetObject",
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*",
+      "${module.s3-data-bucket.bucket.arn}/*",
     ]
   }
 }
@@ -114,17 +114,18 @@ data "aws_iam_policy_document" "zip_s3_policy" {
       "s3:ListBucket",
     ]
     resources = [
-      aws_s3_bucket.data_store.arn,
+      module.s3-data-bucket.bucket.arn,
     ]
   }
   statement {
-    sid    = "AllowReadDataStore"
+    sid    = "AllowReadAndPutDataStore"
     effect = "Allow"
     actions = [
       "s3:GetObject",
+      "s3:PutObject"
     ]
     resources = [
-      "${aws_s3_bucket.data_store.arn}/*",
+      "${module.s3-data-bucket.bucket.arn}/*",
     ]
   }
   statement {
@@ -134,7 +135,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
       "s3:ListBucket"
     ]
     resources = [
-      module.unzipped-s3-data-store.bucket.arn
+      module.s3-unzipped-files-bucket.bucket.arn
     ]
   }
   statement {
@@ -144,14 +145,24 @@ data "aws_iam_policy_document" "zip_s3_policy" {
       "s3:PutObject"
     ]
     resources = [
-      "${module.unzipped-s3-data-store.bucket.arn}/*"
+      "${module.s3-unzipped-files-bucket.bucket.arn}/*"
+    ]
+  }
+  statement {
+    sid    = "AllowPutSercoExportStore"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject"
+    ]
+    resources = [
+      "${module.s3-serco-export-bucket.bucket_arn}/*"
     ]
   }
 }
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "zip_bastion" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=95ed3c3"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -180,7 +191,7 @@ module "zip_bastion" {
   subnet_set    = local.subnet_set
   environment   = local.environment
   region        = "eu-west-2"
-  volume_size   = 96
+  volume_size   = 250
   # tags
   tags_common = local.tags
   tags_prefix = terraform.workspace

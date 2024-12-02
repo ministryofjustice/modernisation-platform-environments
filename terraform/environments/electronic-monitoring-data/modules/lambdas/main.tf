@@ -1,7 +1,9 @@
 locals {
   use_vpc_config = !(var.security_group_ids == null || var.subnet_ids == null)
-  function_uri   = var.function_tag != null ? var.function_tag : (var.is_image ? "${var.function_name}-${var.production_dev}" : "")
+  function_uri   = var.function_tag != null ? var.function_tag : (var.is_image ? (var.image_name != null ? "${var.image_name}-${var.production_dev}" : "${var.function_name}-${var.production_dev}") : "")
 }
+
+data "aws_caller_identity" "current" {}
 
 resource "aws_sqs_queue" "lambda_dlq" {
   name              = "${var.function_name}-dlq"
@@ -13,6 +15,17 @@ data "external" "empty_bash_script" {
 
   program = ["bash", "bash_scripts/empty_bash.sh"]
 }
+
+resource "aws_iam_role_policy_attachment" "lambda_vpc_access_execution" {
+  role       = var.role_name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_sqs_queue_access_execution" {
+  role       = var.role_name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+}
+
 
 resource "aws_kms_key" "lambda_env_key" {
   description         = "KMS key for encrypting Lambda environment variables for ${var.function_name}"
@@ -27,7 +40,7 @@ resource "aws_kms_key" "lambda_env_key" {
       "Sid": "Enable IAM User Permissions",
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::${var.env_account_id}:root"
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
       },
       "Action": "kms:*",
       "Resource": "*"
@@ -145,6 +158,10 @@ resource "aws_lambda_function" "this" {
   role          = var.role_arn
   timeout       = var.timeout
   memory_size   = var.memory_size
+
+  ephemeral_storage {
+    size = var.ephemeral_storage_size # Min 512 MB and the Max 10240 MB
+  }
 
   dynamic "vpc_config" {
     for_each = local.use_vpc_config ? [1] : []

@@ -3,6 +3,7 @@
 #########################
 
 resource "aws_lb" "PPUD-internal-ALB" {
+  # checkov:skip=CKV_AWS_152: "ALB target groups only have 2 targets so cross zone load balancing is not required"
   count              = local.is-development == false ? 1 : 0
   name               = local.application_data.accounts[local.environment].PPUD_Internal_ALB
   internal           = true
@@ -10,6 +11,11 @@ resource "aws_lb" "PPUD-internal-ALB" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.PPUD-ALB.id]
   subnets            = [data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  #  access_logs {
+  #    bucket  = aws_s3_bucket.moj-log-files-uat[0].id
+  #    prefix  = "alb-logs"
+  #    enabled = true
+  #  }
 
   enable_deletion_protection = true
   drop_invalid_header_fields = true

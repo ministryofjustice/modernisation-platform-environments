@@ -63,7 +63,7 @@ do
 done
 
 echo "Updating /etc/rc.local file"
-cat <<EOT > etc/rc.local
+cat <<EOT > /etc/rc.local
 #!/bin/sh
 #
 # This script will be executed *after* all the other init scripts.
@@ -116,8 +116,8 @@ sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
-sed -i '/development-general$/d' /home/ec2-user/.ssh/authorized_keys
-sed -i '/development-general$/d' /root/.ssh/authorized_keys
+sed -i '/.*-general$/d' /home/ec2-user/.ssh/authorized_keys
+sed -i '/.*-general$/d' /root/.ssh/authorized_keys
 sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 ## Add custom metric script
@@ -126,6 +126,14 @@ rm /var/cw-custom.sh
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/cm-cw-custom.sh /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
 #  This script will be ran by the cron job in /etc/cron.d/custom_cloudwatch_metrics
+
+## Additional DBA Steps
+echo "Updating CWA_cwa-app2.xml"
+su - applmgr -c "cp /CWA/app/appl/admin/CWA_cwa-app2.xml /CWA/app/appl/admin/CWA_cwa-app2.xml.tf_backup"
+sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/cwa.${local.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/db_admin@legalservices.gov.uk/db_admin@${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
 
 EOF
 
@@ -244,6 +252,9 @@ resource "aws_ebs_volume" "concurrent_manager" {
   snapshot_id       = local.application_data.accounts[local.environment].concurrent_manager_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
+    replace_triggered_by = [
+      aws_instance.concurrent_manager.id
+    ]
     ignore_changes = [kms_key_id]
   }
 
