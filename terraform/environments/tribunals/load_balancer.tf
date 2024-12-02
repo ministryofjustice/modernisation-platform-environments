@@ -3,15 +3,19 @@ locals {
 
   # Create a mapping between listener headers and target group ARNs
   listener_header_to_target_group = {
-    for service_key, service in var.services : service.name_prefix => (
-      aws_lb_target_group.tribunals_target_group[service_key].arn
+    for service in var.services :
+    service.name_prefix => (
+      lookup(aws_lb_target_group.tribunals_target_group, service.module_key, null) != null ?
+      aws_lb_target_group.tribunals_target_group[service.module_key].arn :
+      null
     )
   }
 
   # Add priority mappings
   listener_rule_priorities = {
-    for service_key, service in var.services : service.name_prefix => (
-      index(keys(var.services), service_key) + 1)
+    for service in var.services : service.name_prefix => (
+      index(keys(var.services), service.module_key) + 1
+    )
   }
 }
 
