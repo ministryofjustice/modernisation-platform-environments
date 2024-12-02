@@ -23,7 +23,7 @@ resource "aws_lakeformation_permissions" "cadet_all_data" {
 
 resource "aws_lakeformation_lf_tag" "domain" {
   for_each = try(local.environment_configuration.cadet_lf_tags, {})
-  key = each.value.key
+  key = each.key
   values = each.value
 }
 
@@ -55,4 +55,10 @@ resource "aws_lakeformation_permissions" "cadet_domain_table_data" {
       values = each.value
     }
   }
+}
+
+import {
+  for_each = try(local.environment_configuration.cadet_lf_tags, {})
+  to = aws_lakeformation_lf_tag.domain[each.key]
+  id = "${local.environment_management.account_ids[terraform.workspace]}:${each.key}"
 }
