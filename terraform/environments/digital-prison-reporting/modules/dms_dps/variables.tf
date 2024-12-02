@@ -1,5 +1,5 @@
 variable "name" {
-  type        = "string"
+  type        = string
   description = "DMS Replication name."
 }
 
@@ -60,19 +60,19 @@ variable "subnet_ids" {
 }
 
 variable "source_address" {
-  type = "string"
+  type = string
 }
 
 variable "vpc" {
-  type = "string"
+  type = string
 }
 
 variable "kinesis_stream_policy" {
-  type = "string"
+  type = string
 }
 
 variable "availability_zone" {
-  type    = "string"
+  type    = string
   default = null
 }
 
@@ -95,13 +95,13 @@ variable "iam_role_permissions_boundary" {
 # Used in tagginga and naming the resources
 
 variable "stack_name" {
-  type        = "string"
+  type        = string
   description = "The name of our application"
   default     = "dblink"
 }
 
 variable "owner" {
-  type        = "string"
+  type        = string
   description = "A group email address to be used in tags"
   default     = "autobots@ga.gov.au"
 }
@@ -111,7 +111,7 @@ variable "owner" {
 #--------------------------------------------------------------
 
 variable "identifier" {
-  type        = "string"
+  type        = string
   default     = "rds"
   description = "Name of the database in the RDS"
 }
@@ -121,7 +121,7 @@ variable "identifier" {
 #--------------------------------------------------------------
 
 variable "target_backup_window" {
-  type        = "string"
+  type        = string
   # 12:00AM-03:00AM AEST
   default     = "14:00-17:00"
   description = "RDS backup window"
@@ -138,25 +138,25 @@ variable "target_db_port" {
 }
 
 variable "target_engine" {
-  type        = "string"
+  type        = string
   default     = "kinesis"
   description = "Engine type, example values mysql, postgres"
 }
 
 variable "target_engine_version" {
-  type        = "string"
+  type        = string
   description = "Engine version"
   default     = "9.3.14"
 }
 
 variable "target_instance_class" {
-  type        = "string"
+  type        = string
   default     = "db.t2.micro"
   description = "Instance class"
 }
 
 variable "target_maintenance_window" {
-  type        = "string"
+  type        = string
   default     = "Mon:00:00-Mon:03:00"
   description = "RDS maintenance window"
 }
@@ -179,24 +179,24 @@ variable "kinesis_settings" {
 #--------------------------------------------------------------
 
 variable "source_app_password" {
-  type        = "string"
+  type        = string
   description = "Password for the endpoint to access the source database"
 }
 
 variable "source_app_username" {
-  type        = "string"
+  type        = string
   description = "Username for the endpoint to access the source database"
 }
 
 variable "source_backup_window" {
-  type        = "string"
+  type        = string
   # 12:00AM-03:00AM AEST
   default     = "14:00-17:00"
   description = "RDS backup window"
 }
 
 variable "source_db_name" {
-  type        = "string"
+  type        = string
   description = "Name of the target database"
   default     = "oracle"
 }
@@ -208,37 +208,37 @@ variable "source_db_port" {
 }
 
 variable "source_engine" {
-  type        = "string"
+  type        = string
   default     = "oracle-se2"
   description = "Engine type, example values mysql, postgres"
 }
 
 variable "source_engine_name" {
-  type        = "string"
+  type        = string
   default     = ""
   description = "Engine name for DMS"
 }
 
 variable "source_engine_version" {
-  type        = "string"
+  type        = string
   description = "Engine version"
   default     = "12.1.0.2.v8"
 }
 
 variable "source_instance_class" {
-  type        = "string"
+  type        = string
   default     = "db.t2.micro"
   description = "Instance class"
 }
 
 variable "source_maintenance_window" {
-  type        = "string"
+  type        = string
   default     = "Mon:00:00-Mon:03:00"
   description = "RDS maintenance window"
 }
 
 variable "source_password" {
-  type        = "string"
+  type        = string
   description = "Password of the source database"
   default     = ""
 }
@@ -250,7 +250,7 @@ variable "source_storage_encrypted" {
 }
 
 variable "source_username" {
-  type        = "string"
+  type        = string
   description = "Username to access the source database"
   default     = ""
 }
@@ -260,7 +260,7 @@ variable "source_username" {
 #--------------------------------------------------------------
 
 variable "replication_instance_maintenance_window" {
-  type        = "string"
+  type        = string
   description = "Maintenance window for the replication instance"
   default     = "sun:10:30-sun:14:30"
 }
@@ -272,13 +272,13 @@ variable "replication_instance_storage" {
 }
 
 variable "replication_instance_version" {
-  type        = "string"
+  type        = string
   description = "Engine version of the replication instance"
   default     = "3.4.6"
 }
 
 variable "replication_instance_class" {
-  type        = "string"
+  type        = string
   description = "Instance class of replication instance"
   default     = "dms.t2.micro"
 }
