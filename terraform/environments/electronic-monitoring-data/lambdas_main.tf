@@ -18,7 +18,7 @@ module "output_file_structure_as_json_from_zip" {
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
-  security_group_ids      = [aws_security_group.lambda_db_security_group.id]
+  security_group_ids      = [aws_security_group.lambda_generic.id]
   subnet_ids              = data.aws_subnets.shared-public.ids
   environment_variables = {
     OUTPUT_BUCKET = module.s3-json-directory-structure-bucket.bucket.id
