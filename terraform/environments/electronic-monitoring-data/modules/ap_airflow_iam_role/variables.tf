@@ -29,7 +29,7 @@ variable "oidc_arn" {
 }
 
 variable "max_session_duration" {
-  type        = int
+  type        = number
   description = "max session duration for the role in seconds"
   nullable    = true
   default     = 7200
