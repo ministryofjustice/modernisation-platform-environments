@@ -44,10 +44,6 @@ locals {
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
-      /* LF Domain Tags */
-      cadet_lf_tags = {
-        domain = ["bold", "civil", "courts", "general", "criminal_history", "development_sandpit", "electronic_monitoring", "finance", "interventions", "opg", "performance", "risk", "people", "prison", "probation", "victims", "victims_case_management"] # extracted from bucket paths
-      }
     }
     test = {
       /* VPC */
