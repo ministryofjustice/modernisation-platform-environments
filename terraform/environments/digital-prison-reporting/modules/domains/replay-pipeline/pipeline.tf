@@ -48,7 +48,7 @@ module "replay_pipeline" {
         },
         "Check All Pending Files Have Been Processed" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {
@@ -246,7 +246,7 @@ module "replay_pipeline" {
         },
         "Check All Files Have Been Replayed" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {

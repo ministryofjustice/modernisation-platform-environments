@@ -10,6 +10,7 @@ from glue_data_validation_lib import Logical_Constants
 from glue_data_validation_lib import RDS_JDBC_CONNECTION
 from glue_data_validation_lib import S3Methods
 from glue_data_validation_lib import CustomPysparkMethods
+from rds_transform_queries import SQLServer_Extract_Transform
 
 from awsglue.utils import getResolvedOptions
 from awsglue.transforms import *
@@ -95,32 +96,8 @@ INT_DATATYPES_LIST = Logical_Constants.INT_DATATYPES_LIST
 
 RECORDED_PKEYS_LIST = Logical_Constants.RECORDED_PKEYS_LIST
 
-QUERY_DICT = {
-    "CurfewSegment": """
-    SELECT [CurfewSegmentID]
-        ,[CurfewID]
-        ,[CurfewSegmentType]
-        ,[BeginDatetime]
-        ,[EndDatetime]
-        ,[LastModifiedDatetime]
-        ,[DayFlags]
-        ,[AdditionalInfo]
-        ,[WeeksOn]
-        ,[WeeksOff]
-        ,[WeeksOffset]
-        ,[ExportToGovernment]
-        ,[PublicHolidaySegmentID]
-        ,[IsPublicHoliday]
-        ,[RowVersion]
-        ,CAST(StartTime as varchar(8)) as StartTime
-        ,CAST(EndTime as varchar(12)) as EndTime
-        ,[SegmentCategoryLookupID]
-        ,[ParentCurfewSegmentID]
-        ,[TravelTimeBefore]
-        ,[TravelTimeAfter]
-    FROM [g4s_emsys_tpims].[dbo].[CurfewSegment]
-    """.strip()
-}
+QUERY_STR_DICT = SQLServer_Extract_Transform.QUERY_STR_DICT
+
 # ==================================================================
 # USER-DEFINED-FUNCTIONS
 # ----------------------
@@ -211,7 +188,7 @@ def compare_rds_parquet_samples(rds_jdbc_conn_obj,
     LOGGER.info(f"""Rows sample taken = {df_parquet_read_sample.count()}""")
 
     if df_prq_read_filtered_count == 0:
-        temp_msg = f"""{validation_sample_fraction_float}-Sample Rows Validated."""
+        temp_msg = f"""{validation_sample_fraction_float} - Sample Rows Validated."""
         df_temp_row = spark.sql(f"""select 
                                     current_timestamp() as run_datetime, 
                                     '' as json_row,
@@ -410,7 +387,7 @@ if __name__ == "__main__":
     max_pkey = agg_row_dict['max_value']
     LOGGER.info(f"""max_pkey = {max_pkey}""")
 
-    rds_transformed_query = QUERY_DICT[f"{rds_sqlserver_db_table}"]
+    rds_transformed_query = QUERY_STR_DICT[f"{db_sch_tbl}"]
     LOGGER.info(f"""rds_transformed_query = \n{rds_transformed_query}""")
 
     df_rds_query_read = rds_jdbc_conn_obj.get_rds_df_read_query_pkey_parallel(

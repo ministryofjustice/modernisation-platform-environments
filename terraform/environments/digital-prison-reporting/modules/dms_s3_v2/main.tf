@@ -138,9 +138,10 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
     for_each = var.source_engine_name == "postgres" ? [1]: []
 
     content {
-      map_boolean_as_boolean = true
-      heartbeat_enable       = true
-      heartbeat_frequency    = 5
+      map_boolean_as_boolean       = true
+      fail_tasks_on_lob_truncation = true
+      heartbeat_enable             = true
+      heartbeat_frequency          = 5
     }
   }
 
