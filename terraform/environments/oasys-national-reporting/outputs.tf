@@ -22,3 +22,8 @@ output "s3_buckets" {
   description = "Names of created S3 buckets"
   value       = { for key, value in module.baseline.s3_buckets : key => value.bucket.id }
 }
+
+output "subnet_id" {
+  description = "subnet_id"
+  value       = data.aws_subnet.data_subnets_a
+}

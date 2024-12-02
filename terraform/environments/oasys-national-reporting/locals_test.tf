@@ -237,7 +237,7 @@ locals {
 
     fsx_windows = {
       t2-bods-windows-share = {
-        preferred_subnet_id = data.aws_subnet.private_subnets_a
+        preferred_subnet_id = data.aws_subnet.private_subnets_a.id
         deployment_type     = "MULTI_AZ_1"
         security_groups     = ["bods"]
         skip_final_backup   = true
