@@ -23,7 +23,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 
   rule {
     name     = "common-rule-set"
-    priority = 1
+    priority = 2
 
     override_action {
       none {}
@@ -63,7 +63,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 
   rule {
     name     = "AllowSpecificIPsForAdminAndSecurePaths"
-    priority = 2
+    priority = 3
 
     action {
       allow {}
@@ -124,7 +124,7 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 
   rule {
     name     = "BlockNonAllowedIPsForAdminAndSecurePaths"
-    priority = 3
+    priority = 4
 
     action {
       block {
@@ -170,15 +170,15 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
 }
 
 resource "aws_wafv2_regex_pattern_set" "blocked_paths" {
-  provider  = aws.us-east-1
-  name      = "blocked-paths"
-  scope     = "CLOUDFRONT"
+  provider = aws.us-east-1
+  name     = "blocked-paths"
+  scope    = "CLOUDFRONT"
 
   regular_expression {
-    regex_string = "^/admin(/.*)?$"
+    regex_string = "(?i)^/admin(/.*)?$"
   }
 
   regular_expression {
-    regex_string = "^/secure(/.*)?$"
+    regex_string = "(?i)^/secure(/.*)?$"
   }
 }
