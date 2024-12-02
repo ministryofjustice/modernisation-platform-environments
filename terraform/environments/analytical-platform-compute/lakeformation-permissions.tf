@@ -23,7 +23,7 @@ resource "aws_lakeformation_permissions" "cadet_all_data" {
 
 resource "aws_lakeformation_lf_tag" "domain" {
   for_each = local.environment_configuration.cadet_lf_tags
-  key = each.key
+  key = each.value.key
   values = each.value
 }
 
@@ -36,8 +36,8 @@ resource "aws_lakeformation_permissions" "cadet_domain_database_data" {
   lf_tag_policy {
     resource_type = "DATABASE"
     expression {
-      key    = "domain"
-      values = each.value
+      key    = each.value.key
+      values = each.value.values
     }
   }
 }
@@ -51,8 +51,8 @@ resource "aws_lakeformation_permissions" "cadet_domain_table_data" {
   lf_tag_policy {
     resource_type = "TABLE"
     expression {
-      key    = "domain"
-      values = each.value
+      key    = each.value.key
+      values = each.value.values
     }
   }
 }
