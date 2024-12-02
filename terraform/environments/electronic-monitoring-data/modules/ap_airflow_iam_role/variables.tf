@@ -27,3 +27,9 @@ variable "oidc_arn" {
   type     = string
   nullable = false
 }
+
+variable "max_session_duration" {
+  type     = int
+  nullable = true
+  default  = 7200
+}

@@ -97,15 +97,16 @@ module "load_emsys_mvp_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
-  name               = "emsys-mvp"
-  environment        = local.environment
-  database_name      = "g4s-emsys-mvp"
-  path_to_data       = "/g4s_emsys_mvp"
-  source_data_bucket = module.s3-dms-target-store-bucket.bucket
-  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
-  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
-  athena_dump_bucket = module.s3-athena-bucket.bucket
-  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  name                 = "emsys-mvp"
+  environment          = local.environment
+  database_name        = "g4s-emsys-mvp"
+  path_to_data         = "/g4s_emsys_mvp"
+  source_data_bucket   = module.s3-dms-target-store-bucket.bucket
+  secret_code          = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn             = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket   = module.s3-athena-bucket.bucket
+  cadt_bucket          = module.s3-create-a-derived-table-bucket.bucket
+  max_session_duration = 12 * 60 * 60
 }
 
 module "load_fep_database" {

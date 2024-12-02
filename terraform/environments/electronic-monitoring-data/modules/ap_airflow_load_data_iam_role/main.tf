@@ -87,10 +87,11 @@ data "aws_iam_policy_document" "load_data" {
 module "load_unstructured_atrium_database" {
   source = "../ap_airflow_iam_role"
 
-  environment         = var.environment
-  role_name_suffix    = "load-${var.name}"
-  role_description    = "${var.name} database permissions"
-  iam_policy_document = data.aws_iam_policy_document.load_data.json
-  secret_code         = var.secret_code
-  oidc_arn            = var.oidc_arn
+  environment          = var.environment
+  role_name_suffix     = "load-${var.name}"
+  role_description     = "${var.name} database permissions"
+  iam_policy_document  = data.aws_iam_policy_document.load_data.json
+  secret_code          = var.secret_code
+  oidc_arn             = var.oidc_arn
+  max_session_duration = var.max_session_duration
 }
