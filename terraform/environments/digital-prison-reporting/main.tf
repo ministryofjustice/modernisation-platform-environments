@@ -1299,10 +1299,6 @@ module "dms_nomis_to_s3_ingestor" {
 
   bucket_name = module.s3_raw_bucket.bucket_id
 
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
-
   depends_on = [
     module.s3_raw_bucket.bucket_id
   ]
