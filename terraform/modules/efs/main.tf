@@ -41,7 +41,7 @@ resource "aws_efs_file_system" "this" {
   provisioned_throughput_in_mibps = var.file_system.provisioned_throughput_in_mibps
   throughput_mode                 = var.file_system.throughput_mode
 
-  # annoyingly you have to define each option as separate block
+  # annoyingly you have to define each option as separate block
   dynamic "lifecycle_policy" {
     for_each = var.file_system.lifecycle_policy.transition_to_archive != null ? [var.file_system.lifecycle_policy] : []
     content {
@@ -64,6 +64,15 @@ resource "aws_efs_file_system" "this" {
   tags = merge(var.tags, {
     Name = var.name
   })
+}
+
+# disable automatic backups - use mod platform everything vault instead
+resource "aws_efs_backup_policy" "policy" {
+  file_system_id = aws_efs_file_system.fs.id
+
+  backup_policy {
+    status = "DISABLED"
+  }
 }
 
 data "aws_iam_policy_document" "this" {
