@@ -410,12 +410,12 @@ resource "aws_iam_role_policy_attachment" "format_json_fms_data_policy_attachmen
 #-----------------------------------------------------------------------------------
 
 
-resource "aws_iam_role" "calculate_checksum_lambda" {
+resource "aws_iam_role" "calculate_checksum" {
   name               = "calculate-checksum-lambda-iam-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-data "aws_iam_policy_document" "calculate_checksum_lambda" {
+data "aws_iam_policy_document" "calculate_checksum" {
   statement {
     sid    = "S3Permissions"
     effect = "Allow"
@@ -434,8 +434,8 @@ data "aws_iam_policy_document" "calculate_checksum_lambda" {
   }
 }
 
-resource "aws_iam_role_policy" "calculate_checksum_lambda" {
+resource "aws_iam_role_policy" "calculate_checksum" {
   name   = "calculate_checksum-lambda-iam-policy"
-  role   = aws_iam_role.calculate_checksum_lambda.id
-  policy = data.aws_iam_policy_document.calculate_checksum_lambda.json
+  role   = aws_iam_role.calculate_checksum.id
+  policy = data.aws_iam_policy_document.calculate_checksum.json
 }

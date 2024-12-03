@@ -158,23 +158,16 @@ variable "checksum_algorithm" {
   default     = "SHA256"
 }
 
-data "archive_file" "calculate_checksum_lambda" {
-  type        = "zip"
-  source_file = "${local.lambda_path}/calculate_checksum_lambda.py"
-  output_path = "${local.lambda_path}/calculate_checksum_lambda.zip"
-}
-
-module "calculate_checksum_lambda" {
-  source           = "./modules/lambdas"
-  filename         = "${local.lambda_path}/calculate_checksum_lambda.zip"
-  function_name    = "calculate_checksum_lambda"
-  role_name        = aws_iam_role.calculate_checksum_lambda.arn
-  role_arn         = aws_iam_role.calculate_checksum_lambda.arn
-  handler          = "calculate_checksum_lambda.handler"
-  runtime          = "python3.12"
-  memory_size      = 4096
-  timeout          = 900
-  source_code_hash = data.archive_file.calculate_checksum_lambda.output_base64sha256
+module "calculate_checksum" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "calculate_checksum"
+  role_name               = aws_iam_role.calculate_checksum.arn
+  role_arn                = aws_iam_role.calculate_checksum.arn
+  handler                 = "calculate_checksum.handler"
+  memory_size             = 4096
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   environment_variables = {
     Checksum = var.checksum_algorithm
   }
@@ -183,7 +176,7 @@ module "calculate_checksum_lambda" {
 resource "aws_lambda_permission" "allow_sns_invoke_checksum_lambda" {
   statement_id  = "AllowSNSInvokeChecksum"
   action        = "lambda:InvokeFunction"
-  function_name = module.calculate_checksum_lambda.lambda_function_name
+  function_name = module.calculate_checksum.lambda_function_name
   principal     = "sns.amazonaws.com"
   source_arn    = aws_sns_topic.s3_events.arn
 }
@@ -191,7 +184,7 @@ resource "aws_lambda_permission" "allow_sns_invoke_checksum_lambda" {
 resource "aws_sns_topic_subscription" "checksum_lambda_subscription" {
   topic_arn = aws_sns_topic.s3_events.arn
   protocol  = "lambda"
-  endpoint  = module.calculate_checksum_lambda.lambda_function_arn
+  endpoint  = module.calculate_checksum.lambda_function_arn
 
   depends_on = [aws_lambda_permission.allow_sns_invoke_checksum_lambda]
 }
