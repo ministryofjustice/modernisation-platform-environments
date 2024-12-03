@@ -403,19 +403,15 @@ locals {
   environment_configuration = local.environment_configurations[local.environment]
   environment_configurations = {
     development = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
       analytical_platform_runner_suffix = "-dev"
     }
     test = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
       analytical_platform_runner_suffix = "-test"
     }
     preproduction = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
       analytical_platform_runner_suffix = "-pp"
     }
     production = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-production"]
       analytical_platform_runner_suffix = ""
     }
   }

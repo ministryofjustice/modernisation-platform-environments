@@ -180,6 +180,12 @@ locals {
       })
     }
 
+    schedule_alarms_lambda = {
+      alarm_patterns = [
+        "public-https-*-unhealthy-load-balancer-host",
+      ]
+    }
+
     route53_zones = {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [

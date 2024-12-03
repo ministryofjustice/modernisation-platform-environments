@@ -201,7 +201,7 @@ if __name__ == "__main__":
     FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
     """.strip()
 
-    parallel_jdbc_conn_num = args['parallel_jdbc_conn_num']
+    parallel_jdbc_conn_num = int(args['parallel_jdbc_conn_num'])
     parquet_df_write_repartition_num = int(args.get('parquet_df_write_repartition_num', 0))
 
 

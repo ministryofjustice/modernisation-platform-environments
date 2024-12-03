@@ -140,8 +140,8 @@
 #    for item in var.db_config : item.name => item
 #  }
 #  provider = aws.core-vpc
-#  zone_id  = var.account_config.route53_inner_zone_info.zone_id
-#  name     = each.key == "primary-db" ? "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone_info.name}" : "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone_info.name}"
+#  zone_id  = var.account_config.route53_inner_zone.zone_id
+#  name     = each.key == "primary-db" ? "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone.name}" : "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone.name}"
 #  type     = "CNAME"
 #  ttl      = 300
 #  records  = [aws_instance.db_ec2_instance[each.key].private_dns]
@@ -350,8 +350,8 @@
 #    for item in var.db_config : item.name => item
 #  }
 #  provider = aws.core-vpc
-#  zone_id  = var.account_config.route53_inner_zone_info.zone_id
-#  name     = each.key == "primary-db" ? "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone_info.name}" : "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone_info.name}"
+#  zone_id  = var.account_config.route53_inner_zone.zone_id
+#  name     = each.key == "primary-db" ? "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone.name}" : "delius-${var.env_name}-db-${index(var.db_config, each.value) + 1}.${var.account_config.route53_inner_zone.name}"
 #  type     = "CNAME"
 #  ttl      = 300
 #  records  = [aws_instance.db_ec2_instance[each.key].private_dns]

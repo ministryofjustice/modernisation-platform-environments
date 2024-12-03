@@ -1231,7 +1231,7 @@ module "dms_nomis_ingestor" {
   dms_target_name              = "kinesis"
   short_name                   = "nomis"
   migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.7" # Upgrade
+  replication_instance_version = "3.5.2"
   replication_instance_class   = "dms.t3.medium"
   subnet_ids = [
     data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
@@ -1247,10 +1247,6 @@ module "dms_nomis_ingestor" {
     "partition_include_schema_table" = "true"
     "include_partition_value"        = "true"
     "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
-  }
-
-  availability_zones = {
-    0 = "eu-west-2a"
   }
 
   tags = merge(
@@ -1299,10 +1295,6 @@ module "dms_nomis_to_s3_ingestor" {
   extra_attributes = "supportResetlog=TRUE"
 
   bucket_name = module.s3_raw_bucket.bucket_id
-
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
 
   depends_on = [
     module.s3_raw_bucket.bucket_id
