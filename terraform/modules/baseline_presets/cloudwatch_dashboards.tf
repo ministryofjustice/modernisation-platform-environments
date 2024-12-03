@@ -792,6 +792,57 @@ locals {
           }
         }
       }
+      load-balancer-port-allocation-error-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"PortAllocationErrorCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB port-allocation-error-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error count"
+            }
+          }
+        }
+      }
+      load-balancer-rejected-flow-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"RejectedFlowCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB rejected-flow-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "flow count"
+            }
+          }
+        }
+      }
+      load-balancer-tcp-client-reset-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"TCP_Client_Reset_Count\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB tcp-client-reset-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "reset count"
+            }
+          }
+        }
+      }
     }
     ssm = {
       ssm-command-success-count = {
@@ -1043,6 +1094,9 @@ locals {
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-bytes,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-packets,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-peak-packets-per-second,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-port-allocation-error-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-rejected-flow-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-tcp-client-reset-count,
       ]
     }
     ssm_command = {
