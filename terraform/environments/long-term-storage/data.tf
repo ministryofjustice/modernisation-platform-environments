@@ -21,6 +21,44 @@ data "aws_iam_policy_document" "aws_transfer_assume_role_policy" {
   }
 }
 
+data "aws_iam_policy_document" "call_centre_access_policy" {
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    effect    = "Allow"
+    resources = [aws_s3_bucket.call_centre.arn]
+    sid       = "AllowListingOfBucket"
+  }
+  statement {
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+      "s3:GetObjectVersion",
+      "s3:GetObjectACL",
+      "s3:PutObjectACL"
+    ]
+    effect    = "Allow"
+    resources = ["${aws_s3_bucket.call_centre.arn}/*"]
+    sid       = "AllowAccessToBucketObjects"
+  }
+  statement {
+    actions   = ["kms:*"]
+    effect    = "Allow"
+    resources = [aws_kms_key.call_centre.arn]
+    sid       = "AllowAccessToKMSKey"
+  }
+  statement {
+    actions   = ["secretsmanager:*"]
+    effect    = "Allow"
+    resources = [aws_secretsmanager_secret.call_centre.arn]
+    sid       = "AllowAccessToSecrets"
+  }
+}
+
 data "aws_iam_policy_document" "call_centre_bucket_policy" {
   statement {
     actions = [
