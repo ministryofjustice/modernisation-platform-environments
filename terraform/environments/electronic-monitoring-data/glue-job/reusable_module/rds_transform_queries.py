@@ -2,6 +2,16 @@
 class SQLServer_Extract_Transform:
 
     QUERY_STR_DICT = {
+
+    "g4s_cap_dw_dbo_D_Comments": """
+    SELECT [CommentSID]
+        ,[VisitID]
+        ,[ActivityID]
+        ,trim(replace(replace(Comments, char(141), ''), char(129), '')) AS Comments
+        ,[CommentType]
+    FROM [g4s_cap_dw].[dbo].[D_Comments]
+    """.strip(),
+
     "g4s_emsys_tpims_dbo_CurfewSegment": """
     SELECT [CurfewSegmentID]
         ,[CurfewID]
@@ -26,6 +36,7 @@ class SQLServer_Extract_Transform:
         ,[TravelTimeAfter]
     FROM [g4s_emsys_tpims].[dbo].[CurfewSegment]
     """.strip(),
+
     "g4s_emsys_tpims_dbo_GPSPositionLatest": """
     SELECT [GPSPositionID]
         ,[PersonID]
@@ -45,4 +56,5 @@ class SQLServer_Extract_Transform:
         ,[SeparationViolation]
     FROM [g4s_emsys_tpims].[dbo].[GPSPositionLatest]
     """.strip()
+
     }
