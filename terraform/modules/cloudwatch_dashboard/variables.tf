@@ -43,6 +43,11 @@ variable "widget_groups" {
   #       value = string
   #     })))
   #   }))
+  #   search_filter_dimension = optional(object({ # optionally apply filter to each 'expression' widget
+  #     negate = optional(bool) # negate the filter, e.g. add NOT to the expression
+  #     name   = string         # the name of the dimension to filter
+  #     values = list(string)   # list of dimension values
+  #   }))
   #   add_ebs_widgets = optional(object({
   #     iops = bool                          # add additional widgets showing EBS IOPS vs configured max
   #     throughput = bool                    # add additional widgets showing EBS thoughput vs configured max
