@@ -393,8 +393,3 @@ module "copy_apdp_cadet_metadata_to_compute_assumable_role" {
   custom_role_policy_arns = [module.copy_apdp_cadet_metadata_to_compute_policy.arn]
   # number_of_custom_role_policy_arns = 1
 }
-
-moved {
-  from = module.analytical_platform_cadet_runner
-  to   = module.copy_apdp_cadet_metadata_to_compute_assumable_role
-}
