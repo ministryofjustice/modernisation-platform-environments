@@ -52,7 +52,12 @@ data "aws_iam_policy_document" "call_centre_access_policy" {
     sid       = "AllowAccessToKMSKey"
   }
   statement {
-    actions   = ["secretsmanager:*"]
+    actions = [
+      "secretsmanager:BatchGet*",
+      "secretsmanager:Describe*",
+      "secretsmanager:Get*",
+      "secretsmanager:List*"
+    ]
     effect    = "Allow"
     resources = [aws_secretsmanager_secret.call_centre.arn]
     sid       = "AllowAccessToSecrets"
