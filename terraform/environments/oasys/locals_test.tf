@@ -31,6 +31,20 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.onr,
+          local.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_autoscaling_groups = {
       t1-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_schedules = {
