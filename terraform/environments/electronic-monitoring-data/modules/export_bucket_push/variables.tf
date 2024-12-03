@@ -40,3 +40,13 @@ variable "production_dev" {
   description = "The environment the lambda is being deployed to"
   type        = string
 }
+
+variable "security_group_ids" {
+  description = "List of security group IDs associated with the Lambda function."
+  type        = list(string)
+}
+
+variable "subnet_ids" {
+  description = "List of subnet IDs associated with the Lambda function."
+  type        = list(string)
+}
