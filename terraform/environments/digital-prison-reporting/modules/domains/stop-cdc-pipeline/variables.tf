@@ -24,11 +24,6 @@ variable "glue_reporting_hub_cdc_jobname" {
   type        = string
 }
 
-variable "s3_glue_bucket_id" {
-  description = "S3, Glue Bucket ID"
-  type        = string
-}
-
 variable "glue_stop_glue_instance_job" {
   description = "Name of job to stop the current running instance of the streaming job"
   type        = string
@@ -48,9 +43,4 @@ variable "tags" {
   type        = map(string)
   default     = {}
   description = "(Optional) Key-value map of resource tags"
-}
-
-variable "domain" {
-  type        = string
-  description = "Domain Name"
 }

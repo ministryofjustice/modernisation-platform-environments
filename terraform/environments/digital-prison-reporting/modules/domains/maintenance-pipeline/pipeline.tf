@@ -26,7 +26,7 @@ module "maintenance_pipeline" {
         },
         "Check All Pending Files Have Been Processed" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {

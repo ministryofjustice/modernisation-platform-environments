@@ -22,6 +22,16 @@
         "table-name": "CurfewSegment"
       },
       "rule-action": "exclude"
+    },
+    {
+      "rule-type": "selection",
+      "rule-id": "03",
+      "rule-name": "03_exclude",
+      "object-locator": {
+        "schema-name": "dbo",
+        "table-name": "GPSPositionLatest"
+      },
+      "rule-action": "exclude"
     }
   ]
 }
