@@ -15,7 +15,7 @@ resource "aws_s3_bucket_policy" "data_protection_policy" {
       {
         Effect = "Allow",
         Principal = "*",
-        Action = ["s3:GetObject", "s3.PutObject"],
+        Action = ["s3:GetObject", "s3:PutObject"],
         Resource = "${aws_s3_bucket.data_protection_keys.arn}/*"
       }
     ]
