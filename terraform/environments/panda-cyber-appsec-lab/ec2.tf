@@ -22,28 +22,39 @@ resource "aws_instance" "kali_linux" {
   }
   user_data = <<-EOF
               #!/bin/bash
+              
+              set -e
+              exec > >(tee /var/log/user-data.log | logger -t user-data) 2>&1
 
-              # Update and install dependencies
+              # Update system packages
+              echo "Updating and upgrading system packages..."
               apt-get update -y
               apt-get upgrade -y
+
+              # Install necessary tools and Kali default tools
+              echo "Installing wget, git, and kali-linux-default tools..."
               apt-get install -y wget git kali-linux-default
 
-              # Ensure 'kali' user exists
-              id -u kali &>/dev/null || useradd -m -s /bin/bash kali
+              # Check if 'kali' user exists
+              if id "kali" &>/dev/null; then
+                  echo "User 'kali' exists. Proceeding to create tooling directory..."
+                  
+                  # Create tooling directory and set ownership
+                  mkdir -p /home/kali/tooling
+                  chown -R kali:kali /home/kali
+                  echo "Tooling directory created under /home/kali and ownership set."
 
-              # Download and install the SSM agent
-              wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
-              dpkg -i amazon-ssm-agent.deb
-              systemctl enable amazon-ssm-agent
-              systemctl start amazon-ssm-agent
+                  # Clone the repository as 'kali' user
+                  echo "Cloning gotestwaf repository into /home/kali/tooling..."
+                  sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
+                  echo "Repository cloned successfully."
+              else
+                  echo "User 'kali' does not exist. Exiting."
+                  exit 1
+              fi
 
-              # Create and set permissions for the tooling directory
-              mkdir -p /home/kali/tooling
-              chown -R kali:kali /home/kali
+              echo "User data script completed successfully."
 
-              # Clone the repository as 'kali' user
-              sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
-             
               EOF
 
   tags = {

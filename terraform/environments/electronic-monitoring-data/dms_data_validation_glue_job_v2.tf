@@ -642,3 +642,64 @@ EOF
   )
 
 }
+
+
+# -------------------------------------------------------------------
+
+resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
+  name = "dms_data_validation"
+  # create_table_default_permission {
+  #   permissions = ["SELECT"]
+
+  #   principal {
+  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+  #   }
+  # }
+}
+
+# -------------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "create_or_refresh_dv_table" {
+  name              = "create-or-refresh-dv-table"
+  retention_in_days = 14
+}
+
+
+resource "aws_s3_object" "create_or_refresh_dv_table" {
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "create_or_refresh_dv_table.py"
+  source = "glue-job/create_or_refresh_dv_table.py"
+  etag   = filemd5("glue-job/create_or_refresh_dv_table.py")
+}
+
+resource "aws_glue_job" "create_or_refresh_dv_table" {
+  count = local.gluejob_count
+
+  name              = "create-or-refresh-dv-table"
+  description       = "Python script uses Boto3-Athena-Client to run sql-statements"
+  role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  default_arguments = {
+    "--parquet_output_bucket_name"       = module.s3-dms-data-validation-bucket.bucket.id
+    "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_tbl_name"            = "glue_df_output"
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.create_or_refresh_dv_table.name
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = ""
+  }
+  command {
+    python_version  = "3"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/create_or_refresh_dv_table.py"
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Py script as glue-job that creates dv table / refreshes its partitions",
+    }
+  )
+
+}

@@ -208,7 +208,7 @@ data "aws_iam_policy_document" "alfresco_efs_access_policy" {
 }
 
 resource "aws_security_group" "alfresco_sfs_alb" {
-  name        = "${var.env_name}-alfresco-sfs-alb"
+  name        = "${var.env_name}-alf-sfs-alb"
   description = "controls access to and from alfresco sfs load balancer"
   vpc_id      = var.account_config.shared_vpc_id
   tags        = local.tags
@@ -236,7 +236,7 @@ resource "aws_vpc_security_group_egress_rule" "alfresco_sfs_alb" {
 
 # internal application load balancer
 resource "aws_lb" "alfresco_sfs" {
-  name               = "${var.app_name}-${var.env_name}-alfresco-sfs-alb"
+  name               = "${var.app_name}-${var.env_name}-alf-sfs-alb"
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alfresco_sfs_alb.id]
