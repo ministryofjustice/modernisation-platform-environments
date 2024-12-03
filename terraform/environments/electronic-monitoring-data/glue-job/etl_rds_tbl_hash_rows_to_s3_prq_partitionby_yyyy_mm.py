@@ -311,11 +311,12 @@ if __name__ == "__main__":
     # VERIFY GIVEN INPUTS - END
     # -----------------------------------------
 
+    rds_query_where_clause = args.get('rds_query_where_clause', None)
     agg_row_dict_list = rds_jdbc_conn_obj.get_min_max_groupby_month(
                                             rds_sqlserver_db_table,
                                             date_partition_column_name,
                                             rds_db_tbl_pkey_column,
-                                            args.get('rds_query_where_clause', None)
+                                            rds_query_where_clause
                                         )
     LOGGER.info(f"""agg_row_dict_list:>\n{[agg_row_dict for agg_row_dict in agg_row_dict_list]}""")
 
@@ -327,9 +328,6 @@ if __name__ == "__main__":
     MONTH({date_partition_column_name}) AS month
     FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
     """.strip()
-
-    rds_query_where_clause = args.get('rds_query_where_clause', None)
-
 
     for agg_row_dict in agg_row_dict_list:
 
