@@ -168,9 +168,11 @@ module "calculate_checksum" {
   memory_size             = 4096
   timeout                 = 900
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
     Checksum = var.checksum_algorithm
   }
+
 }
 
 resource "aws_lambda_permission" "allow_sns_invoke_checksum_lambda" {
