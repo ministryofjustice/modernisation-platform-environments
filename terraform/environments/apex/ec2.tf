@@ -15,7 +15,7 @@ resource "aws_instance" "apex_db_instance" {
   iam_instance_profile        = aws_iam_instance_profile.ec2_instance_profile.id
   key_name                    = aws_key_pair.apex.key_name
   user_data_base64            = base64encode(local.database-instance-userdata)
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
 
   lifecycle {
     ignore_changes = [user_data_base64]
