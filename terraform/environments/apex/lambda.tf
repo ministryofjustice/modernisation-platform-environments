@@ -212,7 +212,7 @@ resource "aws_lambda_layer_version" "backup_lambda" {
   license_info     = "Apache-2.0"
   s3_bucket        = aws_s3_bucket.backup_lambda.id
   s3_key           = "nodejs.zip"
-  source_code_hash = local.hash_value
+  source_code_hash = data.aws_s3_object.nodejs_zip.checksum_sha256
 # Since the nodejs.zip file has been added manually to the s3 bucket the source_code_hash would have to be computed and added manually as well anytime there's a change to nodejs.zip
 # This command allows you to retrieve the hash - openssl dgst -sha256 -binary nodejs.zip | base64  
   compatible_runtimes = ["nodejs18.x"]
