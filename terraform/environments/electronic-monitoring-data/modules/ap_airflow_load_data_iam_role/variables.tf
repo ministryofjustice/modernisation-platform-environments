@@ -43,3 +43,10 @@ variable "cadt_bucket" {
   type        = object({ arn = string })
   description = "bucket for cadt"
 }
+
+variable "max_session_duration" {
+  type        = number
+  description = "max session duration for the role in seconds"
+  nullable    = true
+  default     = 7200
+}
