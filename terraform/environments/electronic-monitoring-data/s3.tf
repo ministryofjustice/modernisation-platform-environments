@@ -606,6 +606,8 @@ module "s3-fms-general-landing-bucket" {
   logging_bucket           = module.s3-logging-bucket
   production_dev           = local.is-production ? "prod" : "dev"
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
+  security_group_ids       = [aws_security_group.lambda_generic.id]
+  subnet_ids               = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
@@ -637,6 +639,8 @@ module "s3-fms-specials-landing-bucket" {
   logging_bucket           = module.s3-logging-bucket
   production_dev           = local.is-production ? "prod" : "dev"
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
+  security_group_ids       = [aws_security_group.lambda_generic.id]
+  subnet_ids               = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
@@ -673,6 +677,8 @@ module "s3-mdss-general-landing-bucket" {
   logging_bucket            = module.s3-logging-bucket
   production_dev            = local.is-production ? "prod" : "dev"
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
+  subnet_ids                = data.aws_subnets.shared-public.ids
+  security_group_ids        = [aws_security_group.lambda_generic.id]
 
   providers = {
     aws = aws
@@ -692,6 +698,8 @@ module "s3-mdss-ho-landing-bucket" {
   logging_bucket            = module.s3-logging-bucket
   production_dev            = local.is-production ? "prod" : "dev"
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
+  security_group_ids        = [aws_security_group.lambda_generic.id]
+  subnet_ids                = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
@@ -711,6 +719,8 @@ module "s3-mdss-specials-landing-bucket" {
   logging_bucket            = module.s3-logging-bucket
   production_dev            = local.is-production ? "prod" : "dev"
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
+  security_group_ids        = [aws_security_group.lambda_generic.id]
+  subnet_ids                = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
