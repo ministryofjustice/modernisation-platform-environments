@@ -266,7 +266,7 @@ locals {
           password_secret_name = "/sap/bods/t2/passwords"
         }
         tags = {
-          backup = "false"
+          backup = true
         }
       }
     }
