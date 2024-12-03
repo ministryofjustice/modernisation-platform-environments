@@ -174,7 +174,7 @@ module "calculate_checksum" {
   source                  = "./modules/lambdas"
   is_image                = true
   function_name           = "calculate_checksum"
-  role_name               = aws_iam_role.calculate_checksum.arn
+  role_name               = aws_iam_role.calculate_checksum.name
   role_arn                = aws_iam_role.calculate_checksum.arn
   handler                 = "calculate_checksum.handler"
   memory_size             = 4096
