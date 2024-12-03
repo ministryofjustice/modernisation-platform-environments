@@ -174,7 +174,7 @@ module "calculate_checksum_lambda" {
   runtime          = "python3.12"
   memory_size      = 4096
   timeout          = 900
-  source_code_hash = data.archive_file.get_metadata_from_rds.output_base64sha256
+  source_code_hash = data.archive_file.calculate_checksum_lambda.output_base64sha256
   environment_variables = {
     Checksum = var.checksum_algorithm
   }
