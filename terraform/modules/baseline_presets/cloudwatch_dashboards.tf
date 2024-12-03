@@ -460,6 +460,23 @@ locals {
           }
         }
       }
+      endpoint-response-time-ms = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_endpoint_response_time_ms_value\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "endpoint-response-time-ms"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "ms"
+            }
+          }
+        }
+      }
       endpoint-cert-days-to-expiry = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-expires-soon.threshold
@@ -991,6 +1008,7 @@ locals {
       height          = 8
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-status,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-response-time-ms,
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-days-to-expiry,
       ]
     }
