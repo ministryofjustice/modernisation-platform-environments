@@ -69,9 +69,9 @@ locals {
           },
           try(strcontains(local.widget_groups[i].widgets[j].expression, "InstanceId"), false) ? local.widget_groups_search_filter_ec2[i] : {},
           local.widget_groups[i].widgets[j],
-          var.accountId == null ? {} : {
+          var.accountId == null && lookup(local.widget_groups[i], "accountId", null) == null ? {} : {
             properties = merge(local.widget_groups[i].widgets[j].properties, {
-              accountId = var.accountId
+              accountId = coalesce(lookup(local.widget_groups[i], "accountId", null), var.accountId)
             })
           }
         ) if local.widget_groups[i].widgets[j] != null

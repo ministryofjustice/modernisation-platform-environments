@@ -34,6 +34,7 @@ variable "widget_groups" {
   #   header_markdown = optional(string)     # include a header text widget if set
   #   width           = number               # width of each widget, must be divisor of 24
   #   height          = number               # height of each widget
+  #   accountId       = optional(string)     # for monitoring accounts, apply this accountId to all widgets in group
   #   search_filter   = optional(object({    # optionally apply filter to each 'expression' widget
   #     negate        = bool                 # negate the filter, e.g. add NOT to the expression
   #     ec2_instance = optional(list(string)) # provide list of EC2 InstanceIds
@@ -43,8 +44,8 @@ variable "widget_groups" {
   #     })))
   #   }))
   #   add_ebs_widgets = optional(object({
-  #     iops = bool                          # add additional widgets showing EBS IOPS vs configured max
-  #     throughput = bool                    # add additional widgets showing EBS thoughput vs configured max
+  #     iops = bool                          # add additional widgets showing EBS IOPS vs configured max
+  #     throughput = bool                    # add additional widgets showing EBS thoughput vs configured max
   #   }))
   #   widgets         = list(any)            # as per https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html
   #   NOTE: widget can also use following fields for module only
