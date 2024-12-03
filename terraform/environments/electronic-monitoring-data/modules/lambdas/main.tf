@@ -159,7 +159,7 @@ resource "aws_lambda_function" "this" {
   }
 
   dynamic "vpc_config" {
-    for_each = local.use_vpc_config ? [1] : []
+    for_each = var.subnet_ids != null && var.security_group_ids != null ? [1] : []
     content {
       security_group_ids = var.security_group_ids
       subnet_ids         = var.subnet_ids
