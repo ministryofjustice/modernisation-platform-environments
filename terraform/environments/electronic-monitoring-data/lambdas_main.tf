@@ -38,6 +38,8 @@ module "unzip_single_file" {
   role_arn                = aws_iam_role.unzip_single_file.arn
   memory_size             = 2048
   timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
@@ -58,6 +60,8 @@ module "unzipped_presigned_url" {
   role_arn                = aws_iam_role.unzipped_presigned_url.arn
   memory_size             = 2048
   timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
 }
@@ -74,6 +78,8 @@ module "rotate_iam_key" {
   role_arn                = aws_iam_role.rotate_iam_keys.arn
   memory_size             = 2048
   timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
 }
@@ -92,6 +98,8 @@ module "virus_scan_definition_upload" {
   role_arn                = aws_iam_role.virus_scan_definition_upload.arn
   memory_size             = 2048
   timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   environment_variables = {
     MODE                         = "definition-upload",
@@ -122,6 +130,8 @@ module "virus_scan_file" {
   ephemeral_storage_size  = 10240
   memory_size             = 2048
   timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   environment_variables = {
     MODE                         = "scan",
@@ -144,6 +154,8 @@ module "format_json_fms_data" {
   role_arn                = aws_iam_role.format_json_fms_data.arn
   memory_size             = 1024
   timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
 }
@@ -167,6 +179,8 @@ module "calculate_checksum" {
   handler                 = "calculate_checksum.handler"
   memory_size             = 4096
   timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
