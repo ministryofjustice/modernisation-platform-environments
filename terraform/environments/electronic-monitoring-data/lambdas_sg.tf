@@ -1,8 +1,3 @@
-## Lambda Generic SG
-data "aws_vpc" "shared" {
-  default = true
-}
-
 resource "aws_security_group" "lambda_generic" {
 
   name_prefix = "${local.bucket_prefix}-generic-lambda-sg"
