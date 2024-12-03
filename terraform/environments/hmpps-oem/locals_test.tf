@@ -88,6 +88,7 @@ locals {
         start          = "-PT6H"
         widget_groups = [
           merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_endpoint_monitoring, {
+            account_name  = "hmpps-oem-${local.environment}"
             search_filter = "type_instance=(c-t1.test.nomis.service.justice.gov.uk OR c-t2.test.nomis.service.justice.gov.uk OR c-t3.test.nomis.service.justice.gov.uk)"
           }),
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
