@@ -95,7 +95,9 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "athena:GetQueryResults",
       "athena:StopQueryExecution"
     ]
-    resources = ["*"]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+    ]
   }
   statement {
     sid    = "GluePermissionsForLoadingJsonTable"
@@ -110,7 +112,12 @@ data "aws_iam_policy_document" "load_json_table_s3_policy_document" {
       "glue:DeleteDatabase",
       "glue:UpdateTable"
     ]
-    resources = ["*"]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:schema/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"
+    ]
   }
   statement {
     sid    = "SecretGetSlackKey"
