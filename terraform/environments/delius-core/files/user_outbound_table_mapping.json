@@ -28,11 +28,11 @@
       "rule-name": "remove_staff_id",
       "rule-target": "column",
       "object-locator": {
-          "schema-name": "DELIUS_APP_SCHEMA",
-          "table-name": "USER_",
-          "column-name": "STAFF_ID"
+        "schema-name": "DELIUS_APP_SCHEMA",
+        "table-name": "USER_",
+        "column-name": "STAFF_ID"
       },
       "rule-action": "remove-column"
-  }
+    }
   ]
 }

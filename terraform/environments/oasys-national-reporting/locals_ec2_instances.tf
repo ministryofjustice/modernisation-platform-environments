@@ -22,9 +22,9 @@ locals {
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-        "xvdd" = { type = "gp3", size = 128 } # D:/ Temp
-        "xvde" = { type = "gp3", size = 128 } # E:/ App
-        "xvdf" = { type = "gp3", size = 700 } # F:/ Storage
+        "xvdd"      = { type = "gp3", size = 128 } # D:/ Temp
+        "xvde"      = { type = "gp3", size = 128 } # E:/ App
+        "xvdf"      = { type = "gp3", size = 700 } # F:/ Storage
       }
       instance = {
         disable_api_termination      = false
