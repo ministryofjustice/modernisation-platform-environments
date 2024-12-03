@@ -58,6 +58,24 @@ resource "aws_iam_role" "call_centre_transfer_logging" {
   tags               = local.tags
 }
 
+resource "aws_iam_role" "call_centre_transfer_access" {
+  name_prefix        = "call-centre-access"
+  assume_role_policy = data.aws_iam_policy_document.aws_transfer_assume_role_policy.json
+  tags               = local.tags
+}
+
+resource "aws_iam_policy" "call_centre_transfer_access" {
+  description = "Access policy for AWS Transfer connector."
+  name_prefix = "call-centre-access"
+  policy      = data.aws_iam_policy_document.call_centre_access_policy.json
+  tags        = local.tags
+}
+
+resource "aws_iam_role_policy_attachment" "call_centre_transfer_access" {
+  policy_arn = aws_iam_policy.call_centre_transfer_access.arn
+  role       = aws_iam_role.call_centre_transfer_access.name
+}
+
 resource "aws_iam_role_policy_attachments_exclusive" "call_centre_transfer_logging" {
   policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
   role_name   = aws_iam_role.call_centre_transfer_logging.name
