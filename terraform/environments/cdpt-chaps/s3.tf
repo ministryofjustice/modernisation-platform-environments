@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "data_protection_keys" {
 
 resource "aws_s3_bucket_policy" "data_protection_policy" {
   bucket = aws_s3_bucket.data_protection_keys.id
-  policy =jsondecode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
