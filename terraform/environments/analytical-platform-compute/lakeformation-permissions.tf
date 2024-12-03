@@ -56,3 +56,8 @@ resource "aws_lakeformation_permissions" "cadet_domain_table_data" {
     }
   }
 }
+
+resource "aws_lakeformation_lf_tag" "sensitive" {
+  key    = "classification"
+  values = ["sensitive"]
+}
