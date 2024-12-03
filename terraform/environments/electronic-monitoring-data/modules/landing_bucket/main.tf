@@ -88,8 +88,8 @@ module "kms_key" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.1"
 
-  aliases               = ["s3/landing_bucket_${var.data_feed}_${var.order_type}"]
-  description           = "${var.data_feed} ${var.order_type} landing bucket KMS key"
+  aliases     = ["s3/landing_bucket_${var.data_feed}_${var.order_type}"]
+  description = "${var.data_feed} ${var.order_type} landing bucket KMS key"
 
   # Give full access to key for root account, and lambda role ability to use.
   enable_default_policy = true
