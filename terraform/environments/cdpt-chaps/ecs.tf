@@ -571,7 +571,7 @@ resource "aws_iam_role_policy" "app_task" {
           "s3:GetObject",
           "s3:PutObject"
         ],
-        "Resource": "${aws_s3_bucket.data_protection_keys.arn}/*"}
+        "Resource": "${aws_s3_bucket.data_protection_keys.arn}/*"
      }
    ]
   }
