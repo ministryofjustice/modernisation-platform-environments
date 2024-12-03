@@ -14,7 +14,9 @@ resource "aws_s3_bucket_policy" "data_protection_policy" {
     Statement = [
       {
         Effect = "Allow",
-        Principal = "*",
+        Principal = {
+          AWS = aws_iam_role.app_task.arn
+        },
         Action = ["s3:GetObject", "s3:PutObject"],
         Resource = "${aws_s3_bucket.data_protection_keys.arn}/*"
       }

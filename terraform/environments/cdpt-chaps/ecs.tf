@@ -105,6 +105,18 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
       }
       environment = [
         {
+          name= "AWS_REGION"
+          value= "eu-west-2"
+        },
+        {
+          name = "AWS_S3_BUCKET"
+          value = "chapsdotnet-data-protection-keys"
+        },
+        {
+          name = "DATA_PROTECTION_BUCKET_PREFIX"
+          value = "keys-directory/"
+        },
+        {
           name  = "Instance"
           value = "https://login.microsoftonline.com/"
         },
@@ -176,6 +188,18 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
         }
       }
       environment = [
+        {
+          name = "AWS_REGION"
+          value = "eu-west-2"
+        },
+        {
+          name = "AWS_S3_BUCKET"
+          value = "chapsdotnet-data-protection-keys"
+        },
+        {
+          name = "DATA_PROTECTION_BUCKET_PREFIX"
+          value = "keys-directory/"
+        },
         {
           name  = "RDS_HOSTNAME"
           value = aws_db_instance.database.address
@@ -540,6 +564,14 @@ resource "aws_iam_role_policy" "app_task" {
           "ecs:DescribeClusters"
         ],
        "Resource": "*"
+     },
+     {
+        "Effect": "Allow",
+        "Action": [
+          "s3:GetObject",
+          "s3:PutObject"
+        ],
+        "Resource": "${aws_s3_bucket.data_protection_keys.arn}/*"}
      }
    ]
   }
