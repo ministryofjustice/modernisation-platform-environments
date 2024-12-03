@@ -62,8 +62,8 @@ data "aws_iam_policy_document" "dpd_table_github_deploy_assume_role_policy" {
       variable = "token.actions.githubusercontent.com:aud"
     }
     condition {
-      test     = "StringLike"
-      values   = ["repo:ministryofjustice//hmpps-dpr-data-product-definitions:*"]
+      test     = "StringEquals"
+      values   = ["repo:ministryofjustice/hmpps-dpr-data-product-definitions:*"]
       variable = "token.actions.githubusercontent.com:sub"
     }
   }
