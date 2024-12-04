@@ -58,12 +58,17 @@ resource "aws_transfer_server" "call_centre" {
 }
 
 resource "aws_transfer_connector" "call_centre" {
-  access_role = aws_iam_role.call_centre_transfer_access.arn
+  access_role  = aws_iam_role.call_centre_transfer_access.arn
+  logging_role = aws_iam_role.call_centre_transfer_logging.arn
   sftp_config {
     trusted_host_keys = [jsondecode(data.aws_secretsmanager_secret_version.call_centre.secret_string)["Fingerprint"]]
     user_secret_id    = aws_secretsmanager_secret.call_centre.id
   }
   url = jsondecode(data.aws_secretsmanager_secret_version.call_centre.secret_string)["Hostname"]
+  tags = merge(
+    local.tags,
+    { Name = "call-centre-migration-connector" }
+  )
 }
 
 resource "aws_iam_role" "call_centre_transfer_logging" {
