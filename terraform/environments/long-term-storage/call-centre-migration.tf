@@ -43,6 +43,11 @@ resource "aws_secretsmanager_secret" "call_centre" {
   tags                           = local.tags
 }
 
+# Because we populate the secret version manually, we refer to its contents with a data call
+data "aws_secretsmanager_secret_version" "call_centre" {
+  secret_id = aws_secretsmanager_secret.call_centre.id
+}
+
 resource "aws_transfer_server" "call_centre" {
   logging_role                = aws_iam_role.call_centre_transfer_logging.arn
   structured_log_destinations = ["${aws_cloudwatch_log_group.call_centre.arn}:*"]
@@ -50,6 +55,15 @@ resource "aws_transfer_server" "call_centre" {
     local.tags,
     { Name = "call-centre-migration" }
   )
+}
+
+resource "aws_transfer_connector" "call_centre" {
+  access_role = aws_iam_role.call_centre_transfer_access.arn
+  sftp_config {
+    trusted_host_keys = [jsondecode(data.aws_secretsmanager_secret_version.call_centre.secret_string)["Fingerprint"]]
+    user_secret_id    = aws_secretsmanager_secret.call_centre.id
+  }
+  url = jsondecode(data.aws_secretsmanager_secret_version.call_centre.secret_string)["Hostname"]
 }
 
 resource "aws_iam_role" "call_centre_transfer_logging" {
