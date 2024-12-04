@@ -1023,17 +1023,6 @@ resource "aws_security_group_rule" "PPUD-Mail-Server-Ingress" {
   security_group_id = aws_security_group.PPUD-Mail-Server[0].id
 }
 
-resource "aws_security_group_rule" "PPUD-Mail-Server-Ingress-1" {
-  description       = "Rule to allow port 587 traffic inbound"
-  count             = local.is-production == true ? 1 : 0
-  type              = "ingress"
-  from_port         = 587
-  to_port           = 587
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.PPUD-Mail-Server[0].id
-}
-
 resource "aws_security_group_rule" "PPUD-Mail-Server-Egress" {
   description       = "Rule to allow port 443 traffic outbound"
   count             = local.is-production == true ? 1 : 0
