@@ -5,7 +5,7 @@ module "debug_instance" {
   version = "5.7.1"
 
   name                        = "network-debug"
-  ami                         = "ami-0bdf149a42243bde8" # Ubuntu Server 24.04 LTS
+  ami                         = "ami-0e8d228ad90af673b" # Ubuntu Server 24.04 LTS
   instance_type               = "t3.micro"
   subnet_id                   = element(module.vpc.private_subnets, 0)
   vpc_security_group_ids      = [module.debug_instance_security_group.security_group_id]
