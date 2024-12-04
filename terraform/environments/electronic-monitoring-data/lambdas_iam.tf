@@ -150,144 +150,6 @@ data "aws_iam_policy_document" "write_meta_to_s3" {
   }
 }
 
-
-
-# ------------------------------------------------
-# Write Metadata to AP
-# ------------------------------------------------
-
-locals {
-  metadata_ap_bucket = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
-}
-
-resource "aws_iam_role" "send_metadata_to_ap" {
-  name               = "send_metadata_to_ap"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-
-resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_write_meta_to_s3" {
-  role       = aws_iam_role.send_metadata_to_ap.name
-  policy_arn = aws_iam_policy.get_meta_from_s3.arn
-}
-
-resource "aws_iam_policy" "get_meta_from_s3" {
-  name   = "get_meta_from_s3"
-  policy = data.aws_iam_policy_document.get_meta_from_s3.json
-}
-
-resource "aws_iam_policy" "write_to_ap_s3" {
-  name   = "write_to_ap_s3"
-  policy = data.aws_iam_policy_document.write_to_ap_s3.json
-}
-
-resource "aws_iam_role_policy_attachment" "write_metadata_to_ap_write_to_ap_s3" {
-  role       = aws_iam_role.send_metadata_to_ap.name
-  policy_arn = aws_iam_policy.write_to_ap_s3.arn
-}
-
-data "aws_iam_policy_document" "get_meta_from_s3" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:ListObjects",
-      "s3:GetObject"
-    ]
-    resources = [
-      "${module.s3-metadata-bucket.bucket.arn}/*"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket"
-    ]
-    resources = [
-      module.s3-metadata-bucket.bucket.arn
-    ]
-  }
-}
-
-data "aws_iam_policy_document" "write_to_ap_s3" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket"
-    ]
-    resources = [
-      "arn:aws:s3:::${local.metadata_ap_bucket}"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl"
-    ]
-    resources = [
-      "arn:aws:s3:::${local.metadata_ap_bucket}/electronic_monitoring/*"
-    ]
-  }
-}
-
-# ------------------------------------------
-# Send table to AP
-# ------------------------------------------
-
-resource "aws_iam_role" "send_table_to_ap" {
-  name               = "send_table_to_ap"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-locals {
-  land_bucket = local.is-production ? "mojap-land" : "mojap-land-dev"
-}
-
-data "aws_iam_policy_document" "get_parquet_files" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:ListBucket",
-    ]
-    resources = [
-      module.s3-dms-target-store-bucket.bucket.arn,
-      "${module.s3-dms-target-store-bucket.bucket.arn}/*",
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetBucketLocation",
-      "s3:ListBucket"
-    ]
-    resources = [
-      "arn:aws:s3:::${local.land_bucket}"
-    ]
-  }
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectAcl"
-    ]
-    resources = [
-      "arn:aws:s3:::${local.land_bucket}/electronic_monitoring/load/*"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "get_parquet_files" {
-  name   = "get_parquet_files"
-  policy = data.aws_iam_policy_document.get_parquet_files.json
-}
-
-resource "aws_iam_role_policy_attachment" "send_table_to_ap_get_parquet_files" {
-  role       = aws_iam_role.send_table_to_ap.name
-  policy_arn = aws_iam_policy.get_parquet_files.arn
-}
-
 # ------------------------------------------------
 # Get tables from db
 # ------------------------------------------------
@@ -631,58 +493,6 @@ resource "aws_iam_role" "rotate_iam_keys" {
 }
 
 #-----------------------------------------------------------------------------------
-# Process landing bucket files
-#-----------------------------------------------------------------------------------
-
-resource "aws_iam_role" "process_landing_bucket_files" {
-  name               = "process_landing_bucket_files"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}
-
-data "aws_iam_policy_document" "process_landing_bucket_files_s3_policy_document" {
-  statement {
-    sid    = "S3PermissionsForLandingBuckets"
-    effect = "Allow"
-    actions = [
-      "s3:PutObjectTagging",
-      "s3:GetObject",
-      "s3:GetObjectTagging",
-      "s3:DeleteObject"
-    ]
-    resources = [
-      "${module.s3-fms-general-landing-bucket.bucket_arn}/*",
-      "${module.s3-fms-specials-landing-bucket.bucket_arn}/*",
-      "${module.s3-mdss-general-landing-bucket.bucket_arn}/*",
-      "${module.s3-mdss-ho-landing-bucket.bucket_arn}/*",
-      "${module.s3-mdss-specials-landing-bucket.bucket_arn}/*",
-    ]
-  }
-
-  statement {
-    sid    = "S3PermissionsForReceivedFilesBucket"
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:PutObjectTagging"
-    ]
-    resources = [
-      "${module.s3-received-files-bucket.bucket.arn}/*",
-    ]
-  }
-}
-
-resource "aws_iam_policy" "process_landing_bucket_files_s3" {
-  name        = "process-landing-bucket-files-s3-policy"
-  description = "Policy for Lambda to create presigned url for unzipped file from S3"
-  policy      = data.aws_iam_policy_document.process_landing_bucket_files_s3_policy_document.json
-}
-
-resource "aws_iam_role_policy_attachment" "process_landing_bucket_files_s3_policy_policy_attachment" {
-  role       = aws_iam_role.process_landing_bucket_files.name
-  policy_arn = aws_iam_policy.process_landing_bucket_files_s3.arn
-}
-
-#-----------------------------------------------------------------------------------
 # Virus scanning - definition upload
 #-----------------------------------------------------------------------------------
 
@@ -768,4 +578,46 @@ resource "aws_iam_policy" "virus_scan_file" {
 resource "aws_iam_role_policy_attachment" "virus_scan_file_policy_attachment" {
   role       = aws_iam_role.virus_scan_file.name
   policy_arn = aws_iam_policy.virus_scan_file.arn
+}
+
+#-----------------------------------------------------------------------------------
+# Load FMS JSON data
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "format_json_fms_data" {
+  name               = "format_json_fms_data"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "format_json_fms_data_policy_document" {
+  statement {
+    sid    = "S3PermissionsForGetUnformattedJSONFiles"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "S3PermissionsForPutFormattedJSONFiles"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+    ]
+    resources = [
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "format_json_fms_data" {
+  name        = "format-json-fms-data"
+  description = "Policy for Lambda to virus scan and move files"
+  policy      = data.aws_iam_policy_document.format_json_fms_data_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "format_json_fms_data_policy_attachment" {
+  role       = aws_iam_role.format_json_fms_data.name
+  policy_arn = aws_iam_policy.format_json_fms_data.arn
 }

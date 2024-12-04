@@ -66,7 +66,7 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_log_volume" {
     ImageId      = "ami-0f43890c2b4907c29"
     InstanceType = "m5.large"
     device       = "nvme1n1p1"
-    fstype       = "xfs"
+    fstype       = "ext4"
   }
 }
 

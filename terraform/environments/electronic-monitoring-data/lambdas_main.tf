@@ -77,45 +77,6 @@ module "create_athena_table" {
   }
 }
 
-
-# ------------------------------------------------------
-# Send Metadata to AP
-# ------------------------------------------------------
-
-
-data "archive_file" "send_metadata_to_ap" {
-  type        = "zip"
-  source_file = "${local.lambda_path}/send_metadata_to_ap.py"
-  output_path = "${local.lambda_path}/send_metadata_to_ap.zip"
-}
-
-module "send_metadata_to_ap" {
-  source             = "./modules/lambdas"
-  filename           = "${local.lambda_path}/send_metadata_to_ap.zip"
-  function_name      = "send_metadata_to_ap"
-  role_arn           = aws_iam_role.send_metadata_to_ap.arn
-  role_name          = aws_iam_role.send_metadata_to_ap.name
-  handler            = "send_metadata_to_ap.handler"
-  source_code_hash   = data.archive_file.send_metadata_to_ap.output_base64sha256
-  layers             = null
-  timeout            = 900
-  memory_size        = 1024
-  runtime            = "python3.11"
-  security_group_ids = null
-  subnet_ids         = data.aws_subnets.shared-public.ids
-  environment_variables = {
-    METADATA_BUCKET_NAME = local.is-production ? "mojap-metadata-prod" : "mojap-metadata-dev"
-
-  }
-}
-resource "aws_lambda_permission" "send_metadata_to_ap" {
-  statement_id  = "AllowS3ObjectMetaInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = module.send_metadata_to_ap.lambda_function_arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = module.s3-metadata-bucket.bucket.arn
-}
-
 # ------------------------------------------------------
 # get file keys for table
 # ------------------------------------------------------
@@ -134,7 +95,7 @@ module "get_file_keys_for_table" {
   role_arn           = aws_iam_role.get_file_keys_for_table.arn
   role_name          = aws_iam_role.get_file_keys_for_table.name
   handler            = "get_file_keys_for_table.handler"
-  source_code_hash   = data.archive_file.send_table_to_ap.output_base64sha256
+  source_code_hash   = data.archive_file.get_file_keys_for_table.output_base64sha256
   layers             = null
   timeout            = 900
   memory_size        = 1024
@@ -145,41 +106,6 @@ module "get_file_keys_for_table" {
     PARQUET_BUCKET_NAME = module.s3-dms-target-store-bucket.bucket.id
   }
 }
-
-
-
-# ------------------------------------------------------
-# Send table to AP 
-# ------------------------------------------------------
-
-
-data "archive_file" "send_table_to_ap" {
-  type        = "zip"
-  source_file = "${local.lambda_path}/send_table_to_ap.py"
-  output_path = "${local.lambda_path}/send_table_to_ap.zip"
-}
-
-module "send_table_to_ap" {
-  source             = "./modules/lambdas"
-  filename           = "${local.lambda_path}/send_table_to_ap.zip"
-  function_name      = "send_table_to_ap"
-  role_arn           = aws_iam_role.send_table_to_ap.arn
-  role_name          = aws_iam_role.send_table_to_ap.name
-  handler            = "send_table_to_ap.handler"
-  source_code_hash   = data.archive_file.send_table_to_ap.output_base64sha256
-  layers             = null
-  timeout            = 900
-  memory_size        = 1024
-  runtime            = "python3.11"
-  security_group_ids = null
-  subnet_ids         = null
-  environment_variables = {
-    AP_DESTINATION_BUCKET = local.land_bucket
-  }
-  reserved_concurrent_executions = 100
-}
-
-
 
 # ------------------------------------------------------
 # Get Tables from DB
@@ -329,25 +255,6 @@ module "rotate_iam_key" {
 }
 
 #-----------------------------------------------------------------------------------
-# Process landing bucket files
-#-----------------------------------------------------------------------------------
-
-module "process_landing_bucket_files" {
-  source                  = "./modules/lambdas"
-  function_name           = "process_landing_bucket_files"
-  is_image                = true
-  role_name               = aws_iam_role.process_landing_bucket_files.name
-  role_arn                = aws_iam_role.process_landing_bucket_files.arn
-  memory_size             = 1024
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-  environment_variables = {
-    DESTINATION_BUCKET = module.s3-received-files-bucket.bucket.id
-  }
-}
-
-#-----------------------------------------------------------------------------------
 # Virus scanning - definition upload
 #-----------------------------------------------------------------------------------
 
@@ -399,4 +306,20 @@ module "virus_scan_file" {
     QUARANTINE_BUCKET_NAME       = module.s3-quarantine-files-bucket.bucket.id
     PROCESSED_BUCKET_NAME        = module.s3-data-bucket.bucket.id
   }
+}
+
+#-----------------------------------------------------------------------------------
+# Process json files
+#-----------------------------------------------------------------------------------
+
+module "format_json_fms_data" {
+  source                  = "./modules/lambdas"
+  function_name           = "format_json_fms_data"
+  is_image                = true
+  role_name               = aws_iam_role.format_json_fms_data.name
+  role_arn                = aws_iam_role.format_json_fms_data.arn
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
 }

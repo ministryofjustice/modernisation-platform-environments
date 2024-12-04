@@ -2,11 +2,20 @@ locals {
 
   baseline_presets_test = {
     options = {
+      cloudwatch_dashboard_default_widget_groups = flatten([
+        local.cloudwatch_dashboard_default_widget_groups,
+        "github_workflows", # metrics are only pushed into test account
+      ])
       enable_ec2_delius_dba_secrets_access = true
 
       sns_topics = {
         pagerduty_integrations = {
-          pagerduty = "hmpps-oem-test"
+          azure-fixngo-pagerduty          = "az-noms-dev-test-environments-alerts"
+          dso-pipelines-pagerduty         = "dso-pipelines"
+          hmpps-domain-services-pagerduty = "hmpps-domain-services-test"
+          nomis-pagerduty                 = "nomis-test"
+          oasys-pagerduty                 = "oasys-test"
+          pagerduty                       = "hmpps-oem-test"
         }
       }
     }
@@ -14,6 +23,10 @@ locals {
 
   # please keep resources in alphabetical order
   baseline_test = {
+
+    cloudwatch_metric_alarms = merge(
+      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].github
+    )
 
     ec2_autoscaling_groups = {
       test-oem = merge(local.ec2_instances.oem, {

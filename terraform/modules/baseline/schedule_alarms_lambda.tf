@@ -6,7 +6,7 @@ module "schedule_alarms_lambda" {
     length(var.schedule_alarms_lambda.alarm_patterns) > 0
   ) ? 1 : 0
 
-  lambda_function_name = var.schedule_alarms_lambda.function_name
+  lambda_function_name = "schedule-alarms"
   lambda_log_level     = var.schedule_alarms_lambda.lambda_log_level
 
   alarm_list     = var.schedule_alarms_lambda.alarm_list

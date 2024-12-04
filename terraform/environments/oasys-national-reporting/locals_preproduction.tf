@@ -87,6 +87,13 @@ locals {
             "Ec2SecretPolicy",
           ])
         })
+        # IMPORTANT: EBS volume initialization, labelling, formatting was carried out manually on this instance. It was not automated so these ebs_volume settings are bespoke. Additional volumes should NOT be /dev/xvd* see the local.ec2_instances.bods.ebs_volumes setting for the correct device names. 
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/xvdk" = { type = "gp3", size = 128 } # D:/ Temp
+          "/dev/xvdl" = { type = "gp3", size = 128 } # E:/ App
+          "/dev/xvdm" = { type = "gp3", size = 700 } # F:/ Storage
+        }
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "r6i.2xlarge"
         })
@@ -135,7 +142,6 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bods/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pp/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/web/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
@@ -292,7 +298,6 @@ locals {
     secretsmanager_secrets = {
       "/sap/bods/pp"             = local.secretsmanager_secrets.bods
       "/sap/bip/pp"              = local.secretsmanager_secrets.bip
-      "/sap/web/pp"              = local.secretsmanager_secrets.web
       "/oracle/database/PPBOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PPBOAUD" = local.secretsmanager_secrets.db
     }

@@ -105,6 +105,7 @@ resource "aws_lb_listener" "tribunals_lb" {
     }
   }
 }
+
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
@@ -121,9 +122,4 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
       values = ["*${each.key}.*"]
     }
   }
-}
-
-resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
-  resource_arn = aws_lb.tribunals_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
 }

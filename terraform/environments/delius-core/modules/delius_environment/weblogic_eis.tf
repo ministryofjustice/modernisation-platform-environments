@@ -68,9 +68,16 @@ module "weblogic_eis" {
   container_memory = var.delius_microservice_configs.weblogic_eis.container_memory
   container_cpu    = var.delius_microservice_configs.weblogic_eis.container_cpu
 
-  health_check_path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
-  health_check_grace_period_seconds = 600
-  health_check_interval             = 30
+  alb_health_check = {
+    path                 = "/NDelius-war/delius/JSP/healthcheck.jsp?ping"
+    healthy_threshold    = 5
+    interval             = 30
+    protocol             = "HTTP"
+    unhealthy_threshold  = 5
+    matcher              = "200-499"
+    timeout              = 10
+    grace_period_seconds = 300
+  }
 
   db_ingress_security_groups = []
 
@@ -88,8 +95,7 @@ module "weblogic_eis" {
   platform_vars = var.platform_vars
   tags          = var.tags
 
-  ignore_changes_service_task_definition = false
-  force_new_deployment                   = false
+  ignore_changes_service_task_definition = true
 
   providers = {
     aws.core-vpc              = aws.core-vpc

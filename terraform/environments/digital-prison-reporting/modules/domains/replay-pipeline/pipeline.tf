@@ -48,11 +48,12 @@ module "replay_pipeline" {
         },
         "Check All Pending Files Have Been Processed" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {
-              "--dpr.orchestration.wait.interval.seconds" : "60"
+              "--dpr.orchestration.wait.interval.seconds" : tostring(var.processed_files_check_wait_interval_seconds),
+              "--dpr.orchestration.max.attempts" : tostring(var.processed_files_check_max_attempts)
             }
           },
           "Next" : "Stop Glue Streaming Job"
@@ -89,7 +90,7 @@ module "replay_pipeline" {
               "--dpr.file.transfer.source.bucket" : var.s3_curated_bucket_id,
               "--dpr.file.transfer.destination.bucket" : var.s3_temp_reload_bucket_id,
               "--dpr.file.transfer.delete.copied.files" : "false",
-              "--dpr.datastorage.retry.maxAttempts"   : tostring(var.glue_s3_max_attempts),
+              "--dpr.datastorage.retry.maxAttempts" : tostring(var.glue_s3_max_attempts),
               "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
               "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
@@ -131,7 +132,7 @@ module "replay_pipeline" {
               "--dpr.file.transfer.source.bucket" : var.s3_raw_bucket_id,
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_archive_bucket_id,
               "--dpr.file.transfer.delete.copied.files" : "true",
-              "--dpr.datastorage.retry.maxAttempts"   : tostring(var.glue_s3_max_attempts),
+              "--dpr.datastorage.retry.maxAttempts" : tostring(var.glue_s3_max_attempts),
               "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
               "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
@@ -150,7 +151,7 @@ module "replay_pipeline" {
               "--dpr.file.transfer.destination.bucket" : var.s3_raw_bucket_id,
               "--dpr.file.transfer.retention.period.amount" : "0",
               "--dpr.file.transfer.delete.copied.files" : "false",
-              "--dpr.datastorage.retry.maxAttempts"   : tostring(var.glue_s3_max_attempts),
+              "--dpr.datastorage.retry.maxAttempts" : tostring(var.glue_s3_max_attempts),
               "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
               "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
@@ -246,11 +247,12 @@ module "replay_pipeline" {
         },
         "Check All Files Have Been Replayed" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {
-              "--dpr.orchestration.wait.interval.seconds" : "60"
+              "--dpr.orchestration.wait.interval.seconds" : tostring(var.processed_files_check_wait_interval_seconds),
+              "--dpr.orchestration.max.attempts" : tostring(var.processed_files_check_max_attempts)
             }
           },
           "Next" : "Empty Raw Data"

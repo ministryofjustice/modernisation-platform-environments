@@ -21,11 +21,11 @@ spec:
   blockDeviceMappings:
     - deviceName: /dev/xvdb
       ebs:
-        volumeSize: 100Gi
+        volumeSize: 200Gi
         volumeType: gp3
         iops: 3000
         encrypted: true
         kmsKeyID: {{ .Values.ebsKmsKeyId }}
         deleteOnTermination: true
-        throughput: 125
+        throughput: 250
   detailedMonitoring: true

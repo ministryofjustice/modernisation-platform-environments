@@ -174,3 +174,27 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds_test" 
     )
   ]
 }
+
+resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
+  name       = "actions-runner-mojas-create-a-derived-table-emds"
+  repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
+  version    = "2.320.0-4"
+  chart      = "actions-runner"
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
+      {
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_organisation        = "moj-analytical-services"
+        github_repository          = "create-a-derived-table"
+        github_runner_labels       = "electronic-monitoring-data"
+        eks_role_arn               = "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-production"]}:role/prod-data-api-cross-account-role"
+      }
+    )
+  ]
+}
