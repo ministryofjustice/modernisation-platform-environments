@@ -460,6 +460,23 @@ locals {
           }
         }
       }
+      endpoint-response-time-ms = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_endpoint_response_time_ms_value\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "endpoint-response-time-ms"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "ms"
+            }
+          }
+        }
+      }
       endpoint-cert-days-to-expiry = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-expires-soon.threshold
@@ -775,6 +792,57 @@ locals {
           }
         }
       }
+      load-balancer-port-allocation-error-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"PortAllocationErrorCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB port-allocation-error-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "error count"
+            }
+          }
+        }
+      }
+      load-balancer-rejected-flow-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"RejectedFlowCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB rejected-flow-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "flow count"
+            }
+          }
+        }
+      }
+      load-balancer-tcp-client-reset-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"TCP_Client_Reset_Count\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB tcp-client-reset-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "reset count"
+            }
+          }
+        }
+      }
     }
     ssm = {
       ssm-command-success-count = {
@@ -991,6 +1059,7 @@ locals {
       height          = 8
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-status,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-response-time-ms,
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-days-to-expiry,
       ]
     }
@@ -1025,6 +1094,9 @@ locals {
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-bytes,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-packets,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-peak-packets-per-second,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-port-allocation-error-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-rejected-flow-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-tcp-client-reset-count,
       ]
     }
     ssm_command = {

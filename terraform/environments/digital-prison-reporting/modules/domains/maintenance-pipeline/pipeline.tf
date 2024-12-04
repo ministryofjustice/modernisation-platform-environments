@@ -30,7 +30,8 @@ module "maintenance_pipeline" {
           "Parameters" : {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {
-              "--dpr.orchestration.wait.interval.seconds" : "60",
+              "--dpr.orchestration.wait.interval.seconds" : tostring(var.processed_files_check_wait_interval_seconds),
+              "--dpr.orchestration.max.attempts" : tostring(var.processed_files_check_max_attempts),
               "--dpr.datastorage.retry.maxAttempts" : tostring(var.glue_s3_max_attempts),
               "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
               "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis)
