@@ -312,6 +312,9 @@ if __name__ == "__main__":
     # -----------------------------------------
 
     rds_query_where_clause = args.get('rds_query_where_clause', None)
+    if rds_query_where_clause is not None:
+        rds_query_where_clause = rds_query_where_clause.strip()
+
     agg_row_dict_list = rds_jdbc_conn_obj.get_min_max_groupby_month(
                                             rds_sqlserver_db_table,
                                             date_partition_column_name,
@@ -329,6 +332,7 @@ if __name__ == "__main__":
     FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
     """.strip()
 
+
     for agg_row_dict in agg_row_dict_list:
 
         agg_row_year = agg_row_dict['year']
@@ -340,18 +344,14 @@ if __name__ == "__main__":
         LOGGER.info(f"""min_pkey_value = {min_pkey_value}""")
         LOGGER.info(f"""max_pkey_value = {max_pkey_value}""")
 
-        pkey_between_clause_str = f""" 
+        pkey_between_clause_str_temp = f""" 
         WHERE {rds_db_tbl_pkey_column} between {min_pkey_value} and {max_pkey_value}""".strip()
 
-        rds_db_select_query_str = rds_db_select_query_str + pkey_between_clause_str
+        rds_db_select_query_str_temp = rds_db_select_query_str + pkey_between_clause_str_temp                              
 
-        if rds_query_where_clause is not None:
-            rds_query_where_clause = rds_query_where_clause.strip()
-            rds_db_select_query_str = rds_db_select_query_str + \
-                                        f""" AND {rds_query_where_clause}"""                                           
-
+        LOGGER.info(f"""rds_db_select_query_str_temp = \n{rds_db_select_query_str_temp}""")
         rds_hashed_rows_df = rds_jdbc_conn_obj.get_rds_df_read_query_pkey_parallel(
-                                    rds_db_select_query_str,
+                                    rds_db_select_query_str_temp,
                                     rds_db_tbl_pkey_column,
                                     min_pkey_value,
                                     max_pkey_value,
