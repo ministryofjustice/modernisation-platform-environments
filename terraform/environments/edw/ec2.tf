@@ -491,6 +491,10 @@ resource "aws_instance" "edw_db_instance" {
   user_data_base64            = base64encode(local.db_userdata)
   user_data_replace_on_change = false
 
+  lifecycle {
+    ignore_changes = [user_data_base64]
+  }
+  
   root_block_device {
     tags = merge(
       local.tags,
