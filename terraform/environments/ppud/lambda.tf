@@ -578,7 +578,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_prod" {
   ]
   # VPC configuration
   vpc_config {
-    subnet_ids         = [aws_subnet.private_subnets_b.id]
+    subnet_ids         = [data.aws_subnet.private_subnets_b.id]
     security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
   }
 }
