@@ -2,10 +2,20 @@ locals {
 
   baseline_presets_test = {
     options = {
-      cloudwatch_dashboard_default_widget_groups = flatten([
-        local.cloudwatch_dashboard_default_widget_groups,
-        "github_workflows", # metrics are only pushed into test account
-      ])
+      cloudwatch_dashboard_default_widget_groups = [
+        "ec2_instance_endpoint_monitoring",
+        "lb",
+        "ec2",
+        "ec2_linux",
+        "ec2_autoscaling_group_linux",
+        "ec2_instance_linux",
+        "ec2_instance_oracle_db_with_backup",
+        "ec2_instance_textfile_monitoring",
+        "ec2_windows",
+        "ssm_command",
+        "github_workflows",
+      ]
+
       enable_ec2_delius_dba_secrets_access = true
 
       sns_topics = {
@@ -30,7 +40,7 @@ locals {
 
     cloudwatch_dashboards = {
       "endpoints-and-pipelines" = {
-        account_name   = "hmpps-oem-${local.environment}"
+        account_name   = "hmpps-oem-test"
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
@@ -39,17 +49,26 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.github_workflows,
         ]
       }
-      "hmpps-domain-services-${local.environment}" = {
-        account_name   = "hmpps-domain-services-${local.environment}"
+      "hmpps-domain-services-test" = {
+        account_name   = "hmpps-domain-services-test"
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_endpoint_monitoring, {
+            account_name = "hmpps-oem-test"
+            search_filter_dimension = {
+              name = "type_instance"
+              values = [
+                "rdgateway1.test.hmpps-domain.service.justice.gov.uk",
+              ]
+            }
+          }),
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
         ]
       }
-      "hmpps-oem-${local.environment}" = {
+      "hmpps-oem-test" = {
         account_name   = null
         periodOverride = "auto"
         start          = "-PT6H"
@@ -82,13 +101,13 @@ locals {
           ]
         }]
       }
-      "nomis-${local.environment}" = {
-        account_name   = "nomis-${local.environment}"
+      "nomis-test" = {
+        account_name   = "nomis-test"
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
           merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_endpoint_monitoring, {
-            account_name = "hmpps-oem-${local.environment}"
+            account_name = "hmpps-oem-test"
             search_filter_dimension = {
               name = "type_instance"
               values = [
@@ -109,8 +128,8 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
         ]
       }
-      "nomis-combined-reporting-${local.environment}" = {
-        account_name   = "nomis-combined-reporting-${local.environment}"
+      "nomis-combined-reporting-test" = {
+        account_name   = "nomis-combined-reporting-test"
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
@@ -119,38 +138,47 @@ locals {
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_filesystems,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
         ]
       }
-      "nomis-data-hub-${local.environment}" = {
-        account_name   = "nomis-data-hub-${local.environment}"
+      "nomis-data-hub-test" = {
+        account_name   = "nomis-data-hub-test"
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_filesystems,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
         ]
       }
-      "oasys-${local.environment}" = {
-        account_name   = "oasys-${local.environment}"
+      "oasys-test" = {
+        account_name   = "oasys-test"
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
+          merge(module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_endpoint_monitoring, {
+            account_name = "hmpps-oem-test"
+            search_filter_dimension = {
+              name = "type_instance"
+              values = [
+                "t1-int.oasys.service.justice.gov.uk",
+                "t2-int.oasys.service.justice.gov.uk",
+              ]
+            }
+          }),
           module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_autoscaling_group_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
           module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
         ]
       }
-      "oasys-national-reporting-${local.environment}" = {
-        account_name   = "oasys-national-reporting-${local.environment}"
+      "oasys-national-reporting-test" = {
+        account_name   = "oasys-national-reporting-test"
         periodOverride = "auto"
         start          = "-PT6H"
         widget_groups = [
