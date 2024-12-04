@@ -123,7 +123,3 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
     }
   }
 }
-
-output "target_group_arns" {
-  value = local.target_group_arns
-}
