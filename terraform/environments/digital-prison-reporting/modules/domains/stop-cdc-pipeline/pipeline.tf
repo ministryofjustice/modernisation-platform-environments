@@ -1,4 +1,3 @@
-# tflint-ignore-file: terraform_required_version
 # Step Function for Stopping the CDC Pipeline
 module "cdc_stop_pipeline" {
   source = "../../step_function"
