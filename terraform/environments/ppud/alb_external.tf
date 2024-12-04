@@ -241,6 +241,29 @@ resource "aws_lb_target_group" "WAM-Target-Group-Preprod" {
   }
 }
 
+resource "aws_lb_target_group" "WAM-Target-Group-Preprod-2" {
+  count    = local.is-preproduction == true ? 1 : 0
+  name     = "WAM-Preprod-2"
+  port     = 443
+  protocol = "HTTPS"
+  vpc_id   = data.aws_vpc.shared.id
+
+  health_check {
+    enabled             = true
+    path                = "/"
+    interval            = 30
+    protocol            = "HTTPS"
+    port                = 443
+    timeout             = 5
+    healthy_threshold   = 5
+    unhealthy_threshold = 2
+    matcher             = "302"
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
 resource "aws_lb_target_group" "WAM-Target-Group-Prod" {
   count    = local.is-production == true ? 1 : 0
   name     = "WAM-Prod"
