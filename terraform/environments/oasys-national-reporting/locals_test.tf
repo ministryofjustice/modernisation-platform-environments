@@ -135,7 +135,7 @@ locals {
           ])
           user_data_raw = base64encode(templatefile(
             "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-              branch = "TM/TM-660/onr-bods-second-server"
+              branch = "main"
           }))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
@@ -151,32 +151,29 @@ locals {
 
     ec2_instances = {
 
-      t2-onr-bods-1 = merge(local.ec2_instances.bods, {
-        config = merge(local.ec2_instances.bods.config, {
-          # ami_name          = ""
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-          user_data_raw = base64encode(templatefile(
-            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-              branch = "TM/TM-732/shared-drive-onr-bods"
-            }
-          ))
-        })
-        instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "m4.xlarge"
-        })
-        cloudwatch_metric_alarms = null
-        tags = merge(local.ec2_instances.bods.tags, {
-          oasys-national-reporting-environment = "t2"
-          domain-name                          = "azure.noms.root"
-        })
-      })
+      # t2-onr-bods-1 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2a"
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #         branch = "TM/TM-732/shared-drive-onr-bods"
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #     domain-name                          = "azure.noms.root"
+      #   })
+      # })
 
       # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
       #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2a"
+      #     availability_zone = "eu-west-2b"
       #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
       #       "Ec2SecretPolicy",
       #     ])
