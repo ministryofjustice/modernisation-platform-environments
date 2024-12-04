@@ -494,8 +494,7 @@ resource "aws_instance" "edw_db_instance" {
   root_block_device {
     tags = merge(
       local.tags,
-      { "Name" = "${local.application_name}-root-volume" },
-      { "Dummy" = "Dummy"}
+      { "Name" = "${local.application_name}-root-volume"}
     )
   }
 
