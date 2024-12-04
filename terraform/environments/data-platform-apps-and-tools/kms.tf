@@ -1,7 +1,7 @@
 module "datahub_rds_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/kms/aws"
-  version = "~> 2.0"
+  version = "~> 3.1"
 
   aliases               = ["rds/datahub"]
   description           = "Datahub RDS"
