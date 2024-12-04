@@ -576,6 +576,11 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_prod" {
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
     aws_lambda_layer_version.lambda_layer_matplotlib_prod[0].arn
   ]
+  # VPC configuration
+  vpc_config {
+    subnet_ids         = [aws_subnet.private_subnets_b.id]
+    security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
+  }
 }
 
 # Archive the zip file
