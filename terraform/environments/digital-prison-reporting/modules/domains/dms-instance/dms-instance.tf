@@ -8,6 +8,7 @@ module "dms_instance" {
   setup_dms_instance           = var.setup_dms_instance
   replication_instance_version = var.replication_instance_version
   replication_instance_class   = var.replication_instance_class
+  replication_instance_storage = var.replication_instance_storage
   subnet_ids                   = var.subnet_ids
   vpc_cidr                     = var.vpc_cidr
   vpc                          = var.vpc
