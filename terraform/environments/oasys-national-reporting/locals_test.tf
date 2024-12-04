@@ -160,6 +160,7 @@ locals {
       #     user_data_raw = base64encode(templatefile(
       #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
       #         branch = "TM/TM-732/shared-drive-onr-bods"
+      #     }))
       #   })
       #   instance = merge(local.ec2_instances.bods.instance, {
       #     instance_type = "m4.xlarge"
@@ -177,10 +178,10 @@ locals {
       #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
       #       "Ec2SecretPolicy",
       #     ])
-      #     user-data-raw = base64encode(templatefile(
+      #     user_data_raw = base64encode(templatefile(
       #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #         branch = "TM/TM-660/onr-bods-second-server"
-      #       }))
+      #         branch = "TM/TM-732/shared-drive-onr-bods"
+      #     }))
       #   })
       #   instance = merge(local.ec2_instances.bods.instance, {
       #     instance_type = "m4.xlarge"
