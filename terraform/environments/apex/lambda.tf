@@ -2,6 +2,7 @@ locals {
   create_db_snapshots_script_prefix = "dbsnapshot"
   delete_db_snapshots_script_prefix = "deletesnapshots"
   db_connect_script_prefix          = "dbconnect"
+  hash_value                        = "Y/4+i1hcHvLBzOaCHJ/m9bQLuVtQwr8gnF//AJ2j+S4="
 }
 
 resource "aws_ssm_parameter" "ssh_key" {
@@ -98,6 +99,11 @@ resource "aws_iam_role_policy_attachment" "backup_lambda" {
 ### S3 for Backup Lambda
 ##################################
 
+data "aws_s3_object" "nodejs_zip" {
+  bucket = aws_s3_bucket.backup_lambda.id
+  key    = "nodejs.zip"
+}
+
 resource "aws_s3_bucket" "backup_lambda" {
   bucket = "${local.application_name}-${local.environment}-backup-lambda"
   tags = merge(
@@ -108,11 +114,11 @@ resource "aws_s3_bucket" "backup_lambda" {
 
 resource "aws_s3_object" "provision_files" {
   bucket       = aws_s3_bucket.backup_lambda.id
-  for_each     = fileset("./zipfiles/", "**")
+  for_each     = toset(["${local.create_db_snapshots_script_prefix}.zip", "${local.delete_db_snapshots_script_prefix}.zip", "${local.db_connect_script_prefix}.zip"])
   key          = each.value
-  source       = "./zipfiles/${each.value}"
+  source       = "./scripts/${each.value}"
   content_type = "application/zip"
-  source_hash  = filemd5("./zipfiles/${each.value}")
+  source_hash  = filemd5("./scripts/${each.value}")
 }
 
 # This delays the creation of resource 
@@ -161,19 +167,19 @@ resource "aws_s3_bucket_versioning" "backup_lambda" {
 data "archive_file" "create_db_snapshots" {
   type        = "zip"
   source_file = "scripts/${local.create_db_snapshots_script_prefix}.js"
-  output_path = "zipfiles/${local.create_db_snapshots_script_prefix}.zip"
+  output_path = "scripts/${local.create_db_snapshots_script_prefix}.zip"
 }
 
 data "archive_file" "delete_db_snapshots" {
   type        = "zip"
   source_file = "scripts/${local.delete_db_snapshots_script_prefix}.py"
-  output_path = "zipfiles/${local.delete_db_snapshots_script_prefix}.zip"
+  output_path = "scripts/${local.delete_db_snapshots_script_prefix}.zip"
 }
 
 data "archive_file" "connect_db" {
   type        = "zip"
   source_file = "scripts/${local.db_connect_script_prefix}.js"
-  output_path = "zipfiles/${local.db_connect_script_prefix}.zip"
+  output_path = "scripts/${local.db_connect_script_prefix}.zip"
 }
 
 
@@ -206,8 +212,9 @@ resource "aws_lambda_layer_version" "backup_lambda" {
   license_info     = "Apache-2.0"
   s3_bucket        = aws_s3_bucket.backup_lambda.id
   s3_key           = "nodejs.zip"
-  source_code_hash = filebase64sha256("zipfiles/nodejs.zip")
-
+  source_code_hash = local.hash_value
+# Since the nodejs.zip file has been added manually to the s3 bucket the source_code_hash would have to be computed and added manually as well anytime there's a change to nodejs.zip
+# This command allows you to retrieve the hash - openssl dgst -sha256 -binary nodejs.zip | base64  
   compatible_runtimes = ["nodejs18.x"]
   depends_on          = [time_sleep.wait_for_provision_files] # This resource creation will be delayed to ensure object exists in the bucket
 }

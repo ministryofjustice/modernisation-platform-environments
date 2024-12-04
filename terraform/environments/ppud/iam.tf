@@ -1375,3 +1375,10 @@ resource "aws_iam_policy_attachment" "attach_lambda_read_only_access_prod" {
   roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].id]
   policy_arn = "arn:aws:iam::aws:policy/AWSLambda_ReadOnlyAccess"
 }
+
+# Attach AWSLambdaVPCAccessExecutionRole Policy to the Role
+resource "aws_iam_role_policy_attachment" "lambda_vpc_access_policy_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
