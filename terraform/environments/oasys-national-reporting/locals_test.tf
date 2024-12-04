@@ -135,7 +135,7 @@ locals {
           ])
           user_data_raw = base64encode(templatefile(
             "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-            branch = "TM/TM-660/onr-bods-second-server"
+              branch = "TM/TM-660/onr-bods-second-server"
           }))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {

@@ -134,13 +134,14 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
   ssl_mode      = var.source_ssl_mode
   username      = var.source_app_username
 
-  dynamic postgres_settings {
-    for_each = var.source_engine_name == "postgres" ? [1]: []
+  dynamic "postgres_settings" {
+    for_each = var.source_engine_name == "postgres" ? [1] : []
 
     content {
-      map_boolean_as_boolean = true
-      heartbeat_enable       = true
-      heartbeat_frequency    = 5
+      map_boolean_as_boolean       = true
+      fail_tasks_on_lob_truncation = true
+      heartbeat_enable             = true
+      heartbeat_frequency          = 5
     }
   }
 
@@ -168,7 +169,6 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
 
   max_file_size           = 120000
   cdc_max_batch_interval  = 10
-  cdc_inserts_and_updates = true
 
   tags = merge(
     var.tags,

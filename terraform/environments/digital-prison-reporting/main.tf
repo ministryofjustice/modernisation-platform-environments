@@ -850,12 +850,13 @@ module "s3_structured_bucket" {
 
 # S3 Curated
 module "s3_curated_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-curated-zone-${local.env}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
+  source                      = "./modules/s3_bucket"
+  create_s3                   = local.setup_buckets
+  name                        = "${local.project}-curated-zone-${local.env}"
+  custom_kms_key              = local.s3_kms_arn
+  create_notification_queue   = false # For SQS Queue
+  enable_lifecycle            = true
+  enable_intelligent_tiering  = false
 
   tags = merge(
     local.all_tags,
@@ -866,7 +867,7 @@ module "s3_curated_bucket" {
   )
 }
 
-# S3 Curated
+# S3 Temp Reload
 module "s3_temp_reload_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
@@ -1230,7 +1231,7 @@ module "dms_nomis_ingestor" {
   dms_target_name              = "kinesis"
   short_name                   = "nomis"
   migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.7" # Upgrade
+  replication_instance_version = "3.5.2"
   replication_instance_class   = "dms.t3.medium"
   subnet_ids = [
     data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
@@ -1246,10 +1247,6 @@ module "dms_nomis_ingestor" {
     "partition_include_schema_table" = "true"
     "include_partition_value"        = "true"
     "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
-  }
-
-  availability_zones = {
-    0 = "eu-west-2a"
   }
 
   tags = merge(
@@ -1298,10 +1295,6 @@ module "dms_nomis_to_s3_ingestor" {
   extra_attributes = "supportResetlog=TRUE"
 
   bucket_name = module.s3_raw_bucket.bucket_id
-
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
 
   depends_on = [
     module.s3_raw_bucket.bucket_id

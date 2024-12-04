@@ -55,3 +55,19 @@ module "quicksight_shared_vpc_security_group" {
 
   tags = local.tags
 }
+
+/* This security group is temporary and will be retired when we're satisfied with DataSync end-to-end */
+module "debug_instance_security_group" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "5.2.0"
+
+  name   = "debug-instance"
+  vpc_id = module.vpc.vpc_id
+
+  egress_cidr_blocks = ["0.0.0.0/0"]
+  egress_rules       = ["all-all"]
+
+  tags = local.tags
+}

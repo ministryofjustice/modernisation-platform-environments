@@ -5,12 +5,14 @@
 #   etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v2.py")
 # }
 
+
 # resource "aws_s3_object" "dms_dv_rds_and_s3_parquet_write_v4d" {
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
 #   key    = "dms_dv_rds_and_s3_parquet_write_v4d.py"
 #   source = "glue-job/dms_dv_rds_and_s3_parquet_write_v4d.py"
 #   etag   = filemd5("glue-job/dms_dv_rds_and_s3_parquet_write_v4d.py")
 # }
+
 
 # resource "aws_s3_object" "rds_to_s3_parquet_migration_monthly" {
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
@@ -19,12 +21,14 @@
 #   etag   = filemd5("glue-job/rds_to_s3_parquet_migration_monthly.py")
 # }
 
+
 # resource "aws_s3_object" "rds_to_s3_parquet_migration" {
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
 #   key    = "rds_to_s3_parquet_migration.py"
 #   source = "glue-job/rds_to_s3_parquet_migration.py"
 #   etag   = filemd5("glue-job/rds_to_s3_parquet_migration.py")
 # }
+
 
 # resource "aws_s3_object" "resizing_parquet_files" {
 #   bucket = module.s3-glue-job-script-bucket.bucket.id
@@ -33,42 +37,18 @@
 #   etag   = filemd5("glue-job/resizing_parquet_files.py")
 # }
 
-resource "aws_s3_object" "create_or_replace_dv_table" {
-  bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "create_or_replace_dv_table.py"
-  source = "glue-job/create_or_replace_dv_table.py"
-  etag   = filemd5("glue-job/create_or_replace_dv_table.py")
-}
-
-# -------------------------------------------------------------------
-
-resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
-  name = "dms_data_validation"
-  # create_table_default_permission {
-  #   permissions = ["SELECT"]
-
-  #   principal {
-  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
-  #   }
-  # }
-}
-
-# -------------------------------------------------------------------
-
-resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
-  name              = "dms-dv-glue-job"
-  retention_in_days = 14
-}
 
 # resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group_v2" {
 #   name              = "dms-dv-glue-job-v2"
 #   retention_in_days = 14
 # }
 
+
 # resource "aws_cloudwatch_log_group" "rds_to_s3_parquet_migration" {
 #   name              = "rds-to-s3-parquet-migration"
 #   retention_in_days = 14
 # }
+
 
 # resource "aws_cloudwatch_log_group" "resizing_parquet_files" {
 #   name              = "resizing-parquet-files"
@@ -368,36 +348,3 @@ resource "aws_cloudwatch_log_group" "dms_dv_cw_log_group" {
 #   )
 
 # }
-
-
-resource "aws_glue_job" "catalog_dv_table_glue_job" {
-  count = local.gluejob_count
-
-  name              = "catalog-dv-table-glue-job"
-  description       = "Python script uses Boto3-Athena-Client to run sql-statements"
-  role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
-  glue_version      = "4.0"
-  worker_type       = "G.1X"
-  number_of_workers = 2
-  default_arguments = {
-    "--parquet_output_bucket_name"       = module.s3-dms-data-validation-bucket.bucket.id
-    "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
-    "--glue_catalog_tbl_name"            = "glue_df_output"
-    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.dms_dv_cw_log_group.name
-    "--enable-continuous-cloudwatch-log" = "true"
-    "--enable-continuous-log-filter"     = "true"
-    "--enable-metrics"                   = ""
-  }
-  command {
-    python_version  = "3"
-    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/create_or_replace_dv_table.py"
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Resource_Type = "Py script as glue-job that creates dv table / refreshes its partitions",
-    }
-  )
-
-}

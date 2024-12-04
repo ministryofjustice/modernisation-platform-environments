@@ -97,6 +97,7 @@ variable "cloudwatch_dashboards" {
   #    header_markdown = optional(string)     # include a header text widget if set
   #    width           = number               # width of each widget, must be divisor of 24
   #    height          = number               # height of each widget
+  #    account_name    = optional(string)     # for monitoring account, limit to given account
   #    widgets         = list(any)            # no need to set x,y,width,height
   #  })), [])
   #}))
