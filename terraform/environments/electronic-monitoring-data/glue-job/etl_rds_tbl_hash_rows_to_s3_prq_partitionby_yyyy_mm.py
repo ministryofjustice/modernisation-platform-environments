@@ -323,7 +323,7 @@ if __name__ == "__main__":
                                         )
     LOGGER.info(f"""agg_row_dict_list:>\n{[agg_row_dict for agg_row_dict in agg_row_dict_list]}""")
 
-    rds_db_select_query_str = f"""
+    rds_db_hash_cols_query_str = f"""
     SELECT {rds_db_tbl_pkey_column}, 
     LOWER(SUBSTRING(CONVERT(VARCHAR(66), 
     HASHBYTES('SHA2_256', CONCAT_WS('', {', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash,
@@ -347,9 +347,9 @@ if __name__ == "__main__":
         pkey_between_clause_str_temp = f""" 
         WHERE {rds_db_tbl_pkey_column} between {min_pkey_value} and {max_pkey_value}""".strip()
 
-        rds_db_select_query_str_temp = rds_db_select_query_str + pkey_between_clause_str_temp
+        rds_db_select_query_str_temp = rds_db_hash_cols_query_str + pkey_between_clause_str_temp
         LOGGER.info(f"""rds_db_select_query_str_temp = \n{rds_db_select_query_str_temp}""")
-        
+
         rds_hashed_rows_df = rds_jdbc_conn_obj.get_rds_df_read_query_pkey_parallel(
                                     rds_db_select_query_str_temp,
                                     rds_db_tbl_pkey_column,
