@@ -21,7 +21,7 @@ resource "aws_lakeformation_permissions" "cadet_all_data" {
   }
 }
 
-resource "aws_lakeformation_lf_tag" "domain" {
+resource "aws_lakeformation_lf_tag" "cadet_tags" {
   for_each = try(local.environment_configuration.cadet_lf_tags, {})
   key      = each.key
   values   = each.value
@@ -55,9 +55,4 @@ resource "aws_lakeformation_permissions" "cadet_domain_table_data" {
       values = each.value
     }
   }
-}
-
-resource "aws_lakeformation_lf_tag" "sensitive" {
-  key    = "classification"
-  values = ["sensitive"]
 }
