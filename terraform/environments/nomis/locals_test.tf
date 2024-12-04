@@ -53,7 +53,7 @@ locals {
       # NOT-ACTIVE (blue deployment) - for testing Combined Reporting
       t1-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
           max_size         = 1
         })
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
