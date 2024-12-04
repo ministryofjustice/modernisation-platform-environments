@@ -347,9 +347,9 @@ if __name__ == "__main__":
         pkey_between_clause_str_temp = f""" 
         WHERE {rds_db_tbl_pkey_column} between {min_pkey_value} and {max_pkey_value}""".strip()
 
-        rds_db_select_query_str_temp = rds_db_select_query_str + pkey_between_clause_str_temp                              
-
+        rds_db_select_query_str_temp = rds_db_select_query_str + pkey_between_clause_str_temp
         LOGGER.info(f"""rds_db_select_query_str_temp = \n{rds_db_select_query_str_temp}""")
+        
         rds_hashed_rows_df = rds_jdbc_conn_obj.get_rds_df_read_query_pkey_parallel(
                                     rds_db_select_query_str_temp,
                                     rds_db_tbl_pkey_column,
