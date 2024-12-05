@@ -24,6 +24,7 @@ locals {
           dso-pipelines-pagerduty         = "dso-pipelines"
           hmpps-domain-services-pagerduty = "hmpps-domain-services-test"
           nomis-pagerduty                 = "nomis-test"
+          nomis-data-hub-pagerduty        = "nomis-data-hub-test"
           oasys-pagerduty                 = "oasys-test"
           pagerduty                       = "hmpps-oem-test"
         }
