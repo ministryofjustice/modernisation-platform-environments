@@ -135,7 +135,7 @@ locals {
           ])
           user_data_raw = base64encode(templatefile(
             "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-              branch = "TM/TM-660/onr-bods-second-server"
+              branch = "main"
           }))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
@@ -168,26 +168,22 @@ locals {
         })
       })
 
-      # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
-      #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2a"
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-      #       "Ec2SecretPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bods.instance, {
-      #     instance_type = "m4.xlarge"
-      #   })
-      #   user_data_raw = base64encode(templatefile(
-      #      "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #      branch = "TM/TM-660/onr-bods-second-server"
-      #    }))
-      #   cloudwatch_metric_alarms = null
-      #   tags = merge(local.ec2_instances.bods.tags, {
-      #     oasys-national-reporting-environment = "t2"
-      #     domain-name                          = "azure.noms.root"
-      #   })
-      # })
+      t2-onr-bods-2 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type = "m4.xlarge"
+        })
+        cloudwatch_metric_alarms = null
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+          domain-name                          = "azure.noms.root"
+        })
+      })
 
       # NOTE: These are all BOE 3.1 instances and are not currently needed
       # t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
@@ -232,6 +228,37 @@ locals {
       #     domain-name = "azure.noms.root"
       #   })
       # })
+    }
+
+    fsx_windows = {
+      t2-bods-windows-share = {
+        preferred_availability_zone = "eu-west-2a"
+        deployment_type             = "MULTI_AZ_1"
+        security_groups             = ["bods"]
+        skip_final_backup           = true
+        storage_capacity            = 128
+        throughput_capacity         = 8
+
+        subnets = [
+          {
+            name               = "private"
+            availability_zones = ["eu-west-2a", "eu-west-2b"]
+          }
+        ]
+
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.mp_ip.ad-azure-dc-a,
+            module.ip_addresses.mp_ip.ad-azure-dc-b,
+          ]
+          domain_name          = "azure.noms.root"
+          username             = "svc_join_domain"
+          password_secret_name = "/sap/bods/t2/passwords"
+        }
+        tags = {
+          backup = true
+        }
+      }
     }
 
     iam_policies = {
