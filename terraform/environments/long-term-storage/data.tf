@@ -4,20 +4,10 @@ data "aws_iam_policy_document" "aws_transfer_assume_role_policy" {
     effect = "Allow"
 
     principals {
-      type        = "Service"
+      type = "Service"
       identifiers = ["transfer.amazonaws.com"]
     }
     actions = ["sts:AssumeRole"]
-    condition {
-      test     = "StringEquals"
-      values   = [data.aws_caller_identity.current.account_id]
-      variable = "aws:SourceAccount"
-    }
-    condition {
-      test     = "ArnLike"
-      values   = ["arn:aws:transfer:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:user/*"]
-      variable = "aws:SourceArn"
-    }
   }
 }
 
