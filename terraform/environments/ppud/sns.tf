@@ -65,6 +65,7 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription4" {
 }
 */
 
+/*
 resource "aws_sns_topic_policy" "sns_topic_policy_ec2cw" {
   count = local.is-production == true ? 1 : 0
   arn   = aws_sns_topic.cw_alerts[0].arn
@@ -98,6 +99,7 @@ resource "aws_sns_topic_policy" "sns_topic_policy_ec2cw" {
     ]
   })
 }
+*/
 
 # PreProduction - Cloud Watch
 
