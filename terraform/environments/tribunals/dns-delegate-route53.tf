@@ -14,7 +14,8 @@ locals {
     "siac.decisions",
     "taxandchancery_ut.decisions",
     "charity.decisions",
-    "phl.decisions"
+    "phl.decisions",
+    "asylumsupport.decisions"
   ]
 
   afd_records_migrated = [
@@ -27,8 +28,7 @@ locals {
     "financeandtax.decisions",
     "landregistrationdivision.decisions",
     "landschamber.decisions",
-    "transportappeals.decisions",
-    "asylumsupport.decisions"
+    "transportappeals.decisions"
   ]
 
   nginx_records = [
