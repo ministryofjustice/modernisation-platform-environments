@@ -942,7 +942,7 @@ locals {
         expression = "SORT(SEARCH('{CustomMetrics, WorkflowName} MetricName=\"GitHubActionRunsFailedCount\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
-          period  = 3600
+          period  = 1800
           stacked = true
           region  = "eu-west-2"
           title   = "GitHub actions-run-failed-count-by-workflow"
