@@ -126,4 +126,54 @@ locals {
     local.cloudwatch_metric_alarms_endpoint_monitoring_endpoint,
     local.cloudwatch_metric_alarms_endpoint_monitoring_cert_expiry
   )
+
+  # you can generate list of scheduled pipelines using script in dso-modernisation-platform-automation repo
+  # e.g. src/github-workflow-monitoring/github-workflow-monitor.sh -i 3600 -n 168 -r all | grep -v all | cut -d, -f2,3 | sed 's/^/["/g' | sed 's/,/", "/g' | sed 's/$/", "dso-pipelines-pagerduty"],/g'
+  gha_pipeline_alarms = [
+    #["dso-certificates", "cert-renewal-devtest", "dso-pipelines-pagerduty"],
+    ["dso-certificates", "cert-renewal-prod", "dso-pipelines-pagerduty"],
+    #["dso-certificates", "stale", "dso-pipelines-pagerduty"],
+    #["dso-infra-azure-ad", "application-management", "dso-pipelines-pagerduty"],
+    #["dso-infra-azure-ad", "application-cleanup", "dso-pipelines-pagerduty"],
+    #["dso-infra-azure-fixngo", "appgw-fix-NOMSProduction1", "dso-pipelines-pagerduty"],
+    #["dso-infra-azure-fixngo", "terragrunt-DigitalStudioDevTestEnvironments", "dso-pipelines-pagerduty"],
+    #["dso-infra-azure-fixngo", "terragrunt-NOMSDigitalStudioProduction1", "dso-pipelines-pagerduty"],
+    #["dso-infra-azure-fixngo", "terragrunt-NOMSDevTestEnvironments", "dso-pipelines-pagerduty"],
+    #["dso-infra-azure-fixngo", "terragrunt-NOMSProduction1", "dso-pipelines-pagerduty"],
+    #["dso-infra-azure-fixngo", "stale", "dso-pipelines-pagerduty"],
+    #["dso-modernisation-platform-automation", "ssm_command_monitoring", "dso-pipelines-pagerduty"],
+    #["dso-modernisation-platform-automation", "github_workflow_monitoring", "dso-pipelines-pagerduty"],
+    #["dso-modernisation-platform-automation", "nomis_environment_start", "dso-pipelines-pagerduty"],
+    #["dso-modernisation-platform-automation", "certificate_renewal", "dso-pipelines-pagerduty"],
+    #["dso-modernisation-platform-automation", "azure_sas_token_refresh", "dso-pipelines-pagerduty"],
+    #["dso-modernisation-platform-automation", "ndh_offloc_cdecopy", "dso-pipelines-pagerduty"],
+    #["dso-modernisation-platform-automation", "nomis_environment_stop", "dso-pipelines-pagerduty"],
+    #["dso-modernisation-platform-automation", "nomis_database_refresh", "dso-pipelines-pagerduty"],
+    #["dso-modernisation-platform-automation", "oasys_database_refresh", "dso-pipelines-pagerduty"],
+    #["dso-repositories", "stale", "dso-pipelines-pagerduty"],
+    #["dso-useful-stuff", "stale", "dso-pipelines-pagerduty"],
+    #["dso-useful-stuff", "dangling-dns", "dso-pipelines-pagerduty"],
+  ]
+
+  cloudwatch_metric_alarms_github_action_failed = {
+    for item in local.gha_pipeline_alarms : "${item[0]}-${item[1]}-github-action-failed" => merge(
+      module.baseline_presets.cloudwatch_metric_alarms.github["failed-github-action-run"],
+      {
+        dimensions = {
+          Repo         = item[0]
+          WorkflowName = item[1]
+        }
+        alarm_actions = [item[2]]
+        ok_actions    = [item[2]]
+      }
+    )
+  }
+  cloudwatch_metric_alarms_github_action_missing = {
+    github-action-metrics-missing = module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].github["github-action-metrics-missing"]
+  }
+
+  cloudwatch_metric_alarms_github_actions = merge(
+    local.cloudwatch_metric_alarms_github_action_failed,
+    local.cloudwatch_metric_alarms_github_action_missing
+  )
 }
