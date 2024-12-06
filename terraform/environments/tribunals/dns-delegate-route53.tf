@@ -1,8 +1,7 @@
 locals {
 
   ec2_records = [
-    "decisions",
-    "asylumsupport.decisions"
+    "decisions"
   ]
 
   ec2_records_migrated = [
@@ -28,7 +27,8 @@ locals {
     "financeandtax.decisions",
     "landregistrationdivision.decisions",
     "landschamber.decisions",
-    "transportappeals.decisions"
+    "transportappeals.decisions",
+    "asylumsupport.decisions"
   ]
 
   nginx_records = [
