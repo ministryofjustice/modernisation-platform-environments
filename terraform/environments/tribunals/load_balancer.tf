@@ -104,10 +104,17 @@ data "aws_instances" "tribunals_instance" {
 # Make sure that the ec2 instance tagged as 'tribunals-instance' exists
 # before adding aws_lb_target_group_attachment, otherwise terraform will fail
 resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
-  for_each         = aws_lb_target_group.tribunals_target_group
-  target_group_arn = each.value.arn
-  target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
-  port             = each.value.port
+  for_each = {
+    for pair in setproduct(keys(aws_lb_target_group.tribunals_target_group), data.aws_instances.tribunals_instance.ids) : 
+    "${pair[0]}-${pair[1]}" => {
+      target_group_key = pair[0]
+      instance_id      = pair[1]
+    }
+  }
+  
+  target_group_arn = aws_lb_target_group.tribunals_target_group[each.value.target_group_key].arn
+  target_id        = each.value.instance_id
+  port             = aws_lb_target_group.tribunals_target_group[each.value.target_group_key].port
 }
 
 resource "aws_lb_listener" "tribunals_lb" {

@@ -15,6 +15,14 @@ $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
 "Got instanceid " + $instanceid >> $logFile
 
+# Get the AZ of the instance
+$az = Get-EC2InstanceMetadata -Path '/placement/availability-zone'
+"Instance is in AZ: $az" >> $logFile
+
+# Set the EBS volume tag based on AZ
+$ebsVolumeTag = if ($az -eq "eu-west-2a") { "tribunals-all-storage-a" } else { "tribunals-all-storage-b" }
+"Using EBS volume tag: $ebsVolumeTag" >> $logFile
+
 $volumeid = Get-EC2Volume -Filter @{ Name="tag:Name"; Values=$ebsVolumeTag } -Select Volumes.VolumeId
 "Got volumeid " + $volumeid >> $logFile
 
