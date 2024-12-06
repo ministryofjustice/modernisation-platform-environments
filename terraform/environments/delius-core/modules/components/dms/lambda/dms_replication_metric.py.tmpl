@@ -2,14 +2,48 @@ import boto3
 import json
 import logging
 import re
+from datetime import datetime
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
 
+    # The following guide describes Instance Scheduling - 
+    #    automatically stop non-production instances overnight
+    # https://user-guide.modernisation-platform.service.justice.gov.uk/concepts/environments/instance-scheduling.html#instance-scheduling-automatically-stop-non-production-instances-overnight
+    # 
+    # We should ignore DMS events sent when the primary database instance is not meant
+    # to be up.   That is under the following conditions:
+    # Before 6am or after 9pm, or all day weekends
+    # Except if the instance scheduling is set to "skip-scheduling" or "skip-auto-stop"
+    # as we do not automatically stop those instances.
+    # The instance scheduling for the environment is embedded into this function at
+    # creation time using the value of the delius primary database instance_scheduling tag;
+    # this avoids having to find and read the tag each time the function gets called as
+    # this instance_scheduling tag is unlikely to change very often if at all.
+    #
+    # If we ignore DMS events out of hours then that avoids changing the status of the
+    # CloudWatch alarm.  This is important because a DMS event is raised when replication
+    # fails overnight (due to the database instance being down), but *NO* DMS event is
+    # raised when the replication starts working again (due to the database instance
+    # being restarted).  Therefore we must avoid processing the overnight failure events.
+
     cloudwatch = boto3.client('cloudwatch')
     for record in event['Records']:
+
+        # Get the current local time and weekday (timezones are respected)
+        now = datetime.now()
+        current_hour    = now.hour
+        current_weekday = now.weekday()  # Monday is 0, Sunday is 6
+
+        # Skip the iteration if before 6am, after 9pm, or it is the weekend.
+        # These times are hard-coded into the stop/start functionality.  We do not
+        # currently support custom times.
+        # Do NOT skip if the instance_scheduling tag has the value of skip-scheduling 
+        # or skip-audit-stop is set as we must handle all DMS events in these environments (they are up 24/7)
+        if (current_hour < 6 or current_hour > 21 or current_weekday >= 5) and (not "${oracle_db_instance_scheduling}" in ["skip-scheduling","skip-auto-stop"]):
+            continue
 
         message = json.loads(record['Sns']['Message'])
         logger.info("SNS Message: %s",message)
