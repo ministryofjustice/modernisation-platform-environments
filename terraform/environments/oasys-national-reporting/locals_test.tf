@@ -231,6 +231,7 @@ locals {
     }
 
     fsx_windows = {
+      # switch to using SINGLE_AZ_1 in T2 (cheaper), change settings in T2 servers then remove this
       t2-bods-windows-share = {
         preferred_availability_zone = "eu-west-2a"
         deployment_type             = "MULTI_AZ_1"
@@ -245,6 +246,27 @@ locals {
             availability_zones = ["eu-west-2a", "eu-west-2b"]
           }
         ]
+
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.mp_ip.ad-azure-dc-a,
+            module.ip_addresses.mp_ip.ad-azure-dc-b,
+          ]
+          domain_name          = "azure.noms.root"
+          username             = "svc_join_domain"
+          password_secret_name = "/sap/bods/t2/passwords"
+        }
+        tags = {
+          backup = true
+        }
+      }
+      t2-bods-win-share = {
+        deployment_type     = "SINGLE_AZ_1"
+        security_groups     = ["bods"]
+        skip_final_backup   = true
+        storage_capacity    = 128
+        throughput_capacity = 8
+        subnet_ids          = [data.aws_subnet.private_subnets_a.id]
 
         self_managed_active_directory = {
           dns_ips = [
