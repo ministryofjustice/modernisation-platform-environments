@@ -1243,7 +1243,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
           "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
         ]
     },
-          {
+    {
       "Sid" : "CloudwatchMetricStatsPolicy",
       "Effect" : "Allow",
       "Action" : [
@@ -1252,7 +1252,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
       "Resource" : [
         "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
       ]
-      },
+      }
     ]
   })
 }
