@@ -266,7 +266,13 @@ locals {
         skip_final_backup   = true
         storage_capacity    = 128
         throughput_capacity = 8
-        subnet_ids          = [data.aws_subnet.private_subnets_a.id]
+
+        subnets = [
+          {
+            name               = "private"
+            availability_zones = ["eu-west-2a"]
+          }
+        ]
 
         self_managed_active_directory = {
           dns_ips = [
