@@ -121,6 +121,14 @@ locals {
         })
       })
 
+      dev-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
+            branch = "TM-626/nomis/weblogic-12-v1"
+          })
+        })
+      })
+
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
         autoscaling_schedules = {} # disable overnight scale down
       })
