@@ -903,14 +903,14 @@ locals {
     github = {
       github-actions-run-success-count-by-repo = {
         type       = "metric"
-        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsSuccessCount\"','Sum'),SUM,DESC)"
+        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsSuccessCount\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
-          period  = 3600
+          period  = 1800
           stacked = true
           region  = "eu-west-2"
           title   = "GitHub actions-run-success-count-by-repo"
-          stat    = "Sum"
+          stat    = "Maximum"
           yAxis = {
             left = {
               showUnits = false,
@@ -921,14 +921,14 @@ locals {
       }
       github-actions-run-failed-count-by-repo = {
         type       = "metric"
-        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsFailedCount\"','Sum'),SUM,DESC)"
+        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsFailedCount\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
-          period  = 3600
+          period  = 1800
           stacked = true
           region  = "eu-west-2"
           title   = "GitHub actions-run-failed-count-by-repo"
-          stat    = "Sum"
+          stat    = "Maximum"
           yAxis = {
             left = {
               showUnits = false,
@@ -939,14 +939,14 @@ locals {
       }
       github-actions-run-failed-count-by-workflow = {
         type       = "metric"
-        expression = "SORT(SEARCH('{CustomMetrics, WorkflowName} MetricName=\"GitHubActionRunsFailedCount\"','Sum'),SUM,DESC)"
+        expression = "SORT(SEARCH('{CustomMetrics, WorkflowName} MetricName=\"GitHubActionRunsFailedCount\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
-          period  = 3600
+          period  = 1800
           stacked = true
           region  = "eu-west-2"
           title   = "GitHub actions-run-failed-count-by-workflow"
-          stat    = "Sum"
+          stat    = "Maximum"
           yAxis = {
             left = {
               showUnits = false,
