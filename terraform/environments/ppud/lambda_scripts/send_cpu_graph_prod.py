@@ -35,8 +35,6 @@ INSTANCE_TYPE = "m5.xlarge"
 # SMTP Configuration
 SMTP_SERVER = "10.27.9.39"
 SMTP_PORT = 25
-MAIL_FROM = "donotreply@cjsm.secure-email.ppud.justice.gov.uk"
-EMAIL_TO = ["nick.buckingham@colt.net"]
 
 def get_metric_data(namespace, metric_name, dimensions):
     response = cloudwatch.get_metric_data(
