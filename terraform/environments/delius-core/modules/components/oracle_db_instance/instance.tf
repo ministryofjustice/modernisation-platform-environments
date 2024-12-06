@@ -49,10 +49,10 @@ module "instance" {
 
   user_data_raw = base64encode(
     templatefile(
-      "${path.module}/concatenated_user_data.sh",
+      "${path.module}/templates/concatenated_user_data.sh",
       {
         default   = var.user_data,
-        ssh_setup = file("${path.module}/ssh_setup.sh"),
+        ssh_setup = file("${path.module}/templates/ssh_key_setup.sh"),
       }
     )
   )
