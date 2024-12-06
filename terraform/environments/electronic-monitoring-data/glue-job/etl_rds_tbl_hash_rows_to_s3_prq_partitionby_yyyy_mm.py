@@ -311,15 +311,19 @@ if __name__ == "__main__":
     # VERIFY GIVEN INPUTS - END
     # -----------------------------------------
 
+    rds_query_where_clause = args.get('rds_query_where_clause', None)
+    if rds_query_where_clause is not None:
+        rds_query_where_clause = rds_query_where_clause.strip()
+
     agg_row_dict_list = rds_jdbc_conn_obj.get_min_max_groupby_month(
                                             rds_sqlserver_db_table,
                                             date_partition_column_name,
                                             rds_db_tbl_pkey_column,
-                                            args.get('rds_query_where_clause', None)
+                                            rds_query_where_clause
                                         )
     LOGGER.info(f"""agg_row_dict_list:>\n{[agg_row_dict for agg_row_dict in agg_row_dict_list]}""")
 
-    rds_db_select_query_str = f"""
+    rds_db_hash_cols_query_str = f"""
     SELECT {rds_db_tbl_pkey_column}, 
     LOWER(SUBSTRING(CONVERT(VARCHAR(66), 
     HASHBYTES('SHA2_256', CONCAT_WS('', {', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash,
@@ -327,8 +331,6 @@ if __name__ == "__main__":
     MONTH({date_partition_column_name}) AS month
     FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
     """.strip()
-
-    rds_query_where_clause = args.get('rds_query_where_clause', None)
 
 
     for agg_row_dict in agg_row_dict_list:
@@ -342,18 +344,14 @@ if __name__ == "__main__":
         LOGGER.info(f"""min_pkey_value = {min_pkey_value}""")
         LOGGER.info(f"""max_pkey_value = {max_pkey_value}""")
 
-        pkey_between_clause_str = f""" 
+        pkey_between_clause_str_temp = f""" 
         WHERE {rds_db_tbl_pkey_column} between {min_pkey_value} and {max_pkey_value}""".strip()
 
-        rds_db_select_query_str = rds_db_select_query_str + pkey_between_clause_str
-
-        if rds_query_where_clause is not None:
-            rds_query_where_clause = rds_query_where_clause.strip()
-            rds_db_select_query_str = rds_db_select_query_str + \
-                                        f""" AND {rds_query_where_clause}"""                                           
+        rds_db_select_query_str_temp = rds_db_hash_cols_query_str + pkey_between_clause_str_temp
+        LOGGER.info(f"""rds_db_select_query_str_temp = \n{rds_db_select_query_str_temp}""")
 
         rds_hashed_rows_df = rds_jdbc_conn_obj.get_rds_df_read_query_pkey_parallel(
-                                    rds_db_select_query_str,
+                                    rds_db_select_query_str_temp,
                                     rds_db_tbl_pkey_column,
                                     min_pkey_value,
                                     max_pkey_value,

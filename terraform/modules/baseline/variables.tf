@@ -97,6 +97,7 @@ variable "cloudwatch_dashboards" {
   #    header_markdown = optional(string)     # include a header text widget if set
   #    width           = number               # width of each widget, must be divisor of 24
   #    height          = number               # height of each widget
+  #    account_name    = optional(string)     # for monitoring account, limit to given account
   #    widgets         = list(any)            # no need to set x,y,width,height
   #  })), [])
   #}))
@@ -492,6 +493,7 @@ variable "fsx_windows" {
     deployment_type                   = optional(string) # [SINGLE_AZ_1 (default), SINGLE_AZ_2, MULTI_AZ_1]
     kms_key_id                        = optional(string, "general")
     preferred_subnet_name             = optional(string, "private") # set if MULTI_AZ_1
+    preferred_subnet_id               = optional(string)            # set if MULTI_AZ_1
     preferred_availability_zone       = optional(string)            # set if MULTI_AZ_1
     security_group_ids                = optional(list(string))
     skip_final_backup                 = optional(bool)
