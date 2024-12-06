@@ -49,8 +49,14 @@ def lambda_handler(event, context):
         statements = re.split(r'\bGO\b', script, flags=re.IGNORECASE)
         for statement in statements:
             if statement.strip():
-                cursor.execute(statement)
-                conn.commit()
+                try:
+                    print(f"Executing statement: {statement.strip()}")
+                    cursor.execute(statement)
+                    conn.commit()
+                except Exception as e:
+                    print(f"Error executing statement: {e}")
+                    print(f"SQL Statement: {statement.strip()}")
+                    break  # Exit on error
 
     # Closing the connection
     cursor.close()

@@ -18,23 +18,8 @@ locals {
   }
   baseline_environment_specific = local.baseline_environments_specific[local.environment]
 
-  cloudwatch_dashboard_default_widget_groups = [
-    "network_lb",
-    "lb",
-    "ec2",
-    "ec2_linux",
-    "ec2_autoscaling_group_linux",
-    "ec2_instance_linux",
-    "ec2_instance_oracle_db_with_backup",
-    "ec2_instance_textfile_monitoring",
-    "ec2_windows",
-    "ssm_command",
-    "github_workflows",
-  ]
-
   baseline_presets_all_environments = {
     options = {
-      cloudwatch_dashboard_default_widget_groups  = local.cloudwatch_dashboard_default_widget_groups
       cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
       enable_backup_plan_daily_and_weekly         = true
       enable_business_unit_kms_cmks               = true
@@ -49,6 +34,8 @@ locals {
       enable_s3_db_backup_bucket                  = true
       enable_s3_shared_bucket                     = true
       enable_s3_software_bucket                   = true
+      enable_ssm_command_monitoring               = true
+      enable_ssm_missing_metric_monitoring        = true
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
     }
   }
@@ -56,120 +43,6 @@ locals {
   baseline_all_environments = {
     options = {
       enable_resource_explorer = true
-    }
-
-    cloudwatch_dashboards = {
-      "corporate-staff-rostering-${local.environment}" = {
-        account_name   = "corporate-staff-rostering-${local.environment}"
-        periodOverride = "auto"
-        start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
-        ]
-      }
-      "hmpps-domain-services-${local.environment}" = {
-        account_name   = "hmpps-domain-services-${local.environment}"
-        periodOverride = "auto"
-        start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
-        ]
-      }
-      "hmpps-oem-${local.environment}" = {
-        account_name   = "hmpps-oem-${local.environment}"
-        periodOverride = "auto"
-        start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
-        ]
-      }
-      "nomis-${local.environment}" = {
-        account_name   = "nomis-${local.environment}"
-        periodOverride = "auto"
-        start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_autoscaling_group_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
-        ]
-      }
-      "nomis-combined-reporting-${local.environment}" = {
-        account_name   = "nomis-combined-reporting-${local.environment}"
-        periodOverride = "auto"
-        start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
-        ]
-      }
-      "nomis-data-hub-${local.environment}" = {
-        account_name   = "nomis-data-hub-${local.environment}"
-        periodOverride = "auto"
-        start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_filesystems,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
-        ]
-      }
-      "oasys-${local.environment}" = {
-        account_name   = "oasys-${local.environment}"
-        periodOverride = "auto"
-        start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_autoscaling_group_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_oracle_db_with_backup,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_textfile_monitoring,
-        ]
-      }
-      "oasys-national-reporting-${local.environment}" = {
-        account_name   = "oasys-national-reporting-${local.environment}"
-        periodOverride = "auto"
-        start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_instance_linux,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
-        ]
-      }
-      "planetfm-${local.environment}" = {
-        account_name   = "planetfm-${local.environment}"
-        periodOverride = "auto"
-        start          = "-PT6H"
-        widget_groups = [
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2,
-          module.baseline_presets.cloudwatch_dashboard_widget_groups.ec2_windows,
-        ]
-      }
     }
 
     iam_policies = {

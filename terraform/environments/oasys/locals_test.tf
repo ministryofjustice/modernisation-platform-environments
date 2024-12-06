@@ -3,7 +3,6 @@ locals {
   baseline_presets_test = {
     options = {
 
-      enable_observability_platform_monitoring = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "oasys-test"
@@ -29,6 +28,20 @@ locals {
         tags = {
           description = "cert for t2 oasys test domains"
         }
+      }
+    }
+
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.onr,
+          local.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
       }
     }
 

@@ -227,24 +227,30 @@ else
 fi
 
 #### Prevent timeout on DB
+
+# Increase ssh session timeout
+sed -i 's/#ClientAliveInterval.*/ClientAliveInterval 1200/' /etc/ssh/sshd_config
+sed -i 's/#ClientAliveCountMax.*/ClientAliveCountMax 5/' /etc/ssh/sshd_config
+service sshd restart 
+
+
 # Add TCP keepalive time to sysctl.conf ---> keepalive solution
-echo "net.ipv4.tcp_keepalive_time = 300" >> /etc/sysctl.conf
+echo "net.ipv4.tcp_keepalive_time = 120" >> /etc/sysctl.conf
 sysctl -p
+
 # Add SQLNET.EXPIRE_TIME to sqlnet.ora ---> keepalive solution
 # Check if SQLNET.EXPIRE_TIME exists in the file and update it, otherwise add it
 if grep -q "^SQLNET.EXPIRE_TIME" /oracle/software/product/10.2.0/network/admin/sqlnet.ora; then
-    # If the line exists, update it to "SQLNET.EXPIRE_TIME = 1"
-    sed -i 's/^SQLNET\.EXPIRE_TIME.*/SQLNET.EXPIRE_TIME = 1/' /oracle/software/product/10.2.0/network/admin/sqlnet.ora
+    # If the line exists, update it to "SQLNET.EXPIRE_TIME = 2"
+    sed -i 's/^SQLNET\.EXPIRE_TIME.*/SQLNET.EXPIRE_TIME = 2/' /oracle/software/product/10.2.0/network/admin/sqlnet.ora
 else
     # If the line does not exist, append it to the end of the file
     echo "SQLNET.EXPIRE_TIME = 1" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
 fi
+
 # Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
-grep -q '(ENABLE *= *broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora || sed -i '/(DESCRIPTION =/a\\  (ENABLE = broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
-# Add inbound connection timeout option to sqlnet
-grep -qxF "SQLNET.INBOUND_CONNECT_TIMEOUT = 0" /oracle/software/product/10.2.0/network/admin/sqlnet.ora || echo "SQLNET.INBOUND_CONNECT_TIMEOUT = 0" >> /oracle/software/product/10.2.0/network/admin/sqlnet.ora
-# Add inbound connection timeout option to listener
-grep -qxF "INBOUND_CONNECT_TIMEOUT_LISTENER = 0" /oracle/software/product/10.2.0/network/admin/listener.ora || echo "INBOUND_CONNECT_TIMEOUT_LISTENER = 0" >> /oracle/software/product/10.2.0/network/admin/listener.ora
+grep -q '(ENABLE = broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora || sed -i '/(DESCRIPTION =/a\\  (ENABLE = broken)' /oracle/software/product/10.2.0/network/admin/tnsnames.ora
+
 
 sudo mkdir -p /var/opt/oracle
 chown oracle:dba /var/opt/oracle
@@ -287,6 +293,7 @@ cat <<EOC3 > /etc/cron.d/backup_cron
 0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
+# 0 7 * * 1 /home/oracle/scripts/maat_05365_ware_db_changes.sh
 EOC3
 
 chown root:root /etc/cron.d/backup_cron
@@ -347,7 +354,7 @@ EOF
 ####### IAM role #######
 
 resource "aws_iam_role" "edw_ec2_role" {
-  name                = "${local.application_name}-ec2-instance-role"
+  name = "${local.application_name}-ec2-instance-role"
   tags = merge(
     local.tags,
     {

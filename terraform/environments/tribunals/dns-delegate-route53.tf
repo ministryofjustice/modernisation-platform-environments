@@ -1,8 +1,7 @@
 locals {
 
   ec2_records = [
-    "decisions",
-    "asylumsupport.decisions"
+    "decisions"
   ]
 
   ec2_records_migrated = [
@@ -15,7 +14,8 @@ locals {
     "siac.decisions",
     "taxandchancery_ut.decisions",
     "charity.decisions",
-    "phl.decisions"
+    "phl.decisions",
+    "asylumsupport.decisions"
   ]
 
   afd_records_migrated = [
@@ -32,6 +32,9 @@ locals {
   ]
 
   nginx_records = [
+  ]
+
+  nginx_records_pre_migration = [
     "",
     "adjudicationpanel",
     "charity",
@@ -97,7 +100,7 @@ resource "aws_route53_record" "afd_instances_migrated" {
   name     = local.afd_records_migrated[count.index]
   type     = "CNAME"
   ttl      = 300
-  records  = [aws_lb.tribunals_lb.dns_name]
+  records  = [aws_cloudfront_distribution.tribunals_distribution.domain_name]
 }
 
 # 'A' records for tribunals URLs routed through the NGINX reverse proxy hosted in AWS DSD Account
@@ -113,6 +116,20 @@ resource "aws_route53_record" "nginx_instances" {
   alias {
     name                   = module.nginx_load_balancer[0].nginx_lb_arn
     zone_id                = module.nginx_load_balancer[0].nginx_lb_zone_id
+    evaluate_target_health = false
+  }
+}
+
+resource "aws_route53_record" "nginx_instances_pre_migration" {
+  count    = local.is-production ? length(local.nginx_records_pre_migration) : 0
+  provider = aws.core-network-services
+  zone_id  = local.production_zone_id
+  name     = local.nginx_records_pre_migration[count.index]
+  type     = "A"
+
+  alias {
+    name                   = "tribunals-nginx-1184258455.eu-west-1.elb.amazonaws.com"
+    zone_id                = "Z32O12XQLNTSW2"
     evaluate_target_health = false
   }
 }

@@ -115,7 +115,7 @@ variable "bucket_key" {
   default     = true
 }
 
-## Dynamic override_expiration_rules
+## Dynamic override_expiration_rules
 variable "override_expiration_rules" {
   type    = list(object({ prefix = string, days = number }))
   default = []
@@ -123,10 +123,16 @@ variable "override_expiration_rules" {
 
 variable "lifecycle_category" {
   type    = string
-  default = "long_term" # Options: "short_term", "long_term", "temporary"
+  default = "standard" # Options: "short_term", "long_term", "temporary", "standard"
 }
 
 variable "enable_lifecycle_expiration" {
   description = "Enable item expiration - requires 'enable_lifecycle' and 'override_expiration_rules' to be defined/enabled."
+  default     = false
+}
+
+variable "enable_intelligent_tiering" {
+  description = "Enable Intelligent-Tiering storage class for S3 bucket"
+  type        = bool
   default     = false
 }

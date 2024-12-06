@@ -639,7 +639,7 @@ if __name__ == "__main__":
     LOGGER.info(f"""prq_table_folder_path = {prq_table_folder_path}""")
 
     total_files, total_size = S3Methods.get_s3_folder_info(PARQUET_OUTPUT_S3_BUCKET_NAME,
-                                                           prq_table_folder_path)
+                                                           f"{prq_table_folder_path}/")
     msg_part_1 = f"""> total_files={total_files}"""
     msg_part_2 = f"""> total_size_mb={total_size/1024/1024:.2f}"""
     LOGGER.info(f"""{msg_part_1}, {msg_part_2}""")

@@ -133,10 +133,10 @@ locals {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
-          # user_data_raw = base64encode(templatefile(
-          #   "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-          #   branch = "TM/TM-620/test-pagefile-change"
-          # }))
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+              branch = "main"
+          }))
         })
         instance = merge(local.ec2_autoscaling_groups.bods.instance, {
           instance_type = "m4.xlarge"
@@ -151,92 +151,114 @@ locals {
 
     ec2_instances = {
 
-      # t2-onr-bods-1 = merge(local.ec2_instances.bods, {
-      #   config = merge(local.ec2_instances.bods.config, {
+      t2-onr-bods-1 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type = "m4.xlarge"
+        })
+        cloudwatch_metric_alarms = null
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+          domain-name                          = "azure.noms.root"
+        })
+      })
+
+      t2-onr-bods-2 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type = "m4.xlarge"
+        })
+        cloudwatch_metric_alarms = null
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "t2"
+          domain-name                          = "azure.noms.root"
+        })
+      })
+
+      # NOTE: These are all BOE 3.1 instances and are not currently needed
+      # t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
+      #   config = merge(local.ec2_instances.boe_app.config, {
       #     availability_zone = "eu-west-2a"
-      #     user_data_raw = base64encode(templatefile(
-      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #       }
-      #     ))
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #     instance_profile_policies = setunion(local.ec2_instances.boe_app.config.instance_profile_policies, [
       #       "Ec2SecretPolicy",
       #     ])
       #   })
-      #   instance = merge(local.ec2_instances.bods.instance, {
+      #   instance = merge(local.ec2_instances.boe_app.instance, {
       #     instance_type = "m4.xlarge"
       #   })
-      #   cloudwatch_metric_alarms = null
-      #   tags = merge(local.ec2_instances.bods.tags, {
+      #   tags = merge(local.ec2_instances.boe_app.tags, {
       #     oasys-national-reporting-environment = "t2"
-      #     domain-name                          = "azure.noms.root"
       #   })
       # })
 
-      # Pending sorting out cluster install of Bods in  modernisation-platform-configuration-management repo
-      # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
-      #   config = merge(local.ec2_instances.bods.config, {
-      #     availability_zone = "eu-west-2b"
-      #     user_data_raw = base64encode(templatefile(
-      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #         branch   = "main"
-      #       }
-      #     ))
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      # # NOTE: currently using a Rhel 6 instance for onr-web instances, not Rhel 7 & independent Tomcat install
+      # t2-onr-web-1-a = merge(local.ec2_instances.boe_web, {
+      #   config = merge(local.ec2_instances.boe_web.config, {
+      #     ami_name          = "base_rhel_6_10_*"
+      #     availability_zone = "eu-west-2a"
+      #     instance_profile_policies = setunion(local.ec2_instances.boe_web.config.instance_profile_policies, [
       #       "Ec2SecretPolicy",
       #     ])
       #   })
-      #   instance = merge(local.ec2_instances.bods.instance, {
-      #     instance_type = "m4.xlarge"
+      #   instance = merge(local.ec2_instances.boe_web.instance, {
+      #     instance_type                = "m4.large"
+      #     metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
       #   })
-      #   cloudwatch_metric_alarms = null
-      #   tags = merge(local.ec2_instances.bods.tags, {
+      #   tags = merge(local.ec2_instances.boe_web.tags, {
+      #     ami                                  = "base_rhel_6_10"
       #     oasys-national-reporting-environment = "t2"
+      #   })
+      # })
+      # t2-onr-client-a = merge(local.ec2_instances.jumpserver, {
+      #   config = merge(local.ec2_instances.jumpserver.config, {
+      #     ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
+      #     availability_zone = "eu-west-2a"
+      #   })
+      #   tags = merge(local.ec2_instances.jumpserver.tags, {
       #     domain-name = "azure.noms.root"
       #   })
       # })
+    }
 
-      t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
-        config = merge(local.ec2_instances.boe_app.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = setunion(local.ec2_instances.boe_app.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.boe_app.instance, {
-          instance_type = "m4.xlarge"
-        })
-        tags = merge(local.ec2_instances.boe_app.tags, {
-          oasys-national-reporting-environment = "t2"
-        })
-      })
+    fsx_windows = {
+      t2-bods-windows-share = {
+        preferred_availability_zone = "eu-west-2a"
+        deployment_type             = "MULTI_AZ_1"
+        security_groups             = ["bods"]
+        skip_final_backup           = true
+        storage_capacity            = 128
+        throughput_capacity         = 8
 
-      # NOTE: currently using a Rhel 6 instance for onr-web instances, not Rhel 7 & independent Tomcat install
-      t2-onr-web-1-a = merge(local.ec2_instances.boe_web, {
-        config = merge(local.ec2_instances.boe_web.config, {
-          ami_name          = "base_rhel_6_10_*"
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = setunion(local.ec2_instances.boe_web.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.boe_web.instance, {
-          instance_type                = "m4.large"
-          metadata_options_http_tokens = "optional" # required as Rhel 6 cloud-init does not support IMDSv2
-        })
-        tags = merge(local.ec2_instances.boe_web.tags, {
-          ami                                  = "base_rhel_6_10"
-          oasys-national-reporting-environment = "t2"
-        })
-      })
-      t2-onr-client-a = merge(local.ec2_instances.jumpserver, {
-        config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name          = "base_windows_server_2012_r2_release_2024-06-01T00-00-32.450Z"
-          availability_zone = "eu-west-2a"
-        })
-        tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.noms.root"
-        })
-      })
+        subnets = [
+          {
+            name               = "private"
+            availability_zones = ["eu-west-2a", "eu-west-2b"]
+          }
+        ]
+
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.mp_ip.ad-azure-dc-a,
+            module.ip_addresses.mp_ip.ad-azure-dc-b,
+          ]
+          domain_name          = "azure.noms.root"
+          username             = "svc_join_domain"
+          password_secret_name = "/sap/bods/t2/passwords"
+        }
+        tags = {
+          backup = true
+        }
+      }
     }
 
     iam_policies = {

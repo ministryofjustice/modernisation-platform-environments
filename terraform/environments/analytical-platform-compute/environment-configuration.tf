@@ -13,11 +13,7 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = [
-        "10.26.0.0/15", # modernisation-platform
-        "10.40.0.0/18", # noms-live-vnet
-        "10.205.0.0/20" # laa-lz-prod
-      ]
+      transit_gateway_routes = ["10.0.0.0/8"]
 
       /* Route53 */
       route53_zone = "compute.development.analytical-platform.service.justice.gov.uk"
@@ -42,14 +38,12 @@ locals {
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-development"
 
-      /* Observability Platform */
-      observability_platform = "development"
-
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
 
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
+
     }
     test = {
       /* VPC */
@@ -64,11 +58,7 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = [
-        "10.26.0.0/15", # modernisation-platform
-        "10.40.0.0/18", # noms-live-vnet
-        "10.205.0.0/20" # laa-lz-prod
-      ]
+      transit_gateway_routes = ["10.0.0.0/8"]
 
       /* Route53 */
       route53_zone = "compute.test.analytical-platform.service.justice.gov.uk"
@@ -86,9 +76,6 @@ locals {
         eks_pod_identity_agent = "v1.3.2-eksbuild.2"
         vpc_cni                = "v1.19.0-eksbuild.1"
       }
-
-      /* Observability Platform */
-      observability_platform = "development"
 
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
@@ -115,10 +102,7 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = [
-        "10.26.0.0/15", # modernisation-platform
-        "10.40.0.0/18"  # noms-live-vnet
-      ]
+      transit_gateway_routes = ["10.0.0.0/8"]
 
       /* Route53 */
       route53_zone = "compute.analytical-platform.service.justice.gov.uk"
@@ -143,14 +127,16 @@ locals {
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"
 
-      /* Observability Platform */
-      observability_platform = "production"
-
       /* QuickSight */
       quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
 
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
+
+      /* LF Domain Tags */
+      cadet_lf_tags = {
+        domain = ["bold", "civil", "courts", "general", "criminal_history", "development_sandpit", "electronic_monitoring", "finance", "interventions", "opg", "performance", "risk", "people", "prison", "probation", "staging", "victims", "victims_case_management"] # extracted from bucket paths
+      }
     }
   }
 }

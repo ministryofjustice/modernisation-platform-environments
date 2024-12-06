@@ -8,7 +8,6 @@ def lambda_handler(event, context):
     user_name = os.getenv("USER_NAME")
     password = os.getenv("PASSWORD")
     new_db_name = os.getenv("NEW_DB_NAME")
-    app_folder = os.getenv("APP_FOLDER")
     admin_username = os.getenv("ADMIN_USERNAME")
     admin_password = os.getenv("ADMIN_PASSWORD")
     admin_password_eat = os.getenv("ADMIN_PASSWORD_EAT")

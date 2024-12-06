@@ -37,6 +37,7 @@ locals {
       enable_s3_bucket                            = true
       enable_s3_db_backup_bucket                  = true
       enable_s3_software_bucket                   = true
+      enable_ssm_command_monitoring               = true
       route53_resolver_rules                      = { outbound-data-and-private-subnets = ["azure-fixngo-domain"] }
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
       software_bucket_name                        = "ec2-image-builder-nomis"
@@ -48,7 +49,6 @@ locals {
       enable_resource_explorer = true
     }
 
-    cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.ssm
-    security_groups          = local.security_groups
+    security_groups = local.security_groups
   }
 }

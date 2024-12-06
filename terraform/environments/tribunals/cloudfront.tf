@@ -1,17 +1,23 @@
 resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
-  aliases = ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
+
+  aliases = local.is-production ? [
+    "*.decisions.tribunals.gov.uk",
+    "*.venues.tribunals.gov.uk",
+    "*.reports.tribunals.gov.uk"
+  ] : ["*.${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   origin {
     domain_name = aws_lb.tribunals_lb.dns_name
     origin_id   = "tribunalsOrigin"
 
     custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+      http_port                = 80
+      https_port               = 443
+      origin_protocol_policy   = "https-only"
+      origin_ssl_protocols     = ["TLSv1.2"]
       origin_keepalive_timeout = 60
-      origin_read_timeout     = 60
+      origin_read_timeout      = 60
     }
 
     custom_header {
@@ -23,7 +29,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   default_cache_behavior {
     target_origin_id = "tribunalsOrigin"
 
-    cache_policy_id = data.aws_cloudfront_cache_policy.caching_disabled.id
+    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
 
     viewer_protocol_policy = "redirect-to-https"

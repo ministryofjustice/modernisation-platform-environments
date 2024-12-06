@@ -339,7 +339,7 @@ locals {
         period              = "60"
         statistic           = "Maximum"
         threshold           = "1"
-        alarm_description   = "Triggers if curl returns error for given endpoint from this EC2"
+        alarm_description   = "Triggers if curl returns error for given endpoint from this EC2. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295505478"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
@@ -349,10 +349,10 @@ locals {
         datapoints_to_alarm = "1"
         metric_name         = "collectd_endpoint_cert_expiry_value"
         namespace           = "CWAgent"
-        period              = "86400"
+        period              = "7200"
         statistic           = "Minimum"
         threshold           = "14"
-        alarm_description   = "Triggers if collectd-endpoint-monitoring detects an endpoint with a certificate due to expire shortly. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615340266"
+        alarm_description   = "Triggers if collectd-endpoint-monitoring detects an endpoint with a certificate due to expire shortly. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5303664662"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions
         ok_actions          = var.options.cloudwatch_metric_alarms_default_actions
       }
@@ -449,4 +449,25 @@ locals {
       }
     }
   }
+
+  cloudwatch_metric_alarms_by_sns_topic = {
+    for sns_key, sns_value in local.sns_topics : sns_key => {
+      for namespace_key, namespace_value in local.cloudwatch_metric_alarms : namespace_key => {
+        for alarm_key, alarm_value in namespace_value : alarm_key => merge(alarm_value, {
+          alarm_actions = [sns_key]
+          ok_actions    = [sns_key]
+        })
+      }
+    }
+  }
+
+  # alarms added via baseline. Put SSM command alerts in dso-pipelines so it doesn't clutter main application alerts
+  cloudwatch_metric_alarms_baseline = merge(
+    var.options.enable_ssm_command_monitoring ? {
+      "failed-ssm-command-${var.environment.account_name}" = local.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].ssm.failed-ssm-command
+    } : {},
+    var.options.enable_ssm_missing_metric_monitoring ? {
+      "ssm-command-metrics-missing-${var.environment.account_name}" = local.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].ssm.ssm-command-metrics-missing
+    } : {},
+  )
 }

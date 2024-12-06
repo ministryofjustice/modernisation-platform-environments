@@ -859,7 +859,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expi
 
 ## Production
 
-/*
+
 data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
   count     = local.is-production == true ? 1 : 0
   policy_id = "SnsTopicId"
@@ -896,7 +896,6 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
     ]
   }
 }
-*/
 
 ####################################################
 # IAM User, Policy for MGN
@@ -1138,4 +1137,247 @@ resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signe
   count      = local.is-development == true ? 1 : 0
   role       = aws_iam_role.aws_signer_role_dev[0].name
   policy_arn = aws_iam_policy.aws_signer_policy_dev[0].arn
+}
+
+#############################################
+# IAM Role & Policy for Send CPU graph - DEV
+#############################################
+
+resource "aws_iam_role" "lambda_role_cloudwatch_get_metric_data_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Get_Metric_Data_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_get_metric_data_dev"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role cloudwatch get_metric_data development"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Sid" : "CloudwatchMetricPolicy",
+      "Effect" : "Allow",
+      "Action" : [
+        "cloudwatch:*"
+      ],
+      "Resource" : [
+        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+      ]
+      },
+      {
+        "Sid" : "S3BucketPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::moj-lambda-layers-dev",
+          "arn:aws:s3:::moj-lambda-layers-dev/*"
+        ]
+      },
+      {
+        "Sid" : "SSMPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:parameter/klayers-account"
+        ]
+      },
+      {
+        "Sid" : "LogPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      },
+      {
+        "Sid" : "SQSPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:Lambda-Queue-Dev"
+        ]
+      },
+      {
+        "Sid" : "SESPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "ses:*"
+        ],
+        "Resource" : [
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
+        ]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev" {
+  count      = local.is-development == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_get_metric_data_dev[0].arn
+}
+
+resource "aws_iam_policy_attachment" "attach_lambda_read_only_access_dev" {
+  count      = local.is-development == true ? 1 : 0
+  name       = "lambda-read-only-access-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambda_ReadOnlyAccess"
+}
+
+#resource "aws_iam_policy_attachment" "attach_ses_full_access" {
+#  count      = local.is-development == true ? 1 : 0
+#  name       = "ses-full-access-iam-attachment"
+#  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
+#  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+#}
+
+
+#############################################
+# IAM Role & Policy for Send CPU graph - PROD
+#############################################
+
+resource "aws_iam_role" "lambda_role_cloudwatch_get_metric_data_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Get_Metric_Data_Prod"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_get_metric_data_prod"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role cloudwatch get_metric_data production"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Sid" : "CloudwatchMetricPolicy",
+      "Effect" : "Allow",
+      "Action" : [
+        "cloudwatch:*"
+      ],
+      "Resource" : [
+        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+      ]
+      },
+      {
+        "Sid" : "S3BucketPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::moj-lambda-layers-prod",
+          "arn:aws:s3:::moj-lambda-layers-prod/*"
+        ]
+      },
+      {
+        "Sid" : "SSMPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:parameter/klayers-account"
+        ]
+      },
+      {
+        "Sid" : "LogPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+        ]
+      },
+      {
+        "Sid" : "SQSPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:Lambda-Queue-Production"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_get_metric_data_prod[0].arn
+}
+
+resource "aws_iam_policy_attachment" "attach_lambda_read_only_access_prod" {
+  count      = local.is-production == true ? 1 : 0
+  name       = "lambda-read-only-access-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/AWSLambda_ReadOnlyAccess"
+}
+
+# Attach AWSLambdaVPCAccessExecutionRole Policy to the Role
+resource "aws_iam_role_policy_attachment" "lambda_vpc_access_policy_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }

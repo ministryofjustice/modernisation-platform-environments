@@ -238,6 +238,16 @@ variable "retention_curated_num_workers" {
   }
 }
 
+variable "processed_files_check_wait_interval_seconds" {
+  description = "Amount of seconds between checks to s3 if all files have been processed"
+  type        = number
+}
+
+variable "processed_files_check_max_attempts" {
+  description = "Maximum number of attempts to check if all files have been processed"
+  type        = number
+}
+
 variable "glue_s3_max_attempts" {
   description = "The maximum number of attempts when making requests to S3"
   type        = number

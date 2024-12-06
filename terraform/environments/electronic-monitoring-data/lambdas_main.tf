@@ -255,25 +255,6 @@ module "rotate_iam_key" {
 }
 
 #-----------------------------------------------------------------------------------
-# Process landing bucket files
-#-----------------------------------------------------------------------------------
-
-module "process_landing_bucket_files" {
-  source                  = "./modules/lambdas"
-  function_name           = "process_landing_bucket_files"
-  is_image                = true
-  role_name               = aws_iam_role.process_landing_bucket_files.name
-  role_arn                = aws_iam_role.process_landing_bucket_files.arn
-  memory_size             = 1024
-  timeout                 = 900
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-  environment_variables = {
-    DESTINATION_BUCKET = module.s3-received-files-bucket.bucket.id
-  }
-}
-
-#-----------------------------------------------------------------------------------
 # Virus scanning - definition upload
 #-----------------------------------------------------------------------------------
 
@@ -325,4 +306,20 @@ module "virus_scan_file" {
     QUARANTINE_BUCKET_NAME       = module.s3-quarantine-files-bucket.bucket.id
     PROCESSED_BUCKET_NAME        = module.s3-data-bucket.bucket.id
   }
+}
+
+#-----------------------------------------------------------------------------------
+# Process json files
+#-----------------------------------------------------------------------------------
+
+module "format_json_fms_data" {
+  source                  = "./modules/lambdas"
+  function_name           = "format_json_fms_data"
+  is_image                = true
+  role_name               = aws_iam_role.format_json_fms_data.name
+  role_arn                = aws_iam_role.format_json_fms_data.arn
+  memory_size             = 1024
+  timeout                 = 900
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
 }

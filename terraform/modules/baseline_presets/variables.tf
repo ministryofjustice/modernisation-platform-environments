@@ -37,11 +37,12 @@ variable "options" {
     enable_ec2_session_manager_cloudwatch_logs   = optional(bool, false)           # create SSM doc and log group for session manager logs
     enable_ec2_ssm_agent_update                  = optional(bool, false)           # create SSM association for auto-update of SSM agent. update-ssm-agent tag needs to be set on EC2s also
     enable_ec2_user_keypair                      = optional(bool, false)           # create secret and key-pair for ec2-user
-    enable_observability_platform_monitoring     = optional(bool, false)           # create role for observability platform monitroing
     enable_s3_bucket                             = optional(bool, false)           # create s3-bucket S3 bucket for general use
     enable_s3_db_backup_bucket                   = optional(bool, false)           # create db-backup S3 buckets
     enable_s3_shared_bucket                      = optional(bool, false)           # create devtest and preprodprod S3 bucket for sharing between accounts
     enable_s3_software_bucket                    = optional(bool, false)           # create software S3 bucket in test account for image builder/configuration-management
+    enable_ssm_command_monitoring                = optional(bool, false)           # create SNS topic and alarms for SSM command monitoring
+    enable_ssm_missing_metric_monitoring         = optional(bool, false)           # create alarm if SSM command metrics are missing
     enable_vmimport                              = optional(bool, false)           # create role for vm imports
     route53_resolver_rules                       = optional(map(list(string)), {}) # create route53 resolver rules; list of map keys to filter local.route53_resolver_rules_all
     iam_service_linked_roles                     = optional(list(string))          # create iam service linked roles; list of map keys to filter local.iam_service_linked_roles; default is to create all

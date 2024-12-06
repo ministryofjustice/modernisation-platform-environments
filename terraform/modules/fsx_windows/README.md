@@ -71,7 +71,7 @@ This:
 module "fsx_windows1" {
   source = "../../modules/fsx_windows"
 
-   preferred_subnet_id         = data.aws_subnet.private_subnets_a.id
+   preferred_availability_zone = "eu-west-2a"
    deployment_type             = "MULTI_AZ_1"
    name                        = "fsx_windows1"
    security_groups             = [aws_security_group.ec2.id]
