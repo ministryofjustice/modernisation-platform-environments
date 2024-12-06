@@ -906,7 +906,7 @@ locals {
         expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsSuccessCount\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
-          period  = 3600
+          period  = 1800
           stacked = true
           region  = "eu-west-2"
           title   = "GitHub actions-run-success-count-by-repo"
@@ -924,7 +924,7 @@ locals {
         expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsFailedCount\"','Maximum'),MAX,DESC)"
         properties = {
           view    = "timeSeries"
-          period  = 3600
+          period  = 1800
           stacked = true
           region  = "eu-west-2"
           title   = "GitHub actions-run-failed-count-by-repo"
