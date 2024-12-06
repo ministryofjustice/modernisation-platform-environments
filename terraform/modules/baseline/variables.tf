@@ -493,6 +493,7 @@ variable "fsx_windows" {
     deployment_type                   = optional(string) # [SINGLE_AZ_1 (default), SINGLE_AZ_2, MULTI_AZ_1]
     kms_key_id                        = optional(string, "general")
     preferred_subnet_name             = optional(string, "private") # set if MULTI_AZ_1
+    preferred_subnet_id               = optional(string)            # set if MULTI_AZ_1
     preferred_availability_zone       = optional(string)            # set if MULTI_AZ_1
     security_group_ids                = optional(list(string))
     skip_final_backup                 = optional(bool)

@@ -331,7 +331,7 @@ locals {
         description            = "Windows Server 2012 R2 client testing for NART"
         instance-access-policy = "full"
         os-type                = "Windows"
-        server-type            = "OnrClient"
+        server-type            = "NcrClient"
         update-ssm-agent       = "patchgroup1"
       }
     }
