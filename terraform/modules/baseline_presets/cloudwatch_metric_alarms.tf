@@ -426,7 +426,7 @@ locals {
         datapoints_to_alarm = "1"
         metric_name         = "GitHubActionRunsFailedCount"
         namespace           = "CustomMetrics"
-        period              = "3600"
+        period              = "1800"
         statistic           = "Maximum"
         threshold           = "1"
         alarm_description   = "Triggers if there has been a failed github action. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295898661"
