@@ -539,6 +539,57 @@ module "s3-data-bucket" {
   tags = local.tags
 }
 
+
+#  bucket notification for data store
+resource "aws_s3_bucket_notification" "data_store" {
+  depends_on = [aws_sns_topic_policy.s3_events_policy]
+  bucket     = module.s3-data-bucket.bucket.id
+
+  # Only for copy events as those are events triggered by data being copied
+  #  from landing bucket.
+  topic {
+    topic_arn = aws_sns_topic.s3_events.arn
+    events = [
+      "s3:ObjectCreated:*"
+    ]
+  }
+}
+
+# sns topic to allow multiple lambdas to be triggered off of it
+resource "aws_sns_topic" "s3_events" {
+  name              = "${module.s3-data-bucket.bucket.id}-object-created-topic"
+  kms_master_key_id = "alias/aws/sns"
+}
+
+# IAM policy document for the SNS topic policy
+data "aws_iam_policy_document" "sns_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions   = ["SNS:Publish"]
+    resources = [aws_sns_topic.s3_events.arn]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [module.s3-data-bucket.bucket.arn]
+    }
+  }
+}
+
+# Apply policy to the SNS topic
+resource "aws_sns_topic_policy" "s3_events_policy" {
+  arn    = aws_sns_topic.s3_events.arn
+  policy = data.aws_iam_policy_document.sns_policy.json
+}
+
+
+
 # ------------------------------------------------------------------------
 # Landing buckets FMS
 # ------------------------------------------------------------------------
@@ -555,6 +606,8 @@ module "s3-fms-general-landing-bucket" {
   logging_bucket           = module.s3-logging-bucket
   production_dev           = local.is-production ? "prod" : "dev"
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
+  security_group_ids       = [aws_security_group.lambda_generic.id]
+  subnet_ids               = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
@@ -586,6 +639,8 @@ module "s3-fms-specials-landing-bucket" {
   logging_bucket           = module.s3-logging-bucket
   production_dev           = local.is-production ? "prod" : "dev"
   received_files_bucket_id = module.s3-received-files-bucket.bucket.id
+  security_group_ids       = [aws_security_group.lambda_generic.id]
+  subnet_ids               = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
@@ -622,6 +677,8 @@ module "s3-mdss-general-landing-bucket" {
   logging_bucket            = module.s3-logging-bucket
   production_dev            = local.is-production ? "prod" : "dev"
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
+  subnet_ids                = data.aws_subnets.shared-public.ids
+  security_group_ids        = [aws_security_group.lambda_generic.id]
 
   providers = {
     aws = aws
@@ -641,6 +698,8 @@ module "s3-mdss-ho-landing-bucket" {
   logging_bucket            = module.s3-logging-bucket
   production_dev            = local.is-production ? "prod" : "dev"
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
+  security_group_ids        = [aws_security_group.lambda_generic.id]
+  subnet_ids                = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
@@ -660,6 +719,8 @@ module "s3-mdss-specials-landing-bucket" {
   logging_bucket            = module.s3-logging-bucket
   production_dev            = local.is-production ? "prod" : "dev"
   received_files_bucket_id  = module.s3-received-files-bucket.bucket.id
+  security_group_ids        = [aws_security_group.lambda_generic.id]
+  subnet_ids                = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
@@ -680,6 +741,8 @@ module "s3-p1-export-bucket" {
   local_tags              = local.tags
   logging_bucket          = module.s3-logging-bucket
   production_dev          = local.is-production ? "prod" : "dev"
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
 
   providers = {
     aws = aws
