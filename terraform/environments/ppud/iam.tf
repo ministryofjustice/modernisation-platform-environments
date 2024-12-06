@@ -1170,7 +1170,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
   description = "AWS IAM Policy for managing aws lambda role cloudwatch get_metric_data development"
   policy = jsonencode({
     "Version" : "2012-10-17",
-    "Statement" : [{
+    "Statement" : [
+      {
       "Sid" : "CloudwatchMetricPolicy",
       "Effect" : "Allow",
       "Action" : [
@@ -1241,7 +1242,18 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
           "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
           "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
         ]
-    }]
+    },
+    {
+      "Sid" : "CloudwatchMetricStatsPolicy",
+      "Effect" : "Allow",
+      "Action" : [
+        "cloudwatch:GetMetricStatistics"
+      ],
+      "Resource" : [
+        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+      ]
+      }
+    ]
   })
 }
 
