@@ -226,7 +226,7 @@ locals {
 data "archive_file" "lambda_dms_replication_metric_zip" {
   type        = "zip"
   source_content          = local.rendered_metric_template 
-  source_content_filename = "dms_replication_metric"
+  source_content_filename = "dms_replication_metric.py"
   output_path             = "${path.module}/lambda/dms_replication_metric.zip"
 }
 
