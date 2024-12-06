@@ -550,7 +550,9 @@ resource "aws_s3_bucket_notification" "data_store" {
   topic {
     topic_arn = aws_sns_topic.s3_events.arn
     events = [
-      "s3:ObjectCreated:*"
+      "s3:ObjectCreated:**.bak",
+      "s3:ObjectCreated:**.zip",
+      "s3:ObjectCreated:**.bacpac",
     ]
   }
 }
