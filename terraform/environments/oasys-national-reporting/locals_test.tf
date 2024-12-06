@@ -151,39 +151,39 @@ locals {
 
     ec2_instances = {
 
-      t2-onr-bods-1 = merge(local.ec2_instances.bods, {
-        config = merge(local.ec2_instances.bods.config, {
-          availability_zone = "eu-west-2a"
-          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "m4.xlarge"
-        })
-        cloudwatch_metric_alarms = null
-        tags = merge(local.ec2_instances.bods.tags, {
-          oasys-national-reporting-environment = "t2"
-          domain-name                          = "azure.noms.root"
-        })
-      })
+      # t2-onr-bods-1 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2a"
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #     domain-name                          = "azure.noms.root"
+      #   })
+      # })
 
-      t2-onr-bods-2 = merge(local.ec2_instances.bods, {
-        config = merge(local.ec2_instances.bods.config, {
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "m4.xlarge"
-        })
-        cloudwatch_metric_alarms = null
-        tags = merge(local.ec2_instances.bods.tags, {
-          oasys-national-reporting-environment = "t2"
-          domain-name                          = "azure.noms.root"
-        })
-      })
+      # t2-onr-bods-2 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     availability_zone = "eu-west-2b"
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type = "m4.xlarge"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "t2"
+      #     domain-name                          = "azure.noms.root"
+      #   })
+      # })
 
       # NOTE: These are all BOE 3.1 instances and are not currently needed
       # t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
@@ -231,18 +231,46 @@ locals {
     }
 
     fsx_windows = {
-      t2-bods-windows-share = {
-        preferred_availability_zone = "eu-west-2a"
-        deployment_type             = "MULTI_AZ_1"
-        security_groups             = ["bods"]
-        skip_final_backup           = true
-        storage_capacity            = 128
-        throughput_capacity         = 8
+      # retain commented out as a version of this (MULTI_AZ_1) fsx_share will be needed in production account
+      # t2-bods-windows-share = {
+      #   preferred_availability_zone = "eu-west-2a"
+      #   deployment_type             = "MULTI_AZ_1"
+      #   security_groups             = ["bods"]
+      #   skip_final_backup           = true
+      #   storage_capacity            = 128
+      #   throughput_capacity         = 8
+
+      #   subnets = [
+      #     {
+      #       name               = "private"
+      #       availability_zones = ["eu-west-2a", "eu-west-2b"]
+      #     }
+      #   ]
+
+      #   self_managed_active_directory = {
+      #     dns_ips = [
+      #       module.ip_addresses.mp_ip.ad-azure-dc-a,
+      #       module.ip_addresses.mp_ip.ad-azure-dc-b,
+      #     ]
+      #     domain_name          = "azure.noms.root"
+      #     username             = "svc_join_domain"
+      #     password_secret_name = "/sap/bods/t2/passwords"
+      #   }
+      #   tags = {
+      #     backup = true
+      #   }
+      # }
+      t2-bods-win-share = {
+        deployment_type     = "SINGLE_AZ_1"
+        security_groups     = ["bods"]
+        skip_final_backup   = true
+        storage_capacity    = 128
+        throughput_capacity = 8
 
         subnets = [
           {
             name               = "private"
-            availability_zones = ["eu-west-2a", "eu-west-2b"]
+            availability_zones = ["eu-west-2a"]
           }
         ]
 
