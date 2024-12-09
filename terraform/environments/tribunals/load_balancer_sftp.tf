@@ -71,6 +71,6 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment_sft
   for_each         = aws_lb_target_group.tribunals_target_group_sftp
   target_group_arn = each.value.arn
   # target_id points to primary ec2 instance, change index to 1 to point at backup ec2 instance
-  target_id        = element(data.aws_instances.backup_instance.ids, 0)
+  target_id        = data.aws_instances.backup_instance.ids[0]
   port             = each.value.port
 }
