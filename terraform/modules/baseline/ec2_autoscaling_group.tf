@@ -16,7 +16,7 @@ module "ec2_autoscaling_group" {
   for_each = var.ec2_autoscaling_groups
 
   # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=0111618bb1c7c52f59f11790b2f4b68a26b51cb3" # v2.6.1
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=64e39ff5845220b914cac348707dcdce84f2fb58" # branch with updated cloudint version and fix deprecated managed_policy_arn resources block
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=59ef74c18bcdc514c80e7b4ae9bb89e4e55f3169" # branch with updated cloudint version and fix deprecated managed_policy_arn resources block
 
   providers = {
     aws.core-vpc = aws.core-vpc
