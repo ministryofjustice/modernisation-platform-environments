@@ -166,6 +166,12 @@ resource "aws_ecs_service" "ecs_service" {
       Name = "${var.app_name}-ecs-service"
     }
   )
+
+  # Add placement constraints
+  placement_constraints {
+    type       = "memberOf"
+    expression = "attribute:Role == Backup"
+  }
 }
 
 // SFTP service
@@ -216,6 +222,12 @@ resource "aws_ecs_service" "ecs_service_sftp" {
       Name = "${var.app_name}-ecs-service"
     }
   )
+
+  # Add placement constraints
+  placement_constraints {
+    type       = "memberOf"
+    expression = "attribute:Role == Backup"
+  }
 }
 
 resource "aws_appautoscaling_target" "ecs_target" {
