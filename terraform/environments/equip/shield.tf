@@ -16,7 +16,7 @@ module "shield" {
       "action"    = "block",
       "name"      = "equip-count-rule",
       "priority"  = 0,
-      "threshold" = "75"
+      "threshold" = "1000"
     }
   }
 }
