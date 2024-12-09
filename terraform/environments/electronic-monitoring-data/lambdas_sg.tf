@@ -11,8 +11,12 @@ resource "aws_security_group" "lambda_generic" {
 
 # get s3 endpoint
 data "aws_vpc_endpoint" "s3" {
+  provider     = aws.core-vpc
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
   vpc_id       = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.s3"
+  }
 }
 
 data "aws_prefix_list" "s3" {
