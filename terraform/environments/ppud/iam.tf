@@ -1229,7 +1229,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
           "sqs:SendMessage"
         ],
         "Resource" : [
-          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:Lambda-Queue-Dev"
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
         ]
       },
       {
