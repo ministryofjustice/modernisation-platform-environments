@@ -87,7 +87,7 @@ locals {
             "Ec2SecretPolicy",
           ])
         })
-        # IMPORTANT: EBS volume initialization, labelling, formatting was carried out manually on this instance. It was not automated so these ebs_volume settings are bespoke. Additional volumes should NOT be /dev/xvd* see the local.ec2_instances.bods.ebs_volumes setting for the correct device names. 
+        # IMPORTANT: EBS volume initialization, labelling, formatting was carried out manually on this instance. It was not automated so these ebs_volume settings are bespoke. Additional volumes should NOT be /dev/xvd* see the local.ec2_instances.bods.ebs_volumes setting for the correct device names.
         ebs_volumes = {
           "/dev/sda1" = { type = "gp3", size = 128 } # root volume
           "/dev/xvdk" = { type = "gp3", size = 128 } # D:/ Temp
@@ -128,6 +128,37 @@ locals {
       #   })
       # cloudwatch_metric_alarms = {}
       # })
+    }
+
+    fsx_windows = {
+
+      pp-bods-win-share = {
+        deployment_type     = "SINGLE_AZ_1"
+        security_groups     = ["bods"]
+        skip_final_backup   = true
+        storage_capacity    = 600
+        throughput_capacity = 8
+
+        subnets = [
+          {
+            name               = "private"
+            availability_zones = ["eu-west-2a"]
+          }
+        ]
+
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.mp_ip.ad-azure-dc-a,
+            module.ip_addresses.mp_ip.ad-azure-dc-b,
+          ]
+          domain_name          = "azure.hmpp.root"
+          username             = "svc_join_domain"
+          password_secret_name = "/sap/bods/pp/passwords"
+        }
+        tags = {
+          backup = true
+        }
+      }
     }
 
     iam_policies = {
