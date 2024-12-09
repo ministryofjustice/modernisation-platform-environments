@@ -5,19 +5,18 @@
 # created sporadically, e.g. ahead of a service release, and will
 # therefore not be continually overwritten.  Writing them to a
 # backup vault allows them to timeout without being overwritten.
+data "aws_iam_policy_document" "assume_AWSBackupDefaultServiceRole" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.account_info.id}:role/modernisation-platform-oidc-cicd"]
+    }
+  }
+}
+
 resource "aws_iam_role_policy" "assume_AWSBackupDefaultServiceRole" {
-  name = "AssumeAWSBackupDefaultServiceRole"
-  role = "AWSBackupDefaultServiceRole"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-        {
-            Effect = "Allow"
-            Principal = {
-                AWS = "arn:aws:iam::${var.account_info.id}:role/modernisation-platform-oidc-cicd"
-            }
-        Action = "sts:AssumeRole"
-        }
-    ]
-  })
+  role   = "AssumeAWSBackupDefaultServiceRole"
+  policy = data.aws_iam_policy_document.assume_AWSBackupDefaultServiceRole.json
 }
