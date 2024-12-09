@@ -11,15 +11,8 @@ resource "aws_security_group" "lambda_generic" {
 
 # get s3 endpoint
 data "aws_vpc_endpoint" "s3" {
-  filter {
-    name   = "service-name"
-    values = ["com.amazonaws.${data.aws_region.current.name}.s3"]
-  }
-
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
+  service_name = ["com.amazonaws.${data.aws_region.current.name}.s3"]
+  vpc_id       = data.aws_vpc.shared.id
 }
 
 data "aws_prefix_list" "s3" {
