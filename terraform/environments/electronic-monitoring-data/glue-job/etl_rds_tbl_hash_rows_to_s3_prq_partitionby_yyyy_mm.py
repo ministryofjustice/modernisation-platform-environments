@@ -418,9 +418,13 @@ if __name__ == "__main__":
         else:
             rds_hashed_rows_df_write = rds_hashed_rows_df.alias("rds_hashed_rows_df_write")
 
+        # write_rds_df_to_s3_parquet_v2(rds_hashed_rows_df_write, 
+        #                               yyyy_mm_partition_by_cols, 
+        #                               prq_table_folder_path)
+    
         write_rds_df_to_s3_parquet(rds_hashed_rows_df_write,
                                    yyyy_mm_partition_by_cols,
-                                   prq_table_folder_path)
+                                   f"""{prq_table_folder_path}/{agg_row_year}/{agg_row_month}""")
         
         LOGGER.info(f"""Partition - '{prq_table_folder_path}/{agg_row_year}/{agg_row_month}' writing completed.""")
     # -----------------------------------------------
