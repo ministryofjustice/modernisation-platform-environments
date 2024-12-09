@@ -580,9 +580,9 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_report_prod" {
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
   reserved_concurrent_executions = 5
   # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
-  # dead_letter_config {
-  #   target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
-  # }
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+  }
   tracing_config {
     mode = "Active"
   }
