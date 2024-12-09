@@ -3,5 +3,5 @@ output "oracle_db_server_name" {
 }
 
 output "oracle_db_instance_scheduling" {
-  value = try(module.instance.aws_instance.tags.instance-scheduling,"default")
+  value = try(module.instance.aws_instance.tags.instance-scheduling, "default")
 }

@@ -433,9 +433,9 @@ locals {
   lambda_s3_data_migrate_handler        = "dpr-s3-data-lifecycle-migration-lambda-v1.lambda_handler"
   lambda_s3_data_migrate_runtime        = "python3.11"
   lambda_s3_data_migrate_tracing        = "PassThrough"
-  lambda_s3_data_migrate_policies       = [
+  lambda_s3_data_migrate_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
-    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"    
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"
   ]
 }

@@ -1172,14 +1172,14 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid" : "CloudwatchMetricPolicy",
-      "Effect" : "Allow",
-      "Action" : [
-        "cloudwatch:*"
-      ],
-      "Resource" : [
-        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-      ]
+        "Sid" : "CloudwatchMetricPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "cloudwatch:*"
+        ],
+        "Resource" : [
+          "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
       },
       {
         "Sid" : "S3BucketPolicy",
@@ -1242,7 +1242,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
           "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
           "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
         ]
-    }
+      }
     ]
   })
 }
@@ -1364,7 +1364,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_prod
           "sqs:SendMessage"
         ],
         "Resource" : [
-          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:Lambda-Queue-Production"
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         ]
       }
     ]

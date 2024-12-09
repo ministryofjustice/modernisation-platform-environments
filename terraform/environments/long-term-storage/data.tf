@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "aws_transfer_assume_role_policy" {
     effect = "Allow"
 
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["transfer.amazonaws.com"]
     }
     actions = ["sts:AssumeRole"]

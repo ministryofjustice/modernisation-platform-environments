@@ -149,7 +149,7 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].outbound_access_cidr]
   }
-    egress {
+  egress {
     description = "Allow telnet to Portal - MoJo"
     from_port   = 3443
     to_port     = 3443

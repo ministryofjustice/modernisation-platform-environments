@@ -150,16 +150,12 @@ if __name__ == "__main__":
     LOGGER.info(f""">> rds_hashed_rows_fulls3path = {rds_hashed_rows_fulls3path} <<""")
     LOGGER.info(f""">> dms_output_fulls3path = {dms_output_fulls3path} <<""")
 
-    hashed_table_schema = T.StructType(
-        [T.StructField(f"{TABLE_PKEY_COLUMN}", T.IntegerType(), False),
-         T.StructField("RowHash", T.StringType(), False)]
-         )
-
     # --------------------------------------------------------------------------------------
 
     rds_hashed_rows_prq_df = CustomPysparkMethods.get_s3_parquet_df_v2(
                                     rds_hashed_rows_fulls3path, 
-                                    hashed_table_schema
+                                    CustomPysparkMethods.get_pyspark_hashed_table_schema(
+                                        TABLE_PKEY_COLUMN)
                                 )
 
     rds_hashed_rows_prq_df_agg = rds_hashed_rows_prq_df.agg(

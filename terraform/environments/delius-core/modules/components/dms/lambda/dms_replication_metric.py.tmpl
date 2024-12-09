@@ -42,7 +42,7 @@ def lambda_handler(event, context):
         # currently support custom times.
         # Do NOT skip if the instance_scheduling tag has the value of skip-scheduling 
         # or skip-audit-stop is set as we must handle all DMS events in these environments (they are up 24/7)
-        if (current_hour < 6 or current_hour > 21 or current_weekday >= 5) and (not "${oracle_db_instance_scheduling}" in ["skip-scheduling","skip-auto-stop"]):
+        if (current_hour < 6 or current_hour >= 21 or current_weekday >= 5) and (not "${oracle_db_instance_scheduling}" in ["skip-scheduling","skip-auto-stop"]):
             continue
 
         message = json.loads(record['Sns']['Message'])

@@ -1,23 +1,27 @@
+# Python script to retrieve elastic load balancer data from cloudwatch, count the connections per 15 minutes
+# graph it and email it to end users via the internal mail relay.
+# Nick Buckingham
+# 9 December 2024
+
 import boto3
 import os
 os.environ['MPLCONFIGDIR'] = "/tmp/graph"
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
-from email import encoders
-from botocore.exceptions import NoCredentialsError, PartialCredentialsError
+import io
 import base64
 import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 
 # Configuration
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 SENDER = 'noreply@internaltest.ppud.justice.gov.uk'
 RECIPIENTS = ['nick.buckingham@colt.net']
-SUBJECT = f'AWS Daily PPUD ELB Request Report - {CURRENT_DATE}'
+SUBJECT = f'AWS PPUD Load Balancer Report - {CURRENT_DATE}'
 AWS_REGION = 'eu-west-2'
-ELB_NAME = "PPUD-ALB"  # Replace with your ELB name
+ELB_NAME = "app/PPUD-ALB/9d129853721723f4"  # Replace with your ELB name
 
 # SMTP Configuration
 SMTP_SERVER = "10.27.9.39"
@@ -25,34 +29,40 @@ SMTP_PORT = 25
 
 # Initialize AWS clients
 cloudwatch = boto3.client("cloudwatch", region_name=AWS_REGION)
-ses = boto3.client("ses", region_name=AWS_REGION)
+#ses = boto3.client("ses", region_name=AWS_REGION)
 
-def get_hourly_request_counts(elb_name):
+def get_elb_request_counts(ELB_NAME):
     """Fetches daily connection counts for the ELB from CloudWatch."""
+    # Calculate the start and end time for the day
+    #start_time = datetime(2024, 12, 8, 6, 0, 0)  # 08:00 UTC, 28 Nov 2024
+    #end_time = datetime(2024, 12, 8, 20, 10, 0)  # 17:00 UTC, 28 Nov 2024
+    current_time = datetime.utcnow()
     end_time = datetime.utcnow()
-    start_time = end_time - timedelta(days=1)  # Fetch data for the last 1 day
+    start_time = end_time - timedelta(hours=14)
 
     response = cloudwatch.get_metric_statistics(
-        Namespace="AWS/ELB",
+        Namespace="AWS/ApplicationELB",
         MetricName="RequestCount",
         Dimensions=[
-            {"Name": "LoadBalancerName", "Value": elb_name}
+            {"Name": "LoadBalancer", "Value": ELB_NAME},
+#			{'Name': 'TargetGroup', 'Value': 'PPUD'},
+#			{'Name': 'AvailabilityZone', 'Value': 'eu-west-2c'}
         ],
         StartTime=start_time,
         EndTime=end_time,
-        Period=3600,  # Daily period
+        Period=900,  # 15 minute intervals
         Statistics=["Sum"]
     )
 
     data_points = sorted(response["Datapoints"], key=lambda x: x["Timestamp"])
     return [(dp["Timestamp"].strftime('%H:%M'), dp["Sum"]) for dp in data_points]
 
-def plot_graph(request_data):
-    """Plots the graph of hourly requests and returns it as an in-memory file."""
+def create_graph(request_data):
+    """Plots the graph of requests and returns it as an in-memory file."""
     times, requests = zip(*request_data)
     plt.figure(figsize=(20, 6))
-    plt.bar(times, requests, color="blue")
-    plt.title(f"Hourly Requests to {ELB_NAME} Over the Last 24 Hours")
+    plt.plot(times, requests, color="blue")
+    plt.title(f"Requests to the PPUD Load Balancer on {CURRENT_DATE} (Every 15 Minutes)")
     plt.xlabel("Time (UTC)")
     plt.ylabel("Number of Requests")
     plt.xticks(rotation=45)
@@ -77,20 +87,19 @@ def plot_graph(request_data):
     os.remove(temp_file)
     return encoded_string
 
-# Function to send an email via SES
-def send_email_with_graph(graph_base64):
+def email_image_to_users(graph_base64):
     """
     Send an email with the graph embedded in the email body using AWS SES.
     """
-    cloudwatch = boto3.client("cloudwatch", region_name=AWS_REGION)
+    ses_client = boto3.client("ses", region_name=AWS_REGION)
 
     # Email body with the embedded image
     email_body = f"""
     <html>
     <body>
         <p>Hi Team,</p>
-        <p>Please find below the daily PPUD ELB Request Report.</p>
-        <img src="data:image/png;base64,{graph_base64}" alt="PPUD ELB Request Report" />
+        <p>Please find below the PPUD Elastic Load Balancer report for {CURRENT_DATE}.</p>
+        <img src="data:image/png;base64,{graph_base64}" alt="PPUD ELB Report" />
         <p>This is an automated email.</p>
     </body>
     </html>
@@ -126,20 +135,22 @@ def send_email_with_graph(graph_base64):
         print("Email sent successfully.")
     except Exception as e:
         print(f"Error sending email: {e}")
+
 		
 def lambda_handler(event, context):
     try:
         # Get hourly request counts
-        request_data = get_hourly_request_counts(ELB_NAME)
+        request_data = get_elb_request_counts(ELB_NAME)
         if not request_data:
             print("No data found for the specified ELB.")
             return
 
         # Create graph
-        temp_file = plot_graph(request_data)
+        #temp_file = plot_graph(request_data)
+        graph_base64 = create_graph(request_data)
 
         # Send email
-        send_email_with_graph(SENDER, temp_file)
+        email_image_to_users(graph_base64)
         print("Process completed successfully.")
 		
     except (NoCredentialsError, PartialCredentialsError) as cred_error:
