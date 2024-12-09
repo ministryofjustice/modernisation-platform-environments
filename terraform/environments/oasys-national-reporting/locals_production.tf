@@ -56,8 +56,8 @@ locals {
 
     #   self_managed_active_directory = {
     #     dns_ips = [
-    #       module.ip_addresses.mp_ip.ad-azure-dc-a,
-    #       module.ip_addresses.mp_ip.ad-azure-dc-b,
+    #       module.ip_addresses.mp_ip.ad-hmpp-dc-a,
+    #       module.ip_addresses.mp_ip.ad-hmpp-dc-b,
     #     ]
     #     domain_name          = "azure.hmpp.root"
     #     username             = "svc_join_domain"
