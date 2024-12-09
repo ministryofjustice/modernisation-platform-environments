@@ -15,10 +15,13 @@ resource "aws_lambda_layer_version" "this" {
   compatible_architectures = var.compatible_architectures
   skip_destroy             = var.layer_skip_destroy
 
-  filename         = "${path.module}/manifests/${var.local_file}"
-  source_code_hash = filebase64sha256("${path.module}/manifests/${var.local_file}")
+  s3_bucket = var.s3_existing_package.bucket
+  s3_key    = var.s3_existing_package.key
 
-  s3_bucket         = local.s3_bucket
-  s3_key            = local.s3_key
-  s3_object_version = local.s3_object_version
+  dynamic "s3_object_version" {
+    for_each = var.s3_existing_package.version != null ? [var.s3_existing_package.version] : []
+    content {
+      s3_object_version = s3_object_version.value
+    }
+  }
 }
