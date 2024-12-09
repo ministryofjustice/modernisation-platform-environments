@@ -190,7 +190,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
     tags = {
       Environment = local.environment
       Name        = "tribunals-instance"
-      Role = "Primary"
+      Role        = "Primary"
     }
   }
 
@@ -264,7 +264,9 @@ resource "aws_instance" "tribunals-backup" {
   }
 
   tags = {
-    Name = "tribunals-backup-instance"
+      Environment = local.environment
+      Name        = "tribunals-backup-instance"
+      Role        = "Backup"
   }
 }
 
