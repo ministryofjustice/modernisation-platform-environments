@@ -159,7 +159,7 @@ module "format_json_fms_data" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
-    DESTINATION_BUCKET_NAME = module.s3-raw-formatted-data-bucket.id
+    DESTINATION_BUCKET_NAME = module.s3-raw-formatted-data-bucket.bucket.id
   }
 }
 
