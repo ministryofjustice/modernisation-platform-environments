@@ -1,10 +1,10 @@
 locals {
   # Setting the IAM name that our Cloud Platform API will use to connect to this role
-  
-  iam-dev     = local.environment_shorthand == "dev"     ? var.cloud-platform-iam-dev     : ""
-  iam-test    = local.environment_shorthand == "test"    ? var.cloud-platform-iam-preprod : ""
+
+  iam-dev     = local.environment_shorthand == "dev" ? var.cloud-platform-iam-dev : ""
+  iam-test    = local.environment_shorthand == "test" ? var.cloud-platform-iam-preprod : ""
   iam-preprod = local.environment_shorthand == "preprod" ? var.cloud-platform-iam-preprod : ""
-  iam-prod    = local.environment_shorthand == "prod"    ? var.cloud-platform-iam-prod    : ""
+  iam-prod    = local.environment_shorthand == "prod" ? var.cloud-platform-iam-prod : ""
 
   resolved-cloud-platform-iam-role = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
 }
@@ -30,14 +30,14 @@ variable "cloud-platform-iam-prod" {
 module "cmt_front_end_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  source = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
-  
+
   trusted_role_arns = [
     local.resolved-cloud-platform-iam-role
   ]
 
-  create_role = true
+  create_role       = true
   role_requires_mfa = false
 
   role_name = "cmt_read_emds_data_${local.environment_shorthand}"

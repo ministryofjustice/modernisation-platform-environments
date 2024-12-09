@@ -8,7 +8,7 @@
 # }
 
 locals {
-  ip_set_dev = [for ip in split("\n", chomp(file("${path.module}/aws_waf_ipset_dev.txt"))) : ip]
+  ip_set_dev  = [for ip in split("\n", chomp(file("${path.module}/aws_waf_ipset_dev.txt"))) : ip]
   ip_set_prod = [for ip in split("\n", chomp(file("${path.module}/aws_waf_ipset.txt"))) : ip]
   ip_set_list = local.environment == "development" ? local.ip_set_dev : local.ip_set_prod
 }
