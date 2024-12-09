@@ -27,8 +27,8 @@ module "datasync_dom1_secret" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.3.1"
 
-  name        = "datasync/dom1"
-  kms_key_id  = module.datasync_credentials_kms.key_arn
+  name       = "datasync/dom1"
+  kms_key_id = module.datasync_credentials_kms.key_arn
 
   ignore_secret_changes = true
   secret_string = jsonencode({

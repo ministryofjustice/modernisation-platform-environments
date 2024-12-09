@@ -3,8 +3,32 @@ locals {
 
   # Create a mapping between listener headers and target group ARNs
   listener_header_to_target_group = {
-    for k, v in var.services :
-    v.name_prefix => aws_lb_target_group.tribunals_target_group[k].arn
+    for k, v in var.services : v.name_prefix => (
+      aws_lb_target_group.tribunals_target_group[k].arn
+    )
+  }
+  service_priorities = {
+    adminappeals             = 1
+    administrativeappeals    = 2
+    carestandards            = 3
+    charity                  = 4
+    cicap                    = 5
+    claimsmanagement         = 6
+    consumercreditappeals    = 7
+    employmentappeals        = 8
+    estateagentappeals       = 9
+    financeandtax            = 10
+    immigrationservices      = 11
+    informationrights        = 12
+    landregistrationdivision = 13
+    landschamber             = 14
+    phl                      = 15
+    siac                     = 16
+    sscs                     = 17
+    tax                      = 18
+    taxandchancery_ut        = 19
+    transportappeals         = 20
+    asylumsupport            = 21
   }
 }
 
@@ -110,12 +134,12 @@ resource "aws_lb_listener" "tribunals_lb" {
     }
   }
 }
+
 resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = index(keys(local.listener_header_to_target_group), each.key) + 1
-
+  priority     = local.service_priorities[each.key]
   action {
     type             = "forward"
     target_group_arn = each.value
@@ -126,9 +150,4 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
       values = ["*${each.key}.*"]
     }
   }
-}
-
-resource "aws_wafv2_web_acl_association" "web_acl_association_my_lb" {
-  resource_arn = aws_lb.tribunals_lb.arn
-  web_acl_arn  = aws_wafv2_web_acl.tribunals_web_acl.arn
 }

@@ -7,7 +7,6 @@ locals {
 
   baseline_presets_test = {
     options = {
-      enable_observability_platform_monitoring = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "nomis-test"
@@ -45,15 +44,17 @@ locals {
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.xtag,
           local.cloudwatch_dashboard_widget_groups.asg,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
         ]
       }
     }
 
     ec2_autoscaling_groups = {
-      # NOT-ACTIVE (blue deployment)
+      # NOT-ACTIVE (blue deployment) - for testing Combined Reporting
       t1-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
+          max_size         = 1
         })
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -70,10 +71,11 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment    = "t1"
-          oracle-db-hostname-a = "t1nomis-a.test.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "t1nomis-b.test.nomis.service.justice.gov.uk"
-          oracle-db-name       = "T1CNOM"
+          nomis-environment     = "t1"
+          oracle-db-hostname-a  = "t1nomis-a.test.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b  = "t1nomis-b.test.nomis.service.justice.gov.uk"
+          oracle-db-name        = "T1CNOM"
+          reporting-environment = "aws"
         })
       })
 

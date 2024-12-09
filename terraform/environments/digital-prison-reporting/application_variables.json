@@ -94,7 +94,7 @@
       "setup_sonatype_secrets": true,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
-      "dps_domains": ["dps-activities"],
+      "dps_domains": ["dps-activities", "dps-case-notes", "dps-basm"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -173,7 +173,8 @@
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
-      "redshift_table_expiry_seconds": "604800"
+      "redshift_table_expiry_seconds": "604800",
+      "enable_s3_data_migrate_lambda": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -269,7 +270,7 @@
       "setup_sonatype_secrets": false,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
-      "dps_domains": ["dps-activities"],
+      "dps_domains": ["dps-activities", "dps-case-notes", "dps-basm"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -348,7 +349,8 @@
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
-      "redshift_table_expiry_seconds": "604800"
+      "redshift_table_expiry_seconds": "604800",
+      "enable_s3_data_migrate_lambda": true
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -446,7 +448,7 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
-      "dps_domains": ["dps-activities"],
+      "dps_domains": ["dps-activities", "dps-case-notes", "dps-basm"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -543,7 +545,8 @@
           ]
         }
       ],
-      "redshift_table_expiry_seconds": "604800"
+      "redshift_table_expiry_seconds": "604800",
+      "enable_s3_data_migrate_lambda": true
     },
     "production": {
       "project_short_id": "dpr",
@@ -639,7 +642,7 @@
       "setup_sonatype_secrets": false,
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
-      "dps_domains": ["dps-activities"],
+      "dps_domains": ["dps-activities", "dps-case-notes", "dps-basm"],
       "alarms": {
         "setup_cw_alarms": true,
         "redshift": {
@@ -733,7 +736,8 @@
           ]
         }
       ],
-      "redshift_table_expiry_seconds": "86400"
+      "redshift_table_expiry_seconds": "86400",
+      "enable_s3_data_migrate_lambda": false
     }
   }
 }

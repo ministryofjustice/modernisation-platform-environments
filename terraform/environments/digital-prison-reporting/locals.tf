@@ -403,19 +403,15 @@ locals {
   environment_configuration = local.environment_configurations[local.environment]
   environment_configurations = {
     development = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
       analytical_platform_runner_suffix = "-dev"
     }
     test = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
       analytical_platform_runner_suffix = "-test"
     }
     preproduction = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
       analytical_platform_runner_suffix = "-pp"
     }
     production = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-production"]
       analytical_platform_runner_suffix = ""
     }
   }
@@ -427,4 +423,19 @@ locals {
       Name = local.application_name
     }
   )
+
+  # DPR Operations,
+  # S3 Data Migration Lambda
+  enable_s3_data_migrate_lambda         = local.application_data.accounts[local.environment].enable_s3_data_migrate_lambda
+  lambda_s3_data_migrate_name           = "${local.project}-s3-data-lifecycle-migration-lambda"
+  lambda_s3_data_migrate_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_s3_data_migrate_code_s3_key    = "build-artifacts/dpr-operations/py_files/dpr-s3-data-lifecycle-migration-lambda-v1.zip"
+  lambda_s3_data_migrate_handler        = "dpr-s3-data-lifecycle-migration-lambda-v1.lambda_handler"
+  lambda_s3_data_migrate_runtime        = "python3.11"
+  lambda_s3_data_migrate_tracing        = "PassThrough"
+  lambda_s3_data_migrate_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"
+  ]
 }

@@ -150,6 +150,13 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = [local.application_data.accounts[local.environment].outbound_access_cidr]
   }
   egress {
+    description = "Allow telnet to Portal - MoJo"
+    from_port   = 3443
+    to_port     = 3443
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].outbound_access_cidr]
+  }
+  egress {
     description = "access to the admin server"
     from_port   = 9500
     to_port     = 9500
@@ -234,9 +241,8 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_iam_role" "ec2_instance_role" {
-  name                = "${local.application_name}-role"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-  assume_role_policy  = <<EOF
+  name               = "${local.application_name}-role"
+  assume_role_policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -250,6 +256,11 @@ resource "aws_iam_role" "ec2_instance_role" {
     ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_instance_role_attachment" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy" "ec2_instance_policy" {

@@ -15,16 +15,16 @@ locals {
         ]
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
-          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+          "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
             branch = "main"
           }
         ))
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-        "/dev/xvdk" = { type = "gp3", size = 128 } # D:/ Temp
-        "/dev/xvdl" = { type = "gp3", size = 128 } # E:/ App
-        "/dev/xvdm" = { type = "gp3", size = 700 } # F:/ Storage
+        "xvdd"      = { type = "gp3", size = 128 } # D:/ Temp
+        "xvde"      = { type = "gp3", size = 128 } # E:/ App
+        "xvdf"      = { type = "gp3", size = 700 } # F:/ Storage
       }
       instance = {
         disable_api_termination      = false

@@ -146,9 +146,24 @@ output "security_groups" {
   value       = aws_security_group.this
 }
 
+output "schedule_alarms_lambda" {
+  description = "schedule alarms lambda output"
+  value       = module.schedule_alarms_lambda
+}
+
 output "sns_topics" {
   description = "map of aws_sns_topic resources corresponding to var.sns_topics"
   value       = aws_sns_topic.this
+}
+
+output "ssm_associations" {
+  description = "map of aws_ssm_association resources corresponding to var.ssm_association"
+  value       = aws_ssm_association.this
+}
+
+output "ssm_documents" {
+  description = "map of aws_ssm_document resources corresponding to var.ssm_documents"
+  value       = aws_ssm_document.this
 }
 
 output "ssm_parameters" {

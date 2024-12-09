@@ -6,7 +6,7 @@ module "vpc" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/vpc/aws"
-  version = "5.13.0"
+  version = "5.15.0"
 
   name                = local.our_vpc_name
   azs                 = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -30,6 +30,7 @@ module "vpc" {
   flow_log_cloudwatch_log_group_retention_in_days = local.vpc_flow_log_cloudwatch_log_group_retention_in_days
   flow_log_max_aggregation_interval               = local.vpc_flow_log_max_aggregation_interval
   vpc_flow_log_tags                               = { Name = local.our_vpc_name }
+  flow_log_log_format                             = "$${version} $${account-id} $${interface-id} $${srcaddr} $${dstaddr} $${srcport} $${dstport} $${protocol} $${packets} $${bytes} $${start} $${end} $${action} $${log-status} $${vpc-id} $${subnet-id} $${instance-id} $${tcp-flags} $${type} $${pkt-srcaddr} $${pkt-dstaddr} $${region} $${az-id} $${sublocation-type} $${sublocation-id} $${pkt-src-aws-service} $${pkt-dst-aws-service} $${flow-direction} $${traffic-path}"
 
   public_subnet_tags = {
     "kubernetes.io/role/elb" = 1

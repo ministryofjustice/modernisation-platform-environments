@@ -142,6 +142,9 @@ cat <<EOT > /etc/cron.d/custom_cloudwatch_metrics
 */1 * * * * root /var/cw-custom.sh > /dev/null 2>&1
 EOT
 
+## Additional DBA steps
+su oracle -c "sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/oracle/product/10.2.0/db_1/appsutil/CWA_cwa-db.xml"
+
 EOF
 
 }
@@ -239,15 +242,6 @@ resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
   security_group_id            = aws_security_group.database.id
   description                  = "SSH from the Bastion"
   referenced_security_group_id = module.bastion_linux.bastion_security_group
-  from_port                    = 22
-  ip_protocol                  = "tcp"
-  to_port                      = 22
-}
-
-resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
-  security_group_id            = aws_security_group.database.id
-  description                  = "Allow Lambda SSH access for backup snapshots"
-  referenced_security_group_id = aws_security_group.backup_lambda.id
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22

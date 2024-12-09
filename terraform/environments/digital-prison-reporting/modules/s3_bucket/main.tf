@@ -32,52 +32,74 @@ resource "aws_s3_bucket_public_access_block" "storage" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
-  #checkov:skip=CKV_AWS_300:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
-  count  = var.enable_lifecycle ? 1 : 0
+  # Create the lifecycle configuration if either lifecycle or Intelligent-Tiering is enabled
+  count = var.enable_lifecycle || var.enable_intelligent_tiering ? 1 : 0
+
   bucket = aws_s3_bucket.storage[0].id
-  rule {
-    id     = var.name
-    status = "Enabled"
 
-    noncurrent_version_transition {
-      noncurrent_days = 90
-      storage_class   = "STANDARD_IA"
+  # Main lifecycle rule for standard categories (short_term, long_term, temporary, standard)
+  dynamic "rule" {
+    for_each = var.enable_lifecycle ? [1] : []
+    content {
+      id     = var.name
+      status = "Enabled"
+
+      # Short-Term Retention Policy
+      dynamic "transition" {
+        for_each = var.lifecycle_category == "short_term" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []
+        content {
+          days          = transition.value.days
+          storage_class = transition.value.storage_class
+        }
+      }
+
+      # Standard Retention Policy: Move to STANDARD_IA after 30 days and remain there indefinitely
+      dynamic "transition" {
+        for_each = var.lifecycle_category == "standard" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []
+        content {
+          days          = transition.value.days
+          storage_class = transition.value.storage_class
+        }
+      }
+
+      # Expiration logic for short-term and temporary categories
+      dynamic "expiration" {
+        for_each = var.lifecycle_category == "short_term" ? [{ days = 90 }] : (
+        var.lifecycle_category == "temporary" ? [{ days = 30 }] : [])
+        content {
+          days = expiration.value.days
+        }
+      }
+
+      # Long-Term Retention Policy
+      dynamic "transition" {
+        for_each = var.lifecycle_category == "long_term" ? [
+          { days = 30, storage_class = "STANDARD_IA" },
+          { days = 180, storage_class = "GLACIER" },
+          { days = 365, storage_class = "DEEP_ARCHIVE" }
+        ] : []
+        content {
+          days          = transition.value.days
+          storage_class = transition.value.storage_class
+        }
+      }
     }
+  }
 
-    noncurrent_version_transition {
-      noncurrent_days = 365
-      storage_class   = "GLACIER"
+  # Intelligent-Tiering rule (applied if enable_intelligent_tiering is true)
+  rule {
+    id     = "${var.name}-intelligent-tiering"
+    status = var.enable_intelligent_tiering ? "Enabled" : "Disabled"
+
+    filter {
+      # Apply to all objects
+      prefix = ""
     }
 
     transition {
-      days          = 60
-      storage_class = "STANDARD_IA"
-    }
-  }
-
-  rule {
-    id     = "${var.name}-reports"
-    status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
-
-    filter {
-      prefix = var.expiration_prefix_redshift
-    }
-
-    expiration {
-      days = var.expiration_days
-    }
-  }
-
-  rule {
-    id     = "${var.name}-dpr"
-    status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
-
-    filter {
-      prefix = var.expiration_prefix_athena
-    }
-
-    expiration {
-      days = var.expiration_days
+      # Move objects to Intelligent-Tiering storage class
+      days          = 0 # Immediately move to Intelligent-Tiering
+      storage_class = "INTELLIGENT_TIERING"
     }
   }
 }

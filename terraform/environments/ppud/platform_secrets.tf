@@ -15,3 +15,23 @@ data "aws_secretsmanager_secret_version" "environment_management" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.environment_management.id
 }
+
+# Klayers Account ID - used by lambda layer ARNs - https://github.com/keithrozario/Klayers?tab=readme-ov-file
+data "aws_ssm_parameter" "klayers_account_dev" {
+  count           = local.is-development == true ? 1 : 0
+  name            = "klayers-account"
+  with_decryption = true
+}
+
+# Klayers Account ID - used by lambda layer ARNs - https://github.com/keithrozario/Klayers?tab=readme-ov-file
+data "aws_ssm_parameter" "klayers_account_prod" {
+  count           = local.is-production == true ? 1 : 0
+  name            = "klayers-account"
+  with_decryption = true
+}
+
+# This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
+data "aws_ssm_parameter" "elb-account-eu-west-2" {
+  name            = "elb-account-eu-west-2"
+  with_decryption = true
+}

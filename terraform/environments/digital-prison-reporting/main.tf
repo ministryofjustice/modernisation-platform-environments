@@ -789,7 +789,7 @@ module "s3_glue_job_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-glue-jobs-${local.environment}"
+      name          = "${local.project}-glue-jobs-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -807,7 +807,7 @@ module "s3_raw_archive_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-raw-archive-${local.env}-s3"
+      name          = "${local.project}-raw-archive-${local.env}-s3"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -824,7 +824,7 @@ module "s3_raw_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-raw-zone-${local.env}"
+      name          = "${local.project}-raw-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -842,7 +842,7 @@ module "s3_structured_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-structured-zone-${local.env}"
+      name          = "${local.project}-structured-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -850,23 +850,24 @@ module "s3_structured_bucket" {
 
 # S3 Curated
 module "s3_curated_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-curated-zone-${local.env}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
+  source                     = "./modules/s3_bucket"
+  create_s3                  = local.setup_buckets
+  name                       = "${local.project}-curated-zone-${local.env}"
+  custom_kms_key             = local.s3_kms_arn
+  create_notification_queue  = false # For SQS Queue
+  enable_lifecycle           = true
+  enable_intelligent_tiering = false
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-curated-zone-${local.env}"
+      name          = "${local.project}-curated-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
 }
 
-# S3 Curated
+# S3 Temp Reload
 module "s3_temp_reload_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
@@ -878,7 +879,7 @@ module "s3_temp_reload_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-temp-reload-${local.env}"
+      name          = "${local.project}-temp-reload-${local.env}"
       Resource_Type = "S3 Bucket",
       Jira          = "DPR2-46"
     }
@@ -897,7 +898,7 @@ module "s3_domain_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-${local.env}"
+      name          = "${local.project}-domain-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -917,7 +918,7 @@ module "s3_schema_registry_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-schema-registry-${local.env}"
+      name          = "${local.project}-schema-registry-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -935,7 +936,7 @@ module "s3_domain_config_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-config-${local.env}"
+      name          = "${local.project}-domain-config-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -953,7 +954,7 @@ module "s3_violation_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-violation-${local.environment}"
+      name          = "${local.project}-violation-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -980,7 +981,7 @@ module "s3_artifacts_store" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-artifact-store-${local.environment}"
+      name          = "${local.project}-artifact-store-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -995,14 +996,23 @@ module "s3_working_bucket" {
   create_notification_queue   = false # For SQS Queue
   enable_lifecycle            = true
   enable_lifecycle_expiration = true
-  expiration_days             = 2
-  expiration_prefix_redshift  = "reports/"
-  expiration_prefix_athena    = "dpr/"
+  lifecycle_category          = "long_term"
+
+  override_expiration_rules = [
+    {
+      prefix = "reports"
+      days   = 7
+    },
+    {
+      prefix = "dpr"
+      days   = 7
+    }
+  ]
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-working-${local.environment}"
+      name          = "${local.project}-working-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -1221,7 +1231,7 @@ module "dms_nomis_ingestor" {
   dms_target_name              = "kinesis"
   short_name                   = "nomis"
   migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.7" # Upgrade
+  replication_instance_version = "3.5.2"
   replication_instance_class   = "dms.t3.medium"
   subnet_ids = [
     data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
@@ -1239,66 +1249,12 @@ module "dms_nomis_ingestor" {
     "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
   }
 
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
-
   tags = merge(
     local.all_tags,
     {
       Name          = "${local.project}-dms-t3nomis-ingestor-${local.env}"
       Resource_Type = "DMS Replication"
       Nomis_Source  = "T3"
-    }
-  )
-}
-
-module "dms_fake_data_ingestor" {
-  source                       = "./modules/dms_dps"
-  setup_dms_instance           = local.setup_fake_data_dms_instance
-  enable_replication_task      = local.enable_fake_data_replication_task # Disable Replication Task
-  name                         = "${local.project}-dms-fake-data-ingestor-${local.env}"
-  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
-  source_engine_name           = "postgres"
-  source_db_name               = "db59b5cf9e5de6b794"
-  source_app_username          = "cp9Zr5bLim"
-  source_app_password          = "whkthrI65zpcFEe5"
-  source_address               = "cloud-platform-59b5cf9e5de6b794.cdwm328dlye6.eu-west-2.rds.amazonaws.com"
-  source_db_port               = 5432
-  vpc                          = data.aws_vpc.shared.id
-  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  project_id                   = local.project
-  env                          = local.environment
-  dms_source_name              = "postgres"
-  dms_target_name              = "kinesis"
-  short_name                   = "fake-data"
-  migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.7" # Rollback
-  replication_instance_class   = "dms.t3.medium"
-  subnet_ids = [
-    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
-  ]
-
-  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
-  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
-
-  kinesis_settings = {
-    "include_null_and_empty"         = "true"
-    "partition_include_schema_table" = "true"
-    "include_partition_value"        = "true"
-    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
-  }
-
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name            = "${local.project}-dms-fake-data-ingestor-${local.env}"
-      Resource_Type   = "DMS Replication"
-      Postgres_Source = "DPS"
     }
   )
 }
@@ -1339,10 +1295,6 @@ module "dms_nomis_to_s3_ingestor" {
   extra_attributes = "supportResetlog=TRUE"
 
   bucket_name = module.s3_raw_bucket.bucket_id
-
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
 
   depends_on = [
     module.s3_raw_bucket.bucket_id
@@ -1471,7 +1423,7 @@ module "s3_application_tf_state" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-terraform-state-${local.environment}"
+      name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )

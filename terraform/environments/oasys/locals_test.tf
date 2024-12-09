@@ -3,7 +3,6 @@ locals {
   baseline_presets_test = {
     options = {
 
-      enable_observability_platform_monitoring = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "oasys-test"
@@ -29,6 +28,20 @@ locals {
         tags = {
           description = "cert for t2 oasys test domains"
         }
+      }
+    }
+
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.onr,
+          local.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
       }
     }
 
@@ -186,7 +199,7 @@ locals {
           "/dev/sde" = { label = "data", size = 500 }
           "/dev/sdf" = { label = "data", size = 500 }
           "/dev/sdj" = { label = "flash", size = 200 }
-          "/dev/sds" = { label = "swap", size = 2 }
+          "/dev/sds" = { label = "swap", size = 4 }
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true

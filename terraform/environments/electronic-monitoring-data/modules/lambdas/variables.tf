@@ -76,15 +76,11 @@ variable "runtime" {
 variable "security_group_ids" {
   description = "List of security group IDs associated with the Lambda function."
   type        = list(string)
-  nullable    = true
-  default     = null
 }
 
 variable "subnet_ids" {
   description = "List of subnet IDs associated with the Lambda function."
   type        = list(string)
-  nullable    = true
-  default     = null
 }
 
 variable "environment_variables" {
@@ -95,7 +91,7 @@ variable "environment_variables" {
 }
 
 variable "reserved_concurrent_executions" {
-  description = "The amount of reserved concurrent executions for the Lambda function."
+  description = "The amount m  of reserved concurrent executions for the Lambda function."
   type        = number
   default     = 10
 }
@@ -133,3 +129,11 @@ variable "ephemeral_storage_size" {
   type        = number
   default     = 512
 }
+
+variable "s3_bucket" {
+  description = "The name of the S3 bucket where the Lambda layer code is stored"
+  type        = string
+  nullable    = true
+  default     = null
+}
+
