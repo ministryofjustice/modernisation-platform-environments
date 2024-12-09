@@ -27,6 +27,31 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_send_cpu_graph_pro
   arn       = aws_lambda_function.terraform_lambda_func_send_cpu_graph_prod[0].arn
 }
 
+# Eventbridge rule to invoke the PPUD ELB report lambda function every weekday at 20:15
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_ppud_elb_report_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_ppud_elb_report_prod[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_schedule_ppud_elb_report_prod[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "daily_schedule_ppud_elb_report_prod" {
+  count               = local.is-production == true ? 1 : 0
+  name                = "ppud-elb-report-daily-weekday-schedule"
+  description         = "Trigger Lambda at 20:15 UTC on weekdays"
+  schedule_expression = "cron(15 20 ? * MON-FRI *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_ppud_elb_report_prod" {
+  count     = local.is-production == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.daily_schedule_ppud_elb_report_prod[0].name
+  target_id = "ppud_elb_report"
+  arn       = aws_lambda_function.terraform_lambda_func_ppud_elb_report_prod[0].arn
+}
+
 # Eventbridge rule to invoke the PPUD Email Report lambda function every Monday at 07:00
 
 resource "aws_lambda_permission" "allow_eventbridge_invoke_ppud_email_report_prod" {
