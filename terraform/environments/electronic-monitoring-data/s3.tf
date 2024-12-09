@@ -552,6 +552,21 @@ resource "aws_s3_bucket_notification" "data_store" {
     events = [
       "s3:ObjectCreated:*"
     ]
+    filter_suffix = ".bak"
+  }
+  topic {
+    topic_arn = aws_sns_topic.s3_events.arn
+    events = [
+      "s3:ObjectCreated:*",
+    ]
+    filter_suffix = ".zip"
+  }
+  topic {
+    topic_arn = aws_sns_topic.s3_events.arn
+    events = [
+      "s3:ObjectCreated:*",
+    ]
+    filter_suffix = ".bacpac"
   }
 }
 
