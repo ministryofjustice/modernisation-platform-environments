@@ -199,7 +199,7 @@ locals {
           "/dev/sde" = { label = "data", size = 500 }
           "/dev/sdf" = { label = "data", size = 500 }
           "/dev/sdj" = { label = "flash", size = 200 }
-          "/dev/sds" = { label = "swap", size = 2 }
+          "/dev/sds" = { label = "swap", size = 4 }
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true

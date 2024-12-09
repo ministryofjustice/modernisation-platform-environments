@@ -24,6 +24,7 @@ locals {
           dso-pipelines-pagerduty         = "dso-pipelines"
           hmpps-domain-services-pagerduty = "hmpps-domain-services-test"
           nomis-pagerduty                 = "nomis-test"
+          nomis-data-hub-pagerduty        = "nomis-data-hub-test"
           oasys-pagerduty                 = "oasys-test"
           pagerduty                       = "hmpps-oem-test"
         }
@@ -35,7 +36,7 @@ locals {
   baseline_test = {
 
     cloudwatch_metric_alarms = merge(
-      module.baseline_presets.cloudwatch_metric_alarms_by_sns_topic["dso-pipelines-pagerduty"].github
+      local.cloudwatch_metric_alarms_github_actions, # gha metrics are only pushed to hmpps-oem-test account
     )
 
     cloudwatch_dashboards = {

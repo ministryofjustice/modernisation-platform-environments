@@ -155,6 +155,8 @@ module "process_landing_bucket_files" {
   timeout                 = 900
   core_shared_services_id = var.core_shared_services_id
   production_dev          = var.production_dev
+  security_group_ids      = var.security_group_ids
+  subnet_ids              = var.subnet_ids
   environment_variables = {
     DESTINATION_BUCKET = var.received_files_bucket_id
   }
