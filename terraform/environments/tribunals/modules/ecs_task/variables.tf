@@ -45,10 +45,10 @@ variable "app_count" {
   description = "Number of docker containers to run"
 }
 
-# variable "lb_tg_arn" {
-#   type        = string
-#   description = "Load balancer target group ARN used by ECS service"
-# }
+variable "lb_tg_arn" {
+  type        = string
+  description = "Load balancer target group ARN used by ECS service"
+}
 
 variable "server_port" {
   type        = string
@@ -65,7 +65,7 @@ variable "is_ftp_app" {
   description = "Determines if it is an ftp app or not"
 }
 
-# variable "sftp_lb_tg_arn" {
-#   type        = string
-#   description = "Network Load balancer target group ARN used by SFTP connections"
-# }
+variable "sftp_lb_tg_arn" {
+  type        = string
+  description = "Network Load balancer target group ARN used by SFTP connections"
+}
