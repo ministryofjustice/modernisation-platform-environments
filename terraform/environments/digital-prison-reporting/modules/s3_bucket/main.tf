@@ -65,7 +65,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
       # Expiration logic for short-term and temporary categories
       dynamic "expiration" {
         for_each = var.lifecycle_category == "short_term" ? [{ days = 90 }] : (
-                   var.lifecycle_category == "temporary" ? [{ days = 30 }] : [])
+        var.lifecycle_category == "temporary" ? [{ days = 30 }] : [])
         content {
           days = expiration.value.days
         }

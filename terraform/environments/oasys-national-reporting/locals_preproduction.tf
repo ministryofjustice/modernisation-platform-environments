@@ -95,7 +95,7 @@ locals {
           "/dev/xvdm" = { type = "gp3", size = 700 } # F:/ Storage
         }
         instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "r6i.2xlarge"
+          instance_type           = "r6i.2xlarge"
           disable_api_termination = true
         })
         cloudwatch_metric_alarms = null
