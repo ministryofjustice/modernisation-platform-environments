@@ -5,18 +5,45 @@
 # created sporadically, e.g. ahead of a service release, and will
 # therefore not be continually overwritten.  Writing them to a
 # backup vault allows them to timeout without being overwritten.
-data "aws_iam_policy_document" "assume_AWSBackupDefaultServiceRole" {
-  statement {
-    actions = ["sts:AssumeRole"]
 
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${var.account_info.id}:role/modernisation-platform-oidc-cicd"]
-    }
+data "aws_iam_role" "AWSBackupDefaultServiceRole" {
+  name = "AWSBackupDefaultServiceRole"
+}
+
+# Decode the existing assume role policy
+locals {
+  existing_statements = try(
+    jsondecode(data.aws_iam_role.AWSBackupDefaultServiceRole.assume_role_policy)["Statement"],
+    []
+  )
+  new_statement = {
+    Effect = "Allow",
+    Principal = {
+      AWS = "arn:aws:iam::${var.account_info.id}:role/modernisation-platform-oidc-cicd"
+    },
+    Action = "sts:AssumeRole"
+  }
+  combined_statements = concat(local.existing_statements, [local.new_statement])
+}
+
+# Create the combined policy
+data "aws_iam_policy_document" "merged_trust_policy" {
+  dynamic "statement" {
+    for_each = toset(local.combined_statements)
+
+       content {
+            effect    = statement.value["Effect"]
+            actions   = [statement.value["Action"]]
+            principals {
+                type        = keys(statement.value["Principal"])[0]
+                identifiers = toset([statement.value["Principal"][keys(statement.value["Principal"])[0]]])
+            }
+       }
   }
 }
 
-resource "aws_iam_role_policy" "assume_AWSBackupDefaultServiceRole" {
-  role   = "AWSBackupDefaultServiceRole"
-  policy = data.aws_iam_policy_document.assume_AWSBackupDefaultServiceRole.json
+resource "aws_iam_role" "update_AWSBackupDefaultServiceRole" {
+  name               = "AWSBackupDefaultServiceRole"
+  assume_role_policy = data.aws_iam_policy_document.merged_trust_policy.json
 }
+
