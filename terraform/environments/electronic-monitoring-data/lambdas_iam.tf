@@ -378,6 +378,8 @@ data "aws_iam_policy_document" "format_json_fms_data_policy_document" {
     effect = "Allow"
     actions = [
       "s3:GetObject",
+      "s3:GetObjectTagging",
+
     ]
     resources = ["${module.s3-data-bucket.bucket.arn}/*"]
   }
