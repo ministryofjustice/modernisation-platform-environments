@@ -21,7 +21,7 @@ resource "aws_cloudwatch_event_rule" "daily_schedule_send_cpu_graph_prod" {
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_target_send_cpu_graph_prod" {
- count      = local.is-production == true ? 1 : 0
+  count     = local.is-production == true ? 1 : 0
   rule      = aws_cloudwatch_event_rule.daily_schedule_send_cpu_graph_prod[0].name
   target_id = "send_cpu_graph"
   arn       = aws_lambda_function.terraform_lambda_func_send_cpu_graph_prod[0].arn
@@ -46,7 +46,7 @@ resource "aws_cloudwatch_event_rule" "weekly_schedule_ppud_email_report_prod" {
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_target_ppud_email_report_prod" {
- count      = local.is-production == true ? 1 : 0
+  count     = local.is-production == true ? 1 : 0
   rule      = aws_cloudwatch_event_rule.weekly_schedule_ppud_email_report_prod[0].name
   target_id = "ppud_email_report"
   arn       = aws_lambda_function.terraform_lambda_func_ppud_email_report_prod[0].arn

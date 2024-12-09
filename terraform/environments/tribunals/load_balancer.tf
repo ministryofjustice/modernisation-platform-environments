@@ -141,7 +141,7 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority = local.service_priorities[each.key]
+  priority     = local.service_priorities[each.key]
   action {
     type             = "forward"
     target_group_arn = each.value

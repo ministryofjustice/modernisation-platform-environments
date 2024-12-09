@@ -217,13 +217,17 @@ resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_logging_attach
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+locals {
+  rendered_metric_template = templatefile("${path.module}/lambda/dms_replication_metric.py.tmpl", { oracle_db_instance_scheduling = var.oracle_db_instance_scheduling })
+}
+
 # Creates a ZIP file containing the contents of the lambda directory which
 # contains a Python script to calculate and put the custom metric
 data "archive_file" "lambda_dms_replication_metric_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda"
-  output_path = "${path.module}/lambda/dms_replication_metric.zip"
-  excludes    = ["dms_replication_metric.zip"]
+  type                    = "zip"
+  source_content          = local.rendered_metric_template
+  source_content_filename = "dms_replication_metric.py"
+  output_path             = "${path.module}/lambda/dms_replication_metric.zip"
 }
 
 # Define a Lambda Function using the python script in the ZIP file -
@@ -242,6 +246,7 @@ resource "aws_lambda_function" "dms_replication_metric_publisher" {
     variables = {
       METRIC_NAMESPACE = "CustomDMSMetrics",
       METRIC_NAME      = "DMSReplicationFailure"
+      TZ               = "Europe/London"
     }
   }
 

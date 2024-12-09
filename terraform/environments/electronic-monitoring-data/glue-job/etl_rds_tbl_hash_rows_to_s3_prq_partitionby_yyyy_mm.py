@@ -10,6 +10,7 @@ from glue_data_validation_lib import Logical_Constants
 from glue_data_validation_lib import RDS_JDBC_CONNECTION
 from glue_data_validation_lib import S3Methods
 from glue_data_validation_lib import CustomPysparkMethods
+from rds_transform_queries import SQLServer_Extract_Transform
 
 from awsglue.utils import getResolvedOptions
 from awsglue.transforms import *
@@ -55,7 +56,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "year_partition_bool",
                        "month_partition_bool",
                        "hashed_output_s3_bucket_name",
-                       "rds_db_table_hashed_rows_parent_dir"
+                       "rds_db_table_hashed_rows_parent_dir",
+                       "incremental_run_bool"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -87,12 +89,7 @@ ATHENA_RUN_OUTPUT_LOCATION = f"s3://{HASHED_OUTPUT_S3_BUCKET_NAME}/athena_temp_s
 
 INT_DATATYPES_LIST = Logical_Constants.INT_DATATYPES_LIST
 
-TBL_COLS_CONVERT_FMT_DICT = {'GPSPosition': 
-                             {'Latitude': 'CONVERT(VARCHAR(MAX), CONVERT(DECIMAL(10,7), Latitude))', 
-                              'RecordedDatetime':'CONVERT(VARCHAR, RecordedDatetime, 120)', 
-                              'AuditDateTime':'CONVERT(VARCHAR, AuditDateTime, 121)'
-                              }
-                            }
+TRANSFORM_COLS_FOR_HASHING_DICT = SQLServer_Extract_Transform.TRANSFORM_COLS_FOR_HASHING_DICT
 
 # ===============================================================================
 
@@ -267,19 +264,16 @@ if __name__ == "__main__":
 
     all_columns_except_pkey = list()
     conversion_col_list = list()
-    if TBL_COLS_CONVERT_FMT_DICT.get(
-        f"{rds_sqlserver_db_table}", None) is not None:
-        conversion_col_list = list(
-                                TBL_COLS_CONVERT_FMT_DICT[
-                                    f"{rds_sqlserver_db_table}"].keys()
-                                )
+    if TRANSFORM_COLS_FOR_HASHING_DICT.get(f"{db_sch_tbl}", None) is not None:
+        conversion_col_list = list(TRANSFORM_COLS_FOR_HASHING_DICT[f"{db_sch_tbl}"].keys())
+
     for e in rds_db_table_empty_df.schema.fields:
         if e.name == rds_db_tbl_pkey_column:
             continue
         
         if e.name in conversion_col_list:
             all_columns_except_pkey.append(
-                TBL_COLS_CONVERT_FMT_DICT[f"{rds_sqlserver_db_table}"][f"{e.name}"]
+                TRANSFORM_COLS_FOR_HASHING_DICT[f"{db_sch_tbl}"][f"{e.name}"]
                 )
         else:
             all_columns_except_pkey.append(f"{e.name}")
@@ -311,9 +305,28 @@ if __name__ == "__main__":
     # VERIFY GIVEN INPUTS - END
     # -----------------------------------------
 
+    incremental_run_bool = args.get('incremental_run_bool', 'false')
     rds_query_where_clause = args.get('rds_query_where_clause', None)
+    
     if rds_query_where_clause is not None:
         rds_query_where_clause = rds_query_where_clause.strip()
+    elif incremental_run_bool == 'true':
+        existing_prq_hashed_rows_df = CustomPysparkMethods.get_s3_parquet_df_v2(
+                                    prq_table_folder_path, 
+                                    CustomPysparkMethods.get_pyspark_hashed_table_schema(
+                                        rds_db_tbl_pkey_column)
+                                    )
+
+        existing_prq_hashed_rows_df_agg = existing_prq_hashed_rows_df.agg(
+                                            F.max(rds_db_tbl_pkey_column).alias(
+                                                f"max_{rds_db_tbl_pkey_column}")
+                                            )
+        existing_prq_hashed_rows_agg_dict = existing_prq_hashed_rows_df_agg.collect()[0]
+        existing_prq_hashed_rows_max_pkey = existing_prq_hashed_rows_agg_dict[
+                                                f"max_{rds_db_tbl_pkey_column}"]
+        rds_query_where_clause = f""" {rds_db_tbl_pkey_column} > {existing_prq_hashed_rows_max_pkey}"""
+
+    LOGGER.info(f"""rds_query_where_clause = {rds_query_where_clause}""")
 
     agg_row_dict_list = rds_jdbc_conn_obj.get_min_max_groupby_month(
                                             rds_sqlserver_db_table,
@@ -321,7 +334,8 @@ if __name__ == "__main__":
                                             rds_db_tbl_pkey_column,
                                             rds_query_where_clause
                                         )
-    LOGGER.info(f"""agg_row_dict_list:>\n{[agg_row_dict for agg_row_dict in agg_row_dict_list]}""")
+    LOGGER.info(f"""agg_row_dict_list:>\n{[agg_row_dict 
+                                           for agg_row_dict in agg_row_dict_list]}""")
 
     rds_db_hash_cols_query_str = f"""
     SELECT {rds_db_tbl_pkey_column}, 
@@ -345,7 +359,7 @@ if __name__ == "__main__":
         LOGGER.info(f"""max_pkey_value = {max_pkey_value}""")
 
         pkey_between_clause_str_temp = f""" 
-        WHERE {rds_db_tbl_pkey_column} between {min_pkey_value} and {max_pkey_value}""".strip()
+        WHERE {rds_db_tbl_pkey_column} between {min_pkey_value} and {max_pkey_value}""".rstrip()
 
         rds_db_select_query_str_temp = rds_db_hash_cols_query_str + pkey_between_clause_str_temp
         LOGGER.info(f"""rds_db_select_query_str_temp = \n{rds_db_select_query_str_temp}""")

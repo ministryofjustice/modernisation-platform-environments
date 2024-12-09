@@ -471,13 +471,17 @@ class RDS_JDBC_CONNECTION():
 
         self.LOGGER.info(f"""query_str-(Aggregate):> \n{query_str}""")
 
-        return (self.spark.read.format("jdbc")
+        df_agg = (self.spark.read.format("jdbc")
                 .option("url", self.rds_jdbc_url_v2)
                 .option("driver", self.RDS_DB_INSTANCE_DRIVER)
                 .option("user", self.RDS_DB_INSTANCE_USER)
                 .option("password", self.RDS_DB_INSTANCE_PWD)
                 .option("query", f"""{query_str}""")
-                .load()).collect()
+                .load())
+        
+        df_agg = df_agg.orderBy(['year', 'month'], ascending=True)
+
+        return df_agg.collect()
 
     def get_min_max_pkey_filter(self,
                                 rds_db_table_name,
@@ -778,3 +782,10 @@ class CustomPysparkMethods:
                 altered_schema_object.add(field_obj)
 
         return altered_schema_object
+
+    @staticmethod
+    def get_pyspark_hashed_table_schema(in_pkey_column):
+        return T.StructType([
+            T.StructField(f"{in_pkey_column}", T.IntegerType(), False),
+            T.StructField("RowHash", T.StringType(), False)]
+            )

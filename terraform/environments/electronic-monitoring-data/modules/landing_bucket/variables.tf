@@ -54,3 +54,13 @@ variable "received_files_bucket_id" {
   description = "The id of the bucket data will be moved to"
   type        = string
 }
+
+variable "security_group_ids" {
+  description = "List of security group IDs associated with the Lambda function."
+  type        = list(string)
+}
+
+variable "subnet_ids" {
+  description = "List of subnet IDs associated with the Lambda function."
+  type        = list(string)
+}
