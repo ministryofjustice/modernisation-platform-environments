@@ -3,7 +3,6 @@ import json
 import logging
 import re
 from datetime import datetime
-from zoneinfo import ZoneInfo
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -34,7 +33,7 @@ def lambda_handler(event, context):
     for record in event['Records']:
 
         # Get the current local time and weekday (timezones are respected)
-        now = datetime.now(ZoneInfo("Europe/London"))
+        now = datetime.now()
         current_hour    = now.hour
         current_weekday = now.weekday()  # Monday is 0, Sunday is 6
 
