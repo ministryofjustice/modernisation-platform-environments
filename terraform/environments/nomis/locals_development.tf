@@ -121,14 +121,6 @@ locals {
         })
       })
 
-      dev-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
-            branch = "TM-626/nomis/weblogic-12-v1"
-          })
-        })
-      })
-
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
         autoscaling_schedules = {} # disable overnight scale down
       })
@@ -137,6 +129,19 @@ locals {
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init.args, {
             branch = "main"
+          })
+        })
+      })
+
+      qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
+        config = merge(local.ec2_autoscaling_groups.web12.config, {
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
+            branch = "TM-626/nomis/weblogic-12-v1"
           })
         })
       })
