@@ -73,12 +73,12 @@ variable "target_group_attachment_port_sftp" {
   description = "The port of the target group for sftp"
 }
 
-# variable "target_group_arns" {
-#   description = "Map of target group ARNs"
-#   type        = map(string)
-# }
+variable "target_group_arns" {
+  description = "Map of target group ARNs"
+  type        = map(string)
+}
 
-# variable "target_group_arns_sftp" {
-#   description = "Map of target group ARNs for sftp"
-#   type        = map(string)
-# }
+variable "target_group_arns_sftp" {
+  description = "Map of target group ARNs for sftp"
+  type        = map(string)
+}

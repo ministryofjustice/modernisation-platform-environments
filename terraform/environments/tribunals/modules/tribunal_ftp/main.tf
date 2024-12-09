@@ -69,6 +69,6 @@ module "app_ecs_task" {
   cluster_id                = var.cluster_id
   cluster_name              = var.cluster_name
   is_ftp_app                = var.is_ftp_app
-  # lb_tg_arn                 = var.target_group_arns["${local.module_name}"]
-  # sftp_lb_tg_arn            = var.target_group_arns_sftp["${local.module_name}"]
+  lb_tg_arn                 = var.target_group_arns["${local.module_name}"]
+  sftp_lb_tg_arn            = var.target_group_arns_sftp["${local.module_name}"]
 }

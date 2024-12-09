@@ -1,12 +1,12 @@
 locals {
-  # target_group_arns = { for k, v in aws_lb_target_group.tribunals_target_group : k => v.arn }
+  target_group_arns = { for k, v in aws_lb_target_group.tribunals_target_group : k => v.arn }
 
-  # # Create a mapping between listener headers and target group ARNs
-  # listener_header_to_target_group = {
-  #   for k, v in var.services : v.name_prefix => (
-  #     aws_lb_target_group.tribunals_target_group[k].arn
-  #   )
-  # }
+  # Create a mapping between listener headers and target group ARNs
+  listener_header_to_target_group = {
+    for k, v in var.services : v.name_prefix => (
+      aws_lb_target_group.tribunals_target_group[k].arn
+    )
+  }
   service_priorities = {
     adminappeals             = 1
     administrativeappeals    = 2
@@ -71,28 +71,28 @@ resource "aws_security_group" "tribunals_lb_sc" {
   }
 }
 
-# resource "aws_lb_target_group" "tribunals_target_group" {
-#   for_each             = var.services
-#   name                 = "${each.value.module_key}-tg"
-#   port                 = each.value.port
-#   protocol             = "HTTP"
-#   vpc_id               = data.aws_vpc.shared.id
-#   target_type          = "instance"
-#   deregistration_delay = 30
+resource "aws_lb_target_group" "tribunals_target_group" {
+  for_each             = var.services
+  name                 = "${each.value.module_key}-tg"
+  port                 = each.value.port
+  protocol             = "HTTP"
+  vpc_id               = data.aws_vpc.shared.id
+  target_type          = "instance"
+  deregistration_delay = 30
 
-#   stickiness {
-#     type = "lb_cookie"
-#   }
+  stickiness {
+    type = "lb_cookie"
+  }
 
-#   health_check {
-#     healthy_threshold   = "3"
-#     interval            = "15"
-#     protocol            = "HTTP"
-#     unhealthy_threshold = "3"
-#     matcher             = "200-499"
-#     timeout             = "10"
-#   }
-# }
+  health_check {
+    healthy_threshold   = "3"
+    interval            = "15"
+    protocol            = "HTTP"
+    unhealthy_threshold = "3"
+    matcher             = "200-499"
+    timeout             = "10"
+  }
+}
 
 data "aws_instances" "primary_instance" {
   filter {
@@ -110,47 +110,47 @@ data "aws_instances" "backup_instance" {
 
 # Make sure that the ec2 instance tagged as 'tribunals-instance' exists
 # before adding aws_lb_target_group_attachment, otherwise terraform will fail
-# resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
-#   for_each         = aws_lb_target_group.tribunals_target_group
-#   target_group_arn = each.value.arn
-#   # target_id points to primary ec2 instance, change index to 1 to point at backup ec2 instance
-#   target_id        = data.aws_instances.backup_instance.ids[0]
-#   port             = each.value.port
-# }
+resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
+  for_each         = aws_lb_target_group.tribunals_target_group
+  target_group_arn = each.value.arn
+  # target_id points to primary ec2 instance, change index to 1 to point at backup ec2 instance
+  target_id        = data.aws_instances.backup_instance.ids[0]
+  port             = each.value.port
+}
 
-# resource "aws_lb_listener" "tribunals_lb" {
-#   depends_on = [
-#     aws_acm_certificate_validation.external
-#   ]
-#   certificate_arn   = aws_acm_certificate.external.arn
-#   load_balancer_arn = aws_lb.tribunals_lb.arn
-#   port              = 443
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+resource "aws_lb_listener" "tribunals_lb" {
+  depends_on = [
+    aws_acm_certificate_validation.external
+  ]
+  certificate_arn   = aws_acm_certificate.external.arn
+  load_balancer_arn = aws_lb.tribunals_lb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
 
-#   default_action {
-#     type = "fixed-response"
-#     fixed_response {
-#       content_type = "text/plain"
-#       message_body = "No matching rule found"
-#       status_code  = "404"
-#     }
-#   }
-# }
+  default_action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "No matching rule found"
+      status_code  = "404"
+    }
+  }
+}
 
-# resource "aws_lb_listener_rule" "tribunals_lb_rule" {
-#   for_each = local.listener_header_to_target_group
+resource "aws_lb_listener_rule" "tribunals_lb_rule" {
+  for_each = local.listener_header_to_target_group
 
-#   listener_arn = aws_lb_listener.tribunals_lb.arn
-#   priority     = local.service_priorities[each.key]
-#   action {
-#     type             = "forward"
-#     target_group_arn = each.value
-#   }
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = local.service_priorities[each.key]
+  action {
+    type             = "forward"
+    target_group_arn = each.value
+  }
 
-#   condition {
-#     host_header {
-#       values = ["*${each.key}.*"]
-#     }
-#   }
-# }
+  condition {
+    host_header {
+      values = ["*${each.key}.*"]
+    }
+  }
+}
