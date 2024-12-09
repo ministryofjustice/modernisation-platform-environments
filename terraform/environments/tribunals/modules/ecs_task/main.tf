@@ -167,10 +167,9 @@ resource "aws_ecs_service" "ecs_service" {
     }
   )
 
-  # Add placement constraints
   placement_constraints {
     type       = "memberOf"
-    expression = "attribute:Role == Backup"
+    expression = "attribute:ecs.availability-zone == eu-west-2b"
   }
 }
 
@@ -226,7 +225,7 @@ resource "aws_ecs_service" "ecs_service_sftp" {
   # Add placement constraints
   placement_constraints {
     type       = "memberOf"
-    expression = "attribute:Role == Backup"
+    expression = "attribute:ecs.availability-zone == eu-west-2b"
   }
 }
 
