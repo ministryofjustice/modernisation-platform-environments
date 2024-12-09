@@ -1,3 +1,8 @@
+# Python script to retrieve emails send data from S3, count the number of outgoing emails
+# graph it and email it to end users via the internal mail relay.
+# Nick Buckingham
+# 9 December 2024
+
 import boto3
 import os
 os.environ['MPLCONFIGDIR'] = "/tmp/graph"
@@ -16,11 +21,14 @@ s3 = boto3.client('s3')
 
 # Configuration
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
+TODAY = datetime.now()
+YESTERDAY = TODAY - timedelta(days=1)
+YESTERDAY_DATE = YESTERDAY.strftime('%a %d %b %Y')
 bucket_name = 'moj-lambda-layers-prod'
-file_names = ['monday.log', 'tuesday.log', 'wednesday.log', 'thursday.log', 'friday.log', 'saturday.log', 'sunday.log']
+file_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 SENDER = 'donotreply@cjsm.secure-email.ppud.justice.gov.uk'
 RECIPIENTS = ['nick.buckingham@colt.net']
-SUBJECT = f'AWS Weekly PPUD Email Report - {CURRENT_DATE}'
+SUBJECT = f'AWS PPUD Email Report - {CURRENT_DATE}'
 AWS_REGION = 'eu-west-2'
 
 # SMTP Configuration
@@ -73,7 +81,7 @@ def send_email_with_graph(graph_base64):
     <html>
     <body>
         <p>Hi Team,</p>
-        <p>Please find below the weekly PPUD Email Report.</p>
+        <p>Please find below the PPUD email report for the week ending {YESTERDAY_DATE}.</p>
         <img src="data:image/png;base64,{graph_base64}" alt="PPUD Email Report" />
         <p>This is an automated email.</p>
     </body>
