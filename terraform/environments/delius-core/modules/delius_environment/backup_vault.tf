@@ -17,6 +17,6 @@ data "aws_iam_policy_document" "assume_AWSBackupDefaultServiceRole" {
 }
 
 resource "aws_iam_role_policy" "assume_AWSBackupDefaultServiceRole" {
-  role   = "AssumeAWSBackupDefaultServiceRole"
+  role   = "AWSBackupDefaultServiceRole"
   policy = data.aws_iam_policy_document.assume_AWSBackupDefaultServiceRole.json
 }
