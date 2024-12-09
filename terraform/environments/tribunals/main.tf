@@ -582,7 +582,7 @@ module "primary_health_lists" {
   target_group_attachment_port_sftp = var.sftp_services["primary_health_lists"].sftp_port
 #   target_group_arns                 = local.target_group_arns
 #   target_group_arns_sftp            = local.target_group_arns_sftp
-}
+# }
 
 module "siac" {
   is_ftp_app                        = true
