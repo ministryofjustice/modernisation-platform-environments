@@ -141,11 +141,11 @@ resource "aws_ecs_service" "ecs_service" {
     type  = "spread"
   }
 
-  load_balancer {
-    target_group_arn = var.lb_tg_arn
-    container_name   = "${var.app_name}-container"
-    container_port   = var.server_port
-  }
+  # load_balancer {
+  #   target_group_arn = var.lb_tg_arn
+  #   container_name   = "${var.app_name}-container"
+  #   container_port   = var.server_port
+  # }
 
   deployment_circuit_breaker {
     enable   = true
@@ -184,18 +184,18 @@ resource "aws_ecs_service" "ecs_service_sftp" {
     type  = "spread"
   }
 
-  load_balancer {
-    target_group_arn = var.lb_tg_arn
-    container_name   = "${var.app_name}-container"
-    container_port   = var.server_port
-  }
+  # load_balancer {
+  #   target_group_arn = var.lb_tg_arn
+  #   container_name   = "${var.app_name}-container"
+  #   container_port   = var.server_port
+  # }
 
   # Additional load balancer for SFTP connections
-  load_balancer {
-    target_group_arn = var.sftp_lb_tg_arn
-    container_name   = "${var.app_name}-container"
-    container_port   = 22
-  }
+  # load_balancer {
+  #   target_group_arn = var.sftp_lb_tg_arn
+  #   container_name   = "${var.app_name}-container"
+  #   container_port   = 22
+  # }
 
   deployment_circuit_breaker {
     enable   = true
