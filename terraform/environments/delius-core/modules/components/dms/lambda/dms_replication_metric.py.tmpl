@@ -3,6 +3,7 @@ import json
 import logging
 import re
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -33,7 +34,7 @@ def lambda_handler(event, context):
     for record in event['Records']:
 
         # Get the current local time and weekday (timezones are respected)
-        now = datetime.now()
+        now = datetime.now(ZoneInfo("Europe/London"))
         current_hour    = now.hour
         current_weekday = now.weekday()  # Monday is 0, Sunday is 6
 
@@ -42,7 +43,7 @@ def lambda_handler(event, context):
         # currently support custom times.
         # Do NOT skip if the instance_scheduling tag has the value of skip-scheduling 
         # or skip-audit-stop is set as we must handle all DMS events in these environments (they are up 24/7)
-        if (current_hour < 6 or current_hour > 21 or current_weekday >= 5) and (not "${oracle_db_instance_scheduling}" in ["skip-scheduling","skip-auto-stop"]):
+        if (current_hour < 6 or current_hour >= 21 or current_weekday >= 5) and (not "${oracle_db_instance_scheduling}" in ["skip-scheduling","skip-auto-stop"]):
             continue
 
         message = json.loads(record['Sns']['Message'])
