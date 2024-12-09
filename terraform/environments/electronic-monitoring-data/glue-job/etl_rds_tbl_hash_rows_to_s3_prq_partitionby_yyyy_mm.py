@@ -57,7 +57,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "month_partition_bool",
                        "hashed_output_s3_bucket_name",
                        "rds_db_table_hashed_rows_parent_dir",
-                       "incremental_run_bool"
+                       "incremental_run_bool",
+                       "skip_partition_if_exists_bool"
                        ]
 
 OPTIONAL_INPUTS = [
@@ -305,6 +306,14 @@ if __name__ == "__main__":
     # VERIFY GIVEN INPUTS - END
     # -----------------------------------------
 
+    skip_partition_if_exists_bool = args.get('skip_partition_if_exists_bool', 'false')
+    if skip_partition_if_exists_bool == 'true':
+        skip_partition_if_exists_bool = True
+    else:
+        skip_partition_if_exists_bool = False
+    LOGGER.warn(f"""skip_partition_if_exists_bool = {skip_partition_if_exists_bool}""")
+    # ---------------------------------------------------------------------------------
+    
     incremental_run_bool = args.get('incremental_run_bool', 'false')
     rds_query_where_clause = args.get('rds_query_where_clause', None)
     
@@ -346,7 +355,6 @@ if __name__ == "__main__":
     FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
     """.strip()
 
-
     for agg_row_dict in agg_row_dict_list:
 
         agg_row_year = agg_row_dict['year']
@@ -357,6 +365,13 @@ if __name__ == "__main__":
         LOGGER.info(f"""agg_row_month = {agg_row_month}""")
         LOGGER.info(f"""min_pkey_value = {min_pkey_value}""")
         LOGGER.info(f"""max_pkey_value = {max_pkey_value}""")
+
+        full_partition_path = f"""{prq_table_folder_path}/{agg_row_year}/{agg_row_month}"""
+        if skip_partition_if_exists_bool:
+            if S3Methods.check_s3_folder_path_if_exists(HASHED_OUTPUT_S3_BUCKET_NAME, 
+                                                        full_partition_path):
+                 LOGGER.info(f"""Already exists, Skipping --> {full_partition_path}""")
+                 continue
 
         pkey_between_clause_str_temp = f""" 
         WHERE {rds_db_tbl_pkey_column} between {min_pkey_value} and {max_pkey_value}""".rstrip()
@@ -424,9 +439,9 @@ if __name__ == "__main__":
     
         write_rds_df_to_s3_parquet(rds_hashed_rows_df_write,
                                    yyyy_mm_partition_by_cols,
-                                   f"""{prq_table_folder_path}/{agg_row_year}/{agg_row_month}""")
+                                   full_partition_path)
         
-        LOGGER.info(f"""Partition - '{prq_table_folder_path}/{agg_row_year}/{agg_row_month}' writing completed.""")
+        LOGGER.info(f"""Partition - '{full_partition_path}' writing completed.""")
     # -----------------------------------------------
 
     total_files, total_size = S3Methods.get_s3_folder_info(HASHED_OUTPUT_S3_BUCKET_NAME, 
