@@ -41,9 +41,17 @@ data "aws_iam_policy_document" "merged_trust_policy" {
        }
   }
 }
+resource "aws_iam_policy" "new_trust_policy" {
+  name        = "AWSBackupDefaultServiceRolePolicy"
+  description = "Updated trust policy for AWSBackupDefaultServiceRole"
 
-resource "aws_iam_role" "update_AWSBackupDefaultServiceRole" {
-  name               = "AWSBackupDefaultServiceRole"
-  assume_role_policy = data.aws_iam_policy_document.merged_trust_policy.json
+  policy = data.aws_iam_policy_document.merged_trust_policy.json
 }
+
+resource "aws_iam_policy_attachment" "attach_policy_to_AWSBackupDefaultServiceRole" {
+  name       = "attach-policy-to-AWSBackupDefaultServiceRole"
+  roles      = ["AWSBackupDefaultServiceRole"]
+  policy_arn = aws_iam_policy.new_trust_policy.arn
+}
+
 
