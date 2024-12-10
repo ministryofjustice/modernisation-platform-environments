@@ -1205,6 +1205,16 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
         ]
       },
       {
+        "Sid" : "EC2Policy",
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeInstances"
+        ],
+        "Resource" : [
+          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      },
+      {
         "Sid" : "LogPolicy",
         "Effect" : "Allow",
         "Action" : [
