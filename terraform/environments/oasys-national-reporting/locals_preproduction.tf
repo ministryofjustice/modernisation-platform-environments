@@ -188,7 +188,7 @@ locals {
               "ec2:DescribeSubnets",
             ]
             resources = [
-              "arn:aws:ec2:*:*:instance/*"
+              "*",
             ]
           }
         ]
