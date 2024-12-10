@@ -27,7 +27,7 @@ resource "aws_iam_policy" "oracle_ec2_snapshot_backup_pass_role_policy" {
       {
         Effect   = "Allow",
         Action   = "iam:PassRole",
-        Resource = "arn:aws:iam::${var.account_info.id}:role/AWSBackupDefaultServiceRole"
+        Resource = "arn:aws:iam::${var.account_info.id}:role/service-role/AWSBackupDefaultServiceRole"
       }
     ]
   })
