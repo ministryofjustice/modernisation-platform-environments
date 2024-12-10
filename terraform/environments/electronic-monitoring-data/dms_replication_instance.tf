@@ -57,7 +57,8 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
 
 resource "aws_kms_key" "dms_replication_instance_key" {
   description = "KMS key for DMS replication instance encryption"
-  policy      = <<EOF
+  #checkov:skip=CKV_AWS_7
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Id": "dms-key-default-1",

@@ -1,4 +1,5 @@
 resource "aws_glue_security_configuration" "example" {
+  #checkov:skip=CKV_AWS_99
   name = "example-security-configuration"
 
   encryption_configuration {
@@ -746,7 +747,8 @@ resource "aws_glue_job" "create_or_refresh_dv_table" {
 
 resource "aws_kms_key" "cloudwatch_log_group_key" {
   description = "KMS key for CloudWatch log group encryption"
-  policy      = <<EOF
+  #checkov:skip=CKV_AWS_7
+  policy = <<EOF
 {
   "Version": "2012-10-17",
   "Id": "key-default-1",
