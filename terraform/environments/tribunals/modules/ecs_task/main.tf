@@ -136,11 +136,6 @@ resource "aws_ecs_service" "ecs_service" {
 
   health_check_grace_period_seconds = 300
 
-  ordered_placement_strategy {
-    field = "attribute:ecs.availability-zone"
-    type  = "spread"
-  }
-
   load_balancer {
     target_group_arn = var.lb_tg_arn
     container_name   = "${var.app_name}-container"
@@ -167,10 +162,6 @@ resource "aws_ecs_service" "ecs_service" {
     }
   )
 
-  placement_constraints {
-    type       = "memberOf"
-    expression = "attribute:ecs.availability-zone == eu-west-2b"
-  }
 }
 
 // SFTP service
