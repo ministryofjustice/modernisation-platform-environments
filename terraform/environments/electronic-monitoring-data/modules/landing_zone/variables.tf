@@ -6,9 +6,8 @@ variable "account_id" {
 variable "data_store_bucket" {
   description = "The bucket landed data is moved to"
   type = object({
-    bucket = object({
-      name = string
-    })
+    id  = string
+    arn = string
   })
 }
 
