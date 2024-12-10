@@ -212,7 +212,7 @@ locals {
           {
             effect    = "Allow"
             actions   = ["autoscaling:Describe*"]
-            resourcea = ["*"]
+            resources = ["*"]
           }
         ]
       }
