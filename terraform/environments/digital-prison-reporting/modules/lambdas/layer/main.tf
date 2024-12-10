@@ -1,7 +1,7 @@
 locals {
-  s3_bucket         = var.s3_existing_package != null ? try(var.s3_existing_package.bucket, null) : null
-  s3_key            = var.s3_existing_package != null ? try(var.s3_existing_package.key, null) : null
-  s3_object_version = var.s3_existing_package != null ? try(var.s3_existing_package.version_id, null) : null
+  s3_bucket         = var.s3_existing_package?.bucket
+  s3_key            = var.s3_existing_package?.key
+  s3_object_version = var.s3_existing_package?.version_id
 }
 
 resource "aws_lambda_layer_version" "this" {
@@ -15,13 +15,7 @@ resource "aws_lambda_layer_version" "this" {
   compatible_architectures = var.compatible_architectures
   skip_destroy             = var.layer_skip_destroy
 
-  s3_bucket = var.s3_existing_package.bucket
-  s3_key    = var.s3_existing_package.key
-
-  dynamic "s3_object_version" {
-    for_each = var.s3_existing_package.version != null ? [var.s3_existing_package.version] : []
-    content {
-      s3_object_version = s3_object_version.value
-    }
-  }
+  s3_bucket         = local.s3_bucket
+  s3_key            = local.s3_key
+  s3_object_version = local.s3_object_version != null ? local.s3_object_version : null
 }
