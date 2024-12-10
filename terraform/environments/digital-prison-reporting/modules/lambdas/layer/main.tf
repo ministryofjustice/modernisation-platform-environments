@@ -18,10 +18,6 @@ resource "aws_lambda_layer_version" "this" {
   s3_bucket = local.s3_bucket
   s3_key    = local.s3_key
 
-  dynamic "s3_object_version" {
-    for_each = local.s3_object_version != null ? [local.s3_object_version] : []
-    content {
-      s3_object_version = s3_object_version.value
-    }
-  }
+  # Directly assign `s3_object_version` conditionally
+  s3_object_version = local.s3_object_version != null ? local.s3_object_version : null
 }
