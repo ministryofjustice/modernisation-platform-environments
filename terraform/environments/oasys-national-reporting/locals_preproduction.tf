@@ -152,7 +152,7 @@ locals {
             module.ip_addresses.azure_fixngo_ip.PCMCW0012,
           ]
           domain_name          = "azure.hmpp.root"
-          username             = "svc_join_domain"
+          username             = "svc_admin"
           password_secret_name = "/sap/bods/pp/passwords"
         }
         tags = {
