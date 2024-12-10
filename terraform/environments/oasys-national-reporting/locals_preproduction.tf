@@ -84,7 +84,7 @@ locals {
             }
           ))
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2SecretPolicy", "Ec2DescribeSubnets",
           ])
         })
         # IMPORTANT: EBS volume initialization, labelling, formatting was carried out manually on this instance. It was not automated so these ebs_volume settings are bespoke. Additional volumes should NOT be /dev/xvd* see the local.ec2_instances.bods.ebs_volumes setting for the correct device names.
@@ -130,36 +130,36 @@ locals {
       # })
     }
 
-    fsx_windows = {
+    # fsx_windows = {
 
-      pp-bods-win-share = {
-        deployment_type     = "SINGLE_AZ_1"
-        security_groups     = ["bods"]
-        skip_final_backup   = true
-        storage_capacity    = 600
-        throughput_capacity = 8
+    #   pp-bods-win-share = {
+    #     deployment_type     = "SINGLE_AZ_1"
+    #     security_groups     = ["bods"]
+    #     skip_final_backup   = true
+    #     storage_capacity    = 600
+    #     throughput_capacity = 8
 
-        subnets = [
-          {
-            name               = "private"
-            availability_zones = ["eu-west-2a"]
-          }
-        ]
+    #     subnets = [
+    #       {
+    #         name               = "private"
+    #         availability_zones = ["eu-west-2a"]
+    #       }
+    #     ]
 
-        self_managed_active_directory = {
-          dns_ips = [
-            module.ip_addresses.azure_fixngo_ip.PCMCW0011,
-            module.ip_addresses.azure_fixngo_ip.PCMCW0012,
-          ]
-          domain_name          = "azure.hmpp.root"
-          username             = "svc_join_domain"
-          password_secret_name = "/sap/bods/pp/passwords"
-        }
-        tags = {
-          backup = true
-        }
-      }
-    }
+    #     self_managed_active_directory = {
+    #       dns_ips = [
+    #         module.ip_addresses.azure_fixngo_ip.PCMCW0011,
+    #         module.ip_addresses.azure_fixngo_ip.PCMCW0012,
+    #       ]
+    #       domain_name          = "azure.hmpp.root"
+    #       username             = "svc_join_domain"
+    #       password_secret_name = "/sap/bods/pp/passwords"
+    #     }
+    #     tags = {
+    #       backup = true
+    #     }
+    #   }
+    # }
 
     iam_policies = {
       Ec2SecretPolicy = {
@@ -175,6 +175,20 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/sap/bods/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          }
+        ]
+      }
+      Ec2DescribeSubnets = {
+        description = "Permissions required for instances to describe subnets"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ec2:DescribeSubnets",
+            ]
+            resources = [
+              "arn:aws:ec2:*:*:instance/*"
             ]
           }
         ]
