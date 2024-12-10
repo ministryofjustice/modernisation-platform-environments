@@ -27,8 +27,7 @@ resource "aws_backup_vault_policy" "oracle_backup_vault_policy" {
           "backup:StartRestoreJob",
           "backup:DeleteBackup",
           "backup:ListBackupJobs",
-          "backup:GetBackupVaultAccessPolicy",
-          "backup:PutBackupVaultAccessPolicy"
+          "backup:GetBackupVaultAccessPolicy"
         ],
         Resource: "${aws_backup_vault.oracle_backup_vault.arn}"
       }
