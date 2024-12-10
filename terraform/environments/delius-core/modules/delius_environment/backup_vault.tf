@@ -9,8 +9,8 @@
 # is documented at: https://docs.aws.amazon.com/aws-backup/latest/devguide/iam-service-roles.html
 
 # New IAM role to allow writing of AWS EC2 snapshots of Oracle Hosts to Backup Vault
-resource "aws_iam_role" "oracle_ec2_backup_service_role" {
-  name = "oracle_ec2_backup_service_role"
+resource "aws_iam_role" "oracle_ec2_snapshot_backup_role" {
+  name = "oracle_ec2_snapshot_backup_role"
 
   assume_role_policy = <<EOF
 {
@@ -33,7 +33,7 @@ resource "aws_iam_role" "oracle_ec2_backup_service_role" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "oracle_ec2_backup_service_policy_attachment" {
-  role       = aws_iam_role.oracle_ec2_backup_service_role.name
+resource "aws_iam_role_policy_attachment" "oracle_ec2_snapshot_backup_role_policy_attachment" {
+  role       = aws_iam_role.oracle_ec2_snapshot_backup_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
 }
