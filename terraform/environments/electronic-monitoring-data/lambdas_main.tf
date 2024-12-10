@@ -158,6 +158,9 @@ module "format_json_fms_data" {
   subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    DESTINATION_BUCKET = module.s3-raw-formatted-data-bucket.bucket.id
+  }
 }
 
 #-----------------------------------------------------------------------------------
