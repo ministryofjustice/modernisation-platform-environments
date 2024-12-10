@@ -6,7 +6,7 @@ resource "aws_dms_endpoint" "dms_rds_source" {
   endpoint_id   = "rds-mssql-${replace(var.database_name, "_", "-")}-tf"
   endpoint_type = "source"
   engine_name   = "sqlserver"
-  # tfsec:ignore:CKV_AWS_296
+  #checkov:skip=CKV_AWS_296
   #   kms_key_arn                 = aws_db_instance.database_2022.kms_key_id
   password    = var.rds_db_instance_pasword
   port        = var.rds_db_instance_port
@@ -32,7 +32,7 @@ resource "aws_dms_s3_endpoint" "dms_s3_parquet_target" {
   endpoint_type           = "target"
   bucket_name             = var.target_s3_bucket_name
   service_access_role_arn = var.ep_service_access_role_arn
-  # tfsec:ignore:CKV_AWS_298
+  #checkov:skip=CKV_AWS_298
   # Extra settings:
   # add_column_name = true
   # add_trailing_padding_character              = false

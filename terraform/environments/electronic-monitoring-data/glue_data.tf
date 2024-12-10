@@ -114,7 +114,7 @@ data "aws_iam_policy_document" "glue_notebook_ec2_iam_policy_document" {
       "ec2:DescribeSecurityGroups"
     ]
     resources = ["*"]
-    # tfsec:ignore:CKV_AWS_111
-    # tfsec:ignore:CKV_AWS_356
+    #checkov:skip=CKV_AWS_111
+    #checkov:skip=CKV_AWS_356
   }
 }

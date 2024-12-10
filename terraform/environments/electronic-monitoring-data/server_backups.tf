@@ -3,8 +3,8 @@
 #------------------------------------------------------------------------------
 resource "aws_secretsmanager_secret" "db_password" {
   name = "db_password"
-  # tfsec:ignore:CKV_AWS_149
-  # tfsec:ignore:CKV2_AWS_57
+  #checkov:skip=CKV_AWS_149
+  #checkov:skip=CKV2_AWS_57
 }
 
 resource "aws_secretsmanager_secret_version" "db_password" {
@@ -55,13 +55,13 @@ resource "aws_db_instance" "database_2022" {
   apply_immediately = true
 
   tags = local.tags
-  # tfsec:ignore:CKV_AWS_354
-  # tfsec:ignore:CKV_AWS_157
-  # tfsec:ignore:CKV_AWS_118
-  # tfsec:ignore:CKV_AWS_353
-  # tfsec:ignore:CKV_AWS_293
-  # tfsec:ignore:CKV_AWS_129
-  # tfsec:ignore:CKV2_AWS_60
+  #checkov:skip=CKV_AWS_354
+  #checkov:skip=CKV_AWS_157
+  #checkov:skip=CKV_AWS_118
+  #checkov:skip=CKV_AWS_353
+  #checkov:skip=CKV_AWS_293
+  #checkov:skip=CKV_AWS_129
+  #checkov:skip=CKV2_AWS_60
 }
 
 #------------------------------------------------------------------------------
