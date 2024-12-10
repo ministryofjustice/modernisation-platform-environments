@@ -84,7 +84,7 @@ locals {
             }
           ))
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy", "Ec2DescribeSubnets",
+            "Ec2SecretPolicy", "Ec2ValidateFSX",
           ])
         })
         # IMPORTANT: EBS volume initialization, labelling, formatting was carried out manually on this instance. It was not automated so these ebs_volume settings are bespoke. Additional volumes should NOT be /dev/xvd* see the local.ec2_instances.bods.ebs_volumes setting for the correct device names.
@@ -179,18 +179,40 @@ locals {
           }
         ]
       }
-      Ec2DescribeSubnets = {
-        description = "Permissions required for instances to describe subnets"
+      Ec2ValidateFSX = {
+        description = "Permissions required for instances to run fsx test scripts"
         statements = [
           {
             effect = "Allow"
             actions = [
-              "ec2:DescribeSubnets",
-              "ec2:DescribeVpcs",
+              "ec2:Describe*"
             ]
             resources = [
-              "*",
+              "*"
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*"
+            ]
+            resources = [
+              "*"
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "cloudwatch:ListMetrics",
+              "cloudwatch:GetMetricStatistics",
+              "cloudwatch:Describe*"
+            ]
+            resources = ["*"]
+          },
+          {
+            effect    = "Allow"
+            actions   = ["autoscaling:Describe*"]
+            resourcea = ["*"]
           }
         ]
       }
