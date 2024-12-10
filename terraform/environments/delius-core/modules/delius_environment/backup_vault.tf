@@ -33,9 +33,13 @@ resource "aws_iam_role" "oracle_ec2_snapshot_backup_role" {
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "oracle_ec2_snapshot_backup_role_policy_attachment" {
+# resource "aws_iam_role_policy_attachment" "oracle_ec2_snapshot_backup_role_policy_attachment" {
+#   role       = aws_iam_role.oracle_ec2_snapshot_backup_role.name
+#   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+
+resource "aws_iam_role_policy_attachment" "oracle_ec2_snapshot_backup_operator_policy_attachment" {
   role       = aws_iam_role.oracle_ec2_snapshot_backup_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+  policy_arn = "arn:aws:iam::aws:policy/AWSBackupOperatorAccess"
 }
 
 resource "aws_iam_policy" "oracle_ec2_snapshot_backup_pass_role_policy" {
