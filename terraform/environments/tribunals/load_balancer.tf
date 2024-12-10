@@ -94,29 +94,21 @@ resource "aws_lb_target_group" "tribunals_target_group" {
   }
 }
 
-data "aws_instances" "primary_instance" {
+data "aws_instances" "tribunals_instance" {
   filter {
-    name   = "tag:Role"
-    values = ["Primary"]
-  }
-}
-
-data "aws_instances" "backup_instance" {
-  filter {
-    name   = "tag:Role"
-    values = ["Backup"]
+    name   = "tag:Name"
+    values = ["tribunals-instance"]
   }
 }
 
 # Make sure that the ec2 instance tagged as 'tribunals-instance' exists
 # before adding aws_lb_target_group_attachment, otherwise terraform will fail
-# resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
-#   for_each         = aws_lb_target_group.tribunals_target_group
-#   target_group_arn = each.value.arn
-#   # target_id points to primary ec2 instance, change "primary_instance" to "backup_instance" in order to point at backup ec2 instance
-#   target_id        = data.aws_instances.primary_instance.ids[0]
-#   port             = each.value.port
-# }
+resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
+  for_each         = aws_lb_target_group.tribunals_target_group
+  target_group_arn = each.value.arn
+  target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
+  port             = each.value.port
+}
 
 resource "aws_lb_listener" "tribunals_lb" {
   depends_on = [
@@ -142,7 +134,7 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority     = local.service_priorities[each.key]
+  priority = local.service_priorities[each.key]
   action {
     type             = "forward"
     target_group_arn = each.value
