@@ -144,6 +144,9 @@ locals {
             branch = "TM-626/nomis/weblogic-12-v1"
           })
         })
+        tags = merge(local.ec2_autoscaling_groups.web12.tags, {
+          nomis-environment = "qa11g"
+        })
       })
     }
 
