@@ -122,10 +122,10 @@ locals {
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               athena_enabled                  = false
+              xray_enabled                    = false
             }
           }
         },
-              xray_enabled                    = false
         "data-engineering" = {
           "identity_centre_team" = "data-engineering",
           "aws_accounts" = {
