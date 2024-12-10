@@ -71,7 +71,7 @@ Import-Module ECSTools
 [Environment]::SetEnvironmentVariable("ECS_ENABLE_AWSLOGS_EXECUTIONROLE_OVERRIDE", "true", "Machine")
 
 "Link instance to shared tribunals cluster " + $ecsCluster >> $logFile
-[Environment]::SetEnvironmentVariable("ECS_INSTANCE_ATTRIBUTES", "{\"Role\":\"Primary\"}", "Machine")
+[Environment]::SetEnvironmentVariable("ECS_INSTANCE_ATTRIBUTES", "{`"Role`":`"Primary`"}", "Machine")
 
 Initialize-ECSAgent -Cluster $ecsCluster -EnableTaskIAMRole -LoggingDrivers '["json-file","awslogs"]'
 
