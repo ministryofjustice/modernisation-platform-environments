@@ -73,7 +73,7 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment_sft
   target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
   port             = each.value.port
   depends_on       = [
-    aws_instance.tribunals-backup,
+    aws_instance.tribunals_backup,
     data.aws_instances.primary_instance
   ]
 }
