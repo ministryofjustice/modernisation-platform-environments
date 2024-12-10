@@ -193,7 +193,6 @@ locals {
               xray_enabled                    = false
               athena_enabled                  = false
             },
-            
             "core-network-services-production" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
