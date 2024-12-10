@@ -22,12 +22,15 @@ resource "aws_backup_vault_policy" "oracle_backup_vault_policy" {
           AWS: "${aws_iam_role.oracle_ec2_snapshot_backup_role.arn}"
         },
         Action: [
-          "backup:StartBackupJob",
-          "backup:StopBackupJob",
-          "backup:StartRestoreJob",
-          "backup:DeleteBackup",
-          "backup:ListBackupJobs",
-          "backup:GetBackupVaultAccessPolicy"
+          "backup:CopyIntoBackupVault",
+          "backup:DeleteRecoveryPoint",
+          "backup:DescribeBackupVault",
+          "backup:DescribeRecoveryPoint",
+          "backup:GetBackupVaultAccessPolicy",
+          "backup:GetRecoveryPointRestoreMetadata",
+          "backup:ListRecoveryPointsByBackupVault",
+          "backup:PutBackupVaultAccessPolicy",
+          "backup:StartRestoreJob"
         ],
         Resource: "${aws_backup_vault.oracle_backup_vault.arn}"
       }
