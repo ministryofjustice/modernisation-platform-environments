@@ -238,24 +238,24 @@ resource "aws_launch_template" "tribunals-backup-lt" {
 }
 
 # # Finally, create the Auto scaling group for the launch template
-resource "aws_autoscaling_group" "tribunals-all-asg" {
-  vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
-  desired_capacity    = 0
-  max_size            = 0
-  min_size            = 0
-  name                = local.app_name
+# resource "aws_autoscaling_group" "tribunals-all-asg" {
+#   vpc_zone_identifier = [data.aws_subnet.public_subnets_a.id]
+#   desired_capacity    = 1
+#   max_size            = 1
+#   min_size            = 1
+#   name                = local.app_name
 
-  launch_template {
-    id      = aws_launch_template.tribunals-all-lt.id
-    version = "$Latest"
-  }
+#   launch_template {
+#     id      = aws_launch_template.tribunals-all-lt.id
+#     version = "$Latest"
+#   }
 
-  tag {
-    key                 = "Name"
-    value               = "tribunals-instance"
-    propagate_at_launch = true
-  }
-}
+#   tag {
+#     key                 = "Name"
+#     value               = "tribunals-instance"
+#     propagate_at_launch = true
+#   }
+# }
 
 # resource "aws_instance" "tribunals_backup" {
 #   launch_template {
