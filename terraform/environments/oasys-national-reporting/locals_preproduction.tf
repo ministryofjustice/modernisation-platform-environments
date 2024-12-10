@@ -186,6 +186,7 @@ locals {
             effect = "Allow"
             actions = [
               "ec2:DescribeSubnets",
+              "ec2:DescribeVpcs",
             ]
             resources = [
               "*",
