@@ -94,10 +94,17 @@ resource "aws_lb_target_group" "tribunals_target_group" {
   }
 }
 
-data "aws_instances" "tribunals_instance" {
+data "aws_instances" "primary_instance" {
   filter {
-    name   = "tag:Name"
-    values = ["tribunals-instance"]
+    name   = "tag:Role"
+    values = ["Primary"]
+  }
+}
+
+data "aws_instances" "backup_instance" {
+  filter {
+    name   = "tag:Role"
+    values = ["Backup"]
   }
 }
 
@@ -138,7 +145,7 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   for_each = local.listener_header_to_target_group
 
   listener_arn = aws_lb_listener.tribunals_lb.arn
-  priority = local.service_priorities[each.key]
+  priority     = local.service_priorities[each.key]
   action {
     type             = "forward"
     target_group_arn = each.value
