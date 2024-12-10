@@ -108,6 +108,10 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment" {
   target_group_arn = each.value.arn
   target_id        = element(data.aws_instances.tribunals_instance.ids, 0)
   port             = each.value.port
+  depends_on       = [
+    aws_instance.tribunals-backup,
+    data.aws_instances.primary_instance
+  ]
 }
 
 resource "aws_lb_listener" "tribunals_lb" {
