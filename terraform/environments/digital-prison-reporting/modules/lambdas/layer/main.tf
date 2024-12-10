@@ -1,7 +1,7 @@
 locals {
-  s3_bucket         = var.s3_existing_package?.bucket
-  s3_key            = var.s3_existing_package?.key
-  s3_object_version = var.s3_existing_package?.version_id
+  s3_bucket         = var.s3_existing_package.bucket
+  s3_key            = var.s3_existing_package.key
+  s3_object_version = var.s3_existing_package.version_id
 }
 
 resource "aws_lambda_layer_version" "this" {
