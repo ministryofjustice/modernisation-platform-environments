@@ -27,8 +27,8 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
   auto_minor_version_upgrade = true
   availability_zone          = var.dms_availability_zone
   engine_version             = var.dms_engine_version
-  #   kms_key_arn                  = "arn:aws:kms:eu-west-2:800964199911:key/b7f54acb-16a3-4958-9340-3bdf5f5842d8"
-  multi_az = false
+  kms_key_arn                = aws_kms_key.dms_replication_instance_key.arn
+  multi_az                   = false
   #   preferred_maintenance_window = "sun:10:30-sun:14:30"
   publicly_accessible         = false
   replication_instance_class  = var.dms_replication_instance_class
@@ -52,4 +52,41 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
     aws_iam_role.dms_endpoint_role
   ]
 
+}
+
+
+resource "aws_kms_key" "dms_replication_instance_key" {
+  description = "KMS key for DMS replication instance encryption"
+  policy      = <<EOF
+{
+  "Version": "2012-10-17",
+  "Id": "dms-key-default-1",
+  "Statement": [
+    {
+      "Sid": "Enable IAM User Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "Allow DMS use of the key",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "dms.${data.aws_region.current.name}.amazonaws.com"
+      },
+      "Action": [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
 }
