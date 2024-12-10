@@ -121,8 +121,8 @@ locals {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
-              athena_enabled                  = false
               xray_enabled                    = false
+              athena_enabled                  = false
             }
           }
         },
