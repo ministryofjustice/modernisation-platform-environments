@@ -4,7 +4,7 @@ module "ec2_instance" {
   for_each = var.ec2_instances
 
   # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=ebf373aef70841d1c854689eb034b4e147be1709"
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=ebf373aef70841d1c854689eb034b4e147be1709"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=9e6d188d410853617af7e737bdddd3e38cc768ef"
 
   providers = {
     aws.core-vpc = aws.core-vpc
