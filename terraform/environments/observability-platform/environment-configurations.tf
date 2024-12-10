@@ -121,11 +121,11 @@ locals {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
-              xray_enabled                    = false
               athena_enabled                  = false
             }
           }
         },
+              xray_enabled                    = false
         "data-engineering" = {
           "identity_centre_team" = "data-engineering",
           "aws_accounts" = {
@@ -186,6 +186,14 @@ locals {
           identity_centre_team = "modernisation-platform"
           slack_channels       = ["mod-plat-observ-test"]
           aws_accounts = {
+            "modernisation-platform-account" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            
             "core-network-services-production" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
