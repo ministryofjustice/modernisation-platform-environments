@@ -1,13 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 2.7.0"
-    }
-  }
-}
-
-
 data "aws_iam_policy_document" "transfer_assume_role" {
   statement {
     effect = "Allow"
