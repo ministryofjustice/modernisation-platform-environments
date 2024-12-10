@@ -10,7 +10,7 @@
 
 # New IAM role to allow writing of AWS EC2 snapshots of Oracle Hosts to Backup Vault
 resource "aws_iam_role" "oracle_ec2_snapshot_backup_role" {
-  name = "oracle_ec2_snapshot_backup_role"
+  name = "oracle-ec2-snapshot-backup-role"
 
   assume_role_policy = <<EOF
 {
@@ -36,4 +36,25 @@ EOF
 resource "aws_iam_role_policy_attachment" "oracle_ec2_snapshot_backup_role_policy_attachment" {
   role       = aws_iam_role.oracle_ec2_snapshot_backup_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+}
+
+resource "aws_iam_policy" "oracle_ec2_snapshot_backup_pass_role_policy" {
+  description = "Allow iam:PassRole for oracle_ec2_snapshot_backup_role"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "iam:PassRole",
+        Resource = aws_iam_role.oracle_ec2_snapshot_backup_role.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "oracle_ec2_snapshot_backup_pass_role_policy_attachment" {
+  name       = "oracle-ec2-snapshot-backup-pass-role-policy-attachment"
+  roles      = ["modernisation-platform-oidc-cicd"]
+  policy_arn = aws_iam_policy.oracle_ec2_snapshot_backup_pass_role_policy.arn
 }
