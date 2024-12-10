@@ -73,4 +73,8 @@ resource "aws_lb_target_group_attachment" "tribunals_target_group_attachment_sft
   # target_id points to primary ec2 instance, change index to 1 to point at backup ec2 instance
   target_id        = data.aws_instances.backup_instance.ids[0]
   port             = each.value.port
+  depends_on       = [
+    aws_instance.tribunals-backup,
+    data.aws_instances.primary_instance
+  ]
 }
