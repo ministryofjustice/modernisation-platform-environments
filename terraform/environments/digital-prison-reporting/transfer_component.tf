@@ -13,6 +13,10 @@ module "transfer_comp_lambda_layer" {
   license_info        = "HMPPS, MOJ Reporting Team"
   local_file          = "transfer-component/redshift_dependency.zip"
   compatible_runtimes = ["java11"]
+  s3_existing_package = {
+    bucket = "dpr-artifact-store-${local.environment}"
+    key    = "third-party/zip_files/redshift-flyway-dependency/redshift_dependency.zip"
+  }
 }
 
 module "transfer_comp_Lambda" {
