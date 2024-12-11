@@ -1187,7 +1187,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
         "Action" : [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:DeleteObject"
+          "s3:DeleteObject",
+          "s3:ListBucket"
         ],
         "Resource" : [
           "arn:aws:s3:::moj-lambda-layers-dev",
@@ -1329,7 +1330,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_prod
         "Action" : [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:DeleteObject"
+          "s3:DeleteObject",
+          "s3:ListBucket"
         ],
         "Resource" : [
           "arn:aws:s3:::moj-lambda-layers-prod",
