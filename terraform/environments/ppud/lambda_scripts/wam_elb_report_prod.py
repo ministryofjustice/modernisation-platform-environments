@@ -18,10 +18,10 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 # Configuration
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 SENDER = 'noreply@internaltest.ppud.justice.gov.uk'
-RECIPIENTS = ['nick.buckingham@colt.net', 'kofi-nimoh@colt.net']
-SUBJECT = f'AWS PPUD Load Balancer Report - {CURRENT_DATE}'
+RECIPIENTS = ['nick.buckingham@colt.net']
+SUBJECT = f'AWS WAM Load Balancer Report - {CURRENT_DATE}'
 AWS_REGION = 'eu-west-2'
-ELB_NAME = "app/PPUD-ALB/9d129853721723f4"  # Replace with your ELB name
+ELB_NAME = "app/WAM-ALB-PROD/bfc963544454bdde"  # Replace with your ELB name
 
 # SMTP Configuration
 SMTP_SERVER = "10.27.9.39"
@@ -62,7 +62,7 @@ def create_graph(request_data):
     times, requests = zip(*request_data)
     plt.figure(figsize=(20, 6))
     plt.plot(times, requests, color="blue")
-    plt.title(f"Requests to the PPUD Load Balancer on {CURRENT_DATE} (Every 15 Minutes)")
+    plt.title(f"Requests to the WAM Load Balancer on {CURRENT_DATE} (Every 15 Minutes)")
     plt.xlabel("Time (UTC)")
     plt.ylabel("Number of Requests")
     plt.xticks(rotation=45)
@@ -98,8 +98,8 @@ def email_image_to_users(graph_base64):
     <html>
     <body>
         <p>Hi Team,</p>
-        <p>Please find below the PPUD Elastic Load Balancer report for {CURRENT_DATE}.</p>
-        <img src="data:image/png;base64,{graph_base64}" alt="PPUD ELB Report" />
+        <p>Please find below the WAM Elastic Load Balancer report for {CURRENT_DATE}.</p>
+        <img src="data:image/png;base64,{graph_base64}" alt="WAM ELB Report" />
         <p>This is an automated email.</p>
     </body>
     </html>

@@ -91,7 +91,7 @@ resource "aws_instance" "s609693lo6vw102" {
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.Live-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
@@ -116,7 +116,7 @@ resource "aws_instance" "s609693lo6vw103" {
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.Archive-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
@@ -599,7 +599,7 @@ resource "aws_instance" "s618358rgvw022" {
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Primary-DOC-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.Archive-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {
