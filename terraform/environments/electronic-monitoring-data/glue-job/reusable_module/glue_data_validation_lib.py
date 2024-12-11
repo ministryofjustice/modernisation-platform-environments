@@ -786,6 +786,6 @@ class CustomPysparkMethods:
     @staticmethod
     def get_pyspark_hashed_table_schema(in_pkey_column):
         return T.StructType([
-            T.StructField(f"{in_pkey_column}", T.IntegerType(), False),
+            T.StructField(f"{in_pkey_column}", T.LongType(), False),
             T.StructField("RowHash", T.StringType(), False)]
             )
