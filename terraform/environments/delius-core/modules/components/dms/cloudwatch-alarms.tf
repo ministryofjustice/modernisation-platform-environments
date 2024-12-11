@@ -246,6 +246,7 @@ resource "aws_lambda_function" "dms_replication_metric_publisher" {
     variables = {
       METRIC_NAMESPACE = "CustomDMSMetrics",
       METRIC_NAME      = "DMSReplicationFailure"
+      TZ               = "Europe/London"
     }
   }
 

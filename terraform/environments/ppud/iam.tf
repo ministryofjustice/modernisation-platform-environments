@@ -1229,7 +1229,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
           "sqs:SendMessage"
         ],
         "Resource" : [
-          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:Lambda-Queue-Dev"
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
         ]
       },
       {
@@ -1265,6 +1265,13 @@ resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_dev" 
   name       = "lambda-cloudwatch-full-access-iam-attachment"
   roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
+}
+
+resource "aws_iam_policy_attachment" "attach_lambda_ec2_read_only_access_dev" {
+  count      = local.is-development == true ? 1 : 0
+  name       = "lambda-ec2-read-only-access-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
 
 #resource "aws_iam_policy_attachment" "attach_ses_full_access" {
@@ -1364,7 +1371,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_prod
           "sqs:SendMessage"
         ],
         "Resource" : [
-          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:Lambda-Queue-Production"
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         ]
       }
     ]

@@ -37,6 +37,38 @@ locals {
       }
     }
 
+    # fsx_windows = {
+    # retain commented out version of (MULTI_AZ_1) fsx_share for production account
+    # pd-bods-win-share = {
+    #   preferred_availability_zone = "eu-west-2a"
+    #   deployment_type             = "MULTI_AZ_1"
+    #   security_groups             = ["bods"]
+    #   skip_final_backup           = true
+    #   storage_capacity            = 600
+    #   throughput_capacity         = 8
+
+    #   subnets = [
+    #     {
+    #       name               = "private"
+    #       availability_zones = ["eu-west-2a", "eu-west-2b"]
+    #     }
+    #   ]
+
+    #   self_managed_active_directory = {
+    #     dns_ips = [
+    #       module.ip_addresses.mp_ip.ad-hmpp-dc-a,
+    #       module.ip_addresses.mp_ip.ad-hmpp-dc-b,
+    #     ]
+    #     domain_name          = "azure.hmpp.root"
+    #     username             = "svc_join_domain"
+    #     password_secret_name = "/sap/bods/pd/passwords"
+    #   }
+    #   tags = {
+    #     backup = true
+    #   }
+    # }
+    # }
+
     route53_zones = {
       "reporting.oasys.service.justice.gov.uk" = {
         ns_records = [

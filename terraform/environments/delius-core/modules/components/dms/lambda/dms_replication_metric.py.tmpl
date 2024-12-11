@@ -35,14 +35,18 @@ def lambda_handler(event, context):
         # Get the current local time and weekday (timezones are respected)
         now = datetime.now()
         current_hour    = now.hour
+        current_minute  = now.minute
         current_weekday = now.weekday()  # Monday is 0, Sunday is 6
 
         # Skip the iteration if before 6am, after 9pm, or it is the weekend.
         # These times are hard-coded into the stop/start functionality.  We do not
         # currently support custom times.
+        # Note - we do not enable monitoring until 6:10am as this allows 10 minutes
+        # for the databases to restart in the morning; otherwise we will get false
+        # alarms since DMS will not be able to connect immediately after 6am.
         # Do NOT skip if the instance_scheduling tag has the value of skip-scheduling 
         # or skip-audit-stop is set as we must handle all DMS events in these environments (they are up 24/7)
-        if (current_hour < 6 or current_hour > 21 or current_weekday >= 5) and (not "${oracle_db_instance_scheduling}" in ["skip-scheduling","skip-auto-stop"]):
+        if (current_hour < 6 or (current_hour == 6 and current_minute <= 10) or current_hour >= 21 or current_weekday >= 5) and (not "${oracle_db_instance_scheduling}" in ["skip-scheduling","skip-auto-stop"]):
             continue
 
         message = json.loads(record['Sns']['Message'])

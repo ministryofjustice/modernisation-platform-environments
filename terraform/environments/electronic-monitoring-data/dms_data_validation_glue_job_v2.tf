@@ -541,6 +541,8 @@ resource "aws_glue_job" "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm" {
     "--year_partition_bool"                 = "true"
     "--month_partition_bool"                = "true"
     "--rds_db_table_hashed_rows_parent_dir" = "rds_tables_rows_hashed"
+    "--incremental_run_bool"                = "false"
+    "--skip_partition_if_exists_bool"       = "false"
     "--rds_query_where_clause"              = ""
     "--coalesce_int"                        = 0
     "--extra-py-files"                      = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
