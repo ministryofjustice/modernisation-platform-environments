@@ -54,7 +54,7 @@ locals {
       t1-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity = 0
-          max_size         = 1
+          max_size         = 0
         })
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -259,7 +259,7 @@ locals {
           local.cloudwatch_metric_alarms.db,
           local.cloudwatch_metric_alarms.db_connected,
           local.cloudwatch_metric_alarms.db_backup,
-          local.cloudwatch_metric_alarms.db_misload,
+          # local.cloudwatch_metric_alarms.db_misload, # disabling as only called on adhoc basis
         )
         config = merge(local.ec2_instances.db.config, {
           ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-06-23T16-28-48.100Z"

@@ -1,8 +1,3 @@
-# Python script to retrieve emails send data from S3, count the number of outgoing emails
-# graph it and email it to end users via the internal mail relay.
-# Nick Buckingham
-# 9 December 2024
-
 import boto3
 import os
 os.environ['MPLCONFIGDIR'] = "/tmp/graph"
@@ -24,8 +19,10 @@ CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 TODAY = datetime.now()
 YESTERDAY = TODAY - timedelta(days=1)
 YESTERDAY_DATE = YESTERDAY.strftime('%a %d %b %Y')
-bucket_name = 'moj-lambda-layers-prod'
-file_names = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+WEEK_AGO = TODAY - timedelta(days=7)
+WEEK_AGO_DATE = WEEK_AGO.strftime('%a %d %b %Y')
+S3_BUCKET = 'moj-lambda-layers-prod'
+FILE_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 SENDER = 'donotreply@cjsm.secure-email.ppud.justice.gov.uk'
 RECIPIENTS = ['nick.buckingham@colt.net']
 SUBJECT = f'AWS PPUD Email Report - {CURRENT_DATE}'
@@ -34,8 +31,6 @@ AWS_REGION = 'eu-west-2'
 # SMTP Configuration
 SMTP_SERVER = "10.27.9.39"
 SMTP_PORT = 25
-MAIL_FROM = "donotreply@cjsm.secure-email.ppud.justice.gov.uk"
-EMAIL_TO = ["nick.buckingham@colt.net"]
 
 def retrieve_file_from_s3(bucket, key):
     response = s3.get_object(Bucket=bucket, Key=key)
@@ -81,7 +76,7 @@ def send_email_with_graph(graph_base64):
     <html>
     <body>
         <p>Hi Team,</p>
-        <p>Please find below the PPUD email report for the week ending {YESTERDAY_DATE}.</p>
+        <p>Please find below the PPUD email report for the week of {WEEK_AGO_DATE} to {YESTERDAY_DATE}.</p>
         <img src="data:image/png;base64,{graph_base64}" alt="PPUD Email Report" />
         <p>This is an automated email.</p>
     </body>
@@ -123,8 +118,8 @@ def lambda_handler(event, context):
     pattern = r'to=<'
     data = {}
     
-    for file_name in file_names:
-        content = retrieve_file_from_s3(bucket_name, file_name)
+    for file_name in FILE_NAMES:
+        content = retrieve_file_from_s3(S3_BUCKET, file_name)
         count = count_occurrences(content, pattern)
         data[file_name] = count
 

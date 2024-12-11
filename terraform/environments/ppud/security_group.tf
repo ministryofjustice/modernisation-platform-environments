@@ -339,6 +339,7 @@ resource "aws_security_group_rule" "Dev-Servers-Standard-Egress-2" {
 # Production
 
 resource "aws_security_group" "Primary-DOC-Server" {
+  # checkov:skip=CKV2_AWS_5: "Temporarily unattached to any EC2 instances"
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
   name        = "Primary-DOC-Server"

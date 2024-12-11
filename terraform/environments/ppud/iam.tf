@@ -1267,6 +1267,13 @@ resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_dev" 
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
 }
 
+resource "aws_iam_policy_attachment" "attach_lambda_ec2_read_only_access_dev" {
+  count      = local.is-development == true ? 1 : 0
+  name       = "lambda-ec2-read-only-access-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
+}
+
 #resource "aws_iam_policy_attachment" "attach_ses_full_access" {
 #  count      = local.is-development == true ? 1 : 0
 #  name       = "ses-full-access-iam-attachment"
