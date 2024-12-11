@@ -186,7 +186,7 @@ locals {
           identity_centre_team = "modernisation-platform"
           slack_channels       = ["mod-plat-observ-test"]
           aws_accounts = {
-            "modernisation-platform-account" = {
+            "Modernisation Platform" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
