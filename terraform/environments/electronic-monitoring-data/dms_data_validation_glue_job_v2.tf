@@ -1,6 +1,6 @@
-resource "aws_glue_security_configuration" "example" {
+resource "aws_glue_security_configuration" "em_glue_security_configuration" {
   #checkov:skip=CKV_AWS_99
-  name = "example-security-configuration"
+  name = "em-glue-security-configuration"
 
   encryption_configuration {
     cloudwatch_encryption {
