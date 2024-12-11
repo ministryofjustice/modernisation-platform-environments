@@ -86,7 +86,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_to_s3_parquet_v1.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
   tags = merge(
     local.tags,
     {
@@ -164,7 +164,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_to_s3_parquet_v2.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
   tags = merge(
     local.tags,
     {
@@ -234,7 +234,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_to_s3_parquet_partitionby_yyyy_mm.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
 
   tags = merge(
@@ -318,7 +318,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -389,7 +389,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/parquet_resize_or_partitionby_yyyy_mm_dd.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -456,7 +456,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_table_rows_hashvalue_to_parquet.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -525,7 +525,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_on_rows_hashvalue.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -601,7 +601,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -671,7 +671,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_sqlserver_query_to_s3_parquet.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -734,7 +734,7 @@ resource "aws_glue_job" "create_or_refresh_dv_table" {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/create_or_refresh_dv_table.py"
   }
-  security_configuration = aws_glue_security_configuration.example.name
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
