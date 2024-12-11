@@ -130,36 +130,36 @@ locals {
       # })
     }
 
-    # fsx_windows = {
+    fsx_windows = {
 
-    #   pp-bods-win-share = {
-    #     deployment_type     = "SINGLE_AZ_1"
-    #     security_groups     = ["bods"]
-    #     skip_final_backup   = true
-    #     storage_capacity    = 600
-    #     throughput_capacity = 8
+      pp-bods-win-share = {
+        deployment_type     = "SINGLE_AZ_1"
+        security_groups     = ["bods"]
+        skip_final_backup   = true
+        storage_capacity    = 600
+        throughput_capacity = 8
 
-    #     subnets = [
-    #       {
-    #         name               = "private"
-    #         availability_zones = ["eu-west-2a"]
-    #       }
-    #     ]
+        subnets = [
+          {
+            name               = "private"
+            availability_zones = ["eu-west-2a"]
+          }
+        ]
 
-    #     self_managed_active_directory = {
-    #       dns_ips = [
-    #         module.ip_addresses.azure_fixngo_ip.PCMCW0011,
-    #         module.ip_addresses.azure_fixngo_ip.PCMCW0012,
-    #       ]
-    #       domain_name          = "azure.hmpp.root"
-    #       username             = "svc_join_domain"
-    #       password_secret_name = "/sap/bods/pp/passwords"
-    #     }
-    #     tags = {
-    #       backup = true
-    #     }
-    #   }
-    # }
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.azure_fixngo_ip.PCMCW0011,
+            module.ip_addresses.azure_fixngo_ip.PCMCW0012,
+          ]
+          domain_name          = "azure.hmpp.root"
+          username             = "svc_fsx_windows"
+          password_secret_name = "/sap/bods/pp/passwords"
+        }
+        tags = {
+          backup = true
+        }
+      }
+    }
 
     iam_policies = {
       Ec2SecretPolicy = {
