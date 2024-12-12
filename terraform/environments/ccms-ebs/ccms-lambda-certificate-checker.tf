@@ -1,0 +1,108 @@
+resource "aws_iam_role" "lambda_certificate_monitor_role" {
+  name = "acm_certificate_monitor_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = "sts:AssumeRole"
+      Effect = "Allow"
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda_policy" {
+  name = "acm_certificate_monitor_policy"
+  role = aws_iam_role.lambda_certificate_monitor_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "sns:Publish"
+        ]
+        Resource = [aws_sns_topic.certificate_expiration_alerts.arn]
+      }
+    ]
+  })
+}
+
+resource "aws_sns_topic" "certificate_expiration_alerts" {
+  name = "acm-certificate-alerts"
+}
+
+resource "aws_sns_topic_subscription" "email" {
+  topic_arn = aws_sns_topic.certificate_expiration_alerts.arn
+  protocol  = "email"
+  endpoint  = var.alert_email
+}
+
+resource "aws_lambda_function" "certificate_monitor" {
+  filename         = "certificate_monitor.zip"
+  function_name    = "acm_certificate_monitor"
+  role            = aws_iam_role.lambda_certificate_monitor_role.arn
+  handler         = "lambda_function.lambda_handler"
+  runtime         = "python3.11"
+  timeout         = 30
+
+  environment {
+    variables = {
+      SNS_TOPIC_ARN = aws_sns_topic.certificate_expiration_alerts.arn
+    }
+  }
+}
+
+resource "aws_cloudwatch_event_rule" "acm_events" {
+  name        = "acm-certificate-events"
+  description = "Capture ACM certificate events"
+
+  event_pattern = jsonencode({
+    source      = ["aws.acm"]
+    detail-type = [
+      "ACM Certificate Approaching Expiration",
+      "ACM Certificate Expired"
+    ]
+  })
+}
+
+resource "aws_cloudwatch_event_target" "lambda_certificate_monitor" {
+  rule      = aws_cloudwatch_event_rule.acm_events.name
+  target_id = "SendToLambda"
+  arn       = aws_lambda_function.certificate_monitor.arn
+}
+
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.certificate_monitor.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.acm_events.arn
+}
+
+variable "alert_email" {
+  description = "maciej.matysiak@digital.justice.gov.uk"
+  type        = string
+}
+
+output "sns_topic_arn" {
+  description = "ARN of the SNS topic for certificate alerts"
+  value       = aws_sns_topic.certificate_expiration_alerts.arn
+}
+
+output "lambda_function_arn" {
+  description = "ARN of the Lambda function"
+  value       = aws_lambda_function.certificate_monitor.arn
+}
