@@ -1,5 +1,5 @@
 resource "aws_iam_role" "lambda_certificate_monitor_role" {
-  name = "acm_certificate_monitor_role"
+  name = "${local.application_name}-${local.environment}-acm_certificate_monitor_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -11,10 +11,13 @@ resource "aws_iam_role" "lambda_certificate_monitor_role" {
       }
     }]
   })
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-certificate-monitor"
+  })
 }
 
 resource "aws_iam_role_policy" "lambda_policy" {
-  name = "acm_certificate_monitor_policy"
+  name = "${local.application_name}-${local.environment}-acm_certificate_monitor_policy"
   role = aws_iam_role.lambda_certificate_monitor_role.id
 
   policy = jsonencode({
@@ -38,16 +41,25 @@ resource "aws_iam_role_policy" "lambda_policy" {
       }
     ]
   })
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-certificate-monitor"
+  })
 }
 
 resource "aws_sns_topic" "certificate_expiration_alerts" {
-  name = "acm-certificate-alerts"
+  name = "${local.application_name}-${local.environment}-acm-certificate-alerts"
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-certificate-monitor"
+  })
 }
 
 resource "aws_sns_topic_subscription" "email" {
   topic_arn = aws_sns_topic.certificate_expiration_alerts.arn
   protocol  = "email"
   endpoint  = local.application_data.accounts[local.environment].certificate_monitor_email
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-certificate-monitor"
+  })
 }
 
 resource "aws_lambda_function" "certificate_monitor" {
@@ -69,7 +81,7 @@ resource "aws_lambda_function" "certificate_monitor" {
 }
 
 resource "aws_cloudwatch_event_rule" "acm_events" {
-  name        = "acm-certificate-events"
+  name        = "${local.application_name}-${local.environment}-acm-certificate-events"
   description = "Capture ACM certificate events"
 
   event_pattern = jsonencode({
@@ -79,12 +91,18 @@ resource "aws_cloudwatch_event_rule" "acm_events" {
       "ACM Certificate Expired"
     ]
   })
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-certificate-monitor"
+  })
 }
 
 resource "aws_cloudwatch_event_target" "lambda_certificate_monitor" {
   rule      = aws_cloudwatch_event_rule.acm_events.name
   target_id = "SendToLambda"
   arn       = aws_lambda_function.certificate_monitor.arn
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-certificate-monitor"
+  })
 }
 
 resource "aws_lambda_permission" "allow_eventbridge" {
@@ -93,6 +111,9 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   function_name = aws_lambda_function.certificate_monitor.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.acm_events.arn
+  tags = merge(local.tags, {
+    Name = "${local.application_name}-${local.environment}-certificate-monitor"
+  })
 }
 
 output "sns_topic_arn" {
