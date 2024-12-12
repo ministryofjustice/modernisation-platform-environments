@@ -154,7 +154,7 @@ locals {
           domain_name                      = "azure.hmpp.root"
           username                         = "svc_fsx_windows"
           password_secret_name             = "/sap/bods/pp/passwords"
-          file_system_administrators_group = "Azure Core"
+          file_system_administrators_group = "Domain Join"
         }
         tags = {
           backup = true
