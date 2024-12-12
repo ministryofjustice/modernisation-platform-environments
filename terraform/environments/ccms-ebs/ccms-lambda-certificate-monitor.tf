@@ -66,6 +66,7 @@ resource "aws_lambda_function" "certificate_monitor" {
 
   environment {
     variables = {
+      EXPIRY_DAYS   = local.application_data.accounts[local.environment].certificate_expiry_days
       SNS_TOPIC_ARN = aws_sns_topic.certificate_expiration_alerts.arn
     }
   }
