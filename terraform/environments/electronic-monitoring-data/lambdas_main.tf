@@ -192,18 +192,3 @@ module "calculate_checksum" {
 
 }
 
-resource "aws_lambda_permission" "allow_sns_invoke_checksum_lambda" {
-  statement_id  = "AllowSNSInvokeChecksum"
-  action        = "lambda:InvokeFunction"
-  function_name = module.calculate_checksum.lambda_function_name
-  principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.s3_events.arn
-}
-
-resource "aws_sns_topic_subscription" "checksum_lambda_subscription" {
-  topic_arn = aws_sns_topic.s3_events.arn
-  protocol  = "lambda"
-  endpoint  = module.calculate_checksum.lambda_function_arn
-
-  depends_on = [aws_lambda_permission.allow_sns_invoke_checksum_lambda]
-}
