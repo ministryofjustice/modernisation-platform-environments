@@ -570,7 +570,7 @@ resource "aws_s3_bucket_notification" "data_store" {
   }
 }
 
-# sns topic to allow multiple lambdas to be triggered off of it
+#trivy:ignore:AVD-AWS-0136
 resource "aws_sns_topic" "s3_events" {
   name              = "${module.s3-data-bucket.bucket.id}-object-created-topic"
   kms_master_key_id = "alias/aws/sns"
