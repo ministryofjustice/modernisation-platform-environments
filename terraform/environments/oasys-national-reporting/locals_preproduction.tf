@@ -151,9 +151,10 @@ locals {
             module.ip_addresses.azure_fixngo_ip.PCMCW0011,
             module.ip_addresses.azure_fixngo_ip.PCMCW0012,
           ]
-          domain_name          = "azure.hmpp.root"
-          username             = "svc_fsx_windows"
-          password_secret_name = "/sap/bods/pp/passwords"
+          domain_name                      = "azure.hmpp.root"
+          username                         = "svc_fsx_windows"
+          password_secret_name             = "/sap/bods/pp/passwords"
+          file_system_administrators_group = "Administrators"
         }
         tags = {
           backup = true
