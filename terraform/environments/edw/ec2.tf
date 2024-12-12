@@ -86,6 +86,89 @@ mkdir -p /home/oracle/scripts
 sudo /etc/init.d/iptables stop
 sudo /sbin/chkconfig iptables off
 
+
+# Install mailx
+sudo yum install -y mailx
+sudo ln -s /bin/mail /bin/mailx
+
+# Configure maat db cron job script:
+
+# Create the maat_05365_ware_db_changes.sh script
+cat << 'EOC22' > /home/oracle/scripts/maat_05365_ware_db_changes.sh
+#!/bin/ksh
+
+# fixed variables
+chown -R oracle:dba /home/oracle/scripts
+
+LOCATE=/home/oracle/scripts
+ORACLE_SID=$1; export ORACLE_SID
+ORACLE_HOME=/oracle/software/product/10.2.0; export ORACLE_HOME
+PATH=$ORACLE_HOME/bin:$PATH; export PATH
+
+cd $LOCATE
+
+sqlplus -s /nolog <<eosql >rundatafix.log
+conn warehouse/whouse_prod
+@maat_05365_ware_db_changes.sql
+exit
+eosql
+
+# mailx -s "MI Production (EDW005) datafix 3079 \`date\`" digital_dba@digital.justice.gov.uk < rundatafix.log
+EOC22
+
+# Create the maat_05365_ware_db_changes.sql script
+cat << 'EOC23' > /home/oracle/scripts/maat_05365_ware_db_changes.sql
+--------------------------------------------------------------------------------------------------------------------
+--
+-- Archive:    %ARCHIVE%
+-- Revision:   %PR%
+-- Date:       %DATE%
+--
+-- Purpose: Modify warehouse tables to set column default values
+--
+--
+-- Dimensions History
+-- ------------------
+--
+-- Ver  Date     Name                 Description
+-- ---- -------- -------------------- ------------------------------------------------------------------------------
+-- 1.0  27/11/14 H Khela             Initial Version
+--
+--
+--------------------------------------------------------------------------------------------------------------------
+SPOOL maat_05365_ware_db_changes.log
+
+-- Set time on so you can see how long each part takes
+SET TIME ON
+
+-- Set echo on so that you can see which command it is executing (and the time)
+SET ECHO ON
+
+ALTER TABLE warehouse.maat_assessment_fact MODIFY (
+time_eff_to_dim_id NUMBER DEFAULT NULL);
+
+ALTER TABLE warehouse.maat_application_dim MODIFY (
+time_eff_to_dim_id NUMBER DEFAULT NULL);
+
+  -- 9710356 rows updated.
+
+  UPDATE warehouse.maat_assessment_fact
+  SET time_eff_to_dim_id = NULL
+  WHERE time_eff_to_dim_id = -1;
+
+  COMMIT;
+
+  -- 4558089 rows updated
+
+  UPDATE warehouse.maat_application_dim
+  SET time_eff_to_dim_id = NULL
+  WHERE time_eff_to_dim_id = -1;
+
+COMMIT;
+
+SPOOL OFF
+EOC23
+
 # Set up log files
 echo "---creating /etc/awslogs/awscli.conf"
 mkdir -p /etc/awslogs
