@@ -170,6 +170,7 @@ SPOOL OFF
 EOC23
 
 echo "Setting up AWS EBS backup"
+INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 cat <<EOC25 > /home/oracle/scripts/aws_ebs_backup.sh
 #!/bin/bash
 /usr/local/bin/aws ec2 create-snapshots \
