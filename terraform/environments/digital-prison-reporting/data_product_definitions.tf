@@ -105,7 +105,7 @@ resource "aws_iam_role_policy_attachment" "dpd_table_github_deploy_put_policy" {
 
 data "aws_iam_policy_document" "dpd_table_read_policy" {
   statement {
-    sid    = "DeployDpdItems"
+    sid    = "ReadDpdItems"
     effect = "Allow"
     actions = [
       "dynamodb:DescribeTable",
@@ -114,7 +114,8 @@ data "aws_iam_policy_document" "dpd_table_read_policy" {
       "dynamodb:Query",
     ]
     resources = [
-      module.dynamo_table_dpd.dynamodb_table_arn
+      module.dynamo_table_dpd.dynamodb_table_arn,
+      "${module.dynamo_table_dpd.dynamodb_table_arn}/index/*"
     ]
   }
 }

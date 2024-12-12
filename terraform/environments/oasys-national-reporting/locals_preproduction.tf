@@ -84,7 +84,7 @@ locals {
             }
           ))
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
+            "Ec2SecretPolicy", "Ec2ValidateFSX",
           ])
         })
         # IMPORTANT: EBS volume initialization, labelling, formatting was carried out manually on this instance. It was not automated so these ebs_volume settings are bespoke. Additional volumes should NOT be /dev/xvd* see the local.ec2_instances.bods.ebs_volumes setting for the correct device names.
@@ -152,7 +152,7 @@ locals {
             module.ip_addresses.azure_fixngo_ip.PCMCW0012,
           ]
           domain_name          = "azure.hmpp.root"
-          username             = "svc_admin"
+          username             = "svc_fsx_windows"
           password_secret_name = "/sap/bods/pp/passwords"
         }
         tags = {
@@ -176,6 +176,43 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
+          }
+        ]
+      }
+      Ec2ValidateFSX = {
+        description = "Permissions required for instances to run fsx test scripts"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "ec2:Describe*"
+            ]
+            resources = [
+              "*"
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*"
+            ]
+            resources = [
+              "*"
+            ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "cloudwatch:ListMetrics",
+              "cloudwatch:GetMetricStatistics",
+              "cloudwatch:Describe*"
+            ]
+            resources = ["*"]
+          },
+          {
+            effect    = "Allow"
+            actions   = ["autoscaling:Describe*"]
+            resources = ["*"]
           }
         ]
       }
