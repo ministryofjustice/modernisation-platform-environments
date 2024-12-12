@@ -41,9 +41,6 @@ resource "aws_iam_role_policy" "lambda_policy" {
       }
     ]
   })
-  tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-certificate-monitor"
-  })
 }
 
 resource "aws_sns_topic" "certificate_expiration_alerts" {
@@ -57,9 +54,6 @@ resource "aws_sns_topic_subscription" "email" {
   topic_arn = aws_sns_topic.certificate_expiration_alerts.arn
   protocol  = "email"
   endpoint  = local.application_data.accounts[local.environment].certificate_monitor_email
-  tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-certificate-monitor"
-  })
 }
 
 resource "aws_lambda_function" "certificate_monitor" {
@@ -100,9 +94,6 @@ resource "aws_cloudwatch_event_target" "lambda_certificate_monitor" {
   rule      = aws_cloudwatch_event_rule.acm_events.name
   target_id = "SendToLambda"
   arn       = aws_lambda_function.certificate_monitor.arn
-  tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-certificate-monitor"
-  })
 }
 
 resource "aws_lambda_permission" "allow_eventbridge" {
@@ -111,9 +102,6 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   function_name = aws_lambda_function.certificate_monitor.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.acm_events.arn
-  tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-certificate-monitor"
-  })
 }
 
 output "sns_topic_arn" {
