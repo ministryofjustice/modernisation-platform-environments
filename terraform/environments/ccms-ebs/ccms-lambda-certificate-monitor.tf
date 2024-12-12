@@ -57,7 +57,7 @@ resource "aws_sns_topic_subscription" "email" {
 }
 
 resource "aws_lambda_function" "certificate_monitor" {
-  filename      = "certificate_monitor.zip"
+  filename      = "./lambda/certificate_monitor.zip"
   function_name = "${local.application_name}-${local.environment}-certificate-monitor"
   role          = aws_iam_role.lambda_certificate_monitor_role.arn
   handler       = "lambda_function.lambda_handler"
