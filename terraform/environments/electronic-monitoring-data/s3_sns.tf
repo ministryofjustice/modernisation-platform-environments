@@ -31,6 +31,7 @@ resource "aws_s3_bucket_notification" "historic_data_store" {
 
 # sns topic to allow multiple lambdas to be triggered off of it
 resource "aws_sns_topic" "historic_s3_events" {
+  #trivy:ignore:AVD-AWS-0136
   name              = "${module.s3-data-bucket.bucket.id}-historic-object-created-topic"
   kms_master_key_id = "alias/aws/sns"
 }
@@ -85,6 +86,7 @@ resource "aws_s3_bucket_notification" "live_serco_fms_data_store" {
 
 # sns topic to allow multiple lambdas to be triggered off of it
 resource "aws_sns_topic" "live_serco_fms_s3_events" {
+  #trivy:ignore:AVD-AWS-0136
   name              = "${module.s3-data-bucket.bucket.id}-live-object-created-topic"
   kms_master_key_id = "alias/aws/sns"
 }
