@@ -164,20 +164,20 @@ if __name__ == "__main__":
             f"""/year={year_int_equals_to}"""
     # ----------------------------------
 
-    rds_df_month_int_equals_to = int(args.get('rds_df_month_int_equals_to', 0))
-    if rds_df_month_int_equals_to != 0:
-        df_parquet_read = df_parquet_read.where(f"""month = {rds_df_month_int_equals_to}""")
+    month_int_equals_to = int(args.get('month_int_equals_to', 0))
+    if month_int_equals_to != 0:
+        df_parquet_read = df_parquet_read.where(f"""month = {month_int_equals_to}""")
         LOGGER.warn(
-            f"""'df_parquet_read' being filtered on month = {rds_df_month_int_equals_to}.""")
+            f"""'df_parquet_read' being filtered on month = {month_int_equals_to}.""")
         output_partition_path = output_partition_path + \
-            f"""/month={rds_df_month_int_equals_to}"""
+            f"""/month={month_int_equals_to}"""
     # --------------------------------------------------
 
-    s3_prq_read_where_clause = args.get('s3_prq_read_where_clause', '').strip()
-    if s3_prq_read_where_clause != '':
-        df_parquet_read = df_parquet_read.where(f"""{s3_prq_read_where_clause}""")
+    s3_prq_df_read_where_clause = args.get('s3_prq_df_read_where_clause', '').strip()
+    if s3_prq_df_read_where_clause != '':
+        df_parquet_read = df_parquet_read.where(f"""{s3_prq_df_read_where_clause}""")
         LOGGER.warn(
-            f"""'df_parquet_read' being filtered on:> {s3_prq_read_where_clause}.""")
+            f"""'df_parquet_read' being filtered on:> {s3_prq_df_read_where_clause}.""")
 
     prq_df_repartition_int = int(args.get('prq_df_repartition_int', 0))
     primarykey_column = args.get('primarykey_column', '')
