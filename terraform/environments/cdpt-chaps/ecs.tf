@@ -105,18 +105,6 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
       }
       environment = [
         {
-          name= "AWS_REGION"
-          value= "eu-west-2"
-        },
-        {
-          name = "AWS_S3_BUCKET"
-          value = "chapsdotnet-data-protection-keys"
-        },
-        {
-          name = "DATA_PROTECTION_BUCKET_PREFIX"
-          value = "keys-directory/"
-        },
-        {
           name  = "Instance"
           value = "https://login.microsoftonline.com/"
         },
@@ -189,18 +177,6 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
       }
       environment = [
         {
-          name = "AWS_REGION"
-          value = "eu-west-2"
-        },
-        {
-          name = "AWS_S3_BUCKET"
-          value = "chapsdotnet-data-protection-keys"
-        },
-        {
-          name = "DATA_PROTECTION_BUCKET_PREFIX"
-          value = "keys-directory/"
-        },
-        {
           name  = "RDS_HOSTNAME"
           value = aws_db_instance.database.address
         },
@@ -219,6 +195,10 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
         {
           name  = "CurServer"
           value = local.application_data.accounts[local.environment].env_name
+        },
+        {
+          name = "Environment"
+          value = local.application_data.accounts[local.environment].environment_name
         }
       ],
       secrets = [
