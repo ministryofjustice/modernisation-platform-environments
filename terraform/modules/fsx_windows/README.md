@@ -17,6 +17,7 @@ NOTES:
 - Use Single-AZ solution for non-production environments to save cost.
 - Multi-AZ can only include 2 availability zones.
 - Set `skip_final_backup true` to avoid issues deleting the resource
+- See <https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5343248588/AD+setup+for+fsx_windows+shared+drives> for specifics about AD setup and especially terraform values for joining the HMPP domain.
 
 ## Security Groups
 
