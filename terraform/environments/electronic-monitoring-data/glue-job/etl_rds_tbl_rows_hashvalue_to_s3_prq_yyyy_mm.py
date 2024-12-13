@@ -292,7 +292,7 @@ if __name__ == "__main__":
     HASHBYTES('SHA2_256', CONCAT_WS('', {', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash,
     YEAR({date_partition_column_name}) AS year,
     MONTH({date_partition_column_name}) AS month
-    FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
+    FROM {rds_sqlserver_db}.{rds_sqlserver_db_schema}.{rds_sqlserver_db_table}
     """.strip()
 
     incremental_run_bool = args.get('incremental_run_bool', 'false')
@@ -301,7 +301,7 @@ if __name__ == "__main__":
     if rds_query_where_clause is not None:
 
         rds_db_hash_cols_query_str = rds_db_hash_cols_query_str + \
-                                        f""" WHERE {rds_query_where_clause.lstrip()}"""
+                                        f""" WHERE {rds_query_where_clause.rstrip()}"""
 
     elif incremental_run_bool == 'true':
         existing_prq_hashed_rows_df = CustomPysparkMethods.get_s3_parquet_df_v2(
