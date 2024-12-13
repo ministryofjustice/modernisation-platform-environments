@@ -8,6 +8,7 @@ locals {
     )
   }
   service_priorities = {
+    # Priority 1 was ommitted from the listener rules to allow the maintenance page to take precedence (when it's needed)
     adminappeals             = 2
     administrativeappeals    = 3
     carestandards            = 4
@@ -155,6 +156,7 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   }
 }
 
+# Maintenance page - uncomment whenever a maintenance page is needed
 resource "aws_lb_listener_rule" "maintenance_page" {
   listener_arn = aws_lb_listener.tribunals_lb.arn
   priority     = 1
