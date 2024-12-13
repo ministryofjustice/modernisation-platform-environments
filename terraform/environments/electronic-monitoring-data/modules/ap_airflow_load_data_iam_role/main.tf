@@ -24,6 +24,8 @@ data "aws_iam_policy_document" "load_data" {
       "${var.source_data_bucket.arn}/staging${var.path_to_data}/*",
       "${var.cadt_bucket.arn}/staging/${local.snake-database}/*",
       "${var.cadt_bucket.arn}/staging${var.path_to_data}/*",
+      "${var.cadt_bucket.arn}/staging/${local.snake-database}_pipeline/*",
+      "${var.cadt_bucket.arn}/staging${var.path_to_data}_pipeline/*",
       "${var.athena_dump_bucket.arn}/output/*"
     ]
   }
