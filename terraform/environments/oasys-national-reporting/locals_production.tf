@@ -60,8 +60,9 @@ locals {
     #       module.ip_addresses.mp_ip.ad-hmpp-dc-b,
     #     ]
     #     domain_name          = "azure.hmpp.root"
-    #     username             = "svc_join_domain"
+    #     username             = "svc_fsx_windows"
     #     password_secret_name = "/sap/bods/pd/passwords"
+    #     file_system_administrators_group = "Domain Join"
     #   }
     #   tags = {
     #     backup = true
