@@ -19,7 +19,7 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 # Configuration
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 SENDER = "donotreply@cjsm.secure-email.ppud.justice.gov.uk"
-RECIPIENTS = ['nick.buckingham@colt.net']
+RECIPIENTS = ["nick.buckingham@colt.net", "gabriella.browning@colt.net", "pankaj.pant@colt.net", "david.savage@colt.net"]
 SUBJECT = f'AWS PPUD Disk Information Report - {CURRENT_DATE}'
 AWS_REGION = 'eu-west-2'
 bucket_name = 'moj-lambda-layers-prod'
@@ -62,6 +62,7 @@ def format_disk_info(disk_info):
     formatted_info = """<table border="1" style="border-collapse: collapse; width: 100%;">
                         <tr style="background-color: #f2f2f2;">
                             <th style="padding: 8px; text-align: left;">Server</th>
+                            <th style="padding: 8px; text-align: left;">Date</th>
                             <th style="padding: 8px; text-align: left;">Drive</th>
                             <th style="padding: 8px; text-align: left;">Drive Label</th>
                             <th style="padding: 8px; text-align: left;">File System</th>
@@ -77,19 +78,28 @@ def format_disk_info(disk_info):
         if current_hostname != info[0]:
             if current_hostname is not None:
               #  formatted_info += f"""<tr><td colspan="9" style="border-bottom: 10px solid black;"></td></tr>"""
-                formatted_info += f"""<tr><td colspan="9" style="height: 20px;"></td></tr>"""
+                formatted_info += f"""<tr><td colspan="10" style="height: 20px;"></td></tr>"""
             current_hostname = info[0]
+    
+        status = info[9].strip().capitalize()
+        status_color = {
+            'Good': 'green',
+            'Low': 'teal',
+            'Warning': 'orange',
+            'Critical': 'red'
+        }.get(status, 'black')
 
         formatted_info += f"""<tr>
                                 <td style="padding: 8px; text-align: left;">{info[0]}</td>
+                                <td style="padding: 8px; text-align: left;">{info[1]}</td>
                                 <td style="padding: 8px; text-align: left;">{info[2]}</td>
                                 <td style="padding: 8px; text-align: left;">{info[3]}</td>
                                 <td style="padding: 8px; text-align: left;">{info[4]}</td>
                                 <td style="padding: 8px; text-align: left;">{info[5]}</td>
                                 <td style="padding: 8px; text-align: left;">{info[6]}</td>
                                 <td style="padding: 8px; text-align: left;">{info[7]}</td>
-                                <td style="padding: 8px; text-align: left;">{info[8]}%</td>
-                                <td style="padding: 8px; text-align: left;">{info[9]}</td>
+                                <td style="padding: 8px; text-align: left;">{info[8]}</td>
+                                <td style="padding: 8px; text-align: left; background-color: {status_color};">{info[9]}</td>
                               </tr>"""
     formatted_info += "</table>"
     return formatted_info
@@ -98,7 +108,7 @@ def send_email(subject, body_html):
     msg = MIMEMultipart()
     msg['From'] = SENDER
     msg['To'] = ', '.join(RECIPIENTS)
-    msg['Subject'] = subject
+    msg['Subject'] = SUBJECT
 
     msg.attach(MIMEText(body_html, 'html'))
 
@@ -116,9 +126,12 @@ def lambda_handler(event, context):
     
     # Format disk information
     formatted_info = format_disk_info(disk_info)
-    
+
+    # Get current date
+    CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
+
     # Email formatted disk information
-    subject = 'AWS PPUD Disk Information Report'
+    subject = 'AWS PPUD Disk Information Report - {CURRENT_DATE}'
     body_html = f"""<html>
     <head></head>
     <body>

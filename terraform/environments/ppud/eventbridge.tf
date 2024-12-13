@@ -102,6 +102,31 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_ppud_email_report_
   arn       = aws_lambda_function.terraform_lambda_func_ppud_email_report_prod[0].arn
 }
 
+# Eventbridge rule to invoke the PPUD Disk Information Report lambda function every Monday at 07:00
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_ppud_disk_info_report_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_ppud_disk_info_report_prod[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.weekly_schedule_ppud_disk_info_report_prod[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "weekly_schedule_ppud_disk_info_report_prod" {
+  count               = local.is-production == true ? 1 : 0
+  name                = "ppud-disk_info-report-weekly-schedule"
+  description         = "Trigger Lambda at 07:10 UTC each Monday"
+  schedule_expression = "cron(0 7 ? * MON *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_ppud_disk_info_report_prod" {
+  count     = local.is-production == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.weekly_schedule_ppud_disk_info_report_prod[0].name
+  target_id = "disk_info_report"
+  arn       = aws_lambda_function.terraform_lambda_func_ppud_disk_info_report_prod[0].arn
+}
+
 # Eventbridge Rule to Disable CPU Alarms each Friday at 23:00
 
 resource "aws_cloudwatch_event_rule" "disable_cpu_alarm" {
