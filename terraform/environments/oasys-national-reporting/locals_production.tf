@@ -85,5 +85,9 @@ locals {
       "production.reporting.oasys.service.justice.gov.uk" = {
       }
     }
+    secretsmanager_secrets = {
+      "/sap/bods/pd" = local.secretsmanager_secrets.bods
+      "/sap/bip/pd"  = local.secretsmanager_secrets.bip
+    }
   }
 }
