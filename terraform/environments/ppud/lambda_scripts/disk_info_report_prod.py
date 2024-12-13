@@ -77,7 +77,6 @@ def format_disk_info(disk_info):
     for info in sorted_disk_info:
         if current_hostname != info[0]:
             if current_hostname is not None:
-              #  formatted_info += f"""<tr><td colspan="9" style="border-bottom: 10px solid black;"></td></tr>"""
                 formatted_info += f"""<tr><td colspan="10" style="height: 20px;"></td></tr>"""
             current_hostname = info[0]
     
