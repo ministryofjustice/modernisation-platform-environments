@@ -99,7 +99,8 @@
         "dps-case-notes",
         "dps-basm",
         "dps-inc-reporting",
-        "dps-csip"
+        "dps-csip",
+        "dps-testing"
       ],
       "alarms": {
         "setup_cw_alarms": true,
