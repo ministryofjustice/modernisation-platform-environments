@@ -279,7 +279,7 @@ sudo mkdir -p /oracle/software
 sudo mkdir -p /oracle/temp_undo
 sudo mkdir -p /backups
 
-# Mount all file systems in fstab
+# #Mount all file systems in fstab
 mount -a
 chmod 777 /stage
 
