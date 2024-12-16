@@ -51,7 +51,6 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_sqlserver_db_table",
                        "rds_db_tbl_pkey_column",
                        "date_partition_column_name",
-                       "parallel_jdbc_conn_num",
                        "rds_yyyy_mm_df_repartition_num",
                        "year_partition_bool",
                        "month_partition_bool",
@@ -62,7 +61,10 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 
 OPTIONAL_INPUTS = [
     "rds_query_where_clause",
-    "coalesce_int"
+    "coalesce_int",
+    "parallel_jdbc_conn_num",
+    "pkey_lower_bound_int",
+    "pkey_upper_bound_int"
 ]
 
 AVAILABLE_ARGS_LIST = CustomPysparkMethods.resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -160,28 +162,10 @@ def write_rds_df_to_s3_parquet(df_rds_write: DataFrame,
 
     s3_table_folder_path = f"""s3://{HASHED_OUTPUT_S3_BUCKET_NAME}/{prq_table_folder_path}"""
 
-    if S3Methods.check_s3_folder_path_if_exists(HASHED_OUTPUT_S3_BUCKET_NAME, 
-                                                prq_table_folder_path):
-
-        LOGGER.info(f"""Purging S3-path: {s3_table_folder_path}""")
-        glueContext.purge_s3_path(s3_table_folder_path, options={"retentionPeriod": 0})
-    # --------------------------------------------------------------------
-
-    # catalog_db, catalog_db_tbl = prq_table_folder_path.split(f"""/{args['rds_sqlserver_db_schema']}/""")
-
-    dydf = DynamicFrame.fromDF(df_rds_write, glueContext, "final_spark_df")
-
-    glueContext.write_dynamic_frame.from_options(frame=dydf, connection_type='s3', format='parquet',
-                                                 connection_options={
-                                                     'path': f"""{s3_table_folder_path}/""",
-                                                     "partitionKeys": partition_by_cols
-                                                 },
-                                                 format_options={
-                                                     'useGlueParquetWriter': True,
-                                                     'compression': 'snappy',
-                                                     'blockSize': 13421773,
-                                                     'pageSize': 1048576
-                                                 })
+    df_rds_write.write.mode("overwrite").format("parquet")\
+                .partitionBy(partition_by_cols)\
+                .save(s3_table_folder_path)
+    
     LOGGER.info(f"""'{db_sch_tbl}' table data written to -> {s3_table_folder_path}/""")
 
 # ===================================================================================================
@@ -283,9 +267,6 @@ if __name__ == "__main__":
 
     date_partition_column_name = args['date_partition_column_name']
     LOGGER.info(f"""date_partition_column_name = {date_partition_column_name}""")
-    
-    parallel_jdbc_conn_num = int(args['parallel_jdbc_conn_num'])
-    LOGGER.info(f"""parallel_jdbc_conn_num = {parallel_jdbc_conn_num}""")
 
     rds_yyyy_mm_df_repartition_num = int(args['rds_yyyy_mm_df_repartition_num'])
     LOGGER.info(f"""rds_yyyy_mm_df_repartition_num = {rds_yyyy_mm_df_repartition_num}""")
@@ -305,11 +286,23 @@ if __name__ == "__main__":
     # VERIFY GIVEN INPUTS - END
     # -----------------------------------------
 
+    rds_db_hash_cols_query_str = f"""
+    SELECT {rds_db_tbl_pkey_column}, 
+    LOWER(SUBSTRING(CONVERT(VARCHAR(66), 
+    HASHBYTES('SHA2_256', CONCAT_WS('', {', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash,
+    YEAR({date_partition_column_name}) AS year,
+    MONTH({date_partition_column_name}) AS month
+    FROM {rds_sqlserver_db}.{rds_sqlserver_db_schema}.{rds_sqlserver_db_table}
+    """.strip()
+
     incremental_run_bool = args.get('incremental_run_bool', 'false')
     rds_query_where_clause = args.get('rds_query_where_clause', None)
-    
+
     if rds_query_where_clause is not None:
-        rds_query_where_clause = rds_query_where_clause.strip()
+
+        rds_db_hash_cols_query_str = rds_db_hash_cols_query_str + \
+                                        f""" WHERE {rds_query_where_clause.rstrip()}"""
+
     elif incremental_run_bool == 'true':
         existing_prq_hashed_rows_df = CustomPysparkMethods.get_s3_parquet_df_v2(
                                     prq_table_folder_path, 
@@ -322,108 +315,102 @@ if __name__ == "__main__":
                                                 f"max_{rds_db_tbl_pkey_column}")
                                             )
         existing_prq_hashed_rows_agg_dict = existing_prq_hashed_rows_df_agg.collect()[0]
-        existing_prq_hashed_rows_max_pkey = existing_prq_hashed_rows_agg_dict[
-                                                f"max_{rds_db_tbl_pkey_column}"]
+        existing_prq_hashed_rows_max_pkey = existing_prq_hashed_rows_agg_dict[f"max_{rds_db_tbl_pkey_column}"]
         rds_query_where_clause = f""" {rds_db_tbl_pkey_column} > {existing_prq_hashed_rows_max_pkey}"""
 
-    LOGGER.info(f"""rds_query_where_clause = {rds_query_where_clause}""")
+        rds_db_hash_cols_query_str = rds_db_hash_cols_query_str + \
+                                        f""" WHERE {rds_query_where_clause}"""
+    # ----------------------------------------------------------
 
-    agg_row_dict_list = rds_jdbc_conn_obj.get_min_max_groupby_month(
-                                            rds_sqlserver_db_table,
-                                            date_partition_column_name,
-                                            rds_db_tbl_pkey_column,
-                                            rds_query_where_clause
-                                        )
-    LOGGER.info(f"""agg_row_dict_list:>\n{[agg_row_dict 
-                                           for agg_row_dict in agg_row_dict_list]}""")
+    LOGGER.info(f"""rds_db_hash_cols_query_str = {rds_db_hash_cols_query_str}""")
 
-    rds_db_hash_cols_query_str = f"""
-    SELECT {rds_db_tbl_pkey_column}, 
-    LOWER(SUBSTRING(CONVERT(VARCHAR(66), 
-    HASHBYTES('SHA2_256', CONCAT_WS('', {', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash,
-    YEAR({date_partition_column_name}) AS year,
-    MONTH({date_partition_column_name}) AS month
-    FROM {rds_sqlserver_db_schema}.[{rds_sqlserver_db_table}]
-    """.strip()
+    pkey_lower_bound_int = int(args.get('pkey_lower_bound_int', 0))
+    pkey_upper_bound_int = int(args.get('pkey_upper_bound_int', 0))
 
+    if pkey_lower_bound_int > 0 and pkey_upper_bound_int > 0:
 
-    for agg_row_dict in agg_row_dict_list:
-
-        agg_row_year = agg_row_dict['year']
-        agg_row_month = agg_row_dict['month']
-        min_pkey_value = agg_row_dict['min_pkey_value']
-        max_pkey_value = agg_row_dict['max_pkey_value']
-        LOGGER.info(f"""agg_row_year = {agg_row_year}""")
-        LOGGER.info(f"""agg_row_month = {agg_row_month}""")
-        LOGGER.info(f"""min_pkey_value = {min_pkey_value}""")
-        LOGGER.info(f"""max_pkey_value = {max_pkey_value}""")
-
-        pkey_between_clause_str_temp = f""" 
-        WHERE {rds_db_tbl_pkey_column} between {min_pkey_value} and {max_pkey_value}""".rstrip()
-
-        rds_db_select_query_str_temp = rds_db_hash_cols_query_str + pkey_between_clause_str_temp
-        LOGGER.info(f"""rds_db_select_query_str_temp = \n{rds_db_select_query_str_temp}""")
+        parallel_jdbc_conn_num = int(args.get('parallel_jdbc_conn_num', 1))
+        LOGGER.info(f"""parallel_jdbc_conn_num = {parallel_jdbc_conn_num}""")
 
         rds_hashed_rows_df = rds_jdbc_conn_obj.get_rds_df_read_query_pkey_parallel(
-                                    rds_db_select_query_str_temp,
+                                    rds_db_hash_cols_query_str,
                                     rds_db_tbl_pkey_column,
-                                    min_pkey_value,
-                                    max_pkey_value,
+                                    pkey_lower_bound_int,
+                                    pkey_upper_bound_int,
                                     parallel_jdbc_conn_num
                                 )
-        # ----------------------------------------------------------
-        temp_msg = f"""{agg_row_year}_{agg_row_month}-rds_hashed_rows_df"""
+    else:
+        rds_hashed_rows_df = rds_jdbc_conn_obj.get_rds_df_read_query(rds_db_hash_cols_query_str)
+    # ----------------------------------------------------------
+
+    LOGGER.info(
+        f"""rds_hashed_rows_df: READ PARTITIONS = {rds_hashed_rows_df.rdd.getNumPartitions()}""")
+
+    if 'year' in yyyy_mm_partition_by_cols \
+        and 'year' not in rds_hashed_rows_df.columns:
+        rds_hashed_rows_df = rds_hashed_rows_df.withColumn(
+                                "year", F.year(date_partition_column_name))
+    # ----------------------------------------------------------
+
+    if 'month' in yyyy_mm_partition_by_cols \
+        and 'month' not in rds_hashed_rows_df.columns:
+        rds_hashed_rows_df = rds_hashed_rows_df.withColumn(
+                                "month", F.month(date_partition_column_name))
+    # ----------------------------------------------------------
+
+    if rds_yyyy_mm_df_repartition_num != 0:
+        # Note: Default 'partitionby_columns' values may not be appropriate for all the scenarios.
+        # So, the user can edit the list-'partitionby_columns' value(s) if required at runtime.
+        # Example: partitionby_columns = ['month']
+        # The above scenario may be when the rds-source-dataframe filtered on single 'year' value.
+        partitionby_columns = yyyy_mm_partition_by_cols + [rds_db_tbl_pkey_column]
+
+        LOGGER.info(f"""rds_hashed_rows_df: Repartitioning on {partitionby_columns}""")
+        rds_hashed_rows_df = rds_hashed_rows_df.repartition(rds_yyyy_mm_df_repartition_num, 
+                                                            *partitionby_columns)
+
         LOGGER.info(
-            f"""{temp_msg}: READ PARTITIONS = {rds_hashed_rows_df.rdd.getNumPartitions()}""")
+            f"""rds_hashed_rows_df: After Repartitioning -> {rds_hashed_rows_df.rdd.getNumPartitions()} partitions.""")
+    # ----------------------------------------------------
 
-        if 'year' in yyyy_mm_partition_by_cols \
-            and 'year' not in rds_hashed_rows_df.columns:
-            rds_hashed_rows_df = rds_hashed_rows_df.withColumn(
-                                    "year", F.year(date_partition_column_name))
+    # Note: If many small size parquet files are created for each partition,
+    # consider using 'orderBy', 'coalesce' features appropriately before writing dataframe into S3 bucket.
+    # df_rds_write = rds_hashed_rows_df.coalesce(1)
 
-        if 'month' in yyyy_mm_partition_by_cols \
-            and 'month' not in rds_hashed_rows_df.columns:
-            rds_hashed_rows_df = rds_hashed_rows_df.withColumn(
-                                    "month", F.month(date_partition_column_name))
+    # NOTE: When filtered rows (ex: based on 'year') are used in separate consecutive batch runs,
+    # consider to appropriately use the parquet write functions with features in built as per the below details.
+    # - write_rds_df_to_s3_parquet(): Overwrites the existing partitions by default.
+    # - write_rds_df_to_s3_parquet_v2(): Adds the new partitions & also the corresponding partitions are updated in athena tables.
+    coalesce_int = int(args.get('coalesce_int', 0))
+    if coalesce_int != 0:
+        LOGGER.warn(f"""WARNING ! >> Given coalesce_int = {coalesce_int}""")
+        rds_hashed_rows_df_write = rds_hashed_rows_df.coalesce(coalesce_int)
+    else:
+        rds_hashed_rows_df_write = rds_hashed_rows_df.alias("rds_hashed_rows_df_write")
+    # ----------------------------------------------------------
 
-        rds_hashed_rows_df = rds_hashed_rows_df.where(
-                                f"""year = {agg_row_year} and month = {agg_row_month}""")
+    # rds_hashed_rows_df_write = rds_hashed_rows_df_write.cache()
+    # unique_partitions_df = rds_hashed_rows_df_write\
+    #                         .select(*yyyy_mm_partition_by_cols)\
+    #                         .distinct()\
+    #                         .orderBy(yyyy_mm_partition_by_cols, ascending=True)
+    
+    # for row in unique_partitions_df.toLocalIterator():
+    #     LOGGER.info(f"""year: {row[yyyy_mm_partition_by_cols[0]]}, 
+    #                 month: {row[yyyy_mm_partition_by_cols[1]]}""")
+    
+    # write_rds_df_to_s3_parquet_v2(rds_hashed_rows_df_write, 
+    #                               yyyy_mm_partition_by_cols, 
+    #                               prq_table_folder_path)
 
-        if rds_yyyy_mm_df_repartition_num != 0:
-            # Note: Default 'partitionby_columns' values may not be appropriate for all the scenarios.
-            # So, the user can edit the list-'partitionby_columns' value(s) if required at runtime.
-            # Example: partitionby_columns = ['month']
-            # The above scenario may be when the rds-source-dataframe filtered on single 'year' value.
-            partitionby_columns = yyyy_mm_partition_by_cols + [rds_db_tbl_pkey_column]
+    LOGGER.info(f"""write_rds_df_to_s3_parquet() - function called.""")
+    write_rds_df_to_s3_parquet(rds_hashed_rows_df_write,
+                                yyyy_mm_partition_by_cols,
+                                prq_table_folder_path)
+    
+    LOGGER.info(f"""'{prq_table_folder_path}' writing completed.""")
+    # rds_hashed_rows_df_write.unpersist()
 
-            LOGGER.info(f"""{temp_msg}: Repartitioning on {partitionby_columns}""")
-            rds_hashed_rows_df = rds_hashed_rows_df.repartition(rds_yyyy_mm_df_repartition_num, *partitionby_columns)
-
-            LOGGER.info(
-                f"""{temp_msg}: After Repartitioning -> {rds_hashed_rows_df.rdd.getNumPartitions()} partitions.""")
-        # ----------------------------------------------------
-
-        # Note: If many small size parquet files are created for each partition,
-        # consider using 'orderBy', 'coalesce' features appropriately before writing dataframe into S3 bucket.
-        # df_rds_write = rds_hashed_rows_df.coalesce(1)
-
-        # NOTE: When filtered rows (ex: based on 'year') are used in separate consecutive batch runs,
-        # consider to appropriately use the parquet write functions with features in built as per the below details.
-        # - write_rds_df_to_s3_parquet(): Overwrites the existing partitions by default.
-        # - write_rds_df_to_s3_parquet_v2(): Adds the new partitions & also the corresponding partitions are updated in athena tables.
-        coalesce_int = int(args.get('coalesce_int', 0))
-        if coalesce_int != 0:
-            LOGGER.warn(f"""{temp_msg}:> coalesce_int = {coalesce_int}""")
-            rds_hashed_rows_df_write = rds_hashed_rows_df.coalesce(coalesce_int)
-        else:
-            rds_hashed_rows_df_write = rds_hashed_rows_df.alias("rds_hashed_rows_df_write")
-
-        write_rds_df_to_s3_parquet(rds_hashed_rows_df_write,
-                                   yyyy_mm_partition_by_cols,
-                                   prq_table_folder_path)
-        
-        LOGGER.info(f"""Partition - '{prq_table_folder_path}/{agg_row_year}/{agg_row_month}' writing completed.""")
-    # -----------------------------------------------
 
     total_files, total_size = S3Methods.get_s3_folder_info(HASHED_OUTPUT_S3_BUCKET_NAME, 
                                                           f"{prq_table_folder_path}/")

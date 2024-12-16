@@ -1,13 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 2.7.0"
-    }
-  }
-}
-
-
 data "aws_iam_policy_document" "transfer_assume_role" {
   statement {
     effect = "Allow"
@@ -230,7 +220,7 @@ resource "aws_transfer_workflow" "this" {
       source_file_location = "$${original.file}"
       destination_file_location {
         s3_file_location {
-          bucket = var.data_store_bucket.bucket
+          bucket = var.data_store_bucket.id
           key    = "${var.supplier}/$${transfer:UserName}/$${transfer:UploadDate}/"
         }
       }

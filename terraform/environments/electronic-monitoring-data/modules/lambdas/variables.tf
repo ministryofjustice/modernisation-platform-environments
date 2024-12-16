@@ -76,11 +76,13 @@ variable "runtime" {
 variable "security_group_ids" {
   description = "List of security group IDs associated with the Lambda function."
   type        = list(string)
+  default     = []
 }
 
 variable "subnet_ids" {
   description = "List of subnet IDs associated with the Lambda function."
   type        = list(string)
+  default     = []
 }
 
 variable "environment_variables" {
