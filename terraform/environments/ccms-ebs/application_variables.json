@@ -100,7 +100,9 @@
       "s3_lifecycle_days_transition_current_glacier": 365,
       "s3_lifecycle_days_transition_current_standard": 90,
       "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_transition_noncurrent_standard": 90,
+      "certificate_expiry_days": 333,
+      "certificate_monitor_email": "maciej.matysiak@digital.justice.gov.uk"
     },
     "test": {
       "short_env": "tst",
@@ -198,7 +200,9 @@
       "s3_lifecycle_days_transition_current_glacier": 365,
       "s3_lifecycle_days_transition_current_standard": 90,
       "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_transition_noncurrent_standard": 90,
+      "certificate_expiry_days": 45,
+      "certificate_monitor_email": "maciej.matysiak@digital.justice.gov.uk"
     },
     "preproduction": {
       "short_env": "prep",
@@ -296,7 +300,9 @@
       "s3_lifecycle_days_transition_current_glacier": 365,
       "s3_lifecycle_days_transition_current_standard": 90,
       "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_transition_noncurrent_standard": 90,
+      "certificate_expiry_days": 45,
+      "certificate_monitor_email": "maciej.matysiak@digital.justice.gov.uk"
     },
     "production": {
       "short_env": "prod",
@@ -396,7 +402,9 @@
       "s3_lifecycle_days_transition_current_glacier": 365,
       "s3_lifecycle_days_transition_current_standard": 90,
       "s3_lifecycle_days_transition_noncurrent_glacier": 365,
-      "s3_lifecycle_days_transition_noncurrent_standard": 90
+      "s3_lifecycle_days_transition_noncurrent_standard": 90,
+      "certificate_expiry_days": 60,
+      "certificate_monitor_email": "maciej.matysiak@digital.justice.gov.uk"
     }
   },
   "webgate_ebs": {
