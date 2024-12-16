@@ -142,10 +142,10 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
   }
   ingress {
-    description = "SSH from the Bastion"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
+    description     = "SSH from the Bastion"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
     security_groups = [module.bastion_linux.bastion_security_group]
   }
 

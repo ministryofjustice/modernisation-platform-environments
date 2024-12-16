@@ -264,9 +264,9 @@ resource "aws_instance" "tribunals_backup" {
   }
 
   tags = {
-      Environment = local.environment
-      Name        = "tribunals-backup-instance"
-      Role        = "Backup"
+    Environment = local.environment
+    Name        = "tribunals-backup-instance"
+    Role        = "Backup"
   }
 }
 
