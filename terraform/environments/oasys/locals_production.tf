@@ -240,7 +240,7 @@ locals {
           "/dev/sdb" = { label = "app", size = 100 }  # /u01
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
           "/dev/sde" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
-          "/dev/sdf" = { label = "data", size = 2000, iops = 9000, throughput = 500  }
+          "/dev/sdf" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
           "/dev/sdj" = { label = "flash", size = 1000, iops = 5000, throughput = 500 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
