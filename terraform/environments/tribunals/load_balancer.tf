@@ -8,27 +8,28 @@ locals {
     )
   }
   service_priorities = {
-    adminappeals             = 1
-    administrativeappeals    = 2
-    carestandards            = 3
-    charity                  = 4
-    cicap                    = 5
-    claimsmanagement         = 6
-    consumercreditappeals    = 7
-    employmentappeals        = 8
-    estateagentappeals       = 9
-    financeandtax            = 10
-    immigrationservices      = 11
-    informationrights        = 12
-    landregistrationdivision = 13
-    landschamber             = 14
-    phl                      = 15
-    siac                     = 16
-    sscs                     = 17
-    tax                      = 18
-    taxandchancery_ut        = 19
-    transportappeals         = 20
-    asylumsupport            = 21
+    # Priority 1 was ommitted from the listener rules to allow the maintenance page to take precedence (when it's needed)
+    adminappeals             = 2
+    administrativeappeals    = 3
+    carestandards            = 4
+    charity                  = 5
+    cicap                    = 6
+    claimsmanagement         = 7
+    consumercreditappeals    = 8
+    employmentappeals        = 9
+    estateagentappeals       = 10
+    financeandtax            = 11
+    immigrationservices      = 12
+    informationrights        = 13
+    landregistrationdivision = 14
+    landschamber             = 15
+    phl                      = 16
+    siac                     = 17
+    sscs                     = 18
+    tax                      = 19
+    taxandchancery_ut        = 20
+    transportappeals         = 21
+    asylumsupport            = 22
   }
 }
 
@@ -151,6 +152,44 @@ resource "aws_lb_listener_rule" "tribunals_lb_rule" {
   condition {
     host_header {
       values = ["*${each.key}.*"]
+    }
+  }
+}
+
+# Maintenance page - uncomment whenever a maintenance page is needed
+resource "aws_lb_listener_rule" "maintenance_page" {
+  listener_arn = aws_lb_listener.tribunals_lb.arn
+  priority     = 1
+
+action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/html"
+      message_body = <<EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance - We'll be back soon</title>
+</head>
+<body style="font-family:Arial,sans-serif;text-align:center;padding:40px;max-width:600px;margin:0 auto">
+    <div style="background:#fff;padding:20px;border-radius:10px">
+        <div style="font-size:48px">🔧</div>
+        <h1>We'll be back soon!</h1>
+        <p>We are currently performing scheduled maintenance to improve our services. We apologize for any inconvenience.</p>
+        <p>Please check back shortly. Thank you for your patience.</p>
+    </div>
+</body>
+</html>
+EOF
+      status_code  = "503"
+    }
+  }
+
+  condition {
+    host_header {
+      values = ["*.*"]
     }
   }
 }
