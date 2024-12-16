@@ -422,11 +422,11 @@ locals {
     github = {
       failed-github-action-run = {
         comparison_operator = "GreaterThanOrEqualToThreshold"
-        evaluation_periods  = "3"
+        evaluation_periods  = "1"
         datapoints_to_alarm = "1"
         metric_name         = "GitHubActionRunsFailedCount"
         namespace           = "CustomMetrics"
-        period              = "3600"
+        period              = "1800"
         statistic           = "Maximum"
         threshold           = "1"
         alarm_description   = "Triggers if there has been a failed github action. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5295898661"

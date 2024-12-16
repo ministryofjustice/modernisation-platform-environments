@@ -5,22 +5,32 @@ import matplotlib.pyplot as plt
 import re
 import io
 import base64
+import smtplib
 from datetime import datetime, timedelta
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 # Initialize boto3 clients
 s3 = boto3.client('s3')
-ses = boto3.client('ses')
+# ses = boto3.client('ses')
 
 # Configuration
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
-bucket_name = 'moj-lambda-layers-dev'
-file_names = ['monday.log', 'tuesday.log', 'wednesday.log', 'thursday.log', 'friday.log', 'saturday.log', 'sunday.log']
-SENDER = 'noreply@internaltest.ppud.justice.gov.uk'
+TODAY = datetime.now()
+YESTERDAY = TODAY - timedelta(days=1)
+YESTERDAY_DATE = YESTERDAY.strftime('%a %d %b %Y')
+WEEK_AGO = TODAY - timedelta(days=7)
+WEEK_AGO_DATE = WEEK_AGO.strftime('%a %d %b %Y')
+S3_BUCKET = 'moj-lambda-layers-prod'
+FILE_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+SENDER = 'donotreply@cjsm.secure-email.ppud.justice.gov.uk'
 RECIPIENTS = ['nick.buckingham@colt.net']
-SUBJECT = f'AWS Weekly PPUD Email Report - {CURRENT_DATE}'
+SUBJECT = f'AWS PPUD Email Report - {CURRENT_DATE}'
 AWS_REGION = 'eu-west-2'
+
+# SMTP Configuration
+SMTP_SERVER = "10.27.9.39"
+SMTP_PORT = 25
 
 def retrieve_file_from_s3(bucket, key):
     response = s3.get_object(Bucket=bucket, Key=key)
@@ -42,13 +52,8 @@ def create_graph(data):
     plt.title('PPUD Emails Sent')
     plt.tight_layout()
 
- #   buf = io.BytesIO()
- #   plt.savefig(buf, format='png')
- #   buf.seek(0)
- #   return buf.getvalue()
-
     # Save the graph to a temporary buffer
-    temp_file = "/tmp/ppud_emails_send.png"
+    temp_file = "/tmp/ppud_emails_sent.png"
     plt.savefig(temp_file)
     plt.close()
 
@@ -60,19 +65,18 @@ def create_graph(data):
     os.remove(temp_file)
     return encoded_string
 	
-# Function to send an email via SES
 def send_email_with_graph(graph_base64):
     """
     Send an email with the graph embedded in the email body using AWS SES.
     """
-    ses_client = boto3.client("ses", region_name=AWS_REGION)
+ #   ses_client = boto3.client("ses", region_name=REGION)
 
     # Email body with the embedded image
     email_body = f"""
     <html>
     <body>
         <p>Hi Team,</p>
-        <p>Please find below the weekly PPUD Email Report.</p>
+        <p>Please find below the PPUD email report for the week of {WEEK_AGO_DATE} to {YESTERDAY_DATE}.</p>
         <img src="data:image/png;base64,{graph_base64}" alt="PPUD Email Report" />
         <p>This is an automated email.</p>
     </body>
@@ -88,24 +92,34 @@ def send_email_with_graph(graph_base64):
     # Attach the HTML body
     msg.attach(MIMEText(email_body, "html"))
 
-    # Send the email
+    # Send the email with AWS SES
+  #  try:
+  #      response = ses_client.send_raw_email(
+  #          Source=SENDER,
+  #          Destinations=RECIPIENTS,
+  #          RawMessage={"Data": msg.as_string()},
+  #      )
+  #      print("Email sent! Message ID:", response["MessageId"])
+  #  except Exception as e:
+  #      print("Error sending email:", e)
+  #      raise
+
+    # Send the email with an EC2 Instance Mail Relay
     try:
-        response = ses_client.send_raw_email(
-            Source=SENDER,
-            Destinations=RECIPIENTS,
-            RawMessage={"Data": msg.as_string()},
-        )
-        print("Email sent! Message ID:", response["MessageId"])
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+         #  server.starttls()
+         #  server.login(SENDER, EMAIL_PASSWORD)
+            server.sendmail(SENDER, RECIPIENTS, msg.as_string())
+        print("Email sent successfully.")
     except Exception as e:
-        print("Error sending email:", e)
-        raise
+        print(f"Error sending email: {e}")
 		
 def lambda_handler(event, context):
     pattern = r'to=<'
     data = {}
     
-    for file_name in file_names:
-        content = retrieve_file_from_s3(bucket_name, file_name)
+    for file_name in FILE_NAMES:
+        content = retrieve_file_from_s3(S3_BUCKET, file_name)
         count = count_occurrences(content, pattern)
         data[file_name] = count
 

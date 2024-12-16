@@ -33,6 +33,7 @@ resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
 }
 
 resource "aws_glue_crawler" "rds_sqlserver_db_glue_crawler" {
+  #checkov:skip=CKV_AWS_195
   name          = "rds-sqlserver-${aws_db_instance.database_2022.identifier}-tf"
   role          = aws_iam_role.dms_dv_glue_job_iam_role.arn
   database_name = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db.name

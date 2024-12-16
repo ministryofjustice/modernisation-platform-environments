@@ -1,13 +1,19 @@
 variable "account_id" {
   description = "The AWS account id"
+  type        = string
 }
 
 variable "data_store_bucket" {
   description = "The bucket landed data is moved to"
+  type = object({
+    id  = string
+    arn = string
+  })
 }
 
 variable "local_tags" {
   description = "The predefined local.tags"
+  type        = map(string)
 }
 
 variable "subnet_ids" {
@@ -33,5 +39,6 @@ variable "user_accounts" {
 
 variable "vpc_id" {
   description = "The vpc used for the SFTP server"
+  type        = string
 }
 

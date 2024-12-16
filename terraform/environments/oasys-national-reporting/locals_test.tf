@@ -231,18 +231,17 @@ locals {
     }
 
     fsx_windows = {
-      t2-bods-windows-share = {
-        preferred_availability_zone = "eu-west-2a"
-        deployment_type             = "MULTI_AZ_1"
-        security_groups             = ["bods"]
-        skip_final_backup           = true
-        storage_capacity            = 128
-        throughput_capacity         = 8
+      t2-bods-win-share = {
+        deployment_type     = "SINGLE_AZ_1"
+        security_groups     = ["bods"]
+        skip_final_backup   = true
+        storage_capacity    = 128
+        throughput_capacity = 8
 
         subnets = [
           {
             name               = "private"
-            availability_zones = ["eu-west-2a", "eu-west-2b"]
+            availability_zones = ["eu-west-2a"]
           }
         ]
 

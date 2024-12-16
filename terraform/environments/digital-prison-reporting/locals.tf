@@ -225,7 +225,7 @@ locals {
   lambda_redshift_table_expiry_tracing        = "Active"
   lambda_redshift_table_expiry_handler        = "uk.gov.justice.digital.lambda.RedShiftTableExpiryLambda::handleRequest"
   lambda_redshift_table_expiry_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  lambda_redshift_table_expiry_jar_version    = "v0.0.12"
+  lambda_redshift_table_expiry_jar_version    = "v0.0.13"
   lambda_redshift_table_expiry_code_s3_key = (
     local.env == "production" || local.env == "preproduction"
     ? "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}.rel-all.jar"
@@ -429,13 +429,13 @@ locals {
   enable_s3_data_migrate_lambda         = local.application_data.accounts[local.environment].enable_s3_data_migrate_lambda
   lambda_s3_data_migrate_name           = "${local.project}-s3-data-lifecycle-migration-lambda"
   lambda_s3_data_migrate_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  lambda_s3_data_migrate_code_s3_key    = "build-artifacts/dpr-operations/py_files/dpr-s3-data-lifecycle-migration-lambda-v1.zip"
-  lambda_s3_data_migrate_handler        = "dpr-s3-data-lifecycle-migration-lambda-v1.lambda_handler"
+  lambda_s3_data_migrate_code_s3_key    = "build-artifacts/dpr-operations/py_files/dpr-s3-data-lifecycle-migration-lambda-v2.zip"
+  lambda_s3_data_migrate_handler        = "dpr-s3-data-lifecycle-migration-lambda-v2.lambda_handler"
   lambda_s3_data_migrate_runtime        = "python3.11"
   lambda_s3_data_migrate_tracing        = "PassThrough"
-  lambda_s3_data_migrate_policies       = [
+  lambda_s3_data_migrate_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
-    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"    
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"
   ]
 }

@@ -18,7 +18,7 @@ resource "aws_instance" "apex_db_instance" {
   user_data_replace_on_change = true
 
   lifecycle {
-    ignore_changes = [user_data_base64]
+    ignore_changes = [user_data_base64, user_data_replace_on_change]
   }
 
   root_block_device {

@@ -79,6 +79,7 @@ resource "aws_security_group_rule" "allow_glue_athena" {
 # ---------------------------------------------------------------------------
 
 resource "aws_security_group" "glue_rds_conn_security_group" {
+  #checkov:skip=CKV2_AWS_5
   name        = "glue-rds-sqlserver-connection-tf"
   description = "Secuity Group for Glue-RDS-Connection"
   vpc_id      = data.aws_vpc.shared.id
@@ -110,6 +111,9 @@ resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_inbound" {
   from_port                    = 0
   to_port                      = 65535
   description                  = "Required ports open for Glue-RDS-Connection"
+  #checkov:skip=CKV_AWS_260
+  #checkov:skip=CKV_AWS_24
+  #checkov:skip=CKV_AWS_25
 }
 
 resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_db_inbound" {

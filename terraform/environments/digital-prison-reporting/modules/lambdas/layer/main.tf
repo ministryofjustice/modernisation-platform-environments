@@ -1,7 +1,7 @@
 locals {
-  s3_bucket         = var.s3_existing_package != null ? try(var.s3_existing_package.bucket, null) : null
-  s3_key            = var.s3_existing_package != null ? try(var.s3_existing_package.key, null) : null
-  s3_object_version = var.s3_existing_package != null ? try(var.s3_existing_package.version_id, null) : null
+  s3_bucket         = var.s3_existing_package.bucket
+  s3_key            = var.s3_existing_package.key
+  s3_object_version = contains(keys(var.s3_existing_package), "version_id") ? var.s3_existing_package.version_id : null
 }
 
 resource "aws_lambda_layer_version" "this" {
@@ -15,10 +15,9 @@ resource "aws_lambda_layer_version" "this" {
   compatible_architectures = var.compatible_architectures
   skip_destroy             = var.layer_skip_destroy
 
-  filename         = "${path.module}/manifests/${var.local_file}"
-  source_code_hash = filebase64sha256("${path.module}/manifests/${var.local_file}")
+  s3_bucket = local.s3_bucket
+  s3_key    = local.s3_key
 
-  s3_bucket         = local.s3_bucket
-  s3_key            = local.s3_key
-  s3_object_version = local.s3_object_version
+  # Directly assign `s3_object_version` conditionally
+  s3_object_version = local.s3_object_version != null ? local.s3_object_version : null
 }

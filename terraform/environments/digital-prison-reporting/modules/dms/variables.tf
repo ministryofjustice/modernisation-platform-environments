@@ -132,7 +132,7 @@ variable "identifier" {
 #--------------------------------------------------------------
 
 variable "target_backup_retention_period" {
-  type        = string
+  type = string
   # Days
   default     = "30"
   description = "Retention of RDS backups"
@@ -187,7 +187,7 @@ variable "source_app_username" {
 }
 
 variable "source_backup_window" {
-  type        = string
+  type = string
   # 12:00AM-03:00AM AEST
   default     = "14:00-17:00"
   description = "RDS backup window"
