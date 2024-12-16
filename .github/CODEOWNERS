@@ -2,6 +2,7 @@
 # https://github.com/ministryofjustice/modernisation-platform/blob/main/scripts/provision-member-directories.sh
 
 * @ministryofjustice/modernisation-platform
+/terraform/environments/analytical-platform-common @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-compute @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
 /terraform/environments/analytical-platform-ingestion @ministryofjustice/analytical-platform @ministryofjustice/modernisation-platform
 /terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
