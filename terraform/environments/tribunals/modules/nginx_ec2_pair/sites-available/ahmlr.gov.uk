@@ -26,7 +26,6 @@
 
 server {
 	listen 80;
-        listen 443;
 
         server_name ahmlr.gov.uk;
 
@@ -34,13 +33,13 @@ server {
                  return 301 https://www.gov.uk/apply-land-registration-tribunal/overview;
         }
         location ~* ^/public {
-                 return 301 https://landregistrationdivision.decisions.tribunals.gov.uk/public/Search30May.aspx;
+                 return 301 http://landregistrationdivision.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Admin {
-                return 301 https://landregistrationdivision.decisions.tribunals.gov.uk/$request_uri;
+                return 301 http://landregistrationdivision.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Judgments {
-                return 301 https://landregistrationdivision.decisions.tribunals.gov.uk/$request_uri;
+                return 301 http://landregistrationdivision.decisions.tribunals.gov.uk/$request_uri;
         }
 }
 

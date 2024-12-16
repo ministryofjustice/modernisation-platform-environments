@@ -26,7 +26,6 @@
 
 server {
         listen 80;
-        listen 443;
 
         server_name www.landstribunal.gov.uk;
 
@@ -34,25 +33,25 @@ server {
                  return 301 https://www.gov.uk/appeal-upper-tribunal-lands;
         }
         location ~* ^/Aspx {
-                 return 301 https://landschamber.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 http://landschamber.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/NEWstyles.css {
-                 return 301 https://landschamber.decisions.tribunals.gov.uk/NEWstyles.css;
+                 return 301 http://landschamber.decisions.tribunals.gov.uk/NEWstyles.css;
         }
         location ~* ^/images {
-                 return 301 https://landschamber.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 http://landschamber.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* .(css|js|png|ico|gif|jpg|jpeg)$ {
-                 return 301 https://landschamber.decisions.tribunals.gov.uk/$request_uri;
+                 return 301 http://landschamber.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Decisions {
-                return 301 https://landschamber.decisions.tribunals.gov.uk/$request_uri;
+                return 301 http://landschamber.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/Admin {
-                return 301 https://landschamber.decisions.tribunals.gov.uk/$request_uri;
+                return 301 http://landschamber.decisions.tribunals.gov.uk/$request_uri;
         }
         location ~* ^/JudgmentFiles {
-                return 301 https://landschamber.decisions.tribunals.gov.uk/$request_uri;
+                return 301 http://landschamber.decisions.tribunals.gov.uk/$request_uri;
         }
 }
 

@@ -26,7 +26,6 @@
 
 server {
         listen 80;
-        listen 443;
 
         server_name siac.tribunals.gov.uk;
 
@@ -34,7 +33,7 @@ server {
                  return 301 https://www.gov.uk/guidance/appeal-to-the-special-immigration-appeals-commission;
         }
         location ~* ^/outcomes2007onwards.htm {
-                 return 301 https://siac.decisions.tribunals.gov.uk;
+                 return 301 http://siac.decisions.tribunals.gov.uk;
         }
 }
 

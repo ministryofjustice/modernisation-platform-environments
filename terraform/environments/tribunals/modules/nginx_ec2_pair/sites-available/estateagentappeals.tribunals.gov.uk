@@ -26,7 +26,6 @@
 
 server {
         listen 80;
-        listen 443;
 
         server_name estateagentappeals.tribunals.gov.uk;
 
@@ -34,7 +33,7 @@ server {
                  return 301 https://www.gov.uk/guidance/estate-agents-appeal-against-a-ban-or-warning-order;
         }
         location ~* ^/decisions.htm {
-                 return 301 https://estateagentappeals.decisions.tribunals.gov.uk;
+                 return 301 http://estateagentappeals.decisions.tribunals.gov.uk;
         }
 }
 

@@ -110,7 +110,7 @@ resource "aws_route53_record" "nginx_instances" {
   count    = local.is-production ? 0 : length(local.nginx_records)
   provider = aws.core-network-services
   zone_id  = local.production_zone_id
-  name     = local.nginx_records[count.index]
+  name     = "${local.nginx_records[count.index]}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type     = "A"
 
   alias {
