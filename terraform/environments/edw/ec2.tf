@@ -538,6 +538,7 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
                 "logs:PutRetentionPolicy",
                 "logs:PutLogEvents",
                 "ec2:DescribeInstances"
+                "ec2:CreateSnapshot"
             ],
             "Resource": ["*"],
             "Effect": "Allow"
