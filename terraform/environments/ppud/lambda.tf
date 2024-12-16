@@ -410,7 +410,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
   reserved_concurrent_executions = 5
   # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
   dead_letter_config {
-     target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
   }
   tracing_config {
     mode = "Active"
@@ -468,7 +468,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_prod" {
   reserved_concurrent_executions = 5
   # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
-     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
   tracing_config {
     mode = "Active"
@@ -531,7 +531,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_email_report_prod" {
   reserved_concurrent_executions = 5
   # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
-     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
   tracing_config {
     mode = "Active"
@@ -687,7 +687,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_memory_graph_prod" {
   reserved_concurrent_executions = 5
   # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
-     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
   tracing_config {
     mode = "Active"
@@ -739,7 +739,7 @@ resource "aws_lambda_function" "terraform_lambda_func_disk_info_report_prod" {
   reserved_concurrent_executions = 5
   # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
-     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
   tracing_config {
     mode = "Active"
@@ -791,7 +791,7 @@ resource "aws_lambda_function" "terraform_lambda_func_disk_read_write_report_pro
   reserved_concurrent_executions = 5
   # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
-     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
+    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
   tracing_config {
     mode = "Active"
