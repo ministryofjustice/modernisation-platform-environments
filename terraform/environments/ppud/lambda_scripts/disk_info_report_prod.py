@@ -19,7 +19,7 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 # Configuration
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 SENDER = "donotreply@cjsm.secure-email.ppud.justice.gov.uk"
-RECIPIENTS = ["nick.buckingham@colt.net", "gabriella.browning@colt.net", "pankaj.pant@colt.net", "david.savage@colt.net"]
+RECIPIENTS = ["nick.buckingham@colt.net", "gabriela.browning@colt.net", "pankaj.pant@colt.net", "david.savage@colt.net"]
 SUBJECT = f'AWS PPUD Disk Information Report - {CURRENT_DATE}'
 AWS_REGION = 'eu-west-2'
 bucket_name = 'moj-lambda-layers-prod'
