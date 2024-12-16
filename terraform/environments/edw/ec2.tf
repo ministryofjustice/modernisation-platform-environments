@@ -536,13 +536,19 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
                 "logs:CreateLogStream",
                 "logs:DescribeLogStreams",
                 "logs:PutRetentionPolicy",
-                "logs:PutLogEvents",
-                "ec2:DescribeInstances",
+                "logs:PutLogEvents"
+            ],
+            "Resource": ["*"],
+            "Effect": "Allow"
+        },
+        {
+            "Action": [
+                "ec2:DescribeInstances",            
                 "ec2:CreateSnapshot"
             ],
             "Resource": ["*"],
             "Effect": "Allow"
-        }, 
+        },         
         {
             "Action": [
                 "ec2:CreateTags"
