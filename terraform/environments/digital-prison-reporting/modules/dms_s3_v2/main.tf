@@ -140,8 +140,8 @@ resource "aws_dms_endpoint" "dms-s3-target-source" {
     content {
       map_boolean_as_boolean       = true
       fail_tasks_on_lob_truncation = true
-      heartbeat_enable             = true
-      heartbeat_frequency          = 5
+      heartbeat_enable             = var.source_postgres_heartbeat_enable
+      heartbeat_frequency          = var.source_postgres_heartbeat_frequency
     }
   }
 
