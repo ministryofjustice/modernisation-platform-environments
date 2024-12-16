@@ -13,24 +13,6 @@ locals {
   # please keep resources in alphabetical order
   baseline_production = {
 
-    acm_certificates = {
-      planetfm_wildcard_cert = {
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                         = "modernisation-platform.service.justice.gov.uk"
-        external_validation_records_created = true
-        subject_alternate_names = [
-          "*.planetfm.service.justice.gov.uk",
-          "cafmwebx.az.justice.gov.uk",
-          "cafmwebx2.az.justice.gov.uk",
-          "cafmtx.az.justice.gov.uk",
-          "cafmtrainweb.az.justice.gov.uk",
-        ]
-        tags = {
-          description = "wildcard cert for planetfm production domains"
-        }
-      }
-    }
-
     ec2_instances = {
       # app servers
       pd-cafm-a-10-b = merge(local.ec2_instances.app, {
