@@ -8,27 +8,27 @@ locals {
     )
   }
   service_priorities = {
-    adminappeals             = 1
-    administrativeappeals    = 2
-    carestandards            = 3
-    charity                  = 4
-    cicap                    = 5
-    claimsmanagement         = 6
-    consumercreditappeals    = 7
-    employmentappeals        = 8
-    estateagentappeals       = 9
-    financeandtax            = 10
-    immigrationservices      = 11
-    informationrights        = 12
-    landregistrationdivision = 13
-    landschamber             = 14
-    phl                      = 15
-    siac                     = 16
-    sscs                     = 17
-    tax                      = 18
-    taxandchancery_ut        = 19
-    transportappeals         = 20
-    asylumsupport            = 21
+    adminappeals             = 2
+    administrativeappeals    = 3
+    carestandards            = 4
+    charity                  = 5
+    cicap                    = 6
+    claimsmanagement         = 7
+    consumercreditappeals    = 8
+    employmentappeals        = 9
+    estateagentappeals       = 10
+    financeandtax            = 11
+    immigrationservices      = 12
+    informationrights        = 13
+    landregistrationdivision = 14
+    landschamber             = 15
+    phl                      = 16
+    siac                     = 17
+    sscs                     = 18
+    tax                      = 19
+    taxandchancery_ut        = 20
+    transportappeals         = 21
+    asylumsupport            = 22
   }
 }
 
