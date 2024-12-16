@@ -16,7 +16,7 @@ resource "aws_lb_target_group" "nginx_lb_tg" {
   }
 }
 
-output "nginx_lb_arn" {
+output "nginx_lb_dns_name" {
   value = aws_lb.nginx_lb.dns_name
 }
 
