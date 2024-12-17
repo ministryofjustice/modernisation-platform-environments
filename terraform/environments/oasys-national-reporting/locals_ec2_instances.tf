@@ -46,7 +46,7 @@ locals {
         backup           = "false"
         component        = "onr_bods"
         os-type          = "Windows"
-        server-type      = "OnrBods"
+        server-type      = "Bods"
         update-ssm-agent = "patchgroup1"
       }
       cloudwatch_metric_alarms = merge(
