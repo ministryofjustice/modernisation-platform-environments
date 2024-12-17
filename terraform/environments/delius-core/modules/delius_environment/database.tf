@@ -140,11 +140,11 @@ data "aws_iam_policy_document" "database_application_passwords_for_mis" {
   }
 }
 
-resource "aws_secretsmanager_secret_policy" "database_application_passwords_for_mis" {
-  count      = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
-  secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
-  policy     = data.aws_iam_policy_document.database_application_passwords_for_mis[0].json
-}
+# resource "aws_secretsmanager_secret_policy" "database_application_passwords_for_mis" {
+#   count      = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
+#   secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
+#   policy     = data.aws_iam_policy_document.database_application_passwords_for_mis[0].json
+# }
 
 
 # Allow Access To Delius Core Application Secret From DeliusEC2 Instance Roles
@@ -167,9 +167,18 @@ data "aws_iam_policy_document" "database_application_passwords_for_delius" {
    }
 }
 
-resource "aws_secretsmanager_secret_policy" "database_application_passwords_for_delius" {
+data "aws_iam_policy_document" "database_application_passwords_combined" {
+  source_policy_documents = lookup(var.environment_config, "has_mis_environment", false) ? [
+    data.aws_iam_policy_document.database_application_passwords_for_mis[0].json,
+    data.aws_iam_policy_document.database_application_passwords_for_delius.json
+  ] : [
+    data.aws_iam_policy_document.database_application_passwords_for_delius.json
+  ]
+}
+
+resource "aws_secretsmanager_secret_policy" "database_application_passwords_combined" {
   secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
-  policy     = data.aws_iam_policy_document.database_application_passwords_for_delius.json
+  policy     = data.aws_iam_policy_document.database_application_passwords_combined.json
 }
 
 # EC2 instances also require access to the DBA passwords, as the SYS password is required
