@@ -92,7 +92,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_runner_grou
         github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
-        github_runner_labels       = "analytical-platform-prod-deployments"
+        github_runner_labels       = "cadet-prod"
         eks_role_arn               = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/create-a-derived-table"
       }
     )
