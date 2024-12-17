@@ -79,7 +79,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_runner_grou
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
-  name       = "actions-runner-mojas-create-a-derived-table-prod-group"
+  name       = "actions-runner-mojas-CADET-prod-group"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.321.0-1-rc1"
   chart      = "actions-runner"
