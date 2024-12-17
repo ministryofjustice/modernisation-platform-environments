@@ -35,7 +35,7 @@ This directory contains the Terraform configuration for the Delius Core environm
 	* used for authenticating users in Delius, MIS, NextCloud, User Management, PWM, and apps in Cloud Platform
 * Password manager (PWM) ECS
 * Oracle EC2 databases
-	* used by Weblogic, GDPR
+	* used by Weblogic, GDPR (now in CP)
 * Alfresco EFS + SFS
 	* Alfresco is mainly hosted in Cloud Platform but some resources remain in MP
 
