@@ -126,7 +126,7 @@ module "oracle_db_standby" {
 
 # Allow Access To Delius Core Application Secret From MIS Primary EC2 Instance Role
 
-data "aws_iam_policy_document" "database_application_passwords" {
+data "aws_iam_policy_document" "database_application_passwords_for_mis" {
   count = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
   statement {
     sid    = "MisAWSAccountToReadTheSecret"
@@ -140,8 +140,54 @@ data "aws_iam_policy_document" "database_application_passwords" {
   }
 }
 
-resource "aws_secretsmanager_secret_policy" "database_application_passwords" {
+resource "aws_secretsmanager_secret_policy" "database_application_passwords_for_mis" {
   count      = lookup(var.environment_config, "has_mis_environment", false) ? 1 : 0
   secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
-  policy     = data.aws_iam_policy_document.database_application_passwords[0].json
+  policy     = data.aws_iam_policy_document.database_application_passwords_for_mis[0].json
+}
+
+
+# Allow Access To Delius Core Application Secret From DeliusEC2 Instance Roles
+# (We include the standby instances since these need to be able to create database links to the primary
+#  for pushing audited interaction data prior to converting a snapshot standby back to a physical standby)
+locals {
+   delius_ec2_instance_roles = [for i in range(1,var.db_config.standby_count+2): "arn:aws:iam::${var.platform_vars.environment_management.account_ids[join("-", ["delius-core", var.account_info.mp_environment])]}:role/instance-role-delius-core-${var.env_name}-db-${i}"]
+}
+
+data "aws_iam_policy_document" "database_application_passwords_for_delius" {
+  statement {
+      sid    = "DeliusAWSAccountToReadApplicationSecrets"
+      effect = "Allow"
+      principals {
+        type        = "AWS"
+        identifiers = local.delius_ec2_instance_roles
+      }
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [module.oracle_db_shared.database_application_passwords_secret_arn]
+   }
+}
+
+resource "aws_secretsmanager_secret_policy" "database_application_passwords_for_delius" {
+  secret_arn = module.oracle_db_shared.database_application_passwords_secret_arn
+  policy     = data.aws_iam_policy_document.database_application_passwords_for_delius.json
+}
+
+# EC2 instances also require access to the DBA passwords, as the SYS password is required
+# when connecting remotely to the data guard broker in Ansible scripts
+data "aws_iam_policy_document" "database_dba_passwords_for_delius" {
+  statement {
+      sid    = "DeliusAWSAccountToReadDBASecrets"
+      effect = "Allow"
+      principals {
+        type        = "AWS"
+        identifiers = local.delius_ec2_instance_roles
+      }
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = [module.oracle_db_shared.database_dba_passwords_secret_arn]
+   }
+}
+
+resource "aws_secretsmanager_secret_policy" "database_dba_passwords_for_delius" {
+  secret_arn = module.oracle_db_shared.database_dba_passwords_secret_arn
+  policy     = data.aws_iam_policy_document.database_dba_passwords_for_delius.json
 }
