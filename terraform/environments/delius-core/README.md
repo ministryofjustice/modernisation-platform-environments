@@ -68,3 +68,8 @@ Modernisation Platform
 
 <!-- If your service is hosted on another MOJ team’s infrastructure, link to their runbook. If your service has another arrangement or runs its own infrastructure, you should list the supplier of that infrastructure (ideally linking to your account’s login page) and describe, simply and briefly, how to raise an issue with them. -->
 
+### Structure
+
+Most of the configuration for the environments is handled in the base level of the delius-core directory, where we have `main_[environment].tf` files that call the `delius_environment `module, passing in locals defined in `locals_[environment].tf` files.
+
+The bulk of the resources are defined in a modular structure where there is a `delius_environment` module that will call other reusable modules such as the `delius_microservice` module or the `oracle_db_instance` module, with files for each microservice deployment (e.g. `weblogic.tf` which is only calling the `delius_microservice` module, or `database.tf` that primarily contains calls to the `oracle_db_instance` module).
