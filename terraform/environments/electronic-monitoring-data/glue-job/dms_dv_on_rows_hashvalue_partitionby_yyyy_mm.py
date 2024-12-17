@@ -247,7 +247,7 @@ if __name__ == "__main__":
                                 )
     
     if prq_df_where_clause is not None:
-        rds_hashed_rows_prq_df = rds_hashed_rows_prq_df.where(f"prq_df_where_clause")
+        rds_hashed_rows_prq_df = rds_hashed_rows_prq_df.where(f"{prq_df_where_clause}")
 
     rds_hashed_rows_prq_df_agg = rds_hashed_rows_prq_df.groupby(group_by_cols_list)\
                                     .agg(
@@ -280,7 +280,7 @@ if __name__ == "__main__":
                                                     rds_db_table_empty_df.schema)
 
     if prq_df_where_clause is not None:
-        migrated_prq_yyyy_mm_df = migrated_prq_yyyy_mm_df.where(f"prq_df_where_clause")
+        migrated_prq_yyyy_mm_df = migrated_prq_yyyy_mm_df.where(f"{prq_df_where_clause}")
 
     migrated_prq_yyyy_mm_df_agg = migrated_prq_yyyy_mm_df.groupby(group_by_cols_list)\
                                     .agg(
