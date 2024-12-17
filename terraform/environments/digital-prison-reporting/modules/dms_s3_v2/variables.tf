@@ -270,6 +270,18 @@ variable "source_ssl_mode" {
   type        = string
 }
 
+variable "source_postgres_heartbeat_enable" {
+  default     = true
+  description = "Only used for Postgres sources. The write-ahead log (WAL) heartbeat feature mimics a dummy transaction. By doing this, it prevents idle logical replication slots from holding onto old WAL logs, which can result in storage full situations on the source."
+  type        = bool
+}
+
+variable "source_postgres_heartbeat_frequency" {
+  default     = 5
+  description = "Only used for Postgres sources.  Sets the WAL heartbeat frequency (in minutes)."
+  type        = number
+}
+
 variable "bucket_name" {
   type    = string
   default = ""
