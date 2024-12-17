@@ -160,7 +160,7 @@ locals {
           security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
-        rpc_tcp_web = {
+        rpc_udp_web = {
           description     = "135: UDP MS-RPC allow ingress from app and db servers"
           from_port       = 135
           to_port         = 135
@@ -296,7 +296,7 @@ locals {
           security_groups = ["web", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
-        rpc_tcp_app = {
+        rpc_udp_app = {
           description     = "135: UDP MS-RPC allow ingress from app and db servers"
           from_port       = 135
           to_port         = 135
