@@ -86,7 +86,7 @@ RDS_HASHED_ROWS_PRQ_PARENT_DIR = args["rds_hashed_rows_prq_parent_dir"]
 DMS_PRQ_OUTPUT_BUCKET = args["dms_prq_output_bucket"]
 RDS_DATABASE_FOLDER = args["rds_database_folder"]
 RDS_DB_SCHEMA_FOLDER = args["rds_db_schema_folder"]
-dms_prq_table_folder = args["dms_prq_table_folder"]
+DMS_PRQ_TABLE_FOLDER = args["dms_prq_table_folder"]
 TABLE_PKEY_COLUMN = args['table_pkey_column']
 DATE_PARTITION_COLUMN_NAME = args['date_partition_column_name']
 
@@ -190,7 +190,7 @@ if __name__ == "__main__":
     db_schema_dirpath = f'''{RDS_DATABASE_FOLDER}/{RDS_DB_SCHEMA_FOLDER}'''.strip()
     rds_hashed_rows_bucket_parent_dir = f"""{RDS_HASHED_ROWS_PRQ_BUCKET}/{RDS_HASHED_ROWS_PRQ_PARENT_DIR}"""
     rds_hashed_rows_fulls3path = f"""s3://{rds_hashed_rows_bucket_parent_dir}/{db_schema_dirpath}/{rds_table_orignal_name}"""
-    dms_output_fulls3path = f"""s3://{DMS_PRQ_OUTPUT_BUCKET}/{db_schema_dirpath}/{dms_prq_table_folder}"""
+    dms_output_fulls3path = f"""s3://{DMS_PRQ_OUTPUT_BUCKET}/{db_schema_dirpath}/{DMS_PRQ_TABLE_FOLDER}"""
     db_sch_tbl = f"""{RDS_DATABASE_FOLDER}_{RDS_DB_SCHEMA_FOLDER}_{rds_table_orignal_name}"""
      
     # -------------------------------------------------------
@@ -201,7 +201,7 @@ if __name__ == "__main__":
           sys.exit(1)
 
     if not S3Methods.check_s3_folder_path_if_exists(DMS_PRQ_OUTPUT_BUCKET, 
-                                                    f"""{db_schema_dirpath}/{dms_prq_table_folder}"""):
+                                                    f"""{db_schema_dirpath}/{DMS_PRQ_TABLE_FOLDER}"""):
           LOGGER.error(f'''>> {dms_output_fulls3path} << Path Not Available !!''')
           sys.exit(1)
     # --------------------------------------------------------------------------------------
@@ -363,7 +363,7 @@ if __name__ == "__main__":
                                 .selectExpr("json_row")
                             )
 
-        subtract_validation_msg = f"""'{dms_prq_table_folder}' - {unmatched_hashvalues_df_count}"""
+        subtract_validation_msg = f"""'{DMS_PRQ_TABLE_FOLDER}' - {unmatched_hashvalues_df_count}"""
         df_subtract_temp = df_subtract_temp.selectExpr(
                                 "current_timestamp as run_datetime",
                                 "json_row",
