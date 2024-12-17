@@ -28,7 +28,8 @@ resource "aws_api_gateway_method" "method" {
   rest_api_id          = aws_api_gateway_rest_api.api_gateway.id
   resource_id          = aws_api_gateway_resource.resource.id
   http_method          = var.http_method
-  authorization        = aws_api_gateway_authorizer.authorizer.id
+  authorization        = "CUSTOM"
+  authorizer_id        = aws_api_gateway_authorizer.authorizer.id
   api_key_required     = var.api_key_required
   request_validator_id = aws_api_gateway_request_validator.request_validator.id
   request_models = {
