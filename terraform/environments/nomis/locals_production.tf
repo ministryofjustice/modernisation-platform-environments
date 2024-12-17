@@ -343,8 +343,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 9000, throughput = 500 }
-          flash = { total_size = 1000, iops = 3000, throughput = 250 }
+          data  = { total_size = 4000, iops = 9000, throughput = 300 }
+          flash = { total_size = 1000, iops = 3000, throughput = 200 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -375,8 +375,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 9000, throughput = 250 }
-          flash = { total_size = 1000, iops = 3000, throughput = 125 }
+          data  = { total_size = 4000, iops = 9000, throughput = 300 }
+          flash = { total_size = 1000, iops = 3000, throughput = 200 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -408,8 +408,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 6000, iops = 9000, throughput = 250 }
-          flash = { total_size = 1000, iops = 3000, throughput = 250 }
+          data  = { total_size = 6000, iops = 9000, throughput = 300 }
+          flash = { total_size = 1000, iops = 3000, throughput = 200 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -444,8 +444,8 @@ locals {
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
           data  = { total_size = 6000, iops = 3000, throughput = 125 }
           flash = { total_size = 1000, iops = 3000, throughput = 125 }
-          # data  = { total_size = 6000, iops = 9000, throughput = 250 } # replace above with this on failover
-          # flash = { total_size = 1000, iops = 3000, throughput = 250 } # replace above with this on failover
+          # data  = { total_size = 6000, iops = 9000, throughput = 300 } # replace above with this on failover
+          # flash = { total_size = 1000, iops = 3000, throughput = 200 } # replace above with this on failover
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
