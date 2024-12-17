@@ -160,14 +160,14 @@ locals {
           security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
-        #rpc_tcp_web2 = {
-        #  description     = "135: TCP MS-RPC allow ingress from app and db servers"
-        #  from_port       = 135
-        #  to_port         = 135
-        #  protocol        = "TCP"
-        #  security_groups = ["app", "database"]
-        #  # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        #}
+        rpc_tcp_web2 = {
+          description     = "135: TCP MS-RPC allow ingress from app and db servers"
+          from_port       = 135
+          to_port         = 135
+          protocol        = "TCP"
+          security_groups = ["app", "database"]
+          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
+        }
         https_web = {
           description     = "443: enduserclient https ingress"
           from_port       = 443
@@ -296,14 +296,14 @@ locals {
           security_groups = ["web", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
-        #rpc_tcp_app2 = {
-        #  description     = "135: TCP MS-RPC allow ingress from app and db servers"
-        #  from_port       = 135
-        #  to_port         = 135
-        #  protocol        = "TCP"
-        #  security_groups = ["web", "database"]
-        #  # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        #}
+        rpc_tcp_app2 = {
+          description     = "135: TCP MS-RPC allow ingress from app and db servers"
+          from_port       = 135
+          to_port         = 135
+          protocol        = "TCP"
+          security_groups = ["web", "database"]
+          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
+        }
         smb_tcp_app = {
           description     = "445: TCP SMB allow ingress from app and db servers"
           from_port       = 445
