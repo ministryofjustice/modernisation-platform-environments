@@ -51,7 +51,7 @@ This directory contains the Terraform configuration for the Delius Core environm
 * LDAP
 	* 
 * PWM
-	* 
+	* https://pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/public/forgottenpassword
 
 
 <!-- The URL(s) of the service’s production environment, and test environments if possible-->
