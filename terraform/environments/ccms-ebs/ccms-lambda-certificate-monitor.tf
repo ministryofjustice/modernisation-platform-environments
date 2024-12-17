@@ -52,9 +52,9 @@ resource "aws_iam_role_policy" "lambda_policy" {
       {
         Effect = "Allow"
         Action = [
-          "SecurityHub:BatchImportFindings",
-          "SecurityHub:BatchUpdateFindings",
-          "SecurityHub:DescribeHub"
+          "securityhub:BatchImportFindings",
+          "securityhub:BatchUpdateFindings",
+          "securityhub:DescribeHub"
         ]
         Resource = "*"
       },
