@@ -65,6 +65,7 @@ locals {
         tags = merge(local.ec2_autoscaling_groups.bods.tags, {
           oasys-national-reporting-environment = "t3"
           domain-name                          = "azure.noms.root"
+          server-type                          = "Bods"
         })
         cloudwatch_metric_alarms = null
       })
