@@ -211,7 +211,7 @@ module "api_gateway_authorizer" {
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables = {
-    environment_name = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+    ENVIRONMENT_NAME = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
   }
 }
 
