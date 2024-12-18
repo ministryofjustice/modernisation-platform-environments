@@ -45,6 +45,15 @@ data "aws_iam_policy_document" "ecr_access" {
     ]
     resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
+  statement {
+    sid    = "DenyECRImagePermissions"
+    effect = "Deny"
+    actions = [
+      "ecr:BatchDeleteImage",
+      "ecr:DeleteImage",
+    ]
+    resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
+  }
 }
 
 module "ecr_access_iam_policy" {
