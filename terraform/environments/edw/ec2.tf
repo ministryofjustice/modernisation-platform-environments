@@ -293,6 +293,16 @@ sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/o
 chown -R oracle:dba /home/oracle/backup*
 chmod -R 740 /home/oracle/backup*
 
+echo "Setting up AWS EBS backup"
+INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+cat <<EOC25 > /home/oracle/scripts/aws_ebs_backup.sh
+#!/bin/bash
+/usr/local/bin/aws ec2 create-snapshots \
+--instance-specification InstanceId=$INSTANCE_ID \
+--description "AWS crash-consistent snapshots of EDW database volumes, automatically created snapshot from oracle_cron inside EC2" \
+--copy-tags-from-source volume
+EOC25
+
 echo "Adding cron job scripts"
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/ /home/oracle/scripts
 chown -R oracle:dba /home/oracle/scripts/
@@ -309,6 +319,7 @@ cat <<EOC3 > /etc/cron.d/backup_cron
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh ${upper(local.application_data.accounts[local.environment].edw_environment)}
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
 # 0 7 * * 1 /home/oracle/scripts/maat_05365_ware_db_changes.sh ${upper(local.application_data.accounts[local.environment].edw_environment)}
+00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log
 10,40 08-17 * * * /home/oracle/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].edw_environment)} 97  >/tmp/disk_space.trc 2>&1
 EOC3
 
@@ -458,12 +469,19 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
                 "logs:CreateLogStream",
                 "logs:DescribeLogStreams",
                 "logs:PutRetentionPolicy",
-                "logs:PutLogEvents",
-                "ec2:DescribeInstances"
+                "logs:PutLogEvents"
             ],
             "Resource": ["*"],
             "Effect": "Allow"
-        }, 
+        },
+        {
+            "Action": [
+                "ec2:DescribeInstances",            
+                "ec2:CreateSnapshots"
+            ],
+            "Resource": ["*"],
+            "Effect": "Allow"
+        },  
         {
             "Action": [
                 "ec2:CreateTags"
