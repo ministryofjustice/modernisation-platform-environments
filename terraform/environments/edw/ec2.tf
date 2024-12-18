@@ -491,6 +491,20 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
         {
             "Effect":"Allow",
             "Action":[
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*.sh",
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*.sql"
+            ]
+        },
+        {
+            "Effect":"Allow",
+            "Action":[
                 "s3:ListBucket"
             ],
             "Resource": [
