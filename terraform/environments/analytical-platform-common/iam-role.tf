@@ -12,6 +12,6 @@ module "ecr_access_iam_role" {
   ]
 
   policies = {
-    ecr = module.ecr_iam_policy.arn
+    ecr = module.ecr_access_iam_policy.arn
   }
 }
