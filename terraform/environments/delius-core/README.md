@@ -49,7 +49,7 @@ This directory contains the Terraform configuration for the Delius Core environm
 * WebLogic
 	* https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk
 * LDAP
-	* ldap.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk:389
+	* ldaps://ldap.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk:636
 * PWM
 	* https://pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/public/forgottenpassword
 
