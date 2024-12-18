@@ -100,3 +100,22 @@ data "aws_iam_policy_document" "sagemaker_bucket_policy" {
     }
   }
 }
+
+resource "aws_sagemaker_model" "mxbai_rerank_xsmall_model" {
+  count              = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0 # Creates IAM role if not provided
+  name               = "mxbai-rerank-xsmall-model"
+  execution_role_arn = aws_iam_role.sagemaker_execution_role[0].arn
+  tags               = local.tags
+
+  primary_container {
+    # image = "764974769150.dkr.ecr.eu-west-2.amazonaws.com/tei:2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
+    image = "public.ecr.aws/sagemaker/sagemaker-distribution:2-gpu"
+    environment = {
+      HF_MODEL_ID = "mixedbread-ai/mxbai-rerank-xsmall-v1"
+    }
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
