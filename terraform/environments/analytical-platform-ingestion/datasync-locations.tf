@@ -1,5 +1,5 @@
 resource "aws_datasync_location_s3" "opg_investigations" {
-  s3_bucket_arn = module.datasync_bucket.s3_bucket_arn
+  s3_bucket_arn = module.datasync_opg_investigations_bucket.s3_bucket_arn
   subdirectory  = "/"
 
   s3_config {
