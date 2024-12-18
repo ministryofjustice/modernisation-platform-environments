@@ -89,7 +89,7 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
 
 # MP CIS -> MP CCSM Dev
 
-resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x_cis" {
   count             = local.is-development ? 1 : 0
   security_group_id = aws_security_group.ec2_sg_ebsdb.id
   type              = "ingress"
