@@ -152,19 +152,19 @@ locals {
           security_groups = ["load-balancer"]
           # NOTE: will need to be changed to point to client access possibly
         }
-        rpc_tcp_web = {
-          description     = "135: TCP MS-RPC allow ingress from app and db servers"
-          from_port       = 135
-          to_port         = 135
-          protocol        = "TCP"
-          security_groups = ["app", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
-        rpc_tcp_web = {
+        rpc_tcp_web = { # typo in name - this is for UDP but can't easily be changed
           description     = "135: UDP MS-RPC allow ingress from app and db servers"
           from_port       = 135
           to_port         = 135
           protocol        = "UDP"
+          security_groups = ["app", "database"]
+          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
+        }
+        rpc_tcp_web2 = {
+          description     = "135: TCP MS-RPC allow ingress from app and db servers"
+          from_port       = 135
+          to_port         = 135
+          protocol        = "TCP"
           security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
@@ -288,19 +288,19 @@ locals {
         }
         # IMPORTANT: check if an 'allow all from load-balancer' rule is required
         # IMPORTANT: check whether http/https traffic is still needed? It's in the original but not used at an app level
-        rpc_tcp_app = {
-          description     = "135: TCP MS-RPC allow ingress from app and db servers"
-          from_port       = 135
-          to_port         = 135
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
-        rpc_tcp_app = {
+        rpc_tcp_app = { # typo in name - this is for UDP but can't easily be changed
           description     = "135: UDP MS-RPC allow ingress from app and db servers"
           from_port       = 135
           to_port         = 135
           protocol        = "UDP"
+          security_groups = ["web", "database"]
+          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
+        }
+        rpc_tcp_app2 = {
+          description     = "135: TCP MS-RPC allow ingress from app and db servers"
+          from_port       = 135
+          to_port         = 135
+          protocol        = "TCP"
           security_groups = ["web", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }

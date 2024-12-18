@@ -369,8 +369,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
 
-  name = "${each.value.target_account_name}-share-role"
-
+  name                 = "${each.value.target_account_name}-share-role"
+  max_session_duration = 12 * 60 * 60
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
