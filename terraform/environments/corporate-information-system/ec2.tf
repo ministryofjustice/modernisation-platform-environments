@@ -196,6 +196,16 @@ resource "aws_security_group_rule" "rds_workspaces" {
   description       = "RDS Workspace access"
 }
 
+resource "aws_security_group_rule" "ccms_mp" {
+  type              = "ingress"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  security_group_id = aws_security_group.ec2_instance_sg.id
+  cidr_blocks       = [local.application_data.accounts[local.environment].ccms_mp_dev_cidr]
+  description       = "CCMS MP 1521 access"
+}
+
 resource "aws_security_group_rule" "dkron_workspaces" {
   type              = "ingress"
   from_port         = 8080
