@@ -39,3 +39,33 @@ resource "aws_s3_bucket_versioning" "scripts" {
     status = "Enabled"
   }
 }
+
+####### Upload scripts to S3 #######
+
+resource "aws_s3_object" "disk_space_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "disk_space_alert.sh"
+  source      = "./scripts/disk_space_alert.sh"
+  source_hash = filemd5("./scripts/disk_space_alert.sh")
+}
+
+resource "aws_s3_object" "free_space_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "freespace_alert.sh"
+  source      = "./scripts/freespace_alert.sh"
+  source_hash = filemd5("./scripts/freespace_alert.sh")
+}
+
+resource "aws_s3_object" "maat_sh_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "maat_05365_ware_db_changes.sh"
+  source      = "./scripts/maat_05365_ware_db_changes.sh"
+  source_hash = filemd5("./scripts/maat_05365_ware_db_changes.sh")
+}
+
+resource "aws_s3_object" "maat_sql_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "maat_05365_ware_db_changes.sql"
+  source      = "./scripts/maat_05365_ware_db_changes.sql"
+  source_hash = filemd5("./scripts/maat_05365_ware_db_changes.sql")
+}

@@ -320,7 +320,7 @@ cat <<EOC3 > /etc/cron.d/backup_cron
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
 # 0 7 * * 1 /home/oracle/scripts/maat_05365_ware_db_changes.sh ${upper(local.application_data.accounts[local.environment].edw_environment)}
 00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log
-10,40 08-17 * * * /home/oracle/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].edw_environment)} 97  >/tmp/disk_space.trc 2>&1
+10,40 08-17 * * * /home/oracle/scripts/disk_space_alert.sh ${upper(local.application_data.accounts[local.environment].edw_environment)} 97  >/tmp/disk_space.trc 2>&1
 EOC3
 
 chown root:root /etc/cron.d/backup_cron
@@ -488,6 +488,20 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
             ],
             "Resource": ["*"],
             "Effect": "Allow"
+        },
+        {
+            "Effect":"Allow",
+            "Action":[
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*.sh",
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*.sql"
+            ]
         }
     ]
 }
