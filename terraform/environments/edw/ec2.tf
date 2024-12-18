@@ -91,17 +91,6 @@ sudo /sbin/chkconfig iptables off
 sudo yum install -y mailx
 sudo ln -s /bin/mail /bin/mailx
 
-
-echo "Setting up AWS EBS backup"
-INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-cat <<EOC25 > /home/oracle/scripts/aws_ebs_backup.sh
-#!/bin/bash
-/usr/local/bin/aws ec2 create-snapshots \
---instance-specification InstanceId=$INSTANCE_ID \
---description "AWS crash-consistent snapshots of EDW database volumes, automatically created snapshot from oracle_cron inside EC2" \
---copy-tags-from-source volume
-EOC25
-
 # Set up log files
 echo "---creating /etc/awslogs/awscli.conf"
 mkdir -p /etc/awslogs
