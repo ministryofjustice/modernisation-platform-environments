@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "mlflow_access" {
+data "aws_iam_policy_document" "ecr_access" {
   statement {
     sid    = "AllowECRRepositoryPermissions"
     effect = "Allow"
