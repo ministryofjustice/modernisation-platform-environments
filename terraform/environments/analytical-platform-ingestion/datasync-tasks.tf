@@ -1,7 +1,7 @@
-resource "aws_datasync_task" "dom1_hq_pgo_shared_group_sis_case_management_investigations" {
-  name                     = "dom1-hq-pgo-shared-group-sis-case-management-investigations"
-  source_location_arn      = aws_datasync_location_smb.dom1_hq_pgo_shared_group_sis_case_management_investigations.arn
-  destination_location_arn = aws_datasync_location_s3.mojap_datasync_s3.arn
+resource "aws_datasync_task" "opg_investigations" {
+  name                     = "opg-investigations"
+  source_location_arn      = aws_datasync_location_smb.opg_investigations.arn
+  destination_location_arn = aws_datasync_location_s3.opg_investigations.arn
   cloudwatch_log_group_arn = module.datasync_task_logs.cloudwatch_log_group_arn
 
   options {
@@ -19,7 +19,7 @@ resource "aws_datasync_task" "dom1_hq_pgo_shared_group_sis_case_management_inves
 
     s3_destination {
       bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
-      s3_bucket_arn          = module.datasync_bucket.s3_bucket_arn
+      s3_bucket_arn          = module.datasync_opg_investigations_bucket.s3_bucket_arn
       subdirectory           = "/"
     }
   }

@@ -161,14 +161,13 @@ module "bold_egress_bucket" {
   }
 }
 
-
-module "datasync_bucket" {
+module "datasync_opg_investigations_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 
-  bucket = "mojap-ingestion-${local.environment}-datasync"
+  bucket = "mojap-ingestion-${local.environment}-datasync-opg-investigations"
 
   force_destroy = true
 
