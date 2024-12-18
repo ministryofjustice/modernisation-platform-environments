@@ -4,7 +4,7 @@ resource "aws_athena_workgroup" "default" {
   state       = "ENABLED"
 
   configuration {
-    bytes_scanned_cutoff_per_query     = 1073741824 # 1 GB
+    bytes_scanned_cutoff_per_query     = 1073741824000 # 1 TB
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
 

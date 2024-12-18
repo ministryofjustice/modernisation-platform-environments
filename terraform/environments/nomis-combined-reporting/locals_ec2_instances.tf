@@ -212,10 +212,10 @@ locals {
         ))
       }
       ebs_volumes = {
-        "/dev/sda1" = { type = "gp3", size = 100 }
-        "/dev/sdb"  = { type = "gp3", size = 100 }
-        "/dev/sdc"  = { type = "gp3", size = 100 }
-        "/dev/sds"  = { type = "gp3", size = 100 }
+        "/dev/sda1" = { type = "gp3", size = 100 } # root volume
+        "xvdd"      = { type = "gp3", size = 100 } # D:/ Temp
+        "xvde"      = { type = "gp3", size = 100 } # E:/ App
+        "xvdf"      = { type = "gp3", size = 100 } # F:/ Storage
       }
       instance = {
         disable_api_termination = false
@@ -231,7 +231,7 @@ locals {
         backup                 = "false"
         instance-access-policy = "full"
         os-type                = "Windows"
-        server-type            = "NcrBods"
+        server-type            = "Bods"
         update-ssm-agent       = "patchgroup1"
       }
     }

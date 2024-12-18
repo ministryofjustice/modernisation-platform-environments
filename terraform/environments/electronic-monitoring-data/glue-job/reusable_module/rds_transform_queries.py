@@ -64,6 +64,15 @@ class SQLServer_Extract_Transform:
         'Latitude': "CAST(FORMAT(Latitude, '0.0######') AS VARCHAR)", 
         'Longitude': "CAST(FORMAT(Longitude, '0.0######') AS VARCHAR)", 
         'RecordedDatetime':'CONVERT(VARCHAR, RecordedDatetime, 120)', 
-        'AuditDateTime':'CONVERT(VARCHAR, AuditDateTime, 121)'
+        'AuditDateTime': """
+        CAST(
+        CASE 
+            WHEN RIGHT(FORMAT(AuditDateTime, 'fff'), 1) = '0' THEN 
+                FORMAT(AuditDateTime, 'yyyy-MM-dd HH:mm:ss.ff')
+            ELSE 
+                FORMAT(AuditDateTime, 'yyyy-MM-dd HH:mm:ss.fff')
+        END 
+        AS VARCHAR)
+        """.strip()
         }
     }

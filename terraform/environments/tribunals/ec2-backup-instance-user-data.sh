@@ -5,7 +5,7 @@ $targetDrive = "D"
 $targetPath = $targetDrive + ":\storage\tribunals\"
 $ecsCluster = "tribunals-all-cluster"
 $ebsVolumeTag = "tribunals-backup-storage"
-$tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","hmlands","lands-chamber", "ftp-admin-appeals", "ftp-tax-tribunal", "ftp-tax-chancery", "ftp-sscs-venues", "ftp-siac", "ftp-primary-health", "ftp-estate-agents", "ftp-consumer-credit", "ftp-claims-management", "ftp-charity-tribunals"
+$tribunalNames = "appeals","transport","care-standards","cicap","employment-appeals","finance-and-tax","immigration-services","information-tribunal","hmlands","lands-chamber", "asylum-support", "ftp-admin-appeals", "ftp-tax-tribunal", "ftp-tax-chancery", "ftp-sscs-venues", "ftp-siac", "ftp-primary-health", "ftp-estate-agents", "ftp-consumer-credit", "ftp-claims-management", "ftp-charity-tribunals"
 $monitorLogFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 $monitorScriptFile = "C:\ProgramData\Amazon\EC2-Windows\Launch\monitor-ebs.ps1"
 
@@ -92,19 +92,40 @@ if (-not $awsCliInstalled) {
     "AWS CLI is already installed." >> $monitorLogFile
 }
 
-# Ensure the target directory exists
-if (-not (Test-Path D:\storage\tribunals)) {
-    New-Item -ItemType Directory -Path D:\storage\tribunals
+$scriptContent = @'
+
+function GetEnvironmentName {
+  $instanceId = Get-EC2InstanceMetadata -Path '/instance-id'
+  $environmentName = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId" "Name=key,Values=Environment" --query 'Tags[0].Value' --output text
+  return $environmentName
 }
 
-# Copy files from S3 to local directory
-aws s3 cp s3://tribunals-ebs-backup-development D:\storage\tribunals --recursive
-
-# Optional: Log the result
-if ($?) {
-    "Files copied successfully from S3 to D:\storage\tribunals" >> $logFile
-} else {
-    "Failed to copy files from S3" >> $logFile
+function SyncFromS3 {
+  $environmentName = GetEnvironmentName
+  "Instance Environment: $environmentName" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\userdata.log"
+  "Sync from S3 started at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  aws s3 sync s3://tribunals-ebs-backup-$environmentName D:\storage\tribunals\ >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
+  "Sync from S3 completed at $(Get-Date)" >> "C:\ProgramData\Amazon\EC2-Windows\Launch\Log\monitorLogFile.log"
 }
+
+# Call the functions
+SyncFromS3
+'@
+
+Set-ExecutionPolicy RemoteSigned -Scope LocalMachine
+
+# Save the script to a file on the EC2 instance
+$scriptContent | Out-File -FilePath "C:\SyncFromS3.ps1"
+
+$Action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument '-ExecutionPolicy Bypass -File "C:\SyncFromS3.ps1"'
+
+# Create a trigger for the immediate execution with a 5-minute delay
+$ImmediateTrigger = New-ScheduledTaskTrigger -Once -At ((Get-Date).AddMinutes(5))
+
+# Create a trigger for the weekly execution
+$WeeklyTrigger = New-ScheduledTaskTrigger -Weekly -At "12:00AM" -DaysOfWeek Sunday
+
+# Register the scheduled task with both triggers
+Register-ScheduledTask -Action $Action -Trigger $ImmediateTrigger, $WeeklyTrigger -TaskName "SyncFromS3" -Description "Sync files from S3 bucket to EBS volume" -RunLevel Highest -User "SYSTEM" -Force
 
 </powershell>

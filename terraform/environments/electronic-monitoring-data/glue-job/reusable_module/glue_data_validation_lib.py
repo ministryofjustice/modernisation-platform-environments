@@ -250,6 +250,43 @@ class RDS_JDBC_CONNECTION():
                     .load())
 
 
+    def get_min_max_count_groupby_yyyy_mm(self,
+                                          rds_db_table,
+                                          date_partition_col,
+                                          pkey_column,
+                                          filter_where_clause=None) -> DataFrame:
+
+        agg_query_str = f"""
+        SELECT YEAR({date_partition_col}) AS year, 
+               MONTH({date_partition_col}) AS month, 
+               MIN({pkey_column}) AS min_{pkey_column}, 
+               MAX({pkey_column}) AS max_{pkey_column},
+               COUNT({pkey_column}) AS count_{pkey_column}
+          FROM {self.rds_db_schema_name}.[{rds_db_table}]
+        """.strip()
+
+        if filter_where_clause is not None:
+            agg_query_str = agg_query_str + \
+                f""" WHERE {filter_where_clause.rstrip()}"""
+
+        agg_query_str = agg_query_str + \
+            f""" GROUP BY YEAR({date_partition_col}), MONTH({date_partition_col})"""
+
+        print(f"""query_str-(Aggregate):> \n{agg_query_str}""")
+
+        df_agg = (self.spark.read.format("jdbc")
+                .option("url", self.rds_jdbc_url_v2)
+                .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                .option("user", self.RDS_DB_INSTANCE_USER)
+                .option("password", self.RDS_DB_INSTANCE_PWD)
+                .option("query", f"""{agg_query_str}""")
+                .load())
+        
+        df_agg = df_agg.orderBy(['year', 'month'], ascending=True)
+
+        return df_agg
+
+
     def get_rds_df_jdbc_read_parallel(self,
                                       rds_tbl_name,
                                       rds_tbl_pkeys_list,

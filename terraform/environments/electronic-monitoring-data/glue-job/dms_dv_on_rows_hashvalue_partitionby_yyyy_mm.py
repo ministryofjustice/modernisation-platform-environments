@@ -47,9 +47,10 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        "rds_hashed_rows_prq_bucket",
                        "rds_hashed_rows_prq_parent_dir",
                        "dms_prq_output_bucket",
+                       "dms_prq_table_folder",
                        "rds_database_folder",
                        "rds_db_schema_folder",
-                       "table_to_be_validated",
+                       "rds_table_orignal_name",
                        "table_pkey_column",
                        "date_partition_column_name",
                        "glue_catalog_db_name",
@@ -58,9 +59,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
                        ]
 
 OPTIONAL_INPUTS = [
-    "yyyy_or_mm_or_pkey_where_clause",
-    "year_int_equals_to",
-    "month_int_equals_to"
+    "rds_only_where_clause",
+    "prq_df_where_clause"
 ]
 
 AVAILABLE_ARGS_LIST = CustomPysparkMethods.resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -86,7 +86,7 @@ RDS_HASHED_ROWS_PRQ_PARENT_DIR = args["rds_hashed_rows_prq_parent_dir"]
 DMS_PRQ_OUTPUT_BUCKET = args["dms_prq_output_bucket"]
 RDS_DATABASE_FOLDER = args["rds_database_folder"]
 RDS_DB_SCHEMA_FOLDER = args["rds_db_schema_folder"]
-TABLE_TO_BE_VALIDATED = args["table_to_be_validated"]
+DMS_PRQ_TABLE_FOLDER = args["dms_prq_table_folder"]
 TABLE_PKEY_COLUMN = args['table_pkey_column']
 DATE_PARTITION_COLUMN_NAME = args['date_partition_column_name']
 
@@ -100,73 +100,6 @@ CATALOG_TABLE_S3_FULL_PATH = f'''s3://{GLUE_CATALOG_DV_BUCKET}/{CATALOG_DB_TABLE
 # ===============================================================================
 # USER-DEFINED-FUNCTIONS
 # ----------------------
-
-
-def get_revised_rds_agg_query_str():
-
-    rds_db_agg_query_str = f"""
-    WITH {TABLE_TO_BE_VALIDATED}_vw AS
-    (
-    SELECT {TABLE_PKEY_COLUMN}, 
-    YEAR({DATE_PARTITION_COLUMN_NAME}) AS year, 
-    MONTH({DATE_PARTITION_COLUMN_NAME}) AS month
-    FROM [{TABLE_TO_BE_VALIDATED}]
-    )
-    SELECT year, month, 
-        MIN({TABLE_PKEY_COLUMN}) AS min_{TABLE_PKEY_COLUMN},
-        MAX({TABLE_PKEY_COLUMN}) AS max_{TABLE_PKEY_COLUMN},
-        COUNT({TABLE_PKEY_COLUMN}) AS count_{TABLE_PKEY_COLUMN}
-    FROM {TABLE_TO_BE_VALIDATED}_vw
-    GROUP BY year, month
-    """.strip()
-
-    yyyy_or_mm_or_pkey_where_clause = ""
-    year_int_equals_to = ""
-    month_int_equals_to = ""
-    where_clause_str = ""
-
-    if args.get("yyyy_or_mm_or_pkey_where_clause", None) is not None:
-        yyyy_or_mm_or_pkey_where_clause = f"""{args['yyyy_or_mm_or_pkey_where_clause']}"""
-  
-    if args.get("year_int_equals_to", 0) != 0:
-        year_int_equals_to = f"""year = {args['year_int_equals_to']}"""
-  
-    if args.get("month_int_equals_to", 0) != 0:
-        month_int_equals_to = f"""month = {args['month_int_equals_to']}"""
-    
-    if yyyy_or_mm_or_pkey_where_clause or year_int_equals_to or month_int_equals_to:
-        where_clause_str = ' AND '.join(filter(None, [yyyy_or_mm_or_pkey_where_clause, 
-                                                      year_int_equals_to, 
-                                                      month_int_equals_to]))
-        rds_db_agg_query_str = rds_db_agg_query_str + f""" WHERE {where_clause_str}"""
-
-    return rds_db_agg_query_str
-
-
-def get_filtered_dataframe(df):
-
-    yyyy_or_mm_or_pkey_where_clause = ""
-    year_int_equals_to = ""
-    month_int_equals_to = ""
-    where_clause_str = ""
-
-    if args.get("yyyy_or_mm_or_pkey_where_clause", None) is not None:
-        yyyy_or_mm_or_pkey_where_clause = f"""{args['yyyy_or_mm_or_pkey_where_clause']}"""
-  
-    if args.get("year_int_equals_to", 0) != 0:
-        year_int_equals_to = f"""year = {args['year_int_equals_to']}"""
-  
-    if args.get("month_int_equals_to", 0) != 0:
-        month_int_equals_to = f"""month = {args['month_int_equals_to']}"""
-
-    if yyyy_or_mm_or_pkey_where_clause or year_int_equals_to or month_int_equals_to:
-        where_clause_str = ' AND '.join(filter(None, [yyyy_or_mm_or_pkey_where_clause, 
-                                                      year_int_equals_to, 
-                                                      month_int_equals_to]))
-        df = df.where(f"""{where_clause_str}""")
-    
-    return df
-
 
 def write_parquet_to_s3(df_dv_output: DataFrame, database, db_sch_tbl_name):
 
@@ -202,129 +135,213 @@ def write_parquet_to_s3(df_dv_output: DataFrame, database, db_sch_tbl_name):
 
 if __name__ == "__main__":
 
-    table_dirpath = f'''{RDS_DATABASE_FOLDER}/{RDS_DB_SCHEMA_FOLDER}/{TABLE_TO_BE_VALIDATED}'''.strip()
-    rds_hashed_rows_bucket_parent_dir = f"""{RDS_HASHED_ROWS_PRQ_BUCKET}/{RDS_HASHED_ROWS_PRQ_PARENT_DIR}"""
-    rds_hashed_rows_fulls3path = f"""s3://{rds_hashed_rows_bucket_parent_dir}/{table_dirpath}"""
-    dms_output_fulls3path = f"""s3://{DMS_PRQ_OUTPUT_BUCKET}/{table_dirpath}"""
-    db_sch_tbl = f"""{RDS_DATABASE_FOLDER}_{RDS_DB_SCHEMA_FOLDER}_{TABLE_TO_BE_VALIDATED}"""
+    if args.get("rds_database_folder", None) is None:
+        LOGGER.error(f"""'rds_database_folder' runtime input is missing! Exiting ...""")
+        sys.exit(1)
+    else:
+        rds_database_folder = args["rds_database_folder"]
+        LOGGER.info(f"""Given rds_database_folder = {rds_database_folder}""")
+
+    if args.get("rds_db_schema_folder", None) is None:
+        LOGGER.error(f"""'rds_db_schema_folder' runtime input is missing! Exiting ...""")
+        sys.exit(1)
+    else:
+        rds_db_schema_folder = args["rds_db_schema_folder"]
+        LOGGER.info(f"""Given rds_db_schema_folder = {rds_db_schema_folder}""")
+    # -------------------------------------------
+
+    rds_jdbc_conn_obj = RDS_JDBC_CONNECTION(RDS_DB_HOST_ENDPOINT,
+                                            RDS_DB_INSTANCE_PWD,
+                                            RDS_DATABASE_FOLDER,
+                                            RDS_DB_SCHEMA_FOLDER)
+
+    try:
+        rds_db_name = rds_jdbc_conn_obj.check_if_rds_db_exists()[0]
+    except IndexError:
+        LOGGER.error(f"""Given database name not found! >> {rds_database_folder} <<""")
+        sys.exit(1)
+    except Exception as e:
+        sys.exit(e)
     # -------------------------------------------------------
 
-    LOGGER.info(f"""db_sch_tbl = {db_sch_tbl}""")
-    LOGGER.info(f"""TABLE_PKEY_COLUMN = {TABLE_PKEY_COLUMN}""")
-    LOGGER.info(f"""DATE_PARTITION_COLUMN_NAME = {DATE_PARTITION_COLUMN_NAME}""")
+    rds_sqlserver_db_tbl_list = rds_jdbc_conn_obj.get_rds_db_tbl_list()
+    if not rds_sqlserver_db_tbl_list:
+        LOGGER.error(f"""rds_sqlserver_db_tbl_list - is empty. Exiting ...!""")
+        sys.exit(1)
+    # -------------------------------------------------------
 
+    if args.get("rds_table_orignal_name", None) is None:
+        LOGGER.error(f"""'rds_table_orignal_name' runtime input is missing! Exiting ...""")
+        sys.exit(1)
+    else:
+        rds_table_orignal_name = args["rds_table_orignal_name"]
+        table_name_prefix = f"""{rds_db_name}_{rds_db_schema_folder}"""
+        db_sch_tbl = f"""{table_name_prefix}_{rds_table_orignal_name}"""
+    # -------------------------------------------------------
+
+    LOGGER.info(f""">> Given, rds_table_orignal_name = {rds_table_orignal_name} <<""")
+    if db_sch_tbl not in rds_sqlserver_db_tbl_list:
+        LOGGER.error(f"""'{db_sch_tbl}' - is not an existing table! Exiting ...""")
+        sys.exit(1)
+    else:
+        LOGGER.info(f"""db_sch_tbl = {db_sch_tbl}""")
+    # -------------------------------------------------------
+
+    db_schema_dirpath = f'''{RDS_DATABASE_FOLDER}/{RDS_DB_SCHEMA_FOLDER}'''.strip()
+    rds_hashed_rows_bucket_parent_dir = f"""{RDS_HASHED_ROWS_PRQ_BUCKET}/{RDS_HASHED_ROWS_PRQ_PARENT_DIR}"""
+    rds_hashed_rows_fulls3path = f"""s3://{rds_hashed_rows_bucket_parent_dir}/{db_schema_dirpath}/{rds_table_orignal_name}"""
+    dms_output_fulls3path = f"""s3://{DMS_PRQ_OUTPUT_BUCKET}/{db_schema_dirpath}/{DMS_PRQ_TABLE_FOLDER}"""
+    db_sch_tbl = f"""{RDS_DATABASE_FOLDER}_{RDS_DB_SCHEMA_FOLDER}_{rds_table_orignal_name}"""
+     
+    # -------------------------------------------------------
 
     if not S3Methods.check_s3_folder_path_if_exists(RDS_HASHED_ROWS_PRQ_BUCKET, 
-                                                    f"""{RDS_HASHED_ROWS_PRQ_PARENT_DIR}/{table_dirpath}"""):
+                                                    f"""{RDS_HASHED_ROWS_PRQ_PARENT_DIR}/{db_schema_dirpath}/{rds_table_orignal_name}"""):
           LOGGER.error(f'''>> {rds_hashed_rows_fulls3path} << Path Not Available !!''')
           sys.exit(1)
-    elif not S3Methods.check_s3_folder_path_if_exists(DMS_PRQ_OUTPUT_BUCKET, 
-                                                      table_dirpath):
+
+    if not S3Methods.check_s3_folder_path_if_exists(DMS_PRQ_OUTPUT_BUCKET, 
+                                                    f"""{db_schema_dirpath}/{DMS_PRQ_TABLE_FOLDER}"""):
           LOGGER.error(f'''>> {dms_output_fulls3path} << Path Not Available !!''')
           sys.exit(1)
     # --------------------------------------------------------------------------------------
 
     LOGGER.info(f""">> rds_hashed_rows_fulls3path = {rds_hashed_rows_fulls3path} <<""")
     LOGGER.info(f""">> dms_output_fulls3path = {dms_output_fulls3path} <<""")
-    
-    rds_jdbc_conn_obj = RDS_JDBC_CONNECTION(RDS_DB_HOST_ENDPOINT,
-                                            RDS_DB_INSTANCE_PWD,
-                                            RDS_DATABASE_FOLDER,
-                                            RDS_DB_SCHEMA_FOLDER)
 
-    # FETCH THE PREPARED RDS AGGREGATE SQL STATEMENT STRING
-    rds_db_agg_query_str = get_revised_rds_agg_query_str()
-    LOGGER.info(f"""rds_db_agg_query_str = \n{rds_db_agg_query_str}""")
+
+    LOGGER.info(f"""TABLE_PKEY_COLUMN = {TABLE_PKEY_COLUMN}""")
+    LOGGER.info(f"""DATE_PARTITION_COLUMN_NAME = {DATE_PARTITION_COLUMN_NAME}""")
 
     # EVALUATE RDS-DATAFRAME ROW-COUNT
-    rds_jdbc_min_max_count_df_agg = rds_jdbc_conn_obj.get_rds_df_read_query(rds_db_agg_query_str)
+    rds_table_row_stats_df_agg = rds_jdbc_conn_obj.get_min_max_count_groupby_yyyy_mm(
+                                                    rds_table_orignal_name,
+                                                    DATE_PARTITION_COLUMN_NAME,
+                                                    TABLE_PKEY_COLUMN,
+                                                    args.get("rds_only_where_clause", None))
+    # +----+-----+-----------------+-----------------+-------------------+
+    # |year|month|min_GPSPositionID|max_GPSPositionID|count_GPSPositionID|
+    # +----+-----+-----------------+-----------------+-------------------+
+    # |1970|1    |41198832         |5785155214       |22972              |
+    # |1970|2    |299219990        |5744796584       |54                 |
+    # |1970|3    |150852111        |5745141548       |35                 |
+    # |1970|4    |603316403        |5328915343       |120                |
+    # |1970|5    |652691585        |5317361051       |24                 |
+    # |1970|6    |149506526        |5745353009       |111                |
+    # |1970|7    |534917358        |5745353143       |65                 |
+    # |1970|8    |530552359        |5574165709       |6                  |
+    # |1970|9    |396540172        |5287871190       |10                 |
+    # |1970|10   |295664992        |5328914939       |7                  |
+    # |1970|11   |659003457        |4658994221       |5                  |
+    # |1970|12   |1130650220       |5330506101       |9                  |
     # --------------------------------------------------------------------------------------
 
     group_by_cols_list = ['year', 'month']
+    prq_df_where_clause = args.get("prq_df_where_clause", None)
+
 
     rds_hashed_rows_prq_df = CustomPysparkMethods.get_s3_parquet_df_v2(
                                     rds_hashed_rows_fulls3path, 
                                     CustomPysparkMethods.get_pyspark_hashed_table_schema(
                                         TABLE_PKEY_COLUMN)
                                 )
-    rds_hashed_rows_prq_df = get_filtered_dataframe(rds_hashed_rows_prq_df)
+    
+    if prq_df_where_clause is not None:
+        rds_hashed_rows_prq_df = rds_hashed_rows_prq_df.where(f"{prq_df_where_clause}")
 
     rds_hashed_rows_prq_df_agg = rds_hashed_rows_prq_df.groupby(group_by_cols_list)\
                                     .agg(
                                         F.min(TABLE_PKEY_COLUMN).alias(f"min_{TABLE_PKEY_COLUMN}"),
                                         F.max(TABLE_PKEY_COLUMN).alias(f"max_{TABLE_PKEY_COLUMN}"),
                                         F.count(TABLE_PKEY_COLUMN).alias(f"count_{TABLE_PKEY_COLUMN}")
-                                        )
+                                        )\
+                                    .orderBy(group_by_cols_list, ascending=True)
+    # +----+-----+-----------------+-----------------+-------------------+
+    # |year|month|min_GPSPositionID|max_GPSPositionID|count_GPSPositionID|
+    # +----+-----+-----------------+-----------------+-------------------+
+    # |1970|1    |41198832         |5785155214       |22972              |
+    # |1970|2    |299219990        |5744796584       |54                 |
+    # |1970|3    |150852111        |5745141548       |35                 |
+    # |1970|4    |603316403        |5328915343       |120                |
+    # |1970|5    |652691585        |5317361051       |24                 |
+    # |1970|6    |149506526        |5745353009       |111                |
+    # |1970|7    |534917358        |5745353143       |65                 |
+    # |1970|8    |530552359        |5574165709       |6                  |
+    # |1970|9    |396540172        |5287871190       |10                 |
+    # |1970|10   |295664992        |5328914939       |7                  |
+    # |1970|11   |659003457        |4658994221       |5                  |
+    # |1970|12   |1130650220       |5330506101       |9                  |
     # --------------------------------------------------------------------------------------
 
-    dms_table_output_prq_df = spark.read.parquet(dms_output_fulls3path)
-    dms_table_output_prq_df = get_filtered_dataframe(dms_table_output_prq_df).cache()
+    rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df(rds_table_orignal_name)
 
-    dms_table_output_prq_df_agg = dms_table_output_prq_df.groupby(group_by_cols_list)\
+    migrated_prq_yyyy_mm_df = CustomPysparkMethods.get_s3_parquet_df_v3(
+                                                    dms_output_fulls3path, 
+                                                    rds_db_table_empty_df.schema)
+
+    if prq_df_where_clause is not None:
+        migrated_prq_yyyy_mm_df = migrated_prq_yyyy_mm_df.where(f"{prq_df_where_clause}")
+
+    migrated_prq_yyyy_mm_df_agg = migrated_prq_yyyy_mm_df.groupby(group_by_cols_list)\
                                     .agg(
                                         F.min(TABLE_PKEY_COLUMN).alias(f"min_{TABLE_PKEY_COLUMN}"),
                                         F.max(TABLE_PKEY_COLUMN).alias(f"max_{TABLE_PKEY_COLUMN}"),
                                         F.count(TABLE_PKEY_COLUMN).alias(f"count_{TABLE_PKEY_COLUMN}")
-                                        )
+                                        )\
+                                    .orderBy(group_by_cols_list, ascending=True)
+    # +----+-----+-----------------+-----------------+-------------------+
+    # |year|month|min_GPSPositionID|max_GPSPositionID|count_GPSPositionID|
+    # +----+-----+-----------------+-----------------+-------------------+
+    # |1970|1    |41198832         |5785155214       |22972              |
+    # |1970|2    |299219990        |5744796584       |54                 |
+    # |1970|3    |150852111        |5745141548       |35                 |
+    # |1970|4    |603316403        |5328915343       |120                |
+    # |1970|5    |652691585        |5317361051       |24                 |
+    # |1970|6    |149506526        |5745353009       |111                |
+    # |1970|7    |534917358        |5745353143       |65                 |
+    # |1970|8    |530552359        |5574165709       |6                  |
+    # |1970|9    |396540172        |5287871190       |10                 |
+    # |1970|10   |295664992        |5328914939       |7                  |
+    # |1970|11   |659003457        |4658994221       |5                  |
+    # |1970|12   |1130650220       |5330506101       |9                  |
     # --------------------------------------------------------------------------------------
 
-    join_columns_list = ['year', 'month']
-    join_where_condition = f"""
-    L.count_{TABLE_PKEY_COLUMN} != R.count_{TABLE_PKEY_COLUMN} OR
-    L.min_{TABLE_PKEY_COLUMN} != R.min_{TABLE_PKEY_COLUMN} OR
-    L.max_{TABLE_PKEY_COLUMN} != R.max_{TABLE_PKEY_COLUMN}
-    """.strip()
-
-    rds_jdbc_vs_hashed_prq_agg_df = rds_jdbc_min_max_count_df_agg.alias('L').join(
-                                        rds_hashed_rows_prq_df_agg.alias('R'), 
-                                        on=join_columns_list, 
-                                        how='left')\
-                                        .where(join_where_condition)\
-                                        .cache()
-
-    rds_jdbc_vs_hashed_prq_agg_df_count = rds_jdbc_vs_hashed_prq_agg_df.count()
-    if rds_jdbc_vs_hashed_prq_agg_df_count != 0:
-        error_msg = f"""rds_jdbc_vs_hashed_prq_agg_df_count != 0 ({rds_jdbc_vs_hashed_prq_agg_df_count})"""
-        LOGGER.error(f"""{error_msg}""")
-        LOGGER.error("\n" + str(rds_jdbc_vs_hashed_prq_agg_df.limit(10).toPandas()))
+    rds_subtract_rds_hashed_rows_df = rds_table_row_stats_df_agg.subtract(rds_hashed_rows_prq_df_agg)
+    rds_subtract_rds_hashed_rows_count = rds_subtract_rds_hashed_rows_df.count()
+    if rds_subtract_rds_hashed_rows_count != 0:
+        LOGGER.error(f'''>> rds_subtract_rds_hashed_rows_count = {rds_subtract_rds_hashed_rows_count} <<''')
+        # rds_subtract_rds_hashed_rows_pd = rds_subtract_rds_hashed_rows_df.toPandas()
+        # rds_subtract_rds_hashed_rows_dict = rds_subtract_rds_hashed_rows_pd.to_dict(orient='list')
+        LOGGER.error(f'''\n{rds_subtract_rds_hashed_rows_df.limit(10).toPandas()}\n''')
         sys.exit(1)
+    # --------------------------------------------------------------------------------------
 
-        # rds_jdbc_vs_hashed_rows_prq_pd = rds_jdbc_vs_hashed_prq_agg_df.toPandas()
-        # rds_jdbc_vs_hashed_rows_prq_dict = rds_jdbc_vs_hashed_rows_prq_pd.to_dict(orient='list')
-    # ------------------------------------
-
-    rds_jdbc_vs_dms_prq_agg_df = rds_jdbc_min_max_count_df_agg.alias('L').join(
-                                        dms_table_output_prq_df_agg.alias('R'), 
-                                        on=join_columns_list,
-                                        how='left')\
-                                        .where(join_where_condition)\
-                                        .cache()
-
-    rds_jdbc_vs_dms_prq_agg_df_count = rds_jdbc_vs_dms_prq_agg_df.count()
-    if rds_jdbc_vs_dms_prq_agg_df_count != 0:
-        error_msg = f"""rds_jdbc_vs_dms_prq_agg_df_count != 0 ({rds_jdbc_vs_dms_prq_agg_df_count})"""
-        LOGGER.error(f"""{error_msg}""")
-        LOGGER.error("\n" + str(rds_jdbc_vs_dms_prq_agg_df.limit(10).toPandas()))
+    rds_hashed_rows_subtract_dms_prq_df = rds_hashed_rows_prq_df_agg.subtract(migrated_prq_yyyy_mm_df_agg)
+    rds_hashed_rows_subtract_dms_prq_count = rds_hashed_rows_subtract_dms_prq_df.count()
+    if rds_hashed_rows_subtract_dms_prq_count != 0:
+        LOGGER.error(f'''>> rds_hashed_rows_subtract_dms_prq_count = {rds_hashed_rows_subtract_dms_prq_count} <<''')
+        # rds_hashed_rows_subtract_dms_prq_pd = rds_hashed_rows_subtract_dms_prq_df.toPandas()
+        # rds_hashed_rows_subtract_dms_prq_dict = rds_hashed_rows_subtract_dms_prq_pd.to_dict(orient='list')
+        LOGGER.error(f'''\n{rds_hashed_rows_subtract_dms_prq_df.limit(10).toPandas()}\n''')
         sys.exit(1)
-    # --------------------
+    # --------------------------------------------------------------------------------------
 
-    rds_jdbc_vs_hashed_prq_agg_df.unpersist()
-    rds_jdbc_vs_dms_prq_agg_df.unpersist()
-    LOGGER.info(f""">> Aggregate stats matched between RDS-Table and Hashed-Output and DMS-Output <<""")
+    LOGGER.info(f""">> Aggregate stats matched between RDS-Original-Table and RDS-Hashed-Output and DMS-Parquet-Output <<""")
 
-    all_columns_except_pkey = [col for col in dms_table_output_prq_df.columns 
+
+    all_columns_except_pkey = [col for col in rds_db_table_empty_df.columns 
                                if col != TABLE_PKEY_COLUMN]
     LOGGER.info(f""">> all_columns_except_pkey = {all_columns_except_pkey} <<""")
 
-    dms_table_output_prq_df_t1 = dms_table_output_prq_df.withColumn(
+    dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
                                     "RowHash", F.sha2(F.concat_ws("", *all_columns_except_pkey), 256))\
-                                    .select(f'{TABLE_PKEY_COLUMN}', 'RowHash')
+                                    .select('year', 'month', f'{TABLE_PKEY_COLUMN}', 'RowHash')
     
     unmatched_hashvalues_df = rds_hashed_rows_prq_df.alias('L').join(
-                                dms_table_output_prq_df_t1.alias('R'), 
-                                on=[f'{TABLE_PKEY_COLUMN}'],
-                                how='left')\
-                                .where("L.RowHash != R.RowHash").cache()
+                                                        dms_hashed_rows_prq_df_t1.alias('R'), 
+                                                        on=['year', 'month', f'{TABLE_PKEY_COLUMN}'],
+                                                        how='left')\
+                                                    .where("L.RowHash != R.RowHash").cache()
     
     unmatched_hashvalues_df_count = unmatched_hashvalues_df.count()
 
@@ -346,7 +363,7 @@ if __name__ == "__main__":
                                 .selectExpr("json_row")
                             )
 
-        subtract_validation_msg = f"""'{TABLE_TO_BE_VALIDATED}' - {unmatched_hashvalues_df_count}"""
+        subtract_validation_msg = f"""'{DMS_PRQ_TABLE_FOLDER}' - {unmatched_hashvalues_df_count}"""
         df_subtract_temp = df_subtract_temp.selectExpr(
                                 "current_timestamp as run_datetime",
                                 "json_row",
@@ -361,7 +378,7 @@ if __name__ == "__main__":
         df_temp = df_dv_output.selectExpr(
                                 "current_timestamp as run_datetime",
                                 "'' as json_row",
-                                f"""'{TABLE_TO_BE_VALIDATED} - Validated.' as validation_msg""",
+                                f"""'{rds_table_orignal_name} - Validated.' as validation_msg""",
                                 f"""'{RDS_DATABASE_FOLDER}' as database_name""",
                                 f"""'{db_sch_tbl}' as full_table_name""",
                                 """'False' as table_to_ap"""

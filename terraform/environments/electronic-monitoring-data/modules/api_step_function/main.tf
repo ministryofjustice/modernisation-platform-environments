@@ -28,7 +28,8 @@ resource "aws_api_gateway_method" "method" {
   rest_api_id          = aws_api_gateway_rest_api.api_gateway.id
   resource_id          = aws_api_gateway_resource.resource.id
   http_method          = var.http_method
-  authorization        = var.authorization
+  authorization        = "CUSTOM"
+  authorizer_id        = aws_api_gateway_authorizer.authorizer.id
   api_key_required     = var.api_key_required
   request_validator_id = aws_api_gateway_request_validator.request_validator.id
   request_models = {
@@ -218,6 +219,19 @@ resource "aws_api_gateway_integration_response" "integration_response_500" {
   depends_on = [
     aws_api_gateway_integration.step_function_integration
   ]
+}
+
+# -------------------------------------------------------
+# API Gateway authorizer
+# -------------------------------------------------------
+
+resource "aws_api_gateway_authorizer" "authorizer" {
+  name                   = "authorizer"
+  type                   = "REQUEST"
+  rest_api_id            = aws_api_gateway_rest_api.api_gateway.id
+  authorizer_uri         = var.lambda_function_invoke_arn
+  authorizer_credentials = var.authorizer_role
+  identity_source        = "method.request.header.RoleArn"
 }
 
 # -------------------------------------------------------
