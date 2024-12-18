@@ -303,7 +303,7 @@ cat <<EOC25 > /home/oracle/scripts/aws_ebs_backup.sh
 EOC25
 
 echo "Adding cron job scripts"
-/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/ /home/oracle/scripts
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/ /home/oracle/scripts --recursive
 chown -R oracle:dba /home/oracle/scripts/
 chmod -R 755 /home/oracle/scripts/*.sh
 
