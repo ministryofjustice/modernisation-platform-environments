@@ -510,6 +510,13 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
             "Resource": [
                 "arn:aws:s3:::${aws_s3_bucket.scripts.id}"
             ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameter"
+            ],
+            "Resource": "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/*SLACK_ALERT_URL"
         }
     ]
 }

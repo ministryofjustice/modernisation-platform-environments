@@ -24,5 +24,5 @@ if grep "no rows" freespace.log
  then 
   echo "all good"
  else
-  mailx -s "EDW $1 freespace at `date`" SLACK_ALERT_URL -- -f "edw@legalservices.gov.uk" < freespace.log
+  mailx -s "EDW $1 freespace at `date`" SLACK_ALERT_URL -- < freespace.log
 fi
