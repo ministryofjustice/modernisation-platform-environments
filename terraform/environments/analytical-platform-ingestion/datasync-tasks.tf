@@ -20,7 +20,6 @@ resource "aws_datasync_task" "opg_investigations" {
     s3_destination {
       bucket_access_role_arn = module.datasync_iam_role.iam_role_arn
       s3_bucket_arn          = module.datasync_opg_investigations_bucket.s3_bucket_arn
-      subdirectory           = "/"
     }
   }
 

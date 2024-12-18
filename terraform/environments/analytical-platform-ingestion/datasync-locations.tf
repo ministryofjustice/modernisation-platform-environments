@@ -11,7 +11,7 @@ resource "aws_datasync_location_s3" "opg_investigations" {
 
 resource "aws_datasync_location_smb" "opg_investigations" {
   server_hostname = "eucw4171nas002.dom1.infra.int"
-  subdirectory    = "/mojshared002$/FITS_3635/Shared/Group/SIS Case Management/Investigations/Cases/Investigation Cases"
+  subdirectory    = "/mojshared002$/FITS_3635/Shared/Group/SIS Case Management/Investigations/Cases/Investigation Cases/"
 
   user     = jsondecode(data.aws_secretsmanager_secret_version.datasync_dom1.secret_string)["username"]
   password = jsondecode(data.aws_secretsmanager_secret_version.datasync_dom1.secret_string)["password"]
