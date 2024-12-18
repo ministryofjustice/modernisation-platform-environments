@@ -24,5 +24,9 @@ resource "aws_datasync_task" "opg_investigations" {
     }
   }
 
+  schedule {
+    schedule_expression = "cron(0 23 ? * WED *)"
+  }
+
   tags = local.tags
 }
