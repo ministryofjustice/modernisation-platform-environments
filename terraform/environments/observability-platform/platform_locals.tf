@@ -4,13 +4,15 @@ locals {
 
   # environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
-  environment_management = merge(
-    jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string),
-    { account_ids = merge(
-        jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string).account_ids,
-        { "modernisation_platform" = data.aws_ssm_parameter.modernisation_platform_account_id.value }
-      )
-    }
+  environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
+
+  account_ids = merge(
+    local.environment_management.account_ids,
+    (
+      local.environment_management.modernisation_platform_account_id != null ?
+      { "modernisation_platform" = local.environment_management.modernisation_platform_account_id } :
+      {}
+    )
   )
 
   # Stores modernisation platform account id for setting up the modernisation-platform provider
