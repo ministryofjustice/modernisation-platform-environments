@@ -61,7 +61,15 @@ class SQLServer_Extract_Transform:
 
     TRANSFORM_COLS_FOR_HASHING_DICT = {
     'g4s_emsys_mvp_dbo_GPSPosition': {
-        'Latitude': "CAST(FORMAT(Latitude, '0.0######') AS VARCHAR)", 
+        'Latitude': """
+        CAST(
+        CASE 
+            WHEN CAST(Latitude AS VARCHAR(50)) LIKE '%e%' THEN 
+                FORMAT(Latitude, '0.0E+0')
+            ELSE 
+                FORMAT(Latitude, '0.0######')
+        END 
+        AS VARCHAR)""".strip(), 
         'Longitude': "CAST(FORMAT(Longitude, '0.0######') AS VARCHAR)", 
         'RecordedDatetime':'CONVERT(VARCHAR, RecordedDatetime, 120)', 
         'AuditDateTime': """
