@@ -544,7 +544,7 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
         {
             "Action": [
                 "ec2:DescribeInstances",            
-                "ec2:CreateSnapshot"
+                "ec2:CreateSnapshots"
             ],
             "Resource": ["*"],
             "Effect": "Allow"
