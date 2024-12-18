@@ -48,7 +48,7 @@ This directory contains the Terraform configuration for the Delius Core environm
 
 * WebLogic
 	* Base URL is https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk
-	* NB: This needs a trailing path of either /jspellhtml/* OR /NDelius* to hit the target group, [for example][https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/login.xhtml]
+	* NB: This needs a trailing path of either /jspellhtml/* OR /NDelius* to hit the target group, [for example](https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/login.xhtml)
 * LDAP
 	* ldaps://ldap.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk:636
 * PWM
