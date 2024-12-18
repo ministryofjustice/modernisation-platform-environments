@@ -67,7 +67,7 @@ class SQLServer_Extract_Transform:
         'AuditDateTime': """
         CAST(
         CASE 
-             WHEN RIGHT(FORMAT(AuditDateTime, 'fff'), 2) = '00' THEN 
+            WHEN RIGHT(FORMAT(AuditDateTime, 'fff'), 2) = '00' THEN 
                 FORMAT(AuditDateTime, 'yyyy-MM-dd HH:mm:ss.f')
             WHEN RIGHT(FORMAT(AuditDateTime, 'fff'), 1) = '0' THEN 
                 FORMAT(AuditDateTime, 'yyyy-MM-dd HH:mm:ss.ff')
