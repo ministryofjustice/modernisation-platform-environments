@@ -87,6 +87,19 @@ resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
   local.application_data.accounts[local.environment].cloud_platform_subnet]
 }
 
+# MP CIS -> MP CCSM Dev
+
+resource "aws_security_group_rule" "ingress_traffic_ebsdb_152x" {
+  count             = local.is-development ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ebsdb.id
+  type              = "ingress"
+  description       = "Oracle Net Listener"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1522
+  cidr_blocks       = ["10.26.56.0/21"]
+}
+
 ### Oracle
 
 resource "aws_security_group_rule" "ingress_traffic_ebsdb_5101" {
