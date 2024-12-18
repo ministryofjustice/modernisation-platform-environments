@@ -169,6 +169,16 @@ COMMIT;
 SPOOL OFF
 EOC23
 
+echo "Setting up AWS EBS backup"
+INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+cat <<EOC25 > /home/oracle/scripts/aws_ebs_backup.sh
+#!/bin/bash
+/usr/local/bin/aws ec2 create-snapshots \
+--instance-specification InstanceId=$INSTANCE_ID \
+--description "AWS crash-consistent snapshots of EDW database volumes, automatically created snapshot from oracle_cron inside EC2" \
+--copy-tags-from-source volume
+EOC25
+
 # Set up log files
 echo "---creating /etc/awslogs/awscli.conf"
 mkdir -p /etc/awslogs
@@ -269,7 +279,7 @@ sudo mkdir -p /oracle/software
 sudo mkdir -p /oracle/temp_undo
 sudo mkdir -p /backups
 
-# Mount all file systems in fstab
+# #Mount all file systems in fstab
 mount -a
 chmod 777 /stage
 
@@ -377,6 +387,7 @@ cat <<EOC3 > /etc/cron.d/backup_cron
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
 # 0 7 * * 1 /home/oracle/scripts/maat_05365_ware_db_changes.sh
+00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log
 EOC3
 
 chown root:root /etc/cron.d/backup_cron
@@ -525,12 +536,19 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
                 "logs:CreateLogStream",
                 "logs:DescribeLogStreams",
                 "logs:PutRetentionPolicy",
-                "logs:PutLogEvents",
-                "ec2:DescribeInstances"
+                "logs:PutLogEvents"
             ],
             "Resource": ["*"],
             "Effect": "Allow"
-        }, 
+        },
+        {
+            "Action": [
+                "ec2:DescribeInstances",            
+                "ec2:CreateSnapshots"
+            ],
+            "Resource": ["*"],
+            "Effect": "Allow"
+        },         
         {
             "Action": [
                 "ec2:CreateTags"
