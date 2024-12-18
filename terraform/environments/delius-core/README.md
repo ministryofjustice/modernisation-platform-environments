@@ -47,7 +47,7 @@ This directory contains the Terraform configuration for the Delius Core environm
 ### **Service URLs:**
 
 * WebLogic
-	* 
+	* https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk
 * LDAP
 	* ldap.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk:389
 * PWM
