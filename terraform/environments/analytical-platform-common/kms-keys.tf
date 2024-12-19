@@ -5,6 +5,8 @@ module "ecr_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.1"
 
+  aliases               = ["ecr/default"]
+  description           = "ECR default KMS key"
   enable_default_policy = true
 
   deletion_window_in_days = 7
