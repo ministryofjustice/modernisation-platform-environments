@@ -34,7 +34,10 @@ resource "aws_iam_role_policy" "cis_ec2_policy" {
       {
         Action   = "s3:*"
         Effect   = "Allow"
-        Resource = "*"
+        "Resource" : [
+          "arn:aws:s3:::laa-software-library",
+          "arn:aws:s3:::laa-software-library/*"
+        ],
       }
     ]
   })
