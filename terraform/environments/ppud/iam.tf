@@ -1492,3 +1492,9 @@ resource "aws_iam_policy_attachment" "attach_lambda_securityhub_readonly_prod" {
   roles      = [aws_iam_role.lambda_role_securityhub_get_data_prod[0].id]
   policy_arn = "arn:aws:iam::aws:policy/AWSSecurityHubReadOnlyAccess"
 }
+
+resource "aws_iam_role_policy_attachment" "lambda_vpc_access_policy_to_lambda_role_securityhub_get_data_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_securityhub_get_data_prod[0].id
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
+}
