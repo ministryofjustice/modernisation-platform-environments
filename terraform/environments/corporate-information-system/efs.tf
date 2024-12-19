@@ -56,22 +56,24 @@ resource "aws_security_group" "efs_product" {
   )
 }
 
-resource "aws_vpc_security_group_egress_rule" "efs_product_outbound" {
-  security_group_id            = aws_security_group.efs_product.id
-  description                  = "EFS Rule outbound to instance"
-  referenced_security_group_id = aws_security_group.database.id
-  from_port                    = 2049
-  ip_protocol                  = "tcp"
-  to_port                      = 2049
+resource "aws_security_group_rule" "efs_product_outbound" {
+  type                     = "egress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.efs_product.id
+  source_security_group_id = aws_security_group.ec2_instance_sg.id
+  description              = "Allow outbound to CIS Instance SG"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "efs_product_inbound" {
-  security_group_id            = aws_security_group.efs_product.id
-  description                  = "EFS Rule inbound from instance"
-  referenced_security_group_id = aws_security_group.database.id
-  from_port                    = 2049
-  ip_protocol                  = "tcp"
-  to_port                      = 2049
+resource "aws_security_group_rule" "efs_product_outbound" {
+  type                     = "ingress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.efs_product.id
+  source_security_group_id = aws_security_group.ec2_instance_sg.id
+  description              = "Allow inbound from CIS Instance SG"
 }
 
 resource "aws_efs_mount_target" "subnet_a" {
