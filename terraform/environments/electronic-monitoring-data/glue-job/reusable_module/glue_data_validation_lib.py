@@ -821,8 +821,20 @@ class CustomPysparkMethods:
         return altered_schema_object
 
     @staticmethod
-    def get_pyspark_hashed_table_schema(in_pkey_column):
-        return T.StructType([
-            T.StructField(f"{in_pkey_column}", T.LongType(), False),
-            T.StructField("RowHash", T.StringType(), False)]
-            )
+    def get_pyspark_hashed_table_schema(in_pkey_column, sf_list=None):
+        if sf_list is None:
+            return T.StructType([
+                T.StructField(f"{in_pkey_column}", T.LongType(), False),
+                T.StructField("RowHash", T.StringType(), False)]
+                )
+        else:
+            schema = T.StructType([
+                T.StructField(f"{in_pkey_column}", T.LongType(), False)]
+                )
+            
+            for sf in sf_list:
+                schema = schema.add(sf)
+            
+            schema = schema.add(T.StructField("RowHash", T.StringType(), False))
+
+            return schema

@@ -60,7 +60,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 
 OPTIONAL_INPUTS = [
     "rds_only_where_clause",
-    "prq_df_where_clause"
+    "prq_df_where_clause",
+    "skip_columns_for_hashing"
 ]
 
 AVAILABLE_ARGS_LIST = CustomPysparkMethods.resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -236,15 +237,41 @@ if __name__ == "__main__":
     # |1970|12   |1130650220       |5330506101       |9                  |
     # --------------------------------------------------------------------------------------
 
+    rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df(rds_table_orignal_name)
+
+    skip_columns_for_hashing_str = args.get("skip_columns_for_hashing", None)
+
+    skip_columns_for_hashing = list()
+    skipped_struct_fields_list = list()
+
+    if skip_columns_for_hashing_str is not None:
+        skip_columns_for_hashing = [f"""{col_name.strip().strip("'").strip('"')}"""
+                                    for col_name in skip_columns_for_hashing_str.split(",")]
+        LOGGER.warn(f"""WARNING ! >> Given skip_columns_for_hashing = {skip_columns_for_hashing}""")
+
+        for e in rds_db_table_empty_df.schema:
+            if e.name in skip_columns_for_hashing:
+                skipped_struct_fields_list.append(f"""T.{e}""")
+
+        LOGGER.warn(f"""WARNING ! >> skipped_struct_fields_list = {skipped_struct_fields_list}""")
+
+
     group_by_cols_list = ['year', 'month']
     prq_df_where_clause = args.get("prq_df_where_clause", None)
 
 
-    rds_hashed_rows_prq_df = CustomPysparkMethods.get_s3_parquet_df_v2(
+    if skipped_struct_fields_list:
+        rds_hashed_rows_prq_df = CustomPysparkMethods.get_s3_parquet_df_v2(
                                     rds_hashed_rows_fulls3path, 
                                     CustomPysparkMethods.get_pyspark_hashed_table_schema(
-                                        TABLE_PKEY_COLUMN)
-                                )
+                                    TABLE_PKEY_COLUMN, skipped_struct_fields_list)
+                                    )
+    else:
+        rds_hashed_rows_prq_df = CustomPysparkMethods.get_s3_parquet_df_v2(
+                                    rds_hashed_rows_fulls3path, 
+                                    CustomPysparkMethods.get_pyspark_hashed_table_schema(
+                                    TABLE_PKEY_COLUMN)
+                                    )
     
     if prq_df_where_clause is not None:
         rds_hashed_rows_prq_df = rds_hashed_rows_prq_df.where(f"{prq_df_where_clause}")
@@ -272,8 +299,6 @@ if __name__ == "__main__":
     # |1970|11   |659003457        |4658994221       |5                  |
     # |1970|12   |1130650220       |5330506101       |9                  |
     # --------------------------------------------------------------------------------------
-
-    rds_db_table_empty_df = rds_jdbc_conn_obj.get_rds_db_table_empty_df(rds_table_orignal_name)
 
     migrated_prq_yyyy_mm_df = CustomPysparkMethods.get_s3_parquet_df_v3(
                                                     dms_output_fulls3path, 

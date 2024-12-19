@@ -64,7 +64,8 @@ OPTIONAL_INPUTS = [
     "coalesce_int",
     "parallel_jdbc_conn_num",
     "pkey_lower_bound_int",
-    "pkey_upper_bound_int"
+    "pkey_upper_bound_int",
+    "skip_columns_for_hashing"
 ]
 
 AVAILABLE_ARGS_LIST = CustomPysparkMethods.resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -246,13 +247,21 @@ if __name__ == "__main__":
         sys.exit(1)
     # ---------------------------------------
 
+    skip_columns_for_hashing_str = args.get("skip_columns_for_hashing", None)
+    skip_columns_for_hashing = list()
+    if skip_columns_for_hashing_str is not None:
+        skip_columns_for_hashing = [f"""{col_name.strip().strip("'").strip('"')}"""
+                                    for col_name in skip_columns_for_hashing_str.split(",")]
+        LOGGER.warn(f"""WARNING ! >> Given skip_columns_for_hashing = {skip_columns_for_hashing}""")
+    
     all_columns_except_pkey = list()
     conversion_col_list = list()
     if TRANSFORM_COLS_FOR_HASHING_DICT.get(f"{db_sch_tbl}", None) is not None:
         conversion_col_list = list(TRANSFORM_COLS_FOR_HASHING_DICT[f"{db_sch_tbl}"].keys())
 
     for e in rds_db_table_empty_df.schema.fields:
-        if e.name == rds_db_tbl_pkey_column:
+        if (e.name == rds_db_tbl_pkey_column) \
+            or (e.name in skip_columns_for_hashing):
             continue
         
         if e.name in conversion_col_list:
@@ -286,8 +295,12 @@ if __name__ == "__main__":
     # VERIFY GIVEN INPUTS - END
     # -----------------------------------------
 
+    partial_select_str = f"""SELECT {rds_db_tbl_pkey_column}, """
+    if skip_columns_for_hashing_str is not None:
+        partial_select_str = partial_select_str + ', '.join(skip_columns_for_hashing)
+    
     rds_db_hash_cols_query_str = f"""
-    SELECT {rds_db_tbl_pkey_column}, 
+    {partial_select_str}
     LOWER(SUBSTRING(CONVERT(VARCHAR(66), 
     HASHBYTES('SHA2_256', CONCAT_WS('', {', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash,
     YEAR({date_partition_column_name}) AS year,
