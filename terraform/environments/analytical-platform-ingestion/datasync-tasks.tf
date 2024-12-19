@@ -9,11 +9,12 @@ resource "aws_datasync_task" "opg_investigations" {
     uid               = "NONE"
     posix_permissions = "NONE"
     log_level         = "TRANSFER"
+    verify_mode       = "ONLY_FILES_TRANSFERRED"
   }
 
   task_report_config {
     report_overrides {}
-    report_level         = "SUCCESSES_AND_ERRORS"
+    report_level         = "ERRORS_ONLY"
     output_type          = "STANDARD"
     s3_object_versioning = "INCLUDE"
 
@@ -24,7 +25,7 @@ resource "aws_datasync_task" "opg_investigations" {
   }
 
   schedule {
-    schedule_expression = "cron(0 23 ? * WED *)"
+    schedule_expression = "cron(0 23 ? * THU *)"
   }
 
   tags = local.tags
