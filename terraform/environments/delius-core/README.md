@@ -63,7 +63,6 @@ Replace [env] and [vpc] with the following values:
 |test   | hmpps-test         |
 |stage  | hmpps-preproduction|
 |preprod| hmpps-preproduction|
-|prod   | hmpps-production   |
 
 <!-- The URL(s) of the service’s production environment, and test environments if possible-->
 
