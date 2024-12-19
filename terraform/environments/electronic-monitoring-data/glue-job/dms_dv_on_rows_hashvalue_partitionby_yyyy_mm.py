@@ -250,9 +250,9 @@ if __name__ == "__main__":
                                     for col_name in skip_columns_for_hashing_str.split(",")]
         LOGGER.warn(f"""WARNING ! >> Given skip_columns_for_hashing = {skip_columns_for_hashing}""")
 
-        for e in rds_db_table_empty_df.schema:
-            if e.name in skip_columns_for_hashing:
-                skipped_struct_fields_list.append(e)
+        for sf in rds_db_table_empty_df.schema:
+            if sf.name in skip_columns_for_hashing:
+                skipped_struct_fields_list.append(sf)
 
         LOGGER.warn(f"""WARNING ! >> skipped_struct_fields_list = {skipped_struct_fields_list}""")
         skipped_cols_condition_list = [f"(L.{col} != R.{col})" 
