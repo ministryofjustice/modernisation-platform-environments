@@ -22,7 +22,8 @@
       "role_id_s3_software_library": "LAA-CIS-db-test-AppEc2Role-11TDCT1YVY25O"
     },
     "test": {
-      "example_var": "test-data"
+      "example_var": "test-data",
+      "app_ami_id": "TEST-value",
     },
     "preproduction": {
       "example_var": "preproduction-data"
