@@ -85,14 +85,14 @@ resource "aws_iam_role_policy" "cis_s3fs_policy" {
           "arn:aws:s3:::laa-software-bucket2/*",
           "arn:aws:s3:::laa-software-library",
           "arn:aws:s3:::laa-software-library/*",
-          "arn:aws:s3:::laa-cis-inbound-production",
-          "arn:aws:s3:::laa-cis-inbound-production/*",
-          "arn:aws:s3:::laa-cis-outbound-production",
-          "arn:aws:s3:::laa-cis-outbound-production/*",
-          "arn:aws:s3:::laa-ccms-outbound-production",
-          "arn:aws:s3:::laa-ccms-outbound-production/*",
-          "arn:aws:s3:::laa-ccms-inbound-production",
-          "arn:aws:s3:::laa-ccms-inbound-production/*"
+          "arn:aws:s3:::laa-cis-inbound-${local.application_data.accounts[local.environment].s3_bucket_env}",
+          "arn:aws:s3:::laa-cis-inbound-${local.application_data.accounts[local.environment].s3_bucket_env}/*",
+          "arn:aws:s3:::laa-cis-outbound-${local.application_data.accounts[local.environment].s3_bucket_env}",
+          "arn:aws:s3:::laa-cis-outbound-${local.application_data.accounts[local.environment].s3_bucket_env}/*",
+          "arn:aws:s3:::laa-ccms-outbound-${local.application_data.accounts[local.environment].s3_bucket_env}",
+          "arn:aws:s3:::laa-ccms-outbound-${local.application_data.accounts[local.environment].s3_bucket_env}/*",
+          "arn:aws:s3:::laa-ccms-inbound-${local.application_data.accounts[local.environment].s3_bucket_env}",
+          "arn:aws:s3:::laa-ccms-inbound-${local.application_data.accounts[local.environment].s3_bucket_env}/*"
         ],
         "Effect" : "Allow"
       },

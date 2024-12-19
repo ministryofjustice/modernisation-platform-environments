@@ -16,7 +16,8 @@
       "sdisize": "150",
       "s3fs_ami_id": "ami-0a6006bac3b9bb8d3",
       "s3fsinstancetype": "t3a.small",
-      "ccms_mp_dev_cidr": "10.26.56.0/21"
+      "ccms_mp_dev_cidr": "10.26.56.0/21",
+      "s3_bucket_env": "development"
     },
     "test": {
       "example_var": "test-data"
