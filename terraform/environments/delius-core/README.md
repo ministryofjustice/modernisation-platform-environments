@@ -47,13 +47,23 @@ This directory contains the Terraform configuration for the Delius Core environm
 ### **Service URLs:**
 
 * WebLogic
-	* Base URL is https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk
-	* NB: This needs a trailing path of either /jspellhtml/* OR /NDelius* to hit the target group, [for example](https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/login.xhtml)
+	* Base URL is [(https://ndelius.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk](https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/login.xhtml)
+	* NB: This needs a trailing path of either /jspellhtml/* OR /NDelius* to hit the target group, e.g. `/NDelius-war/delius/JSP/auth/login.xhtml`
 	* Also, ensure you are connected to the GlobalProtect VPN
 * LDAP
-	* ldaps://ldap.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk:636
+	* ldaps://ldap.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk:636
 * PWM
-	* https://pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/public/forgottenpassword
+	* [https://pwm.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk/public/forgottenpassword](https://pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/public/forgottenpassword)
+
+Replace [env] and [vpc] with the following values:
+
+| [env] |    [vpc]   |
+|-------|--------------------|
+|dev    | hmpps-development  |
+|test   | hmpps-test         |
+|stage  | hmpps-preproduction|
+|preprod| hmpps-preproduction|
+|prod   | hmpps-production   |
 
 
 <!-- The URL(s) of the service’s production environment, and test environments if possible-->
