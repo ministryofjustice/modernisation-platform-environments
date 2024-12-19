@@ -2,8 +2,7 @@
 
 if [ $# -ne 1 ]; then
  echo "1st parameter is ENV"
-fi
-
+else
 # fixed variables
 LOCATE=$HOME/scripts
 ORACLE_SID=EDW;export ORACLE_SID
@@ -21,8 +20,9 @@ conn / as sysdba
 exit
 eosql
 if grep "no rows" freespace.log
- then 
+then 
   echo "all good"
- else
-  mailx -s "EDW $1 freespace at `date`" SLACK_ALERT_URL -- < freespace.log
+else
+  mailx -s "EDW $1 freespace at `date`" SLACK_ALERT_URL -- < logs/freespace_alert.log
+fi
 fi

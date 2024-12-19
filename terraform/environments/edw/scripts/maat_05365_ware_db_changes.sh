@@ -2,8 +2,7 @@
 
 if [ $# -ne 1 ]; then
  echo "1st parameter is ENV"
-fi
-
+else
 # fixed variables
 chown -R oracle:dba /home/oracle/scripts
 
@@ -21,3 +20,4 @@ exit
 eosql
 
 mailx -s "MI $1 (EDW005) datafix 3079 \`date\`" SLACK_ALERT_URL < rundatafix.log
+fi

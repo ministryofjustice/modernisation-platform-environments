@@ -1,8 +1,7 @@
 #!/bin/bash
 if [ $# -ne 2 ]; then
  echo "1st parameter is ENV and 2nd parameter is  % usage "
-fi
-
+else
 
  ALERT=$2 # alert level
  MAILLOG=/tmp/mail.log
