@@ -57,7 +57,8 @@ data "aws_iam_policy_document" "ecr_access" {
 }
 
 module "ecr_access_iam_policy" {
-  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.48.0"
@@ -65,4 +66,6 @@ module "ecr_access_iam_policy" {
   name_prefix = "ecr-access"
 
   policy = data.aws_iam_policy_document.ecr_access.json
+
+  tags = local.tags
 }
