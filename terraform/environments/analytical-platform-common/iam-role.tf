@@ -8,7 +8,7 @@ module "ecr_access_iam_role" {
   name = "ecr-access"
 
   subjects = [
-    "ministrofjustice/*",
+    "ministryofjustice/*",
     "moj-analytical-services/*"
   ]
 
