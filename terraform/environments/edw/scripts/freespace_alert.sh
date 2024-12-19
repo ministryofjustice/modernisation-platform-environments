@@ -14,12 +14,12 @@ ORAENV_ASK="NO";export ORAENV_ASK
 
 cd $LOCATE
 
-sqlplus -s /nolog <<eosql >freespace.log
+sqlplus -s /nolog <<eosql >logs/freespace_alert.log
 conn / as sysdba
 @freespace_alert.sql
 exit
 eosql
-if grep "no rows" freespace.log
+if grep "no rows" logs/freespace_alert.log
 then 
   echo "all good"
 else
