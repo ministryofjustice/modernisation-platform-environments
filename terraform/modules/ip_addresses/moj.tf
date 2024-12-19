@@ -41,6 +41,13 @@ locals {
       "194.33.218.0/24"
     ]
 
+    VM02_dia_networks = [
+      "213.107.164.0/24",
+      "213.107.165.0/24",
+      "213.107.166.0/24",
+      "213.107.167.0/24"
+    ]
+
     mojo_azure_landing_zone_egress = [
       "20.49.214.199/32",
       "20.49.214.228/32",
@@ -49,7 +56,7 @@ locals {
     ]
 
     palo_alto_primsa_access_corporate   = "128.77.75.64/26"
-    palo_alto_primsa_access_third_party = "128.77.75.0/25"
+    palo_alto_primsa_access_third_party = "128.77.75.0/26"
     palo_alto_primsa_access_residents   = "128.77.75.128/26"
 
     ark_dc_external_internet = [
@@ -90,7 +97,9 @@ locals {
       local.moj_cidr.mojo_arkf_internet_egress_exponential_e,
       local.moj_cidr.mojo_arkf_internet_egress_vodafone,
       local.moj_cidr.ark_dc_external_internet,
-      local.moj_cidr.mojo_azure_landing_zone_egress
+      local.moj_cidr.mojo_azure_landing_zone_egress,
+      local.moj_cidr.palo_alto_primsa_access_third_party,
+      local.moj_cidr.VM02_dia_networks
     ])
 
     trusted_moj_enduser_internal = [
