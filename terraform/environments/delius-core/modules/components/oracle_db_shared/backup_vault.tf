@@ -34,5 +34,5 @@ resource "aws_backup_vault" "oracle_backup_vault" {
 resource "aws_iam_policy_attachment" "oracle_ec2_snapshot_backup_role_policy_attachment" {
   name       = "oracle-ec2-snapshot-backup-role-policy-attachment"
   roles      = var.instance_roles
-  policy_arn = "arn:aws:iam::${var.account_info.id}:policy/service-role/AWSBackupServiceRolePolicyForBackup"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
 }
