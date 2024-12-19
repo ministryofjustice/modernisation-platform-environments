@@ -300,7 +300,7 @@ if __name__ == "__main__":
         partial_select_str = partial_select_str + ', '.join(skip_columns_for_hashing)
     
     rds_db_hash_cols_query_str = f"""
-    {partial_select_str}
+    {partial_select_str},
     LOWER(SUBSTRING(CONVERT(VARCHAR(66), 
     HASHBYTES('SHA2_256', CONCAT_WS('', {', '.join(all_columns_except_pkey)})), 1), 3, 66)) AS RowHash,
     YEAR({date_partition_column_name}) AS year,

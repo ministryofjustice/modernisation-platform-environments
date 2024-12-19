@@ -243,7 +243,8 @@ if __name__ == "__main__":
 
     skip_columns_for_hashing = list()
     skipped_struct_fields_list = list()
-
+    skipped_cols_condition_list = list()
+    skipped_cols_alias = list()
     if skip_columns_for_hashing_str is not None:
         skip_columns_for_hashing = [f"""{col_name.strip().strip("'").strip('"')}"""
                                     for col_name in skip_columns_for_hashing_str.split(",")]
@@ -254,6 +255,10 @@ if __name__ == "__main__":
                 skipped_struct_fields_list.append(f"""T.{e}""")
 
         LOGGER.warn(f"""WARNING ! >> skipped_struct_fields_list = {skipped_struct_fields_list}""")
+        skipped_cols_condition_list = [f"(L.{col} != R.{col})" 
+                                       for col in skip_columns_for_hashing]
+        skipped_cols_alias = [f"L.{col} as rds_{col}, R.{col} as dms_{col}"
+                              for col in skip_columns_for_hashing]
 
 
     group_by_cols_list = ['year', 'month']
@@ -362,11 +367,23 @@ if __name__ == "__main__":
                                     "RowHash", F.sha2(F.concat_ws("", *all_columns_except_pkey), 256))\
                                     .select('year', 'month', f'{TABLE_PKEY_COLUMN}', 'RowHash')
     
+    
+    unmatched_condition_str = f"""
+    (L.RowHash != R.RowHash)
+    or (R.RowHash is null)
+    """.strip()
+
+    if skipped_cols_condition_list:
+        unmatched_condition_str = unmatched_condition_str + ' or ' + \
+                                    {' or '.join(skipped_cols_condition_list)}
+    
+    LOGGER.info(f""">> unmatched_condition_str = {unmatched_condition_str} <<""")
+
     unmatched_hashvalues_df = rds_hashed_rows_prq_df.alias('L').join(
                                                         dms_hashed_rows_prq_df_t1.alias('R'), 
                                                         on=['year', 'month', f'{TABLE_PKEY_COLUMN}'],
                                                         how='left')\
-                                                    .where("L.RowHash != R.RowHash").cache()
+                                                    .where(unmatched_condition_str).cache()
     
     unmatched_hashvalues_df_count = unmatched_hashvalues_df.count()
 
@@ -374,12 +391,20 @@ if __name__ == "__main__":
 
     if unmatched_hashvalues_df_count != 0:
         LOGGER.warn(f"""unmatched_hashvalues_df_count> {unmatched_hashvalues_df_count}: Row differences found!""")
-
-        unmatched_hashvalues_df_select = unmatched_hashvalues_df.selectExpr(
-                                            f"L.{TABLE_PKEY_COLUMN} as {TABLE_PKEY_COLUMN}", 
-                                            "L.RowHash as rds_row_hash", 
-                                            "R.RowHash as dms_output_row_hash"
-                                        ).limit(10)
+        
+        if skipped_cols_alias:
+            unmatched_hashvalues_df_select = unmatched_hashvalues_df.selectExpr(
+                                        f"L.{TABLE_PKEY_COLUMN} as {TABLE_PKEY_COLUMN}", 
+                                        f"{', '.join(skipped_cols_alias)}",
+                                        "L.RowHash as rds_row_hash", 
+                                        "R.RowHash as dms_output_row_hash"
+                                    ).limit(10)
+        else:
+            unmatched_hashvalues_df_select = unmatched_hashvalues_df.selectExpr(
+                                                f"L.{TABLE_PKEY_COLUMN} as {TABLE_PKEY_COLUMN}", 
+                                                "L.RowHash as rds_row_hash", 
+                                                "R.RowHash as dms_output_row_hash"
+                                            ).limit(10)
 
         df_subtract_temp = (unmatched_hashvalues_df_select
                                 .withColumn('json_row', 
