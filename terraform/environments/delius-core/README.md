@@ -57,7 +57,6 @@ This directory contains the Terraform configuration for the Delius Core environm
 
 Replace [env] and [vpc] with the following values:
 
-<center>
 | [env] |    [vpc]   |
 |-------|--------------------|
 |dev    | hmpps-development  |
@@ -65,7 +64,6 @@ Replace [env] and [vpc] with the following values:
 |stage  | hmpps-preproduction|
 |preprod| hmpps-preproduction|
 |prod   | hmpps-production   |
-</center>
 
 <!-- The URL(s) of the service’s production environment, and test environments if possible-->
 
