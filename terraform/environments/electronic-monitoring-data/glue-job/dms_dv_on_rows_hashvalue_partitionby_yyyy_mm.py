@@ -368,7 +368,7 @@ if __name__ == "__main__":
         dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
                                         "RowHash", F.sha2(F.concat_ws("", *all_columns_except_pkey), 256))\
                                         .select('year', 'month', f'{TABLE_PKEY_COLUMN}', 
-                                                f"{', '.join(skip_columns_for_hashing)}", 
+                                                ', '.join(f"'{col}'" for col in skip_columns_for_hashing),
                                                 'RowHash')
     else:    
         dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
