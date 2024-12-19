@@ -32,6 +32,7 @@ locals {
       "194.33.197.0/25"
     ]
 
+    # Ian Norris: for sites that don't go through prisma
     vodafone_dia_networks = [
       "194.33.200.0/21",
       "194.33.216.0/23",
@@ -84,7 +85,8 @@ locals {
       local.moj_cidr.mojo_arkf_internet_egress_vodafone,
       local.moj_cidr.ark_dc_external_internet,
       local.moj_cidr.mojo_azure_landing_zone_egress,
-      # local.moj_cidr.VM02_dia_networks,
+      local.moj_cidr.vodafone_dia_networks,
+      local.moj_cidr.VM02_dia_networks,
     ])
 
     trusted_moj_enduser_internal = [
