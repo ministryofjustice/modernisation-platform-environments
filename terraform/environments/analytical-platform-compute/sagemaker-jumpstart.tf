@@ -123,5 +123,5 @@ resource "aws_sagemaker_model" "mxbai_rerank_xsmall_model" {
 
 data "aws_sagemaker_prebuilt_ecr_image" "huggingface_image" {
   repository_name = "huggingface-pytorch-inference"
-  image_tag       = "4.26.0"
+  image_tag       = "2.1.0-transformers4.37.0-gpu-py310-cu118-ubuntu20.04"
 }
