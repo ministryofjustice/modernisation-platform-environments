@@ -9,12 +9,11 @@ securityhub = boto3.client('securityhub')
 
 # Configuration
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
-SENDER = 'noreply@internaltest.ppud.justice.gov.uk'
+SENDER = 'donotreply@cjsm.secure-email.ppud.justice.gov.uk'
 RECIPIENTS = ['nick.buckingham@colt.net']
 SUBJECT = f'AWS Security Hub - Critical Vulnerabilities - {CURRENT_DATE}'
 SMTP_SERVER = "10.27.9.39"
 SMTP_PORT = 25
-AWS_REGION = 'eu-west-2'
 
 def check_critical_vulnerabilities():
     findings = []
@@ -23,6 +22,7 @@ def check_critical_vulnerabilities():
         Filters={
             'WorkflowState': [{'Value': 'NEW', 'Comparison': 'EQUALS'}],
             'RecordState': [{'Value': 'ACTIVE', 'Comparison': 'EQUALS'}],
+            'Region': [{'Value': 'eu-west-2', 'Comparison': 'EQUALS'}],
             'SeverityLabel': [{'Value': 'CRITICAL', 'Comparison': 'EQUALS'}]
         }
     )
