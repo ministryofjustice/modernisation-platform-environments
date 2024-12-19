@@ -9,9 +9,11 @@ locals {
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
-    https_external = flatten([
+    https_external_1 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    ])
+    https_external_2 = flatten([
       module.ip_addresses.external_cidrs.cloud_platform,
     ])
     https_external_monitoring = flatten([
@@ -38,11 +40,12 @@ locals {
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
-    https_external = flatten([
+    https_external_1 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
-      module.ip_addresses.moj_cidr.vodafone_dia_networks,
       module.ip_addresses.external_cidrs.cloud_platform,
+    ])
+    https_external_2 = flatten([
       module.ip_addresses.external_cidrs.sodeco,
       module.ip_addresses.external_cidrs.interserve,
       module.ip_addresses.external_cidrs.meganexus,
@@ -83,13 +86,13 @@ locals {
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
     ])
-    # NOTE: this is at the limit for the number of rules in a single SG
-    # Always test changes in preproduction first
-    https_external = flatten([
+    # too many rules to put in single SG so split over two
+    https_external_1 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
-      module.ip_addresses.moj_cidr.vodafone_dia_networks,
       module.ip_addresses.external_cidrs.cloud_platform,
+    ])
+    https_external_2 = flatten([
       module.ip_addresses.external_cidrs.sodeco,
       module.ip_addresses.external_cidrs.interserve,
       module.ip_addresses.external_cidrs.meganexus,
@@ -201,8 +204,39 @@ locals {
           to_port     = 443
           protocol    = "tcp"
           cidr_blocks = flatten([
-            local.security_group_cidrs.https_external,
+            local.security_group_cidrs.https_external_1,
             local.security_group_cidrs.https_external_monitoring,
+          ])
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+    public_lb_2 = {
+      description = "Security group for internal load balancer part 2"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = flatten([
+            local.security_group_cidrs.https_external_2,
           ])
         }
       }
@@ -233,7 +267,7 @@ locals {
           to_port         = 8080
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.https_internal
-          security_groups = ["private_lb", "public_lb"]
+          security_groups = ["private_lb", "public_lb", "public_lb_2"]
         }
       }
       egress = {
