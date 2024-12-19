@@ -29,11 +29,8 @@ resource "aws_iam_policy" "oracle_ec2_snapshot_backup_role_policy" {
       },
       {
         Effect  = "Allow"
-        Action  = ["backup:StartBackupJob"]
-      },
-      {
-        Effect  = "Allow"
         Action  = ["backup:ListBackupVaults",
+                   "backup:StartBackupJob",
                    "backup:DescribeBackupJob",
                    "ec2:DescribeSnapshots"],
         Resource = "*"
