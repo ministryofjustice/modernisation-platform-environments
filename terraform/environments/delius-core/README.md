@@ -47,7 +47,7 @@ This directory contains the Terraform configuration for the Delius Core environm
 ### **Service URLs:**
 
 * WebLogic
-	* Base URL is [(https://ndelius.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk](https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/login.xhtml)
+	* Base URL is [https://ndelius.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk](https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/login.xhtml)
 	* NB: This needs a trailing path of either /jspellhtml/* OR /NDelius* to hit the target group, e.g. `/NDelius-war/delius/JSP/auth/login.xhtml`
 	* Also, ensure you are connected to the GlobalProtect VPN
 * LDAP
@@ -57,6 +57,7 @@ This directory contains the Terraform configuration for the Delius Core environm
 
 Replace [env] and [vpc] with the following values:
 
+<center>
 | [env] |    [vpc]   |
 |-------|--------------------|
 |dev    | hmpps-development  |
@@ -64,7 +65,7 @@ Replace [env] and [vpc] with the following values:
 |stage  | hmpps-preproduction|
 |preprod| hmpps-preproduction|
 |prod   | hmpps-production   |
-
+</center>
 
 <!-- The URL(s) of the service’s production environment, and test environments if possible-->
 
