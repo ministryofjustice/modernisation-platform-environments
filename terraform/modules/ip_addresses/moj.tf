@@ -48,9 +48,9 @@ locals {
       "20.26.11.108/32"
     ]
 
-    palo_alto_primsa_access_corporate   = "128.77.75.64/26"
-    palo_alto_primsa_access_third_party = "128.77.75.0/25"
-    palo_alto_primsa_access_residents   = "128.77.75.128/26"
+    palo_alto_prisma_access_corporate   = "128.77.75.64/26"
+    palo_alto_prisma_access_third_party = "128.77.75.0/26"
+    palo_alto_prisma_access_residents   = "128.77.75.128/26"
 
     ark_dc_external_internet = [
       "195.59.75.0/24",
