@@ -66,7 +66,7 @@ resource "aws_security_group_rule" "efs_product_outbound" {
   description              = "Allow outbound to CIS Instance SG"
 }
 
-resource "aws_security_group_rule" "efs_product_outbound" {
+resource "aws_security_group_rule" "efs_product_inbound" {
   type                     = "ingress"
   from_port                = 2049
   to_port                  = 2049
