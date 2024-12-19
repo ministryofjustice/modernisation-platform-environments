@@ -39,12 +39,8 @@ locals {
     ]
 
     # Ian Norris: For moj_wifi sites without prisma, in case we break out locally for prisma sites
-    VM02_dia_networks = [
-      "213.107.164.0/24",
-      "213.107.165.0/24",
-      "213.107.166.0/24",
-      "213.107.167.0/24"
-    ]
+    # Aggregating 213.107.164.0/24 213.107.165.0/24 213.107.166.0/24 213.107.167.0/24 to save on SG rules
+    VM02_dia_networks = "213.107.164.0/22"
 
     mojo_azure_landing_zone_egress = [
       "20.49.214.199/32",
