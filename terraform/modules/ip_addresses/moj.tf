@@ -84,7 +84,7 @@ locals {
       local.moj_cidr.mojo_arkf_internet_egress_vodafone,
       local.moj_cidr.ark_dc_external_internet,
       local.moj_cidr.mojo_azure_landing_zone_egress,
-      local.moj_cidr.VM02_dia_networks,
+      # local.moj_cidr.VM02_dia_networks,
     ])
 
     trusted_moj_enduser_internal = [
