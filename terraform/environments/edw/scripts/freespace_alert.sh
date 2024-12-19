@@ -2,7 +2,7 @@
 
 if [ $# -ne 1 ]; then
  echo "1st parameter is ENV"
-else
+fi
 
 # fixed variables
 LOCATE=$HOME/scripts

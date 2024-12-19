@@ -1,7 +1,7 @@
 #!/bin/bash
 if [ $# -ne 2 ]; then
  echo "1st parameter is ENV and 2nd parameter is  % usage "
-else
+fi
 
 
  ALERT=$2 # alert level
