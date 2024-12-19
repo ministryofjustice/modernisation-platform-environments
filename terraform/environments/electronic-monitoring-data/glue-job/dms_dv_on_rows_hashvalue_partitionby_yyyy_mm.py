@@ -360,7 +360,8 @@ if __name__ == "__main__":
 
 
     all_columns_except_pkey = [col for col in rds_db_table_empty_df.columns 
-                               if col != TABLE_PKEY_COLUMN]
+                               if col != TABLE_PKEY_COLUMN \
+                                or (col not in skip_columns_for_hashing)]
     LOGGER.info(f""">> all_columns_except_pkey = {all_columns_except_pkey} <<""")
 
     dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
@@ -368,14 +369,11 @@ if __name__ == "__main__":
                                     .select('year', 'month', f'{TABLE_PKEY_COLUMN}', 'RowHash')
     
     
-    unmatched_condition_str = f"""
-    (L.RowHash != R.RowHash)
-    or (R.RowHash is null)
-    """.strip()
+    unmatched_condition_str = """(L.RowHash != R.RowHash) or (R.RowHash is null)"""
 
     if skipped_cols_condition_list:
         unmatched_condition_str = unmatched_condition_str + ' or ' + \
-                                    {' or '.join(skipped_cols_condition_list)}
+                                    ' or '.join(skipped_cols_condition_list)
     
     LOGGER.info(f""">> unmatched_condition_str = {unmatched_condition_str} <<""")
 
