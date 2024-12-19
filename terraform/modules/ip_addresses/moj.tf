@@ -53,14 +53,6 @@ locals {
     palo_alto_prisma_access_third_party = "128.77.75.0/26"
     palo_alto_prisma_access_residents   = "128.77.75.128/26"
 
-    ark_dc_external_internet = [
-      "195.59.75.0/24",
-      "194.33.192.0/25",
-      "194.33.193.0/25",
-      "194.33.196.0/25",
-      "194.33.197.0/25"
-    ]
-
     # for devices connected to Prison Networks
     vodafone_wan_nicts_aggregate = "10.80.0.0/12"
     # For users without an MOJ Official device, e.g. private prisons
