@@ -110,7 +110,7 @@ resource "aws_sagemaker_model" "mxbai_rerank_xsmall_model" {
 
   primary_container {
     # image = "764974769150.dkr.ecr.eu-west-2.amazonaws.com/tei:2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
-    image = "public.ecr.aws/sagemaker/sagemaker-distribution:2-gpu"
+    image = data.aws_sagemaker_prebuilt_ecr_image.huggingface_image.registry_path
     environment = {
       HF_MODEL_ID = "mixedbread-ai/mxbai-rerank-xsmall-v1"
     }
@@ -119,4 +119,8 @@ resource "aws_sagemaker_model" "mxbai_rerank_xsmall_model" {
   lifecycle {
     create_before_destroy = true
   }
+}
+
+data "aws_sagemaker_prebuilt_ecr_image" "huggingface_image" {
+  repository_name = "huggingface-pytorch-inference"
 }
