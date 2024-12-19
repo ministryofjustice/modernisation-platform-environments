@@ -17,7 +17,7 @@ module "oracle_db_shared" {
   env_name           = var.env_name
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.env_name]
-  instance_roles     = [for i in range(1,try(var.db_config.primary_instance_count, 1) + try(var.db_config.standby_count, 0) + 1): "arn:aws:iam::${var.account_info.id}:role/instance-role-delius-core-${var.env_name}-db-${i}"]
+  instance_roles     = [for i in range(1,try(var.db_config.primary_instance_count, 1) + try(var.db_config.standby_count, 0) + 1): "instance-role-delius-core-${var.env_name}-db-${i}"]
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
