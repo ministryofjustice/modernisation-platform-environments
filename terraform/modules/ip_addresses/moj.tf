@@ -38,6 +38,7 @@ locals {
       "194.33.218.0/24"
     ]
 
+    # Ian Norris: For moj_wifi sites without prisma, in case we break out locally for prisma sites
     VM02_dia_networks = [
       "213.107.164.0/24",
       "213.107.165.0/24",
@@ -52,7 +53,7 @@ locals {
       "20.26.11.108/32"
     ]
 
-    palo_alto_prisma_access_corporate   = "128.77.75.64/26" # MacOS Global Protect
+    palo_alto_prisma_access_corporate   = "128.77.75.64/26" # MacOS Global Protect
     palo_alto_prisma_access_third_party = "128.77.75.0/26"
     palo_alto_prisma_access_residents   = "128.77.75.128/26"
 
