@@ -10,14 +10,6 @@ resource "aws_sns_topic" "cw_alerts" {
   name  = "ppud-prod-cw-alerts"
 }
 
-/*
-resource "aws_sns_topic_policy" "sns_policy" {
-  count  = local.is-production == true ? 1 : 0
-  arn    = aws_sns_topic.cw_alerts[0].arn
-  policy = data.aws_iam_policy_document.sns_topic_policy_ec2cw[0].json 
-}
-*/
-
 resource "aws_sns_topic_subscription" "cw_subscription" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_alerts[0].arn
@@ -33,6 +25,13 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription" {
   topic_arn = aws_sns_topic.cw_alerts[0].arn
   protocol  = "sms"
   endpoint  = "+447903642202" # Nick Buckingham
+}
+
+resource "aws_sns_topic_subscription" "cw_email_subscription" {
+  count     = local.is-production == true ? 1 : 0
+  topic_arn = aws_sns_topic.cw_alerts[0].arn
+  protocol  = "email"
+  endpoint  = "nbuckingham@gmail.com"
 }
 
 /*
@@ -62,42 +61,6 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription4" {
   topic_arn = aws_sns_topic.cw_alerts[0].arn
   protocol  = "sms"
   endpoint  = "+447887576466" # Kofi Owusu-nimoh
-}
-*/
-
-/*
-resource "aws_sns_topic_policy" "sns_topic_policy_ec2cw" {
-  count = local.is-production == true ? 1 : 0
-  arn   = aws_sns_topic.cw_alerts[0].arn
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        "Sid" : "SnsTopicId",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : "*"
-        },
-        "Action" : [
-          "SNS:Publish",
-          "SNS:RemovePermission",
-          "SNS:SetTopicAttributes",
-          "SNS:DeleteTopic",
-          "SNS:ListSubscriptionsByTopic",
-          "SNS:GetTopicAttributes",
-          "SNS:AddPermission",
-          "SNS:Subscribe"
-        ],
-        "Resource" : "aws_sns_topic.cw_alerts[0].arn",
-        "Condition" : {
-          "StringEquals" : {
-            "AWS:SourceOwner" : "data.aws_caller_identity.current.account_id"
-          }
-        }
-      }
-    ]
-  })
 }
 */
 
