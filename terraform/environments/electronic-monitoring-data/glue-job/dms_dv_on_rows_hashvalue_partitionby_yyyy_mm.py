@@ -252,7 +252,7 @@ if __name__ == "__main__":
 
         for e in rds_db_table_empty_df.schema:
             if e.name in skip_columns_for_hashing:
-                skipped_struct_fields_list.append(f"""T.{e}""")
+                skipped_struct_fields_list.append(e)
 
         LOGGER.warn(f"""WARNING ! >> skipped_struct_fields_list = {skipped_struct_fields_list}""")
         skipped_cols_condition_list = [f"(L.{col} != R.{col})" 
