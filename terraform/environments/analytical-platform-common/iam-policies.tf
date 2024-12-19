@@ -54,6 +54,15 @@ data "aws_iam_policy_document" "ecr_access" {
     ]
     resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
+  statement {
+    sid    = "AllowECRKMSKeyPermissions"
+    effect = "Allow"
+    actions = [
+      "kms:CreateGrant",
+      "kms:DescribeKey"
+    ]
+    resources = [module.ecr_kms.key_arn]
+  }
 }
 
 module "ecr_access_iam_policy" {
