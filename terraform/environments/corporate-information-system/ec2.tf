@@ -235,3 +235,13 @@ resource "aws_security_group_rule" "ssh_workspaces" {
   cidr_blocks       = [local.application_data.accounts[local.environment].managementcidr]
   description       = "SSH Workspace access"
 }
+
+resource "aws_security_group_rule" "efs_to_ec2" {
+  type                     = "ingress"
+  from_port                = 2049
+  to_port                  = 2049
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.ec2_instance_sg.id
+  source_security_group_id = aws_security_group.efs_product.id
+  description              = "Allow inbound NFS traffic from EFS"
+}
