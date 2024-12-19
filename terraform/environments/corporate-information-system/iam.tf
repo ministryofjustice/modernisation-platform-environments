@@ -32,16 +32,28 @@ resource "aws_iam_role_policy" "cis_ec2_policy" {
     Version = "2012-10-17"
     Statement = [
       {
-        Action   = "s3:*"
-        Effect   = "Allow"
-        "Resource" : [
+        Effect = "Allow"
+        Action = [
+          "s3:GetBucketLocation",
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
           "arn:aws:s3:::laa-software-library",
           "arn:aws:s3:::laa-software-library/*"
-        ],
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Resource = "arn:aws:iam::${local.application_data.accounts[local.environment].acc_id_s3_software_library}:role/${local.application_data.accounts[local.environment].role_id_s3_software_library}"
       }
     ]
   })
 }
+
 
 ######################################
 # CIS S3FS IAM Role & Policy

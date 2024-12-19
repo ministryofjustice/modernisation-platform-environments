@@ -17,7 +17,9 @@
       "s3fs_ami_id": "ami-0a6006bac3b9bb8d3",
       "s3fsinstancetype": "t3a.small",
       "ccms_mp_dev_cidr": "10.26.56.0/21",
-      "s3_bucket_env": "development"
+      "s3_bucket_env": "development",
+      "acc_id_s3_software_library": "013163512034",
+      "role_id_s3_software_library": "LAA-CIS-db-test-AppEc2Role-11TDCT1YVY25O"
     },
     "test": {
       "example_var": "test-data"
