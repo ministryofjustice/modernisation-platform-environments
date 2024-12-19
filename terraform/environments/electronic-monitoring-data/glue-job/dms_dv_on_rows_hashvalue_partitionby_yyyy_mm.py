@@ -364,9 +364,16 @@ if __name__ == "__main__":
                                 or (col not in skip_columns_for_hashing)]
     LOGGER.info(f""">> all_columns_except_pkey = {all_columns_except_pkey} <<""")
 
-    dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
-                                    "RowHash", F.sha2(F.concat_ws("", *all_columns_except_pkey), 256))\
-                                    .select('year', 'month', f'{TABLE_PKEY_COLUMN}', 'RowHash')
+    if skip_columns_for_hashing:
+        dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
+                                        "RowHash", F.sha2(F.concat_ws("", *all_columns_except_pkey), 256))\
+                                        .select('year', 'month', f'{TABLE_PKEY_COLUMN}', 
+                                                f"{', '.join(skip_columns_for_hashing)}", 
+                                                'RowHash')
+    else:    
+        dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
+                                        "RowHash", F.sha2(F.concat_ws("", *all_columns_except_pkey), 256))\
+                                        .select('year', 'month', f'{TABLE_PKEY_COLUMN}', 'RowHash')
     
     
     unmatched_condition_str = """(L.RowHash != R.RowHash) or (R.RowHash is null)"""
