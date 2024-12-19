@@ -9,7 +9,7 @@ resource "aws_backup_vault" "oracle_backup_vault" {
   )
 }
 
-# Allow the AWSBackupDefaultServiceRole role to be passed to the instance roles.
+# Allow the AWSBackupDefaultServiceRole role to be assumed by the instance roles.
 # We use Backup Vault to manage EC2 snapshots for Oracle hosts as these are only created sporadically, 
 # e.g. ahead of a service release, and will therefore not be continually overwritten.  Writing them to a
 # backup vault allows them to timeout without being overwritten.
@@ -25,6 +25,14 @@ resource "aws_iam_policy" "oracle_ec2_snapshot_backup_role_policy" {
         Effect   = "Allow",
         Action   = "iam:AssumeRole",
         Resource = "arn:aws:iam::${var.account_info.id}:role/service-role/AWSBackupDefaultServiceRole"
+      },
+      {
+        Effect  = "Allow"
+        Action  = ["backup:ListBackupVaults",
+                   "backup:StartBackupJob",
+                   "backup:DescribeBackupJob",
+                   "ec2:DescribeSnapshots"],
+        Resource = "*"
       }
     ]
   })
