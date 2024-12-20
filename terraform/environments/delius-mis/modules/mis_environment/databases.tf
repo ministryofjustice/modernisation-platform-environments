@@ -21,9 +21,9 @@ module "oracle_db_shared" {
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
   instance_roles     = concat(
-     each.key == "mis-db" ? [for i in range(1,try(var.mis_db_config.instance_count, 1) + 1): "arn:aws:iam::${var.account_info.id}:role/instance-role-delius-mis-${var.env_name}-${each.key}-${i}"] : [],
-     each.key == "boe-db" ? [for i in range(1,try(var.boe_db_config.instance_count, 1) + 1): "arn:aws:iam::${var.account_info.id}:role/instance-role-delius-mis-${var.env_name}-${each.key}-${i}"] : [],
-     each.key == "dsd-db" ? [for i in range(1,try(var.dsd_db_config.instance_count, 1) + 1): "arn:aws:iam::${var.account_info.id}:role/instance-role-delius-mis-${var.env_name}-${each.key}-${i}"] : []
+     each.key == "mis-db" ? [for i in range(1,try(var.mis_db_config.instance_count, 1) + 1): "instance-role-delius-mis-${var.env_name}-${each.key}-${i}"] : [],
+     each.key == "boe-db" ? [for i in range(1,try(var.boe_db_config.instance_count, 1) + 1): "instance-role-delius-mis-${var.env_name}-${each.key}-${i}"] : [],
+     each.key == "dsd-db" ? [for i in range(1,try(var.dsd_db_config.instance_count, 1) + 1): "instance-role-delius-mis-${var.env_name}-${each.key}-${i}"] : []
   )
 
   db_suffix = each.key
