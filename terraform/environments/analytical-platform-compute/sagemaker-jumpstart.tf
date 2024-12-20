@@ -1,50 +1,79 @@
 # image
 # model id
 
-
-resource "aws_iam_role" "sagemaker_execution_role" {
+module "sagemaker_execution_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0 # Creates IAM role if not provided
-  name  = "poc-sagemaker-execution-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "sagemaker.amazonaws.com"
-        }
-      },
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  create_role       = true
+  role_name         = "poc-sagemaker-execution-role"
+  role_requires_mfa = false
+
+  trusted_role_services = ["sagemaker.amazonaws.com"]
+
+  custom_role_policy_arns = [module.sagemaker_jumpstart_execution_policy[0].arn]
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "sagemaker_jumpstart_execution_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0 # Creates IAM role if not provided
+  statement {
+    sid    = "LogsAccess"
+    effect = "Allow"
+    actions = [
+      "cloudwatch:PutMetricData",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:CreateLogGroup",
+      "logs:DescribeLogStreams",
     ]
-  })
-
-  inline_policy {
-    name = "terraform-inferences-policy"
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Effect = "Allow",
-          Action = [
-            "cloudwatch:PutMetricData",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents",
-            "logs:CreateLogGroup",
-            "logs:DescribeLogStreams",
-            "s3:GetObject",
-            "s3:PutObject",
-            "s3:ListBucket",
-            "ecr:GetAuthorizationToken",
-            "ecr:BatchCheckLayerAvailability",
-            "ecr:GetDownloadUrlForLayer",
-            "ecr:BatchGetImage"
-          ],
-          Resource = "*"
-        }
-      ]
-    })
-
+    resources = [
+      "*"
+    ]
   }
+  statement {
+    sid    = "BucketAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::mojap-compute-sagemaker-jumpstart-${local.environment}/*",
+      "arn:aws:s3:::mojap-compute-sagemaker-jumpstart-${local.environment}"
+    ]
+  }
+  statement {
+    sid    = "EcrSagemakerImageAccess"
+    effect = "Allow"
+    actions = [
+      "ecr:GetAuthorizationToken",
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage"
+    ]
+    resources = ["*"]
+  }
+}
+
+module "sagemaker_jumpstart_execution_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0 # Creates IAM role if not provided
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.48.0"
+
+  name = "sagemaker-jumpstart-execution-policy"
+
+  policy = data.aws_iam_policy_document.sagemaker_jumpstart_execution_policy[0].json
 
   tags = local.tags
 }
@@ -91,8 +120,10 @@ data "aws_iam_policy_document" "sagemaker_bucket_policy" {
     sid     = "BroadS3Access"
     effect  = "Allow"
     actions = ["s3:*"]
-    resources = ["arn:aws:s3:::mojap-compute-sagemaker-jumpstart-${local.environment}/*",
-    "arn:aws:s3:::mojap-compute-sagemaker-jumpstart-${local.environment}"]
+    resources = [
+      "arn:aws:s3:::mojap-compute-sagemaker-jumpstart-${local.environment}/*",
+      "arn:aws:s3:::mojap-compute-sagemaker-jumpstart-${local.environment}"
+    ]
 
     principals {
       type        = "AWS"
