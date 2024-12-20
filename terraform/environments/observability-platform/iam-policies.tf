@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "amazon_managed_grafana_remote_cloudwatch" {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
     resources = [
-      for account in local.all_aws_accounts : format("arn:aws:iam::%s:role/observability-platform", local.environment_management.account_ids[account])
+      for account in local.all_aws_accounts : format("arn:aws:iam::%s:role/observability-platform", local.merged_account_ids[account])
     ]
   }
 }

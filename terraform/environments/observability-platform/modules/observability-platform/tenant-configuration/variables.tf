@@ -36,3 +36,8 @@ variable "aws_accounts" {
     }
   }
 }
+
+variable "merged_account_ids" {
+  description = "A map of all merged account IDs for the tenant configuration"
+  type        = map(string)
+}

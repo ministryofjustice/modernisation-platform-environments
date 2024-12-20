@@ -7,7 +7,8 @@ module "tenant_configuration" {
     aws.sso = aws.sso-readonly
   }
 
-  environment_management = local.environment_management
+  merged_account_ids     = local.merged_account_ids
+  environment_management = local.merged_account_ids
   name                   = each.key
   identity_centre_team   = each.value.identity_centre_team
   aws_accounts           = each.value.aws_accounts
