@@ -59,7 +59,7 @@ locals {
       test = {
         document_type   = "Command"
         document_format = "YAML"
-        content         = file("${path.module}/ssm_documents/test.yaml")
+        content         = file("${path.module}/ssm-documents/test.yaml")
         tags = {
           Name = "test"
         }
