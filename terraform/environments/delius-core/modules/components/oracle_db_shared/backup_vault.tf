@@ -16,7 +16,7 @@ resource "aws_backup_vault" "oracle_backup_vault" {
 # The AWSBackupDefaultServiceRole managed by AWS and is documented at: 
 # https://docs.aws.amazon.com/aws-backup/latest/devguide/iam-service-roles.html
 resource "aws_iam_policy" "oracle_ec2_snapshot_backup_role_policy" {
-  name = "oracle-ec2-snapshot-backup-role-policy"
+  name = "${var.env_name}-${var.db_suffix}-oracle-ec2-snapshot-backup-role-policy"
   description = "Allow iam:PassRole for AWSBackupDefaultServiceRole"
 
   policy = jsonencode({
@@ -41,7 +41,7 @@ resource "aws_iam_policy" "oracle_ec2_snapshot_backup_role_policy" {
 
 # Allow Access To AWSBackupDefaultServiceRolePolicy From EC2 Instance Roles
 resource "aws_iam_policy_attachment" "oracle_ec2_snapshot_backup_role_policy_attachment" {
-  name       = "oracle-ec2-snapshot-backup-role-policy-attachment"
+  name       = "${var.env_name}-${var.db_suffix}-oracle-ec2-snapshot-backup-role-policy-attachment"
   roles      = var.instance_roles
   policy_arn = aws_iam_policy.oracle_ec2_snapshot_backup_role_policy.arn
 }
