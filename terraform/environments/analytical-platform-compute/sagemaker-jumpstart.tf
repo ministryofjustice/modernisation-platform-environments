@@ -115,6 +115,9 @@ module "sagemaker_bucket" {
 
 data "aws_iam_policy_document" "sagemaker_bucket_policy" {
   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
+  #checkov:skip=CKV_AWS_111: test policy for development
+  #checkov:skip=CKV_AWS_356: test policy for development
+
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0 # Creates IAM role if not provided
   statement {
     sid     = "BroadS3Access"
@@ -127,7 +130,7 @@ data "aws_iam_policy_document" "sagemaker_bucket_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = [aws_iam_role.sagemaker_execution_role[0].arn]
+      identifiers = [module.sagemaker_execution_role[0].iam_role_arn]
     }
   }
 }
@@ -135,7 +138,7 @@ data "aws_iam_policy_document" "sagemaker_bucket_policy" {
 resource "aws_sagemaker_model" "mxbai_rerank_xsmall_model" {
   count                    = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0 # Creates IAM role if not provided
   name                     = "mxbai-rerank-xsmall-model"
-  execution_role_arn       = aws_iam_role.sagemaker_execution_role[0].arn
+  execution_role_arn       = module.sagemaker_execution_role[0].iam_role_arn
   tags                     = local.tags
   enable_network_isolation = true
 
