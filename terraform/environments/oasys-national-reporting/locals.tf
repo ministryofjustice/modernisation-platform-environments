@@ -56,7 +56,14 @@ locals {
     security_groups       = local.security_groups
 
     ssm_documents = {
-      
+      test = {
+        document_type   = "Command"
+        document_format = "YAML"
+        content         = file("${path.module}/ssm_documents/test.yaml")
+        tags = {
+          Name = "test"
+        }
+      }
     }
   }
 }
