@@ -399,7 +399,7 @@ if __name__ == "__main__":
         if skipped_cols_alias:
             unmatched_hashvalues_df_select = unmatched_hashvalues_df.selectExpr(
                                         f"L.{TABLE_PKEY_COLUMN} as {TABLE_PKEY_COLUMN}", 
-                                        f"{', '.join(skipped_cols_alias)}",
+                                        *skipped_cols_alias,
                                         "L.RowHash as rds_row_hash", 
                                         "R.RowHash as dms_output_row_hash"
                                     ).limit(10)
