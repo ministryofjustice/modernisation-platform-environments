@@ -5,6 +5,8 @@ import sys
 # from logging import getLogger
 # import pandas as pd
 
+from itertools import chain
+
 from glue_data_validation_lib import SparkSession
 from glue_data_validation_lib import S3Methods
 from glue_data_validation_lib import CustomPysparkMethods
@@ -257,8 +259,10 @@ if __name__ == "__main__":
         LOGGER.warn(f"""WARNING ! >> skipped_struct_fields_list = {skipped_struct_fields_list}""")
         skipped_cols_condition_list = [f"(L.{col} != R.{col})" 
                                        for col in skip_columns_for_hashing]
-        skipped_cols_alias = [f"L.{col} as rds_{col}, R.{col} as dms_{col}"
-                              for col in skip_columns_for_hashing]
+        skipped_cols_alias = list(
+                                chain.from_iterable((f'L.{col} as rds_{col}', f'R.{col} as dms_{col}')
+                                for col in skip_columns_for_hashing)
+                                )
 
 
     group_by_cols_list = ['year', 'month']
@@ -401,7 +405,8 @@ if __name__ == "__main__":
                                         f"L.{TABLE_PKEY_COLUMN} as {TABLE_PKEY_COLUMN}", 
                                         *skipped_cols_alias,
                                         "L.RowHash as rds_row_hash", 
-                                        "R.RowHash as dms_output_row_hash"
+                                        "R.RowHash as dms_output_row_hash",
+                                        "L.year as year", "L.month as month"
                                     ).limit(10)
         else:
             unmatched_hashvalues_df_select = unmatched_hashvalues_df.selectExpr(
