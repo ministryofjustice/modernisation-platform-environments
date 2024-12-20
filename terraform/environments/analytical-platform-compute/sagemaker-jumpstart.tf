@@ -154,7 +154,7 @@ resource "aws_sagemaker_model" "mxbai_rerank_xsmall_model" {
   }
 
   lifecycle {
-    create_before_destroy = true
+    create_before_destroy = false
   }
 }
 
