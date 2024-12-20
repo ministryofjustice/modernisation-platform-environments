@@ -41,7 +41,7 @@ resource "aws_iam_policy" "oracle_ec2_snapshot_backup_role_policy" {
 
 # Allow Access To AWSBackupDefaultServiceRolePolicy From EC2 Instance Roles
 resource "aws_iam_policy_attachment" "oracle_ec2_snapshot_backup_role_policy_attachment" {
-  name       = "${var.env_name}-${var.db_suffix}-oracle-ec2-snapshot-backup-role-policy-attachment"
+  name       = "${var.env_name}-${var.db_suffix}-ec2-snapshot-backup-role-policy-attach"
   roles      = var.instance_roles
   policy_arn = aws_iam_policy.oracle_ec2_snapshot_backup_role_policy.arn
 }
