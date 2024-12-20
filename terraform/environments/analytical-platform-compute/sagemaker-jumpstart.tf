@@ -22,6 +22,9 @@ module "sagemaker_execution_role" {
 data "aws_iam_policy_document" "sagemaker_jumpstart_execution_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  #checkov:skip=CKV_AWS_111: test policy for development
+  #checkov:skip=CKV_AWS_356: test policy for development
+
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0 # Creates IAM role if not provided
   statement {
     sid    = "LogsAccess"
