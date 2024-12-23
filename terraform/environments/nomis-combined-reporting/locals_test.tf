@@ -98,27 +98,6 @@ locals {
           nomis-combined-reporting-environment = "t1"
         })
       })
-
-      t1-ncr-web-2 = merge(local.ec2_instances.bip_web, {
-        config = merge(local.ec2_instances.bip_web.config, {
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-            "Ec2T1ReportingPolicy",
-          ])
-        })
-        instance = merge(local.ec2_instances.bip_web.instance, {
-          instance_type = "r6i.large"
-        })
-        user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
-          args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_instances.bip_web.tags, {
-          instance-scheduling                  = "skip-scheduling"
-          nomis-combined-reporting-environment = "t1"
-        })
-      })
     }
 
     efs = {
@@ -169,7 +148,6 @@ locals {
           private-t1-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "t1-ncr-web-1" },
-              { ec2_instance_name = "t1-ncr-web-2" },
             ]
           })
         }
@@ -201,7 +179,6 @@ locals {
           t1-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "t1-ncr-web-1" },
-              { ec2_instance_name = "t1-ncr-web-2" },
             ]
           })
         }
