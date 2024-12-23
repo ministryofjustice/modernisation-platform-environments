@@ -77,6 +77,13 @@ locals {
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.enduserclient_internal
         }
+        http7777 = {
+          description = "Allow http7777 ingress"
+          from_port   = 7777
+          to_port     = 7777
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.http7xxx
+        }
         https = {
           description = "Allow https ingress"
           from_port   = 443

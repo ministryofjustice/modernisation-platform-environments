@@ -174,7 +174,7 @@ locals {
           })
         }
         listeners = merge(local.lbs.private.listeners, {
-          http = merge(local.lbs.private.listeners.http, {
+          http-7777 = merge(local.lbs.private.listeners.http-7777, {
             alarm_target_group_names = []
             rules = {
               web = {
