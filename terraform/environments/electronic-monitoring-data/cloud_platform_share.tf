@@ -120,6 +120,7 @@ data "aws_iam_policy_document" "standard_athena_access" {
     effect = "Allow"
     actions = [
       "glue:GetDatabases",
+      "glue:GetDatabase",
       "glue:GetTables"
     ]
     resources = [
