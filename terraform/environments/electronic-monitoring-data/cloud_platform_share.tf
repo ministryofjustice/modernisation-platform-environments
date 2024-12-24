@@ -129,3 +129,14 @@ data "aws_iam_policy_document" "standard_athena_access" {
     ]
   }
 }
+
+resource "aws_iam_policy" "standard_athena_access" {
+  name_prefix = "standard_athena_access"
+  description = "Standard permissions for Athena"
+  policy      = data.aws_iam_policy_document.standard_athena_access.json
+}
+
+resource "aws_iam_role_policy_attachment" "standard_athena_access" {
+  policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.cmt_front_end_assumable_role.iam_role_name
+}
