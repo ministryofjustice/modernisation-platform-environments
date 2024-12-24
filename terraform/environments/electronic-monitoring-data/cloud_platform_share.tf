@@ -68,3 +68,64 @@ module "cmt_front_end_assumable_role" {
 #     aws.destination = aws
 #   }
 # }
+
+
+data "aws_iam_policy_document" "standard_athena_access" {
+  statement {
+    actions = [
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetWorkGroup",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+    ]
+  }
+  statement {
+    actions = [
+      "athena:ListWorkGroups"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+  statement {
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+  statement {
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [module.s3-athena-bucket.bucket.arn]
+  }
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:Get*",
+      "glue:List*"
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
+    ]
+  }
+}
