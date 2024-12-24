@@ -33,9 +33,10 @@ module "cmt_front_end_assumable_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
-  trusted_role_arns = [
-    local.resolved-cloud-platform-iam-role
-  ]
+  trusted_role_arns = flatten([
+    local.resolved-cloud-platform-iam-role,
+    data.aws_iam_roles.data_engineering_roles.arns
+  ])
 
   create_role       = true
   role_requires_mfa = false
