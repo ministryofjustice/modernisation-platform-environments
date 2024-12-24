@@ -26,6 +26,6 @@ resource "aws_lakeformation_permissions" "share_fms_with_cp" {
     database_name    = "staged_fms_${local.env_}dbt"
     table_name       = "account"
     table_catalog_id = data.aws_caller_identity.current.account_id
-    name             = aws_lakeformation_data_cells_filter.filter_fms_current.id.name
+    name             = aws_lakeformation_data_cells_filter.filter_fms_current.name
   }
 }
