@@ -27,7 +27,7 @@ resource "aws_lakeformation_data_cells_filter" "filter_fms_current" {
       excluded_column_names = []
     }
     row_filter {
-      filter_expression = "__current=true"
+      filter_expression = " __current=true"
     }
   }
 }
