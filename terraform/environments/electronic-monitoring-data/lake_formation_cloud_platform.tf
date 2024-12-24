@@ -36,7 +36,7 @@ resource "aws_lakeformation_data_cells_filter" "filter_fms_current" {
 resource "aws_lakeformation_permissions" "share_fms_with_cp" {
   count       = local.is-development ? 0 : 1
   principal   = module.cmt_front_end_assumable_role.iam_role_arn
-  permissions = ["SELECT"]
+  permissions = ["DESCRIBE", "SELECT"]
   data_cells_filter {
     database_name    = "staged_fms_${local.env_}dbt"
     table_name       = "account"
