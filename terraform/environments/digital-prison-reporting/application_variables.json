@@ -100,6 +100,7 @@
         "dps-basm",
         "dps-inc-reporting",
         "dps-csip",
+        "dps-alerts",
         "dps-testing"
       ],
       "alarms": {
@@ -282,7 +283,8 @@
         "dps-case-notes",
         "dps-basm",
         "dps-inc-reporting",
-        "dps-csip"
+        "dps-csip",
+        "dps-alerts"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -466,7 +468,8 @@
         "dps-case-notes",
         "dps-basm",
         "dps-inc-reporting",
-        "dps-csip"
+        "dps-csip",
+        "dps-alerts"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -666,7 +669,8 @@
         "dps-case-notes",
         "dps-basm",
         "dps-inc-reporting",
-        "dps-csip"
+        "dps-csip",
+        "dps-alerts"
       ],
       "alarms": {
         "setup_cw_alarms": true,

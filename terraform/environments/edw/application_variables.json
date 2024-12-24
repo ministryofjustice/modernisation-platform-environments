@@ -20,7 +20,6 @@
       "edw_cis_ip": "10.221.60.123",
       "edw_eric_ip": "10.221.60.125",
       "edw_ccms_ip": "10.221.60.130",
-      "edw_backup_lambda_arn": "arn:aws:lambda:eu-west-2:411213865113:function:snapshotDBFunction",
       "edw_sg_inbound_count": "1",
       "edw_management_cidr": "10.200.0.0/20",
       "edw_bastion_ssh_cidr": "10.202.0.0/20",

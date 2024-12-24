@@ -1,5 +1,6 @@
 module "ecr_access_iam_role" {
-  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
   version = "5.48.0"
@@ -7,11 +8,13 @@ module "ecr_access_iam_role" {
   name = "ecr-access"
 
   subjects = [
-    "ministrofjustice/*",
+    "ministryofjustice/*",
     "moj-analytical-services/*"
   ]
 
   policies = {
-    ecr = module.ecr_access_iam_policy.arn
+    ecr_access = module.ecr_access_iam_policy.arn
   }
+
+  tags = local.tags
 }

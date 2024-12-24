@@ -91,94 +91,6 @@ sudo /sbin/chkconfig iptables off
 sudo yum install -y mailx
 sudo ln -s /bin/mail /bin/mailx
 
-# Configure maat db cron job script:
-
-# Create the maat_05365_ware_db_changes.sh script
-cat << 'EOC22' > /home/oracle/scripts/maat_05365_ware_db_changes.sh
-#!/bin/ksh
-
-# fixed variables
-chown -R oracle:dba /home/oracle/scripts
-
-LOCATE=/home/oracle/scripts
-ORACLE_SID=$1; export ORACLE_SID
-ORACLE_HOME=/oracle/software/product/10.2.0; export ORACLE_HOME
-PATH=$ORACLE_HOME/bin:$PATH; export PATH
-
-cd $LOCATE
-
-sqlplus -s /nolog <<eosql >rundatafix.log
-conn warehouse/whouse_prod
-@maat_05365_ware_db_changes.sql
-exit
-eosql
-
-# mailx -s "MI Production (EDW005) datafix 3079 \`date\`" digital_dba@digital.justice.gov.uk < rundatafix.log
-EOC22
-
-# Create the maat_05365_ware_db_changes.sql script
-cat << 'EOC23' > /home/oracle/scripts/maat_05365_ware_db_changes.sql
---------------------------------------------------------------------------------------------------------------------
---
--- Archive:    %ARCHIVE%
--- Revision:   %PR%
--- Date:       %DATE%
---
--- Purpose: Modify warehouse tables to set column default values
---
---
--- Dimensions History
--- ------------------
---
--- Ver  Date     Name                 Description
--- ---- -------- -------------------- ------------------------------------------------------------------------------
--- 1.0  27/11/14 H Khela             Initial Version
---
---
---------------------------------------------------------------------------------------------------------------------
-SPOOL maat_05365_ware_db_changes.log
-
--- Set time on so you can see how long each part takes
-SET TIME ON
-
--- Set echo on so that you can see which command it is executing (and the time)
-SET ECHO ON
-
-ALTER TABLE warehouse.maat_assessment_fact MODIFY (
-time_eff_to_dim_id NUMBER DEFAULT NULL);
-
-ALTER TABLE warehouse.maat_application_dim MODIFY (
-time_eff_to_dim_id NUMBER DEFAULT NULL);
-
-  -- 9710356 rows updated.
-
-  UPDATE warehouse.maat_assessment_fact
-  SET time_eff_to_dim_id = NULL
-  WHERE time_eff_to_dim_id = -1;
-
-  COMMIT;
-
-  -- 4558089 rows updated
-
-  UPDATE warehouse.maat_application_dim
-  SET time_eff_to_dim_id = NULL
-  WHERE time_eff_to_dim_id = -1;
-
-COMMIT;
-
-SPOOL OFF
-EOC23
-
-echo "Setting up AWS EBS backup"
-INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
-cat <<EOC25 > /home/oracle/scripts/aws_ebs_backup.sh
-#!/bin/bash
-/usr/local/bin/aws ec2 create-snapshots \
---instance-specification InstanceId=$INSTANCE_ID \
---description "AWS crash-consistent snapshots of EDW database volumes, automatically created snapshot from oracle_cron inside EC2" \
---copy-tags-from-source volume
-EOC25
-
 # Set up log files
 echo "---creating /etc/awslogs/awscli.conf"
 mkdir -p /etc/awslogs
@@ -380,14 +292,34 @@ sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/o
 chown -R oracle:dba /home/oracle/backup*
 chmod -R 740 /home/oracle/backup*
 
+echo "Setting up AWS EBS backup"
+INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+cat <<EOC25 > /home/oracle/scripts/aws_ebs_backup.sh
+#!/bin/bash
+/usr/local/bin/aws ec2 create-snapshots \
+--instance-specification InstanceId=$INSTANCE_ID \
+--description "AWS crash-consistent snapshots of EDW database volumes, automatically created snapshot from oracle_cron inside EC2" \
+--copy-tags-from-source volume
+EOC25
+
+echo "Adding cron job scripts"
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/ /home/oracle/scripts --recursive
+chown -R oracle:dba /home/oracle/scripts/
+chmod -R 755 /home/oracle/scripts/*.sh
+
+echo "Update Slack alert URL for Oracle scripts"
+export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/oracle/scripts/*.sh
+
 # Create /etc/cron.d/backup_cron with the cron jobs
 cat <<EOC3 > /etc/cron.d/backup_cron
 0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
 0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
-00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
+00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh ${upper(local.application_data.accounts[local.environment].edw_environment)}
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
-# 0 7 * * 1 /home/oracle/scripts/maat_05365_ware_db_changes.sh
+# 0 7 * * 1 /home/oracle/scripts/maat_05365_ware_db_changes.sh ${upper(local.application_data.accounts[local.environment].edw_environment)}
 00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log
+10,40 08-17 * * * /home/oracle/scripts/disk_space_alert.sh ${upper(local.application_data.accounts[local.environment].edw_environment)} 97  >/tmp/disk_space.trc 2>&1
 EOC3
 
 chown root:root /etc/cron.d/backup_cron
@@ -441,7 +373,7 @@ shutdown abort;
 startup;
 exit;
 EOC6"
-
+ 
 EOF
 }
 
@@ -548,13 +480,43 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
             ],
             "Resource": ["*"],
             "Effect": "Allow"
-        },         
+        },
         {
             "Action": [
                 "ec2:CreateTags"
             ],
             "Resource": ["*"],
             "Effect": "Allow"
+        },
+        {
+            "Effect":"Allow",
+            "Action":[
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*.sh",
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*.sql"
+            ]
+        },
+        {
+            "Effect":"Allow",
+            "Action":[
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameter"
+            ],
+            "Resource": "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/*SLACK_ALERT_URL"
         }
     ]
 }
