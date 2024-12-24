@@ -9,7 +9,7 @@ resource "aws_lakeformation_data_cells_filter" "filter_fms_current" {
     table_catalog_id = data.aws_caller_identity.current.account_id
     table_name       = "account"
     column_wildcard {
-      excluded_column_names = ["__*"]
+      excluded_column_names = ["__deleted"]
     }
 
     row_filter {
