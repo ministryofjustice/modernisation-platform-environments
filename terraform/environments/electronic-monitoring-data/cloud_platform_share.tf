@@ -119,9 +119,8 @@ data "aws_iam_policy_document" "standard_athena_access" {
   statement {
     effect = "Allow"
     actions = [
-      "glue:GetDatabase",
-      "glue:ListDatabases",
-      "glue:ListTables"
+      "glue:GetDatabases",
+      "glue:GetTables"
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
