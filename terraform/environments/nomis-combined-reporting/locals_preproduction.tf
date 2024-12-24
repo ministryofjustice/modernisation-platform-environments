@@ -294,9 +294,32 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
+        instance_target_groups = {
+          private-pp-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "pp-ncr-web-1" },
+            ]
+          })
+        }
         listeners = merge(local.lbs.private.listeners, {
-          https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
+          http-7777 = merge(local.lbs.private.listeners.http-7777, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "private-pp-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "int.preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
           })
         })
       })
@@ -366,6 +389,7 @@ locals {
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "public" },
           { name = "admin", type = "A", lbs_map_key = "public" },
+          { name = "int", type = "A", lbs_map_key = "private" },
         ]
       }
     }
