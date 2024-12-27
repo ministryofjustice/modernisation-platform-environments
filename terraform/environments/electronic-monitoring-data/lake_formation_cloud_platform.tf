@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_lakeformation_resource" "data_bucket" {
-  arn = module.s3-create-a-derived-bucket.bucket.arn
+  arn = module.s3-create-a-derived-table-bucket.bucket.arn
 }
 
 module "share_current_version" {
