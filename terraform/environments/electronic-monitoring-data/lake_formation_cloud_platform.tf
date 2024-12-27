@@ -7,6 +7,7 @@ resource "aws_lakeformation_resource" "data_bucket" {
 }
 
 module "share_current_version" {
+  count  = local.is-development ? 0 : 1
   source = "./modules/lakeformation"
   table_filters = {
     "account" = "__current=true"
