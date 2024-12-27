@@ -22,7 +22,9 @@ resource "aws_lakeformation_data_lake_settings" "emds_development" {
 }
 
 resource "aws_lakeformation_permissions" "data_engineering_permissions" {
-  permissions      = ["ALL"]
-  principal        = try(one(data.aws_iam_roles.data_engineering_roles.arns))
-  catalog_resource = true
+  permissions = ["ALL"]
+  principal   = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  database {
+    name = "*"
+  }
 }
