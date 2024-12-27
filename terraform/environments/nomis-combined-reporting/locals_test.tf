@@ -144,8 +144,34 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
-        instance_target_groups = {}
-        listeners              = {}
+        instance_target_groups = {
+          private-t1-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "t1-ncr-web-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.private.listeners, {
+          http-7777 = merge(local.lbs.private.listeners.http-7777, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "private-t1-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-int.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
       })
 
       public = merge(local.lbs.public, {
@@ -187,6 +213,7 @@ locals {
         ]
         lb_alias_records = [
           { name = "t1", type = "A", lbs_map_key = "public" },
+          { name = "t1-int", type = "A", lbs_map_key = "private" },
         ]
       }
     }

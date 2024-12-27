@@ -29,15 +29,15 @@ This directory contains the Terraform configuration for the Delius Core environm
 
 * WebLogic app ECS
 * WebLogic EIS ECS
-	* external interface services
-	* serves API endpoints to allow services to interact with Delius data
+ 	* external interface services
+ 	* serves API endpoints to allow services to interact with Delius data
 * LDAP ECS
-	* used for authenticating users in Delius, MIS, NextCloud, User Management, PWM, and apps in Cloud Platform
+ 	* used for authenticating users in Delius, MIS, NextCloud, User Management, PWM, and apps in Cloud Platform
 * Password manager (PWM) ECS
 * Oracle EC2 databases
-	* used by Weblogic, GDPR (now in CP)
+ 	* used by Weblogic, GDPR (now in CP)
 * Alfresco EFS + SFS
-	* Alfresco is mainly hosted in Cloud Platform but some resources remain in MP
+ 	* Alfresco is mainly hosted in Cloud Platform but some resources remain in MP
 
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
@@ -47,13 +47,13 @@ This directory contains the Terraform configuration for the Delius Core environm
 ### **Service URLs:**
 
 * WebLogic
-	* Base URL is [https://ndelius.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk](https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/login.xhtml)
-	* NB: This needs a trailing path of either /jspellhtml/* OR /NDelius* to hit the target group, e.g. `/NDelius-war/delius/JSP/auth/login.xhtml`
-	* Also, ensure you are connected to the GlobalProtect VPN
+ 	* Base URL is [https://ndelius.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk](https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/login.xhtml)
+ 	* NB: This needs a trailing path of either /jspellhtml/*OR /NDelius* to hit the target group, e.g. `/NDelius-war/delius/JSP/auth/login.xhtml`
+ 	* Also, ensure you are connected to the GlobalProtect VPN
 * LDAP
-	* ldaps://ldap.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk:636
+ 	* ldaps://ldap.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk:636
 * PWM
-	* [https://pwm.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk/public/forgottenpassword](https://pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/public/forgottenpassword)
+ 	* [https://pwm.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk/public/forgottenpassword](https://pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/public/forgottenpassword)
 
 Replace [env] and [vpc] with the following values:
 
@@ -80,6 +80,6 @@ Modernisation Platform
 
 ### Structure
 
-Most of the configuration for the environments is handled in the base level of the delius-core directory, where we have `main_[environment].tf` files that call the `delius_environment `module, passing in locals defined in `locals_[environment].tf` files.
+Most of the configuration for the environments is handled in the base level of the delius-core directory, where we have `main_[environment].tf` files that call the `delius_environment`module, passing in locals defined in `locals_[environment].tf` files.
 
 The bulk of the resources are defined in a modular structure where there is a `delius_environment` module that will call other reusable modules such as the `delius_microservice` module or the `oracle_db_instance` module, with files for each microservice deployment (e.g. `weblogic.tf` which is only calling the `delius_microservice` module, or `database.tf` that primarily contains calls to the `oracle_db_instance` module).
