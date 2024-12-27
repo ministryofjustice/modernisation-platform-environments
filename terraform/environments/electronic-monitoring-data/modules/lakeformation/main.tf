@@ -47,6 +47,6 @@ resource "aws_lakeformation_permissions" "share_filtered_data_with_role" {
     database_name    = var.database_name
     table_name       = each.key
     table_catalog_id = data.aws_caller_identity.current.account_id
-    name             = aws_lakeformation_data_cells_filter.data_filter[count.index].table_data[0].name
+    name             = aws_lakeformation_data_cells_filter.data_filter[each.key].table_data[0].name
   }
 }
