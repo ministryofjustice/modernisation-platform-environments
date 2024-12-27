@@ -1,6 +1,6 @@
 locals {
   env_          = "${local.environment_shorthand}_"
-  cap_dw_tables = ["contact_history", "equipment_details", "event_history", "incident", "order_details", "services", "suspension_of_visits", "violations", "visit_details"]
+  cap_dw_tables = is-production ? ["contact_history", "equipment_details", "event_history", "incident", "order_details", "services", "suspension_of_visits", "violations", "visit_details"] : 0
 }
 
 resource "aws_lakeformation_resource" "data_bucket" {
@@ -21,7 +21,6 @@ resource "aws_lakeformation_resource" "data_bucket" {
 
 module "cleaned_specials" {
   for_each = toset(local.cap_dw_tables)
-  count    = local.is-production ? 1 : 0
   source   = "./modules/lakeformation"
   table_filters = {
     each.key = "specials_flag=0"
