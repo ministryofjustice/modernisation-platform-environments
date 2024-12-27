@@ -1,6 +1,6 @@
 locals {
   env_          = "${local.environment_shorthand}_"
-  cap_dw_tables = is-production ? ["contact_history", "equipment_details", "event_history", "incident", "order_details", "services", "suspension_of_visits", "violations", "visit_details"] : 0
+  cap_dw_tables = local.is-production ? ["contact_history", "equipment_details", "event_history", "incident", "order_details", "services", "suspension_of_visits", "violations", "visit_details"] : 0
 }
 
 resource "aws_lakeformation_resource" "data_bucket" {
