@@ -20,3 +20,9 @@ resource "aws_lakeformation_data_lake_settings" "emds_development" {
     data.aws_iam_role.github_actions_role.arn
   ]
 }
+
+resource "aws_lakeformation_permissions" "data_engineering_permissions" {
+  permissions      = ["ALL"]
+  principal        = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  catalog_resource = true
+}
