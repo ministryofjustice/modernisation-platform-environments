@@ -9,6 +9,17 @@ resource "aws_lakeformation_permissions" "data_engineering_permissions" {
   }
 }
 
+resource "aws_lakeformation_permissions" "data_engineering_permissions" {
+  for_each    = var.table_filters
+  permissions = ["ALL"]
+  principal   = var.data_engineer_role_arn
+
+  table {
+    database_name = var.database_name
+    name          = each.key
+  }
+}
+
 resource "aws_lakeformation_permissions" "de_s3_bucket_permissions" {
   principal = var.data_engineer_role_arn
 
