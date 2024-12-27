@@ -18,7 +18,7 @@ module "eks_cluster_logs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "eks-cluster-logs-kms-access"
 
@@ -45,7 +45,7 @@ module "karpenter_sqs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "karpenter-sqs-kms-access"
 
@@ -71,7 +71,7 @@ module "amazon_prometheus_proxy_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "amazon-prometheus-proxy"
 
@@ -98,7 +98,7 @@ module "managed_prometheus_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "managed-prometheus-kms-access"
 
@@ -147,7 +147,7 @@ module "mlflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "mlflow"
 
@@ -168,7 +168,7 @@ module "gha_mojas_airflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "github-actions-mojas-airflow"
 
@@ -258,7 +258,7 @@ module "analytical_platform_lake_formation_share_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "analytical-platform-lake-formation-sharing-policy"
 
@@ -292,7 +292,7 @@ module "quicksight_vpc_connection_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "quicksight-vpc-connection"
 
@@ -341,7 +341,7 @@ module "data_production_mojap_derived_bucket_lake_formation_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "analytical-platform-data-bucket-lake-formation-policy"
 
@@ -446,7 +446,7 @@ module "copy_apdp_cadet_metadata_to_compute_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.51.0"
 
   name_prefix = "copy-apdp-cadet-metadata-to-compute-"
 
