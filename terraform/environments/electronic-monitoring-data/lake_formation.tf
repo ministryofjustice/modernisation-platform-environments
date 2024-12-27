@@ -20,19 +20,3 @@ resource "aws_lakeformation_data_lake_settings" "emds_development" {
     data.aws_iam_role.github_actions_role.arn
   ]
 }
-
-
-data "aws_lakeformation_databases" "all_databases" {}
-
-
-resource "aws_lakeformation_permissions" "data_engineering_permissions" {
-  for_each = { for db in data.aws_lakeformation_databases.all_databases.database_names : db => db }
-
-  permissions = ["ALL"]
-  principal   = try(one(data.aws_iam_roles.data_engineering_roles.arns))
-
-  database {
-    name = each.value
-  }
-}
-
