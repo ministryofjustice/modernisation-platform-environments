@@ -23,7 +23,7 @@ module "cleaned_specials" {
   for_each = toset(local.cap_dw_tables)
   source   = "./modules/lakeformation"
   table_filters = {
-    each.key = "specials_flag=0"
+    (each.key) = "specials_flag=0"
   }
   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
   database_name           = "historic_api_mart_historic_dev_dbt"
