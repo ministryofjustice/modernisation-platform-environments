@@ -14,11 +14,9 @@ variable "data_engineer_role_arn" {
   type        = string
 }
 
-variable "data_bucket" {
-  description = "Bucket with data"
-  type = object({
-    arn = string
-  })
+variable "data_bucket_lf_resource" {
+  description = "arn of the lake formation resource for the data bucket"
+  type        = string
 }
 
 variable "role_arn" {

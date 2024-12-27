@@ -9,17 +9,13 @@ resource "aws_lakeformation_permissions" "data_engineering_permissions" {
   }
 }
 
-resource "aws_lakeformation_resource" "data_bucket" {
-  arn = var.data_bucket.arn
-}
-
 resource "aws_lakeformation_permissions" "s3_bucket_permissions" {
   principal = var.role_arn
 
   permissions = ["DATA_LOCATION_ACCESS"]
 
   data_location {
-    arn = aws_lakeformation_resource.data_bucket.arn
+    arn = var.data_bucket_lf_resource
   }
 }
 
