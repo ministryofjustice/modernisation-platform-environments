@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_test = {
+    maintenance_title   = "Prison-NOMIS Reporting T1 Maintenance Window"
+    maintenance_message = "Prison-NOMIS Reporting T1 is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down."
+  }
+
   baseline_presets_test = {
     options = {
       sns_topics = {
@@ -200,6 +205,25 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_test)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1.test.reporting.nomis.service.justice.gov.uk",
+                      "maintenance.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -212,6 +236,7 @@ locals {
           { name = "db", type = "CNAME", ttl = "3600", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
           { name = "t1", type = "A", lbs_map_key = "public" },
           { name = "t1-int", type = "A", lbs_map_key = "private" },
         ]
