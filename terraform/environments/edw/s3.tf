@@ -69,3 +69,17 @@ resource "aws_s3_object" "maat_sql_script" {
   source      = "./scripts/maat_05365_ware_db_changes.sql"
   source_hash = filemd5("./scripts/maat_05365_ware_db_changes.sql")
 }
+
+resource "aws_s3_object" "pmon_check_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "pmon_check.sh"
+  source      = "./scripts/pmon_check.sh"
+  source_hash = filemd5("./scripts/pmon_check.sh")
+}
+
+resource "aws_s3_object" "rootrotate_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "rootrotate.sh"
+  source      = "./scripts/rootrotate.sh"
+  source_hash = filemd5("./scripts/rootrotate.sh")
+}

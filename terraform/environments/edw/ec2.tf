@@ -144,6 +144,14 @@ log_group_name = $APPNAME-CDCstatus
 log_stream_name = {instance_id}
 EOC2
 
+
+# Create directories if they don't exist
+mkdir -p /home/oracle/scripts/logs
+
+# Create the log files if they don't exist
+touch /home/oracle/scripts/logs/freespace_alert.log
+touch /home/oracle/scripts/logs/pmon_status_alert.log
+touch /home/oracle/scripts/logs/cdc_check.log
 sudo chmod 755 /home/oracle/scripts/logs
 sudo chmod 755 /etc/awslogs
 sudo chmod 755 /tmp/cwlogs
@@ -278,16 +286,13 @@ chmod -R 777 /home/oracle
 # Set permissions for staging directory
 chmod -R 777 /stage/owb/
 
-# Replace the secret in the rootrotate.sh script
-sed -i "s|--secret-id .* --query|--secret-id ${aws_secretsmanager_secret.edw_db_ec2_root_secret.id} --query|g" /root/scripts/rootrotate.sh
-
 #### setup_backups:
 
 # setup efs backup mount point
 sudo mkdir -p /home/oracle/backup_logs/
 sudo mkdir -p /backups/$APPNAME_RMAN
 chmod 777 /backups/EDW_RMAN
-sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh
+sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/rman_arch_backup_v2_1.sh
 sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_full_backup.sh
 chown -R oracle:dba /home/oracle/backup*
 chmod -R 740 /home/oracle/backup*
@@ -307,13 +312,18 @@ echo "Adding cron job scripts"
 chown -R oracle:dba /home/oracle/scripts/
 chmod -R 755 /home/oracle/scripts/*.sh
 
+sudo mv /home/oracle/scripts/rootrotate.sh /root/scripts/
+
+# Replace the secret in the rootrotate.sh script
+sed -i "s|--secret-id .* --query|--secret-id ${aws_secretsmanager_secret.edw_db_ec2_root_secret.id} --query|g" /root/scripts/rootrotate.sh
+
 echo "Update Slack alert URL for Oracle scripts"
 export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
 sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/oracle/scripts/*.sh
 
 # Create /etc/cron.d/backup_cron with the cron jobs
 cat <<EOC3 > /etc/cron.d/backup_cron
-0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
+0 */3 * * * /home/oracle/backup_scripts/rman_arch_backup_v2_1.sh $APPNAME
 0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
 00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh ${upper(local.application_data.accounts[local.environment].edw_environment)}
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
@@ -359,6 +369,18 @@ cat /etc/cron.d/oracle_rotation >> /home/oracle/crecrontab.txt
 chown oracle:dba /home/oracle/crecrontab.txt
 chmod 777 /home/oracle/crecrontab.txt
 su oracle -c "crontab /home/oracle/crecrontab.txt"
+
+chown root:root /root/scripts/rootrotate.sh
+chmod 700 /root/scripts/rootrotate.sh
+
+# Create /etc/cron.d/rootrotate with the cron job
+cat <<EOC30 > /etc/cron.d/rootrotate
+0 6 28 * * /root/scripts/rootrotate.sh
+EOC30
+
+chown root:root /etc/cron.d/rootrotate
+chmod 644 /etc/cron.d/rootrotate
+
 
 #Update send mail URL 
 echo "Update Sendmail configurations"
