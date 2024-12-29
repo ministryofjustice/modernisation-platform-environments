@@ -292,7 +292,7 @@ chmod -R 777 /stage/owb/
 sudo mkdir -p /home/oracle/backup_logs/
 sudo mkdir -p /backups/$APPNAME_RMAN
 chmod 777 /backups/EDW_RMAN
-sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/rman_arch_backup_v2_1.sh
+sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_arch_backup_v2_1.sh
 sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_full_backup.sh
 chown -R oracle:dba /home/oracle/backup*
 chmod -R 740 /home/oracle/backup*
@@ -312,6 +312,7 @@ echo "Adding cron job scripts"
 chown -R oracle:dba /home/oracle/scripts/
 chmod -R 755 /home/oracle/scripts/*.sh
 
+sudo mkdir -p /root/scripts/
 sudo mv /home/oracle/scripts/rootrotate.sh /root/scripts/
 
 # Replace the secret in the rootrotate.sh script
@@ -375,7 +376,7 @@ chmod 700 /root/scripts/rootrotate.sh
 
 # Create /etc/cron.d/rootrotate with the cron job
 cat <<EOC30 > /etc/cron.d/rootrotate
-0 6 28 * * /root/scripts/rootrotate.sh
+0 6 28 * * root /root/scripts/rootrotate.sh
 EOC30
 
 chown root:root /etc/cron.d/rootrotate

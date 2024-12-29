@@ -56,6 +56,13 @@ resource "aws_s3_object" "free_space_script" {
   source_hash = filemd5("./scripts/freespace_alert.sh")
 }
 
+resource "aws_s3_object" "free_space_sql_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "freespace_alert.sql"
+  source      = "./scripts/freespace_alert.sql"
+  source_hash = filemd5("./scripts/freespace_alert.sql")
+}
+
 resource "aws_s3_object" "maat_sh_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "maat_05365_ware_db_changes.sh"
@@ -83,3 +90,11 @@ resource "aws_s3_object" "rootrotate_script" {
   source      = "./scripts/rootrotate.sh"
   source_hash = filemd5("./scripts/rootrotate.sh")
 }
+
+resource "aws_s3_object" "alert_rota_script" {
+  bucket      = aws_s3_bucket.scripts.id
+  key         = "alert_rota.sh"
+  source      = "./scripts/alert_rota.sh"
+  source_hash = filemd5("./scripts/alert_rota.sh")
+}
+
