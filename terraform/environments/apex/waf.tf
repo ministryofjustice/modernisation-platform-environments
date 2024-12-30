@@ -45,7 +45,7 @@ resource "aws_wafv2_rule_group" "manual_rules" {
 
     statement {
       ip_set_reference_statement {
-        arn = aws_wafv2_ip_set.manual_allow_set.arn
+        arn = aws_wafv2_ip_set.wafmanualallowset.arn
       }
     }
 
@@ -66,7 +66,7 @@ resource "aws_wafv2_rule_group" "manual_rules" {
 
     statement {
       ip_set_reference_statement {
-        arn = aws_wafv2_ip_set.manual_block_set.arn
+        arn = aws_wafv2_ip_set.wafmanualblockset.arn
       }
     }
 
