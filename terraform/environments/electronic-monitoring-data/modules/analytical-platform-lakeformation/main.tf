@@ -20,15 +20,15 @@ resource "aws_lakeformation_permissions" "data_location_share" {
 
 resource "aws_lakeformation_data_cells_filter" "data_filter" {
   for_each = {
-    for db in var.databases_to_share : db.name => db
+    for db in var.databases_to_share : db.source_database => db
   }
   table_data {
-    database_name    = each.value.source_database
+    database_name    = each.key
     name             = "filter-${each.value.source_table}"
     table_catalog_id = data.aws_caller_identity.current.account_id
     table_name       = each.value.source_table
     column_wildcard {
-      excluded_column_names = each.value.excluded_columns ? each.value.excluded_columns : []
+      excluded_column_names = each.value.excluded_columns
     }
     dynamic "row_filter" {
       for_each = each.value.row_filter != "" ? [each.value.row_filter] : []
@@ -47,13 +47,13 @@ resource "aws_lakeformation_data_cells_filter" "data_filter" {
 
 resource "aws_lakeformation_permissions" "share_filtered_data" {
   for_each = {
-    for db in var.databases_to_share : db.name => db
+    for db in var.databases_to_share : db.source_database => db
   }
   permissions = each.value.permissions
   principal   = var.destination_account_id
 
   data_cells_filter {
-    database_name    = each.value.source_database
+    database_name    = each.key
     table_name       = each.value.source_table
     table_catalog_id = data.aws_caller_identity.current.account_id
     name             = aws_lakeformation_data_cells_filter.data_filter[each.key].table_data[0].name

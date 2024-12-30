@@ -9,14 +9,13 @@ locals {
     }
   ]
 
-  databases_to_share = [
+  databases = [
     {
-      source_database = "staged_fms${local.env_}_dbt"
-      source_table    = "account"
-      permissions     = ["DESCRIBE", "SELECT"]
-      row_filter      = "__current=true"
-
-
+      source_database  = "staged_fms${local.env_}_dbt"
+      source_table     = "account"
+      permissions      = ["DESCRIBE", "SELECT"]
+      row_filter       = "__current=true"
+      excluded_columns = []
     }
   ]
 }
@@ -29,5 +28,5 @@ module "analytical_platform_lf_share" {
 
   data_locations = local.data_locations
 
-  databases_to_share = local.databases_to_share
+  databases_to_share = local.databases
 }

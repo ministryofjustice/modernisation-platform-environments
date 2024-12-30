@@ -13,9 +13,10 @@ variable "data_locations" {
 variable "databases_to_share" {
   description = "A list of databases to share"
   type = list(object({
-    source_database = string
-    source_table    = string
-    row_filter      = string
-    permissions     = list(string)
+    source_database  = string
+    source_table     = string
+    row_filter       = string
+    permissions      = list(string)
+    excluded_columns = list(string)
   }))
 }
