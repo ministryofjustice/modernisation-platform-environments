@@ -16,6 +16,7 @@ locals {
       permissions     = ["DESCRIBE", "SELECT"]
       row_filter      = "__current=true"
 
+
     }
   ]
 }
