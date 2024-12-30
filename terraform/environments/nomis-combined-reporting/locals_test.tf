@@ -174,6 +174,25 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_test)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-int.test.reporting.nomis.service.justice.gov.uk",
+                      "maintenance-int.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -237,6 +256,7 @@ locals {
         ]
         lb_alias_records = [
           { name = "maintenance", type = "A", lbs_map_key = "public" },
+          { name = "maintenance-int", type = "A", lbs_map_key = "private" },
           { name = "t1", type = "A", lbs_map_key = "public" },
           { name = "t1-int", type = "A", lbs_map_key = "private" },
         ]
