@@ -13,7 +13,7 @@ locals {
     {
       source_database  = "staged_fms_${local.env_}dbt"
       source_table     = "account"
-      permissions      = ["DESCRIBE", "SELECT"]
+      permissions      = ["SELECT"]
       row_filter       = "__current=true"
       excluded_columns = []
     }
