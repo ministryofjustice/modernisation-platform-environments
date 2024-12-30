@@ -152,6 +152,7 @@ mkdir -p /home/oracle/scripts/logs
 touch /home/oracle/scripts/logs/freespace_alert.log
 touch /home/oracle/scripts/logs/pmon_status_alert.log
 touch /home/oracle/scripts/logs/cdc_check.log
+touch /home/oracle/scripts/logs/aws_ebs_backup.log
 sudo chmod 755 /home/oracle/scripts/logs
 sudo chmod 755 /etc/awslogs
 sudo chmod 755 /tmp/cwlogs
@@ -297,9 +298,6 @@ sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/o
 chown -R oracle:dba /home/oracle/backup*
 chmod -R 740 /home/oracle/backup*
 
-mkdir -p /home/oracle/scripts/logs/aws-ebs-backup.log
-chmod 644 /home/oracle/scripts/logs/aws-ebs-backup.log
-
 echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
 
@@ -315,7 +313,7 @@ fi
 # Get the environment parameter
 ENV=\$1
 
-LOG_FILE="/home/oracle/scripts/logs/aws-ebs-backup.log"
+LOG_FILE="/home/oracle/scripts/logs/aws_ebs_backup.log"
 
 # Recreate log file and log start time
 echo "Backup started at \$(date) for environment: \$ENV" > \$LOG_FILE
@@ -336,8 +334,6 @@ else
   mailx -s "Backup for EC2 instance \$INSTANCE_ID on \$ENV failed at \$(date)" SLACK_ALERT_URL -- < \$LOG_FILE
 fi
 
-# Log end time
-echo "Backup ended at \$(date) for environment: \$ENV" >> \$LOG_FILE
 EOC5
 
 echo "Adding cron job scripts"
