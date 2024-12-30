@@ -50,8 +50,11 @@ resource "aws_lakeformation_data_cells_filter" "data_filter" {
     column_wildcard {
       excluded_column_names = []
     }
-    row_filter {
-      filter_expression = each.value
+    dynamic "row_filter" {
+      for_each = each.value != "" ? [each.value] : []
+      content {
+        filter_expression = each.value
+      }
     }
   }
 }

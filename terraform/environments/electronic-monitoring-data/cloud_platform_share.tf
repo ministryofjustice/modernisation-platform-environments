@@ -46,6 +46,25 @@ module "cmt_front_end_assumable_role" {
   tags = local.tags
 }
 
+module "specials_cmt_front_end_assumable_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.48.0"
+
+  trusted_role_arns = flatten([
+    local.resolved-cloud-platform-iam-role,
+    data.aws_iam_roles.data_engineering_roles.arns
+  ])
+
+  create_role       = true
+  role_requires_mfa = false
+
+  role_name = "specials_cmt_read_emds_data_${local.environment_shorthand}"
+
+  tags = local.tags
+}
+
 # module "share_api_data_marts" {
 #   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 #   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
