@@ -7,12 +7,13 @@ resource "aws_lakeformation_resource" "data_location" {
 }
 
 resource "aws_lakeformation_permissions" "data_location_share" {
+  for_each  = { for idx, loc in var.data_locations : loc.data_location => loc }
   principal = var.destination_account_id
 
   permissions = ["DATA_LOCATION_ACCESS"]
 
   data_location {
-    arn = aws_lakeformation_resource.data_location.arn
+    arn = each.value.data_location
   }
 }
 
