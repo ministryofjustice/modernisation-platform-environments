@@ -337,7 +337,7 @@ chown root:root /etc/cron.d/backup_cron
 chmod 644 /etc/cron.d/backup_cron
 
 # Add backup_cron to crontab for oracle user
-yes | cp -f /etc/cron.d/backup_cron /home/oracle/crecrontab.txt
+cp -f /etc/cron.d/backup_cron /home/oracle/crecrontab.txt
 chown oracle:dba /home/oracle/crecrontab.txt
 chmod 744 /home/oracle/crecrontab.txt
 su oracle -c "crontab /home/oracle/crecrontab.txt"

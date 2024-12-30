@@ -16,7 +16,7 @@ echo 'Script run on $(date)' >> maat_05365_ware_db_changes.log  # Append run tim
 cd $LOCATE
 
 sqlplus -s /nolog <<eosql >maat_05365_ware_db_changes.log
-conn warehouse/whouse_prod
+conn warehouse/password
 @maat_05365_ware_db_changes.sql
 exit
 eosql
