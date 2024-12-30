@@ -14,7 +14,7 @@ locals {
 }
 
 resource "aws_wafv2_ip_set" "wafmanualallowset" {
-  name              = "${upper(local.application_name)} Manual Allow Set"
+  name              = "${upper(local.application_name)}-manual-allow-set"
 
   # Ranges from https://github.com/ministryofjustice/laa-apex/blob/master/aws/application/application_stack.template
   # removed redundant ip addresses such as RedCentric access and AWS Holborn offices Wifi
@@ -26,7 +26,7 @@ resource "aws_wafv2_ip_set" "wafmanualallowset" {
 }
 
 resource "aws_wafv2_ip_set" "wafmanualblockset" {
-  name               = "${upper(local.application_name)} Manual Block Set"
+  name               = "${upper(local.application_name)}-manual-block-set"
   scope              = "CLOUDFRONT"
   description        = "Manual Block Set for ${local.application_name} WAF"
   ip_address_version = "IPV4"
@@ -34,7 +34,7 @@ resource "aws_wafv2_ip_set" "wafmanualblockset" {
 }
 
 resource "aws_wafv2_rule_group" "manual-rules" {
-  name        = "${upper(local.application_name)} Manual Rules"
+  name        = "${upper(local.application_name)}-manual-rules"
   scope       = "CLOUDFRONT" # Use "CLOUDFRONT" for CloudFront
   capacity    = 10 # Adjust based on complexity
   description = "Manual Allow/Block Rules for ${local.application_name}"
@@ -89,7 +89,7 @@ resource "aws_wafv2_rule_group" "manual-rules" {
 }
 
 resource "aws_wafv2_web_acl" "waf_acl" {
-  name        = "${upper(local.application_name)} Whitelisting Requesters"
+  name        = "${upper(local.application_name)}-Whitelisting-Requesters"
   scope       = "CLOUDFRONT" # Use "CLOUDFRONT" for CloudFront
   description = "Web ACL for ${local.application_name}"
 
@@ -121,7 +121,7 @@ resource "aws_wafv2_web_acl" "waf_acl" {
   visibility_config {
     sampled_requests_enabled   = true
     cloudwatch_metrics_enabled = true
-    metric_name                = "${upper(local.application_name)} Whitelisting Requesters"
+    metric_name                = "${upper(local.application_name)}-Whitelisting-Requesters"
   }
 }
 
