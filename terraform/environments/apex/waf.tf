@@ -33,7 +33,7 @@ resource "aws_wafv2_ip_set" "wafmanualblockset" {
   addresses          = [] 
 }
 
-resource "aws_wafv2_rule_group" "manual_rules" {
+resource "aws_wafv2_rule_group" "manual-rules" {
   name        = "${upper(local.application_name)} Manual Rules"
   scope       = "CLOUDFRONT" # Use "CLOUDFRONT" for CloudFront
   capacity    = 10 # Adjust based on complexity
@@ -103,7 +103,7 @@ resource "aws_wafv2_web_acl" "waf_acl" {
 
     statement {
       rule_group_reference_statement {
-        arn = aws_wafv2_rule_group.manual_rules.arn
+        arn = aws_wafv2_rule_group.manual-rules.arn
       }
     }
 
