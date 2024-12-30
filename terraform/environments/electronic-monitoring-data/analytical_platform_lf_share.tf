@@ -24,7 +24,7 @@ module "analytical_platform_lf_share" {
   count  = local.is-test ? 1 : 0
   source = "./modules/analytical-platform-lakeformation"
 
-  destination_account_id = local.environment_management.account_ids["analytical-platform-data-engineering-sandbox-a"]
+  destination_account_id = local.environment_management.account_ids["analytical-platform-data-engineering-sandboxa"]
 
   data_locations = local.data_locations
 
