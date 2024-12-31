@@ -37,6 +37,7 @@ resource "aws_wafv2_ip_set" "wafmanualblockset" {
 
 resource "aws_wafv2_rule_group" "manual-rules" {
   name        = "${upper(local.application_name)}-manual-rules"
+  provider    = aws.us-east-1
   scope       = "CLOUDFRONT" # Use "CLOUDFRONT" for CloudFront
   capacity    = 10 # Adjust based on complexity
   description = "Manual Allow/Block Rules for ${local.application_name}"
