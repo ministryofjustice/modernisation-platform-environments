@@ -256,6 +256,23 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
+            ]
           }
         ]
       }
