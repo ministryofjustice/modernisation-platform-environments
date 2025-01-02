@@ -65,29 +65,29 @@ module "specials_cmt_front_end_assumable_role" {
   tags = local.tags
 }
 
-module "share_api_data_marts" {
-  count = local.is-production ? 1 : 0
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-lakeformation?ref=32525da937012178e430585ac5a00f05193f58eb"
-  data_locations = [{
-    data_location = module.s3-create-a-derived-table-bucket.bucket.arn
-    register      = true
-    share         = true
-    hybrid_mode   = false # will be managed exclusively in LakeFormation
-    principal     = module.cmt_front_end_assumable_role.iam_role_arn
-  }]
+# module "share_api_data_marts" {
+#   count = local.is-production ? 1 : 0
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+#   source = "github.com/ministryofjustice/terraform-aws-analytical-platform-lakeformation?ref=32525da937012178e430585ac5a00f05193f58eb"
+#   data_locations = [{
+#     data_location = module.s3-create-a-derived-table-bucket.bucket.arn
+#     register      = true
+#     share         = true
+#     hybrid_mode   = false # will be managed exclusively in LakeFormation
+#     principal     = module.cmt_front_end_assumable_role.iam_role_arn
+#   }]
 
-  databases_to_share = [{
-    name      = "api_data_marts"
-    principal = module.cmt_front_end_assumable_role.iam_role_arn
-  }]
+#   databases_to_share = [{
+#     name      = "api_data_marts"
+#     principal = module.cmt_front_end_assumable_role.iam_role_arn
+#   }]
 
-  providers = {
-    aws.source      = aws
-    aws.destination = aws
-  }
-}
+#   providers = {
+#     aws.source      = aws
+#     aws.destination = aws
+#   }
+# }
 
 
 data "aws_iam_policy_document" "standard_athena_access" {
