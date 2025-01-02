@@ -4,7 +4,7 @@
 resource "aws_sns_topic_subscription" "live_serco_fms_sns_subscription" {
   topic_arn = aws_sns_topic.live_serco_fms_s3_events.arn
   protocol  = "sqs"
-  endpoint  = module.format_json_fms_data.lambda_function_dlq_arn
+  endpoint  = module.format_json_fms_data.lambda_function_arn
 }
 
 resource "aws_lambda_permission" "live_serco_fms_with_sns" {
