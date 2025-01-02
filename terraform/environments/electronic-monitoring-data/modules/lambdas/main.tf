@@ -80,7 +80,10 @@ data "aws_iam_policy_document" "lambda_dlq_policy" {
     actions = [
       "sqs:SendMessage",
       "sqs:GetQueueAttributes",
-      "sqs:GetQueueUrl"
+      "sqs:GetQueueUrl",
+      "sqs:ReceiveMessage",
+      "sqs:DeleteMessage",
+      "sqs:ChangeMessageVisibility"
     ]
     resources = [aws_sqs_queue.lambda_dlq.arn]
   }

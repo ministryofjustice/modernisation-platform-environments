@@ -9,3 +9,7 @@ output "lambda_function_arn" {
 output "lambda_function_invoke_arn" {
   value = aws_lambda_function.this.invoke_arn
 }
+
+output "lambda_function_dlq_arn" {
+  value = aws_sqs_queue.lambda_dlq.arn
+}
