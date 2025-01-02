@@ -9,6 +9,10 @@ resource "aws_lakeformation_permissions" "data_engineering_permissions" {
   }
 }
 
+resource "random_id" "suffix" {
+  byte_length = 32
+}
+
 resource "aws_lakeformation_permissions" "data_engineering_table_permissions" {
   for_each    = var.table_filters
   permissions = ["ALL"]
