@@ -20,7 +20,7 @@ module "share_current_version" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
 }
 
-module "cleaned_specials" {
+module "cap_dw_excluding_specials" {
   for_each = toset(local.cap_dw_tables)
   source   = "./modules/lakeformation"
   table_filters = {
@@ -32,13 +32,37 @@ module "cleaned_specials" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
 }
 
-module "cleaned_api_marts" {
+module "cap_dw_including_specials" {
   for_each = toset(local.cap_dw_tables)
   source   = "./modules/lakeformation"
   table_filters = {
     (each.key) = ""
   }
+  role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
+  database_name           = "historic_api_mart_historic_dev_dbt"
+  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+}
+
+module "am_for_non_specials_role" {
+  for_each = toset(local.am_tables)
+  source   = "./modules/lakeformation"
+  table_filters = {
+    (each.key) = ""
+  }
   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
+  database_name           = "historic_api_mart_historic_dev_dbt"
+  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+}
+
+module "am_for_specials_role" {
+  for_each = toset(local.am_tables)
+  source   = "./modules/lakeformation"
+  table_filters = {
+    (each.key) = ""
+  }
+  role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
   database_name           = "historic_api_mart_historic_dev_dbt"
   data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
