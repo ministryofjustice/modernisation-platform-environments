@@ -78,8 +78,9 @@ resource "aws_s3_bucket_notification" "live_serco_fms_data_store" {
   topic {
     topic_arn = aws_sns_topic.live_serco_fms_s3_events.arn
     events = [
-      "s3:ObjectCreated:*"
+      "s3:ObjectCreated:"
     ]
+    filter_prefix = "serco/fms/"
     filter_suffix = ".JSON"
   }
 }
