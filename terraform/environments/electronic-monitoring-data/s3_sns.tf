@@ -1,3 +1,6 @@
+data "aws_s3_bucket_policy" "existing_s3_data_bucket_policy" {
+  bucket = module.s3-data-bucket.bucket.id
+}
 
 #  bucket notification for data store
 resource "aws_s3_bucket_notification" "historic_data_store" {
@@ -67,6 +70,31 @@ resource "aws_sns_topic_policy" "historic_s3_events_policy" {
 # Live data sns notification
 # -----------------------------------------------
 
+data "aws_iam_policy_document" "live_serco_policy" {
+  statement {
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["s3.amazonaws.com"]
+    }
+
+    actions   = ["sns:Publish"]
+    resources = [aws_sns_topic.live_serco_fms_s3_events.arn]
+  }
+}
+
+data "aws_iam_policy_document" "merged_with_serco_policy" {
+  source_policy_documents = [
+    data.aws_s3_bucket_policy.existing_s3_data_bucket_policy.policy,
+    data.aws_iam_policy_document.new_policy.json
+  ]
+}
+
+resource "aws_s3_bucket_policy" "new_policy" {
+  bucket = module.s3-data-bucket.bucket.id
+  policy = data.aws_iam_policy_document.merged_policy.json
+}
 
 #  bucket notification for data store
 resource "aws_s3_bucket_notification" "live_serco_fms_data_store" {
