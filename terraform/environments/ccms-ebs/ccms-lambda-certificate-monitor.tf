@@ -26,11 +26,37 @@ resource "aws_iam_role_policy" "lambda_policy" {
       {
         Effect = "Allow"
         Action = [
+          "acm:DescribeCertificate",
+          "acm:GetCertificate",
+          "acm:ListCertificates",
+          "acm:ListTagsForCertificate"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:ListMetrics"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ]
         Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "securityhub:BatchImportFindings",
+          "securityhub:BatchUpdateFindings",
+          "securityhub:DescribeHub"
+        ]
+        Resource = "*"
       },
       {
         Effect = "Allow"
@@ -68,8 +94,9 @@ resource "aws_lambda_function" "certificate_monitor" {
 
   environment {
     variables = {
-      EXPIRY_DAYS   = local.application_data.accounts[local.environment].certificate_expiry_days
-      SNS_TOPIC_ARN = aws_sns_topic.certificate_expiration_alerts.arn
+      EXPIRY_DAYS         = local.application_data.accounts[local.environment].certificate_expiry_days
+      SECURITY_HUB_REGION = "eu-west-2"
+      SNS_TOPIC_ARN       = aws_sns_topic.certificate_expiration_alerts.arn
     }
   }
   tags = merge(local.tags, {

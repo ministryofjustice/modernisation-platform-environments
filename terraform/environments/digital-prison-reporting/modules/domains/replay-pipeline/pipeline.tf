@@ -166,6 +166,7 @@ module "replay_pipeline" {
           "Parameters" : {
             "JobName" : var.glue_reporting_hub_batch_jobname,
             "Arguments" : {
+              "--dpr.batch.load.fileglobpattern" : "{part-*.snappy.parquet,LOAD*parquet}",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }

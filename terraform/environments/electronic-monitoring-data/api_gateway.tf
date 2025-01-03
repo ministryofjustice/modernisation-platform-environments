@@ -24,4 +24,6 @@ module "get_zipped_file_api_api" {
     }
     required = ["file_name", "zip_file_name"]
   }
+  authorizer_role            = aws_iam_role.api_gateway_authorizer.arn
+  lambda_function_invoke_arn = module.api_gateway_authorizer.lambda_function_invoke_arn
 }
