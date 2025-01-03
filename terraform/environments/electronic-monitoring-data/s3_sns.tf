@@ -87,13 +87,13 @@ data "aws_iam_policy_document" "live_serco_policy" {
 data "aws_iam_policy_document" "merged_with_serco_policy" {
   source_policy_documents = [
     data.aws_s3_bucket_policy.existing_s3_data_bucket_policy.policy,
-    data.aws_iam_policy_document.new_policy.json
+    data.aws_iam_policy_document.live_serco_policy.json
   ]
 }
 
 resource "aws_s3_bucket_policy" "new_policy" {
   bucket = module.s3-data-bucket.bucket.id
-  policy = data.aws_iam_policy_document.merged_policy.json
+  policy = data.aws_iam_policy_document.merged_with_serco_policy.json
 }
 
 #  bucket notification for data store
