@@ -13,7 +13,10 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "example_var": "production-data"
+      "env_short": "prod",
+      "smtp_ami_id": "ami-07c2c2bf769d5174d",
+      "smtp_instance_type": "t2.large",
+      "old_mail_server_url": "mail.aws.prd.legalservices.gov.uk"
     }
   }
 }

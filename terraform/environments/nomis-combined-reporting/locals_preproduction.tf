@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_preproduction = {
+    maintenance_title   = "Prison-NOMIS Reporting LSAST and/or Pre-Production Maintenance Window"
+    maintenance_message = "Prison-NOMIS Reporting LSAST and/or Pre-Production is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down."
+  }
+
   baseline_presets_preproduction = {
     options = {
       sns_topics = {
@@ -251,6 +256,23 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
+            ]
           }
         ]
       }
@@ -319,6 +341,25 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "int.preproduction.reporting.nomis.service.justice.gov.uk",
+                      "maintenance-int.preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -369,6 +410,25 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "maintenance.preproducion.reporting.nomis.service.justice.gov.uk",
+                      "preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -390,6 +450,8 @@ locals {
           { name = "", type = "A", lbs_map_key = "public" },
           { name = "admin", type = "A", lbs_map_key = "public" },
           { name = "int", type = "A", lbs_map_key = "private" },
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
+          { name = "maintenance-int", type = "A", lbs_map_key = "private" },
         ]
       }
     }

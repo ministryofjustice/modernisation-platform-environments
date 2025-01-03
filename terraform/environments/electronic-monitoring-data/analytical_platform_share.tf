@@ -264,6 +264,18 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/structured/*"
     ]
   }
+  statement {
+    sid       = "ListAccountAliasDBT"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucketDBT"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
 }
 
 
