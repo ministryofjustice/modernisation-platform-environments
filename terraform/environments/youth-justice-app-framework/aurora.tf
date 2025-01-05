@@ -4,8 +4,10 @@ module "aurora" {
   vpc_id       = data.aws_vpc.shared.id
   tags         = local.tags
 
-  database_subnets           = local.data_subnet_list[*].id
-  alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id
+  database_subnets = local.data_subnet_list[*].id
+  #alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id
+  alb_route53_record_zone_id = data.private_dns_zone.aws_route53_zone_id
+
 
   name                       = "yjafrds01-cluster"
   azs                        = ["eu-west-2a", "eu-west-2b"]

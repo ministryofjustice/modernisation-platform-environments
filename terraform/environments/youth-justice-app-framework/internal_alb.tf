@@ -7,10 +7,11 @@ module "internal_alb" {
   alb_subnets_ids = local.private_subnet_list[*].id
   tags            = local.tags
 
-  alb_name                   = "yjaf-int"
-  internal                   = true
-  alb_route53_record_name    = "private-lb"
-  alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id #data.aws_route53_zone_id.inner.id
+  alb_name                = "yjaf-int"
+  internal                = true
+  alb_route53_record_name = "private-lb"
+  #alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id #data.aws_route53_zone_id.inner.id
+  alb_route53_record_zone_id = data.private_dns_zone.aws_route53_zone_id
 
   listeners     = local.internal_listeners
   target_groups = local.target_groups

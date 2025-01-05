@@ -1,3 +1,4 @@
+/* not sure what to do about this as I can't create it.
 module "private_dns_zone" {
   source              = "./modules/dns/hosted_zone"
   domain_name         = "${local.environment}.yjaf"
@@ -6,3 +7,4 @@ module "private_dns_zone" {
   vpc                 = data.aws_vpc.shared.id
   tags                = local.tags
 }
+*/
