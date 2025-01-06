@@ -111,6 +111,37 @@ locals {
           oracle-db-sid      = "T2OASYS2"
         })
       })
+      t2-oasys-web-c = merge(local.ec2_autoscaling_groups.web, {
+        autoscaling_schedules = {
+          scale_up   = { recurrence = "0 5 * * Mon-Fri" }
+          scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
+        }
+        user_data_cloud_init = {
+          args = {
+            branch       = "oasys-web-swap"
+            ansible_args = ""
+          }
+          scripts = [ # paths are relative to templates/ dir
+            "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+            "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+            "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+          ]
+        }
+        config = merge(local.ec2_autoscaling_groups.web.config, {
+          ami_name                  = "oasys_webserver_release_*"
+          availability_zone         = "eu-west-2a"
+          iam_resource_names_prefix = "ec2-web-t2"
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+            "Ec2T2WebPolicy",
+          ])
+        })
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
+          description        = "t2 oasys web"
+          oasys-environment  = "t2"
+          oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+          oracle-db-sid      = "T2OASYS" # for each env using azure DB will need to be OASPROD
+        })
+      })
     }
 
     ec2_instances = {
