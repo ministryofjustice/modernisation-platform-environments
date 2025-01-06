@@ -32,6 +32,8 @@ resource "aws_s3_bucket_public_access_block" "storage" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
+  #checkov:skip=CKV_AWS_300:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+
   # Create the lifecycle configuration if either lifecycle or Intelligent-Tiering is enabled
   count = var.enable_lifecycle || var.enable_intelligent_tiering ? 1 : 0
 
@@ -100,6 +102,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
       # Move objects to Intelligent-Tiering storage class
       days          = 0 # Immediately move to Intelligent-Tiering
       storage_class = "INTELLIGENT_TIERING"
+    }
+  }
+
+  # Expiration rules
+  dynamic "rule" {
+    for_each = var.override_expiration_rules
+    content {
+      id     = rule.value.id
+      status = "Enabled"
+
+      filter {
+        prefix = rule.value.prefix
+      }
+
+      expiration {
+        days = rule.value.days
+      }
     }
   }
 }
