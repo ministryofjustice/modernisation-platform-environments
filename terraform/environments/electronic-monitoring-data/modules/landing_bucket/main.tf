@@ -12,7 +12,7 @@ module "this-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${var.local_bucket_prefix}-land-${var.data_feed}-${var.order_type}-"
-  versioning_enabled = false
+  versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
@@ -49,7 +49,18 @@ module "this-bucket" {
       }
 
       expiration = {
-        days = 7
+        days = 30
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 30
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 90
       }
     }
   ]

@@ -1,34 +1,59 @@
 # ---------------------------------------
 # live fms data json trigger
 # ---------------------------------------
-resource "aws_sns_topic_subscription" "live_serco_fms_sns_subscription" {
-  topic_arn = aws_sns_topic.live_serco_fms_s3_events.arn
-  protocol  = "lambda"
-  endpoint  = module.format_json_fms_data.lambda_function_arn
+resource "aws_s3_bucket_notification" "historic_data_store" {
+  depends_on = [aws_lambda_permission.historic, aws_lambda_permission.live_serco_fms]
+  bucket     = module.s3-data-bucket.bucket.id
+
+  lambda_function {
+    lambda_function_arn = module.calculate_checksum.lambda_function_arn
+    events = [
+      "s3:ObjectCreated:*"
+    ]
+    filter_suffix = ".bak"
+  }
+  lambda_function {
+    lambda_function_arn = module.calculate_checksum.lambda_function_arn
+    events = [
+      "s3:ObjectCreated:*",
+    ]
+    filter_suffix = ".zip"
+  }
+  lambda_function {
+    lambda_function_arn = module.calculate_checksum.lambda_function_arn
+    events = [
+      "s3:ObjectCreated:*",
+    ]
+    filter_suffix = ".bacpac"
+  }
+  lambda_function {
+    lambda_function_arn = module.format_json_fms_data.lambda_function_arn
+    events = [
+      "s3:ObjectCreated:*",
+    ]
+    filter_suffix = ".JSON"
+    filter_prefix = "serco/fms/"
+  }
 }
 
-resource "aws_lambda_permission" "live_serco_fms_with_sns" {
-  statement_id  = "LiveServcoFMSLambdaAllowExecutionFromSNS"
+
+resource "aws_lambda_permission" "live_serco_fms" {
+  statement_id  = "LiveSercoFMSLambdaAllowExecutionFromS3Bucket"
   action        = "lambda:InvokeFunction"
   function_name = module.format_json_fms_data.lambda_function_name
-  principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.live_serco_fms_s3_events.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = module.s3-data-bucket.bucket.arn
 }
 
 
 # ---------------------------------------
 # historic data json trigger
 # ---------------------------------------
-resource "aws_sns_topic_subscription" "historic_sns_subscription" {
-  topic_arn = aws_sns_topic.historic_s3_events.arn
-  protocol  = "lambda"
-  endpoint  = module.calculate_checksum.lambda_function_arn
-}
 
-resource "aws_lambda_permission" "historic_with_sns" {
-  statement_id  = "ChecksumLambdaAllowExecutionFromHistoricDataSNS"
+resource "aws_lambda_permission" "historic" {
+  statement_id  = "ChecksumLambdaAllowExecutionFromHistoricData"
   action        = "lambda:InvokeFunction"
   function_name = module.calculate_checksum.lambda_function_name
-  principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.historic_s3_events.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = module.s3-data-bucket.bucket.arn
 }

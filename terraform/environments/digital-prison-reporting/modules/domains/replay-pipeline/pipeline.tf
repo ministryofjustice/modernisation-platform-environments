@@ -166,6 +166,7 @@ module "replay_pipeline" {
           "Parameters" : {
             "JobName" : var.glue_reporting_hub_batch_jobname,
             "Arguments" : {
+              "--dpr.batch.load.fileglobpattern" : "{part-*.snappy.parquet,LOAD*parquet}",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
@@ -252,7 +253,8 @@ module "replay_pipeline" {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {
               "--dpr.orchestration.wait.interval.seconds" : tostring(var.processed_files_check_wait_interval_seconds),
-              "--dpr.orchestration.max.attempts" : tostring(var.processed_files_check_max_attempts)
+              "--dpr.orchestration.max.attempts" : tostring(var.processed_files_check_max_attempts),
+              "--dpr.allowed.s3.file.regex" : "\\d+-\\d+.parquet"
             }
           },
           "Next" : "Empty Raw Data"
