@@ -181,7 +181,7 @@
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
-      "redshift_table_expiry_seconds": "604800",
+      "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true
     },
     "test": {
@@ -364,7 +364,7 @@
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
-      "redshift_table_expiry_seconds": "604800",
+      "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true
     },
     "preproduction": {
@@ -567,7 +567,7 @@
           ]
         }
       ],
-      "redshift_table_expiry_seconds": "604800",
+      "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true
     },
     "production": {
@@ -765,7 +765,7 @@
           ]
         }
       ],
-      "redshift_table_expiry_seconds": "86400",
+      "redshift_table_expiry_days": 1,
       "enable_s3_data_migrate_lambda": false
     }
   }

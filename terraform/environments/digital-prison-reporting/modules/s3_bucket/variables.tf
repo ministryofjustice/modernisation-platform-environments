@@ -58,21 +58,6 @@ variable "enable_lifecycle" {
   default     = false
 }
 
-#variable "expiration_days" {
-#  description = "Days to wait before deleting expired items."
-#  default     = 90
-#}
-
-#variable "expiration_prefix_redshift" {
-#  description = "Directory Prefix where Redshift Async query results are stored to apply expiration to."
-#  default     = "/"
-#}
-
-#variable "expiration_prefix_athena" {
-#  description = "Directory Prefix where Athena Async query results are stored to apply expiration to."
-#  default     = "/"
-#}
-
 variable "enable_versioning_config" {
   description = "Enable Versioning Config for S3 Storage, Default is Disabled"
   default     = "Disabled"
@@ -117,18 +102,13 @@ variable "bucket_key" {
 
 ## Dynamic override_expiration_rules
 variable "override_expiration_rules" {
-  type    = list(object({ prefix = string, days = number }))
+  type    = list(object({ id = string, prefix = string, days = number }))
   default = []
 }
 
 variable "lifecycle_category" {
   type    = string
   default = "standard" # Options: "short_term", "long_term", "temporary", "standard"
-}
-
-variable "enable_lifecycle_expiration" {
-  description = "Enable item expiration - requires 'enable_lifecycle' and 'override_expiration_rules' to be defined/enabled."
-  default     = false
 }
 
 variable "enable_intelligent_tiering" {

@@ -102,6 +102,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
       storage_class = "INTELLIGENT_TIERING"
     }
   }
+
+  # Expiration rules
+  dynamic "rule" {
+    for_each = var.override_expiration_rules
+    content {
+      id     = rule.value.id
+      status = "Enabled"
+
+      filter {
+        prefix = rule.value.prefix
+      }
+
+      expiration {
+        days = rule.value.days
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "encryption" {
