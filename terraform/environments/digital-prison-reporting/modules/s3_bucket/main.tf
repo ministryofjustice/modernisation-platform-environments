@@ -32,6 +32,8 @@ resource "aws_s3_bucket_public_access_block" "storage" {
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
+  #checkov:skip=CKV_AWS_300:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+
   # Create the lifecycle configuration if either lifecycle or Intelligent-Tiering is enabled
   count = var.enable_lifecycle || var.enable_intelligent_tiering ? 1 : 0
 

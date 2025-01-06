@@ -25,6 +25,7 @@ variable "cloudtrail_access_policy" {
 
 variable "s3_notification_name" {
   description = "S3 Notification Event Name"
+  type        = string
   default     = "s3-notification-event"
 }
 
