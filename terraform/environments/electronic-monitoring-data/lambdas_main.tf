@@ -93,7 +93,7 @@ module "virus_scan_definition_upload" {
   function_name           = "definition-upload"
   is_image                = true
   ecr_repo_name           = "analytical-platform-ingestion-scan"
-  function_tag            = "0.1.0"
+  function_tag            = "0.1.3"
   role_name               = aws_iam_role.virus_scan_definition_upload.name
   role_arn                = aws_iam_role.virus_scan_definition_upload.arn
   memory_size             = 2048
@@ -124,7 +124,7 @@ module "virus_scan_file" {
   function_name           = "scan"
   is_image                = true
   ecr_repo_name           = "analytical-platform-ingestion-scan"
-  function_tag            = "0.1.0"
+  function_tag            = "0.1.3"
   role_name               = aws_iam_role.virus_scan_file.name
   role_arn                = aws_iam_role.virus_scan_file.arn
   ephemeral_storage_size  = 10240
