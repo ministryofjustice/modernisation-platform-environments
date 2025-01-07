@@ -1296,10 +1296,6 @@ module "dms_fake_data_ingestor" {
     "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
   }
 
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
-
   tags = merge(
     local.all_tags,
     {
