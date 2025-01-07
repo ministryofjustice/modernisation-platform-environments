@@ -264,6 +264,18 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/structured/*"
     ]
   }
+  statement {
+    sid       = "ListAccountAliasDBT"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucketDBT"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
 }
 
 
@@ -369,8 +381,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
 
-  name = "${each.value.target_account_name}-share-role"
-
+  name                 = "${each.value.target_account_name}-share-role"
+  max_session_duration = 12 * 60 * 60
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

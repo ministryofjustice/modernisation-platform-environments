@@ -64,3 +64,13 @@ variable "sync" {
   type        = bool
   default     = true
 }
+
+variable "authorizer_role" {
+  description = "ARN of the Role the Authorizer uses"
+  type        = string
+}
+
+variable "lambda_function_invoke_arn" {
+  description = "ARN of the Lambda function to invoke"
+  type        = string
+}

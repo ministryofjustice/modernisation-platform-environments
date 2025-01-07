@@ -1,14 +1,6 @@
 locals {
   baseline_presets_production = {
     options = {
-      cloudwatch_dashboard_default_widget_groups = [
-        "ec2",
-        "ec2_linux",
-        "ec2_instance_linux",
-        "ec2_instance_filesystems",
-        "ec2_instance_textfile_monitoring",
-        "ec2_windows",
-      ]
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "nomis-data-hub-production"
@@ -24,7 +16,6 @@ locals {
       dr-ndh-app-b = merge(local.ec2_instances.ndh_app, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.ndh_app.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_filesystems_check
         )
         config = merge(local.ec2_instances.ndh_app.config, {
           availability_zone = "eu-west-2b"
@@ -58,7 +49,6 @@ locals {
       pd-ndh-app-a = merge(local.ec2_instances.ndh_app, {
         cloudwatch_metric_alarms = merge(
           local.ec2_instances.ndh_app.cloudwatch_metric_alarms,
-          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_filesystems_check
         )
         config = merge(local.ec2_instances.ndh_app.config, {
           availability_zone = "eu-west-2a"

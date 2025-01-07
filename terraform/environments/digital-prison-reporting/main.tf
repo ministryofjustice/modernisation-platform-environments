@@ -340,14 +340,14 @@ module "glue_s3_file_transfer_job" {
 module "glue_switch_prisons_hive_data_location_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-switch-prisons-hive-data-location-${local.env}"
-  short_name                    = "${local.project}-switch-prisons-hive-data-location"
+  name                          = "${local.project}-switch-prisons-data-source-${local.env}"
+  short_name                    = "${local.project}-switch-prisons-data-source"
   command_type                  = "glueetl"
   description                   = "Switch Prisons Hive tables data location.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.prisons.data.switch.target.s3.path: (Required) s3 path to point the prisons data to e.g. s3://dpr-curated-zone-<env>"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-switch-prisons-hive-data-location-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-prisons-hive-data-location-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-switch-prisons-data-source-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-prisons-data-source-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
   enable_continuous_log_filter = false
@@ -365,7 +365,7 @@ module "glue_switch_prisons_hive_data_location_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-switch-prisons-hive-data-location-${local.env}"
+      Name          = "${local.project}-switch-prisons-data-source-${local.env}"
       Resource_Type = "Glue Job"
       Jira          = "DPR2-46"
     }
@@ -995,16 +995,17 @@ module "s3_working_bucket" {
   custom_kms_key              = local.s3_kms_arn
   create_notification_queue   = false # For SQS Queue
   enable_lifecycle            = true
-  enable_lifecycle_expiration = true
   lifecycle_category          = "long_term"
 
   override_expiration_rules = [
     {
-      prefix = "reports"
-      days   = 7
+      id = "reports"
+      prefix = "reports/"
+      days   = local.s3_redshift_table_expiry_days
     },
     {
-      prefix = "dpr"
+      id = "dpr"
+      prefix = "dpr/"
       days   = 7
     }
   ]

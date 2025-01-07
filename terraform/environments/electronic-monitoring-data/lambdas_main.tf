@@ -89,17 +89,17 @@ module "rotate_iam_key" {
 #-----------------------------------------------------------------------------------
 
 module "virus_scan_definition_upload" {
-  source                  = "./modules/lambdas"
-  function_name           = "definition-upload"
-  is_image                = true
-  ecr_repo_name           = "analytical-platform-ingestion-scan"
-  function_tag            = "0.1.0"
-  role_name               = aws_iam_role.virus_scan_definition_upload.name
-  role_arn                = aws_iam_role.virus_scan_definition_upload.arn
-  memory_size             = 2048
-  timeout                 = 900
-  security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.shared-public.ids
+  source        = "./modules/lambdas"
+  function_name = "definition-upload"
+  is_image      = true
+  ecr_repo_name = "analytical-platform-ingestion-scan"
+  function_tag  = "0.1.3"
+  role_name     = aws_iam_role.virus_scan_definition_upload.name
+  role_arn      = aws_iam_role.virus_scan_definition_upload.arn
+  memory_size   = 2048
+  timeout       = 900
+  # security_group_ids      = [aws_security_group.lambda_generic.id]
+  # subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   environment_variables = {
     MODE                         = "definition-upload",
@@ -124,7 +124,7 @@ module "virus_scan_file" {
   function_name           = "scan"
   is_image                = true
   ecr_repo_name           = "analytical-platform-ingestion-scan"
-  function_tag            = "0.1.0"
+  function_tag            = "0.1.3"
   role_name               = aws_iam_role.virus_scan_file.name
   role_arn                = aws_iam_role.virus_scan_file.arn
   ephemeral_storage_size  = 10240
@@ -191,4 +191,28 @@ module "calculate_checksum" {
   }
 
 }
+
+
+#-----------------------------------------------------------------------------------
+# API Gateway authorizer
+#-----------------------------------------------------------------------------------
+
+module "api_gateway_authorizer" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "api_gateway_authorizer"
+  role_name               = aws_iam_role.api_gateway_authorizer.name
+  role_arn                = aws_iam_role.api_gateway_authorizer.arn
+  handler                 = "api_gateway_authorizer.handler"
+  memory_size             = 4096
+  timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    ENVIRONMENT_NAME = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
+  }
+}
+
 

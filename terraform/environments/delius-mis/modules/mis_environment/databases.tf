@@ -20,6 +20,11 @@ module "oracle_db_shared" {
   env_name           = var.env_name
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
+  instance_roles = concat(
+    each.key == "mis-db" ? [for i in range(1, try(var.mis_db_config.instance_count, 1) + 1) : "arn:aws:iam::${var.account_info.id}:role/instance-role-delius-mis-${var.env_name}-mis-db-${i}"] : [],
+    each.key == "boe-db" ? [for i in range(1, try(var.boe_db_config.instance_count, 1) + 1) : "arn:aws:iam::${var.account_info.id}:role/instance-role-delius-mis-${var.env_name}-boe-db-${i}"] : [],
+    each.key == "dsd-db" ? [for i in range(1, try(var.dsd_db_config.instance_count, 1) + 1) : "arn:aws:iam::${var.account_info.id}:role/instance-role-delius-mis-${var.env_name}-mis-db-${i}"] : []
+  )
 
   db_suffix = each.key
 
