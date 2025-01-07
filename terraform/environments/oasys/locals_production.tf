@@ -772,6 +772,8 @@ locals {
           { name = "t2-b", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
           { name = "t2-b-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
           { name = "t2-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-c", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-c-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
 
           { name = "_9f1b86e95d13d2cc7b9629f67d672c40", type = "CNAME", ttl = "86400", records = ["_7ea92a123c65795698dd19834dd71f61.fdbjvjdfdx.acm-validations.aws."] },
           { name = "_26aaae7b839510727c2dd323b483ea5d.pp", type = "CNAME", ttl = "86400", records = ["_72222d02a82256bb6d75c872bc7bc1aa.qxcwttcyyb.acm-validations.aws."] },
