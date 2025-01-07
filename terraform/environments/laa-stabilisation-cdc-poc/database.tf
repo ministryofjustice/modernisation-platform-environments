@@ -90,8 +90,8 @@ ln -s /bin/mail /bin/mailx
 
 ## Remove SSH key allowed
 echo "Removing old SSH key"
-sed -i '/.*-general$/d' /home/ec2-user/.ssh/authorized_keys
-sed -i '/.*-general$/d' /root/.ssh/authorized_keys
+# sed -i '/.*-general$/d' /home/ec2-user/.ssh/authorized_keys
+# sed -i '/.*-general$/d' /root/.ssh/authorized_keys
 sed -i '/testimage$/d' /root/.ssh/authorized_keys
 
 ## Add custom metric script
