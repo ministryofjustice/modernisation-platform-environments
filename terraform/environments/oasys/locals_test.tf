@@ -111,6 +111,35 @@ locals {
           oracle-db-sid      = "T2OASYS2"
         })
       })
+      t2-oasys-san-web-a = merge(local.ec2_autoscaling_groups.web, {
+        # For SAN project (OASYS replacement) requested by Howard Smith
+        # Autoscaling disabled as initially server will be configured manually
+        config = merge(local.ec2_autoscaling_groups.web.config, {
+          ami_name                  = "oasys_webserver_release_*"
+          availability_zone         = "eu-west-2a"
+          iam_resource_names_prefix = "ec2-web-t2"
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+            "Ec2T2WebPolicy",
+          ])
+        })
+        ebs_volumes = {
+          "/dev/sda1" = { snapshot_id = "snap-0eefca38cbebc9289" }
+          "/dev/sda2" = { snapshot_id = "snap-073b980c752b70d71" }
+          "/dev/sdb" = { snapshot_id = "snap-0ccf326230b3def99" }
+          "/dev/sdc" = { snapshot_id = "snap-05dcf8714290d64d1" }
+        }
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.web.tags, {
+          description        = "t2 oasys web"
+          oasys-environment  = "t2"
+          oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+          oracle-db-sid      = "T2OASYS2"
+        })
+      })
     }
 
     ec2_instances = {
