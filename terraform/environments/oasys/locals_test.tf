@@ -113,21 +113,15 @@ locals {
       })
       t2-oasys-web-c = merge(local.ec2_autoscaling_groups.web, {
         # For SAN project (OASYS replacement) requested by Howard Smith
-        # Autoscaling disabled as initially server will be configured manually
-        autoscaling_group = {
-          desired_capacity          = 1
-          max_size                  = 1
-          force_delete              = true
-          vpc_zone_identifier       = module.environment.subnets["private"].ids
+        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           warm_pool = {
             min_size          = 0
-            max_group_prepared_capacity = 1
             reuse_on_scale_in = true
-          }    
-        }
+          }
+        })
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
-          availability_zone         = "eu-west-2a"
+          availability_zone         = "eu-west-2b"
           iam_resource_names_prefix = "ec2-web-t2"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2T2WebPolicy",
