@@ -114,6 +114,18 @@ locals {
       t2-oasys-san-web-a = merge(local.ec2_autoscaling_groups.web, {
         # For SAN project (OASYS replacement) requested by Howard Smith
         # Autoscaling disabled as initially server will be configured manually
+        autoscaling_group = {
+          desired_capacity          = 1
+          max_size                  = 1
+          force_delete              = true
+          vpc_zone_identifier       = module.environment.subnets["private"].ids
+          wait_for_capacity_timeout = 60m
+          warm_pool = {
+            min_size          = 0
+            max_group_prepared_capacity = 1
+            reuse_on_scale_in = true
+          }    
+        }
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "OASys San Test"
           availability_zone         = "eu-west-2a"
