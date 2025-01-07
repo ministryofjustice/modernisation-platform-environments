@@ -27,7 +27,7 @@ module "cap_dw_excluding_specials" {
     (each.key) = "specials_flag=0"
   }
   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
-  database_name           = "historic_api_mart_historic_dev_dbt"
+  database_name           = "historic_api_mart_tables_historic_dev_dbt"
   data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
 }
@@ -39,7 +39,7 @@ module "cap_dw_including_specials" {
     (each.key) = ""
   }
   role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
-  database_name           = "historic_api_mart_historic_dev_dbt"
+  database_name           = "historic_api_mart_tables_historic_dev_dbt"
   data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
 }
@@ -51,7 +51,7 @@ module "am_for_non_specials_role" {
     (each.key) = ""
   }
   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
-  database_name           = "historic_api_mart_historic_dev_dbt"
+  database_name           = "historic_api_mart_tables_historic_dev_dbt"
   data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
 }
@@ -63,7 +63,7 @@ module "am_for_specials_role" {
     (each.key) = ""
   }
   role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
-  database_name           = "historic_api_mart_historic_dev_dbt"
+  database_name           = "historic_api_mart_tables_historic_dev_dbt"
   data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
 }
