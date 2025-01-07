@@ -1306,55 +1306,6 @@ module "dms_fake_data_ingestor" {
   )
 }
 
-# DMS Nomis Data Collector
-module "dms_nomis_to_s3_ingestor" {
-  source                       = "./modules/dms_s3_v2"
-  setup_dms_instance           = true
-  enable_replication_task      = true
-  name                         = "${local.project}-dms-nomis-ingestor-s3-target-${local.env}"
-  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
-  source_engine_name           = "oracle"
-  source_db_name               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
-  source_app_username          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["user"]
-  source_app_password          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["password"]
-  source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
-  vpc                          = data.aws_vpc.shared.id
-  project_id                   = local.project
-  env                          = local.environment
-  dms_source_name              = "oracle"
-  dms_target_name              = "s3"
-  short_name                   = "nomis"
-  migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.5.1" # Upgrade
-  allow_major_version_upgrade  = true
-  replication_instance_class   = "dms.t3.medium"
-  subnet_ids = [
-    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
-  ]
-
-  rename_rule_source_schema = "OMS_OWNER"
-  rename_rule_output_space  = "nomis"
-
-  extra_attributes = "supportResetlog=TRUE"
-
-  bucket_name = module.s3_raw_bucket.bucket_id
-
-  depends_on = [
-    module.s3_raw_bucket.bucket_id
-  ]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-dms-t3nomis-ingestor-s3-target-${local.env}"
-      Resource_Type = "DMS Replication"
-      Nomis_Source  = "T3"
-      Jira          = "DPR2-165"
-    }
-  )
-}
-
 # Dynamo DB Tables
 # Dynamo DB for DomainRegistry, DPR-306/DPR-218
 module "dynamo_tab_domain_registry" {
