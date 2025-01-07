@@ -115,19 +115,13 @@ locals {
         # For SAN project (OASYS replacement) requested by Howard Smith
         # Autoscaling disabled as initially server will be configured manually
         config = merge(local.ec2_autoscaling_groups.web.config, {
-          ami_name                  = "oasys_webserver_release_*"
+          ami_name                  = "OASys San Test"
           availability_zone         = "eu-west-2a"
           iam_resource_names_prefix = "ec2-web-t2"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2T2WebPolicy",
           ])
         })
-        ebs_volumes = {
-          "/dev/sda1" = { snapshot_id = "snap-0eefca38cbebc9289" }
-          "/dev/sda2" = { snapshot_id = "snap-073b980c752b70d71" }
-          "/dev/sdb" = { snapshot_id = "snap-0ccf326230b3def99" }
-          "/dev/sdc" = { snapshot_id = "snap-05dcf8714290d64d1" }
-        }
         user_data_cloud_init = {
         }
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -539,3 +533,7 @@ locals {
     }
   }
 }
+
+
+
+
