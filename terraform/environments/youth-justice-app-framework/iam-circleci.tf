@@ -31,9 +31,23 @@ resource "aws_iam_role" "circleci_role" {
   })
 }
 
-
-
-resource "aws_iam_role_policy_attachment" "circleci_policy" {
-  role       = aws_iam_role.circleci_role.name
-  policy_arn = "arn:aws:iam::aws:policy/<your-policy>"
+resource "aws_iam_policy" "policy_file" {
+  name   = "yjaf-circleci-policy"
+  path   = "/"
+  policy = file("./policy_files/circleci_push_pull.json")
+  tags   = local.tags
 }
+
+resource "aws_iam_role_policy_attachment" "custom_circleci_policy" {
+  role       = aws_iam_role.circleci_role.name
+  policy_arn = aws_iam_policy.policy_file.arn
+}
+
+resource "aws_iam_role_policy_attachment" "aws_circleci_policies" {
+  for_each = {
+    "AWSCodeDeployRoleForECS" = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForECS"
+  }
+  role       = aws_iam_role.circleci_role.name
+  policy_arn = each.value
+}
+
