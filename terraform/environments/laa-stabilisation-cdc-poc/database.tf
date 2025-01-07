@@ -80,7 +80,6 @@ echo "Setting up cron jobs"
 su oracle -c "crontab -l > /home/oracle/oraclecrontab.txt"
 sed -i '/disk_space.sh/d' /home/oracle/oraclecrontab.txt
 echo "00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log" >> /home/oracle/oraclecrontab.txt
-echo "0,30 08-17 * * 1-5 /home/oracle/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} >/tmp/disk_space.trc 2>&1" >> /home/oracle/oraclecrontab.txt
 
 chown oracle:oinstall /home/oracle/oraclecrontab.txt
 chmod 744 /home/oracle/oraclecrontab.txt
