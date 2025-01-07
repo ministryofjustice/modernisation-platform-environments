@@ -218,3 +218,36 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "ssm_parameters", {}),
   )
 }
+
+resource "aws_ami" "oasys_san_test" {
+  name                = "OASys San Test"
+  description         = "OASys SAN Test backup ami"
+  virtualization_type = "hvm"
+  root_device_name    = "/dev/sda1"
+  ebs_block_device {
+    delete_on_termination = false
+    device_name           = "/dev/sda1"
+    snapshot_id           = "snap-0eefca38cbebc9289"
+  }
+  ebs_block_device {
+    delete_on_termination = false
+    device_name           = "/dev/sda2"
+    snapshot_id           = "snap-073b980c752b70d71"
+  }
+  ebs_block_device {
+    delete_on_termination = false
+    device_name           = "/dev/sdb"
+    snapshot_id           = "snap-0ccf326230b3def99"
+  }
+  ebs_block_device {
+    delete_on_termination = false
+    device_name           = "/dev/sdc"
+    snapshot_id           = "snap-05dcf8714290d64d1"
+  }
+  tags = merge(
+    local.tags,
+    {
+      Name  = "oasys san test"
+    },
+  )
+}
