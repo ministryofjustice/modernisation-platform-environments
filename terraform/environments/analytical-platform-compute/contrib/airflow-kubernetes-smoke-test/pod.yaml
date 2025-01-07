@@ -21,7 +21,6 @@ metadata:
     checkov.io/skip13: CKV2_K8S_6
 spec:
   securityContext:
-    readOnlyRootFilesystem: true
     runAsNonRoot: true
     runAsUser: 1000
   affinity:
@@ -50,4 +49,5 @@ spec:
         limits:
           memory: 128Mi
           cpu: 200m
-      
+      securityContext:
+        readOnlyRootFilesystem: true
