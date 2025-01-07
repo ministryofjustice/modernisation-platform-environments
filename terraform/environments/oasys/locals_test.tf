@@ -128,11 +128,8 @@ locals {
           "/dev/sdb" = { snapshot_id = "snap-0ccf326230b3def99" }
           "/dev/sdc" = { snapshot_id = "snap-05dcf8714290d64d1" }
         }
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
+        user_data_cloud_init = {
+        }
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "t2 oasys web"
           oasys-environment  = "t2"
