@@ -4,11 +4,11 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  admin_roles = local.is-development ? "sandbox" : "data-eng"
-  suffix      = local.is-production ? "" : "-test"
+  admin_roles       = local.is-development ? "sandbox" : "data-eng"
+  suffix            = local.is-production ? "" : "-test"
   prod_dbs_to_grant = ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"]
-  dev_dbs_to_grant = ["${db}_historic_dev_dbt" for db in local.prod_dbs_to_grant]
-  dbs_to_grant = flatten([prod_dbs_to_grant, dev_dbs_to_grant])
+  dev_dbs_to_grant  = [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"]
+  dbs_to_grant      = flatten([prod_dbs_to_grant, dev_dbs_to_grant])
 }
 
 # Source Analytics DBT Secrets
