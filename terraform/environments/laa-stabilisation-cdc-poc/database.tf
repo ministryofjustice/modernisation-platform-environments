@@ -61,7 +61,8 @@ PRIVATE_IP=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 
 echo "Updating /etc/hosts"
 sed -i '/${local.database_hostname}$/d' /etc/hosts
-sed -i '/laa-oem-app$/d' /etc/hosts # This is removed for POC
+sed -i '/laa-oem-app$/d' /etc/hosts
+sed -i '/cwa-.*$/d' /etc/hosts
 echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
 
 echo "Setting up AWS EBS backup"

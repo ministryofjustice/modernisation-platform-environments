@@ -13,7 +13,7 @@
       "ebs_oraredo_size": "100",
       "ebs_share_size": "50",
       "ebs_concurrent_manager_size": "200",
-      "cwa_ec2_key": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEnmotXCYSQGYSc2Xu8eClV0/Hu076Bq3z7nHHFKbLjP vincent.cheung@MJ004609",
+      "cwa_ec2_key": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDAQUcMqXMcs+lOLPXySeSXvPZdaOO4gAZ34yBefe0UFZp867gRepg/J8MgMfNus4qzcw1pEOBW7sZb1fTw5bijJVMjNsqI260fo9yTslRgIVgB4m+5rBuFpWCH1NA3tZ906+2X3shRXAvfAW6pGsjEDZ5caMvut1zpWZueHDGNfxrTw6ZpWaEfD56L7m3TsP7Ng38Ejmron6Nf/CjxLrNehTmtf3eq+oTbf4kLiaD+gdm1XIBGg5cXDIutRFtuK6iAKPofGWHFe+LO7SzuEblThA6L9jhbZsxUtPKe1UZkQwO3EirXam0Z/Kses/q7ATOGsRmKT3aQsquNDutYlh1EJwCU7sEKFR4JM0au8YiYDSz8rNAouEpRNZijdfNlnO0rE+wILWkpa3wuEQIgQBRSWzkShffcY5SSswnjGSWJuFbsn5jyZcQTB7pYpgVry+ZSK8FdWUjZoDpj6/zVQ5mlRDcy7B1r/sO/DWtyNcWeeyuuCgg7dRoHLNjggAQCyL8= vincent.cheung@MJ004609",
       "oradata_snapshot_id": "snap-0f9d4701fbe6b03cd",
       "oracle_snapshot_id": "snap-0ce3857d7b4ad8e85",
       "oraarch_snapshot_id": "snap-05e1cb7e47ed25970",
