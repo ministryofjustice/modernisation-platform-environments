@@ -1,0 +1,37 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: airflow-kubernetes-smoke-test
+  namespace: airflow
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: compute.analytical-platform.service.justice.gov.uk/karpenter-node-pool
+                operator: In
+                values:
+                  - general-spot
+  tolerations:
+    - key: compute.analytical-platform.service.justice.gov.uk/karpenter-node-pool
+      operator: Equal
+      value: general-spot
+      effect: NoSchedule
+  restartPolicy: Never
+  containers:
+    - name: main
+      image: ghcr.io/ministryofjustice/analytical-platform-airflow-python-base:1.4.0
+      command: ["/bin/sh", "-c", "date && cat /etc/os-release && sleep 120"]
+      resources:
+        requests:
+          memory: 64Mi
+          cpu: 100m
+        limits:
+          memory: 128Mi
+          cpu: 200m
+      
