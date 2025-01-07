@@ -8,7 +8,7 @@ locals {
   suffix            = local.is-production ? "" : "-test"
   prod_dbs_to_grant = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"] : []
   dev_dbs_to_grant  = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
-  dbs_to_grant      = flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant])
+  dbs_to_grant      = map(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant]))
 }
 
 # Source Analytics DBT Secrets
