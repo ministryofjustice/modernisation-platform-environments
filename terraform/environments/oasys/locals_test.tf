@@ -111,31 +111,22 @@ locals {
           oracle-db-sid      = "T2OASYS2"
         })
       })
-      t2-oasys-san-web-a = merge(local.ec2_autoscaling_groups.web, {
+      t2-oasys-web-c = merge(local.ec2_autoscaling_groups.web, {
         # For SAN project (OASYS replacement) requested by Howard Smith
         # Autoscaling disabled as initially server will be configured manually
-        autoscaling_group = {
-          desired_capacity          = 1
-          max_size                  = 1
-          force_delete              = true
-          vpc_zone_identifier       = module.environment.subnets["private"].ids
-          wait_for_capacity_timeout = 60m
-          warm_pool = {
-            min_size          = 0
-            max_group_prepared_capacity = 1
-            reuse_on_scale_in = true
-          }    
-        }
         config = merge(local.ec2_autoscaling_groups.web.config, {
-          ami_name                  = "OASys San Test"
+          ami_name                  = "oasys_webserver_release_*"
           availability_zone         = "eu-west-2a"
           iam_resource_names_prefix = "ec2-web-t2"
           instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
             "Ec2T2WebPolicy",
           ])
         })
-        user_data_cloud_init = {
-        }
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
           description        = "t2 oasys web"
           oasys-environment  = "t2"
@@ -143,6 +134,38 @@ locals {
           oracle-db-sid      = "T2OASYS2"
         })
       })
+      # t2-oasys-san-web-a = merge(local.ec2_autoscaling_groups.web, {
+      #   # For SAN project (OASYS replacement) requested by Howard Smith
+      #   # Autoscaling disabled as initially server will be configured manually
+      #   autoscaling_group = {
+      #     desired_capacity          = 1
+      #     max_size                  = 1
+      #     force_delete              = true
+      #     vpc_zone_identifier       = module.environment.subnets["private"].ids
+      #     wait_for_capacity_timeout = 60m
+      #     warm_pool = {
+      #       min_size          = 0
+      #       max_group_prepared_capacity = 1
+      #       reuse_on_scale_in = true
+      #     }    
+      #   }
+      #   config = merge(local.ec2_autoscaling_groups.web.config, {
+      #     ami_name                  = "OASys San Test"
+      #     availability_zone         = "eu-west-2a"
+      #     iam_resource_names_prefix = "ec2-web-t2"
+      #     instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
+      #       "Ec2T2WebPolicy",
+      #     ])
+      #   })
+      #   user_data_cloud_init = {
+      #   }
+      #   tags = merge(local.ec2_autoscaling_groups.web.tags, {
+      #     description        = "t2 oasys web"
+      #     oasys-environment  = "t2"
+      #     oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
+      #     oracle-db-sid      = "T2OASYS2"
+      #   })
+      # })
     }
 
     ec2_instances = {
@@ -412,6 +435,22 @@ locals {
                   }
                 ]
               }
+              t2-web-c-http-8080 = {
+                priority = 160
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-oasys-web-c-pb-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2-c.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
               t1-web-http-8080 = {
                 priority = 300
                 actions = [{
@@ -470,6 +509,22 @@ locals {
                     host_header = {
                       values = [
                         "t2-b-int.oasys.service.justice.gov.uk",
+                      ]
+                    }
+                  }
+                ]
+              }
+              t2-web-c-http-8080 = {
+                priority = 160
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-oasys-web-c-pv-http-8080"
+                }]
+                conditions = [
+                  {
+                    host_header = {
+                      values = [
+                        "t2-c-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
