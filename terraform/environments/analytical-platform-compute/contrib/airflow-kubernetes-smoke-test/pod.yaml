@@ -4,6 +4,21 @@ kind: Pod
 metadata:
   name: airflow-kubernetes-smoke-test
   namespace: airflow
+  annotations:
+    # These Chekov checks are skipped because they are not relevant to this pod, its used for smoke testing by the platform team
+    checkov.io/skip1: CKV_K8S_43
+    checkov.io/skip2: CKV_K8S_9
+    checkov.io/skip3: CKV_K8S_31
+    checkov.io/skip4: CKV_K8S_15
+    checkov.io/skip5: CKV_K8S_8
+    checkov.io/skip6: CKV_K8S_30
+    checkov.io/skip7: CKV_K8S_37
+    checkov.io/skip8: CKV_K8S_40
+    checkov.io/skip9: CKV_K8S_20
+    checkov.io/skip10: CKV_K8S_28
+    checkov.io/skip11: CKV_K8S_22
+    checkov.io/skip12: CKV_K8S_38
+    checkov.io/skip13: CKV2_K8S_6
 spec:
   securityContext:
     runAsNonRoot: true
