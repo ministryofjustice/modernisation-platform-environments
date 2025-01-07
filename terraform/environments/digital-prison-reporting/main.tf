@@ -1336,9 +1336,6 @@ module "dms_nomis_to_s3_ingestor" {
   rename_rule_source_schema = "OMS_OWNER"
   rename_rule_output_space  = "nomis"
 
-  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
-  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
-
   extra_attributes = "supportResetlog=TRUE"
 
   bucket_name = module.s3_raw_bucket.bucket_id
