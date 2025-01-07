@@ -135,7 +135,7 @@ resource "aws_s3_object" "db_postbuild_script" {
 
 resource "time_sleep" "wait_db_userdata_scripts" {
   create_duration = "1m"
-  depends_on      = [aws_s3_object.db_custom_script, aws_s3_object.db_prereqs_script, aws_s3_object.db_postbuild_script, aws_s3_object.disk_space_script]
+  depends_on      = [aws_s3_object.db_custom_script, aws_s3_object.db_prereqs_script, aws_s3_object.db_postbuild_script]
 }
 
 ######################################
