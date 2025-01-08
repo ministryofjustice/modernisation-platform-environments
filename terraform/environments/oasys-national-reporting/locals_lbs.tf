@@ -10,7 +10,7 @@ locals {
       force_destroy_bucket             = true
       internal_lb                      = false
       load_balancer_type               = "application"
-      security_groups                  = ["public-lb"]
+      security_groups                  = ["public-lb", "public-lb-2"]
       subnets                          = module.environment.subnets["public"].ids
 
       listeners = {
