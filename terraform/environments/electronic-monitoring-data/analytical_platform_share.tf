@@ -452,7 +452,7 @@ module "share_dbs_with_cadt_role" {
 }
 
 resource "aws_glue_catalog_database" "cadt_databases" {
-  count = length(local.dbs_to_grant)
+  for_each = toset(local.dbs_to_grant)
 
-  name = local.dbs_to_grant[count.index]
+  name = each.value
 }
