@@ -15,13 +15,14 @@ defaults:
   run:
     shell: bash
 
-permissions:
-  contents: write
+permissions: {}
+  
 
 jobs:
   create-and-commit-dependabot-file:
     permissions:
       pull-requests: write
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
