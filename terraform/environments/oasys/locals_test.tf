@@ -387,22 +387,6 @@ locals {
                   }
                 ]
               }
-              t2-web-c-http-8080 = {
-                priority = 160
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-oasys-web-c-pb-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [
-                        "t2-c.oasys.service.justice.gov.uk",
-                      ]
-                    }
-                  }
-                ]
-              }
               t1-web-http-8080 = {
                 priority = 300
                 actions = [{
@@ -461,22 +445,6 @@ locals {
                     host_header = {
                       values = [
                         "t2-b-int.oasys.service.justice.gov.uk",
-                      ]
-                    }
-                  }
-                ]
-              }
-              t2-web-c-http-8080 = {
-                priority = 160
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-oasys-web-c-pv-http-8080"
-                }]
-                conditions = [
-                  {
-                    host_header = {
-                      values = [
-                        "t2-c-int.oasys.service.justice.gov.uk",
                       ]
                     }
                   }
