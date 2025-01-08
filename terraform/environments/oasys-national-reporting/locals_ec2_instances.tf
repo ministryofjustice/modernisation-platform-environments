@@ -50,6 +50,9 @@ locals {
         update-ssm-agent = "patchgroup1"
       }
       cloudwatch_metric_alarms = merge(
+        module.baseline_presets.cloudwatch_metric_alarms.ec2,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
         local.cloudwatch_metric_alarms.windows,
         local.cloudwatch_metric_alarms.bods,
       )

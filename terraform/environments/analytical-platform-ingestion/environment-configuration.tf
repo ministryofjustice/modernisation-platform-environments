@@ -20,9 +20,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.3"
-      transfer_image_version = "0.0.18"
-      notify_image_version   = "0.0.19"
+      scan_image_version     = "0.1.4"
+      transfer_image_version = "0.0.19"
+      notify_image_version   = "0.0.20"
 
       /* Target Buckets */
       target_buckets          = ["mojap-land-dev"]
@@ -65,9 +65,9 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.3"
-      transfer_image_version = "0.0.18"
-      notify_image_version   = "0.0.19"
+      scan_image_version     = "0.1.4"
+      transfer_image_version = "0.0.19"
+      notify_image_version   = "0.0.20"
 
       /* Target Buckets */
       target_buckets          = ["mojap-land", "mojap-ingestion-${local.environment}-ext-2024-target"]
