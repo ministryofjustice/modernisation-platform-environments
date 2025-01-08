@@ -153,6 +153,7 @@ locals {
 
       t2-onr-bods-1 = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2024-12-02T00-00-37.662Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
@@ -170,6 +171,7 @@ locals {
 
       t2-onr-bods-2 = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2024-12-02T00-00-37.662Z"
           availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
             "Ec2SecretPolicy",
