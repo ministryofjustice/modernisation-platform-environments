@@ -1,6 +1,7 @@
 
 variable "name" {
   description = "Name of the Bucket"
+  type        = string
   default     = ""
 }
 
@@ -24,11 +25,13 @@ variable "cloudtrail_access_policy" {
 
 variable "s3_notification_name" {
   description = "S3 Notification Event Name"
+  type        = string
   default     = "s3-notification-event"
 }
 
 variable "create_s3" {
   description = "Setup S3 Buckets"
+  type        = bool
   default     = false
 }
 
@@ -40,59 +43,45 @@ variable "custom_kms_key" {
 
 variable "create_notification_queue" {
   description = "Setup Notification Queue"
+  type        = bool
   default     = false
 }
 
 variable "sqs_msg_retention_seconds" {
   description = "SQS Message Retention"
+  type        = number
   default     = 86400
 }
 
 variable "filter_prefix" {
   description = "S3 Notification Filter Prefix"
+  type        = string
   default     = null
 }
 
 variable "enable_lifecycle" {
   description = "Enabled Lifecycle for S3 Storage, Default is False"
+  type        = bool
   default     = false
 }
 
-#variable "expiration_days" {
-#  description = "Days to wait before deleting expired items."
-#  default     = 90
-#}
-
-#variable "expiration_prefix_redshift" {
-#  description = "Directory Prefix where Redshift Async query results are stored to apply expiration to."
-#  default     = "/"
-#}
-
-#variable "expiration_prefix_athena" {
-#  description = "Directory Prefix where Athena Async query results are stored to apply expiration to."
-#  default     = "/"
-#}
-
 variable "enable_versioning_config" {
   description = "Enable Versioning Config for S3 Storage, Default is Disabled"
+  type        = string
   default     = "Disabled"
 }
 
 variable "enable_s3_versioning" {
   description = "Enable Versioning for S3 Bucket, Default is false"
+  type        = bool
   default     = false
 }
 
 variable "enable_notification" {
   description = "Enable S3 Bucket Notifications, Default is false"
+  type        = bool
   default     = false
 }
-
-#variable "bucket_notifications" {
-#  type        = map(any)
-#  description = "AWS S3 Bucket Notifications"
-#  default     = null
-#}
 
 variable "bucket_notifications" {
   type        = any
@@ -112,23 +101,19 @@ variable "dependency_lambda" {
 
 variable "bucket_key" {
   description = "If Bucket Key is Enabled or Disabled"
+  type        = bool
   default     = true
 }
 
 ## Dynamic override_expiration_rules
 variable "override_expiration_rules" {
-  type    = list(object({ prefix = string, days = number }))
+  type    = list(object({ id = string, prefix = string, days = number }))
   default = []
 }
 
 variable "lifecycle_category" {
   type    = string
   default = "standard" # Options: "short_term", "long_term", "temporary", "standard"
-}
-
-variable "enable_lifecycle_expiration" {
-  description = "Enable item expiration - requires 'enable_lifecycle' and 'override_expiration_rules' to be defined/enabled."
-  default     = false
 }
 
 variable "enable_intelligent_tiering" {
