@@ -450,3 +450,9 @@ module "share_dbs_with_cadt_role" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
 }
+
+resource "aws_glue_catalog_database" "cadt_databases" {
+  count = length(local.dbs_to_grant)
+
+  name = local.dbs_to_grant[count.index]
+}
