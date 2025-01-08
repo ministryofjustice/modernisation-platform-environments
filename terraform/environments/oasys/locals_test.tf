@@ -118,67 +118,6 @@ locals {
           oracle-db-sid      = "T2OASYS2"
         })
       })
-      t2-oasys-web-c = merge(local.ec2_autoscaling_groups.web, {
-        # For SAN project (OASYS replacement) requested by Howard Smith
-        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity    = 1  # setting to 0 leaves in a stopped state because of the warm_pool config below
-          warm_pool = {
-            min_size          = 0
-            reuse_on_scale_in = true
-          }
-        })
-        config = merge(local.ec2_autoscaling_groups.web.config, {
-          ami_name                  = "oasys_webserver_release_*"
-          availability_zone         = "eu-west-2b"
-          iam_resource_names_prefix = "ec2-web-t2"
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
-            "Ec2T2WebPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          description        = "t2 oasys web"
-          oasys-environment  = "t2"
-          oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
-          oracle-db-sid      = "T2OASYS2"
-        })
-      })
-      # t2-oasys-san-web-a = merge(local.ec2_autoscaling_groups.web, {
-      #   # For SAN project (OASYS replacement) requested by Howard Smith
-      #   # Autoscaling disabled as initially server will be configured manually
-      #   autoscaling_group = {
-      #     desired_capacity          = 1
-      #     max_size                  = 1
-      #     force_delete              = true
-      #     vpc_zone_identifier       = module.environment.subnets["private"].ids
-      #     wait_for_capacity_timeout = 60m
-      #     warm_pool = {
-      #       min_size          = 0
-      #       max_group_prepared_capacity = 1
-      #       reuse_on_scale_in = true
-      #     }    
-      #   }
-      #   config = merge(local.ec2_autoscaling_groups.web.config, {
-      #     ami_name                  = "OASys San Test"
-      #     availability_zone         = "eu-west-2a"
-      #     iam_resource_names_prefix = "ec2-web-t2"
-      #     instance_profile_policies = concat(local.ec2_autoscaling_groups.web.config.instance_profile_policies, [
-      #       "Ec2T2WebPolicy",
-      #     ])
-      #   })
-      #   user_data_cloud_init = {
-      #   }
-      #   tags = merge(local.ec2_autoscaling_groups.web.tags, {
-      #     description        = "t2 oasys web"
-      #     oasys-environment  = "t2"
-      #     oracle-db-hostname = "db.t2.oasys.hmpps-test.modernisation-platform.internal"
-      #     oracle-db-sid      = "T2OASYS2"
-      #   })
-      # })
     }
 
     ec2_instances = {
