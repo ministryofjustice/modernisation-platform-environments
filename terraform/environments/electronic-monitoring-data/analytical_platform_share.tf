@@ -417,7 +417,6 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
 }
 
-
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([[for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn], data.aws_iam_session_context.current.issuer_arn, try(one(data.aws_iam_roles.data_engineering_roles.arns), [])])
 
@@ -436,21 +435,18 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
-resource "aws_lakeformation_permissions" "grant_cadt_databases" {
-  for_each    = local.dbs_to_grant
-  principal   = aws_iam_role.dataapi_cross_role.arn
-  permissions = ["ALL"]
-  database {
-    name = each.value
-  }
+module "share_dbs_with_de_role" {
+  count                   = local.is-production ? 1 : 0
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = local.dbs_to_grant
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 }
 
-resource "aws_lakeformation_permissions" "grant_cadt_tables" {
-  for_each    = local.dbs_to_grant
-  principal   = aws_iam_role.dataapi_cross_role.arn
-  permissions = ["ALL"]
-  table {
-    database_name = each.value
-    wildcard      = true
-  }
+module "share_dbs_with_cadt_role" {
+  count                   = local.is-production ? 1 : 0
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = local.dbs_to_grant
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.dataapi_cross_role.arn
 }

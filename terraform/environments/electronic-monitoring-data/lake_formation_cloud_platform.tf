@@ -10,7 +10,7 @@ resource "aws_lakeformation_resource" "data_bucket" {
 
 module "share_current_version" {
   count  = local.is-test ? 1 : 0
-  source = "./modules/lakeformation"
+  source = "./modules/lakeformation_with_data_filter"
   table_filters = {
     "account" = "__current=true"
   }
@@ -22,7 +22,7 @@ module "share_current_version" {
 
 # module "cap_dw_excluding_specials" {
 #   for_each = toset(local.cap_dw_tables)
-#   source   = "./modules/lakeformation"
+#   source   = "./modules/lakeformation_with_data_filter"
 #   table_filters = {
 #     (each.key) = "specials_flag=0"
 #   }
@@ -34,7 +34,7 @@ module "share_current_version" {
 
 # module "cap_dw_including_specials" {
 #   for_each = toset(local.cap_dw_tables)
-#   source   = "./modules/lakeformation"
+#   source   = "./modules/lakeformation_with_data_filter"
 #   table_filters = {
 #     (each.key) = ""
 #   }
@@ -46,7 +46,7 @@ module "share_current_version" {
 
 # module "am_for_non_specials_role" {
 #   for_each = toset(local.am_tables)
-#   source   = "./modules/lakeformation"
+#   source   = "./modules/lakeformation_with_data_filter"
 #   table_filters = {
 #     (each.key) = ""
 #   }
@@ -58,7 +58,7 @@ module "share_current_version" {
 
 # module "am_for_specials_role" {
 #   for_each = toset(local.am_tables)
-#   source   = "./modules/lakeformation"
+#   source   = "./modules/lakeformation_with_data_filter"
 #   table_filters = {
 #     (each.key) = ""
 #   }
