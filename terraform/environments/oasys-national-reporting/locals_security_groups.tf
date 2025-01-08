@@ -6,15 +6,14 @@ locals {
     enduserclient_internal = flatten([
       "10.0.0.0/8",
     ])
-    # enduserclient_public = flatten([
-    #   module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
-    #   module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-    #   module.ip_addresses.mp_cidrs.live_eu_west_nat,
-    # ])
-    enduserclient_public_trusted_moj_digital_staff_public = module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
-    enduserclient_public_azure_internet_egress            = module.ip_addresses.azure_fixngo_cidrs.internet_egress
-    enduserclient_public_live_eu_west_nat                 = module.ip_addresses.mp_cidrs.live_eu_west_nat
-    noms_core                                             = module.ip_addresses.azure_fixngo_cidrs.devtest_core
+    enduserclient_public1 = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
+    ])
+    enduserclient_public2 = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.mp_cidrs.live_eu_west_nat,
+    ])
+    noms_core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
     oasys_db = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.devtest_oasys_db,
@@ -31,15 +30,14 @@ locals {
     enduserclient_internal = [
       "10.0.0.0/8"
     ]
-    # enduserclient_public = flatten([
-    #   module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
-    #   module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-    #   module.ip_addresses.mp_cidrs.live_eu_west_nat,
-    # ])
-    enduserclient_public_trusted_moj_digital_staff_public = module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
-    enduserclient_public_azure_internet_egress            = module.ip_addresses.azure_fixngo_cidrs.internet_egress
-    enduserclient_public_live_eu_west_nat                 = module.ip_addresses.mp_cidrs.live_eu_west_nat
-    noms_core                                             = module.ip_addresses.azure_fixngo_cidrs.prod_core
+    enduserclient_public1 = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
+    ])
+    enduserclient_public2 = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.internet_egress,
+      module.ip_addresses.mp_cidrs.live_eu_west_nat,
+    ])
+    noms_core = module.ip_addresses.azure_fixngo_cidrs.prod_core
     oasys_db = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
       module.ip_addresses.azure_fixngo_cidrs.prod_oasys_db,
@@ -69,47 +67,19 @@ locals {
           protocol    = -1
           self        = true
         }
-        http_lb_staff_public = {
-          description = "Allow http ingress from trusted_moj_digital_staff_public"
+        http = {
+          description = "Allow http ingress"
           from_port   = 80
           to_port     = 80
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public_trusted_moj_digital_staff_public
+          cidr_blocks = local.security_group_cidrs.enduserclient_public1
         }
-        http_lb_internet_egress = {
-          description = "Allow http ingress from azure internet egress"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public_azure_internet_egress
-        }
-        http_lb_live_eu_west_nat = {
-          description = "Allow http ingress from public live eu west nat"
-          from_port   = 80
-          to_port     = 80
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public_live_eu_west_nat
-        }
-        https_lb_staff_public = {
-          description = "Allow enduserclient https ingress"
+        https = {
+          description = "Allow https ingress"
           from_port   = 443
           to_port     = 443
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public_trusted_moj_digital_staff_public
-        }
-        https_lb_internet_egress = {
-          description = "Allow http ingress from azure internet egress"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public_azure_internet_egress
-        }
-        https_lb_live_eu_west_nat = {
-          description = "Allow http ingress from public live eu west nat"
-          from_port   = 443
-          to_port     = 443
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public_live_eu_west_nat
+          cidr_blocks = local.security_group_cidrs.enduserclient_public1
         }
       }
       egress = {
@@ -119,6 +89,42 @@ locals {
           to_port     = 0
           protocol    = "-1"
           cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+    public-lb-2 = {
+      description = "Security group for public load balancer part 2"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public2
+        }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public2
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
         }
       }
     }
