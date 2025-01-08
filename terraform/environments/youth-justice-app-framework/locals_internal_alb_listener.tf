@@ -35,20 +35,6 @@ locals {
             }
           }]
         },
-        sentences = {
-          priority = 3
-          actions = [
-            {
-              type             = "forward"
-              target_group_key = "sentences-target-group-1"
-            }
-          ]
-          conditions = [{
-            path_pattern = {
-              values = ["/sentences", "/api/v1/sentences*"]
-            }
-          }]
-        }
         yp = {
           priority = 4
           actions = [
