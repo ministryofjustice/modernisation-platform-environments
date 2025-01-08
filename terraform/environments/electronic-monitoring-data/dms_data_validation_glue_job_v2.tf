@@ -578,6 +578,7 @@ resource "aws_glue_job" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
     "--rds_db_table_hashed_rows_parent_dir" = "rds_tables_rows_hashed"
     "--incremental_run_bool"                = "false"
     "--rds_query_where_clause"              = ""
+    "--df_where_clause"                     = ""
     "--skip_columns_for_hashing"            = ""
     "--coalesce_int"                        = 0
     "--extra-py-files"                      = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
