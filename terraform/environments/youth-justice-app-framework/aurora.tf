@@ -4,9 +4,8 @@ module "aurora" {
   vpc_id       = data.aws_vpc.shared.id
   tags         = local.tags
 
-  database_subnets = local.data_subnet_list[*].id
-  #alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id
-  alb_route53_record_zone_id = data.private_dns_zone.aws_route53_zone_id
+  database_subnets           = local.data_subnet_list[*].id
+  alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
 
 
   name                       = "yjafrds01-cluster"
@@ -21,7 +20,7 @@ module "aurora" {
   user_passwords_to_reset = ["postgres_rotated"]
 
   engine          = "aurora-postgresql"
-  engine_version  = "16.1"
+  engine_version  = "16.2"
   master_username = "root"
 
   create_sheduler              = true
