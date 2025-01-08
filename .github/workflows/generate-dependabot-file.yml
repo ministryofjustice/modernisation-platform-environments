@@ -29,8 +29,6 @@ jobs:
       - name: Commit changes to GitHub
         run: bash ./scripts/git-setup.sh
       - run: bash ./scripts/git-commit.sh .github
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - run: bash ./scripts/git-pull-request.sh dependabot
         env:
           SECRET: ${{ secrets.GITHUB_TOKEN }}
