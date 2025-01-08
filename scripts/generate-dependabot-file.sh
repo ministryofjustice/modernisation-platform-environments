@@ -27,6 +27,12 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+  - package-ecosystem: "devcontainers"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    reviewers:
+      - "ministryofjustice/devcontainer-community"
 EOL
 
 echo "Generating entry for Terraform ecosystem"
