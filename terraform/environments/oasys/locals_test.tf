@@ -115,10 +115,10 @@ locals {
         # For SAN project (OASYS replacement) requested by Howard Smith
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
           desired_capacity    = 1  # setting to 0 leaves in a stopped state because of the warm_pool config below
-          # warm_pool = {
-          #   min_size          = 0
-          #   reuse_on_scale_in = true
-          # }
+          warm_pool = {
+            min_size          = 0
+            reuse_on_scale_in = true
+          }
         })
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
