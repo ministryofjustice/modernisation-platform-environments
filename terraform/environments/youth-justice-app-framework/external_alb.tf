@@ -6,9 +6,9 @@ module "external_alb" {
   vpc_id       = data.aws_vpc.shared.id
   tags         = local.tags
 
-  alb_name                   = "yjaf-ext"
-  internal                   = false
-  alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id #data.aws_route53_zone_id.inner.id
+  alb_name = "yjaf-ext"
+  internal = false
+  #alb_route53_record_zone_id = module.private_dns_zone.aws_route53_zone_id #data.aws_route53_zone_id.inner.id
 
   listeners              = local.external_listeners
   existing_target_groups = module.internal_alb.target_group_arns
