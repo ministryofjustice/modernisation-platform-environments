@@ -4,8 +4,11 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  admin_roles = local.is-development ? "sandbox" : "data-eng"
-  suffix      = local.is-production ? "" : "-test"
+  admin_roles       = local.is-development ? "sandbox" : "data-eng"
+  suffix            = local.is-production ? "" : "-test"
+  prod_dbs_to_grant = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"] : []
+  dev_dbs_to_grant  = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
+  dbs_to_grant      = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant]))
 }
 
 # Source Analytics DBT Secrets
@@ -430,5 +433,24 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     # These settings should replicate current behaviour: LakeFormation is Ignored
     permissions = ["ALL"]
     principal   = "IAM_ALLOWED_PRINCIPALS"
+  }
+}
+
+resource "aws_lakeformation_permissions" "grant_cadt_databases" {
+  for_each    = local.dbs_to_grant
+  principal   = aws_iam_role.dataapi_cross_role.arn
+  permissions = ["ALL"]
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "grant_cadt_tables" {
+  for_each    = local.dbs_to_grant
+  principal   = aws_iam_role.dataapi_cross_role.arn
+  permissions = ["ALL"]
+  table {
+    database_name = each.value
+    wildcard      = true
   }
 }
