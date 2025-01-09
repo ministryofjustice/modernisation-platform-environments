@@ -67,7 +67,7 @@ resource "aws_instance" "kali_linux" {
 resource "aws_instance" "defect_dojo" {
   ami                         = "ami-0e8d228ad90af673b"
   associate_public_ip_address = true
-  instance_type               = "t2.micro"
+  instance_type               = "t2.large"
   subnet_id                   = module.vpc.private_subnets.0
   vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
