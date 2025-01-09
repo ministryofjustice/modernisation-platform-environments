@@ -32,6 +32,7 @@ module "ecs_cluster" {
 
 #Service discovery namespace
 resource "aws_service_discovery_private_dns_namespace" "namespace" {
+  count       = var.service_discovery_namespace != "" ? 1 : 0
   name        = var.service_discovery_namespace
   vpc         = var.vpc_id
   description = "Private DNS namespace for ecs service discovery"

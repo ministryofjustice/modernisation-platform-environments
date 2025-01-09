@@ -125,7 +125,7 @@ variable "ecs_subnet_ids" {
 variable "service_discovery_namespace" {
   description = "The name of the service discovery namespace"
   type        = string
-  default     = "ecs"
+  default     = ""
 }
 
 variable "additional_ecs_common_security_group_ingress" {

@@ -16,7 +16,7 @@ data "aws_lb_target_group" "external_target_group" {
   for_each = { for k, v in var.ecs_services : k => v if v.internal_only == false }
   name     = "${each.value.name}-target-group-2"
 }
-
+/* commented out as not allowed and may not need it anyway
 resource "aws_service_discovery_service" "service_discovery" {
   for_each     = var.ecs_services
   name         = each.value.name
@@ -35,7 +35,7 @@ resource "aws_service_discovery_service" "service_discovery" {
     failure_threshold = 1
   }
 }
-
+*/
 #For each ecs service create a service module
 module "ecs_service" {
   for_each = var.ecs_services
@@ -138,10 +138,10 @@ module "ecs_service" {
     }
   }
 
-  service_registries = {
-    container_name = each.value.name
-    registry_arn   = aws_service_discovery_service.service_discovery[each.key].arn
-  }
+  #service_registries = {
+  #  container_name = each.value.name
+  #  registry_arn   = aws_service_discovery_service.service_discovery[each.key].arn
+  #}
 
   deployment_controller = {
     type = each.value.deployment_controller

@@ -1,3 +1,4 @@
+/* not sure if we need this
 resource "aws_iam_openid_connect_provider" "circleci" {
   url = "https://oidc.circleci.com/org/3c8b8a35-eba8-48df-a553-b0f1435cb75d"
 
@@ -50,4 +51,4 @@ resource "aws_iam_role_policy_attachment" "aws_circleci_policies" {
   role       = aws_iam_role.circleci_role.name
   policy_arn = each.value
 }
-
+*/
