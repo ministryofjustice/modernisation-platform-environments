@@ -441,7 +441,6 @@ module "share_dbs_with_de_role" {
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = try(one(data.aws_iam_roles.data_engineering_roles.arns))
-  depends_on              = [aws_glue_catalog_database.cadt_databases]
 }
 
 module "share_dbs_with_cadt_role" {
@@ -450,5 +449,4 @@ module "share_dbs_with_cadt_role" {
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
-  depends_on              = [aws_glue_catalog_database.cadt_databases]
 }
