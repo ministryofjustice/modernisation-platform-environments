@@ -12,9 +12,9 @@ locals {
   instance_type        = "ml.g4dn.xlarge"
   instance_count       = 1
   async_config = {
-    s3_output_path    = "mojap-compute-sagemaker-jumpstart-${local.environment}/output"
-    s3_failure_path   = "mojap-compute-sagemaker-jumpstart-${local.environment}/failure"
-    kms_key_id        = null
+    s3_output_path    = "s3://mojap-compute-sagemaker-jumpstart-${local.environment}/async-output"
+    s3_failure_path   = "s3://mojap-compute-sagemaker-jumpstart-${local.environment}/failure"
+    kms_key_id        = module.sagemaker_test_endpoint_kms[0].key_arn
     sns_error_topic   = null
     sns_success_topic = null
   }
@@ -28,11 +28,11 @@ locals {
   model_data               = null
   sagemaker_execution_role = null
   autoscaling = {
-    min_capacity               = 1
-    max_capacity               = null
-    scaling_target_invocations = null
+    min_capacity               = 0
+    max_capacity               = 4
+    scaling_target_invocations = 100
     scale_in_cooldown          = 300
-    scale_out_cooldown         = 660
+    scale_out_cooldown         = 66
   }
   framework_version = local.pytorch_version != null ? local.pytorch_version : local.tensorflow_version
   repository_name   = local.pytorch_version != null ? "huggingface-pytorch-inference" : "huggingface-tensorflow-inference"
@@ -54,6 +54,25 @@ locals {
   }
 
 }
+
+
+module "sagemaker_test_endpoint_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  count   = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["sagemaker/test_endpoint"]
+  description           = "Sagemaker Jumpstart test endpoint KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+}
+
 
 # random lowercase string used for naming
 resource "random_string" "resource_id" {
@@ -255,7 +274,9 @@ locals {
 resource "aws_sagemaker_endpoint_configuration" "huggingface_realtime" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.real_time ? 1 : 0
   name  = "${local.name_prefix}-ep-config-${random_string.resource_id.result}"
-  tags  = local.tags
+
+  kms_key_arn = local.async_config.kms_key_id
+  tags        = local.tags
 
 
   production_variants {
@@ -270,7 +291,9 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_realtime" {
 resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.asynchronous ? 1 : 0
   name  = "${local.name_prefix}-ep-config-${random_string.resource_id.result}"
-  tags  = local.tags
+
+  kms_key_arn = local.async_config.kms_key_id
+  tags        = local.tags
 
 
   production_variants {
@@ -296,7 +319,9 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
 resource "aws_sagemaker_endpoint_configuration" "huggingface_serverless" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.serverless ? 1 : 0
   name  = "${local.name_prefix}-ep-config-${random_string.resource_id.result}"
-  tags  = local.tags
+
+  kms_key_arn = local.async_config.kms_key_id
+  tags        = local.tags
 
 
   production_variants {
@@ -347,7 +372,7 @@ locals {
 }
 
 resource "aws_appautoscaling_target" "sagemaker_target" {
-  count              = local.use_autoscaling
+  count              = terraform.workspace == "analytical-platform-compute-development" && local.use_autoscaling
   min_capacity       = local.autoscaling.min_capacity
   max_capacity       = local.autoscaling.max_capacity
   resource_id        = "endpoint/${aws_sagemaker_endpoint.huggingface.name}/variant/AllTraffic"
@@ -356,7 +381,7 @@ resource "aws_appautoscaling_target" "sagemaker_target" {
 }
 
 resource "aws_appautoscaling_policy" "sagemaker_policy" {
-  count              = local.use_autoscaling
+  count              = terraform.workspace == "analytical-platform-compute-development" && local.use_autoscaling
   name               = "${local.name_prefix}-scaling-target-${random_string.resource_id.result}"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.sagemaker_target[0].resource_id
