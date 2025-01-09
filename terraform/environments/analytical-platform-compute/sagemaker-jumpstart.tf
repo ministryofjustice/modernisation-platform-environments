@@ -14,7 +14,6 @@ locals {
   async_config = {
     s3_output_path    = "s3://mojap-compute-sagemaker-jumpstart-${local.environment}/async-output"
     s3_failure_path   = "s3://mojap-compute-sagemaker-jumpstart-${local.environment}/failure"
-    kms_key_id        = module.sagemaker_test_endpoint_kms[0].key_arn
     sns_error_topic   = null
     sns_success_topic = null
   }
@@ -271,7 +270,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_realtime" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.real_time ? 1 : 0
   name  = "${local.name_prefix}-ep-config-${random_string.resource_id.result}"
 
-  kms_key_arn = local.async_config.kms_key_id
+  kms_key_arn = module.sagemaker_test_endpoint_kms[0].key_arn
   tags        = local.tags
 
 
@@ -288,7 +287,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.asynchronous ? 1 : 0
   name  = "${local.name_prefix}-ep-config-${random_string.resource_id.result}"
 
-  kms_key_arn = local.async_config.kms_key_id
+  kms_key_arn = module.sagemaker_test_endpoint_kms[0].key_arn
   tags        = local.tags
 
 
@@ -302,7 +301,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
     output_config {
       s3_output_path  = local.async_config.s3_output_path
       s3_failure_path = local.async_config.s3_failure_path
-      kms_key_id      = local.async_config.kms_key_id
+      kms_key_id      = module.sagemaker_test_endpoint_kms[0].key_arn
       notification_config {
         error_topic   = local.async_config.sns_error_topic
         success_topic = local.async_config.sns_success_topic
@@ -316,7 +315,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_serverless" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.serverless ? 1 : 0
   name  = "${local.name_prefix}-ep-config-${random_string.resource_id.result}"
 
-  kms_key_arn = local.async_config.kms_key_id
+  kms_key_arn = module.sagemaker_test_endpoint_kms[0].key_arn
   tags        = local.tags
 
 
