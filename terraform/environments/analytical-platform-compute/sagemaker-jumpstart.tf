@@ -87,7 +87,7 @@ resource "random_string" "resource_id" {
 # Container Image
 # ----------------
 data "aws_sagemaker_prebuilt_ecr_image" "huggingface_image" {
-  repository_name = "huggingface-pytorch-inference"
+  repository_name = local.repository_name
   image_tag       = local.pytorch_version != null ? local.pytorch_image_tag[local.image_key] : local.tensorflow_image_tag[local.image_key]
 }
 
