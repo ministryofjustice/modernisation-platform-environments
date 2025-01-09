@@ -27,6 +27,11 @@ module "aurora" {
   stop_aurora_cluster_schedule = "cron(00 00 ? * MON-FRI *)"
   performance_insights_enabled = true
 
+  #pass in provider for creating records on central route53
+  providers = {
+    aws.core-network-services = aws.core-network-services
+  }
+
   # todo - some of these rules are commented out as the resource doesn't exist yet. 
   # It would make more sense the add the rules in their respective modules rather than here
   rds_security_group_ingress = [

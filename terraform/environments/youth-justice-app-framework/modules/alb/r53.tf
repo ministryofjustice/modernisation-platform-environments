@@ -1,5 +1,5 @@
 #If route53_record_name set do this
-#resource "aws_route53_record" "maindns" {
+#resource "aws_route53_record" "dns" {
 #  provider = aws.core-network-services
 #  count    = var.alb_route53_record_name != "" ? 1 : 0
 

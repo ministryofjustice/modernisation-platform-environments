@@ -14,4 +14,10 @@ module "internal_alb" {
 
   listeners     = local.internal_listeners
   target_groups = local.target_groups
+
+  #pass in provider for creating records on central route53
+  providers = {
+    aws.core-network-services = aws.core-network-services
+  }
+
 }

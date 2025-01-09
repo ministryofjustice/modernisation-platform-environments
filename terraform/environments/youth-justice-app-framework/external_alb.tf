@@ -1,5 +1,9 @@
 module "external_alb" {
   source = "./modules/alb"
+  #pass in provider for creating records on central route53
+  providers = {
+    aws.core-network-services = aws.core-network-services
+  }
 
   environment  = local.environment
   project_name = local.project_name
