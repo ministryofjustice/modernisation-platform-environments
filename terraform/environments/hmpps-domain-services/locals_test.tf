@@ -93,6 +93,19 @@ locals {
         })
       })
 
+      test-nartclient = merge(local.ec2_autoscaling_groups.jumpserver, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.jumpserver, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.jumpserver.config, {
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-870/create-nartclient-userdata"
+            }
+          ))
+        })
+      })
+
       # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
       # test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
       #   tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
