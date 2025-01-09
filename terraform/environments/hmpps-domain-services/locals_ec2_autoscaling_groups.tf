@@ -107,7 +107,7 @@ locals {
         scale_down = { recurrence = "0 19 * * Mon-Fri", desired_capacity = 0 }
       }
       config = {
-        ami_name                      = "hmpps_windows_server_2019_release_2024-*"
+        ami_name                      = "hmpps_windows_server_2022_release_2025-*"
         ebs_volumes_copy_all_from_ami = false
         iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies = [
@@ -119,7 +119,7 @@ locals {
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
           "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-            branch = "TM/TM-870/create-nartclient-userdata"
+            branch = "main"
           }
         ))
       }
@@ -133,9 +133,9 @@ locals {
         vpc_security_group_ids  = ["private-jumpserver"]
       }
       tags = {
-        ami_name               = "hmpps_windows_server_2019"
+        ami_name               = "hmpps_windows_server_2022"
         backup                 = "false"
-        description            = "Windows Server 2019 jumpserver client testing for Nart"
+        description            = "Windows Server 2022 jumpserver client testing for Nart"
         instance-access-policy = "full"
         os-type                = "Windows"
         server-type            = "NartClient"
