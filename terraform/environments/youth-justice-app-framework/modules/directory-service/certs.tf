@@ -10,35 +10,35 @@
 #############################
 #Deploy the CA solution from the available AWS cloudformation stack
 
-#resource "aws_cloudformation_stack" "pki_quickstart" {
-#  name = "MicrosoftPKIQuickStart"
+resource "aws_cloudformation_stack" "pki_quickstart" {
+  name = "MicrosoftPKIQuickStart"
 
-#  template_url = "https://aws-ia-us-east-1.s3.us-east-1.amazonaws.com/cfn-ps-microsoft-pki/templates/microsoft-pki.template.yaml"
+  template_url = "https://aws-ia-us-east-1.s3.us-east-1.amazonaws.com/cfn-ps-microsoft-pki/templates/microsoft-pki.template.yaml"
 
-#  capabilities     = ["CAPABILITY_AUTO_EXPAND", "CAPABILITY_IAM"]
-#  disable_rollback = true #change to true so we can debug
-#  parameters = {
-#    "VPCCIDR"                = var.vpc_cidr_block
-#    "VPCID"                  = var.ds_managed_ad_vpc_id
-#    "CaServerSubnet"         = var.ds_managed_ad_subnet_ids[0]
-#    "DomainMembersSG"        = aws_security_group.ad_sg.id
-#    "KeyPairName"            = module.key_pair.key_pair_name
-#    "DirectoryType"          = "AWSManaged"
-#    "DomainDNSName"          = aws_directory_service_directory.ds_managed_ad.name
-#    "DomainNetBIOSName"      = var.ds_managed_ad_short_name
-#    "DomainController1IP"    = tolist(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)[0]
-#    "DomainController2IP"    = tolist(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)[1]
-#    "AdministratorSecret"    = aws_secretsmanager_secret.mad_admin_secret.arn
-#    "CADeploymentType"       = "Two-Tier"
-#    "UseS3ForCRL"            = "No"
-#    "EntCaServerNetBIOSName" = "SubordinateCA"
-#    "OrCaServerNetBIOSName"  = "RootCA"
-#  }
+  capabilities     = ["CAPABILITY_AUTO_EXPAND", "CAPABILITY_IAM"]
+  disable_rollback = true #change to true so we can debug
+  parameters = {
+    "VPCCIDR"                = var.vpc_cidr_block
+    "VPCID"                  = var.ds_managed_ad_vpc_id
+    "CaServerSubnet"         = var.ds_managed_ad_subnet_ids[0]
+    "DomainMembersSG"        = aws_security_group.ad_sg.id
+    "KeyPairName"            = module.key_pair.key_pair_name
+    "DirectoryType"          = "AWSManaged"
+    "DomainDNSName"          = aws_directory_service_directory.ds_managed_ad.name
+    "DomainNetBIOSName"      = var.ds_managed_ad_short_name
+    "DomainController1IP"    = tolist(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)[0]
+    "DomainController2IP"    = tolist(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)[1]
+    "AdministratorSecret"    = aws_secretsmanager_secret.mad_admin_secret.arn
+    "CADeploymentType"       = "Two-Tier"
+    "UseS3ForCRL"            = "No"
+    "EntCaServerNetBIOSName" = "SubordinateCA"
+    "OrCaServerNetBIOSName"  = "RootCA"
+  }
 
-#  timeouts {
-#    create = "60m"
-#    update = "60m"
-#    delete = "2h"
-#  }
-#}
+  timeouts {
+    create = "60m"
+    update = "60m"
+    delete = "2h"
+  }
+}
 
