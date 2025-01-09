@@ -43,10 +43,10 @@ locals {
     "2.0.0-gpu" = "2.0.0-transformers${local.transformers_version}-gpu-py310-cu118-ubuntu20.04"
     "2.1.0-gpu" = "2.1.0-transformers${local.transformers_version}-gpu-py310-cu118-ubuntu20.04"
   }
-  # tensorflow_image_tag = {
-  #   "2.5.1-gpu" = "2.5.1-transformers${local.transformers_version}-gpu-py36-cu111-ubuntu18.04"
-  #   "2.5.1-cpu" = "2.5.1-transformers${local.transformers_version}-cpu-py36-ubuntu18.04"
-  # }
+  tensorflow_image_tag = {
+    "2.5.1-gpu" = "2.5.1-transformers${local.transformers_version}-gpu-py36-cu111-ubuntu18.04"
+    "2.5.1-cpu" = "2.5.1-transformers${local.transformers_version}-cpu-py36-ubuntu18.04"
+  }
   sagemaker_endpoint_type = {
     real_time    = (local.async_config.s3_output_path == null && local.serverless_config.max_concurrency == null) ? true : false
     asynchronous = (local.async_config.s3_output_path != null && local.serverless_config.max_concurrency == null) ? true : false
@@ -255,15 +255,9 @@ resource "aws_sagemaker_model" "model_with_hub_model" { # mxbai_rerank_xsmall_mo
   }
 }
 
-data "aws_sagemaker_prebuilt_ecr_image" "huggingface_image" {
-  repository_name = "huggingface-pytorch-inference"
-  image_tag       = "2.1.0-transformers4.37.0-gpu-py310-cu118-ubuntu20.04"
-}
-
-
 locals {
   # sagemaker_model = local.model_data != null && local.hf_model_id == null ? aws_sagemaker_model.model_with_model_artifact[0] : aws_sagemaker_model.model_with_hub_model[0]
-  sagemaker_model = aws_sagemaker_model.mxbai_rerank_xsmall_model[0]
+  sagemaker_model = aws_sagemaker_model.model_with_hub_model[0]
 }
 
 ###
@@ -339,7 +333,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_serverless" {
 locals {
   sagemaker_endpoint_config = (
     local.sagemaker_endpoint_type.real_time ?
-    aws_sagemaker_endpoint_configuration.huggingface[0] : (
+    aws_sagemaker_endpoint_configuration.huggingface_realtime[0] : (
       local.sagemaker_endpoint_type.asynchronous ?
       aws_sagemaker_endpoint_configuration.huggingface_async[0] : (
         local.sagemaker_endpoint_type.serverless ?
@@ -368,20 +362,20 @@ resource "aws_sagemaker_endpoint" "huggingface" {
 
 
 locals {
-  use_autoscaling = local.autoscaling.max_capacity != null && local.autoscaling.scaling_target_invocations != null && !local.sagemaker_endpoint_type.serverless ? 1 : 0
+  use_autoscaling = terraform.workspace == "analytical-platform-compute-development" && local.autoscaling.max_capacity != null && local.autoscaling.scaling_target_invocations != null && !local.sagemaker_endpoint_type.serverless ? 1 : 0
 }
 
 resource "aws_appautoscaling_target" "sagemaker_target" {
-  count              = terraform.workspace == "analytical-platform-compute-development" && local.use_autoscaling
+  count              = local.use_autoscaling
   min_capacity       = local.autoscaling.min_capacity
   max_capacity       = local.autoscaling.max_capacity
-  resource_id        = "endpoint/${aws_sagemaker_endpoint.huggingface.name}/variant/AllTraffic"
+  resource_id        = "endpoint/${aws_sagemaker_endpoint.huggingface[0].name}/variant/AllTraffic"
   scalable_dimension = "sagemaker:variant:DesiredInstanceCount"
   service_namespace  = "sagemaker"
 }
 
 resource "aws_appautoscaling_policy" "sagemaker_policy" {
-  count              = terraform.workspace == "analytical-platform-compute-development" && local.use_autoscaling
+  count              = local.use_autoscaling
   name               = "${local.name_prefix}-scaling-target-${random_string.resource_id.result}"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.sagemaker_target[0].resource_id
