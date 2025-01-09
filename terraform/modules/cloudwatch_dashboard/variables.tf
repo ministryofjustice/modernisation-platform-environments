@@ -54,8 +54,10 @@ variable "widget_groups" {
   #   }))
   #   widgets         = list(any)            # as per https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/CloudWatch-Dashboard-Body-Structure.html
   #   NOTE: widget can also use following fields for module only
-  #     expression      = "" # automatically create metrics[] with expression
-  #     search_filter   = "" # additional search filter, e.g. InstanceId=(i-05a8b662eb6a6a5f6 OR i-065e9f701ab8fda22)
+  #     expression        = string # automatically create metrics[] with expression
+  #     expression_math   = string # if additional maths need to be applied to the expression
+  #     expression_period = number # optionally fix the time period
+  #     search_filter     = string # additional search filter, e.g. InstanceId=(i-05a8b662eb6a6a5f6 OR i-065e9f701ab8fda22)
   #                                                           NOT InstanceId=(i-05a8b662eb6a6a5f6 OR i-065e9f701ab8fda22)
   #     alarm_threshold = number # automatically create horizontal annotation (if supported)
   # }))
