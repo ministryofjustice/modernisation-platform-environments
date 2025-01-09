@@ -106,7 +106,7 @@ locals {
               expression = lookup(widget, "search_filter", null) == null ? widget.expression : replace(widget.expression, "MetricName=", "${widget.search_filter} MetricName=")
               label      = ""
               id         = "q1"
-              # visible    = lookup(widget, "expression_math", null) == null ? true : false
+              visible    = lookup(widget, "expression_math", null) == null ? true : false
             }]],
             lookup(widget, "expression_math", null) == null ? [] : [[{
               expression = widget.expression_math

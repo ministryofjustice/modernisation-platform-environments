@@ -33,8 +33,8 @@ locals {
       }
       network-in-bandwidth = {
         type            = "metric"
-        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkIn\"','Sum'),SUM,DESC)"
-        expression_math = "SORT((8*q1)/(1000000*DIFF_TIME(AVG(q1))),SUM,DESC)"
+        expression      = "SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkIn\"','Sum')"
+        expression_math = "(8*q1)/(1000000*DIFF_TIME(IF(AVG(q1) == 0,1,AVG(q1))))"
         properties = {
           view    = "timeSeries"
           stacked = true
@@ -51,8 +51,8 @@ locals {
       }
       network-out-bandwidth = {
         type            = "metric"
-        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkOut\"','Sum'),SUM,DESC)"
-        expression_math = "SORT((8*q1)/(1000000*DIFF_TIME(AVG(q1))),SUM,DESC)"
+        expression      = "SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkOut\"','Sum')"
+        expression_math = "(8*q1)/(1000000*DIFF_TIME(AVG(q1)))"
         properties = {
           view    = "timeSeries"
           stacked = true
