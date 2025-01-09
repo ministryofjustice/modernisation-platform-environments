@@ -27,7 +27,6 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription" {
   endpoint  = "+447903642202" # Nick Buckingham
 }
 
-/*
 resource "aws_sns_topic_subscription" "cw_sms_subscription1" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_alerts[0].arn
@@ -55,7 +54,6 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription4" {
   protocol  = "sms"
   endpoint  = "+447887576466" # Kofi Owusu-nimoh
 }
-*/
 
 # PreProduction - Cloud Watch
 
