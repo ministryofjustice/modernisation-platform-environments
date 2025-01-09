@@ -438,17 +438,19 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 module "share_dbs_with_de_role" {
   count                   = local.is-production ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
-  dbs_to_grant            = [for name, db in aws_glue_catalog_database.cadt_databases : db.id]
+  dbs_to_grant            = toset([for name, db in aws_glue_catalog_database.cadt_databases : db.id])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  depends_on              = [aws_glue_catalog_database.cadt_databases]
 }
 
 module "share_dbs_with_cadt_role" {
   count                   = local.is-production ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
-  dbs_to_grant            = [for name, db in aws_glue_catalog_database.cadt_databases : db.id]
+  dbs_to_grant            = toset([for name, db in aws_glue_catalog_database.cadt_databases : db.id])
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
+  depends_on              = [aws_glue_catalog_database.cadt_databases]
 }
 
 resource "aws_glue_catalog_database" "cadt_databases" {
