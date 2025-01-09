@@ -59,6 +59,11 @@ module "eks" {
     vpc-cni = {
       addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
       service_account_role_arn = module.vpc_cni_iam_role.iam_role_arn
+      configuration_values = jsonencode({
+        env = {
+          ENABLE_BANDWIDTH_PLUGIN = "true"
+        }
+      })
     }
   }
 
