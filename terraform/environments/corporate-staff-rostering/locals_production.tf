@@ -14,6 +14,86 @@ locals {
   # please keep resources in alphabetical order
   baseline_production = {
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.app,
+          local.cloudwatch_dashboard_widget_groups.web,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+      "pd-csr-db-a" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          {
+            width         = 8
+            height        = 8
+            search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-db-a" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-error,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run,
+            ]
+          },
+          {
+            header_markdown = "## EBS PERFORMANCE"
+            width           = 8
+            height          = 8
+            add_ebs_widgets = { iops = true, throughput = true }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-db-a" }] }
+            widgets         = []
+          }
+        ]
+      }
+      "pd-csr-db-b" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          {
+            width         = 8
+            height        = 8
+            search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-db-b" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+              null,
+              null,
+            ]
+          },
+          {
+            header_markdown = "## EBS PERFORMANCE"
+            width           = 8
+            height          = 8
+            add_ebs_widgets = { iops = true, throughput = true }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-db-b" }] }
+            widgets         = []
+          }
+        ]
+      }
+    }
+
     ec2_instances = {
       pd-csr-db-a = merge(local.ec2_instances.db, {
         config = merge(local.ec2_instances.db.config, {
@@ -29,7 +109,7 @@ locals {
           "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 1500, iops = 6000 }
+          data  = { total_size = 1500 }
           flash = { total_size = 500 }
         })
         instance = merge(local.ec2_instances.db.instance, {
@@ -38,6 +118,7 @@ locals {
           ami           = "base_ol_8_5"
           description   = "PD CSR Oracle primary DB server"
           pre-migration = "PDCDL00013"
+          oracle-sids   = "PIWFM"
         })
       })
 
@@ -68,6 +149,7 @@ locals {
           ami           = "base_ol_8_5"
           description   = "PD CSR Oracle secondary DB server"
           pre-migration = "PDCDL00014"
+          oracle-sids   = "DIWFM"
         })
       })
 
@@ -566,7 +648,7 @@ locals {
         records = [
           { name = "test", type = "NS", ttl = "86400", records = ["ns-1332.awsdns-38.org", "ns-2038.awsdns-62.co.uk", "ns-62.awsdns-07.com", "ns-689.awsdns-22.net"] },
           { name = "pp", type = "NS", ttl = "86400", records = ["ns-1408.awsdns-48.org", "ns-1844.awsdns-38.co.uk", "ns-447.awsdns-55.com", "ns-542.awsdns-03.net"] },
-          { name = "piwfm", type = "A", ttl = "300", records = ["10.40.8.132"] },
+          { name = "piwfm", type = "CNAME", ttl = "300", records = ["pd-csr-db-a.corporate-staff-rostering.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
           { name = "traina", type = "CNAME", ttl = "300", records = ["traina.pp.csr.service.justice.gov.uk"] },
           { name = "trainb", type = "CNAME", ttl = "300", records = ["trainb.pp.csr.service.justice.gov.uk"] },
         ]

@@ -15,7 +15,7 @@ locals {
 
   globalprotect_ips = concat(
     module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_alpha,
-    module.ip_addresses.moj_cidr.moj_aws_digital_macos_globalprotect_prisma,
+    module.ip_addresses.moj_cidr.palo_alto_prisma_access_corporate,
   )
   unilink_ips = [
     "194.75.210.216/29", # Unilink AOVPN

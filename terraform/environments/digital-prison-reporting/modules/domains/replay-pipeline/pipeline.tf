@@ -48,11 +48,12 @@ module "replay_pipeline" {
         },
         "Check All Pending Files Have Been Processed" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {
-              "--dpr.orchestration.wait.interval.seconds" : "60"
+              "--dpr.orchestration.wait.interval.seconds" : tostring(var.processed_files_check_wait_interval_seconds),
+              "--dpr.orchestration.max.attempts" : tostring(var.processed_files_check_max_attempts)
             }
           },
           "Next" : "Stop Glue Streaming Job"
@@ -165,6 +166,7 @@ module "replay_pipeline" {
           "Parameters" : {
             "JobName" : var.glue_reporting_hub_batch_jobname,
             "Arguments" : {
+              "--dpr.batch.load.fileglobpattern" : "{part-*.snappy.parquet,LOAD*parquet}",
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
               "--dpr.config.key" : var.domain
             }
@@ -246,11 +248,13 @@ module "replay_pipeline" {
         },
         "Check All Files Have Been Replayed" : {
           "Type" : "Task",
-          "Resource" : "arn:aws:states:::glue:startJobRun",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
           "Parameters" : {
             "JobName" : var.glue_unprocessed_raw_files_check_job,
             "Arguments" : {
-              "--dpr.orchestration.wait.interval.seconds" : "60"
+              "--dpr.orchestration.wait.interval.seconds" : tostring(var.processed_files_check_wait_interval_seconds),
+              "--dpr.orchestration.max.attempts" : tostring(var.processed_files_check_max_attempts),
+              "--dpr.allowed.s3.file.regex" : "\\d+-\\d+.parquet"
             }
           },
           "Next" : "Empty Raw Data"

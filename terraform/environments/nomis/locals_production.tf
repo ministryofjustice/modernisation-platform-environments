@@ -98,6 +98,39 @@ locals {
           }
         ]
       }
+      "prod-nomis-db-1-b" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          {
+            width         = 8
+            height        = 8
+            search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-1-b" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+              null,
+              null,
+            ]
+          },
+          {
+            header_markdown = "## EBS PERFORMANCE"
+            width           = 8
+            height          = 8
+            add_ebs_widgets = { iops = true, throughput = true }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-1-b" }] }
+            widgets         = []
+          }
+        ]
+      }
       "prod-nomis-db-2-a" = {
         periodOverride = "auto"
         start          = "-PT6H"
@@ -138,6 +171,39 @@ locals {
             height          = 8
             add_ebs_widgets = { iops = true, throughput = true }
             search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-2-a" }] }
+            widgets         = []
+          }
+        ]
+      }
+      "prod-nomis-db-2-b" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          {
+            width         = 8
+            height        = 8
+            search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-2-b" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+              null,
+              null,
+            ]
+          },
+          {
+            header_markdown = "## EBS PERFORMANCE"
+            width           = 8
+            height          = 8
+            add_ebs_widgets = { iops = true, throughput = true }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-2-b" }] }
             widgets         = []
           }
         ]
@@ -277,8 +343,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 9000, throughput = 500 }
-          flash = { total_size = 1000, iops = 3000, throughput = 250 }
+          data  = { total_size = 4000, iops = 9000, throughput = 300 }
+          flash = { total_size = 1000, iops = 3000, throughput = 200 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -309,8 +375,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 500 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 4000, iops = 9000, throughput = 250 }
-          flash = { total_size = 1000, iops = 3000, throughput = 125 }
+          data  = { total_size = 4000, iops = 9000, throughput = 300 }
+          flash = { total_size = 1000, iops = 3000, throughput = 200 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -342,8 +408,8 @@ locals {
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 6000, iops = 9000, throughput = 250 }
-          flash = { total_size = 1000, iops = 3000, throughput = 250 }
+          data  = { total_size = 6000, iops = 9000, throughput = 300 }
+          flash = { total_size = 1000, iops = 3000, throughput = 200 }
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
@@ -378,8 +444,8 @@ locals {
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
           data  = { total_size = 6000, iops = 3000, throughput = 125 }
           flash = { total_size = 1000, iops = 3000, throughput = 125 }
-          # data  = { total_size = 6000, iops = 9000, throughput = 250 } # replace above with this on failover
-          # flash = { total_size = 1000, iops = 3000, throughput = 250 } # replace above with this on failover
+          # data  = { total_size = 6000, iops = 9000, throughput = 300 } # replace above with this on failover
+          # flash = { total_size = 1000, iops = 3000, throughput = 200 } # replace above with this on failover
         })
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true

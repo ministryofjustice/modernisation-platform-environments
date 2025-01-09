@@ -4,8 +4,11 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  admin_roles = local.is-development ? "sandbox" : "data-eng"
-  suffix      = local.is-production ? "" : "-test"
+  admin_roles       = local.is-development ? "sandbox" : "data-eng"
+  suffix            = local.is-production ? "" : "-test"
+  prod_dbs_to_grant = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"] : []
+  dev_dbs_to_grant  = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
+  dbs_to_grant      = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant]))
 }
 
 # Source Analytics DBT Secrets
@@ -264,6 +267,18 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/structured/*"
     ]
   }
+  statement {
+    sid       = "ListAccountAliasDBT"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucketDBT"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
 }
 
 
@@ -369,8 +384,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
 
-  name = "${each.value.target_account_name}-share-role"
-
+  name                 = "${each.value.target_account_name}-share-role"
+  max_session_duration = 12 * 60 * 60
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -402,7 +417,6 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
 }
 
-
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([[for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn], data.aws_iam_session_context.current.issuer_arn, try(one(data.aws_iam_roles.data_engineering_roles.arns), [])])
 
@@ -419,4 +433,20 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     permissions = ["ALL"]
     principal   = "IAM_ALLOWED_PRINCIPALS"
   }
+}
+
+module "share_dbs_with_de_role" {
+  count                   = local.is-production ? 1 : 0
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = local.dbs_to_grant
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+}
+
+module "share_dbs_with_cadt_role" {
+  count                   = local.is-production ? 1 : 0
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = local.dbs_to_grant
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.dataapi_cross_role.arn
 }

@@ -182,7 +182,6 @@ resource "aws_lambda_function" "app_post_migrate" {
       ADMIN_PASSWORD     = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_password"]
       ADMIN_PASSWORD_EAT = jsondecode(data.aws_secretsmanager_secret_version.tribunals_admin_site_credentials_secret_current.secret_string)["admin_password_eat"]
       NEW_DB_NAME        = each.value.app_db_name
-      APP_FOLDER         = each.value.sql_post_setup_path
     }
   }
 

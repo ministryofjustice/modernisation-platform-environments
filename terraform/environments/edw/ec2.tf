@@ -38,7 +38,7 @@ fi
 
 # Check if the chrony.conf file exists and is properly configured
 if ! grep -q "server 169.254.169.123" /etc/chrony.conf; then
-  sudo bash -c 'cat << EOC9 > /etc/chrony.conf
+  sudo bash -c 'cat << EOC1 > /etc/chrony.conf
 server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4
 # Record the rate at which the system clock gains/losses time.
 driftfile /var/lib/chrony/drift
@@ -50,7 +50,7 @@ makestep 1.0 3
 logdir /var/log/chrony
 # Select which information is logged
 log measurements statistics tracking
-EOC9'
+EOC1'
 fi
 
 # Start chronyd service
@@ -86,20 +86,25 @@ mkdir -p /home/oracle/scripts
 sudo /etc/init.d/iptables stop
 sudo /sbin/chkconfig iptables off
 
+
+# Install mailx
+sudo yum install -y mailx
+sudo ln -s /bin/mail /bin/mailx
+
 # Set up log files
 echo "---creating /etc/awslogs/awscli.conf"
 mkdir -p /etc/awslogs
-cat > /etc/awslogs/awscli.conf <<-EOC1
+cat > /etc/awslogs/awscli.conf <<-EOC2
 [plugins]
 cwlogs = cwlogs
 [default]
 region = $REGION
-EOC1
+EOC2
 
 echo "---creating /tmp/cwlogs/logstreams.conf"
 mkdir -p /tmp/cwlogs
 
-cat > /tmp/cwlogs/logstreams.conf <<-EOC2
+cat > /tmp/cwlogs/logstreams.conf <<-EOC3
 [general]
 state_file = /var/awslogs/agent-state
 
@@ -137,8 +142,17 @@ log_stream_name = {instance_id}
 file = /home/oracle/scripts/logs/cdc_check.log
 log_group_name = $APPNAME-CDCstatus
 log_stream_name = {instance_id}
-EOC2
+EOC3
 
+
+# Create directories if they don't exist
+mkdir -p /home/oracle/scripts/logs
+
+# Create the log files if they don't exist
+touch /home/oracle/scripts/logs/freespace_alert.log
+touch /home/oracle/scripts/logs/pmon_status_alert.log
+touch /home/oracle/scripts/logs/cdc_check.log
+touch /home/oracle/scripts/logs/aws_ebs_backup.log
 sudo chmod 755 /home/oracle/scripts/logs
 sudo chmod 755 /etc/awslogs
 sudo chmod 755 /tmp/cwlogs
@@ -162,7 +176,7 @@ echo "---setup_file_systems"
 sudo yum install e2fsprogs
 
 echo "Updating /etc/fstab file and mount"
-cat <<EOT > /etc/fstab
+cat <<EOC4 > /etc/fstab
 /dev/VolGroup00/LogVol00	/	ext3	defaults	1 1
 LABEL=/boot	/boot	ext3	defaults	1 2
 tmpfs	/dev/shm	tmpfs	defaults	0 0
@@ -176,7 +190,7 @@ proc	/proc	proc	defaults	0 0
 /dev/xvdi /oracle/software ext4 defaults 0 0
 /dev/xvdj /oracle/temp_undo ext4 defaults 0 0
 $EFS.efs.eu-west-2.amazonaws.com:/ /backups nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
-EOT
+EOC4
 
 # Create file systems 
 sudo mkdir -p /oracle/dbf
@@ -186,7 +200,7 @@ sudo mkdir -p /oracle/software
 sudo mkdir -p /oracle/temp_undo
 sudo mkdir -p /backups
 
-# Mount all file systems in fstab
+# #Mount all file systems in fstab
 mount -a
 chmod 777 /stage
 
@@ -273,34 +287,86 @@ chmod -R 777 /home/oracle
 # Set permissions for staging directory
 chmod -R 777 /stage/owb/
 
-# Replace the secret in the rootrotate.sh script
-sed -i "s|--secret-id .* --query|--secret-id ${aws_secretsmanager_secret.edw_db_ec2_root_secret.id} --query|g" /root/scripts/rootrotate.sh
-
 #### setup_backups:
 
 # setup efs backup mount point
 sudo mkdir -p /home/oracle/backup_logs/
 sudo mkdir -p /backups/$APPNAME_RMAN
 chmod 777 /backups/EDW_RMAN
-sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh
+sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_arch_backup_v2_1.sh
 sed -i "s/\/backups\/production\/MIDB_RMAN\//\/backups\/$APPNAME_RMAN/g" /home/oracle/backup_scripts/rman_full_backup.sh
 chown -R oracle:dba /home/oracle/backup*
 chmod -R 740 /home/oracle/backup*
 
+echo "Setting up AWS EBS backup"
+INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+
+cat <<EOC5 > /home/oracle/scripts/aws_ebs_backup.sh
+#!/bin/bash
+
+# Check if the environment parameter is provided
+if [ $# -ne 1 ]; then
+  echo "Usage: \$0 <ENV>"
+  exit 1
+fi
+
+# Get the environment parameter
+ENV=\$1
+
+LOG_FILE="/home/oracle/scripts/logs/aws_ebs_backup.log"
+
+# Recreate log file and log start time
+echo "Backup started at \$(date) for environment: \$ENV" > \$LOG_FILE
+
+INSTANCE_ID=\$(curl http://169.254.169.254/latest/meta-data/instance-id)
+
+# Create snapshot
+/usr/local/bin/aws ec2 create-snapshots \
+--instance-specification InstanceId=\$INSTANCE_ID \
+--description "AWS crash-consistent snapshots of EDW database volumes, automatically created snapshot from oracle_cron inside EC2 for environment: \$ENV" \
+--copy-tags-from-source volume
+
+# Check if the backup command was successful
+if [ \$? -eq 0 ]; then
+  echo "Backup completed successfully at \$(date) for environment: \$ENV" >> \$LOG_FILE
+else
+  echo "Backup failed at \$(date) for environment: \$ENV" >> \$LOG_FILE
+  mailx -s "Backup for EC2 instance \$INSTANCE_ID on \$ENV failed at \$(date)" SLACK_ALERT_URL -- < \$LOG_FILE
+fi
+
+EOC5
+
+echo "Adding cron job scripts"
+/usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/ /home/oracle/scripts --recursive
+chown -R oracle:dba /home/oracle/scripts/
+chmod -R 755 /home/oracle/scripts/*.sh
+
+sudo mkdir -p /root/scripts/
+sudo mv /home/oracle/scripts/rootrotate.sh /root/scripts/
+
+# Replace the secret in the rootrotate.sh script
+sed -i "s|--secret-id .* --query|--secret-id ${aws_secretsmanager_secret.edw_db_ec2_root_secret.id} --query|g" /root/scripts/rootrotate.sh
+
+echo "Update Slack alert URL for Oracle scripts"
+export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter --name SLACK_ALERT_URL --with-decryption --query Parameter.Value --output text`
+sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/oracle/scripts/*.sh
+
 # Create /etc/cron.d/backup_cron with the cron jobs
-cat <<EOC3 > /etc/cron.d/backup_cron
-0 */3 * * * /home/oracle/backup_scripts/rman_s3_arch_backup_v2_1.sh $APPNAME
+cat <<EOC6 > /etc/cron.d/backup_cron
+0 */3 * * * /home/oracle/backup_scripts/rman_arch_backup_v2_1.sh $APPNAME
 0 06 * * 01 /home/oracle/backup_scripts/rman_full_backup.sh $APPNAME
-00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh
+00 07,10,13,16 * * * /home/oracle/scripts/freespace_alert.sh ${upper(local.application_data.accounts[local.environment].edw_environment)}
 00,15,30,45 * * * * /home/oracle/scripts/pmon_check.sh
-# 0 7 * * 1 /home/oracle/scripts/maat_05365_ware_db_changes.sh
-EOC3
+# 0 7 * * 1 /home/oracle/scripts/maat_05365_ware_db_changes.sh ${upper(local.application_data.accounts[local.environment].edw_environment)}
+00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh ${upper(local.application_data.accounts[local.environment].edw_environment)} > /tmp/aws_ebs_backup.log
+10,40 08-17 * * * /home/oracle/scripts/disk_space_alert.sh ${upper(local.application_data.accounts[local.environment].edw_environment)} 97  >/tmp/disk_space.trc 2>&1
+EOC6
 
 chown root:root /etc/cron.d/backup_cron
 chmod 644 /etc/cron.d/backup_cron
 
 # Add backup_cron to crontab for oracle user
-yes | cp -f /etc/cron.d/backup_cron /home/oracle/crecrontab.txt
+cp -f /etc/cron.d/backup_cron /home/oracle/crecrontab.txt
 chown oracle:dba /home/oracle/crecrontab.txt
 chmod 744 /home/oracle/crecrontab.txt
 su oracle -c "crontab /home/oracle/crecrontab.txt"
@@ -309,9 +375,9 @@ chown root:root /var/cw-custom.sh
 chmod 700 /var/cw-custom.sh
 
 # Create /etc/cron.d/custom_cloudwatch_metrics with the cron job
-cat <<EOC4 > /etc/cron.d/custom_cloudwatch_metrics
+cat <<EOC7 > /etc/cron.d/custom_cloudwatch_metrics
 */1 * * * * root /var/cw-custom.sh
-EOC4
+EOC7
 
 chown root:root /etc/cron.d/custom_cloudwatch_metrics
 chmod 600 /etc/cron.d/custom_cloudwatch_metrics
@@ -321,9 +387,9 @@ chown oracle:dba /home/oracle/scripts/alert_rota.sh
 chmod 755 /home/oracle/scripts/alert_rota.sh
 
 # Create /etc/cron.d/oracle_rotation with the cron jobs
-cat <<EOC5 > /etc/cron.d/oracle_rotation
+cat <<EOC8 > /etc/cron.d/oracle_rotation
 00 07 * * * /home/oracle/scripts/alert_rota.sh $APPNAME
-EOC5
+EOC8
 
 chown root:root /etc/cron.d/oracle_rotation
 chmod 644 /etc/cron.d/oracle_rotation
@@ -334,6 +400,18 @@ chown oracle:dba /home/oracle/crecrontab.txt
 chmod 777 /home/oracle/crecrontab.txt
 su oracle -c "crontab /home/oracle/crecrontab.txt"
 
+chown root:root /root/scripts/rootrotate.sh
+chmod 700 /root/scripts/rootrotate.sh
+
+# Create /etc/cron.d/rootrotate with the cron job
+cat <<EOC9 > /etc/cron.d/rootrotate
+0 6 28 * * root /root/scripts/rootrotate.sh
+EOC9
+
+chown root:root /etc/cron.d/rootrotate
+chmod 644 /etc/cron.d/rootrotate
+
+
 #Update send mail URL 
 echo "Update Sendmail configurations"
 sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${local.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.cf
@@ -342,12 +420,12 @@ sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_u
 sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
-sudo su - oracle -c "sqlplus / as sysdba << EOC6
+sudo su - oracle -c "sqlplus / as sysdba << EOC10
 shutdown abort;
 startup;
 exit;
-EOC6"
-
+EOC10"
+ 
 EOF
 }
 
@@ -442,18 +520,55 @@ resource "aws_iam_policy" "edw_ec2_role_policy" {
                 "logs:CreateLogStream",
                 "logs:DescribeLogStreams",
                 "logs:PutRetentionPolicy",
-                "logs:PutLogEvents",
-                "ec2:DescribeInstances"
+                "logs:PutLogEvents"
             ],
             "Resource": ["*"],
             "Effect": "Allow"
-        }, 
+        },
+        {
+            "Action": [
+                "ec2:DescribeInstances",            
+                "ec2:CreateSnapshots"
+            ],
+            "Resource": ["*"],
+            "Effect": "Allow"
+        },
         {
             "Action": [
                 "ec2:CreateTags"
             ],
             "Resource": ["*"],
             "Effect": "Allow"
+        },
+        {
+            "Effect":"Allow",
+            "Action":[
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:GetObject",
+                "s3:GetObjectAcl",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*.sh",
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}/*.sql"
+            ]
+        },
+        {
+            "Effect":"Allow",
+            "Action":[
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::${aws_s3_bucket.scripts.id}"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssm:GetParameter"
+            ],
+            "Resource": "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/*SLACK_ALERT_URL"
         }
     ]
 }
@@ -653,15 +768,6 @@ resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
   security_group_id            = aws_security_group.edw_db_security_group.id
   description                  = "SSH from the Bastion"
   referenced_security_group_id = module.bastion_linux.bastion_security_group
-  from_port                    = 22
-  ip_protocol                  = "tcp"
-  to_port                      = 22
-}
-
-resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
-  security_group_id            = aws_security_group.edw_db_security_group.id
-  description                  = "Allow Lambda SSH access for backup snapshots"
-  referenced_security_group_id = aws_security_group.backup_lambda.id
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22

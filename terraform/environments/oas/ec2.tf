@@ -94,6 +94,27 @@ resource "aws_security_group" "ec2" {
   }
   ingress {
     description = "Access to the managed server"
+    from_port   = 9505
+    to_port     = 9505
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  }
+  ingress {
+    description = "Access to the managed server from workspace"
+    from_port   = 9505
+    to_port     = 9505
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
+  }
+  ingress {
+    description = "Access to the managed server from laa development"
+    from_port   = 9505
+    to_port     = 9505
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz] #!ImportValue env-ManagementCIDR
+  }
+  ingress {
+    description = "Access to the managed server"
     from_port   = 9514
     to_port     = 9514
     protocol    = "tcp"
@@ -141,11 +162,25 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
   }
+  ingress {
+    description     = "SSH from the Bastion"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [module.bastion_linux.bastion_security_group]
+  }
 
   egress {
     description = "Allow AWS SSM Session Manager"
     from_port   = 443
     to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].outbound_access_cidr]
+  }
+  egress {
+    description = "Allow telnet to Portal - MoJo"
+    from_port   = 3443
+    to_port     = 3443
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].outbound_access_cidr]
   }
@@ -174,6 +209,20 @@ resource "aws_security_group" "ec2" {
     description = "Access to the managed server from workspace"
     from_port   = 9502
     to_port     = 9502
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
+  }
+  egress {
+    description = "Access to the managed server"
+    from_port   = 9505
+    to_port     = 9505
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_vpc.shared.cidr_block] #!ImportValue env-VpcCidr
+  }
+  egress {
+    description = "Access to the managed server from workspace"
+    from_port   = 9505
+    to_port     = 9505
     protocol    = "tcp"
     cidr_blocks = [local.application_data.accounts[local.environment].managementcidr] #!ImportValue env-ManagementCIDR
   }
@@ -234,9 +283,8 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 }
 
 resource "aws_iam_role" "ec2_instance_role" {
-  name                = "${local.application_name}-role"
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
-  assume_role_policy  = <<EOF
+  name               = "${local.application_name}-role"
+  assume_role_policy = <<EOF
 {
     "Version": "2012-10-17",
     "Statement": [
@@ -250,6 +298,11 @@ resource "aws_iam_role" "ec2_instance_role" {
     ]
 }
 EOF
+}
+
+resource "aws_iam_role_policy_attachment" "ec2_instance_role_attachment" {
+  role       = aws_iam_role.ec2_instance_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy" "ec2_instance_policy" {

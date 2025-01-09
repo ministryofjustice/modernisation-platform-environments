@@ -49,3 +49,8 @@ variable "db_suffix" {
   type        = string
   default     = "db"
 }
+
+variable "instance_roles" {
+  description = "AMI roles associated with the database EC2 hosts"
+  type        = list(string)
+}

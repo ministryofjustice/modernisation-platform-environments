@@ -3,24 +3,24 @@ resource "aws_sns_topic" "dms_alerts_topic" {
   name              = "delius-dms-alerts-topic"
   kms_master_key_id = var.account_config.kms_keys.general_shared
 
-  http_success_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  http_success_feedback_role_arn    = aws_iam_role.sns_logging_role.arn
   http_success_feedback_sample_rate = 100
-  http_failure_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  http_failure_feedback_role_arn    = aws_iam_role.sns_logging_role.arn
 }
 
 resource "aws_iam_role" "sns_logging_role" {
   name = "sns-logging-role"
 
   assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-          "Service": "sns.amazonaws.com"
+        "Action" : "sts:AssumeRole",
+        "Principal" : {
+          "Service" : "sns.amazonaws.com"
         },
-        "Effect": "Allow",
-        "Sid": ""
+        "Effect" : "Allow",
+        "Sid" : ""
       }
     ]
   })
@@ -179,8 +179,8 @@ resource "aws_iam_role" "lambda_put_metric_data_role" {
     Version = "2012-10-17",
     Statement = [
       {
-        Action    = "sts:AssumeRole",
-        Effect    = "Allow",
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
         Principal = {
           Service = "lambda.amazonaws.com"
         }
@@ -191,13 +191,13 @@ resource "aws_iam_role" "lambda_put_metric_data_role" {
 
 resource "aws_iam_policy" "lambda_put_metric_data_policy" {
   name = "lambda-put-metric-data-policy"
-  
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "cloudwatch:PutMetricData"
         ],
         Resource = "*"
@@ -217,13 +217,17 @@ resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_logging_attach
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+locals {
+  rendered_metric_template = templatefile("${path.module}/lambda/dms_replication_metric.py.tmpl", { oracle_db_instance_scheduling = var.oracle_db_instance_scheduling })
+}
+
 # Creates a ZIP file containing the contents of the lambda directory which
 # contains a Python script to calculate and put the custom metric
 data "archive_file" "lambda_dms_replication_metric_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda"
-  output_path = "${path.module}/lambda/dms_replication_metric.zip"
-  excludes    = ["dms_replication_metric.zip"]
+  type                    = "zip"
+  source_content          = local.rendered_metric_template
+  source_content_filename = "dms_replication_metric.py"
+  output_path             = "${path.module}/lambda/dms_replication_metric.zip"
 }
 
 # Define a Lambda Function using the python script in the ZIP file -
@@ -232,16 +236,17 @@ data "archive_file" "lambda_dms_replication_metric_zip" {
 # metric is 0 if the replication task is not stopped (normal state),
 # and 1 if not (whether it has been stopped manually or has failed)
 resource "aws_lambda_function" "dms_replication_metric_publisher" {
-  function_name = "dms-replication-metric-publisher"
-  role          = aws_iam_role.lambda_put_metric_data_role.arn
-  handler       = "dms_replication_metric.lambda_handler"
-  runtime       = "python3.8"
-  filename      = data.archive_file.lambda_dms_replication_metric_zip.output_path
+  function_name    = "dms-replication-metric-publisher"
+  role             = aws_iam_role.lambda_put_metric_data_role.arn
+  handler          = "dms_replication_metric.lambda_handler"
+  runtime          = "python3.8"
+  filename         = data.archive_file.lambda_dms_replication_metric_zip.output_path
   source_code_hash = data.archive_file.lambda_dms_replication_metric_zip.output_base64sha256
   environment {
     variables = {
       METRIC_NAMESPACE = "CustomDMSMetrics",
       METRIC_NAME      = "DMSReplicationFailure"
+      TZ               = "Europe/London"
     }
   }
 
@@ -255,7 +260,7 @@ resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publis
   function_name = aws_lambda_function.dms_replication_metric_publisher.function_name
   principal     = "sns.amazonaws.com"
 
-  source_arn    = aws_sns_topic.dms_events_topic.arn
+  source_arn = aws_sns_topic.dms_events_topic.arn
 }
 
 resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
@@ -273,8 +278,8 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
   period              = "60"
 
   dimensions = {
-      SourceId = each.key
-    }
+    SourceId = each.key
+  }
 
   alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
   ok_actions    = [aws_sns_topic.dms_alerts_topic.arn]
@@ -289,9 +294,9 @@ resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
 resource "aws_sns_topic" "dms_events_topic" {
   name = "delius-dms-events-topic"
 
-  lambda_success_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  lambda_success_feedback_role_arn    = aws_iam_role.sns_logging_role.arn
   lambda_success_feedback_sample_rate = 100
-  lambda_failure_feedback_role_arn = aws_iam_role.sns_logging_role.arn
+  lambda_failure_feedback_role_arn    = aws_iam_role.sns_logging_role.arn
 }
 
 resource "aws_sns_topic_subscription" "dms_events_lambda_subscription" {
@@ -302,9 +307,9 @@ resource "aws_sns_topic_subscription" "dms_events_lambda_subscription" {
 
 # We handle State Change and Failure DMS Events
 resource "aws_dms_event_subscription" "dms_task_event_subscription" {
-  name       = "dms-task-event-alerts"
-  sns_topic_arn = aws_sns_topic.dms_events_topic.arn
-  source_type   = "replication-task"
+  name             = "dms-task-event-alerts"
+  sns_topic_arn    = aws_sns_topic.dms_events_topic.arn
+  source_type      = "replication-task"
   event_categories = ["state change", "failure"]
-  enabled = true
+  enabled          = true
 }

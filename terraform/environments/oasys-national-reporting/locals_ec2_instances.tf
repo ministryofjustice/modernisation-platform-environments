@@ -22,9 +22,9 @@ locals {
       }
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 128 } # root volume
-        "xvdd" = { type = "gp3", size = 128 } # D:/ Temp
-        "xvde" = { type = "gp3", size = 128 } # E:/ App
-        "xvdf" = { type = "gp3", size = 700 } # F:/ Storage
+        "xvdd"      = { type = "gp3", size = 128 } # D:/ Temp
+        "xvde"      = { type = "gp3", size = 128 } # E:/ App
+        "xvdf"      = { type = "gp3", size = 700 } # F:/ Storage
       }
       instance = {
         disable_api_termination      = false
@@ -46,10 +46,13 @@ locals {
         backup           = "false"
         component        = "onr_bods"
         os-type          = "Windows"
-        server-type      = "OnrBods"
+        server-type      = "Bods"
         update-ssm-agent = "patchgroup1"
       }
       cloudwatch_metric_alarms = merge(
+        module.baseline_presets.cloudwatch_metric_alarms.ec2,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
         local.cloudwatch_metric_alarms.windows,
         local.cloudwatch_metric_alarms.bods,
       )

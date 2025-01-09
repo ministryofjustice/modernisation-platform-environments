@@ -40,6 +40,109 @@ locals {
       }
     }
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.connectivity,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.onr,
+          local.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+      "pd-oasys-db-a" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          {
+            width         = 8
+            height        = 8
+            search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-oasys-db-a" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-error,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run,
+            ]
+          },
+          {
+            header_markdown = "## OASys BATCH"
+            width           = 8
+            height          = 8
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-oasys-db-a" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-error,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated,
+              null
+            ]
+          },
+          {
+            header_markdown = "## EBS PERFORMANCE"
+            width           = 8
+            height          = 8
+            add_ebs_widgets = { iops = true, throughput = true }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-oasys-db-a" }] }
+            widgets         = []
+          }
+        ]
+      }
+      "pd-oasys-db-b" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          {
+            width         = 8
+            height        = 8
+            search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-oasys-db-b" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_linux.free-disk-space-low,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_os.service-status-error-os-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_connected.oracle-db-disconnected,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-error,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_oracle_db_backup.oracle-db-rman-backup-did-not-run,
+            ]
+          },
+          {
+            header_markdown = "## Other"
+            width           = 8
+            height          = 8
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-oasys-db-b" }] }
+            widgets = [
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-error,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_textfile_monitoring.textfile-monitoring-metric-not-updated,
+              null
+            ]
+          },
+          {
+            header_markdown = "## EBS PERFORMANCE"
+            width           = 8
+            height          = 8
+            add_ebs_widgets = { iops = true, throughput = true }
+            search_filter   = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-oasys-db-b" }] }
+            widgets         = []
+          }
+        ]
+      }
+    }
+
     ec2_autoscaling_groups = {
       pd-oasys-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
@@ -137,7 +240,7 @@ locals {
           "/dev/sdb" = { label = "app", size = 100 }  # /u01
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
           "/dev/sde" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
-          "/dev/sdf" = { label = "data", size = 2000 }
+          "/dev/sdf" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
           "/dev/sdj" = { label = "flash", size = 1000, iops = 5000, throughput = 500 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
@@ -167,7 +270,7 @@ locals {
           "/dev/sdb" = { label = "app", size = 100 }  # /u01
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
           "/dev/sde" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
-          "/dev/sdf" = { label = "data", size = 2000 }
+          "/dev/sdf" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
           "/dev/sdj" = { label = "flash", size = 1000, iops = 5000, throughput = 500 }
           "/dev/sds" = { label = "swap", size = 2 }
         }
@@ -669,6 +772,8 @@ locals {
           { name = "t2-b", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
           { name = "t2-b-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
           { name = "t2-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-c", type = "CNAME", ttl = "3600", records = ["public-lb-1856376477.eu-west-2.elb.amazonaws.com"] },
+          { name = "t2-c-int", type = "CNAME", ttl = "3600", records = ["internal-private-lb-1575012313.eu-west-2.elb.amazonaws.com"] },
 
           { name = "_9f1b86e95d13d2cc7b9629f67d672c40", type = "CNAME", ttl = "86400", records = ["_7ea92a123c65795698dd19834dd71f61.fdbjvjdfdx.acm-validations.aws."] },
           { name = "_26aaae7b839510727c2dd323b483ea5d.pp", type = "CNAME", ttl = "86400", records = ["_72222d02a82256bb6d75c872bc7bc1aa.qxcwttcyyb.acm-validations.aws."] },

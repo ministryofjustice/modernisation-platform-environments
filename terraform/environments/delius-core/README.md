@@ -1,91 +1,85 @@
 # Service Runbook
 
+  
+
 <!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
+
 To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
 
-_If you have any questions surrounding this page please post in the `#team-name` channel._
+  
+
+_If you have any questions surrounding this page please post in the `#ask-probation-hosting` channel._
+
+  
 
 ## Mandatory Information
 
+  
+
 ### **Last review date:**
+
+  17/12/24
 
 <!-- Adding the last date this page was reviewed, with any accompanying information -->
 
+  
+
 ### **Description:**
+This directory contains the Terraform configuration for the Delius Core environments, which are primarily comprised of the following resources:
+
+* WebLogic app ECS
+* WebLogic EIS ECS
+  * external interface services
+  * serves API endpoints to allow services to interact with Delius data
+* LDAP ECS
+  * used for authenticating users in Delius, MIS, NextCloud, User Management, PWM, and apps in Cloud Platform
+* Password manager (PWM) ECS
+* Oracle EC2 databases
+  * used by Weblogic, GDPR (now in CP)
+* Alfresco EFS + SFS
+  * Alfresco is mainly hosted in Cloud Platform but some resources remain in MP
+
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
 
+  
+
 ### **Service URLs:**
 
-<!--  The URL(s) of the service’s production environment, and test environments if possible-->
+* WebLogic
+  * Base URL is [https://ndelius.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk](https://ndelius.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/NDelius-war/delius/JSP/auth/login.xhtml)
+  * NB: This needs a trailing path of either /jspellhtml/_OR /NDelius_ to hit the target group, e.g. `/NDelius-war/delius/JSP/auth/login.xhtml`
+  * Also, ensure you are connected to the GlobalProtect VPN
+* LDAP
+  * ldaps://ldap.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk:636
+* PWM
+  * [https://pwm.[env].delius-core.[vpc].modernisation-platform.service.justice.gov.uk/public/forgottenpassword](https://pwm.dev.delius-core.hmpps-development.modernisation-platform.service.justice.gov.uk/public/forgottenpassword)
 
-### **Incident response hours:**
+Replace [env] and [vpc] with the following values:
 
-<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+| [env] |    [vpc]   |
+|-------|--------------------|
+|dev    | hmpps-development  |
+|test   | hmpps-test         |
+|stage  | hmpps-preproduction|
+|preprod| hmpps-preproduction|
 
-### **Incident contact details:**
+<!-- The URL(s) of the service’s production environment, and test environments if possible-->
 
-<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
-### **Service team contact:**
-
-<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 
 ### **Hosting environment:**
 
+  
+
 Modernisation Platform
+
+  
 
 <!-- If your service is hosted on another MOJ team’s infrastructure, link to their runbook. If your service has another arrangement or runs its own infrastructure, you should list the supplier of that infrastructure (ideally linking to your account’s login page) and describe, simply and briefly, how to raise an issue with them. -->
 
-## Optional
+### Structure
 
-### **Other URLs:**
+Most of the configuration for the environments is handled in the base level of the delius-core directory, where we have `main_[environment].tf` files that call the `delius_environment`module, passing in locals defined in `locals_[environment].tf` files.
 
-<!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
-
-### **Expected speed and frequency of releases:**
-
-<!-- How often are you able to release changes to your service, and how long do those changes take? -->
-
-### **Automatic alerts:**
-
-<!-- List, briefly, problems (or types of problem) that will automatically alert your team when they occur. -->
-
-### **Impact of an outage:**
-
-<!-- A short description of the risks if your service is down for an extended period of time. -->
-
-### **Out of hours response types:**
-
-<!-- Describe how incidents that page a person on call are responded to. How long are out-of-hours responders expected to spend trying to resolve issues before they stop working, put the service into maintenance mode, and hand the issue to in-hours support? -->
-
-### **Consumers of this service:**
-
-<!-- List which other services (with links to their runbooks) rely on this service. If your service is considered a platform, these may be too numerous to reasonably list. -->
-
-### **Services consumed by this:**
-
-<!-- List which other services (with links to their runbooks) this service relies on. -->
-
-### **Restrictions on access:**
-
-<!-- Describe any conditions which restrict access to the service, such as if it’s IP-restricted or only accessible from a private network.-->
-
-### **How to resolve specific issues:**
-
-<!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
-
-## Design decisions
-
-### Naming conventions
-
-The infrastructure code supports multiple environments per Modernisation Platform account.
-As such, we've adopted some naming conventions to allow easy, consistent and predictable naming for resources.
-
-For example, resource name takes the form
-`environmentname-resourceidentifier`
-- where environmentname is the name for the delius environment, NOT the Modernisation Platform account name, e.g. `dev`, `stage`, `preprod`
-- resourceidentifier is an identifier for the resource that together with the environmentname gives full clarity about what the resource represents, e.g. `ldap-efs` or `delius-db-1`
-e.g.
-`dev-ldap-efs`
-`preprod-delius-db-1`
+The bulk of the resources are defined in a modular structure where there is a `delius_environment` module that will call other reusable modules such as the `delius_microservice` module or the `oracle_db_instance` module, with files for each microservice deployment (e.g. `weblogic.tf` which is only calling the `delius_microservice` module, or `database.tf` that primarily contains calls to the `oracle_db_instance` module).

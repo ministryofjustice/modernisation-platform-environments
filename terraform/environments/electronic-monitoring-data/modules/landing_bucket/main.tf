@@ -12,7 +12,7 @@ module "this-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_prefix      = "${var.local_bucket_prefix}-land-${var.data_feed}-${var.order_type}-"
-  versioning_enabled = false
+  versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
@@ -49,7 +49,18 @@ module "this-bucket" {
       }
 
       expiration = {
-        days = 7
+        days = 30
+      }
+
+      noncurrent_version_transition = [
+        {
+          days          = 30
+          storage_class = "GLACIER"
+        }
+      ]
+
+      noncurrent_version_expiration = {
+        days = 90
       }
     }
   ]
@@ -88,8 +99,8 @@ module "kms_key" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.1"
 
-  aliases               = ["s3/landing_bucket_${var.data_feed}_${var.order_type}"]
-  description           = "${var.data_feed} ${var.order_type} landing bucket KMS key"
+  aliases     = ["s3/landing_bucket_${var.data_feed}_${var.order_type}"]
+  description = "${var.data_feed} ${var.order_type} landing bucket KMS key"
 
   # Give full access to key for root account, and lambda role ability to use.
   enable_default_policy = true
@@ -155,6 +166,8 @@ module "process_landing_bucket_files" {
   timeout                 = 900
   core_shared_services_id = var.core_shared_services_id
   production_dev          = var.production_dev
+  security_group_ids      = var.security_group_ids
+  subnet_ids              = var.subnet_ids
   environment_variables = {
     DESTINATION_BUCKET = var.received_files_bucket_id
   }

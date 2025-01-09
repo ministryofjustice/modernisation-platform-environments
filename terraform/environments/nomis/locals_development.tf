@@ -132,6 +132,22 @@ locals {
           })
         })
       })
+
+      qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
+        config = merge(local.ec2_autoscaling_groups.web12.config, {
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.web12.tags, {
+          nomis-environment = "qa11g"
+        })
+      })
     }
 
     ec2_instances = {

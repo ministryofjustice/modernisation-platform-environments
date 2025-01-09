@@ -31,73 +31,89 @@ resource "aws_s3_bucket_public_access_block" "storage" {
   restrict_public_buckets = true
 }
 
-# Resource to define S3 bucket lifecycle configuration
 resource "aws_s3_bucket_lifecycle_configuration" "lifecycle" {
-  #checkov:skip=CKV_AWS_300: "Ensure S3 lifecycle configuration sets period for aborting failed uploads"
-  # Enable the lifecycle configuration only if the variable `enable_lifecycle` is true
-  count  = var.enable_lifecycle ? 1 : 0
+  #checkov:skip=CKV_AWS_300:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+
+  # Create the lifecycle configuration if either lifecycle or Intelligent-Tiering is enabled
+  count = var.enable_lifecycle || var.enable_intelligent_tiering ? 1 : 0
+
   bucket = aws_s3_bucket.storage[0].id
 
-  # Main lifecycle rule for standard categories (short_term, long_term, temporary)
-  rule {
-    id     = var.name
-    status = "Enabled"
+  # Main lifecycle rule for standard categories (short_term, long_term, temporary, standard)
+  dynamic "rule" {
+    for_each = var.enable_lifecycle ? [1] : []
+    content {
+      id     = var.name
+      status = "Enabled"
 
-    # Short-Term Retention Policy
-    # - Transitions objects to STANDARD_IA after 30 days (cost-effective storage for infrequent access).
-    # - Deletes objects after 90 days.
-    dynamic "transition" {
-      for_each = var.lifecycle_category == "short_term" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []
-      content {
-        days          = transition.value.days
-        storage_class = transition.value.storage_class
+      # Short-Term Retention Policy
+      dynamic "transition" {
+        for_each = var.lifecycle_category == "short_term" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []
+        content {
+          days          = transition.value.days
+          storage_class = transition.value.storage_class
+        }
       }
-    }
 
-    dynamic "expiration" {
-      for_each = var.lifecycle_category == "short_term" ? [{ days = 90 }] : (
-      var.lifecycle_category == "temporary" ? [{ days = 30 }] : [])
-      content {
-        days = expiration.value.days
+      # Standard Retention Policy: Move to STANDARD_IA after 30 days and remain there indefinitely
+      dynamic "transition" {
+        for_each = var.lifecycle_category == "standard" ? [{ days = 30, storage_class = "STANDARD_IA" }] : []
+        content {
+          days          = transition.value.days
+          storage_class = transition.value.storage_class
+        }
       }
-    }
 
-    # Long-Term Retention Policy
-    # - Transitions objects to progressively cheaper storage classes:
-    #   - STANDARD_IA after 60 days.
-    #   - GLACIER after 180 days.
-    #   - DEEP_ARCHIVE after 365 days.
-    # - Does not delete objects (no expiration).
-    dynamic "transition" {
-      for_each = var.lifecycle_category == "long_term" ? [
-        { days = 60, storage_class = "STANDARD_IA" },
-        { days = 180, storage_class = "GLACIER" },
-        { days = 365, storage_class = "DEEP_ARCHIVE" }
-      ] : []
-      content {
-        days          = transition.value.days
-        storage_class = transition.value.storage_class
+      # Expiration logic for short-term and temporary categories
+      dynamic "expiration" {
+        for_each = var.lifecycle_category == "short_term" ? [{ days = 90 }] : (
+        var.lifecycle_category == "temporary" ? [{ days = 30 }] : [])
+        content {
+          days = expiration.value.days
+        }
+      }
+
+      # Long-Term Retention Policy
+      dynamic "transition" {
+        for_each = var.lifecycle_category == "long_term" ? [
+          { days = 30, storage_class = "STANDARD_IA" },
+          { days = 180, storage_class = "GLACIER" },
+          { days = 365, storage_class = "DEEP_ARCHIVE" }
+        ] : []
+        content {
+          days          = transition.value.days
+          storage_class = transition.value.storage_class
+        }
       }
     }
   }
 
-  # Dynamic rule for custom expiration rules
-  # - Allows adding additional lifecycle policies dynamically using the `override_expiration_rules` variable.
-  # - Each custom rule is defined with:
-  #   - A unique prefix to filter objects (e.g., "reports/", "dpr/").
-  #   - An expiration time in days for objects under that prefix.
-  # - The `id` for each rule is derived dynamically based on the prefix (slashes `/` are replaced with dashes `-` for compatibility).
-  # - Rules are enabled or disabled based on the `enable_lifecycle_expiration` variable.
+  # Intelligent-Tiering rule (applied if enable_intelligent_tiering is true)
+  rule {
+    id     = "${var.name}-intelligent-tiering"
+    status = var.enable_intelligent_tiering ? "Enabled" : "Disabled"
+
+    filter {
+      # Apply to all objects
+      prefix = ""
+    }
+
+    transition {
+      # Move objects to Intelligent-Tiering storage class
+      days          = 0 # Immediately move to Intelligent-Tiering
+      storage_class = "INTELLIGENT_TIERING"
+    }
+  }
+
+  # Expiration rules
   dynamic "rule" {
     for_each = var.override_expiration_rules
     content {
-      # Generate rule ID without worrying about trailing slashes in the prefix
-      id     = "${var.name}-${rule.value.prefix}"
-      status = var.enable_lifecycle_expiration ? "Enabled" : "Disabled"
+      id     = rule.value.id
+      status = "Enabled"
 
       filter {
-        # Append '/' directly in the filter block to ensure proper prefix format
-        prefix = "${rule.value.prefix}/"
+        prefix = rule.value.prefix
       }
 
       expiration {

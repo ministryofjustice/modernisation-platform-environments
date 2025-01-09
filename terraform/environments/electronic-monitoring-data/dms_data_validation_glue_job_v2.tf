@@ -1,3 +1,22 @@
+resource "aws_glue_security_configuration" "em_glue_security_configuration" {
+  #checkov:skip=CKV_AWS_99
+  name = "em-glue-security-configuration"
+
+  encryption_configuration {
+    cloudwatch_encryption {
+      cloudwatch_encryption_mode = "DISABLED"
+    }
+
+    job_bookmarks_encryption {
+      job_bookmarks_encryption_mode = "DISABLED"
+    }
+
+    s3_encryption {
+      s3_encryption_mode = "DISABLED"
+    }
+  }
+}
+
 resource "aws_s3_object" "aws_s3_object_pyzipfile_to_s3folder" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
   key    = "${var.s3_pylib_dir_path}/glue_data_validation_lib.zip"
@@ -9,7 +28,8 @@ resource "aws_s3_object" "aws_s3_object_pyzipfile_to_s3folder" {
 
 resource "aws_cloudwatch_log_group" "dms_dv_rds_to_s3_parquet_v1" {
   name              = "dms-dv-rds-to-s3-parquet-v1"
-  retention_in_days = 14
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
 resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v1" {
@@ -66,7 +86,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_to_s3_parquet_v1.py"
   }
-
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
   tags = merge(
     local.tags,
     {
@@ -86,7 +106,8 @@ EOF
 
 resource "aws_cloudwatch_log_group" "dms_dv_rds_to_s3_parquet_v2" {
   name              = "dms-dv-rds-to-s3-parquet-v2"
-  retention_in_days = 14
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
 resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v2" {
@@ -143,7 +164,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_to_s3_parquet_v2.py"
   }
-
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
   tags = merge(
     local.tags,
     {
@@ -156,7 +177,8 @@ EOF
 
 resource "aws_cloudwatch_log_group" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
   name              = "etl-rds-to-s3-parquet-partitionby-yyyy-mm"
-  retention_in_days = 14
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
 resource "aws_s3_object" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
@@ -212,6 +234,8 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_to_s3_parquet_partitionby_yyyy_mm.py"
   }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
+
 
   tags = merge(
     local.tags,
@@ -225,7 +249,8 @@ EOF
 
 resource "aws_cloudwatch_log_group" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
   name              = "etl-dv-rds-to-s3-parquet-partitionby-yyyy-mm"
-  retention_in_days = 14
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
 resource "aws_s3_object" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
@@ -293,6 +318,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm.py"
   }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -306,7 +332,8 @@ EOF
 
 resource "aws_cloudwatch_log_group" "parquet_resize_or_partitionby_yyyy_mm_dd" {
   name              = "parquet-resize-or-partitionby-yyyy-mm-dd"
-  retention_in_days = 14
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
 resource "aws_s3_object" "parquet_resize_or_partitionby_yyyy_mm_dd" {
@@ -362,6 +389,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/parquet_resize_or_partitionby_yyyy_mm_dd.py"
   }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -375,7 +403,8 @@ EOF
 
 resource "aws_cloudwatch_log_group" "etl_table_rows_hashvalue_to_parquet" {
   name              = "etl-table-rows-hashvalue-to-parquet"
-  retention_in_days = 14
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
 resource "aws_s3_object" "etl_table_rows_hashvalue_to_parquet" {
@@ -427,6 +456,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_table_rows_hashvalue_to_parquet.py"
   }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -441,7 +471,8 @@ EOF
 
 resource "aws_cloudwatch_log_group" "dms_dv_on_rows_hashvalue" {
   name              = "dms-dv-on-rows-hashvalue"
-  retention_in_days = 14
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
 resource "aws_s3_object" "dms_dv_on_rows_hashvalue" {
@@ -494,6 +525,7 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_on_rows_hashvalue.py"
   }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -506,27 +538,33 @@ EOF
 
 
 
-resource "aws_cloudwatch_log_group" "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm" {
-  name              = "etl-rds-tbl-hash-rows-to-s3-prq-partitionby-yyyy-mm"
-  retention_in_days = 14
+resource "aws_cloudwatch_log_group" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
+  name              = "etl-rds-tbl-rows-hashvalue-to-s3-prq-yyyy-mm"
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
-resource "aws_s3_object" "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm" {
+resource "aws_s3_object" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
   bucket = module.s3-glue-job-script-bucket.bucket.id
-  key    = "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.py"
-  source = "glue-job/etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.py"
-  etag   = filemd5("glue-job/etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.py")
+  key    = "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
+  source = "glue-job/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
+  etag   = filemd5("glue-job/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py")
 }
 
-resource "aws_glue_job" "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm" {
+resource "aws_glue_job" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
   count = local.gluejob_count
 
-  name              = "etl-rds-tbl-hash-rows-to-s3-prq-partitionby-yyyy-mm"
+  name              = "etl-rds-tbl-rows-hashvalue-to-s3-prq-yyyy-mm"
   description       = "Table migration & validation Glue-Job (PySpark)."
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
   glue_version      = "4.0"
   worker_type       = "G.2X"
-  number_of_workers = 4
+  number_of_workers = 2
+
+  execution_property {
+    max_concurrent_runs = 12
+  }
+  
   default_arguments = {
     "--script_bucket_name"                  = module.s3-glue-job-script-bucket.bucket.id
     "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022.endpoint)[0]
@@ -536,17 +574,22 @@ resource "aws_glue_job" "etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm" {
     "--rds_sqlserver_db_table"              = ""
     "--rds_db_tbl_pkey_column"              = ""
     "--date_partition_column_name"          = ""
+    "--pkey_lower_bound_int"                = ""
+    "--pkey_upper_bound_int"                = ""
     "--parallel_jdbc_conn_num"              = 1
     "--rds_yyyy_mm_df_repartition_num"      = 0
     "--year_partition_bool"                 = "true"
     "--month_partition_bool"                = "true"
     "--rds_db_table_hashed_rows_parent_dir" = "rds_tables_rows_hashed"
+    "--incremental_run_bool"                = "false"
     "--rds_query_where_clause"              = ""
+    "--df_where_clause"                     = ""
+    "--skip_columns_for_hashing"            = ""
     "--coalesce_int"                        = 0
     "--extra-py-files"                      = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
     "--hashed_output_s3_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
     "--glue_catalog_db_name"                = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
-    "--continuous-log-logGroup"             = "/aws-glue/jobs/${aws_cloudwatch_log_group.etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.name}"
+    "--continuous-log-logGroup"             = "/aws-glue/jobs/${aws_cloudwatch_log_group.etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.name}"
     "--enable-continuous-cloudwatch-log"    = "true"
     "--enable-continuous-log-filter"        = "true"
     "--enable-metrics"                      = "true"
@@ -563,8 +606,9 @@ EOF
   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
   command {
     python_version  = "3"
-    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_tbl_hash_rows_to_s3_prq_partitionby_yyyy_mm.py"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
   }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,
@@ -577,7 +621,8 @@ EOF
 
 resource "aws_cloudwatch_log_group" "etl_rds_sqlserver_query_to_s3_parquet" {
   name              = "etl-rds-sqlserver-query-to-s3-parquet"
-  retention_in_days = 14
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
 }
 
 resource "aws_s3_object" "etl_rds_sqlserver_query_to_s3_parquet" {
@@ -633,6 +678,182 @@ EOF
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_sqlserver_query_to_s3_parquet.py"
   }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue-Job that processes data sourced from both RDS and S3",
+    }
+  )
+
+}
+
+
+# -------------------------------------------------------------------
+
+resource "aws_glue_catalog_database" "dms_dv_glue_catalog_db" {
+  name = "dms_data_validation"
+  # create_table_default_permission {
+  #   permissions = ["SELECT"]
+
+  #   principal {
+  #     data_lake_principal_identifier = "IAM_ALLOWED_PRINCIPALS"
+  #   }
+  # }
+}
+
+# -------------------------------------------------------------------
+
+resource "aws_cloudwatch_log_group" "create_or_refresh_dv_table" {
+  name              = "create-or-refresh-dv-table"
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+}
+
+
+resource "aws_s3_object" "create_or_refresh_dv_table" {
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "create_or_refresh_dv_table.py"
+  source = "glue-job/create_or_refresh_dv_table.py"
+  etag   = filemd5("glue-job/create_or_refresh_dv_table.py")
+}
+
+resource "aws_glue_job" "create_or_refresh_dv_table" {
+  count = local.gluejob_count
+
+  name              = "create-or-refresh-dv-table"
+  description       = "Python script uses Boto3-Athena-Client to run sql-statements"
+  role_arn          = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.1X"
+  number_of_workers = 2
+  default_arguments = {
+    "--parquet_output_bucket_name"       = module.s3-dms-data-validation-bucket.bucket.id
+    "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_tbl_name"            = "glue_df_output"
+    "--continuous-log-logGroup"          = aws_cloudwatch_log_group.create_or_refresh_dv_table.name
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = ""
+  }
+  command {
+    python_version  = "3"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/create_or_refresh_dv_table.py"
+  }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Py script as glue-job that creates dv table / refreshes its partitions",
+    }
+  )
+
+}
+
+
+resource "aws_kms_key" "cloudwatch_log_group_key" {
+  description = "KMS key for CloudWatch log group encryption"
+  #checkov:skip=CKV_AWS_7
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Id": "key-default-1",
+  "Statement": [
+    {
+      "Sid": "Enable IAM User Permissions",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      },
+      "Action": "kms:*",
+      "Resource": "*"
+    },
+    {
+      "Sid": "Allow CloudWatch Logs use of the key",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "logs.${data.aws_region.current.name}.amazonaws.com"
+      },
+      "Action": [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:DescribeKey"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+EOF
+}
+
+
+
+resource "aws_cloudwatch_log_group" "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm" {
+  name              = "dms-dv-on-rows-hashvalue-partitionby-yyyy-mm"
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+}
+
+resource "aws_s3_object" "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm" {
+  bucket = module.s3-glue-job-script-bucket.bucket.id
+  key    = "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"
+  source = "glue-job/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"
+  etag   = filemd5("glue-job/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py")
+}
+
+resource "aws_glue_job" "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm" {
+  count = local.gluejob_count
+
+  name              = "dms-dv-on-rows-hashvalue-partitionby-yyyy-mm"
+  description       = "Table migration & validation Glue-Job (PySpark)."
+  role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
+  glue_version      = "4.0"
+  worker_type       = "G.2X"
+  number_of_workers = 4
+  default_arguments = {
+    "--script_bucket_name"               = module.s3-glue-job-script-bucket.bucket.id
+    "--rds_db_host_ep"                   = split(":", aws_db_instance.database_2022.endpoint)[0]
+    "--rds_db_pwd"                       = aws_db_instance.database_2022.password
+    "--rds_database_folder"              = ""
+    "--rds_db_schema_folder"             = "dbo"
+    "--rds_table_orignal_name"           = ""
+    "--table_pkey_column"                = ""
+    "--date_partition_column_name"       = ""
+    "--rds_hashed_rows_prq_parent_dir"   = "rds_tables_rows_hashed"
+    "--dms_prq_output_bucket"            = module.s3-dms-target-store-bucket.bucket.id
+    "--dms_prq_table_folder"             = ""
+    "--rds_only_where_clause"            = ""
+    "--prq_df_where_clause"              = ""
+    "--skip_columns_for_hashing"         = ""
+    "--rds_hashed_rows_prq_bucket"       = module.s3-dms-data-validation-bucket.bucket.id
+    "--glue_catalog_dv_bucket"           = module.s3-dms-data-validation-bucket.bucket.id
+    "--glue_catalog_db_name"             = aws_glue_catalog_database.dms_dv_glue_catalog_db.name
+    "--glue_catalog_tbl_name"            = "glue_df_output"
+    "--extra-py-files"                   = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
+    "--continuous-log-logGroup"          = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.name}"
+    "--enable-continuous-cloudwatch-log" = "true"
+    "--enable-continuous-log-filter"     = "true"
+    "--enable-metrics"                   = "true"
+    "--enable-auto-scaling"              = "true"
+    "--conf"                             = <<EOF
+spark.sql.legacy.parquet.datetimeRebaseModeInRead=CORRECTED 
+--conf spark.sql.sources.partitionOverwriteMode=dynamic 
+--conf spark.sql.parquet.aggregatePushdown=true 
+--conf spark.sql.files.maxPartitionBytes=512m 
+EOF
+
+  }
+
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  command {
+    python_version  = "3"
+    script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"
+  }
+  security_configuration = aws_glue_security_configuration.em_glue_security_configuration.name
 
   tags = merge(
     local.tags,

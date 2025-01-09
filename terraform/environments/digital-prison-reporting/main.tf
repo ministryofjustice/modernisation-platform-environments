@@ -340,14 +340,14 @@ module "glue_s3_file_transfer_job" {
 module "glue_switch_prisons_hive_data_location_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-switch-prisons-hive-data-location-${local.env}"
-  short_name                    = "${local.project}-switch-prisons-hive-data-location"
+  name                          = "${local.project}-switch-prisons-data-source-${local.env}"
+  short_name                    = "${local.project}-switch-prisons-data-source"
   command_type                  = "glueetl"
   description                   = "Switch Prisons Hive tables data location.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.prisons.data.switch.target.s3.path: (Required) s3 path to point the prisons data to e.g. s3://dpr-curated-zone-<env>"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-switch-prisons-hive-data-location-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-prisons-hive-data-location-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-switch-prisons-data-source-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-prisons-data-source-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
   enable_continuous_log_filter = false
@@ -365,7 +365,7 @@ module "glue_switch_prisons_hive_data_location_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-switch-prisons-hive-data-location-${local.env}"
+      Name          = "${local.project}-switch-prisons-data-source-${local.env}"
       Resource_Type = "Glue Job"
       Jira          = "DPR2-46"
     }
@@ -850,12 +850,13 @@ module "s3_structured_bucket" {
 
 # S3 Curated
 module "s3_curated_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-curated-zone-${local.env}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
+  source                     = "./modules/s3_bucket"
+  create_s3                  = local.setup_buckets
+  name                       = "${local.project}-curated-zone-${local.env}"
+  custom_kms_key             = local.s3_kms_arn
+  create_notification_queue  = false # For SQS Queue
+  enable_lifecycle           = true
+  enable_intelligent_tiering = false
 
   tags = merge(
     local.all_tags,
@@ -866,7 +867,7 @@ module "s3_curated_bucket" {
   )
 }
 
-# S3 Curated
+# S3 Temp Reload
 module "s3_temp_reload_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
@@ -994,16 +995,17 @@ module "s3_working_bucket" {
   custom_kms_key              = local.s3_kms_arn
   create_notification_queue   = false # For SQS Queue
   enable_lifecycle            = true
-  enable_lifecycle_expiration = true
   lifecycle_category          = "long_term"
 
   override_expiration_rules = [
     {
-      prefix = "reports"
-      days   = 7
+      id = "reports"
+      prefix = "reports/"
+      days   = local.s3_redshift_table_expiry_days
     },
     {
-      prefix = "dpr"
+      id = "dpr"
+      prefix = "dpr/"
       days   = 7
     }
   ]
@@ -1230,7 +1232,7 @@ module "dms_nomis_ingestor" {
   dms_target_name              = "kinesis"
   short_name                   = "nomis"
   migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.7" # Upgrade
+  replication_instance_version = "3.5.2"
   replication_instance_class   = "dms.t3.medium"
   subnet_ids = [
     data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
@@ -1246,10 +1248,6 @@ module "dms_nomis_ingestor" {
     "partition_include_schema_table" = "true"
     "include_partition_value"        = "true"
     "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
-  }
-
-  availability_zones = {
-    0 = "eu-west-2a"
   }
 
   tags = merge(
@@ -1298,10 +1296,6 @@ module "dms_nomis_to_s3_ingestor" {
   extra_attributes = "supportResetlog=TRUE"
 
   bucket_name = module.s3_raw_bucket.bucket_id
-
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
 
   depends_on = [
     module.s3_raw_bucket.bucket_id

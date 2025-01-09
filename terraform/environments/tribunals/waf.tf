@@ -1,7 +1,7 @@
 resource "aws_wafv2_ip_set" "allowed_ip_set" {
-  provider  = aws.us-east-1
-  name      = "allowed-ip-set"
-  scope     = "CLOUDFRONT"
+  provider = aws.us-east-1
+  name     = "allowed-ip-set"
+  scope    = "CLOUDFRONT"
   addresses = [
     "20.26.11.71/32", "20.26.11.108/32", "20.49.214.199/32",
     "20.49.214.228/32", "51.149.249.0/29", "51.149.249.32/29",
@@ -164,56 +164,6 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
     visibility_config {
       cloudwatch_metrics_enabled = true
       metric_name                = "BlockNonAllowedIPsMetrics"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  rule {
-    name     = "BlockCareStandardsAdmin"
-    priority = 1
-
-    action {
-      block {
-        custom_response {
-          response_code            = 403
-          custom_response_body_key = "CustomResponseBodyKey1"
-        }
-      }
-    }
-    statement {
-      or_statement {
-        statement {
-          byte_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            positional_constraint = "CONTAINS"
-            search_string         = "carestandards.decisions.tribunals.gov.uk/admin"
-            text_transformation {
-              priority = 0
-              type     = "LOWERCASE"
-            }
-          }
-        }
-        statement {
-          byte_match_statement {
-            field_to_match {
-              uri_path {}
-            }
-            positional_constraint = "CONTAINS"
-            search_string         = "carestandards.tribunals.hmcts-preproduction.modernisation-platform.service.justice.gov.uk/admin"
-            text_transformation {
-              priority = 0
-              type     = "LOWERCASE"
-            }
-          }
-        }
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "CareStandardsBlockMetrics"
       sampled_requests_enabled   = true
     }
   }

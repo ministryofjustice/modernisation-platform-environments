@@ -17,6 +17,7 @@ NOTES:
 - Use Single-AZ solution for non-production environments to save cost.
 - Multi-AZ can only include 2 availability zones.
 - Set `skip_final_backup true` to avoid issues deleting the resource
+- See <https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/5343248588/AD+setup+for+fsx_windows+shared+drives> for specifics about AD setup and especially terraform values for joining the HMPP domain.
 
 ## Security Groups
 
@@ -71,7 +72,7 @@ This:
 module "fsx_windows1" {
   source = "../../modules/fsx_windows"
 
-   preferred_subnet_id         = data.aws_subnet.private_subnets_a.id
+   preferred_availability_zone = "eu-west-2a"
    deployment_type             = "MULTI_AZ_1"
    name                        = "fsx_windows1"
    security_groups             = [aws_security_group.ec2.id]
