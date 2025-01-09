@@ -13,5 +13,5 @@ resource "aws_route53_record" "db_ec2_instance_public" {
   name     = var.db_type == "primary" ? "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-${var.db_count_index}.${var.account_config.dns_suffix}" : "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-${var.db_count_index + 1}.${var.account_config.dns_suffix}"
   type     = "CNAME"
   ttl      = 60
-  records  = [module.instance.aws.instance.private_ip]
+  records  = [module.instance.aws_instance.private_ip]
 }
