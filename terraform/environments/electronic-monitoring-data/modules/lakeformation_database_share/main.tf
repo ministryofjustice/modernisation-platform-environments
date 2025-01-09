@@ -30,6 +30,36 @@ resource "aws_lakeformation_permissions" "grant_cadt_tables" {
   }
 }
 
+resource "aws_lakeformation_permissions" "s3_bucket_permissions_de" {
+  principal = var.de_role_arn
+
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn = var.data_bucket_lf_resource
+  }
+}
+
+
+resource "aws_lakeformation_permissions" "grant_cadt_databases_de" {
+  for_each    = { for k, v in aws_glue_catalog_database.cadt_databases : k => v.id }
+  principal   = var.de_role_arn
+  permissions = ["ALL"]
+  database {
+    name = each.value
+  }
+}
+
+resource "aws_lakeformation_permissions" "grant_cadt_tables_de" {
+  for_each    = { for k, v in aws_glue_catalog_database.cadt_databases : k => v.id }
+  principal   = var.de_role_arn
+  permissions = ["ALL"]
+  table {
+    database_name = each.value
+    wildcard      = true
+  }
+}
+
 resource "aws_glue_catalog_database" "cadt_databases" {
   for_each = var.dbs_to_grant
 

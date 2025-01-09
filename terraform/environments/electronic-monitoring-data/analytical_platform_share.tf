@@ -435,18 +435,11 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
-module "share_dbs_with_de_role" {
-  count                   = local.is-production ? 1 : 0
-  source                  = "./modules/lakeformation_database_share"
-  dbs_to_grant            = local.dbs_to_grant
-  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  role_arn                = try(one(data.aws_iam_roles.data_engineering_roles.arns))
-}
-
-module "share_dbs_with_cadt_role" {
+module "share_dbs_with_roles" {
   count                   = local.is-production ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 }

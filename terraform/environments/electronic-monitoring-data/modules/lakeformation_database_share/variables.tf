@@ -13,3 +13,8 @@ variable "role_arn" {
   description = "Role to grant permissions to"
   type        = string
 }
+
+variable "de_role_arn" {
+  description = "DE Role to grant permissions to"
+  type        = string
+}
