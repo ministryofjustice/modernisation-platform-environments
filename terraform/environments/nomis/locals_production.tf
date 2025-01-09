@@ -64,8 +64,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-1-a" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -108,8 +111,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-1-b" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -141,8 +147,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-2-a" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -185,8 +194,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-2-b" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
