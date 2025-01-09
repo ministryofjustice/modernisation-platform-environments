@@ -31,6 +31,42 @@ locals {
           }
         }
       }
+      network-in-bandwidth = {
+        type            = "metric"
+        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkIn\"','Sum'),SUM,DESC)"
+        expression_math = "SORT((8*q1)/(1000000*DIFF_TIME(AVG(q1)),SUM,DESC))"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 network-in-bandwidth"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "Mbps"
+            }
+          }
+        }
+      }
+      network-out-bandwidth = {
+        type            = "metric"
+        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkOut\"','Sum'),SUM,DESC)"
+        expression_math = "SORT((8*q1)/(1000000*DIFF_TIME(AVG(q1)),SUM,DESC))"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 network-out-bandwidth"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "Mbps"
+            }
+          }
+        }
+      }
       instance-status-check-failed = {
         type            = "metric"
         alarm_threshold = 1
@@ -58,6 +94,24 @@ locals {
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 system-status-check-failed"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "exitcode"
+            }
+          }
+        }
+      }
+      attached-ebs-status-check-failed = {
+        type            = "metric"
+        alarm_threshold = 1
+        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"StatusCheckFailed_AttachedEBS\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 attached-ebs-status-check-failed"
           stat    = "Maximum"
           yAxis = {
             left = {
@@ -965,8 +1019,11 @@ locals {
       height          = 8
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        local.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+        local.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
         local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
         local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed
       ]
     }
     ec2_windows = {
