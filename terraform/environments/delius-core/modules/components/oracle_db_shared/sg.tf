@@ -47,6 +47,30 @@ resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
   )
 }
 
+resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_legacy_oracle" {
+  security_group_id = aws_security_group.db_ec2.id
+  cidr_ipv4         = var.environment_config.migration_environment_private_cidr
+  from_port         = local.db_port
+  to_port           = local.db_tcps_port
+  ip_protocol       = "tcp"
+  description       = "Allow communication out on port 1521 to legacy"
+  tags = merge(var.tags,
+    { Name = "legacy-oracle-out" }
+  )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_legacy_oracle" {
+  security_group_id = aws_security_group.db_ec2.id
+  cidr_ipv4         = var.environment_config.legacy_engineering_vpc_cidr
+  from_port         = local.db_port
+  to_port           = local.db_tcps_port
+  ip_protocol       = "tcp"
+  description       = "Allow communication in on port 1521 from legacy"
+  tags = merge(var.tags,
+    { Name = "legacy-oracle-in" }
+  )
+}
+
 resource "aws_vpc_security_group_egress_rule" "db_inter_conn" {
   security_group_id            = aws_security_group.db_ec2.id
   description                  = "Allow communication between delius db instances"
