@@ -252,7 +252,8 @@ if __name__ == "__main__":
              prq_rds_table_row_stats_df_agg_updated.write.mode("overwrite").parquet(f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""")
         else:
             rds_table_row_stats_df_agg.write.mode("overwrite").parquet(f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""")
-
+        # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
     # +----+-----+-----------------+-----------------+-------------------+
     # |year|month|min_GPSPositionID|max_GPSPositionID|count_GPSPositionID|
     # +----+-----+-----------------+-----------------+-------------------+
