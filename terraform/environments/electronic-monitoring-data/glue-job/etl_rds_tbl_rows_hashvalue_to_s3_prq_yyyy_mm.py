@@ -61,6 +61,7 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 
 OPTIONAL_INPUTS = [
     "rds_query_where_clause",
+    "df_where_clause",
     "coalesce_int",
     "parallel_jdbc_conn_num",
     "pkey_lower_bound_int",
@@ -370,6 +371,10 @@ if __name__ == "__main__":
         rds_hashed_rows_df = rds_hashed_rows_df.withColumn(
                                 "month", F.month(date_partition_column_name))
     # ----------------------------------------------------------
+
+    df_where_clause = args.get('df_where_clause', None)
+    if df_where_clause is not None:
+        rds_hashed_rows_df = rds_hashed_rows_df.where(f"{df_where_clause}")
 
     if rds_yyyy_mm_df_repartition_num != 0:
         # Note: Default 'partitionby_columns' values may not be appropriate for all the scenarios.

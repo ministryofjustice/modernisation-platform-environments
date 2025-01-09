@@ -559,7 +559,12 @@ resource "aws_glue_job" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
   role_arn          = aws_iam_role.glue_mig_and_val_iam_role.arn
   glue_version      = "4.0"
   worker_type       = "G.2X"
-  number_of_workers = 4
+  number_of_workers = 2
+
+  execution_property {
+    max_concurrent_runs = 12
+  }
+  
   default_arguments = {
     "--script_bucket_name"                  = module.s3-glue-job-script-bucket.bucket.id
     "--rds_db_host_ep"                      = split(":", aws_db_instance.database_2022.endpoint)[0]
@@ -578,6 +583,7 @@ resource "aws_glue_job" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
     "--rds_db_table_hashed_rows_parent_dir" = "rds_tables_rows_hashed"
     "--incremental_run_bool"                = "false"
     "--rds_query_where_clause"              = ""
+    "--df_where_clause"                     = ""
     "--skip_columns_for_hashing"            = ""
     "--coalesce_int"                        = 0
     "--extra-py-files"                      = "s3://${module.s3-glue-job-script-bucket.bucket.id}/${aws_s3_object.aws_s3_object_pyzipfile_to_s3folder.id}"
