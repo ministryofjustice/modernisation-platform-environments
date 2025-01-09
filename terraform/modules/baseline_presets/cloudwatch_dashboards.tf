@@ -34,13 +34,13 @@ locals {
       network-in-bandwidth = {
         type              = "metric"
         expression        = "SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkIn\"','Sum')"
-        expression_math   = "q1/(125000*300)"
+        expression_math   = "SORT(q1/(125000*300),SUM,DESC)"
         expression_period = 300
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "EC2 network-in-bandwidth"
+          title   = "EC2 network-in-5min-average"
           stat    = "Average"
           yAxis = {
             left = {
@@ -53,13 +53,13 @@ locals {
       network-out-bandwidth = {
         type              = "metric"
         expression        = "SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkOut\"','Sum')"
-        expression_math   = "q1/(125000*60)"
-        expression_period = 60
+        expression_math   = "SORT(q1/(125000*300),SUM,DESC)"
+        expression_period = 300
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "EC2 network-out-bandwidth"
+          title   = "EC2 network-out-5min-average"
           stat    = "Average"
           yAxis = {
             left = {
