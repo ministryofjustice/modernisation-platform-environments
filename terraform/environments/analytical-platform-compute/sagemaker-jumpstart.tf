@@ -76,6 +76,8 @@ module "sagemaker_test_endpoint_kms" {
 
 # random lowercase string used for naming
 resource "random_string" "resource_id" {
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
   length  = 8
   lower   = true
   special = false
