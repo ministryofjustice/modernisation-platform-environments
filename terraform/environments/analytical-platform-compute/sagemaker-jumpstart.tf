@@ -268,7 +268,7 @@ locals {
 
 resource "aws_sagemaker_endpoint_configuration" "huggingface_realtime" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.real_time ? 1 : 0
-  name  = "${local.name_prefix}-ep-config-${random_string.resource_id.result}"
+  name  = "${local.name_prefix}-ep-config-${random_string.resource_id[0].result}"
 
   kms_key_arn = module.sagemaker_test_endpoint_kms[0].key_arn
   tags        = local.tags
@@ -285,7 +285,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_realtime" {
 
 resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.asynchronous ? 1 : 0
-  name  = "${local.name_prefix}-ep-config-${random_string.resource_id.result}"
+  name  = "${local.name_prefix}-ep-config-${random_string.resource_id[0].result}"
 
   kms_key_arn = module.sagemaker_test_endpoint_kms[0].key_arn
   tags        = local.tags
@@ -313,7 +313,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
 
 resource "aws_sagemaker_endpoint_configuration" "huggingface_serverless" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.serverless ? 1 : 0
-  name  = "${local.name_prefix}-ep-config-${random_string.resource_id.result}"
+  name  = "${local.name_prefix}-ep-config-${random_string.resource_id[0].result}"
 
   kms_key_arn = module.sagemaker_test_endpoint_kms[0].key_arn
   tags        = local.tags
@@ -351,7 +351,7 @@ locals {
 
 resource "aws_sagemaker_endpoint" "huggingface" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
-  name  = "${local.name_prefix}-ep-${random_string.resource_id.result}"
+  name  = "${local.name_prefix}-ep-${random_string.resource_id[0].result}"
   tags  = local.tags
 
   endpoint_config_name = local.sagemaker_endpoint_config.name
@@ -377,7 +377,7 @@ resource "aws_appautoscaling_target" "sagemaker_target" {
 
 resource "aws_appautoscaling_policy" "sagemaker_policy" {
   count              = local.use_autoscaling
-  name               = "${local.name_prefix}-scaling-target-${random_string.resource_id.result}"
+  name               = "${local.name_prefix}-scaling-target-${random_string.resource_id[0].result}"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.sagemaker_target[0].resource_id
   scalable_dimension = aws_appautoscaling_target.sagemaker_target[0].scalable_dimension
