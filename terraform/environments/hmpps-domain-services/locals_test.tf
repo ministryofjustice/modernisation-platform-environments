@@ -94,7 +94,7 @@ locals {
       })
 
       test-nartclient = merge(local.ec2_autoscaling_groups.jumpserver, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.jumpserver, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.jumpserver.autoscaling_group, {
           desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.jumpserver.config, {
