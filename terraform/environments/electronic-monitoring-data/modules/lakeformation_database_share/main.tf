@@ -12,7 +12,7 @@ resource "aws_lakeformation_permissions" "s3_bucket_permissions" {
 
 
 resource "aws_lakeformation_permissions" "grant_cadt_databases" {
-  for_each    = var.dbs_to_grant
+  for_each    = { for k, v in aws_glue_catalog_database.cadt_databases : k => v.id }
   principal   = var.role_arn
   permissions = ["ALL"]
   database {
@@ -21,11 +21,17 @@ resource "aws_lakeformation_permissions" "grant_cadt_databases" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_tables" {
-  for_each    = var.dbs_to_grant
+  for_each    = { for k, v in aws_glue_catalog_database.cadt_databases : k => v.id }
   principal   = var.role_arn
   permissions = ["ALL"]
   table {
     database_name = each.value
     wildcard      = true
   }
+}
+
+resource "aws_glue_catalog_database" "cadt_databases" {
+  for_each = var.dbs_to_grant
+
+  name = each.value
 }
