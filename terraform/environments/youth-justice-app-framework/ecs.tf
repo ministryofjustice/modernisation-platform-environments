@@ -21,6 +21,21 @@ module "ecs" {
   ec2_desired_capacity = 5
   nameserver           = join(".", [split(".", data.aws_vpc.shared.cidr_block)[0], split(".", data.aws_vpc.shared.cidr_block)[1], "0", "2"]) #eg "10.23.0.2"
 
+  spot_overrides = [
+    {
+      instance_type     = "t3.xlarge"
+      weighted_capacity = "3"
+    },
+    {
+      instance_type     = "m5.large"
+      weighted_capacity = "2"
+    },
+    {
+      instance_type     = "t3.large"
+      weighted_capacity = "1"
+    }
+  ]
+
   #todo should be a ecs specific user instead of root user
   ecs_service_postgres_secret_arn = "arn:aws:secretsmanager:eu-west-2:012345678:secret:rds!cluster-9e616cc2-98fd-4b4a-af98-44b25c088ff8-KPsJBM"
 

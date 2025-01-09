@@ -65,6 +65,18 @@ module "autoscaling" {
     market_type = "spot" #todo change this later, spot temporarily to save money
   }
 
+  # Mixed instances
+  use_mixed_instances_policy = true
+  mixed_instances_policy = {
+    instances_distribution = {
+      on_demand_base_capacity                  = 0
+      on_demand_percentage_above_base_capacity = 10
+      spot_allocation_strategy                 = "capacity-optimized"
+    }
+
+    override = var.spot_overrides
+  }
+
   block_device_mappings = [
     {
       # Root volume

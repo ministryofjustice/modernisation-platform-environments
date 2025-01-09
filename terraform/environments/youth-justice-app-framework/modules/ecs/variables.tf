@@ -255,3 +255,12 @@ variable "ecs_common_security_group_ingress" {
   }))
   default = []
 }
+
+variable "spot_overrides" {
+  description = "A list of spot instance overrides"
+  type = list(object({
+    instance_type     = string
+    weighted_capacity = string
+  }))
+  default = []
+}
