@@ -82,19 +82,3 @@ data "aws_secretsmanager_secret_version" "openmetadata_entra_id_client_id" {
 data "aws_secretsmanager_secret_version" "openmetadata_entra_id_tenant_id" {
   secret_id = "openmetadata/entra-id/tenant-id"
 }
-
-##################################################
-# Data Platform Apps and Tools JML
-##################################################
-
-data "aws_secretsmanager_secret_version" "govuk_notify_api_key" {
-  count = terraform.workspace == "data-platform-apps-and-tools-production" ? 1 : 0
-
-  secret_id = aws_secretsmanager_secret.govuk_notify_api_key[0].id
-}
-
-data "aws_secretsmanager_secret_version" "jml_email" {
-  count = terraform.workspace == "data-platform-apps-and-tools-production" ? 1 : 0
-
-  secret_id = aws_secretsmanager_secret.jml_email[0].id
-}

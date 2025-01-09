@@ -33,17 +33,3 @@ resource "aws_secretsmanager_secret" "github_app_arc_private_key" {
 
   name = "github/arc/private-key"
 }
-
-# Create a new secret in AWS SecretsManager for Gov.UK Notify API key
-resource "aws_secretsmanager_secret" "govuk_notify_api_key" {
-  count = terraform.workspace == "data-platform-apps-and-tools-production" ? 1 : 0
-
-  name = "gov-uk-notify/production/api-key"
-}
-
-# Email secret for Lambda function
-resource "aws_secretsmanager_secret" "jml_email" {
-  count = terraform.workspace == "data-platform-apps-and-tools-production" ? 1 : 0
-
-  name = "jml/email"
-}
