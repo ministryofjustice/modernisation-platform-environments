@@ -228,6 +228,10 @@ if __name__ == "__main__":
                                         f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""", 
                                         CustomPysparkMethods.get_year_month_min_max_count_schema(TABLE_PKEY_COLUMN)
                                         )
+        
+        if prq_df_where_clause is not None:
+            rds_table_row_stats_df_agg = rds_table_row_stats_df_agg.where(f"{prq_df_where_clause}")
+        # -----------------------------------------------------------------------------------------
     else:
         rds_table_row_stats_df_agg = rds_jdbc_conn_obj.get_min_max_count_groupby_yyyy_mm(
                                                         rds_table_orignal_name,
