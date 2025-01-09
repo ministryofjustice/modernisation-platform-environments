@@ -8,7 +8,7 @@ locals {
   suffix            = local.is-production ? "" : "-test"
   prod_dbs_to_grant = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"] : []
   dev_dbs_to_grant  = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
-  dbs_to_grant      = flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant])
+  dbs_to_grant      = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant]))
 }
 
 # Source Analytics DBT Secrets
@@ -438,7 +438,7 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 module "share_dbs_with_de_role" {
   count                   = local.is-production ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
-  dbs_to_grant            = toset([for name, db in aws_glue_catalog_database.cadt_databases : db.id])
+  dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = try(one(data.aws_iam_roles.data_engineering_roles.arns))
   depends_on              = [aws_glue_catalog_database.cadt_databases]
@@ -447,14 +447,8 @@ module "share_dbs_with_de_role" {
 module "share_dbs_with_cadt_role" {
   count                   = local.is-production ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
-  dbs_to_grant            = toset([for name, db in aws_glue_catalog_database.cadt_databases : db.id])
+  dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
   depends_on              = [aws_glue_catalog_database.cadt_databases]
-}
-
-resource "aws_glue_catalog_database" "cadt_databases" {
-  for_each = toset(local.dbs_to_grant)
-
-  name = each.value
 }
