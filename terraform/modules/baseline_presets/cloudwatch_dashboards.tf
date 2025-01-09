@@ -32,15 +32,16 @@ locals {
         }
       }
       network-in-bandwidth = {
-        type            = "metric"
-        expression      = "SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkIn\"','Sum')"
-        expression_math = "(8*q1)/(1000000*DIFF_TIME(IF(AVG(q1) == 0,1,AVG(q1))))"
+        type              = "metric"
+        expression        = "SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkIn\"','Sum')"
+        expression_math   = "q1/(125000*300)"
+        expression_period = 300
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 network-in-bandwidth"
-          stat    = "Sum"
+          stat    = "Average"
           yAxis = {
             left = {
               showUnits = false,
@@ -50,15 +51,16 @@ locals {
         }
       }
       network-out-bandwidth = {
-        type            = "metric"
-        expression      = "SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkOut\"','Sum')"
-        expression_math = "(8*q1)/(1000000*DIFF_TIME(AVG(q1)))"
+        type              = "metric"
+        expression        = "SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkOut\"','Sum')"
+        expression_math   = "q1/(125000*60)"
+        expression_period = 60
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 network-out-bandwidth"
-          stat    = "Sum"
+          stat    = "Average"
           yAxis = {
             left = {
               showUnits = false,

@@ -102,17 +102,27 @@ locals {
         widget.properties,
         lookup(widget, "expression", null) == null ? {} : {
           metrics = concat(
-            [[{
-              expression = lookup(widget, "search_filter", null) == null ? widget.expression : replace(widget.expression, "MetricName=", "${widget.search_filter} MetricName=")
-              label      = ""
-              id         = "q1"
-              visible    = lookup(widget, "expression_math", null) == null ? true : false
-            }]],
-            lookup(widget, "expression_math", null) == null ? [] : [[{
-              expression = widget.expression_math
-              label      = ""
-              id         = "m1"
-            }]]
+            [[merge(
+              {
+                expression = lookup(widget, "search_filter", null) == null ? widget.expression : replace(widget.expression, "MetricName=", "${widget.search_filter} MetricName=")
+                label      = ""
+                id         = "q1"
+                visible    = lookup(widget, "expression_math", null) == null ? true : false
+              },
+              lookup(widget, "expression_period", null) == null ? {} : {
+                period = widget.expression_period
+              }
+            )]],
+            lookup(widget, "expression_math", null) == null ? [] : [[merge(
+              {
+                expression = widget.expression_math
+                label      = ""
+                id         = "m1"
+              },
+              lookup(widget, "expression_period", null) == null ? {} : {
+                period = widget.expression_period
+              }
+            )]]
           )
         },
         lookup(widget, "alarm_threshold", null) == null ? {} : {
