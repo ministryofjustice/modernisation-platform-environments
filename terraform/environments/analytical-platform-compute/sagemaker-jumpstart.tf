@@ -357,7 +357,7 @@ resource "aws_sagemaker_endpoint" "huggingface" {
 # ----------------
 
 resource "aws_appautoscaling_target" "sagemaker_target" {
-  count              = terraform.workspace == "analytical-platform-compute-development"
+  count              = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
   min_capacity       = local.autoscaling.min_capacity
   max_capacity       = local.autoscaling.max_capacity
   resource_id        = "endpoint/${aws_sagemaker_endpoint.huggingface[0].name}/variant/AllTraffic"
