@@ -256,11 +256,6 @@ resource "aws_sagemaker_model" "model_with_hub_model" { # mxbai_rerank_xsmall_mo
   }
 }
 
-locals {
-  # sagemaker_model = local.model_data != null && local.hf_model_id == null ? aws_sagemaker_model.model_with_model_artifact[0] : aws_sagemaker_model.model_with_hub_model[0]
-  sagemaker_model = aws_sagemaker_model.model_with_hub_model[0]
-}
-
 ###
 # ----------------
 # SageMaker Endpoint configuration
@@ -276,7 +271,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_realtime" {
 
   production_variants {
     variant_name           = "AllTraffic"
-    model_name             = local.sagemaker_model.name
+    model_name             = aws_sagemaker_model.model_with_hub_model[0].name
     initial_instance_count = local.instance_count
     instance_type          = local.instance_type
   }
@@ -293,7 +288,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
 
   production_variants {
     variant_name           = "AllTraffic"
-    model_name             = local.sagemaker_model.name
+    model_name             = aws_sagemaker_model.model_with_hub_model[0].name
     initial_instance_count = local.instance_count
     instance_type          = local.instance_type
   }
@@ -321,7 +316,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_serverless" {
 
   production_variants {
     variant_name = "AllTraffic"
-    model_name   = local.sagemaker_model.name
+    model_name   = aws_sagemaker_model.model_with_hub_model[0].name
 
     serverless_config {
       max_concurrency   = local.serverless_config.max_concurrency
@@ -361,13 +356,8 @@ resource "aws_sagemaker_endpoint" "huggingface" {
 # AutoScaling configuration
 # ----------------
 
-
-locals {
-  use_autoscaling = terraform.workspace == "analytical-platform-compute-development" && local.autoscaling.max_capacity != null && local.autoscaling.scaling_target_invocations != null && !local.sagemaker_endpoint_type.serverless ? 1 : 0
-}
-
 resource "aws_appautoscaling_target" "sagemaker_target" {
-  count              = local.use_autoscaling
+  count              = terraform.workspace == "analytical-platform-compute-development"
   min_capacity       = local.autoscaling.min_capacity
   max_capacity       = local.autoscaling.max_capacity
   resource_id        = "endpoint/${aws_sagemaker_endpoint.huggingface[0].name}/variant/AllTraffic"
@@ -376,7 +366,7 @@ resource "aws_appautoscaling_target" "sagemaker_target" {
 }
 
 resource "aws_appautoscaling_policy" "sagemaker_policy" {
-  count              = local.use_autoscaling
+  count              = terraform.workspace == "analytical-platform-compute-development"
   name               = "${local.name_prefix}-scaling-target-${random_string.resource_id[0].result}"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.sagemaker_target[0].resource_id
