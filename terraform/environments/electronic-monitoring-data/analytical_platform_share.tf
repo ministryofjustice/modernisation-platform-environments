@@ -393,7 +393,7 @@ resource "aws_iam_role" "analytical_platform_share_role" {
         Effect = "Allow"
         Principal = {
           # In case consumer has a central location for terraform state storage that isn't the target account.
-          AWS = "arn:aws:iam::${try(each.value.assume_account_id, each.value.target_account_id)}:root"
+          AWS = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-engineering-sandboxa"]}:root"
         }
         Action = "sts:AssumeRole"
       }
