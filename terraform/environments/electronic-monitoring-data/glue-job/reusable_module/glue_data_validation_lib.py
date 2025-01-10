@@ -847,7 +847,7 @@ class CustomPysparkMethods:
                 T.StructField("month", T.IntegerType(), False),
                 T.StructField(f"min_{in_pkey_column_str}", T.LongType(), False),
                 T.StructField(f"max_{in_pkey_column_str}", T.LongType(), False),
-                T.StructField(f"count_{in_pkey_column_str}", T.IntegerType(), False)]
+                T.StructField(f"count_{in_pkey_column_str}", T.LongType(), False)]
                 )
         return agg_schema
 
