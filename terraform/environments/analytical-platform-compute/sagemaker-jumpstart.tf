@@ -54,25 +54,6 @@ locals {
 
 }
 
-
-module "sagemaker_test_endpoint_kms" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  count   = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
-  source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.1"
-
-  aliases               = ["sagemaker/test_endpoint"]
-  description           = "Sagemaker Jumpstart test endpoint KMS key"
-  enable_default_policy = true
-
-  deletion_window_in_days = 7
-
-  tags = local.tags
-}
-
-
 # random lowercase string used for naming
 resource "random_string" "resource_id" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
@@ -261,28 +242,10 @@ resource "aws_sagemaker_model" "model_with_hub_model" { # mxbai_rerank_xsmall_mo
 # SageMaker Endpoint configuration
 # ----------------
 
-resource "aws_sagemaker_endpoint_configuration" "huggingface_realtime" {
-  count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.real_time ? 1 : 0
-  name  = "${local.name_prefix}-ep-config-${random_string.resource_id[0].result}"
-
-  kms_key_arn = module.sagemaker_test_endpoint_kms[0].key_arn
-  tags        = local.tags
-
-
-  production_variants {
-    variant_name           = "AllTraffic"
-    model_name             = aws_sagemaker_model.model_with_hub_model[0].name
-    initial_instance_count = local.instance_count
-    instance_type          = local.instance_type
-  }
-}
-
-
 resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.asynchronous ? 1 : 0
   name  = "${local.name_prefix}-ep-config-${random_string.resource_id[0].result}"
 
-  kms_key_arn = module.sagemaker_test_endpoint_kms[0].key_arn
   tags        = local.tags
 
 
@@ -296,47 +259,12 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
     output_config {
       s3_output_path  = local.async_config.s3_output_path
       s3_failure_path = local.async_config.s3_failure_path
-      kms_key_id      = module.sagemaker_test_endpoint_kms[0].key_arn
       notification_config {
         error_topic   = local.async_config.sns_error_topic
         success_topic = local.async_config.sns_success_topic
       }
     }
   }
-}
-
-
-resource "aws_sagemaker_endpoint_configuration" "huggingface_serverless" {
-  count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.serverless ? 1 : 0
-  name  = "${local.name_prefix}-ep-config-${random_string.resource_id[0].result}"
-
-  kms_key_arn = module.sagemaker_test_endpoint_kms[0].key_arn
-  tags        = local.tags
-
-
-  production_variants {
-    variant_name = "AllTraffic"
-    model_name   = aws_sagemaker_model.model_with_hub_model[0].name
-
-    serverless_config {
-      max_concurrency   = local.serverless_config.max_concurrency
-      memory_size_in_mb = local.serverless_config.memory_size_in_mb
-    }
-  }
-}
-
-
-locals {
-  sagemaker_endpoint_config = (
-    local.sagemaker_endpoint_type.real_time ?
-    aws_sagemaker_endpoint_configuration.huggingface_realtime[0] : (
-      local.sagemaker_endpoint_type.asynchronous ?
-      aws_sagemaker_endpoint_configuration.huggingface_async[0] : (
-        local.sagemaker_endpoint_type.serverless ?
-        aws_sagemaker_endpoint_configuration.huggingface_serverless[0] : null
-      )
-    )
-  )
 }
 
 # ----------------
