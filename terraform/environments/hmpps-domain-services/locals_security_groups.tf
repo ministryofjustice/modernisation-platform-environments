@@ -65,7 +65,7 @@ locals {
           to_port     = 80
           protocol    = "TCP"
           security_groups = [
-            "public-lb",
+            "public-lb", "public-lb-2"
           ]
         }
         http-from-euc = {
