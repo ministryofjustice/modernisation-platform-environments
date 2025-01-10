@@ -33,23 +33,19 @@ locals {
     scale_in_cooldown          = 300
     scale_out_cooldown         = 66
   }
-  framework_version = local.pytorch_version != null ? local.pytorch_version : local.tensorflow_version
-  repository_name   = local.pytorch_version != null ? "huggingface-pytorch-inference" : "huggingface-tensorflow-inference"
-  device            = length(regexall("^ml\\.[g|p{1,3}\\.$]", local.instance_type)) > 0 ? "gpu" : "cpu"
+  framework_version = local.pytorch_version
+  repository_name   = "huggingface-pytorch-inference"
+  device            = "gpu"
   image_key         = "${local.framework_version}-${local.device}"
   pytorch_image_tag = {
     "2.0.0-cpu" = "2.0.0-transformers${local.transformers_version}-cpu-py310-ubuntu20.04"
     "2.0.0-gpu" = "2.0.0-transformers${local.transformers_version}-gpu-py310-cu118-ubuntu20.04"
     "2.1.0-gpu" = "2.1.0-transformers${local.transformers_version}-gpu-py310-cu118-ubuntu20.04"
   }
-  tensorflow_image_tag = {
-    "2.5.1-gpu" = "2.5.1-transformers${local.transformers_version}-gpu-py36-cu111-ubuntu18.04"
-    "2.5.1-cpu" = "2.5.1-transformers${local.transformers_version}-cpu-py36-ubuntu18.04"
-  }
   sagemaker_endpoint_type = {
-    real_time    = (local.async_config.s3_output_path == null && local.serverless_config.max_concurrency == null) ? true : false
-    asynchronous = (local.async_config.s3_output_path != null && local.serverless_config.max_concurrency == null) ? true : false
-    serverless   = (local.async_config.s3_output_path == null && local.serverless_config.max_concurrency != null) ? true : false
+    real_time    = false
+    asynchronous = true
+    serverless   = false
   }
 
 }
@@ -70,7 +66,7 @@ resource "random_string" "resource_id" {
 # ----------------
 data "aws_sagemaker_prebuilt_ecr_image" "huggingface_image" {
   repository_name = local.repository_name
-  image_tag       = local.pytorch_version != null ? local.pytorch_image_tag[local.image_key] : local.tensorflow_image_tag[local.image_key]
+  image_tag       = local.pytorch_image_tag[local.image_key]
 }
 
 # ----------------
@@ -246,7 +242,7 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
   count = terraform.workspace == "analytical-platform-compute-development" && local.sagemaker_endpoint_type.asynchronous ? 1 : 0
   name  = "${local.name_prefix}-ep-config-${random_string.resource_id[0].result}"
 
-  tags        = local.tags
+  tags = local.tags
 
 
   production_variants {
@@ -259,10 +255,10 @@ resource "aws_sagemaker_endpoint_configuration" "huggingface_async" {
     output_config {
       s3_output_path  = local.async_config.s3_output_path
       s3_failure_path = local.async_config.s3_failure_path
-      notification_config {
-        error_topic   = local.async_config.sns_error_topic
-        success_topic = local.async_config.sns_success_topic
-      }
+      # notification_config {
+      #   error_topic   = local.async_config.sns_error_topic
+      #   success_topic = local.async_config.sns_success_topic
+      # }
     }
   }
 }
