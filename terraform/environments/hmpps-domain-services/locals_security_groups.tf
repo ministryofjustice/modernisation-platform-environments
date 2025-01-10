@@ -33,7 +33,7 @@ locals {
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     ])
     enduserclient_public2 = flatten([
-      module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
+      module.ip_addresses.mp_cidrs.live_eu_west_nat,
     ])
     rd_session_hosts = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
