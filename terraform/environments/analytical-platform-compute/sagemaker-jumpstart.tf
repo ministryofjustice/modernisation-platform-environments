@@ -366,7 +366,7 @@ resource "aws_appautoscaling_target" "sagemaker_target" {
 }
 
 resource "aws_appautoscaling_policy" "sagemaker_policy" {
-  count              = terraform.workspace == "analytical-platform-compute-development"
+  count              = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
   name               = "${local.name_prefix}-scaling-target-${random_string.resource_id[0].result}"
   policy_type        = "TargetTrackingScaling"
   resource_id        = aws_appautoscaling_target.sagemaker_target[0].resource_id
