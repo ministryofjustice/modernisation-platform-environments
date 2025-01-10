@@ -21,7 +21,7 @@ locals {
     max_concurrency   = null
     memory_size_in_mb = null
   }
-  hf_model_id              = "mixedbread-ai/mxbai-rerank-xsmall-v1"
+  hf_model_id              = "meta-llama/Llama-3.2-1B"
   hf_api_token             = null
   hf_model_revision        = null
   model_data               = null
