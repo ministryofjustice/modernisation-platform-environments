@@ -277,7 +277,7 @@ resource "aws_sagemaker_endpoint" "huggingface" {
   name  = "${local.name_prefix}-ep-${random_string.resource_id[0].result}"
   tags  = local.tags
 
-  endpoint_config_name = local.sagemaker_endpoint_config.name
+  endpoint_config_name = aws_sagemaker_endpoint_configuration.huggingface_async[0].name
 }
 
 # ----------------
