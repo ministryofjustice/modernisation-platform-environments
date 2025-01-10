@@ -18,8 +18,9 @@ resource "aws_sns_topic_subscription" "cw_subscription" {
   #  endpoint  = aws_secretsmanager_secret_version.support_email_account[0].secret_string
 }
 
-# SMS topic subscriptions to be implemented temporarily over the Christmas period
+# SMS topic subscriptions to be implemented temporarily over the Christmas period or during other periods of low staffing.
 
+/*
 resource "aws_sns_topic_subscription" "cw_sms_subscription" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_alerts[0].arn
@@ -27,14 +28,6 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription" {
   endpoint  = "+447903642202" # Nick Buckingham
 }
 
-resource "aws_sns_topic_subscription" "cw_email_subscription" {
-  count     = local.is-production == true ? 1 : 0
-  topic_arn = aws_sns_topic.cw_alerts[0].arn
-  protocol  = "email"
-  endpoint  = "nbuckingham@gmail.com"
-}
-
-/*
 resource "aws_sns_topic_subscription" "cw_sms_subscription1" {
   count     = local.is-production == true ? 1 : 0
   topic_arn = aws_sns_topic.cw_alerts[0].arn

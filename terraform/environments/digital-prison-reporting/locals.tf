@@ -225,7 +225,7 @@ locals {
   lambda_redshift_table_expiry_tracing        = "Active"
   lambda_redshift_table_expiry_handler        = "uk.gov.justice.digital.lambda.RedShiftTableExpiryLambda::handleRequest"
   lambda_redshift_table_expiry_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  lambda_redshift_table_expiry_jar_version    = "v0.0.14"
+  lambda_redshift_table_expiry_jar_version    = "v0.0.18"
   lambda_redshift_table_expiry_code_s3_key = (
     local.env == "production" || local.env == "preproduction"
     ? "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}.rel-all.jar"
@@ -240,9 +240,11 @@ locals {
   lambda_redshift_table_expiry_cluster_id          = module.datamart.cluster_id
   lambda_redshift_table_expiry_database_name       = module.datamart.cluster_database_name
   lambda_redshift_table_expiry_schedule_expression = "rate(1 hour)"
-  lambda_redshift_table_expiry_seconds             = local.application_data.accounts[local.environment].redshift_table_expiry_seconds
+  lambda_redshift_table_expiry_seconds             = (local.application_data.accounts[local.environment].redshift_table_expiry_days * 86400)
   lambda_redshift_table_expiry_timeout_seconds     = 900
   lambda_redshift_table_expiry_memory_size         = 1024
+
+  s3_redshift_table_expiry_days                    = local.application_data.accounts[local.environment].redshift_table_expiry_days + 1
 
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 

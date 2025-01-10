@@ -1,13 +1,13 @@
 resource "aws_iam_policy" "cica_extraction_policy" {
   name        = "AuthenticatedCicaExtractionPolicy"
   description = "Policy for Cica Bedrock model access and Textract"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Sid      = "AuthenticatedCicaExtractionPolicy",
-        Effect   = "Allow",
-        Action   = [
+        Sid    = "AuthenticatedCicaExtractionPolicy",
+        Effect = "Allow",
+        Action = [
           "bedrock:InvokeModel",
           "bedrock:Get*",
           "bedrock:List*"
@@ -22,9 +22,9 @@ resource "aws_iam_policy" "cica_extraction_policy" {
         ]
       },
       {
-        Sid      = "TextractPolicy",
-        Effect   = "Allow",
-        Action   = [
+        Sid    = "TextractPolicy",
+        Effect = "Allow",
+        Action = [
           "textract:AnalyzeDocument",
           "textract:GetDocumentAnalysis",
           "textract:GetDocumentTextDetection",
@@ -38,7 +38,7 @@ resource "aws_iam_policy" "cica_extraction_policy" {
 }
 
 resource "aws_iam_role" "cica_extraction_role" {
-  name               = "CicaExtractionServicesRole"
+  name = "CicaExtractionServicesRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [

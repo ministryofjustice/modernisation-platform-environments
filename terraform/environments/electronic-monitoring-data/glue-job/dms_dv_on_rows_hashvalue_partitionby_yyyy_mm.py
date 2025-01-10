@@ -5,6 +5,8 @@ import sys
 # from logging import getLogger
 # import pandas as pd
 
+from itertools import chain
+
 from glue_data_validation_lib import SparkSession
 from glue_data_validation_lib import S3Methods
 from glue_data_validation_lib import CustomPysparkMethods
@@ -61,7 +63,8 @@ DEFAULT_INPUTS_LIST = ["JOB_NAME",
 OPTIONAL_INPUTS = [
     "rds_only_where_clause",
     "prq_df_where_clause",
-    "skip_columns_for_hashing"
+    "skip_columns_for_hashing",
+    "read_rds_tbl_agg_stats_from_parquet"
 ]
 
 AVAILABLE_ARGS_LIST = CustomPysparkMethods.resolve_args(DEFAULT_INPUTS_LIST+OPTIONAL_INPUTS)
@@ -214,12 +217,47 @@ if __name__ == "__main__":
     LOGGER.info(f"""TABLE_PKEY_COLUMN = {TABLE_PKEY_COLUMN}""")
     LOGGER.info(f"""DATE_PARTITION_COLUMN_NAME = {DATE_PARTITION_COLUMN_NAME}""")
 
+    group_by_cols_list = ['year', 'month']
+    prq_df_where_clause = args.get("prq_df_where_clause", None)
+
     # EVALUATE RDS-DATAFRAME ROW-COUNT
-    rds_table_row_stats_df_agg = rds_jdbc_conn_obj.get_min_max_count_groupby_yyyy_mm(
-                                                    rds_table_orignal_name,
-                                                    DATE_PARTITION_COLUMN_NAME,
-                                                    TABLE_PKEY_COLUMN,
-                                                    args.get("rds_only_where_clause", None))
+    read_rds_tbl_agg_stats_from_parquet = args.get("read_rds_tbl_agg_stats_from_parquet", None)
+
+    if read_rds_tbl_agg_stats_from_parquet == 'true':
+        rds_table_row_stats_df_agg = CustomPysparkMethods.get_s3_parquet_df_v2(
+                                        f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""", 
+                                        CustomPysparkMethods.get_year_month_min_max_count_schema(TABLE_PKEY_COLUMN)
+                                        )
+        
+        if prq_df_where_clause is not None:
+            rds_table_row_stats_df_agg = rds_table_row_stats_df_agg.where(f"{prq_df_where_clause}")
+        # -----------------------------------------------------------------------------------------
+    else:
+        rds_table_row_stats_df_agg = rds_jdbc_conn_obj.get_min_max_count_groupby_yyyy_mm(
+                                                        rds_table_orignal_name,
+                                                        DATE_PARTITION_COLUMN_NAME,
+                                                        TABLE_PKEY_COLUMN,
+                                                        args.get("rds_only_where_clause", None))
+        
+        if S3Methods.check_s3_folder_path_if_exists(RDS_HASHED_ROWS_PRQ_BUCKET, 
+                                                    f"{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg"):
+             prq_rds_table_row_stats_df_agg = CustomPysparkMethods.get_s3_parquet_df_v2(
+                                                f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""", 
+                                                rds_table_row_stats_df_agg.schema
+                                                )
+             prq_rds_table_row_stats_df_agg_updated = CustomPysparkMethods.update_df1_with_df2(prq_rds_table_row_stats_df_agg,
+                                                                            rds_table_row_stats_df_agg,
+                                                                            group_by_cols_list,
+                                                                            [e.name 
+                                                                                for e in rds_table_row_stats_df_agg.schema.fields
+                                                                                    if e.name not in group_by_cols_list
+                                                                            ]
+                                                      )
+             prq_rds_table_row_stats_df_agg_updated.write.mode("overwrite").parquet(f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""")
+        else:
+            rds_table_row_stats_df_agg.write.mode("overwrite").parquet(f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""")
+        # --------------------------------------------------------------------
+    # --------------------------------------------------------------------
     # +----+-----+-----------------+-----------------+-------------------+
     # |year|month|min_GPSPositionID|max_GPSPositionID|count_GPSPositionID|
     # +----+-----+-----------------+-----------------+-------------------+
@@ -257,25 +295,24 @@ if __name__ == "__main__":
         LOGGER.warn(f"""WARNING ! >> skipped_struct_fields_list = {skipped_struct_fields_list}""")
         skipped_cols_condition_list = [f"(L.{col} != R.{col})" 
                                        for col in skip_columns_for_hashing]
-        skipped_cols_alias = [f"L.{col} as rds_{col}, R.{col} as dms_{col}"
-                              for col in skip_columns_for_hashing]
-
-
-    group_by_cols_list = ['year', 'month']
-    prq_df_where_clause = args.get("prq_df_where_clause", None)
+        skipped_cols_alias = list(
+                                chain.from_iterable((f'L.{col} as rds_{col}', f'R.{col} as dms_{col}')
+                                for col in skip_columns_for_hashing)
+                                )
 
 
     if skipped_struct_fields_list:
         rds_hashed_rows_prq_df = CustomPysparkMethods.get_s3_parquet_df_v2(
                                     rds_hashed_rows_fulls3path, 
                                     CustomPysparkMethods.get_pyspark_hashed_table_schema(
-                                    TABLE_PKEY_COLUMN, skipped_struct_fields_list)
+                                                            TABLE_PKEY_COLUMN, 
+                                                            skipped_struct_fields_list)
                                     )
     else:
         rds_hashed_rows_prq_df = CustomPysparkMethods.get_s3_parquet_df_v2(
                                     rds_hashed_rows_fulls3path, 
                                     CustomPysparkMethods.get_pyspark_hashed_table_schema(
-                                    TABLE_PKEY_COLUMN)
+                                                            TABLE_PKEY_COLUMN)
                                     )
     
     if prq_df_where_clause is not None:
@@ -360,13 +397,19 @@ if __name__ == "__main__":
 
 
     all_columns_except_pkey = [col for col in rds_db_table_empty_df.columns 
-                               if col != TABLE_PKEY_COLUMN \
-                                or (col not in skip_columns_for_hashing)]
+                               if col != TABLE_PKEY_COLUMN and (col not in skip_columns_for_hashing)]
     LOGGER.info(f""">> all_columns_except_pkey = {all_columns_except_pkey} <<""")
 
-    dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
-                                    "RowHash", F.sha2(F.concat_ws("", *all_columns_except_pkey), 256))\
-                                    .select('year', 'month', f'{TABLE_PKEY_COLUMN}', 'RowHash')
+    if skip_columns_for_hashing:
+        dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
+                                        "RowHash", F.sha2(F.concat_ws("", *all_columns_except_pkey), 256))\
+                                        .select('year', 'month', TABLE_PKEY_COLUMN, 
+                                                *skip_columns_for_hashing,
+                                                'RowHash')
+    else:    
+        dms_hashed_rows_prq_df_t1 = migrated_prq_yyyy_mm_df.withColumn(
+                                        "RowHash", F.sha2(F.concat_ws("", *all_columns_except_pkey), 256))\
+                                        .select('year', 'month', f'{TABLE_PKEY_COLUMN}', 'RowHash')
     
     
     unmatched_condition_str = """(L.RowHash != R.RowHash) or (R.RowHash is null)"""
@@ -393,9 +436,10 @@ if __name__ == "__main__":
         if skipped_cols_alias:
             unmatched_hashvalues_df_select = unmatched_hashvalues_df.selectExpr(
                                         f"L.{TABLE_PKEY_COLUMN} as {TABLE_PKEY_COLUMN}", 
-                                        f"{', '.join(skipped_cols_alias)}",
+                                        *skipped_cols_alias,
                                         "L.RowHash as rds_row_hash", 
-                                        "R.RowHash as dms_output_row_hash"
+                                        "R.RowHash as dms_output_row_hash",
+                                        "L.year as year", "L.month as month"
                                     ).limit(10)
         else:
             unmatched_hashvalues_df_select = unmatched_hashvalues_df.selectExpr(

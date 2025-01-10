@@ -98,7 +98,6 @@ locals {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
         })
-        cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pp"
           domain-name                          = "azure.hmpp.root"

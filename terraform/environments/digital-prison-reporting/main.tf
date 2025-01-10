@@ -995,16 +995,17 @@ module "s3_working_bucket" {
   custom_kms_key              = local.s3_kms_arn
   create_notification_queue   = false # For SQS Queue
   enable_lifecycle            = true
-  enable_lifecycle_expiration = true
   lifecycle_category          = "long_term"
 
   override_expiration_rules = [
     {
-      prefix = "reports"
-      days   = 7
+      id = "reports"
+      prefix = "reports/"
+      days   = local.s3_redshift_table_expiry_days
     },
     {
-      prefix = "dpr"
+      id = "dpr"
+      prefix = "dpr/"
       days   = 7
     }
   ]
