@@ -1,27 +1,11 @@
 # This ECR is used to store the image built by in https://github.com/ministryofjustice/analytical-platform-jml-report/releases
 
-module "jml-ecr" {
+module "jml_ecr" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   source = "terraform-aws-modules/ecr/aws"
    version = "2.3.0"
 
-  repository_name = "jml-report-ecr"
-
-  # repository_lambda_read_access_arns = []
-  repository_lifecycle_policy = jsonencode({
-    rules = [
-      {
-        rulePriority = 1,
-        description  = "Keep last 10 images",
-        selection = {
-          tagStatus     = "tagged",
-          tagPrefixList = ["v"],
-          countType     = "imageCountMoreThan",
-          countNumber   = 10
-        },
-        action = {
-          type = "expire"
-        }
-      }
-    ]
-  })
+  repository_name = "analytical-platform-jml-report"
 }
