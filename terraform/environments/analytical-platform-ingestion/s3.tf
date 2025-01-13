@@ -2,7 +2,7 @@ module "landing_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.1.2"
+  version = "4.3.0"
 
   bucket = "mojap-ingestion-${local.environment}-landing"
 
@@ -43,7 +43,7 @@ module "quarantine_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.1.2"
+  version = "4.3.0"
 
   bucket = "mojap-ingestion-${local.environment}-quarantine"
 
@@ -77,7 +77,7 @@ module "definitions_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.1.2"
+  version = "4.3.0"
 
   bucket = "mojap-ingestion-${local.environment}-definitions"
 
@@ -97,7 +97,7 @@ module "processed_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.1.2"
+  version = "4.3.0"
 
   bucket = "mojap-ingestion-${local.environment}-processed"
 
@@ -138,7 +138,7 @@ module "bold_egress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.1.2"
+  version = "4.3.0"
 
   bucket = "mojap-ingestion-${local.environment}-bold-egress"
 
@@ -161,13 +161,38 @@ module "bold_egress_bucket" {
   }
 }
 
-module "datasync_opg_investigations_bucket" {
+module "datasync_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.1.2"
+  version = "4.3.0"
 
-  bucket = "mojap-ingestion-${local.environment}-datasync-opg-investigations"
+  bucket = "mojap-ingestion-${local.environment}-datasync"
+
+  force_destroy = true
+
+  versioning = {
+    enabled = true
+  }
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.s3_datasync_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+}
+
+
+module "datasync_opg_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.3.0"
+
+  bucket = "mojap-ingestion-${local.environment}-datasync-opg"
 
   force_destroy = true
 
