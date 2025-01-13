@@ -5,6 +5,8 @@ locals {
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-var-log-messages"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-var-log-secure"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-system"] : [],
+    var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-application"] : [],
+    var.options.enable_ec2_cloud_watch_agent ? ["cwagent-windows-security"] : [],  
   ])
 
   cloudwatch_log_groups = {
