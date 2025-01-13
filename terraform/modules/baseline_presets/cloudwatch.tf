@@ -20,5 +20,11 @@ locals {
     cwagent-windows-system = {
       retention_in_days = var.options.cloudwatch_log_groups_retention_in_days
     }
+    cwagent-windows-application = {
+      retention_in_days = var.options.cloudwatch_log_groups_retention_in_days
+    }
+    cwagent-windows-security = {
+      retention_in_days = var.options.cloudwatch_log_groups_retention_in_days
+    }
   }
 }
