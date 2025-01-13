@@ -27,4 +27,5 @@ module "jml_ecr" {
   })
 
   tags = local.tags
+
 }
