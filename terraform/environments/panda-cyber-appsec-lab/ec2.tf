@@ -73,7 +73,7 @@ resource "aws_instance" "defect_dojo" {
   associate_public_ip_address = true
   instance_type               = "t2.large"
   subnet_id                   = module.vpc.private_subnets.0
-  vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]
+  vpc_security_group_ids      = [aws_security_group.defect_dojo_sg]
   iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
   ebs_optimized               = true
 
