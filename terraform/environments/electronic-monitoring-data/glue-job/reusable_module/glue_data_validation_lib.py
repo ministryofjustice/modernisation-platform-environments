@@ -838,3 +838,43 @@ class CustomPysparkMethods:
             schema = schema.add(T.StructField("RowHash", T.StringType(), False))
 
             return schema
+
+    @staticmethod
+    def get_year_month_min_max_count_schema(in_pkey_column_str):
+
+        agg_schema = T.StructType([
+                T.StructField("year", T.IntegerType(), False),
+                T.StructField("month", T.IntegerType(), False),
+                T.StructField(f"min_{in_pkey_column_str}", T.LongType(), False),
+                T.StructField(f"max_{in_pkey_column_str}", T.LongType(), False),
+                T.StructField(f"count_{in_pkey_column_str}", T.LongType(), False)]
+                )
+        return agg_schema
+
+    @staticmethod
+    def update_df1_with_df2(df1: DataFrame, df2: DataFrame, 
+                            all_remaining_columns_list,
+                            join_columns_list = ['year', 'month']):
+        #agg_schema = __class__.get_year_month_min_max_count_schema()
+
+        # Step 1: Find unmatched rows from df1 / df_parquet
+        df_unmatched_rows = df1.join(df2, join_columns_list, "left_anti")
+
+        # Step 2: Update matched rows between df2 / df_JDBC AND df1 / df_parquet
+        update_columns_select = [df2[c].alias(c) for c in all_remaining_columns_list]
+        key_columns_select = [df1[c] for c in join_columns_list]
+        df_updated_rows = df1.join(df2, join_columns_list, "inner") \
+            .select(
+                *key_columns_select,
+                *update_columns_select
+            )
+
+        # Step 3: Include new rows from df2 / df_JDBC not in df1 / df_parquet
+        df_new_rows = df2.join(df1, join_columns_list, "left_anti")
+
+        # Step 4: Combine all type of rows in dataframes
+        final_df = df_unmatched_rows.union(df_updated_rows).union(df_new_rows)
+
+        final_df = final_df.orderBy(join_columns_list)
+
+        return final_df

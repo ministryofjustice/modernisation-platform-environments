@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.29.0"
+  version = "20.31.6"
 
   cluster_name    = local.eks_cluster_name
   cluster_version = local.environment_configuration.eks_cluster_version
@@ -59,6 +59,11 @@ module "eks" {
     vpc-cni = {
       addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
       service_account_role_arn = module.vpc_cni_iam_role.iam_role_arn
+      configuration_values = jsonencode({
+        env = {
+          ENABLE_BANDWIDTH_PLUGIN = "true"
+        }
+      })
     }
   }
 
@@ -172,7 +177,7 @@ module "karpenter" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "20.29.0"
+  version = "20.31.6"
 
   cluster_name = module.eks.cluster_name
 

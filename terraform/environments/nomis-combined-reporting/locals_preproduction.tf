@@ -309,6 +309,23 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
+            ]
           }
         ]
       }
@@ -423,6 +440,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
+                      "admin.preproduction.reporting.nomis.service.justice.gov.uk",
                       "maintenance.preproducion.reporting.nomis.service.justice.gov.uk",
                       "preproduction.reporting.nomis.service.justice.gov.uk",
                     ]

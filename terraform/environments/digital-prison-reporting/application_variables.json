@@ -101,6 +101,8 @@
         "dps-inc-reporting",
         "dps-csip",
         "dps-alerts",
+        "dps-use-of-force",
+        "dps-locations",
         "dps-testing"
       ],
       "alarms": {
@@ -284,7 +286,9 @@
         "dps-basm",
         "dps-inc-reporting",
         "dps-csip",
-        "dps-alerts"
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-locations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -469,7 +473,9 @@
         "dps-basm",
         "dps-inc-reporting",
         "dps-csip",
-        "dps-alerts"
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-locations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -670,7 +676,9 @@
         "dps-basm",
         "dps-inc-reporting",
         "dps-csip",
-        "dps-alerts"
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-locations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
