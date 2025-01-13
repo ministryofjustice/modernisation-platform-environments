@@ -75,6 +75,7 @@ locals {
     }
 
     ec2_instances = {
+
       pp-jump2022-1 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
           availability_zone = "eu-west-2a"
@@ -83,6 +84,7 @@ locals {
           domain-name = "azure.hmpp.root"
         })
       })
+
       pp-rdgw-1-a = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"

@@ -93,19 +93,6 @@ locals {
         })
       })
 
-      test-nartclient = merge(local.ec2_autoscaling_groups.jumpserver, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.jumpserver.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.jumpserver.config, {
-          user_data_raw = base64encode(templatefile(
-            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-              branch = "TM/TM-870/create-nartclient-userdata"
-            }
-          ))
-        })
-      })
-
       # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
       # test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
       #   tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
@@ -130,6 +117,7 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
+
       t1-jump2022-1 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
           availability_zone = "eu-west-2a"
