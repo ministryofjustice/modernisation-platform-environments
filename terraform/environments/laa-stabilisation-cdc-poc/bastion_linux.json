@@ -6,7 +6,7 @@
       "luke": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGkmRs9iKxV3BSu+nsL4+ZRwPCRSltO+9C1gqn3wbV6d luke.wiltshire1@justice.gov.uk",
       "ben": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIO6C0Xdmg1lNWWRzRL/ErtHdruC7wmK7ZLn7JaQtZ8L5 ben.burrell@justice.gov.uk",
       "monica": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFoj4bbhr12aWvFwXWoByr1MunYxk6IQNPCWKkxkWrHh monica.erceg1@justice.gov.uk"
-   },
+    },
     "preproduction": {},
     "production": {}
   }
