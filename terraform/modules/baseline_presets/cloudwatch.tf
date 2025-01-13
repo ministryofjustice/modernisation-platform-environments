@@ -1,5 +1,5 @@
 locals {
-  cloudwatch_log_groups_retention_default = contains(["preproduction", "production"], var.environment.environment) ? 396 : 30
+  cloudwatch_log_groups_retention_default = contains(["preproduction", "production"], var.environment.environment) ? 396 : 30 # 13 month retention on prod as per MOJ guidance
   cloudwatch_log_groups_filter = flatten([
     var.options.enable_ec2_session_manager_cloudwatch_logs ? ["session-manager-logs"] : [],
     var.options.enable_ec2_cloud_watch_agent ? ["cwagent-var-log-messages"] : [],
