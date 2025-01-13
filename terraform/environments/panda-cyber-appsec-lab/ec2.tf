@@ -149,6 +149,14 @@ resource "aws_security_group" "defect_dojo_sg" {
     cidr_blocks = [var.my_ip]
   }
 
+  ingress {
+    description = "Allow TCP/8443 from my IP"
+    from_port   = 8443
+    to_port     = 8443
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip]
+  }
+
   egress {
     description = "Allow all traffic outbound"
     from_port   = 0
