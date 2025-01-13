@@ -853,18 +853,20 @@ class CustomPysparkMethods:
 
     @staticmethod
     def update_df1_with_df2(df1: DataFrame, df2: DataFrame, 
-                            join_columns_list, 
-                            all_remaining_columns_list):
+                            all_remaining_columns_list,
+                            join_columns_list = ['year', 'month']):
+        #agg_schema = __class__.get_year_month_min_max_count_schema()
+
         # Step 1: Find unmatched rows from df1 / df_parquet
         df_unmatched_rows = df1.join(df2, join_columns_list, "left_anti")
 
         # Step 2: Update matched rows between df2 / df_JDBC AND df1 / df_parquet
-        update_select_columns = [df2[c].alias(c) for c in all_remaining_columns_list]
+        update_columns_select = [df2[c].alias(c) for c in all_remaining_columns_list]
+        key_columns_select = [df1[c] for c in join_columns_list]
         df_updated_rows = df1.join(df2, join_columns_list, "inner") \
             .select(
-                df1['year'],
-                df1['month'],
-                *update_select_columns
+                *key_columns_select,
+                *update_columns_select
             )
 
         # Step 3: Include new rows from df2 / df_JDBC not in df1 / df_parquet
