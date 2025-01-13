@@ -12,6 +12,11 @@ resource "aws_datasync_task" "opg" {
     verify_mode       = "ONLY_FILES_TRANSFERRED"
   }
 
+  includes {
+    filter_type = "SIMPLE_PATTERN"
+    value       = "/ITAS/Database/ITAS Database/ITAS Database.xlsx|/ITAS/Database/ITAS Complaints Db/ITAS Complaints Database.xlsx"
+  }
+
   task_report_config {
     report_overrides {}
     report_level         = "ERRORS_ONLY"
