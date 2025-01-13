@@ -95,6 +95,9 @@ resource "aws_instance" "defect_dojo" {
               # Update and install dependencies
               apt-get update
               apt-get upgrade
+              sudo git clone https://github.com/DefectDojo/django-DefectDojo.git
+              cd django-DefectDojo
+              sudo docker-compose up -d
               EOF
 
   tags = {
