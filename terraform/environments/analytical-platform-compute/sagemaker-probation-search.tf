@@ -6,14 +6,9 @@ resource "aws_iam_role" "probation_search_sagemaker_invoke_role" {
     Statement = [
       {
         Effect = "Allow"
-        Principal = {
-          Service = "opensearch.amazonaws.com"
-        }
         Action = "sts:AssumeRole"
-        Condition = {
-          StringEquals = {
-            "aws:SourceAccount" = "754256621582"
-          }
+        Principal = {
+          AWS = "arn:aws:iam::754256621582:role/hmpps-probation-search-dev-xa-opensearch-to-sagemaker"
         }
       }
     ]
@@ -24,12 +19,12 @@ resource "aws_iam_role" "probation_search_sagemaker_invoke_role" {
       Version = "2012-10-17"
       Statement = [
         {
-          Effect = "Allow"
-          Resource = aws_sagemaker_endpoint.probation_search_endpoint.arn
+          Effect   = "Allow"
           Action = [
             "sagemaker:InvokeEndpointAsync",
             "sagemaker:InvokeEndpoint"
           ]
+          Resource = aws_sagemaker_endpoint.probation_search_endpoint.arn
         }
       ]
     })
