@@ -244,7 +244,7 @@ locals {
   lambda_redshift_table_expiry_timeout_seconds     = 900
   lambda_redshift_table_expiry_memory_size         = 1024
 
-  s3_redshift_table_expiry_days                    = local.application_data.accounts[local.environment].redshift_table_expiry_days + 1
+  s3_redshift_table_expiry_days = local.application_data.accounts[local.environment].redshift_table_expiry_days + 1
 
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
