@@ -133,6 +133,20 @@ locals {
           protocol    = -1
           self        = true
         }
+        rdp_tcp_web = {
+          description = "3389: Allow RDP TCP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        rdp_udp_web = {
+          description = "3389: Allow RDP UDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
       }
       egress = {
         all = {
