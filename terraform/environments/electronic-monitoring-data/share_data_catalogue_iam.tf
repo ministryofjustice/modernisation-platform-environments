@@ -32,49 +32,42 @@ data "aws_iam_policy_document" "datahub_read_cadet_bucket" {
   }
 }
 
-data "aws_iam_policy_document" "datahub_ingest_glue_datasets" {
-  statement {
-    sid    = "datahubIngestGlueDatasets"
-    effect = "Allow"
-    actions = [
-      "glue:GetDatabases",
-      "glue:GetTables"
-    ]
-    resources = [
-      "arn:aws:glue::${local.env_account_id}:catalog",
-      "arn:aws:glue::${local.env_account_id}:database/*",
-      "arn:aws:glue::${local.env_account_id}:table/*"
-    ]
-  }
-}
-
 resource "aws_iam_policy" "datahub_read_cadet_bucket" {
   name   = "datahub_read_CaDeT_bucket"
   policy = data.aws_iam_policy_document.datahub_read_cadet_bucket.json
 }
 
-resource "aws_iam_policy" "datahub_ingest_glue_datasets" {
-  name   = "datahub_ingest_glue_datasets"
-  policy = data.aws_iam_policy_document.datahub_ingest_glue_datasets.json
+# Allow Github actions to assume a role via OIDC.
+# So that scheduled jobs in the data-catalogue repo can access the CaDeT bucket.
+data "aws_iam_policy_document" "datahub_ingestion_github_actions" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:aws:iam::${local.env_account_id}:oidc-provider/token.actions.githubusercontent.com"]
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["sts.amazonaws.com"]
+      variable = "token.actions.githubusercontent.com:aud"
+    }
+    condition {
+      test     = "StringLike"
+      values   = ["repo:ministryofjustice/data-catalogue:*"]
+      variable = "token.actions.githubusercontent.com:sub"
+    }
+  }
 }
 
-module "datahub_ingestion_roles" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "~> 5.0"
+resource "aws_iam_role" "datahub_ingestion_github_actions" {
+  name                 = "datahub-ingestion-github-actions"
+  assume_role_policy   = data.aws_iam_policy_document.datahub_ingestion_github_actions.json
+  max_session_duration = 14400
+}
 
-  for_each = local.datahub_cp_irsa_role_arns
-
-  create_role = true
-
-  role_name = "datahub-ingestion-${each.key}"
-
-  role_requires_mfa = false
-
-  trusted_role_arns = [each.value]
-
-  custom_role_policy_arns = [
-    aws_iam_policy.datahub_read_cadet_bucket.arn,
-    aws_iam_policy.datahub_ingest_glue_datasets.arn,
-  ]
+resource "aws_iam_role_policy_attachment" "datahub_ingestion_github_actions" {
+  policy_arn = aws_iam_policy.datahub_read_cadet_bucket.arn
+  role       = aws_iam_role.datahub_ingestion_github_actions.name
 }
