@@ -118,14 +118,14 @@ locals {
         })
       })
 
-      t1-jump2022-1 = merge(local.ec2_instances.jumpserver, {
-        config = merge(local.ec2_instances.jumpserver.config, {
-          availability_zone = "eu-west-2a"
-        })
-        tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.noms.root"
-        })
-      })
+      # t1-jump2022-1 = merge(local.ec2_instances.jumpserver, {
+      #   config = merge(local.ec2_instances.jumpserver.config, {
+      #     availability_zone = "eu-west-2a"
+      #   })
+      #   tags = merge(local.ec2_instances.jumpserver.tags, {
+      #     domain-name = "azure.noms.root"
+      #   })
+      # })
     }
 
     fsx_windows = {
