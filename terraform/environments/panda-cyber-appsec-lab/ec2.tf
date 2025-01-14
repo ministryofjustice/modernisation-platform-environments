@@ -133,6 +133,9 @@ resource "aws_security_group" "kali_linux_sg" {
 # Security Group for Defect Dojo instance
 # trivy:ignore:AVD-AWS-0104
 resource "aws_security_group" "defect_dojo_sg" {
+  lifecycle {
+    create_before_destroy = true
+  }
   name        = "allow_tcp"
   description = "Allow TCP inbound traffic"
   vpc_id      = module.vpc.vpc_id
