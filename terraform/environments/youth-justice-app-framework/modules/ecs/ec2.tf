@@ -49,10 +49,11 @@ module "autoscaling" {
   }
   security_groups = [module.autoscaling_sg.security_group_id]
 
-  vpc_zone_identifier = var.ecs_subnet_ids
-  min_size            = var.ec2_min_size
-  max_size            = var.ec2_max_size
-  desired_capacity    = var.ec2_desired_capacity
+  vpc_zone_identifier   = var.ecs_subnet_ids
+  min_size              = var.ec2_min_size
+  max_size              = var.ec2_max_size
+  desired_capacity      = var.ec2_desired_capacity
+  desired_capacity_type = "units"
 
   # Launch template settings
   create_launch_template = true
