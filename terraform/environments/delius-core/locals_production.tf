@@ -3,23 +3,23 @@
 # Sample data
 # tags demonstrate inheritance due to merges in the module
 locals {
-  environment_config_preprod = {
-    migration_environment_private_cidr     = ["10.160.0.0/22", "10.160.4.0/22", "10.160.8.0/22"]
-    migration_environment_vpc_cidr         = "10.160.0.0/20"
-    migration_environment_db_cidr          = ["10.160.12.0/24", "10.160.13.0/24", "10.160.14.0/25"]
-    migration_environment_full_name        = "del-pre-prod"
+  environment_config_prod = {
+    migration_environment_private_cidr     = ["10.160.16.0/22", "10.160.20.0/22", "10.160.24.0/22"]
+    migration_environment_vpc_cidr         = "10.160.16.0/20"
+    migration_environment_db_cidr          = ["10.160.28.0/24", "10.160.29.0/24", "10.160.30.0/25"]
+    migration_environment_full_name        = "del-prod"
     migration_environment_abbreviated_name = "del"
-    migration_environment_short_name       = "pre-prod"
+    migration_environment_short_name       = "prod"
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
-    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/preprod/ec2-user.pub")
+    ec2_user_ssh_key                       = file("${path.module}/files/.ssh/prod/ec2-user.pub")
     homepage_path                          = "/"
     has_mis_environment                    = false
   }
 
-  ldap_config_preprod = {
+  ldap_config_prod = {
     name                        = "ldap"
     encrypted                   = true
-    migration_source_account_id = "010587221707"
+    migration_source_account_id = "050243167760"
     migration_lambda_role       = "ldap-data-migration-lambda-role"
     efs_throughput_mode         = "elastic"
     efs_provisioned_throughput  = null
@@ -31,7 +31,7 @@ locals {
   }
 
 
-  db_config_preprod = {
+  db_config_prod = {
     instance_type  = "r7i.4xlarge"
     ami_name_regex = "^delius_core_ol_8_5_oracle_db_19c_patch_2024-06-04T11-24-58.162Z"
     instance_policies = {
@@ -79,7 +79,7 @@ locals {
     }
   }
 
-  delius_microservices_configs_preprod = {
+  delius_microservices_configs_prod = {
 
     weblogic = {
       image_tag        = "6.2.0.3"
@@ -111,14 +111,14 @@ locals {
     }
   }
 
-  bastion_config_preprod = {
+  bastion_config_prod = {
     business_unit           = local.vpc_name
     subnet_set              = local.subnet_set
     environment             = local.environment
     extra_user_data_content = "yum install -y openldap-clients"
   }
 
-  dms_config_preprod = {
+  dms_config_prod = {
     deploy_dms                 = false
     replication_enabled        = false
     replication_instance_class = "dms.t3.medium"
@@ -130,7 +130,7 @@ locals {
       read_database = "PRENDAS1"
     }
     audit_target_endpoint = {
-      write_environment = "preprod" # Until production exists set dummy replication target
+      write_environment = "prod" # Until production exists set dummy replication target
       write_database    = "NONE"    # Remove this dummy attribute once production target exists
     }
     user_source_endpoint = { # Set this map to {} once production exists
