@@ -1,4 +1,3 @@
-
 data "aws_iam_policy_document" "jml_lambda_policy" {
   statement {
     sid    = "LambdaECRImageRetrievalPolicy"
