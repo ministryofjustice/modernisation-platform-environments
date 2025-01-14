@@ -1,4 +1,4 @@
-/*
+
 module "codedeploy" {
   source       = "./modules/codedeploy"
   project_name = local.project_name
@@ -26,11 +26,11 @@ module "codedeploy" {
     { "yp" = "internal" },
   ]
 
-  internal_alb_name = "yjaf-internal"
-  external_alb_name = "yjaf-external"
+  internal_alb_name = "yjaf-int-internal"
+  external_alb_name = "yjaf-ext-external"
   depends_on = [
     module.internal_alb,
     module.external_alb,
   ]
 }
-*/
+
