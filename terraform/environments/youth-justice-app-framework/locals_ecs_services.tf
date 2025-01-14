@@ -64,7 +64,7 @@ locals {
             },
             {
               "name" : "SPRING_PROFILES_ACTIVE",
-              "value" : "dev"
+              "value" : "moj-${local.environment}"
             },
             {
               "name" : "DD_SERVICE",
@@ -80,7 +80,7 @@ locals {
             },
             {
               "name" : "DD_ENV",
-              "value" : "dev"
+              "value" : "moj-${local.environment}"
             },
             {
               "name" : "DD_PROFILING_ENABLED",
@@ -395,6 +395,28 @@ locals {
         }
       ]
       enable_postgres_secret = false
+      additional_mount_points = [
+        {
+          sourceVolume : "cache",
+          containerPath : "/var/cache/nginx",
+          readOnly : false
+        },
+        {
+          sourceVolume : "conf",
+          containerPath : "/etc/nginx",
+          readOnly : false
+        }
+      ]
+      volumes = [
+        {
+          "name" : "cache",
+          "host" : {}
+        },
+        {
+          "name" : "conf",
+          "host" : {}
+        }
+      ]
     },
     views = {
       name        = "views"
