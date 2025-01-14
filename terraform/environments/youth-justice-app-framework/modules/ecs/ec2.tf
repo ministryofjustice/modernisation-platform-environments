@@ -61,9 +61,9 @@ module "autoscaling" {
   image_id             = local.ecs_optimized_ami.image_id #todo change to output of image builder
   instance_type        = var.ec2_instance_type
   key_name             = module.key_pair.key_pair_name
-  instance_market_options = {
-    market_type = "spot" #todo change this later, spot temporarily to save money
-  }
+  #instance_market_options = {
+  #  market_type = "spot" #todo change this later, spot temporarily to save money
+  #}
 
   # Mixed instances
   use_mixed_instances_policy = true
