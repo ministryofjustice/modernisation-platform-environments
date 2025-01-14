@@ -16,7 +16,7 @@ data "aws_iam_policy_document" "jml_lambda_policy" {
     condition {
       test     = "StringLike"
       variable = "aws:sourceArn"
-      values   = ["arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:function:data_platform_jml_extract*)"]
+      values   = ["arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:function:data_platform_jml_extract*"]
     }
   }
 }
