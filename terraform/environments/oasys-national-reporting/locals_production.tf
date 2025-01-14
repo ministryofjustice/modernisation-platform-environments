@@ -70,6 +70,26 @@ locals {
       }
     }
 
+    iam_policies = {
+      Ec2SecretPolicy = {
+        description = "Permissions required for secret value access by instances"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          }
+        ]
+      }
+    }
+
     route53_zones = {
       "reporting.oasys.service.justice.gov.uk" = {
         ns_records = [
