@@ -14,7 +14,7 @@ resource "aws_datasync_task" "opg" {
 
   includes {
     filter_type = "SIMPLE_PATTERN"
-    value       = "/ITAS/Database/ITAS Database/ITAS Database.xlsx|/ITAS/Database/ITAS Complaints Db/ITAS Complaints Database.xlsx"
+    value       = "/Investigations/Cases/Closed Cases/*"
   }
 
   task_report_config {
