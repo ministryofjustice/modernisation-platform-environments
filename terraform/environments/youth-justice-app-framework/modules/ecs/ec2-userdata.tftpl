@@ -1,9 +1,4 @@
 #!/bin/bash
-sed -i -e 's/nameserver .*//g' /etc/resolv.conf
-echo nameserver ${nameserver} >> /etc/resolv.conf
-echo DNS1=${nameserver} >> /etc/sysconfig/network-scripts/ifcfg-eth0
-sed -i -e 's/PEERDNS=yes/PEERDNS=no/g' /etc/sysconfig/network-scripts/ifcfg-eth0
-
 yum install amazon-cloudwatch-agent -y
 cat >>/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json <<EOF
 {
