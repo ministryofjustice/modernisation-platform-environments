@@ -22,7 +22,6 @@ data "aws_iam_policy_document" "jml_lambda_policy" {
   }
 }
 
-
 # This ECR is used to store the image built by in https://github.com/ministryofjustice/analytical-platform-jml-report/releases
 
 module "jml_ecr" {
