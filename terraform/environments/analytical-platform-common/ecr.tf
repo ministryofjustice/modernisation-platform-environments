@@ -30,12 +30,10 @@ module "jml_ecr" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source = "terraform-aws-modules/ecr/aws"
-   version = "2.3.0"
+  version = "2.3.0"
 
-  repository_name = "analytical-platform-jml-report"
-
+  repository_name   = "analytical-platform-jml-report"
   repository_policy = data.aws_iam_policy_document.jml_lambda_policy.json
 
   tags = local.tags
-
 }
