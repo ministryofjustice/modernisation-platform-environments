@@ -35,14 +35,14 @@ locals {
 
     ec2_instances = {
 
-      # pd-jump2022-1 = merge(local.ec2_instances.jumpserver, {
-      #   config = merge(local.ec2_instances.jumpserver.config, {
-      #     availability_zone = "eu-west-2a"
-      #   })
-      #   tags = merge(local.ec2_instances.jumpserver.tags, {
-      #     domain-name = "azure.hmpp.root"
-      #   })
-      # })
+      pd-jump2022-1 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
 
       pd-rdgw-1-a = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
