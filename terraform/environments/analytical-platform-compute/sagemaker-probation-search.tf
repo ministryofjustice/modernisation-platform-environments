@@ -1,10 +1,13 @@
 resource "aws_iam_role" "probation_search_sagemaker_invoke_role" {
   name = "probation-search-sagemaker-role"
 
+  ## Allow role in Account A (MOJ Cloud Platform account) to assume this role and invoke SageMaker in Account B (Analytical Platform Compute account on MOJ Modernisation Platform)
+  ## See https://github.com/opensearch-project/ml-commons/blob/f741f71fff0d2ef6df7a3a62729cc1cb0953a37c/docs/tutorials/aws/semantic_search_with_bedrock_titan_embedding_model_in_another_account.md
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = "AssumeFromCloudPlatform"
         Effect = "Allow"
         Action = "sts:AssumeRole"
         Principal = {
@@ -13,22 +16,23 @@ resource "aws_iam_role" "probation_search_sagemaker_invoke_role" {
       }
     ]
   })
+}
 
-  inline_policy {
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Effect   = "Allow"
-          Action = [
-            "sagemaker:InvokeEndpointAsync",
-            "sagemaker:InvokeEndpoint"
-          ]
-          Resource = aws_sagemaker_endpoint.probation_search_endpoint.arn
-        }
-      ]
-    })
-  }
+resource "aws_iam_role_policy" "probation_search_sagemaker_invoke_policy" {
+  role = aws_iam_role.probation_search_sagemaker_invoke_role.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action = [
+          "sagemaker:InvokeEndpointAsync",
+          "sagemaker:InvokeEndpoint"
+        ]
+        Resource = aws_sagemaker_endpoint.probation_search_endpoint.arn
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role" "probation_search_sagemaker_execution_role" {
