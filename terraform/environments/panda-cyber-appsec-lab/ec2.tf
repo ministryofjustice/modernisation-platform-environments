@@ -74,7 +74,7 @@ resource "aws_instance" "defect_dojo" {
   associate_public_ip_address = true
   instance_type               = "t2.large"
   subnet_id                   = module.vpc.private_subnets.0
-  vpc_security_group_ids      = [aws_security_group.defect_dojo_sg]
+  vpc_security_group_ids      = [aws_security_group.defect_dojo_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
   ebs_optimized               = true
 
@@ -133,6 +133,9 @@ resource "aws_security_group" "kali_linux_sg" {
 # Security Group for Defect Dojo instance
 # trivy:ignore:AVD-AWS-0104
 resource "aws_security_group" "defect_dojo_sg" {
+  lifecycle {
+    create_before_destroy = true
+  }
   name        = "allow_tcp"
   description = "Allow TCP inbound traffic"
   vpc_id      = module.vpc.vpc_id
