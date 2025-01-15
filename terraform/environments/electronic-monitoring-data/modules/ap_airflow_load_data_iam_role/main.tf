@@ -74,6 +74,12 @@ data "aws_iam_policy_document" "load_data" {
     ]
   }
   statement {
+    sid       = "GetDataAccessForLakeFormation${local.camel-sid}"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+  statement {
     sid       = "ListAccountAlias${local.camel-sid}"
     effect    = "Allow"
     actions   = ["iam:ListAccountAliases"]
