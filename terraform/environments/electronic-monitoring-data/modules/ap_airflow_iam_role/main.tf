@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "oidc_assume_role_policy" {
 # -----------------------------
 
 resource "aws_iam_role" "role_ap_airflow" {
-  name                  = local.role_name
+  name_prefix           = local.role_name
   description           = var.role_description
   assume_role_policy    = data.aws_iam_policy_document.oidc_assume_role_policy.json
   force_detach_policies = true
@@ -46,8 +46,8 @@ resource "aws_iam_role" "role_ap_airflow" {
 }
 
 resource "aws_iam_policy" "role_ap_airflow" {
-  name   = local.role_name
-  policy = var.iam_policy_document
+  name_prefix = local.role_name
+  policy      = var.iam_policy_document
 }
 
 resource "aws_iam_role_policy_attachment" "role_ap_airflow" {
