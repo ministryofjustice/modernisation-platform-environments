@@ -424,6 +424,8 @@ data "aws_iam_policy_document" "copy_mdss_data_policy_document" {
     actions = [
       "s3:GetObject",
       "s3:GetObjectTagging",
+      "s3:PutObject",
+      "s3:PutObjectTagging",
     ]
     resources = ["${module.s3-data-bucket.bucket.arn}/*"]
   }
