@@ -1,3 +1,4 @@
+# tflint-ignore: terraform_required_providers
 data "external" "build_lambdas" {
   program = [
     "bash", "-c",
