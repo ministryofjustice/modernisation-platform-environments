@@ -399,13 +399,56 @@ data "aws_iam_policy_document" "format_json_fms_data_policy_document" {
 
 resource "aws_iam_policy" "format_json_fms_data" {
   name        = "format-json-fms-data"
-  description = "Policy for Lambda to virus scan and move files"
+  description = "Policy for lambda to format FMS data from data to raw-formatted bucket"
   policy      = data.aws_iam_policy_document.format_json_fms_data_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "format_json_fms_data_policy_attachment" {
   role       = aws_iam_role.format_json_fms_data.name
   policy_arn = aws_iam_policy.format_json_fms_data.arn
+}
+
+#-----------------------------------------------------------------------------------
+# Load MDSS JSON data
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "copy_mdss_data" {
+  name               = "copy_mdss_data"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "copy_mdss_data_policy_document" {
+  statement {
+    sid    = "S3PermissionsForGetJSONLFiles"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectTagging",
+    ]
+    resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "S3PermissionsForPutJSONLFiles"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging",
+    ]
+    resources = [
+      "${module.s3-raw-formatted-data-bucket.bucket.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "copy_mdss_data" {
+  name        = "copy-mdss-data"
+  description = "Policy for copying MDSS data from data to raw-formatted bucket"
+  policy      = data.aws_iam_policy_document.copy_mdss_data_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "copy_mdss_data_policy_attachment" {
+  role       = aws_iam_role.copy_mdss_data.name
+  policy_arn = aws_iam_policy.copy_mdss_data.arn
 }
 
 #-----------------------------------------------------------------------------------
