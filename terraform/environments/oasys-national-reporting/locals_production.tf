@@ -59,6 +59,7 @@ locals {
           oasys-national-reporting-environment = "pd"
           domain-name                          = "azure.hmpp.root"
         })
+        cloudwatch_metric_alarms = null # TODO: REMOVE THIS LATER
       })
     }
 
