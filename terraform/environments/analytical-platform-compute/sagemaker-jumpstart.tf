@@ -215,7 +215,7 @@ data "aws_iam_policy_document" "sagemaker_bucket_policy" {
 # ----------------
 resource "aws_sagemaker_model" "model_with_hub_model" { # meta-lama-3.2-1B-model
   count                    = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
-  name                     = "meta-lama-3.2-1b-model"
+  name                     = "meta-lama-3-2-1b-model"
   execution_role_arn       = module.sagemaker_execution_role[0].iam_role_arn
   tags                     = local.tags
   enable_network_isolation = false
