@@ -225,7 +225,7 @@ module "load_unstructured_atrium_database" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 
-  name               = "unstructured-atrium-database"
+  name               = "unstructured-atrium"
   environment        = local.environment
   database_name      = "g4s-atrium-unstructured"
   path_to_data       = "/load/g4s_atrium_unstructured/structure"
