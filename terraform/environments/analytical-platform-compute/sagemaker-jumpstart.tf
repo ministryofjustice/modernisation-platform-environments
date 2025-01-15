@@ -21,14 +21,14 @@ locals {
     max_concurrency   = null
     memory_size_in_mb = null
   }
-  hf_model_id              = "meta-llama/Llama-3.2-1B"
+  hf_model_id              = "HuggingFaceTB/SmolLM-135M"
   hf_api_token             = null
   hf_model_revision        = null
   model_data               = null
   sagemaker_execution_role = null
   autoscaling = {
     min_capacity               = 0
-    max_capacity               = 4
+    max_capacity               = 1
     scaling_target_invocations = 100
     scale_in_cooldown          = 300
     scale_out_cooldown         = 66
@@ -38,8 +38,6 @@ locals {
   device            = "gpu"
   image_key         = "${local.framework_version}-${local.device}"
   pytorch_image_tag = {
-    "2.0.0-cpu" = "2.0.0-transformers${local.transformers_version}-cpu-py310-ubuntu20.04"
-    "2.0.0-gpu" = "2.0.0-transformers${local.transformers_version}-gpu-py310-cu118-ubuntu20.04"
     "2.1.0-gpu" = "2.1.0-transformers${local.transformers_version}-gpu-py310-cu118-ubuntu20.04"
   }
   sagemaker_endpoint_type = {
@@ -213,9 +211,9 @@ data "aws_iam_policy_document" "sagemaker_bucket_policy" {
 # ----------------
 # SageMaker Model
 # ----------------
-resource "aws_sagemaker_model" "model_with_hub_model" { # meta-lama-3.2-1B-model
+resource "aws_sagemaker_model" "model_with_hub_model" { # HuggingFaceTB/SmolLM-135M
   count                    = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
-  name                     = "meta-lama-3-2-1b-model"
+  name                     = "huggingfacetb-smollm-135m"
   execution_role_arn       = module.sagemaker_execution_role[0].iam_role_arn
   tags                     = local.tags
   enable_network_isolation = false
