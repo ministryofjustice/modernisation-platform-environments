@@ -21,12 +21,25 @@ module "github-cloudtrail-auditlog" {
   depends_on = [data.external.build_lambdas]
 }
 
-
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://oidc-configuration.audit-log.githubusercontent.com"
 
   client_id_list = [
     "sts.amazonaws.com"
   ]
+}
+
+resource "aws_iam_policy" "github_audit_log_write_policy" {
+  name = "github-audit-log-write-policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "s3:PutObject"
+        Resource = "arn:aws:s3:::${module.github-cloudtrail-auditlog.github_auditlog_s3bucket}/*"
+      }
+    ]
+  })
 }
 
