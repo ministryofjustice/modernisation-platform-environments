@@ -37,6 +37,31 @@ locals {
       }
     }
 
+    ec2_instances = {
+      pd-onr-bods-1 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2025-*"
+          availability_zone = "eu-west-2a"
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+              branch = "main"
+            }
+          ))
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type           = "r6i.2xlarge" # TODO: CHECK THIS FIRST
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "pd"
+          domain-name                          = "azure.hmpp.root"
+        })
+      })
+    }
+
     fsx_windows = {
 
       pd-bods-win-share = {
