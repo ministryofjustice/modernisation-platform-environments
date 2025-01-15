@@ -21,7 +21,7 @@ locals {
     max_concurrency   = null
     memory_size_in_mb = null
   }
-  hf_model_id              = "HuggingFaceTB/SmolLM-135M"
+  hf_model_id              = "HuggingFaceTB/SmolLM2-135M-Instruct"
   hf_api_token             = null
   hf_model_revision        = null
   model_data               = null
@@ -213,7 +213,7 @@ data "aws_iam_policy_document" "sagemaker_bucket_policy" {
 # ----------------
 resource "aws_sagemaker_model" "model_with_hub_model" { # HuggingFaceTB/SmolLM-135M
   count                    = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
-  name                     = "huggingfacetb-smollm-135m"
+  name                     = "huggingfacetb-smoll2-135m-instruct"
   execution_role_arn       = module.sagemaker_execution_role[0].iam_role_arn
   tags                     = local.tags
   enable_network_isolation = false
