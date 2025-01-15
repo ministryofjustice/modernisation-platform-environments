@@ -1,4 +1,4 @@
-# This file is auto-generated here, do not manually amend. 
+# This file is auto-generated here, do not manually amend.
 # scripts/generate-dependabot.sh
 
 version: 2
@@ -18,6 +18,10 @@ updates:
   # a dependabot configuration, so we need to add all directories individually
   # See: github.com/dependabot/dependabot-core/issues/2178
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-common"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-compute"
     schedule:
       interval: "daily"
@@ -27,6 +31,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-ingestion"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-ingestion/modules/routes"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -147,6 +155,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/data-platform-apps-and-tools/modules/auth0-log-streams"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/delius-alfresco"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -290,7 +302,15 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/domains/maintenance-pipeline"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/pipeline-lambda"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/domains/reconciliation-job"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -299,6 +319,14 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/replay-pipeline"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/domains/start-cdc-pipeline"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/domains/stop-cdc-pipeline"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -362,6 +390,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/pipeline_trigger"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/rds/aws-aurora"
     schedule:
       interval: "daily"
@@ -398,11 +430,51 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/glue-job/Archived"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/ap_airflow_iam_role"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/ap_airflow_load_data_iam_role"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/api_step_function"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data/modules/dms"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/export_bucket_presigned_url"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/export_bucket_push"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/lakeformation_database_share"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/lakeformation_w_data_filter"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/electronic-monitoring-data/modules/lambdas"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/landing_bucket"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/landing_bucket_iam_user_access"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -418,7 +490,7 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/electronic-monitoring-data/modules/s3_log_bucket"
+    directory: "/terraform/environments/electronic-monitoring-data/modules/step_function"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -458,7 +530,15 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/laa-mail-relay"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/laa-oem"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/laa-stabilisation-cdc-poc"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -550,6 +630,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/observability-platform/modules/grafana/athena-source"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/observability-platform/modules/grafana/cloudwatch-source"
     schedule:
       interval: "daily"
@@ -630,11 +714,15 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/tribunals/modules/ecs_loadbalancer"
+    directory: "/terraform/environments/tribunals/modules/ecs_task"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/tribunals/modules/ecs_task"
+    directory: "/terraform/environments/tribunals/modules/nginx_ec2_pair"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/tribunals/modules/nginx_load_balancer"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -651,6 +739,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/xhibit-portal"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -682,6 +774,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/modules/fargate_graceful_retirement"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/modules/fsx_windows"
     schedule:
       interval: "daily"
@@ -691,6 +787,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/modules/lb_listener"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/modules/schedule_alarms_lambda"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

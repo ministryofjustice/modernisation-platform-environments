@@ -21,6 +21,7 @@
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-apps-and-tools @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/data-platform-labs @ministryofjustice/modernisation-platform
+/terraform/environments/delius-alfresco @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/delius-core @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/delius-iaps @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
 /terraform/environments/delius-jitbit @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform

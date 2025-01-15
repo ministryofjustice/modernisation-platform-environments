@@ -4,8 +4,7 @@ locals {
 
   baseline_presets_production = {
     options = {
-      cloudwatch_log_groups_retention_in_days = 90
-      db_backup_lifecycle_rule                = "rman_backup_one_month"
+      db_backup_lifecycle_rule = "rman_backup_one_month"
 
       sns_topics = {
         pagerduty_integrations = {
@@ -63,8 +62,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-oasys-db-a" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -107,8 +109,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-oasys-db-b" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -816,8 +821,11 @@ locals {
       "/oracle/database/PDONRSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PDONRAUD" = local.secretsmanager_secrets.db
       "/oracle/database/PDONRBDS" = local.secretsmanager_secrets.db
-      "/oracle/database/PDBOSYS"  = local.secretsmanager_secrets.db_bip
-      "/oracle/database/PDBOAUD"  = local.secretsmanager_secrets.db_bip
+
+      "/oracle/database/PDBOSYS" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/PDBOAUD" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/DRBOSYS" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/DRBOAUD" = local.secretsmanager_secrets.db_bip
 
       "/oracle/database/TRBIPINF" = local.secretsmanager_secrets.db_bip
 

@@ -8,7 +8,6 @@ locals {
 
   baseline_presets_production = {
     options = {
-      cloudwatch_log_groups_retention_in_days = 90
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -64,8 +63,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-1-a" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -108,8 +110,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-1-b" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -141,8 +146,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-2-a" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -185,8 +193,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-2-b" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -229,7 +240,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
+            branch = "753de472568b54954ea0cb8fe6fb8d28ecf33aa3" # 2025-01-14 nomis release
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -243,7 +254,7 @@ locals {
       # ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 5
+          desired_capacity = 6
           max_size         = 6
 
           initial_lifecycle_hooks = {
@@ -272,7 +283,7 @@ locals {
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
             # Comment in instance refresh above if changing branch + want automated instance refresh
-            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
+            branch = "753de472568b54954ea0cb8fe6fb8d28ecf33aa3" # 2025-01-14 nomis release
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
