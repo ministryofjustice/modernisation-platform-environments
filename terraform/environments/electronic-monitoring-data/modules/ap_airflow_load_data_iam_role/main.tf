@@ -94,7 +94,7 @@ data "aws_iam_policy_document" "load_data" {
   }
 }
 
-module "load_unstructured_atrium_database" {
+module "ap_database_sharing" {
   source = "../ap_airflow_iam_role"
 
   environment          = var.environment
@@ -104,4 +104,12 @@ module "load_unstructured_atrium_database" {
   secret_code          = var.secret_code
   oidc_arn             = var.oidc_arn
   max_session_duration = var.max_session_duration
+}
+
+module "share_dbs_with_roles" {
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = toset([local.snake-database])
+  data_bucket_lf_resource = var.data_bucket_lf_resource
+  role_arn                = module.ap_database_sharing.iam_role.arn
+  de_role_arn             = var.de_role_arn
 }
