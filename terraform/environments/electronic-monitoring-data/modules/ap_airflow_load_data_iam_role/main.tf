@@ -1,6 +1,7 @@
 locals {
   camel-sid      = join("", [for word in split("-", var.name) : title(word)])
-  snake-database = replace(var.database_name, "-", "_")
+  suffix         = var.environment == "test" ? "_test" : ""
+  snake-database = "${replace(var.database_name, "-", "_")}${local.suffix}"
 }
 
 data "aws_region" "current" {}
