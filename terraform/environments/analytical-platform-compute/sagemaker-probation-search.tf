@@ -5,18 +5,33 @@ locals {
   probation_search_environments = {
     analytical-platform-compute-development = {
       hmpps-probation-search-dev = {
-        namespace     = "hmpps-probation-search-dev"
-        instance_type = "ml.t2.medium"
+        namespace       = "hmpps-probation-search-dev"
+        instance_type   = "ml.t2.medium"
+        repository_name = "tei-cpu"
+        image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
+        environment = {
+          HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
+        }
       }
     }
     analytical-platform-compute-production = {
       hmpps-probation-search-preprod = {
-        namespace     = "hmpps-probation-search-preprod"
-        instance_type = "ml.t2.medium"
+        namespace       = "hmpps-probation-search-preprod"
+        instance_type   = "ml.t2.medium"
+        repository_name = "tei-cpu"
+        image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
+        environment = {
+          HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
+        }
       },
       hmpps-probation-search-prod = {
-        namespace     = "hmpps-probation-search-prod"
-        instance_type = "ml.g6.xlarge"
+        namespace       = "hmpps-probation-search-prod"
+        instance_type   = "ml.g6.xlarge"
+        repository_name = "tei"
+        image_tag       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
+        environment = {
+          HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
+        }
       }
     }
   }
@@ -26,16 +41,20 @@ locals {
 # ------------------------------------------------------------------------------
 # SageMaker
 # ------------------------------------------------------------------------------
+data "aws_sagemaker_prebuilt_ecr_image" "probation_search_huggingface_embedding_image" {
+  for_each        = tomap(local.probation_search_environment)
+  repository_name = each.value.repository_name
+  image_tag       = each.value.image_tag
+}
+
 resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
   #checkov:skip=CKV_AWS_370:Network isolation must be disabled to enable us to pull the model from Huggingface
   for_each           = tomap(local.probation_search_environment)
   name               = "${each.value.namespace}-sagemaker-hf-model"
   execution_role_arn = aws_iam_role.probation_search_sagemaker_execution_role[each.key].arn
   primary_container {
-    image = "764974769150.dkr.ecr.eu-west-2.amazonaws.com/tei:2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
-    environment = {
-      HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
-    }
+    image       = data.aws_sagemaker_prebuilt_ecr_image.probation_search_huggingface_embedding_image[each.key].registry_path
+    environment = each.value.environment
   }
 }
 
