@@ -20,3 +20,13 @@ module "github-cloudtrail-auditlog" {
   # Ensure the module waits for Lambdas to be built
   depends_on = [data.external.build_lambdas]
 }
+
+
+resource "aws_iam_openid_connect_provider" "github" {
+  url = "https://oidc-configuration.audit-log.githubusercontent.com"
+
+  client_id_list = [
+    "sts.amazonaws.com"
+  ]
+}
+
