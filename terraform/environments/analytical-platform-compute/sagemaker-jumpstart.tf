@@ -227,7 +227,7 @@ resource "aws_sagemaker_model" "model_with_hub_model" { # HuggingFaceTB/SmolLM-1
   }
 
   lifecycle {
-    create_before_destroy = false
+    create_before_destroy = true
   }
 }
 
