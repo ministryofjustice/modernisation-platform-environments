@@ -1,11 +1,6 @@
 ##############################################
 # IAM Instance Profile
 ##############################################
-#resource "aws_iam_instance_profile" "db_ec2_instanceprofile" {
-#  name = format("%s-delius-db-ec2_instance_iam_role", var.env_name)
-#  role = aws_iam_role.db_ec2_instance_iam_role.name
-#}
-
 
 # Pre-reqs - IAM role, attachment for SSM usage and instance profile
 data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
@@ -20,15 +15,6 @@ data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
     }
   }
 }
-
-
-#resource "aws_iam_role" "db_ec2_instance_iam_role" {
-#  name               = lower(format("%s-delius-db-ec2_instance", var.env_name))
-#  assume_role_policy = data.aws_iam_policy_document.db_ec2_instance_iam_assume_policy.json
-#  tags = merge(var.tags,
-#    { Name = lower(format("%s-delius-db-ec2_instance", var.env_name)) }
-#  )
-#}
 
 data "aws_iam_policy_document" "business_unit_kms_key_access" {
   statement {
@@ -69,12 +55,6 @@ data "aws_iam_policy_document" "core_shared_services_bucket_access" {
   }
 }
 
-resource "aws_iam_policy" "core_shared_services_bucket_access" {
-  name   = "${var.env_name}-${var.db_suffix}-core-shared-services-bucket-access-policy"
-  path   = "/"
-  policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
-}
-
 data "aws_iam_policy_document" "ec2_access_for_ansible" {
   statement {
     effect = "Allow"
@@ -100,46 +80,6 @@ data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
   }
 }
 
-resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
-  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ssm-parameter-store-access"
-  path   = "/"
-  policy = data.aws_iam_policy_document.allow_access_to_ssm_parameter_store.json
-}
-#
-#resource "aws_iam_role_policy_attachment" "allow_access_to_ssm_parameter_store" {
-#  role       = aws_iam_role.db_ec2_instance_iam_role.name
-#  policy_arn = aws_iam_policy.allow_access_to_ssm_parameter_store.arn
-#}
-
-resource "aws_iam_policy" "ec2_access_for_ansible" {
-  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ansible-ec2-access"
-  path   = "/"
-  policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
-}
-
-#resource "aws_iam_role_policy" "business_unit_kms_key_access" {
-#  name   = "business_unit_kms_key_access"
-#  role   = aws_iam_role.db_ec2_instance_iam_role.name
-#  policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
-#}
-#
-#resource "aws_iam_role_policy" "core_shared_services_bucket_access" {
-#  name   = "core_shared_services_bucket_access"
-#  role   = aws_iam_role.db_ec2_instance_iam_role.name
-#  policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
-#}
-#
-#resource "aws_iam_role_policy" "ec2_access" {
-#  name   = "ec2_access"
-#  role   = aws_iam_role.db_ec2_instance_iam_role.name
-#  policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
-#}
-
-#resource "aws_iam_role_policy_attachment" "db_ec2_instance_amazonssmmanagedinstancecore" {
-#  role       = aws_iam_role.db_ec2_instance_iam_role.name
-#  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-#}
-
 # Policy document for both Oracle database DBA and application secrets
 
 data "aws_iam_policy_document" "db_access_to_secrets_manager" {
@@ -159,13 +99,6 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
       aws_secretsmanager_secret.database_application_passwords.arn,
     ]
   }
-}
-
-# Policy to allow access to both Oracle database DBA and application secrets
-
-resource "aws_iam_policy" "db_access_to_secrets_manager" {
-  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-secrets-manager-access"
-  policy = data.aws_iam_policy_document.db_access_to_secrets_manager.json
 }
 
 data "aws_iam_policy_document" "instance_ssm" {
@@ -223,62 +156,20 @@ data "aws_iam_policy_document" "instance_ssm" {
   }
 }
 
-resource "aws_iam_policy" "instance_ssm" {
-  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ssm-access"
-  policy = data.aws_iam_policy_document.instance_ssm.json
+data "aws_iam_policy_document" "combined_instance_policy" {
+  source_policy_documents = [
+    data.aws_iam_policy_document.core_shared_services_bucket_access.json,
+    data.aws_iam_policy_document.allow_access_to_ssm_parameter_store.json,
+    data.aws_iam_policy_document.ec2_access_for_ansible.json,
+    data.aws_iam_policy_document.db_access_to_secrets_manager.json,
+    data.aws_iam_policy_document.oracledb_backup_bucket_access.json,
+    data.aws_iam_policy_document.db_ssh_keys_s3_policy_document.json,
+    data.aws_iam_policy_document.instance_ssm.json,
+    data.aws_iam_policy_document.oracle_ec2_snapshot_backup_role_policy_document.json
+  ]
 }
 
-# new IAM role OEM setup to allow ec2s to access secrets manager and kms keys
-# resource "aws_iam_role" "EC2OracleEnterpriseManagementSecretsRole" {
-#   name = "EC2OracleEnterpriseManagementSecretsRole-${var.env_name}-${var.db_suffix}"
-
-#   assume_role_policy = <<EOF
-# {
-#   "Version": "2012-10-17",
-#   "Statement": [
-#     {
-#       "Effect": "Allow",
-#       "Principal": {
-#         "AWS": "*"
-#       },
-#       "Action": "sts:AssumeRole",
-#       "Condition": {
-#         "ForAnyValue:ArnLike": {
-#           "aws:PrincipalArn": "arn:aws:iam::${var.account_info.id}:role/instance-role-${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-*"
-#         }
-#       }
-#     }
-#   ]
-# }
-# EOF
-# }
-
-# resource "aws_iam_role_policy_attachment" "allow_kms_keys_access" {
-#   role       = aws_iam_role.EC2OracleEnterpriseManagementSecretsRole.name
-#   policy_arn = aws_iam_policy.business_unit_kms_key_access.arn
-# }
-
-# data "aws_iam_policy_document" "OracleEnterpriseManagementSecretsPolicyDocument" {
-#   statement {
-#     sid    = "OracleEnterpriseManagementSecretsPolicyDocument"
-#     effect = "Allow"
-#     actions = [
-#       "secretsmanager:GetSecretValue"
-#     ]
-#     resources = [
-#       "arn:aws:secretsmanager:*:*:secret:/oracle/database/EMREP/shared-*",
-#       "arn:aws:secretsmanager:*:*:secret:/oracle/database/*RCVCAT/shared-*",
-#       "arn:aws:secretsmanager:*:*:secret:/oracle/oem/shared-*"
-#     ]
-#   }
-# }
-
-# resource "aws_iam_policy" "OracleEnterpriseManagementSecretsPolicy" {
-#   name   = "OracleEnterpriseManagementSecretsPolicy-${var.env_name}-${var.db_suffix}"
-#   policy = data.aws_iam_policy_document.OracleEnterpriseManagementSecretsPolicyDocument.json
-# }
-
-# resource "aws_iam_role_policy_attachment" "OracleEnterpriseManagementSecretsPolicy" {
-#   role       = aws_iam_role.EC2OracleEnterpriseManagementSecretsRole.name
-#   policy_arn = aws_iam_policy.OracleEnterpriseManagementSecretsPolicy.arn
-# }
+resource "aws_iam_policy" "combined_instance_policy" {
+  name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-combined-instance-policy"
+  policy = data.aws_iam_policy_document.combined_instance_policy.json
+}

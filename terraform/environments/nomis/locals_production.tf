@@ -8,7 +8,6 @@ locals {
 
   baseline_presets_production = {
     options = {
-      cloudwatch_log_groups_retention_in_days = 90
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -241,7 +240,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
+            branch = "753de472568b54954ea0cb8fe6fb8d28ecf33aa3" # 2025-01-14 nomis release
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {

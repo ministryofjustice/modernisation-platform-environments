@@ -4,7 +4,6 @@ locals {
 
   baseline_presets_production = {
     options = {
-      cloudwatch_log_groups_retention_in_days = 90
       db_backup_lifecycle_rule                = "rman_backup_one_month"
 
       sns_topics = {

@@ -51,6 +51,7 @@ updates:
       - "/terraform/environments/data-platform"
       - "/terraform/environments/data-platform-apps-and-tools"
       - "/terraform/environments/data-platform-apps-and-tools/modules/auth0-log-streams"
+      - "/terraform/environments/delius-alfresco"
       - "/terraform/environments/delius-core"
       - "/terraform/environments/delius-core/modules/components/dms"
       - "/terraform/environments/delius-core/modules/components/ldap"
