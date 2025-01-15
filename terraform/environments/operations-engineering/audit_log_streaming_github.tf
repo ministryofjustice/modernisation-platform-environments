@@ -43,3 +43,30 @@ resource "aws_iam_policy" "github_audit_log_write_policy" {
   })
 }
 
+resource "aws_iam_role" "github_audit_log_role" {
+  name = "github-audit-log-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "oidc-configuration.audit-log.githubusercontent.com:aud" = "sts.amazonaws.com",
+            "oidc-configuration.audit-log.githubusercontent.com:sub" = "https://github.com/ministry-of-justice-uk"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "github_policy_attachment" {
+  name       = "github-audit-log-policy-attachment"
+  policy_arn = aws_iam_policy.github_audit_log_write_policy.arn
+  roles      = [aws_iam_role.github_audit_log_role.name]
+}
