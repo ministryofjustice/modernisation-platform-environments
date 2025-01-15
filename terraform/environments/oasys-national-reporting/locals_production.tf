@@ -37,38 +37,58 @@ locals {
       }
     }
 
-    # fsx_windows = {
-    # retain commented out version of (MULTI_AZ_1) fsx_share for production account
-    # pd-bods-win-share = {
-    #   preferred_availability_zone = "eu-west-2a"
-    #   deployment_type             = "MULTI_AZ_1"
-    #   security_groups             = ["bods"]
-    #   skip_final_backup           = true
-    #   storage_capacity            = 600
-    #   throughput_capacity         = 8
+    fsx_windows = {
 
-    #   subnets = [
-    #     {
-    #       name               = "private"
-    #       availability_zones = ["eu-west-2a", "eu-west-2b"]
-    #     }
-    #   ]
+      pd-bods-win-share = {
+        preferred_availability_zone = "eu-west-2a"
+        deployment_type             = "MULTI_AZ_1"
+        security_groups             = ["bods"]
+        skip_final_backup           = true
+        storage_capacity            = 600
+        throughput_capacity         = 8
 
-    #   self_managed_active_directory = {
-    #     dns_ips = [
-    #       module.ip_addresses.mp_ip.ad-hmpp-dc-a,
-    #       module.ip_addresses.mp_ip.ad-hmpp-dc-b,
-    #     ]
-    #     domain_name          = "azure.hmpp.root"
-    #     username             = "svc_fsx_windows"
-    #     password_secret_name = "/sap/bods/pd/passwords"
-    #     file_system_administrators_group = "Domain Join"
-    #   }
-    #   tags = {
-    #     backup = true
-    #   }
-    # }
-    # }
+        subnets = [
+          {
+            name               = "private"
+            availability_zones = ["eu-west-2a", "eu-west-2b"]
+          }
+        ]
+
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.azure_fixngo_ip.PCMCW0011,
+            module.ip_addresses.azure_fixngo_ip.PCMCW0012,
+          ]
+          domain_name                      = "azure.hmpp.root"
+          username                         = "svc_fsx_windows"
+          password_secret_name             = "/sap/bods/pd/passwords"
+          file_system_administrators_group = "Domain Join"
+        }
+        tags = {
+          backup = true
+        }
+      }
+    }
+
+    iam_policies = {
+      Ec2SecretPolicy = {
+        description = "Permissions required for secret value access by instances"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          }
+        ]
+      }
+    }
 
     route53_zones = {
       "reporting.oasys.service.justice.gov.uk" = {
@@ -86,8 +106,10 @@ locals {
       }
     }
     secretsmanager_secrets = {
-      "/sap/bods/pd" = local.secretsmanager_secrets.bods
-      "/sap/bip/pd"  = local.secretsmanager_secrets.bip
+      "/sap/bods/pd"             = local.secretsmanager_secrets.bods
+      "/sap/bip/pd"              = local.secretsmanager_secrets.bip
+      "/oracle/database/PDBOSYS" = local.secretsmanager_secrets.db
+      "/oracle/database/PDBOAUD" = local.secretsmanager_secrets.db
     }
   }
 }

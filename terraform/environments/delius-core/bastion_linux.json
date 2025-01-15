@@ -15,6 +15,7 @@
       "snorris": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKlqHtp9W9q2d14MHNB8zSdMTzHtDl1tEZeTjF6uUj+z sebastian.norris@digital.justice.gov.uk"
     },
     "stage": {},
-    "preprod": {}
+    "preprod": {},
+    "prod": {}
   }
 }

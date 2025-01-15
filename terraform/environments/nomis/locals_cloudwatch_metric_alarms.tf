@@ -75,15 +75,6 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
-      local.environment == "production" ? {
-        free-disk-space-low = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux["free-disk-space-low"], {
-          threshold = "90"
-        })
-        } : {
-        free-disk-space-low = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux["free-disk-space-low"], {
-          threshold = "85"
-        })
-      }
     )
 
     xtag = merge(

@@ -123,6 +123,43 @@ locals {
       }
     }
 
+    private-jumpserver = {
+      description = "Security group for jumpservers"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        rdp_tcp_web = {
+          description = "3389: Allow RDP TCP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        rdp_udp_web = {
+          description = "3389: Allow RDP UDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+
     public-lb = {
       description = "Security group for public load-balancer"
       ingress = {

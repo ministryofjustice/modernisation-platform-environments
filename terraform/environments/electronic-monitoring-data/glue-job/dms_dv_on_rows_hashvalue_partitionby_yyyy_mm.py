@@ -222,11 +222,12 @@ if __name__ == "__main__":
 
     # EVALUATE RDS-DATAFRAME ROW-COUNT
     read_rds_tbl_agg_stats_from_parquet = args.get("read_rds_tbl_agg_stats_from_parquet", None)
+    hashed_rows_agg_schema = CustomPysparkMethods.get_year_month_min_max_count_schema(TABLE_PKEY_COLUMN)
 
     if read_rds_tbl_agg_stats_from_parquet == 'true':
         rds_table_row_stats_df_agg = CustomPysparkMethods.get_s3_parquet_df_v2(
                                         f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""", 
-                                        CustomPysparkMethods.get_year_month_min_max_count_schema(TABLE_PKEY_COLUMN)
+                                        hashed_rows_agg_schema
                                         )
         
         if prq_df_where_clause is not None:
@@ -238,24 +239,37 @@ if __name__ == "__main__":
                                                         DATE_PARTITION_COLUMN_NAME,
                                                         TABLE_PKEY_COLUMN,
                                                         args.get("rds_only_where_clause", None))
-        
+
+        for e in hashed_rows_agg_schema:
+            rds_table_row_stats_df_agg = rds_table_row_stats_df_agg.withColumn(
+                                                                        e.name, F.col(f"{e.name}").cast(e.dataType))
+
         if S3Methods.check_s3_folder_path_if_exists(RDS_HASHED_ROWS_PRQ_BUCKET, 
                                                     f"{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg"):
+             
              prq_rds_table_row_stats_df_agg = CustomPysparkMethods.get_s3_parquet_df_v2(
                                                 f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""", 
                                                 rds_table_row_stats_df_agg.schema
                                                 )
-             prq_rds_table_row_stats_df_agg_updated = CustomPysparkMethods.update_df1_with_df2(prq_rds_table_row_stats_df_agg,
-                                                                            rds_table_row_stats_df_agg,
-                                                                            group_by_cols_list,
-                                                                            [e.name 
-                                                                                for e in rds_table_row_stats_df_agg.schema.fields
-                                                                                    if e.name not in group_by_cols_list
-                                                                            ]
-                                                      )
-             prq_rds_table_row_stats_df_agg_updated.write.mode("overwrite").parquet(f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""")
+             
+             prq_rds_table_row_stats_df_agg_updated = CustomPysparkMethods.update_df1_with_df2(
+                                                            prq_rds_table_row_stats_df_agg,
+                                                            rds_table_row_stats_df_agg,
+                                                            [e.name 
+                                                                for e in rds_table_row_stats_df_agg.schema.fields
+                                                                    if e.name not in group_by_cols_list
+                                                            ],
+                                                            group_by_cols_list
+                                                        )
+            
+             prq_rds_table_row_stats_df_agg_updated.write\
+                                                   .mode("overwrite")\
+                                                   .option("overwriteSchema", "True")\
+                                                   .parquet(
+                                                    f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""")
         else:
-            rds_table_row_stats_df_agg.write.mode("overwrite").parquet(f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""")
+            rds_table_row_stats_df_agg.write.mode("overwrite").parquet(
+                                                    f"""s3://{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg""")
         # --------------------------------------------------------------------
     # --------------------------------------------------------------------
     # +----+-----+-----------------+-----------------+-------------------+
