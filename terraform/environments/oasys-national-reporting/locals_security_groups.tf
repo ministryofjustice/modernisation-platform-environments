@@ -20,6 +20,7 @@ locals {
     ])
     rdp = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      module.ip_addresses.azure_fixngo_cidrs.devtest
     ])
   }
 
@@ -44,6 +45,7 @@ locals {
     ])
     rdp = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      module.ip_addresses.azure_fixngo_cidrs.prod
     ])
   }
 

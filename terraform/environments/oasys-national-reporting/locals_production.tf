@@ -17,7 +17,7 @@ locals {
     # instance_type_defaults = {
     #   web = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
     #   boe = "m4.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
-    #   bods = "r4.2xlarge" # 8 vCPUs, 61GB RAM x 2 instance, NOT CONFIRMED as pre-prod usage may not warrant this high spec
+    #   bods = "r6i.2xlarge" # 8 vCPUs, 64GB RAM x 2 instance
     # }
 
     acm_certificates = {
