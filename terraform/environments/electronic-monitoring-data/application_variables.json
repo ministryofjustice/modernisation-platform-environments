@@ -40,7 +40,7 @@
             {
               "glue_database": "serco_fms_test_dbt",
               "glue_tables": [
-                "*"
+                "account"
               ]
             }
           ]
