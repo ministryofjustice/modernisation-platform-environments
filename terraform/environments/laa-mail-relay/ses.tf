@@ -59,9 +59,9 @@ resource "aws_iam_user" "smtp" {
   tags = local.tags
 }
 
-resource "aws_iam_access_key" "smtp" {
-  user = aws_iam_user.smtp.name
-}
+# resource "aws_iam_access_key" "smtp" {
+#   user = aws_iam_user.smtp.name
+# }
 
 data "aws_iam_policy_document" "smtp_user" {
   statement {
@@ -88,10 +88,10 @@ resource "aws_secretsmanager_secret" "smtp_user" {
   )
 }
 
-resource "aws_secretsmanager_secret_version" "smtp_user" {
-  secret_id     = aws_secretsmanager_secret.smtp_user.id
-  secret_string = aws_iam_access_key.smtp.id
-}
+# resource "aws_secretsmanager_secret_version" "smtp_user" {
+#   secret_id     = aws_secretsmanager_secret.smtp_user.id
+#   secret_string = aws_iam_access_key.smtp.id
+# }
 
 resource "aws_secretsmanager_secret" "smtp_password" {
   name        = "postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD"
@@ -102,10 +102,10 @@ resource "aws_secretsmanager_secret" "smtp_password" {
   )
 }
 
-resource "aws_secretsmanager_secret_version" "smtp_password" {
-  secret_id     = aws_secretsmanager_secret.smtp_password.id
-  secret_string = aws_iam_access_key.smtp.ses_smtp_password_v4
-}
+# resource "aws_secretsmanager_secret_version" "smtp_password" {
+#   secret_id     = aws_secretsmanager_secret.smtp_password.id
+#   secret_string = aws_iam_access_key.smtp.ses_smtp_password_v4
+# }
 
 resource "aws_secretsmanager_secret" "smtp_sesans" {
   name        = "postfix/app/SESANS_MP"
