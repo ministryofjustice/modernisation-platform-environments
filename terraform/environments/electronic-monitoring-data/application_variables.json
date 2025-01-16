@@ -38,7 +38,7 @@
           ],
           "resource_shares": [
             {
-              "glue_database": "test_db_name",
+              "glue_database": "serco_fms_test_dbt",
               "glue_tables": [
                 "*"
               ]
