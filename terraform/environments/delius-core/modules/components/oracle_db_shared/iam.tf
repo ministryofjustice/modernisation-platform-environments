@@ -197,7 +197,7 @@ resource "aws_iam_policy" "core_shared_services_bucket_access_policy" {
   policy = data.aws_iam_policy_document.dummy_policy.json
 }
 
-resource "aws_iam_policy" "ssm_parameter_store_access" {
+resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
   name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-ssm-parameter-store-access"
   policy = data.aws_iam_policy_document.dummy_policy.json
 }
