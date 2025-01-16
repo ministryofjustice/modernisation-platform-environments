@@ -80,6 +80,14 @@ resource "aws_cloudwatch_log_subscription_filter" "lambda_payment_load_monitor" 
   # role_arn        = aws_iam_role.lambda_payment_load_monitor_role.arn
 }
 
+resource "aws_lambda_permission" "allow_cloudwatch_logs_invoke" {
+  statement_id  = "AllowCloudWatchLogsInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.lambda_payment_load_monitor.function_name
+  principal     = "logs.amazonaws.com"
+  source_arn    = "arn:aws:logs:${var.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/lambda/${local.application_name}-${local.environment}-payment-load-monitor:*"
+}
+
 output "sns_topic_arn_payment_load_monitor" {
   description = "ARN of the SNS topic for Payment Load monitor"
   value       = aws_sns_topic.payment_load_notifications.arn
