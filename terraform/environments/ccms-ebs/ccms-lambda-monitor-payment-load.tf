@@ -33,7 +33,7 @@ resource "aws_iam_role_policy" "lambda_payment_load_monitor_policy" {
       {
         Effect   = "Allow"
         Action   = ["sns:Publish"]
-        Resource = [aws_sns_topic.payment_load_monitor.arn]
+        Resource = [aws_sns_topic.payment_load_notifications.arn]
       }
     ]
   })
@@ -47,7 +47,7 @@ resource "aws_sns_topic" "payment_load_notifications" {
 }
 
 resource "aws_sns_topic_subscription" "payment_load_notofications_email" {
-  topic_arn = aws_sns_topic.payment_load_notofications.arn
+  topic_arn = aws_sns_topic.payment_load_notifications.arn
   protocol  = "email"
   endpoint  = local.application_data.accounts[local.environment].payment_load_monitor_email
 }
@@ -64,7 +64,7 @@ resource "aws_lambda_function" "lambda_payment_load_monitor" {
 
   environment {
     variables = {
-      SNS_TOPIC_ARN = aws_sns_topic.payment_load_monitor.arn
+      SNS_TOPIC_ARN = aws_sns_topic.payment_load_notifications.arn
     }
   }
   tags = merge(local.tags, {
