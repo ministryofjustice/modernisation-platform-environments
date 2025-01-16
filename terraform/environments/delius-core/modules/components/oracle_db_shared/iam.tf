@@ -192,7 +192,7 @@ data "aws_iam_policy_document" "dummy_policy" {
   }
 }
 
-resource "aws_iam_policy" "core_shared_services_bucket_access_policy" {
+resource "aws_iam_policy" "core_shared_services_bucket_access" {
   name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-shared-services-bucket-access-policy"
   policy = data.aws_iam_policy_document.dummy_policy.json
 }
