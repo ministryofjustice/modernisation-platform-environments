@@ -17,7 +17,7 @@ locals {
     # instance_type_defaults = {
     #   web = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
     #   boe = "m4.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
-    #   bods = "r4.2xlarge" # 8 vCPUs, 61GB RAM x 2 instance, NOT CONFIRMED as pre-prod usage may not warrant this high spec
+    #   bods = "r6i.2xlarge" # 8 vCPUs, 64GB RAM x 2 instance
     # }
 
     acm_certificates = {
@@ -35,6 +35,32 @@ locals {
           description = "Wildcard certificate for the ${local.environment} environment"
         }
       }
+    }
+
+    ec2_instances = {
+      # pd-onr-bods-1 = merge(local.ec2_instances.bods, {
+      #   config = merge(local.ec2_instances.bods.config, {
+      #     ami_name          = "hmpps_windows_server_2019_release_2025-01-02T00-00-37.501Z"
+      #     availability_zone = "eu-west-2a"
+      #     user_data_raw = base64encode(templatefile(
+      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
+      #         branch = "main"
+      #       }
+      #     ))
+      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy",
+      #     ])
+      #   })
+      #   instance = merge(local.ec2_instances.bods.instance, {
+      #     instance_type           = "r6i.2xlarge"
+      #     disable_api_termination = true
+      #   })
+      #   tags = merge(local.ec2_instances.bods.tags, {
+      #     oasys-national-reporting-environment = "pd"
+      #     domain-name                          = "azure.hmpp.root"
+      #   })
+      #   cloudwatch_metric_alarms = null # <= REMOVE THIS LATER
+      # })
     }
 
     fsx_windows = {
@@ -67,6 +93,26 @@ locals {
         tags = {
           backup = true
         }
+      }
+    }
+
+    iam_policies = {
+      Ec2SecretPolicy = {
+        description = "Permissions required for secret value access by instances"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/sap/bods/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/sap/bip/pd/*",
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
+            ]
+          }
+        ]
       }
     }
 

@@ -4,9 +4,9 @@
 # tags demonstrate inheritance due to merges in the module
 locals {
   environment_config_stage = {
-    migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/23"]
+    migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/22"]
     migration_environment_vpc_cidr         = "10.160.32.0/20"
-    migration_environment_db_cidr          = ["10.160.42.0/23", "10.160.44.0/23", "10.160.46.0/23"]
+    migration_environment_db_cidr          = ["10.160.44.0/24", "10.160.45.0/24", "10.160.46.0/25"]
     migration_environment_full_name        = "del-stage"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "stage"

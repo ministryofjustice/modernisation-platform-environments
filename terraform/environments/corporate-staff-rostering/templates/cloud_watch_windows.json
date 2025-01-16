@@ -42,7 +42,7 @@
         "resources": ["*"]
       },
       "Memory": {
-        "metrics_collection_interval": 5,
+        "metrics_collection_interval": 60,
         "measurement": [
           "% Committed Bytes In Use",
           "Available Bytes",
@@ -52,7 +52,7 @@
         ]
       },
       "Network Interface": {
-        "metrics_collection_interval": 5,
+        "metrics_collection_interval": 60,
         "measurement": [
           "Bytes Received/sec",
           "Bytes Sent/sec",
@@ -115,18 +115,26 @@
       "windows_events": {
         "collect_list": [
           {
+            "event_name": "System",
+            "event_levels": ["INFORMATION", "WARNING", "ERROR", "CRITICAL"],
+            "log_group_name": "cwagent-windows-system",
+            "log_stream_name": "{instance_id}",
+            "event_format": "xml"
+          },
+          {
             "event_name": "Application",
-            "event_levels": ["INFORMATION", "ERROR"],
+            "event_levels": ["INFORMATION", "WARNING", "ERROR", "CRITICAL"],
             "log_group_name": "cwagent-windows-application",
             "log_stream_name": "{instance_id}",
             "event_format": "xml"
           },
           {
-            "event_name": "System",
-            "event_levels": ["INFORMATION", "ERROR"],
-            "log_group_name": "cwagent-windows-system",
+            "event_name": "Security",
+            "log_group_name": "cwagent-windows-security",
             "log_stream_name": "{instance_id}",
-            "event_format": "xml"
+            "filter": {
+              "event_id": [1102, 4624, 4625, 4657, 4663, 4688, 4700, 4702, 4719, 4720, 4722, 4723, 4724, 4727, 4728]
+            }
           }
         ]
       }

@@ -239,7 +239,11 @@ if __name__ == "__main__":
                                                         DATE_PARTITION_COLUMN_NAME,
                                                         TABLE_PKEY_COLUMN,
                                                         args.get("rds_only_where_clause", None))
-        
+
+        for e in hashed_rows_agg_schema:
+            rds_table_row_stats_df_agg = rds_table_row_stats_df_agg.withColumn(
+                                                                        e.name, F.col(f"{e.name}").cast(e.dataType))
+
         if S3Methods.check_s3_folder_path_if_exists(RDS_HASHED_ROWS_PRQ_BUCKET, 
                                                     f"{rds_hashed_rows_bucket_parent_dir}/rds_table_row_stats_df_agg"):
              
@@ -257,9 +261,6 @@ if __name__ == "__main__":
                                                             ],
                                                             group_by_cols_list
                                                         )
-             for e in hashed_rows_agg_schema:
-                 df_prq_rds_table_agg_row_stats = df_prq_rds_table_agg_row_stats.withColumn(
-                                                                                e.name, F.col(f"{e.name}").cast(e.dataType))
             
              prq_rds_table_row_stats_df_agg_updated.write\
                                                    .mode("overwrite")\
