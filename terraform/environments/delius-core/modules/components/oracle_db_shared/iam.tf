@@ -212,7 +212,7 @@ resource "aws_iam_policy" "instance_ssm" {
   policy = data.aws_iam_policy_document.dummy_policy.json
 }
 
-resource "aws_iam_policy" "secrets_manager_access" {
+resource "aws_iam_policy" "db_access_to_secrets_manager" {
   name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-secrets-manager-access"
   policy = data.aws_iam_policy_document.dummy_policy.json
 }
