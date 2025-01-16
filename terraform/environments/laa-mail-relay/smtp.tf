@@ -63,9 +63,9 @@ resource "aws_instance" "smtp" {
     { "Name" = "${local.application_name}-${local.environment}" }
   )
 
-  depends_on = [
-    aws_secretsmanager_secret_version.smtp_user, aws_secretsmanager_secret_version.smtp_password
-  ]
+  # depends_on = [
+  #   aws_secretsmanager_secret_version.smtp_user, aws_secretsmanager_secret_version.smtp_password
+  # ]
 }
 
 #################################
