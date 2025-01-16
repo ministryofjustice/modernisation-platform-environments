@@ -39,15 +39,15 @@ resource "aws_iam_role_policy" "lambda_payment_load_monitor_policy" {
   })
 }
 
-resource "aws_sns_topic" "payment_load_monitor" {
-  name = "${local.application_name}-${local.environment}-payment-load-monitor"
+resource "aws_sns_topic" "payment_load_notifications" {
+  name = "${local.application_name}-${local.environment}-payment-load-notifications"
   tags = merge(local.tags, {
-    Name = "${local.application_name}-${local.environment}-payment-load-monitor"
+    Name = "${local.application_name}-${local.environment}-payment-load-notifications"
   })
 }
 
-resource "aws_sns_topic_subscription" "payment_load_monitor_email" {
-  topic_arn = aws_sns_topic.payment_load_monitor.arn
+resource "aws_sns_topic_subscription" "payment_load_notofications_email" {
+  topic_arn = aws_sns_topic.payment_load_notofications.arn
   protocol  = "email"
   endpoint  = local.application_data.accounts[local.environment].payment_load_monitor_email
 }
@@ -73,7 +73,7 @@ resource "aws_lambda_function" "lambda_payment_load_monitor" {
 }
 
 resource "aws_cloudwatch_log_subscription_filter" "lambda_payment_load_monitor" {
-  name            = "cloudwatch-to-slack-filter"
+  name            = "payment-load-filter"
   log_group_name  = "/aws/lambda/${local.application_name}-${local.environment}-payment-load"
   filter_pattern  = ""
   destination_arn = aws_lambda_function.lambda_payment_load_monitor.arn
@@ -82,7 +82,7 @@ resource "aws_cloudwatch_log_subscription_filter" "lambda_payment_load_monitor" 
 
 output "sns_topic_arn_payment_load_monitor" {
   description = "ARN of the SNS topic for Payment Load monitor"
-  value       = aws_sns_topic.payment_load_monitor.arn
+  value       = aws_sns_topic.payment_load_notifications.arn
 }
 
 output "lambda_function_arn_lambda_payment_load_monitor" {
