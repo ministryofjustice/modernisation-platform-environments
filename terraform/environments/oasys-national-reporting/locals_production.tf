@@ -40,7 +40,7 @@ locals {
     ec2_instances = {
       pd-onr-bods-1 = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
-          ami_name          = "hmpps_windows_server_2019_release_2025-*"
+          ami_name          = "hmpps_windows_server_2019_release_2025-01-02T00-00-37.501Z"
           availability_zone = "eu-west-2a"
           user_data_raw = base64encode(templatefile(
             "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
@@ -52,14 +52,14 @@ locals {
           ])
         })
         instance = merge(local.ec2_instances.bods.instance, {
-          instance_type           = "r6i.2xlarge" # TODO: CHECK THIS FIRST
+          instance_type           = "r6i.2xlarge"
           disable_api_termination = true
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
           domain-name                          = "azure.hmpp.root"
         })
-        cloudwatch_metric_alarms = null # TODO: REMOVE THIS LATER
+        cloudwatch_metric_alarms = null # <= REMOVE THIS LATER
       })
     }
 
