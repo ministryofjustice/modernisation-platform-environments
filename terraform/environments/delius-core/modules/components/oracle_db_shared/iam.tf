@@ -173,3 +173,46 @@ resource "aws_iam_policy" "combined_instance_policy" {
   name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-combined-instance-policy"
   policy = data.aws_iam_policy_document.combined_instance_policy.json
 }
+
+
+/*
+    Dummy policies to allow these to be detached
+*/
+
+data "aws_iam_policy_document" "dummy_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "sts:AssumeRole"
+    ]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "core_shared_services_bucket_access_policy" {
+  name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-shared-services-bucket-access-policy"
+  policy = data.aws_iam_policy_document.dummy_policy.json
+}
+
+resource "aws_iam_policy" "ssm_parameter_store_access" {
+  name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-ssm-parameter-store-access"
+  policy = data.aws_iam_policy_document.dummy_policy.json
+}
+
+resource "aws_iam_policy" "ansible_ec2_access" {
+  name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-db-ansible-ec2-access"
+  policy = data.aws_iam_policy_document.dummy_policy.json
+}
+
+resource "aws_iam_policy" "ssm_access" {
+  name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-ssm-access"
+  policy = data.aws_iam_policy_document.dummy_policy.json
+}
+
+resource "aws_iam_policy" "secrets_manager_access" {
+  name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-secrets-manager-access"
+  policy = data.aws_iam_policy_document.dummy_policy.json
+}
