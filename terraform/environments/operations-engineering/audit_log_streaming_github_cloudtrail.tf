@@ -1,0 +1,66 @@
+locals {
+  oidc_provider = "token.actions.githubusercontent.com"
+}
+
+resource "aws_iam_openid_connect_provider" "github_actions" {
+  url            = "https://${local.oidc_provider}"
+  client_id_list = ["sts.amazonaws.com"]
+}
+
+data "aws_iam_policy_document" "github_actions_assume_role_policy_document" {
+  version = "2012-10-17"
+
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "${local.oidc_provider}:sub"
+      values = [
+        "repo:ministryofjustice/operations-engineering:*"
+      ]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${local.oidc_provider}:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "cloudtrail_query_role" {
+  name               = "cloudtrail_query_role"
+  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_policy_document.json
+}
+
+resource "aws_iam_policy" "cloudtrail_query_policy" {
+  name        = "cloudtrail_query_policy"
+  description = "Policy to query CloudTrail Data Lake"
+
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "cloudtrail:LookupEvents",
+          "cloudtrail:StartQuery",
+          "cloudtrail:GetQueryResults"
+        ],
+        "Resource" : "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "cloudtrail_query_policy_attachment" {
+  role       = aws_iam_role.cloudtrail_query_role.name
+  policy_arn = aws_iam_policy.cloudtrail_query_policy.arn
+}
