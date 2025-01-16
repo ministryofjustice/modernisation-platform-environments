@@ -393,3 +393,19 @@ module "copy_apdp_cadet_metadata_to_compute_assumable_role" {
   custom_role_policy_arns = [module.copy_apdp_cadet_metadata_to_compute_policy.arn]
   # number_of_custom_role_policy_arns = 1
 }
+
+module "find_moj_data_quicksight_sa_assumable_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.52.1"
+
+  allow_self_assume_role = false
+  trusted_role_arns  = ["arn:aws:iam::754256621582:role/cloud-platform-irsa-e5ba8827240d2ff3-live"]
+
+  create_role       = true
+  role_requires_mfa = false
+  role_name         = "find-moj-data-quicksight"
+
+  custom_role_policy_arns = [module.find_moj_data_quicksight_policy.arn]
+}
