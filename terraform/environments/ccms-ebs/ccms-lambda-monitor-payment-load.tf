@@ -46,7 +46,7 @@ resource "aws_sns_topic" "payment_load_monitor" {
   })
 }
 
-resource "aws_sns_topic_subscription" "email" {
+resource "aws_sns_topic_subscription" "payment_load_monitor_email" {
   topic_arn = aws_sns_topic.payment_load_monitor.arn
   protocol  = "email"
   endpoint  = local.application_data.accounts[local.environment].payment_load_monitor_email

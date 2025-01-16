@@ -76,7 +76,7 @@ resource "aws_sns_topic" "certificate_expiration_alerts" {
   })
 }
 
-resource "aws_sns_topic_subscription" "email" {
+resource "aws_sns_topic_subscription" "certificate_monitor_email" {
   topic_arn = aws_sns_topic.certificate_expiration_alerts.arn
   protocol  = "email"
   endpoint  = local.application_data.accounts[local.environment].certificate_monitor_email
