@@ -323,6 +323,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:DeregisterResource",
       "lakeformation:ListPermissions",
       "lakeformation:DescribeResource",
+      "lakeformation:CreateDataCellsFilter",
 
     ]
     resources = [
