@@ -207,7 +207,7 @@ resource "aws_iam_policy" "ec2_access_for_ansible" {
   policy = data.aws_iam_policy_document.dummy_policy.json
 }
 
-resource "aws_iam_policy" "ssm_access" {
+resource "aws_iam_policy" "instance_ssm" {
   name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-ssm-access"
   policy = data.aws_iam_policy_document.dummy_policy.json
 }
