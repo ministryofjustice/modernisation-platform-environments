@@ -107,14 +107,14 @@ resource "aws_secretsmanager_secret_version" "smtp_password" {
   secret_string = aws_iam_access_key.smtp.ses_smtp_password_v4
 }
 
-# resource "aws_secretsmanager_secret" "smtp_sesans" {
-#   name        = "postfix/app/SESANS"
-#   description = "Secret to pull from Ansible code from https://github.com/ministryofjustice/laa-aws-postfix-smtp"
-#   tags = merge(
-#     local.tags,
-#     { "Name" = "postfix/app/SESANS" }
-#   )
-# }
+resource "aws_secretsmanager_secret" "smtp_sesans" {
+  name        = "postfix/app/SESANS_MP"
+  description = "Secret to pull from Ansible code from https://github.com/ministryofjustice/laa-aws-postfix-smtp"
+  tags = merge(
+    local.tags,
+    { "Name" = "postfix/app/SESANS_MP" }
+  )
+}
 
 resource "aws_secretsmanager_secret" "smtp_sesrsap" {
   name        = "postfix/app/SESRSAP"

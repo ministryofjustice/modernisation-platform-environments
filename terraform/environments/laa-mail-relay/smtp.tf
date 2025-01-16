@@ -30,7 +30,7 @@ mkdir -p /root/ansible
 echo "Getting secrets from Secrets Manager"
 export SESP=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD --query SecretString --output text`
 export SESU=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/APP_DATA_MIGRATION_SMTP_USER --query SecretString --output text`
-export SESANS=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/SESANS --query SecretString --output text`
+export SESANS=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/SESANS_MP --query SecretString --output text`
 # mkdir -p /run/cfn-init # Path to store cfn-init scripts
 
 echo "Running Ansible Pull"
