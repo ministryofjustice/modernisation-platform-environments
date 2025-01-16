@@ -77,7 +77,7 @@ resource "aws_cloudwatch_log_subscription_filter" "lambda_payment_load_monitor" 
   log_group_name  = "/aws/lambda/${local.application_name}-${local.environment}-payment-load"
   filter_pattern  = ""
   destination_arn = aws_lambda_function.lambda_payment_load_monitor.arn
-  role_arn        = aws_iam_role.lambda_payment_load_monitor_role.arn
+  # role_arn        = aws_iam_role.lambda_payment_load_monitor_role.arn
 }
 
 output "sns_topic_arn_payment_load_monitor" {
