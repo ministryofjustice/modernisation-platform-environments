@@ -197,49 +197,11 @@ data "aws_iam_policy_document" "dummy_policy" {
   Reinstate previous policies so that they may be detatched
 
 */
-data "aws_iam_policy_document" "core_shared_services_bucket_access" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-      "s3:GetObject"
-    ]
-    resources = [
-      "arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001/*",
-      "arn:aws:s3:::mod-platform-image-artefact-bucket20230203091453221500000001"
-    ]
-  }
-}
 
 resource "aws_iam_policy" "core_shared_services_bucket_access" {
   name   = "${var.env_name}-${var.db_suffix}-core-shared-services-bucket-access-policy"
   path   = "/"
   policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
-}
-
-data "aws_iam_policy_document" "ec2_access_for_ansible" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "ec2:DescribeTags",
-      "ec2:DescribeInstances",
-      "ec2:DescribeVolumes"
-    ]
-    resources = ["*"]
-  }
-}
-
-data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
-  #checkov:skip=CKV_AWS_111 "ignore"
-  #checkov:skip=CKV_AWS_356 "ignore"
-  statement {
-    sid    = "AllowAccessToSsmParameterStore"
-    effect = "Allow"
-    actions = [
-      "ssm:PutParameter"
-    ]
-    resources = ["*"]
-  }
 }
 
 resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
@@ -253,87 +215,11 @@ resource "aws_iam_policy" "ec2_access_for_ansible" {
   path   = "/"
   policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
 }
-
-
-data "aws_iam_policy_document" "db_access_to_secrets_manager" {
-  statement {
-    sid = "DbAccessToSecretsManager"
-    actions = [
-      "secretsmanager:Describe*",
-      "secretsmanager:Get*",
-      "secretsmanager:ListSecret*",
-      "secretsmanager:Put*",
-      "secretsmanager:RestoreSecret",
-      "secretsmanager:Update*"
-    ]
-    effect = "Allow"
-    resources = [
-      aws_secretsmanager_secret.database_dba_passwords.arn,
-      aws_secretsmanager_secret.database_application_passwords.arn,
-    ]
-  }
-}
-
 # Policy to allow access to both Oracle database DBA and application secrets
 
 resource "aws_iam_policy" "db_access_to_secrets_manager" {
   name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-secrets-manager-access"
   policy = data.aws_iam_policy_document.db_access_to_secrets_manager.json
-}
-
-data "aws_iam_policy_document" "instance_ssm" {
-  #checkov:skip=CKV_AWS_108 "ignore"
-  #checkov:skip=CKV_AWS_111 "ignore"
-  #checkov:skip=CKV_AWS_356 "ignore"
-  statement {
-    sid    = "SSMManagedSSM"
-    effect = "Allow"
-    actions = [
-      "ssm:DescribeAssociation",
-      "ssm:GetDeployablePatchSnapshotForInstance",
-      "ssm:GetDocument",
-      "ssm:DescribeDocument",
-      "ssm:GetManifest",
-      "ssm:ListAssociations",
-      "ssm:ListInstanceAssociations",
-      "ssm:PutInventory",
-      "ssm:PutComplianceItems",
-      "ssm:PutConfigurePackageResult",
-      "ssm:UpdateAssociationStatus",
-      "ssm:UpdateInstanceAssociationStatus",
-      "ssm:UpdateInstanceInformation",
-      "ssm:GetParameter*"
-    ]
-    resources = [
-      "*"
-    ]
-  }
-
-  statement {
-    sid    = "SSMManagedSSMMessages"
-    effect = "Allow"
-    actions = [
-      "ssmmessages:CreateControlChannel",
-      "ssmmessages:CreateDataChannel",
-      "ssmmessages:OpenControlChannel",
-      "ssmmessages:OpenDataChannel",
-    ]
-    resources = ["*"]
-  }
-
-  statement {
-    sid    = "SSMManagedEC2Messages"
-    effect = "Allow"
-    actions = [
-      "ec2messages:AcknowledgeMessage",
-      "ec2messages:DeleteMessage",
-      "ec2messages:FailMessage",
-      "ec2messages:GetEndpoint",
-      "ec2messages:GetMessages",
-      "ec2messages:SendReply"
-    ]
-    resources = ["*"]
-  }
 }
 
 resource "aws_iam_policy" "instance_ssm" {
