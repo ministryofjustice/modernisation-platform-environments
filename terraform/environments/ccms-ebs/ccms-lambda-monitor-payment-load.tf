@@ -80,12 +80,12 @@ resource "aws_cloudwatch_log_subscription_filter" "lambda_payment_load_monitor" 
   role_arn        = aws_iam_role.lambda_payment_load_monitor_role.arn
 }
 
-output "sns_topic_arn" {
+output "sns_topic_arn_payment_load_monitor" {
   description = "ARN of the SNS topic for Payment Load monitor"
   value       = aws_sns_topic.payment_load_monitor.arn
 }
 
-output "lambda_function_arn" {
+output "lambda_function_arn_lambda_payment_load_monitor" {
   description = "ARN of the Payment Load monitor Lambda function"
   value       = aws_lambda_function.lambda_payment_load_monitor.arn
 }
