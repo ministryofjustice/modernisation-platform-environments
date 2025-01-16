@@ -14,8 +14,10 @@
           ],
           "resource_shares": [
             {
-              "glue_database": "dms_data_validation",
-              "glue_tables": ["*"]
+              "glue_database": "serco_fms_test_dbt",
+              "glue_tables": [
+                "*"
+              ]
             }
           ]
         }
@@ -31,11 +33,15 @@
           "target_account_id": "593291632749",
           "assume_account_name": "analytical-platform-management-production",
           "assume_account_id": "042130406152",
-          "data_locations": ["emds-test-bucket-name"],
+          "data_locations": [
+            "emds-test-bucket-name"
+          ],
           "resource_shares": [
             {
               "glue_database": "test_db_name",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             }
           ]
         }
@@ -56,11 +62,15 @@
           "target_account_id": "593291632749",
           "assume_account_name": "analytical-platform-management-production",
           "assume_account_id": "042130406152",
-          "data_locations": ["emds-prod-bucket-name"],
+          "data_locations": [
+            "emds-prod-bucket-name"
+          ],
           "resource_shares": [
             {
               "glue_database": "capita_alcohol_monitoring",
-              "glue_tables": ["*"]
+              "glue_tables": [
+                "*"
+              ]
             }
           ]
         }
