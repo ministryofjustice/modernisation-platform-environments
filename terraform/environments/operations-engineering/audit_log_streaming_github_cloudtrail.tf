@@ -1,10 +1,6 @@
 locals {
   oidc_provider = "token.actions.githubusercontent.com"
-}
-
-resource "aws_iam_openid_connect_provider" "github_actions" {
-  url            = "https://${local.oidc_provider}"
-  client_id_list = ["sts.amazonaws.com"]
+  account_id    = local.environment_management.account_ids[terraform.workspace]
 }
 
 data "aws_iam_policy_document" "github_actions_assume_role_policy_document" {
@@ -16,7 +12,7 @@ data "aws_iam_policy_document" "github_actions_assume_role_policy_document" {
 
     principals {
       type        = "Federated"
-      identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+      identifiers = ["arn:aws:iam::${local.account_id}:oidc-provider/token.actions.githubusercontent.com"]
     }
 
     condition {
