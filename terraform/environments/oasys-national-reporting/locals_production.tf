@@ -154,7 +154,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "reporting.oasys.service.justice.gov.uk",
+                      "pd-bods.production.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -282,6 +282,9 @@ locals {
         ]
       }
       "production.reporting.oasys.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "pd-bods", type = "A", lbs_map_key = "public" }
+        ],
       }
     }
     secretsmanager_secrets = {
