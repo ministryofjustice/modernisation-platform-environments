@@ -140,17 +140,22 @@ resource "aws_iam_role" "probation_search_sagemaker_execution_role" {
 resource "aws_iam_role_policy" "probation_search_sagemaker_logs_policy" {
   for_each = tomap(local.probation_search_environment)
   role     = aws_iam_role.probation_search_sagemaker_execution_role[each.key].id
-  
+
   policy = jsonencode({
-    Sid    = "LogsAccess"
-    Effect = "Allow"
-    Actions = [
-      "cloudwatch:PutMetricData",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "logs:CreateLogGroup",
-      "logs:DescribeLogStreams",
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "LogsAccess"
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:PutMetricData",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:CreateLogGroup",
+          "logs:DescribeLogStreams",
+        ]
+        Resource = "*"
+      }
     ]
-    Resources = "*"
   })
 }
