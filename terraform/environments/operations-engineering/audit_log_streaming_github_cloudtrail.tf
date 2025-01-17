@@ -50,6 +50,8 @@ resource "aws_iam_policy" "cloudtrail_query_policy" {
           "cloudtrail:StartQuery",
           "cloudtrail:GetQueryResults"
         ],
+        #checkov:skip=CKV_AWS_290:Cannot not define specific resources for cloudtrail
+        #checkov:skip=CKV_AWS_355:Cannot not define specific resources for cloudtrail
         "Resource" : "*"
       }
     ]
