@@ -68,7 +68,5 @@ module "oracle_observer" {
 
   container_vars_default = {}
 
-  container_secrets_default = {
-    "JDBC_PASSWORD" = "UNKNOWN"
-    }
+  container_secrets_default = {}
 }
