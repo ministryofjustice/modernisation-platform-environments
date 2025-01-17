@@ -23,7 +23,7 @@ locals {
         environment = {
           HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
         }
-      },
+      }
       hmpps-probation-search-prod = {
         namespace       = "hmpps-probation-search-prod"
         instance_type   = "ml.g6.xlarge"
@@ -60,8 +60,8 @@ resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
 
 resource "aws_sagemaker_endpoint_configuration" "probation_search_config" {
   #checkov:skip=CKV_AWS_98:KMS key is not supported for NVMe instance storage.
-  for_each    = tomap(local.probation_search_environment)
-  name        = "${each.value.namespace}-sagemaker-endpoint-config"
+  for_each = tomap(local.probation_search_environment)
+  name     = "${each.value.namespace}-sagemaker-endpoint-config"
   production_variants {
     variant_name           = "AllTraffic"
     model_name             = aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key].name
@@ -134,5 +134,22 @@ resource "aws_iam_role" "probation_search_sagemaker_execution_role" {
         Action = "sts:AssumeRole"
       }
     ]
+  })
+}
+
+resource "aws_iam_role_policy" "probation_search_sagemaker_logs_policy" {
+  for_each = tomap(local.probation_search_environment)
+  role  = aws_iam_role.probation_search_sagemaker_execution_role[each.key].id
+  policy = jsonencode({
+    Sid    = "LogsAccess"
+    Effect = "Allow"
+    Actions = [
+      "cloudwatch:PutMetricData",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:CreateLogGroup",
+      "logs:DescribeLogStreams",
+    ]
+    Resources = "*"
   })
 }
