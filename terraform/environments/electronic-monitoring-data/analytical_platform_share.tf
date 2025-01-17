@@ -324,7 +324,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:ListPermissions",
       "lakeformation:DescribeResource",
       "lakeformation:CreateDataCellsFilter",
-
+      "lakeformation:GetDataCellsFilter",
     ]
     resources = [
       #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
