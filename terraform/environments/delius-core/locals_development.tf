@@ -104,6 +104,13 @@ locals {
       container_cpu    = 512
       container_memory = 1024
     }
+
+    oracle_observer = {
+      image_tag        = "latest"
+      container_port   = 2222
+      container_cpu    = 512
+      container_memory = 1024
+    }
   }
 
   bastion_config_dev = {
