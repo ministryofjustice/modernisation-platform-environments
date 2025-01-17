@@ -139,7 +139,8 @@ resource "aws_iam_role" "probation_search_sagemaker_execution_role" {
 
 resource "aws_iam_role_policy" "probation_search_sagemaker_logs_policy" {
   for_each = tomap(local.probation_search_environment)
-  role  = aws_iam_role.probation_search_sagemaker_execution_role[each.key].id
+  role     = aws_iam_role.probation_search_sagemaker_execution_role[each.key].id
+  
   policy = jsonencode({
     Sid    = "LogsAccess"
     Effect = "Allow"
