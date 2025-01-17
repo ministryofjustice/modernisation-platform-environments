@@ -254,8 +254,8 @@ locals {
   lambda_scheduled_dataset_jar_version    = "v0.0.1"
   lambda_scheduled_dataset_code_s3_key = (
   local.env == "production" || local.env == "preproduction"
-  ? "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}.rel-all.jar"
-  : "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}-all.jar"
+  ? "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/digital-prison-reporting-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}.rel-all.jar"
+  : "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/digital-prison-reporting-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}-all.jar"
   )
   lambda_scheduled_dataset_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
