@@ -39,7 +39,7 @@ module "scheduled_dataset_lambda" {
 
 }
 
-module "step_function_notification_lambda_trigger" {
+module "scheduled_dataset_lambda_trigger" {
   source = "./modules/lambda_trigger"
 
   enable_lambda_trigger = local.lambda_scheduled_dataset_enabled
