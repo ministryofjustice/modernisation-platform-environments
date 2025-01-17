@@ -6,7 +6,7 @@ locals {
     analytical-platform-compute-development = {
       hmpps-probation-search-dev = {
         namespace       = "hmpps-probation-search-dev"
-        instance_type   = "ml.t2.medium"
+        instance_type   = "ml.m6g.large"
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
@@ -17,7 +17,7 @@ locals {
     analytical-platform-compute-production = {
       hmpps-probation-search-preprod = {
         namespace       = "hmpps-probation-search-preprod"
-        instance_type   = "ml.t2.medium"
+        instance_type   = "ml.m6g.large"
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
@@ -59,9 +59,9 @@ resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
 }
 
 resource "aws_sagemaker_endpoint_configuration" "probation_search_config" {
+  #checkov:skip=CKV_AWS_98:KMS key is not supported for NVMe instance storage.
   for_each    = tomap(local.probation_search_environment)
   name        = "${each.value.namespace}-sagemaker-endpoint-config"
-  kms_key_arn = module.sagemaker_kms.key_arn
   production_variants {
     variant_name           = "AllTraffic"
     model_name             = aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key].name
