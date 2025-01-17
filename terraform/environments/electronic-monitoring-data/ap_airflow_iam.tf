@@ -185,7 +185,7 @@ module "load_telephony_database" {
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
 }
 
-module "load_unstructured_atrium_database" {
+module "load_atrium_unstructured_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
