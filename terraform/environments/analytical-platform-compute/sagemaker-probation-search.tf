@@ -152,7 +152,7 @@ resource "aws_iam_role_policy" "probation_search_sagemaker_logs_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "logs:CreateLogGroup",
-          "logs:DescribeLogStreams",
+          "logs:DescribeLogStreams"
         ]
         Resource = "*"
       }
