@@ -138,6 +138,8 @@ resource "aws_iam_role" "probation_search_sagemaker_execution_role" {
 }
 
 resource "aws_iam_role_policy" "probation_search_sagemaker_logs_policy" {
+  #checkov:skip=CKV_AWS_290:Role is only used by SageMaker service
+  #checkov:skip=CKV_AWS_355:Role is only used by SageMaker service
   for_each = tomap(local.probation_search_environment)
   role     = aws_iam_role.probation_search_sagemaker_execution_role[each.key].id
 
