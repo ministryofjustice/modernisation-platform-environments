@@ -244,6 +244,33 @@ locals {
   lambda_redshift_table_expiry_timeout_seconds     = 900
   lambda_redshift_table_expiry_memory_size         = 1024
 
+  # Scheduled Dataset Lambda
+  lambda_scheduled_dataset_enabled        = true
+  lambda_scheduled_dataset_name           = "${local.project}-scheduled-dataset"
+  lambda_scheduled_dataset_runtime        = "java21"
+  lambda_scheduled_dataset_tracing        = "Active"
+  lambda_scheduled_dataset_handler        = "uk.gov.justice.digital.hmpps.scheduled.lambda.ReportSchedulerLambda::handleRequest"
+  lambda_scheduled_dataset_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_scheduled_dataset_jar_version    = "v0.0.1"
+  lambda_scheduled_dataset_code_s3_key = (
+  local.env == "production" || local.env == "preproduction"
+  ? "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}.rel-all.jar"
+  : "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}-all.jar"
+  )
+  lambda_scheduled_dataset_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    aws_iam_policy.redshift_dataapi_cross_policy.arn,
+    aws_iam_policy.dpd_table_read_policy.arn
+  ]
+  lambda_scheduled_dataset_secret_arn          = module.datamart.credential_secret_arn
+  lambda_scheduled_dataset_cluster_id          = module.datamart.cluster_id
+  lambda_scheduled_dataset_database_name       = module.datamart.cluster_database_name
+  lambda_scheduled_dataset_dpd_ddb_table_arn   = module.dynamo_table_dpd.dynamodb_table_arn
+  lambda_scheduled_dataset_schedule_expression = "rate(1 hour)"
+  lambda_scheduled_dataset_timeout_seconds     = 900
+  lambda_scheduled_dataset_memory_size         = 1024
+
   s3_redshift_table_expiry_days = local.application_data.accounts[local.environment].redshift_table_expiry_days + 1
 
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
