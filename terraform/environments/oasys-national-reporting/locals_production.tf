@@ -154,7 +154,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "pd-bods.production.reporting.oasys.service.justice.gov.uk",
+                      "bods.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
