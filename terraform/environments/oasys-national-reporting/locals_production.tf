@@ -135,7 +135,7 @@ locals {
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
-          pp-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
+          pd-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
             attachments = [
               { ec2_instance_name = "pd-onr-bods-1" },
             ]
