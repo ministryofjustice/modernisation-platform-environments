@@ -59,9 +59,9 @@ resource "aws_iam_user" "smtp" {
   tags = local.tags
 }
 
-# resource "aws_iam_access_key" "smtp" {
-#   user = aws_iam_user.smtp.name
-# }
+resource "aws_iam_access_key" "smtp" {
+  user = aws_iam_user.smtp.name
+}
 
 data "aws_iam_policy_document" "smtp_user" {
   statement {
