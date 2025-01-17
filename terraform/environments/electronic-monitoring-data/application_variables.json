@@ -29,8 +29,8 @@
       "enable_dbt_k8s_secrets": true,
       "analytical_platform_share": [
         {
-          "target_account_name": "analytical-platform-data-production",
-          "target_account_id": "593291632749",
+          "target_account_name": "analytical-platform-data-engineering-sandbox-a",
+          "target_account_id": "684969100054",
           "assume_account_name": "analytical-platform-management-production",
           "assume_account_id": "042130406152",
           "data_locations": [
