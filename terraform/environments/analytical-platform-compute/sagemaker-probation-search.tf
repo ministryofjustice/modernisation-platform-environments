@@ -6,7 +6,7 @@ locals {
     analytical-platform-compute-development = {
       hmpps-probation-search-dev = {
         namespace       = "hmpps-probation-search-dev"
-        instance_type   = "ml.m6g.large"
+        instance_type   = "ml.t2.large"
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
@@ -17,7 +17,7 @@ locals {
     analytical-platform-compute-production = {
       hmpps-probation-search-preprod = {
         namespace       = "hmpps-probation-search-preprod"
-        instance_type   = "ml.m6g.large"
+        instance_type   = "ml.t2.large"
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
