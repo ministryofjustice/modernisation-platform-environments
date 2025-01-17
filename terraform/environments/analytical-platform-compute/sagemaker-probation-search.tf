@@ -74,6 +74,9 @@ resource "aws_sagemaker_endpoint" "probation_search_endpoint" {
   for_each             = tomap(local.probation_search_environment)
   name                 = "${each.value.namespace}-sagemaker-endpoint"
   endpoint_config_name = aws_sagemaker_endpoint_configuration.probation_search_config[each.key].name
+  lifecycle {
+    create_before_destroy = false
+  }
 }
 
 
