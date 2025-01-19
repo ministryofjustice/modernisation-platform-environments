@@ -61,3 +61,15 @@ variable "waf_geoIP_rules" {
   default = []
 
 }
+
+variable "scope" {
+  description = "The scope of the WAF"
+  type        = string
+  default     = "REGIONAL"
+}
+
+variable "region" {
+  description = "The region to deploy the WAF in"
+  type        = string
+  default     = "eu-west-2"
+}

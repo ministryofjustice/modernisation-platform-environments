@@ -27,8 +27,8 @@ module "log_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 
-  bucket_prefix = "${var.alb_name}-${local.alb_suffix}-connection-logs"
-  acl           = "log-delivery-write"
+  bucket = "${var.alb_name}-${local.alb_suffix}-connection-logs"
+  acl    = "log-delivery-write"
 
   # For example only
   force_destroy = true
