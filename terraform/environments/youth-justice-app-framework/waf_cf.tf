@@ -1,3 +1,4 @@
+/*
 module "waf_cf" {
   source = "./modules/waf"
   providers = {
@@ -18,3 +19,4 @@ module "waf_cf" {
     }
   ]
 }
+*/

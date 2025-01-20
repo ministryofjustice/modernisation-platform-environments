@@ -1,4 +1,4 @@
-resource "aws_cloudfront_distribution" "external" {
+/*resource "aws_cloudfront_distribution" "external" {
   # http_version = "http2"
   origin {
     domain_name = var.alb_dns
@@ -129,3 +129,4 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
     }
   }
 }
+*/

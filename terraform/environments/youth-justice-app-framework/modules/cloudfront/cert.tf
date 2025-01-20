@@ -1,5 +1,5 @@
 #Must create ns record in main hosted zone before running
-
+/*
 provider "aws" {
   alias  = "us-east-1"
   region = "us-east-1"
@@ -38,3 +38,4 @@ resource "aws_acm_certificate_validation" "cert" {
   certificate_arn         = aws_acm_certificate.domain_cert.arn
   validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.name]
 }
+*/
