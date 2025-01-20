@@ -251,7 +251,7 @@ locals {
   lambda_scheduled_dataset_tracing        = "Active"
   lambda_scheduled_dataset_handler        = "uk.gov.justice.digital.hmpps.scheduled.lambda.ReportSchedulerLambda::handleRequest"
   lambda_scheduled_dataset_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  lambda_scheduled_dataset_jar_version    = "v0.0.1"
+  lambda_scheduled_dataset_jar_version    = "v0.0.2"
   lambda_scheduled_dataset_code_s3_key = (
     local.env == "production" || local.env == "preproduction"
     ? "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}.rel-all.jar"
