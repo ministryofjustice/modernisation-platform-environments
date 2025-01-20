@@ -34,7 +34,6 @@ module "analytical_platform_jml_report_ecr_repository" {
   version = "2.3.0"
 
   repository_name            = "analytical-platform-jml-report"
-  repository_policy          = data.aws_iam_policy_document.analytical_platform_jml_report_ecr_repository.json
   repository_encryption_type = "KMS"
   repository_kms_key         = module.ecr_kms.key_arn
 
