@@ -56,4 +56,6 @@ resource "aws_mwaa_environment" "main" {
       log_level = "INFO"
     }
   }
+
+  tags = local.tags
 }

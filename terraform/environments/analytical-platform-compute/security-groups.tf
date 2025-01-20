@@ -78,4 +78,6 @@ module "mwaa_security_group" {
       rule = "all-all"
     }
   ]
+
+  tags = local.tags
 }

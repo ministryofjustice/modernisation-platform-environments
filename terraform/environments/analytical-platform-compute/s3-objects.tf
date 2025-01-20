@@ -1,4 +1,7 @@
 module "airflow_requirements_object" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
   version = "4.4.0"
 
@@ -6,4 +9,6 @@ module "airflow_requirements_object" {
   key           = "requirements.txt"
   file_source   = "src/airflow/requirements.txt"
   force_destroy = true
+
+  tags = local.tags
 }
