@@ -1,9 +1,3 @@
-
-provider "aws-east-1" {
-  alias  = "us-east-1"
-  region = "us-east-1"
-}
-
 module "waf_cf" {
   source = "./modules/waf"
   providers = {
