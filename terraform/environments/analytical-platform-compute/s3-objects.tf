@@ -21,7 +21,7 @@ module "airflow_kube_config_object" {
   version = "4.4.0"
 
   bucket = module.mwaa_bucket.s3_bucket_id
-  key    = ".kube/config"
+  key    = dags/.kube/config"
   content = templatefile("${path.module}/src/airflow/kube_config", {
     cluster_name                       = module.eks.cluster_name
     cluster_server                     = module.eks.cluster_endpoint
