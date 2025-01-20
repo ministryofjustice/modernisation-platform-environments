@@ -12,8 +12,7 @@ clusters:
       server: ${cluster_server}
 
 users:
-
-  - name: ${cluster_name}
+  - name: analytical-platform-compute
     user:
       exec:
         apiVersion: client.authentication.k8s.io/v1
