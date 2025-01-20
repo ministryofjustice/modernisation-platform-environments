@@ -136,7 +136,6 @@ module "mojap_compute_logs_bucket_eu_west_1" {
   )
 }
 
-
 data "aws_iam_policy_document" "athena_query_results_policy_eu_west_2" {
   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
   statement {
