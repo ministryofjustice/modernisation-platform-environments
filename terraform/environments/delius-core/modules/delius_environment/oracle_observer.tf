@@ -69,9 +69,9 @@ module "oracle_observer" {
   container_vars_default = {}
 
   container_vars_env_specific = {
-    "PRIMARYDB_HOSTNAME"  = join(".",local.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])
-    "STANDBYDB1_HOSTNAME" = local.oracle_db_server_names["standbydb1"] == "none" ? "none" : join(".",local.oracle_db_server_names["standbydb1"], var.account_config.route53_inner_zone.name])
-    "STANDBYDB2_HOSTNAME" = local.oracle_db_server_names["standbydb2"] == "none" ? "none" : join(".",local.oracle_db_server_names["standbydb2"], var.account_config.route53_inner_zone.name])
+    "PRIMARYDB_HOSTNAME"  = join(".",[local.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])
+    "STANDBYDB1_HOSTNAME" = local.oracle_db_server_names["standbydb1"] == "none" ? "none" : join(".",[local.oracle_db_server_names["standbydb1"], var.account_config.route53_inner_zone.name])
+    "STANDBYDB2_HOSTNAME" = local.oracle_db_server_names["standbydb2"] == "none" ? "none" : join(".",[local.oracle_db_server_names["standbydb2"], var.account_config.route53_inner_zone.name])
     "DATABASE_PORT"       = var.db_config.database_port
     "DATABASE_NAME"       = var.db_config.database_name
     }
