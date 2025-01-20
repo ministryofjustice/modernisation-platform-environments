@@ -1,3 +1,5 @@
+#tfsec:ignore:AWS0054 "This is an internal alb, the traffic only moves within the vpc and https is not required."
+#tfsec:ignore:AVD-AWS-0054
 module "internal_alb" {
   source = "./modules/alb"
 

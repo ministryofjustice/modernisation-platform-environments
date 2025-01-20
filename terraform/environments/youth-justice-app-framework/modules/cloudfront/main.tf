@@ -103,6 +103,19 @@ resource "aws_cloudfront_origin_request_policy" "headers_policy" {
   }
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
+  bucket = aws_s3_bucket.cloudfront.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+  lifecycle {
+    prevent_destroy = false
+  }
+}
+
 resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
   name    = "Strict-Transport-Security"
   comment = "Policy to enforce Strict-Transport-Security header."

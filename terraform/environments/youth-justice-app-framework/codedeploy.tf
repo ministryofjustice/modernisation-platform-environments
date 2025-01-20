@@ -1,4 +1,4 @@
-
+/*
 module "codedeploy" {
   source       = "./modules/codedeploy"
   project_name = local.project_name
@@ -34,3 +34,4 @@ module "codedeploy" {
   ]
 }
 
+*/

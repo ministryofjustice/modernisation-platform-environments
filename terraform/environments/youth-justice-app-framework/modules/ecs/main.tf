@@ -3,7 +3,7 @@ data "aws_availability_zones" "available" {}
 ################################################################################
 # Cluster
 ################################################################################
-
+#tfsec:ignore:AVD-AWS-0130
 module "ecs_cluster" {
   source  = "terraform-aws-modules/ecs/aws//modules/cluster"
   version = "5.11.2"

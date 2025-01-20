@@ -16,7 +16,7 @@ module "alb" {
   security_groups       = [module.alb_sg.security_group_id]
 
   idle_timeout               = 240
-  drop_invalid_header_fields = false
+  drop_invalid_header_fields = true
   access_logs                = local.access_logs
 
   #todo aws config integration missing
@@ -39,16 +39,13 @@ module "log_bucket" {
   attach_elb_log_delivery_policy = true # Required for ALB logs
   attach_lb_log_delivery_policy  = true # Required for ALB/NLB logs
 
-  #todo after creating access logging bucket
-  #logging = {
-  #  target_bucket = var.s3_access_logging_bucket
-  #  target_prefix = "${var.alb_name}-${var.env}-internallb-logs/"
-  #  target_object_key_format = {
-  #    partitioned_prefix = {
-  #      partition_date_source = "DeliveryTime" # "EventTime"
-  #    }
-  #  }
-  #}
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        sse_algorithm = "AES256"
+      }
+    }
+  }
 
   attach_deny_insecure_transport_policy = false #todo probably should be true but matching yjaf atm
   attach_require_latest_tls_policy      = false #todo same here

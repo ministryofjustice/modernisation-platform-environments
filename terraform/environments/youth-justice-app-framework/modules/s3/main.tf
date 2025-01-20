@@ -31,8 +31,8 @@ resource "aws_s3_bucket_public_access_block" "default" {
 }
 
 resource "aws_s3_bucket_versioning" "default" {
-  for_each                = toset(local.bucket_name)
-  bucket                  = aws_s3_bucket.default[each.value].id
+  for_each = toset(local.bucket_name)
+  bucket   = aws_s3_bucket.default[each.value].id
   versioning_configuration {
     status = "Enabled"
   }
@@ -99,6 +99,19 @@ resource "aws_s3_bucket_policy" "default" {
 	}
 
   POLICY
- 
+
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
+  for_each = toset(local.bucket_name)
+  bucket   = aws_s3_bucket.default[each.value].id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+  # TODO Set prevent_destroy to true to stop Terraform destroying this resource in the future if required
+  lifecycle {
+    prevent_destroy = false
+  }
+}

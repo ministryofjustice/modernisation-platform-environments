@@ -178,6 +178,16 @@ resource "aws_instance" "ad_instance" {
   lifecycle {
     ignore_changes = [ami]
   }
+  metadata_options {
+    http_tokens = "required"
+  }
+  root_block_device {
+    encrypted = true
+    tags = merge(local.tags,
+      { Name = "root-device-mgmt-ad-instance" },
+      { device-name = "/dev/sda1" }
+    )
+  }
 }
 
 
