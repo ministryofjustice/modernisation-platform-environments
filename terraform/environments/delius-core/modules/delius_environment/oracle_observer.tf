@@ -4,10 +4,10 @@ module "oracle_observer" {
   account_info          = var.account_info
   certificate_arn       = aws_acm_certificate.external.arn
 
-  desired_count = 1
+  # Do not create an Oracle Observer microservice if it has no configuration
+  desired_count = try(var.delius_microservice_configs.oracle_observer,{}) == {} ? 0 : 1
 
   container_secrets_env_specific = {}
-  container_vars_env_specific    = {}
 
   container_port_config = [
     {
@@ -46,7 +46,7 @@ module "oracle_observer" {
     },
     {
       ip_protocol = "tcp"
-      port        = 1521
+      port        = var.db_config.database_port
       cidr_ipv4   = var.account_config.shared_vpc_cidr
     }
   ]
@@ -66,9 +66,15 @@ module "oracle_observer" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
-  container_vars_default = {
-    "TEST_VAR" = "test value"
-  }
+  container_vars_default = {}
+
+  container_vars_env_specific = {
+    "PRIMARYDB_HOSTNAME"  = "${local.oracle_db_server_names["primarydb"]}"
+    "STANDBYDB1_HOSTNAME" = "${local.oracle_db_server_names["standbydb1"]}"
+    "STANDBYDB2_HOSTNAME" = "${local.oracle_db_server_names["standbydb2"]}"
+    "DATABASE_PORT"       = var.db_config.database_port
+    "DATABASE_NAME"       = var.db_config.database_name
+    }
 
   container_secrets_default = {}
 }

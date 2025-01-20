@@ -72,6 +72,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+    database_name  = "DMDNDA"
+    database_port  = local.db_port
   }
 
   delius_microservices_configs_dev = {
@@ -128,14 +130,14 @@ locals {
     # Please ensure any changes made here are consistent with Ansible variables.
     audit_source_endpoint = {
       read_host     = "standbydb2"
-      read_database = "DMDNDAS2"
+      read_database = "${local.db_config_dev.database_name}S2"
     }
     audit_target_endpoint = {
       write_environment = "test"
     }
     user_source_endpoint = {}
     user_target_endpoint = {
-      write_database = "DMDNDA"
+      write_database = local.db_config_dev.database_name
     }
     is-production = false
   }
