@@ -13,6 +13,7 @@ locals {
       "role_name"      = "dev-datatransfer-lambda-role"
     }
   }
+  data_catalogue_role_arn = ""
 }
 
 # ------------------------------------------------------------------------
@@ -1194,12 +1195,30 @@ resource "aws_s3_bucket_policy" "data_store" {
   policy = data.aws_iam_policy_document.data_store_deny_all.json
 }
 
+data "aws_iam_policy_document" "cadt_bucket_policy" {
+  statement {
+    principals {
+      type        = "AWS"
+      identifiers = [local.data_catalogue_role_arn]
+    }
 
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+    ]
+
+    resources = [
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/em_data_artifacts/*",
+    ]
+  }
+}
 
 module "s3-create-a-derived-table-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
 
   bucket_name        = "${local.bucket_prefix}-cadt"
+  bucket_policy      = data.aws_iam_policy_document.cadt_bucket_policy.json
   versioning_enabled = true
 
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
