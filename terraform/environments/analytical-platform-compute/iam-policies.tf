@@ -572,6 +572,9 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
 }
 
 module "mwaa_execution_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.52.2"
 
