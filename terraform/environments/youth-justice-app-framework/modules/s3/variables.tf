@@ -8,6 +8,11 @@ variable "project_name" {
   description = "Project name"
 }
 
+variable "environment_name" {
+  type        = string
+  description = "Environment name"
+}
+
 variable "tags" {
   type        = map(any)
   description = "Tags to apply to resources, where applicable"
@@ -31,3 +36,14 @@ variable "log_bucket" {
   description = "Bucket to send logs to"
   default     = null
 }
+
+variable "allow_replication" {
+  type        = bool
+  description = "Used to indicate that policy should be assigned to enable replication from the equivelent old account."
+  default     = true
+}
+
+variable "s3_source_account" {
+  type        = string
+  description = "Source account from whch s3 buckets may be replicated."
+ }

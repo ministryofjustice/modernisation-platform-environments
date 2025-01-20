@@ -1,11 +1,11 @@
 resource "aws_s3_bucket" "default" {
-  for_each = toset(var.bucket_name)
+  for_each = toset(local.bucket_name)
   bucket   = each.value
   tags     = var.tags
 }
 
 resource "aws_s3_bucket_ownership_controls" "default" {
-  for_each = toset(var.bucket_name)
+  for_each = toset(local.bucket_name)
   bucket   = aws_s3_bucket.default[each.value].id
   rule {
     object_ownership = var.ownership_controls
@@ -13,7 +13,7 @@ resource "aws_s3_bucket_ownership_controls" "default" {
 }
 
 resource "aws_s3_bucket_acl" "default" {
-  for_each = toset(var.bucket_name)
+  for_each = toset(local.bucket_name)
   bucket   = aws_s3_bucket.default[each.value].id
   acl      = var.acl
   depends_on = [
@@ -22,7 +22,7 @@ resource "aws_s3_bucket_acl" "default" {
 }
 
 resource "aws_s3_bucket_public_access_block" "default" {
-  for_each                = toset(var.bucket_name)
+  for_each                = toset(local.bucket_name)
   bucket                  = aws_s3_bucket.default[each.value].bucket
   block_public_acls       = true
   block_public_policy     = true
@@ -30,10 +30,75 @@ resource "aws_s3_bucket_public_access_block" "default" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_versioning" "default" {
+  for_each                = toset(local.bucket_name)
+  bucket                  = aws_s3_bucket.default[each.value].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_logging" "default" {
-  for_each = var.log_bucket != null ? toset(var.bucket_name) : []
+  for_each = var.log_bucket != null ? toset(local.bucket_name) : []
   bucket   = aws_s3_bucket.default[each.value].id
 
   target_bucket = var.log_bucket
   target_prefix = aws_s3_bucket.default[each.value].bucket
 }
+
+
+resource "aws_s3_bucket_policy" "default" {
+  for_each = var.allow_replication == true ? toset(local.bucket_name) : []
+  bucket   = aws_s3_bucket.default[each.value].id
+
+
+  policy = <<POLICY
+     {
+        "Version": "2012-10-17",
+	"Id": "PolicyForDestinationBucket",
+	"Statement":
+	  [
+		{
+			"Sid": "Permissions to check replication result",
+			"Effect": "Allow",
+			"Principal": { "AWS": "arn:aws:iam::${var.s3_source_account}:role/admin"},
+			"Action": [
+				"s3:List*"
+			],
+			"Resource": [
+				"arn:aws:s3:::${each.value}",
+				"arn:aws:s3:::${each.value}/*"
+			]
+		},
+		{
+			"Sid": "Permissions on objects and buckets",
+			"Effect": "Allow",
+			"Principal": { "AWS": "arn:aws:iam::${var.s3_source_account}:role/cross-account-bucket-replication-role"},
+			"Action": [
+				"s3:List*",
+				"s3:GetBucketVersioning",
+				"s3:PutBucketVersioning",
+				"s3:ReplicateDelete",
+				"s3:ReplicateObject"
+			],
+			"Resource": [
+				"arn:aws:s3:::${each.value}",
+				"arn:aws:s3:::${each.value}/*"
+			]
+		},
+		{
+			"Sid": "Permission to override bucket owner",
+			"Effect": "Allow",
+			"Principal": {
+				"AWS": "arn:aws:iam::${var.s3_source_account}:role/cross-account-bucket-replication-role"
+			},
+			"Action": "s3:ObjectOwnerOverrideToBucketOwner",
+			"Resource": "arn:aws:s3:::${each.value}/*"
+		}
+	  ]
+	}
+
+  POLICY
+ 
+}
+
