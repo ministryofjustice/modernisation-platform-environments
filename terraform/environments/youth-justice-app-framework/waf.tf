@@ -1,4 +1,3 @@
-/*
 module "waf" {
   source       = "./modules/waf"
   project_name = local.project_name
@@ -48,4 +47,3 @@ module "waf" {
     }
   ]
 }
-*/
