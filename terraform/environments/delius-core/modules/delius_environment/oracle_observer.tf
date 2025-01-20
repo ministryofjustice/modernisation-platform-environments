@@ -66,7 +66,9 @@ module "oracle_observer" {
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
-  container_vars_default = {}
+  container_vars_default = {
+    "TEST_VAR" = "test value"
+  }
 
   container_secrets_default = {}
 }
