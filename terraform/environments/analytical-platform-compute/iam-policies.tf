@@ -462,7 +462,7 @@ data "aws_iam_policy_document" "find_moj_data_quicksight_policy" {
             "quicksight:GenerateEmbedUrlForAnonymousUser"
         ]
         resources = [
-            "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:namespace/default/",
+            "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:namespace/default",
             "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:dashboard/6898300c-69fe-4f84-b172-1784ab6bf1a0"
         ]
         condition {
