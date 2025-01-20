@@ -272,7 +272,7 @@ class RDS_JDBC_CONNECTION():
         agg_query_str = agg_query_str + \
             f""" GROUP BY YEAR({date_partition_col}), MONTH({date_partition_col})"""
 
-        print(f"""query_str-(Aggregate):> \n{agg_query_str}""")
+        self.LOGGER.info(f"""query_str-(Aggregate):> \n{agg_query_str}""")
 
         df_agg = (self.spark.read.format("jdbc")
                 .option("url", self.rds_jdbc_url_v2)

@@ -1,5 +1,5 @@
 variable "my_ip" {
-  type = string
+  type    = string
   default = "18.170.74.92/32"
 }
 

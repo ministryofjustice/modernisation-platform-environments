@@ -576,7 +576,7 @@ resource "aws_glue_job" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
     "--date_partition_column_name"          = ""
     "--pkey_lower_bound_int"                = ""
     "--pkey_upper_bound_int"                = ""
-    "--parallel_jdbc_conn_num"              = 1
+    "--parallel_jdbc_conn_num"              = 2
     "--rds_yyyy_mm_df_repartition_num"      = 0
     "--year_partition_bool"                 = "true"
     "--month_partition_bool"                = "true"
