@@ -20,3 +20,66 @@ module "github-cloudtrail-auditlog" {
   # Ensure the module waits for Lambdas to be built
   depends_on = [data.external.build_lambdas]
 }
+
+resource "aws_iam_openid_connect_provider" "github" {
+  url = "https://oidc-configuration.audit-log.githubusercontent.com"
+
+  client_id_list = [
+    "sts.amazonaws.com"
+  ]
+}
+
+data "aws_kms_key" "key" {
+  key_id = "alias/GitHubCloudTrailOpenEvent"
+}
+
+resource "aws_iam_policy" "github_audit_log_write_policy" {
+  name = "github-audit-log-write-policy"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "s3:PutObject"
+        Resource = "arn:aws:s3:::${module.github-cloudtrail-auditlog.github_auditlog_s3bucket}/*"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "kms:Encrypt",
+          "kms:ReEncrypt",
+          "kms:GenerateDataKey"
+        ],
+        "Resource" : data.aws_kms_key.key.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "github_audit_log_role" {
+  name = "github-audit-log-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.github.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "oidc-configuration.audit-log.githubusercontent.com:aud" = "sts.amazonaws.com",
+            "oidc-configuration.audit-log.githubusercontent.com:sub" = "https://github.com/ministry-of-justice-uk"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "github_policy_attachment" {
+  name       = "github-audit-log-policy-attachment"
+  policy_arn = aws_iam_policy.github_audit_log_write_policy.arn
+  roles      = [aws_iam_role.github_audit_log_role.name]
+}
