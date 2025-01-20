@@ -65,6 +65,45 @@ locals {
     }
 
     ec2_autoscaling_groups = {
+      t2-onr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
+          desired_capacity = 0
+          max_size         = 2
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_cms.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
+            branch = "TM-864/onr/build-t2-bip"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.bip_cms.tags, {
+          oasys-national-reporting-environment = "t2"
+        })
+      })
+
+      t2-onr-web = merge(local.ec2_autoscaling_groups.bip_web, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
+          desired_capacity = 0
+        })
+        config = merge(local.ec2_autoscaling_groups.bip_web.config, {
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
+            branch = "TM-864/onr/build-t2-bip"
+          })
+        })
+        tags = merge(local.ec2_autoscaling_groups.bip_web.tags, {
+          oasys-national-reporting-environment = "t2"
+        })
+      })
+
       t2-test-web-asg = merge(local.ec2_autoscaling_groups.boe_web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.boe_web.autoscaling_group, {
           desired_capacity = 0
