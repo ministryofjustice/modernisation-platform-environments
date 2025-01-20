@@ -74,4 +74,6 @@ module "mwaa_alb" {
       port             = 443
     }
   }
+
+  tags = local.tags
 }
