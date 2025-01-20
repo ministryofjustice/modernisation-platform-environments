@@ -1,3 +1,4 @@
+/*
 module "ecs" {
   source = "./modules/ecs"
 
@@ -47,3 +48,4 @@ module "ecs" {
 
   depends_on = [module.internal_alb, module.external_alb]
 }
+*/
