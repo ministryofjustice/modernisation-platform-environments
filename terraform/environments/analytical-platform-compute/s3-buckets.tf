@@ -193,3 +193,26 @@ module "mojap_compute_athena_query_results_bucket_eu_west_2" {
     { "backup" = "false" }
   )
 }
+
+module "mwaa_bucket" {
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.4.0"
+
+  bucket = "mojap-compute-${local.environment}-mwaa"
+
+  force_destroy = true
+
+  versioning = {
+    enabled = true
+  }
+
+  server_side_encryption_configuration = {
+    rule = {
+      bucket_key_enabled = true
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.mwaa_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+}
