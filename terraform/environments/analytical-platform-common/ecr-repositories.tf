@@ -21,11 +21,6 @@ data "aws_iam_policy_document" "analytical_platform_jml_report_ecr_repository" {
   }
 }
 
-resource "aws_ecr_repository_policy" "analytical_platform_jml_report_ecr_repository_policy" {
-  repository = "analytical-platform-jml-report"
-  policy     = data.aws_iam_policy_document.analytical_platform_jml_report_ecr_repository.json
-}
-
 module "analytical_platform_jml_report_ecr_repository" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -36,6 +31,32 @@ module "analytical_platform_jml_report_ecr_repository" {
   repository_name            = "analytical-platform-jml-report"
   repository_encryption_type = "KMS"
   repository_kms_key         = module.ecr_kms.key_arn
+  repository_policy_statements = {
+    "lambda-ecr" = {
+      sid    = "LambdaECRImageRetrievalPolicy"
+      effect = "Allow"
+      actions = [
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:SetRepositoryPolicy",
+        "ecr:DeleteRepositoryPolicy",
+        "ecr:GetRepositoryPolicy"
+      ]
+      principals = [
+        {
+          type        = "service"
+          identifiers = ["lambda.amazonaws.com"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "StringLike"
+          variable = "aws:sourceArn"
+          values   = ["arn:aws:lambda:${data.aws_region.current.name}:${local.environment_management.account_ids["analytical-platform-data-production"]}:function:analytical-platform-jml-report"]
+        }
+      ]
+    }
+  }
 
   create_lifecycle_policy = false
 
