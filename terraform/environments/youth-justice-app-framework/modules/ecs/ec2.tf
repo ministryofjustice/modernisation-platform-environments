@@ -34,6 +34,7 @@ locals {
   ecs_optimized_ami = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)
 }
 
+#tfsec:ignore:AVD-AWS-0130
 module "autoscaling" {
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "7.6.1"

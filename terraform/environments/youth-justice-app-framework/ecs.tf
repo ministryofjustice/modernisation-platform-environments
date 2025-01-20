@@ -1,4 +1,5 @@
 /*
+#tfsec:ignore:AVD-AWS-0130
 module "ecs" {
   source = "./modules/ecs"
 

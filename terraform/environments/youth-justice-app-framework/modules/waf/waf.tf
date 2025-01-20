@@ -14,7 +14,7 @@ resource "aws_wafv2_web_acl" "waf" {
   name        = "${var.waf_name}-waf"
   description = "${var.waf_name}-waf from terraform"
   scope       = var.scope
-  #provider    = aws.standard
+  provider    = aws.standard
 
   default_action {
     allow {}
