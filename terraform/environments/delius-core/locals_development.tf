@@ -107,7 +107,7 @@ locals {
 
     oracle_observer = {
       image_tag        = "latest"
-      container_port   = 2222
+      container_port   = 8080
       container_cpu    = 512
       container_memory = 1024
     }
