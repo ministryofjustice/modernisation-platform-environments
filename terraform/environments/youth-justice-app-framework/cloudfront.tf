@@ -1,3 +1,4 @@
+/*
 module "cloudfront" {
   source = "./modules/cloudfront"
 
@@ -9,3 +10,4 @@ module "cloudfront" {
   project_name     = local.project_name
   tags             = local.tags
 }
+*/
