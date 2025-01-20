@@ -181,7 +181,7 @@ locals {
       }
     }
 
-    # DO NOT DEPLOY YET AS OTHER THINGS AREN'T READY
+    # DO NOT FULLY DEPLOY YET AS WEB INSTANCES ARE NOT IN USE
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
@@ -274,7 +274,7 @@ locals {
       #           conditions = [{
       #             host_header = {
       #               values = [
-      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
       #               ]
       #             }
       #           }]

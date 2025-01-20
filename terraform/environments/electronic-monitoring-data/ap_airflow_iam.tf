@@ -22,6 +22,9 @@ module "load_alcohol_monitoring_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
   name               = "alcohol-monitoring"
   environment        = local.environment
   database_name      = "capita-alcohol-monitoring"
@@ -36,6 +39,9 @@ module "load_alcohol_monitoring_database" {
 module "load_orca_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 
   name               = "orca"
   environment        = local.environment
@@ -52,6 +58,9 @@ module "load_atrium_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
   name               = "atrium"
   environment        = local.environment
   database_name      = "g4s-atrium"
@@ -67,6 +76,9 @@ module "load_atv_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
   name               = "atv"
   environment        = local.environment
   database_name      = "g4s-atv"
@@ -81,6 +93,9 @@ module "load_atv_database" {
 module "load_cap_dw_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 
   name                 = "cap-dw"
   environment          = local.environment
@@ -98,6 +113,9 @@ module "load_emsys_mvp_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
   name                 = "emsys-mvp"
   environment          = local.environment
   database_name        = "g4s-emsys-mvp"
@@ -114,6 +132,9 @@ module "load_fep_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
   name               = "fep"
   environment        = local.environment
   database_name      = "g4s-fep"
@@ -128,6 +149,9 @@ module "load_fep_database" {
 module "load_rf_hours_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 
   name               = "rf-hours"
   environment        = local.environment
@@ -144,6 +168,9 @@ module "load_subject_history_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
   name               = "subject-history"
   environment        = local.environment
   database_name      = "g4s-subject-history"
@@ -158,6 +185,9 @@ module "load_subject_history_database" {
 module "load_tasking_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 
   name               = "tasking"
   environment        = local.environment
@@ -174,6 +204,9 @@ module "load_telephony_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
   name               = "telephony"
   environment        = local.environment
   database_name      = "g4s-telephony"
@@ -189,7 +222,10 @@ module "load_unstructured_atrium_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
-  name               = "unstructured-atrium-database"
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
+  name               = "unstructured-atrium"
   environment        = local.environment
   database_name      = "g4s-atrium-unstructured"
   path_to_data       = "/load/g4s_atrium_unstructured/structure"
@@ -205,10 +241,32 @@ module "load_fms" {
   count  = local.is-test || local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
   name               = "fms"
   environment        = local.environment
   database_name      = "serco-fms"
   path_to_data       = "/serco/fms"
+  source_data_bucket = module.s3-raw-formatted-data-bucket.bucket
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+}
+
+
+module "load_mdss" {
+  count  = local.is-test || local.is-production ? 1 : 0
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
+  name               = "mdss"
+  environment        = local.environment
+  database_name      = "allied-mdss"
+  path_to_data       = "/allied/mdss"
   source_data_bucket = module.s3-raw-formatted-data-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn

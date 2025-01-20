@@ -9,8 +9,10 @@ locals {
     enduserclient_internal = [
       "10.0.0.0/8"
     ]
-    enduserclient_public = flatten([
+    enduserclient_public1 = flatten([
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    ])
+    enduserclient_public2 = flatten([
       module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
     ])
     rd_session_hosts = flatten([
@@ -27,8 +29,10 @@ locals {
     enduserclient_internal = [
       "10.0.0.0/8"
     ]
-    enduserclient_public = flatten([
+    enduserclient_public1 = flatten([
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    ])
+    enduserclient_public2 = flatten([
       module.ip_addresses.mp_cidrs.live_eu_west_nat,
     ])
     rd_session_hosts = flatten([
@@ -61,7 +65,7 @@ locals {
           to_port     = 80
           protocol    = "TCP"
           security_groups = [
-            "public-lb",
+            "public-lb", "public-lb-2"
           ]
         }
         http-from-euc = {
@@ -119,6 +123,43 @@ locals {
       }
     }
 
+    private-jumpserver = {
+      description = "Security group for jumpservers"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        rdp_tcp_web = {
+          description = "3389: Allow RDP TCP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        rdp_udp_web = {
+          description = "3389: Allow RDP UDP ingress"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+
     public-lb = {
       description = "Security group for public load-balancer"
       ingress = {
@@ -134,14 +175,49 @@ locals {
           from_port   = 80
           to_port     = 80
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public
+          cidr_blocks = local.security_group_cidrs.enduserclient_public1
         }
         https_lb = {
           description = "Allow enduserclient https ingress"
           from_port   = 443
           to_port     = 443
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public
+          cidr_blocks = local.security_group_cidrs.enduserclient_public1
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+    public-lb-2 = {
+      description = "Security group for public load-balancer"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http_lb = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public2
+        }
+        https_lb = {
+          description = "Allow enduserclient https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public2
         }
       }
       egress = {

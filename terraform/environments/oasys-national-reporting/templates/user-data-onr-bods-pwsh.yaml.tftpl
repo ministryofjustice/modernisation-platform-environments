@@ -4,26 +4,22 @@
 # See C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch* for script output
 version: 1.0 # version 1.0 is required as this executes AFTER the SSM Agent is running
 tasks:
-  - task: executeScript
+  - task: initializeVolume
     inputs:
-      - frequency: once
-        type: powershell
-        runAs: admin
-        content: |-
-          # Initialize all offline disks
-          $offlineDisks = Get-Disk | Where-Object IsOffline -Eq $true
-          foreach ($disk in $offlineDisks) {
-          Initialize-Disk -Number $disk.Number -PartitionStyle GPT
-          }
-          # Create partitions and assign drive letters
-          $letters = @('D', 'E', 'F')
-          $labels  = @('Temp', 'App', 'Storage')
-          $disks = Get-Disk | Where-Object PartitionStyle -Eq 'GPT' | Where-Object IsSystem -Eq $false
-          for ($i = 0; $i -lt $disks.Count; $i++) {
-          $partition = New-Partition -DiskNumber $disks[$i].Number -UseMaximumSize
-          Format-Volume -Partition $partition -FileSystem NTFS -NewFileSystemLabel $labels[$i] -Confirm:$false
-          Set-Partition -InputObject $partition -NewDriveLetter $letters[$i]
-          }
+      initialize: devices
+      devices:
+      - device: xvdd
+        name: Temp
+        letter: D
+        partition: gpt
+      - device: xvde
+        name: App
+        letter: E
+        partition: gpt
+      - device: xvdf
+        name: Storage
+        letter: F
+        partition: gpt
   - task: executeScript
     inputs:
       - frequency: once
