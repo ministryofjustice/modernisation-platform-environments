@@ -44,7 +44,7 @@ module "mwaa_alb" {
     https = {
       port            = 443
       protocol        = "HTTPS"
-      certificate_arn = module.certificate.acm_certificate_arn
+      certificate_arn = module.acm_certificate.acm_certificate_arn
 
       forward = {
         target_group_key = "mwaa"
