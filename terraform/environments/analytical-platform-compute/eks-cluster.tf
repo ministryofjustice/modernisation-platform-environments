@@ -155,6 +155,11 @@ module "eks" {
         }
       }
     }
+    apc-mwaa = {
+      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/mwaa-execution"
+      username          = "apc-mwaa"
+      kubernetes_groups = ["mwaa"]
+    }
     data-engineering-airflow = {
       principal_arn     = local.environment_configuration.data_engineering_airflow_execution_role_arn
       username          = "data-engineering-airflow"
