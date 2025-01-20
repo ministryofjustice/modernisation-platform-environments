@@ -21,7 +21,7 @@ module "analytical_platform_jml_report_ecr_repository" {
       ]
       principals = [
         {
-          type        = "service"
+          type        = "Service"
           identifiers = ["lambda.amazonaws.com"]
         }
       ]
