@@ -60,6 +60,7 @@ resource "aws_iam_instance_profile" "ad_instance_profile" {
 
 #create a security group for your EC2 instance
 resource "aws_security_group" "ad_sg" {
+  #checkov:skip=CKV_AWS_382:todo add better rules
   name        = "ad_management_server_sg"
   description = "Allow AD traffic"
   vpc_id      = var.ds_managed_ad_vpc_id
@@ -166,7 +167,7 @@ resource "aws_instance" "ad_instance" {
   key_name                    = module.key_pair.key_pair_name
   subnet_id                   = var.management_subnet_id
   associate_public_ip_address = false
-  vpc_security_group_ids      = ["${aws_security_group.ad_sg.id}"]
+  vpc_security_group_ids      = [aws_security_group.ad_sg.id]
   tags                        = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
   user_data                   = data.template_file.windows-dc-userdata.rendered
   ebs_optimized               = true

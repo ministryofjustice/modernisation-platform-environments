@@ -1,18 +1,22 @@
 variable "alb_name" {
   description = "Name of the load balancer"
+  type        = string
 }
 
 variable "project_name" {
   description = "The name of the project"
+  type        = string
 }
 
 variable "environment" {
   description = "The environment for the load balancer"
+  type        = string
 }
 
 variable "internal" {
   description = "Is the load balancer internal"
   default     = true
+  type        = bool
 }
 
 variable "alb_subnets_ids" {
@@ -22,11 +26,13 @@ variable "alb_subnets_ids" {
 
 variable "vpc_id" {
   description = "The vpc id for the target group"
+  type        = string
 }
 
 variable "enable_access_logs" {
   description = "Enable access logs for the load balancer"
   default     = false #s3 bucket doesn't exist yet #todo change to true after it exists
+  type        = bool
 }
 
 variable "alb_ingress_with_source_security_group_id_rules" {

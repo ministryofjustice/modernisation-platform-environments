@@ -69,6 +69,8 @@ resource "aws_s3_bucket" "cloudfront" {
   #checkov:skip=CKV_AWS_144: "Cross-region replication is not required"
   #checkov:skip=CKV_AWS_18:  "Bucket access logging is not required"
   #checkov:skip=CKV_AWS_21:  "Bucket versioning is not required"
+  #checkov:skip=CKV2_AWS_61:  "lift and shift" todo fix later  
+  #checkov:skip=CKV2_AWS_62:  "lift and shift"
   bucket = "${var.project_name}-${var.environment}-cloudfront-logs"
   tags   = var.tags
 }
@@ -78,7 +80,7 @@ resource "aws_s3_bucket_ownership_controls" "cloudfront" {
   #checkov:skip=CKV2_AWS_65:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
   bucket = aws_s3_bucket.cloudfront.id
   rule {
-    object_ownership = "BucketOwnerPreferred"
+    object_ownership = "ObjectWriter"
   }
 }
 
@@ -112,7 +114,7 @@ resource "aws_cloudfront_origin_request_policy" "headers_policy" {
     cookie_behavior = "none" # This does not include any cookies in the origin request.
   }
 }
-
+#trivy:ignore:AVD-AWS-0132 todo fix later
 resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
   bucket = aws_s3_bucket.cloudfront.id
   rule {

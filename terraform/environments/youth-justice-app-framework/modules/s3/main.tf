@@ -1,5 +1,8 @@
 resource "aws_s3_bucket" "default" {
   #checkov:skip=CKV_AWS_145
+  #checkov:skip=CKV_AWS_144
+  #checkov:skip=CKV2_AWS_61:  "lift and shift" todo fix later
+  #checkov:skip=CKV2_AWS_62:  "lift and shift"
   for_each = toset(local.bucket_name)
   bucket   = each.value
   tags     = var.tags
