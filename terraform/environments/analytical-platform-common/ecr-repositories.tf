@@ -21,7 +21,7 @@ module "analytical_platform_jml_report_ecr_repository" {
       ]
       principals = [
         {
-          type        = "service"
+          type        = "Service"
           identifiers = ["lambda.amazonaws.com"]
         }
       ]
@@ -30,6 +30,20 @@ module "analytical_platform_jml_report_ecr_repository" {
           test     = "StringLike"
           variable = "aws:sourceArn"
           values   = ["arn:aws:lambda:${data.aws_region.current.name}:${local.environment_management.account_ids["analytical-platform-data-production"]}:function:analytical-platform-jml-report"]
+        }
+      ]
+    }
+    cross-account = {
+      sid    = "CrossAccountPermission"
+      effect = "Allow"
+      actions = [
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+      ]
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = [local.environment_management.account_ids["analytical-platform-data-production"]]
         }
       ]
     }
