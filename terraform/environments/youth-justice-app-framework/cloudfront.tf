@@ -1,5 +1,5 @@
 
-/*
+
 module "cloudfront_yjaf" {
   source = "./modules/cloudfront"
 
@@ -12,4 +12,3 @@ module "cloudfront_yjaf" {
   project_name     = local.project_name
   tags             = local.tags
 }
-*/
