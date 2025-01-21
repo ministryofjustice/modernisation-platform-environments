@@ -74,7 +74,7 @@ module "cw-ftp-ec2" {
   short_env    = local.application_data.accounts[local.environment].short_env
   name         = "ec2-ftp"
   topic        = aws_sns_topic.cw_alerts.arn
-  instanceId   = aws_instance.ec2_ftp.id
+  instanceId   = aws_instance.ec2_ftp[0].id
   imageId      = local.application_data.accounts[local.environment].ftp_ami_id
   instanceType = local.application_data.accounts[local.environment].ec2_instance_type_ftp
   fileSystem   = "xfs"       # Linux root filesystem
