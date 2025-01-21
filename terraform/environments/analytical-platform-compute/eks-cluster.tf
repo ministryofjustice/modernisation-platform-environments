@@ -17,6 +17,16 @@ module "eks" {
   vpc_id                   = module.vpc.vpc_id
   control_plane_subnet_ids = module.vpc.intra_subnets
   subnet_ids               = module.vpc.private_subnets
+  cluster_security_group_additional_rules = {
+    vpc = {
+      description = "Allow traffic from the VPC"
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "tcp"
+      type        = "ingress"
+      cidr_blocks = [module.vpc.vpc_cidr_block]
+    }
+  }
 
   authentication_mode                      = "API"
   enable_cluster_creator_admin_permissions = true
@@ -59,6 +69,11 @@ module "eks" {
     vpc-cni = {
       addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
       service_account_role_arn = module.vpc_cni_iam_role.iam_role_arn
+      configuration_values = jsonencode({
+        env = {
+          ENABLE_BANDWIDTH_PLUGIN = "true"
+        }
+      })
     }
   }
 
@@ -149,6 +164,11 @@ module "eks" {
           }
         }
       }
+    }
+    apc-mwaa = {
+      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/mwaa-execution"
+      username          = "apc-mwaa"
+      kubernetes_groups = ["mwaa"]
     }
     data-engineering-airflow = {
       principal_arn     = local.environment_configuration.data_engineering_airflow_execution_role_arn

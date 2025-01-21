@@ -798,22 +798,22 @@ module "s3_artifacts_store" {
 
 # S3 Violation Zone Bucket, DPR-408
 module "s3_working_bucket" {
-  source                      = "./modules/s3_bucket"
-  create_s3                   = local.setup_buckets
-  name                        = "${local.project}-working-${local.environment}"
-  custom_kms_key              = local.s3_kms_arn
-  create_notification_queue   = false # For SQS Queue
-  enable_lifecycle            = true
-  lifecycle_category          = "long_term"
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-working-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+  lifecycle_category        = "long_term"
 
   override_expiration_rules = [
     {
-      id = "reports"
+      id     = "reports"
       prefix = "reports/"
       days   = local.s3_redshift_table_expiry_days
     },
     {
-      id = "dpr"
+      id     = "dpr"
       prefix = "dpr/"
       days   = 7
     }
