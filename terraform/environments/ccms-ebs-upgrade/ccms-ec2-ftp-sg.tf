@@ -15,7 +15,7 @@ resource "aws_security_group" "ec2_sg_ftp" {
 ### FTP
 
 resource "aws_security_group_rule" "ingress_traffic_ftp_20" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
+  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
   type              = "ingress"
   description       = "FTP"
   protocol          = "TCP"
@@ -28,7 +28,7 @@ resource "aws_security_group_rule" "ingress_traffic_ftp_20" {
 ### FTP Passive Ports
 
 resource "aws_security_group_rule" "ingress_traffic_ftp_3000" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
+  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
   type              = "ingress"
   description       = "FTP Passive Ports"
   protocol          = "TCP"
@@ -41,7 +41,7 @@ resource "aws_security_group_rule" "ingress_traffic_ftp_3000" {
 ### SSH
 
 resource "aws_security_group_rule" "ingress_traffic_ftp_22" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
+  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
   type              = "ingress"
   description       = "SSH"
   protocol          = "TCP"
