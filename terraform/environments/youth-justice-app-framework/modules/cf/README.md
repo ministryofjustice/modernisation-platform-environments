@@ -1,3 +1,0 @@
-# Cloudfront module
-
-

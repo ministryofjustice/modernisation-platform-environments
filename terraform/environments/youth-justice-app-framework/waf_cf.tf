@@ -1,8 +1,9 @@
 
 module "waf-cf" {
-  source = "./modules/wafs"
+  source = "./modules/waf"
   providers = {
-    aws = aws.us-east-1
+    aws           = aws
+    aws.us-east-1 = aws.us-east-1
   }
 
   project_name = local.project_name

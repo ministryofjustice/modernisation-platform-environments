@@ -1,9 +1,13 @@
 
 module "waf" {
-  source       = "./modules/wafs"
+  source       = "./modules/waf"
   project_name = local.project_name
   tags         = local.tags
   waf_name     = "yjaf-default-alb"
+
+  providers = {
+    aws.us-east-1 = aws.us-east-1
+  }
 
   waf_IP_rules = {
     "Cloudfront" = {

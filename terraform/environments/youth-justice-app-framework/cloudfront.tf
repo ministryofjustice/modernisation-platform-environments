@@ -1,8 +1,9 @@
 module "cloudfront_yjaf" {
-  source = "./modules/cf"
+  source = "./modules/cloudfront"
 
   providers = {
-    aws = aws.us-east-1
+    aws           = aws
+    aws.us-east-1 = aws.us-east-1
   }
 
   cloudfront_alias = "yjaf.${local.environment}.yjbservices.yjb.gov.uk"
