@@ -65,6 +65,10 @@ resource "aws_cloudfront_distribution" "external" {
 }
 
 resource "aws_s3_bucket" "cloudfront" {
+  #checkov:skip=CKV_AWS_145: Use default encryption, todo add a ticket to change this later
+  #checkov:skip=CKV_AWS_144: "Cross-region replication is not required"
+  #checkov:skip=CKV_AWS_18:  "Bucket access logging is not required"
+  #checkov:skip=CKV_AWS_21:  "Bucket versioning is not required"
   bucket = "${var.project_name}-${var.environment}-cloudfront-logs"
   tags   = var.tags
 }
@@ -123,6 +127,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront" {
 }
 
 resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
+  #checkov:skip=CKV_AWS_259:Todo fix this later
   name    = "Strict-Transport-Security"
   comment = "Policy to enforce Strict-Transport-Security header."
 

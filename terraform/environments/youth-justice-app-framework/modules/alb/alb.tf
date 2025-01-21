@@ -1,5 +1,6 @@
 #Internal
 module "alb" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/alb/aws"
   version = "9.9.0"
 
@@ -24,6 +25,7 @@ module "alb" {
 }
 
 module "log_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 

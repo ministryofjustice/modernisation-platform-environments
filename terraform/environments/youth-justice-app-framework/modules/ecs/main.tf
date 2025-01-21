@@ -5,6 +5,7 @@ data "aws_availability_zones" "available" {}
 ################################################################################
 #tfsec:ignore:AVD-AWS-0130
 module "ecs_cluster" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/ecs/aws//modules/cluster"
   version = "5.11.2"
 

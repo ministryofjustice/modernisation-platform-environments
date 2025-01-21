@@ -38,3 +38,8 @@ variable "r53_zone_id" {
   description = "The ID of the Route 53 hosted zone to use for DNS validation"
   type        = string
 }
+
+variable "kms_key_arn" {
+  description = "The ARN of the KMS key to use for encryption"
+  type        = string
+}

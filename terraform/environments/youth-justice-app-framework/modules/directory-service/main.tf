@@ -7,9 +7,10 @@ resource "random_password" "mad_admin_password" {
 }
 
 resource "aws_secretsmanager_secret" "mad_admin_secret" {
+  #checkov:skip=CKV2_AWS_57:todo add rotation if needed
   name        = "${var.ds_managed_ad_directory_name}_${local.ds_managed_ad_admin_secret_sufix}"
   description = "Administrator Password for AD"
-  #kms_key_id = var.ds_managed_ad_secret_key
+  kms_key_id  = var.ds_managed_ad_secret_key
 }
 
 #Store secret as key value pair where key is password

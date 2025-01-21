@@ -9,9 +9,11 @@ resource "random_password" "user_password" {
 }
 
 resource "aws_secretsmanager_secret" "user_admin_secret" {
+  #checkov:skip=CKV2_AWS_57:todo add rotation if needed
   for_each    = toset(var.user_passwords_to_reset)
   name        = "${var.name}-db-${each.value}-password"
   description = "Password for User on db"
+  kms_key_id  = var.kms_key_id
 }
 
 resource "aws_secretsmanager_secret_version" "user_secret_version" {

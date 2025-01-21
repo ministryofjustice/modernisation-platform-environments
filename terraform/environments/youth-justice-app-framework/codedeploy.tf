@@ -4,6 +4,7 @@ module "codedeploy" {
   project_name = local.project_name
   tags         = local.tags
   cluster_name = "yjaf-cluster"
+  environment  = local.environment
   services = [
     { "auth" = "internal" },
     { "bands" = "internal" },
@@ -31,5 +32,6 @@ module "codedeploy" {
   depends_on = [
     module.internal_alb,
     module.external_alb,
+    module.ecs
   ]
 }

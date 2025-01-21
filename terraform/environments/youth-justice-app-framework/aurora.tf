@@ -32,8 +32,8 @@ module "aurora" {
   providers = {
     aws.core-network-services = aws.core-network-services
   }
-
   kms_key_arn = module.kms.key_arn
+  kms_key_id  = module.kms.key_id
 
   # todo - some of these rules are commented out as the resource doesn't exist yet. 
   # It would make more sense the add the rules in their respective modules rather than here

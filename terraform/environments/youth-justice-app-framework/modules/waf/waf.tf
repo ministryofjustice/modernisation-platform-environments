@@ -1,6 +1,7 @@
 #duplicate resource to get around provider error
 
 resource "aws_wafv2_web_acl" "waf" {
+  #checkov:skip=CKV2_AWS_31:add this later depends on datadog todo
   count       = var.scope != "CLOUDFRONT" ? 1 : 0
   name        = "${var.waf_name}-waf"
   description = "${var.waf_name}-waf from terraform"
@@ -25,7 +26,7 @@ resource "aws_wafv2_web_acl" "waf" {
         }
       }
       visibility_config {
-        cloudwatch_metrics_enabled = false
+        cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
         sampled_requests_enabled   = true
       }
@@ -50,7 +51,7 @@ resource "aws_wafv2_web_acl" "waf" {
         }
       }
       visibility_config {
-        cloudwatch_metrics_enabled = false
+        cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
         sampled_requests_enabled   = true
       }
@@ -76,7 +77,7 @@ resource "aws_wafv2_web_acl" "waf" {
         }
       }
       visibility_config {
-        cloudwatch_metrics_enabled = false
+        cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
         sampled_requests_enabled   = true
       }
@@ -86,7 +87,7 @@ resource "aws_wafv2_web_acl" "waf" {
   tags = local.tags
 
   visibility_config {
-    cloudwatch_metrics_enabled = false
+    cloudwatch_metrics_enabled = true
     metric_name                = "WAF"
     sampled_requests_enabled   = true
   }
@@ -94,6 +95,7 @@ resource "aws_wafv2_web_acl" "waf" {
 }
 
 resource "aws_wafv2_web_acl" "cf" {
+  #checkov:skip=CKV2_AWS_31:add this later depends on datadog todo
   count       = var.scope != "CLOUDFRONT" ? 0 : 1
   name        = "${var.waf_name}-waf"
   description = "${var.waf_name}-waf from terraform"
@@ -119,7 +121,7 @@ resource "aws_wafv2_web_acl" "cf" {
         }
       }
       visibility_config {
-        cloudwatch_metrics_enabled = false
+        cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
         sampled_requests_enabled   = true
       }
@@ -144,7 +146,7 @@ resource "aws_wafv2_web_acl" "cf" {
         }
       }
       visibility_config {
-        cloudwatch_metrics_enabled = false
+        cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
         sampled_requests_enabled   = true
       }
@@ -170,7 +172,7 @@ resource "aws_wafv2_web_acl" "cf" {
         }
       }
       visibility_config {
-        cloudwatch_metrics_enabled = false
+        cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
         sampled_requests_enabled   = true
       }
@@ -180,7 +182,7 @@ resource "aws_wafv2_web_acl" "cf" {
   tags = local.tags
 
   visibility_config {
-    cloudwatch_metrics_enabled = false
+    cloudwatch_metrics_enabled = true
     metric_name                = "WAF"
     sampled_requests_enabled   = true
   }

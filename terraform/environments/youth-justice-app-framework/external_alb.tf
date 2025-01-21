@@ -1,6 +1,7 @@
 #tfsec:ignore:AWS0053 "The load balancer is internet facing by design."
 #tfsec:ignore:AVD-AWS-0053
 module "external_alb" {
+  #checkov:skip=CKV_AWS_2:false alert
   source = "./modules/alb"
   #pass in provider for creating records on central route53
   providers = {

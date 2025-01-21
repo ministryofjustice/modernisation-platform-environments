@@ -60,7 +60,7 @@ resource "aws_iam_policy_attachment" "codedeploy_service_role_policy" {
 
 resource "aws_codedeploy_deployment_group" "this" {
   for_each               = { for pair in var.services : join("", keys(pair)) => pair }
-  deployment_group_name  = each.key
+  deployment_group_name  = var.environment
   app_name               = aws_codedeploy_app.this[each.key].name
   deployment_config_name = "CodeDeployDefault.ECSAllAtOnce"
   service_role_arn       = aws_iam_role.codedeploy_service_role.arn

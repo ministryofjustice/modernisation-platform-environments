@@ -181,6 +181,12 @@ variable "alb_route53_record_name" {
   default     = ""
 }
 
+variable "kms_key_id" {
+  description = "The ARN of the KMS key to use for encryption"
+  type        = string
+  default     = null
+}
+
 variable "kms_key_arn" {
   description = "The ARN of the KMS key to use for encryption"
   type        = string

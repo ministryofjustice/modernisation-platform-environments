@@ -38,6 +38,7 @@ resource "aws_service_discovery_service" "service_discovery" {
 */
 #For each ecs service create a service module
 module "ecs_service" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   for_each = var.ecs_services
   source   = "terraform-aws-modules/ecs/aws//modules/service"
   version  = "5.11.2"

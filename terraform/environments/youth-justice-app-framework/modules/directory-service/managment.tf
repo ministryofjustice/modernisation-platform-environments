@@ -63,60 +63,53 @@ resource "aws_security_group" "ad_sg" {
   name        = "ad_management_server_sg"
   description = "Allow AD traffic"
   vpc_id      = var.ds_managed_ad_vpc_id
-  ingress { #inbound on 3389 from my ip todo, better rules later
-    from_port   = 3389
-    to_port     = 3389
-    protocol    = "tcp"
-    cidr_blocks = ["85.87.99.44/32"]
-  }
-  ingress { #inbound on 3389 from olivier ip todo, better rules later
-    from_port   = 3389
-    to_port     = 3389
-    protocol    = "tcp"
-    cidr_blocks = ["145.224.92.80/32"]
-  }
-  ingress { #inbound on 3389 from my ip todo, better rules later
+  ingress { #inbound on 3389 , better rules later, test if actually needed
     from_port   = 389
     to_port     = 389
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr_block]
+    description = "LDAP"
   }
-  ingress { #inbound on mysql adfs service? todo, test removal
+  ingress { #inbound on 3389 , better rules later, test if actually needed
+    from_port   = 636
+    to_port     = 636
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr_block]
+    description = "LDAP"
+  }
+  ingress { #inbound on mysql adfs service? todo, test removal, test if actually needed
     from_port   = 1433
     to_port     = 1433
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr_block]
+    description = "ADFS"
   }
-  ingress { #inbound on 443 for adfs service?  todo, test removal
+  ingress { #inbound on 443 for adfs service?  todo, test removal, test if actually needed
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr_block]
+    description = "ADFS"
   }
-  ingress { #inbound on 3389 from my ip todo, better rules later
+  ingress { #inbound on 3389 , todo better rules later, test if actually needed
     from_port   = 53
     to_port     = 53
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr_block]
+    description = "LDAP"
   }
-  ingress { #inbound on 3389 from my ip todo, better rules later
+  ingress { #inbound on 3389 , todo better rules later, test if actually needed
     from_port   = 88
     to_port     = 88
     protocol    = "tcp"
     cidr_blocks = [var.vpc_cidr_block]
+    description = "LDAP"
   }
   egress { #allow all out #todo filter this down
     from_port   = 0
     to_port     = 0
     cidr_blocks = ["0.0.0.0/0"]
     description = "Allow all outbound"
-    protocol    = "-1"
-  }
-  ingress { #temp to investigate issues
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = [var.vpc_cidr_block]
-    description = "Allow all inbound from vpc"
     protocol    = "-1"
   }
   tags = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
@@ -130,6 +123,7 @@ resource "random_password" "ad_instance_admin_password" {
 
 #create a keypair for your EC2 instance
 resource "aws_secretsmanager_secret" "ad_instance_admin_secret" {
+  #checkov:skip=CKV2_AWS_57:todo add rotation if needed
   name        = "ad_instance_password_secret_1"
   description = "Local Admin for management instance" #todo do I need this?
   kms_key_id  = var.ds_managed_ad_secret_key

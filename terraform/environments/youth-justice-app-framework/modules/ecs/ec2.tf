@@ -10,6 +10,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" { #todo what should this be?
 
 #create keypair for ec2 instances
 module "key_pair" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/key-pair/aws"
   version = "2.0.3"
 
@@ -36,6 +37,7 @@ locals {
 
 #tfsec:ignore:AVD-AWS-0130
 module "autoscaling" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/autoscaling/aws"
   version = "7.6.1"
 
@@ -50,11 +52,12 @@ module "autoscaling" {
   }
   security_groups = [module.autoscaling_sg.security_group_id]
 
-  vpc_zone_identifier   = var.ecs_subnet_ids
-  min_size              = var.ec2_min_size
-  max_size              = var.ec2_max_size
-  desired_capacity      = var.ec2_desired_capacity
-  desired_capacity_type = "units"
+  vpc_zone_identifier       = var.ecs_subnet_ids
+  min_size                  = var.ec2_min_size
+  max_size                  = var.ec2_max_size
+  desired_capacity          = var.ec2_desired_capacity
+  desired_capacity_type     = "units"
+  wait_for_capacity_timeout = "60m"
 
   # Launch template settings
   create_launch_template = true
@@ -101,6 +104,7 @@ module "autoscaling" {
 }
 
 module "autoscaling_sg" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
   version = "5.1.2"
 

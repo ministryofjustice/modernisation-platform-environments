@@ -199,7 +199,7 @@ resource "aws_cloudwatch_log_group" "function_log_group_start" {
   count             = var.create_sheduler ? 1 : 0
   name              = "/aws/lambda/${aws_lambda_function.start_aurora_lambda_function[0].function_name}"
   retention_in_days = 365
-  kms_key_id        = var.kms_key_arn
+  kms_key_id        = var.kms_key_id
   lifecycle {
     prevent_destroy = false
   }
@@ -210,7 +210,7 @@ resource "aws_cloudwatch_log_group" "function_log_group_stop" {
   count             = var.create_sheduler ? 1 : 0
   name              = "/aws/lambda/${aws_lambda_function.stop_aurora_lambda_function[0].function_name}"
   retention_in_days = 365
-  kms_key_id        = var.kms_key_arn
+  kms_key_id        = var.kms_key_id
   lifecycle {
     prevent_destroy = false
   }

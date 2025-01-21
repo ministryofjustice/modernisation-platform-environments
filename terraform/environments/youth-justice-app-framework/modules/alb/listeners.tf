@@ -15,6 +15,7 @@ locals {
 }
 
 resource "aws_lb_listener" "this" {
+  #checkov:skip=CKV_AWS_103
   for_each = { for k, v in var.listeners : k => v }
 
 

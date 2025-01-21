@@ -37,6 +37,7 @@ variable "tags" {
 
 variable "project_name" {
   description = "The name of the project"
+  type        = string
 }
 
 variable "waf_IP_rules" {

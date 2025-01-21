@@ -65,6 +65,7 @@ module "aurora" {
 
 #todo match yjaf production security group
 resource "aws_security_group" "rds" {
+  # checkov:skip=CKV2_AWS_5: Configured in Redshift cluster, Checkov not detecting reference.
   name        = "RDS Postgres Security Group"
   description = "Controls access to the PostgreSQL RDS"
   vpc_id      = var.vpc_id

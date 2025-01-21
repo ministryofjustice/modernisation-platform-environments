@@ -6,6 +6,7 @@ module "waf" {
   waf_name     = "yjaf-default-alb"
 
   providers = {
+    aws           = aws
     aws.us-east-1 = aws.us-east-1
   }
 

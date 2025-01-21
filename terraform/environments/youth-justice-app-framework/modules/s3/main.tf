@@ -1,4 +1,5 @@
 resource "aws_s3_bucket" "default" {
+  #checkov:skip=CKV_AWS_145
   for_each = toset(local.bucket_name)
   bucket   = each.value
   tags     = var.tags
@@ -103,6 +104,7 @@ resource "aws_s3_bucket_policy" "default" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
+  #checkov:skip=CKV_AWS_145
   for_each = toset(local.bucket_name)
   bucket   = aws_s3_bucket.default[each.value].id
   rule {

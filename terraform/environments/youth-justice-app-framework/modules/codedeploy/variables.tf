@@ -39,3 +39,8 @@ variable "external_listener_port" {
   type        = number
   default     = 443
 }
+
+variable "environment" {
+  description = "The environment to deploy to"
+  type        = string
+}
