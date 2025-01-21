@@ -30,6 +30,7 @@ module "aurora" {
 
   #pass in provider for creating records on central route53
   providers = {
+    aws                       = aws
     aws.core-network-services = aws.core-network-services
   }
   kms_key_arn = module.kms.key_arn
