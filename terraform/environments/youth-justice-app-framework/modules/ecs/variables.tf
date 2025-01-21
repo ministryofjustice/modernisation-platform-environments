@@ -1,21 +1,26 @@
 variable "cluster_name" {
   description = "The name of the ECS cluster"
+  type        = string
 }
 
 variable "project_name" {
   description = "The name of the project"
+  type        = string
 }
 
 variable "vpc_id" {
   description = "The VPC ID"
+  type        = string
 }
 
 variable "environment" {
   description = "The environment for the ECS cluster"
+  type        = string
 }
 
 variable "nameserver" {
   description = "The nameserver for the ECS cluster, normally ends in .0.2"
+  type        = string
 }
 
 variable "ecs_services" {

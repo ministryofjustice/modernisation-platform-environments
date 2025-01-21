@@ -1,5 +1,6 @@
 variable "domain_name" {
   default = "example.com"
+  type    = string
 }
 
 variable "tags" {
@@ -8,6 +9,7 @@ variable "tags" {
 }
 
 variable "project_name" {
+  type = string
 }
 
 variable "private_hosted_zone" {

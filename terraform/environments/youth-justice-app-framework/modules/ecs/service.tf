@@ -107,7 +107,7 @@ module "ecs_service" {
       ]) : each.value.secrets
       docker_labels = merge(try(each.value.dockerLabels, null), {
         "com.datadoghq.tags.service" : each.value.name,
-        "com.datadoghq.tags.env" : "${var.environment}",
+        "com.datadoghq.tags.env" : var.environment,
       })
       health_check = {
         command = each.value.health_check.command
