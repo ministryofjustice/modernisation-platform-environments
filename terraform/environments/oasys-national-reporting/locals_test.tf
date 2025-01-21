@@ -56,7 +56,7 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a"]
-          security_groups    = ["boe"]
+          security_groups    = ["boe", "bip-app"]
         }]
         tags = {
           backup = "false"
@@ -67,7 +67,7 @@ locals {
     ec2_autoscaling_groups = {
       t2-onr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
           max_size         = 2
         })
         config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
