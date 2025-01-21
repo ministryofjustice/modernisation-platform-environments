@@ -21,6 +21,6 @@ module "external_alb" {
 
 
   alb_subnets_ids   = local.public_subnet_list[*].id
-  web_acl_arn       = module.waf.waf_arn
+  web_acl_arn       = module.alb_waf.waf_arn
   associate_web_acl = true
 }

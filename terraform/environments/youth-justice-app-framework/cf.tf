@@ -1,7 +1,6 @@
 
-/*
 module "cloudfront_yjaf" {
-  source = "./modules/cloudfront"
+  source = "./modules/cf"
 
 
   cloudfront_alias = "yjaf.${local.environment}.yjbservices.yjb.gov.uk"
@@ -12,4 +11,3 @@ module "cloudfront_yjaf" {
   project_name     = local.project_name
   tags             = local.tags
 }
-*/

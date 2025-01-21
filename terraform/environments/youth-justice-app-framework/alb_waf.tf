@@ -1,6 +1,6 @@
-/*
-module "waf" {
-  source       = "./modules/waf"
+
+module "alb_waf" {
+  source       = "./modules/wafs"
   project_name = local.project_name
   tags         = local.tags
   waf_name     = "yjaf-default-alb"
@@ -48,4 +48,3 @@ module "waf" {
     }
   ]
 }
-*/
