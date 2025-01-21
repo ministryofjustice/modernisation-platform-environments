@@ -15,7 +15,8 @@ resource "aws_security_group" "ec2_sg_ftp" {
 ### FTP
 
 resource "aws_security_group_rule" "ingress_traffic_ftp_20" {
-  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
+  count             = local.is-test ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "ingress"
   description       = "FTP"
   protocol          = "TCP"
@@ -28,7 +29,8 @@ resource "aws_security_group_rule" "ingress_traffic_ftp_20" {
 ### FTP Passive Ports
 
 resource "aws_security_group_rule" "ingress_traffic_ftp_3000" {
-  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
+  count             = local.is-test ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "ingress"
   description       = "FTP Passive Ports"
   protocol          = "TCP"
@@ -41,7 +43,8 @@ resource "aws_security_group_rule" "ingress_traffic_ftp_3000" {
 ### SSH
 
 resource "aws_security_group_rule" "ingress_traffic_ftp_22" {
-  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
+  count             = local.is-test ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "ingress"
   description       = "SSH"
   protocol          = "TCP"
@@ -58,7 +61,8 @@ resource "aws_security_group_rule" "ingress_traffic_ftp_22" {
 ### FTP
 
 resource "aws_security_group_rule" "egress_traffic_ftp_20" {
-  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
+  count             = local.is-test ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "FTP"
   protocol          = "TCP"
@@ -71,7 +75,8 @@ resource "aws_security_group_rule" "egress_traffic_ftp_20" {
 ### SSH
 
 resource "aws_security_group_rule" "egress_traffic_ftp_22" {
-  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
+  count             = local.is-test ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "SSH"
   protocol          = "TCP"
@@ -83,7 +88,8 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22" {
 ### HTTPS
 
 resource "aws_security_group_rule" "egress_traffic_ftp_443" {
-  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
+  count             = local.is-test ? 1 : 0
+  security_group_id = aws_security_group.ec2_sg_ftp.id
   type              = "egress"
   description       = "HTTPS"
   protocol          = "TCP"

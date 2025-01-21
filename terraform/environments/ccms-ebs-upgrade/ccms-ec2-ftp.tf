@@ -68,6 +68,7 @@ resource "aws_instance" "ec2_ftp" {
 }
 
 module "cw-ftp-ec2" {
+  count  = local.is-test ? 1 : 0
   source = "./modules/cw-ec2"
 
   short_env    = local.application_data.accounts[local.environment].short_env
