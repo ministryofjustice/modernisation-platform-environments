@@ -23,7 +23,7 @@ locals {
         disable_api_termination = false
         instance_type           = "m6i.xlarge"
         key_name                = "ec2-user"
-        vpc_security_group_ids  = ["bip"]
+        vpc_security_group_ids  = ["bip-app"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -71,7 +71,7 @@ locals {
         disable_api_termination = false
         instance_type           = "r6i.xlarge"
         key_name                = "ec2-user"
-        vpc_security_group_ids  = ["web"]
+        vpc_security_group_ids  = ["bip-web"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
