@@ -17,6 +17,16 @@ module "eks" {
   vpc_id                   = module.vpc.vpc_id
   control_plane_subnet_ids = module.vpc.intra_subnets
   subnet_ids               = module.vpc.private_subnets
+  cluster_security_group_additional_rules = {
+    vpc = {
+      description = "Allow traffic from the VPC"
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "tcp"
+      type        = "ingress"
+      cidr_blocks = [module.vpc.vpc_cidr_block]
+    }
+  }
 
   authentication_mode                      = "API"
   enable_cluster_creator_admin_permissions = true
