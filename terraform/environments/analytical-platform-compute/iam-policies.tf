@@ -615,7 +615,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
-    resources = [module.mwaa_s3_bucket.s3_bucket_arn]
+    resources = [module.mwaa_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "MWAAS3WriteAccess"
@@ -625,7 +625,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "s3:GetObject",
       "s3:DeleteObject"
     ]
-    resources = ["${module.mwaa_s3_bucket.s3_bucket_arn}/*"]
+    resources = ["${module.mwaa_bucket.s3_bucket_arn}/*"]
   }
 }
 
