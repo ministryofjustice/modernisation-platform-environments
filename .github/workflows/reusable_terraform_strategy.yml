@@ -28,55 +28,56 @@
           run: |
             set -euo pipefail
 
-            echo '{"include":[' > matrix.out
-
+            # 1) Fetch environment data from <application>.json, produce newline-separated JSON objects
             if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
-              # On a branch => plan on all accounts, but plan_apply only on dev/test
+              # On a branch => plan on all accounts, but plan_apply on dev/test
               curl -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
-                | jq -r '.environments[]' \
-                | jq '.name' \
-                | jq 'if contains("production") then {"target": ., "action":"plan"} else {"target": ., "action":"plan_apply"} end' -j \
-                | sed s"/}{/},{/g" \
+                | jq -c '.environments[] as $env |
+                    if $env.name | contains("production") then
+                      {"target": $env.name, "action": "plan"}
+                    else
+                      {"target": $env.name, "action": "plan_apply"}
+                    end' \
                 > envlist.json
             else
               # On main => plan_apply on all accounts
               curl -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
-                | jq -r '.environments[] | {"target" : .name, "action" : "plan_apply"}' -j \
-                | sed s"/}{/},{/g" \
+                | jq -c '.environments[] | {"target": .name, "action": "plan_apply"}' \
                 > envlist.json
             fi
+
+            # At this point, envlist.json might look like:
+            # {"target":"development","action":"plan_apply"}
+            # {"target":"test","action":"plan_apply"}
+            # {"target":"production","action":"plan"}
+
+            # 2) Discover valid subfolders with platform_backend.tf
             COMPONENTS=""
+            # Optionally include the root folder as a blank component:
             COMPONENTS="$COMPONENTS \"\""
 
             if [ -d "terraform/environments/${{ inputs.application }}" ]; then
               for d in $(find "terraform/environments/${{ inputs.application }}" -mindepth 1 -maxdepth 1 -type d); do
-                # e.g. d="terraform/environments/analytical-platform-compute/network"
                 subfolder="$(basename "$d")"
-
-                # We'll skip if there's no "platform_backend.tf" inside that directory.
-                if [ ! -f "$d/platform_backend.tf" ]; then
-                  continue
+                # Only include if there's a platform_backend.tf in this folder
+                if [ -f "$d/platform_backend.tf" ]; then
+                  # e.g. skip .terraform or other special folders if needed
+                  [ "$subfolder" = ".terraform" ] && continue
+                  COMPONENTS="$COMPONENTS \"$subfolder\""
                 fi
-
-                # If needed, exclude certain known folders
-                [ "$subfolder" = ".terraform" ] && continue
-
-                # Add to our COMPONENTS list
-                COMPONENTS="$COMPONENTS \"$subfolder\""
               done
             fi
 
             echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
 
-            echo -n > final-list.json
+            # 3) Double loop to merge each environment object with each component
             echo "[" > final-list.json
-
             firstOuter=true
-            while IFS= read -r envobj; do
-              # envobj might be something like {"target":"development","action":"plan_apply"}
 
+            while IFS= read -r envobj; do
+              # envobj is a single-line JSON obj, e.g. {"target":"development","action":"plan_apply"}
               for c in $COMPONENTS; do
-                rawC=$(echo "$c" | sed 's/"//g')   # strip quotes from "network" => network
+                rawC=$(echo "$c" | sed 's/"//g') # remove quotes
 
                 if [ "$firstOuter" = true ]; then
                   firstOuter=false
@@ -84,24 +85,23 @@
                   echo "," >> final-list.json
                 fi
 
-                # Merge { "target":"dev", "action":"..." } + { "component":"subfolder" }
+                # Merge environment + { component: $rawC }
                 echo -n "$envobj" | jq --arg comp "$rawC" '. + {"component": $comp}' >> final-list.json
               done
-            done < <(echo $(cat envlist.json))
+            done < envlist.json
 
             echo "]" >> final-list.json
 
-            # Wrap in {"include": ... } for GitHub Actions matrix
+            # Wrap in {"include":[ ... ]} for GitHub Actions
             echo -n '{"include":' > matrix.out
             cat final-list.json >> matrix.out
             echo -n '}' >> matrix.out
-
 
             matrix=$(cat matrix.out | jq -r)
             echo "Matrix is:"
             echo "$matrix"
 
-            # Output the matrix JSON
+            # Output for the next job
             echo 'matrix<<EOF' >> $GITHUB_OUTPUT
             echo "${matrix}" >> $GITHUB_OUTPUT
             echo 'EOF' >> $GITHUB_OUTPUT
