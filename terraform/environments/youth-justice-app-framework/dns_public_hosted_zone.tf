@@ -1,4 +1,4 @@
-/*
+
 module "public_dns_zone" {
   source              = "./modules/dns/hosted_zone"
   domain_name         = "${local.environment}.yjbservices.yjb.gov.uk"
@@ -7,4 +7,3 @@ module "public_dns_zone" {
   vpc                 = data.aws_vpc.shared.id
   tags                = local.tags
 }
-*/
