@@ -4,6 +4,7 @@
 
 variable "waf_name" {
   description = "Name of the load balancer"
+  type        = string
 }
 
 variable "associate_web_acl" {

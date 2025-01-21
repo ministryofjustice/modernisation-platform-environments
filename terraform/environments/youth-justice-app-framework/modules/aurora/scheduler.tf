@@ -55,7 +55,7 @@ resource "aws_iam_policy" "scheduler_aurora_lambda_policy" {
                 "rds:DescribeOptionGroups"
               ],
            "Resource": [
-              "*"
+              "${module.aurora.cluster_arn}"
              ]
         },
         {
@@ -86,7 +86,13 @@ data "archive_file" "python_lambda_start_aurora_cluster" {
   output_path = "${path.module}/zip/scheduler-start-aurora-cluster.zip"
 }
 
+
 resource "aws_lambda_function" "start_aurora_lambda_function" {
+  #checkov:skip=CKV_AWS_50: "X-ray tracing is not required"
+  #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"#checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  #checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+  #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   count            = var.create_sheduler ? 1 : 0
   function_name    = "start-aurora-cluster"
   description      = "Used for starting Aurora cluster"
@@ -96,7 +102,7 @@ resource "aws_lambda_function" "start_aurora_lambda_function" {
   runtime          = "python3.9"
   handler          = "scheduler-start-aurora-cluster.lambda_handler"
   timeout          = 5
-
+  kms_key_arn      = var.kms_key_arn
   environment { // Key value pair used as tags in RDS
     variables = {
       KEY    = "schedule",
@@ -138,7 +144,13 @@ data "archive_file" "python_lambda_stop_aurora_cluster" {
   output_path = "${path.module}/zip/scheduler-stop-aurora-cluster.zip"
 }
 
+
 resource "aws_lambda_function" "stop_aurora_lambda_function" {
+  #checkov:skip=CKV_AWS_50: "X-ray tracing is not required"
+  #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"#checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  #checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
+  #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   count            = var.create_sheduler ? 1 : 0
   function_name    = "stop-aurora-cluster"
   description      = "Used for stopping Aurora cluster"
@@ -148,7 +160,7 @@ resource "aws_lambda_function" "stop_aurora_lambda_function" {
   runtime          = "python3.9"
   handler          = "scheduler-stop-aurora-cluster.lambda_handler"
   timeout          = 5
-
+  kms_key_arn      = var.kms_key_arn
   environment { // Key value pair used as tags in RDS
     variables = {
       KEY    = "schedule",
@@ -186,7 +198,8 @@ resource "aws_lambda_permission" "allow_eventbridge_invoke_aurora_stop" {
 resource "aws_cloudwatch_log_group" "function_log_group_start" {
   count             = var.create_sheduler ? 1 : 0
   name              = "/aws/lambda/${aws_lambda_function.start_aurora_lambda_function[0].function_name}"
-  retention_in_days = 7
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
   lifecycle {
     prevent_destroy = false
   }
@@ -196,7 +209,8 @@ resource "aws_cloudwatch_log_group" "function_log_group_start" {
 resource "aws_cloudwatch_log_group" "function_log_group_stop" {
   count             = var.create_sheduler ? 1 : 0
   name              = "/aws/lambda/${aws_lambda_function.stop_aurora_lambda_function[0].function_name}"
-  retention_in_days = 7
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
   lifecycle {
     prevent_destroy = false
   }

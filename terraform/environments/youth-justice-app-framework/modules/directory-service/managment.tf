@@ -132,7 +132,7 @@ resource "random_password" "ad_instance_admin_password" {
 resource "aws_secretsmanager_secret" "ad_instance_admin_secret" {
   name        = "ad_instance_password_secret_1"
   description = "Local Admin for management instance" #todo do I need this?
-  #kms_key_id = var.ds_managed_ad_secret_key
+  kms_key_id  = var.ds_managed_ad_secret_key
 }
 
 resource "aws_secretsmanager_secret_version" "ad_instance_admin_secret_version" {

@@ -1,5 +1,4 @@
-/*
-module "waf_cf" {
+module "waf-cf" {
   source = "./modules/waf"
   providers = {
     aws = aws.us-east-1
@@ -19,4 +18,3 @@ module "waf_cf" {
     }
   ]
 }
-*/

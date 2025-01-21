@@ -1,6 +1,5 @@
 #tfsec:ignore:AWS0053 "The load balancer is internet facing by design."
 #tfsec:ignore:AVD-AWS-0053
-/*
 module "external_alb" {
   source = "./modules/alb"
   #pass in provider for creating records on central route53
@@ -25,4 +24,3 @@ module "external_alb" {
   web_acl_arn       = module.waf.waf_arn
   associate_web_acl = true
 }
-*/

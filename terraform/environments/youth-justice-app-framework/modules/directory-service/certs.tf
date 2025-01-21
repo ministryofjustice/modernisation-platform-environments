@@ -11,6 +11,7 @@
 #Deploy the CA solution from the available AWS cloudformation stack
 
 resource "aws_cloudformation_stack" "pki_quickstart" {
+  #checkov:skip=CKV_AWS_124: "The template is provided by AWS"
   name = "MicrosoftPKIQuickStart"
 
   template_url = "https://aws-ia-us-east-1.s3.us-east-1.amazonaws.com/cfn-ps-microsoft-pki/templates/microsoft-pki.template.yaml"

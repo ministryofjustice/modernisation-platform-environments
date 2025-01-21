@@ -32,6 +32,8 @@ module "aurora" {
     aws.core-network-services = aws.core-network-services
   }
 
+  kms_key_arn = module.kms.key_arn
+
   # todo - some of these rules are commented out as the resource doesn't exist yet. 
   # It would make more sense the add the rules in their respective modules rather than here
   rds_security_group_ingress = [
