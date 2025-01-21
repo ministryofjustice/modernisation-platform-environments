@@ -57,7 +57,7 @@ resource "aws_iam_policy" "github_audit_log_write_policy" {
 }
 
 resource "aws_iam_role" "github_audit_log_role" {
-  name = "github-audit-log-role"
+  name = "github-audit-log-role-test-sam-bot"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
