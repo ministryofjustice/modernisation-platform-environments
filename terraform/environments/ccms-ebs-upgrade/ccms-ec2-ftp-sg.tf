@@ -58,7 +58,7 @@ resource "aws_security_group_rule" "ingress_traffic_ftp_22" {
 ### FTP
 
 resource "aws_security_group_rule" "egress_traffic_ftp_20" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
+  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
   type              = "egress"
   description       = "FTP"
   protocol          = "TCP"
@@ -71,7 +71,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_20" {
 ### SSH
 
 resource "aws_security_group_rule" "egress_traffic_ftp_22" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
+  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
   type              = "egress"
   description       = "SSH"
   protocol          = "TCP"
@@ -83,7 +83,7 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22" {
 ### HTTPS
 
 resource "aws_security_group_rule" "egress_traffic_ftp_443" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
+  security_group_id = aws_security_group.ec2_sg_ftp[count.index].id
   type              = "egress"
   description       = "HTTPS"
   protocol          = "TCP"
