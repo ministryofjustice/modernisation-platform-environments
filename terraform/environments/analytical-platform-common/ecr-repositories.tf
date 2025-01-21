@@ -33,6 +33,20 @@ module "analytical_platform_jml_report_ecr_repository" {
         }
       ]
     }
+    cross-account = {
+      sid    = "CrossAccountPermission"
+      effect = "Allow"
+      actions = [
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+      ]
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = [local.environment_management.account_ids["analytical-platform-data-production"]]
+        }
+      ]
+    }
   }
 
   create_lifecycle_policy = false

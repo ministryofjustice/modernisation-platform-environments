@@ -286,6 +286,7 @@ module "analytical_platform_ui_service_role" {
 module "analytical_platform_control_panel_service_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.52.1"
 
@@ -309,6 +310,7 @@ module "analytical_platform_control_panel_service_role" {
 module "analytical_platform_data_eng_dba_service_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.52.1"
 
@@ -328,6 +330,7 @@ module "analytical_platform_data_eng_dba_service_role" {
 
 module "quicksight_vpc_connection_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.52.1"
@@ -355,8 +358,6 @@ module "lake_formation_to_data_production_mojap_derived_tables_role" {
 
   role_name = "lake-formation-data-production-data-access"
 
-  # number_of_custom_role_policy_arns = 1
-
   custom_role_policy_arns = [
     module.data_production_mojap_derived_bucket_lake_formation_policy.arn,
   ]
@@ -377,6 +378,7 @@ module "lake_formation_to_data_production_mojap_derived_tables_role" {
 module "copy_apdp_cadet_metadata_to_compute_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.52.1"
 
@@ -391,21 +393,41 @@ module "copy_apdp_cadet_metadata_to_compute_assumable_role" {
   role_name         = "copy-apdp-cadet-metadata-to-compute"
 
   custom_role_policy_arns = [module.copy_apdp_cadet_metadata_to_compute_policy.arn]
-  # number_of_custom_role_policy_arns = 1
 }
 
 module "find_moj_data_quicksight_sa_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.52.1"
 
   allow_self_assume_role = false
-  trusted_role_arns  = ["arn:aws:iam::754256621582:role/cloud-platform-irsa-e5ba8827240d2ff3-live"]
+  trusted_role_arns      = ["arn:aws:iam::754256621582:role/cloud-platform-irsa-e5ba8827240d2ff3-live"]
 
   create_role       = true
   role_requires_mfa = false
   role_name         = "find-moj-data-quicksight"
 
   custom_role_policy_arns = [module.find_moj_data_quicksight_policy.arn]
+}
+
+module "mwaa_execution_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.52.2"
+
+  create_role = true
+
+  role_name         = "mwaa-execution"
+  role_requires_mfa = false
+
+  trusted_role_services = [
+    "airflow.amazonaws.com",
+    "airflow-env.amazonaws.com"
+  ]
+
+  custom_role_policy_arns = [module.mwaa_execution_iam_policy.arn]
 }
