@@ -91,5 +91,5 @@ variable "aws_kms_key_usage" {
 variable "bt_genesys_aws_third_party_account_id" {
     type        = string
     description = "The AWS account ID of the BT Genesys third-party organisation."
-    default     = ""
+    default     = "1234"
 }
