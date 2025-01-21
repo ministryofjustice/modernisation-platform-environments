@@ -1,9 +1,5 @@
 #Must create ns record in main hosted zone before running
 #create a certificate in ACM
-provider "aws" {
-  alias  = "us-east-1"
-  region = "us-east-1"
-}
 
 resource "aws_acm_certificate" "domain_cert" {
   domain_name       = var.cloudfront_alias

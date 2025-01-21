@@ -1,20 +1,11 @@
 #duplicate resource to get around provider error
-provider "aws" {
-  alias  = "us-east-1"
-  region = "us-east-1"
-}
-
-provider "aws" {
-  alias  = "standard"
-  region = var.region
-}
 
 resource "aws_wafv2_web_acl" "waf" {
   count       = var.scope != "CLOUDFRONT" ? 1 : 0
   name        = "${var.waf_name}-waf"
   description = "${var.waf_name}-waf from terraform"
   scope       = var.scope
-  provider    = aws.standard
+
   default_action {
     allow {}
   }
