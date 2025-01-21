@@ -21,15 +21,6 @@ provider "aws" {
   }
 }
 
-# AWS provider for core-vpc-<environment>, to access resources in the core-vpc accounts
-provider "aws" {
-  alias  = "core-vpc"
-  region = "eu-west-2"
-  assume_role {
-    role_arn = !can(regex("githubactionsrolesession|AdministratorAccess", data.aws_caller_identity.original_session.arn)) ? "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-read-only" : "arn:aws:iam::${local.environment_management.account_ids[local.provider_name]}:role/member-delegation-${local.vpc_name}-${local.environment}"
-  }
-}
-
 # AWS provider for network services to enable dns entries for certificate validation to be created
 provider "aws" {
   alias  = "core-network-services"
@@ -48,6 +39,16 @@ provider "aws" {
   }
 }
 
+# Provider for reading resources from root account IdentityStore
+provider "aws" {
+  region = "eu-west-2"
+  alias  = "sso-readonly"
+  assume_role {
+    role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
+  }
+}
+
+# Provider for interacting with the EKS cluster
 provider "kubernetes" {
   host                   = module.eks.cluster_endpoint
   cluster_ca_certificate = base64decode(module.eks.cluster_certificate_authority_data)
@@ -58,6 +59,7 @@ provider "kubernetes" {
   }
 }
 
+# Provider for interacting with the EKS cluster using Helm
 provider "helm" {
   kubernetes {
     host                   = module.eks.cluster_endpoint
@@ -67,14 +69,5 @@ provider "helm" {
       command     = "bash"
       args        = ["scripts/eks-authentication.sh", local.environment_management.account_ids[terraform.workspace], module.eks.cluster_name]
     }
-  }
-}
-
-# Provider for reading resources from root account IdentityStore
-provider "aws" {
-  region = "eu-west-2"
-  alias  = "sso-readonly"
-  assume_role {
-    role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
 }

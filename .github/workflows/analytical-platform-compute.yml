@@ -1,65 +1,68 @@
 ---
-name: analytical-platform-compute
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'terraform/environments/analytical-platform-compute/**'
-      - '.github/workflows/analytical-platform-compute.yml'
+  name: analytical-platform-compute
 
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'terraform/environments/analytical-platform-compute/**'
-      - '.github/workflows/analytical-platform-compute.yml'
+  on:
+    push:
+      branches:
+        - main
+      paths:
+        - 'terraform/environments/analytical-platform-compute/**'
+        - '.github/workflows/analytical-platform-compute.yml'
 
-  workflow_dispatch:
-    inputs:
-      action:
-        description: 'Set either [deploy|destroy].'
-        default: 'deploy'
-        required: true
-        type: string
-        options:
-          - deploy
-          - destroy
+    pull_request:
+      branches:
+        - main
+      paths:
+        - 'terraform/environments/analytical-platform-compute/**'
+        - '.github/workflows/analytical-platform-compute.yml'
 
-permissions:
-  id-token: write  # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+    workflow_dispatch:
+      inputs:
+        action:
+          description: 'Set either [deploy|destroy].'
+          default: 'deploy'
+          required: true
+          type: choice
+          options:
+            - deploy
+            - destroy
 
-jobs:
-  strategy:
-    uses: ./.github/workflows/reusable_terraform_strategy.yml
-    if: inputs.action != 'destroy'
-    with:
-      application: "${{ github.workflow }}"
+  permissions:
+    id-token: write
+    contents: read
 
-  terraform:
-    needs: strategy
-    if: inputs.action != 'destroy'
+  jobs:
     strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
-    with:
-      application: "${{ github.workflow }}"
-      environment: "${{ matrix.target }}"
-      action: "${{ matrix.action }}"
-    secrets:
-      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+      uses: ./.github/workflows/reusable_terraform_strategy.yml
+      if: inputs.action != 'destroy'
+      with:
+        application: "${{ github.workflow }}"   # e.g. "analytical-platform-compute"
 
-  destroy-development:
-    if: inputs.action == 'destroy'
-    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
-    with:
-      application: "${{ github.workflow }}"
-      environment: "development"
-      action: "plan_apply"
-      plan_apply_tfargs: "-destroy"
-    secrets:
-      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+    terraform:
+      needs: strategy
+      if: inputs.action != 'destroy'
+      strategy:
+        fail-fast: false
+        matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+      uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+      with:
+        application: "${{ github.workflow }}"
+        environment: "${{ matrix.target }}"
+        action: "${{ matrix.action }}"
+        component: "${{ matrix.component }}"   # (NEW) We pass the discovered component
+      secrets:
+        modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+        pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+
+    destroy-development:
+      if: inputs.action == 'destroy'
+      uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+      with:
+        application: "${{ github.workflow }}"
+        environment: "development"
+        action: "plan_apply"
+        plan_apply_tfargs: "-destroy"
+        # No "component" here, or you could do similar logic
+      secrets:
+        modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+        pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
