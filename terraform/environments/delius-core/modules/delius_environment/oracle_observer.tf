@@ -74,7 +74,9 @@ module "oracle_observer" {
     "STANDBYDB2_HOSTNAME" = local.oracle_db_server_names["standbydb2"] == "none" ? "none" : join(".",[local.oracle_db_server_names["standbydb2"], var.account_config.route53_inner_zone.name])
     "DATABASE_PORT"       = var.db_config.database_port
     "DATABASE_NAME"       = var.db_config.database_name
+    "DATABASE_SECRETS"    = "${var.app_name}-${var.env_name}-db-dba-passwords"
     }
 
+  # container_secrets assumes we are using SSM Parameter store for Secrets, rather than Secrets Manager so we cannot use it to get database passwords
   container_secrets_default = {}
 }
