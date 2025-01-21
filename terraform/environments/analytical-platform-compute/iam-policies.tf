@@ -23,6 +23,8 @@ module "eks_cluster_logs_kms_access_iam_policy" {
   name_prefix = "eks-cluster-logs-kms-access"
 
   policy = data.aws_iam_policy_document.eks_cluster_logs_kms_access.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "karpenter_sqs_kms_access" {
@@ -50,6 +52,8 @@ module "karpenter_sqs_kms_access_iam_policy" {
   name_prefix = "karpenter-sqs-kms-access"
 
   policy = data.aws_iam_policy_document.karpenter_sqs_kms_access.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "amazon_prometheus_proxy" {
@@ -76,6 +80,8 @@ module "amazon_prometheus_proxy_iam_policy" {
   name_prefix = "amazon-prometheus-proxy"
 
   policy = data.aws_iam_policy_document.amazon_prometheus_proxy.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "managed_prometheus_kms_access" {
@@ -103,6 +109,8 @@ module "managed_prometheus_kms_access_iam_policy" {
   name_prefix = "managed-prometheus-kms-access"
 
   policy = data.aws_iam_policy_document.managed_prometheus_kms_access.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "mlflow" {
@@ -152,6 +160,8 @@ module "mlflow_iam_policy" {
   name_prefix = "mlflow"
 
   policy = data.aws_iam_policy_document.mlflow.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "gha_mojas_airflow" {
@@ -173,6 +183,8 @@ module "gha_mojas_airflow_iam_policy" {
   name_prefix = "github-actions-mojas-airflow"
 
   policy = data.aws_iam_policy_document.gha_mojas_airflow.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
@@ -483,7 +495,6 @@ module "find_moj_data_quicksight_policy" {
   tags = local.tags
 }
 
-# Based on CMK policy from https://docs.aws.amazon.com/mwaa/latest/userguide/mwaa-create-role.html#mwaa-create-role-json
 data "aws_iam_policy_document" "mwaa_execution_policy" {
   statement {
     effect  = "Deny"
@@ -580,4 +591,54 @@ module "mwaa_execution_iam_policy" {
 
   name   = "mwaa-execution"
   policy = data.aws_iam_policy_document.mwaa_execution_policy.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "gha_moj_ap_airflow" {
+  statement {
+    sid    = "MWAAKMSAccess"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
+    ]
+    resources = [module.mwaa_kms.key_arn]
+  }
+  statement {
+    sid    = "MWAABucketAccess"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [module.mwaa_s3_bucket.s3_bucket_arn]
+  }
+  statement {
+    sid    = "MWAAS3WriteAccess"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+    ]
+    resources = ["${module.mwaa_s3_bucket.s3_bucket_arn}/*"]
+  }
+}
+
+module "gha_moj_ap_airflow_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.52.1"
+
+  name = "github-actions-ministryofjustice-analytical-platform-airflow"
+
+  policy = data.aws_iam_policy_document.gha_moj_ap_airflow.json
+
+  tags = local.tags
 }
