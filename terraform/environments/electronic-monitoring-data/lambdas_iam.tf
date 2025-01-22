@@ -524,7 +524,7 @@ data "aws_iam_policy_document" "lamba_logger_policy_document" {
 
 resource "aws_iam_role_policy" "lambda_logger_policy" {
   name   = "pipeline-logger-policy"
-  role   = aws_iam_role.lambda_logger_role.id
+  role   = aws_iam_role.event_logger.id
   policy = data.aws_iam_policy_document.lamba_logger_policy_document.json
 }
 
@@ -557,6 +557,6 @@ data "aws_iam_policy_document" "lambda_summary_policy_document" {
 
 resource "aws_iam_role_policy" "lambda_summary_policy" {
   name   = "pipeline-summary-policy"
-  role   = aws_iam_role.lambda_summary_role.id
+  role   = aws_iam_role.summary_generator.id
   policy = data.aws_iam_policy_document.lambda_summary_policy_document.json
 }
