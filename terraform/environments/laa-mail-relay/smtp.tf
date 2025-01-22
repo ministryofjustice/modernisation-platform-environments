@@ -30,11 +30,11 @@ mkdir -p /root/ansible
 echo "Getting secrets from Secrets Manager"
 export SESP=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/APP_DATA_MIGRATION_SMTP_PASSWORD --query SecretString --output text`
 export SESU=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/APP_DATA_MIGRATION_SMTP_USER --query SecretString --output text`
-export SESANS=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/SESANS --query SecretString --output text`
+export SESANS=`/usr/local/bin/aws --region eu-west-2 secretsmanager get-secret-value --secret-id postfix/app/SESANS_MP --query SecretString --output text`
 # mkdir -p /run/cfn-init # Path to store cfn-init scripts
 
 echo "Running Ansible Pull"
-ansible-pull -U https://$SESANS@github.com/ministryofjustice/laa-aws-postfix-smtp aws/app/ansible/adhoc.yml -C modernisation-platform -i aws/app/ansible/inventory/$ENV --limit=smtp --extra-vars "smtp_user_name=${aws_iam_access_key.smtp.id} smtp_user_pass=${aws_iam_access_key.smtp.ses_smtp_password_v4}" -d /root/ansible | tail -n +3
+ansible-pull -U https://$SESANS@github.com/ministryofjustice/laa-aws-postfix-smtp aws/app/ansible/adhoc.yml -C modernisation-platform -i aws/app/ansible/inventory/$ENV --limit=smtp --extra-vars "smtp_user_name=$SESU smtp_user_pass=$SESP" -d /root/ansible | tail -n +3
 
 EOF
 }
@@ -62,6 +62,10 @@ resource "aws_instance" "smtp" {
     local.tags,
     { "Name" = "${local.application_name}-${local.environment}" }
   )
+
+  depends_on = [
+    aws_secretsmanager_secret_version.smtp_user, aws_secretsmanager_secret_version.smtp_password
+  ]
 }
 
 #################################
