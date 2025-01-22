@@ -517,8 +517,7 @@ data "aws_iam_policy_document" "lamba_logger_policy_document" {
     ]
     resources = [
       "${aws_cloudwatch_log_group.pipeline_logs.arn}:*",
-      "${aws_s3_bucket.input_bucket_1.arn}/*",
-      "${aws_s3_bucket.input_bucket_2.arn}/*"
+      "${module.s3-fms-general-landing-bucket.bucket.arn}}/*"
     ]
   }
 }
@@ -551,8 +550,7 @@ data "aws_iam_policy_document" "lambda_summary_policy_document" {
     ]
     resources = [
       "${aws_cloudwatch_log_group.pipeline_logs.arn}:*",
-      aws_lambda_function.slack_notifier.arn,
-      aws_lambda_function.email_formatter.arn
+      module.summary_generator.lambda_function_arn
     ]
   }
 }

@@ -7,17 +7,8 @@ resource "aws_cloudwatch_log_group" "pipeline_logs" {
 }
 
 # S3 Bucket Notifications
-resource "aws_s3_bucket_notification" "bucket_1_notification" {
-  bucket = aws_s3_bucket.input_bucket_1.id
-
-  lambda_function {
-    lambda_function_arn = module.event_logger.lambda_function_arn
-    events              = ["s3:ObjectCreated:*"]
-  }
-}
-
-resource "aws_s3_bucket_notification" "bucket_2_notification" {
-  bucket = aws_s3_bucket.input_bucket_2.id
+resource "aws_s3_bucket_notification" "fms_bucket_notification" {
+  bucket = module.s3-fms-general-landing-bucket.bucket.id
 
   lambda_function {
     lambda_function_arn = module.event_logger.lambda_function_arn
