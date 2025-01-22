@@ -23,6 +23,8 @@ module "eks_cluster_logs_kms_access_iam_policy" {
   name_prefix = "eks-cluster-logs-kms-access"
 
   policy = data.aws_iam_policy_document.eks_cluster_logs_kms_access.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "karpenter_sqs_kms_access" {
@@ -50,6 +52,8 @@ module "karpenter_sqs_kms_access_iam_policy" {
   name_prefix = "karpenter-sqs-kms-access"
 
   policy = data.aws_iam_policy_document.karpenter_sqs_kms_access.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "amazon_prometheus_proxy" {
@@ -76,6 +80,8 @@ module "amazon_prometheus_proxy_iam_policy" {
   name_prefix = "amazon-prometheus-proxy"
 
   policy = data.aws_iam_policy_document.amazon_prometheus_proxy.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "managed_prometheus_kms_access" {
@@ -103,6 +109,8 @@ module "managed_prometheus_kms_access_iam_policy" {
   name_prefix = "managed-prometheus-kms-access"
 
   policy = data.aws_iam_policy_document.managed_prometheus_kms_access.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "mlflow" {
@@ -152,6 +160,8 @@ module "mlflow_iam_policy" {
   name_prefix = "mlflow"
 
   policy = data.aws_iam_policy_document.mlflow.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "gha_mojas_airflow" {
@@ -173,11 +183,11 @@ module "gha_mojas_airflow_iam_policy" {
   name_prefix = "github-actions-mojas-airflow"
 
   policy = data.aws_iam_policy_document.gha_mojas_airflow.json
+
+  tags = local.tags
 }
 
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   #checkov:skip=CKV_AWS_110: test policy for development
   #checkov:skip=CKV_AWS_107: test policy for development
   #checkov:skip=CKV_AWS_111: test policy for development
@@ -268,11 +278,8 @@ module "analytical_platform_lake_formation_share_policy" {
 }
 
 data "aws_iam_policy_document" "quicksight_vpc_connection" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   #checkov:skip=CKV_AWS_111:Policy suggested by AWS documentation
   #checkov:skip=CKV_AWS_356:Policy suggested by AWS documentation
-
   statement {
     sid    = "QuickSightVPCConnection"
     effect = "Allow"
@@ -302,8 +309,6 @@ module "quicksight_vpc_connection_iam_policy" {
 }
 
 data "aws_iam_policy_document" "data_production_mojap_derived_bucket_lake_formation_policy" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
   statement {
     sid    = "AllowS3ReadWriteAPDataProdDerivedTables"
     effect = "Allow"
@@ -451,6 +456,189 @@ module "copy_apdp_cadet_metadata_to_compute_policy" {
   name_prefix = "copy-apdp-cadet-metadata-to-compute-"
 
   policy = data.aws_iam_policy_document.copy_apdp_cadet_metadata_to_compute_policy.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "find_moj_data_quicksight_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "quicksight:GenerateEmbedUrlForAnonymousUser"
+    ]
+    resources = [
+      "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:namespace/default",
+      "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:dashboard/6898300c-69fe-4f84-b172-1784ab6bf1a0"
+    ]
+    condition {
+      test     = "ForAllValues:StringEquals"
+      variable = "quicksight:AllowedEmbeddingDomains"
+
+      values = [
+        "https://dev.find-moj-data.service.justice.gov.uk",
+      ]
+    }
+  }
+}
+
+module "find_moj_data_quicksight_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.52.1"
+
+  name_prefix = "find-moj-data-quicksight-policy-"
+
+  policy = data.aws_iam_policy_document.find_moj_data_quicksight_policy.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "mwaa_execution_policy" {
+  statement {
+    effect  = "Deny"
+    actions = ["s3:ListAllMyBuckets"]
+    resources = [
+      "arn:aws:s3:::mojap-compute-${local.environment}-mwaa",
+      "arn:aws:s3:::mojap-compute-${local.environment}-mwaa/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:GetObject*",
+      "s3:GetBucket*",
+      "s3:List*"
+    ]
+    resources = [
+      "arn:aws:s3:::mojap-compute-${local.environment}-mwaa",
+      "arn:aws:s3:::mojap-compute-${local.environment}-mwaa/*"
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogStream",
+      "logs:CreateLogGroup",
+      "logs:PutLogEvents",
+      "logs:GetLogEvents",
+      "logs:GetLogRecord",
+      "logs:GetLogGroupFields",
+      "logs:GetQueryResults"
+    ]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${local.environment}-*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["logs:DescribeLogGroups"]
+    resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["s3:GetAccountPublicAccessBlock"]
+    resources = ["*"]
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["cloudwatch:PutMetricData"]
+    resources = ["*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "sqs:ChangeMessageVisibility",
+      "sqs:DeleteMessage",
+      "sqs:GetQueueAttributes",
+      "sqs:GetQueueUrl",
+      "sqs:ReceiveMessage",
+      "sqs:SendMessage"
+    ]
+    resources = ["arn:aws:sqs:${data.aws_region.current.name}:*:airflow-celery-*"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey*",
+      "kms:Encrypt"
+    ]
+    resources = [module.mwaa_kms.key_arn]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values = [
+        "s3.${data.aws_region.current.name}.amazonaws.com",
+        "sqs.${data.aws_region.current.name}.amazonaws.com"
+      ]
+    }
+  }
+  statement {
+    sid       = "AllowEKSDescribeCluster"
+    effect    = "Allow"
+    actions   = ["eks:DescribeCluster"]
+    resources = [module.eks.cluster_arn]
+  }
+}
+
+module "mwaa_execution_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.52.2"
+
+  name   = "mwaa-execution"
+  policy = data.aws_iam_policy_document.mwaa_execution_policy.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "gha_moj_ap_airflow" {
+  statement {
+    sid    = "MWAAKMSAccess"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
+    ]
+    resources = [module.mwaa_kms.key_arn]
+  }
+  statement {
+    sid    = "MWAABucketAccess"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation"
+    ]
+    resources = [module.mwaa_bucket.s3_bucket_arn]
+  }
+  statement {
+    sid    = "MWAAS3WriteAccess"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:GetObject",
+      "s3:DeleteObject"
+    ]
+    resources = ["${module.mwaa_bucket.s3_bucket_arn}/*"]
+  }
+}
+
+module "gha_moj_ap_airflow_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.52.1"
+
+  name = "github-actions-ministryofjustice-analytical-platform-airflow"
+
+  policy = data.aws_iam_policy_document.gha_moj_ap_airflow.json
 
   tags = local.tags
 }

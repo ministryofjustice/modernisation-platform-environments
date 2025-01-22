@@ -38,29 +38,44 @@ locals {
     }
 
     ec2_instances = {
-      # pd-onr-bods-1 = merge(local.ec2_instances.bods, {
-      #   config = merge(local.ec2_instances.bods.config, {
-      #     ami_name          = "hmpps_windows_server_2019_release_2025-01-02T00-00-37.501Z"
-      #     availability_zone = "eu-west-2a"
-      #     user_data_raw = base64encode(templatefile(
-      #       "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-      #         branch = "main"
-      #       }
-      #     ))
-      #     instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
-      #       "Ec2SecretPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bods.instance, {
-      #     instance_type           = "r6i.2xlarge"
-      #     disable_api_termination = true
-      #   })
-      #   tags = merge(local.ec2_instances.bods.tags, {
-      #     oasys-national-reporting-environment = "pd"
-      #     domain-name                          = "azure.hmpp.root"
-      #   })
-      #   cloudwatch_metric_alarms = null # <= REMOVE THIS LATER
-      # })
+      pd-onr-bods-1 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2025-01-02T00-00-37.501Z"
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type           = "r6i.2xlarge"
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "pd"
+          domain-name                          = "azure.hmpp.root"
+        })
+        cloudwatch_metric_alarms = null # <= REMOVE THIS LATER
+      })
+
+      pd-onr-bods-2 = merge(local.ec2_instances.bods, {
+        config = merge(local.ec2_instances.bods.config, {
+          ami_name          = "hmpps_windows_server_2019_release_2025-01-02T00-00-37.501Z"
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bods.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bods.instance, {
+          instance_type           = "r6i.2xlarge"
+          disable_api_termination = true
+        })
+        tags = merge(local.ec2_instances.bods.tags, {
+          oasys-national-reporting-environment = "pd"
+          domain-name                          = "azure.hmpp.root"
+        })
+        cloudwatch_metric_alarms = null # <= REMOVE THIS LATER
+      })
+
     }
 
     fsx_windows = {
@@ -116,6 +131,144 @@ locals {
       }
     }
 
+    # DO NOT FULLY DEPLOY YET AS WEB INSTANCES ARE NOT IN USE
+    lbs = {
+      public = merge(local.lbs.public, {
+        instance_target_groups = {
+          pd-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
+            attachments = [
+              { ec2_instance_name = "pd-onr-bods-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              pd-onr-bods-http28080 = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-onr-bods-http28080"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "bods.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
+
+      # No web instances built yet, not in use
+      # private = {
+      #   drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
+      #   enable_cross_zone_load_balancing = true
+      #   enable_delete_protection         = false
+      #   idle_timeout                     = 3600
+      #   internal_lb                      = true
+      #   load_balancer_type               = "application"
+      #   security_groups                  = ["lb"]
+      #   subnets                          = module.environment.subnets["private"].ids
+
+      #   instance_target_groups = {
+      #     pd-onr-web-1-a = {
+      #       port     = 7777
+      #       protocol = "HTTP"
+      #       health_check = {
+      #         enabled             = true
+      #         healthy_threshold   = 3
+      #         interval            = 30
+      #         matcher             = "200-399"
+      #         path                = "/"
+      #         port                = 7777
+      #         timeout             = 5
+      #         unhealthy_threshold = 5
+      #       }
+      #       stickiness = {
+      #         enabled = true
+      #         type    = "lb_cookie"
+      #       }
+      #       attachments = [
+      #         { ec2_instance_name = "pd-onr-web-1-a" },
+      #       ]
+      #     }
+      #   }
+
+      #   listeners = {
+      #     http = {
+      #       port     = 7777
+      #       protocol = "HTTP"
+
+      #       default_action = {
+      #         type = "fixed-response"
+      #         fixed_response = {
+      #           content_type = "text/plain"
+      #           message_body = "Not implemented"
+      #           status_code  = "501"
+      #         }
+      #       }
+      #       rules = {
+      #         pd-onr-web-1-a = {
+      #           priority = 4000
+
+      #           actions = [{
+      #             type              = "forward"
+      #             target_group_name = "pd-onr-web-1-a"
+      #           }]
+
+      #           conditions = [{
+      #             host_header = {
+      #               values = [
+      #                 "pd-onr-web-1-a.oasys-national-reporting.hmpps-production.modernisation-platform.service.justice.gov.uk",
+      #               ]
+      #             }
+      #           }]
+      #         }
+      #       }
+      #     }
+      #     https = {
+      #       certificate_names_or_arns = ["oasys_national_reporting_wildcard_cert"]
+      #       port                      = 443
+      #       protocol                  = "HTTPS"
+      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
+
+      #       default_action = {
+      #         type = "fixed-response"
+      #         fixed_response = {
+      #           content_type = "text/plain"
+      #           message_body = "Not implemented"
+      #           status_code  = "501"
+      #         }
+      #       }
+
+      #       rules = {
+      #         pd-onr-web-1-a = {
+      #           priority = 4580
+
+      #           actions = [{
+      #             type              = "forward"
+      #             target_group_name = "pd-onr-web-1-a"
+      #           }]
+
+      #           conditions = [{
+      #             host_header = {
+      #               values = [
+      #                 "pd-onr-web-1-a.oasys-national-reporting.hmpps-production.modernisation-platform.service.justice.gov.uk",
+      #               ]
+      #             }
+      #           }]
+      #         }
+      #       }
+      #     }
+      #   }
+      # }
+    } # end of lbs
+
     route53_zones = {
       "reporting.oasys.service.justice.gov.uk" = {
         ns_records = [
@@ -127,6 +280,9 @@ locals {
           { name = "test", type = "NS", ttl = "86000", records = ["ns-1440.awsdns-52.org", "ns-1823.awsdns-35.co.uk", "ns-43.awsdns-05.com", "ns-893.awsdns-47.net"] },
           { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1161.awsdns-17.org", "ns-2014.awsdns-59.co.uk", "ns-487.awsdns-60.com", "ns-919.awsdns-50.net"] },
         ]
+        lb_alias_records = [
+          { name = "bods", type = "A", lbs_map_key = "public" }
+        ],
       }
       "production.reporting.oasys.service.justice.gov.uk" = {
       }

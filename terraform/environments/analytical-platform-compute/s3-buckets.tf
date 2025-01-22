@@ -136,7 +136,6 @@ module "mojap_compute_logs_bucket_eu_west_1" {
   )
 }
 
-
 data "aws_iam_policy_document" "athena_query_results_policy_eu_west_2" {
   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
   statement {
@@ -193,4 +192,32 @@ module "mojap_compute_athena_query_results_bucket_eu_west_2" {
     local.tags,
     { "backup" = "false" }
   )
+}
+
+module "mwaa_bucket" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.4.0"
+
+  bucket = "mojap-compute-${local.environment}-mwaa"
+
+  force_destroy = true
+
+  versioning = {
+    enabled = true
+  }
+
+  server_side_encryption_configuration = {
+    rule = {
+      bucket_key_enabled = true
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.mwaa_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+
+  tags = local.tags
 }
