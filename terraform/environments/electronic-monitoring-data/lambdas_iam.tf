@@ -496,3 +496,69 @@ resource "aws_iam_role" "api_gateway_authorizer" {
   name               = "api_gateway_authorizer"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
+
+# -----------------------------------------------------------------------------------
+# Event logger
+# -----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "lambda_logger_role" {
+  name               = "pipeline-logger-role-fms"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "lamba_logger_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "s3:GetObject"
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.pipeline_logs.arn}:*",
+      "${aws_s3_bucket.input_bucket_1.arn}/*",
+      "${aws_s3_bucket.input_bucket_2.arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "lambda_logger_policy" {
+  name   = "pipeline-logger-policy"
+  role   = aws_iam_role.lambda_logger_role.id
+  policy = data.aws_iam_policy_document.lamba_logger_policy_document.json
+}
+
+# -----------------------------------------------------------------------------------
+# Event Summary
+# -----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "lambda_summary_role" {
+  name               = "pipeline-summary-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "lambda_summary_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:StartQuery",
+      "logs:GetQueryResults",
+      "lambda:InvokeFunction"
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.pipeline_logs.arn}:*",
+      aws_lambda_function.slack_notifier.arn,
+      aws_lambda_function.email_formatter.arn
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "lambda_summary_policy" {
+  name   = "pipeline-summary-policy"
+  role   = aws_iam_role.lambda_summary_role.id
+  policy = data.aws_iam_policy_document.lambda_summary_policy_document.json
+}
