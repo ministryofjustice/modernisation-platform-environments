@@ -35,7 +35,7 @@ module "kms" {
           test     = "ArnLike"
           variable = "kms:EncryptionContext:aws:logs:arn"
           values = [
-            "arn:aws:logs:${local.region}:${data.aws_caller_identity.current.account_id}:log-group:*",
+            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*",
           ]
         }
       ]
