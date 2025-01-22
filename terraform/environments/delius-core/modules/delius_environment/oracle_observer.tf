@@ -77,6 +77,7 @@ module "oracle_observer" {
     "DATABASE_SECRETS"    = "${var.app_name}-${var.env_name}-oracle-db-dba-passwords"
     }
 
-  # container_secrets assumes we are using SSM Parameter store for Secrets, rather than Secrets Manager so we cannot use it to get database passwords
-  container_secrets_default = {}
+  container_secrets_default = {
+    "DATABASE_SECRETS_JSON" = "arn:aws:secretsmanager:eu-west-2:${var.account_info.id}:secret:${var.app_name}-${var.env_name}-oracle-db-dba-passwords"
+  }
 }
