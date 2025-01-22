@@ -87,7 +87,7 @@ locals {
 
       t2-onr-web = merge(local.ec2_autoscaling_groups.bip_web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
-          desired_capacity = 0
+          desired_capacity = 1
         })
         config = merge(local.ec2_autoscaling_groups.bip_web.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
