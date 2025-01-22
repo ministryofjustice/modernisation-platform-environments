@@ -44,6 +44,10 @@ locals {
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
+      /* MWAA */
+      airflow_version                 = "2.10.3"
+      airflow_environment_class       = "mw1.small"
+      airflow_webserver_instance_name = "Development"
     }
     test = {
       /* VPC */
@@ -88,6 +92,11 @@ locals {
 
       /* UI */
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
+
+      /* MWAA */
+      airflow_version                 = "2.10.3"
+      airflow_environment_class       = "mw1.medium"
+      airflow_webserver_instance_name = "Test"
     }
     production = {
       /* VPC */
@@ -132,6 +141,11 @@ locals {
 
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
+
+      /* MWAA */
+      airflow_version                 = "2.10.3"
+      airflow_environment_class       = "mw1.medium"
+      airflow_webserver_instance_name = "Production"
 
       /* LF Domain Tags */
       cadet_lf_tags = {

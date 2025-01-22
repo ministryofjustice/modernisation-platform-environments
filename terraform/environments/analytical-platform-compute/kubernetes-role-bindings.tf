@@ -31,3 +31,20 @@ resource "kubernetes_role_binding" "airflow_serviceaccount_management" {
     name      = "airflow-serviceaccount-management"
   }
 }
+
+resource "kubernetes_role_binding" "mwaa_execution" {
+  metadata {
+    name      = "mwaa-execution"
+    namespace = kubernetes_namespace.mwaa.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role.mwaa_execution.metadata[0].name
+  }
+  subject {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Group"
+    name      = "mwaa"
+  }
+}

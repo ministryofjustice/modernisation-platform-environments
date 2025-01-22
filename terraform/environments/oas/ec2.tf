@@ -163,6 +163,13 @@ resource "aws_security_group" "ec2" {
     cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
   }
   ingress {
+    description = "http access from LZ to oas-mp to test connectivity"
+    from_port   = 3443
+    to_port     = 3443
+    protocol    = "tcp"
+    cidr_blocks = [local.application_data.accounts[local.environment].inbound_cidr_lz]
+  }
+  ingress {
     description     = "SSH from the Bastion"
     from_port       = 22
     to_port         = 22
