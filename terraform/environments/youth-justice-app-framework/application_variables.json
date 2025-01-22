@@ -1,16 +1,24 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "environment_name": "yjaf-development",
+      "allow_s3_replication": true,
+      "source_account": "856879713508"
     },
     "test": {
-      "example_var": "test-data"
+      "environment_name": "yjaf-test",
+      "allow_s3_replication": true,
+      "source_account": "856879713508"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "environment_name": "yjaf-preproduction",
+      "allow_s3_replication": true,
+      "source_account": "053556912568"
     },
     "production": {
-      "example_var": "production-data"
+      "environment_name": "jyaf-production",
+      "allow_s3_replication": true,
+      "source_account": "066012302209"
     }
   }
 }
