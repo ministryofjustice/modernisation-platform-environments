@@ -132,14 +132,14 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
           name  = "CurServer"
           value = local.application_data.accounts[local.environment].env_name
         }
-      ],
+      ]
       secrets = [
         {
           name = "RDS_PASSWORD",
           valueFrom = aws_secretsmanager_secret_version.db_password.arn
         }
       ]
-    }
+    },
     {
       name      = "chaps-container"
       image     = "${local.ecr_url}:chaps-${local.application_data.accounts[local.environment].environment_name}"
@@ -151,7 +151,7 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
           containerPort = 80
           protocol      = "tcp"
         }
-      ],
+      ]
       healthCheck = {
         command     = ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
         interval    = 30
