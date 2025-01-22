@@ -59,6 +59,7 @@ module "autoscaling" {
   ignore_desired_capacity_changes = true #ecs is scaling itself
   desired_capacity_type           = "units"
   wait_for_capacity_timeout       = "60m"
+  delete_timeout                  = "60m"
 
   # Launch template settings
   create_launch_template = true
