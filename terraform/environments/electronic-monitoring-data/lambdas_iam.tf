@@ -501,7 +501,7 @@ resource "aws_iam_role" "api_gateway_authorizer" {
 # Event logger
 # -----------------------------------------------------------------------------------
 
-resource "aws_iam_role" "lambda_logger_role" {
+resource "aws_iam_role" "event_logger" {
   name               = "pipeline-logger-role-fms"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
@@ -533,7 +533,7 @@ resource "aws_iam_role_policy" "lambda_logger_policy" {
 # Event Summary
 # -----------------------------------------------------------------------------------
 
-resource "aws_iam_role" "lambda_summary_role" {
+resource "aws_iam_role" "summary_generator" {
   name               = "pipeline-summary-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
