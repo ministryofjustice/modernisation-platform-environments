@@ -349,6 +349,20 @@ locals {
                   }
                 }]
               }
+              t2-onr-web-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-onr-web-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2.test.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -461,7 +475,8 @@ locals {
     route53_zones = {
       "test.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "t2-bods", type = "A", lbs_map_key = "public" }
+          { name = "t2", type = "A", lbs_map_key = "public" },
+          { name = "t2-bods", type = "A", lbs_map_key = "public" },
         ],
       }
     }
