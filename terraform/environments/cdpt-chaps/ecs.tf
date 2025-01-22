@@ -83,20 +83,16 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
           containerPort = 8080
           protocol      = "tcp"
         }
-      ]      
-      /*healthCheck = {
-      path        = "/"
-      command     = [
-        "CMD-SHELL",
-        "curl -k -f https://localhost:8080/ || exit 1"
-      ]
+      ]  
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -k -f https://localhost:8080/ || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3
         startPeriod = 60
-      },*/
+      }
       logConfiguration = {
-        logDriver = "awslogs",
+        logDriver = "awslogs"
         options = {
           awslogs-group         = aws_cloudwatch_log_group.chapsdotnet_cloudwatch_group.name,
           awslogs-region        = "eu-west-2",
@@ -139,11 +135,11 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
       ],
       secrets = [
         {
-          name : "RDS_PASSWORD",
-          valueFrom : aws_secretsmanager_secret_version.db_password.arn
+          name = "RDS_PASSWORD",
+          valueFrom = aws_secretsmanager_secret_version.db_password.arn
         }
       ]
-    },
+    }
     {
       name      = "chaps-container"
       image     = "${local.ecr_url}:chaps-${local.application_data.accounts[local.environment].environment_name}"
@@ -156,17 +152,14 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
           protocol      = "tcp"
         }
       ],
-      /*healthCheck = {
-        path        = "/"
-        command     = [
-          "CMD-SHELL",
-          "curl -f http://localhost:80/ || exit 1"
-        ]
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3
         startPeriod = 60
-      }*/
+      }
+
       logConfiguration = {
         logDriver = "awslogs",
         options = {
@@ -200,11 +193,11 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
           name = "Environment"
           value = local.application_data.accounts[local.environment].environment_name
         }
-      ],
+      ]
       secrets = [
         {
-          name : "RDS_PASSWORD",
-          valueFrom : aws_secretsmanager_secret_version.db_password.arn
+          name = "RDS_PASSWORD",
+          valueFrom = aws_secretsmanager_secret_version.db_password.arn
         }
       ]
     }
