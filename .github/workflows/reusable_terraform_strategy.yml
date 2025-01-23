@@ -54,7 +54,7 @@
             # 2) Discover valid subfolders with platform_backend.tf
             COMPONENTS=""
             # Optionally include the root folder as a blank component:
-            COMPONENTS="$COMPONENTS ''"
+            COMPONENTS="$COMPONENTS NONE"
 
             if [ -d "terraform/environments/${{ inputs.application }}" ]; then
               for d in $(find "terraform/environments/${{ inputs.application }}" -mindepth 1 -maxdepth 1 -type d); do
@@ -63,7 +63,7 @@
                 if [ -f "$d/platform_backend.tf" ]; then
                   # e.g. skip .terraform or other special folders if needed
                   [ "$subfolder" = ".terraform" ] && continue
-                  COMPONENTS="$COMPONENTS \"$subfolder\""
+                  COMPONENTS="$COMPONENTS $subfolder"
                 fi
               done
             fi

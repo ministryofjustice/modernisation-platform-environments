@@ -109,7 +109,7 @@
 
         - name: Terraform Init
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           run: |
@@ -122,7 +122,7 @@
         #
         - name: Terraform Workspace Select
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           run: |
@@ -134,7 +134,7 @@
         - name: Terraform State Refresh (Optional)
           if: inputs.do_state_refresh_on_plan == true
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           run: |
@@ -151,7 +151,7 @@
           env:
             POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && inputs.post_plan_to_pr == true }}"
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           run: |
@@ -171,7 +171,7 @@
           if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2'
           id: evaluate_terraform_plan
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           shell: bash
@@ -181,7 +181,7 @@
         - name: Create Plan PR message (Optional)
           if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           run: |
@@ -320,7 +320,7 @@
 
         - name: Terraform Init
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           run: |
@@ -330,7 +330,7 @@
 
         - name: Terraform Workspace Select
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           run: |
@@ -338,7 +338,7 @@
 
         - name: Terraform Plan
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           run: |
@@ -349,7 +349,7 @@
 
         - name: Terraform Apply
           working-directory: >
-            ${{ inputs.component != ''
+            ${{ inputs.component != 'NONE'
                 && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
                 || format('terraform/environments/{0}', inputs.application) }}
           run: |
