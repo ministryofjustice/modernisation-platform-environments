@@ -170,13 +170,18 @@ module "eks" {
       username          = "apc-mwaa"
       kubernetes_groups = ["mwaa"]
     }
+    gha-moj-ap-airflow = {
+      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-ministryofjustice-analytical-platform-airflow"
+      username          = "github-actions-moj-ap-airflow"
+      kubernetes_groups = ["mwaa-serviceaccount-management"]
+    }
+    /* Legacy Airflow */
     data-engineering-airflow = {
       principal_arn     = local.environment_configuration.data_engineering_airflow_execution_role_arn
       username          = "data-engineering-airflow"
       kubernetes_groups = ["airflow"]
     }
     github-actions-mojas-airflow = {
-      # principal_arn doesn't use the module output because they reference each other
       principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-mojas-airflow"
       username          = "github-actions-mojas-airflow"
       kubernetes_groups = ["airflow-serviceaccount-management"]
