@@ -108,11 +108,11 @@ resource "aws_secretsmanager_secret_version" "smtp_password" {
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesans" {
-  name        = "postfix/app/SESANS"
+  name        = "postfix/app/SESANS_MP"
   description = "Secret to pull from Ansible code from https://github.com/ministryofjustice/laa-aws-postfix-smtp"
   tags = merge(
     local.tags,
-    { "Name" = "postfix/app/SESANS" }
+    { "Name" = "postfix/app/SESANS_MP" }
   )
 }
 

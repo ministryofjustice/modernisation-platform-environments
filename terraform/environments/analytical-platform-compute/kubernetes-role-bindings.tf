@@ -48,3 +48,20 @@ resource "kubernetes_role_binding" "mwaa_execution" {
     name      = "mwaa"
   }
 }
+
+resource "kubernetes_role_binding" "mwaa_serviceaccount_management" {
+  metadata {
+    name      = "mwaa-serviceaccount-management"
+    namespace = kubernetes_namespace.mwaa.metadata[0].name
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Role"
+    name      = kubernetes_role.mwaa_serviceaccount_management.metadata[0].name
+  }
+  subject {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "Group"
+    name      = "mwaa-serviceaccount-management"
+  }
+}
