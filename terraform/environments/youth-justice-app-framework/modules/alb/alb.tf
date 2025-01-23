@@ -59,7 +59,7 @@ module "log_bucket" {
 module "alb_sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.1.2"
+  version = "5.3.0"
 
   name        = "${var.alb_name}-${local.alb_suffix}-lb-security-group"
   description = "ALB security group"
