@@ -627,6 +627,12 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
     ]
     resources = ["${module.mwaa_bucket.s3_bucket_arn}/*"]
   }
+  statement {
+    sid       = "EKSAccess"
+    effect    = "Allow"
+    actions   = ["eks:DescribeCluster"]
+    resources = [module.eks.cluster_arn]
+  }
 }
 
 module "gha_moj_ap_airflow_iam_policy" {
