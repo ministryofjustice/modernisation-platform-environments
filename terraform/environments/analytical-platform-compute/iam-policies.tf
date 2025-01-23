@@ -476,7 +476,6 @@ data "aws_iam_policy_document" "find_moj_data_quicksight_policy" {
 
       values = [
         "https://dev.find-moj-data.service.justice.gov.uk",
-        "https://test.find-moj-data.service.justice.gov.uk",
         "https://preprod.find-moj-data.service.justice.gov.uk",
         "https://find-moj-data.service.justice.gov.uk"
       ]
