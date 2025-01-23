@@ -28,7 +28,7 @@ locals {
       instance    = local.ec2_instances.bip_web.instance
 
       lb_target_groups = {
-        http-7777 = {
+        asg-http-7777 = {
           port     = 7777
           protocol = "HTTP"
           health_check = {

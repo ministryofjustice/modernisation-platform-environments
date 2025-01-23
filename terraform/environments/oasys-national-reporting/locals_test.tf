@@ -391,20 +391,20 @@ locals {
                   }
                 }]
               }
-              t2-onr-web-http-7777 = {
-                priority = 200
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "t2-onr-web-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "t2.test.reporting.oasys.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              #t2-onr-web-http-7777 = {
+              #  priority = 200
+              #  actions = [{
+              #    type              = "forward"
+              #    target_group_name = "t2-onr-web-http-7777"
+              #  }]
+              #  conditions = [{
+              #    host_header = {
+              #      values = [
+              #        "t2.test.reporting.oasys.service.justice.gov.uk",
+              #      ]
+              #    }
+              #  }]
+              #}
             }
           })
         })
