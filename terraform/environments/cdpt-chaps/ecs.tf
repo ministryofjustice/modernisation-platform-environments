@@ -85,7 +85,7 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
         }
       ]  
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -k -f https://localhost:8080/ || exit 1"]
+        command     = ["CMD-SHELL", "curl -k -f https://localhost:8080/dotnet-health || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3
@@ -153,7 +153,7 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
         }
       ]
       healthCheck = {
-        command     = ["CMD-SHELL", "curl -f http://localhost:80/ || exit 1"]
+        command     = ["CMD-SHELL", "curl -f http://localhost:80/alive || exit 1"]
         interval    = 30
         timeout     = 5
         retries     = 3
