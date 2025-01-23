@@ -1,4 +1,5 @@
 resource "random_id" "suffix" {
+  count = length(var.container_port_config) == 0 ? 0 : 1
   keepers = {
     protocol         = var.target_group_protocol
     port             = var.container_port_config[0].containerPort
@@ -13,10 +14,10 @@ resource "aws_lb_target_group" "frontend" {
   count = var.microservice_lb != null ? 1 : 0
   #checkov:skip=CKV_AWS_261 "ignore"
   # https://github.com/hashicorp/terraform-provider-aws/issues/16889
-  name                 = "${var.env_name}-${var.name}-${random_id.suffix.hex}"
-  port                 = random_id.suffix.keepers.port
-  protocol             = random_id.suffix.keepers.protocol
-  protocol_version     = random_id.suffix.keepers.protocol_version
+  name                 = "${var.env_name}-${var.name}-${random_id.suffix[0].hex}"
+  port                 = random_id.suffix[0].keepers.port
+  protocol             = random_id.suffix[0].keepers.protocol
+  protocol_version     = random_id.suffix[0].keepers.protocol_version
   vpc_id               = var.account_config.shared_vpc_id
   target_type          = "ip"
   deregistration_delay = 30

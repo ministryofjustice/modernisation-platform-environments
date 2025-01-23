@@ -9,12 +9,7 @@ module "oracle_observer" {
 
   container_secrets_env_specific = {}
 
-  container_port_config = [
-    {
-      containerPort = var.delius_microservice_configs.oracle_observer.container_port
-      protocol      = "tcp"
-    }
-  ]
+  container_port_config = []
 
   ecs_cluster_arn = module.ecs.ecs_cluster_arn
   env_name        = var.env_name
@@ -34,16 +29,6 @@ module "oracle_observer" {
 
   ecs_service_ingress_security_group_ids = []
   ecs_service_egress_security_group_ids = [
-    {
-      ip_protocol = "tcp"
-      port        = 389
-      cidr_ipv4   = var.account_config.shared_vpc_cidr
-    },
-    {
-      ip_protocol = "udp"
-      port        = 389
-      cidr_ipv4   = var.account_config.shared_vpc_cidr
-    },
     {
       ip_protocol = "tcp"
       port        = var.db_config.database_port
