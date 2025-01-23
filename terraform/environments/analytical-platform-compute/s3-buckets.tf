@@ -218,4 +218,6 @@ module "mwaa_bucket" {
       }
     }
   }
+
+  tags = local.tags
 }
