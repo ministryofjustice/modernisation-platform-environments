@@ -372,6 +372,11 @@ locals {
               # { ec2_instance_name = "t2-onr-bods-2" },
             ]
           })
+          t2-onr-web-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "t1-onr-web-1" },
+            ]
+          })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -391,20 +396,20 @@ locals {
                   }
                 }]
               }
-              #t2-onr-web-http-7777 = {
-              #  priority = 200
-              #  actions = [{
-              #    type              = "forward"
-              #    target_group_name = "t2-onr-web-http-7777"
-              #  }]
-              #  conditions = [{
-              #    host_header = {
-              #      values = [
-              #        "t2.test.reporting.oasys.service.justice.gov.uk",
-              #      ]
-              #    }
-              #  }]
-              #}
+              t2-onr-web-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t2-onr-web-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t2.test.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
