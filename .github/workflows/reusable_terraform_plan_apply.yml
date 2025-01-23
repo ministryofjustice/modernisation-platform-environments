@@ -49,10 +49,6 @@
         pipeline_github_token:
           required: true
 
-  #
-  # The environment variables below create a default workspace name as <application>-<environment>.
-  # If you want a different naming scheme, adjust accordingly.
-  #
   env:
     ACCOUNT_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
     WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
@@ -110,6 +106,7 @@
         #
         # Terraform Init
         #
+
         - name: Terraform Init
           working-directory: >
             ${{ inputs.component != ''
