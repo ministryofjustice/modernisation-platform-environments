@@ -257,7 +257,7 @@ locals {
         instance = merge(local.ec2_instances.bip_web.instance, {
           instance_type = "r6i.large"
         })
-        user_data_cloud_init = merge(local.ec2_instancess.bip_web.user_data_cloud_init, {
+        user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
             branch = "TM-864/onr/build-t2-bip"
           })
