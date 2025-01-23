@@ -106,12 +106,8 @@
         #
         # Terraform Init
         #
-
         - name: Terraform Init
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           run: |
             terraform --version
             echo "terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${{env.BACKEND_NUMBER}}:role/modernisation-account-terraform-state-member-access\"}"
@@ -121,10 +117,7 @@
         # Terraform Workspace Select
         #
         - name: Terraform Workspace Select
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           run: |
             terraform workspace select "${WORKSPACE_NAME}"
 
@@ -133,10 +126,7 @@
         #
         - name: Terraform State Refresh (Optional)
           if: inputs.do_state_refresh_on_plan == true
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           run: |
             set -o pipefail
             tf_args="${{ inputs.plan_apply_tfargs }}"
@@ -150,10 +140,7 @@
           id: plan
           env:
             POST_PLAN_TO_PR: "${{ github.event_name == 'pull_request' && inputs.post_plan_to_pr == true }}"
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           run: |
             set -o pipefail
             exitcode=0
@@ -170,20 +157,14 @@
         - name: Evaluate Terraform Plan
           if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2'
           id: evaluate_terraform_plan
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           shell: bash
           run: |
             bash ${GITHUB_WORKSPACE}/scripts/terraform-plan-evaluator.sh tfplan.json
 
         - name: Create Plan PR message (Optional)
           if: github.event_name == 'pull_request' && steps.plan.outputs.exitcode == '2' && inputs.post_plan_to_pr == true
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           run: |
             comment() {
               url="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
@@ -277,7 +258,7 @@
                 repo: repo,
                 issue_number: context.payload.pull_request.number,
                 body: `@${context.actor} Terraform plan evaluation detected changes to resources that require approval from a member of @ministryofjustice/modernisation-platform - please contact #ask-modernisation-platform for assistance\n
-                Guidance on approving these PRs is available at https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/reviewing-mp-environments-prs.html#process-for-approving-prs`
+              Guidance on approving these PRs is available at https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/reviewing-mp-environments-prs.html#process-for-approving-prs`
               });
 
     #
@@ -319,28 +300,19 @@
             terraform_wrapper: false
 
         - name: Terraform Init
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           run: |
             terraform --version
             echo "terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${{env.BACKEND_NUMBER}}:role/modernisation-account-terraform-state-member-access\"}"
             terraform init -backend-config=assume_role={role_arn="arn:aws:iam::${{env.BACKEND_NUMBER}}:role/modernisation-account-terraform-state-member-access"}
 
         - name: Terraform Workspace Select
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           run: |
             terraform workspace select "${WORKSPACE_NAME}"
 
         - name: Terraform Plan
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           run: |
             set -o pipefail
             tf_args="-out x.tfplan ${{ inputs.plan_apply_tfargs }}"
@@ -348,10 +320,7 @@
             terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
         - name: Terraform Apply
-          working-directory: >
-            ${{ inputs.component != 'NONE'
-                && format('terraform/environments/{0}/{1}', inputs.application, inputs.component)
-                || format('terraform/environments/{0}', inputs.application) }}
+          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
           run: |
             set -o pipefail
             tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
