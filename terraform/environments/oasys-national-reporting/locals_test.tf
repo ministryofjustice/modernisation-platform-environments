@@ -67,7 +67,7 @@ locals {
     ec2_autoscaling_groups = {
       t2-onr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
           max_size         = 2
         })
         config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
@@ -87,7 +87,7 @@ locals {
 
       t2-onr-web = merge(local.ec2_autoscaling_groups.bip_web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
-          desired_capacity = 1
+          desired_capacity = 0
         })
         config = merge(local.ec2_autoscaling_groups.bip_web.config, {
           instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
@@ -225,6 +225,48 @@ locals {
           domain-name                          = "azure.noms.root"
         })
       })
+
+      t2-onr-cms-1 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "m6i.xlarge"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
+            branch = "TM-864/onr/build-t2-bip"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "t2"
+        })
+      })
+
+      #t2-onr-web-1 = merge(local.ec2_instances.bip_web, {
+      #  config = merge(local.ec2_instances.bip_web.config, {
+      #    availability_zone = "eu-west-2a"
+      #    instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+      #      "Ec2SecretPolicy",
+      #    ])
+      #  })
+      #  instance = merge(local.ec2_instances.bip_web.instance, {
+      #    instance_type = "r6i.large"
+      #  })
+      #  user_data_cloud_init = merge(local.ec2_instancess.bip_web.user_data_cloud_init, {
+      #    args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
+      #      branch = "TM-864/onr/build-t2-bip"
+      #    })
+      #  })
+      #  tags = merge(local.ec2_instances.bip_web.tags, {
+      #    instance-scheduling                  = "skip-scheduling"
+      #    oasys-national-reporting-environment = "t2"
+      #  })
+      #})
 
       # NOTE: These are all BOE 3.1 instances and are not currently needed
       # t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
