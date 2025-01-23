@@ -374,7 +374,7 @@ locals {
           })
           t2-onr-web-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
             attachments = [
-              { ec2_instance_name = "t1-onr-web-1" },
+              { ec2_instance_name = "t2-onr-web-1" },
             ]
           })
         }
