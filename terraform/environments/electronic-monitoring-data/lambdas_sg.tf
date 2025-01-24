@@ -19,22 +19,22 @@ data "aws_vpc_endpoint" "s3" {
   }
 }
 
-data "aws_vpc_endpoint" "secrets_manager" {
-  provider     = aws.core-vpc
-  service_name = "com.amazonaws.${data.aws_region.current.name}.secretsmanager"
-  vpc_id       = data.aws_vpc.shared.id
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.secretsmanager"
-  }
+resource "aws_vpc_endpoint" "secretsmanager" {
+  vpc_id              = data.aws_vpc.shared.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.secretsmanager"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [data.aws_subnets.shared-public.ids]
+  security_group_ids  = [aws_security_group.lambda_generic.id]
+  private_dns_enabled = true
 }
 
-data "aws_vpc_endpoint" "iam" {
-  provider     = aws.core-vpc
-  service_name = "com.amazonaws.${data.aws_region.current.name}.iam"
-  vpc_id       = data.aws_vpc.shared.id
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.iam"
-  }
+resource "aws_vpc_endpoint" "iam" {
+  vpc_id              = data.aws_vpc.shared.id
+  service_name        = "com.amazonaws.${data.aws_region.current.name}.iam"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [data.aws_subnets.shared-public.ids]
+  security_group_ids  = [aws_security_group.lambda_generic.id]
+  private_dns_enabled = true
 }
 
 data "aws_prefix_list" "s3" {
@@ -88,7 +88,7 @@ resource "aws_security_group_rule" "lambda_egress_secrets_manager" {
   to_port           = 443
   protocol          = "tcp"
   security_group_id = aws_security_group.lambda_generic.id
-  prefix_list_ids   = [data.aws_vpc_endpoint.secrets_manager.prefix_list_id]
+  prefix_list_ids   = [aws_vpc_endpoint.secrets_manager.prefix_list_id]
 }
 
 resource "aws_security_group_rule" "lambda_egress_iam" {
@@ -98,5 +98,5 @@ resource "aws_security_group_rule" "lambda_egress_iam" {
   to_port           = 443
   protocol          = "tcp"
   security_group_id = aws_security_group.lambda_generic.id
-  prefix_list_ids   = [data.aws_vpc_endpoint.iam.prefix_list_id]
+  prefix_list_ids   = [aws_vpc_endpoint.iam.prefix_list_id]
 }
