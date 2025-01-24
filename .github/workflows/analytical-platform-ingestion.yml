@@ -311,76 +311,76 @@
                 Guidance on approving these PRs is available at https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/reviewing-mp-environments-prs.html#process-for-approving-prs`
               });
 
-    apply:
-      name: "Terraform Apply"
-      needs: terraform
-      if: ${{ inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2' }}
-      runs-on: ubuntu-latest
-      environment: "${{ inputs.application }}-${{ inputs.environment }}"
-      steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v3
+    # apply:
+    #   name: "Terraform Apply"
+    #   needs: terraform
+    #   if: ${{ inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2' }}
+    #   runs-on: ubuntu-latest
+    #   environment: "${{ inputs.application }}-${{ inputs.environment }}"
+    #   steps:
+    #     - name: Checkout Repository
+    #       uses: actions/checkout@v3
 
-        - name: Get AWS Account Number
-          run: |
-            ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
-            echo "::add-mask::$ACCOUNT_NUMBER"
-            echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+    #     - name: Get AWS Account Number
+    #       run: |
+    #         ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< "$ENVIRONMENT_MANAGEMENT")
+    #         echo "::add-mask::$ACCOUNT_NUMBER"
+    #         echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-        - name: Get Backend AWS Account Number
-          run: |
-            BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< "$ENVIRONMENT_MANAGEMENT")
-            echo "::add-mask::$BACKEND_NUMBER"
-            echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
+    #     - name: Get Backend AWS Account Number
+    #       run: |
+    #         BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< "$ENVIRONMENT_MANAGEMENT")
+    #         echo "::add-mask::$BACKEND_NUMBER"
+    #         echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
-        - name: Configure AWS Credentials
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-            role-session-name: githubactionsrolesession
-            aws-region: "eu-west-2"
+    #     - name: Configure AWS Credentials
+    #       uses: aws-actions/configure-aws-credentials@v4
+    #       with:
+    #         role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+    #         role-session-name: githubactionsrolesession
+    #         aws-region: "eu-west-2"
 
-        - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v3
-          with:
-            terraform_version: "~1"
+    #     - name: Setup Terraform
+    #       uses: hashicorp/setup-terraform@v3
+    #       with:
+    #         terraform_version: "~1"
 
-        #
-        # Terraform Init
-        #
-        - name: Terraform Init
-          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-          run: |
-            terraform --version
-            echo "terraform init"
-            terraform init
+    #     #
+    #     # Terraform Init
+    #     #
+    #     - name: Terraform Init
+    #       working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+    #       run: |
+    #         terraform --version
+    #         echo "terraform init"
+    #         terraform init
 
-        #
-        # Terraform Workspace Select
-        #
-        - name: Terraform Workspace Select
-          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-          run: |
-            terraform workspace select "${WORKSPACE_NAME}" || terraform workspace new "${WORKSPACE_NAME}"
+    #     #
+    #     # Terraform Workspace Select
+    #     #
+    #     - name: Terraform Workspace Select
+    #       working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+    #       run: |
+    #         terraform workspace select "${WORKSPACE_NAME}" || terraform workspace new "${WORKSPACE_NAME}"
 
-        #
-        # Terraform Plan
-        #
-        - name: Terraform Plan
-          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-          run: |
-            set -o pipefail
-            tf_args="-out x.tfplan ${{ inputs.plan_apply_tfargs }}"
-            echo "terraform plan ${tf_args}"
-            terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+    #     #
+    #     # Terraform Plan
+    #     #
+    #     - name: Terraform Plan
+    #       working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+    #       run: |
+    #         set -o pipefail
+    #         tf_args="-out x.tfplan ${{ inputs.plan_apply_tfargs }}"
+    #         echo "terraform plan ${tf_args}"
+    #         terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
-        #
-        # Terraform Apply
-        #
-        - name: Terraform Apply
-          working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
-          run: |
-            set -o pipefail
-            tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
-            echo "terraform apply ${tf_args}"
-            terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+    #     #
+    #     # Terraform Apply
+    #     #
+    #     - name: Terraform Apply
+    #       working-directory: "${{ inputs.component != 'NONE' && format('terraform/environments/{0}/{1}', inputs.application, inputs.component) || format('terraform/environments/{0}', inputs.application) }}"
+    #       run: |
+    #         set -o pipefail
+    #         tf_args="${{ inputs.plan_apply_tfargs }} x.tfplan"
+    #         echo "terraform apply ${tf_args}"
+    #         terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
