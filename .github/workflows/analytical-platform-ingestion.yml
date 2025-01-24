@@ -1,5 +1,5 @@
 ---
-  name: "Analytical Platform Ingestion Terraform Workflow"
+  name: analytical-platform-ingestion
 
   on:
     push:
@@ -22,7 +22,7 @@
           description: 'Choose an action'
           default: 'deploy'
           required: true
-          type: string
+          type: choice
           options:
             - deploy
             - destroy
