@@ -90,9 +90,7 @@
             "memory_rss",
             "num_threads",
             "pid_count",
-            "pid",
-            "read_bytes",
-            "write_bytes"
+            "pid"
           ]
         },
         {
@@ -103,9 +101,7 @@
             "memory_rss",
             "num_threads",
             "pid_count",
-            "pid",
-            "read_bytes",
-            "write_bytes"
+            "pid"
           ]
         },
         {
@@ -116,9 +112,7 @@
             "memory_rss",
             "num_threads",
             "pid_count",
-            "pid",
-            "read_bytes",
-            "write_bytes"
+            "pid"
           ]
         },
         {
@@ -129,9 +123,7 @@
             "memory_rss",
             "num_threads",
             "pid_count",
-            "pid",
-            "read_bytes",
-            "write_bytes"
+            "pid"
           ]
         }
       ]
