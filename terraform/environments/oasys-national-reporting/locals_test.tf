@@ -226,32 +226,32 @@ locals {
         })
       })
 
-      # t2-onr-cms-1 = merge(local.ec2_instances.bip_cms, {
-      #   config = merge(local.ec2_instances.bip_cms.config, {
-      #     availability_zone = "eu-west-2a"
-      #     instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
-      #       # "Ec2SecretPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_web.instance, {
-      #     instance_type = "m6i.xlarge"
-      #   })
-      #   user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
-      #     args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
-      #       # branch = "TM-864/onr/build-t2-bip"
-      #     })
-      #   })
-      #   tags = merge(local.ec2_instances.bip_cms.tags, {
-      #     instance-scheduling      #       #       # = "skip-scheduling"
-      #     oasys-national-reporting-environment = "t2"
-      #   })
-      # })
+      t2-onr-cms-1 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "m6i.xlarge"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
+            branch = "TM-864/onr/build-t2-bip"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "t2"
+        })
+      })
 
       # t2-onr-web-1 = merge(local.ec2_instances.bip_web, {
       #   config = merge(local.ec2_instances.bip_web.config, {
       #     availability_zone = "eu-west-2a"
       #     instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-      #       # "Ec2SecretPolicy",
+      #       "Ec2SecretPolicy",
       #     ])
       #   })
       #   instance = merge(local.ec2_instances.bip_web.instance, {
@@ -263,7 +263,7 @@ locals {
       #     })
       #   })
       #   tags = merge(local.ec2_instances.bip_web.tags, {
-      #     instance-scheduling      #       #       # = "skip-scheduling"
+      #     instance-scheduling                  = "skip-scheduling"
       #     oasys-national-reporting-environment = "t2"
       #   })
       # })
