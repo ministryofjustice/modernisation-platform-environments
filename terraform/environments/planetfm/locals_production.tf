@@ -165,7 +165,7 @@ locals {
           "/dev/sde"  = { type = "gp3", size = 50 }
           "/dev/sdf"  = { type = "gp3", size = 85 }
           "/dev/sdg"  = { type = "gp3", size = 100 }
-          "/dev/sdh"  = { type = "gp3", size = 150 } # T: drive
+          "/dev/sdh"  = { type = "gp3", size = 250 } # T: drive
           "/dev/sdi"  = { type = "gp3", size = 250 } # U: drive
         }
         instance = merge(local.ec2_instances.db.instance, {
