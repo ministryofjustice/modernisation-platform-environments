@@ -19,8 +19,34 @@ data "aws_vpc_endpoint" "s3" {
   }
 }
 
+data "aws_vpc_endpoint" "secrets_manager" {
+  provider     = aws.core-vpc
+  service_name = "com.amazonaws.${data.aws_region.current.name}.secretsmanager"
+  vpc_id       = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.secretsmanager"
+  }
+}
+
+data "aws_vpc_endpoint" "iam" {
+  provider     = aws.core-vpc
+  service_name = "com.amazonaws.iam"
+  vpc_id       = data.aws_vpc.shared.id
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-com.amazonaws.${data.aws_region.current.name}.iam"
+  }
+}
+
 data "aws_prefix_list" "s3" {
   name = "com.amazonaws.${data.aws_region.current.name}.s3"
+}
+
+data "aws_prefix_list" "secrets_manager" {
+  name = "com.amazonaws.${data.aws_region.current.name}.secrets_manager"
+}
+
+data "aws_prefix_list" "iam" {
+  name = "com.amazonaws.iam"
 }
 
 resource "aws_security_group_rule" "lambda_ingress_generic" {
@@ -43,6 +69,26 @@ resource "aws_security_group_rule" "lambda_ingress_s3" {
   security_group_id = aws_security_group.lambda_generic.id
 }
 
+resource "aws_security_group_rule" "lambda_ingress_secrets_manager" {
+  type              = "ingress"
+  description       = "allow secrets_manager"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_prefix_list.secrets_manager.id]
+  security_group_id = aws_security_group.lambda_generic.id
+}
+
+resource "aws_security_group_rule" "lambda_ingress_iam" {
+  type              = "ingress"
+  description       = "allow iam"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_prefix_list.iam.id]
+  security_group_id = aws_security_group.lambda_generic.id
+}
+
 resource "aws_security_group_rule" "lambda_egress_generic" {
   type              = "egress"
   description       = "allow all"
@@ -60,5 +106,25 @@ resource "aws_security_group_rule" "lambda_egress_s3" {
   to_port           = 65535
   protocol          = "tcp"
   prefix_list_ids   = [data.aws_prefix_list.s3.id]
+  security_group_id = aws_security_group.lambda_generic.id
+}
+
+resource "aws_security_group_rule" "lambda_egress_secrets_manager" {
+  type              = "egress"
+  description       = "allow secrets_manager"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_prefix_list.secrets_manager.id]
+  security_group_id = aws_security_group.lambda_generic.id
+}
+
+resource "aws_security_group_rule" "lambda_egress_iam" {
+  type              = "egress"
+  description       = "allow iam"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "tcp"
+  prefix_list_ids   = [data.aws_prefix_list.iam.id]
   security_group_id = aws_security_group.lambda_generic.id
 }
