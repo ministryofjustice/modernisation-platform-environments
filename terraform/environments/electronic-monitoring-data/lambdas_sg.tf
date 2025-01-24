@@ -87,7 +87,7 @@ resource "aws_security_group_rule" "lambda_egress_secrets_manager" {
   to_port           = 443
   protocol          = "tcp"
   security_group_id = aws_security_group.lambda_generic.id
-  prefix_list_ids   = [data.aws_vpc_endpoint.secrets_manager.id]
+  prefix_list_ids   = [data.aws_vpc_endpoint.secrets_manager.service_name]
 }
 
 resource "aws_security_group_rule" "lambda_egress_iam" {
@@ -97,5 +97,5 @@ resource "aws_security_group_rule" "lambda_egress_iam" {
   to_port           = 443
   protocol          = "tcp"
   security_group_id = aws_security_group.lambda_generic.id
-  prefix_list_ids   = [data.aws_vpc_endpoint.execute_api.id]
+  prefix_list_ids   = [data.aws_vpc_endpoint.execute_api.service_name]
 }
