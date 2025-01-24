@@ -71,17 +71,17 @@ resource "aws_route53_record" "webgate_ec2" {
 
 ## EBSWEBGATE LB DNS
 resource "aws_route53_record" "ebswgate" {
-  count    = local.is-production ? 0 : 1
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
-  name = "portal-ag-upgrade.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type = "A"
+  name     = "portal-ag-upgrade.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type     = "A"
   alias {
-    name                   = aws_lb.webgate_lb[count.index].dns_name
-    zone_id                = aws_lb.webgate_lb[count.index].zone_id
+    name                   = aws_lb.webgate_lb.dns_name
+    zone_id                = aws_lb.webgate_lb.zone_id
     evaluate_target_health = false
   }
 }
+
 
 ## FTP
 resource "aws_route53_record" "ftp" {
