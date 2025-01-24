@@ -16,6 +16,21 @@ locals {
         completion_window = 3600
         delete_after      = lookup(var.options, "backup_plan_daily_delete_after", 7)
       }
+      selection = {
+        selection_tags = [{
+          type  = "STRINGEQUALS"
+          key   = "backup-plan"
+          value = "daily-and-weekly"
+        }]
+      }
+    }
+    daily_except_sunday_vss = {
+      rule = {
+        schedule          = "cron(30 23 ? * MON-SAT *)"
+        start_window      = 60
+        completion_window = 3600
+        delete_after      = lookup(var.options, "backup_plan_daily_delete_after", 7)
+      }
       advanced_backup_setting = {
         backup_options = {
           WindowsVSS = "enabled"
@@ -26,11 +41,26 @@ locals {
         selection_tags = [{
           type  = "STRINGEQUALS"
           key   = "backup-plan"
-          value = "daily-and-weekly"
+          value = "daily-and-weekly-vss"
         }]
       }
     }
     weekly_on_sunday = {
+      rule = {
+        schedule          = "cron(30 23 ? * SUN *)"
+        start_window      = 60
+        completion_window = 3600
+        delete_after      = lookup(var.options, "backup_plan_weekly_delete_after", 28)
+      }
+      selection = {
+        selection_tags = [{
+          type  = "STRINGEQUALS"
+          key   = "backup-plan"
+          value = "daily-and-weekly"
+        }]
+      }
+    }
+    weekly_on_sunday_vss = {
       rule = {
         schedule          = "cron(30 23 ? * SUN *)"
         start_window      = 60
@@ -47,7 +77,7 @@ locals {
         selection_tags = [{
           type  = "STRINGEQUALS"
           key   = "backup-plan"
-          value = "daily-and-weekly"
+          value = "daily-and-weekly-vss"
         }]
       }
     }
