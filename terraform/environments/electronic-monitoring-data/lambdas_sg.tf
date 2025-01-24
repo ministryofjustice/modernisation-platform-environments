@@ -42,7 +42,7 @@ data "aws_prefix_list" "s3" {
 }
 
 data "aws_prefix_list" "secrets_manager" {
-  name = "com.amazonaws.${data.aws_region.current.name}.secrets_manager"
+  name = "com.amazonaws.${data.aws_region.current.name}.secretsmanager"
 }
 
 data "aws_prefix_list" "iam" {
