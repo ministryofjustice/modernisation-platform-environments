@@ -60,7 +60,8 @@ data "aws_iam_policy_document" "rotate_iam_keys" {
       "secretsmanager:UpdateSecret",
       "secretsmanager:UpdateSecretVersionStage",
       "secretsmanager:ListSecretVersionIds",
-      "secretsmanager:PutSecretValue"
+      "secretsmanager:PutSecretValue",
+      "secretsmanager:DescribeSecret",
     ]
     resources = [module.secrets_manager.secret_arn]
   }
