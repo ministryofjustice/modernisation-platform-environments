@@ -4,7 +4,7 @@ locals {
 
   baseline_presets_production = {
     options = {
-      db_backup_lifecycle_rule                = "rman_backup_one_month"
+      db_backup_lifecycle_rule = "rman_backup_one_month"
 
       sns_topics = {
         pagerduty_integrations = {
@@ -821,8 +821,11 @@ locals {
       "/oracle/database/PDONRSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PDONRAUD" = local.secretsmanager_secrets.db
       "/oracle/database/PDONRBDS" = local.secretsmanager_secrets.db
-      "/oracle/database/PDBOSYS"  = local.secretsmanager_secrets.db_bip
-      "/oracle/database/PDBOAUD"  = local.secretsmanager_secrets.db_bip
+
+      "/oracle/database/PDBOSYS" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/PDBOAUD" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/DRBOSYS" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/DRBOAUD" = local.secretsmanager_secrets.db_bip
 
       "/oracle/database/TRBIPINF" = local.secretsmanager_secrets.db_bip
 

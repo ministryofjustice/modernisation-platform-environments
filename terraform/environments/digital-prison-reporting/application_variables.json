@@ -103,6 +103,8 @@
         "dps-alerts",
         "dps-use-of-force",
         "dps-locations",
+        "dps-incentives",
+        "dps-non-associations",
         "dps-testing"
       ],
       "alarms": {
@@ -288,6 +290,8 @@
         "dps-csip",
         "dps-alerts",
         "dps-use-of-force",
+        "dps-incentives",
+        "dps-non-associations",
         "dps-locations"
       ],
       "alarms": {
@@ -475,6 +479,8 @@
         "dps-csip",
         "dps-alerts",
         "dps-use-of-force",
+        "dps-incentives",
+        "dps-non-associations",
         "dps-locations"
       ],
       "alarms": {
@@ -678,6 +684,8 @@
         "dps-csip",
         "dps-alerts",
         "dps-use-of-force",
+        "dps-incentives",
+        "dps-non-associations",
         "dps-locations"
       ],
       "alarms": {

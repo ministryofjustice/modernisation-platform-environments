@@ -4,6 +4,10 @@ terraform {
       version = "~> 5.0"
       source  = "hashicorp/aws"
     }
+    dns = {
+      version = "~> 3.0"
+      source  = "hashicorp/dns"
+    }
     http = {
       version = "~> 3.0"
       source  = "hashicorp/http"

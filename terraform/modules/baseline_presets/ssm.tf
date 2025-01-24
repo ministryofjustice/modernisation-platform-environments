@@ -196,6 +196,7 @@ locals {
           description = "cloud watch agent config for windows managed by baseline module"
           file        = local.cloud_watch_windows_filename
           type        = "String"
+          tier        = "Advanced"
         }
       }
     }

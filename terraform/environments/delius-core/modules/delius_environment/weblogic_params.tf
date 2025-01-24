@@ -143,5 +143,7 @@ module "weblogic_ssm" {
 data "aws_ssm_parameter" "weblogic_ssm" {
   for_each = toset(local.weblogic_ssm.vars)
   name     = "/${var.account_info.application_name}-${var.env_name}/weblogic/${each.key}"
+
+  depends_on = [module.weblogic_ssm] # ensure module runs first before reading params.
 }
 

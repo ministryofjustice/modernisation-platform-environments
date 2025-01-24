@@ -1,5 +1,5 @@
 # ---------------------------------------
-# live fms data json trigger
+# Data bucket notification triggers
 # ---------------------------------------
 resource "aws_s3_bucket_notification" "historic_data_store" {
   depends_on = [aws_lambda_permission.historic, aws_lambda_permission.live_serco_fms]
@@ -34,8 +34,31 @@ resource "aws_s3_bucket_notification" "historic_data_store" {
     filter_suffix = ".JSON"
     filter_prefix = "serco/fms/"
   }
+  lambda_function {
+    lambda_function_arn = module.copy_mdss_data.lambda_function_arn
+    events = [
+      "s3:ObjectCreated:*",
+    ]
+    filter_suffix = ".jsonl"
+    filter_prefix = "allied/mdss/"
+  }
 }
 
+# ---------------------------------------
+# mdss data jsonl lambda trigger
+# ---------------------------------------
+
+resource "aws_lambda_permission" "live_allied_mdss" {
+  statement_id  = "LiveSercoFMSLambdaAllowExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = module.copy_mdss_data.lambda_function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = module.s3-data-bucket.bucket.arn
+}
+
+# ---------------------------------------
+# fms data JSON lambda trigger
+# ---------------------------------------
 
 resource "aws_lambda_permission" "live_serco_fms" {
   statement_id  = "LiveSercoFMSLambdaAllowExecutionFromS3Bucket"
@@ -45,9 +68,8 @@ resource "aws_lambda_permission" "live_serco_fms" {
   source_arn    = module.s3-data-bucket.bucket.arn
 }
 
-
 # ---------------------------------------
-# historic data json trigger
+# historic data checksum trigger
 # ---------------------------------------
 
 resource "aws_lambda_permission" "historic" {

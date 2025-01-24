@@ -16,18 +16,18 @@ resource "aws_backup_vault" "oracle_backup_vault" {
 # The AWSBackupDefaultServiceRole managed by AWS and is documented at: 
 # https://docs.aws.amazon.com/aws-backup/latest/devguide/iam-service-roles.html
 data "aws_iam_policy_document" "oracle_ec2_snapshot_backup_role_policy_document" {
-   statement {
-       effect    = "Allow"
-       actions   = ["iam:PassRole"]
-       resources = ["arn:aws:iam::${var.account_info.id}:role/service-role/AWSBackupDefaultServiceRole"]
-   }
-   statement {
-       effect    = "Allow"
-       actions   = ["backup:ListBackupVaults",
-                   "backup:StartBackupJob",
-                   "backup:DescribeBackupJob",
-                   "ec2:DescribeSnapshots"]
-       resources = ["*"]
-   }
+  statement {
+    effect    = "Allow"
+    actions   = ["iam:PassRole"]
+    resources = ["arn:aws:iam::${var.account_info.id}:role/service-role/AWSBackupDefaultServiceRole"]
+  }
+  statement {
+    effect = "Allow"
+    actions = ["backup:ListBackupVaults",
+      "backup:StartBackupJob",
+      "backup:DescribeBackupJob",
+    "ec2:DescribeSnapshots"]
+    resources = ["*"]
+  }
 }
 

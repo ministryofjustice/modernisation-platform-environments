@@ -16,7 +16,7 @@ output "ssh_keys_bucket_name" {
 
 output "instance_policies" {
   value = {
-     "combined_instance_policy" = aws_iam_policy.combined_instance_policy
+    "combined_instance_policy" = aws_iam_policy.combined_instance_policy
   }
 }
 
