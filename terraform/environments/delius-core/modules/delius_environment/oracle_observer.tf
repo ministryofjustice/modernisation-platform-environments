@@ -59,7 +59,7 @@ module "oracle_observer" {
     "STANDBYDB2_HOSTNAME" = local.oracle_db_server_names["standbydb2"] == "none" ? "none" : join(".",[local.oracle_db_server_names["standbydb2"], var.account_config.route53_inner_zone.name])
     "DATABASE_PORT"       = var.db_config.database_port
     "DATABASE_NAME"       = var.db_config.database_name
-    "DUMMY_VALUE"         = "force_redeploy"
+    "DUMMY_VALUE"         = "force_redeploy_1"
     }
 
   container_secrets_default = {
