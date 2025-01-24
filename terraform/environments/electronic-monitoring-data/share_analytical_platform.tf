@@ -439,7 +439,6 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 }
 
 module "share_dbs_with_roles" {
-  count                   = local.is-production ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
