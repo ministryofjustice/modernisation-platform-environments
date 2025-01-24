@@ -85,3 +85,22 @@ resource "kubernetes_role" "mwaa_execution" {
     ]
   }
 }
+
+resource "kubernetes_role" "mwaa_serviceaccount_management" {
+  metadata {
+    name      = "airflow-serviceaccount-management"
+    namespace = kubernetes_namespace.mwaa.metadata[0].name
+  }
+  rule {
+    api_groups = [""]
+    resources  = ["serviceaccounts"]
+    verbs = [
+      "create",
+      "delete",
+      "get",
+      "list",
+      "patch",
+      "update"
+    ]
+  }
+}

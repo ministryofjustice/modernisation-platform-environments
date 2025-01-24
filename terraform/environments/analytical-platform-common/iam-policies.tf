@@ -20,6 +20,7 @@ data "aws_iam_policy_document" "ecr_access" {
     effect = "Allow"
     actions = [
       "ecr:CreateRepository",
+      "ecr:DescribeRepositories",
       "ecr:GetRepositoryPolicy",
       "ecr:SetRepositoryPolicy"
     ]
