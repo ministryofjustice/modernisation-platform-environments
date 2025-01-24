@@ -62,7 +62,7 @@ data "aws_iam_policy_document" "rotate_iam_keys" {
       "secretsmanager:ListSecretVersionIds",
       "secretsmanager:PutSecretValue"
     ]
-    resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}${module.secrets_manager.secret_name}*"]
+    resources = [module.secrets_manager.secret_arn]
   }
 }
 
