@@ -1,7 +1,7 @@
 locals {
 
   backup_plans_filter = flatten([
-    var.options.enable_backup_plan_daily_and_weekly ? ["daily_except_sunday", "weekly_on_sunday"] : []
+    var.options.enable_backup_plan_daily_and_weekly ? ["daily_except_sunday", "weekly_on_sunday", "daily_except_sunday_vss", "weekly_on_sunday_vss"] : []
   ])
 
   backup_plans = {
