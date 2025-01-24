@@ -247,26 +247,26 @@ locals {
         })
       })
 
-      # t2-onr-web-1 = merge(local.ec2_instances.bip_web, {
-      #   config = merge(local.ec2_instances.bip_web.config, {
-      #     availability_zone = "eu-west-2a"
-      #     instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
-      #       "Ec2SecretPolicy",
-      #     ])
-      #   })
-      #   instance = merge(local.ec2_instances.bip_web.instance, {
-      #     instance_type = "r6i.large"
-      #   })
-      #   user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
-      #     args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
-      #       # branch = "TM-864/onr/build-t2-bip"
-      #     })
-      #   })
-      #   tags = merge(local.ec2_instances.bip_web.tags, {
-      #     instance-scheduling                  = "skip-scheduling"
-      #     oasys-national-reporting-environment = "t2"
-      #   })
-      # })
+      t2-onr-web-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.large"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
+            branch = "TM-864/onr/build-t2-bip"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "t2"
+        })
+      })
 
       # NOTE: These are all BOE 3.1 instances and are not currently needed
       # t2-onr-boe-1-a = merge(local.ec2_instances.boe_app, {
@@ -374,7 +374,7 @@ locals {
           })
           t2-onr-web-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
             attachments = [
-              # { ec2_instance_name = "t2-onr-web-1" },
+              { ec2_instance_name = "t2-onr-web-1" },
             ]
           })
         }
