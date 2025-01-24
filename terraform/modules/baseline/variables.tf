@@ -1105,7 +1105,7 @@ variable "ssm_parameters" {
     parameters = map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
-      teir        = optional(string, "Standard")
+      tier        = optional(string, "Standard")
       kms_key_id  = optional(string)
       file        = optional(string)
       random = optional(object({
