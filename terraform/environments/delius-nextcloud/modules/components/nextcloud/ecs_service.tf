@@ -59,7 +59,7 @@ module "nextcloud_service" {
 
   ecs_cluster_arn   = module.ecs.ecs_cluster_arn
   env_name          = var.env_name
-  health_check_path = "/status.php"
+  # health_check_path = "/status.php"
   #health_check_path                  = "/"
   alb_listener_rule_paths            = ["/"]
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn

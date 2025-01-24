@@ -12,7 +12,8 @@ module "nextcloud_efs" {
   provisioned_throughput_in_mibps = null
   tags                            = var.tags
 
-  vpc_id     = var.account_info.vpc_id
-  subnet_ids = var.account_config.ordered_private_subnet_ids
-  vpc_cidr   = var.account_config.shared_vpc_cidr
+  account_info = var.account_info
+  vpc_id       = var.account_info.vpc_id
+  subnet_ids   = var.account_config.ordered_private_subnet_ids
+  vpc_cidr     = var.account_config.shared_vpc_cidr
 }
