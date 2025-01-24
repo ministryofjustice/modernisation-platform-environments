@@ -312,7 +312,7 @@
 
     apply:
       name: "Terraform Apply"
-      needs: plan
+      needs: terraform
       if: ${{ inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2' }}
       runs-on: ubuntu-latest
       environment: "${{ inputs.application }}-${{ inputs.environment }}"
