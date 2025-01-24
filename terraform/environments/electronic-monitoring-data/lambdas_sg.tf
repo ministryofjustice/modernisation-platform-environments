@@ -23,7 +23,7 @@ resource "aws_vpc_endpoint" "secretsmanager" {
   vpc_id              = data.aws_vpc.shared.id
   service_name        = "com.amazonaws.${data.aws_region.current.name}.secretsmanager"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [data.aws_subnets.shared-public.ids]
+  subnet_ids          = data.aws_subnets.shared-public.ids
   security_group_ids  = [aws_security_group.lambda_generic.id]
   private_dns_enabled = true
 }
@@ -32,7 +32,7 @@ resource "aws_vpc_endpoint" "iam" {
   vpc_id              = data.aws_vpc.shared.id
   service_name        = "com.amazonaws.${data.aws_region.current.name}.iam"
   vpc_endpoint_type   = "Interface"
-  subnet_ids          = [data.aws_subnets.shared-public.ids]
+  subnet_ids          = data.aws_subnets.shared-public.ids
   security_group_ids  = [aws_security_group.lambda_generic.id]
   private_dns_enabled = true
 }
