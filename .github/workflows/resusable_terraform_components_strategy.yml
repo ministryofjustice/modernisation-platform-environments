@@ -1,0 +1,107 @@
+---
+    name: terraform strategy
+
+    on:
+      workflow_call:
+        inputs:
+          application:
+            type: string
+            required: true
+            description: "Application name for which this strategy matrix pipeline should run."
+        outputs:
+          matrix:
+            description: "Matrix JSON string to feed that can be used as strategy in a separate terraform job"
+            value: ${{ jobs.strategy.outputs.matrix }}
+
+    jobs:
+      strategy:
+        name: "strategy"
+        runs-on: ubuntu-latest
+        outputs:
+          matrix: "${{ steps.strategy.outputs.matrix }}"
+        steps:
+          - name: Check out Repo
+            uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
+
+          - name: Generate Strategy Matrix
+            id: strategy
+            run: |
+              set -euo pipefail
+
+              # 1) Fetch environment data from <application>.json, produce newline-separated JSON objects
+              if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+                # On a branch => plan on all accounts, but plan_apply on dev/test
+                curl -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
+                  | jq -c '.environments[] as $env |
+                      if $env.name | contains("production") then
+                        {"target": $env.name, "action": "plan"}
+                      else
+                        {"target": $env.name, "action": "plan_apply"}
+                      end' \
+                  > envlist.json
+              else
+                # On main => plan_apply on all accounts
+                curl -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
+                  | jq -c '.environments[] | {"target": .name, "action": "plan_apply"}' \
+                  > envlist.json
+              fi
+
+              # At this point, envlist.json might look like:
+              # {"target":"development","action":"plan_apply"}
+              # {"target":"test","action":"plan_apply"}
+              # {"target":"production","action":"plan"}
+
+              # 2) Discover valid subfolders with platform_backend.tf
+              COMPONENTS=""
+              # Optionally include the root folder as a blank component:
+              COMPONENTS="$COMPONENTS NONE"
+
+              if [ -d "terraform/environments/${{ inputs.application }}" ]; then
+                for d in $(find "terraform/environments/${{ inputs.application }}" -mindepth 1 -maxdepth 1 -type d); do
+                  subfolder="$(basename "$d" | tr -d '\r\n')"
+                  # Only include if there's a platform_backend.tf in this folder
+                  if [ -f "$d/platform_backend.tf" ]; then
+                    # e.g. skip .terraform or other special folders if needed
+                    [ "$subfolder" = ".terraform" ] && continue
+                    COMPONENTS="$COMPONENTS $subfolder"
+                  fi
+                done
+              fi
+
+              echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
+
+              # 3) Double loop to merge each environment object with each component
+              echo "[" > final-list.json
+              firstOuter=true
+
+              while IFS= read -r envobj; do
+                # envobj is a single-line JSON obj, e.g. {"target":"development","action":"plan_apply"}
+                for c in $COMPONENTS; do
+                  rawC=$(echo "$c" | sed 's/"//g') # remove quotes
+
+                  if [ "$firstOuter" = true ]; then
+                    firstOuter=false
+                  else
+                    echo "," >> final-list.json
+                  fi
+
+                  # Merge environment + { component: $rawC }
+                  echo -n "$envobj" | jq --arg comp "$rawC" '. + {"component": $comp}' >> final-list.json
+                done
+              done < envlist.json
+
+              echo "]" >> final-list.json
+
+              # Wrap in {"include":[ ... ]} for GitHub Actions
+              echo -n '{"include":' > matrix.out
+              cat final-list.json >> matrix.out
+              echo -n '}' >> matrix.out
+
+              matrix=$(cat matrix.out | jq -r)
+              echo "Matrix is:"
+              echo "$matrix"
+
+              # Output for the next job
+              echo 'matrix<<EOF' >> $GITHUB_OUTPUT
+              echo "${matrix}" >> $GITHUB_OUTPUT
+              echo 'EOF' >> $GITHUB_OUTPUT
