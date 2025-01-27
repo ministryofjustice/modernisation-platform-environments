@@ -77,7 +77,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
-            branch = "TM-864/onr/build-t2-bip"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.bip_cms.tags, {
@@ -96,7 +96,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
-            branch = "TM-864/onr/build-t2-bip"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.bip_web.tags, {
@@ -238,7 +238,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
-            branch = "TM-864/onr/build-t2-bip"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
@@ -259,7 +259,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
           args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
-            branch = "TM-864/onr/build-t2-bip"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_instances.bip_web.tags, {
