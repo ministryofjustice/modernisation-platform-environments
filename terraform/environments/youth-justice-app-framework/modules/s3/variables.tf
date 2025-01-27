@@ -46,4 +46,4 @@ variable "allow_replication" {
 variable "s3_source_account" {
   type        = string
   description = "Source account from whch s3 buckets may be replicated."
- }
+}
