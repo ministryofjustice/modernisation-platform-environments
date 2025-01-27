@@ -95,7 +95,7 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
     sid       = "AllowS3List"
     effect    = "Allow"
     actions   = ["s3:ListBucket"]
-    resources = [module.terraform_s3_bucket.s3_bucket_arn]
+    resources = [module.terraform_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "AllowS3Write"
@@ -104,7 +104,7 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
       "s3:GetObject",
       "s3:PutObject"
     ]
-    resources = ["${module.terraform_s3_bucket.s3_bucket_arn}/*"]
+    resources = ["${module.terraform_bucket.s3_bucket_arn}/*"]
   }
 }
 
