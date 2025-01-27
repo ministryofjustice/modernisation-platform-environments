@@ -57,6 +57,7 @@ module "airflow_plugins_object" {
   bucket        = module.mwaa_bucket.s3_bucket_id
   key           = "plugins.zip"
   file_source   = "plugins.zip"
+  source_hash   = data.archive_file.airflow_plugins.output_md5
   force_destroy = true
 
   tags = local.tags
