@@ -99,11 +99,19 @@ locals {
       #     domain-name = "azure.noms.root"
       #   })
       # }
-      # test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
-      #   tags = merge(local.ec2_autoscaling_groups.rds.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      # }
+      test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
+        config = merge(local.ec2_autoscaling_groups.rds.config, {
+          availability_zone = "eu-west-2a"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "TM/TM-916/add-rds-role-to-jumpservers"
+            }
+          ))          
+        })
+        tags = merge(local.ec2_autoscaling_groups.rds.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
     }
 
     ec2_instances = {
