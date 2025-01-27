@@ -8,6 +8,7 @@ locals {
       enable_cross_zone_load_balancing = true
       enable_delete_protection         = false
       force_destroy_bucket             = true
+      idle_timeout                     = 3600
       internal_lb                      = false
       load_balancer_type               = "application"
       security_groups                  = ["public-lb", "public-lb-2"]
@@ -45,6 +46,42 @@ locals {
       }
 
       instance_target_groups = {
+        http-7010 = {
+          port     = 7010
+          protocol = "HTTP"
+          health_check = {
+            enabled             = true
+            healthy_threshold   = 3
+            interval            = 30
+            matcher             = "200-399"
+            path                = "/keepalive.htm"
+            port                = 7010
+            timeout             = 5
+            unhealthy_threshold = 5
+          }
+          stickiness = {
+            enabled = true
+            type    = "lb_cookie"
+          }
+        }
+        http-7777 = {
+          port     = 7777
+          protocol = "HTTP"
+          health_check = {
+            enabled             = true
+            healthy_threshold   = 3
+            interval            = 30
+            matcher             = "200-399"
+            path                = "/keepalive.htm"
+            port                = 7777
+            timeout             = 5
+            unhealthy_threshold = 5
+          }
+          stickiness = {
+            enabled = true
+            type    = "lb_cookie"
+          }
+        }
         http28080 = {
           port     = 28080
           protocol = "HTTP"

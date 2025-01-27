@@ -9,6 +9,7 @@ locals {
     migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "pre-prod"
+    migration_environment_private_cidr     = ["10.160.0.0/22", "10.160.4.0/22", "10.160.8.0/22"]
     cloudwatch_alarm_schedule              = true
     cloudwatch_alarm_disable_time          = "20:45"
     cloudwatch_alarm_enable_time           = "06:15"
