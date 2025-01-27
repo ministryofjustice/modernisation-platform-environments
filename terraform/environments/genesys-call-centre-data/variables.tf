@@ -88,8 +88,14 @@ variable "aws_kms_key_usage" {
     default     = ""
 }
 
+# variable "bt_genesys_aws_third_party_account_id" {
+#     type        = number
+#     description = "The AWS account ID of the BT Genesys third-party organisation."
+#     default     = 1234
+# }
+
 variable "bt_genesys_aws_third_party_account_id" {
-    type        = number
+    type        = string
     description = "The AWS account ID of the BT Genesys third-party organisation."
-    default     = 1234
+    default     = "arn:aws:iam::803963757240:root"
 }
