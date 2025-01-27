@@ -35,7 +35,7 @@ module "managed-ad" {
 
 ## Copy Data from one env to another
 
-The following describes the process of copying data from one environment to another. For example copying from preprod to dev. 
+The following describes the process of copying data from one environment to another. For example copying from preprod to dev.
 
 Once you are on a management server, export the OUs, groups, roles and users from the source environment using the following powershell commands
   

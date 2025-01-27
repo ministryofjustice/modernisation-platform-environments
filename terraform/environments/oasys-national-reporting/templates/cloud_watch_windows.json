@@ -20,9 +20,7 @@
           "% Interrupt Time",
           "% User Time"
         ],
-        "resources": [
-          "*"
-        ]
+        "resources": ["*"]
       },
       "LogicalDisk": {
         "measurement": [
@@ -41,9 +39,7 @@
           },
           "% Disk Write Time"
         ],
-        "resources": [
-          "*"
-        ]
+        "resources": ["*"]
       },
       "Memory": {
         "metrics_collection_interval": 5,
@@ -63,9 +59,7 @@
           "Packets Received/sec",
           "Packets Sent/sec"
         ],
-        "resources": [
-          "*"
-        ]
+        "resources": ["*"]
       },
       "System": {
         "measurement": [
@@ -90,7 +84,9 @@
             "memory_rss",
             "num_threads",
             "pid_count",
-            "pid"
+            "pid",
+            "read_bytes",
+            "write_bytes"
           ]
         },
         {
@@ -101,7 +97,9 @@
             "memory_rss",
             "num_threads",
             "pid_count",
-            "pid"
+            "pid",
+            "read_bytes",
+            "write_bytes"
           ]
         },
         {
@@ -112,7 +110,9 @@
             "memory_rss",
             "num_threads",
             "pid_count",
-            "pid"
+            "pid",
+            "read_bytes",
+            "write_bytes"
           ]
         },
         {
@@ -123,7 +123,9 @@
             "memory_rss",
             "num_threads",
             "pid_count",
-            "pid"
+            "pid",
+            "read_bytes",
+            "write_bytes"
           ]
         }
       ]
@@ -132,14 +134,7 @@
       "InstanceId": "${aws:InstanceId}",
       "AutoScalingGroupName": "${aws:AutoScalingGroupName}"
     },
-    "aggregation_dimensions": [
-      [
-        "AutoScalingGroupName"
-      ],
-      [
-        "InstanceId"
-      ]
-    ]
+    "aggregation_dimensions": [["AutoScalingGroupName"], ["InstanceId"]]
   },
   "logs": {
     "logs_collected": {
@@ -147,20 +142,14 @@
         "collect_list": [
           {
             "event_name": "Application",
-            "event_levels": [
-              "INFORMATION",
-              "ERROR"
-            ],
+            "event_levels": ["INFORMATION", "ERROR"],
             "log_group_name": "cwagent-windows-application",
             "log_stream_name": "{instance_id}",
             "event_format": "xml"
           },
           {
             "event_name": "System",
-            "event_levels": [
-              "INFORMATION",
-              "ERROR"
-            ],
+            "event_levels": ["INFORMATION", "ERROR"],
             "log_group_name": "cwagent-windows-system",
             "log_stream_name": "{instance_id}",
             "event_format": "xml"
