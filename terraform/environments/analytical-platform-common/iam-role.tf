@@ -47,15 +47,11 @@ module "analytical_platform_terraform_iam_role" {
   create_role = true
 
   role_name         = "analytical-platform-terraform"
-  role_requires_mfa = true
+  role_requires_mfa = false
 
-  trusted_role_arns = [
-    module.analytical_platform_github_actions_iam_role.arn
-  ]
+  trusted_role_arns = [module.analytical_platform_github_actions_iam_role.arn]
 
-  custom_role_policy_arns = [
-    module.analytical_platform_terraform_iam_policy.arn
-  ]
+  custom_role_policy_arns = [module.analytical_platform_terraform_iam_policy.arn]
 
   tags = local.tags
 }
