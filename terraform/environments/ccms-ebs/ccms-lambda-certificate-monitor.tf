@@ -76,7 +76,7 @@ resource "aws_sns_topic" "certificate_expiration_alerts" {
   })
 }
 
-resource "aws_sns_topic_subscription" "email" {
+resource "aws_sns_topic_subscription" "certificate_monitor_email" {
   topic_arn = aws_sns_topic.certificate_expiration_alerts.arn
   protocol  = "email"
   endpoint  = local.application_data.accounts[local.environment].certificate_monitor_email
@@ -134,12 +134,12 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   source_arn    = aws_cloudwatch_event_rule.acm_events.arn
 }
 
-output "sns_topic_arn" {
+output "sns_topic_arn_certificate_expiration_alerts" {
   description = "ARN of the SNS topic for certificate alerts"
   value       = aws_sns_topic.certificate_expiration_alerts.arn
 }
 
-output "lambda_function_arn" {
+output "lambda_function_arn_certificate_monitor" {
   description = "ARN of the Lambda function"
   value       = aws_lambda_function.certificate_monitor.arn
 }
