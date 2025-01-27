@@ -16,7 +16,7 @@ resource "aws_s3_bucket_policy" "default" {
         Sid    = "AllowAccountFullAccess",
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          AWS = "arn:aws:iam::211125476974:root"
         },
         Action   = "s3:*",
         Resource = "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
@@ -58,7 +58,7 @@ resource "aws_guardduty_publishing_destination" "default" {
 resource "aws_kms_key" "s3" {
   description = "KMS key for GuardDuty publishing"
   key_usage   = "ENCRYPT_DECRYPT"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
@@ -67,7 +67,7 @@ resource "aws_kms_key" "s3" {
         Principal = {
           Service = "guardduty.amazonaws.com"
         },
-        Action = "kms:*",
+        Action   = "kms:*",
         Resource = "*"
       }
     ]
