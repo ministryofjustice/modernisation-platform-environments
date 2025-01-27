@@ -53,3 +53,25 @@ resource "aws_guardduty_publishing_destination" "default" {
     aws_s3_bucket_policy.default
   ]
 }
+
+# AWS KMS Key (Call Centre Staging)
+resource "aws_kms_key" "s3" {
+  description = "KMS key for GuardDuty publishing"
+  key_usage   = "ENCRYPT_DECRYPT"
+  policy      = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowGuardDutyAccess",
+        Effect = "Allow",
+        Principal = {
+          Service = "guardduty.amazonaws.com"
+        },
+        Action = "kms:*",
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+data "aws_caller_identity" "current" {}
