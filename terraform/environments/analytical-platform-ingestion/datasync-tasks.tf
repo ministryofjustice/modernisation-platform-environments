@@ -9,7 +9,8 @@ resource "aws_datasync_task" "opg" {
     uid               = "NONE"
     posix_permissions = "NONE"
     log_level         = "TRANSFER"
-    verify_mode       = "ONLY_FILES_TRANSFERRED"
+    transfer_mode     = "CHANGED"
+    verify_mode       = "NONE"
   }
 
   includes {
