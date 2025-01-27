@@ -1,9 +1,9 @@
 module "oracle_observer" {
-  source                = "../helpers/delius_microservice"
+  source                = "../../helpers/delius_microservice"
   account_config        = var.account_config
   account_info          = var.account_info
-  certificate_arn       = aws_acm_certificate.external.arn
-
+  certificate_arn       = null
+  
   # Do not create an Oracle Observer microservice if it has no configuration
   desired_count = try(var.delius_microservice_configs.oracle_observer,{}) == {} ? 0 : 1
 
@@ -11,7 +11,7 @@ module "oracle_observer" {
 
   container_port_config = []
 
-  ecs_cluster_arn = module.ecs.ecs_cluster_arn
+  ecs_cluster_arn = var.ecs_cluster_arn
   env_name        = var.env_name
 
   target_group_protocol_version = "HTTP1"
@@ -31,12 +31,12 @@ module "oracle_observer" {
   ecs_service_egress_security_group_ids = [
     {
       ip_protocol = "tcp"
-      port        = var.db_config.database_port
+      port        = var.database_port
       cidr_ipv4   = var.account_config.shared_vpc_cidr
     }
   ]
 
-  cluster_security_group_id = aws_security_group.cluster.id
+  cluster_security_group_id = var.cluster_security_group_id
 
   ignore_changes_service_task_definition = false
 
@@ -46,19 +46,18 @@ module "oracle_observer" {
   }
 
   log_error_pattern      = "FATAL"
-  sns_topic_arn          = aws_sns_topic.delius_core_alarms.arn
-  frontend_lb_arn_suffix = aws_lb.delius_core_frontend.arn_suffix
+  sns_topic_arn          = var.sns_topic_arn
 
-  bastion_sg_id = module.bastion_linux.bastion_security_group
+  bastion_sg_id = null
 
   container_vars_default = {}
 
   container_vars_env_specific = {
-    "PRIMARYDB_HOSTNAME"  = join(".",[local.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])
-    "STANDBYDB1_HOSTNAME" = local.oracle_db_server_names["standbydb1"] == "none" ? "none" : join(".",[local.oracle_db_server_names["standbydb1"], var.account_config.route53_inner_zone.name])
-    "STANDBYDB2_HOSTNAME" = local.oracle_db_server_names["standbydb2"] == "none" ? "none" : join(".",[local.oracle_db_server_names["standbydb2"], var.account_config.route53_inner_zone.name])
-    "DATABASE_PORT"       = var.db_config.database_port
-    "DATABASE_NAME"       = var.db_config.database_name
+    "PRIMARYDB_HOSTNAME"  = join(".",[var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])
+    "STANDBYDB1_HOSTNAME" = var.oracle_db_server_names["standbydb1"] == "none" ? "none" : join(".",[var.oracle_db_server_names["standbydb1"], var.account_config.route53_inner_zone.name])
+    "STANDBYDB2_HOSTNAME" = var.oracle_db_server_names["standbydb2"] == "none" ? "none" : join(".",[var.oracle_db_server_names["standbydb2"], var.account_config.route53_inner_zone.name])
+    "DATABASE_PORT"       = var.database_port
+    "DATABASE_NAME"       = var.database_name
     }
 
   container_secrets_default = {
