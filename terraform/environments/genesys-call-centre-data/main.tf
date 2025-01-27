@@ -19,16 +19,15 @@ resource "aws_s3_bucket_policy" "default" {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
         Action    = "s3:*",
-        Resource  = [
-          "arn:aws:s3:::${aws_s3_bucket.default.id}",
-          "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
-        ]
+        Resource  = "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
       },
       {
         Sid       = "AllowThirdPartyWriteOnly",
         Effect    = "Allow",
         Principal = {
-          AWS = var.bt_genesys_aws_third_party_account_id
+          AWS = [
+            var.bt_genesys_aws_third_party_account_id
+          ]
         },
         Action    = [
           "s3:PutObject",
