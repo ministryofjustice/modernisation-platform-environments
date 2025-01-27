@@ -47,7 +47,7 @@ resource "aws_guardduty_detector" "default" {
 resource "aws_guardduty_publishing_destination" "default" {
   detector_id     = aws_guardduty_detector.default.id
   destination_arn = aws_s3_bucket.default.arn
-  kms_key_arn     = aws_kms_key.default.arn
+  kms_key_arn     = aws_kms_key.s3.arn
   depends_on = [
     aws_s3_bucket.default,
     aws_s3_bucket_policy.default
