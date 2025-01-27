@@ -26,7 +26,7 @@ resource "aws_s3_bucket_policy" "default" {
           AWS = var.bt_genesys_aws_s3_bucket_policy_statement_principal_aws
         },
         Action   = var.bt_genesys_aws_s3_bucket_policy_statement_action,
-        Resource = var.bt_genesys_aws_s3_bucket_policy_statement_resource
+        Resource = "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
       }
     ]
   })

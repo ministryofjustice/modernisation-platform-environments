@@ -73,14 +73,6 @@ variable "bt_genesys_aws_s3_bucket_policy_statement_action" {
   ]
 }
 
-variable "bt_genesys_aws_s3_bucket_policy_statement_resource" {
-  type        = list(any)
-  description = ""
-  default = [
-    "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
-  ]
-}
-
 variable "aws_kms_key_s3_description" {
   type        = string
   description = ""
