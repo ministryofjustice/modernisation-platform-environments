@@ -71,11 +71,54 @@ module "ecr_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.48.0"
+  version = "5.52.2"
 
   name_prefix = "ecr-access"
 
   policy = data.aws_iam_policy_document.ecr_access.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "analytical_platform_github_actions" {
+  statement {
+    sid    = "AllowKMS"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [module.terraform_s3_kms.key_arn]
+  }
+  statement {
+    sid       = "AllowS3List"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [module.terraform_bucket.s3_bucket_arn]
+  }
+  statement {
+    sid    = "AllowS3Write"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = ["${module.terraform_bucket.s3_bucket_arn}/*"]
+  }
+}
+
+module "analytical_platform_github_actions_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.52.2"
+
+  name_prefix = "analytical-platform-github-actions"
+
+  policy = data.aws_iam_policy_document.analytical_platform_github_actions.json
 
   tags = local.tags
 }
