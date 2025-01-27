@@ -8,6 +8,7 @@ module "airflow_requirements_object" {
   bucket        = module.mwaa_bucket.s3_bucket_id
   key           = "requirements.txt"
   file_source   = "src/airflow/requirements.txt"
+  source_hash   = filemd5("src/airflow/requirements.txt")
   force_destroy = true
 
   tags = local.tags
@@ -42,6 +43,7 @@ module "airflow_local_settings_object" {
   bucket        = module.mwaa_bucket.s3_bucket_id
   key           = "dags/airflow_local_settings.py"
   file_source   = "src/airflow/local-settings/${local.environment}/airflow_local_settings.py"
+  source_hash   = filemd5("src/airflow/local-settings/${local.environment}/airflow_local_settings.py")
   force_destroy = true
 
   tags = local.tags
