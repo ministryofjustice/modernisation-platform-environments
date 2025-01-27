@@ -40,7 +40,7 @@ module "airflow_local_settings_object" {
   version = "4.4.0"
 
   bucket        = module.mwaa_bucket.s3_bucket_id
-  key           = "requirements.txt"
+  key           = "dags/airflow_local_settings.py"
   file_source   = "src/airflow/local-settings/${local.environment}/airflow_local_settings.py"
   force_destroy = true
 
