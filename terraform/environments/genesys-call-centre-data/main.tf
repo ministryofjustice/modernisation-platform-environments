@@ -25,7 +25,7 @@ resource "aws_s3_bucket_policy" "default" {
         Sid    = "AllowThirdPartyWriteOnly",
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::803963757240:root"
+          AWS = var.bt_genesys_aws_third_party_account_id
         },
         Action = [
           "s3:PutObject",
