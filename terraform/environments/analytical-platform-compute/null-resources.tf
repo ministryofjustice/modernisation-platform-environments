@@ -4,7 +4,7 @@ resource "null_resource" "update_mwaa" {
   }
 
   provisioner "local-exec" {
-    command = "bash scripts/update-mwaa-environment.sh ${local.environment}"
+    command = "bash scripts/update-mwaa-environment.sh ${local.environment_management.account_ids[terraform.workspace]} ${local.environment}"
   }
 
   depends_on = [aws_mwaa_environment.main]
