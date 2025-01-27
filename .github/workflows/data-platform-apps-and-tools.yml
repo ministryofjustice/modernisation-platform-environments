@@ -1,65 +1,73 @@
 ---
-name: data-platform-apps-and-tools
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'terraform/environments/data-platform-apps-and-tools/**'
-      - '.github/workflows/data-platform-apps-and-tools.yml'
+  name: data-platform-apps-and-tools
 
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'terraform/environments/data-platform-apps-and-tools/**'
-      - '.github/workflows/data-platform-apps-and-tools.yml'
+  on:
+    push:
+      branches:
+        - main
+      paths:
+        - 'terraform/environments/data-platform-apps-and-tools/**'
+        - '.github/workflows/data-platform-apps-and-tools.yml'
 
-  workflow_dispatch:
-    inputs:
-      action:
-        description: 'Set either [deploy|destroy].'
-        default: 'deploy'
-        required: true
-        type: string
-        options:
-          - deploy
-          - destroy
+    pull_request:
+      branches:
+        - main
+      paths:
+        - 'terraform/environments/data-platform-apps-and-tools/**'
+        - '.github/workflows/data-platform-apps-and-tools.yml'
 
-permissions:
-  id-token: write  # This is required for requesting the JWT
-  contents: read  # This is required for actions/checkout
+    workflow_dispatch:
+      inputs:
+        action:
+          description: 'Set either [deploy|destroy].'
+          default: 'deploy'
+          required: true
+          type: string
+          options:
+            - deploy
+            - destroy
 
-jobs:
-  strategy:
-    uses: ./.github/workflows/reusable_terraform_strategy.yml
-    if: inputs.action != 'destroy'
-    with:
-      application: "${{ github.workflow }}"
+  permissions:
+    id-token: write  # Required for requesting the JWT
+    contents: read   # Required for actions/checkout
 
-  terraform:
-    needs: strategy
-    if: inputs.action != 'destroy'
+  jobs:
     strategy:
-      fail-fast: false
-      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
-    with:
-      application: "${{ github.workflow }}"
-      environment: "${{ matrix.target }}"
-      action: "${{ matrix.action }}"
-    secrets:
-      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+      # This job generates a matrix of environments (and possibly components) by calling your reusable strategy workflow.
+      uses: ./.github/workflows/reusable_terraform_strategy.yml
+      if: inputs.action != 'destroy'
+      with:
+        # e.g. "data-platform-apps-and-tools.json" must exist in the Modernisation Platform repo
+        # so the strategy can load environment info from it.
+        application: "${{ github.workflow }}"  # Typically: "data-platform-apps-and-tools"
 
-  destroy-development:
-    if: inputs.action == 'destroy'
-    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
-    with:
-      application: "${{ github.workflow }}"
-      environment: "development"
-      action: "plan_apply"
-      plan_apply_tfargs: "-destroy"
-    secrets:
-      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+    terraform:
+      needs: strategy
+      if: inputs.action != 'destroy'
+      strategy:
+        fail-fast: false
+        matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+      # Calls the plan/apply reusable workflow with each item in the matrix
+      uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+      with:
+        # Pass along the "application" and "environment" from the matrix
+        application: "${{ github.workflow }}"
+        environment: "${{ matrix.target }}"
+        action: "${{ matrix.action }}"
+        component: "${{ matrix.component }}"      # If your strategy workflow also outputs "matrix.component"
+      secrets:
+        modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+        pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+
+    destroy-development:
+      if: inputs.action == 'destroy'
+      uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+      with:
+        application: "${{ github.workflow }}"
+        environment: "development"
+        action: "plan_apply"
+        plan_apply_tfargs: "-destroy"
+        # If you need component logic on destroy, pass it here as well, e.g. component: ...
+      secrets:
+        modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+        pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
