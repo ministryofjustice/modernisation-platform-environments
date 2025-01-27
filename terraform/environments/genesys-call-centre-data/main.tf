@@ -32,7 +32,8 @@ resource "aws_s3_bucket_policy" "default" {
         },
         Action    = [
           "s3:PutObject",
-          "s3:PutObjectAcl"
+          "s3:PutObjectAcl",
+          "s3:ListBucket"
         ],
         Resource  = "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
       }
@@ -55,10 +56,3 @@ resource "aws_guardduty_publishing_destination" "default" {
     aws_s3_bucket_policy.default
   ]
 }
-
-# # AWS KMS Key (Call Centre Staging)
-# resource "aws_kms_key" "default" {
-#   description = ""
-#   key_usage   = ""
-#   policy      = ""
-# }
