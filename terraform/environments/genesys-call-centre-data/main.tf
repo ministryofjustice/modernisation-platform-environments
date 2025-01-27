@@ -1,38 +1,32 @@
 # AWS S3 Bucket (Call Centre Staging)
 resource "aws_s3_bucket" "default" {
   bucket = var.call_centre_staging_aws_s3_bucket
-  tags = {
-    environment = var.aws_s3_bucket_tags_environment
-  }
+  tags   = var.tags
 }
 
 # AWS S3 Bucket Policy (Call Centre Staging)
 resource "aws_s3_bucket_policy" "default" {
   bucket = var.call_centre_staging_aws_s3_bucket
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = var.json_encode_decode_version,
     Statement = [
       {
-        Sid    = "AllowAccountFullAccess",
-        Effect = "Allow",
+        Sid    = var.moj_aws_s3_bucket_policy_statement_sid,
+        Effect = var.moj_aws_s3_bucket_policy_statement_effect,
         Principal = {
-          AWS = "arn:aws:iam::211125476974:root"
+          Service : var.moj_aws_s3_bucket_policy_statement_principal_service
         },
-        Action   = "s3:*",
+        Action   = var.moj_aws_s3_bucket_policy_statement_action,
         Resource = "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
       },
       {
-        Sid    = "AllowThirdPartyWriteOnly",
-        Effect = "Allow",
+        Sid    = var.bt_genesys_aws_s3_bucket_policy_statement_sid,
+        Effect = var.bt_genesys_aws_s3_bucket_policy_statement_effect,
         Principal = {
-          AWS = var.bt_genesys_aws_third_party_account_id
+          AWS = var.bt_genesys_aws_s3_bucket_policy_statement_principal_aws
         },
-        Action = [
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:ListBucket"
-        ],
-        Resource = ["arn:aws:s3:::${aws_s3_bucket.default.id}/*"]
+        Action   = var.bt_genesys_aws_s3_bucket_policy_statement_action,
+        Resource = var.bt_genesys_aws_s3_bucket_policy_statement_resource
       }
     ]
   })
@@ -56,19 +50,19 @@ resource "aws_guardduty_publishing_destination" "default" {
 
 # AWS KMS Key (Call Centre Staging)
 resource "aws_kms_key" "s3" {
-  description = "KMS key for GuardDuty publishing"
-  key_usage   = "ENCRYPT_DECRYPT"
+  description = var.aws_kms_key_s3_description
+  key_usage   = var.aws_kms_key_s3_key_usage
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = var.json_encode_decode_version,
     Statement = [
       {
-        Sid    = "AllowGuardDutyAccess",
-        Effect = "Allow",
+        Sid    = var.aws_kms_key_s3_policy_statement_sid,
+        Effect = var.aws_kms_key_s3_policy_statement_effect,
         Principal = {
-          Service = "guardduty.amazonaws.com"
+          Service = var.aws_kms_key_s3_policy_statement_principal_service
         },
-        Action   = "kms:*",
-        Resource = "*"
+        Action   = var.aws_kms_key_s3_policy_statement_action,
+        Resource = var.aws_kms_key_s3_policy_statement_resource
       }
     ]
   })
