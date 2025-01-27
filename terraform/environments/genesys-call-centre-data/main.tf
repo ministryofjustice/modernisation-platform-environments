@@ -1,7 +1,6 @@
 # AWS S3 Bucket (Call Centre Staging)
 resource "aws_s3_bucket" "default" {
   bucket = var.call_centre_staging_aws_s3_bucket
-  tags   = var.tags
 }
 
 # AWS S3 Bucket Policy (Call Centre Staging)

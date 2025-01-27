@@ -4,11 +4,6 @@ variable "call_centre_staging_aws_s3_bucket" {
   default     = "call-centre-staging"
 }
 
-variable "tags" {
-  type        = map(any)
-  description = "Tags to apply to resources, where applicable"
-}
-
 variable "json_encode_decode_version" {
   type        = string
   description = ""
