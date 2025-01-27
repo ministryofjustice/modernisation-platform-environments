@@ -9,7 +9,7 @@ resource "aws_s3_bucket" "default" {
 # AWS S3 Bucket Policy (Call Centre Staging)
 resource "aws_s3_bucket_policy" "default" {
   bucket = var.call_centre_staging_aws_s3_bucket
-  policy = jsondecode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
