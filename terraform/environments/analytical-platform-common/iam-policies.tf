@@ -101,6 +101,7 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
     sid    = "AllowS3Write"
     effect = "Allow"
     actions = [
+      "s3:DeleteObject",
       "s3:GetObject",
       "s3:PutObject"
     ]
