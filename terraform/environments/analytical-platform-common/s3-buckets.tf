@@ -10,7 +10,7 @@ module "terraform_bucket" {
   force_destroy = true
 
   versioning = {
-    status = "Disabled"
+    status = "Enabled"
   }
 
   server_side_encryption_configuration = {
