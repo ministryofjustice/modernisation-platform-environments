@@ -3,7 +3,7 @@ module "analytical_platform_jml_report_ecr_repository" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/ecr/aws"
-  version = "2.3.0"
+  version = "2.3.1"
 
   repository_name            = "analytical-platform-jml-report"
   repository_encryption_type = "KMS"

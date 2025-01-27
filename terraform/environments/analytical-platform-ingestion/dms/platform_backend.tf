@@ -9,6 +9,6 @@ terraform {
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
     use_lockfile         = true
-    workspace_key_prefix = "environments/members/analytical-platform-ingestion" # This will store the object as environments/members/analytical-platform-ingestion/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/analytical-platform-ingestion/dms" # This will store the object as environments/members/analytical-platform-ingestion/${workspace}/terraform.tfstate
   }
 }
