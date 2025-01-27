@@ -4,11 +4,14 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  admin_roles       = local.is-development ? "sandbox" : "data-eng"
-  suffix            = local.is-production ? "" : "-test"
-  prod_dbs_to_grant = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"] : []
-  dev_dbs_to_grant  = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
-  dbs_to_grant      = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant]))
+  dbt_suffix             = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
+  admin_roles            = local.is-development ? "sandbox" : "data-eng"
+  suffix                 = local.is-production ? "" : "-test"
+  live_feed_dbs          = ["serco_fms", "allied_mdss", "staged_fms", "preprocessed_fms"]
+  prod_dbs_to_grant      = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"] : []
+  dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
+  live_feed_dbs_to_grant = [for db in local.live_feed_dbs : "${db}${local.dbt_suffix}"]
+  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.live_feed_dbs_to_grant]))
 }
 
 # Source Analytics DBT Secrets
@@ -436,7 +439,6 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 }
 
 module "share_dbs_with_roles" {
-  count                   = local.is-production ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
