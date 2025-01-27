@@ -31,3 +31,33 @@ module "airflow_kube_config_object" {
 
   tags = local.tags
 }
+
+module "airflow_local_settings_object" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
+  version = "4.4.0"
+
+  bucket        = module.mwaa_bucket.s3_bucket_id
+  key           = "requirements.txt"
+  file_source   = "src/airflow/local-settings/${local.environment}/airflow_local_settings.py"
+  force_destroy = true
+
+  tags = local.tags
+}
+
+module "airflow_plugins_object" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws//modules/object"
+  version = "4.4.0"
+
+  bucket        = module.mwaa_bucket.s3_bucket_id
+  key           = "plugins.zip"
+  file_source   = "plugins.zip"
+  force_destroy = true
+
+  tags = local.tags
+}

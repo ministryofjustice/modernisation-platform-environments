@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
-# This scripts exists because the Terraform Kubernetes provider does not pass assumed credentials from the default AWS provider
-
 AWS_ACCOUNT_ID=${1}
-EKS_CLUSTER_NAME=${2}
+MWAA_ENVIRONMENT_NAME=${2}
 AWS_ROLE=${3:-MemberInfrastructureAccess}
 
 assumeRole=$(aws sts assume-role \
@@ -18,4 +16,4 @@ export AWS_SECRET_ACCESS_KEY
 AWS_SESSION_TOKEN=$(echo ${assumeRole} | jq -r '.Credentials.SessionToken')
 export AWS_SESSION_TOKEN
 
-aws eks get-token --cluster-name "${EKS_CLUSTER_NAME}"
+aws mwaa update-environment --name "${MWAA_ENVIRONMENT_NAME}"
