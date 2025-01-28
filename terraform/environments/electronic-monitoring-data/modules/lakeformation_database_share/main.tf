@@ -64,4 +64,10 @@ resource "aws_glue_catalog_database" "cadt_databases" {
   for_each = var.dbs_to_grant
 
   name = each.value
+
+  lifecycle {
+    prevent_destroy = true
+    # Ignore all changes to the database after creation
+    ignore_changes = all
+  }
 }
