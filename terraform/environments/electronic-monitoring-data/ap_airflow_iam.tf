@@ -238,7 +238,7 @@ module "load_unstructured_atrium_database" {
 
 
 module "load_fms" {
-  count  = local.is-test || local.is-production ? 1 : 0
+  count  = local.is-development ? 0 : 1
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
@@ -257,7 +257,7 @@ module "load_fms" {
 
 
 module "load_mdss" {
-  count  = local.is-test || local.is-production ? 1 : 0
+  count  = local.is-development ? 0 : 1
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn

@@ -40,6 +40,7 @@ resource "aws_iam_policy" "datahub_read_cadet_bucket" {
 # Allow Github actions to assume a role via OIDC.
 # So that scheduled jobs in the data-catalogue repo can access the CaDeT bucket.
 data "aws_iam_policy_document" "datahub_ingestion_github_actions" {
+  # checkov:skip=CKV_AWS_358: Bug in the linter
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRoleWithWebIdentity"]
