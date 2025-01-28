@@ -154,6 +154,7 @@ module "eks" {
   }
 
   access_entries = {
+    # Analytical Platform Engineering access to cluster
     sso-administrator = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.eks_sso_access_role.names)}"
       policy_associations = {
@@ -165,13 +166,15 @@ module "eks" {
         }
       }
     }
+    # MWAA access to MWAA role in MWAA namespace
     apc-mwaa = {
       principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/mwaa-execution"
       username          = "apc-mwaa"
       kubernetes_groups = ["mwaa"]
     }
-    gha-moj-ap-airflow = {
-      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-ministryofjustice-analytical-platform-airflow"
+    # Analytical Platform Common access to MWAA ServiceAccount management role in MWAA namespace
+    gha-mojap-common = {
+      principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"
       username          = "github-actions-moj-ap-airflow"
       kubernetes_groups = ["mwaa-serviceaccount-management"]
     }

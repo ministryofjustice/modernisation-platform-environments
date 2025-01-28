@@ -1,6 +1,12 @@
 locals {
+  env_map = {
+    "production"    = "prod"
+    "preproduction" = "preprod"
+    "test"          = "test"
+    "development"   = "dev"
+  }
   camel-sid      = join("", [for word in split("-", var.name) : title(word)])
-  suffix         = var.environment == "test" ? "_test" : ""
+  suffix         = var.environment != "production" ? "_${local.env_map[var.environment]}" : ""
   snake-database = "${replace(var.database_name, "-", "_")}${local.suffix}"
 }
 

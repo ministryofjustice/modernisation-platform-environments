@@ -80,7 +80,7 @@ module "ecr_access_iam_policy" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "analytical_platform_github_actions" {
+data "aws_iam_policy_document" "analytical_platform_terraform" {
   statement {
     sid    = "AllowKMS"
     effect = "Allow"
@@ -106,6 +106,54 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
       "s3:PutObject"
     ]
     resources = ["${module.terraform_bucket.s3_bucket_arn}/*"]
+  }
+}
+
+module "analytical_platform_terraform_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.52.2"
+
+  name_prefix = "analytical-platform-terraform"
+
+  policy = data.aws_iam_policy_document.analytical_platform_terraform.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "analytical_platform_github_actions" {
+  statement {
+    sid     = "AllowAssumeRole"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    resources = [
+      module.analytical_platform_terraform_iam_role.iam_role_arn,
+      "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/analytical-platform-infrastructure-access"
+    ]
+  }
+  statement {
+    sid       = "AllowKMS"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [module.secrets_manager_common_kms.key_arn]
+  }
+  statement {
+    sid       = "AllowSecretsManager"
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [module.analytical_platform_compute_cluster_data_secret.secret_arn]
+  }
+  statement {
+    sid     = "AllowEKS"
+    effect  = "Allow"
+    actions = ["eks:DescribeCluster"]
+    resources = [
+      "arn:aws:eks:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-development"]}:cluster/*",
+      "arn:aws:eks:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-test"]}:cluster/*",
+      "arn:aws:eks:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:cluster/*"
+    ]
   }
 }
 
