@@ -12,6 +12,8 @@ resource "aws_mwaa_environment" "main" {
   dag_s3_path                    = "dags/"
   requirements_s3_path           = "requirements.txt"
   requirements_s3_object_version = module.airflow_requirements_object.s3_object_version_id
+  plugins_s3_path                = "plugins.zip"
+  plugins_s3_object_version      = module.airflow_plugins_object.s3_object_version_id
 
   max_workers = 2
   min_workers = 1
