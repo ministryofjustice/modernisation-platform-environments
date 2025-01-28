@@ -21,6 +21,10 @@ module "dynamo_table_dpd" {
     {
       name = "category"
       type = "S"
+    },
+    {
+      name = "scheduled"
+      type = "S"
     }
   ]
 
@@ -28,6 +32,11 @@ module "dynamo_table_dpd" {
     {
       name            = "category-index"
       hash_key        = "category"
+      projection_type = "ALL"
+    },
+    {
+      name            = "scheduled-index"
+      hash_key        = "scheduled"
       projection_type = "ALL"
     }
   ]
