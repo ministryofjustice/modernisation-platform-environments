@@ -133,6 +133,13 @@ locals {
           protocol    = -1
           self        = true
         }
+        rpc_rds = {
+          description = "135: Allow RPC ingress from RDS"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
         rdp_tcp_web = {
           description = "3389: Allow RDP TCP ingress"
           from_port   = 3389
@@ -148,11 +155,17 @@ locals {
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
         winrm_rds = {
-          description = "5985: Allow WinRM TCP ingress (powershell remoting) for RDS"
+          description = "5985/6: Allow WinRM TCP ingress (powershell remoting) for RDS"
           from_port   = 5985
           to_port     = 5986
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        dynamic_rpc_rds = {
+          description = "49152-65535: Allow Dynamic RPC TCP ingress from RDS"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "TCP"
         }
       }
       egress = {
