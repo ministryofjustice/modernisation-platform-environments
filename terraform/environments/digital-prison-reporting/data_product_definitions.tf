@@ -2,6 +2,7 @@ locals {
   table_name = "${local.project}-data-product-definition"
 }
 
+
 module "dynamo_table_dpd" {
   source              = "./modules/dynamo_tables"
   create_table        = true
