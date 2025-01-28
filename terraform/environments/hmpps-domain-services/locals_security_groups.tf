@@ -147,7 +147,7 @@ locals {
           protocol    = "UDP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
-        rpc_tcp_rds = {
+        rpc_tcp_cb = {
           description = "445: Allow RPC TCP ingress from Connection Broker"
           from_port   = 445
           to_port     = 445
