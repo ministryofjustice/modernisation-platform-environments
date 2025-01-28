@@ -9,5 +9,5 @@ terraform {
       source  = "hashicorp/http"
     }
   }
-  required_version = "~> 1.5"
+  required_version = "~> 1.10"
 }
