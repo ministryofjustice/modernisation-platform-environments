@@ -10,6 +10,112 @@ variable "json_encode_decode_version" {
   default     = "2012-10-17"
 }
 
+variable "notification_sns_arn" {
+  type        = string
+  description = "The arn for the bucket notification SNS topic"
+  default     = ""
+}
+
+variable "notification_enabled" {
+  type        = bool
+  description = "Boolean indicating if a notification resource is required for the bucket"
+  default     = false
+}
+
+variable "notification_events" {
+  type        = list(string)
+  description = "The event for which we send notifications"
+  default     = [""]
+}
+
+variable "sse_algorithm" {
+  type        = string
+  description = "The server-side encryption algorithm to use"
+  default     = "aws:kms"
+}
+
+variable "custom_kms_key" {
+  type        = string
+  description = "KMS key ARN to use"
+  default     = ""
+}
+
+variable "versioning_enabled" {
+  type        = bool
+  description = "Activate S3 bucket versioning"
+  default     = true
+}
+
+variable "lifecycle_rule" {
+  description = "List of maps containing configuration of object lifecycle management."
+  type        = any
+  default = [{
+    id      = "main"
+    enabled = "Enabled"
+    prefix  = ""
+    tags = {
+      rule      = "log"
+      autoclean = "true"
+    }
+    transition = [
+      {
+        days          = 90
+        storage_class = "STANDARD_IA"
+        }, {
+        days          = 365
+        storage_class = "GLACIER"
+      }
+    ]
+    expiration = {
+      days = 730
+    }
+    noncurrent_version_transition = [
+      {
+        days          = 90
+        storage_class = "STANDARD_IA"
+        }, {
+        days          = 365
+        storage_class = "GLACIER"
+      }
+    ]
+    noncurrent_version_expiration = {
+      days = 730
+    }
+  }]
+}
+
+variable "log_buckets" {
+  type        = map(any)
+  description = "Map containing log bucket details and its associated bucket policy."
+  default     = null
+  nullable    = true
+}
+
+variable "log_bucket_name" {
+  type        = string
+  description = ""
+  default     = ""
+  nullable    = true
+}
+
+variable "log_partition_date_source" {
+  type        = string
+  default     = "None"
+  description = "Partition logs by date. Allowed values are 'EventTime', 'DeliveryTime', or 'None'."
+
+  validation {
+    condition     = contains(["EventTime", "DeliveryTime", "None"], var.log_partition_date_source)
+    error_message = "log_partition_date_source must be either 'EventTime', 'DeliveryTime', or 'None'."
+  }
+}
+
+variable "log_prefix" {
+  type        = string
+  description = "Prefix for all log object keys."
+  default     = null
+  nullable    = true
+}
+
 variable "aws_guardduty_detector_enable" {
   type        = bool
   description = ""
@@ -55,7 +161,7 @@ variable "bt_genesys_aws_s3_bucket_policy_statement_effect" {
 variable "bt_genesys_aws_s3_bucket_policy_statement_principal_aws" {
   type        = string
   description = "The AWS account ID of the BT Genesys third-party organisation."
-  default     = "arn:aws:iam::803963757240:root"
+  default     = "arn:aws:iam::684969100054:root"
 }
 
 variable "bt_genesys_aws_s3_bucket_policy_statement_action" {
@@ -63,7 +169,6 @@ variable "bt_genesys_aws_s3_bucket_policy_statement_action" {
   description = ""
   default = [
     "s3:PutObject",
-    "s3:PutObjectAcl",
     "s3:ListBucket"
   ]
 }
