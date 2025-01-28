@@ -18,4 +18,4 @@ export AWS_SECRET_ACCESS_KEY
 AWS_SESSION_TOKEN=$(echo ${assumeRole} | jq -r '.Credentials.SessionToken')
 export AWS_SESSION_TOKEN
 
-aws eks get-token --cluster-name ${EKS_CLUSTER_NAME}
+aws eks get-token --cluster-name "${EKS_CLUSTER_NAME}"
