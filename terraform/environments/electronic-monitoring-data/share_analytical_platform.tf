@@ -5,7 +5,7 @@ locals {
     oidc_cluster_identifier = "placeholder2"
   }
   dbt_suffix             = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
-  admin_roles            = local.is-development ? "sandbox" : "data-eng"
+  admin_roles            = local.is-development ? "sandbox_" : "data-eng-"
   suffix                 = local.is-production ? "" : "-test"
   live_feed_dbs          = ["serco_fms", "allied_mdss", "staged_fms", "preprocessed_fms"]
   prod_dbs_to_grant      = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"] : []
@@ -34,7 +34,7 @@ data "aws_iam_session_context" "current" {
 }
 
 data "aws_iam_roles" "data_engineering_roles" {
-  name_regex = "AWSReservedSSO_modernisation-platform-${local.admin_roles}-*"
+  name_regex = "AWSReservedSSO_modernisation-platform-${local.admin_roles}s*"
 }
 
 ## DBT Analytics EKS Cluster Identifier
