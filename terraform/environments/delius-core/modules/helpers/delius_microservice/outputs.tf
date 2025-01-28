@@ -32,11 +32,11 @@ output "rds_port" {
 }
 
 output "nlb_arn" {
-  value = aws_lb.delius_microservices.arn
+  value = try(aws_lb.delius_microservices[0].arn,null)
 }
 
 output "nlb_dns_name" {
-  value = aws_lb.delius_microservices.dns_name
+  value = try(aws_lb.delius_microservices[0].dns_name,null)
 }
 
 output "nlb_target_group_arn_map" {
@@ -46,5 +46,5 @@ output "nlb_target_group_arn_map" {
 }
 
 output "nlb_service_r53_record" {
-  value = aws_route53_record.services_nlb_r53_record.fqdn
+  value = try(aws_route53_record.services_nlb_r53_record[0].fqdn,null)
 }
