@@ -6,5 +6,5 @@ terraform {
       configuration_aliases = [aws.us-east-1, aws.bucket-replication]
     }
   }
-  required_version = "~> 1.5"
+  required_version = "~> 1.10"
 }

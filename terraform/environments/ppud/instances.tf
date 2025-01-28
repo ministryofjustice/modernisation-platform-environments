@@ -649,7 +649,7 @@ resource "aws_instance" "s618358rgvw027" {
   instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Secondary-DOC-Server[0].id]
+  vpc_security_group_ids = [aws_security_group.Live-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_c.id
 
   metadata_options {
