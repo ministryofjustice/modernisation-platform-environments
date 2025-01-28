@@ -233,7 +233,7 @@ locals {
             "Ec2SecretPolicy",
           ])
         })
-        instance = merge(local.ec2_instances.bip_web.instance, {
+        instance = merge(local.ec2_instances.bip_cms.instance, {
           instance_type = "m6i.xlarge"
         })
         user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
