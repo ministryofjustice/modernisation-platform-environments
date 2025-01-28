@@ -21,16 +21,12 @@ module "dynamo_table_dpd" {
     {
       name = "category"
       type = "S"
-    },
-    {
-      name = "scheduled"
-      type = "S"
     }
   ]
 
   global_secondary_indexes = [
     {
-      name            = "scheduled-index"
+      name            = "scheduled-index2"
       hash_key        = "scheduled"
       projection_type = "ALL"
     },
