@@ -66,8 +66,12 @@ resource "aws_glue_catalog_database" "cadt_databases" {
   name = each.value
 
   lifecycle {
-    prevent_destroy = true
-    # Ignore all changes to the database after creation
-    ignore_changes = all
+    # Only ignore changes to the properties, but allow the resource itself to be removed
+    ignore_changes = [
+      description,
+      location_uri,
+      parameters,
+      target_database
+    ]
   }
 }
