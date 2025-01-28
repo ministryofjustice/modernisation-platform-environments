@@ -166,6 +166,7 @@ locals {
           from_port   = 49152
           to_port     = 65535
           protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
       }
       egress = {
