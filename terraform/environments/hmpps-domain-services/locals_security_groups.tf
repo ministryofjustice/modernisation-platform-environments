@@ -168,11 +168,18 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
-        dynamic_rpc_rds = {
+        dynamic_rpc_tcp_rds = {
           description = "49152-65535: Allow Dynamic RPC TCP ingress from RDS"
           from_port   = 49152
           to_port     = 65535
           protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        dynamic_rpc_udp_rds = {
+          description = "49152-65535: Allow Dyanmic RPC UDP ingress from RDS"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "UDP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
       }
