@@ -117,6 +117,44 @@ resource "aws_s3_bucket_logging" "default" {
   }
 }
 
+# Block public access policies for this bucket
+resource "aws_s3_bucket_public_access_block" "default" {
+  bucket                  = aws_s3_bucket.default.bucket
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+# AWS S3 Bucket cross-region replication
+resource "aws_s3_bucket_replication_configuration" "default" {
+  for_each = var.replication_enabled ? toset(["run"]) : []
+  bucket   = aws_s3_bucket.default.id
+  role     = aws_iam_role.replication_role[0].arn
+  rule {
+    id       = "SourceToDestinationReplication"
+    status   = var.replication_enabled ? "Enabled" : "Disabled"
+    priority = 0
+
+    destination {
+      bucket        = var.replication_enabled ? aws_s3_bucket.replication[0].arn : aws_s3_bucket.replication[0].arn
+      storage_class = "STANDARD"
+      encryption_configuration {
+        replica_kms_key_id = (var.custom_replication_kms_key != "") ? var.custom_replication_kms_key : "arn:aws:kms:${var.replication_region}:${data.aws_caller_identity.current.account_id}:alias/aws/s3"
+      }
+    }
+
+    source_selection_criteria {
+      sse_kms_encrypted_objects {
+        status = (var.replication_enabled != false) ? "Enabled" : "Disabled"
+      }
+    }
+  }
+  depends_on = [
+    aws_s3_bucket_versioning.default
+  ]
+}
+
 # AWS S3 Bucket Policy (Call Centre Staging)
 resource "aws_s3_bucket_policy" "default" {
   bucket = var.call_centre_staging_aws_s3_bucket

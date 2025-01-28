@@ -109,6 +109,24 @@ variable "log_partition_date_source" {
   }
 }
 
+variable "replication_enabled" {
+  type        = bool
+  description = "Activate S3 bucket replication"
+  default     = false
+}
+
+variable "replication_region" {
+  type        = string
+  description = "Region to create S3 replication bucket"
+  default     = "eu-west-2"
+}
+
+variable "custom_replication_kms_key" {
+  type        = string
+  description = "KMS key ARN to use for replication to eu-west-2"
+  default     = ""
+}
+
 variable "log_prefix" {
   type        = string
   description = "Prefix for all log object keys."
