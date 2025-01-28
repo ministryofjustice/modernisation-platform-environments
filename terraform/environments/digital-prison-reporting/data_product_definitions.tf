@@ -26,9 +26,10 @@ module "dynamo_table_dpd" {
 
   global_secondary_indexes = [
     {
-      name            = "scheduled-index2"
+      name            = "scheduled-index"
       hash_key        = "scheduled"
       projection_type = "ALL"
+      range_key       = "data-product-id"
     },
     {
       name            = "category-index"
