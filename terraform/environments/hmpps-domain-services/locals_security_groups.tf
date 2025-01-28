@@ -133,11 +133,18 @@ locals {
           protocol    = -1
           self        = true
         }
-        rpc_rds = {
-          description = "135: Allow RPC ingress from RDS"
+        rpc_tcp_rds = {
+          description = "135: Allow RPC TCP ingress from RDS"
           from_port   = 135
           to_port     = 135
           protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        rds_udp_rds = {
+          description = "135: Allow RPC UDP ingress from RDS"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "UDP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
         rdp_tcp_web = {
