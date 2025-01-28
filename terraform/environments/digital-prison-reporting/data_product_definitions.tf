@@ -21,6 +21,10 @@ module "dynamo_table_dpd" {
     {
       name = "category"
       type = "S"
+    },
+    {
+      name = "scheduled"
+      type = "S"
     }
   ]
 
