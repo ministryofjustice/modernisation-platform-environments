@@ -143,7 +143,7 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
     sid       = "AllowSecretsManager"
     effect    = "Allow"
     actions   = ["secretsmanager:GetSecretValue"]
-    resources = [module.secrets_manager_common.secret_arn]
+    resources = [module.analytical_platform_compute_cluster_data_secret.secret_arn]
   }
   statement {
     sid     = "AllowEKS"
