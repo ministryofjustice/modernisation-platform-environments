@@ -68,50 +68,6 @@ locals {
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
   glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
   glue_log_retention_in_days       = local.application_data.accounts[local.environment].glue_log_retention_in_days
-  # Reporting Hub Job
-  reporting_hub_driver_mem   = local.application_data.accounts[local.environment].reporting_hub_spark_driver_mem
-  reporting_hub_executor_mem = local.application_data.accounts[local.environment].reporting_hub_spark_executor_mem
-  reporting_hub_worker_type  = local.application_data.accounts[local.environment].reporting_hub_worker_type
-  reporting_hub_num_workers  = local.application_data.accounts[local.environment].reporting_hub_num_workers
-  reporting_hub_log_level    = local.application_data.accounts[local.environment].reporting_hub_spark_log_level
-
-  reporting_hub_batch_duration_seconds      = local.application_data.accounts[local.environment].reporting_hub_batch_duration_seconds
-  reporting_hub_add_idle_time_between_reads = local.application_data.accounts[local.environment].reporting_hub_add_idle_time_between_reads
-
-  reporting_hub_idle_time_between_reads_in_millis = local.application_data.accounts[local.environment].reporting_hub_idle_time_between_reads_in_millis
-
-  reporting_hub_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_retry_max_attempts
-  reporting_hub_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_min_wait_millis
-  reporting_hub_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_max_wait_millis
-
-  reporting_hub_domain_refresh_enabled = local.application_data.accounts[local.environment].reporting_hub_domain_refresh_enabled
-
-  # Reporting Hub Batch Job
-  reporting_hub_batch_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_batch_job_worker_type
-  reporting_hub_batch_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_batch_job_num_workers
-  reporting_hub_batch_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_batch_job_log_level
-
-  reporting_hub_batch_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_batch_job_schema_cache_max_size
-
-  reporting_hub_batch_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_attempts
-  reporting_hub_batch_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_min_wait_millis
-  reporting_hub_batch_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_wait_millis
-
-  # Reporting Hub CDC Job
-  reporting_hub_cdc_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_cdc_job_worker_type
-  reporting_hub_cdc_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_cdc_job_num_workers
-  reporting_hub_cdc_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_cdc_job_log_level
-
-  reporting_hub_cdc_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_cdc_job_schema_cache_max_size
-
-  reporting_hub_cdc_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_attempts
-  reporting_hub_cdc_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_min_wait_millis
-  reporting_hub_cdc_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_wait_millis
-
-  # Refresh Job
-  refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
-  refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers
-  refresh_job_log_level   = local.application_data.accounts[local.environment].refresh_job_log_level
 
   # Common Maintenance Job settings
   maintenance_job_retry_max_attempts    = local.application_data.accounts[local.environment].maintenance_job_retry_max_attempts
