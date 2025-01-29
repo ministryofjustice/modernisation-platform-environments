@@ -136,19 +136,19 @@ locals {
       })
 
       # test jumpserver - do not use
-      # t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
-      #   config = merge(local.ec2_instances.jumpserver.config, {
-      #     availability_zone = "eu-west-2b"
-      #     user_data_raw = base64encode(templatefile(
-      #       "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-      #       branch = "TM/TM-916/add-rds-role-to-jumpservers"
-      #       }
-      #     ))
-      #   })
-      #   tags = merge(local.ec2_instances.jumpserver.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      # })
+      t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "TM/TM-916/add-rds-role-to-jumpservers"
+            }
+          ))
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
     }
 
     fsx_windows = {
