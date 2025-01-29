@@ -79,21 +79,10 @@ locals {
   compact_job_num_workers = local.application_data.accounts[local.environment].compact_job_num_workers
   compact_job_log_level   = local.application_data.accounts[local.environment].compact_job_log_level
 
-  # Compact Domain Job
-  compact_domain_job_worker_type = local.application_data.accounts[local.environment].compact_domain_job_worker_type
-  compact_domain_job_num_workers = local.application_data.accounts[local.environment].compact_domain_job_num_workers
-  compact_domain_job_log_level   = local.application_data.accounts[local.environment].compact_domain_job_log_level
-  compact_domain_job_schedule    = local.application_data.accounts[local.environment].compact_domain_job_schedule
-
   # Retention (vacuum) Job
   retention_job_worker_type = local.application_data.accounts[local.environment].retention_job_worker_type
   retention_job_num_workers = local.application_data.accounts[local.environment].retention_job_num_workers
   retention_job_log_level   = local.application_data.accounts[local.environment].retention_job_log_level
-
-  # Retention (vacuum) Domain Job
-  retention_domain_job_worker_type = local.application_data.accounts[local.environment].retention_domain_job_worker_type
-  retention_domain_job_num_workers = local.application_data.accounts[local.environment].retention_domain_job_num_workers
-  retention_domain_job_log_level   = local.application_data.accounts[local.environment].retention_domain_job_log_level
 
   # Hive Table Creation Job
   hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
