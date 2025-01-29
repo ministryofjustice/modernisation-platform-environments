@@ -44,5 +44,5 @@ module "pagerduty_core_alerts" {
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.lambda_failure.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys["electronic_monitoring_data"]
+  pagerduty_integration_key = local.pagerduty_integration_keys["Electronic Monitoring Data Alarms"]
 }
