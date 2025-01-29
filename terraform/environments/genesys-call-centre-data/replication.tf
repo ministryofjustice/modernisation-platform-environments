@@ -2,7 +2,7 @@ locals {
   replication_bucket = "arn:aws:s3:::${var.replication_bucket}/*"
 }
 
-# data "aws_caller_identity" "current" {}
+data "aws_caller_identity" "current" {}
 
 resource "aws_s3_bucket_notification" "bucket_notification_replication" {
   count    = var.replication_enabled && var.notification_enabled ? 1 : 0
