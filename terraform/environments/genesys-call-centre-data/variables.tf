@@ -164,6 +164,52 @@ variable "moj_aws_s3_bucket_policy_statement_action" {
   default     = "s3:*"
 }
 
+variable "moj_aws_iam_policy_document_statement_effect" {
+  type        = string
+  description = ""
+  default     = "Allow"
+}
+
+variable "moj_aws_iam_policy_document_statement_actions" {
+  type        = list
+  description = ""
+  default     = [
+    "sts:AssumeRole"
+  ]
+}
+
+variable "moj_aws_iam_policy_document_principals_type" {
+  type        = string
+  description = ""
+  default     = "Service"
+}
+
+variable "moj_aws_iam_policy_document_principals_identifiers" {
+  type        = list
+  description = ""
+  default     = [
+    "s3.amazonaws.com"
+  ]
+}
+
+variable "moj_aws_s3_bucket_replication_configuration_rule_id" {
+  type        = string
+  description = ""
+  default     = "STANDARD"
+}
+
+variable "moj_aws_s3_bucket_replication_configuration_rule_destination_storage_class" {
+  type        = string
+  description = ""
+  default     = "STANDARD"
+}
+
+variable "suffix_name" {
+  type        = string
+  default     = ""
+  description = "Suffix for role and policy names"
+}
+
 variable "bt_genesys_aws_s3_bucket_policy_statement_sid" {
   type        = string
   description = ""

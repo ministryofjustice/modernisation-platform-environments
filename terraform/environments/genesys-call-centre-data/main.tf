@@ -15,8 +15,6 @@ resource "aws_s3_bucket_notification" "default" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
-  #checkov:skip=CKV2_AWS_67: "Ensure AWS S3 bucket encrypted with Customer Managed Key (CMK) has regular rotation"
-
   bucket = aws_s3_bucket.default.id
   rule {
     apply_server_side_encryption_by_default {
@@ -135,19 +133,33 @@ resource "aws_iam_role" "replication_role" {
   tags               = var.tags
 }
 
+# S3 bucket replication: assume role policy
+data "aws_iam_policy_document" "s3-assume-role-policy" {
+  version = var.json_encode_decode_version
+  statement {
+    effect  = var.moj_aws_iam_policy_document_statement_effect
+    actions = var.moj_aws_iam_policy_document_statement_actions
+
+    principals {
+      type        = var.moj_aws_iam_policy_document_principals_type
+      identifiers = var.moj_aws_iam_policy_document_principals_identifiers
+    }
+  }
+}
+
 # AWS S3 Bucket cross-region replication
 resource "aws_s3_bucket_replication_configuration" "default" {
   for_each = var.replication_enabled ? toset(["run"]) : []
   bucket   = aws_s3_bucket.default.id
   role     = aws_iam_role.replication_role[0].arn
   rule {
-    id       = "SourceToDestinationReplication"
+    id       = var.moj_aws_s3_bucket_replication_configuration_rule_id
     status   = var.replication_enabled ? "Enabled" : "Disabled"
     priority = 0
 
     destination {
       bucket        = var.replication_enabled ? aws_s3_bucket.replication[0].arn : aws_s3_bucket.replication[0].arn
-      storage_class = "STANDARD"
+      storage_class = var.moj_aws_s3_bucket_replication_configuration_rule_destination_storage_class
       encryption_configuration {
         replica_kms_key_id = (var.custom_replication_kms_key != "") ? var.custom_replication_kms_key : "arn:aws:kms:${var.replication_region}:${data.aws_caller_identity.current.account_id}:alias/aws/s3"
       }
