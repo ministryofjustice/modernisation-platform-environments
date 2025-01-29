@@ -211,24 +211,3 @@ module "glue_retention_job" {
     "--dpr.datastorage.retry.maxWaitMillis" = local.maintenance_job_retry_max_wait_millis
   }
 }
-
-# Maintenance Job Schedules (triggers)
-resource "aws_glue_trigger" "retention_domain_job" {
-  name     = "${local.retention_domain_job_name}-trigger"
-  schedule = local.retention_domain_job_schedule
-  type     = "SCHEDULED"
-
-  actions {
-    job_name = module.glue_retention_domain_job.name
-  }
-}
-
-resource "aws_glue_trigger" "compact_domain_job" {
-  name     = "${local.compact_domain_job_name}-trigger"
-  schedule = local.compact_domain_job_schedule
-  type     = "SCHEDULED"
-
-  actions {
-    job_name = module.glue_compact_domain_job.name
-  }
-}
