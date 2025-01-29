@@ -126,6 +126,15 @@ resource "aws_s3_bucket_public_access_block" "default" {
   restrict_public_buckets = true
 }
 
+# S3 bucket replication: role
+resource "aws_iam_role" "replication_role" {
+  provider           = aws.bucket-replication
+  count              = var.replication_enabled ? 1 : 0
+  name               = "AWSS3BucketReplication${var.suffix_name}"
+  assume_role_policy = data.aws_iam_policy_document.s3-assume-role-policy.json
+  tags               = var.tags
+}
+
 # AWS S3 Bucket cross-region replication
 resource "aws_s3_bucket_replication_configuration" "default" {
   for_each = var.replication_enabled ? toset(["run"]) : []
