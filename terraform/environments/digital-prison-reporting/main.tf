@@ -391,66 +391,6 @@ module "activate_glue_trigger_job" {
   }
 }
 
-# Glue Job, Data Reconciliation Job
-module "glue_data_reconciliation_job" {
-  source                       = "./modules/domains/reconciliation-job"
-  create_job                   = local.create_job && local.create_glue_connection
-  env                          = local.env
-  job_name                     = "${local.project}-data-reconciliation-job-${local.env}"
-  short_name                   = "${local.project}-data-reconciliation-job"
-  create_sec_conf              = local.create_sec_conf
-  temp_dir                     = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-data-reconciliation-${local.env}/"
-  spark_event_logs             = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-data-reconciliation-${local.env}/"
-  script_file_version          = "digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  s3_kms_arn                   = local.s3_kms_arn
-  execution_class              = "STANDARD"
-  worker_type                  = "G.1X"
-  num_workers                  = 2
-  max_concurrent_runs          = 64
-  account_region               = local.account_region
-  account_id                   = local.account_id
-  log_group_retention_in_days  = local.glue_log_retention_in_days
-  connections = local.create_glue_connection ? concat([
-    aws_glue_connection.glue_operational_datastore_connection[0].name,
-    aws_glue_connection.glue_nomis_connection[0].name
-  ], values(aws_glue_connection.glue_dps_connection)[*].name) : []
-  additional_secret_arns = concat([
-    aws_secretsmanager_secret.operational_db_secret.arn,
-    aws_secretsmanager_secret.nomis.arn
-  ], values(aws_secretsmanager_secret.dps)[*].arn)
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name = "${local.project}-data-reconciliation-${local.env}"
-      Jira = "DPR2-1117"
-    }
-  )
-  glue_job_arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
-    "--extra-jars"                = local.glue_jobs_latest_jar_location
-    "--extra-files"               = local.shared_log4j_properties_path
-    "--class"                     = "uk.gov.justice.digital.job.DataReconciliationJob"
-    "--dpr.aws.region"            = local.account_region
-    "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id
-    "--dpr.log.level"             = local.glue_job_common_log_level
-    "--dpr.raw.s3.path"           = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.raw.archive.s3.path"   = "s3://${module.s3_raw_archive_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
-
-    # dpr.reconciliation.datasource properties can be modified to configure
-    # the job for either Nomis, a DPS database or some other data store
-    "--dpr.reconciliation.datasource.glue.connection.name"        = aws_glue_connection.glue_nomis_connection[0].name
-    "--dpr.reconciliation.datasource.source.schema.name"          = "OMS_OWNER"
-    "--dpr.reconciliation.datasource.should.uppercase.tablenames" = "true"
-    "--dpr.reconciliation.fail.job.if.checks.fail"                = "true"
-    "--dpr.reconciliation.report.results.to.cloudwatch"           = "false"
-  })
-}
-
 # kinesis Data Stream Ingestor
 module "kinesis_stream_ingestor" {
   source                    = "./modules/kinesis_stream"
