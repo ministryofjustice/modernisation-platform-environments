@@ -25,9 +25,9 @@ provider "datadog" {
 
 # Create a new Datadog - Amazon Web Services integration
 resource "datadog_integration_aws" "sandbox" {
-  account_id  = var.account_id
+  account_id  = var.aws_account_id
   role_name   = "Yjaf-Datadog-AWS-Integration-Role"
-  filter_tags = var.filter_tags
+  filter_tags = var.filter_tags #["application:youth-justice-app-framework"]
   account_specific_namespace_rules = {
     auto_scaling = false
     opsworks     = false
