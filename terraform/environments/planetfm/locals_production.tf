@@ -252,7 +252,7 @@ locals {
           description      = "CAFM Assessment Management"
           pre-migration    = "PFWW00037"
           update-ssm-agent = "patchgroup1"
-          backup-plan      = "daily-and-weekly-vss"
+          backup-plan      = "daily-and-weekly"
         })
       })
 
