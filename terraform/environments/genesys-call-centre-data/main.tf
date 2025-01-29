@@ -125,7 +125,7 @@ resource "aws_s3_bucket_public_access_block" "default" {
 }
 
 # S3 bucket replication: role
-resource "aws_iam_role" "replication_role" {
+resource "aws_iam_role" "replication" {
   provider           = aws.bucket-replication
   count              = var.replication_enabled ? 1 : 0
   name               = "AWSS3BucketReplication${var.suffix_name}"
@@ -151,7 +151,7 @@ data "aws_iam_policy_document" "s3-assume-role-policy" {
 resource "aws_s3_bucket_replication_configuration" "default" {
   for_each = var.replication_enabled ? toset(["run"]) : []
   bucket   = aws_s3_bucket.default.id
-  role     = aws_iam_role.replication_role[0].arn
+  role     = aws_iam_role.replication.arn
   rule {
     id       = var.moj_aws_s3_bucket_replication_configuration_rule_id
     status   = var.replication_enabled ? "Enabled" : "Disabled"

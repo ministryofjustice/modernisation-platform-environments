@@ -195,7 +195,7 @@ variable "moj_aws_iam_policy_document_principals_identifiers" {
 variable "moj_aws_s3_bucket_replication_configuration_rule_id" {
   type        = string
   description = ""
-  default     = "STANDARD"
+  default     = "SourceToDestinationReplication"
 }
 
 variable "moj_aws_s3_bucket_replication_configuration_rule_destination_storage_class" {
@@ -309,4 +309,22 @@ variable "call_centre_curated_aws_s3_bucket" {
   type        = string
   description = "AWS S3 call centre curated bucket name"
   default     = "call-centre-curated"
+}
+
+variable "ownership_controls" {
+  type        = string
+  description = "Bucket Ownership Controls - for use WITH acl var above options are 'BucketOwnerPreferred' or 'ObjectWriter'. To disable ACLs and use new AWS recommended controls set this to 'BucketOwnerEnforced' and which will disabled ACLs and ignore var.acl"
+  default     = "ObjectWriter"
+}
+
+variable "acl" {
+  type        = string
+  description = "Use canned ACL on the bucket instead of BucketOwnerEnforced ownership controls. var.ownership_controls must be set to corresponding value below."
+  default     = "private"
+}
+
+variable "replication_bucket" {
+  type        = string
+  description = "Name of bucket used for replication - if not specified then * will be used in the policy"
+  default     = ""
 }
