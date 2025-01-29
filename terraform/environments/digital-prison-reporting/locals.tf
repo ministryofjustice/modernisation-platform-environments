@@ -138,7 +138,6 @@ locals {
   retention_domain_job_worker_type = local.application_data.accounts[local.environment].retention_domain_job_worker_type
   retention_domain_job_num_workers = local.application_data.accounts[local.environment].retention_domain_job_num_workers
   retention_domain_job_log_level   = local.application_data.accounts[local.environment].retention_domain_job_log_level
-  retention_domain_job_schedule    = local.application_data.accounts[local.environment].retention_domain_job_schedule
 
   # Hive Table Creation Job
   hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
