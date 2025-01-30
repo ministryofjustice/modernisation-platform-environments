@@ -1,0 +1,88 @@
+# # Each job is made up of a comma seperated list of parameters as defined below.
+#
+# JobID,Customer,Server,Local Dir,Remote Dir,Protocol,Port,Direction,Retain,Userid,Password
+#
+# Field descriptions:-
+#    JobID      : The job number that is called with the cURL script.
+#    Customer   : The Customer name. Not esential but provides a name for the transfer.
+#    Server     : The name of the remote server.  Make sure it can be resolved.
+#    Local Dir  : The full path of local the directory relative to root.
+#                 Note the last character must be a '/' to signify a directory.
+#    Remote Dir : The full path of remote the directory relative to root
+#                 Note the last character must be a '/' to signify a directory.
+#                 For Windows servers use the relative path from user login.
+#                 For Unix servers use the full path fro the '/' directory.
+#    Portocol   : This can be an of the following:-
+#                       ftp     - Unencrypted ftp.
+#                       ftps    - Encrypted control channel with clear data channel.
+#                       wftps   - Encrypted control and data channels.
+#    Port       : The port number to be used for control connction.
+#    Direction  : Are the files to be pushed or pulled. This can be 'push' or 'pull'.
+#    Retain     : What to do on transfer (delete/retain). A retained file is moved to
+#                 a sub directory called BACKUP.
+#    UserID     : The user name on th remote server.
+#    Password   : The passord for the specified user. This is in plain text.
+#
+#
+# 2 3 4 8 10 11 12 13 14 7
+#
+############################################################
+# Outbound
+############################################################
+#
+# RBS outbound traffic.
+#001,RBS,ftp-prod,/export/home/aebsprod/Outbound/CCMS/RBS/,/s3xfer/S3/laa-ccms-outbound-production/CCMS/Outbound/_RBS-Prod/,ftps,21,push,delete,s3xfer,<ftp-user-password>
+#
+# Allpay outbound traffic from cdb1d1prod.
+002,Allpay,ftp-prod,/export/home/aebsprod/Outbound/CCMS/Allpay/,/s3xfer/S3/laa-ccms-outbound-production/CCMS_PRD_Allpay/Outbound/,ftps,21,push,retain,s3xfer,<ftp-user-password>
+#
+# Eckoh outbound tracfic from cdb1d1prod.
+003,Eckoh,ftp-prod,/export/home/aebsprod/Outbound/CCMS/Eckoh/,/s3xfer/S3/laa-ccms-outbound-production/CCMS_PRD_Eckoh/Outbound/,ftps,21,push,retain,s3xfer,<ftp-user-password>
+#
+# Rossendales outbound traffic from cdb1d1prod.
+004,Rossendales,ftp-prod,/export/home/aebsprod/Outbound/CCMS/Rossendales/,/s3xfer/S3/laa-ccms-outbound-production/CCMS_PRD_Rossendales/Outbound/,ftps,21,push,retain,s3xfer,<ftp-user-password>
+#
+# DST Transfer to replace IOS transfer. Goes to CDS (Central Print)
+005,DST,ftp-prod,/export/home/aebsprod/Outbound/CCMS/IOS/,/s3xfer/S3/laa-ccms-outbound-production/CCMS_PRD_DST/Outbound/,ftps,21,push,retain,s3xfer,<ftp-user-password>
+#
+# DST transfer to replace IOS transfer of adhoc EDRMS files. Goes to CDS (Central Print)
+006,DST_PETEERBOROUGH,ftp-prod,/export/home/aebsprod/Outbound/CCMS/IOS/ADHOC/,/s3xfer/S3/laa-ccms-outbound-production/CCMS_PRD_DST/Outbound/Peterborough/,ftps,21,push,retain,s3xfer,<ftp-user-password>
+#
+# Barclaycard outbound traffic from cdb1d1prod.
+#007,Barclaycard,ftp-prod,/export/home/aebsprod/Inbound/CCMS/Barclaycard/,/s3xfer/S3/laa-ccms-outbound-production/CCMS_PRD_Barclaycard/Outbound/,ftps,21,push,delete,s3xfer,<ftp-user-password>
+#
+# TDX Outbound traffic from ftp-prod
+# psb 008,CCMS_TDX,ACP-LSC-FIL01,/export/home/aebsprod/Outbound/CCMS/TDX/,CCMS_PRD_TDX/Outbound/,ftp,21,push,retain,CCMS_PRD_TDX,<ftp-tdx-user-password>
+008,CCMS_TDX,ftp-tdx,/export/home/aebsprod/Outbound/CCMS/TDX/,CCMS_PRD_TDX/Outbound/,ftp,21,push,retain,CCMS_PRD_TDX,<ftp-tdx-user-password>
+#
+# Microgen Bacway Outbound RBS
+##010,Microgen,ACP-LAA-CAS02,/export/home/aebsprod/Outbound/CCMS/RBS/,Inbound/,wftps,3650,push,retain,Microgen,M1crog3n!!
+010,Microgen,ftp-prod,/export/home/aebsprod/Outbound/CCMS/RBS/,/s3xfer/S3/bacway-production-eu-west-2-842522700642/BACS/,ftps,21,push,retain,s3xfer,<ftp-user-password>
+#
+# outbound test for new script
+#098,CCMS_TDX,ftp-prod,/export/home/aebsprod/scripts/testfiles/,/s3xfer/S3/laa-ccms-outbound-production/TESTING/,ftps,21,push,delete,s3xfer,<ftp-user-password>
+#098,CCMS_TDX,ftp-prod,/export/home/aebsprod/scripts/testfiles/,/s3xfer/S3/laa-ccms-inbound-production/TESTING/,ftps,21,push,retain,s3xfer,<ftp-user-password>
+##098,CCMS_TDX,ftp-prod,/export/home/aebsprod/scripts/testfiles/,/s3xfer/S3/bacway-production-eu-west-2-842522700642/TESTING/,ftps,21,push,retain,s3xfer,<ftp-user-password>
+#
+#
+
+############################################################
+# Inbound
+############################################################
+# inbound test for new script
+099,CCMS_TDX,ftp-prod,/export/home/aebsprod/scripts/testfiles/,/s3xfer/S3/laa-ccms-inbound-production/TESTING/,ftps,21,pull,retain,s3xfer,<ftp-user-password>
+#
+# RBS inbound traffic from ftp-prod.
+011,RBS,ftp-prod,/export/home/aebsprod/Inbound/CCMS/RBS/,/s3xfer/S3/laa-ccms-inbound-production/CCMS_PRD_RBS/Inbound/,ftps,21,pull,retain,s3xfer,<ftp-user-password>
+#
+# Citibank inbound traffic from ftp-prod.
+### Discontinued 012,Citibank,ftp-prod,/export/home/aebsprod/Inbound/CCMS/Citibank/,/s3xfer/S3/laa-ccms-inbound-production/CCMS/Inbound/_Citibank-Prod/,ftps,990,pull,delete,s3xfer,<ftp-user-password>
+#
+# LFFramework inbound traffic from ftp-prod.
+#013,LFFramework,ftp-prod,/export/home/aebsprod/Inbound/CCMS/LFFramework/,/s3xfer/S3/laa-ccms-inbound-production/CCMS/Inbound/_LFFramework-Prod/,ftps,21,pull,delete,s3xfer,<ftp-user-password>
+#
+# Barclaycard inbound traffic from ftp-prod.
+#014,Barclaycard,ftp-prod,/export/home/aebsprod/Inbound/CCMS/Barclaycard/,/s3xfer/S3/laa-ccms-inbound-production/CCMS/Inbound/_Barclaycard-Prod/,ftps,21,pull,delete,s3xfer,<ftp-user-password>
+#
+# PAYMENT FILE Inbound file for ios-temp payment files for Paragon from ftp-prod
+015,Payment_File_CDS,ftp-prod,/export/home/aebsprod/scripts/CDS/,/s3xfer/S3/laa-ccms-inbound-production/PAYMENT_FILES/Inbound/,ftps,21,pull,delete,s3xfer,<ftp-user-password>
