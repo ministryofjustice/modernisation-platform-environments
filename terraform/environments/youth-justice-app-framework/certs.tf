@@ -4,7 +4,7 @@ module "certs" {
 
   project_name = local.project_name
 
-  r53_zone_id = module.public_dns_zone.aws_route53_zone_id
+  r53_zone_id = module.public_dns_zone.aws_route53_zone_id[0]
   domain_name = "yjaf.${local.environment}.yjbservices.yjb.gov.uk"
 
   tags = local.tags
