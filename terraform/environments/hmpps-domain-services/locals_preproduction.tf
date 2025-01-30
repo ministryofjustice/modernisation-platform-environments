@@ -92,6 +92,8 @@ locals {
         tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.hmpp.root domain"
           domain-name = "azure.hmpp.root"
+          backup-plan = "daily-and-weekly-vss"
+          backup      = "true"
         })
       })
 

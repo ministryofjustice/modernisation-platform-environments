@@ -54,6 +54,7 @@ locals {
         iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies = [
           "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "arn:aws:iam::aws:policy/AWSEC2VssSnapshotPolicy",
           "EC2Default",
           "EC2S3BucketWriteAndDeleteAccessPolicy",
           "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
