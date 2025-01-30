@@ -495,7 +495,7 @@ resource "aws_security_group_rule" "Live-DOC-Server-Egress-2" {
   security_group_id = aws_security_group.Live-DOC-Server[0].id
 }
 
-
+/*
 resource "aws_security_group" "Secondary-DOC-Server" {
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
@@ -572,6 +572,7 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-2" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.Secondary-DOC-Server[0].id
 }
+*/
 
 resource "aws_security_group" "Archive-DOC-Server" {
   count       = local.is-preproduction == false ? 1 : 0
