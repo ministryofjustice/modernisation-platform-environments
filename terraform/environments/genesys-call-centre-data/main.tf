@@ -1,8 +1,3 @@
-provider "aws" {
-  alias  = "bucket-replication"
-  region = "us-west-2"  # Adjust the region as needed
-}
-
 module "s3_staging" {
   source = "../.."
   providers = {
