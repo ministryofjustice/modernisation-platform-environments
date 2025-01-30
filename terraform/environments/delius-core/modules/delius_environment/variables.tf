@@ -108,3 +108,9 @@ variable "env_name_to_dms_config_map" {
   description = "Map of delius-core environments to DMS configurations"
   type        = any
 }
+
+variable "shared_ca_name" {
+  default     = "acm-pca-non-live"
+  type        = string
+  description = "Name of the Resource Share in Resource Access Manager for the private cert authority"
+}
