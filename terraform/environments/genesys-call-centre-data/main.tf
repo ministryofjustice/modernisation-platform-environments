@@ -218,6 +218,22 @@ resource "aws_guardduty_detector" "default" {
   enable = var.aws_guardduty_detector_enable
 }
 
+# AWS GuardDuty Organization Admin Account (Call Centre Staging)
+resource "aws_guardduty_organization_admin_account" "default" {
+  admin_account_id = var.aws_guardduty_organization_admin_account_id
+  depends_on = [aws_guardduty_detector.default]
+}
+
+# AWS GuardDuty Member (Call Centre Staging)
+resource "aws_guardduty_member" "default" {
+  for_each = toset([var.aws_guardduty_organization_admin_account_id])
+  account_id = each.key
+  detector_id = aws_guardduty_detector.default.id
+  email = var.aws_guardduty_member_email
+  invite = var.aws_guardduty_member_invite
+  disable_email_notification = var.aws_guardduty_member_disable_email_notification
+}
+
 # AWS GuardDuty Publishing Destination (Call Centre Staging)
 resource "aws_guardduty_publishing_destination" "default" {
   detector_id     = aws_guardduty_detector.default.id

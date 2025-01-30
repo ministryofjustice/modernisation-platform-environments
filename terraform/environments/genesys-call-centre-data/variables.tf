@@ -140,6 +140,30 @@ variable "aws_guardduty_detector_enable" {
   default     = true
 }
 
+variable "aws_guardduty_organization_admin_account_id" {
+  type        = string
+  description = ""
+  default     = "123456789012"
+}
+
+variable "aws_guardduty_member_email" {
+  type        = string
+  description = ""
+  default     = "123456789012"
+}
+
+variable "aws_guardduty_member_invite" {
+  type        = bool
+  description = ""
+  default     = true
+}
+
+variable "aws_guardduty_member_disable_email_notification" {
+  type        = bool
+  description = ""
+  default     = false
+}
+
 variable "moj_aws_s3_bucket_policy_statement_sid" {
   type        = string
   description = ""
