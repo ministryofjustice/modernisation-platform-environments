@@ -54,7 +54,6 @@ locals {
           oasys-national-reporting-environment = "pd"
           domain-name                          = "azure.hmpp.root"
         })
-        cloudwatch_metric_alarms = null # <= REMOVE THIS LATER
       })
 
       pd-onr-bods-2 = merge(local.ec2_instances.bods, {
