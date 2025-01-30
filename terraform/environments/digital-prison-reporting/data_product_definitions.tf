@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "dpd_table_github_deploy_assume_role_policy" {
     }
     condition {
       test     = "StringLike"
-      values   = ["repo:ministryofjustice/hmpps-dpr-data-product-definitions:environment:${trimsuffix(local.environment, "uction")}"]
+      values   = ["repo:ministryofjustice/*"]
       variable = "token.actions.githubusercontent.com:sub"
     }
   }
