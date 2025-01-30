@@ -226,7 +226,7 @@ resource "aws_guardduty_organization_admin_account" "default" {
 
 # AWS GuardDuty Member (Call Centre Staging)
 resource "aws_guardduty_member" "default" {
-  for_each = toset([var.aws_guardduty_organization_admin_account_id])
+  for_each = toset(["211125476974"])
   account_id = each.key
   detector_id = aws_guardduty_detector.default.id
   email = var.aws_guardduty_member_email

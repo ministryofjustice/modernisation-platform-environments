@@ -143,13 +143,13 @@ variable "aws_guardduty_detector_enable" {
 variable "aws_guardduty_organization_admin_account_id" {
   type        = string
   description = ""
-  default     = "123456789012"
+  default     = "211125476974"
 }
 
 variable "aws_guardduty_member_email" {
   type        = string
   description = ""
-  default     = "123456789012"
+  default     = "ebubechukwu.obara@justice.gov.uk"
 }
 
 variable "aws_guardduty_member_invite" {
