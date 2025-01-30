@@ -341,7 +341,7 @@ variable "bucket_prefix" {
   default     = null
 }
 
-variable "tags" {
-  type        = map(any)
-  description = "Tags to apply to resources, where applicable"
-}
+# variable "tags" {
+#   type        = map(any)
+#   description = "Tags to apply to resources, where applicable"
+# }
