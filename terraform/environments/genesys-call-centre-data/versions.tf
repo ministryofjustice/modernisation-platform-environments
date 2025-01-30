@@ -1,10 +1,8 @@
 terraform {
   required_providers {
     aws = {
-      version               = "~> 5.0"
-      source                = "hashicorp/aws"
-      # configuration_aliases = [aws.bucket-replication]
-      alias  = "bucket-replication"
+      version = "~> 5.0"
+      source  = "hashicorp/aws"
     }
     http = {
       version = "~> 3.0"
