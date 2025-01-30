@@ -32,7 +32,7 @@
 /terraform/environments/electronic-monitoring-data @ministryofjustice/azure-aws-sso-electronic-monitoring-data @ministryofjustice/hmpps-electronic-monitoring-data-store @ministryofjustice/modernisation-platform
 /terraform/environments/equip @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/eric @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
-/terraform/environments/example @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
+/terraform/environments/example @ministryofjustice/green-ops @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/genesys-call-centre-data @ministryofjustice/genesys-call-centre-data @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-domain-services @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/hmpps-oem @ministryofjustice/hmpps-dba @ministryofjustice/hmpps-migration @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
