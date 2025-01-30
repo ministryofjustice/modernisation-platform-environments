@@ -20,6 +20,18 @@
 #   }
 # }
 
+provider "aws" {
+  alias  = "bucket-replication"
+  region = "us-west-2"  # Adjust the region as needed
+}
+
+module "s3_staging" {
+  source = "../.."
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+}
+
 
 # AWS S3 Bucket (Call Centre Staging)
 resource "aws_s3_bucket" "default" {
