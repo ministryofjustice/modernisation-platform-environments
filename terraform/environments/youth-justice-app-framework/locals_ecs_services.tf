@@ -405,6 +405,11 @@ locals {
           sourceVolume : "conf",
           containerPath : "/etc/nginx",
           readOnly : false
+        },
+        {
+          sourceVolume : "tmpfs-1",
+          containerPath : "/var/run",
+          readOnly : false
         }
       ]
       volumes = [
@@ -414,6 +419,10 @@ locals {
         },
         {
           "name" : "conf",
+          "host" : {}
+        },
+        {
+          "name" : "tmpfs-1",
           "host" : {}
         }
       ]
