@@ -340,3 +340,8 @@ variable "bucket_prefix" {
   description = "Bucket prefix, which will include a randomised suffix to ensure globally unique names"
   default     = null
 }
+
+variable "tags" {
+  type        = map(any)
+  description = "Tags to apply to resources, where applicable"
+}
