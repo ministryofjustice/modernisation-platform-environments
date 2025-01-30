@@ -6,14 +6,16 @@ data "aws_ssoadmin_instances" "main" {
   provider = aws.sso-readonly
 }
 
-data "aws_identitystore_group" "observability_platform" {
+data "aws_identitystore_group" "observability_platform_admins" {
+  for_each = toset(["observability-platform", "operations-engineering"])
+
   provider = aws.sso-readonly
 
   identity_store_id = tolist(data.aws_ssoadmin_instances.main.identity_store_ids)[0]
 
   filter {
     attribute_path  = "DisplayName"
-    attribute_value = "observability-platform"
+    attribute_value = each.value
   }
 }
 
