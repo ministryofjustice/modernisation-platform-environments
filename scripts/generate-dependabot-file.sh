@@ -4,6 +4,9 @@ set -euo pipefail
 
 dependabot_file=.github/dependabot.yml
 
+# Clear the dependabot file
+> $dependabot_file
+
 # Get a list of Terraform folders
 all_tf_folders=`find . -type f -name '*.tf' | sed 's#/[^/]*$##' | sed 's/.\///'| sort | uniq`
 echo
@@ -14,7 +17,7 @@ echo "Writing dependabot.yml file"
 # Creates a dependabot file to avoid having to manually add each new TF folder
 # Add any additional fixed entries in this top section
   cat > $dependabot_file << EOL
-# This file is auto-generated here, do not manually amend. 
+# This file is auto-generated here, do not manually amend.
 # scripts/generate-dependabot.sh
 
 version: 2

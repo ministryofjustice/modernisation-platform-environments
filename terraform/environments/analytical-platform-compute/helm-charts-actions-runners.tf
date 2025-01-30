@@ -6,7 +6,7 @@ resource "helm_release" "actions_runner_mojas_airflow" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.320.0-4"
+  version    = "2.321.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -32,7 +32,7 @@ resource "helm_release" "actions_runner_mojas_airflow_create_a_pipeline" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow-create-a-pipeline"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.320.0-4"
+  version    = "2.321.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -57,7 +57,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.320.0-4"
+  version    = "2.321.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -81,7 +81,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_non_spot" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-non-spot"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.320.0-4"
+  version    = "2.321.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -109,7 +109,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-dpr"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.320.0-4"
+  version    = "2.321.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -133,7 +133,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr_pp" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-dpr-pp"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.320.0-4"
+  version    = "2.321.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -157,7 +157,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds_test" 
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-emds-test"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.320.0-4"
+  version    = "2.321.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
@@ -181,7 +181,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-emds"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.320.0-4"
+  version    = "2.321.0"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [

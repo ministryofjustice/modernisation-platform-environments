@@ -113,7 +113,7 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring["endpoint-cert-expires-soon"],
       {
         dimensions = {
-          type          = "exitcode"
+          type          = "gauge"
           type_instance = value[0]
         }
         alarm_actions = [value[2]]

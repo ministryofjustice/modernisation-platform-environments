@@ -48,8 +48,8 @@ locals {
           pid_finder = "native"
         }
       }
-      bods-svcmgr-process-count = {
-        alarm_description   = "This alarm checks that the PID count for the BODS SvcMGR does not drop below 1."
+      bods-data-services-process-count = {
+        alarm_description   = "This alarm checks that the PID count for Data Services does not drop below 1."
         namespace           = "CWAgent"
         metric_name         = "procstat_lookup pid_count"
         period              = 60
@@ -59,7 +59,7 @@ locals {
         threshold           = 1
         treat_missing_data  = "breaching"
         dimensions = {
-          exe        = "SvcMgr"
+          exe        = "AL_JobService"
           pid_finder = "native"
         }
       }

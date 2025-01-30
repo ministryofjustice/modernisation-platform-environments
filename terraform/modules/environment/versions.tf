@@ -6,5 +6,5 @@ terraform {
       configuration_aliases = [aws.core-vpc, aws.core-network-services, aws.modernisation-platform]
     }
   }
-  required_version = "~> 1.5"
+  required_version = "~> 1.10"
 }

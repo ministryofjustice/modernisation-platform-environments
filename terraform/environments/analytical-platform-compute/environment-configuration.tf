@@ -21,15 +21,15 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
       eks_cluster_version = "1.31"
-      eks_node_version    = "1.26.2-360b7a38"
+      eks_node_version    = "1.29.0-c55d099c"
       eks_cluster_addon_versions = {
-        coredns                = "v1.11.3-eksbuild.2"
-        kube_proxy             = "v1.31.2-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.36.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.9-eksbuild.1"
-        aws_guardduty_agent    = "v1.7.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.2-eksbuild.2"
-        vpc_cni                = "v1.19.0-eksbuild.1"
+        coredns                = "v1.11.4-eksbuild.2"
+        kube_proxy             = "v1.31.3-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.38.1-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.3-eksbuild.1"
+        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
+        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
+        vpc_cni                = "v1.19.2-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -44,6 +44,10 @@ locals {
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
+      /* MWAA */
+      airflow_version                 = "2.10.3"
+      airflow_environment_class       = "mw1.small"
+      airflow_webserver_instance_name = "Development"
     }
     test = {
       /* VPC */
@@ -66,15 +70,15 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.31"
-      eks_node_version    = "1.26.2-360b7a38"
+      eks_node_version    = "1.29.0-c55d099c"
       eks_cluster_addon_versions = {
-        coredns                = "v1.11.3-eksbuild.2"
-        kube_proxy             = "v1.31.2-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.36.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.9-eksbuild.1"
-        aws_guardduty_agent    = "v1.7.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.2-eksbuild.2"
-        vpc_cni                = "v1.19.0-eksbuild.1"
+        coredns                = "v1.11.4-eksbuild.2"
+        kube_proxy             = "v1.31.3-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.38.1-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.3-eksbuild.1"
+        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
+        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
+        vpc_cni                = "v1.19.2-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -88,6 +92,11 @@ locals {
 
       /* UI */
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
+
+      /* MWAA */
+      airflow_version                 = "2.10.3"
+      airflow_environment_class       = "mw1.medium"
+      airflow_webserver_instance_name = "Test"
     }
     production = {
       /* VPC */
@@ -110,15 +119,15 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.31"
-      eks_node_version    = "1.26.2-360b7a38"
+      eks_node_version    = "1.29.0-c55d099c"
       eks_cluster_addon_versions = {
-        coredns                = "v1.11.3-eksbuild.2"
-        kube_proxy             = "v1.31.2-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.36.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.0.9-eksbuild.1"
-        aws_guardduty_agent    = "v1.7.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.2-eksbuild.2"
-        vpc_cni                = "v1.19.0-eksbuild.1"
+        coredns                = "v1.11.4-eksbuild.2"
+        kube_proxy             = "v1.31.3-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.38.1-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.3-eksbuild.1"
+        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
+        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
+        vpc_cni                = "v1.19.2-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -132,6 +141,11 @@ locals {
 
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
+
+      /* MWAA */
+      airflow_version                 = "2.10.3"
+      airflow_environment_class       = "mw1.medium"
+      airflow_webserver_instance_name = "Production"
 
       /* LF Domain Tags */
       cadet_lf_tags = {

@@ -2,6 +2,101 @@ locals {
 
   ec2_instances = {
 
+    bip_cms = {
+      config = {
+        ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
+        iam_resource_names_prefix = "ec2-bip"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name = "private"
+      }
+      ebs_volumes = {
+        "/dev/sdb" = { type = "gp3", size = 100 }
+        "/dev/sdc" = { type = "gp3", size = 100 }
+        "/dev/sds" = { type = "gp3", size = 100 }
+      }
+      instance = {
+        disable_api_termination = false
+        instance_type           = "m6i.xlarge"
+        key_name                = "ec2-user"
+        vpc_security_group_ids  = ["bip-app"]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
+      }
+      user_data_cloud_init = {
+        args = {
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
+        }
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+        ]
+      }
+      tags = {
+        ami                    = "base_rhel_8_5"
+        backup                 = "false"
+        description            = "onr bip CMS"
+        instance-access-policy = "full"
+        os-type                = "Linux"
+        server-type            = "onr-bip-cms"
+        update-ssm-agent       = "patchgroup1"
+      }
+    }
+
+    bip_web = {
+      config = {
+        ami_name                  = "base_rhel_8_5_2023-07*" # RHEL 8.8
+        iam_resource_names_prefix = "ec2-web"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name = "private"
+      }
+      ebs_volumes = {
+        "/dev/sdb" = { type = "gp3", size = 100 }
+        "/dev/sdc" = { type = "gp3", size = 100 }
+        "/dev/sds" = { type = "gp3", size = 100 }
+      }
+      instance = {
+        disable_api_termination = false
+        instance_type           = "r6i.xlarge"
+        key_name                = "ec2-user"
+        vpc_security_group_ids  = ["bip-web"]
+        tags = {
+          backup-plan = "daily-and-weekly"
+        }
+      }
+      user_data_cloud_init = {
+        args = {
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
+        }
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+        ]
+      }
+      tags = {
+        ami                    = "base_rhel_8_5"
+        backup                 = "false"
+        instance-access-policy = "full"
+        os-type                = "Linux"
+        server-type            = "onr-web"
+        update-ssm-agent       = "patchgroup1"
+      }
+    }
+
     bods = {
       config = {
         ami_name                      = "hmpps_windows_server_2019_release_*"
@@ -50,6 +145,9 @@ locals {
         update-ssm-agent = "patchgroup1"
       }
       cloudwatch_metric_alarms = merge(
+        module.baseline_presets.cloudwatch_metric_alarms.ec2,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+        module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
         local.cloudwatch_metric_alarms.windows,
         local.cloudwatch_metric_alarms.bods,
       )

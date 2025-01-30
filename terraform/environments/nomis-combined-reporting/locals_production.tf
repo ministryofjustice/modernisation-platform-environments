@@ -111,6 +111,23 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PD/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PD*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
+            ]
           }
         ]
       }

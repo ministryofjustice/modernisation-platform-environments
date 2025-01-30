@@ -61,6 +61,21 @@ data "aws_subnet" "data_subnets_c" {
   }
 }
 
+# All data Subnets
+data "aws_subnet" "data_subnets" {
+  for_each = toset(["a", "b", "c"])
+  vpc_id   = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-data-${data.aws_region.current.name}${each.value}"]
+  }
+}
+
+
+locals {
+  data_subnet_list = [for subnet in data.aws_subnet.data_subnets : subnet]
+}
+
 data "aws_subnet" "private_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
@@ -82,6 +97,21 @@ data "aws_subnet" "private_subnets_c" {
   }
 }
 
+# All private Subnets
+data "aws_subnet" "private_subnets" {
+  for_each = toset(["a", "b", "c"])
+  vpc_id   = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}${each.value}"]
+  }
+}
+
+
+locals {
+  private_subnet_list = [for subnet in data.aws_subnet.private_subnets : subnet]
+}
+
 data "aws_subnet" "public_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
   tags = {
@@ -101,6 +131,21 @@ data "aws_subnet" "public_subnets_c" {
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}c"
   }
+}
+
+# All public Subnets
+data "aws_subnet" "public_subnets" {
+  for_each = toset(["a", "b", "c"])
+  vpc_id   = data.aws_vpc.shared.id
+  filter {
+    name   = "tag:Name"
+    values = ["${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-public-${data.aws_region.current.name}${each.value}"]
+  }
+}
+
+
+locals {
+  public_subnet_list = [for subnet in data.aws_subnet.public_subnets : subnet]
 }
 
 # Route53 DNS data

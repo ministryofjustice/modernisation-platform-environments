@@ -18,7 +18,7 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 # Configuration
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 SENDER = "donotreply@cjsm.secure-email.ppud.justice.gov.uk"
-RECIPIENTS = ['nick.buckingham@colt.net', 'kofi-nimoh@colt.net']
+RECIPIENTS = ['nick.buckingham@colt.net', 'kofi.owusu-nimoh@colt.net']
 SUBJECT = f'AWS PPUD Load Balancer Report - {CURRENT_DATE}'
 AWS_REGION = 'eu-west-2'
 ELB_NAME = "app/PPUD-ALB/9d129853721723f4"  # Replace with your ELB name

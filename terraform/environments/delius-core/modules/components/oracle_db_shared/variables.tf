@@ -3,6 +3,9 @@ variable "env_name" {
   type        = string
 }
 
+variable "app_name" {
+  type = string
+}
 
 variable "tags" {
   description = "Tags to apply to the instance"
@@ -50,7 +53,37 @@ variable "db_suffix" {
   default     = "db"
 }
 
-variable "instance_roles" {
-  description = "AMI roles associated with the database EC2 hosts"
-  type        = list(string)
+variable "database_name" {
+  type = string
+}
+
+variable "database_port" {
+  type = number
+}
+
+variable "oracle_db_server_names" {
+  type = object({
+    primarydb  = string
+    standbydb1 = string
+    standbydb2 = string
+  })
+}
+
+variable "sns_topic_arn" {
+  description = "The ARN of the SNS topic"
+  type        = string
+}
+
+variable "cluster_security_group_id" {
+  description = "Security group id for the cluster"
+  type        = string
+}
+
+variable "delius_microservice_configs" {
+  type = any
+}
+
+variable "ecs_cluster_arn" {
+  description = "The ARN of the ECS cluster"
+  type        = string
 }

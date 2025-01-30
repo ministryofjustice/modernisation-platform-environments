@@ -101,6 +101,10 @@
         "dps-inc-reporting",
         "dps-csip",
         "dps-alerts",
+        "dps-use-of-force",
+        "dps-locations",
+        "dps-incentives",
+        "dps-non-associations",
         "dps-testing"
       ],
       "alarms": {
@@ -181,7 +185,7 @@
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
-      "redshift_table_expiry_seconds": "604800",
+      "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true
     },
     "test": {
@@ -284,7 +288,11 @@
         "dps-basm",
         "dps-inc-reporting",
         "dps-csip",
-        "dps-alerts"
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-incentives",
+        "dps-non-associations",
+        "dps-locations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -364,7 +372,7 @@
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
-      "redshift_table_expiry_seconds": "604800",
+      "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true
     },
     "preproduction": {
@@ -469,7 +477,11 @@
         "dps-basm",
         "dps-inc-reporting",
         "dps-csip",
-        "dps-alerts"
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-incentives",
+        "dps-non-associations",
+        "dps-locations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -567,7 +579,7 @@
           ]
         }
       ],
-      "redshift_table_expiry_seconds": "604800",
+      "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true
     },
     "production": {
@@ -670,7 +682,11 @@
         "dps-basm",
         "dps-inc-reporting",
         "dps-csip",
-        "dps-alerts"
+        "dps-alerts",
+        "dps-use-of-force",
+        "dps-incentives",
+        "dps-non-associations",
+        "dps-locations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -765,7 +781,7 @@
           ]
         }
       ],
-      "redshift_table_expiry_seconds": "86400",
+      "redshift_table_expiry_days": 1,
       "enable_s3_data_migrate_lambda": false
     }
   }

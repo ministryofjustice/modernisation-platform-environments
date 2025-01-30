@@ -708,10 +708,7 @@ locals {
     route53_zones = {
       "pp.csr.service.justice.gov.uk" = {
         records = [
-          # Set to IP of the Azure CSR PP DB in PPCDL00019
-          { name = "ppiwfm", type = "A", ttl = "300", records = ["10.40.42.132"] },
-          { name = "ppiwfm-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
-          { name = "ppiwfm-b", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppiwfm", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "r1", type = "A", lbs_map_key = "r12" },

@@ -47,7 +47,16 @@ module "instance" {
   iam_resource_names_prefix = "instance"
   instance_profile_policies = var.instance_profile_policies
 
-  user_data_raw = base64encode(var.user_data)
+  user_data_raw = base64encode(
+    templatefile(
+      "${path.module}/templates/concatenated_user_data.sh",
+      {
+        default   = var.user_data,
+        ssh_setup = file("${path.module}/templates/ssh_key_setup.sh"),
+      }
+    )
+  )
+
 
   business_unit     = var.account_info.business_unit
   application_name  = var.account_info.application_name

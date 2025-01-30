@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.29.0"
+  version = "20.31.6"
 
   cluster_name    = local.eks_cluster_name
   cluster_version = local.environment_configuration.eks_cluster_version
@@ -17,6 +17,16 @@ module "eks" {
   vpc_id                   = module.vpc.vpc_id
   control_plane_subnet_ids = module.vpc.intra_subnets
   subnet_ids               = module.vpc.private_subnets
+  cluster_security_group_additional_rules = {
+    vpc = {
+      description = "Allow traffic from the VPC"
+      from_port   = 0
+      to_port     = 65535
+      protocol    = "tcp"
+      type        = "ingress"
+      cidr_blocks = [module.vpc.vpc_cidr_block]
+    }
+  }
 
   authentication_mode                      = "API"
   enable_cluster_creator_admin_permissions = true
@@ -59,6 +69,11 @@ module "eks" {
     vpc-cni = {
       addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
       service_account_role_arn = module.vpc_cni_iam_role.iam_role_arn
+      configuration_values = jsonencode({
+        env = {
+          ENABLE_BANDWIDTH_PLUGIN = "true"
+        }
+      })
     }
   }
 
@@ -139,6 +154,7 @@ module "eks" {
   }
 
   access_entries = {
+    # Analytical Platform Engineering access to cluster
     sso-administrator = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.eks_sso_access_role.names)}"
       policy_associations = {
@@ -150,13 +166,25 @@ module "eks" {
         }
       }
     }
+    # MWAA access to MWAA role in MWAA namespace
+    apc-mwaa = {
+      principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/mwaa-execution"
+      username          = "apc-mwaa"
+      kubernetes_groups = ["mwaa"]
+    }
+    # Analytical Platform Common access to MWAA ServiceAccount management role in MWAA namespace
+    gha-mojap-common = {
+      principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"
+      username          = "github-actions-moj-ap-airflow"
+      kubernetes_groups = ["mwaa-serviceaccount-management"]
+    }
+    /* Legacy Airflow */
     data-engineering-airflow = {
       principal_arn     = local.environment_configuration.data_engineering_airflow_execution_role_arn
       username          = "data-engineering-airflow"
       kubernetes_groups = ["airflow"]
     }
     github-actions-mojas-airflow = {
-      # principal_arn doesn't use the module output because they reference each other
       principal_arn     = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-actions-mojas-airflow"
       username          = "github-actions-mojas-airflow"
       kubernetes_groups = ["airflow-serviceaccount-management"]
@@ -172,7 +200,7 @@ module "karpenter" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "20.29.0"
+  version = "20.31.6"
 
   cluster_name = module.eks.cluster_name
 

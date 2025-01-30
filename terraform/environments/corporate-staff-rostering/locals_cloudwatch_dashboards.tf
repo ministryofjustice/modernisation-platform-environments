@@ -12,8 +12,11 @@ locals {
       }
       widgets = [
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
         # CloudWatch agent not running, monitored by Glenn Bot instead
       ]
     }
@@ -33,8 +36,11 @@ locals {
       }
       widgets = [
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -58,8 +64,11 @@ locals {
       }
       widgets = [
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
         module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
         # CloudWatch agent not running, monitored by Glenn Bot instead
       ]
     }

@@ -116,7 +116,7 @@
           ]
         },
         {
-          "exe": "SvcMgr",
+          "exe": "AL_JobService",
           "measurement": [
             "cpu_time_system",
             "cpu_time_user",

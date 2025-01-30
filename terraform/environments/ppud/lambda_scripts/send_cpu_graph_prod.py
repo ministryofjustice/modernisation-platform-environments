@@ -26,7 +26,7 @@ SERVER = "022"
 END_TIME = datetime.utcnow()
 START_TIME = END_TIME - timedelta(hours=9)
 SENDER = "donotreply@cjsm.secure-email.ppud.justice.gov.uk"
-RECIPIENTS = ["nick.buckingham@colt.net", "pankaj.pant@colt.net", "david.savage@colt.net", "kofi-nimoh@colt.net", "helen.stimpson@colt.net"]
+RECIPIENTS = ["nick.buckingham@colt.net", "pankaj.pant@colt.net", "david.savage@colt.net", "kofi.owusu-nimoh@colt.net", "helen.stimpson@colt.net"]
 SUBJECT = f'AWS EC2 CPU Utilization Report - {SERVER} - {CURRENT_DATE}'
 REGION = "eu-west-2"
 IMAGE_ID = "ami-02f8251c8cdf2464f"

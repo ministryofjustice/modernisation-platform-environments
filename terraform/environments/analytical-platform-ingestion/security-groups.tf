@@ -90,7 +90,7 @@ module "datasync_activation_nlb_security_group" {
   vpc_id = module.connected_vpc.vpc_id
 
   egress_cidr_blocks = ["${local.environment_configuration.datasync_instance_private_ip}/32"]
-  egress_rules       = ["http-80-tcp", ]
+  egress_rules       = ["http-80-tcp"]
 
   ingress_cidr_blocks = ["${data.external.external_ip.result["ip"]}/32"]
   ingress_rules       = ["http-80-tcp"]
@@ -110,7 +110,7 @@ module "datasync_vpc_endpoint_security_group" {
   vpc_id = module.connected_vpc.vpc_id
 
   egress_cidr_blocks = [module.connected_vpc.vpc_cidr_block]
-  egress_rules       = ["all-all", ]
+  egress_rules       = ["all-all"]
 
   ingress_with_cidr_blocks = [
     {
@@ -159,6 +159,16 @@ module "datasync_instance_security_group" {
   description = "Security Group for DataSync Instance"
 
   vpc_id = module.connected_vpc.vpc_id
+
+  egress_with_cidr_blocks = [
+    {
+      from_port   = 445
+      to_port     = 445
+      protocol    = "tcp"
+      description = "SMB"
+      cidr_blocks = "10.0.0.0/8"
+    }
+  ]
 
   egress_with_source_security_group_id = [
     {

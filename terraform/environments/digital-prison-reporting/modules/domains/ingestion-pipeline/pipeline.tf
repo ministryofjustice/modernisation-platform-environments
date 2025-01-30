@@ -198,7 +198,6 @@ module "data_ingestion_pipeline" {
               "--dpr.datastorage.retry.minWaitMillis" : tostring(var.glue_s3_retry_min_wait_millis),
               "--dpr.datastorage.retry.maxWaitMillis" : tostring(var.glue_s3_retry_max_wait_millis),
               "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
-              "--dpr.allowed.s3.file.extensions" : ".parquet",
               "--dpr.config.key" : var.domain
             }
           },

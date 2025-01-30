@@ -17,9 +17,17 @@ module "oracle_db_shared" {
   env_name           = var.env_name
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.env_name]
-  instance_roles     = [for i in range(1, try(var.db_config.primary_instance_count, 1) + try(var.db_config.standby_count, 0) + 1) : "instance-role-delius-core-${var.env_name}-db-${i}"]
 
-  bastion_sg_id = module.bastion_linux.bastion_security_group
+  # The following variables are required for setting up the Data Guard Observer as a Microservice
+  app_name                    = var.app_name
+  database_name               = var.db_config.database_name
+  database_port               = var.db_config.database_port
+  sns_topic_arn               = aws_sns_topic.delius_core_alarms.arn
+  oracle_db_server_names      = local.oracle_db_server_names
+  bastion_sg_id               = module.bastion_linux.bastion_security_group
+  cluster_security_group_id   = aws_security_group.cluster.id
+  delius_microservice_configs = var.delius_microservice_configs
+  ecs_cluster_arn             = module.ecs.ecs_cluster_arn
 
   providers = {
     aws.bucket-replication    = aws

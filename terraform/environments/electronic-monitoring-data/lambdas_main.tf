@@ -89,17 +89,17 @@ module "rotate_iam_key" {
 #-----------------------------------------------------------------------------------
 
 module "virus_scan_definition_upload" {
-  source                  = "./modules/lambdas"
-  function_name           = "definition-upload"
-  is_image                = true
-  ecr_repo_name           = "analytical-platform-ingestion-scan"
-  function_tag            = "0.1.0"
-  role_name               = aws_iam_role.virus_scan_definition_upload.name
-  role_arn                = aws_iam_role.virus_scan_definition_upload.arn
-  memory_size             = 2048
-  timeout                 = 900
-  security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.shared-public.ids
+  source        = "./modules/lambdas"
+  function_name = "definition-upload"
+  is_image      = true
+  ecr_repo_name = "analytical-platform-ingestion-scan"
+  function_tag  = "0.1.3"
+  role_name     = aws_iam_role.virus_scan_definition_upload.name
+  role_arn      = aws_iam_role.virus_scan_definition_upload.arn
+  memory_size   = 2048
+  timeout       = 900
+  # security_group_ids      = [aws_security_group.lambda_generic.id]
+  # subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   environment_variables = {
     MODE                         = "definition-upload",
@@ -124,7 +124,7 @@ module "virus_scan_file" {
   function_name           = "scan"
   is_image                = true
   ecr_repo_name           = "analytical-platform-ingestion-scan"
-  function_tag            = "0.1.0"
+  function_tag            = "0.1.3"
   role_name               = aws_iam_role.virus_scan_file.name
   role_arn                = aws_iam_role.virus_scan_file.arn
   ephemeral_storage_size  = 10240
@@ -143,7 +143,7 @@ module "virus_scan_file" {
 }
 
 #-----------------------------------------------------------------------------------
-# Process json files
+# Process live files
 #-----------------------------------------------------------------------------------
 
 module "format_json_fms_data" {
@@ -152,6 +152,24 @@ module "format_json_fms_data" {
   is_image                = true
   role_name               = aws_iam_role.format_json_fms_data.name
   role_arn                = aws_iam_role.format_json_fms_data.arn
+  memory_size             = 1024
+  timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    DESTINATION_BUCKET = module.s3-raw-formatted-data-bucket.bucket.id
+  }
+}
+
+module "copy_mdss_data" {
+  source                  = "./modules/lambdas"
+  function_name           = "copy_mdss_data"
+  image_name              = "copy_data"
+  is_image                = true
+  role_name               = aws_iam_role.copy_mdss_data.name
+  role_arn                = aws_iam_role.copy_mdss_data.arn
   memory_size             = 1024
   timeout                 = 900
   security_group_ids      = [aws_security_group.lambda_generic.id]
