@@ -1,25 +1,3 @@
-# terraform {
-#   required_providers {
-#     aws = {
-#       version               = "~> 5.0"
-#       source                = "hashicorp/aws"
-#       configuration_aliases = [aws.bucket-replication]
-#     }
-#     http = {
-#       version = "~> 3.0"
-#       source  = "hashicorp/http"
-#     }
-#   }
-#   required_version = "~> 1.0"
-# }
-
-# module "s3_staging" {
-#   source = "../.."
-#   providers = {
-#     aws.bucket-replication = aws
-#   }
-# }
-
 provider "aws" {
   alias  = "bucket-replication"
   region = "us-west-2"  # Adjust the region as needed
@@ -186,14 +164,15 @@ data "aws_iam_policy_document" "s3-assume-role-policy" {
 resource "aws_s3_bucket_replication_configuration" "default" {
   for_each = var.replication_enabled ? toset(["run"]) : []
   bucket   = aws_s3_bucket.default.id
-  role     = aws_iam_role.replication.arn
+  role     = aws_iam_role.replication[0].arn
   rule {
     id       = var.moj_aws_s3_bucket_replication_configuration_rule_id
     status   = var.replication_enabled ? "Enabled" : "Disabled"
     priority = 0
 
     destination {
-      bucket        = var.replication_enabled ? aws_s3_bucket.replication[0].arn : aws_s3_bucket.replication[0].arn
+      # bucket        = var.replication_enabled ? aws_s3_bucket.replication[0].arn : aws_s3_bucket.replication[0].arn
+      bucket        = aws_s3_bucket.default.arn
       storage_class = var.moj_aws_s3_bucket_replication_configuration_rule_destination_storage_class
       encryption_configuration {
         replica_kms_key_id = (var.custom_replication_kms_key != "") ? var.custom_replication_kms_key : "arn:aws:kms:${var.replication_region}:${data.aws_caller_identity.current.account_id}:alias/aws/s3"
@@ -274,3 +253,5 @@ resource "aws_kms_key" "s3" {
     ]
   })
 }
+
+data "aws_caller_identity" "current" {}
