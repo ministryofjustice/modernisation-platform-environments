@@ -42,4 +42,10 @@ locals {
   application_secret_name = "${local.secret_prefix}-application-passwords"
   mis_account_id          = lookup(var.platform_vars.environment_management.account_ids, join("-", ["delius-mis", var.account_info.mp_environment]), null)
 
+  oracle_db_server_names = {
+    primarydb  = try(module.oracle_db_primary[0].oracle_db_server_name, "none"),
+    standbydb1 = try(module.oracle_db_standby[0].oracle_db_server_name, "none"),
+    standbydb2 = try(module.oracle_db_standby[1].oracle_db_server_name, "none")
+  }
+
 }
