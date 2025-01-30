@@ -338,6 +338,7 @@ resource "aws_security_group_rule" "Dev-Servers-Standard-Egress-2" {
 
 # Production
 
+/*
 resource "aws_security_group" "Primary-DOC-Server" {
   # checkov:skip=CKV2_AWS_5: "Temporarily unattached to any EC2 instances"
   count       = local.is-preproduction == false ? 1 : 0
@@ -415,7 +416,7 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Egress-2" {
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.Primary-DOC-Server[0].id
 }
-
+*/
 
 resource "aws_security_group" "Live-DOC-Server" {
   count       = local.is-preproduction == false ? 1 : 0
