@@ -20,6 +20,12 @@ module "external_alb" {
   listeners              = local.external_listeners
   existing_target_groups = module.internal_alb.target_group_arns
 
+  alb_ingress_with_cidr_blocks_rules = [
+    {
+      rule        = "https-443-tcp"
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
 
   alb_subnets_ids   = local.public_subnet_list[*].id
   web_acl_arn       = module.waf.waf_arn
