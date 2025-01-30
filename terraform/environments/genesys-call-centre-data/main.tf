@@ -153,7 +153,7 @@ resource "aws_iam_role" "replication" {
   count              = var.replication_enabled ? 1 : 0
   name               = "AWSS3BucketReplication${var.suffix_name}"
   assume_role_policy = data.aws_iam_policy_document.s3-assume-role-policy.json
-  tags               = var.tags
+  # tags               = var.tags
 }
 
 # S3 bucket replication: assume role policy
