@@ -20,8 +20,8 @@ module "oracle_db_shared" {
 
   # The following variables are required for setting up the Data Guard Observer as a Microservice
   app_name                    = var.app_name
-  database_name               = var.db_config.database_name
-  database_port               = var.db_config.database_port
+  database_name               = try(var.delius_microservice_configs.oracle_observer,{}) == {} ? null : var.db_config.database_name
+  database_port               = try(var.delius_microservice_configs.oracle_observer,{}) == {} ? null : var.db_config.database_port
   sns_topic_arn               = aws_sns_topic.delius_core_alarms.arn
   oracle_db_server_names      = local.oracle_db_server_names
   bastion_sg_id               = module.bastion_linux.bastion_security_group

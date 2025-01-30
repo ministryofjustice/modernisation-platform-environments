@@ -17,13 +17,13 @@ module "oracle_observer" {
   target_group_protocol_version = "HTTP1"
 
   name                       = "oracle-observer"
-  container_image            = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-oracle-observer:${var.delius_microservice_configs.oracle_observer.image_tag}"
+  container_image            = try(var.delius_microservice_configs.oracle_observer,{}) == {} ? null : "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-oracle-observer:${var.delius_microservice_configs.oracle_observer.image_tag}"
   platform_vars              = var.platform_vars
   tags                       = var.tags
   db_ingress_security_groups = []
 
-  container_cpu                      = var.delius_microservice_configs.oracle_observer.container_cpu
-  container_memory                   = var.delius_microservice_configs.oracle_observer.container_memory
+  container_cpu                      = try(var.delius_microservice_configs.oracle_observer,{}) == {} ? null : var.delius_microservice_configs.oracle_observer.container_cpu
+  container_memory                   = try(var.delius_microservice_configs.oracle_observer,{}) == {} ? null : var.delius_microservice_configs.oracle_observer.container_memory
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
 
