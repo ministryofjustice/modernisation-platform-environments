@@ -39,6 +39,13 @@ locals {
         "analytical-platform" = {
           identity_centre_team = "analytical-platform"
           aws_accounts = {
+            "analytical-platform-common-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
             "analytical-platform-compute-development" = {
               cloudwatch_enabled                 = true
               prometheus_push_enabled            = false
