@@ -2,8 +2,8 @@
 resource "aws_route53_record" "dbdns" {
   count   = var.cloudfront_route53_record_name != "" ? 1 : 0
   zone_id = var.r53_zone_id
-  name    = aws_cloudfront_distribution.external.domain_name
+  name    = var.cloudfront_route53_record_name
   type    = "CNAME"
   ttl     = 300
-  records = [var.cloudfront_route53_record_name]
+  records = [aws_cloudfront_distribution.external.domain_name]
 }
