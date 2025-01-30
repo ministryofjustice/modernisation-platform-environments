@@ -9,7 +9,7 @@ module "cloudfront_yjaf" {
   cloudfront_alias = "yjaf.${local.environment}.yjbservices.yjb.gov.uk"
   alb_dns          = module.external_alb.dns_name
   waf_web_acl_arn  = module.waf-cf.waf_arn
-  r53_zone_id      = module.public_dns_zone[0].aws_route53_zone_id
+  r53_zone_id      = module.public_dns_zone.aws_route53_zone_id
   cloudfront_route53_record_name = "yjaf.${local.environment}.yjbservices.yjb.gov.uk"
   kms_key_arn      = module.kms.key_arn
   environment      = local.environment
