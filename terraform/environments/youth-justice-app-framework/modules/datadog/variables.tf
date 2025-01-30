@@ -9,3 +9,8 @@ variable "project_name" {
   description = "The name of the project"
   type        = string
 }
+
+variable "datadog_integration_external_id" {
+  description = "The external ID for the Datadog integration"
+  type        = string
+}
