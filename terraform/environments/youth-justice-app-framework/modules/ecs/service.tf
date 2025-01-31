@@ -88,7 +88,7 @@ module "ecs_service" {
         [
           {
             "name" : "SPRING_PROFILES_ACTIVE",
-            "value" : var.environment
+            "value" : "moj-${var.environment}"
           },
           {
             "name" : "DD_SERVICE",
