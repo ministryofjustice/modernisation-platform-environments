@@ -49,28 +49,6 @@ resource "aws_s3_bucket_notification" "replication" {
   }
 }
 
-resource "aws_network_acl_rule" "private_inbound" {
-  network_acl_id = var.network_acl_id
-  rule_number    = 100
-  egress         = false
-  protocol       = var.private_inbound_outbound_acl_rules[count.index]["protocol"]
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 80
-  to_port        = 80
-}
-
-resource "aws_network_acl_rule" "private_outbound" {
-  network_acl_id = var.network_acl_id
-  rule_number    = 200
-  egress         = false
-  protocol       = var.private_inbound_outbound_acl_rules[count.index]["protocol"]
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 80
-  to_port        = 80
-}
-
 # tfsec:ignore:aws-s3-encryption-customer-key
 #tfsec:ignore:avd-aws-0132 S3 encryption should use Custom Managed Keys, KMS is acceptable compromise 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
