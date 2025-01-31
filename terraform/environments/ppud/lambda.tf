@@ -505,6 +505,15 @@ resource "aws_lambda_layer_version" "lambda_layer_matplotlib_prod" {
   compatible_runtimes = ["python3.12"]
 }
 
+resource "aws_lambda_layer_version" "lambda_layer_matplotlib_prod_new" {
+  count               = local.is-production == true ? 1 : 0
+  layer_name          = "matplotlib-layer-prod"
+  description         = "matplotlib-layer for python 3.12"
+  s3_bucket           = aws_s3_bucket.moj-infrastructure[0].id
+  s3_key              = "lambda/layers/matplotlib-layer.zip"
+  compatible_runtimes = ["python3.12"]
+}
+
 ##################################################
 # Lambda Function to graph PPUD Email Usage - PROD
 ##################################################
