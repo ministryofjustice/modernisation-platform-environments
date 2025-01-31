@@ -4,11 +4,6 @@ data "aws_ram_resource_share" "shared_ca" {
   resource_owner = "OTHER-ACCOUNTS"
 }
 
-output "shared_ram_shares" {
-  value = data.aws_ram_resource_share.shared_ca
-}
-
-
 data "aws_acmpca_certificate_authority" "shared_ca" {
   arn = data.aws_ram_resource_share.shared_ca.resource_arns[0]
 }
@@ -16,7 +11,6 @@ data "aws_acmpca_certificate_authority" "shared_ca" {
 resource "tls_private_key" "key" {
   algorithm = "RSA"
 }
-
 
 resource "tls_cert_request" "csr" {
   private_key_pem = tls_private_key.key.private_key_pem
