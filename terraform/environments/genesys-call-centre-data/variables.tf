@@ -140,10 +140,16 @@ variable "aws_guardduty_detector_enable" {
   default     = true
 }
 
-variable "aws_guardduty_organization_admin_account_id" {
+variable "aws_guardduty_organization_admin_account_id_string" {
   type        = string
   description = ""
   default     = "211125476974"
+}
+
+variable "aws_guardduty_organization_admin_account_id_list" {
+  type        = list(string)
+  description = ""
+  default     = ["211125476974"]
 }
 
 variable "aws_guardduty_member_email" {
@@ -365,19 +371,14 @@ variable "bucket_prefix" {
   default     = null
 }
 
-# variable "tags" {
-#   type        = map(any)
-#   description = "Tags to apply to resources, where applicable"
-# }
-
 variable "force_destroy" {
   type        = bool
   description = "A boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error. These objects are not recoverable."
   default     = false
 }
 
-# variable "network_acl_id" {
-#   type        = string
-#   description = ""
-#   default     = ""
-# }
+variable "network_acl_id" {
+  type        = string
+  description = ""
+  default     = "acl-04ab36970f6f08063"
+}

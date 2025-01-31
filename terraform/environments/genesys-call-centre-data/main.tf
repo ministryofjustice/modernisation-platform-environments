@@ -49,29 +49,16 @@ resource "aws_s3_bucket_notification" "replication" {
   }
 }
 
-# resource "aws_network_acl_rule" "private_inbound" {
-#   network_acl_id = var.network_acl_id
-#   rule_number    = 100
-#   egress         = false
-#   protocol       = "tcp"
-#   rule_action    = "allow"
-#   cidr_block     = "0.0.0.0/0"
-#   from_port      = 80
-#   to_port        = 80
-# }
-
-# resource "aws_network_acl_rule" "default" {
-
-# }
-
-# resource "aws_network_acl_rule" "default" {
-#   egress      = false
-#   protocol    = "tcp"
-#   from_port   = 22
-#   to_port     = 22
-#   rule_action = "allow"
-#   cidr_block  = "0.0.0.0/0"
-# }
+resource "aws_network_acl_rule" "private_inbound" {
+  network_acl_id = var.network_acl_id
+  rule_number    = 100
+  egress         = false
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 80
+  to_port        = 80
+}
 
 # tfsec:ignore:aws-s3-encryption-customer-key
 #tfsec:ignore:avd-aws-0132 S3 encryption should use Custom Managed Keys, KMS is acceptable compromise 
@@ -95,69 +82,6 @@ resource "aws_s3_bucket_versioning" "default" {
 }
 
 # Configure bucket lifecycle rules
-# resource "aws_s3_bucket_lifecycle_configuration" "default" {
-#   #checkov:skip=CKV_AWS_300: "Ensure S3 lifecycle configuration sets period for aborting failed uploads"
-#   bucket = aws_s3_bucket.default.id
-
-#   dynamic "rule" {
-#     for_each = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
-
-#     content {
-#       id = lookup(rule.value, "id", null)
-#       filter {
-#         prefix = lookup(rule.value, "prefix", null)
-#       }
-#       status = lookup(rule.value, "enabled", null)
-
-#       abort_incomplete_multipart_upload {
-#         days_after_initiation = lookup(rule.value, "abort_incomplete_multipart_upload_days", "7")
-#       }
-
-#       # Max 1 block - expiration
-#       dynamic "expiration" {
-#         for_each = length(keys(lookup(rule.value, "expiration", {}))) == 0 ? [] : [lookup(rule.value, "expiration", {})]
-
-#         content {
-#           date                         = lookup(expiration.value, "date", null)
-#           days                         = lookup(expiration.value, "days", null)
-#           expired_object_delete_marker = lookup(expiration.value, "expired_object_delete_marker", null)
-#         }
-#       }
-
-#       # Several blocks - transition
-#       dynamic "transition" {
-#         for_each = lookup(rule.value, "transition", [])
-
-#         content {
-#           date          = lookup(transition.value, "date", null)
-#           days          = lookup(transition.value, "days", null)
-#           storage_class = transition.value.storage_class
-#         }
-#       }
-
-#       # Max 1 block - noncurrent_version_expiration
-#       dynamic "noncurrent_version_expiration" {
-#         for_each = length(keys(lookup(rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [
-#           lookup(rule.value, "noncurrent_version_expiration", {})
-#         ]
-
-#         content {
-#           noncurrent_days = lookup(noncurrent_version_expiration.value, "days", null)
-#         }
-#       }
-
-#       # Several blocks - noncurrent_version_transition
-#       dynamic "noncurrent_version_transition" {
-#         for_each = lookup(rule.value, "noncurrent_version_transition", [])
-
-#         content {
-#           noncurrent_days = lookup(noncurrent_version_transition.value, "days", null)
-#           storage_class   = noncurrent_version_transition.value.storage_class
-#         }
-#       }
-#     }
-#   }
-# }
 resource "aws_s3_bucket_lifecycle_configuration" "replication" {
   #checkov:skip=CKV_AWS_300: "Ensure S3 lifecycle configuration sets period for aborting failed uploads"
   count    = var.replication_enabled ? 1 : 0
@@ -327,13 +251,13 @@ resource "aws_guardduty_organization_configuration" "default" {
 
 # AWS GuardDuty Organization Admin Account (Call Centre Staging)
 resource "aws_guardduty_organization_admin_account" "default" {
-  admin_account_id = var.aws_guardduty_organization_admin_account_id
+  admin_account_id = var.aws_guardduty_organization_admin_account_id_string
   depends_on = [aws_guardduty_detector.default]
 }
 
 # AWS GuardDuty Member (Call Centre Staging)
 resource "aws_guardduty_member" "default" {
-  for_each = toset(["211125476974"])
+  for_each = toset(var.aws_guardduty_organization_admin_account_id_list)
   account_id = each.key
   detector_id = aws_guardduty_detector.default.id
   email = var.aws_guardduty_member_email
