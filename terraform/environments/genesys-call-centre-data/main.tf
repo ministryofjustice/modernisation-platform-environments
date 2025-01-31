@@ -33,7 +33,7 @@ resource "aws_s3_bucket" "replication" {
   bucket        = var.bucket_name != null ? "${var.bucket_name}-replication" : null
   bucket_prefix = var.bucket_prefix != null ? "${var.bucket_prefix}-replication" : null
   force_destroy = var.force_destroy
-  tags          = var.tags
+  # tags          = var.tags
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
