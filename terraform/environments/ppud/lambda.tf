@@ -476,7 +476,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_prod" {
   layers = [
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod[0].arn
+    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
   ]
   # VPC configuration
   vpc_config {
@@ -548,7 +548,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_email_report_prod" {
   layers = [
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod[0].arn
+    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
   ]
   # VPC configuration
   vpc_config {
@@ -600,7 +600,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_report_prod" {
   layers = [
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod[0].arn
+    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
   ]
   # VPC configuration
   vpc_config {
@@ -652,7 +652,7 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_elb_report_prod" {
   layers = [
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod[0].arn
+    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
   ]
   # VPC configuration
   vpc_config {
@@ -756,7 +756,7 @@ resource "aws_lambda_function" "terraform_lambda_func_disk_info_report_prod" {
   layers = [
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod[0].arn
+    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
   ]
   # VPC configuration
   vpc_config {
@@ -808,7 +808,7 @@ resource "aws_lambda_function" "terraform_lambda_func_disk_read_write_report_pro
   layers = [
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod[0].arn
+    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
   ]
   # VPC configuration
   vpc_config {
