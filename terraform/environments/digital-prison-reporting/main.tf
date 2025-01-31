@@ -391,49 +391,6 @@ module "activate_glue_trigger_job" {
   }
 }
 
-# kinesis Data Stream Ingestor
-module "kinesis_stream_ingestor" {
-  source                    = "./modules/kinesis_stream"
-  create_kinesis_stream     = local.create_kinesis
-  name                      = local.kinesis_stream_ingestor
-  shard_count               = 1 # Not Valid when ON-DEMAND Mode
-  retention_period          = local.kinesis_retention_hours
-  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
-  enforce_consumer_deletion = false
-  encryption_type           = "KMS"
-  kms_key_id                = local.kinesis_kms_id
-  project_id                = local.project
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = local.kinesis_stream_ingestor
-      Resource_Type = "Kinesis Data Stream"
-    }
-  )
-}
-
-module "kinesis_stream_reconciliation_firehose_s3" {
-  source                     = "./modules/kinesis_firehose"
-  name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
-  aws_account_id             = local.account_id
-  aws_region                 = local.account_region
-  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
-  cloudwatch_log_stream_name = "DestinationDelivery"
-  cloudwatch_logging_enabled = false
-  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn
-  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name
-  target_s3_arn              = module.s3_working_bucket.bucket_arn
-  target_s3_id               = module.s3_working_bucket.bucket_id
-  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
-  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}-error/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/!{firehose:error-output-type}"
-  target_s3_kms              = local.s3_kms_arn
-  buffering_size             = 128
-  buffering_interval         = 900
-  database_name              = module.glue_reconciliation_database.db_name
-  table_name                 = module.glue_reconciliation_table.table_name
-}
-
 # Glue Registry
 module "glue_registry_avro" {
   source               = "./modules/glue_registry"
@@ -447,81 +404,6 @@ module "glue_registry_avro" {
     }
   )
 }
-
-###################################################
-# Glue Tables, Reusable Module: /modules/glue_table
-###################################################
-module "glue_reconciliation_table" {
-  source                    = "./modules/glue_table"
-  enable_glue_catalog_table = true
-  name                      = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
-
-  # AWS Glue catalog DB
-  glue_catalog_database_name       = module.glue_reconciliation_database.db_name
-  glue_catalog_database_parameters = null
-
-  # AWS Glue catalog table
-  glue_catalog_table_description = "Glue Table for reconciliation data, managed by Terraform."
-  glue_catalog_table_table_type  = "EXTERNAL_TABLE"
-  glue_catalog_table_parameters = {
-    EXTERNAL              = "TRUE"
-    "parquet.compression" = "SNAPPY"
-    "classification"      = "parquet"
-  }
-  glue_catalog_table_storage_descriptor = {
-
-    location      = "s3://${module.s3_working_bucket.bucket_id}/reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/"
-    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
-    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-
-    columns = [
-      {
-        columns_name    = "data"
-        columns_type    = "string"
-        columns_comment = "Nested JSON data"
-      },
-      {
-        columns_name    = "metadata"
-        columns_type    = "string"
-        columns_comment = "Common metadata"
-      }
-    ]
-
-    partition_keys = [
-      {
-        name    = "year",
-        type    = "string",
-        comment = ""
-      },
-      {
-        name    = "month",
-        type    = "string",
-        comment = ""
-      },
-      {
-        name    = "day",
-        type    = "string",
-        comment = ""
-      }
-    ]
-
-    ser_de_info = [
-      {
-        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
-
-        parameters = {
-          "serialization.format" = 1
-        }
-      }
-    ]
-
-    skewed_info = []
-
-    sort_columns = []
-  }
-  glue_table_depends_on = [module.glue_reconciliation_database.db_name]
-}
-
 
 ##################
 ### S3 Buckets ###
@@ -956,55 +838,6 @@ module "datamart" {
     {
       Name          = local.redshift_cluster_name
       Resource_Type = "Redshift Cluster"
-    }
-  )
-}
-
-# DMS Nomis Data Collector
-module "dms_nomis_ingestor" {
-  source                       = "./modules/dms_dps"
-  setup_dms_instance           = local.setup_dms_instance      # Disable all DMS Resources
-  enable_replication_task      = local.enable_replication_task # Disable Replication Task
-  name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
-  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
-  source_engine_name           = "oracle"
-  source_db_name               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
-  source_app_username          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["user"]
-  source_app_password          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["password"]
-  source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
-  vpc                          = data.aws_vpc.shared.id
-  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  project_id                   = local.project
-  env                          = local.environment
-  dms_source_name              = "oracle"
-  dms_target_name              = "kinesis"
-  short_name                   = "nomis"
-  migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.5.2"
-  replication_instance_class   = "dms.t3.medium"
-  subnet_ids = [
-    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
-  ]
-
-  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
-  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
-
-  extra_attributes = "supportResetlog=TRUE"
-
-  kinesis_settings = {
-    "include_null_and_empty"         = "true"
-    "partition_include_schema_table" = "true"
-    "include_partition_value"        = "true"
-    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
-  }
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-dms-t3nomis-ingestor-${local.env}"
-      Resource_Type = "DMS Replication"
-      Nomis_Source  = "T3"
     }
   )
 }

@@ -16,7 +16,7 @@
 /terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-information-system @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cis-dbas @ministryofjustice/laa-cis-team @ministryofjustice/modernisation-platform
-/terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
+/terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-migration @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-apps-and-tools @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/modernisation-platform
@@ -62,6 +62,7 @@
 /terraform/environments/pra-register @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/refer-monitor @ministryofjustice/hmpps-interventions-dashboard-access @ministryofjustice/hmpps-interventions-dev @ministryofjustice/modernisation-platform
 /terraform/environments/sprinkler @ministryofjustice/azure-aws-sso-modernisation-platform @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
+/terraform/environments/sprinkler/playground @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/testing @ministryofjustice/modernisation-platform @ministryofjustice/modernisation-platform
 /terraform/environments/tipstaff @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/tribunals @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
