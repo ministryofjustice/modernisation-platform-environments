@@ -32,22 +32,6 @@ resource "aws_iam_role_policy_attachment" "eventbridge_logs_policy_attachment" {
   role       = aws_iam_role.eventbridge_to_logs_role.name
 }
 
-data "aws_iam_policy_document" "route53-query-logging-policy" {
-  statement {
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-
-    resources = ["arn:aws:logs:*:*:log-group:/aws/route53/*"]
-
-    principals {
-      identifiers = ["route53.amazonaws.com"]
-      type        = "Service"
-    }
-  }
-}
-
 resource "aws_cloudwatch_log_resource_policy" "log_group_policy" {
   policy_name = "${var.env_name}-eventbridge-to-logs-policy"
   policy_document = jsonencode({
