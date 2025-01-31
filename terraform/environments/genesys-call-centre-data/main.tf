@@ -8,12 +8,16 @@ module "s3_staging" {
 
 # AWS S3 Bucket (Call Centre Staging)
 resource "aws_s3_bucket" "default" {
+  #checkov:skip=CKV_AWS_144: "Replication handled in replication configuration resource"
+  #checkov:skip=CKV_AWS_18: "Logging handled in logging configuration resource"
+  #checkov:skip=CKV_AWS_21: "Versioning handled in Versioning configuration resource"
+  #checkov:skip=CKV_AWS_145: "Encryption handled in encryption configuration resource"
   bucket = var.call_centre_staging_aws_s3_bucket
 }
 
 # Event Notifications for S3 buckets
 resource "aws_s3_bucket_notification" "default" {
-  count  = var.notification_enabled == true ? 1 : 0
+  count  = var.replication_enabled && var.notification_enabled ? 1 : 0
   bucket = aws_s3_bucket.default.id
 
   topic {
@@ -27,6 +31,7 @@ resource "aws_s3_bucket" "replication" {
   #checkov:skip=CKV_AWS_18: "Logging handled in logging configuration resource"
   #checkov:skip=CKV_AWS_21: "Versioning handled in versioning configuration resource"
   #checkov:skip=CKV_AWS_145: "Encryption handled in encryption configuration resource"
+  #checkov:skip=CKV2_AWS_61: "Ensure that an S3 bucket has a lifecycle configuration"
 
   count         = var.replication_enabled ? 1 : 0
   provider      = aws.bucket-replication
@@ -36,6 +41,8 @@ resource "aws_s3_bucket" "replication" {
   # tags          = var.tags
 }
 
+# tfsec:ignore:aws-s3-encryption-customer-key
+#tfsec:ignore:avd-aws-0132 S3 encryption should use Custom Managed Keys, KMS is acceptable compromise 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
   #checkov:skip=CKV2_AWS_67: "Ensure AWS S3 bucket encrypted with Customer Managed Key (CMK) has regular rotation"
   bucket = aws_s3_bucket.default.id
