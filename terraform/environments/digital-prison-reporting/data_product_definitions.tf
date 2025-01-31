@@ -53,14 +53,14 @@ data "aws_iam_policy_document" "dpd_table_github_deploy_assume_role_policy" {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"]
     }
     condition {
-      test     = "StringEquals"
-      values   = ["sts.amazonaws.com"]
-      variable = "token.actions.githubusercontent.com:aud"
-    }
-    condition {
       test     = "StringLike"
       values   = ["repo:ministryofjustice/hmpps-dpr-data-product-definitions:*"]
       variable = "token.actions.githubusercontent.com:sub"
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["sts.amazonaws.com"]
+      variable = "token.actions.githubusercontent.com:aud"
     }
   }
 }
