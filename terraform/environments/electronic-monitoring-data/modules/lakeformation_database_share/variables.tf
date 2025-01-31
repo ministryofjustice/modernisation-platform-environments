@@ -18,3 +18,9 @@ variable "de_role_arn" {
   description = "DE Role to grant permissions to"
   type        = string
 }
+
+variable "db_exists" {
+  description = "Whether the database exists"
+  type        = bool
+  default     = false
+}
