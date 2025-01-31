@@ -376,8 +376,8 @@ variable "force_destroy" {
   default     = false
 }
 
-variable "network_acl_id" {
-  type        = string
-  description = ""
-  default     = ""
-}
+# variable "network_acl_id" {
+#   type        = string
+#   description = ""
+#   default     = ""
+# }
