@@ -7,7 +7,7 @@ provider "aws" {
 module "s3_staging" {
   source = "../.."
   providers = {
-    aws.bucket-replication = aws
+    aws.bucket-replication = aws.bucket-replication
   }
 }
 

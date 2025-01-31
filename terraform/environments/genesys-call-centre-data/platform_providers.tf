@@ -48,8 +48,8 @@ provider "aws" {
   }
 }
 
-# # Provider for Bucket Replication
-# provider "aws" {
-#   alias  = "bucket-replication"
-#   region = "eu-west-2"  # Adjust the region as needed
-# }
+# Provider for Bucket Replication
+provider "aws" {
+  alias  = "bucket-replication"
+  region = "eu-west-2"  # Adjust the region as needed
+}
