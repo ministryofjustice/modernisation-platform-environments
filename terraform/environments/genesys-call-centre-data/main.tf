@@ -298,7 +298,7 @@ resource "aws_guardduty_detector" "default" {
 resource "aws_guardduty_organization_configuration" "default" {
   # auto_enable = true
   auto_enable_organization_members = "ALL"
-  detector_id = aws_guardduty_detector.ok.id
+  detector_id = aws_guardduty_detector.default.id
 }
 
 # AWS GuardDuty Organization Admin Account (Call Centre Staging)
