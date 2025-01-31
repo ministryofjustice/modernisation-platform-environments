@@ -89,10 +89,14 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
         })
+        instance = merge(local.ec2_instances.rdgw.instance, {
+          tags = {
+            backup-plan = "daily-and-weekly-vss"
+          }
+        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.hmpp.root domain"
           domain-name = "azure.hmpp.root"
-          backup-plan = "daily-and-weekly-vss"
         })
       })
 
