@@ -3,6 +3,7 @@ locals {
 }
 
 module "bastion_linux" {
+  count                    = local.environment == "development" ? 1 : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.4.1"
 
   providers = {

@@ -42,7 +42,6 @@ resource "aws_security_group" "mojfin" {
   }
 
   dynamic "ingress" {
-    for_each = local.environment == "preproduction" ? [] : [local.cp_vpc_cidr]
     content {
       description = "Cloud Platform VPC Internal Traffic inbound"
       from_port   = 1521
