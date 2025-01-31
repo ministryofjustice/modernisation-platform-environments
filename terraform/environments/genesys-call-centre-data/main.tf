@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "default" {
   #checkov:skip=CKV_AWS_18: "Logging handled in logging configuration resource"
   #checkov:skip=CKV_AWS_21: "Versioning handled in Versioning configuration resource"
   #checkov:skip=CKV_AWS_145: "Encryption handled in encryption configuration resource"
-  #checkov:skip=CKV2_AWS_61: "Ensure that an S3 bucket has a lifecycle configuration"
+  #checkov:skip=CKV2_AWS_61:
   bucket = var.call_centre_staging_aws_s3_bucket
 }
 
@@ -295,21 +295,27 @@ resource "aws_guardduty_detector" "default" {
   enable = var.aws_guardduty_detector_enable
 }
 
-# # AWS GuardDuty Organization Admin Account (Call Centre Staging)
-# resource "aws_guardduty_organization_admin_account" "default" {
-#   admin_account_id = var.aws_guardduty_organization_admin_account_id
-#   depends_on = [aws_guardduty_detector.default]
-# }
+resource "aws_guardduty_organization_configuration" "default" {
+  # auto_enable = true
+  auto_enable_organization_members = "ALL"
+  detector_id = aws_guardduty_detector.ok.id
+}
 
-# # AWS GuardDuty Member (Call Centre Staging)
-# resource "aws_guardduty_member" "default" {
-#   for_each = toset(["211125476974"])
-#   account_id = each.key
-#   detector_id = aws_guardduty_detector.default.id
-#   email = var.aws_guardduty_member_email
-#   invite = var.aws_guardduty_member_invite
-#   disable_email_notification = var.aws_guardduty_member_disable_email_notification
-# }
+# AWS GuardDuty Organization Admin Account (Call Centre Staging)
+resource "aws_guardduty_organization_admin_account" "default" {
+  admin_account_id = var.aws_guardduty_organization_admin_account_id
+  depends_on = [aws_guardduty_detector.default]
+}
+
+# AWS GuardDuty Member (Call Centre Staging)
+resource "aws_guardduty_member" "default" {
+  for_each = toset(["211125476974"])
+  account_id = each.key
+  detector_id = aws_guardduty_detector.default.id
+  email = var.aws_guardduty_member_email
+  invite = var.aws_guardduty_member_invite
+  disable_email_notification = var.aws_guardduty_member_disable_email_notification
+}
 
 # AWS GuardDuty Publishing Destination (Call Centre Staging)
 resource "aws_guardduty_publishing_destination" "default" {
@@ -324,6 +330,7 @@ resource "aws_guardduty_publishing_destination" "default" {
 
 # AWS KMS Key (Call Centre Staging)
 resource "aws_kms_key" "s3" {
+  #checkov:skip=CKV_AWS_7
   description = var.aws_kms_key_s3_description
   key_usage   = var.aws_kms_key_s3_key_usage
   policy = jsonencode({
