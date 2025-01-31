@@ -41,14 +41,12 @@ resource "aws_security_group" "mojfin" {
     cidr_blocks = [local.workspaces_cidr]
   }
 
-  dynamic "ingress" {
-    content {
+  ingress {
       description = "Cloud Platform VPC Internal Traffic inbound"
       from_port   = 1521
       to_port     = 1521
       protocol    = "tcp"
-      cidr_blocks = [ingress.value]
-    }
+      cidr_blocks = [local.cp_vpc_cidr]
   }
 
   dynamic "ingress" {
