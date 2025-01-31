@@ -192,7 +192,8 @@ resource "aws_s3_bucket_public_access_block" "default" {
 }
 
 resource "aws_s3_bucket_public_access_block" "replication" {
-  bucket                  = aws_s3_bucket.replication.id
+  count                   = var.replication_enabled ? 1 : 0
+  bucket                  = aws_s3_bucket.replication[count.index].id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
