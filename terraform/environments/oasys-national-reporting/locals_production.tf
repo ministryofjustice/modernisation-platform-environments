@@ -54,9 +54,15 @@ locals {
           oasys-national-reporting-environment = "pd"
           domain-name                          = "azure.hmpp.root"
         })
-        cloudwatch_metric_alarms = null # <= REMOVE THIS LATER
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+          local.cloudwatch_metric_alarms.windows,
+          local.cloudwatch_metric_alarms.bods_primary,
+        )
       })
-
+   
       pd-onr-bods-2 = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
           ami_name          = "hmpps_windows_server_2019_release_2025-01-02T00-00-37.501Z"
@@ -73,9 +79,14 @@ locals {
           oasys-national-reporting-environment = "pd"
           domain-name                          = "azure.hmpp.root"
         })
-        cloudwatch_metric_alarms = null # <= REMOVE THIS LATER
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+          local.cloudwatch_metric_alarms.windows,
+          local.cloudwatch_metric_alarms.bods_secondary,
+        )
       })
-
     }
 
     fsx_windows = {

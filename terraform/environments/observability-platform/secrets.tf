@@ -29,3 +29,11 @@ resource "aws_secretsmanager_secret" "pagerduty_integration_keys" {
 
   name = "grafana/notifications/pagerduty-integration-keys"
 }
+
+#tfsec:ignore:avd-aws-0098 CMK not required currently
+resource "aws_secretsmanager_secret" "non_modernisation_platform_account_ids" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
+
+  name = "observability-platform/non-modernisation-platform-account-ids"
+}
