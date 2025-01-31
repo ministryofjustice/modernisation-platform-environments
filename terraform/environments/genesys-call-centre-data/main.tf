@@ -36,71 +36,109 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
 resource "aws_s3_bucket_versioning" "default" {
   bucket = aws_s3_bucket.default.id
   versioning_configuration {
-    status = (var.versioning_enabled != true) ? "Suspended" : "Enabled"
+    status = var.versioning_enabled
   }
 }
 
 # Configure bucket lifecycle rules
-resource "aws_s3_bucket_lifecycle_configuration" "default" {
+# resource "aws_s3_bucket_lifecycle_configuration" "default" {
+#   #checkov:skip=CKV_AWS_300: "Ensure S3 lifecycle configuration sets period for aborting failed uploads"
+#   bucket = aws_s3_bucket.default.id
+
+#   dynamic "rule" {
+#     for_each = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
+
+#     content {
+#       id = lookup(rule.value, "id", null)
+#       filter {
+#         prefix = lookup(rule.value, "prefix", null)
+#       }
+#       status = lookup(rule.value, "enabled", null)
+
+#       abort_incomplete_multipart_upload {
+#         days_after_initiation = lookup(rule.value, "abort_incomplete_multipart_upload_days", "7")
+#       }
+
+#       # Max 1 block - expiration
+#       dynamic "expiration" {
+#         for_each = length(keys(lookup(rule.value, "expiration", {}))) == 0 ? [] : [lookup(rule.value, "expiration", {})]
+
+#         content {
+#           date                         = lookup(expiration.value, "date", null)
+#           days                         = lookup(expiration.value, "days", null)
+#           expired_object_delete_marker = lookup(expiration.value, "expired_object_delete_marker", null)
+#         }
+#       }
+
+#       # Several blocks - transition
+#       dynamic "transition" {
+#         for_each = lookup(rule.value, "transition", [])
+
+#         content {
+#           date          = lookup(transition.value, "date", null)
+#           days          = lookup(transition.value, "days", null)
+#           storage_class = transition.value.storage_class
+#         }
+#       }
+
+#       # Max 1 block - noncurrent_version_expiration
+#       dynamic "noncurrent_version_expiration" {
+#         for_each = length(keys(lookup(rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [
+#           lookup(rule.value, "noncurrent_version_expiration", {})
+#         ]
+
+#         content {
+#           noncurrent_days = lookup(noncurrent_version_expiration.value, "days", null)
+#         }
+#       }
+
+#       # Several blocks - noncurrent_version_transition
+#       dynamic "noncurrent_version_transition" {
+#         for_each = lookup(rule.value, "noncurrent_version_transition", [])
+
+#         content {
+#           noncurrent_days = lookup(noncurrent_version_transition.value, "days", null)
+#           storage_class   = noncurrent_version_transition.value.storage_class
+#         }
+#       }
+#     }
+#   }
+# }
+resource "aws_s3_bucket_lifecycle_configuration" "replication" {
   #checkov:skip=CKV_AWS_300: "Ensure S3 lifecycle configuration sets period for aborting failed uploads"
-  bucket = aws_s3_bucket.default.id
+  count    = var.replication_enabled ? 1 : 0
+  provider = aws.bucket-replication
+  bucket   = aws_s3_bucket.replication[count.index].id
+  rule {
+    id     = "main"
+    status = "Enabled"
 
-  dynamic "rule" {
-    for_each = try(jsondecode(var.lifecycle_rule), var.lifecycle_rule)
+    transition {
+      days          = 90
+      storage_class = "STANDARD_IA"
+    }
 
-    content {
-      id = lookup(rule.value, "id", null)
-      filter {
-        prefix = lookup(rule.value, "prefix", null)
-      }
-      status = lookup(rule.value, "enabled", null)
+    transition {
+      days          = 365
+      storage_class = "GLACIER"
+    }
 
-      abort_incomplete_multipart_upload {
-        days_after_initiation = lookup(rule.value, "abort_incomplete_multipart_upload_days", "7")
-      }
+    expiration {
+      days = 730
+    }
 
-      # Max 1 block - expiration
-      dynamic "expiration" {
-        for_each = length(keys(lookup(rule.value, "expiration", {}))) == 0 ? [] : [lookup(rule.value, "expiration", {})]
+    noncurrent_version_transition {
+      noncurrent_days = 90
+      storage_class   = "STANDARD_IA"
+    }
 
-        content {
-          date                         = lookup(expiration.value, "date", null)
-          days                         = lookup(expiration.value, "days", null)
-          expired_object_delete_marker = lookup(expiration.value, "expired_object_delete_marker", null)
-        }
-      }
+    noncurrent_version_transition {
+      noncurrent_days = 365
+      storage_class   = "GLACIER"
+    }
 
-      # Several blocks - transition
-      dynamic "transition" {
-        for_each = lookup(rule.value, "transition", [])
-
-        content {
-          date          = lookup(transition.value, "date", null)
-          days          = lookup(transition.value, "days", null)
-          storage_class = transition.value.storage_class
-        }
-      }
-
-      # Max 1 block - noncurrent_version_expiration
-      dynamic "noncurrent_version_expiration" {
-        for_each = length(keys(lookup(rule.value, "noncurrent_version_expiration", {}))) == 0 ? [] : [
-          lookup(rule.value, "noncurrent_version_expiration", {})
-        ]
-
-        content {
-          noncurrent_days = lookup(noncurrent_version_expiration.value, "days", null)
-        }
-      }
-
-      # Several blocks - noncurrent_version_transition
-      dynamic "noncurrent_version_transition" {
-        for_each = lookup(rule.value, "noncurrent_version_transition", [])
-
-        content {
-          noncurrent_days = lookup(noncurrent_version_transition.value, "days", null)
-          storage_class   = noncurrent_version_transition.value.storage_class
-        }
-      }
+    noncurrent_version_expiration {
+      noncurrent_days = 730
     }
   }
 }
@@ -218,21 +256,21 @@ resource "aws_guardduty_detector" "default" {
   enable = var.aws_guardduty_detector_enable
 }
 
-# AWS GuardDuty Organization Admin Account (Call Centre Staging)
-resource "aws_guardduty_organization_admin_account" "default" {
-  admin_account_id = var.aws_guardduty_organization_admin_account_id
-  depends_on = [aws_guardduty_detector.default]
-}
+# # AWS GuardDuty Organization Admin Account (Call Centre Staging)
+# resource "aws_guardduty_organization_admin_account" "default" {
+#   admin_account_id = var.aws_guardduty_organization_admin_account_id
+#   depends_on = [aws_guardduty_detector.default]
+# }
 
-# AWS GuardDuty Member (Call Centre Staging)
-resource "aws_guardduty_member" "default" {
-  for_each = toset(["211125476974"])
-  account_id = each.key
-  detector_id = aws_guardduty_detector.default.id
-  email = var.aws_guardduty_member_email
-  invite = var.aws_guardduty_member_invite
-  disable_email_notification = var.aws_guardduty_member_disable_email_notification
-}
+# # AWS GuardDuty Member (Call Centre Staging)
+# resource "aws_guardduty_member" "default" {
+#   for_each = toset(["211125476974"])
+#   account_id = each.key
+#   detector_id = aws_guardduty_detector.default.id
+#   email = var.aws_guardduty_member_email
+#   invite = var.aws_guardduty_member_invite
+#   disable_email_notification = var.aws_guardduty_member_disable_email_notification
+# }
 
 # AWS GuardDuty Publishing Destination (Call Centre Staging)
 resource "aws_guardduty_publishing_destination" "default" {

@@ -41,9 +41,9 @@ variable "custom_kms_key" {
 }
 
 variable "versioning_enabled" {
-  type        = bool
+  type        = string
   description = "Activate S3 bucket versioning"
-  default     = true
+  default     = "Enabled"
 }
 
 variable "lifecycle_rule" {
