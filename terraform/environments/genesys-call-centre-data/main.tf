@@ -22,7 +22,22 @@ resource "aws_s3_bucket_notification" "default" {
   }
 }
 
+resource "aws_s3_bucket" "replication" {
+  #checkov:skip=CKV_AWS_144: "Replication not required on replication bucket"
+  #checkov:skip=CKV_AWS_18: "Logging handled in logging configuration resource"
+  #checkov:skip=CKV_AWS_21: "Versioning handled in versioning configuration resource"
+  #checkov:skip=CKV_AWS_145: "Encryption handled in encryption configuration resource"
+
+  count         = var.replication_enabled ? 1 : 0
+  provider      = aws.bucket-replication
+  bucket        = var.bucket_name != null ? "${var.bucket_name}-replication" : null
+  bucket_prefix = var.bucket_prefix != null ? "${var.bucket_prefix}-replication" : null
+  force_destroy = var.force_destroy
+  tags          = var.tags
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
+  #checkov:skip=CKV2_AWS_67: "Ensure AWS S3 bucket encrypted with Customer Managed Key (CMK) has regular rotation"
   bucket = aws_s3_bucket.default.id
   rule {
     apply_server_side_encryption_by_default {
