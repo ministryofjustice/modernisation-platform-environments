@@ -26,18 +26,3 @@ resource "aws_cloudwatch_event_target" "ec2_status_check_failed_target" {
   arn       = aws_cloudwatch_log_group.ec2_status_check_log_group.arn
   target_id = local.alarm_name
 }
-
-resource "aws_cloudwatch_log_resource_policy" "log_group_policy" {
-  policy_name = local.alarm_name
-  policy_document = jsonencode({
-    Version = "2012-10-17",
-    Statement : [{
-      Action = "logs:PutLogEvents",
-      Effect = "Allow",
-      Principal = {
-        Service = "events.amazonaws.com"
-      },
-      Resource = aws_cloudwatch_log_group.ec2_status_check_log_group.arn
-    }]
-  })
-}
