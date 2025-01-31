@@ -64,9 +64,8 @@ resource "aws_glue_catalog_database" "cadt_databases" {
   for_each = var.dbs_to_grant
 
   name = each.value
-
   lifecycle {
-    # Only ignore changes to the properties, but allow the resource itself to be removed
+    prevent_destroy = true
     ignore_changes = [
       description,
       location_uri,
