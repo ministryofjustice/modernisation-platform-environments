@@ -5,7 +5,7 @@ module "managed_grafana" {
   #checkov:skip=CKV2_AWS_5:AMG doesn't run in a VPC, so it doesn't need a security group
 
   source  = "terraform-aws-modules/managed-service-grafana/aws"
-  version = "2.2.0"
+  version = "2.3.0"
 
   name = local.application_name
 
