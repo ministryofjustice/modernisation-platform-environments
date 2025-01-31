@@ -1339,7 +1339,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_prod
         ]
       },
       {
-        "Sid" : "S3BucketPolicy-1",
+        "Sid" : "NewS3BucketPolicy",
         "Effect" : "Allow",
         "Action" : [
           "s3:GetObject",
