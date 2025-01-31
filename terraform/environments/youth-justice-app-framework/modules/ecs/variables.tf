@@ -65,7 +65,7 @@ variable "ecs_services" {
     })), [])
     volumes = optional(list(object({
       name = string
-      host = map(any)
+      host = optional(map(any))
     })), [])
     additional_environment_variables = optional(list(object({
       name  = string
@@ -99,7 +99,7 @@ variable "ecs_services" {
       })), [])
       volumes = optional(list(object({
         name = string
-        host = map(any)
+        host = optional(map(any))
       })), [])
       environment = optional(list(object({
         name  = string

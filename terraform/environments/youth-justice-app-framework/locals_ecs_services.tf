@@ -272,6 +272,36 @@ locals {
         }
       ]
       enable_postgres_secret = false
+      additional_mount_points = [
+        {
+            "sourceVolume": "logging",
+            "containerPath": "/root/logging",
+            "readOnly": false
+        },
+        {
+            "sourceVolume": "gateway-logs",
+            "containerPath": "/var/log/yjaf",
+            "readOnly": false
+        }
+      ]
+      volumes = [
+        {
+          "name" : "logging",
+          "host" : {}
+        },
+        {
+          "name" : "gateway-logs",
+          "dockerVolumeConfiguration": {
+              "scope": "shared",
+              "autoprovision": true,
+              "driver": "local"
+          }
+        },
+        {
+          "name" : "tmpfs-1",
+          "host" : {}
+        }
+      ]
     },
     placements = {
       name        = "placements"
