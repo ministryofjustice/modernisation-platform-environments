@@ -31,9 +31,9 @@ resource "aws_cloudwatch_log_resource_policy" "log_group_policy" {
   policy_name = local.alarm_name
   policy_document = jsonencode({
     Version = "2012-10-17",
-    Statement: [{
-      Action    = "logs:PutLogEvents",
-      Effect    = "Allow",
+    Statement : [{
+      Action = "logs:PutLogEvents",
+      Effect = "Allow",
       Principal = {
         Service = "events.amazonaws.com"
       },

@@ -51,17 +51,17 @@ variable "db_suffix" {
 
 # The following variables are required for setting up the Data Guard Observer as a Microservice
 variable "app_name" {
-  type = string
+  type    = string
   default = null
 }
 
 variable "database_name" {
-  type = string
+  type    = string
   default = null
 }
 
 variable "database_port" {
-  type = number
+  type    = number
   default = null
 }
 
@@ -77,22 +77,22 @@ variable "oracle_db_server_names" {
 variable "sns_topic_arn" {
   description = "The ARN of the SNS topic"
   type        = string
-  default = null
+  default     = null
 }
 
 variable "cluster_security_group_id" {
   description = "Security group id for the cluster"
   type        = string
-  default = null
+  default     = null
 }
 
 variable "delius_microservice_configs" {
-  type = any
+  type    = any
   default = {}
 }
 
 variable "ecs_cluster_arn" {
   description = "The ARN of the ECS cluster"
   type        = string
-  default = null
+  default     = null
 }
