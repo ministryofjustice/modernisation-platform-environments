@@ -27,13 +27,6 @@ resource "aws_s3_bucket_notification" "default" {
   }
 }
 
-# AWS S3 bucket Public Access Block (Call Centre Staging)
-resource "aws_s3_bucket_public_access_block" "default" {
-  bucket = aws_s3_bucket.default.id
-  block_public_acls   = true
-  block_public_policy = true
-}
-
 resource "aws_s3_bucket" "replication" {
   #checkov:skip=CKV_AWS_144: "Replication not required on replication bucket"
   #checkov:skip=CKV_AWS_18: "Logging handled in logging configuration resource"
@@ -189,9 +182,9 @@ resource "aws_s3_bucket_logging" "default" {
   }
 }
 
-# Block public access policies for this bucket
+# AWS S3 bucket Public Access Block (Call Centre Staging)
 resource "aws_s3_bucket_public_access_block" "default" {
-  bucket                  = aws_s3_bucket.default.bucket
+  bucket                  = aws_s3_bucket.default.id
   block_public_acls       = true
   block_public_policy     = true
   ignore_public_acls      = true
