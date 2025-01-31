@@ -102,6 +102,13 @@ locals {
           oasys-national-reporting-environment = "pp"
           domain-name                          = "azure.hmpp.root"
         })
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+          local.cloudwatch_metric_alarms.windows,
+          local.cloudwatch_metric_alarms.bods_primary ,
+        )
       })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
