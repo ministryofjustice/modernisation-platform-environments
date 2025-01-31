@@ -12,6 +12,7 @@ resource "aws_s3_bucket" "default" {
   #checkov:skip=CKV_AWS_18: "Logging handled in logging configuration resource"
   #checkov:skip=CKV_AWS_21: "Versioning handled in Versioning configuration resource"
   #checkov:skip=CKV_AWS_145: "Encryption handled in encryption configuration resource"
+  #checkov:skip=CKV2_AWS_61: "Ensure that an S3 bucket has a lifecycle configuration"
   bucket = var.call_centre_staging_aws_s3_bucket
 }
 
@@ -26,13 +27,18 @@ resource "aws_s3_bucket_notification" "default" {
   }
 }
 
+# AWS S3 bucket Public Access Block (Call Centre Staging)
+resource "aws_s3_bucket_public_access_block" "default" {
+  bucket = aws_s3_bucket.default.id
+  block_public_acls   = true
+  block_public_policy = true
+}
+
 resource "aws_s3_bucket" "replication" {
   #checkov:skip=CKV_AWS_144: "Replication not required on replication bucket"
   #checkov:skip=CKV_AWS_18: "Logging handled in logging configuration resource"
   #checkov:skip=CKV_AWS_21: "Versioning handled in versioning configuration resource"
   #checkov:skip=CKV_AWS_145: "Encryption handled in encryption configuration resource"
-  #checkov:skip=CKV2_AWS_61: "Ensure that an S3 bucket has a lifecycle configuration"
-
   count         = var.replication_enabled ? 1 : 0
   provider      = aws.bucket-replication
   bucket        = var.bucket_name != null ? "${var.bucket_name}-replication" : null
