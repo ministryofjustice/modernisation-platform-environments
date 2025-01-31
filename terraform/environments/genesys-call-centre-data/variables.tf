@@ -382,3 +382,30 @@ variable "network_acl_id" {
   description = ""
   default     = "acl-04ab36970f6f08063"
 }
+
+variable "private_inbound_outbound_acl_rules" {
+  description = "List of inbound and outbound ACL rules for private subnets"
+  type = list(object({
+    protocol  = string
+    from_port = number
+    to_port   = number
+    action    = string
+    cidr_block = string
+  }))
+  default = [
+    {
+      protocol   = "tcp"
+      from_port  = 80
+      to_port    = 80
+      action     = "allow"
+      cidr_block = "0.0.0.0/0"
+    },
+    {
+      protocol   = "tcp"
+      from_port  = 443
+      to_port    = 443
+      action     = "allow"
+      cidr_block = "0.0.0.0/0"
+    }
+  ]
+}

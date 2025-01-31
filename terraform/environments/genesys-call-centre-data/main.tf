@@ -53,7 +53,7 @@ resource "aws_network_acl_rule" "private_inbound" {
   network_acl_id = var.network_acl_id
   rule_number    = 100
   egress         = false
-  protocol       = "tcp"
+  protocol       = var.private_inbound_outbound_acl_rules[count.index]["protocol"]
   rule_action    = "allow"
   cidr_block     = "0.0.0.0/0"
   from_port      = 80
@@ -64,7 +64,7 @@ resource "aws_network_acl_rule" "private_outbound" {
   network_acl_id = var.network_acl_id
   rule_number    = 200
   egress         = false
-  protocol       = "tcp"
+  protocol       = var.private_inbound_outbound_acl_rules[count.index]["protocol"]
   rule_action    = "allow"
   cidr_block     = "0.0.0.0/0"
   from_port      = 80
