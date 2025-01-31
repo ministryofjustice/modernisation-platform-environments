@@ -16,6 +16,18 @@ resource "aws_s3_bucket" "default" {
   bucket = var.call_centre_staging_aws_s3_bucket
 }
 
+resource "aws_s3_bucket" "replication" {
+  #checkov:skip=CKV_AWS_144: "Replication not required on replication bucket"
+  #checkov:skip=CKV_AWS_18: "Logging handled in logging configuration resource"
+  #checkov:skip=CKV_AWS_21: "Versioning handled in versioning configuration resource"
+  #checkov:skip=CKV_AWS_145: "Encryption handled in encryption configuration resource"
+  count         = var.replication_enabled ? 1 : 0
+  provider      = aws.bucket-replication
+  bucket        = var.bucket_name != null ? "${var.bucket_name}-replication" : null
+  bucket_prefix = var.bucket_prefix != null ? "${var.bucket_prefix}-replication" : null
+  force_destroy = var.force_destroy
+}
+
 # Event Notifications for S3 buckets
 resource "aws_s3_bucket_notification" "default" {
   count  = var.replication_enabled && var.notification_enabled ? 1 : 0
@@ -27,17 +39,14 @@ resource "aws_s3_bucket_notification" "default" {
   }
 }
 
-resource "aws_s3_bucket" "replication" {
-  #checkov:skip=CKV_AWS_144: "Replication not required on replication bucket"
-  #checkov:skip=CKV_AWS_18: "Logging handled in logging configuration resource"
-  #checkov:skip=CKV_AWS_21: "Versioning handled in versioning configuration resource"
-  #checkov:skip=CKV_AWS_145: "Encryption handled in encryption configuration resource"
-  count         = var.replication_enabled ? 1 : 0
-  provider      = aws.bucket-replication
-  bucket        = var.bucket_name != null ? "${var.bucket_name}-replication" : null
-  bucket_prefix = var.bucket_prefix != null ? "${var.bucket_prefix}-replication" : null
-  force_destroy = var.force_destroy
-  # tags          = var.tags
+resource "aws_s3_bucket_notification" "replication" {
+  count  = var.replication_enabled ? 1 : 0
+  bucket = aws_s3_bucket.replication[count.index].id
+
+  topic {
+    topic_arn = var.notification_sns_arn
+    events    = var.notification_events
+  }
 }
 
 # tfsec:ignore:aws-s3-encryption-customer-key
