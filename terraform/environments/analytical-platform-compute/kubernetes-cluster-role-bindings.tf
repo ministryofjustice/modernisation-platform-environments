@@ -1,4 +1,4 @@
-resource "kubernetes_role_binding" "mwaa_external_secrets" {
+resource "kubernetes_cluster_role_binding" "mwaa_external_secrets" {
   metadata {
     name = "mwaa-external-secrets"
   }
