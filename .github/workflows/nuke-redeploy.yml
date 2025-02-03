@@ -21,7 +21,6 @@ env:
   AWS_REGION: "eu-west-2"
   ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
   NUKE_REDEPLOY_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE_REBUILD }}
-  BACKEND_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
   TF_IN_AUTOMATION: true
 
 permissions: {}
@@ -77,7 +76,7 @@ jobs:
         run: |
           terraform --version
           echo "Terraform Plan - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
-          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development} "assume_role={role_arn=\"arn:aws:iam::${{ env.BACKEND_NUMBER }}:role/modernisation-account-terraform-state-member-access\"}"
+          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
           terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
           bash scripts/terraform-plan.sh terraform/environments/${ACCOUNT_NAME%-development}
 
@@ -86,7 +85,7 @@ jobs:
         run: |
           terraform --version
           echo "Terraform apply - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
-          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development} "assume_role={role_arn=\"arn:aws:iam::${{ env.BACKEND_NUMBER }}:role/modernisation-account-terraform-state-member-access\"}"
+          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
           terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
           bash scripts/terraform-apply.sh terraform/environments/${ACCOUNT_NAME%-development}
 
