@@ -12,7 +12,7 @@ locals {
     ])
     enduserclient_public2 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-      module.ip_addresses.mp_cidrs.live_eu_west_nat,
+      module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
     ])
     noms_core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
     oasys_db = flatten([
