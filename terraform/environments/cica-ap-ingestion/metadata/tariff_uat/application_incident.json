@@ -1,0 +1,37 @@
+{
+    "$schema": "https://moj-analytical-services.github.io/metadata_schema/table/v1.4.0.json",
+    "name": "application_incident",
+    "description": "",
+    "data_format": "parquet",
+    "columns": [
+        {
+            "name": "op",
+            "type": "character",
+            "description": "Type of change, for rows added by ongoing replication.",
+            "nullable": true,
+            "enum": [
+                "I",
+                "U",
+                "D"
+            ]
+        },
+        {
+            "name": "ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        }
+    ],
+    "location": "APPLICATION_INCIDENT/",
+    "primary_key": [
+        "primary_key_col"
+    ],
+    "partitions": null
+}
+

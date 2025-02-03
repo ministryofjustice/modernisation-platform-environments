@@ -1,0 +1,169 @@
+{
+    "$schema": "https://moj-analytical-services.github.io/metadata_schema/table/v1.4.0.json",
+    "name": "cases",
+    "description": "",
+    "data_format": "parquet",
+    "columns": [
+        {
+            "name": "op",
+            "type": "character",
+            "description": "Type of change, for rows added by ongoing replication.",
+            "nullable": true,
+            "enum": [
+                "I",
+                "U",
+                "D"
+            ]
+        },
+        {
+            "name": "anon",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "appl_rec_date",
+            "type": "date",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "appl_rec_date",
+            "type": "date",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ar_ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ar_ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "archived_date",
+            "type": "date",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "cica_account",
+            "type": "varchar2",
+            "description": "",
+            "nullable": true
+        },
+        {
+            "name": "cica_online",
+            "type": "varchar2",
+            "description": "",
+            "nullable": true
+        },
+        {
+            "name": "created_date",
+            "type": "date",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "curr_stat_type",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "last_mov_date",
+            "type": "date",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "per_id",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "per_id",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "per_id",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "prefix",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "prefix",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "section_ref",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "section_ref",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "sub_type",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "sub_type",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        }
+    ],
+    "location": "CASES/",
+    "primary_key": [
+        "ar_ref_no", "ref_year"
+    ],
+    "partitions": null
+}
+
