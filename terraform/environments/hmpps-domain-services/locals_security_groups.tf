@@ -75,6 +75,20 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient_internal
         }
+        dns-resolution-tcp = {
+          description = "Allow TCP for domain name resolution"
+          from_port   = 53
+          to_port     = 53
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.domain_controllers
+        }
+        dns-resolution-udp = {
+          description = "Allow UDP for domain name resolution"
+          from_port   = 53
+          to_port     = 53
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.domain_controllers
+        }
         rpc_udp_rd_sessionhost = {
           description = "135: UDP MS-RPC ingress from remote desktop session hosts"
           from_port   = 135
@@ -95,6 +109,41 @@ locals {
           to_port     = 443
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient_internal
+        }
+        rpc-session-host = {
+          description = "Allow connection to RD Session Host"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        rpd-session-host = {
+          description = "Allow connection to RD Session Host"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        rdp-session-host-udp = {
+          description = "Allow connection to RD Session Host and internal RD Resources"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        rdp-udp = {
+          description = "RDP over UDP from external RD Clients to the Gateway"
+          from_port   = 3391
+          to_port     = 3391
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        winrm_rds = {
+          description = "5985/6: Allow WinRM TCP ingress (powershell remoting) for RDS"
+          from_port   = 5985
+          to_port     = 5986
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
         rpc_dynamic_tcp_rd_sessionhost = {
           description = "49152-65535: TCP Dynamic Port ingress from remote desktop session hosts"
@@ -146,6 +195,20 @@ locals {
           to_port     = 135
           protocol    = "UDP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        rds_ad_389 = {
+          description = "389: AD communication"
+          from_port   = 389
+          to_port     = 389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.domain_controllers
+        }
+        rds_ad_636 = {
+          description = "636: AD communication"
+          from_port   = 636
+          to_port     = 636
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.domain_controllers
         }
         rpc_tcp_cb = {
           description = "445: Allow RPC TCP ingress from Connection Broker"
