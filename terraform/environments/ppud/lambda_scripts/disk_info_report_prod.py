@@ -22,8 +22,8 @@ SENDER = "donotreply@cjsm.secure-email.ppud.justice.gov.uk"
 RECIPIENTS = ["nick.buckingham@colt.net", "gabriela.browning@colt.net", "pankaj.pant@colt.net", "david.savage@colt.net"]
 SUBJECT = f'AWS PPUD Disk Information Report - {CURRENT_DATE}'
 AWS_REGION = 'eu-west-2'
-bucket_name = 'moj-lambda-layers-prod'
-file_key = 'all-disks.log'
+bucket_name = 'moj-infrastructure'
+file_key = 'lambda/output/all-disks.log'
 
 # SMTP Configuration
 SMTP_SERVER = "10.27.9.39"
