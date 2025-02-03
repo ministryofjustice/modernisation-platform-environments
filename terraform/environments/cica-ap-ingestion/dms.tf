@@ -1,18 +1,3 @@
-
-# parameters for Tariff
-#resource "aws_dms_endpoint" "source" {
-#  database_name = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["dbname"]
-#  endpoint_id   = "tariff-source"
-#  endpoint_type = "source"
-#  engine_name   = "oracle"
-#  password      = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
-#  port          = 1521
-#  server_name   = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
-#  ssl_mode      = "none"
-#
-#  username = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
-#}
-
 # DMS Source Endpoint
 resource "aws_dms_endpoint" "source_endpoint" {
   endpoint_id   = var.source_database.endpoint_id
@@ -39,23 +24,6 @@ resource "aws_security_group" "vpc_dms_replication_instance_group" {
   description = "allow dms replication instance access to the shared vpc on the modernisation platform"
 }
 
-  ingress {
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    description     = "Allow all inbound traffic from ec2"
-    security_groups = [aws_security_group.cluster_ec2.id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    description = "Allow all outbound traffic"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-
 # DMS Replication Subnet Group
 resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
   replication_subnet_group_id          = "dms-replication-subnet-group"
@@ -73,11 +41,10 @@ resource "aws_dms_replication_instance" "replication_instance" {
 
 # DMS Replication Task
 resource "aws_dms_replication_task" "replication_task" {
-  replication_task_id      = "replication_task-id-CHANGE-THIS!!"
-  table_mappings           = "????"
-  migration_type           = "full-load-and-cdc" # Adjust as necessary
-  replication_instance_arn = aws_dms_replication_instance.replication_instance.arn
-  source_endpoint_arn      = aws_dms_endpoint.source_endpoint.arn
-  target_endpoint_arn      = aws_dms_s3_endpoint.s3_target_endpoint.arn
+  replication_task_id       = "${replace(var.database_name, "_", "-")}-db-migration-task-tf"
+  table_mappings            = trimspace(file("${path.module}/dms_${var.database_name}_task_transformations.json"))
+  migration_type            = "full-load-and-cdc"
+  replication_instance_arn  = aws_dms_replication_instance.replication_instance.arn
+  source_endpoint_arn       = aws_dms_endpoint.source_endpoint.arn
+  target_endpoint_arn       = aws_dms_s3_endpoint.s3_target_endpoint.arn
 }
-

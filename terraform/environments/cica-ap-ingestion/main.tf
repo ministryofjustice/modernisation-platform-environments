@@ -146,31 +146,31 @@ resource "aws_dms_replication_task" "dms-replication" {
 }
 
 # Create an endpoint for the source database
-resource "aws_dms_endpoint" "source" {
-  #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
-  #checkov:skip=CKV_AWS_296: "Ensure DMS endpoint uses Customer Managed Key (CMK).TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
-
-
-  count = var.setup_dms_instance ? 1 : 0
-
-  database_name = var.source_db_name
-  endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source"
-  endpoint_type = "source"
-  engine_name   = var.source_engine_name
-  password      = var.source_app_password
-  port          = var.source_db_port
-  server_name   = var.source_address
-  ssl_mode      = "none"
-  username      = var.source_app_username
-
-  extra_connection_attributes = var.extra_attributes
-
-  tags = var.tags
-
-  depends_on = [
-    aws_dms_replication_instance.dms
-  ]
-}
+#resource "aws_dms_endpoint" "source" {
+#  #checkov:skip=CKV2_AWS_49: "Ensure AWS Database Migration Service endpoints have SSL configured - Will resolve through Spike"
+#  #checkov:skip=CKV_AWS_296: "Ensure DMS endpoint uses Customer Managed Key (CMK).TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
+#
+#
+#  count = var.setup_dms_instance ? 1 : 0
+#
+#  database_name = var.source_db_name
+#  endpoint_id   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-source"
+#  endpoint_type = "source"
+#  engine_name   = var.source_engine_name
+#  password      = var.source_app_password
+#  port          = var.source_db_port
+#  server_name   = var.source_address
+#  ssl_mode      = "none"
+#  username      = var.source_app_username
+#
+#  extra_connection_attributes = var.extra_attributes
+#
+#  tags = var.tags
+#
+#  depends_on = [
+#    aws_dms_replication_instance.dms
+#  ]
+#}
 
 
 # Create a subnet group using existing VPC subnets
