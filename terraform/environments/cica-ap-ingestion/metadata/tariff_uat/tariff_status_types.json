@@ -1,0 +1,43 @@
+{
+    "$schema": "https://moj-analytical-services.github.io/metadata_schema/table/v1.4.0.json",
+    "name": "tariff_status_types",
+    "description": "",
+    "data_format": "parquet",
+    "columns": [
+        {
+            "name": "op",
+            "type": "character",
+            "description": "Type of change, for rows added by ongoing replication.",
+            "nullable": true,
+            "enum": [
+                "I",
+                "U",
+                "D"
+            ]
+        },
+        {
+            "name": "curr",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "descr",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "stat_type",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        }
+    ],
+    "location": "TARIFF_STATUS_TYPES/",
+    "primary_key": [
+        "primary_key_col"
+    ],
+    "partitions": null
+}
+
