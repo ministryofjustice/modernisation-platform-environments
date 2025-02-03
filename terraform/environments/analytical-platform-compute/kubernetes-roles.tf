@@ -88,12 +88,32 @@ resource "kubernetes_role" "mwaa_execution" {
 
 resource "kubernetes_role" "mwaa_serviceaccount_management" {
   metadata {
-    name      = "airflow-serviceaccount-management"
+    name      = "mwaa-serviceaccount-management"
     namespace = kubernetes_namespace.mwaa.metadata[0].name
   }
   rule {
     api_groups = [""]
     resources  = ["serviceaccounts"]
+    verbs = [
+      "create",
+      "delete",
+      "get",
+      "list",
+      "patch",
+      "update"
+    ]
+  }
+}
+
+resource "kubernetes_role" "mwaa_external_secrets" {
+  metadata {
+    name      = "mwaa-external-secrets"
+    namespace = kubernetes_namespace.mwaa.metadata[0].name
+
+  }
+  rule {
+    api_groups = ["external-secrets.io"]
+    resources  = ["externalsecrets"]
     verbs = [
       "create",
       "delete",
