@@ -100,13 +100,16 @@ locals {
       #   })
       # }
       test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
+        autoscaling_group = merge(local.ec2_autoscaling_groups.rds.autoscaling_group, {
+          desired_capacity = 0
+        })
         config = merge(local.ec2_autoscaling_groups.rds.config, {
           availability_zone = "eu-west-2a"
           user_data_raw = base64encode(templatefile(
             "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-            branch = "TM/TM-916/add-rds-role-to-jumpservers"
+              branch = "TM/TM-916/add-rds-role-to-jumpservers"
             }
-          ))          
+          ))
         })
         tags = merge(local.ec2_autoscaling_groups.rds.tags, {
           domain-name = "azure.noms.root"
@@ -141,7 +144,7 @@ locals {
           availability_zone = "eu-west-2b"
           user_data_raw = base64encode(templatefile(
             "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-            branch = "TM/TM-916/add-rds-role-to-jumpservers"
+              branch = "TM/TM-916/add-rds-role-to-jumpservers"
             }
           ))
         })
