@@ -47,7 +47,7 @@
         },        
         {
             "rule-type": "transformation",
-            "rule-id": "4",
+            "rule-id": "ZTABLE",
             "rule-name": "add_client_db",
             "rule-target": "column",
             "object-locator": {
@@ -62,6 +62,16 @@
                 "length": "20",
                 "scale": ""
             }
-        }
+        },
+        {
+            "rule-type": "selection",
+            "rule-id": "1",
+            "rule-name": "select_zed_table",
+            "object-locator": {
+                "schema-name": "DELIUS_APP_SCHEMA",
+                "table-name": "Z_HP7874_OFFENDER"
+            },
+            "rule-action": "include"
+        },
     ]
 }
