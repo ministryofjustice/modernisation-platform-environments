@@ -5,7 +5,7 @@ locals {
   retention_job_short_name = "${local.project}-maintenance-retention"
   retention_job_name       = "${local.retention_job_short_name}-${local.env}"
 
-  curated_zone_nomis_path    = "s3://${module.s3_curated_bucket.bucket_id}/nomis/"
+  curated_zone_nomis_path = "s3://${module.s3_curated_bucket.bucket_id}/nomis/"
 
   compact_job_class   = "uk.gov.justice.digital.job.CompactionJob"
   retention_job_class = "uk.gov.justice.digital.job.VacuumJob"
