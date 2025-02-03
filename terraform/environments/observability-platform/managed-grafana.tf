@@ -5,7 +5,7 @@ module "managed_grafana" {
   #checkov:skip=CKV2_AWS_5:AMG doesn't run in a VPC, so it doesn't need a security group
 
   source  = "terraform-aws-modules/managed-service-grafana/aws"
-  version = "2.1.1"
+  version = "2.2.0"
 
   name = local.application_name
 
@@ -31,7 +31,7 @@ module "managed_grafana" {
 
   role_associations = {
     "ADMIN" = {
-      "group_ids" = [data.aws_identitystore_group.observability_platform.id]
+      "group_ids" = [for group in data.aws_identitystore_group.observability_platform_admins : group.id]
     }
     "EDITOR" = {
       "group_ids" = [for team in data.aws_identitystore_group.all_identity_centre_teams : team.id]

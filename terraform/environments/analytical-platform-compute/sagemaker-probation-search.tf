@@ -6,7 +6,7 @@ locals {
     analytical-platform-compute-development = {
       hmpps-probation-search-dev = {
         namespace       = "hmpps-probation-search-dev"
-        instance_type   = "ml.t2.medium"
+        instance_type   = "ml.t2.large"
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
@@ -17,13 +17,13 @@ locals {
     analytical-platform-compute-production = {
       hmpps-probation-search-preprod = {
         namespace       = "hmpps-probation-search-preprod"
-        instance_type   = "ml.t2.medium"
+        instance_type   = "ml.t2.large"
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
           HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
         }
-      },
+      }
       hmpps-probation-search-prod = {
         namespace       = "hmpps-probation-search-prod"
         instance_type   = "ml.g6.xlarge"
@@ -59,9 +59,9 @@ resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
 }
 
 resource "aws_sagemaker_endpoint_configuration" "probation_search_config" {
-  for_each    = tomap(local.probation_search_environment)
-  name        = "${each.value.namespace}-sagemaker-endpoint-config"
-  kms_key_arn = module.sagemaker_kms.key_arn
+  #checkov:skip=CKV_AWS_98:KMS key is not supported for NVMe instance storage.
+  for_each = tomap(local.probation_search_environment)
+  name     = "${each.value.namespace}-sagemaker-endpoint-config"
   production_variants {
     variant_name           = "AllTraffic"
     model_name             = aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key].name
@@ -132,6 +132,31 @@ resource "aws_iam_role" "probation_search_sagemaker_execution_role" {
           Service = "sagemaker.amazonaws.com"
         }
         Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "probation_search_sagemaker_logs_policy" {
+  #checkov:skip=CKV_AWS_290:Role is only used by SageMaker service
+  #checkov:skip=CKV_AWS_355:Role is only used by SageMaker service
+  for_each = tomap(local.probation_search_environment)
+  role     = aws_iam_role.probation_search_sagemaker_execution_role[each.key].id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "LogsAccess"
+        Effect = "Allow"
+        Action = [
+          "cloudwatch:PutMetricData",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:CreateLogGroup",
+          "logs:DescribeLogStreams"
+        ]
+        Resource = "*"
       }
     ]
   })

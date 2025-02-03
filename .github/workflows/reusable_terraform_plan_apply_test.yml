@@ -117,8 +117,8 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           terraform --version
-          echo "terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${{env.BACKEND_NUMBER}}:role/modernisation-account-terraform-state-member-access\"}"
-          terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${{env.BACKEND_NUMBER}}:role/modernisation-account-terraform-state-member-access\"}
+          echo "terraform init"
+          terraform init
 
       - name: Terraform Workspace Select
         working-directory: "terraform/environments/${{ inputs.application }}"
@@ -243,12 +243,6 @@ jobs:
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-      - name: Get Backend AWS Account Number
-        run: |
-          BACKEND_NUMBER=$(jq -r -e '.modernisation_platform_account_id' <<< $ENVIRONMENT_MANAGEMENT)
-          echo "::add-mask::$BACKEND_NUMBER"
-          echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
         with:
@@ -266,8 +260,8 @@ jobs:
         working-directory: "terraform/environments/${{ inputs.application }}"
         run: |
           terraform --version
-          echo "terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${{env.BACKEND_NUMBER}}:role/modernisation-account-terraform-state-member-access\"}"
-          terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${{env.BACKEND_NUMBER}}:role/modernisation-account-terraform-state-member-access\"}
+          echo "terraform init"
+          terraform init
 
       - name: Terraform Workspace Select
         working-directory: "terraform/environments/${{ inputs.application }}"

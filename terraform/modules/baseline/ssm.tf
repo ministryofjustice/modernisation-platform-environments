@@ -120,6 +120,7 @@ resource "aws_ssm_parameter" "fixed" {
   type        = each.value.type
   key_id      = each.value.type == "SecureString" && each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
   value       = each.value.value
+  tier        = each.value.tier
 
   tags = merge(local.tags, {
     Name = each.key

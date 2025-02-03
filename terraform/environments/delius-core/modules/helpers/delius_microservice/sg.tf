@@ -70,6 +70,7 @@ resource "aws_security_group_rule" "bastion_to_ecs_service_tcp" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "nlb_to_ecs_service" {
+  count                        = length(var.container_port_config) == 0 ? 0 : 1
   security_group_id            = aws_security_group.ecs_service.id
   description                  = "network load balancer to ecs service"
   from_port                    = var.container_port_config[0].containerPort
