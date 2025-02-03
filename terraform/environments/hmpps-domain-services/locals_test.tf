@@ -105,6 +105,9 @@ locals {
         })
         config = merge(local.ec2_autoscaling_groups.rds.config, {
           availability_zone = "eu-west-2a"
+          instance_profile_policies = merge(local.ec2_autoscaling_groups.rds.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
           user_data_raw = base64encode(templatefile(
             "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
               branch = "TM/TM-916/add-rds-role-to-jumpservers"
@@ -178,6 +181,24 @@ locals {
       #     password_secret_name = "/microsoft/AD/azure.noms.root/shared-passwords"
       #   }
       # }
+    }
+
+    iam_policies = {
+      Ec2SecretPolicy = {
+        description = "Permissions required for secret value access by instances"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/microsoft/AD/azure.noms.root/shared-passwords-*",
+            ]
+          }
+        ]
+      }
     }
 
     lbs = {
