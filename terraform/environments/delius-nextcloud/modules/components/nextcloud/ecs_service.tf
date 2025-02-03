@@ -57,8 +57,8 @@ module "nextcloud_service" {
     readOnly      = false
   }]
 
-  ecs_cluster_arn   = module.ecs.ecs_cluster_arn
-  env_name          = var.env_name
+  ecs_cluster_arn = module.ecs.ecs_cluster_arn
+  env_name        = var.env_name
   alb_health_check = {
     path                 = "/status.php"
     interval             = 30

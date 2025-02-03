@@ -40,7 +40,7 @@
           component:
             type: string
             required: false
-            default: ""
+            default: "NONE"
             description: "Optional: subfolder in 'terraform/environments/<application>' if present."
 
         secrets:
@@ -56,7 +56,7 @@
       GITHUB_TOKEN: "${{ secrets.pipeline_github_token }}"
 
     concurrency:
-      group: ${{ inputs.application }}-${{ inputs.environment }}
+      group: ${{ inputs.application }}-${{ inputs.environment }}-${{ inputs.component }}
 
     jobs:
       plan:
@@ -91,7 +91,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a  # v4.0.1
+            uses: aws-actions/configure-aws-credentials@4fc4975a852c8cd99761e2de1f4ba73402e44dd9  # v4.0.3
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
               role-session-name: githubactionsrolesession
@@ -287,7 +287,7 @@
               echo "BACKEND_NUMBER=${BACKEND_NUMBER}" >> $GITHUB_ENV
 
           - name: Configure AWS Credentials
-            uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a  # v4.0.1
+            uses: aws-actions/configure-aws-credentials@4fc4975a852c8cd99761e2de1f4ba73402e44dd9  # v4.0.3
             with:
               role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
               role-session-name: githubactionsrolesession
