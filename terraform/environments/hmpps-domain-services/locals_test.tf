@@ -105,7 +105,7 @@ locals {
         })
         config = merge(local.ec2_autoscaling_groups.rds.config, {
           availability_zone = "eu-west-2a"
-          instance_profile_policies = merge(local.ec2_autoscaling_groups.rds.config.instance_profile_policies, [
+          instance_profile_policies = concat(local.ec2_autoscaling_groups.rds.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
           user_data_raw = base64encode(templatefile(
