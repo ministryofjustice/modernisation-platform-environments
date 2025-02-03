@@ -1,8 +1,7 @@
 {
-    "keys": {
-      "development": {
-      },
-      "preproduction": {},
-      "production": {}
-    }
+  "keys": {
+    "development": {},
+    "preproduction": {},
+    "production": {}
   }
+}
