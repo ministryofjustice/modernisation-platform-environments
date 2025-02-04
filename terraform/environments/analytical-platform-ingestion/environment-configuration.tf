@@ -79,7 +79,7 @@ locals {
       /* Transfer Server */
       transfer_server_hostname = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
       transfer_server_sftp_users = {
-        "chris-j" = {
+        "sscl-chris-j" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAgEAx1BrX2NaosOZiGrfvuMYU08aycG/IlBO9FuZFAnXjLTGzw7BABkEJgCG6BHQydJymQIVNxhM9558p/l3CuAA7ItXncRLNNZ4eSLs2x81amEujV7KOuan28LSKU4yd5K+bCUOnpq35w0XEeYrwvEUHgrlR75FWumrus3rpv7xSbz4+7YqtweVOREUNew8Md/1jJpr26CHgn1VqtLKWzUOVU/UjKlKhr+dH7CbFGaux0Le+ntvD04TL91fx3yGFBN23Ybw+epGNhVFlPKuFfr++SDbF5M22jFu1lMtL96CPEVgTMYgcwRLeX51CrykmezFq1YEY//w2JDw8PKbDYF2ouLZLexh0M9l95VvejNNGx2BIEkfblXH8zWIWPu6D9ju6HOzucqKTctjLioZGVoaBwZA8MG8KvS887+4R611VNxZ05PxGJiIqWAcwgDKl91uFuzOkWXmoWXALqyI/QEMO5CU3JoUsZhHY4+eEnxyIoN1xqB4XSUwsvY0/hRZs2bvnTgKIPkwjqckhytpuTT6L8oAhSLDaUyBhy216pIBgq0EFRpStdLa2R3PQrrXalxl4ooyz3AeshnIUi4WslXRnw7/WUcgOeV5i8jqQmygvLlLjAtyAT+zsC0ItXsDzrovN9dpTTHmsPwr3ZGM9TmdrVZC7h3ZOkbrckhfVLtE8wU="
           cidr_blocks = ["51.140.183.67/32"]
         }
