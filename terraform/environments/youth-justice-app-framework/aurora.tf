@@ -19,6 +19,7 @@ module "aurora" {
   snapshot_identifier = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:sharedwithdevencrypt"
 
   user_passwords_to_reset = ["postgres_rotated"]
+  aws_account_id          = local.application_data.accounts[local.environment].source_account
 
   engine          = "aurora-postgresql"
   engine_version  = "16.2"
