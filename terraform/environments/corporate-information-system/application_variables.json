@@ -16,7 +16,24 @@
       "sdisize": "150",
       "s3fs_ami_id": "ami-0a6006bac3b9bb8d3",
       "s3fsinstancetype": "t3a.small",
-      "ccms_mp_dev_cidr": "10.26.56.0/21"
+      "ccms_mp_dev_cidr": "10.26.56.0/21",
+      "cis_environment": "dev",
+      "alert_evaluation_period": "5",   
+      "alert_period": "60",
+      "alert_threshold": "90",
+      "cis_logstream_errors_detected_threshold": "1",
+      "cis_logstream_errors_detected_periods": "3600",
+      "cis_logstream_errors_detected_evaluation_periods": "1",
+      "cis_log_metric_name_rman_arch_backup": "rman_arch_backup_log_errors",
+      "cis_log_metric_name_rman_backup": "rman_backup_log_errors",
+      "cis_log_metric_pmon_status": "db_PMON_status_alerts",
+      "cis_log_metrics_tbs_freespace": "db_tablespace_space_alerts",
+      "cis_diskspace_alert_evaluation_periods": "1",
+      "cis_disk_path": "/oracle/dbf",
+      "cis_disk_device": "/dev/xvdf",
+      "cis_disk_fs_type": "ext4",
+      "cis_log_metrics_oracle_alerts": "oracle_alert_log_errors",
+      "edw_dashboard_refresh_period": "60"
     },
     "test": {
       "example_var": "test-data"
