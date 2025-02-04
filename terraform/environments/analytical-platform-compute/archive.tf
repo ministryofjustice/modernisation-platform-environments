@@ -15,7 +15,7 @@ resource "null_resource" "prepare_plugins" {
 
 data "archive_file" "airflow_plugins" {
   type        = "zip"
-  source_dir  = "dist/airflow/plugins"
+  source_dir  = "src/airflow/plugins"
   output_path = "plugins.zip"
 
   depends_on = [null_resource.prepare_plugins]
