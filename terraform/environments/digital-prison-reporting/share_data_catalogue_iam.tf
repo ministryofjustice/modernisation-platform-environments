@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "datahub_read_cadet_bucket" {
       "s3:Describe*"
     ]
     resources = [
-      module.s3_structured_historical_bucket.bucket.arn
+      module.s3_structured_historical_bucket.bucket_arn
     ]
     condition {
       test = "StringLike"
@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "datahub_read_cadet_bucket" {
 }
 
 resource "aws_iam_policy" "datahub_read_cadet_bucket" {
-  name   = "datahub_read_CaDeT_bucket"
+  name   = "${local.project}_datahub_read_cadet_bucket"
   policy = data.aws_iam_policy_document.datahub_read_cadet_bucket.json
 }
 
@@ -52,9 +52,19 @@ data "aws_iam_policy_document" "datahub_ingestion_github_actions" {
 }
 
 resource "aws_iam_role" "datahub_ingestion_github_actions" {
-  name                 = "datahub-ingestion-github-actions"
+  name                 = "${local.project}_datahub-ingestion-github-actions"
   assume_role_policy   = data.aws_iam_policy_document.datahub_ingestion_github_actions.json
   max_session_duration = 14400
+  
+  tags = merge(
+    local.tags,
+    {
+      Name           = "${local.project}_datahub-ingestion-github-actions"
+      Resource_Type  = "iam"
+      Jira           = "DPR2-751"
+      Resource_Group = "Front-End"
+    }
+  )
 }
 
 resource "aws_iam_role_policy_attachment" "datahub_ingestion_github_actions" {
