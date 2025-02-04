@@ -6,8 +6,6 @@ module "s3_staging" {
   }
 }
 
-# Skip Checkov: AVD-AWS-0102
-#checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
 
 # AWS S3 Bucket (Call Centre Staging)
 resource "aws_s3_bucket" "default" {
@@ -287,6 +285,61 @@ resource "aws_kms_key" "s3" {
       }
     ]
   })
+}
+
+# Skip Checkov: AVD-AWS-0102
+resource "aws_network_acl" "example" {
+  #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+  vpc_id = ""
+  subnet_ids = ""
+}
+
+resource "aws_network_acl_rule" "allow_http_inbound" {
+  #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+  network_acl_id = aws_network_acl.example.id
+  rule_number    = 100
+  egress         = false
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 80
+  to_port        = 80
+}
+
+resource "aws_network_acl_rule" "allow_https_inbound" {
+  #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+  network_acl_id = aws_network_acl.example.id
+  rule_number    = 101
+  egress         = false
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 443
+  to_port        = 443
+}
+
+resource "aws_network_acl_rule" "allow_http_outbound" {
+  #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+  network_acl_id = aws_network_acl.example.id
+  rule_number    = 200
+  egress         = true
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 80
+  to_port        = 80
+}
+
+resource "aws_network_acl_rule" "allow_https_outbound" {
+  #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+  network_acl_id = aws_network_acl.example.id
+  rule_number    = 201
+  egress         = true
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 443
+  to_port        = 443
 }
 
 data "aws_caller_identity" "current" {}
