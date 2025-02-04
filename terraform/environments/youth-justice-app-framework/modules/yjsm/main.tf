@@ -2,8 +2,26 @@ resource "aws_instance" "yjsm" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = "t3a.xlarge"  
   key_name               = "user1"       
-  monitoring             = true          
+  monitoring             = true
+  ebs_optimized          = true
+  iam_instance_profile   = var.yjsm_ec2_role
+  
+  vpc_security_group_ids = [var.yjsm_service]
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }   
+  
+  
+  root_block_device {
+    encrypted             = true
+    delete_on_termination = false
+    volume_size           = 60
+    volume_type           = "gp2"
+    device_name           = "/dev/xvda"
+  }
+  
   tags = {
     Name = "YJSM"
   }
