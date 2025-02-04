@@ -27,7 +27,7 @@ resource "aws_iam_policy" "rds_export_to_s3_policy" {
           "s3:PutObject",
           "s3:AbortMultipartUpload"
         ],
-        "Resource" : "arn:aws:s3:::moj-${local.environment}-redshift-serverless-yjb-reporting/*"
+        "Resource" : "arn:aws:s3:::moj-${local.environment}-redshift-yjb-reporting/*"
       }
     ]
   })

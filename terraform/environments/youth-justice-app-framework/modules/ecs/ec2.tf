@@ -63,7 +63,7 @@ module "autoscaling" {
 
   # Launch template settings
   create_launch_template = true
-  ebs_optimized          = "Disable"
+  ebs_optimized          = false
   #launch_template_id     = aws_launch_template.this.id #todo try creating within the module instead
   launch_template_name = "${var.cluster_name}-ec2-launch-template"
   image_id             = local.ecs_optimized_ami.image_id #todo change to output of image builder
