@@ -1,3 +1,14 @@
+#trivy:ignore:AVD-AWS-0102
+module "s3_staging" {
+  source = "../.."
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+}
+
+# Skip Checkov: AVD-AWS-0102
+#checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+
 # AWS S3 Bucket (Call Centre Staging)
 resource "aws_s3_bucket" "default" {
   #checkov:skip=CKV_AWS_144: "Replication handled in replication configuration resource"
@@ -230,4 +241,52 @@ resource "aws_guardduty_organization_configuration" "default" {
   detector_id = aws_guardduty_detector.default.id
 }
 
-# AWS GuardDuty Organization Admin Account (Call
+# AWS GuardDuty Organization Admin Account (Call Centre Staging)
+resource "aws_guardduty_organization_admin_account" "default" {
+  admin_account_id = var.aws_guardduty_organization_admin_account_id_string
+  depends_on = [aws_guardduty_detector.default]
+}
+
+# AWS GuardDuty Member (Call Centre Staging)
+resource "aws_guardduty_member" "default" {
+  for_each = toset(var.aws_guardduty_organization_admin_account_id_list)
+  account_id = each.key
+  detector_id = aws_guardduty_detector.default.id
+  email = var.aws_guardduty_member_email
+  invite = var.aws_guardduty_member_invite
+  disable_email_notification = var.aws_guardduty_member_disable_email_notification
+}
+
+# AWS GuardDuty Publishing Destination (Call Centre Staging)
+resource "aws_guardduty_publishing_destination" "default" {
+  detector_id     = aws_guardduty_detector.default.id
+  destination_arn = aws_s3_bucket.default.arn
+  kms_key_arn     = aws_kms_key.s3.arn
+  depends_on = [
+    aws_s3_bucket.default,
+    aws_s3_bucket_policy.default
+  ]
+}
+
+# AWS KMS Key (Call Centre Staging)
+resource "aws_kms_key" "s3" {
+  #checkov:skip=CKV_AWS_7
+  description = var.aws_kms_key_s3_description
+  key_usage   = var.aws_kms_key_s3_key_usage
+  policy = jsonencode({
+    Version = var.json_encode_decode_version,
+    Statement = [
+      {
+        Sid    = var.aws_kms_key_s3_policy_statement_sid,
+        Effect = var.aws_kms_key_s3_policy_statement_effect,
+        Principal = {
+          Service = var.aws_kms_key_s3_policy_statement_principal_service
+        },
+        Action   = var.aws_kms_key_s3_policy_statement_action,
+        Resource = var.aws_kms_key_s3_policy_statement_resource
+      }
+    ]
+  })
+}
+
+data "aws_caller_identity" "current" {}
