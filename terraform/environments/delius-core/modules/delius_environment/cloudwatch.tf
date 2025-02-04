@@ -35,17 +35,17 @@ resource "aws_iam_role_policy_attachment" "eventbridge_logs_policy_attachment" {
 resource "aws_cloudwatch_log_resource_policy" "log_group_policy" {
   policy_name = "${var.env_name}-eventbridge-to-logs-policy"
   policy_document = jsonencode({
-    Version = "2012-10-17",
-    Statement : [{
-      Actions = [
-        "logs:CreateLogStream",
-        "logs:PutLogEvents",
-      ],
-      Effect = "Allow",
-      Principal = {
-        Service = "events.amazonaws.com"
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Effect" : "Allow",
+      "Principal" : {
+        "Service" = ["events.amazonaws.com", "delivery.logs.amazonaws.com"]
       },
-      Resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:log-group:/metrics/${var.env_name}/*"]
+      "Action" : [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource" : "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.id}:log-group:/metrics/${var.env_name}/*"
     }]
   })
 }
