@@ -47,7 +47,7 @@ module "datasync_exclude_path_secret" {
   version = "1.3.1"
 
   name       = "datasync/exclude-paths"
-  kms_key_id = module.secretsmanager_common_secret.key_arn
+  kms_key_id = module.secretsmanager_common_kms.key_arn
 
   ignore_secret_changes = true
   secret_string         = "CHANGEME"
