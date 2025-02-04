@@ -52,6 +52,8 @@ module "aurora" {
   backup_retention_period      = var.backup_retention_period
 
   # Monitoring
+  create_monitoring_role            = true
+  monitoring_interval               = 60
   enabled_cloudwatch_logs_exports   = ["postgresql"]
   create_cloudwatch_log_group       = true
   performance_insights_enabled      = var.performance_insights_enabled
