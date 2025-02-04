@@ -40,7 +40,9 @@ resource "aws_iam_policy" "backup_lambda" { #tfsec:ignore:aws-iam-no-policy-wild
     "Statement": [
         {
             "Action": [
+                "ec2:CreateNetworkInterface",
                 "ec2:DescribeNetworkInterfaces",
+                "ec2:DeleteNetworkInterface",
                 "ec2:DeleteSnapshot",
                 "ec2:DescribeSubnets",
                 "ec2:DescribeVpcs",
