@@ -288,15 +288,19 @@ resource "aws_kms_key" "s3" {
 }
 
 # Skip Checkov: AVD-AWS-0102
-resource "aws_network_acl" "example" {
+resource "aws_network_acl" "default" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  vpc_id = ""
-  subnet_ids = ""
+  vpc_id = "acl-04ab36970f6f08063"
+  subnet_ids = [
+    "subnet-0bb27b9eb632f03b1",
+    "subnet-03c0d6913df01115e",
+    "subnet-0a318473cd5c8c09b"
+  ]
 }
 
 resource "aws_network_acl_rule" "allow_http_inbound" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  network_acl_id = aws_network_acl.example.id
+  network_acl_id = aws_network_acl.default.id
   rule_number    = 100
   egress         = false
   protocol       = "tcp"
@@ -308,7 +312,7 @@ resource "aws_network_acl_rule" "allow_http_inbound" {
 
 resource "aws_network_acl_rule" "allow_https_inbound" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  network_acl_id = aws_network_acl.example.id
+  network_acl_id = aws_network_acl.default.id
   rule_number    = 101
   egress         = false
   protocol       = "tcp"
@@ -320,7 +324,7 @@ resource "aws_network_acl_rule" "allow_https_inbound" {
 
 resource "aws_network_acl_rule" "allow_http_outbound" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  network_acl_id = aws_network_acl.example.id
+  network_acl_id = aws_network_acl.default.id
   rule_number    = 200
   egress         = true
   protocol       = "tcp"
@@ -332,7 +336,7 @@ resource "aws_network_acl_rule" "allow_http_outbound" {
 
 resource "aws_network_acl_rule" "allow_https_outbound" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  network_acl_id = aws_network_acl.example.id
+  network_acl_id = aws_network_acl.default.id
   rule_number    = 201
   egress         = true
   protocol       = "tcp"
