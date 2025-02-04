@@ -20,7 +20,7 @@ resource "aws_datasync_task" "opg" {
 
   excludes {
     filter_type = "SIMPLE_PATTERN"
-    value       = data.aws_secretsmanager_secret.datasync_exclude_path.secret_string
+    value       = data.aws_secretsmanager_secret_version.datasync_exclude_path.secret_string
   }
 
   task_report_config {
