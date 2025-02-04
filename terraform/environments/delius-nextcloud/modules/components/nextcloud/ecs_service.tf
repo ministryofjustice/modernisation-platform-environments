@@ -57,10 +57,18 @@ module "nextcloud_service" {
     readOnly      = false
   }]
 
-  ecs_cluster_arn   = module.ecs.ecs_cluster_arn
-  env_name          = var.env_name
-  health_check_path = "/status.php"
-  #health_check_path                  = "/"
+  ecs_cluster_arn = module.ecs.ecs_cluster_arn
+  env_name        = var.env_name
+  alb_health_check = {
+    path                 = "/status.php"
+    interval             = 30
+    timeout              = 5
+    healthy_threshold    = 5
+    unhealthy_threshold  = 5
+    matcher              = "200-499"
+    protocol             = "HTTP"
+    grace_period_seconds = 120
+  }
   alb_listener_rule_paths            = ["/"]
   microservice_lb_https_listener_arn = aws_alb_listener.nextcloud_https.arn
   microservice_lb                    = aws_alb.nextcloud

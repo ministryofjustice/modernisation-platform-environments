@@ -1,6 +1,12 @@
 locals {
+  env_map = {
+    "production"    = "prod"
+    "preproduction" = "preprod"
+    "test"          = "test"
+    "development"   = "dev"
+  }
   camel-sid      = join("", [for word in split("-", var.name) : title(word)])
-  suffix         = var.environment == "test" ? "_test" : ""
+  suffix         = var.environment != "production" ? "_${local.env_map[var.environment]}" : ""
   snake-database = "${replace(var.database_name, "-", "_")}${local.suffix}"
 }
 
@@ -112,4 +118,5 @@ module "share_dbs_with_roles" {
   data_bucket_lf_resource = var.data_bucket_lf_resource
   role_arn                = module.ap_database_sharing.iam_role.arn
   de_role_arn             = var.de_role_arn
+  db_exists               = var.db_exists
 }

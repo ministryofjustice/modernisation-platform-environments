@@ -77,6 +77,9 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+
+    database_name = "change_me"
+    database_port = local.db_port
   }
 
   delius_microservices_configs_prod = {
@@ -106,8 +109,8 @@ locals {
       image_tag        = "6.0.3-latest"
       container_port   = 389
       slapd_log_level  = "conns,config,stats,stats2"
-      container_cpu    = 2048
-      container_memory = 4096
+      container_cpu    = 16384
+      container_memory = 32768
     }
   }
 
@@ -131,7 +134,7 @@ locals {
     }
     audit_target_endpoint = {
       write_environment = "prod" # Until production exists set dummy replication target
-      write_database    = "NONE"    # Remove this dummy attribute once production target exists
+      write_database    = "NONE" # Remove this dummy attribute once production target exists
     }
     user_source_endpoint = { # Set this map to {} once production exists
       read_host     = "primarydb"
