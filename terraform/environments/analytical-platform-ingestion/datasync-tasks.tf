@@ -18,6 +18,11 @@ resource "aws_datasync_task" "opg" {
     value       = "/Investigations/Cases/Closed Cases/*"
   }
 
+  excludes {
+    filter_type = "SIMPLE_PATTERN"
+    value       = data.aws_secretsmanager_secret.datasync_exclude_path.secret_string
+  }
+
   task_report_config {
     report_overrides {}
     report_level         = "ERRORS_ONLY"
