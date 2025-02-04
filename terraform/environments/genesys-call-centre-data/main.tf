@@ -287,33 +287,20 @@ resource "aws_kms_key" "s3" {
   })
 }
 
-# Skip Checkov: AVD-AWS-0102
-resource "aws_network_acl" "default" {
-  #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  vpc_id = "acl-04ab36970f6f08063"
-  subnet_ids = [
-    "subnet-0bb27b9eb632f03b1",
-    "subnet-03c0d6913df01115e",
-    "subnet-0a318473cd5c8c09b"
-  ]
-}
+# resource "aws_network_acl" "default" {
+#   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+#   vpc_id = "acl-04ab36970f6f08063"
+#   subnet_ids = [
+#     "subnet-0bb27b9eb632f03b1",
+#     "subnet-03c0d6913df01115e",
+#     "subnet-0a318473cd5c8c09b"
+#   ]
+# }
 
-resource "aws_network_acl_rule" "allow_http_inbound" {
+resource "aws_network_acl_rule" "private_inbound" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  network_acl_id = aws_network_acl.default.id
+  network_acl_id = "acl-04ab36970f6f08063"
   rule_number    = 100
-  egress         = false
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 80
-  to_port        = 80
-}
-
-resource "aws_network_acl_rule" "allow_https_inbound" {
-  #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  network_acl_id = aws_network_acl.default.id
-  rule_number    = 101
   egress         = false
   protocol       = "tcp"
   rule_action    = "allow"
@@ -322,23 +309,11 @@ resource "aws_network_acl_rule" "allow_https_inbound" {
   to_port        = 443
 }
 
-resource "aws_network_acl_rule" "allow_http_outbound" {
+resource "aws_network_acl_rule" "private_outound" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  network_acl_id = aws_network_acl.default.id
-  rule_number    = 200
-  egress         = true
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 80
-  to_port        = 80
-}
-
-resource "aws_network_acl_rule" "allow_https_outbound" {
-  #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  network_acl_id = aws_network_acl.default.id
-  rule_number    = 201
-  egress         = true
+  network_acl_id = "acl-04ab36970f6f08063"
+  rule_number    = 101
+  egress         = false
   protocol       = "tcp"
   rule_action    = "allow"
   cidr_block     = "0.0.0.0/0"
