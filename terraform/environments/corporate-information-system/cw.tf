@@ -94,7 +94,7 @@ resource "aws_cloudwatch_metric_alarm" "CISEbsDiskSpaceUsedOverThreshold" {
   namespace           = "CustomScript"
   period              = local.application_data.accounts[local.environment].alert_period
   statistic           = "Average"
-  threshold           = local.application_data.accounts[local.environment].cis_diskspace_alert_threshold
+  threshold           = local.application_data.accounts[local.environment].alert_threshold
   treat_missing_data  = "breaching"
 
   dimensions = {
