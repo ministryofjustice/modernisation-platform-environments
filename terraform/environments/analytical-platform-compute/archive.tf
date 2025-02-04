@@ -4,6 +4,10 @@ resource "null_resource" "prepare_plugins" {
   #   menu_links     = filemd5("src/airflow/plugins/analytical_platform_menu_links.py")
   # }
 
+  triggers = {
+    always_run = "${timestamp()}"
+  }
+
   provisioner "local-exec" {
     command = "bash scripts/prepare-plugins.sh ${local.environment}"
   }
