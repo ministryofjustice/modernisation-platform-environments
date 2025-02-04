@@ -1,22 +1,14 @@
-resource "null_resource" "prepare_plugins" {
-  # triggers = {
-  #   local_settings = filemd5("src/airflow/local-settings/development/airflow_local_settings.py")
-  #   menu_links     = filemd5("src/airflow/plugins/analytical_platform_menu_links.py")
-  # }
-
-  triggers = {
-    always_run = "${timestamp()}"
-  }
-
-  provisioner "local-exec" {
-    command = "bash scripts/prepare-plugins.sh ${local.environment}"
-  }
-}
-
 data "archive_file" "airflow_plugins" {
   type        = "zip"
-  source_dir  = "src/airflow/plugins"
   output_path = "plugins.zip"
 
-  depends_on = [null_resource.prepare_plugins]
+  source {
+    content  = file("src/airflow/local-settings/${local.environment}/airflow_local_settings.py")
+    filename = "airflow_local_settings.py"
+  }
+
+  source {
+    content  = file("src/airflow/plugins/analytical_platform_menu_links.py")
+    filename = "analytical_platform_menu_links.py"
+  }
 }
