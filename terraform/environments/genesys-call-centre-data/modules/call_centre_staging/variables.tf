@@ -201,9 +201,9 @@ variable "moj_aws_iam_policy_document_statement_effect" {
 }
 
 variable "moj_aws_iam_policy_document_statement_actions" {
-  type        = list
+  type        = list(any)
   description = ""
-  default     = [
+  default = [
     "sts:AssumeRole"
   ]
 }
@@ -215,9 +215,9 @@ variable "moj_aws_iam_policy_document_principals_type" {
 }
 
 variable "moj_aws_iam_policy_document_principals_identifiers" {
-  type        = list
+  type        = list(any)
   description = ""
-  default     = [
+  default = [
     "s3.amazonaws.com"
   ]
 }
