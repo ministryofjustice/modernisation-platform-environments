@@ -291,20 +291,6 @@ data "aws_caller_identity" "current" {}
 
 #####
 # Network ACL rule ...
-resource "aws_vpc" "ok_vpc" {
-  cidr_block = "10.0.0.0/16"
-}
-
-resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.ok_vpc.id
-  cidr_block = "10.0.1.0/24"
-}
-
-resource "aws_network_acl" "acl_ok" {
-  vpc_id = aws_vpc.ok_vpc.id
-  subnet_ids = [aws_subnet.main.id]
-}
-
 resource "aws_flow_log" "default" {
   iam_role_arn    = "arn"
   log_destination = "log"
@@ -336,6 +322,16 @@ resource "aws_default_security_group" "default" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
+
+resource "aws_subnet" "main" {
+  vpc_id     = aws_vpc.ok_vpc.id
+  cidr_block = "10.0.1.0/24"
+}
+
+resource "aws_network_acl" "acl_ok" {
+  vpc_id = aws_vpc.ok_vpc.id
+  subnet_ids = [aws_subnet.main.id]
 }
 
 resource "aws_network_acl" "default" {
