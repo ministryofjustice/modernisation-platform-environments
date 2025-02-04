@@ -80,10 +80,8 @@ resource "aws_iam_policy" "production-s3-access" {
       "Action" : "s3:ListBucket",
       "Effect" : "Allow",
       "Resource" : [
-        "arn:aws:s3:::moj-scripts",
-        "arn:aws:s3:::moj-scripts/*",
-        "arn:aws:s3:::moj-release-management",
-        "arn:aws:s3:::moj-release-management/*"
+        "arn:aws:s3:::moj-infrastructure",
+        "arn:aws:s3:::moj-infrastructure/*"
       ]
     }]
   })
@@ -1334,8 +1332,8 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_prod
           "s3:ListBucket"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-lambda-layers-prod",
-          "arn:aws:s3:::moj-lambda-layers-prod/*"
+          "arn:aws:s3:::moj-infrastructure",
+          "arn:aws:s3:::moj-infrastructure/*"
         ]
       },
       {
