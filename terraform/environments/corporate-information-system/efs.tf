@@ -115,8 +115,8 @@ resource "aws_cloudwatch_metric_alarm" "efs_connection_repo_home" {
   period             = local.application_data.accounts[local.environment].alert_period
   statistic          = "Sum"
   threshold          = local.environment == "production" ? 4 : 3
-  alarm_actions      = [aws_sns_topic.cis.alerting_topic.arn]
-  ok_actions         = [aws_sns_topic.cis.alerting_topic.arn]
+  alarm_actions      = [aws_sns_topic.cis_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.cis_alerting_topic.arn]
   treat_missing_data = "breaching"
   tags = merge(
     local.tags,
