@@ -40,8 +40,18 @@ resource "aws_iam_policy" "backup_lambda" { #tfsec:ignore:aws-iam-no-policy-wild
     "Statement": [
         {
             "Action": [
+                "ec2:DescribeNetworkInterfaces",
                 "ec2:DeleteSnapshot",
-                "ec2:DescribeSnapshots"
+                "ec2:DescribeSubnets",
+                "ec2:DescribeVpcs",
+                "ec2:DescribeInstances",
+                "ec2:DescribeAddresses",
+                "ec2:DescribeInstanceStatus",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeSnapshots",
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
             ],
             "Resource": "*",
             "Effect": "Allow"
