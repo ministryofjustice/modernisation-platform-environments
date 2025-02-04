@@ -287,6 +287,21 @@ resource "aws_kms_key" "s3" {
   })
 }
 
+# Network ACL rule ...
+resource "aws_vpc" "ok_vpc" {
+  cidr_block = "10.0.0.0/16"
+}
+
+resource "aws_subnet" "main" {
+  vpc_id     = aws_vpc.ok_vpc.id
+  cidr_block = "10.0.1.0/24"
+}
+
+resource "aws_network_acl" "acl_ok" {
+  vpc_id = aws_vpc.ok_vpc.id
+  subnet_ids = [aws_subnet.main.id]
+}
+
 resource "aws_network_acl" "default" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
   vpc_id = "acl-04ab36970f6f08063"
