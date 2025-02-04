@@ -21,6 +21,7 @@
       "alert_evaluation_period": "5",   
       "alert_period": "60",
       "alert_threshold": "90",
+      "cis_region": "eu-west-2",
       "cis_logstream_errors_detected_threshold": "1",
       "cis_logstream_errors_detected_periods": "3600",
       "cis_logstream_errors_detected_evaluation_periods": "1",
@@ -33,7 +34,7 @@
       "cis_disk_device": "/dev/xvdf",
       "cis_disk_fs_type": "ext4",
       "cis_log_metrics_oracle_alerts": "oracle_alert_log_errors",
-      "edw_dashboard_refresh_period": "60"
+      "cis_dashboard_refresh_period": "60"
     },
     "test": {
       "example_var": "test-data"
