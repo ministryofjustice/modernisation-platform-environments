@@ -1,4 +1,3 @@
-#checkov:skip=AVD-AWS-0102
 module "vpc" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=AVD-AWS-0102
@@ -21,6 +20,7 @@ module "vpc" {
 
 module "vpc_endpoints" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=AVD-AWS-0102
 
   source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
 
@@ -59,6 +59,7 @@ module "vpc_endpoints" {
 
 resource "aws_security_group" "vpc_endpoints" {
   #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
+  #checkov:skip=AVD-AWS-0102
   description = "Security Group for controlling all VPC endpoint traffic"
   name        = format("%s-vpc-endpoint-sg", local.application_name)
   vpc_id      = module.vpc.vpc_id
@@ -66,6 +67,7 @@ resource "aws_security_group" "vpc_endpoints" {
 }
 
 resource "aws_security_group_rule" "allow_all_vpc" {
+  #checkov:skip=AVD-AWS-0102
   cidr_blocks       = [module.vpc.vpc_cidr_block]
   description       = "Allow all traffic in from VPC CIDR"
   from_port         = 0
