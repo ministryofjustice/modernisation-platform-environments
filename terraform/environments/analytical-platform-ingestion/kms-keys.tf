@@ -241,7 +241,7 @@ module "s3_datasync_kms" {
   deletion_window_in_days = 7
 }
 
-module "common_secretsmanager_secret" {
+module "secretsmanager_common_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
