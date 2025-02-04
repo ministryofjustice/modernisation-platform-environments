@@ -60,6 +60,14 @@ resource "aws_iam_role_policy_attachment" "backup_lambda" {
 ### S3 for Backup Lambda
 ##################################
 
+resource "aws_s3_bucket" "backup_lambda" {
+  bucket = "${local.application_name_short}-${local.environment}-backup-lambda"
+  tags = merge(
+    local.tags,
+    { Name = "${local.application_name_short}-${local.environment}-backup-lambda" }
+  )
+}
+
 resource "aws_s3_bucket_ownership_controls" "backup_lambda" {
   bucket = aws_s3_bucket.backup_lambda.id
   rule {
