@@ -25,6 +25,11 @@ on:
         options:
           - deploy
           - destroy
+      component:
+        description: "Optional: Subfolder in 'terraform/environments/<application>' to target a specific component for destroy. Leave empty to destroy the <application> environment."
+        required: false
+        default: "NONE"
+        type: string
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -61,6 +66,7 @@ jobs:
       environment: "development"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"
+      component: "${{ inputs.component }}"  # If no component, defaults to destroying the entire environment
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
