@@ -37,8 +37,8 @@ locals {
           name          = "etchosts-container"
           image         = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/auth:preprod"
           port_mappings = []
-          cpu           = 90
-          memory        = 180
+          cpu           = 512
+          memory        = 512
           mount_points = [
             {
               sourceVolume : "hosts",
@@ -274,14 +274,14 @@ locals {
       enable_postgres_secret = false
       additional_mount_points = [
         {
-            "sourceVolume": "logging",
-            "containerPath": "/root/logging",
-            "readOnly": false
+          "sourceVolume" : "logging",
+          "containerPath" : "/root/logging",
+          "readOnly" : false
         },
         {
-            "sourceVolume": "gateway-logs",
-            "containerPath": "/var/log/yjaf",
-            "readOnly": false
+          "sourceVolume" : "gateway-logs",
+          "containerPath" : "/var/log/yjaf",
+          "readOnly" : false
         }
       ]
       volumes = [
@@ -291,10 +291,10 @@ locals {
         },
         {
           "name" : "gateway-logs",
-          "dockerVolumeConfiguration": {
-              "scope": "shared",
-              "autoprovision": true,
-              "driver": "local"
+          "dockerVolumeConfiguration" : {
+            "scope" : "shared",
+            "autoprovision" : true,
+            "driver" : "local"
           }
         },
         {

@@ -16,10 +16,27 @@ resource "aws_secretsmanager_secret" "user_admin_secret" {
   kms_key_id  = var.kms_key_id
 }
 
-resource "aws_secretsmanager_secret_version" "user_secret_version" {
-  for_each      = toset(var.user_passwords_to_reset)
-  secret_id     = aws_secretsmanager_secret.user_admin_secret[each.value].id
-  secret_string = random_password.user_password[each.value].result
+resource "aws_secretsmanager_secret_version" "aurora_rotated_user_version" {
+  for_each  = toset(var.user_passwords_to_reset)
+  secret_id = aws_secretsmanager_secret.aurora_rotated_user.id
+  secret_string = jsonencode({
+    username            = each.value
+    password            = random_password.user_password[each.value].result
+    engine              = "postgres"
+    host                = module.aurora.cluster_endpoint
+    port                = 5432
+    dbname              = var.db_name
+    dbClusterIdentifier = module.aurora.cluster_identifier
+  })
+}
+
+resource "aws_secretsmanager_secret_rotation" "aurora_rotated_user" {
+  for_each            = toset(var.user_passwords_to_reset)
+  secret_id           = aws_secretsmanager_secret.user_admin_secret.id
+  rotation_lambda_arn = aws_lambda_function.rds_secret_rotation.arn
+  rotation_rules {
+    automatically_after_days = 30 # Adjust as needed
+  }
 }
 
 data "aws_secretsmanager_secret_version" "master_secret" {
