@@ -287,19 +287,19 @@ resource "aws_kms_key" "s3" {
   })
 }
 
-# resource "aws_network_acl" "default" {
-#   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-#   vpc_id = "acl-04ab36970f6f08063"
-#   subnet_ids = [
-#     "subnet-0bb27b9eb632f03b1",
-#     "subnet-03c0d6913df01115e",
-#     "subnet-0a318473cd5c8c09b"
-#   ]
-# }
+resource "aws_network_acl" "default" {
+  #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+  vpc_id = "acl-04ab36970f6f08063"
+  subnet_ids = [
+    "subnet-0bb27b9eb632f03b1",
+    "subnet-03c0d6913df01115e",
+    "subnet-0a318473cd5c8c09b"
+  ]
+}
 
 resource "aws_network_acl_rule" "private_inbound" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
-  network_acl_id = "acl-04ab36970f6f08063"
+  network_acl_id = aws_network_acl.default.id
   rule_number    = 100
   egress         = false
   protocol       = "tcp"
@@ -309,11 +309,11 @@ resource "aws_network_acl_rule" "private_inbound" {
   to_port        = 443
 }
 
-resource "aws_network_acl_rule" "private_outound" {
+resource "aws_network_acl_rule" "private_outbound" {
   #checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
   network_acl_id = "acl-04ab36970f6f08063"
   rule_number    = 101
-  egress         = false
+  egress         = true
   protocol       = "tcp"
   rule_action    = "allow"
   cidr_block     = "0.0.0.0/0"
