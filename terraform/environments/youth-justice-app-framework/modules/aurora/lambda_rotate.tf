@@ -44,7 +44,7 @@ resource "aws_iam_role_policy_attachment" "rds_secret_rotation_secrets_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "rds_secret_rotation_secrets_policy" {
+resource "aws_iam_role_policy_attachment" "rds_secret_rotation_secrets_policy_VPC" {
   role       = aws_iam_role.rds_secret_rotation.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
@@ -91,7 +91,7 @@ resource "aws_iam_policy" "rds_secret_rotation_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "rds_secret_rotation_policy_attach" {
+resource "aws_iam_role_policy_attachment" "rds_secret_rotation_policy_attach_custom" {
   role       = aws_iam_role.rds_secret_rotation.name
   policy_arn = aws_iam_policy.rds_secret_rotation_policy.arn
 }
