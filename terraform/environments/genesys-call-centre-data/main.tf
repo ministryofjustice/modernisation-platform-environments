@@ -334,7 +334,7 @@ data "aws_caller_identity" "current" {}
 #   subnet_ids = [aws_subnet.main.id]
 # }
 
-#checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+#checkov:skip=AVD-AWS-0102: Network ACL rule allows access using ALL ports
 resource "aws_network_acl" "default" {
   vpc_id = "acl-04ab36970f6f08063"
   subnet_ids = [
@@ -344,7 +344,7 @@ resource "aws_network_acl" "default" {
   ]
 }
 
-#checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+#checkov:skip=AVD-AWS-0102: Network ACL rule allows access using ALL ports
 resource "aws_network_acl_rule" "private_inbound" {
   network_acl_id = aws_network_acl.default.id
   rule_number    = 100
@@ -356,7 +356,7 @@ resource "aws_network_acl_rule" "private_inbound" {
   to_port        = 443
 }
 
-#checkov:skip=AVD-AWS-0102: "Network ACL rule allows access using ALL ports"
+#checkov:skip=AVD-AWS-0102: Network ACL rule allows access using ALL ports
 resource "aws_network_acl_rule" "private_outbound" {
   network_acl_id = "acl-04ab36970f6f08063"
   rule_number    = 101
