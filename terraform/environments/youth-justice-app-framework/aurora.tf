@@ -1,4 +1,3 @@
-
 module "aurora" {
   source       = "./modules/aurora"
   project_name = local.project_name
@@ -20,7 +19,7 @@ module "aurora" {
 
   user_passwords_to_reset = ["postgres_rotated"]
   db_name                 = "yjafrds01"
-  aws_account_id          = local.application_data.accounts[local.environment].source_account
+  aws_account_id          = data.aws_caller_identity.current.account_id
 
   engine          = "aurora-postgresql"
   engine_version  = "16.6"
