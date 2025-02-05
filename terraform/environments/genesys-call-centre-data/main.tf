@@ -289,14 +289,95 @@ resource "aws_kms_key" "s3" {
 
 data "aws_caller_identity" "current" {}
 
-resource "aws_vpc_endpoint" "this" {
-  vpc_id              = "vpc-0854846a32de08f57"
-  service_name        = "com.amazonaws.eu-west-2.execute-api"
-  private_dns_enabled = true
-#   subnet_ids          = var.subnet_ids
-#   security_group_ids  = var.security_group_ids
-  vpc_endpoint_type   = "Interface"
+#####
+# # Network ACL rule ...
+# resource "aws_flow_log" "default" {
+#   iam_role_arn    = "arn"
+#   log_destination = "log"
+#   traffic_type    = "ALL"
+#   vpc_id          = aws_vpc.ok_vpc.id
+# }
 
-#   tags = var.tags
+# resource "aws_vpc" "ok_vpc" {
+#   cidr_block = "10.0.0.0/16"
+# }
+
+# resource "aws_vpc" "issue_vpc" {
+#   cidr_block = "10.0.0.0/16"
+# }
+
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.issue_vpc.id
+
+  ingress {
+    protocol  = "6"
+    self      = true
+    from_port = 0
+    to_port   = 0
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "6"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
+
+resource "aws_subnet" "main" {
+  vpc_id     = aws_vpc.ok_vpc.id
+  cidr_block = "10.0.1.0/24"
+}
+
+resource "aws_network_acl" "acl_ok" {
+  vpc_id = aws_vpc.ok_vpc.id
+  subnet_ids = [aws_subnet.main.id]
+}
+
+#checkov:skip=AVD-AWS-0102
+resource "aws_network_acl" "default" {
+  #checkov:skip=CKV2_AWS_1
+  vpc_id = "acl-04ab36970f6f08063"
+  subnet_ids = [
+    "subnet-0bb27b9eb632f03b1",
+    "subnet-03c0d6913df01115e",
+    "subnet-0a318473cd5c8c09b"
+  ]
+}
+
+#checkov:skip=AVD-AWS-0102
+resource "aws_network_acl_rule" "private_inbound" {
+  network_acl_id = aws_network_acl.default.id
+  rule_number    = 100
+  egress         = false
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 443
+  to_port        = 443
+}
+
+#checkov:skip=AVD-AWS-0102
+resource "aws_network_acl_rule" "private_outbound" {
+  network_acl_id = "acl-04ab36970f6f08063"
+  rule_number    = 101
+  egress         = true
+  protocol       = "tcp"
+  rule_action    = "allow"
+  cidr_block     = "0.0.0.0/0"
+  from_port      = 443
+  to_port        = 443
+}
+#####
+
+# resource "aws_vpc_endpoint" "this" {
+#   vpc_id              = "vpc-0854846a32de08f57"
+#   service_name        = "com.amazonaws.eu-west-2.execute-api"
+#   private_dns_enabled = true
+# #   subnet_ids          = var.subnet_ids
+# #   security_group_ids  = var.security_group_ids
+#   vpc_endpoint_type   = "Interface"
+
+# #   tags = var.tags
+# }
 
