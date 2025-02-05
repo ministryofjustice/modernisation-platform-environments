@@ -4,9 +4,11 @@ resource "aws_instance" "yjsm" {
   key_name               = "user1"       
   monitoring             = true
   ebs_optimized          = true
-  iam_instance_profile   = var.yjsm_ec2_role
-  
-  vpc_security_group_ids = [var.yjsm_service]
+  iam_instance_profile   = aws_iam_instance_profile.yjsm_ec2_profile.id
+  vpc_security_group_ids = [aws_security_group.yjsm_service.id]
+  subnet_id              = var.subnet_id
+
+
 
   metadata_options {
     http_endpoint = "enabled"
@@ -19,7 +21,6 @@ resource "aws_instance" "yjsm" {
     delete_on_termination = false
     volume_size           = 60
     volume_type           = "gp2"
-    device_name           = "/dev/xvda"
   }
   
   tags = {

@@ -14,12 +14,13 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "yjsm_ec2_role" {
-  description = "The IAM role name for the EC2 instance"
+
+variable "subnet_id" {
+  description = "Subnet ID for the EC2 instance"
   type        = string
 }
 
-variable "yjsm_service" {
-  description = "YJSM security group"
+variable "environment" {
+  description = "The environment for the ECS cluster"
   type        = string
 }

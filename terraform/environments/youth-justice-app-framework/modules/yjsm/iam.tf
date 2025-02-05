@@ -6,12 +6,18 @@ resource "aws_iam_role" "yjsm_ec2_role" {
       {
         Effect = "Allow"
         Principal = {
-          Service = "ecs-tasks.amazonaws.com"
+          Service = "ec2.amazonaws.com"
         }
         Action = "sts:AssumeRole"
       }
     ]
   })
+}
+
+
+resource "aws_iam_instance_profile" "yjsm_ec2_profile" {
+  name = "yjsm-ec2-instance"
+  role = aws_iam_role.yjsm_ec2_role.name
 }
 
 #todo add missing policies to this role
