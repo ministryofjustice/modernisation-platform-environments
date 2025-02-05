@@ -3,7 +3,7 @@
     "development": {
       "environment_name": "yjaf-development",
       "allow_s3_replication": true,
-      "source_account": "856879713508"
+      "source_account": "711387140977"
     },
     "test": {
       "environment_name": "yjaf-test",
