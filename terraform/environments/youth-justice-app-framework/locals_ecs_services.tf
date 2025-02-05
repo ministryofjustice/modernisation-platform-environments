@@ -3,9 +3,9 @@ locals {
     auth = {
       name                              = "auth"
       image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/auth:preprod"
-      task_cpu                          = 1124
+      task_cpu                          = 1280
       container_cpu                     = 1024
-      task_memory                       = 2248
+      task_memory                       = 2560
       container_memory                  = 2048
       health_check_grace_period_seconds = 300
       additional_environment_variables = [
@@ -37,7 +37,7 @@ locals {
           name          = "etchosts-container"
           image         = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/auth:preprod"
           port_mappings = []
-          cpu           = 512
+          cpu           = 256
           memory        = 512
           mount_points = [
             {

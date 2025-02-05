@@ -37,6 +37,7 @@ resource "aws_secretsmanager_secret_rotation" "aurora_rotated_user" {
   rotation_rules {
     automatically_after_days = 30 # Adjust as needed
   }
+  depends_on = [aws_lambda_permission.allow_secrets_manager]
 }
 
 data "aws_secretsmanager_secret_version" "master_secret" {
