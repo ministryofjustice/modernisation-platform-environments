@@ -1,4 +1,3 @@
-#trivy:ignore:AVD-AWS-0102
 module "s3_staging" {
   source = "../.."
   providers = {
