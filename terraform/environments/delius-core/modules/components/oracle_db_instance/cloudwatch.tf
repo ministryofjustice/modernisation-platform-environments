@@ -32,7 +32,9 @@ resource "aws_cloudwatch_event_rule" "ec2_status_check_failed_event" {
     "source" : ["aws.cloudwatch"],
     "detail-type" : ["CloudWatch Alarm State Change"],
     "detail" : {
-      "state" : ["ALARM"],
+      "state": {
+        "value": ["ALARM"]
+      }
       "alarmName" : ["${local.alarm_name}"]
     }
   })
@@ -42,5 +44,4 @@ resource "aws_cloudwatch_event_target" "ec2_status_check_failed_target" {
   rule      = aws_cloudwatch_event_rule.ec2_status_check_failed_event.name
   arn       = aws_cloudwatch_log_group.ec2_status_check_log_group.arn
   target_id = local.alarm_name
-  role_arn  = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/${var.env_name}-eventbridge-to-logs-role"
 }
