@@ -290,24 +290,24 @@ resource "aws_kms_key" "s3" {
 data "aws_caller_identity" "current" {}
 
 #####
-# # Network ACL rule ...
-# resource "aws_flow_log" "default" {
-#   iam_role_arn    = "arn"
-#   log_destination = "log"
-#   traffic_type    = "ALL"
-#   vpc_id          = aws_vpc.ok_vpc.id
-# }
+# Network ACL rule ...
+resource "aws_flow_log" "default" {
+  iam_role_arn    = "arn"
+  log_destination = "log"
+  traffic_type    = "ALL"
+  vpc_id          = "vpc-0854846a32de08f57"
+}
 
-# resource "aws_vpc" "ok_vpc" {
-#   cidr_block = "10.0.0.0/16"
-# }
+resource "aws_vpc" "ok_vpc" {
+  cidr_block = "10.0.0.0/16"
+}
 
 # resource "aws_vpc" "issue_vpc" {
 #   cidr_block = "10.0.0.0/16"
 # }
 
 # resource "aws_default_security_group" "default" {
-#   vpc_id = "acl-04ab36970f6f08063"
+#   vpc_id = "vpc-0854846a32de08f57"
 
 #   ingress {
 #     protocol  = "6"
@@ -325,12 +325,12 @@ data "aws_caller_identity" "current" {}
 # }
 
 # resource "aws_subnet" "main" {
-#   vpc_id     = "acl-04ab36970f6f08063"
+#   vpc_id     = "vpc-0854846a32de08f57"
 #   cidr_block = "10.0.1.0/24"
 # }
 
 # resource "aws_network_acl" "acl_ok" {
-#   vpc_id = "acl-04ab36970f6f08063"
+#   vpc_id = "vpc-0854846a32de08f57"
 #   subnet_ids = [
 #     "subnet-0bb27b9eb632f03b1",
 #     "subnet-03c0d6913df01115e",
@@ -383,5 +383,10 @@ data "aws_caller_identity" "current" {}
 #   vpc_endpoint_type   = "Interface"
 
 # #   tags = var.tags
+# }
+
+# resource "aws_vpc" "ok_vpc" {
+#   cidr_block = "10.0.0.0/16"
+#   # other VPC configurations
 # }
 
