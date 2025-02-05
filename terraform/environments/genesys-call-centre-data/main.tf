@@ -325,13 +325,17 @@ resource "aws_default_security_group" "default" {
 }
 
 resource "aws_subnet" "main" {
-  vpc_id     = aws_vpc.ok_vpc.id
+  vpc_id     = "acl-04ab36970f6f08063"
   cidr_block = "10.0.1.0/24"
 }
 
 resource "aws_network_acl" "acl_ok" {
-  vpc_id = aws_vpc.ok_vpc.id
-  subnet_ids = [aws_subnet.main.id]
+  vpc_id = "acl-04ab36970f6f08063"
+  subnet_ids = [
+    "subnet-0bb27b9eb632f03b1",
+    "subnet-03c0d6913df01115e",
+    "subnet-0a318473cd5c8c09b"
+  ]
 }
 
 #checkov:skip=AVD-AWS-0102
@@ -347,7 +351,7 @@ resource "aws_network_acl" "default" {
 
 #checkov:skip=AVD-AWS-0102
 resource "aws_network_acl_rule" "private_inbound" {
-  network_acl_id = aws_network_acl.default.id
+  network_acl_id = "acl-04ab36970f6f08063"
   rule_number    = 100
   egress         = false
   protocol       = "tcp"
