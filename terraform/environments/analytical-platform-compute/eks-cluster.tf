@@ -176,7 +176,7 @@ module "eks" {
     gha-mojap-common = {
       principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"
       username          = "github-actions-moj-ap-airflow"
-      kubernetes_groups = ["mwaa-serviceaccount-management"]
+      kubernetes_groups = ["mwaa-serviceaccount-management", "mwaa-external-secrets"]
     }
     /* Legacy Airflow */
     data-engineering-airflow = {

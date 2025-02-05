@@ -41,3 +41,7 @@ data "aws_ec2_transit_gateway" "moj_tgw" {
 data "aws_secretsmanager_secret_version" "datasync_dom1" {
   secret_id = module.datasync_dom1_secret.secret_id
 }
+
+data "aws_secretsmanager_secret_version" "datasync_exclude_path" {
+  secret_id = module.datasync_exclude_path_secret.secret_id
+}

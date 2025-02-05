@@ -496,15 +496,6 @@ data "archive_file" "zip_the_send_cpu_graph_code_prod" {
 
 # Lambda Layer for Matplotlib
 
-resource "aws_lambda_layer_version" "lambda_layer_matplotlib_prod" {
-  count               = local.is-production == true ? 1 : 0
-  layer_name          = "matplotlib-layer"
-  description         = "matplotlib-layer for python 3.12"
-  s3_bucket           = aws_s3_bucket.moj-lambda-layers-prod[0].id
-  s3_key              = "matplotlib-layer.zip"
-  compatible_runtimes = ["python3.12"]
-}
-
 resource "aws_lambda_layer_version" "lambda_layer_matplotlib_prod_new" {
   count               = local.is-production == true ? 1 : 0
   layer_name          = "matplotlib-layer-prod"

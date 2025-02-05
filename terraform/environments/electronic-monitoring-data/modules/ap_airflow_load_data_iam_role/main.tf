@@ -5,6 +5,12 @@ locals {
     "test"          = "test"
     "development"   = "dev"
   }
+  env_suffixes = {
+    "production"    = ""
+    "preproduction" = "-pp"
+    "test"          = ""
+    "development"   = "-dev"
+  }
   camel-sid      = join("", [for word in split("-", var.name) : title(word)])
   suffix         = var.environment != "production" ? "_${local.env_map[var.environment]}" : ""
   snake-database = "${replace(var.database_name, "-", "_")}${local.suffix}"
@@ -104,7 +110,7 @@ module "ap_database_sharing" {
   source = "../ap_airflow_iam_role"
 
   environment          = var.environment
-  role_name_suffix     = "load-${var.name}"
+  role_name_suffix     = "load-${var.name}${local.env_suffixes[var.environment]}"
   role_description     = "${var.name} database permissions"
   iam_policy_document  = data.aws_iam_policy_document.load_data.json
   secret_code          = var.secret_code

@@ -62,7 +62,7 @@ locals {
           local.cloudwatch_metric_alarms.bods_primary,
         )
       })
-   
+
       pd-onr-bods-2 = merge(local.ec2_instances.bods, {
         config = merge(local.ec2_instances.bods.config, {
           ami_name          = "hmpps_windows_server_2019_release_2025-01-02T00-00-37.501Z"
