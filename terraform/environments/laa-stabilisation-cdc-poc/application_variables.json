@@ -20,7 +20,9 @@
       "oratmp_snapshot_id": "snap-0f313ed0cb6e23533",
       "oraredo_snapshot_id": "snap-05bb18f43eb0d445a",
       "share_snapshot_id": "snap-024bcbbd00404fa13",
-      "old_domain_name": "tst.legalservices.gov.uk"
+      "old_domain_name": "tst.legalservices.gov.uk",
+      "cwa_poc2_app_ami_id": "ami-04e09f3c07ac0cae3",
+      "cwa_poc2_app_instance_type": "m4.xlarge",
     },
     "test": {
       "example_var": "test-data"
