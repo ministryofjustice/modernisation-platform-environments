@@ -307,7 +307,7 @@ data "aws_caller_identity" "current" {}
 # }
 
 resource "aws_default_security_group" "default" {
-  vpc_id = aws_vpc.issue_vpc.id
+  vpc_id = "acl-04ab36970f6f08063"
 
   ingress {
     protocol  = "6"
