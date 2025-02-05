@@ -464,6 +464,13 @@ resource "aws_s3_bucket_versioning" "moj-log-files-prod" {
   }
 }
 
+resource "aws_s3_bucket_logging" "moj-log-files-prod" {
+  count  = local.is-production == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  target_prefix = "s3-logs/moj-log-files-prod-logs/"
+}
+
 resource "aws_s3_bucket_public_access_block" "moj-log-files-prod" {
   count                   = local.is-production == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-log-files-prod[0].id
@@ -507,7 +514,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 60
+      days = 120
     }
   }
 }
