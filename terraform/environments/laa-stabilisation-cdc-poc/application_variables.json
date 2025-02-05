@@ -21,8 +21,10 @@
       "oraredo_snapshot_id": "snap-05bb18f43eb0d445a",
       "share_snapshot_id": "snap-024bcbbd00404fa13",
       "old_domain_name": "tst.legalservices.gov.uk",
-      "cwa_poc2_app_ami_id": "ami-04e09f3c07ac0cae3",
+      "cwa_poc2_app_ami_id": "ami-0ef40b85457e0369d",
       "cwa_poc2_app_instance_type": "m4.xlarge",
+      "cwa_poc2_ebs_app_size": "200",
+      "cwa_poc2_app_snapshot_id": "snap-0329caef83f4a6c51"
     },
     "test": {
       "example_var": "test-data"
