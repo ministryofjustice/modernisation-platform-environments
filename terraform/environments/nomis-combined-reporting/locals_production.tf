@@ -221,10 +221,68 @@ locals {
     lbs = {
       private = merge(local.lbs.private, {
       })
+
+      public = merge(local.lbs.public, {
+        instance_target_groups = {
+          pd-http-7010 = merge(local.lbs.public.instance_target_groups.http-7010, {
+            attachments = [
+              { ec2_instance_name = "pd-ncr-webadmin-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              webadmin = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-http-7010"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "admin.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "admin.reporting.nomis.service.justice.gov.uk",
+                      "maintenance.reporting.nomis.service.justice.gov.uk",
+                      "reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
     }
 
     route53_zones = {
       "reporting.nomis.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
+          { name = "admin", type = "A", lbs_map_key = "public" },
+          { name = "int", type = "A", lbs_map_key = "private" },
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
+          { name = "maintenance-int", type = "A", lbs_map_key = "private" },
+        ]
         ns_records = [
           # use this if NS records can be pulled from terrafrom, otherwise use records variable
           { name = "production", ttl = "86400", zone_name = "production.reporting.nomis.service.justice.gov.uk" }
