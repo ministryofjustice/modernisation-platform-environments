@@ -164,6 +164,14 @@ resource "aws_security_group" "defect_dojo_sg" {
     cidr_blocks = [var.my_ip]
   }
 
+  ingress {
+    description = "Allow HTTPS inbound"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
   egress {
     description = "Allow all traffic outbound"
     from_port   = 0
