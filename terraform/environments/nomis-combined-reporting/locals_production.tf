@@ -27,86 +27,6 @@ locals {
       }
     }
 
-    ec2_autoscaling_groups = {
-      pd-ncr-app = merge(local.ec2_autoscaling_groups.bip_app, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_app.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_app.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_app.config.instance_profile_policies, [
-            "Ec2PDReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init.args, {
-            branch = "TM-913/align-ncr-and-onr-ansible"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_app.tags, {
-          nomis-combined-reporting-environment = "pd"
-        })
-      })
-
-      pd-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 2
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_cms.config.instance_profile_policies, [
-            "Ec2PDReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
-            branch = "TM-913/align-ncr-and-onr-ansible"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_cms.tags, {
-          nomis-combined-reporting-environment = "pd"
-        })
-      })
-
-      pd-ncr-webadmin = merge(local.ec2_autoscaling_groups.bip_webadmin, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_webadmin.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_webadmin.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_webadmin.config.instance_profile_policies, [
-            "Ec2PDReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init.args, {
-            branch = "TM-913/align-ncr-and-onr-ansible"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_webadmin.tags, {
-          nomis-combined-reporting-environment = "pd"
-        })
-      })
-
-      pd-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_web.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
-            "Ec2PDReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
-            branch = "TM-913/align-ncr-and-onr-ansible"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_web.tags, {
-          nomis-combined-reporting-environment = "pd"
-        })
-      })
-    }
-
-
     ec2_instances = {
 
       pd-ncr-db-1-a = merge(local.ec2_instances.db, {
@@ -150,6 +70,18 @@ locals {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
           oracle-sids                          = "DRBIPSYS DRBIPAUD"
+        })
+      })
+
+      pd-ncr-cms-1 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pd"
         })
       })
     }
