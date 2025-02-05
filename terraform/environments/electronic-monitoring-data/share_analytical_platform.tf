@@ -6,7 +6,7 @@ locals {
   }
   dbt_suffix             = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
   admin_roles            = local.is-development ? "sandbox_" : "data-eng"
-  suffix                 = local.is-production ? "" : "-test"
+  suffix                 = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
   live_feed_dbs          = ["serco_fms", "allied_mdss", "staged_fms", "preprocessed_fms"]
   prod_dbs_to_grant      = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
