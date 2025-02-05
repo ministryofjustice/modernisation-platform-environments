@@ -18,9 +18,6 @@ resource "aws_cloudwatch_metric_alarm" "status_check_failed_alarm" {
     InstanceId = module.instance.aws_instance.id
   }
   treat_missing_data       = "breaching"
-  alarm_actions             = [
-    "arn:aws:sns:us-west-2:123456789012:your-sns-topic"  # Replace with your SNS topic ARN
-  ]
 }
 
 resource "aws_cloudwatch_log_group" "ec2_status_check_log_group" {
