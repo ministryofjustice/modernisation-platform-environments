@@ -1,6 +1,6 @@
 locals {
   instance_name = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-${local.instance_name_index}"
-  alarm_name    = "${local.instance_name}-instance-status-check-failed-reboot"
+  alarm_name    = "${local.instance_name}-instance-unavailable"
 }
 
 resource "aws_cloudwatch_metric_alarm" "status_check_failed_alarm" {
