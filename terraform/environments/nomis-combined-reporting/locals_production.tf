@@ -29,6 +29,55 @@ locals {
 
     ec2_instances = {
 
+      pd-ncr-app-1 = merge(local.ec2_instances.bip_app, {
+        config = merge(local.ec2_instances.bip_app.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+      pd-ncr-app-2 = merge(local.ec2_instances.bip_app, {
+        config = merge(local.ec2_instances.bip_app.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+      pd-ncr-app-3 = merge(local.ec2_instances.bip_app, {
+        config = merge(local.ec2_instances.bip_app.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+      pd-ncr-app-4 = merge(local.ec2_instances.bip_app, {
+        config = merge(local.ec2_instances.bip_app.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
       pd-ncr-db-1-a = merge(local.ec2_instances.db, {
         cloudwatch_metric_alarms = merge(
           local.cloudwatch_metric_alarms.db,
@@ -81,6 +130,30 @@ locals {
           ])
         })
         tags = merge(local.ec2_instances.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-cms-2 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-webadmin-1 = merge(local.ec2_instances.bip_webadmin, {
+        config = merge(local.ec2_instances.bip_webadmin.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_webadmin.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_webadmin.tags, {
           nomis-combined-reporting-environment = "pd"
         })
       })
