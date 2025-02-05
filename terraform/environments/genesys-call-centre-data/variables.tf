@@ -16,10 +16,11 @@ variable "acl" {
   description = ""
 }
 
-variable "sns_topic_arn" {
-  type        = string
-  description = "The ARN of the SNS topic for notifications."
-}
+# variable "sns_topic_arn" {
+#   type        = string
+#   default     = ""
+#   description = "The ARN of the SNS topic for notifications."
+# }
 
 variable "versioning_enabled" {
   type        = bool
