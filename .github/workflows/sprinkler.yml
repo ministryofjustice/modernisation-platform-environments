@@ -25,6 +25,11 @@ on:
         options:
           - deploy
           - destroy
+      component:
+        description: "Optional: Subfolder in 'terraform/environments/<application>' to target a specific component for destroy. Leave empty to destroy the <application> environment."
+        required: false
+        default: "NONE"
+        type: string
 
 permissions:
   id-token: write  # This is required for requesting the JWT
@@ -32,7 +37,7 @@ permissions:
 
 jobs:
   strategy:
-    uses: ./.github/workflows/reusable_terraform_strategy.yml
+    uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
     with:
       application: "${{ github.workflow }}"
@@ -43,23 +48,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
+      component: "${{ matrix.component }}"      # If your strategy workflow also outputs "matrix.component"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
 
   destroy-development:
     if: inputs.action == 'destroy'
-    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
       environment: "development"
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"
+      component: "${{ inputs.component }}"  # If no component, defaults to destroying the entire environment
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
