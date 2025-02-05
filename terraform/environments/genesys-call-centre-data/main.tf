@@ -306,72 +306,72 @@ data "aws_caller_identity" "current" {}
 #   cidr_block = "10.0.0.0/16"
 # }
 
-resource "aws_default_security_group" "default" {
-  vpc_id = "acl-04ab36970f6f08063"
+# resource "aws_default_security_group" "default" {
+#   vpc_id = "acl-04ab36970f6f08063"
 
-  ingress {
-    protocol  = "6"
-    self      = true
-    from_port = 0
-    to_port   = 0
-  }
+#   ingress {
+#     protocol  = "6"
+#     self      = true
+#     from_port = 0
+#     to_port   = 0
+#   }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "6"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+#   egress {
+#     from_port   = 0
+#     to_port     = 0
+#     protocol    = "6"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
-resource "aws_subnet" "main" {
-  vpc_id     = "acl-04ab36970f6f08063"
-  cidr_block = "10.0.1.0/24"
-}
+# resource "aws_subnet" "main" {
+#   vpc_id     = "acl-04ab36970f6f08063"
+#   cidr_block = "10.0.1.0/24"
+# }
 
-resource "aws_network_acl" "acl_ok" {
-  vpc_id = "acl-04ab36970f6f08063"
-  subnet_ids = [
-    "subnet-0bb27b9eb632f03b1",
-    "subnet-03c0d6913df01115e",
-    "subnet-0a318473cd5c8c09b"
-  ]
-}
+# resource "aws_network_acl" "acl_ok" {
+#   vpc_id = "acl-04ab36970f6f08063"
+#   subnet_ids = [
+#     "subnet-0bb27b9eb632f03b1",
+#     "subnet-03c0d6913df01115e",
+#     "subnet-0a318473cd5c8c09b"
+#   ]
+# }
 
-#checkov:skip=AVD-AWS-0102
-resource "aws_network_acl" "default" {
-  #checkov:skip=CKV2_AWS_1
-  vpc_id = "acl-04ab36970f6f08063"
-  subnet_ids = [
-    "subnet-0bb27b9eb632f03b1",
-    "subnet-03c0d6913df01115e",
-    "subnet-0a318473cd5c8c09b"
-  ]
-}
+# #checkov:skip=AVD-AWS-0102
+# resource "aws_network_acl" "default" {
+#   #checkov:skip=CKV2_AWS_1
+#   vpc_id = "acl-04ab36970f6f08063"
+#   subnet_ids = [
+#     "subnet-0bb27b9eb632f03b1",
+#     "subnet-03c0d6913df01115e",
+#     "subnet-0a318473cd5c8c09b"
+#   ]
+# }
 
-#checkov:skip=AVD-AWS-0102
-resource "aws_network_acl_rule" "private_inbound" {
-  network_acl_id = "acl-04ab36970f6f08063"
-  rule_number    = 100
-  egress         = false
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 443
-  to_port        = 443
-}
+# #checkov:skip=AVD-AWS-0102
+# resource "aws_network_acl_rule" "private_inbound" {
+#   network_acl_id = "acl-04ab36970f6f08063"
+#   rule_number    = 100
+#   egress         = false
+#   protocol       = "tcp"
+#   rule_action    = "allow"
+#   cidr_block     = "0.0.0.0/0"
+#   from_port      = 443
+#   to_port        = 443
+# }
 
-#checkov:skip=AVD-AWS-0102
-resource "aws_network_acl_rule" "private_outbound" {
-  network_acl_id = "acl-04ab36970f6f08063"
-  rule_number    = 101
-  egress         = true
-  protocol       = "tcp"
-  rule_action    = "allow"
-  cidr_block     = "0.0.0.0/0"
-  from_port      = 443
-  to_port        = 443
-}
+# #checkov:skip=AVD-AWS-0102
+# resource "aws_network_acl_rule" "private_outbound" {
+#   network_acl_id = "acl-04ab36970f6f08063"
+#   rule_number    = 101
+#   egress         = true
+#   protocol       = "tcp"
+#   rule_action    = "allow"
+#   cidr_block     = "0.0.0.0/0"
+#   from_port      = 443
+#   to_port        = 443
+# }
 #####
 
 # resource "aws_vpc_endpoint" "this" {
