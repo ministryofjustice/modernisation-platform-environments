@@ -121,8 +121,8 @@ resource "aws_ssm_maintenance_window_task" "pre_lin_healthcheck_maintenance_wind
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
-      output_s3_key_prefix = "ssm_output/"
+      output_s3_bucket     = aws_s3_bucket.moj-log-files-prod.id
+      output_s3_key_prefix = "health_check_reports/linux/pre/"
       timeout_seconds      = 600
     }
   }
@@ -149,8 +149,8 @@ resource "aws_ssm_maintenance_window_task" "post_lin_healthcheck_maintenance_win
 
   task_invocation_parameters {
     run_command_parameters {
-      output_s3_bucket     = aws_s3_bucket.MoJ-Health-Check-Reports.id
-      output_s3_key_prefix = "ssm_output/"
+      output_s3_bucket     = aws_s3_bucket.moj-log-files-prod.id
+      output_s3_key_prefix = "health_check_reports/linux/post/"
       timeout_seconds      = 600
     }
   }
