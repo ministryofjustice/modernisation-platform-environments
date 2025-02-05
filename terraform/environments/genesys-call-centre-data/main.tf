@@ -49,6 +49,13 @@ resource "aws_s3_bucket_notification" "replication" {
   }
 }
 
+resource "aws_s3_bucket_ownership_controls" "default" {
+  bucket = aws_s3_bucket.default.id
+  rule {
+    object_ownership = var.ownership_controls
+  }
+}
+
 # tfsec:ignore:aws-s3-encryption-customer-key
 #tfsec:ignore:avd-aws-0132 S3 encryption should use Custom Managed Keys, KMS is acceptable compromise 
 resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
@@ -131,19 +138,19 @@ resource "aws_s3_bucket_logging" "default" {
 # AWS S3 bucket Public Access Block (Call Centre Staging)
 resource "aws_s3_bucket_public_access_block" "default" {
   bucket                  = aws_s3_bucket.default.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  block_public_acls       = var.block_public_acls
+  block_public_policy     = var.block_public_policy
+  ignore_public_acls      = var.ignore_public_acls
+  restrict_public_buckets = var.restrict_public_buckets
 }
 
 resource "aws_s3_bucket_public_access_block" "replication" {
   count                   = var.replication_enabled ? 1 : 0
   bucket                  = aws_s3_bucket.replication[count.index].id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  block_public_acls       = var.block_public_acls
+  block_public_policy     = var.block_public_policy
+  ignore_public_acls      = var.ignore_public_acls
+  restrict_public_buckets = var.restrict_public_buckets
 }
 
 # S3 bucket replication: role

@@ -309,38 +309,6 @@ variable "aws_kms_key_s3_policy_statement_resource" {
   default     = "*"
 }
 
-###
-
-variable "call_centre_landing_aws_s3_bucket" {
-  type        = string
-  description = "AWS S3 call centre landing bucket name"
-  default     = "call-centre-landing"
-}
-
-variable "call_centre_logs_aws_s3_bucket" {
-  type        = string
-  description = "AWS S3 call centre logs bucket name"
-  default     = "call-centre-logs"
-}
-
-variable "call_centre_archive_aws_s3_bucket" {
-  type        = string
-  description = "AWS S3 call centre staging bucket name"
-  default     = "call-centre-archive"
-}
-
-variable "call_centre_ingestion_aws_s3_bucket" {
-  type        = string
-  description = "AWS S3 call centre ingestion bucket name"
-  default     = "call-centre-ingestion"
-}
-
-variable "call_centre_curated_aws_s3_bucket" {
-  type        = string
-  description = "AWS S3 call centre curated bucket name"
-  default     = "call-centre-curated"
-}
-
 variable "ownership_controls" {
   type        = string
   description = "Bucket Ownership Controls - for use WITH acl var above options are 'BucketOwnerPreferred' or 'ObjectWriter'. To disable ACLs and use new AWS recommended controls set this to 'BucketOwnerEnforced' and which will disabled ACLs and ignore var.acl"
@@ -351,12 +319,6 @@ variable "acl" {
   type        = string
   description = "Use canned ACL on the bucket instead of BucketOwnerEnforced ownership controls. var.ownership_controls must be set to corresponding value below."
   default     = "private"
-}
-
-variable "replication_bucket" {
-  type        = string
-  description = "Name of bucket used for replication - if not specified then * will be used in the policy"
-  default     = ""
 }
 
 variable "bucket_name" {
@@ -377,8 +339,26 @@ variable "force_destroy" {
   default     = false
 }
 
-variable "network_acl_id" {
-  type        = string
+variable "block_public_acls" {
+  type        = bool
   description = ""
-  default     = "acl-04ab36970f6f08063"
+  default     = true
+}
+
+variable "block_public_policy" {
+  type        = bool
+  description = ""
+  default     = true
+}
+
+variable "ignore_public_acls" {
+  type        = bool
+  description = ""
+  default     = true
+}
+
+variable "restrict_public_buckets" {
+  type        = bool
+  description = ""
+  default     = true
 }
