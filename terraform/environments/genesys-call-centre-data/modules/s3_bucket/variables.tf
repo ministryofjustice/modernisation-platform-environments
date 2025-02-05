@@ -46,8 +46,14 @@ variable "notification_events" {
 variable "sse_algorithm" {
   type        = string
   description = "The server-side encryption algorithm to use"
-  default     = "aws:kms"
+  default     = "AES256"
 }
+
+# variable "sse_algorithm" {
+#   type        = string
+#   description = "The server-side encryption algorithm to use"
+#   default     = "aws:kms"
+# }
 
 variable "custom_kms_key" {
   type        = string

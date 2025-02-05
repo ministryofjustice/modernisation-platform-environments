@@ -202,7 +202,7 @@ resource "aws_s3_bucket_replication_configuration" "default" {
 
 # AWS S3 Bucket Policy (Call Centre Staging)
 resource "aws_s3_bucket_policy" "default" {
-  bucket = var.call_centre_staging_aws_s3_bucket
+  bucket = var.bucket_name
   policy = jsonencode({
     Version = var.json_encode_decode_version,
     Statement = [
