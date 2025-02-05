@@ -1,6 +1,26 @@
 locals {
   instance_name = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-${local.instance_name_index}"
-  alarm_name    = "${local.instance_name}-instance-status-check-failed"
+  alarm_name    = "${local.instance_name}-instance-status-check-failed-reboot"
+}
+
+resource "aws_cloudwatch_metric_alarm" "status_check_failed_alarm" {
+  alarm_name          = local.alarm_name
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  metric_name         = "StatusCheckFailed"
+  namespace           = "AWS/EC2"
+  period              = 60
+  statistic           = "Average"
+  threshold           = 1
+  actions_enabled     = true
+  alarm_description   = "Alarm when the EC2 instance has failed the status check, or lacks 'sufficient data'"
+  dimensions = {
+    InstanceId = module.instance.aws_instance.id
+  }
+  treat_missing_data       = "breaching"
+  alarm_actions             = [
+    "arn:aws:sns:us-west-2:123456789012:your-sns-topic"  # Replace with your SNS topic ARN
+  ]
 }
 
 resource "aws_cloudwatch_log_group" "ec2_status_check_log_group" {
