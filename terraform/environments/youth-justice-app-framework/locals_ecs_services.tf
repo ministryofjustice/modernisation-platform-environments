@@ -258,6 +258,7 @@ locals {
       task_memory                       = 3072
       desired_count                     = 1
       health_check_grace_period_seconds = 600
+      autoscaling_max_capacity          = 1
       ecs_task_iam_role_name            = "gateway-custom-role"
       deployment_controller             = "ECS"
       #todo add gateway sg

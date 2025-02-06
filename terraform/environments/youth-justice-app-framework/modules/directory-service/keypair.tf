@@ -9,16 +9,3 @@ module "key_pair" {
 
   tags = local.all_tags
 }
-
-# Create a Secrets Manager secret to store the private key
-resource "aws_secretsmanager_secret" "key_pair_secret" {
-  name = "keypair/${var.management_keypair_name}/private-key"
-
-  tags = local.all_tags
-}
-
-# Store the private key inside the secret
-resource "aws_secretsmanager_secret_version" "key_pair_secret_version" {
-  secret_id     = aws_secretsmanager_secret.key_pair_secret.id
-  secret_string = module.key_pair.private_key_pem
-}
