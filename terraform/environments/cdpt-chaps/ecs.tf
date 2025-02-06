@@ -566,16 +566,6 @@ resource "aws_security_group" "chaps_combined_ecs_service" {
   }
 }
 
-# resource "aws_security_group_rule" "self_referencing_ingress" {
-#   description = "Allow HTTP traffic between chaps and chapsdotnet containers in the same task"
-#   type              = "ingress"
-#   from_port         = 80
-#   to_port           = 8080
-#   protocol          = "tcp"
-#   security_group_id = aws_security_group.chaps_combined_ecs_service.id
-#   source_security_group_id = aws_security_group.chaps_combined_ecs_service.id
-# }
-
 # AWS EventBridge rule
 resource "aws_cloudwatch_event_rule" "ecs_events" {
   name        = "ecs-events"
