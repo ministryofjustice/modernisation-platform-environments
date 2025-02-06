@@ -93,10 +93,12 @@ resource "aws_instance" "defect_dojo" {
   user_data = <<-EOF
               #!/bin/bash
               # Update and install dependencies
-              apt-get update
-              apt-get upgrade
+              sudo apt-get update
+              sudo apt-get upgrade
               sudo git clone https://github.com/DefectDojo/django-DefectDojo.git
               cd django-DefectDojo
+              sudo apt install docker.io -y
+              sudo apt install docker-compose
               sudo docker-compose up -d
               EOF
 
