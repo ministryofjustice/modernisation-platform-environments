@@ -6,7 +6,7 @@ variable "bucket_name" {
 variable "replication_enabled" {
   type        = bool
   description = "Activate S3 bucket replication"
-
+  default     = false
 }
 
 
