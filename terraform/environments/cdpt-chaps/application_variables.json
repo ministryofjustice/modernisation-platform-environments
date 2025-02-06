@@ -32,9 +32,11 @@
       "ec2_desired_capacity": 2,
       "ec2_max_size": 4,
       "ec2_min_size": 2,
-      "instance_type": "t3.large",
+      "instance_type": "t3.xlarge",
       "container_port": 80,
-      "client_id": "2e2cc8ad-7b64-41b9-93a1-c16b9a00b34f"
+      "dotnet_client_id": "efdcd721-93a1-46c1-b0da-29532763b12d",
+      "TenantId": "c6874728-71e6-41fe-a9e1-2e8c36776ad8",
+      "CallbackPath": "/signin-oidc"
     },
     "production": {
       "db_instance_class": "db.t3.2xlarge",
