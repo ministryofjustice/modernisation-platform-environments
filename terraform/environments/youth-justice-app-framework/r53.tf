@@ -3,8 +3,8 @@ resource "aws_route53_record" "dbdns" {
   provider = aws.core-network-services
 
   zone_id = data.aws_route53_zone.yjaf-inner.id
-  name    = module.aurora.rds_cluster_endpoint
+  name    = "db-yjafrds01"
   type    = "CNAME"
   ttl     = 300
-  records = ["db-yjafrds01"]
+  records = [module.aurora.rds_cluster_endpoint]
 }

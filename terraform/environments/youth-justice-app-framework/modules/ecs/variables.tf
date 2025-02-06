@@ -269,3 +269,9 @@ variable "spot_overrides" {
   }))
   default = []
 }
+
+variable "ecs_allowed_secret_arns" {
+  description = "A list of allowed secret ARNs"
+  type        = list(string)
+  default     = []
+}
