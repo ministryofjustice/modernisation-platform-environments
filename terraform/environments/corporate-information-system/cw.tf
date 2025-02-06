@@ -376,29 +376,29 @@ resource "aws_sns_topic" "cis_alerting_topic" {
 
 # Pager duty integration
 
-# # Get the map of pagerduty integration keys from the modernisation platform account
-# data "aws_secretsmanager_secret" "cis_pagerduty_integration_keys" {
-#   provider = aws.modernisation-platform
-#   name     = "pagerduty_integration_keys"
-# }
-# data "aws_secretsmanager_secret_version" "cis_pagerduty_integration_keys" {
-#   provider  = aws.modernisation-platform
-#   secret_id = data.aws_secretsmanager_secret.cis_pagerduty_integration_keys.id
-# }
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "cis_pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+data "aws_secretsmanager_secret_version" "cis_pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.cis_pagerduty_integration_keys.id
+}
 
-# # Add a local to get the keys
-# locals {
-#   cis_pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.cis_pagerduty_integration_keys.secret_string)
-#   cis_pagerduty_integration_key_name = local.application_data.accounts[local.environment].cis_pagerduty_integration_key_name
-# }
+# Add a local to get the keys
+locals {
+  cis_pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.cis_pagerduty_integration_keys.secret_string)
+  cis_pagerduty_integration_key_name = local.application_data.accounts[local.environment].cis_pagerduty_integration_key_name
+}
 
-# # link the sns topic to the service
+# link the sns topic to the service
 
-# module "cis_pagerduty_core_alerts" {
-#   depends_on = [
-#     aws_sns_topic.cis_alerting_topic
-#   ]
-#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-#   sns_topics                = [aws_sns_topic.cis_alerting_topic.name]
-#   pagerduty_integration_key = local.cis_pagerduty_integration_keys[local.cis_pagerduty_integration_key_name]
-# }
+module "cis_pagerduty_core_alerts" {
+  depends_on = [
+    aws_sns_topic.cis_alerting_topic
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.cis_alerting_topic.name]
+  pagerduty_integration_key = local.cis_pagerduty_integration_keys[local.cis_pagerduty_integration_key_name]
+}
