@@ -1,12 +1,18 @@
+variable "my_ip" {
+  type    = string
+  default = "18.170.74.92/32"
+}
+
 # Kali Linux Instance
 resource "aws_instance" "kali_linux" {
   ami                         = "ami-0f398bcc12f72f967" // aws-marketplace/kali-last-snapshot-amd64-2024.2.0-804fcc46-63fc-4eb6-85a1-50e66d6c7215
-  associate_public_ip_address = false
+  associate_public_ip_address = true
   instance_type               = "t2.micro"
   subnet_id                   = module.vpc.private_subnets.0
   vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
   ebs_optimized               = true
+
   metadata_options {
     http_tokens = "required"
   }
@@ -21,27 +27,39 @@ resource "aws_instance" "kali_linux" {
   }
   user_data = <<-EOF
               #!/bin/bash
-              # Update and install dependencies
-              apt-get update
-              apt-get upgrade
-              apt-get install -y wget
               
+              set -e
+              exec > >(tee /var/log/user-data.log | logger -t user-data) 2>&1
 
-              # Download the SSM agent
-              wget https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/debian_amd64/amazon-ssm-agent.deb
+              # Update system packages
+              echo "Updating and upgrading system packages..."
+              apt-get update -y
+              apt-get upgrade -y
 
-              # Install the agent
-              dpkg -i amazon-ssm-agent.deb
+              # Install necessary tools and Kali default tools
+              echo "Installing wget, git, and kali-linux-default tools..."
+              apt-get install -y wget git kali-linux-default
 
-              # Start the SSM service
-              systemctl enable amazon-ssm-agent
-              systemctl start amazon-ssm-agent
+              # Check if 'kali' user exists
+              if id "kali" &>/dev/null; then
+                  echo "User 'kali' exists. Proceeding to create tooling directory..."
+                  
+                  # Create tooling directory and set ownership
+                  mkdir -p /home/kali/tooling
+                  chown -R kali:kali /home/kali
+                  echo "Tooling directory created under /home/kali and ownership set."
 
-              # Check the status
-              systemctl status amazon-ssm-agent
+                  # Clone the repository as 'kali' user
+                  echo "Cloning gotestwaf repository into /home/kali/tooling..."
+                  sudo -u kali git clone https://github.com/wallarm/gotestwaf.git /home/kali/tooling
+                  echo "Repository cloned successfully."
+              else
+                  echo "User 'kali' does not exist. Exiting."
+                  exit 1
+              fi
 
-              # Install kali-linux-default tools
-              apt-get install -y kali-linux-default
+              echo "User data script completed successfully."
+
               EOF
 
   tags = {
@@ -53,12 +71,13 @@ resource "aws_instance" "kali_linux" {
 # Defect Dojo Instance
 resource "aws_instance" "defect_dojo" {
   ami                         = "ami-0e8d228ad90af673b"
-  associate_public_ip_address = false
-  instance_type               = "t2.micro"
+  associate_public_ip_address = true
+  instance_type               = "t2.large"
   subnet_id                   = module.vpc.private_subnets.0
-  vpc_security_group_ids      = [aws_security_group.kali_linux_sg.id]
+  vpc_security_group_ids      = [aws_security_group.defect_dojo_sg.id]
   iam_instance_profile        = aws_iam_instance_profile.ssm_instance_profile.name
   ebs_optimized               = true
+
   metadata_options {
     http_tokens = "required"
   }
@@ -74,8 +93,13 @@ resource "aws_instance" "defect_dojo" {
   user_data = <<-EOF
               #!/bin/bash
               # Update and install dependencies
-              apt-get update
-              apt-get upgrade
+              sudo apt-get update
+              sudo apt-get upgrade
+              sudo git clone https://github.com/DefectDojo/django-DefectDojo.git
+              cd django-DefectDojo
+              sudo apt install docker.io -y
+              sudo apt install docker-compose -y
+              sudo docker-compose up -d
               EOF
 
   tags = {
@@ -99,6 +123,49 @@ resource "aws_security_group" "kali_linux_sg" {
     cidr_blocks = ["10.0.0.0/16"]
   }
 
+  egress {
+    description = "Allow all traffic outbound"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# Security Group for Defect Dojo instance
+# trivy:ignore:AVD-AWS-0104
+resource "aws_security_group" "defect_dojo_sg" {
+  lifecycle {
+    create_before_destroy = true
+  }
+  name        = "allow_tcp"
+  description = "Allow TCP inbound traffic"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    description = "Allow TCP/8080 from my IP"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip]
+  }
+
+  ingress {
+    description = "Allow TCP/443 from my IP"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip]
+  }
+
+  ingress {
+    description = "Allow TCP/8443 from my IP"
+    from_port   = 8443
+    to_port     = 8443
+    protocol    = "tcp"
+    cidr_blocks = [var.my_ip]
+  }
+  
   egress {
     description = "Allow all traffic outbound"
     from_port   = 0

@@ -133,12 +133,17 @@ class RDS_JDBC_CONNECTION():
 
     def get_rds_db_table_row_count(self,
                                    in_table_name,
-                                   in_pkeys_col_list) -> DataFrame:
-
-        query_str = f"""
-        SELECT count({', '.join(in_pkeys_col_list)}) as row_count
-        FROM {self.rds_db_schema_name}.[{in_table_name}]
-        """.strip()
+                                   in_pkeys_columns) -> DataFrame:
+        if isinstance(in_pkeys_columns, list):
+            query_str = f"""
+            SELECT count({', '.join(in_pkeys_columns)}) as row_count
+            FROM {self.rds_db_schema_name}.[{in_table_name}]
+            """.strip()
+        else:
+            query_str = f"""
+            SELECT count({in_pkeys_columns}) as row_count
+            FROM {self.rds_db_schema_name}.[{in_table_name}]
+            """.strip()            
 
         return (self.spark.read.format("jdbc")
                 .option("url", self.rds_jdbc_url_v2)
@@ -182,6 +187,105 @@ class RDS_JDBC_CONNECTION():
                     .option("upperBound", jdbc_partition_col_upperbound)
                     .option("numPartitions", numPartitions)
                     .load())
+
+    def get_rds_df_read_query_pkey_parallel(self,
+                                          in_db_query,
+                                          jdbc_partition_column,
+                                          jdbc_partition_col_lowerbound,
+                                          jdbc_partition_col_upperbound,
+                                          jdbc_read_partitions_num=1
+                                          ) -> DataFrame:
+
+        numPartitions = jdbc_read_partitions_num
+        # Note: numPartitions is normally equal to number of executors defined.
+        # The maximum number of partitions that can be used for parallelism in table reading and writing.
+        # This also determines the maximum number of concurrent JDBC connections.
+
+        # fetchSize = jdbc_rows_fetch_size
+        # The JDBC fetch size, which determines how many rows to fetch per round trip.
+        # This can help performance on JDBC drivers which default to low fetch size (e.g. Oracle with 10 rows).
+        # Too Small: => frequent round trips to database
+        # Too Large: => Consume a lot of memory
+
+        return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({in_db_query}) as t""")
+                    .option("partitionColumn", jdbc_partition_column)
+                    .option("lowerBound", jdbc_partition_col_lowerbound)
+                    .option("upperBound", jdbc_partition_col_upperbound)
+                    .option("numPartitions", numPartitions)
+                    .load())
+
+    def get_rds_df_read_query(self, in_db_query) -> DataFrame:
+
+        return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({in_db_query}) as t""")
+                    .load())
+
+
+    def get_rds_df_query_min_max_count(self, 
+                                       rds_table_name,
+                                       table_pkey_column) -> DataFrame:
+
+        query_str = f"""
+        SELECT min({table_pkey_column}) as min_value,
+               max({table_pkey_column}) as max_value,
+               count({table_pkey_column}) as count_value
+        FROM {self.rds_db_schema_name}.[{rds_table_name}]
+        """.strip()
+
+        return (self.spark.read.format("jdbc")
+                    .option("url", self.rds_jdbc_url_v2)
+                    .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                    .option("user", self.RDS_DB_INSTANCE_USER)
+                    .option("password", self.RDS_DB_INSTANCE_PWD)
+                    .option("dbtable", f"""({query_str}) as t""")
+                    .load())
+
+
+    def get_min_max_count_groupby_yyyy_mm(self,
+                                          rds_db_table,
+                                          date_partition_col,
+                                          pkey_column,
+                                          filter_where_clause=None) -> DataFrame:
+
+        agg_query_str = f"""
+        SELECT YEAR({date_partition_col}) AS year, 
+               MONTH({date_partition_col}) AS month, 
+               MIN({pkey_column}) AS min_{pkey_column}, 
+               MAX({pkey_column}) AS max_{pkey_column},
+               COUNT({pkey_column}) AS count_{pkey_column}
+          FROM {self.rds_db_schema_name}.[{rds_db_table}]
+        """.strip()
+
+        if filter_where_clause is not None:
+            agg_query_str = agg_query_str + \
+                f""" WHERE {filter_where_clause.rstrip()}"""
+
+        agg_query_str = agg_query_str + \
+            f""" GROUP BY YEAR({date_partition_col}), MONTH({date_partition_col})"""
+
+        self.LOGGER.info(f"""query_str-(Aggregate):> \n{agg_query_str}""")
+
+        df_agg = (self.spark.read.format("jdbc")
+                .option("url", self.rds_jdbc_url_v2)
+                .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                .option("user", self.RDS_DB_INSTANCE_USER)
+                .option("password", self.RDS_DB_INSTANCE_PWD)
+                .option("query", f"""{agg_query_str}""")
+                .load())
+        
+        df_agg = df_agg.orderBy(['year', 'month'], ascending=True)
+
+        return df_agg
+
 
     def get_rds_df_jdbc_read_parallel(self,
                                       rds_tbl_name,
@@ -318,6 +422,16 @@ class RDS_JDBC_CONNECTION():
                 .option("query", f"""{query_str}""")
                 .load())
 
+    def get_rds_db_query_df(self, rds_db_query) -> DataFrame:
+
+        return (self.spark.read.format("jdbc")
+                .option("url", self.rds_jdbc_url_v2)
+                .option("driver", self.RDS_DB_INSTANCE_DRIVER)
+                .option("user", self.RDS_DB_INSTANCE_USER)
+                .option("password", self.RDS_DB_INSTANCE_PWD)
+                .option("query", f"""{rds_db_query}""")
+                .load())
+
     def get_jdbc_partition_column(self,
                                   rds_db_table_name,
                                   rds_tbl_pkeys_list):
@@ -394,13 +508,17 @@ class RDS_JDBC_CONNECTION():
 
         self.LOGGER.info(f"""query_str-(Aggregate):> \n{query_str}""")
 
-        return (self.spark.read.format("jdbc")
+        df_agg = (self.spark.read.format("jdbc")
                 .option("url", self.rds_jdbc_url_v2)
                 .option("driver", self.RDS_DB_INSTANCE_DRIVER)
                 .option("user", self.RDS_DB_INSTANCE_USER)
                 .option("password", self.RDS_DB_INSTANCE_PWD)
                 .option("query", f"""{query_str}""")
-                .load()).collect()
+                .load())
+        
+        df_agg = df_agg.orderBy(['year', 'month'], ascending=True)
+
+        return df_agg.collect()
 
     def get_min_max_pkey_filter(self,
                                 rds_db_table_name,
@@ -628,10 +746,8 @@ class CustomPysparkMethods:
     def get_nvl_select_list(in_rds_df: DataFrame,
                             rds_jdbc_conn_obj,
                             in_rds_tbl_name):
-        df_col_attr = rds_jdbc_conn_obj.get_rds_tbl_col_attributes(
-            in_rds_tbl_name)
-        df_col_attr_dict = CustomPysparkMethods.get_rds_tbl_col_attr_dict(
-            df_col_attr)
+        df_col_attr = rds_jdbc_conn_obj.get_rds_tbl_col_attributes(in_rds_tbl_name)
+        df_col_attr_dict = CustomPysparkMethods.get_rds_tbl_col_attr_dict(df_col_attr)
         df_col_dtype_dict = CustomPysparkMethods.get_dtypes_dict(in_rds_df)
 
         temp_select_list = list()
@@ -703,3 +819,62 @@ class CustomPysparkMethods:
                 altered_schema_object.add(field_obj)
 
         return altered_schema_object
+
+    @staticmethod
+    def get_pyspark_hashed_table_schema(in_pkey_column, sf_list=None):
+        if sf_list is None:
+            return T.StructType([
+                T.StructField(f"{in_pkey_column}", T.LongType(), False),
+                T.StructField("RowHash", T.StringType(), False)]
+                )
+        else:
+            schema = T.StructType([
+                T.StructField(f"{in_pkey_column}", T.LongType(), False)]
+                )
+            
+            for sf in sf_list:
+                schema = schema.add(sf)
+            
+            schema = schema.add(T.StructField("RowHash", T.StringType(), False))
+
+            return schema
+
+    @staticmethod
+    def get_year_month_min_max_count_schema(in_pkey_column_str):
+
+        agg_schema = T.StructType([
+                T.StructField("year", T.IntegerType(), False),
+                T.StructField("month", T.IntegerType(), False),
+                T.StructField(f"min_{in_pkey_column_str}", T.LongType(), False),
+                T.StructField(f"max_{in_pkey_column_str}", T.LongType(), False),
+                T.StructField(f"count_{in_pkey_column_str}", T.LongType(), False)]
+                )
+        return agg_schema
+
+    @staticmethod
+    def update_df1_with_df2(df1: DataFrame, df2: DataFrame, 
+                            all_remaining_columns_list,
+                            join_columns_list = ['year', 'month']):
+        #agg_schema = __class__.get_year_month_min_max_count_schema()
+
+        # Step 1: Find unmatched rows from df1 / df_parquet
+        df_unmatched_rows = df1.join(df2, join_columns_list, "left_anti")
+
+        # Step 2: Update matched rows between df2 / df_JDBC AND df1 / df_parquet
+        update_columns_select = [df2[c].alias(c) for c in all_remaining_columns_list]
+        key_columns_select = [df1[c] for c in join_columns_list]
+        df_updated_rows = df1.join(df2, join_columns_list, "inner") \
+            .select(
+                *key_columns_select,
+                *update_columns_select
+            )
+
+        # Step 3: Include new rows from df2 / df_JDBC not in df1 / df_parquet
+        df_new_rows = df2.join(df1, join_columns_list, "left_anti")
+
+        # Step 4: Combine all type of rows in dataframes
+        final_df = df_unmatched_rows.union(df_updated_rows).union(df_new_rows)
+
+        final_df = final_df.orderBy(join_columns_list)
+
+        return final_df

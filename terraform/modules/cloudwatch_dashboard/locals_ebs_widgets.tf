@@ -103,14 +103,14 @@ locals {
                 label      = "${ebs_value.id} ${ebs_value.tags.Name}"
                 region     = "eu-west-2"
               }],
-              ["AWS/EBS", "VolumeReadOps", "VolumeId", ebs_value.id, {
+              ["AWS/EBS", "VolumeReadBytes", "VolumeId", ebs_value.id, {
                 id      = ebs_value.metric_id_r
                 period  = 60
                 region  = "eu-west-2"
                 stat    = "Sum"
                 visible = false
               }],
-              ["AWS/EBS", "VolumeWriteOps", "VolumeId", ebs_value.id, {
+              ["AWS/EBS", "VolumeWriteBytes", "VolumeId", ebs_value.id, {
                 id      = ebs_value.metric_id_w
                 period  = 60
                 region  = "eu-west-2"

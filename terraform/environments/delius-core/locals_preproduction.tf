@@ -4,9 +4,9 @@
 # tags demonstrate inheritance due to merges in the module
 locals {
   environment_config_preprod = {
-    migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/22"]
+    migration_environment_private_cidr     = ["10.160.0.0/22", "10.160.4.0/22", "10.160.8.0/22"]
     migration_environment_vpc_cidr         = "10.160.0.0/20"
-    migration_environment_db_cidr          = ["10.160.44.0/24", "10.160.45.0/24", "10.160.46.0/25"]
+    migration_environment_db_cidr          = ["10.160.12.0/24", "10.160.13.0/24", "10.160.14.0/25"]
     migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "pre-prod"
@@ -21,13 +21,13 @@ locals {
     encrypted                   = true
     migration_source_account_id = "010587221707"
     migration_lambda_role       = "ldap-data-migration-lambda-role"
-    efs_throughput_mode         = "bursting"
+    efs_throughput_mode         = "elastic"
     efs_provisioned_throughput  = null
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
     tls_port                    = 636
-    desired_count               = 0
+    desired_count               = 1
   }
 
 
@@ -140,7 +140,8 @@ locals {
     user_target_endpoint = {
       write_database = "PRENDA"
     }
-    is-production = local.is-production
+    # Auditing from the Pre-Prod environment is considered production data
+    is-production = true
   }
 
 }

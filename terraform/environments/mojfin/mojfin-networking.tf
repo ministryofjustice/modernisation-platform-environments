@@ -22,12 +22,15 @@ resource "aws_security_group" "mojfin" {
     cidr_blocks = [local.appstream_cidr]
   }
 
-  ingress {
-    description = "Ireland Shared Services Inbound - Workspaces etc"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.cidr_ire_workspace]
+  dynamic "ingress" {
+    for_each = local.environment == "preproduction" ? [] : [local.cidr_ire_workspace]
+    content {
+      description = "Ireland Shared Services Inbound - Workspaces etc"
+      from_port   = 1521
+      to_port     = 1521
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
   ingress {
@@ -39,19 +42,22 @@ resource "aws_security_group" "mojfin" {
   }
 
   ingress {
-    description = "Cloud Platform VPC Internal Traffic inbound"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.cp_vpc_cidr]
+      description = "Cloud Platform VPC Internal Traffic inbound"
+      from_port   = 1521
+      to_port     = 1521
+      protocol    = "tcp"
+      cidr_blocks = [local.cp_vpc_cidr]
   }
 
-  ingress {
-    description = "Connectivity Analytic Platform (Airflow) use of Transit Gateway to MoJFin"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.analytic_platform_cidr]
+  dynamic "ingress" {
+    for_each = local.environment == "preproduction" ? [] : [local.analytic_platform_cidr]
+    content {
+      description = "Connectivity Analytic Platform (Airflow) use of Transit Gateway to MoJFin"
+      from_port   = 1521
+      to_port     = 1521
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
   ingress {
@@ -62,12 +68,15 @@ resource "aws_security_group" "mojfin" {
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
 
-  ingress {
-    description = "Temp rule for DBlinks, remove rule once the other DBs have been migrated to MP"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [local.lz_vpc]
+  dynamic "ingress" {
+    for_each = local.environment == "preproduction" ? [] : [local.lz_vpc]
+    content {
+      description = "Temp rule for DBlinks, remove rule once the other DBs have been migrated to MP"
+      from_port   = 1521
+      to_port     = 1521
+      protocol    = "tcp"
+      cidr_blocks = [ingress.value]
+    }
   }
 
   egress {

@@ -3,26 +3,34 @@ locals {
   secretsmanager_secrets = {
     bip = {
       secrets = {
-        passwords = { description = "BIP Passwords" }
-        config    = { description = "BIP Configuration" }
-      }
-    }
-    bip_app = {
-      secrets = {
-        passwords = { description = "BIP Passwords" }
-        config    = { description = "BIP Configuration" }
-      }
-    }
-    bip_web = {
-      secrets = {
-        passwords = { description = "Web Passwords" }
-        config    = { description = "Web Configuration" }
+        passwords = {
+          description = "BIP Passwords"
+          tags = {
+            instance-access-policy = "full"
+          }
+        }
+        config = {
+          description = "BIP Configuration"
+          tags = {
+            instance-access-policy = "limited"
+          }
+        }
       }
     }
     bods = {
       secrets = {
-        passwords = { description = "BODS Passwords" }
-        config    = { description = "BODS Configuration" }
+        passwords = {
+          description = "BODS Passwords"
+          tags = {
+            instance-access-policy = "full"
+          }
+        }
+        config = {
+          description = "BODS Configuration"
+          tags = {
+            instance-access-policy = "limited"
+          }
+        }
       }
     }
     db = {

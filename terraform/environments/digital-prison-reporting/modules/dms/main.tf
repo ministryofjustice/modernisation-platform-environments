@@ -102,9 +102,8 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   parquet_timestamp_in_millisecond = false
   include_op_for_full_load         = true
 
-  max_file_size           = 120000
-  cdc_max_batch_interval  = 10
-  cdc_inserts_and_updates = true
+  max_file_size          = 120000
+  cdc_max_batch_interval = 10
 
   depends_on = [aws_iam_policy.dms-s3-target-policy, aws_iam_policy.dms-operator-s3-policy]
 
@@ -126,6 +125,7 @@ resource "aws_dms_replication_subnet_group" "dms-s3-target-subnet-group" {
 resource "aws_security_group" "dms_s3_target_sec_group" {
   #checkov:skip=CKV2_AWS_5
   #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
 
   count = var.setup_dms_instance ? 1 : 0
 

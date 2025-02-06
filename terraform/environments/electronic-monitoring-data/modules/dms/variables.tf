@@ -5,6 +5,7 @@ variable "database_name" {
 
 variable "local_tags" {
   description = "The predefined local.tags"
+  type        = map(string)
 }
 # ---------------------------------------------------------
 

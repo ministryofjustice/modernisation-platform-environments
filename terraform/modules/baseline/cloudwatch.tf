@@ -35,7 +35,13 @@ module "cloudwatch_dashboard" {
   ec2_instances  = module.ec2_instance
   periodOverride = lookup(each.value, "periodOverride", null)
   start          = lookup(each.value, "start", null)
-  widget_groups  = lookup(each.value, "widget_groups", [])
+  widget_groups = [
+    for widget_group in lookup(each.value, "widget_groups", []) : merge(widget_group,
+      lookup(widget_group, "account_name", null) == null ? {} : {
+        accountId = var.environment.account_ids[lookup(widget_group, "account_name", null)]
+      }
+    )
+  ]
 }
 
 resource "aws_cloudwatch_log_group" "this" {

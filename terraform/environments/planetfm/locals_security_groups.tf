@@ -105,7 +105,7 @@ locals {
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
         rdp_tcp_web = {
-          description = "3389: Allow RDP UDP ingress from jumpserver"
+          description = "3389: Allow RDP TCP ingress from jumpserver"
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"

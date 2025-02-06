@@ -1,5 +1,5 @@
 ---
-apiVersion: karpenter.sh/v1beta1
+apiVersion: karpenter.sh/v1
 kind: NodePool
 metadata:
   name: general-on-demand
@@ -13,7 +13,7 @@ spec:
         compute.analytical-platform.service.justice.gov.uk/karpenter-node-pool: "general-on-demand"
     spec:
       nodeClassRef:
-        apiVersion: karpenter.k8s.aws/v1beta1
+        group: karpenter.k8s.aws
         kind: EC2NodeClass
         name: bottlerocket-general
       taints:

@@ -72,14 +72,17 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+    database_name = "DMDNDA"
+    database_port = local.db_port
   }
 
   delius_microservices_configs_dev = {
     weblogic = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 4096
-      container_cpu    = 2048
+      image_tag                = "6.2.0.3"
+      container_port           = 8080
+      container_memory         = 4096
+      container_cpu            = 2048
+      task_definition_revision = 9
     }
 
     weblogic_eis = {
@@ -103,6 +106,12 @@ locals {
       container_cpu    = 512
       container_memory = 1024
     }
+
+    oracle_observer = {
+      image_tag        = "latest"
+      container_cpu    = 512
+      container_memory = 1024
+    }
   }
 
   bastion_config_dev = {
@@ -120,15 +129,15 @@ locals {
     # Please ensure any changes made here are consistent with Ansible variables.
     audit_source_endpoint = {
       read_host     = "standbydb2"
-      read_database = "DMDNDAS2"
+      read_database = "${local.db_config_dev.database_name}S2"
     }
     audit_target_endpoint = {
       write_environment = "test"
     }
     user_source_endpoint = {}
     user_target_endpoint = {
-      write_database = "DMDNDA"
+      write_database = local.db_config_dev.database_name
     }
-    is-production = local.is-production
+    is-production = false
   }
 }

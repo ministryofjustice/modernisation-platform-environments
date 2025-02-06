@@ -87,14 +87,28 @@ locals {
             "Ec2SecretPolicy",
           ])
         })
+        # IMPORTANT: EBS volume initialization, labelling, formatting was carried out manually on this instance. It was not automated so these ebs_volume settings are bespoke. Additional volumes should NOT be /dev/xvd* see the local.ec2_instances.bods.ebs_volumes setting for the correct device names.
+        ebs_volumes = {
+          "/dev/sda1" = { type = "gp3", size = 128 } # root volume
+          "/dev/xvdk" = { type = "gp3", size = 128 } # D:/ Temp
+          "/dev/xvdl" = { type = "gp3", size = 128 } # E:/ App
+          "/dev/xvdm" = { type = "gp3", size = 700 } # F:/ Storage
+        }
         instance = merge(local.ec2_instances.bods.instance, {
-          instance_type = "r6i.2xlarge"
+          instance_type           = "r6i.2xlarge"
+          disable_api_termination = true
         })
-        cloudwatch_metric_alarms = null
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pp"
           domain-name                          = "azure.hmpp.root"
         })
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+          local.cloudwatch_metric_alarms.windows,
+          local.cloudwatch_metric_alarms.bods_primary,
+        )
       })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
@@ -122,6 +136,38 @@ locals {
       # })
     }
 
+    fsx_windows = {
+
+      pp-bods-win-share = {
+        deployment_type     = "SINGLE_AZ_1"
+        security_groups     = ["bods"]
+        skip_final_backup   = true
+        storage_capacity    = 600
+        throughput_capacity = 8
+
+        subnets = [
+          {
+            name               = "private"
+            availability_zones = ["eu-west-2a"]
+          }
+        ]
+
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.azure_fixngo_ip.PCMCW0011,
+            module.ip_addresses.azure_fixngo_ip.PCMCW0012,
+          ]
+          domain_name                      = "azure.hmpp.root"
+          username                         = "svc_fsx_windows"
+          password_secret_name             = "/sap/bods/pp/passwords"
+          file_system_administrators_group = "Domain Join"
+        }
+        tags = {
+          backup = true
+        }
+      }
+    }
+
     iam_policies = {
       Ec2SecretPolicy = {
         description = "Permissions required for secret value access by instances"
@@ -135,7 +181,6 @@ locals {
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/sap/bods/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/sap/bip/pp/*",
-              "arn:aws:secretsmanager:*:*:secret:/sap/web/pp/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*",
             ]
           }
@@ -143,7 +188,7 @@ locals {
       }
     }
 
-    # DO NOT DEPLOY YET AS OTHER THINGS AREN'T READY
+    # DO NOT FULLY DEPLOY YET AS WEB INSTANCES ARE NOT IN USE
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
@@ -236,7 +281,7 @@ locals {
       #           conditions = [{
       #             host_header = {
       #               values = [
-      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
       #               ]
       #             }
       #           }]
@@ -292,7 +337,6 @@ locals {
     secretsmanager_secrets = {
       "/sap/bods/pp"             = local.secretsmanager_secrets.bods
       "/sap/bip/pp"              = local.secretsmanager_secrets.bip
-      "/sap/web/pp"              = local.secretsmanager_secrets.web
       "/oracle/database/PPBOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PPBOAUD" = local.secretsmanager_secrets.db
     }

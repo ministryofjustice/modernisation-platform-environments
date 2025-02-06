@@ -11,6 +11,9 @@ resource "aws_sfn_state_machine" "this" {
     include_execution_data = true
     level                  = "ALL"
   }
+  tracing_configuration {
+    enabled = true
+  }
 }
 
 resource "aws_iam_role" "step_function_role" {
@@ -45,7 +48,7 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
   statement {
     effect    = "Allow"
     actions   = ["sns:Publish", "sqs:SendMessage"]
-    resources = ["*"]
+    resources = ["arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"]
   }
   statement {
     effect    = "Allow"
@@ -68,7 +71,7 @@ data "aws_iam_policy_document" "step_function_base_permissions" {
       "logs:PutDestinationPolicy",
       "logs:PutLogEvents"
     ]
-    resources = ["*"]
+    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"]
   }
 }
 
@@ -87,7 +90,7 @@ data "aws_iam_policy_document" "this_log_key_document" {
       identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
     actions   = ["kms:*"]
-    resources = ["*"]
+    resources = ["arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/*"]
   }
 
   statement {
@@ -103,7 +106,7 @@ data "aws_iam_policy_document" "this_log_key_document" {
       "kms:GenerateDataKey",
       "kms:DescribeKey"
     ]
-    resources = ["*"]
+    resources = ["arn:aws:kms:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:key/*"]
   }
 }
 

@@ -30,7 +30,8 @@ locals {
         security_groups    = ["bip"]
       }]
       tags = {
-        backup = "false"
+        backup      = "false"
+        backup-plan = "daily-and-weekly"
       }
     }
   }

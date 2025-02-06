@@ -99,11 +99,11 @@ module "g4s" {
     # local.sftp_account_dev,
 
     # Test account for supplier.
-    # local.sftp_account_g4s_test,
+    local.sftp_account_g4s_test,
 
     # Accounts for each system to be migrated.
     # local.sftp_account_g4s_atrium,
-    local.sftp_account_g4s_atrium_unstructured,
+    # local.sftp_account_g4s_atrium_unstructured,
     # local.sftp_account_g4s_cap_dw,
     # local.sftp_account_g4s_integrity,
     # local.sftp_account_g4s_telephony,
@@ -113,7 +113,7 @@ module "g4s" {
     # local.sftp_account_g4s_atv,
     # local.sftp_account_g4s_emsys_mvp,
     # local.sftp_account_g4s_emsys_tpims,
-    local.sftp_account_g4s_x_drive,
+    # local.sftp_account_g4s_x_drive,
   ]
 
   data_store_bucket = module.s3-data-bucket.bucket

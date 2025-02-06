@@ -75,9 +75,24 @@ locals {
     }
 
     ec2_instances = {
+
+      pp-jump2022-1 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.hmpp.root"
+        })
+      })
+
       pp-rdgw-1-a = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.rdgw.instance, {
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.hmpp.root domain"
@@ -151,6 +166,12 @@ locals {
           })
         })
       })
+    }
+
+    schedule_alarms_lambda = {
+      alarm_patterns = [
+        "public-https-*-unhealthy-load-balancer-host",
+      ]
     }
 
     route53_zones = {

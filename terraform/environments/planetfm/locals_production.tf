@@ -13,24 +13,6 @@ locals {
   # please keep resources in alphabetical order
   baseline_production = {
 
-    acm_certificates = {
-      planetfm_wildcard_cert = {
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                         = "modernisation-platform.service.justice.gov.uk"
-        external_validation_records_created = true
-        subject_alternate_names = [
-          "*.planetfm.service.justice.gov.uk",
-          "cafmwebx.az.justice.gov.uk",
-          "cafmwebx2.az.justice.gov.uk",
-          "cafmtx.az.justice.gov.uk",
-          "cafmtrainweb.az.justice.gov.uk",
-        ]
-        tags = {
-          description = "wildcard cert for planetfm production domains"
-        }
-      }
-    }
-
     ec2_instances = {
       # app servers
       pd-cafm-a-10-b = merge(local.ec2_instances.app, {
@@ -50,12 +32,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-10-b"
           description      = "RDS Session Host and CAFM App Server/PFME Licence Server"
           pre-migration    = "PDFAW0010"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
 
       pd-cafm-a-11-a = merge(local.ec2_instances.app, {
@@ -75,12 +57,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-11-a"
           description      = "RDS session host and app server"
           pre-migration    = "PDFWA0011"
           update-ssm-agent = "patchgroup1"
-        }
+        })
       })
 
       pd-cafm-a-12-b = merge(local.ec2_instances.app, {
@@ -100,12 +82,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-12-b"
           description      = "RDS session host and app Server"
           pre-migration    = "PDFAW0012"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
 
       pd-cafm-a-13-a = merge(local.ec2_instances.app, {
@@ -125,12 +107,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-13-a"
           description      = "RDS session host and App Server"
           pre-migration    = "PDFAW0013"
           update-ssm-agent = "patchgroup1"
-        }
+        })
       })
 
       # database servers
@@ -183,7 +165,7 @@ locals {
           "/dev/sde"  = { type = "gp3", size = 50 }
           "/dev/sdf"  = { type = "gp3", size = 85 }
           "/dev/sdg"  = { type = "gp3", size = 100 }
-          "/dev/sdh"  = { type = "gp3", size = 150 } # T: drive
+          "/dev/sdh"  = { type = "gp3", size = 250 } # T: drive
           "/dev/sdi"  = { type = "gp3", size = 250 } # U: drive
         }
         instance = merge(local.ec2_instances.db.instance, {
@@ -228,12 +210,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.2xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-36-b"
           description      = "CAFM Asset Management"
           pre-migration    = "PDFWW00036"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
 
       pd-cafm-w-37-a = merge(local.ec2_instances.web, {
@@ -265,12 +247,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.2xlarge"
         })
-        tags = {
+        tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-37-a"
           description      = "CAFM Assessment Management"
           pre-migration    = "PFWW00037"
           update-ssm-agent = "patchgroup1"
-        }
+        })
       })
 
       pd-cafm-w-38-b = merge(local.ec2_instances.web, {
@@ -290,12 +272,12 @@ locals {
           disable_api_termination = true
           instance_type           = "t3.large"
         })
-        tags = {
+        tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-38-b"
           description      = "CAFM Web Training"
           pre-migration    = "PDFWW3QCP660001"
           update-ssm-agent = "patchgroup2"
-        }
+        })
       })
     }
 

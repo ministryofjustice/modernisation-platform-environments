@@ -9,6 +9,7 @@ on:
     paths:
       - '.github/workflows/generate-dependabot-file.yml'
       - 'scripts/generate-dependabot-file.sh'
+      - 'terraform/environments/**/platform_backend.tf'
   workflow_dispatch:
 
 defaults:
@@ -16,12 +17,11 @@ defaults:
     shell: bash
 
 permissions:
-  contents: read
+  contents: write
+  pull-requests: write
 
 jobs:
-  create-and-commit-dependabot-file:
-    permissions:
-      pull-requests: write
+  create-and-commit-dependabot-file:    
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
@@ -34,7 +34,7 @@ jobs:
         env:
           SECRET: ${{ secrets.GITHUB_TOKEN }}
       - name: Slack failure notification
-        uses: slackapi/slack-github-action@37ebaef184d7626c5f204ab8d3baff4262dd30f0 # v1.26.0
+        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v1.26.0
         with:
           payload: |
             {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}

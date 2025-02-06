@@ -238,6 +238,31 @@ variable "retention_curated_num_workers" {
   }
 }
 
+variable "processed_files_check_wait_interval_seconds" {
+  description = "Amount of seconds between checks to s3 if all files have been processed"
+  type        = number
+}
+
+variable "processed_files_check_max_attempts" {
+  description = "Maximum number of attempts to check if all files have been processed"
+  type        = number
+}
+
+variable "glue_s3_max_attempts" {
+  description = "The maximum number of attempts when making requests to S3"
+  type        = number
+}
+
+variable "glue_s3_retry_min_wait_millis" {
+  description = "The minimum wait duration in millis before a request to S3 is retried"
+  type        = number
+}
+
+variable "glue_s3_retry_max_wait_millis" {
+  description = "The maximum wait duration in millis before a request to S3 is retried"
+  type        = number
+}
+
 variable "tags" {
   type        = map(string)
   default     = {}

@@ -39,7 +39,7 @@ locals {
     mountPoints : [
       {
         sourceVolume : "tribunals",
-        containerPath : "C:/inetpub/wwwroot/${local.documents_location}"
+        containerPath : "C:/inetpub/wwwroot"
       }
     ]
   }])

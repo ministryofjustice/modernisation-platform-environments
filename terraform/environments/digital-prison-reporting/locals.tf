@@ -11,30 +11,26 @@ locals {
 
   # glue_db                       = local.application_data.accounts[local.environment].glue_db_name
   # glue_db_data_domain           = local.application_data.accounts[local.environment].glue_db_data_domain
-  description             = local.application_data.accounts[local.environment].db_description
-  create_db               = local.application_data.accounts[local.environment].create_database
-  glue_job                = local.application_data.accounts[local.environment].glue_job_name
-  create_job              = local.application_data.accounts[local.environment].create_job
-  create_sec_conf         = local.application_data.accounts[local.environment].create_security_conf
-  env                     = local.environment
-  s3_kms_arn              = aws_kms_key.s3.arn
-  operational_db_kms_arn  = aws_kms_key.operational_db.arn
-  operational_db_kms_id   = aws_kms_key.operational_db.key_id
-  kinesis_kms_arn         = aws_kms_key.kinesis-kms-key.arn
-  kinesis_kms_id          = data.aws_kms_key.kinesis_kms_key.key_id
-  create_bucket           = local.application_data.accounts[local.environment].setup_buckets
-  account_id              = data.aws_caller_identity.current.account_id
-  account_region          = data.aws_region.current.name
-  create_kinesis          = local.application_data.accounts[local.environment].create_kinesis_streams
-  kinesis_retention_hours = local.application_data.accounts[local.environment].kinesis_retention_hours
-  enable_glue_registry    = local.application_data.accounts[local.environment].create_glue_registries
-  setup_buckets           = local.application_data.accounts[local.environment].setup_s3_buckets
-  create_glue_connection  = local.application_data.accounts[local.environment].create_glue_connections
-  image_id                = local.application_data.accounts[local.environment].ami_image_id
-  instance_type           = local.application_data.accounts[local.environment].ec2_instance_type
-  create_datamart         = local.application_data.accounts[local.environment].setup_redshift
-  redshift_cluster_name   = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
-  kinesis_stream_ingestor = "${local.application_data.accounts[local.environment].project_short_id}-kinesis-ingestor-${local.environment}"
+  description            = local.application_data.accounts[local.environment].db_description
+  create_db              = local.application_data.accounts[local.environment].create_database
+  glue_job               = local.application_data.accounts[local.environment].glue_job_name
+  create_job             = local.application_data.accounts[local.environment].create_job
+  create_sec_conf        = local.application_data.accounts[local.environment].create_security_conf
+  env                    = local.environment
+  s3_kms_arn             = aws_kms_key.s3.arn
+  operational_db_kms_arn = aws_kms_key.operational_db.arn
+  operational_db_kms_id  = aws_kms_key.operational_db.key_id
+  kinesis_kms_id         = data.aws_kms_key.kinesis_kms_key.key_id
+  create_bucket          = local.application_data.accounts[local.environment].setup_buckets
+  account_id             = data.aws_caller_identity.current.account_id
+  account_region         = data.aws_region.current.name
+  enable_glue_registry   = local.application_data.accounts[local.environment].create_glue_registries
+  setup_buckets          = local.application_data.accounts[local.environment].setup_s3_buckets
+  create_glue_connection = local.application_data.accounts[local.environment].create_glue_connections
+  image_id               = local.application_data.accounts[local.environment].ami_image_id
+  instance_type          = local.application_data.accounts[local.environment].ec2_instance_type
+  create_datamart        = local.application_data.accounts[local.environment].setup_redshift
+  redshift_cluster_name  = "${local.application_data.accounts[local.environment].project_short_id}-redshift-${local.environment}"
 
   glue_job_common_log_level = local.application_data.accounts[local.environment].glue_job_common_log_level
 
@@ -68,50 +64,6 @@ locals {
   glue_placeholder_script_location = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/scripts/digital-prison-reporting-jobs-vLatest.scala"
   glue_jobs_latest_jar_location    = "s3://${local.project}-artifact-store-${local.environment}/build-artifacts/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
   glue_log_retention_in_days       = local.application_data.accounts[local.environment].glue_log_retention_in_days
-  # Reporting Hub Job
-  reporting_hub_driver_mem   = local.application_data.accounts[local.environment].reporting_hub_spark_driver_mem
-  reporting_hub_executor_mem = local.application_data.accounts[local.environment].reporting_hub_spark_executor_mem
-  reporting_hub_worker_type  = local.application_data.accounts[local.environment].reporting_hub_worker_type
-  reporting_hub_num_workers  = local.application_data.accounts[local.environment].reporting_hub_num_workers
-  reporting_hub_log_level    = local.application_data.accounts[local.environment].reporting_hub_spark_log_level
-
-  reporting_hub_batch_duration_seconds      = local.application_data.accounts[local.environment].reporting_hub_batch_duration_seconds
-  reporting_hub_add_idle_time_between_reads = local.application_data.accounts[local.environment].reporting_hub_add_idle_time_between_reads
-
-  reporting_hub_idle_time_between_reads_in_millis = local.application_data.accounts[local.environment].reporting_hub_idle_time_between_reads_in_millis
-
-  reporting_hub_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_retry_max_attempts
-  reporting_hub_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_min_wait_millis
-  reporting_hub_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_retry_max_wait_millis
-
-  reporting_hub_domain_refresh_enabled = local.application_data.accounts[local.environment].reporting_hub_domain_refresh_enabled
-
-  # Reporting Hub Batch Job
-  reporting_hub_batch_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_batch_job_worker_type
-  reporting_hub_batch_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_batch_job_num_workers
-  reporting_hub_batch_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_batch_job_log_level
-
-  reporting_hub_batch_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_batch_job_schema_cache_max_size
-
-  reporting_hub_batch_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_attempts
-  reporting_hub_batch_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_min_wait_millis
-  reporting_hub_batch_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_batch_job_retry_max_wait_millis
-
-  # Reporting Hub CDC Job
-  reporting_hub_cdc_job_worker_type = local.application_data.accounts[local.environment].reporting_hub_cdc_job_worker_type
-  reporting_hub_cdc_job_num_workers = local.application_data.accounts[local.environment].reporting_hub_cdc_job_num_workers
-  reporting_hub_cdc_job_log_level   = local.application_data.accounts[local.environment].reporting_hub_cdc_job_log_level
-
-  reporting_hub_cdc_job_schema_cache_max_size = local.application_data.accounts[local.environment].reporting_hub_cdc_job_schema_cache_max_size
-
-  reporting_hub_cdc_job_retry_max_attempts    = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_attempts
-  reporting_hub_cdc_job_retry_min_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_min_wait_millis
-  reporting_hub_cdc_job_retry_max_wait_millis = local.application_data.accounts[local.environment].reporting_hub_cdc_job_retry_max_wait_millis
-
-  # Refresh Job
-  refresh_job_worker_type = local.application_data.accounts[local.environment].refresh_job_worker_type
-  refresh_job_num_workers = local.application_data.accounts[local.environment].refresh_job_num_workers
-  refresh_job_log_level   = local.application_data.accounts[local.environment].refresh_job_log_level
 
   # Common Maintenance Job settings
   maintenance_job_retry_max_attempts    = local.application_data.accounts[local.environment].maintenance_job_retry_max_attempts
@@ -123,22 +75,10 @@ locals {
   compact_job_num_workers = local.application_data.accounts[local.environment].compact_job_num_workers
   compact_job_log_level   = local.application_data.accounts[local.environment].compact_job_log_level
 
-  # Compact Domain Job
-  compact_domain_job_worker_type = local.application_data.accounts[local.environment].compact_domain_job_worker_type
-  compact_domain_job_num_workers = local.application_data.accounts[local.environment].compact_domain_job_num_workers
-  compact_domain_job_log_level   = local.application_data.accounts[local.environment].compact_domain_job_log_level
-  compact_domain_job_schedule    = local.application_data.accounts[local.environment].compact_domain_job_schedule
-
   # Retention (vacuum) Job
   retention_job_worker_type = local.application_data.accounts[local.environment].retention_job_worker_type
   retention_job_num_workers = local.application_data.accounts[local.environment].retention_job_num_workers
   retention_job_log_level   = local.application_data.accounts[local.environment].retention_job_log_level
-
-  # Retention (vacuum) Domain Job
-  retention_domain_job_worker_type = local.application_data.accounts[local.environment].retention_domain_job_worker_type
-  retention_domain_job_num_workers = local.application_data.accounts[local.environment].retention_domain_job_num_workers
-  retention_domain_job_log_level   = local.application_data.accounts[local.environment].retention_domain_job_log_level
-  retention_domain_job_schedule    = local.application_data.accounts[local.environment].retention_domain_job_schedule
 
   # Hive Table Creation Job
   hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
@@ -225,7 +165,7 @@ locals {
   lambda_redshift_table_expiry_tracing        = "Active"
   lambda_redshift_table_expiry_handler        = "uk.gov.justice.digital.lambda.RedShiftTableExpiryLambda::handleRequest"
   lambda_redshift_table_expiry_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  lambda_redshift_table_expiry_jar_version    = "v0.0.12"
+  lambda_redshift_table_expiry_jar_version    = "v0.0.20"
   lambda_redshift_table_expiry_code_s3_key = (
     local.env == "production" || local.env == "preproduction"
     ? "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-${local.lambda_redshift_table_expiry_jar_version}.rel-all.jar"
@@ -240,9 +180,38 @@ locals {
   lambda_redshift_table_expiry_cluster_id          = module.datamart.cluster_id
   lambda_redshift_table_expiry_database_name       = module.datamart.cluster_database_name
   lambda_redshift_table_expiry_schedule_expression = "rate(1 hour)"
-  lambda_redshift_table_expiry_seconds             = local.application_data.accounts[local.environment].redshift_table_expiry_seconds
+  lambda_redshift_table_expiry_seconds             = (local.application_data.accounts[local.environment].redshift_table_expiry_days * 86400)
   lambda_redshift_table_expiry_timeout_seconds     = 900
   lambda_redshift_table_expiry_memory_size         = 1024
+
+  # Scheduled Dataset Lambda
+  lambda_scheduled_dataset_enabled        = true
+  lambda_scheduled_dataset_name           = "${local.project}-scheduled-dataset"
+  lambda_scheduled_dataset_runtime        = "java21"
+  lambda_scheduled_dataset_tracing        = "Active"
+  lambda_scheduled_dataset_handler        = "uk.gov.justice.digital.hmpps.scheduled.lambda.ReportSchedulerLambda::handleRequest"
+  lambda_scheduled_dataset_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_scheduled_dataset_jar_version    = "v0.0.7"
+  lambda_scheduled_dataset_code_s3_key = (
+    local.env == "production" || local.env == "preproduction"
+    ? "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}.rel-all.jar"
+    : "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}-all.jar"
+  )
+  lambda_scheduled_dataset_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    aws_iam_policy.redshift_dataapi_cross_policy.arn,
+    aws_iam_policy.dpd_table_read_policy.arn
+  ]
+  lambda_scheduled_dataset_secret_arn          = module.datamart.credential_secret_arn
+  lambda_scheduled_dataset_cluster_id          = module.datamart.cluster_id
+  lambda_scheduled_dataset_database_name       = module.datamart.cluster_database_name
+  lambda_scheduled_dataset_dpd_ddb_table_arn   = module.dynamo_table_dpd.dynamodb_table_arn
+  lambda_scheduled_dataset_schedule_expression = "rate(1 hour)"
+  lambda_scheduled_dataset_timeout_seconds     = 900
+  lambda_scheduled_dataset_memory_size         = 1024
+
+  s3_redshift_table_expiry_days = local.application_data.accounts[local.environment].redshift_table_expiry_days + 1
 
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
@@ -403,19 +372,15 @@ locals {
   environment_configuration = local.environment_configurations[local.environment]
   environment_configurations = {
     development = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
       analytical_platform_runner_suffix = "-dev"
     }
     test = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
       analytical_platform_runner_suffix = "-test"
     }
     preproduction = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-development"]
       analytical_platform_runner_suffix = "-pp"
     }
     production = {
-      observability_platform_account_id = local.environment_management.account_ids["observability-platform-production"]
       analytical_platform_runner_suffix = ""
     }
   }
@@ -427,4 +392,19 @@ locals {
       Name = local.application_name
     }
   )
+
+  # DPR Operations,
+  # S3 Data Migration Lambda
+  enable_s3_data_migrate_lambda         = local.application_data.accounts[local.environment].enable_s3_data_migrate_lambda
+  lambda_s3_data_migrate_name           = "${local.project}-s3-data-lifecycle-migration-lambda"
+  lambda_s3_data_migrate_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_s3_data_migrate_code_s3_key    = "build-artifacts/dpr-operations/py_files/dpr-s3-data-lifecycle-migration-lambda-v2.zip"
+  lambda_s3_data_migrate_handler        = "dpr-s3-data-lifecycle-migration-lambda-v2.lambda_handler"
+  lambda_s3_data_migrate_runtime        = "python3.11"
+  lambda_s3_data_migrate_tracing        = "PassThrough"
+  lambda_s3_data_migrate_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"
+  ]
 }

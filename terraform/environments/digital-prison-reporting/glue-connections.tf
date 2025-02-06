@@ -79,6 +79,7 @@ resource "aws_glue_connection" "glue_dps_connection" {
 
 resource "aws_security_group" "glue_job_connection_sg" {
   #checkov:skip=CKV2_AWS_5
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   name        = "${local.project}-glue-connection_sg"
   description = "Security group for glue jobs when using Glue Connections"
   vpc_id      = data.aws_vpc.shared.id

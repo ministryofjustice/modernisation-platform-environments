@@ -9,9 +9,6 @@ variable "module_name" {
 variable "app_url" {
 }
 
-variable "sql_migration_path" {
-}
-
 variable "app_db_name" {
 }
 

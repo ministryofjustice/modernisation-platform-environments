@@ -9,9 +9,9 @@ resource "aws_dms_endpoint" "dms_user_target_endpoint_db" {
   engine_name                 = "oracle"
   username                    = local.dms_audit_username
   password                    = join(",", [jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username], jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username]])
-  server_name                 = join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone_info.name])
+  server_name                 = join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])
   port                        = local.db_tcps_port
-  extra_connection_attributes = "UseDirectPathFullLoad=false;ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone_info.name])}:${local.db_tcps_port}/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
+  extra_connection_attributes = "UseDirectPathFullLoad=false;ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])}:${local.db_tcps_port}/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
   # We initially use an empty wallet for encryption - a populated wallet will be added by DMS configuration
   ssl_mode        = "verify-ca"
   certificate_arn = aws_dms_certificate.empty_oracle_wallet.certificate_arn
@@ -32,9 +32,9 @@ resource "aws_dms_endpoint" "dms_audit_target_endpoint_db" {
   engine_name                 = "oracle"
   username                    = local.dms_audit_username
   password                    = join(",", [jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username], jsondecode(data.aws_secretsmanager_secret_version.delius_core_application_passwords.secret_string)[local.dms_audit_username]])
-  server_name                 = join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone_info.name])
+  server_name                 = join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])
   port                        = local.db_tcps_port
-  extra_connection_attributes = "UseDirectPathFullLoad=false;ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone_info.name])}:${local.db_tcps_port}/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
+  extra_connection_attributes = "UseDirectPathFullLoad=false;ArchivedLogDestId=1;AdditionalArchivedLogDestId=32;asm_server=${join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])}:${local.db_tcps_port}/+ASM;asm_user=${local.dms_audit_username};UseBFile=true;UseLogminerReader=false;"
   # We initially use an empty wallet for encryption - a populated wallet will be added by DMS configuration
   ssl_mode        = "verify-ca"
   certificate_arn = aws_dms_certificate.empty_oracle_wallet.certificate_arn

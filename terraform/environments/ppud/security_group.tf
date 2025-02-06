@@ -338,18 +338,18 @@ resource "aws_security_group_rule" "Dev-Servers-Standard-Egress-2" {
 
 # Production
 
-resource "aws_security_group" "Primary-DOC-Server" {
+resource "aws_security_group" "Live-DOC-Server" {
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
-  name        = "Primary-DOC-Server"
-  description = "Primary-DOC-Server for DEV & PROD"
+  name        = "Live-DOC-Server"
+  description = "Live-DOC-Server for DEV & PROD"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
 }
 
-resource "aws_security_group_rule" "Primary-DOC-Server-Ingress" {
+resource "aws_security_group_rule" "Live-DOC-Server-Ingress" {
   description       = "Rule to allow port 80 traffic inbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
@@ -357,10 +357,10 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Ingress" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Primary-DOC-Server[0].id
+  security_group_id = aws_security_group.Live-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Primary-DOC-Server-Ingress-1" {
+resource "aws_security_group_rule" "Live-DOC-Server-Ingress-1" {
   description       = "Rule to allow port 445 traffic inbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
@@ -368,10 +368,10 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Ingress-1" {
   to_port           = 445
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Primary-DOC-Server[0].id
+  security_group_id = aws_security_group.Live-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Primary-DOC-Server-Ingress-2" {
+resource "aws_security_group_rule" "Live-DOC-Server-Ingress-2" {
   description       = "Rule to allow port 3389 traffic inbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
@@ -379,10 +379,10 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Ingress-2" {
   to_port           = 3389
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Primary-DOC-Server[0].id
+  security_group_id = aws_security_group.Live-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Primary-DOC-Server-Egress" {
+resource "aws_security_group_rule" "Live-DOC-Server-Egress" {
   description       = "Rule to allow all traffic outbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
@@ -390,10 +390,10 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Primary-DOC-Server[0].id
+  security_group_id = aws_security_group.Live-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Primary-DOC-Server-Egress-1" {
+resource "aws_security_group_rule" "Live-DOC-Server-Egress-1" {
   description       = "Rule to allow port 443 traffic outbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
@@ -401,10 +401,10 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Primary-DOC-Server[0].id
+  security_group_id = aws_security_group.Live-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Primary-DOC-Server-Egress-2" {
+resource "aws_security_group_rule" "Live-DOC-Server-Egress-2" {
   description       = "Rule to allow port 80 traffic outbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
@@ -412,22 +412,21 @@ resource "aws_security_group_rule" "Primary-DOC-Server-Egress-2" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Primary-DOC-Server[0].id
+  security_group_id = aws_security_group.Live-DOC-Server[0].id
 }
 
-
-resource "aws_security_group" "Secondary-DOC-Server" {
+resource "aws_security_group" "Archive-DOC-Server" {
   count       = local.is-preproduction == false ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id
-  name        = "Secondary-DOC-Server"
-  description = "Secondary-DOC-Server for DEV & PROD"
+  name        = "Archive-DOC-Server"
+  description = "Archive-DOC-Server for DEV & PROD"
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"
   }
 }
 
-resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress" {
+resource "aws_security_group_rule" "Archive-DOC-Server-Ingress" {
   description       = "Rule to allow port 80 traffic inbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
@@ -435,10 +434,10 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
+  security_group_id = aws_security_group.Archive-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress-1" {
+resource "aws_security_group_rule" "Archive-DOC-Server-Ingress-1" {
   description       = "Rule to allow port 445 traffic inbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
@@ -446,10 +445,10 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress-1" {
   to_port           = 445
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
+  security_group_id = aws_security_group.Archive-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress-2" {
+resource "aws_security_group_rule" "Archive-DOC-Server-Ingress-2" {
   description       = "Rule to allow port 3389 traffic inbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "ingress"
@@ -457,10 +456,10 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Ingress-2" {
   to_port           = 3389
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
+  security_group_id = aws_security_group.Archive-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Secondary-DOC-Server-Egress" {
+resource "aws_security_group_rule" "Archive-DOC-Server-Egress" {
   description       = "Rule to allow all traffic outbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
@@ -468,10 +467,10 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Egress" {
   to_port           = 0
   protocol          = "all"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
+  security_group_id = aws_security_group.Archive-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-1" {
+resource "aws_security_group_rule" "Archive-DOC-Server-Egress-1" {
   description       = "Rule to allow port 443 traffic outbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
@@ -479,10 +478,10 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-1" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
+  security_group_id = aws_security_group.Archive-DOC-Server[0].id
 }
 
-resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-2" {
+resource "aws_security_group_rule" "Archive-DOC-Server-Egress-2" {
   description       = "Rule to allow port 80 traffic outbound"
   count             = local.is-preproduction == false ? 1 : 0
   type              = "egress"
@@ -490,7 +489,7 @@ resource "aws_security_group_rule" "Secondary-DOC-Server-Egress-2" {
   to_port           = 80
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.Secondary-DOC-Server[0].id
+  security_group_id = aws_security_group.Archive-DOC-Server[0].id
 }
 
 resource "aws_security_group" "PPUD-Database-Server" {

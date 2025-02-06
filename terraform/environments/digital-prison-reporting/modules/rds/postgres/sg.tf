@@ -37,6 +37,7 @@ resource "aws_security_group_rule" "rule" {
 }
 
 resource "aws_security_group_rule" "rds_allow_all" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   count = var.enable_rds ? 1 : 0
 
   type              = "egress"

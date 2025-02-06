@@ -109,6 +109,12 @@ presets:
         - property: PackageName
           type: regex
           value: "^(opensearch-)?analysis-.+$"
+        - property: PackageName
+          type: glob
+          value: "titaniam-lockbox*"
+        - property: PackageName
+          type: glob
+          value: "rni*"
       S3Bucket:
         - property: tag:component
           value: "secure-baselines"

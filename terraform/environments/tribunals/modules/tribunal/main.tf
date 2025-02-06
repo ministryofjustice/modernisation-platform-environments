@@ -3,7 +3,6 @@ locals {
   app                          = var.app_name
   app_url                      = var.app_url
   module_name                  = var.module_name
-  sql_migration_path           = var.sql_migration_path
   app_db_name                  = var.app_db_name
   app_db_login_name            = var.app_db_login_name
   app_source_db_name           = var.app_source_db_name

@@ -155,6 +155,65 @@ locals {
       tags                 = local.ec2_instances.web.tags
     }
 
+    web12 = {
+      autoscaling_group = {
+        desired_capacity          = 1
+        force_delete              = true
+        max_size                  = 1
+        vpc_zone_identifier       = module.environment.subnets["private"].ids
+        wait_for_capacity_timeout = 0
+        warm_pool = {
+          min_size          = 0
+          reuse_on_scale_in = true
+        }
+      }
+      autoscaling_schedules = {
+        "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
+        "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
+      }
+      config = {
+        ami_name                  = "base_ol_8_5*"
+        iam_resource_names_prefix = "ec2-instance"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy"
+        ]
+        subnet_name = "private"
+      }
+      ebs_volumes = {
+        "/dev/sdb" = { label = "app", type = "gp3", size = 100 }
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "t3.large"
+        key_name                     = "ec2-user"
+        vpc_security_group_ids       = ["private-web"]
+        metadata_options_http_tokens = "required"
+      }
+      user_data_cloud_init = {
+        args = {
+          branch       = "main"
+          ansible_args = "--tags ec2provision"
+        }
+        scripts = [ # paths are relative to templates/ dir
+          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
+          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
+        ]
+      }
+      tags = {
+        # ami       = "base_ol_8_5" # commented out to ensure harden role does not re-run
+        backup           = "false"
+        component        = "web"
+        description      = "For testing nomis weblogic 12 image"
+        os-type          = "Linux"
+        server-type      = "nomis-web12"
+        update-ssm-agent = "patchgroup1"
+      }
+    }
+
     web19c = {
       autoscaling_group = {
         desired_capacity          = 1

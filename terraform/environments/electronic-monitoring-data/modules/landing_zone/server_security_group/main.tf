@@ -19,6 +19,7 @@ resource "aws_security_group" "this" {
       supplier = var.user_name,
     },
   )
+  #checkov:skip=CKV2_AWS_5
 }
 
 resource "aws_vpc_security_group_ingress_rule" "this_ipv4" {

@@ -17,6 +17,9 @@ resource "aws_instance" "apex_db_instance" {
   user_data_base64            = base64encode(local.database-instance-userdata)
   user_data_replace_on_change = true
 
+  lifecycle {
+    ignore_changes = [user_data_base64, user_data_replace_on_change]
+  }
 
   root_block_device {
     delete_on_termination = false
@@ -65,14 +68,14 @@ resource "aws_vpc_security_group_ingress_rule" "db_ecs" {
   to_port                      = 1521
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
-#   security_group_id = aws_security_group.database.id
-#   description       = "Allow MP VPC (OAS) to access database instance"
-#   cidr_ipv4         = data.aws_vpc.shared.cidr_block
-#   from_port         = 1521
-#   ip_protocol       = "tcp"
-#   to_port           = 1521
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_mp_vpc" {
+  security_group_id = aws_security_group.database.id
+  description       = "Allow MP VPC (OAS) to access database instance"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
+}
 
 resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
   security_group_id            = aws_security_group.database.id
@@ -83,24 +86,24 @@ resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
   to_port                      = 22
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
-#   security_group_id = aws_security_group.database.id
-#   description       = "Database listener port access to Workspaces"
-#   cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr
-#   from_port         = 1521
-#   ip_protocol       = "tcp"
-#   to_port           = 1521
-# }
+resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
+  security_group_id = aws_security_group.database.id
+  description       = "Database listener port access to Workspaces"
+  cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
+}
 
 # This is a temp rule whilst OAS resides in LZ
-# resource "aws_vpc_security_group_ingress_rule" "oas_lz" {
-#   security_group_id = aws_security_group.database.id
-#   description       = "Allow OAS in LZ to access APEX"
-#   cidr_ipv4         = local.application_data.accounts[local.environment].oas_lz_cidr
-#   from_port         = 1521
-#   ip_protocol       = "tcp"
-#   to_port           = 1521
-# }
+resource "aws_vpc_security_group_ingress_rule" "oas_lz" {
+  security_group_id = aws_security_group.database.id
+  description       = "Allow OAS in LZ to access APEX"
+  cidr_ipv4         = local.application_data.accounts[local.environment].oas_lz_cidr
+  from_port         = 1521
+  ip_protocol       = "tcp"
+  to_port           = 1521
+}
 
 resource "aws_vpc_security_group_egress_rule" "db_outbound" {
   security_group_id = aws_security_group.database.id

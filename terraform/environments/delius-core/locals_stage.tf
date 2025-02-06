@@ -4,9 +4,9 @@
 # tags demonstrate inheritance due to merges in the module
 locals {
   environment_config_stage = {
-    migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/23"]
+    migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/22"]
     migration_environment_vpc_cidr         = "10.160.32.0/20"
-    migration_environment_db_cidr          = ["10.160.42.0/23", "10.160.44.0/23", "10.160.46.0/23"]
+    migration_environment_db_cidr          = ["10.160.44.0/24", "10.160.45.0/24", "10.160.46.0/25"]
     migration_environment_full_name        = "del-stage"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "stage"
@@ -21,13 +21,13 @@ locals {
     encrypted                   = true
     migration_source_account_id = "205048117103"
     migration_lambda_role       = "ldap-data-migration-lambda-role"
-    efs_throughput_mode         = "bursting"
+    efs_throughput_mode         = "elastic"
     efs_provisioned_throughput  = null
     efs_backup_schedule         = "cron(0 19 * * ? *)",
     efs_backup_retention_period = "30"
     port                        = 389
     tls_port                    = 636
-    desired_count               = 0
+    desired_count               = 1
   }
 
 
@@ -140,6 +140,7 @@ locals {
     user_target_endpoint = {
       write_database = "STGNDA"
     }
-    is-production = local.is-production
+    # Auditing from the Stage environment is considered production data
+    is-production = true
   }
 }

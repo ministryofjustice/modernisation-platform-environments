@@ -653,7 +653,7 @@ if __name__ == "__main__":
 
     total_files, total_size = S3Methods.get_s3_folder_info(
                                 PRQ_FILES_SRC_S3_BUCKET_NAME, 
-                                f"{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}")
+                                f"{rds_db_name}/{rds_sqlserver_db_schema}/{rds_sqlserver_db_table}/")
     total_size_mb = total_size/1024/1024
     LOGGER.warn(f""">> '{db_sch_tbl}' Size: {total_size_mb} MB <<""")
 

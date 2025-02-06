@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_preproduction = {
+    maintenance_title   = "Prison-NOMIS Reporting LSAST and/or Pre-Production Maintenance Window"
+    maintenance_message = "Prison-NOMIS Reporting LSAST and/or Pre-Production is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down."
+  }
+
   baseline_presets_preproduction = {
     options = {
       sns_topics = {
@@ -25,85 +30,6 @@ locals {
           description = "Wildcard certificate for the preproduction environment"
         }
       }
-    }
-
-    ec2_autoscaling_groups = {
-      pp-ncr-app = merge(local.ec2_autoscaling_groups.bip_app, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_app.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_app.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_app.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_app.tags, {
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
-
-      pp-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 2
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_cms.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_cms.tags, {
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
-
-      pp-ncr-webadmin = merge(local.ec2_autoscaling_groups.bip_webadmin, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_webadmin.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_webadmin.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_webadmin.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_webadmin.tags, {
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
-
-      pp-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_web.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_web.tags, {
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
     }
 
     ec2_instances = {
@@ -251,6 +177,23 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*LS/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/LS*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
+            ]
           }
         ]
       }
@@ -287,6 +230,23 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*PP/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/PP*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
+            ]
           }
         ]
       }
@@ -294,9 +254,51 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
+        instance_target_groups = {
+          private-pp-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "pp-ncr-web-1" },
+            ]
+          })
+        }
         listeners = merge(local.lbs.private.listeners, {
-          https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_combined_reporting_wildcard_cert"]
+          http-7777 = merge(local.lbs.private.listeners.http-7777, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "private-pp-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "int.preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "int.preproduction.reporting.nomis.service.justice.gov.uk",
+                      "maintenance-int.preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
           })
         })
       })
@@ -346,6 +348,26 @@ locals {
                   }
                 }]
               }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "admin.preproduction.reporting.nomis.service.justice.gov.uk",
+                      "maintenance.preproducion.reporting.nomis.service.justice.gov.uk",
+                      "preproduction.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -366,6 +388,9 @@ locals {
         lb_alias_records = [
           { name = "", type = "A", lbs_map_key = "public" },
           { name = "admin", type = "A", lbs_map_key = "public" },
+          { name = "int", type = "A", lbs_map_key = "private" },
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
+          { name = "maintenance-int", type = "A", lbs_map_key = "private" },
         ]
       }
     }
