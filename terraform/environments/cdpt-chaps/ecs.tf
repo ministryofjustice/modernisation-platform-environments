@@ -1,12 +1,3 @@
-#data "aws_ecs_task_definition" "chaps_task_definition" {
-#  task_definition = "chapsFamily"
-#}
-
-#data "aws_ecs_task_definition" "chapsdotnet_task_definition" {
-#  task_definition = "chapsdotnet-family"
-#  depends_on = [aws_ecs_task_definition.chaps_task_definition]
-#}
-
 resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${local.application_name}-ec2-instance-policy"
 
@@ -71,25 +62,104 @@ resource "aws_cloudwatch_log_group" "deployment_logs" {
   retention_in_days = "7"
 }
 
-resource "aws_ecs_task_definition" "chaps_task_definition" {
-  family                   = "chapsFamily"
+resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
+  family                   = "chaps-yarp-family"
   requires_compatibilities = ["EC2"]
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
+  memory                   = 2300
+  cpu                      = 1200
+ 
   container_definitions = jsonencode([
     {
-      name      = "chaps-container"
-      image     = "${local.ecr_url}:chaps-${local.application_data.accounts[local.environment].environment_name}"
-      cpu       = 1024
-      memory    = 2048
+      name      = "chapsdotnet-container"
+      image     = "${local.ecr_url}:chapsdotnet-${local.application_data.accounts[local.environment].environment_name}"
+      cpu       = 512
+      memory    = 1024
       essential = true
       portMappings = [
         {
-          containerPort = local.application_data.accounts[local.environment].container_port
+          containerPort = 8080
+          protocol      = "tcp"
+        }
+      ]  
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost:8080/dotnet-health || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          awslogs-group         = aws_cloudwatch_log_group.chapsdotnet_cloudwatch_group.name,
+          awslogs-region        = "eu-west-2",
+          awslogs-stream-prefix = "chapsdotnet"
+        }
+      }
+      environment = [
+        {
+          name  = "Instance"
+          value = "https://login.microsoftonline.com/"
+        },
+        {
+          name = "TenantId"
+          value = local.application_data.accounts[local.environment].TenantId
+        },
+        {
+          name  = "CallbackPath"
+          value = "/signin-oidc"
+        },
+        {
+          name  = "RDS_HOSTNAME"
+          value = aws_db_instance.database.address
+        },
+        {
+          name  = "RDS_USERNAME"
+          value = aws_db_instance.database.username
+        },
+        {
+          name  = "DB_NAME"
+          value = local.application_data.accounts[local.environment].db_name
+        },
+        {
+          name  = "CLIENT_ID"
+          value = local.application_data.accounts[local.environment].dotnet_client_id
+        },
+        {
+          name  = "CurServer"
+          value = local.application_data.accounts[local.environment].env_name
+        }
+      ]
+      secrets = [
+        {
+          name = "RDS_PASSWORD",
+          valueFrom = aws_secretsmanager_secret_version.db_password.arn
+        }
+      ]
+    },
+    {
+      name      = "chaps-container"
+      image     = "${local.ecr_url}:chaps-${local.application_data.accounts[local.environment].environment_name}"
+      cpu       = 512
+      memory    = 1024
+      essential = true
+      portMappings = [
+        {
+          containerPort = 80
           protocol      = "tcp"
         }
       ]
+      healthCheck = {
+        command     = ["CMD-SHELL", "curl -f http://localhost:80/alive || exit 1"]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
+
       logConfiguration = {
         logDriver = "awslogs",
         options = {
@@ -101,109 +171,38 @@ resource "aws_ecs_task_definition" "chaps_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.database.address}"
+          value = aws_db_instance.database.address
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.database.username}"
+          value = aws_db_instance.database.username
         },
         {
           name  = "DB_NAME"
-          value = "${local.application_data.accounts[local.environment].db_name}"
+          value = local.application_data.accounts[local.environment].db_name
         },
         {
           name  = "CLIENT_ID"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].dotnet_client_id
         },
         {
           name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].env_name}"
+          value = local.application_data.accounts[local.environment].env_name
+        },
+        {
+          name = "Environment"
+          value = local.application_data.accounts[local.environment].environment_name
         }
-      ],
+      ]
       secrets = [
         {
-          name : "RDS_PASSWORD",
-          valueFrom : aws_secretsmanager_secret_version.db_password.arn
+          name = "RDS_PASSWORD",
+          valueFrom = aws_secretsmanager_secret_version.db_password.arn
         }
       ]
     }
   ])
 }
-
-resource "aws_ecs_task_definition" "chapsdotnet_task" {
-  count                    = local.application_data.accounts[local.environment].create_chapsdotnet ? 1 : 0
-  family                   = "chapsdotnet-family"
-  requires_compatibilities = ["EC2"]
-  network_mode             = "awsvpc"
-  execution_role_arn       = aws_iam_role.app_execution.arn
-  task_role_arn            = aws_iam_role.app_task.arn
-  container_definitions = jsonencode([
-    {
-      name      = "chapsdotnet-container"
-      image     = "${local.ecr_url}:chapsdotnet-${local.application_data.accounts[local.environment].environment_name}"
-      cpu       = 1024
-      memory    = 2048
-      essential = true
-      portMappings = [
-        {
-          containerPort = 8080
-          protocol      = "tcp"
-        }
-      ]
-      logConfiguration = {
-        logDriver = "awslogs",
-        options = {
-          awslogs-group         = aws_cloudwatch_log_group.chapsdotnet_cloudwatch_group.name,
-          awslogs-region        = "eu-west-2",
-          awslogs-stream-prefix = "chapsdotnet"
-        }
-      }
-
-      environment = [
-
-        {
-          name  = "Instance"
-          value = "https://login.microsoftonline.com/"
-        },
-        {
-          name  = "TenantId"
-          value = "${local.application_data.accounts[local.environment].TenantId}"
-        },
-        {
-          name  = "CallbackPath"
-          value = "/signin-oidc"
-        },
-        {
-          name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.database.address}"
-        },
-        {
-          name  = "RDS_USERNAME"
-          value = "${aws_db_instance.database.username}"
-        },
-        {
-          name  = "DB_NAME"
-          value = "${local.application_data.accounts[local.environment].db_name}"
-        },
-        {
-          name  = "CLIENT_ID"
-          value = "${local.application_data.accounts[local.environment].dotnet_client_id}"
-        },
-        {
-          name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].env_name}"
-        }
-      ],
-      secrets = [
-        {
-          name : "RDS_PASSWORD",
-          valueFrom : aws_secretsmanager_secret_version.db_password.arn
-        }
-      ]
-    }
-  ])
-}
-
 
 resource "aws_key_pair" "ec2-user" {
   key_name   = "${local.application_name}-ec2"
@@ -211,14 +210,11 @@ resource "aws_key_pair" "ec2-user" {
   tags       = local.tags
 }
 
-resource "aws_ecs_service" "chaps_service" {
-  depends_on = [
-    aws_lb_listener.https_listener
-  ]
-
-  name                              = "chaps-service"
+resource "aws_ecs_service" "chaps_yarp_combined_service" {
+  depends_on                        = [aws_lb_listener.https_listener]
+  name                              = "chaps-yarp-combined-service"
   cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chaps_task_definition.arn
+  task_definition                   = data.aws_ecs_task_definition.latest.task_definition
   desired_count                     = local.application_data.accounts[local.environment].app_count
   health_check_grace_period_seconds = 60
   force_new_deployment              = true
@@ -230,80 +226,25 @@ resource "aws_ecs_service" "chaps_service" {
     capacity_provider = aws_ecs_capacity_provider.chaps.name
     weight            = 1
   }
-
-  # ordered_placement_strategy {
-  #   field = "attribute:ecs.availability-zone"
-  #   type  = "spread"
-  # }
-
-  # ordered_placement_strategy {
-  #   type  = "spread"
-  #   field = "instanceId"
-  # }
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
-    security_groups = [aws_security_group.ecs_service.id]
-  }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "chaps-service"
-    }
-  )
-}
-
-resource "aws_ecs_service" "chapsdotnet_service" {
-  count = local.application_data.accounts[local.environment].create_chapsdotnet ? 1 : 0
-  depends_on = [
-    aws_lb_listener.https_listener
-  ]
-
-  name                              = "chapsdotnet-service"
-  cluster                           = aws_ecs_cluster.ecs_cluster.id
-  task_definition                   = aws_ecs_task_definition.chapsdotnet_task[0].arn
-  desired_count                     = local.application_data.accounts[local.environment].app_count
-  health_check_grace_period_seconds = 60
-  force_new_deployment              = true
-
-  deployment_minimum_healthy_percent = 50
-  deployment_maximum_percent         = 200
-
-  capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.chaps.name
-    weight            = 1
-  }
-
-  # ordered_placement_strategy {
-  #   field = "attribute:ecs.availability-zone"
-  #   type  = "spread"
-  # }
-
-  # ordered_placement_strategy {
-  #   type  = "spread"
-  #   field = "instanceId"
-  # }
-
+    security_groups = [aws_security_group.chaps_combined_ecs_service.id]
+   }
+  
   load_balancer {
     target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
     container_name   = "chapsdotnet-container"
     container_port   = 8080
   }
-
-  network_configuration {
-    subnets         = data.aws_subnets.shared-private.ids
-    security_groups = [aws_security_group.chapsdotnet_service.id]
-  }
-
+  
   tags = merge(
     local.tags,
     {
-      Name = "chapsdotnet-service"
+      Name = "chaps-yarp-combined-service"
     }
   )
 }
-
 
 resource "aws_ecs_capacity_provider" "chaps" {
   name = "${local.application_name}-ecs-capacity-provider"
@@ -531,7 +472,12 @@ resource "aws_iam_role_policy" "app_execution" {
               "logs:CreateLogStream",
               "logs:PutLogEvents",
               "logs:DescribeLogStreams",
-              "secretsmanager:GetSecretValue"
+              "secretsmanager:GetSecretValue",
+              "ec2:CreateNetworkInterface",
+              "ec2:DeleteNetworkInterface",
+              "ec2:AttachNetworkInterface",
+              "ec2:DetachNetworkInterface",
+              "ec2:DescribeNetworkInterfaces"
            ],
            "Resource": "*",
            "Effect": "Allow"
@@ -583,7 +529,12 @@ resource "aws_iam_role_policy" "app_task" {
           "logs:PutLogEvents",
           "ecr:*",
           "iam:*",
-          "ec2:*"
+          "ec2:*",
+          "ecs:DescribeTasks",
+          "ecs:ListTasks",
+          "ecs:DescribeContainerInstances",
+          "ecs:ListContainerInstances",
+          "ecs:DescribeClusters"
         ],
        "Resource": "*"
      }
@@ -592,62 +543,28 @@ resource "aws_iam_role_policy" "app_task" {
   EOF
 }
 
-resource "aws_security_group" "ecs_service" {
-  name_prefix = "ecs-service-sg-"
+resource "aws_security_group" "chaps_combined_ecs_service" {
+  name_prefix = "chaps-combined-ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [module.lb_access_logs_enabled.security_group.id]
-  }
-
-  ingress {
-    description = "Allow HTTP traffic from chapsdotnet container"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-
-resource "aws_security_group" "chapsdotnet_service" {
-  name_prefix = "chapsdotnet-service-sg-"
-  description = "Allow traffic for chapsdotnet service"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
+    description = "Allow HTTP traffic from load balancer"
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
     security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
+ 
 
+  # Allow all outbound traffic for both containers
   egress {
+    description = "Allow all traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
-  tags = merge(
-    local.tags,
-    {
-      Name = "chapsdotnet-service-sg"
-    }
-  )
 }
-
 
 # AWS EventBridge rule
 resource "aws_cloudwatch_event_rule" "ecs_events" {

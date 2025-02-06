@@ -91,7 +91,7 @@ locals {
         })
         instance = merge(local.ec2_instances.rdgw.instance, {
           tags = {
-            backup-plan = "daily-and-weekly-vss"
+            backup-plan = "daily-and-weekly"
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
