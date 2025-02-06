@@ -110,3 +110,23 @@ resource "aws_s3_bucket_policy" "default" {
     ]
   })
 }
+
+resource "aws_kms_key" "s3" {
+  #checkov:skip=CKV_AWS_7
+  description = var.aws_kms_key_s3_description
+  key_usage   = var.aws_kms_key_s3_key_usage
+  policy = jsonencode({
+    Version = var.json_encode_decode_version,
+    Statement = [
+      {
+        Sid    = var.aws_kms_key_s3_policy_statement_sid,
+        Effect = var.aws_kms_key_s3_policy_statement_effect,
+        Principal = {
+          Service = var.aws_kms_key_s3_policy_statement_principal_service
+        },
+        Action   = var.aws_kms_key_s3_policy_statement_action,
+        Resource = var.aws_kms_key_s3_policy_statement_resource
+      }
+    ]
+  })
+}
