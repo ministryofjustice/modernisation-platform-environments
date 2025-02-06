@@ -5,9 +5,7 @@
 module "s3_landing_bucket" {
   source             = "./modules/s3"
   bucket_name        = var.s3_bucket_landing
-  # bucket_acl         = var.acl
   versioning_enabled = var.versioning_enabled
-  # logging_enabled    = var.logging_enabled
   force_destroy      = var.force_destroy
 }
 
@@ -15,9 +13,7 @@ module "s3_landing_bucket" {
 module "s3_logs_bucket" {
   source             = "./modules/s3"
   bucket_name        = var.s3_bucket_logs
-  # bucket_acl         = var.acl
   versioning_enabled = var.versioning_enabled
-  # logging_enabled    = var.logging_enabled
   force_destroy      = var.force_destroy
 }
 
