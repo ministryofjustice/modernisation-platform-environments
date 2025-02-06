@@ -98,7 +98,7 @@ resource "aws_instance" "defect_dojo" {
               sudo git clone https://github.com/DefectDojo/django-DefectDojo.git
               cd django-DefectDojo
               sudo apt install docker.io -y
-              sudo apt install docker-compose
+              sudo apt install docker-compose -y
               sudo docker-compose up -d
               EOF
 
