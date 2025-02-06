@@ -1,4 +1,4 @@
-variable "call_centre_staging_aws_s3_bucket" {
+variable "call_centre_staging" {
   type        = string
   description = "AWS S3 call centre staging bucket name"
   default     = "call-centre-staging"
@@ -40,10 +40,16 @@ variable "custom_kms_key" {
   default     = ""
 }
 
+# variable "versioning_enabled" {
+#   type        = string
+#   description = "Activate S3 bucket versioning"
+#   default     = "Enabled"
+# }
+
 variable "versioning_enabled" {
-  type        = string
+  type        = bool
   description = "Activate S3 bucket versioning"
-  default     = "Enabled"
+  default     = true
 }
 
 variable "lifecycle_rule" {
@@ -117,7 +123,7 @@ variable "replication_enabled" {
 
 variable "replication_region" {
   type        = string
-  description = "Region to create S3 replication bucket"
+  description = "Region to create S3 replication bucket. Only revant if 'replication_enabled' is set to true."
   default     = "eu-west-2"
 }
 
@@ -309,10 +315,16 @@ variable "aws_kms_key_s3_policy_statement_resource" {
   default     = "*"
 }
 
+# variable "ownership_controls" {
+#   type        = string
+#   description = "Bucket Ownership Controls - for use WITH acl var above options are 'BucketOwnerPreferred' or 'ObjectWriter'. To disable ACLs and use new AWS recommended controls set this to 'BucketOwnerEnforced' and which will disabled ACLs and ignore var.acl"
+#   default     = "ObjectWriter"
+# }
+
 variable "ownership_controls" {
   type        = string
   description = "Bucket Ownership Controls - for use WITH acl var above options are 'BucketOwnerPreferred' or 'ObjectWriter'. To disable ACLs and use new AWS recommended controls set this to 'BucketOwnerEnforced' and which will disabled ACLs and ignore var.acl"
-  default     = "ObjectWriter"
+  default     = "BucketOwnerEnforced"
 }
 
 variable "acl" {
@@ -361,4 +373,10 @@ variable "restrict_public_buckets" {
   type        = bool
   description = ""
   default     = true
+}
+
+variable "auto_enable_organization_members" {
+  type        = string
+  description = ""
+  default     = "ALL"
 }
