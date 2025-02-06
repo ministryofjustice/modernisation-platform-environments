@@ -70,6 +70,36 @@ resource "aws_guardduty_detector" "default" {
   depends_on = [module.s3_bucket_staging]
 }
 
+resource "aws_guardduty_organization_configuration" "default" {
+  # auto_enable = true
+  auto_enable_organization_members = "ALL"
+  detector_id                      = aws_guardduty_detector.default.id
+}
+
+resource "aws_guardduty_organization_admin_account" "default" {
+  admin_account_id = var.aws_guardduty_organization_admin_account_id_string
+  depends_on       = [aws_guardduty_detector.default]
+}
+
+resource "aws_guardduty_member" "default" {
+  for_each                   = toset(var.aws_guardduty_organization_admin_account_id_list)
+  account_id                 = each.key
+  detector_id                = aws_guardduty_detector.default.id
+  email                      = var.aws_guardduty_member_email
+  invite                     = var.aws_guardduty_member_invite
+  disable_email_notification = var.aws_guardduty_member_disable_email_notification
+}
+
+resource "aws_guardduty_publishing_destination" "default" {
+  detector_id     = aws_guardduty_detector.default.id
+  destination_arn = aws_s3_bucket.default.arn
+  kms_key_arn     = aws_kms_key.s3.arn
+  depends_on = [
+    module.s3_bucket_staging,
+    aws_s3_bucket_policy.default
+  ]
+}
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
   #checkov:skip=CKV2_AWS_67: "Ensure AWS S3 bucket encrypted with Customer Managed Key (CMK) has regular rotation"
   bucket = module.s3_bucket_staging.bucket.id
