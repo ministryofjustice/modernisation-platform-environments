@@ -71,11 +71,11 @@ done
 echo "Updating /etc/hosts"
 sed -i '/${local.database_hostname}$/d' /etc/hosts
 sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
-sed -i '/${local.cm_hostname}$/d' /etc/hosts
+sed -i '/cwa-app2$/d' /etc/hosts
 sed -i '/laa-oem-app$/d' /etc/hosts # This is removed for POC
-echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
-echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
-echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
+echo "$PRIVATE_IP	${local.database_hostname}.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
+echo "$APP1_IP	${local.appserver1_hostname}.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
+echo "$CM_IP	${local.cm_hostname}.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
 ## Update the send mail url
 echo "Update Sendmail configurations"

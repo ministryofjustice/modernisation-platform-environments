@@ -33,10 +33,10 @@ done
 echo "Updating /etc/hosts"
 sed -i '/${local.database_hostname}$/d' /etc/hosts
 sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
-sed -i '/${local.cm_hostname}$/d' /etc/hosts
-echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
-echo "$PRIVATE_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
-echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
+sed -i '/cwa-app2$/d' /etc/hosts
+echo "$DB_IP	${local.database_hostname}.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
+echo "$PRIVATE_IP	${local.appserver1_hostname}.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
+echo "$CM_IP	${local.cm_hostname}.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
 echo "Updating /etc/fstab file and mount"
 cat <<EOT > /etc/fstab
