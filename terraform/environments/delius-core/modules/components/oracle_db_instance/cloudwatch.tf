@@ -39,9 +39,3 @@ resource "aws_cloudwatch_event_rule" "ec2_status_check_failed_event" {
     }
   })
 }
-
-resource "aws_cloudwatch_event_target" "ec2_status_check_failed_target" {
-  rule      = aws_cloudwatch_event_rule.ec2_status_check_failed_event.name
-  arn       = aws_cloudwatch_log_group.ec2_status_check_log_group.arn
-  target_id = local.alarm_name
-}
