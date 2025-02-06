@@ -1,10 +1,10 @@
 #trivy:ignore:AVD-AWS-0102
-# module "s3_staging" {
-#   source = "../.."
-#   providers = {
-#     aws.bucket-replication = aws.bucket-replication
-#   }
-# }
+module "s3_staging" {
+  source = "../.."
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+}
 
 
 # AWS S3 Bucket
