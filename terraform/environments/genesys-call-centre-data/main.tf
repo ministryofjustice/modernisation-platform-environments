@@ -1,6 +1,6 @@
 module "s3_bucket_staging" {
   # source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.0"
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/11707a540d9ced11f8df4a8ed1547753dd3a0b7d"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=11707a540d9ced11f8df4a8ed1547753dd3a0b7d"
 
   bucket_prefix                            = "call-centre-staging"
   versioning_enabled                       = true
