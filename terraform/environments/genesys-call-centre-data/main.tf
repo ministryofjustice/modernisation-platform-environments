@@ -8,9 +8,9 @@ module "s3_bucket_staging" {
   ownership_controls = "BucketOwnerEnforced"
 
   # Refer to the below section "Replication" before enabling replication
-  replication_enabled                      = true
+  replication_enabled                      = false
   # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
-  replication_region                       = "eu-west-2"
+  # replication_region                       = "eu-west-2"
   providers = {
     # Here we use the default provider Region for replication. Destination buckets can be within the same Region as the
     # source bucket. On the other hand, if you need to enable cross-region replication, please contact the Modernisation
