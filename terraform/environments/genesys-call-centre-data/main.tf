@@ -111,50 +111,50 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
   }
 }
 
-# resource "aws_s3_bucket_public_access_block" "default" {
-#   bucket                  = aws_s3_bucket.default.id
-#   block_public_acls       = var.block_public_acls
-#   block_public_policy     = var.block_public_policy
-#   ignore_public_acls      = var.ignore_public_acls
-#   restrict_public_buckets = var.restrict_public_buckets
-# }
+resource "aws_s3_bucket_public_access_block" "default" {
+  bucket                  = module.s3_bucket_staging.bucket.id
+  block_public_acls       = var.block_public_acls
+  block_public_policy     = var.block_public_policy
+  ignore_public_acls      = var.ignore_public_acls
+  restrict_public_buckets = var.restrict_public_buckets
+}
 
-# data "aws_iam_policy_document" "s3-assume-role-policy" {
-#   version = var.json_encode_decode_version
-#   statement {
-#     effect  = var.moj_aws_iam_policy_document_statement_effect
-#     actions = var.moj_aws_iam_policy_document_statement_actions
+data "aws_iam_policy_document" "s3-assume-role-policy" {
+  version = var.json_encode_decode_version
+  statement {
+    effect  = var.moj_aws_iam_policy_document_statement_effect
+    actions = var.moj_aws_iam_policy_document_statement_actions
 
-#     principals {
-#       type        = var.moj_aws_iam_policy_document_principals_type
-#       identifiers = var.moj_aws_iam_policy_document_principals_identifiers
-#     }
-#   }
-# }
+    principals {
+      type        = var.moj_aws_iam_policy_document_principals_type
+      identifiers = var.moj_aws_iam_policy_document_principals_identifiers
+    }
+  }
+}
 
-# resource "aws_s3_bucket_policy" "default" {
-#   bucket = var.call_centre_staging_aws_s3_bucket
-#   policy = jsonencode({
-#     Version = var.json_encode_decode_version,
-#     Statement = [
-#       {
-#         Sid    = var.moj_aws_s3_bucket_policy_statement_sid,
-#         Effect = var.moj_aws_s3_bucket_policy_statement_effect,
-#         Principal = {
-#           Service : var.moj_aws_s3_bucket_policy_statement_principal_service
-#         },
-#         Action   = var.moj_aws_s3_bucket_policy_statement_action,
-#         Resource = "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
-#       },
-#       {
-#         Sid    = var.bt_genesys_aws_s3_bucket_policy_statement_sid,
-#         Effect = var.bt_genesys_aws_s3_bucket_policy_statement_effect,
-#         Principal = {
-#           AWS = var.bt_genesys_aws_s3_bucket_policy_statement_principal_aws
-#         },
-#         Action   = var.bt_genesys_aws_s3_bucket_policy_statement_action,
-#         Resource = "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
-#       }
-#     ]
-#   })
-# }
+resource "aws_s3_bucket_policy" "default" {
+  bucket = module.s3_bucket_staging.bucket.id
+  policy = jsonencode({
+    Version = var.json_encode_decode_version,
+    Statement = [
+      {
+        Sid    = var.moj_aws_s3_bucket_policy_statement_sid,
+        Effect = var.moj_aws_s3_bucket_policy_statement_effect,
+        Principal = {
+          Service : var.moj_aws_s3_bucket_policy_statement_principal_service
+        },
+        Action   = var.moj_aws_s3_bucket_policy_statement_action,
+        Resource = "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
+      },
+      {
+        Sid    = var.bt_genesys_aws_s3_bucket_policy_statement_sid,
+        Effect = var.bt_genesys_aws_s3_bucket_policy_statement_effect,
+        Principal = {
+          AWS = var.bt_genesys_aws_s3_bucket_policy_statement_principal_aws
+        },
+        Action   = var.bt_genesys_aws_s3_bucket_policy_statement_action,
+        Resource = "arn:aws:s3:::${aws_s3_bucket.default.id}/*"
+      }
+    ]
+  })
+}
