@@ -20,13 +20,6 @@ locals {
 
   baseline_presets_all_environments = {
     options = {
-      cloudwatch_dashboard_default_widget_groups = [
-        "network_lb",
-        "ec2",
-        "ec2_linux",
-        "ec2_instance_linux",
-        "ec2_instance_oracle_db_with_backup",
-      ]
       cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters  = ["hmpps-oem-${local.environment}"]
       cloudwatch_metric_oam_links                 = ["hmpps-oem-${local.environment}"]
@@ -45,6 +38,7 @@ locals {
       enable_s3_db_backup_bucket                  = true
       enable_s3_shared_bucket                     = true
       enable_s3_software_bucket                   = true
+      enable_ssm_command_monitoring               = true
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]
       software_bucket_name                        = "csr-software"
     }

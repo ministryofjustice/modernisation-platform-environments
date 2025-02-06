@@ -18,3 +18,13 @@ module "connected_vpc_route53_resolver_logs" {
   name              = "/aws/route53-resolver/connected-vpc"
   retention_in_days = 400
 }
+
+module "datasync_task_logs" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
+  version = "5.6.0"
+
+  name              = "/aws/datasync/tasks"
+  retention_in_days = 400
+}

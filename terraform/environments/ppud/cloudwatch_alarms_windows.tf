@@ -277,9 +277,9 @@ resource "aws_cloudwatch_metric_alarm" "low_disk_space_H_volume_rgvw027" {
   namespace           = "CWAgent"
   period              = "60"
   statistic           = "Average"
-  threshold           = "5"
+  threshold           = "3"
   treat_missing_data  = "notBreaching"
-  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 5% for 5 minutes, the alarm will trigger"
+  alarm_description   = "This metric monitors the amount of free disk space on the instance. If the amount of free disk space falls below 3% for 5 minutes, the alarm will trigger"
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     InstanceId   = "i-00cbccc46d25e77c6"

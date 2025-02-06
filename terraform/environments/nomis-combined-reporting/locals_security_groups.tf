@@ -7,8 +7,10 @@ locals {
     enduserclient_internal = flatten([
       "10.0.0.0/8",
     ])
-    enduserclient_public = flatten([
+    enduserclient_public1 = flatten([
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    ])
+    enduserclient_public2 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
     ])
@@ -31,8 +33,10 @@ locals {
     enduserclient_internal = [
       "10.0.0.0/8"
     ]
-    enduserclient_public = flatten([
+    enduserclient_public1 = flatten([
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    ])
+    enduserclient_public2 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.mp_cidrs.live_eu_west_nat,
     ])
@@ -73,6 +77,13 @@ locals {
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.enduserclient_internal
         }
+        http7777 = {
+          description = "Allow http7777 ingress"
+          from_port   = 7777
+          to_port     = 7777
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.http7xxx
+        }
         https = {
           description = "Allow https ingress"
           from_port   = 443
@@ -107,14 +118,50 @@ locals {
           from_port   = 80
           to_port     = 80
           protocol    = "tcp"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public
+          cidr_blocks = local.security_group_cidrs.enduserclient_public1
         }
         https = {
           description = "Allow https ingress"
           from_port   = 443
           to_port     = 443
           protocol    = "tcp"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public
+          cidr_blocks = local.security_group_cidrs.enduserclient_public1
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+    public-lb-2 = {
+      description = "Security group for public load balancer part 2"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public2
+        }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public2
         }
       }
       egress = {
@@ -144,7 +191,7 @@ locals {
           to_port         = 7010
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "public-lb"]
+          security_groups = ["lb", "public-lb", "public-lb-2"]
         }
         http7777 = {
           description     = "Allow http7777 ingress"
@@ -152,7 +199,7 @@ locals {
           to_port         = 7777
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "public-lb"]
+          security_groups = ["lb", "public-lb", "public-lb-2"]
         }
         http8005 = {
           description     = "Allow http8005 ingress"
@@ -160,7 +207,7 @@ locals {
           to_port         = 8005
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "public-lb"]
+          security_groups = ["lb", "public-lb", "public-lb-2"]
         }
         http8443 = {
           description     = "Allow http8443 ingress"
@@ -168,7 +215,7 @@ locals {
           to_port         = 8443
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "public-lb"]
+          security_groups = ["lb", "public-lb", "public-lb-2"]
         }
       }
       egress = {

@@ -59,7 +59,7 @@ resource "aws_ssm_association" "this" {
 
   apply_only_at_cron_interval = each.value.apply_only_at_cron_interval
   association_name            = each.key
-  name                        = each.value.name
+  name                        = try(aws_ssm_document.this[each.value.name].name, each.value.name) # so ssm_doc is created first
   max_concurrency             = each.value.max_concurrency
   max_errors                  = each.value.max_errors
   schedule_expression         = each.value.schedule_expression
@@ -120,6 +120,7 @@ resource "aws_ssm_parameter" "fixed" {
   type        = each.value.type
   key_id      = each.value.type == "SecureString" && each.value.kms_key_id != null ? try(var.environment.kms_keys[each.value.kms_key_id].arn, each.value.kms_key_id) : null
   value       = each.value.value
+  tier        = each.value.tier
 
   tags = merge(local.tags, {
     Name = each.key

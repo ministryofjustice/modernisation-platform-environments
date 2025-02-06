@@ -94,6 +94,8 @@ module "push_lambda" {
   timeout                 = 900
   core_shared_services_id = var.core_shared_services_id
   production_dev          = var.production_dev
+  security_group_ids      = var.security_group_ids
+  subnet_ids              = var.subnet_ids
   environment_variables = {
     DESTINATION_BUCKET = var.destination_bucket_id
   }

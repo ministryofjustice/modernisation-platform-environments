@@ -7,7 +7,20 @@ locals {
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_linux,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
-      local.environment == "production" ? {} : {
+      local.environment == "production" ? {
+        cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2["cpu-utilization-high"], {
+          evaluation_periods  = "15"
+          datapoints_to_alarm = "15"
+          threshold           = "95"
+          alarm_description   = "Triggers if the average cpu remains at 95% utilization or above for 15 minutes. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4326064583"
+        })
+        cpu-iowait-high = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux["cpu-iowait-high"], {
+          evaluation_periods  = "60"
+          datapoints_to_alarm = "60"
+          threshold           = "75"
+          alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 1 hour. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
+        })
+        } : {
         cpu-utilization-high = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2["cpu-utilization-high"], {
           evaluation_periods  = "480"
           datapoints_to_alarm = "480"

@@ -76,3 +76,17 @@ data "http" "prometheus_operator_crds" {
 
   url = each.value
 }
+
+data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_runners_github_app" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  secret_id = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
+}
+
+data "aws_vpc_endpoint" "mwaa_webserver" {
+  service_name = aws_mwaa_environment.main.webserver_vpc_endpoint_service
+}
+
+data "dns_a_record_set" "mwaa_webserver_vpc_endpoint" {
+  host = data.aws_vpc_endpoint.mwaa_webserver.dns_entry[0].dns_name
+}

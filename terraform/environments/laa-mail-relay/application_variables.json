@@ -7,13 +7,22 @@
       "old_mail_server_url": "mail.aws.dev.legalservices.gov.uk"
     },
     "test": {
-      "example_var": "test-data"
+      "env_short": "uat",
+      "smtp_ami_id": "ami-07c2c2bf769d5174d",
+      "smtp_instance_type": "t2.large",
+      "old_mail_server_url": "mail.aws.uat.legalservices.gov.uk"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "env_short": "stg",
+      "smtp_ami_id": "ami-07c2c2bf769d5174d",
+      "smtp_instance_type": "t2.large",
+      "old_mail_server_url": "mail.aws.stg.legalservices.gov.uk"
     },
     "production": {
-      "example_var": "production-data"
+      "env_short": "prod",
+      "smtp_ami_id": "ami-07c2c2bf769d5174d",
+      "smtp_instance_type": "t2.large",
+      "old_mail_server_url": "mail.aws.prd.legalservices.gov.uk"
     }
   }
 }

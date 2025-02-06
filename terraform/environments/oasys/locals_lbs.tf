@@ -8,7 +8,7 @@ locals {
       internal_lb              = false
       force_destroy_bucket     = true
       s3_versioning            = false
-      security_groups          = ["public_lb"]
+      security_groups          = ["public_lb", "public_lb_2"]
       subnets                  = module.environment.subnets["public"].ids
 
       listeners = {

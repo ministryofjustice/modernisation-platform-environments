@@ -40,6 +40,7 @@ resource "aws_security_group_rule" "lambda_ingress_generic" {
 }
 
 resource "aws_security_group_rule" "lambda_egress_generic" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   count = local.enable_generic_lambda_sg ? 1 : 0
 
   type              = "egress"
@@ -88,6 +89,7 @@ resource "aws_security_group_rule" "serverless_gw_ingress" {
 }
 
 resource "aws_security_group_rule" "serverless_gw_egress" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   count = local.enable_dbuilder_serverless_gw ? 1 : 0
 
   type              = "egress"
@@ -102,6 +104,7 @@ resource "aws_security_group_rule" "serverless_gw_egress" {
 # VPC Gateway Endpoint SG
 resource "aws_security_group" "gateway_endpoint_sg" {
   #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
 
   count = local.include_dbuilder_gw_vpclink ? 1 : 0
 

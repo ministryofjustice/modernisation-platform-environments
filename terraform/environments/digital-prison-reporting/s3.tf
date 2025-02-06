@@ -11,7 +11,7 @@ module "s3_audit_logging_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-audit-logging-${local.environment}"
+      name          = "${local.project}-audit-logging-${local.environment}"
       Resource_Type = "S3 Bucket"
       Jira          = "DPR-471"
     }
@@ -31,7 +31,7 @@ module "s3_transfer_artifacts_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-transfer-artifacts-${local.environment}"
+      name          = "${local.project}-transfer-artifacts-${local.environment}"
       Resource_Type = "S3 Bucket"
       Jira          = "DPR-504"
     }
@@ -51,7 +51,7 @@ module "s3_domain_preview_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-preview-${local.environment}"
+      name          = "${local.project}-domain-preview-${local.environment}"
       Resource_Type = "S3 Bucket"
       Jira          = "DPR-637"
     }
@@ -71,7 +71,7 @@ module "s3_structured_historical_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-structured-historical-${local.environment}"
+      name          = "${local.project}-structured-historical-${local.environment}"
       Resource_Type = "S3 Bucket"
       Jira          = "DPR2-717"
     }

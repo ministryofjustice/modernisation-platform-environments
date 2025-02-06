@@ -17,6 +17,7 @@ resource "aws_vpc_endpoint_service_allowed_principal" "HomeOffice" {
 resource "aws_lb" "ppud_internal_nlb" {
   # checkov:skip=CKV2_AWS_28: "ALB is already protected by WAF"
   # checkov:skip=CKV_AWS_152: "ALB target groups only have 2 targets so cross zone load balancing is not required"
+  # checkov:skip=CKV_AWS_91: "ELB Logging not required"
   count                      = local.is-production == true ? 1 : 0
   name                       = "ppud-internal-nlb"
   internal                   = true
@@ -24,11 +25,6 @@ resource "aws_lb" "ppud_internal_nlb" {
   subnets                    = [data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
   security_groups            = [aws_security_group.PPUD-ALB.id]
   enable_deletion_protection = true
-  #access_logs {
-  # bucket  = aws_s3_bucket.moj-log-files-prod[0].id
-  # prefix  = "alb-logs"
-  # enabled = true
-  #}
 
   tags = {
     Name = "${var.networking[0].business-unit}-${local.environment}"

@@ -23,7 +23,7 @@ locals {
 module "instance" {
   #checkov:skip=CKV_TF_1
   #checkov:skip=CKV_TF_2
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=20622418aa13871c279c12d9ae5e98f29c9a46f0"
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -47,7 +47,16 @@ module "instance" {
   iam_resource_names_prefix = "instance"
   instance_profile_policies = var.instance_profile_policies
 
-  user_data_raw = base64encode(var.user_data)
+  user_data_raw = base64encode(
+    templatefile(
+      "${path.module}/templates/concatenated_user_data.sh",
+      {
+        default   = var.user_data,
+        ssh_setup = file("${path.module}/templates/ssh_key_setup.sh"),
+      }
+    )
+  )
+
 
   business_unit     = var.account_info.business_unit
   application_name  = var.account_info.application_name

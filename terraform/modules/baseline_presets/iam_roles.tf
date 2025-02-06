@@ -5,7 +5,6 @@ locals {
     var.options.enable_ec2_delius_dba_secrets_access ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
-    var.options.enable_observability_platform_monitoring ? ["observability-platform"] : [],
     try(length(var.options.cloudwatch_metric_oam_links), 0) != 0 ? ["CloudWatch-CrossAccountSharingRole"] : [],
     var.options.enable_vmimport ? ["vmimport"] : [],
   ]))
@@ -89,21 +88,6 @@ locals {
         "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
         "arn:aws:iam::aws:policy/CloudWatchAutomaticDashboardsAccess",
         "arn:aws:iam::aws:policy/AWSXrayReadOnlyAccess"
-      ]
-    }
-
-    # allow Observability Plaform read-only access to Cloudwatch metrics
-    observability-platform = {
-      assume_role_policy = [{
-        effect  = "Allow"
-        actions = ["sts:AssumeRole"]
-        principals = {
-          type        = "AWS"
-          identifiers = ["observability-platform-development"]
-        }
-      }]
-      policy_attachments = [
-        "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess",
       ]
     }
 

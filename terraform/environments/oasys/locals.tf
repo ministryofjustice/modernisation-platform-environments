@@ -28,6 +28,7 @@ locals {
         "ec2_instance_linux",
         "ec2_instance_oracle_db_with_backup",
         "ec2_instance_textfile_monitoring",
+        "ssm_command",
       ]
       cloudwatch_metric_alarms_default_actions    = ["pagerduty"]
       cloudwatch_metric_oam_links_ssm_parameters  = ["hmpps-oem-${local.environment}"]
@@ -45,6 +46,7 @@ locals {
       enable_s3_bucket                            = true
       enable_s3_db_backup_bucket                  = true
       enable_s3_shared_bucket                     = true
+      enable_ssm_command_monitoring               = true
       enable_vmimport                             = true
       s3_bucket_name                              = "${local.application_name}-${local.environment}"
       s3_iam_policies                             = ["EC2S3BucketWriteAndDeleteAccessPolicy"]

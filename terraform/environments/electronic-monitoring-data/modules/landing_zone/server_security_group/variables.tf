@@ -12,6 +12,7 @@ variable "cidr_ipv6s" {
 
 variable "local_tags" {
   description = "The predefined local.tags"
+  type        = map(string)
 }
 
 variable "supplier" {
@@ -26,4 +27,5 @@ variable "user_name" {
 
 variable "vpc_id" {
   description = "The vpc used for the SFTP server"
+  type        = string
 }

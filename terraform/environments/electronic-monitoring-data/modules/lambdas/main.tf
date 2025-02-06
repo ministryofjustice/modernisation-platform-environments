@@ -5,6 +5,8 @@ locals {
 
 data "aws_caller_identity" "current" {}
 
+data "aws_region" "current" {}
+
 resource "aws_sqs_queue" "lambda_dlq" {
   name              = "${var.function_name}-dlq"
   kms_master_key_id = aws_kms_key.lambda_env_key.id
@@ -141,15 +143,8 @@ resource "aws_cloudwatch_log_group" "lambda_cloudwatch_group" {
   kms_key_id        = aws_kms_key.lambda_env_key.arn
 }
 
-
 resource "aws_lambda_function" "this" {
   #checkov:skip=CKV_AWS_272:Lambda needs code-signing, see ELM-1975
-  # Zip File config
-  filename         = var.is_image ? null : var.filename
-  handler          = var.is_image ? null : var.handler
-  layers           = var.is_image ? null : var.layers
-  source_code_hash = var.is_image ? null : var.source_code_hash
-  runtime          = var.is_image ? null : var.runtime
   # Image config
   image_uri    = var.is_image ? "${var.core_shared_services_id}.dkr.ecr.eu-west-2.amazonaws.com/${var.ecr_repo_name}:${local.function_uri}" : null
   package_type = var.is_image ? "Image" : null
@@ -164,7 +159,7 @@ resource "aws_lambda_function" "this" {
   }
 
   dynamic "vpc_config" {
-    for_each = local.use_vpc_config ? [1] : []
+    for_each = var.security_group_ids != null && var.subnet_ids != null ? [1] : []
     content {
       security_group_ids = var.security_group_ids
       subnet_ids         = var.subnet_ids

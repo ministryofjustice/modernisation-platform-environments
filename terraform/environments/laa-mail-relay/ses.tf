@@ -1,5 +1,5 @@
 resource "aws_sesv2_email_identity" "postfix" {
-  email_identity         = local.environment == "production" ? "tbc" : data.aws_route53_zone.external.name
+  email_identity         = data.aws_route53_zone.external.name
   configuration_set_name = local.environment == "production" ? aws_sesv2_configuration_set.postfix[0].configuration_set_name : null
   dkim_signing_attributes {
     next_signing_key_length = "RSA_1024_BIT"
@@ -108,11 +108,11 @@ resource "aws_secretsmanager_secret_version" "smtp_password" {
 }
 
 resource "aws_secretsmanager_secret" "smtp_sesans" {
-  name        = "postfix/app/SESANS"
+  name        = "postfix/app/SESANS_MP"
   description = "Secret to pull from Ansible code from https://github.com/ministryofjustice/laa-aws-postfix-smtp"
   tags = merge(
     local.tags,
-    { "Name" = "postfix/app/SESANS" }
+    { "Name" = "postfix/app/SESANS_MP" }
   )
 }
 

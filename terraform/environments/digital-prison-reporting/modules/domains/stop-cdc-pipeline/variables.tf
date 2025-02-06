@@ -24,11 +24,6 @@ variable "glue_reporting_hub_cdc_jobname" {
   type        = string
 }
 
-variable "s3_glue_bucket_id" {
-  description = "S3, Glue Bucket ID"
-  type        = string
-}
-
 variable "glue_stop_glue_instance_job" {
   description = "Name of job to stop the current running instance of the streaming job"
   type        = string
@@ -44,13 +39,18 @@ variable "glue_unprocessed_raw_files_check_job" {
   type        = string
 }
 
+variable "processed_files_check_wait_interval_seconds" {
+  description = "Amount of seconds between checks to s3 if all files have been processed"
+  type        = number
+}
+
+variable "processed_files_check_max_attempts" {
+  description = "Maximum number of attempts to check if all files have been processed"
+  type        = number
+}
+
 variable "tags" {
   type        = map(string)
   default     = {}
   description = "(Optional) Key-value map of resource tags"
-}
-
-variable "domain" {
-  type        = string
-  description = "Domain Name"
 }

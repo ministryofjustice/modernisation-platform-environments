@@ -7,7 +7,6 @@ locals {
 
   baseline_presets_preproduction = {
     options = {
-      cloudwatch_log_groups_retention_in_days = 90
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -49,6 +48,7 @@ locals {
           local.cloudwatch_dashboard_widget_groups.db,
           local.cloudwatch_dashboard_widget_groups.xtag,
           local.cloudwatch_dashboard_widget_groups.asg,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
         ]
       }
     }

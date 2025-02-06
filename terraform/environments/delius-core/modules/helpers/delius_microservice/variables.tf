@@ -217,12 +217,6 @@ variable "platform_vars" {
   })
 }
 
-variable "health_check_grace_period_seconds" {
-  description = "The amount of time, in seconds, that Amazon ECS waits before unhealthy instances are shut down."
-  type        = number
-  default     = 60
-}
-
 variable "ecs_cluster_arn" {
   description = "The ARN of the ECS cluster"
   type        = string
@@ -376,18 +370,6 @@ variable "alb_security_group_id" {
   default     = null
 }
 
-variable "health_check_path" {
-  description = "The health check path for the alb target group"
-  type        = string
-  default     = "/"
-}
-
-variable "health_check_interval" {
-  description = "The health check interval for the alb target group"
-  type        = string
-  default     = "300"
-}
-
 variable "alb_stickiness_enabled" {
   description = "Enable or disable stickiness"
   type        = string
@@ -496,12 +478,6 @@ variable "redeploy_on_apply" {
   default     = false
 }
 
-variable "force_new_deployment" {
-  description = "Force a new deployment"
-  type        = bool
-  default     = false
-}
-
 variable "ecs_service_ingress_security_group_ids" {
   description = "Security group ids to allow ingress to the ECS service"
   type = list(object({
@@ -587,7 +563,7 @@ variable "extra_task_exec_role_policies" {
   default     = {}
 }
 
-variable "health_check" {
+variable "container_health_check" {
   description = "The health check configuration for the container"
   type = object({
     command     = list(string)
@@ -597,6 +573,30 @@ variable "health_check" {
     startPeriod = number
   })
   default = null
+}
+
+variable "alb_health_check" {
+  description = "The health check configuration for the ALB"
+  type = object({
+    path                 = string
+    interval             = number
+    timeout              = number
+    healthy_threshold    = number
+    unhealthy_threshold  = number
+    matcher              = string
+    protocol             = string
+    grace_period_seconds = number
+  })
+  default = {
+    path                 = "/"
+    interval             = 30
+    timeout              = 5
+    healthy_threshold    = 5
+    unhealthy_threshold  = 5
+    matcher              = "200-499"
+    protocol             = "HTTP"
+    grace_period_seconds = 120
+  }
 }
 
 variable "nlb_ingress_security_group_ids" {
@@ -627,4 +627,10 @@ variable "system_controls" {
   description = "The system controls for the container"
   type        = list(any)
   default     = []
+}
+
+variable "pin_task_definition_revision" {
+  type        = number
+  description = "The revision of the task definition to use"
+  default     = 0
 }

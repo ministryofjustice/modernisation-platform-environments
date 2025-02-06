@@ -22,197 +22,6 @@ resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
   etag   = filemd5("files/log4j2.properties")
 }
 
-module "glue_reporting_hub_job" {
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = "${local.project}-reporting-hub-${local.env}"
-  short_name                    = "${local.project}-reporting-hub"
-  description                   = local.description
-  command_type                  = "gluestreaming"
-  job_language                  = "scala"
-  create_security_configuration = local.create_sec_conf
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-${local.env}/"
-  # Using s3a for checkpoint because to align with Hadoop 3 supports
-  checkpoint_dir   = "s3a://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-${local.env}/"
-  spark_event_logs = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-${local.env}/"
-  # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-  additional_policies          = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  execution_class              = "STANDARD"
-  worker_type                  = local.reporting_hub_worker_type
-  number_of_workers            = local.reporting_hub_num_workers
-  max_concurrent               = 1
-  region                       = local.account_region
-  account                      = local.account_id
-  log_group_retention_in_days  = local.glue_log_retention_in_days
-  connections                  = local.create_glue_connection ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : []
-  additional_secret_arns       = [aws_secretsmanager_secret.operational_db_secret.arn]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-reporting-hub-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR-265"
-    }
-  )
-
-  arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
-    "--extra-jars"                          = local.glue_jobs_latest_jar_location
-    "--extra-files"                         = local.shared_log4j_properties_path
-    "--job-bookmark-option"                 = "job-bookmark-disable"
-    "--class"                               = "uk.gov.justice.digital.job.DataHubJob"
-    "--dpr.kinesis.stream.arn"              = module.kinesis_stream_ingestor.kinesis_stream_arn
-    "--dpr.aws.region"                      = local.account_region
-    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.batchDurationSeconds"            = local.reporting_hub_batch_duration_seconds
-    "--dpr.add.idle.time.between.reads"     = local.reporting_hub_add_idle_time_between_reads
-    "--dpr.idle.time.between.reads.millis"  = local.reporting_hub_idle_time_between_reads_in_millis
-    "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_retry_max_attempts
-    "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_retry_min_wait_millis
-    "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_retry_max_wait_millis
-    "--dpr.raw.s3.path"                     = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
-    "--enable-metrics"                      = true
-    "--enable-spark-ui"                     = false
-    "--enable-auto-scaling"                 = true
-    "--enable-job-insights"                 = true
-    "--dpr.aws.dynamodb.endpointUrl"        = "https://dynamodb.${local.account_region}.amazonaws.com"
-    "--dpr.contract.registryName"           = trimprefix(module.glue_registry_avro.registry_name, "${local.glue_avro_registry[0]}/")
-    "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.domain.target.path"              = "s3://${module.s3_domain_bucket.bucket_id}"
-    "--dpr.domain.catalog.db"               = module.glue_data_domain_database.db_name
-    "--dpr.redshift.secrets.name"           = "${local.project}-redshift-secret-${local.environment}"
-    "--dpr.datamart.db.name"                = "datamart"
-    "--dpr.log.level"                       = local.reporting_hub_log_level
-    "--dpr.domainrefresh.enabled"           = local.reporting_hub_domain_refresh_enabled
-  })
-}
-
-# Glue Job, Reporting Hub Batch
-module "glue_reporting_hub_batch_job" {
-  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
-
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = "${local.project}-reporting-hub-batch-${local.env}"
-  short_name                    = "${local.project}-reporting-hub-batch"
-  command_type                  = "glueetl"
-  description                   = "Applies initial batch load inserts from reporting hub to structured and curated zones"
-  create_security_configuration = local.create_sec_conf
-  job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-batch-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-batch-${local.env}/"
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  additional_policies           = module.dms_nomis_to_s3_ingestor.dms_s3_iam_policy_admin_arn
-  execution_class               = "FLEX"
-  worker_type                   = local.reporting_hub_batch_job_worker_type
-  number_of_workers             = local.reporting_hub_batch_job_num_workers
-  max_concurrent                = 64
-  region                        = local.account_region
-  account                       = local.account_id
-  log_group_retention_in_days   = local.glue_log_retention_in_days
-  connections                   = local.create_glue_connection ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : []
-  additional_secret_arns        = [aws_secretsmanager_secret.operational_db_secret.arn]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-reporting-hub-batch-${local.env}"
-      Resource_Type = "Glue Job"
-    }
-  )
-
-  arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
-    "--extra-jars"                          = local.glue_jobs_latest_jar_location
-    "--extra-files"                         = local.shared_log4j_properties_path
-    "--class"                               = "uk.gov.justice.digital.job.DataHubBatchJob"
-    "--datalake-formats"                    = "delta"
-    "--dpr.aws.region"                      = local.account_region
-    "--dpr.raw.s3.path"                     = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
-    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.contract.registryName"           = module.s3_schema_registry_bucket.bucket_id
-    "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
-    "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_batch_job_retry_max_attempts
-    "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_batch_job_retry_min_wait_millis
-    "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_batch_job_retry_max_wait_millis
-    "--dpr.schema.cache.max.size"           = local.reporting_hub_batch_job_schema_cache_max_size
-    "--dpr.log.level"                       = local.reporting_hub_batch_job_log_level
-  })
-}
-
-# Glue Job, Reporting Hub CDC
-module "glue_reporting_hub_cdc_job" {
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = "${local.project}-reporting-hub-cdc-${local.env}"
-  short_name                    = "${local.project}-reporting-hub-cdc"
-  command_type                  = "gluestreaming"
-  description                   = "Monitors the reporting hub for table changes and applies them to structured and curated zones.\nArguments:\n--dpr.config.key: (Optional) config key e.g. prisoner\n--dpr.clean.cdc.checkpoint: (Optional) boolean flag to clean checkpoint directory"
-  create_security_configuration = local.create_sec_conf
-  job_language                  = "scala"
-  checkpoint_dir                = "s3://${module.s3_glue_job_bucket.bucket_id}/checkpoint/${local.project}-reporting-hub-cdc-${local.env}/"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-reporting-hub-cdc-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-reporting-hub-cdc-${local.env}/"
-  script_location               = local.glue_placeholder_script_location
-  enable_continuous_log_filter  = false
-  project_id                    = local.project
-  aws_kms_key                   = local.s3_kms_arn
-  execution_class               = "STANDARD"
-  additional_policies           = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  worker_type                   = local.reporting_hub_cdc_job_worker_type
-  number_of_workers             = local.reporting_hub_cdc_job_num_workers
-  max_concurrent                = 64
-  region                        = local.account_region
-  account                       = local.account_id
-  log_group_retention_in_days   = local.glue_log_retention_in_days
-  connections                   = local.create_glue_connection ? [aws_glue_connection.glue_operational_datastore_connection[0].name] : []
-  additional_secret_arns        = [aws_secretsmanager_secret.operational_db_secret.arn]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-reporting-hub-cdc-${local.env}"
-      Resource_Type = "Glue Job"
-    }
-  )
-
-  arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
-    "--extra-jars"                          = local.glue_jobs_latest_jar_location
-    "--extra-files"                         = local.shared_log4j_properties_path
-    "--job-bookmark-option"                 = "job-bookmark-disable"
-    "--class"                               = "uk.gov.justice.digital.job.DataHubCdcJob"
-    "--datalake-formats"                    = "delta"
-    "--dpr.aws.region"                      = local.account_region
-    "--dpr.raw.archive.s3.path"             = "s3://${module.s3_raw_archive_bucket.bucket_id}/"
-    "--dpr.raw.s3.path"                     = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"              = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.violations.s3.path"              = "s3://${module.s3_violation_bucket.bucket_id}/"
-    "--dpr.curated.s3.path"                 = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.datastorage.retry.maxAttempts"   = local.reporting_hub_cdc_job_retry_max_attempts
-    "--dpr.datastorage.retry.minWaitMillis" = local.reporting_hub_cdc_job_retry_min_wait_millis
-    "--dpr.datastorage.retry.maxWaitMillis" = local.reporting_hub_cdc_job_retry_max_wait_millis
-    "--enable-metrics"                      = true
-    "--enable-spark-ui"                     = false
-    "--enable-auto-scaling"                 = true
-    "--enable-job-insights"                 = true
-    "--dpr.contract.registryName"           = module.s3_schema_registry_bucket.bucket_id
-    "--dpr.config.s3.bucket"                = module.s3_glue_job_bucket.bucket_id
-    "--dpr.domain.registry"                 = "${local.project}-domain-registry-${local.environment}"
-    "--dpr.schema.cache.max.size"           = local.reporting_hub_cdc_job_schema_cache_max_size
-    "--dpr.log.level"                       = local.reporting_hub_cdc_job_log_level
-  })
-}
-
 # Glue Job, Create Hive Tables
 module "glue_hive_table_creation_job" {
   source                        = "./modules/glue_job"
@@ -340,14 +149,14 @@ module "glue_s3_file_transfer_job" {
 module "glue_switch_prisons_hive_data_location_job" {
   source                        = "./modules/glue_job"
   create_job                    = local.create_job
-  name                          = "${local.project}-switch-prisons-hive-data-location-${local.env}"
-  short_name                    = "${local.project}-switch-prisons-hive-data-location"
+  name                          = "${local.project}-switch-prisons-data-source-${local.env}"
+  short_name                    = "${local.project}-switch-prisons-data-source"
   command_type                  = "glueetl"
   description                   = "Switch Prisons Hive tables data location.\nArguments:\n--dpr.config.key: (Required) config key e.g. prisoner\n--dpr.prisons.data.switch.target.s3.path: (Required) s3 path to point the prisons data to e.g. s3://dpr-curated-zone-<env>"
   create_security_configuration = local.create_sec_conf
   job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-switch-prisons-hive-data-location-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-prisons-hive-data-location-${local.env}/"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-switch-prisons-data-source-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-switch-prisons-data-source-${local.env}/"
   # Placeholder Script Location
   script_location              = local.glue_placeholder_script_location
   enable_continuous_log_filter = false
@@ -365,7 +174,7 @@ module "glue_switch_prisons_hive_data_location_job" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-switch-prisons-hive-data-location-${local.env}"
+      Name          = "${local.project}-switch-prisons-data-source-${local.env}"
       Resource_Type = "Glue Job"
       Jira          = "DPR2-46"
     }
@@ -582,109 +391,6 @@ module "activate_glue_trigger_job" {
   }
 }
 
-# Glue Job, Data Reconciliation Job
-module "glue_data_reconciliation_job" {
-  source                       = "./modules/domains/reconciliation-job"
-  create_job                   = local.create_job && local.create_glue_connection
-  env                          = local.env
-  job_name                     = "${local.project}-data-reconciliation-job-${local.env}"
-  short_name                   = "${local.project}-data-reconciliation-job"
-  create_sec_conf              = local.create_sec_conf
-  temp_dir                     = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-data-reconciliation-${local.env}/"
-  spark_event_logs             = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-data-reconciliation-${local.env}/"
-  script_file_version          = "digital-prison-reporting-jobs-vLatest.scala"
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  s3_kms_arn                   = local.s3_kms_arn
-  execution_class              = "STANDARD"
-  worker_type                  = "G.1X"
-  num_workers                  = 2
-  max_concurrent_runs          = 64
-  account_region               = local.account_region
-  account_id                   = local.account_id
-  log_group_retention_in_days  = local.glue_log_retention_in_days
-  connections = local.create_glue_connection ? concat([
-    aws_glue_connection.glue_operational_datastore_connection[0].name,
-    aws_glue_connection.glue_nomis_connection[0].name
-  ], values(aws_glue_connection.glue_dps_connection)[*].name) : []
-  additional_secret_arns = concat([
-    aws_secretsmanager_secret.operational_db_secret.arn,
-    aws_secretsmanager_secret.nomis.arn
-  ], values(aws_secretsmanager_secret.dps)[*].arn)
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name = "${local.project}-data-reconciliation-${local.env}"
-      Jira = "DPR2-1117"
-    }
-  )
-  glue_job_arguments = merge(local.glue_datahub_job_extra_operational_datastore_args, {
-    "--extra-jars"                = local.glue_jobs_latest_jar_location
-    "--extra-files"               = local.shared_log4j_properties_path
-    "--class"                     = "uk.gov.justice.digital.job.DataReconciliationJob"
-    "--dpr.aws.region"            = local.account_region
-    "--dpr.config.s3.bucket"      = module.s3_glue_job_bucket.bucket_id
-    "--dpr.log.level"             = local.glue_job_common_log_level
-    "--dpr.raw.s3.path"           = "s3://${module.s3_raw_bucket.bucket_id}/"
-    "--dpr.raw.archive.s3.path"   = "s3://${module.s3_raw_archive_bucket.bucket_id}/"
-    "--dpr.structured.s3.path"    = "s3://${module.s3_structured_bucket.bucket_id}/"
-    "--dpr.curated.s3.path"       = "s3://${module.s3_curated_bucket.bucket_id}/"
-    "--dpr.contract.registryName" = module.s3_schema_registry_bucket.bucket_id
-
-    # dpr.reconciliation.datasource properties can be modified to configure
-    # the job for either Nomis, a DPS database or some other data store
-    "--dpr.reconciliation.datasource.glue.connection.name"        = aws_glue_connection.glue_nomis_connection[0].name
-    "--dpr.reconciliation.datasource.source.schema.name"          = "OMS_OWNER"
-    "--dpr.reconciliation.datasource.should.uppercase.tablenames" = "true"
-    "--dpr.reconciliation.fail.job.if.checks.fail"                = "true"
-    "--dpr.reconciliation.report.results.to.cloudwatch"           = "false"
-  })
-}
-
-# kinesis Data Stream Ingestor
-module "kinesis_stream_ingestor" {
-  source                    = "./modules/kinesis_stream"
-  create_kinesis_stream     = local.create_kinesis
-  name                      = local.kinesis_stream_ingestor
-  shard_count               = 1 # Not Valid when ON-DEMAND Mode
-  retention_period          = local.kinesis_retention_hours
-  shard_level_metrics       = ["IncomingBytes", "OutgoingBytes"]
-  enforce_consumer_deletion = false
-  encryption_type           = "KMS"
-  kms_key_id                = local.kinesis_kms_id
-  project_id                = local.project
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = local.kinesis_stream_ingestor
-      Resource_Type = "Kinesis Data Stream"
-    }
-  )
-}
-
-module "kinesis_stream_reconciliation_firehose_s3" {
-  source                     = "./modules/kinesis_firehose"
-  name                       = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
-  aws_account_id             = local.account_id
-  aws_region                 = local.account_region
-  cloudwatch_log_group_name  = "/aws/kinesisfirehose/reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
-  cloudwatch_log_stream_name = "DestinationDelivery"
-  cloudwatch_logging_enabled = false
-  kinesis_source_stream_arn  = module.kinesis_stream_ingestor.kinesis_stream_arn
-  kinesis_source_stream_name = module.kinesis_stream_ingestor.kinesis_stream_name
-  target_s3_arn              = module.s3_working_bucket.bucket_arn
-  target_s3_id               = module.s3_working_bucket.bucket_id
-  target_s3_prefix           = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/"
-  target_s3_error_prefix     = "reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}-error/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/!{firehose:error-output-type}"
-  target_s3_kms              = local.s3_kms_arn
-  buffering_size             = 128
-  buffering_interval         = 900
-  database_name              = module.glue_reconciliation_database.db_name
-  table_name                 = module.glue_reconciliation_table.table_name
-}
-
 # Glue Registry
 module "glue_registry_avro" {
   source               = "./modules/glue_registry"
@@ -698,81 +404,6 @@ module "glue_registry_avro" {
     }
   )
 }
-
-###################################################
-# Glue Tables, Reusable Module: /modules/glue_table
-###################################################
-module "glue_reconciliation_table" {
-  source                    = "./modules/glue_table"
-  enable_glue_catalog_table = true
-  name                      = "reconciliation-${module.kinesis_stream_ingestor.kinesis_stream_name}"
-
-  # AWS Glue catalog DB
-  glue_catalog_database_name       = module.glue_reconciliation_database.db_name
-  glue_catalog_database_parameters = null
-
-  # AWS Glue catalog table
-  glue_catalog_table_description = "Glue Table for reconciliation data, managed by Terraform."
-  glue_catalog_table_table_type  = "EXTERNAL_TABLE"
-  glue_catalog_table_parameters = {
-    EXTERNAL              = "TRUE"
-    "parquet.compression" = "SNAPPY"
-    "classification"      = "parquet"
-  }
-  glue_catalog_table_storage_descriptor = {
-
-    location      = "s3://${module.s3_working_bucket.bucket_id}/reconciliation/${module.kinesis_stream_ingestor.kinesis_stream_name}/"
-    input_format  = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetInputFormat"
-    output_format = "org.apache.hadoop.hive.ql.io.parquet.MapredParquetOutputFormat"
-
-    columns = [
-      {
-        columns_name    = "data"
-        columns_type    = "string"
-        columns_comment = "Nested JSON data"
-      },
-      {
-        columns_name    = "metadata"
-        columns_type    = "string"
-        columns_comment = "Common metadata"
-      }
-    ]
-
-    partition_keys = [
-      {
-        name    = "year",
-        type    = "string",
-        comment = ""
-      },
-      {
-        name    = "month",
-        type    = "string",
-        comment = ""
-      },
-      {
-        name    = "day",
-        type    = "string",
-        comment = ""
-      }
-    ]
-
-    ser_de_info = [
-      {
-        serialization_library = "org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe"
-
-        parameters = {
-          "serialization.format" = 1
-        }
-      }
-    ]
-
-    skewed_info = []
-
-    sort_columns = []
-  }
-  glue_table_depends_on = [module.glue_reconciliation_database.db_name]
-}
-
 
 ##################
 ### S3 Buckets ###
@@ -789,7 +420,7 @@ module "s3_glue_job_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-glue-jobs-${local.environment}"
+      name          = "${local.project}-glue-jobs-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -807,7 +438,7 @@ module "s3_raw_archive_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-raw-archive-${local.env}-s3"
+      name          = "${local.project}-raw-archive-${local.env}-s3"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -824,7 +455,7 @@ module "s3_raw_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-raw-zone-${local.env}"
+      name          = "${local.project}-raw-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -842,7 +473,7 @@ module "s3_structured_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-structured-zone-${local.env}"
+      name          = "${local.project}-structured-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -850,23 +481,24 @@ module "s3_structured_bucket" {
 
 # S3 Curated
 module "s3_curated_bucket" {
-  source                    = "./modules/s3_bucket"
-  create_s3                 = local.setup_buckets
-  name                      = "${local.project}-curated-zone-${local.env}"
-  custom_kms_key            = local.s3_kms_arn
-  create_notification_queue = false # For SQS Queue
-  enable_lifecycle          = true
+  source                     = "./modules/s3_bucket"
+  create_s3                  = local.setup_buckets
+  name                       = "${local.project}-curated-zone-${local.env}"
+  custom_kms_key             = local.s3_kms_arn
+  create_notification_queue  = false # For SQS Queue
+  enable_lifecycle           = true
+  enable_intelligent_tiering = false
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-curated-zone-${local.env}"
+      name          = "${local.project}-curated-zone-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
 }
 
-# S3 Curated
+# S3 Temp Reload
 module "s3_temp_reload_bucket" {
   source                    = "./modules/s3_bucket"
   create_s3                 = local.setup_buckets
@@ -878,7 +510,7 @@ module "s3_temp_reload_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-temp-reload-${local.env}"
+      name          = "${local.project}-temp-reload-${local.env}"
       Resource_Type = "S3 Bucket",
       Jira          = "DPR2-46"
     }
@@ -897,7 +529,7 @@ module "s3_domain_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-${local.env}"
+      name          = "${local.project}-domain-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -917,7 +549,7 @@ module "s3_schema_registry_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-schema-registry-${local.env}"
+      name          = "${local.project}-schema-registry-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -935,7 +567,7 @@ module "s3_domain_config_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-domain-config-${local.env}"
+      name          = "${local.project}-domain-config-${local.env}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -953,7 +585,7 @@ module "s3_violation_bucket" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-violation-${local.environment}"
+      name          = "${local.project}-violation-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -980,7 +612,7 @@ module "s3_artifacts_store" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-artifact-store-${local.environment}"
+      name          = "${local.project}-artifact-store-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -988,21 +620,31 @@ module "s3_artifacts_store" {
 
 # S3 Violation Zone Bucket, DPR-408
 module "s3_working_bucket" {
-  source                      = "./modules/s3_bucket"
-  create_s3                   = local.setup_buckets
-  name                        = "${local.project}-working-${local.environment}"
-  custom_kms_key              = local.s3_kms_arn
-  create_notification_queue   = false # For SQS Queue
-  enable_lifecycle            = true
-  enable_lifecycle_expiration = true
-  expiration_days             = 2
-  expiration_prefix_redshift  = "reports/"
-  expiration_prefix_athena    = "dpr/"
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-working-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+  lifecycle_category        = "long_term"
+
+  override_expiration_rules = [
+    {
+      id     = "reports"
+      prefix = "reports/"
+      days   = local.s3_redshift_table_expiry_days
+    },
+    {
+      id     = "dpr"
+      prefix = "dpr/"
+      days   = 7
+    }
+  ]
 
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-working-${local.environment}"
+      name          = "${local.project}-working-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )
@@ -1201,109 +843,6 @@ module "datamart" {
 }
 
 # DMS Nomis Data Collector
-module "dms_nomis_ingestor" {
-  source                       = "./modules/dms_dps"
-  setup_dms_instance           = local.setup_dms_instance      # Disable all DMS Resources
-  enable_replication_task      = local.enable_replication_task # Disable Replication Task
-  name                         = "${local.project}-dms-nomis-ingestor-${local.env}"
-  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
-  source_engine_name           = "oracle"
-  source_db_name               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
-  source_app_username          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["user"]
-  source_app_password          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["password"]
-  source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
-  vpc                          = data.aws_vpc.shared.id
-  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  project_id                   = local.project
-  env                          = local.environment
-  dms_source_name              = "oracle"
-  dms_target_name              = "kinesis"
-  short_name                   = "nomis"
-  migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.7" # Upgrade
-  replication_instance_class   = "dms.t3.medium"
-  subnet_ids = [
-    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
-  ]
-
-  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
-  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
-
-  extra_attributes = "supportResetlog=TRUE"
-
-  kinesis_settings = {
-    "include_null_and_empty"         = "true"
-    "partition_include_schema_table" = "true"
-    "include_partition_value"        = "true"
-    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
-  }
-
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-dms-t3nomis-ingestor-${local.env}"
-      Resource_Type = "DMS Replication"
-      Nomis_Source  = "T3"
-    }
-  )
-}
-
-module "dms_fake_data_ingestor" {
-  source                       = "./modules/dms_dps"
-  setup_dms_instance           = local.setup_fake_data_dms_instance
-  enable_replication_task      = local.enable_fake_data_replication_task # Disable Replication Task
-  name                         = "${local.project}-dms-fake-data-ingestor-${local.env}"
-  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
-  source_engine_name           = "postgres"
-  source_db_name               = "db59b5cf9e5de6b794"
-  source_app_username          = "cp9Zr5bLim"
-  source_app_password          = "whkthrI65zpcFEe5"
-  source_address               = "cloud-platform-59b5cf9e5de6b794.cdwm328dlye6.eu-west-2.rds.amazonaws.com"
-  source_db_port               = 5432
-  vpc                          = data.aws_vpc.shared.id
-  kinesis_stream_policy        = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_admin_arn
-  project_id                   = local.project
-  env                          = local.environment
-  dms_source_name              = "postgres"
-  dms_target_name              = "kinesis"
-  short_name                   = "fake-data"
-  migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.4.7" # Rollback
-  replication_instance_class   = "dms.t3.medium"
-  subnet_ids = [
-    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
-  ]
-
-  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
-  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
-
-  kinesis_settings = {
-    "include_null_and_empty"         = "true"
-    "partition_include_schema_table" = "true"
-    "include_partition_value"        = "true"
-    "kinesis_target_stream"          = "arn:aws:kinesis:eu-west-2:${data.aws_caller_identity.current.account_id}:stream/${local.kinesis_stream_ingestor}"
-  }
-
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name            = "${local.project}-dms-fake-data-ingestor-${local.env}"
-      Resource_Type   = "DMS Replication"
-      Postgres_Source = "DPS"
-    }
-  )
-}
-
-# DMS Nomis Data Collector
 module "dms_nomis_to_s3_ingestor" {
   source                       = "./modules/dms"
   setup_dms_instance           = true
@@ -1339,10 +878,6 @@ module "dms_nomis_to_s3_ingestor" {
   extra_attributes = "supportResetlog=TRUE"
 
   bucket_name = module.s3_raw_bucket.bucket_id
-
-  availability_zones = {
-    0 = "eu-west-2a"
-  }
 
   depends_on = [
     module.s3_raw_bucket.bucket_id
@@ -1471,7 +1006,7 @@ module "s3_application_tf_state" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-terraform-state-${local.environment}"
+      name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "S3 Bucket"
     }
   )

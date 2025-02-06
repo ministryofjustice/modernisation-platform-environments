@@ -1,0 +1,24 @@
+{
+  "accounts": {
+    "development": {
+      "environment_name": "yjaf-development",
+      "allow_s3_replication": true,
+      "source_account": "856879713508"
+    },
+    "test": {
+      "environment_name": "yjaf-test",
+      "allow_s3_replication": true,
+      "source_account": "856879713508"
+    },
+    "preproduction": {
+      "environment_name": "yjaf-preproduction",
+      "allow_s3_replication": true,
+      "source_account": "053556912568"
+    },
+    "production": {
+      "environment_name": "jyaf-production",
+      "allow_s3_replication": true,
+      "source_account": "066012302209"
+    }
+  }
+}

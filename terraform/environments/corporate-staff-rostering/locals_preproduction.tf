@@ -13,6 +13,20 @@ locals {
   # please keep resources in alphabetical order
   baseline_preproduction = {
 
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.network_lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.app,
+          local.cloudwatch_dashboard_widget_groups.web,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
+      }
+    }
+
     ec2_instances = {
       pp-csr-db-a = merge(local.ec2_instances.db, {
         config = merge(local.ec2_instances.db.config, {
@@ -664,32 +678,24 @@ locals {
             }
           })
           http-7770 = merge(local.lbs.rxy.listeners.http-7770, {
-            alarm_target_group_names = ["pp-csr-w-34-7770"]
-            cloudwatch_metric_alarms = {}
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7770"
             }
           })
           http-7771 = merge(local.lbs.rxy.listeners.http-7771, {
-            alarm_target_group_names = ["pp-csr-w-34-7771"]
-            cloudwatch_metric_alarms = {}
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7771"
             }
           })
           http-7780 = merge(local.lbs.rxy.listeners.http-7780, {
-            alarm_target_group_names = ["pp-csr-w-34-7780"]
-            cloudwatch_metric_alarms = {}
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7780"
             }
           })
           http-7781 = merge(local.lbs.rxy.listeners.http-7781, {
-            alarm_target_group_names = ["pp-csr-w-34-7781"]
-            cloudwatch_metric_alarms = {}
             default_action = {
               type              = "forward"
               target_group_name = "pp-csr-w-34-7781"
@@ -702,10 +708,7 @@ locals {
     route53_zones = {
       "pp.csr.service.justice.gov.uk" = {
         records = [
-          # Set to IP of the Azure CSR PP DB in PPCDL00019
-          { name = "ppiwfm", type = "A", ttl = "300", records = ["10.40.42.132"] },
-          { name = "ppiwfm-a", type = "A", ttl = "300", records = ["10.40.42.132"] },
-          { name = "ppiwfm-b", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
+          { name = "ppiwfm", type = "CNAME", ttl = "300", records = ["pp-csr-db-a.corporate-staff-rostering.hmpps-preproduction.modernisation-platform.service.justice.gov.uk"] },
         ]
         lb_alias_records = [
           { name = "r1", type = "A", lbs_map_key = "r12" },

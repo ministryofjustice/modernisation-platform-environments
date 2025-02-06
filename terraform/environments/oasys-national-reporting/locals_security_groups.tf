@@ -2,14 +2,17 @@ locals {
   security_group_cidrs_devtest = {
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     enduserclient_internal = flatten([
       "10.0.0.0/8",
     ])
-    enduserclient_public = flatten([
-      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    enduserclient_public1 = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
+    ])
+    enduserclient_public2 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
-      module.ip_addresses.mp_cidrs.live_eu_west_nat,
+      module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
     ])
     noms_core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
     oasys_db = flatten([
@@ -18,18 +21,22 @@ locals {
     ])
     rdp = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      module.ip_addresses.azure_fixngo_cidrs.devtest
     ])
   }
 
   security_group_cidrs_preprod_prod = {
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     enduserclient_internal = [
       "10.0.0.0/8"
     ]
-    enduserclient_public = flatten([
-      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
+    enduserclient_public1 = flatten([
+      module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public
+    ])
+    enduserclient_public2 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.mp_cidrs.live_eu_west_nat,
     ])
@@ -40,6 +47,7 @@ locals {
     ])
     rdp = flatten([
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
+      module.ip_addresses.azure_fixngo_cidrs.prod
     ])
   }
 
@@ -63,19 +71,19 @@ locals {
           protocol    = -1
           self        = true
         }
-        http_lb = {
+        http = {
           description = "Allow http ingress"
           from_port   = 80
           to_port     = 80
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public
+          cidr_blocks = local.security_group_cidrs.enduserclient_public1
         }
-        https_lb = {
-          description = "Allow enduserclient https ingress"
+        https = {
+          description = "Allow https ingress"
           from_port   = 443
           to_port     = 443
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient_public
+          cidr_blocks = local.security_group_cidrs.enduserclient_public1
         }
       }
       egress = {
@@ -85,6 +93,42 @@ locals {
           to_port     = 0
           protocol    = "-1"
           cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+    public-lb-2 = {
+      description = "Security group for public load balancer part 2"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public2
+        }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public2
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
         }
       }
     }
@@ -152,6 +196,7 @@ locals {
           cidr_blocks     = local.security_group_cidrs.http7xxx
           security_groups = ["lb", "private-jumpserver"]
         }
+
         weblogic_node_manager_web = {
           description     = "5556: weblogic node manager"
           from_port       = 5556
@@ -159,6 +204,14 @@ locals {
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.http7xxx
           security_groups = ["lb", "private-jumpserver"]
+        }
+        http7010 = {
+          description     = "Allow http7010 ingress"
+          from_port       = 7010
+          to_port         = 7010
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb", "public-lb", "public-lb-2"]
         }
         weblogic_admin = {
           description     = "7001: Weblogic admin port"
@@ -192,6 +245,98 @@ locals {
           to_port     = 0
           protocol    = "-1"
           cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+
+    bip-web = {
+      description = "Security group for bip web tier"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http7010 = {
+          description     = "Allow http7010 ingress"
+          from_port       = 7010
+          to_port         = 7010
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb", "public-lb", "public-lb-2"]
+        }
+        http7777 = {
+          description     = "Allow http7777 ingress"
+          from_port       = 7777
+          to_port         = 7777
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb", "public-lb", "public-lb-2"]
+        }
+        http8005 = {
+          description     = "Allow http8005 ingress"
+          from_port       = 8005
+          to_port         = 8005
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb", "public-lb", "public-lb-2"]
+        }
+        http8443 = {
+          description     = "Allow http8443 ingress"
+          from_port       = 8443
+          to_port         = 8443
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.http7xxx
+          security_groups = ["lb", "public-lb", "public-lb-2"]
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
+    bip-app = {
+      description = "Security group for bip application tier"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        all-from-web = {
+          description     = "Allow all ingress from web"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          security_groups = ["bip-web"]
+        }
+        cms-ingress = {
+          description     = "Allow http6400-http6500 ingress"
+          from_port       = 6400
+          to_port         = 6500
+          protocol        = "tcp"
+          security_groups = ["private-jumpserver"]
+          cidr_blocks     = ["10.0.0.0/8"] # added for testing, remove later
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
         }
       }
     }

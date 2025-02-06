@@ -1,3 +1,17 @@
+variable "core_shared_services_id" {
+  description = "The core shared services id"
+  type        = string
+}
+
+variable "cross_account_access_role" {
+  description = "An object containing the cross account number and role name."
+  type = object({
+    account_number = string
+    role_name      = string
+  })
+  default = null
+}
+
 variable "data_feed" {
   description = "The data feed the bucket relates to"
   type        = string
@@ -31,7 +45,22 @@ variable "order_type" {
   type        = string
 }
 
-variable "s3_trigger_lambda_arn" {
-  description = "The lambda arn used with s3 notification to be triggered on ObjectCreated*"
+variable "production_dev" {
+  description = "The environment the lambda is being deployed to"
   type        = string
+}
+
+variable "received_files_bucket_id" {
+  description = "The id of the bucket data will be moved to"
+  type        = string
+}
+
+variable "security_group_ids" {
+  description = "List of security group IDs associated with the Lambda function."
+  type        = list(string)
+}
+
+variable "subnet_ids" {
+  description = "List of subnet IDs associated with the Lambda function."
+  type        = list(string)
 }

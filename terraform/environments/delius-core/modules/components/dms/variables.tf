@@ -70,3 +70,8 @@ variable "env_name_to_dms_config_map" {
   description = "Map of delius-core environments to DMS configs"
   type        = any
 }
+
+variable "oracle_db_instance_scheduling" {
+  description = "instance_scheduling value.  See https://user-guide.modernisation-platform.service.justice.gov.uk/concepts/environments/instance-scheduling.html"
+  type        = string
+}

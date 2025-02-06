@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_test = {
+    maintenance_title   = "Prison-NOMIS Reporting T1 Maintenance Window"
+    maintenance_message = "Prison-NOMIS Reporting T1 is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down."
+  }
+
   baseline_presets_test = {
     options = {
       sns_topics = {
@@ -13,7 +18,39 @@ locals {
   # please keep resources in alphabetical order
   baseline_test = {
 
+    acm_certificates = {
+      nomis_combined_reporting_wildcard_cert = {
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name              = "modernisation-platform.service.justice.gov.uk"
+        subject_alternate_names = [
+          "test.reporting.nomis.service.justice.gov.uk",
+          "*.test.reporting.nomis.service.justice.gov.uk",
+        ]
+        tags = {
+          description = "Wildcard certificate for the test environment"
+        }
+      }
+    }
+
     ec2_instances = {
+      t1-ncr-cms-1 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
+
       t1-ncr-db-1-a = merge(local.ec2_instances.db, {
         cloudwatch_metric_alarms = merge(
           local.cloudwatch_metric_alarms.db,
@@ -41,10 +78,35 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "T1 NCR DATABASE"
           nomis-combined-reporting-environment = "t1"
-          oracle-sids                          = "T1BIPSYS T1BIPAUD"
+          oracle-sids                          = "T1BIPSYS T1BIPAUD T1BISYS T1BIAUD"
           instance-scheduling                  = "skip-scheduling"
         })
       })
+
+      t1-ncr-web-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2T1ReportingPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "r6i.large"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "t1"
+        })
+      })
+    }
+
+    efs = {
+      t1-ncr-sap-share = local.efs.sap_share
     }
 
     iam_policies = {
@@ -80,6 +142,23 @@ locals {
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/*T1/*",
               "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
             ]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:Describe*",
+            ]
+            resources = ["*"]
+          },
+          {
+            effect = "Allow"
+            actions = [
+              "elasticloadbalancing:SetRulePriorities",
+            ]
+            resources = [
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/private-lb/*",
+              "arn:aws:elasticloadbalancing:*:*:listener-rule/app/public-lb/*",
+            ]
           }
         ]
       }
@@ -87,8 +166,103 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
-        instance_target_groups = {}
-        listeners              = {}
+        instance_target_groups = {
+          private-t1-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "t1-ncr-web-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.private.listeners, {
+          http-7777 = merge(local.lbs.private.listeners.http-7777, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "private-t1-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-int.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_test)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1-int.test.reporting.nomis.service.justice.gov.uk",
+                      "maintenance-int.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
+
+      public = merge(local.lbs.public, {
+        instance_target_groups = {
+          t1-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "t1-ncr-web-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "t1-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_test)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "t1.test.reporting.nomis.service.justice.gov.uk",
+                      "maintenance.test.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
       })
     }
 
@@ -96,8 +270,12 @@ locals {
       "test.reporting.nomis.service.justice.gov.uk" = {
         records = [
           { name = "db", type = "CNAME", ttl = "3600", records = ["t1-ncr-db-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "web", type = "CNAME", ttl = "3600", records = ["t1-ncr-web-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] },
-          { name = "etl", type = "CNAME", ttl = "3600", records = ["t1-ncr-etl-1-a.nomis-combined-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk"] }
+        ]
+        lb_alias_records = [
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
+          { name = "maintenance-int", type = "A", lbs_map_key = "private" },
+          { name = "t1", type = "A", lbs_map_key = "public" },
+          { name = "t1-int", type = "A", lbs_map_key = "private" },
         ]
       }
     }
@@ -119,6 +297,8 @@ locals {
     secretsmanager_secrets = {
       "/oracle/database/T1BIPSYS" = local.secretsmanager_secrets.db
       "/oracle/database/T1BIPAUD" = local.secretsmanager_secrets.db
+      "/oracle/database/T1BISYS"  = local.secretsmanager_secrets.db
+      "/oracle/database/T1BIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/t1"               = local.secretsmanager_secrets.bip
       "/sap/bods/t1"              = local.secretsmanager_secrets.bods
     }

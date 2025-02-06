@@ -3,7 +3,6 @@ locals {
   baseline_presets_test = {
     options = {
 
-      enable_observability_platform_monitoring = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "oasys-test"
@@ -29,6 +28,20 @@ locals {
         tags = {
           description = "cert for t2 oasys test domains"
         }
+      }
+    }
+
+    cloudwatch_dashboards = {
+      "CloudWatch-Default" = {
+        periodOverride = "auto"
+        start          = "-PT6H"
+        widget_groups = [
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.lb,
+          local.cloudwatch_dashboard_widget_groups.db,
+          local.cloudwatch_dashboard_widget_groups.onr,
+          local.cloudwatch_dashboard_widget_groups.ec2,
+          module.baseline_presets.cloudwatch_dashboard_widget_groups.ssm_command,
+        ]
       }
     }
 
@@ -78,6 +91,13 @@ locals {
       t2-oasys-web-b = merge(local.ec2_autoscaling_groups.web, {
         # For SAN project (OASYS replacement) requested by Howard Smith
         # Autoscaling disabled as initially server will be configured manually
+        autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
+          desired_capacity = 1 # setting to 0 leaves in a stopped state because of the warm_pool config below
+          warm_pool = {
+            min_size          = 0
+            reuse_on_scale_in = true
+          }
+        })
         config = merge(local.ec2_autoscaling_groups.web.config, {
           ami_name                  = "oasys_webserver_release_*"
           availability_zone         = "eu-west-2b"
@@ -186,7 +206,7 @@ locals {
           "/dev/sde" = { label = "data", size = 500 }
           "/dev/sdf" = { label = "data", size = 500 }
           "/dev/sdj" = { label = "flash", size = 200 }
-          "/dev/sds" = { label = "swap", size = 2 }
+          "/dev/sds" = { label = "swap", size = 4 }
         }
         instance = merge(local.ec2_instances.db19c.instance, {
           disable_api_termination = true
@@ -500,3 +520,7 @@ locals {
     }
   }
 }
+
+
+
+

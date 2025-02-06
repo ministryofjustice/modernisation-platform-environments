@@ -21,6 +21,17 @@ locals {
       ])
     }
   ]
+  widget_groups_search_filter_dimension = [
+    for widget_group in var.widget_groups : lookup(widget_group, "search_filter_dimension", null) == null ? {} : {
+      search_filter = join("", [
+        lookup(widget_group.search_filter_dimension, "negate", false) ? "NOT " : "",
+        widget_group.search_filter_dimension.name,
+        "=(",
+        join(" OR ", widget_group.search_filter_dimension.values),
+        ")",
+      ])
+    }
+  ]
 
   widget_groups = [
     for i in range(length(var.widget_groups)) : merge(var.widget_groups[i], {
@@ -68,10 +79,11 @@ locals {
             y      = (floor(j * local.widget_groups[i].width / 24) * local.widget_groups[i].height) + local.widget_group_y[i] + local.widget_group_header_height[i]
           },
           try(strcontains(local.widget_groups[i].widgets[j].expression, "InstanceId"), false) ? local.widget_groups_search_filter_ec2[i] : {},
+          try(strcontains(local.widget_groups[i].widgets[j].expression, local.widget_groups[i].search_filter_dimension.name), false) ? local.widget_groups_search_filter_dimension[i] : {},
           local.widget_groups[i].widgets[j],
-          var.accountId == null ? {} : {
+          var.accountId == null && lookup(local.widget_groups[i], "accountId", null) == null ? {} : {
             properties = merge(local.widget_groups[i].widgets[j].properties, {
-              accountId = var.accountId
+              accountId = coalesce(lookup(local.widget_groups[i], "accountId", null), var.accountId)
             })
           }
         ) if local.widget_groups[i].widgets[j] != null
@@ -89,11 +101,29 @@ locals {
       properties = merge(
         widget.properties,
         lookup(widget, "expression", null) == null ? {} : {
-          metrics = [[{
-            expression = lookup(widget, "search_filter", null) == null ? widget.expression : replace(widget.expression, "MetricName=", "${widget.search_filter} MetricName=")
-            label      = ""
-            id         = "q1"
-          }]]
+          metrics = concat(
+            [[merge(
+              {
+                expression = lookup(widget, "search_filter", null) == null ? widget.expression : replace(widget.expression, "MetricName=", "${widget.search_filter} MetricName=")
+                label      = ""
+                id         = "q1"
+                visible    = lookup(widget, "expression_math", null) == null ? true : false
+              },
+              lookup(widget, "expression_period", null) == null ? {} : {
+                period = widget.expression_period
+              }
+            )]],
+            lookup(widget, "expression_math", null) == null ? [] : [[merge(
+              {
+                expression = widget.expression_math
+                label      = ""
+                id         = "m1"
+              },
+              lookup(widget, "expression_period", null) == null ? {} : {
+                period = widget.expression_period
+              }
+            )]]
+          )
         },
         lookup(widget, "alarm_threshold", null) == null ? {} : {
           # Annotation currently failing with 'Should match exactly one schema in oneOf' error

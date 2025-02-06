@@ -31,6 +31,42 @@ locals {
           }
         }
       }
+      network-in-bandwidth = {
+        type              = "metric"
+        expression        = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkIn\"','Sum')/(125000*300),SUM,DESC)"
+        expression_period = 300
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 network-in-5min-average"
+          stat    = "Average"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "Mbps"
+            }
+          }
+        }
+      }
+      network-out-bandwidth = {
+        type              = "metric"
+        expression        = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkOut\"','Sum')/(125000*300),SUM,DESC)"
+        expression_period = 300
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 network-out-5min-average"
+          stat    = "Average"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "Mbps"
+            }
+          }
+        }
+      }
       instance-status-check-failed = {
         type            = "metric"
         alarm_threshold = 1
@@ -58,6 +94,24 @@ locals {
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 system-status-check-failed"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "exitcode"
+            }
+          }
+        }
+      }
+      attached-ebs-status-check-failed = {
+        type            = "metric"
+        alarm_threshold = 1
+        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"StatusCheckFailed_AttachedEBS\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 attached-ebs-status-check-failed"
           stat    = "Maximum"
           yAxis = {
             left = {
@@ -460,12 +514,30 @@ locals {
           }
         }
       }
+      endpoint-response-time-ms = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_endpoint_response_time_ms_value\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = false
+          region  = "eu-west-2"
+          title   = "endpoint-response-time-ms"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "ms"
+            }
+          }
+        }
+      }
       endpoint-cert-days-to-expiry = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-expires-soon.threshold
         expression      = "SORT(SEARCH('{CWAgent,InstanceId,type,type_instance} MetricName=\"collectd_endpoint_cert_expiry_value\"','Minimum'),MIN,ASC)"
         properties = {
           view    = "bar"
+          period  = 3600
           stacked = false
           region  = "eu-west-2"
           title   = "endpoint-cert-days-to-expiry"
@@ -634,6 +706,24 @@ locals {
           }
         }
       }
+      load-balancer-processed-bandwidth = {
+        type              = "metric"
+        expression        = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"ProcessedBytes\"','Sum')/(125000*300),SUM,DESC)"
+        expression_period = 300
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "ALB processed-data-5min-average"
+          stat    = "Average"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "Mbps"
+            }
+          }
+        }
+      }
       unhealthy-load-balancer-host = {
         type            = "metric"
         expression      = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"UnHealthyHostCount\"','Maximum'),MAX,DESC)"
@@ -740,19 +830,20 @@ locals {
           }
         }
       }
-      load-balancer-processed-bytes = {
-        type       = "metric"
-        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedBytes\"','Sum'),SUM,DESC)"
+      load-balancer-processed-bandwidth = {
+        type              = "metric"
+        expression        = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedBytes\"','Sum')/(125000*300),SUM,DESC)"
+        expression_period = 300
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "NLB processed-bytes"
-          stat    = "Sum"
+          title   = "NLB processed-data-5min-average"
+          stat    = "Average"
           yAxis = {
             left = {
               showUnits = false,
-              label     = "processed bytes"
+              label     = "Mbps"
             }
           }
         }
@@ -774,46 +865,165 @@ locals {
           }
         }
       }
-    }
-    ssm = {
-      ssm-command-invocation-status = {
-        type = "metric"
+      load-balancer-port-allocation-error-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"PortAllocationErrorCount\"','Sum'),SUM,DESC)"
         properties = {
-          view    = "singleValue"
+          view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "SSM CommandInvocation Failures - Per Account"
-          stat    = "Maximum"
-          period  = 300
-          metrics = [
-            [{ "expression" : "REMOVE_EMPTY(SEARCH('{CustomMetrics, Account} FailedSSMCommandInvocations', 'Sum', 300))", "label" : "Failed Invocations - ", "id" : "q1" }]
-          ]
+          title   = "NLB port-allocation-error-count"
+          stat    = "Sum"
           yAxis = {
             left = {
               showUnits = false,
-              label     = "failed invocations"
+              label     = "error count"
+            }
+          }
+        }
+      }
+      load-balancer-rejected-flow-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"RejectedFlowCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB rejected-flow-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "flow count"
+            }
+          }
+        }
+      }
+      load-balancer-tcp-client-reset-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"TCP_Client_Reset_Count\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "NLB tcp-client-reset-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "reset count"
+            }
+          }
+        }
+      }
+    }
+    ssm = {
+      ssm-command-success-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, DocumentName} MetricName=\"SSMCommandSuccessCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 3600
+          stacked = true
+          region  = "eu-west-2"
+          title   = "SSM command-success-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
+            }
+          }
+        }
+      }
+      ssm-command-failed-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, DocumentName} MetricName=\"SSMCommandFailedCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 3600
+          stacked = true
+          region  = "eu-west-2"
+          title   = "SSM command-failed-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
+            }
+          }
+        }
+      }
+      ssm-command-ignore-count = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, DocumentName} MetricName=\"SSMCommandIgnoreCount\"','Sum'),SUM,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 3600
+          stacked = true
+          region  = "eu-west-2"
+          title   = "SSM command-ignore-count"
+          stat    = "Sum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
             }
           }
         }
       }
     }
     github = {
-      github-failed-workflow-runs = {
-        type = "metric"
+      github-actions-run-success-count-by-repo = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsSuccessCount\"','Maximum'),MAX,DESC)"
         properties = {
-          view    = "singleValue"
+          view    = "timeSeries"
+          period  = 1800
           stacked = true
           region  = "eu-west-2"
-          title   = "GitHub Failed Workflow Runs - Per Repository"
+          title   = "GitHub actions-run-success-count-by-repo"
           stat    = "Maximum"
-          period  = 300
-          metrics = [
-            [{ "expression" : "REMOVE_EMPTY(SEARCH('{CustomMetrics, Repository} FailedGitHubWorkflowRuns', 'Sum', 300))", "label" : "Failed Runs - ", "id" : "q1" }]
-          ]
           yAxis = {
             left = {
               showUnits = false,
-              label     = "failed runs"
+              label     = "count"
+            }
+          }
+        }
+      }
+      github-actions-run-failed-count-by-repo = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, Repo} MetricName=\"GitHubActionRunsFailedCount\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 1800
+          stacked = true
+          region  = "eu-west-2"
+          title   = "GitHub actions-run-failed-count-by-repo"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
+            }
+          }
+        }
+      }
+      github-actions-run-failed-count-by-workflow = {
+        type       = "metric"
+        expression = "SORT(SEARCH('{CustomMetrics, WorkflowName} MetricName=\"GitHubActionRunsFailedCount\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          period  = 1800
+          stacked = true
+          region  = "eu-west-2"
+          title   = "GitHub actions-run-failed-count-by-workflow"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "count"
             }
           }
         }
@@ -828,8 +1038,11 @@ locals {
       height          = 8
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        local.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+        local.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
         local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
         local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed
       ]
     }
     ec2_windows = {
@@ -922,6 +1135,7 @@ locals {
       height          = 8
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-status,
+        local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-response-time-ms,
         local.cloudwatch_dashboard_widgets.ec2_instance_cwagent_collectd_endpoint_monitoring.endpoint-cert-days-to-expiry,
       ]
     }
@@ -934,15 +1148,15 @@ locals {
         local.cloudwatch_dashboard_widgets.lb.load-balancer-requests,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-http-4XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-http-5XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-processed-bandwidth,
+        local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-requests,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-4XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-5XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-active-connections,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-new-connections,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-connection-errors,
-        local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
-        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
-        null,
       ]
     }
     network_lb = {
@@ -953,18 +1167,32 @@ locals {
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-unhealthy-host-count,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-active-flow-count,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-new-flow-count,
-        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-bytes,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-bandwidth,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-packets,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-peak-packets-per-second,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-port-allocation-error-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-rejected-flow-count,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-tcp-client-reset-count,
       ]
     }
-    custom = {
-      header_markdown = "## Custom Metrics"
+    ssm_command = {
+      header_markdown = "## SSM Command Metrics"
       width           = 8
       height          = 8
       widgets = [
-        local.cloudwatch_dashboard_widgets.ssm.ssm-command-invocation-status,
-        local.cloudwatch_dashboard_widgets.github.github-failed-workflow-runs,
+        local.cloudwatch_dashboard_widgets.ssm.ssm-command-success-count,
+        local.cloudwatch_dashboard_widgets.ssm.ssm-command-failed-count,
+        local.cloudwatch_dashboard_widgets.ssm.ssm-command-ignore-count,
+      ]
+    }
+    github_workflows = {
+      header_markdown = "## GitHub Workflow Metrics"
+      width           = 8
+      height          = 8
+      widgets = [
+        local.cloudwatch_dashboard_widgets.github.github-actions-run-success-count-by-repo,
+        local.cloudwatch_dashboard_widgets.github.github-actions-run-failed-count-by-repo,
+        local.cloudwatch_dashboard_widgets.github.github-actions-run-failed-count-by-workflow,
       ]
     }
   }

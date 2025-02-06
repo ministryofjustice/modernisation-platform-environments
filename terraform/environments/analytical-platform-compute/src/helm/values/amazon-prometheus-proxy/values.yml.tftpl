@@ -14,6 +14,10 @@ alertmanager:
 grafana:
   enabled: false
 
+kube-state-metrics:
+  extraArgs:
+    - --metric-labels-allowlist=pods=[*]
+
 prometheus:
   agentMode: true
   serviceAccount:
