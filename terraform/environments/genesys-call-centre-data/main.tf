@@ -44,7 +44,7 @@ resource "aws_guardduty_member" "default" {
 
 resource "aws_guardduty_publishing_destination" "default" {
   detector_id     = aws_guardduty_detector.default.id
-  destination_arn = aws_s3_bucket.default.arn
+  destination_arn = module.s3_bucket_staging.bucket.arn
   kms_key_arn     = aws_kms_key.s3.arn
   depends_on = [
     module.s3_bucket_staging,
