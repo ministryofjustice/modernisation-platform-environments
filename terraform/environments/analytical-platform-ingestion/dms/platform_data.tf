@@ -3,6 +3,22 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
+data "aws_vpc" "shared" {
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+data "aws_subnet_ids" "private" {
+  vpc_id = data.aws_vpc.shared.id
+
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+
+
 # Route53 DNS data
 data "aws_route53_zone" "network-services" {
   provider = aws.core-network-services
@@ -44,3 +60,4 @@ data "aws_iam_session_context" "whoami" {
 data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
+
