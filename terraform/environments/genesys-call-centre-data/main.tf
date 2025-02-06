@@ -3,7 +3,7 @@
 
 # S3 Bucket - Landing
 module "s3_landing_bucket" {
-  source             = var.s3_source
+  source             = "./modules/s3"
   bucket_name        = var.s3_bucket_landing
   # bucket_acl         = var.acl
   versioning_enabled = var.versioning_enabled
@@ -13,7 +13,7 @@ module "s3_landing_bucket" {
 
 # S3 Bucket - Logs
 module "s3_logs_bucket" {
-  source             = var.s3_source
+  source             = "./modules/s3"
   bucket_name        = var.s3_bucket_logs
   # bucket_acl         = var.acl
   versioning_enabled = var.versioning_enabled
