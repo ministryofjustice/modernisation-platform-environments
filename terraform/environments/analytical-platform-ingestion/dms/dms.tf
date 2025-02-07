@@ -5,6 +5,7 @@ resource "aws_dms_endpoint" "source_endpoint" {
   engine_name   = var.source_database.engine_name
   username      = var.source_database.username
   password      = var.source_database.password
+  kms_key_arn   = var.dms_kms_source_cmk.type.arn
   server_name   = var.source_database.server_name
   port          = var.source_database.port
   database_name = var.source_database.database_name
@@ -27,7 +28,7 @@ resource "aws_security_group" "vpc_dms_replication_instance_group" {
 # DMS Replication Subnet Group
 resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
   replication_subnet_group_id          = "dms-replication-subnet-group"
-  subnet_ids                           = data.aws_subnets.shared-public.ids
+  subnet_ids                          = data.aws_subnet_ids.private.id
   replication_subnet_group_description = "DMS replication subnet group"
 }
 
@@ -35,16 +36,17 @@ resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
 resource "aws_dms_replication_instance" "replication_instance" {
   replication_instance_id     = "dms-replication-instance"
   replication_instance_class  = var.replication_instance_class
-  replication_subnet_group_id = aws_dms_replication_subnet_group.replication_subnet_group.id
+  vpc_security_group_ids      = [aws_security_group.vpc_dms_replication_instance_group.id]
+  replication_subnet_group_id = "dms-replication-subnet-group"
   publicly_accessible         = false
 }
 
 # DMS Replication Task
 resource "aws_dms_replication_task" "replication_task" {
   replication_task_id       = "${replace(var.database_name, "_", "-")}-db-migration-task-tf"
-  table_mappings            = trimspace(file("${path.module}/dms_${var.database_name}_task_transformations.json"))
+  table_mappings            = file("${path.module}/metadata/${var.database_name}")
   migration_type            = "full-load-and-cdc"
-  replication_instance_arn  = aws_dms_replication_instance.replication_instance.arn
-  source_endpoint_arn       = aws_dms_endpoint.source_endpoint.arn
-  target_endpoint_arn       = aws_dms_s3_endpoint.s3_target_endpoint.arn
+  replication_instance_arn  = aws_dms_replication_instance.replication_instance.id
+  source_endpoint_arn       = aws_dms_endpoint.source_endpoint.id
+  target_endpoint_arn       = aws_dms_s3_endpoint.s3_target_endpoint.id
 }
