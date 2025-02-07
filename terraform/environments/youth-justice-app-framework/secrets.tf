@@ -21,7 +21,7 @@ resource "aws_secretsmanager_secret_version" "auto_admit_version" {
 
 resource "aws_secretsmanager_secret" "LDAP_administration_secret" {
   #checkov:skip=CKV2_AWS_57:todo add rotation if needed
-  name        = "LDAP-administration"
+  name        = "LDAP-administration-user"
   description = "Password for LDAP-administration"
   kms_key_id  = module.kms.key_id
   tags        = local.tags
