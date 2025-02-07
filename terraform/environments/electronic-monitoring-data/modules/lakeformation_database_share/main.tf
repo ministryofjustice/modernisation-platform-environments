@@ -1,3 +1,6 @@
+locals {
+  dbs_to_create = var.db_exists ? toset([]) : toset(var.dbs_to_grant)
+}
 data "aws_caller_identity" "current" {}
 
 resource "aws_lakeformation_permissions" "s3_bucket_permissions" {
@@ -61,12 +64,11 @@ resource "aws_lakeformation_permissions" "grant_cadt_tables_de" {
 }
 
 resource "aws_glue_catalog_database" "cadt_databases" {
-  for_each = var.dbs_to_grant
+  for_each = local.dbs_to_create
 
   name = each.value
-
   lifecycle {
-    # Only ignore changes to the properties, but allow the resource itself to be removed
+    prevent_destroy = true
     ignore_changes = [
       description,
       location_uri,

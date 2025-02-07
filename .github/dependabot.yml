@@ -34,6 +34,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-ingestion/dms"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-ingestion/modules/routes"
     schedule:
       interval: "daily"
@@ -227,18 +231,6 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-mis/modules/mis_environment"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-nextcloud"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-nextcloud/modules/components/nextcloud"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-nextcloud/modules/environment"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -699,6 +691,14 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/sprinkler"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/sprinkler/playground"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/sprinkler/testbed"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

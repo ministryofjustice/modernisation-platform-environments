@@ -11,7 +11,13 @@ variable project_id {
   description = "(Required) Project Short ID that will be used for resources."
 }
 
+
 variable short_name {
+  type        = string
+  description = "(Required) Short name of the project."
+}
+
+variable "collaborator_access" {
   type        = string
   description = "(Required) Short name of the project."
 }

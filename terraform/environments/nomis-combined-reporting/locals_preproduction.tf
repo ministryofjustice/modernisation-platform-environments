@@ -32,85 +32,6 @@ locals {
       }
     }
 
-    ec2_autoscaling_groups = {
-      pp-ncr-app = merge(local.ec2_autoscaling_groups.bip_app, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_app.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_app.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_app.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_app.tags, {
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
-
-      pp-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 2
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_cms.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_cms.tags, {
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
-
-      pp-ncr-webadmin = merge(local.ec2_autoscaling_groups.bip_webadmin, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_webadmin.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_webadmin.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_webadmin.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_webadmin.tags, {
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
-
-      pp-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_web.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
-            "Ec2PPReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_web.tags, {
-          nomis-combined-reporting-environment = "pp"
-        })
-      })
-    }
-
     ec2_instances = {
 
       ls-ncr-db-1-a = merge(local.ec2_instances.db, {
@@ -334,7 +255,7 @@ locals {
     lbs = {
       private = merge(local.lbs.private, {
         instance_target_groups = {
-          private-pp-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+          private-pp-http-7777 = merge(local.lbs.private.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "pp-ncr-web-1" },
             ]

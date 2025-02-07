@@ -6,7 +6,7 @@ locals {
   }
   dbt_suffix             = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
   admin_roles            = local.is-development ? "sandbox_" : "data-eng"
-  suffix                 = local.is-production ? "" : "-test"
+  suffix                 = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
   live_feed_dbs          = ["serco_fms", "allied_mdss", "staged_fms", "preprocessed_fms"]
   prod_dbs_to_grant      = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock"] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
@@ -81,7 +81,7 @@ data "tls_certificate" "dbt_analytics" {
 
 ## OIDC, OpenID Connect
 resource "aws_iam_openid_connect_provider" "cluster" {
-  count           = local.is-production ? 0 : 1
+  count           = local.is-production || local.is-preproduction ? 0 : 1
   client_id_list  = ["sts.amazonaws.com"]
   thumbprint_list = [data.tls_certificate.dbt_analytics.certificates[0].sha1_fingerprint]
   url             = "https://oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}"
@@ -117,7 +117,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
 
     principals {
       type        = "Federated"
-      identifiers = [local.is-production ? aws_iam_openid_connect_provider.analytical_platform_compute.arn : aws_iam_openid_connect_provider.cluster[0].arn]
+      identifiers = [local.is-production || local.is-preproduction ? aws_iam_openid_connect_provider.analytical_platform_compute.arn : aws_iam_openid_connect_provider.cluster[0].arn]
     }
     condition {
       test     = "StringEquals"
