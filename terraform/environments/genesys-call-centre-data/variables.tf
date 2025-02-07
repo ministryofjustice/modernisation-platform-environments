@@ -315,23 +315,17 @@ variable "aws_kms_key_s3_policy_statement_resource" {
   default     = "*"
 }
 
-# variable "ownership_controls" {
-#   type        = string
-#   description = "Bucket Ownership Controls - for use WITH acl var above options are 'BucketOwnerPreferred' or 'ObjectWriter'. To disable ACLs and use new AWS recommended controls set this to 'BucketOwnerEnforced' and which will disabled ACLs and ignore var.acl"
-#   default     = "ObjectWriter"
-# }
-
 variable "ownership_controls" {
   type        = string
   description = "Bucket Ownership Controls - for use WITH acl var above options are 'BucketOwnerPreferred' or 'ObjectWriter'. To disable ACLs and use new AWS recommended controls set this to 'BucketOwnerEnforced' and which will disabled ACLs and ignore var.acl"
   default     = "BucketOwnerEnforced"
 }
 
-variable "acl" {
-  type        = string
-  description = "Use canned ACL on the bucket instead of BucketOwnerEnforced ownership controls. var.ownership_controls must be set to corresponding value below."
-  default     = "private"
-}
+# variable "acl" {
+#   type        = string
+#   description = "Use canned ACL on the bucket instead of BucketOwnerEnforced ownership controls. var.ownership_controls must be set to corresponding value below."
+#   default     = "private"
+# }
 
 variable "bucket_name" {
   type        = string

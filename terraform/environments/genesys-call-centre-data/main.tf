@@ -1,3 +1,18 @@
+locals {
+  bt_supplier_account_mapping = {
+    "production"    = null
+    "preproduction" = null
+    "test"          = null
+    "development" = {
+      "account_number" = 572734708359
+      "role_name"      = "dev-datatransfer-lambda-role"
+    }
+  }
+  tags = {
+    # key/value pair of the terraforms
+  }
+}
+
 module "s3_bucket_staging" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=11707a540d9ced11f8df4a8ed1547753dd3a0b7d"
 
@@ -5,7 +20,7 @@ module "s3_bucket_staging" {
   versioning_enabled = var.versioning_enabled
 
   ownership_controls = var.ownership_controls
-  acl                = var.acl
+  # acl                = var.acl
 
   replication_enabled = var.replication_enabled
   replication_region  = var.replication_region
@@ -15,7 +30,7 @@ module "s3_bucket_staging" {
   }
 
   lifecycle_rule = var.lifecycle_rule
-  tags = local.tags
+  tags           = local.tags
 }
 
 resource "aws_guardduty_detector" "default" {
@@ -63,26 +78,26 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
   }
 }
 
-resource "aws_s3_bucket_public_access_block" "default" {
-  bucket                  = module.s3_bucket_staging.bucket.id
-  block_public_acls       = var.block_public_acls
-  block_public_policy     = var.block_public_policy
-  ignore_public_acls      = var.ignore_public_acls
-  restrict_public_buckets = var.restrict_public_buckets
-}
+# resource "aws_s3_bucket_public_access_block" "default" {
+#   bucket                  = module.s3_bucket_staging.bucket.id
+#   block_public_acls       = var.block_public_acls
+#   block_public_policy     = var.block_public_policy
+#   ignore_public_acls      = var.ignore_public_acls
+#   restrict_public_buckets = var.restrict_public_buckets
+# }
 
-data "aws_iam_policy_document" "s3-assume-role-policy" {
-  version = var.json_encode_decode_version
-  statement {
-    effect  = var.moj_aws_iam_policy_document_statement_effect
-    actions = var.moj_aws_iam_policy_document_statement_actions
+# data "aws_iam_policy_document" "s3-assume-role-policy" {
+#   version = var.json_encode_decode_version
+#   statement {
+#     effect  = var.moj_aws_iam_policy_document_statement_effect
+#     actions = var.moj_aws_iam_policy_document_statement_actions
 
-    principals {
-      type        = var.moj_aws_iam_policy_document_principals_type
-      identifiers = var.moj_aws_iam_policy_document_principals_identifiers
-    }
-  }
-}
+#     principals {
+#       type        = var.moj_aws_iam_policy_document_principals_type
+#       identifiers = var.moj_aws_iam_policy_document_principals_identifiers
+#     }
+#   }
+# }
 
 resource "aws_s3_bucket_policy" "default" {
   bucket = module.s3_bucket_staging.bucket.id
