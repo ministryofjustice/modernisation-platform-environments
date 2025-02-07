@@ -183,7 +183,7 @@ resource "aws_instance" "concurrent_manager" {
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = local.cm_ec2_name },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "no" } : { "snapshot-with-daily-35-day-retention" = "yes" }
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-daily-35-day-retention" = "yes" }
   )
 
   depends_on = [time_sleep.wait_cm_custom_script] # This resource creation will be delayed to ensure object exists in the bucket

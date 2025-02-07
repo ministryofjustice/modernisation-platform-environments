@@ -240,7 +240,7 @@ resource "aws_instance" "app2" {
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${upper(local.application_name_short)} App Instance 2" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "no" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 
   depends_on = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
