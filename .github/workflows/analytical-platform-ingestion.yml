@@ -42,9 +42,17 @@
         # so the strategy can load environment info from it.
         application: "${{ github.workflow }}"  # Typically: "analytical-platform-ingestion"
 
+    skipping_terraform:
+      needs: strategy
+      if: ${{ inputs.action != 'destroy' && (needs.strategy.outputs.matrix == '' || toJson(fromJson(needs.strategy.outputs.matrix)) == '[]')}}  # conversion from and to Json standardises output
+      runs-on: ubuntu-latest
+      steps:
+        - name: Skip Terraform
+          run: echo "No terraform changes detected. Skipping Terraform plan/apply."
+
     terraform:
       needs: strategy
-      if: ${{ inputs.action != 'destroy' && needs.strategy.outputs.matrix != '' && toJson(fromJson(needs.strategy.outputs.matrix)) != '[]'}} # if this works, I don't know why
+      if: ${{ inputs.action != 'destroy' && needs.strategy.outputs.matrix != '' && toJson(fromJson(needs.strategy.outputs.matrix)) != '[]'}}  # conversion from and to Json standardises output
       strategy:
         fail-fast: false
         matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
