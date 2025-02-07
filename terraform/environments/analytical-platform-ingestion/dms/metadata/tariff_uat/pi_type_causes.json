@@ -1,0 +1,37 @@
+{
+    "$schema": "https://moj-analytical-services.github.io/metadata_schema/table/v1.4.0.json",
+    "name": "pi_type_causes",
+    "description": "",
+    "data_format": "parquet",
+    "columns": [
+        {
+            "name": "op",
+            "type": "character",
+            "description": "Type of change, for rows added by ongoing replication.",
+            "nullable": true,
+            "enum": [
+                "I",
+                "U",
+                "D"
+            ]
+        },
+        {
+            "name": "pi_type_cause",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "pi_type_cause",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        }
+    ],
+    "location": "PI_TYPE_CAUSES/",
+    "primary_key": [
+        "pi_type_cause"
+    ],
+    "partitions": null
+}
+
