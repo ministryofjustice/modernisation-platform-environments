@@ -107,12 +107,14 @@ jobs:
               fi
 
               # If changes are detected, add an entry to the matrix.
-              if [ "$firstEntry" = true ]; then
-                firstEntry=false
-              else
-                echo "," >> final-list.json
+              if [ "$comp" != "root" ]; then
+                if [ "$firstEntry" = true ]; then
+                  firstEntry=false
+                else
+                  echo "," >> final-list.json
+                fi
+                echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
               fi
-              echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
             done
 
             # If root has changes but no components, add root to the matrix.
