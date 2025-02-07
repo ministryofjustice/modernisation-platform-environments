@@ -138,12 +138,6 @@ variable dms_kms_source_cmk {
   })
 }
 
-variable flow_log_cloudwatch_log_group_kms_key_id {
-  description = "The ARN of the KMS Key to use when encrypting log data for VPC flow logs"
-  type        = string
-  default     = null
-}
-
 
 # DMS - General
 
