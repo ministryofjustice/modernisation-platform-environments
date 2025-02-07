@@ -58,7 +58,8 @@ jobs:
           fi
 
           # 2) Discover valid subfolders that contain a platform_backend.tf file.
-          COMPONENTS="root"  # Include the root folder as "root".
+          # We always include the application folder itself as "root".
+          COMPONENTS="root"
           if [ -d "terraform/environments/${{ inputs.application }}" ]; then
             for d in $(find "terraform/environments/${{ inputs.application }}" -mindepth 1 -maxdepth 1 -type d); do
               subfolder="$(basename "$d" | tr -d '\r\n')"
@@ -72,32 +73,52 @@ jobs:
           echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
 
           # 3) Build the final matrix by looping over environments and components.
-          #    Only add an entry if the component folder has changes relative to main.
+          #    Only add an entry if the folder has changes relative to main.
+          #    For "root", we only consider changes to files directly in the application folder.
           echo "[" > final-list.json
           firstEntry=true
 
           while IFS= read -r envobj; do
             for comp in $COMPONENTS; do
-              # Determine which folder to check.
               if [ "$comp" = "root" ]; then
-                folder="."
-              else
-                folder="terraform/environments/${{ inputs.application }}/$comp"
-              fi
-
-              if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
-                # Compute the merge base using the branch tip.
-                merge_base=$(git merge-base origin/main "$head_commit")
-                # Compare the changes between the merge base and the branch tip for the folder.
-                if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
-                  echo "Skipping '$comp' as no changes detected in '$folder' (branch compared to merge base)"
+                # For the top-level (application) folder, restrict to files directly within it.
+                folder="terraform/environments/${{ inputs.application }}"
+                if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+                  merge_base=$(git merge-base origin/main "$head_commit")
+                  changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
+                else
+                  changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
+                fi
+                top_level_changed=false
+                prefix="$folder/"
+                for f in $changed_files; do
+                  # Only consider files directly under $folder (i.e. with no further subdirectories)
+                  if [[ "$f" == "$prefix"* ]]; then
+                    rel="${f#$prefix}"
+                    if [[ "$rel" != *"/"* ]]; then
+                      top_level_changed=true
+                      break
+                    fi
+                  fi
+                done
+                if ! $top_level_changed; then
+                  echo "Skipping 'root' as no top-level changes detected in '$folder'"
                   continue
                 fi
               else
-                # On main, compare the last commit.
-                if git diff --quiet HEAD~1 HEAD -- "$folder"; then
-                  echo "Skipping '$comp' as no changes detected in '$folder' (main branch)"
-                  continue
+                # For component subfolders, use the standard diff check.
+                folder="terraform/environments/${{ inputs.application }}/$comp"
+                if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+                  merge_base=$(git merge-base origin/main "$head_commit")
+                  if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
+                    echo "Skipping '$comp' as no changes detected in '$folder' (branch compared to merge base)"
+                    continue
+                  fi
+                else
+                  if git diff --quiet HEAD~1 HEAD -- "$folder"; then
+                    echo "Skipping '$comp' as no changes detected in '$folder' (main branch)"
+                    continue
+                  fi
                 fi
               fi
 
