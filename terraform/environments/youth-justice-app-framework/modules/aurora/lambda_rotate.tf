@@ -1,3 +1,7 @@
+locals {
+  user_admin_secret_arns = values(aws_secretsmanager_secret.user_admin_secret)[*].arn
+}
+
 resource "aws_lambda_function" "rds_secret_rotation" {
   #checkov:skip=CKV_AWS_50: "X-ray tracing is not required"
   #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"#checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
@@ -50,6 +54,7 @@ resource "aws_iam_role_policy_attachment" "rds_secret_rotation_secrets_policy_VP
 }
 
 resource "aws_iam_policy" "rds_secret_rotation_policy" {
+  #checkov:skip=CKV_AWS_356: get random password is required for the lambda to rotate the secret
   name        = "rds-secret-rotation-policy"
   description = "Allows Lambda to rotate RDS credentials"
   policy = jsonencode({
@@ -58,7 +63,7 @@ resource "aws_iam_policy" "rds_secret_rotation_policy" {
       {
         "Condition" : {
           "StringEquals" : {
-            "secretsmanager:resource/AllowRotationLambdaArn" : "${aws_lambda_function.rds_secret_rotation.arn}"
+            "secretsmanager:resource/AllowRotationLambdaArn" : aws_lambda_function.rds_secret_rotation.arn
           }
         },
         "Action" : [
@@ -67,22 +72,12 @@ resource "aws_iam_policy" "rds_secret_rotation_policy" {
           "secretsmanager:PutSecretValue",
           "secretsmanager:UpdateSecretVersionStage"
         ],
-        "Resource" : "arn:aws:secretsmanager:eu-west-2:${var.aws_account_id}:secret:*",
+        "Resource" : local.user_admin_secret_arns,
         "Effect" : "Allow"
       },
       {
         "Action" : [
           "secretsmanager:GetRandomPassword"
-        ],
-        "Resource" : "*",
-        "Effect" : "Allow"
-      },
-      {
-        "Action" : [
-          "ec2:CreateNetworkInterface",
-          "ec2:DeleteNetworkInterface",
-          "ec2:DescribeNetworkInterfaces",
-          "ec2:DetachNetworkInterface"
         ],
         "Resource" : "*",
         "Effect" : "Allow"
@@ -97,11 +92,12 @@ resource "aws_iam_role_policy_attachment" "rds_secret_rotation_policy_attach_cus
 }
 
 resource "aws_lambda_permission" "allow_secrets_manager" {
+  for_each      = toset(var.user_passwords_to_reset)
   statement_id  = "AllowSecretsManagerInvoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.rds_secret_rotation.function_name
   principal     = "secretsmanager.amazonaws.com"
 
   # Restrict invocation to a specific AWS account
-  source_account = var.aws_account_id
+  source_arn = aws_secretsmanager_secret.user_admin_secret[each.value].arn
 }

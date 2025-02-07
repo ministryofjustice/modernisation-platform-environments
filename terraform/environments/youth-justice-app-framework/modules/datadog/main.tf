@@ -11,13 +11,14 @@ data "aws_iam_policy_document" "datadog_aws_integration_assume_role" {
       variable = "sts:ExternalId"
 
       values = [
-        "${var.datadog_integration_external_id}"
+        var.datadog_integration_external_id
       ]
     }
   }
 }
 
 data "aws_iam_policy_document" "datadog_aws_integration" {
+  #checkov:skip=CKV_AWS_356: datadog required
   statement {
     actions = [
       "apigateway:GET",
