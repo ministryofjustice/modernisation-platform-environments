@@ -21,7 +21,7 @@ jobs:
       matrix: "${{ steps.strategy.outputs.matrix }}"
     steps:
       - name: Check out Repo
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b
 
       - name: Generate Strategy Matrix
         id: strategy
@@ -39,8 +39,8 @@ jobs:
             head_commit=HEAD
           fi
 
-          # 1) Fetch environment data from <application>.json.
-          if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
+          # Fetch environment data from <application>.json.
+          if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
             # On a branch: production gets "plan", dev/test get "plan_apply".
             curl -s -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
               | jq -c '.environments[] as $env |
@@ -57,8 +57,7 @@ jobs:
               > envlist.json
           fi
 
-          # 2) Discover valid subfolders that contain a platform_backend.tf file.
-          # We always include the application folder itself as "root".
+          # Discover valid subfolders that contain a platform_backend.tf file and check for changes.
           COMPONENTS="root"
           if [ -d "terraform/environments/${{ inputs.application }}" ]; then
             for d in $(find "terraform/environments/${{ inputs.application }}" -mindepth 1 -maxdepth 1 -type d); do
@@ -72,54 +71,39 @@ jobs:
 
           echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
 
-          # 3) Build the final matrix by looping over environments and components.
-          #    Only add an entry if the folder has changes relative to main.
-          #    For "root", we only consider changes to files directly in the application folder.
+          # Build the final matrix by looping over environments and components.
           echo "[" > final-list.json
           firstEntry=true
 
           while IFS= read -r envobj; do
+            root_changed=false
+            component_changed=false
+
             for comp in $COMPONENTS; do
-              if [ "$comp" = "root" ]; then
-                # For the top-level (application) folder, restrict to files directly within it.
-                folder="terraform/environments/${{ inputs.application }}"
-                if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
-                  merge_base=$(git merge-base origin/main "$head_commit")
-                  changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
-                else
-                  changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
-                fi
-                top_level_changed=false
-                prefix="$folder/"
-                for f in $changed_files; do
-                  # Only consider files directly under $folder (i.e. with no further subdirectories)
-                  if [[ "$f" == "$prefix"* ]]; then
-                    rel="${f#$prefix}"
-                    if [[ "$rel" != *"/"* ]]; then
-                      top_level_changed=true
-                      break
-                    fi
-                  fi
-                done
-                if ! $top_level_changed; then
-                  echo "Skipping 'root' as no top-level changes detected in '$folder'"
+              folder="terraform/environments/${{ inputs.application }}"
+              if [ "$comp" != "root" ]; then
+                folder="$folder/$comp"
+              fi
+
+              # Check for changes in the folder.
+              if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+                merge_base=$(git merge-base origin/main "$head_commit")
+                if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
+                  echo "Skipping '$comp' as no changes detected in '$folder' (branch compared to merge base)"
                   continue
                 fi
               else
-                # For component subfolders, use the standard diff check.
-                folder="terraform/environments/${{ inputs.application }}/$comp"
-                if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
-                  merge_base=$(git merge-base origin/main "$head_commit")
-                  if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
-                    echo "Skipping '$comp' as no changes detected in '$folder' (branch compared to merge base)"
-                    continue
-                  fi
-                else
-                  if git diff --quiet HEAD~1 HEAD -- "$folder"; then
-                    echo "Skipping '$comp' as no changes detected in '$folder' (main branch)"
-                    continue
-                  fi
+                if git diff --quiet HEAD~1 HEAD -- "$folder"; then
+                  echo "Skipping '$comp' as no changes detected in '$folder' (main branch)"
+                  continue
                 fi
+              fi
+
+              # If changes are detected, mark the appropriate flag.
+              if [ "$comp" == "root" ]; then
+                root_changed=true
+              else
+                component_changed=true
               fi
 
               # If changes are detected, add an entry to the matrix.
@@ -130,6 +114,17 @@ jobs:
               fi
               echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
             done
+
+            # If root has changes but no components, add root to the matrix.
+            if $root_changed && ! $component_changed; then
+              if [ "$firstEntry" = true ]; then
+                firstEntry=false
+              else
+                echo "," >> final-list.json
+              fi
+              echo -n "$envobj" | jq --arg comp "root" '. + {"component": $comp}' >> final-list.json
+            fi
+
           done < envlist.json || true
 
           echo "]" >> final-list.json
