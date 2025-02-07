@@ -15,7 +15,7 @@ locals {
       subnets                          = module.environment.subnets["private"].ids
 
       instance_target_groups = {
-        web = {
+        http-7777 = {
           port     = 7777
           protocol = "HTTP"
           health_check = {
