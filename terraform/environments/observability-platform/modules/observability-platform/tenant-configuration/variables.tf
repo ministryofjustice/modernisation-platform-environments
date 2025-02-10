@@ -10,6 +10,11 @@ variable "identity_centre_team" {
   type = string
 }
 
+variable "identity_centre_viewer_teams" {
+  type    = list(string)
+  default = []
+}
+
 variable "aws_accounts" {
   type = map(object({
     cloudwatch_enabled                 = optional(bool)

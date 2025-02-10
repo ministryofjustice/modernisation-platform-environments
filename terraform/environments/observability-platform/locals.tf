@@ -2,7 +2,10 @@
 locals {
   all_identity_centre_teams = distinct(flatten([
     for tenant_name, tenant_config in local.environment_configuration.tenant_configuration :
-    lookup(tenant_config, "identity_centre_team", []) if tenant_name != "observability-platform"
+    concat(
+      lookup(tenant_config, "identity_centre_team", []),
+      lookup(tenant_config, "identity_centre_viewer_teams", [])
+    ) if tenant_name != "observability-platform"
   ]))
 
   all_slack_channels = distinct(flatten([

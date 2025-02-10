@@ -7,8 +7,9 @@ module "tenant_configuration" {
     aws.sso = aws.sso-readonly
   }
 
-  environment_management = local.environment_management
-  name                   = each.key
-  identity_centre_team   = each.value.identity_centre_team
-  aws_accounts           = each.value.aws_accounts
+  environment_management       = local.environment_management
+  name                         = each.key
+  identity_centre_team         = each.value.identity_centre_team
+  identity_centre_viewer_teams = try(each.value.identity_centre_viewer_teams, [])
+  aws_accounts                 = each.value.aws_accounts
 }

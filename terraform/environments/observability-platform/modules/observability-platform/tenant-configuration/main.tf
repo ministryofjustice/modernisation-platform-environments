@@ -92,3 +92,17 @@ module "team" {
     module.athena_source
   ]
 }
+
+# module "viewer_team" {
+#   for_each = var.identity_centre_viewer_teams
+
+#   source = "../../grafana/viewer-team"
+
+#   providers = {
+#     aws = aws.sso
+#   }
+
+#   name = each.key
+
+#   depends_on = [module.team]
+# }

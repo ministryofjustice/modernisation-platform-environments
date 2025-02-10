@@ -37,7 +37,8 @@ locals {
           }
         },
         "analytical-platform" = {
-          identity_centre_team = "analytical-platform"
+          identity_centre_team         = "analytical-platform"
+          identity_centre_viewer_teams = ["analytical-platform-airflow"]
           aws_accounts = {
             "analytical-platform-common-production" = {
               cloudwatch_enabled              = true
