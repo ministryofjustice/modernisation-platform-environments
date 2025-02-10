@@ -14,5 +14,5 @@ module "production_replication_cica_dms_iam_role" {
 
   trusted_role_services = ["s3.amazonaws.com"]
 
-  custom_role_policy_arns = [module.production_replication_cica_dms_iam_policy.arn]
+  custom_role_policy_arns = [module.production_replication_cica_dms_iam_policy[0].arn]
 }
