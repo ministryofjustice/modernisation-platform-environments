@@ -19,7 +19,7 @@ module "s3_cica_dms_egress_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::593291632749:role/mojap-data-production-cica-dms-egress-${local.environment}"]
+          identifiers = ["arn:aws:iam::593291632749:role/mojap-data-production-cica-dms-egress-production"]
         }
       ]
     }
