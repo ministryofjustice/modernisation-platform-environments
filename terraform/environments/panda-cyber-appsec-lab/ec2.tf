@@ -168,7 +168,7 @@ resource "aws_security_group" "defect_dojo_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.my_ip]
   }
-  
+
   egress {
     description = "Allow all traffic outbound"
     from_port   = 0
