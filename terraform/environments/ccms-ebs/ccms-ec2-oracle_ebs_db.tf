@@ -446,7 +446,7 @@ resource "aws_volume_attachment" "swap2_att" {
     aws_ebs_volume.swap2
   ]
   device_name = "/dev/sdx"
-  volume_id   = aws_ebs_volume.swap2.id
+  volume_id   = aws_ebs_volume.swap2[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
