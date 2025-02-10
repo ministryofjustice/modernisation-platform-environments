@@ -73,7 +73,10 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 # Add a local to get the keys
 locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  sns_names_map              = tomap({ "lambda_failure" : aws_sns_topic.lambda_failure.name, "fms_bucket_alarm" : aws_sns_topic.fms_land_bucket_count.name })
+  sns_names_map              = tomap({
+      "lambda_failure" : aws_sns_topic.lambda_failure.name,
+      "fms_bucket_alarm" : aws_sns_topic.fms_land_bucket_count.name
+  })
 }
 
 # link the sns topic to the service
