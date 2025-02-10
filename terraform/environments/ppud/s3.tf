@@ -465,8 +465,8 @@ resource "aws_s3_bucket_versioning" "moj-log-files-prod" {
 }
 
 resource "aws_s3_bucket_logging" "moj-log-files-prod" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-log-files-prod[0].id
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/moj-log-files-prod-logs/"
 }
