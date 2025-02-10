@@ -16,7 +16,6 @@
       paths:
         - 'terraform/environments/analytical-platform-ingestion/**'
         - '.github/workflows/analytical-platform-ingestion.yml'
-        - '.github/workflows/reusable_terraform_component_strategy.yml'
 
     workflow_dispatch:
       inputs:
