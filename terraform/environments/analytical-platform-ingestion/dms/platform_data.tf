@@ -3,28 +3,6 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-data "aws_vpc" "shared" {
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}"
-  }
-}
-
-data "aws_kms_secret" "dms" {
-    provider = aws.core-network-services
-    secret_arn = var.dms_kms_secret_arn
-    encryption_context = {
-    "Key" = "Value"
-  }
-}
-
-data "aws_subnet_ids" "private" {
-  vpc_id = data.aws_vpc.shared.id
-
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}"
-  }
-}
-
 # Route53 DNS data
 data "aws_route53_zone" "network-services" {
   provider = aws.core-network-services
