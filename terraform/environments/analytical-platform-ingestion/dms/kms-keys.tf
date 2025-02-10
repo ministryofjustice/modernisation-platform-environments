@@ -6,7 +6,7 @@ module "s3_cica_dms_ingress_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
-  aliases               = ["s3/cica-dms-egress"]
+  aliases               = ["s3/cica-dms-ingress"]
   description           = "Used in the CICA DMS Ingress Solution"
   enable_default_policy = true
   key_statements = [

@@ -1,6 +1,6 @@
 #tfsec:ignore:avd-aws-0088 - The bucket policy is attached to the bucket
 #tfsec:ignore:avd-aws-0132 - The bucket policy is attached to the bucket
-module "cica_dms_egress_bucket" {
+module "cica_dms_ingress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   count = local.environment == "production" ? 1 : 0
@@ -54,19 +54,19 @@ module "cica_dms_egress_bucket" {
   }
 
   attach_policy = true
-  policy        = data.aws_iam_policy_document.cica_dms_egress_bucket_policy.json
+  policy        = data.aws_iam_policy_document.cica_dms_ingress_bucket_policy.json
 
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.s3_cica_dms_egress_kms[0].key_arn
+        kms_master_key_id = module.s3_cica_dms_ingress_kms[0].key_arn
         sse_algorithm     = "aws:kms"
       }
     }
   }
 }
 
-data "aws_iam_policy_document" "cica_dms_egress_bucket_policy" {
+data "aws_iam_policy_document" "cica_dms_ingress_bucket_policy" {
   statement {
     sid    = "ReplicationPermissions"
     effect = "Allow"
