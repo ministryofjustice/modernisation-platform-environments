@@ -95,6 +95,9 @@ resource "aws_instance" "defect_dojo" {
               # Update and install dependencies
               sudo apt-get update
               sudo apt-get upgrade
+              cd /home
+              sudo mkdir appsec
+              cd appsec
               sudo git clone https://github.com/DefectDojo/django-DefectDojo.git
               cd django-DefectDojo
               sudo apt install docker.io -y
@@ -165,7 +168,7 @@ resource "aws_security_group" "defect_dojo_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.my_ip]
   }
-  
+
   egress {
     description = "Allow all traffic outbound"
     from_port   = 0

@@ -1,107 +1,146 @@
 ---
-    name: terraform strategy
+name: terraform strategy
 
-    on:
-      workflow_call:
-        inputs:
-          application:
-            type: string
-            required: true
-            description: "Application name for which this strategy matrix pipeline should run."
-        outputs:
-          matrix:
-            description: "Matrix JSON string to feed that can be used as strategy in a separate terraform job"
-            value: ${{ jobs.strategy.outputs.matrix }}
+on:
+  workflow_call:
+    inputs:
+      application:
+        type: string
+        required: true
+        description: "Application name for which this strategy matrix pipeline should run."
+    outputs:
+      matrix:
+        description: "Matrix JSON string to feed that can be used as strategy in a separate terraform job"
+        value: ${{ jobs.strategy.outputs.matrix }}
 
-    jobs:
-      strategy:
-        name: "strategy"
-        runs-on: ubuntu-latest
-        outputs:
-          matrix: "${{ steps.strategy.outputs.matrix }}"
-        steps:
-          - name: Check out Repo
-            uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b  # v4.1.4
+jobs:
+  strategy:
+    name: "strategy"
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: "${{ steps.strategy.outputs.matrix }}"
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b
 
-          - name: Generate Strategy Matrix
-            id: strategy
-            run: |
-              set -euo pipefail
+      - name: Generate Strategy Matrix
+        id: strategy
+        run: |
+          set -euo pipefail
 
-              # 1) Fetch environment data from <application>.json, produce newline-separated JSON objects
-              if [[ "${{ github.ref }}" != "refs/heads/main" ]]; then
-                # On a branch => plan on all accounts, but plan_apply on dev/test
-                curl -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
-                  | jq -c '.environments[] as $env |
-                      if $env.name | contains("production") then
-                        {"target": $env.name, "action": "plan"}
-                      else
-                        {"target": $env.name, "action": "plan_apply"}
-                      end' \
-                  > envlist.json
-              else
-                # On main => plan_apply on all accounts
-                curl -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
-                  | jq -c '.environments[] | {"target": .name, "action": "plan_apply"}' \
-                  > envlist.json
-              fi
+          # Fetch the main branch so we can compare against it.
+          git fetch origin main
 
-              # At this point, envlist.json might look like:
-              # {"target":"development","action":"plan_apply"}
-              # {"target":"test","action":"plan_apply"}
-              # {"target":"production","action":"plan"}
+          # Determine the commit to use as the tip of the branch.
+          # For pull request events (ref starts with "refs/pull/"), use the PR's head commit.
+          if [[ "${GITHUB_REF}" == refs/pull/* ]]; then
+            head_commit=$(jq --raw-output .pull_request.head.sha "$GITHUB_EVENT_PATH")
+          else
+            head_commit=HEAD
+          fi
 
-              # 2) Discover valid subfolders with platform_backend.tf
-              COMPONENTS=""
-              # Optionally include the root folder as a blank component:
-              COMPONENTS="$COMPONENTS root"
-
-              if [ -d "terraform/environments/${{ inputs.application }}" ]; then
-                for d in $(find "terraform/environments/${{ inputs.application }}" -mindepth 1 -maxdepth 1 -type d); do
-                  subfolder="$(basename "$d" | tr -d '\r\n')"
-                  # Only include if there's a platform_backend.tf in this folder
-                  if [ -f "$d/platform_backend.tf" ]; then
-                    # e.g. skip .terraform or other special folders if needed
-                    [ "$subfolder" = ".terraform" ] && continue
-                    COMPONENTS="$COMPONENTS $subfolder"
-                  fi
-                done
-              fi
-
-              echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
-
-              # 3) Double loop to merge each environment object with each component
-              echo "[" > final-list.json
-              firstOuter=true
-
-              while IFS= read -r envobj; do
-                # envobj is a single-line JSON obj, e.g. {"target":"development","action":"plan_apply"}
-                for c in $COMPONENTS; do
-                  rawC=$(echo "$c" | sed 's/"//g') # remove quotes
-
-                  if [ "$firstOuter" = true ]; then
-                    firstOuter=false
+          # Fetch environment data from <application>.json.
+          if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+            # On a branch: production gets "plan", dev/test get "plan_apply".
+            curl -s -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
+              | jq -c '.environments[] as $env |
+                  if $env.name | contains("production") then
+                    {"target": $env.name, "action": "plan"}
                   else
-                    echo "," >> final-list.json
-                  fi
+                    {"target": $env.name, "action": "plan_apply"}
+                  end' \
+              > envlist.json
+          else
+            # On main: all accounts get "plan_apply".
+            curl -s -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
+              | jq -c '.environments[] | {"target": .name, "action": "plan_apply"}' \
+              > envlist.json
+          fi
 
-                  # Merge environment + { component: $rawC }
-                  echo -n "$envobj" | jq --arg comp "$rawC" '. + {"component": $comp}' >> final-list.json
-                done
-              done < envlist.json
+          # Discover valid subfolders that contain a platform_backend.tf file and check for changes.
+          COMPONENTS="root"
+          if [ -d "terraform/environments/${{ inputs.application }}" ]; then
+            for d in $(find "terraform/environments/${{ inputs.application }}" -mindepth 1 -maxdepth 1 -type d); do
+              subfolder="$(basename "$d" | tr -d '\r\n')"
+              if [ -f "$d/platform_backend.tf" ]; then
+                [ "$subfolder" = ".terraform" ] && continue
+                COMPONENTS="$COMPONENTS $subfolder"
+              fi
+            done
+          fi
 
-              echo "]" >> final-list.json
+          echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
 
-              # Wrap in {"include":[ ... ]} for GitHub Actions
-              echo -n '{"include":' > matrix.out
-              cat final-list.json >> matrix.out
-              echo -n '}' >> matrix.out
+          # Build the final matrix by looping over environments and components.
+          echo "[" > final-list.json
+          firstEntry=true
 
-              matrix=$(cat matrix.out | jq -r)
-              echo "Matrix is:"
-              echo "$matrix"
+          while IFS= read -r envobj; do
+            root_changed=false
+            component_changed=false
 
-              # Output for the next job
-              echo 'matrix<<EOF' >> $GITHUB_OUTPUT
-              echo "${matrix}" >> $GITHUB_OUTPUT
-              echo 'EOF' >> $GITHUB_OUTPUT
+            for comp in $COMPONENTS; do
+              folder="terraform/environments/${{ inputs.application }}"
+              if [ "$comp" != "root" ]; then
+                folder="$folder/$comp"
+              fi
+
+              # Check for changes in the folder.
+              if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+                merge_base=$(git merge-base origin/main "$head_commit")
+                if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
+                  echo "Skipping '$comp' as no changes detected in '$folder' (branch compared to merge base)"
+                  continue
+                fi
+              else
+                if git diff --quiet HEAD~1 HEAD -- "$folder"; then
+                  echo "Skipping '$comp' as no changes detected in '$folder' (main branch)"
+                  continue
+                fi
+              fi
+
+              # If changes are detected, mark the appropriate flag.
+              if [ "$comp" == "root" ]; then
+                root_changed=true
+              else
+                component_changed=true
+              fi
+
+              # If changes are detected, add an entry to the matrix.
+              if [ "$comp" != "root" ]; then
+                if [ "$firstEntry" = true ]; then
+                  firstEntry=false
+                else
+                  echo "," >> final-list.json
+                fi
+                echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
+              fi
+            done
+
+            # If root has changes but no components, add root to the matrix.
+            if $root_changed && ! $component_changed; then
+              if [ "$firstEntry" = true ]; then
+                firstEntry=false
+              else
+                echo "," >> final-list.json
+              fi
+              echo -n "$envobj" | jq --arg comp "root" '. + {"component": $comp}' >> final-list.json
+            fi
+
+          done < envlist.json || true
+
+          echo "]" >> final-list.json
+
+          # Wrap the JSON array in {"include": [...] } for the GitHub Actions matrix.
+          echo -n '{"include":' > matrix.out
+          cat final-list.json >> matrix.out
+          echo '}' >> matrix.out
+
+          matrix=$(cat matrix.out | jq -r)
+          echo "Matrix is:"
+          echo "$matrix"
+
+          # Output the matrix for subsequent jobs.
+          echo 'matrix<<EOF' >> $GITHUB_OUTPUT
+          echo "${matrix}" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
