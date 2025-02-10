@@ -34,7 +34,7 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
     "UseS3ForCRL"            = "No"
     "EntCaServerNetBIOSName" = "SubordinateCA"
     "OrCaServerNetBIOSName"  = "RootCA"
-    "AMI"                    = data.aws_ami.windows_2019.id
+    "AMI"                    = "/aws/service/ami-windows-latest/CIS Microsoft Windows Server 2019 Benchmark - Level 1 -*"
   }
 
   timeouts {
