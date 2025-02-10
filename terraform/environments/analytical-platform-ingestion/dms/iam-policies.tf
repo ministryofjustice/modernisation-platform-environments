@@ -56,10 +56,12 @@ module "production_replication_cica_dms_iam_policy" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
+  count = local.environment == "production" ? 1 : 0
+
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.52.2"
 
-  name_prefix = "analytical-platform-ingestion-production-cica-dms-ingress-production"
+  name_prefix = "cica-dms-ingress-production-replication"
 
   policy = data.aws_iam_policy_document.production_cica_dms_replication.json
 }

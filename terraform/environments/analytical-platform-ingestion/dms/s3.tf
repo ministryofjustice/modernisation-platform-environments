@@ -72,7 +72,7 @@ data "aws_iam_policy_document" "cica_dms_egress_bucket_policy" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::471112983409:role/mojap-data-production-cica-dms-ingress-production"]
+      identifiers = ["arn:aws:iam::471112983409:role/mojap-data-production-cica-dms-ingress-production"] #TODO: Update this / confirm
     }
     actions = [
       "s3:ReplicateObject",
