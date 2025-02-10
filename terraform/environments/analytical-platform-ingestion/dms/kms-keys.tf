@@ -5,7 +5,7 @@ module "s3_cica_dms_egress_kms" {
   version = "3.1.0"
 
   aliases               = ["s3/cica-dms-egress"]
-  description           = "Used in the Bold Egress Solution"
+  description           = "Used in the CICA DMS Egress Solution"
   enable_default_policy = true
   key_statements = [
     {
