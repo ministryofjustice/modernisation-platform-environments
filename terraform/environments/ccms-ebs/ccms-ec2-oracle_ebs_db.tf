@@ -423,32 +423,32 @@ resource "aws_volume_attachment" "dbf04_att" {
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
-resource "aws_ebs_volume" "swap2" {
-  count = local.is-development ? 1 : 0
-  lifecycle {
-    ignore_changes = [kms_key_id]
-  }
-  availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_swap2
-  type              = "io2"
-  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_swap2
-  encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  tags = merge(local.tags,
-    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "swap2")) },
-    { device-name = "/dev/sdx" }
-  )
-}
-
-resource "aws_volume_attachment" "swap2_att" {
-  count = local.is-development ? 1 : 0
-  depends_on = [
-    aws_ebs_volume.swap2
-  ]
-  device_name = "/dev/sdx"
-  volume_id   = aws_ebs_volume.swap2[0].id
-  instance_id = aws_instance.ec2_oracle_ebs.id
-}
+# resource "aws_ebs_volume" "swap2" {
+#   count = local.is-development ? 1 : 0
+#   lifecycle {
+#     ignore_changes = [kms_key_id]
+#   }
+#   availability_zone = "eu-west-2a"
+#   size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_swap2
+#   type              = "io2"
+#   iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_swap2
+#   encrypted         = true
+#   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+#   tags = merge(local.tags,
+#     { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "swap2")) },
+#     { device-name = "/dev/sdx" }
+#   )
+# }
+# 
+# resource "aws_volume_attachment" "swap2_att" {
+#   count = local.is-development ? 1 : 0
+#   depends_on = [
+#     aws_ebs_volume.swap2
+#   ]
+#   device_name = "/dev/sdx"
+#   volume_id   = aws_ebs_volume.swap2[0].id
+#   instance_id = aws_instance.ec2_oracle_ebs.id
+# }
 
 /*
 ####  This mount was required for golive incident
