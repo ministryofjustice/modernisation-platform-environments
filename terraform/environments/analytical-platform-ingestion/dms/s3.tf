@@ -20,7 +20,7 @@ module "cica_dms_egress_bucket" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.s3_cica_dms_egress_kms.key_arn
+        kms_master_key_id = module.s3_cica_dms_egress_kms[0].key_arn
         sse_algorithm     = "aws:kms"
       }
     }
