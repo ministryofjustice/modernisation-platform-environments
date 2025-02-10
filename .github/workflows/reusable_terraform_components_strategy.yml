@@ -22,24 +22,30 @@ jobs:
     steps:
       - name: Check out Repo
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b
+        with:
+          fetch-depth: 0    # Ensure the full history is fetched so that commits are available.
 
       - name: Generate Strategy Matrix
         id: strategy
         run: |
           set -euo pipefail
 
-          # Fetch the main branch for comparison.
+          # --------------------------------------------------------------------
+          # 1. Fetch the main branch for comparison.
+          # --------------------------------------------------------------------
           git fetch origin main
 
           # Determine the commit to use as the tip of the branch.
-          # For pull request events, use the PR's head commit.
+          # For pull request events, use the PR's head commit; otherwise, use HEAD.
           if [[ "${GITHUB_REF}" == refs/pull/* ]]; then
             head_commit=$(jq --raw-output .pull_request.head.sha "$GITHUB_EVENT_PATH")
           else
             head_commit=HEAD
           fi
 
-          # Fetch environment data from <application>.json.
+          # --------------------------------------------------------------------
+          # 2. Fetch environment data from <application>.json.
+          # --------------------------------------------------------------------
           if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
             # On a branch: production gets "plan", others get "plan_apply".
             curl -s -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
@@ -55,8 +61,10 @@ jobs:
               | jq -c '.environments[] | {"target": .name, "action": "plan_apply"}' > envlist.json
           fi
 
-          # Discover valid subfolders that contain a platform_backend.tf file.
-          # Always include the application folder itself as "root".
+          # --------------------------------------------------------------------
+          # 3. Discover valid subfolders that contain a platform_backend.tf file.
+          #     Always include the application folder itself as "root".
+          # --------------------------------------------------------------------
           COMPONENTS="root"
           app_dir="terraform/environments/${{ inputs.application }}"
           if [ -d "$app_dir" ]; then
@@ -70,12 +78,15 @@ jobs:
 
           echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
 
-          # Build the final matrix by checking each component independently.
+          # --------------------------------------------------------------------
+          # 4. Build the final matrix by checking each component independently.
+          # --------------------------------------------------------------------
           echo "[" > final-list.json
           firstEntry=true
 
           while IFS= read -r envobj; do
             for comp in $COMPONENTS; do
+              # Set the folder path.
               if [ "$comp" = "root" ]; then
                 folder="$app_dir"
               else
@@ -96,7 +107,7 @@ jobs:
                 fi
               fi
 
-              # Add an entry for this component.
+              # Add an entry for this component if changes are detected.
               if [ "$firstEntry" = true ]; then
                 firstEntry=false
               else
@@ -105,10 +116,11 @@ jobs:
               echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
             done
           done < envlist.json
-
           echo "]" >> final-list.json
 
-          # Wrap the JSON array in a matrix object.
+          # --------------------------------------------------------------------
+          # 5. Wrap the JSON array in a matrix object.
+          # --------------------------------------------------------------------
           echo -n '{"include":' > matrix.out
           cat final-list.json >> matrix.out
           echo '}' >> matrix.out
@@ -117,7 +129,9 @@ jobs:
           echo "Matrix is:"
           echo "$matrix"
 
-          # Pass the matrix to subsequent jobs.
+          # --------------------------------------------------------------------
+          # 6. Output the matrix for subsequent jobs.
+          # --------------------------------------------------------------------
           echo 'matrix<<EOF' >> $GITHUB_OUTPUT
           echo "${matrix}" >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
