@@ -169,6 +169,30 @@ resource "aws_security_group" "defect_dojo_sg" {
     cidr_blocks = [var.my_ip]
   }
 
+  # New rules for Local VPN (10.0.0.0/16)
+
+  ingress {
+    description = "Allow TCP/8080 from VPN subnet"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  ingress {
+    description = "Allow TCP/8080 from VPN subnet"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+  ingress {
+    description = "Allow TCP/8080 from VPN subnet"
+    from_port   = 8443
+    to_port     = 8443
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
   egress {
     description = "Allow all traffic outbound"
     from_port   = 0
