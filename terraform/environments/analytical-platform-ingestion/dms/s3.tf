@@ -3,10 +3,12 @@
 module "cica_dms_egress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
+  count = local.environment == "production" ? 1 : 0
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "mojap-ingestion-production-cica-dms-egress"
+  bucket = "mojap-ingestion-${local.environment}-cica-dms-egress"
 
   force_destroy = true
 
@@ -20,7 +22,7 @@ module "cica_dms_egress_bucket" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.s3_cica_dms_egress_kms.key_arn
+        kms_master_key_id = module.s3_cica_dms_egress_kms[0].key_arn
         sse_algorithm     = "aws:kms"
       }
     }
