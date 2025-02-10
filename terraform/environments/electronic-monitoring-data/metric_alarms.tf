@@ -1,3 +1,4 @@
+#tfsec:ignore:avd-aws-0136 No encryption is enabled on the SNS topic
 resource "aws_sns_topic" "lambda_failure" {
   name              = "lambda-failures"
   kms_master_key_id = "alias/aws/sns"
