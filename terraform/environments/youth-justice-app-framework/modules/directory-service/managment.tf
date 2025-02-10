@@ -30,14 +30,14 @@ resource "aws_iam_role_policy_attachment" "join_ad_role_policy_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-#data resource to get the latest Microsoft Windows Server 2019 Base ami
+#data resource to get the latest CIS Microsoft Windows Server 2019 Benchmark - Level 1 ami
 data "aws_ami" "windows_2019" {
   most_recent = true
-  owners      = ["amazon"]
+   owners      = ["aws-marketplace"]
   filter {
     name   = "name"
-    values = ["Windows_Server-2019-English-Full-Base-*"]
-  }
+    values = ["CIS Microsoft Windows Server 2019 Benchmark - Level 1 -*"]
+   }
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
@@ -140,6 +140,57 @@ resource "aws_secretsmanager_secret_version" "ad_instance_admin_secret_version" 
 data "template_file" "windows-dc-userdata" {
   template = <<EOF
 <powershell>
+
+# Function to be run on Server Restart
+function Initialise-Server {
+  $transcriptFile = "C:\i2N\Log\Init_Transcript_$(Get-Date -Format "yyyyMMdd hhmm").log"
+  $logFile        = "C:\i2N\Log\Init_LogFile_$(Get-Date -Format "yyyyMMdd hhmm").log"Start-Transcript -Path $logtranscriptFileFile
+
+  Start-Transcript -Path $logtranscriptFileFile
+
+  Import-Module -Name International
+
+  Write-Output "$(Get-Date) Set System Locale, etc." | Out-File  $logFile -Append
+
+  Set-WinSystemLocale -SystemLocal en-GB
+  Set-WinUILanguageOverride -Language en-GB
+  Set-WinUserLanguageList -LanguageList en-GB -Force
+  Set-WinSystemLocale en-GB
+  Set-Culture en-GB
+  Set-TimeZone -ID "GMT Standard Time"
+
+  Write-Output "$(Get-Date) Install Software" | Out-File  $logFile -Append
+  $Download_Folder = "C:\i2N\Software"
+ 
+  #Download and install Firefox
+  $Download = join-path $Download_Folder firefox.exe
+
+  Invoke-WebRequest 'https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US'  -OutFile $Download
+  Start-Process "$Download" -Wait -ArgumentList "/S"
+  Write-Output "$(Get-Date) Firefox Installed" | Out-File  $logFile -Append
+
+
+  #Download and install Notepad++
+  $Download = join-path $Download_Folder npp.8.7.5.Installer.x64.exe
+
+  Invoke-WebRequest 'https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.7.5/npp.8.7.5.Installer.x64.exe'  -OutFile $Download
+  Start-Process "$Download_Folder" /S -NoNewWindow -Wait -PassThru -Wait
+  Write-Output "$(Get-Date) Notepad++ installed" | Out-File  $logFile -Append
+
+
+  #Download and install pgAdmin 4 v7.8
+  $Download = join-path $Download_Folder pgadmin4-7.8-x64.exe
+
+  Invoke-WebRequest 'https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v7.8/windows/pgadmin4-7.8-x64.exe'  -OutFile $Download
+  Start-Process "$Download" -Wait -ArgumentList "/VERYSILENT /ALLUSERS /NORESTART"
+  Write-Output "$(Get-Date) pgAdmin installed" | Out-File  $logFile -Append
+
+  Write-Output "$(Get-Date) Installes Complete" | Out-File  $logFile -Append
+
+  Stop-Transcript
+}
+
+
 net user Administrator "$${admin_password}"
 $Password = ConvertTo-SecureString "$${admin_password}" -AsPlainText -Force;
 Add-WindowsFeature AD-Domain-Services -IncludeManagementTools
@@ -150,6 +201,17 @@ $adapterIndex = (Get-NetAdapter | Where-Object { $_.Name -like '*Ethernet*' }).I
 $dnsServers = $${ad_dns_servers}
 # Set the DNS server addresses for the specified network adapter
 Set-DnsClientServerAddress -InterfaceIndex $adapterIndex -ServerAddresses $dnsServers
+
+# Create some standard folders that will be needed by the Initialisation Script
+New-Item -Path "C:\" -Name "i2N" -ItemType Directory
+New-Item -Path "C:\i2N" -Name "Software" -ItemType Directory
+
+# Create a job to run following Restart
+$trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+Register-ScheduledJob -Name Server-Initialise -Trigger $trigger -ScriptBlock {
+  Initialise-Server
+}
+
 Restart-Computer -Force
 </powershell>
 EOF

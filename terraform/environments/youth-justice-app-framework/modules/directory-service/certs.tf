@@ -34,6 +34,7 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
     "UseS3ForCRL"            = "No"
     "EntCaServerNetBIOSName" = "SubordinateCA"
     "OrCaServerNetBIOSName"  = "RootCA"
+    "AMI"                    = data.aws_ami.windows_2019.id
   }
 
   timeouts {
