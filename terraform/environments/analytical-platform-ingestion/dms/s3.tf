@@ -6,7 +6,7 @@ module "cica_dms_egress_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "mojap-ingestion-${local.environment}-cica-dms-egress"
+  bucket = "mojap-ingestion-production-cica-dms-egress"
 
   force_destroy = true
 
@@ -33,7 +33,7 @@ data "aws_iam_policy_document" "cica_dms_egress_bucket_policy" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::593291632749:role/mojap-data-production-cica-dms-egress-${local.environment}"]
+      identifiers = ["arn:aws:iam::593291632749:role/mojap-data-production-cica-dms-egress-production"]
     }
     actions = [
       "s3:ReplicateObject",
@@ -42,6 +42,6 @@ data "aws_iam_policy_document" "cica_dms_egress_bucket_policy" {
       "s3:ReplicateTags",
       "s3:ReplicateDelete"
     ]
-    resources = ["arn:aws:s3:::mojap-ingestion-${local.environment}-cica-dms-egress/*"]
+    resources = ["arn:aws:s3:::mojap-ingestion-production-cica-dms-egress/*"]
   }
 }
