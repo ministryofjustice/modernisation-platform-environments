@@ -8,12 +8,49 @@ module "cica_dms_egress_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "mojap-ingestion-${local.environment}-cica-dms-egress"
+  bucket = "mojap-ingestion-${local.environment}-cica-dms-ingress"
 
   force_destroy = true
 
   versioning = {
     enabled = true
+  }
+
+  replication_configuration = {
+    role = module.production_replication_cica_dms_iam_role.iam_role_arn
+    rules = [
+      {
+        id                        = "mojap-ingestion-cica-dms-ingress"
+        status                    = "Enabled"
+        delete_marker_replication = true
+
+        source_selection_criteria = {
+          sse_kms_encrypted_objects = {
+            enabled = true
+          }
+        }
+
+        destination = {
+          account_id    = "471112983409"
+          bucket        = "arn:aws:s3:::mojap-ingestion-production-cica-dms-ingress"
+          storage_class = "STANDARD"
+          access_control_translation = {
+            owner = "Destination"
+          }
+          encryption_configuration = {
+            replica_kms_key_id = "arn:aws:kms:eu-west-2:593291632749:key/mrk-0148560792c648ccb8cf051ee32e358c" #TODO: Update this - also replica?
+          }
+          metrics = {
+            status  = "Enabled"
+            minutes = 15
+          }
+          replication_time = {
+            status  = "Enabled"
+            minutes = 15
+          }
+        }
+      }
+    ]
   }
 
   attach_policy = true
@@ -35,7 +72,7 @@ data "aws_iam_policy_document" "cica_dms_egress_bucket_policy" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::593291632749:role/mojap-data-production-cica-dms-egress-production"]
+      identifiers = ["arn:aws:iam::471112983409:role/mojap-data-production-cica-dms-ingress-production"]
     }
     actions = [
       "s3:ReplicateObject",
@@ -44,6 +81,6 @@ data "aws_iam_policy_document" "cica_dms_egress_bucket_policy" {
       "s3:ReplicateTags",
       "s3:ReplicateDelete"
     ]
-    resources = ["arn:aws:s3:::mojap-ingestion-production-cica-dms-egress/*"]
+    resources = ["arn:aws:s3:::mojap-ingestion-production-cica-dms-ingress/*"]
   }
 }

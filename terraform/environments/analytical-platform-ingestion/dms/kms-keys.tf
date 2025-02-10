@@ -1,4 +1,4 @@
-module "s3_cica_dms_egress_kms" {
+module "s3_cica_dms_ingress_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   count = local.environment == "production" ? 1 : 0
@@ -7,7 +7,7 @@ module "s3_cica_dms_egress_kms" {
   version = "3.1.0"
 
   aliases               = ["s3/cica-dms-egress"]
-  description           = "Used in the CICA DMS Egress Solution"
+  description           = "Used in the CICA DMS Ingress Solution"
   enable_default_policy = true
   key_statements = [
     {
@@ -21,7 +21,7 @@ module "s3_cica_dms_egress_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::593291632749:role/mojap-data-production-cica-dms-egress-production"]
+          identifiers = ["arn:aws:iam::471112983409:role/mojap-data-production-cica-dms-ingress-production"]
         }
       ]
     }
