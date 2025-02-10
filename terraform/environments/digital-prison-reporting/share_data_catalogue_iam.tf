@@ -15,7 +15,7 @@ data "aws_iam_policy_document" "datahub_read_cadet_bucket" {
       test     = "StringLike"
       variable = "s3:prefix"
       values = [
-        "data/${local.environment}/run_artefacts/latest/target/*"
+        "data/${local.environment}/run_artefacts/deploy-prod-digital-prisons-reporting/latest/target/*"
       ]
     }
   }
