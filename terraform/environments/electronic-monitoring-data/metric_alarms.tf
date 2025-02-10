@@ -1,10 +1,13 @@
 resource "aws_sns_topic" "lambda_failure" {
-  name_prefix = "lambda-failure-"
+  name_prefix       = "lambda-failure-"
+  kms_master_key_id = "alias/aws/sns"
 }
 
 # Alarm - "there is at least one error in a minute in AWS Lambda functions"
 module "all_lambdas_errors_alarm" {
-  source = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
+  source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
+  version = "5.7.0"
 
   alarm_name          = "all-lambdas-errors"
   alarm_description   = "Lambdas with errors"
@@ -39,10 +42,30 @@ locals {
 
 # link the sns topic to the service
 module "pagerduty_core_alerts" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   depends_on = [
     aws_sns_topic.lambda_failure
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.lambda_failure.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["electronic_monitoring_data_alarms"]
+}
+
+module "all_lambdas_errors_alarm" {
+  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
+  source = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
+
+  alarm_name          = "all-lambdas-errors"
+  alarm_description   = "Lambdas with errors"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  threshold           = 0
+  period              = 60
+  unit                = "Count"
+
+  namespace   = "AWS/Lambda"
+  metric_name = "Errors"
+  statistic   = "Maximum"
+
+  alarm_actions = [aws_sns_topic.lambda_failure.arn]
 }
