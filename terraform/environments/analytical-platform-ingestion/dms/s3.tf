@@ -3,6 +3,8 @@
 module "cica_dms_egress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
+  count = local.environment == "production" ? 1 : 0
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
@@ -25,7 +27,6 @@ module "cica_dms_egress_bucket" {
       }
     }
   }
-  count = local.environment == "production" ? 1 : 0
 }
 
 data "aws_iam_policy_document" "cica_dms_egress_bucket_policy" {

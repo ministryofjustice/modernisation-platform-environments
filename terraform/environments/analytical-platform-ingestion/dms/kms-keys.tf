@@ -1,6 +1,8 @@
 module "s3_cica_dms_egress_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
+  count = local.environment == "production" ? 1 : 0
+
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
@@ -25,6 +27,4 @@ module "s3_cica_dms_egress_kms" {
     }
   ]
   deletion_window_in_days = 7
-
-  count = local.environment == "production" ? 1 : 0
 }
