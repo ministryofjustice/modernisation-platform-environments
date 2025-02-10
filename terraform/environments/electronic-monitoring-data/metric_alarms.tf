@@ -51,11 +51,11 @@ module "files_in_fms_land_bucket_alarm" {
   statistic   = "Sum"
 
   dimensions = {
-    BucketName  = module.s3-fms-general-landing-bucket.bucket.id
+    BucketName  = module.s3-fms-general-landing-bucket.bucket_id
     StorageType = "AllStorageTypes"
   }
 
-  alarm_actions = [aws_sns_topic.land_bucket_count.arn]
+  alarm_actions = [aws_sns_topic.fms_land_bucket_count.arn]
 }
 
 
