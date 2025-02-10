@@ -28,3 +28,16 @@ module "s3_cica_dms_egress_kms" {
   ]
   deletion_window_in_days = 7
 }
+
+
+module "dms_kms_source_cmk" {
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.0"
+
+  aliases               = ["dms"]
+  description           = "Data Migration Service KMS Key to be used as a Customer Managed Key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
