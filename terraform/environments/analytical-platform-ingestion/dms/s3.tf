@@ -6,7 +6,7 @@ module "cica_dms_egress_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "mojap-ingestion-production-cica-dms-egress"
+  bucket = "mojap-ingestion-${local.environment}-cica-dms-egress"
 
   force_destroy = true
 
@@ -25,6 +25,7 @@ module "cica_dms_egress_bucket" {
       }
     }
   }
+  count = local.environment == "production" ? 1 : 0
 }
 
 data "aws_iam_policy_document" "cica_dms_egress_bucket_policy" {

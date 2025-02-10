@@ -25,4 +25,6 @@ module "s3_cica_dms_egress_kms" {
     }
   ]
   deletion_window_in_days = 7
+
+  count = local.environment == "production" ? 1 : 0
 }
