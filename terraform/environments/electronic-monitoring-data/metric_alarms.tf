@@ -50,22 +50,3 @@ module "pagerduty_core_alerts" {
   sns_topics                = [aws_sns_topic.lambda_failure.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["electronic_monitoring_data_alarms"]
 }
-
-module "all_lambdas_errors_alarm" {
-  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
-  source = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-
-  alarm_name          = "all-lambdas-errors"
-  alarm_description   = "Lambdas with errors"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = 1
-  threshold           = 0
-  period              = 60
-  unit                = "Count"
-
-  namespace   = "AWS/Lambda"
-  metric_name = "Errors"
-  statistic   = "Maximum"
-
-  alarm_actions = [aws_sns_topic.lambda_failure.arn]
-}
