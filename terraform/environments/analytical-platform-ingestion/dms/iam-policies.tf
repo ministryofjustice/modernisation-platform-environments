@@ -39,7 +39,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "kms:Decrypt",
       "kms:GenerateDataKey"
     ]
-    resources = [module.production_cica_dms_kms.key_arn]
+    resources = [module.s3_cica_dms_ingress_kms.key_arn]
   }
   statement {
     sid    = "DestinationBucketKMSKey"
@@ -61,7 +61,7 @@ module "production_replication_cica_dms_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.52.2"
 
-  name_prefix = "cica-dms-ingress-production-replication"
+  name_prefix = "analytical-platform-ingestion-production-cica-dms-ingress-production"
 
   policy = data.aws_iam_policy_document.production_cica_dms_replication.json
 }
