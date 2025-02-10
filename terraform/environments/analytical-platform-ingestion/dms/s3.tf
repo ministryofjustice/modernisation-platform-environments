@@ -17,7 +17,7 @@ module "cica_dms_ingress_bucket" {
   }
 
   replication_configuration = {
-    role = module.production_replication_cica_dms_iam_role.iam_role_arn
+    role = module.production_replication_cica_dms_iam_role[0].iam_role_arn
     rules = [
       {
         id                        = "mojap-ingestion-cica-dms-ingress"
