@@ -8,7 +8,7 @@ data "aws_route53_zone" "application_zone" {
 data "aws_instances" "chaps_instances" {
   filter {
     name   = "tag:Name"
-    values = ["cdpt-chaps-cluster-scaling-group"] 
+    values = ["cdpt-chaps-cluster-scaling-group"]
   }
 
   filter {
@@ -18,5 +18,5 @@ data "aws_instances" "chaps_instances" {
 }
 
 data "aws_ecs_task_definition" "latest" {
-    task_definition = aws_ecs_task_definition.chaps_yarp_task_definition.family
+  task_definition = aws_ecs_task_definition.chaps_yarp_task_definition.family
 }

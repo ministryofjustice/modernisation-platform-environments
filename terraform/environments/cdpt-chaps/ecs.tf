@@ -70,7 +70,7 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
   task_role_arn            = aws_iam_role.app_task.arn
   memory                   = 2300
   cpu                      = 1200
- 
+
   container_definitions = jsonencode([
     {
       name      = "chapsdotnet-container"
@@ -83,7 +83,7 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
           containerPort = 8080
           protocol      = "tcp"
         }
-      ]  
+      ]
       healthCheck = {
         command     = ["CMD-SHELL", "curl -f http://localhost:8080/dotnet-health || exit 1"]
         interval    = 30
@@ -105,7 +105,7 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
           value = "https://login.microsoftonline.com/"
         },
         {
-          name = "TenantId"
+          name  = "TenantId"
           value = local.application_data.accounts[local.environment].TenantId
         },
         {
@@ -135,7 +135,7 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
       ]
       secrets = [
         {
-          name = "RDS_PASSWORD",
+          name      = "RDS_PASSWORD",
           valueFrom = aws_secretsmanager_secret_version.db_password.arn
         }
       ]
@@ -190,13 +190,13 @@ resource "aws_ecs_task_definition" "chaps_yarp_task_definition" {
           value = local.application_data.accounts[local.environment].env_name
         },
         {
-          name = "Environment"
+          name  = "Environment"
           value = local.application_data.accounts[local.environment].environment_name
         }
       ]
       secrets = [
         {
-          name = "RDS_PASSWORD",
+          name      = "RDS_PASSWORD",
           valueFrom = aws_secretsmanager_secret_version.db_password.arn
         }
       ]
@@ -230,14 +230,14 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
     security_groups = [aws_security_group.chaps_combined_ecs_service.id]
-   }
-  
+  }
+
   load_balancer {
     target_group_arn = aws_lb_target_group.chapsdotnet_target_group.arn
     container_name   = "chapsdotnet-container"
     container_port   = 8080
   }
-  
+
   tags = merge(
     local.tags,
     {
@@ -548,13 +548,13 @@ resource "aws_security_group" "chaps_combined_ecs_service" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    description = "Allow HTTP traffic from load balancer"
+    description     = "Allow HTTP traffic from load balancer"
     from_port       = 8080
     to_port         = 8080
     protocol        = "tcp"
     security_groups = [module.lb_access_logs_enabled.security_group.id]
   }
- 
+
 
   # Allow all outbound traffic for both containers
   egress {

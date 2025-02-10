@@ -40,9 +40,9 @@ resource "aws_security_group" "db" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port       = 1433
-    to_port         = 1433
-    protocol        = "tcp"
+    from_port   = 1433
+    to_port     = 1433
+    protocol    = "tcp"
     cidr_blocks = [data.aws_vpc.shared.cidr_block]
   }
   egress {
