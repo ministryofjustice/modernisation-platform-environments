@@ -3,6 +3,7 @@ resource "aws_eip" "transfer_server" {
 
   domain = "vpc"
 
+
   tags = merge(
     local.tags,
     {
