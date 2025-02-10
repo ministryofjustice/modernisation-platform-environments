@@ -38,6 +38,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 # Add a local to get the keys
 locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  sns_names_map              = { "lambda_failure" = aws_sns_topic.lambda_failure.name }
 }
 
 # link the sns topic to the service
@@ -47,6 +48,6 @@ module "pagerduty_core_alerts" {
     aws_sns_topic.lambda_failure
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.lambda_failure.name]
+  sns_topics                = [for key, value in local.sns_names_map : value]
   pagerduty_integration_key = local.pagerduty_integration_keys["electronic_monitoring_data_alarms"]
 }
