@@ -476,6 +476,8 @@ data "aws_iam_policy_document" "find_moj_data_quicksight_policy" {
 
       values = [
         "https://dev.find-moj-data.service.justice.gov.uk",
+        "https://preprod.find-moj-data.service.justice.gov.uk",
+        "https://find-moj-data.service.justice.gov.uk"
       ]
     }
   }
@@ -626,6 +628,12 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "s3:DeleteObject"
     ]
     resources = ["${module.mwaa_bucket.s3_bucket_arn}/*"]
+  }
+  statement {
+    sid       = "EKSAccess"
+    effect    = "Allow"
+    actions   = ["eks:DescribeCluster"]
+    resources = [module.eks.cluster_arn]
   }
 }
 

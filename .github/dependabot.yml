@@ -34,6 +34,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-ingestion/dms"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-ingestion/modules/routes"
     schedule:
       interval: "daily"
@@ -227,18 +231,6 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/delius-mis/modules/mis_environment"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-nextcloud"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-nextcloud/modules/components/nextcloud"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/delius-nextcloud/modules/environment"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -702,6 +694,14 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/sprinkler/playground"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/sprinkler/testbed"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/tipstaff"
     schedule:
       interval: "daily"
@@ -743,6 +743,46 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/youth-justice-app-framework"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/alb"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/aurora"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/cloudfront"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/codedeploy"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/directory-service"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/dns/certs"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/dns/hosted_zone"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/ecs"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/s3"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/waf"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

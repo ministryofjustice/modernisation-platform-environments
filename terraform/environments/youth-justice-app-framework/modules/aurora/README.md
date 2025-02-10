@@ -2,7 +2,7 @@
 
 Terraform module which creates RDS aurora resources on AWS.
 
-Taken from https://github.com/terraform-aws-modules/terraform-aws-rds-aurora
+Taken from <https://github.com/terraform-aws-modules/terraform-aws-rds-aurora>
 
 Version using version.txt file for now, we will move to remote modules and git refs later
 

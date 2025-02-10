@@ -9,5 +9,5 @@ terraform {
       source  = "hashicorp/archive"
     }
   }
-  required_version = "~> 1.8"
+  required_version = "~> 1.10"
 }
