@@ -1,4 +1,3 @@
-
 data "aws_iam_policy_document" "production_cica_dms_replication" {
   statement {
     sid    = "DestinationBucketPermissions"
