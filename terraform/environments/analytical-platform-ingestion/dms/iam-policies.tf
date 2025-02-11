@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "s3:ReplicateTags",
       "s3:ReplicateDelete"
     ]
-    resources = ["arn:aws:s3:::mojap-ingestion-production-cica-dms-ingress/*"]
+    resources = ["arn:aws:s3:::mojap-data-production-cica-dms-ingress-production/*"]
   }
   statement {
     sid    = "SourceBucketPermissions"
@@ -48,7 +48,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "kms:Encrypt",
       "kms:GenerateDataKey"
     ]
-    resources = ["arn:aws:kms:eu-west-2:471112983409:key/d6969401-8722-4f00-9cb4-2c6261515b02"] #TODO: Update this
+    resources = ["arn:aws:kms:eu-west-2:593291632749:key/mrk-27fd90a6ddbc463fb78b0a21592fa8a1"]
   }
 }
 
@@ -61,7 +61,7 @@ module "production_replication_cica_dms_iam_policy" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.52.2"
 
-  name_prefix = "analytical-platform-ingestion-production-cica-dms-ingress-production"
+  name_prefix = "cica-dms-ingress-replication"
 
   policy = data.aws_iam_policy_document.production_cica_dms_replication.json
 }

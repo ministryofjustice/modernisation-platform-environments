@@ -9,22 +9,7 @@ module "s3_cica_dms_ingress_kms" {
   aliases               = ["s3/cica-dms-ingress"]
   description           = "Used in the CICA DMS Ingress Solution"
   enable_default_policy = true
-  key_statements = [
-    {
-      sid = "AllowAnalyticalPlatformDataProduction"
-      actions = [
-        "kms:Encrypt",
-        "kms:GenerateDataKey"
-      ]
-      resources = ["*"]
-      effect    = "Allow"
-      principals = [
-        {
-          type        = "AWS"
-          identifiers = ["arn:aws:iam::471112983409:role/mojap-data-production-cica-dms-ingress-production"]
-        }
-      ]
-    }
-  ]
+  multi_region          = true
+
   deletion_window_in_days = 7
 }

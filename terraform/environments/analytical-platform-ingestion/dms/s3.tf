@@ -31,14 +31,14 @@ module "cica_dms_ingress_bucket" {
         }
 
         destination = {
-          account_id    = "471112983409"
-          bucket        = "arn:aws:s3:::mojap-ingestion-production-cica-dms-ingress"
+          account_id    = "593291632749"
+          bucket        = "arn:aws:s3:::mojap-ingestion-production-cica-dms-ingress-production"
           storage_class = "STANDARD"
           access_control_translation = {
             owner = "Destination"
           }
           encryption_configuration = {
-            replica_kms_key_id = "arn:aws:kms:eu-west-2:593291632749:key/mrk-0148560792c648ccb8cf051ee32e358c" #TODO: Update this - also replica?
+            replica_kms_key_id = "arn:aws:kms:eu-west-2:593291632749:key/mrk-0148560792c648ccb8cf051ee32e358c" #TODO: Update this after AP is merged and key is created - also replica?
           }
           metrics = {
             status  = "Enabled"
