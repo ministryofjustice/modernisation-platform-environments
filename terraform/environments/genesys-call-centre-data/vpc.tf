@@ -1,6 +1,5 @@
+#tfsec:ignore:avd-aws-0102 NACLs not restricted
 module "vpc" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-
   source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
 
   name            = "${local.application_name}-${local.environment}"
@@ -18,8 +17,6 @@ module "vpc" {
 }
 
 module "vpc_endpoints" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-
   source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
 
   security_group_ids = [aws_security_group.vpc_endpoints.id]
