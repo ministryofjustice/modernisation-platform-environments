@@ -4,7 +4,7 @@ resource "aws_glue_crawler" "iceberg_crawler" {
   role          = aws_iam_role.glue_role.arn
 
   iceberg_target {
-    paths                   = "s3://emds-test-cadt/data/test/models/domain_name=historic/database_name=historic_api_mart_mock/"
+    paths                   = toset(["s3://emds-test-cadt/data/test/models/domain_name=historic/database_name=historic_api_mart_mock/"])
     maximum_traversal_depth = 20
   }
 
