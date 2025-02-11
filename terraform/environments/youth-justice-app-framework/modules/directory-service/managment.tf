@@ -37,8 +37,8 @@ data "aws_ami" "windows_2019" {
    owners      = ["amazon"]
  filter {
     name   = "name"
-  #  values = ["CIS Microsoft Windows Server 2019 Benchmark - Level 1 -*"] # Use this after Subscription 
-  values = ["Windows_Server-2019-English-Full-Base-*"]
+  #  values = ["CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*"] # Use this after Subscription 
+  values = ["Windows_Server-2022-English-Full-Base-*"]
     
    }
   filter {
@@ -147,7 +147,8 @@ data "template_file" "windows-dc-userdata" {
 # Function to be run on Server Restart
 function Initialise-Server {
   $transcriptFile = "C:\i2N\Log\Init_Transcript_$(Get-Date -Format "yyyyMMdd hhmm").log"
-  $logFile        = "C:\i2N\Log\Init_LogFile_$(Get-Date -Format "yyyyMMdd hhmm").log"Start-Transcript -Path $logtranscriptFileFile
+  $logFile        = "C:\i2N\Log\Init_LogFile_$(Get-Date -Format "yyyyMMdd hhmm").log"
+  Start-Transcript -Path $logtranscriptFileFile
 
   Start-Transcript -Path $logtranscriptFileFile
 
@@ -189,7 +190,9 @@ function Initialise-Server {
   Write-Output "$(Get-Date) pgAdmin installed" | Out-File  $logFile -Append
 
   Write-Output "$(Get-Date) Installes Complete" | Out-File  $logFile -Append
-
+  
+  UnRegister-ScheduledJob -Name  Initialise-Server
+  
   Stop-Transcript
 }
 
@@ -211,7 +214,7 @@ New-Item -Path "C:\i2N" -Name "Software" -ItemType Directory
 
 # Create a job to run following Restart
 $trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
-Register-ScheduledJob -Name Server-Initialise -Trigger $trigger -ScriptBlock {
+Register-ScheduledJob -Name  Initialise-Server -Trigger $trigger -ScriptBlock {
   Initialise-Server
 }
 
