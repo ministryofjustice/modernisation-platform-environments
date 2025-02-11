@@ -32,7 +32,7 @@ module "cica_dms_ingress_bucket" {
 
         destination = {
           account_id    = "593291632749"
-          bucket        = "arn:aws:s3:::mojap-ingestion-production-cica-dms-ingress-production"
+          bucket        = "arn:aws:s3:::mojap-data-production-cica-dms-ingress-production"
           storage_class = "STANDARD"
           access_control_translation = {
             owner = "Destination"
