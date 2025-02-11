@@ -25,39 +25,6 @@ module "all_lambdas_errors_alarm" {
   alarm_actions = [aws_sns_topic.lambda_failure.arn]
 }
 
-#tfsec:ignore:avd-aws-0136 No encryption is enabled on the SNS topic
-resource "aws_sns_topic" "fms_land_bucket_count" {
-  name              = "fms-land-bucket-count"
-  kms_master_key_id = "alias/aws/sns"
-}
-
-# Alarm - "Detect when no files land in fms bucket within 24 hours"
-module "files_in_fms_land_bucket_alarm" {
-  #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
-  source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-  version = "5.7.0"
-
-  alarm_name          = "fms-land-no-files"
-  alarm_description   = "Detect when no files land in fms bucket within 24 hours"
-  comparison_operator = "LessThanOrEqualToThreshold"
-  evaluation_periods  = 1
-  threshold           = 0
-  period              = 86400
-  unit                = "Count"
-
-  namespace   = "AWS/S3"
-  metric_name = "NumberOfObjects"
-  statistic   = "Sum"
-
-  dimensions = {
-    BucketName  = module.s3-fms-general-landing-bucket.bucket.id
-    StorageType = "AllStorageTypes"
-  }
-
-  alarm_actions = [aws_sns_topic.land_bucket_count.arn]
-}
-
-
 # Get the map of pagerduty integration keys from the modernisation platform account
 data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
   provider = aws.modernisation-platform
