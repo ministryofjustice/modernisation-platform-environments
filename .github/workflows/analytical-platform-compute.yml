@@ -1,73 +1,82 @@
 ---
-  name: analytical-platform-compute
+name: analytical-platform-compute
 
-  on:
-    push:
-      branches:
-        - main
-      paths:
-        - 'terraform/environments/analytical-platform-compute/**'
-        - '.github/workflows/analytical-platform-compute.yml'
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "terraform/environments/analytical-platform-compute/**"
+      - ".github/workflows/analytical-platform-compute.yml"
+      - ".github/workflows/reusable_terraform_component_strategy.yml"
 
-    pull_request:
-      branches:
-        - main
-      paths:
-        - 'terraform/environments/analytical-platform-compute/**'
-        - '.github/workflows/analytical-platform-compute.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "terraform/environments/analytical-platform-compute/**"
+      - ".github/workflows/analytical-platform-compute.yml"
 
-    workflow_dispatch:
-      inputs:
-        action:
-          description: 'Set either [deploy|destroy].'
-          default: 'deploy'
-          required: true
-          type: choice
-          options:
-            - deploy
-            - destroy
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Set either [deploy|destroy]."
+        default: "deploy"
+        required: true
+        type: choice
+        options:
+          - deploy
+          - destroy
 
-  permissions:
-    id-token: write  # Required for requesting the JWT
-    contents: read   # Required for actions/checkout
+permissions:
+  id-token: write # Required for requesting the JWT
+  contents: read # Required for actions/checkout
 
-  jobs:
+jobs:
+  strategy:
+    # This job generates a matrix of environments (and possibly components) by calling your reusable strategy workflow.
+    uses: ./.github/workflows/reusable_terraform_components_strategy.yml
+    if: inputs.action != 'destroy'
+    with:
+      # e.g. "analytical-platform-compute.json" must exist in the Modernisation Platform repo
+      # so the strategy can load environment info from it.
+      application: "${{ github.workflow }}" # Typically: "analytical-platform-compute"
+
+  skipping_terraform:
+    needs: strategy
+    if: ${{ inputs.action != 'destroy' && (needs.strategy.outputs.matrix == '' || toJson(fromJson(needs.strategy.outputs.matrix)) == '[]')}} # conversion from and to Json standardises output
+    runs-on: ubuntu-latest
+    steps:
+      - name: Skip Terraform
+        run: echo "No terraform changes detected. Skipping Terraform plan/apply."
+
+  terraform:
+    needs: strategy
+    if: ${{ inputs.action != 'destroy' && needs.strategy.outputs.matrix != '' && toJson(fromJson(needs.strategy.outputs.matrix)) != '[]'}} # conversion from and to Json standardises output
     strategy:
-      # This job generates a matrix of environments (and possibly components) by calling your reusable strategy workflow.
-      uses: ./.github/workflows/reusable_terraform_components_strategy.yml
-      if: inputs.action != 'destroy'
-      with:
-        # e.g. "analytical-platform-compute.json" must exist in the Modernisation Platform repo
-        # so the strategy can load environment info from it.
-        application: "${{ github.workflow }}"  # Typically: "analytical-platform-compute"
+      fail-fast: false
+      matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
+    # Calls the plan/apply reusable workflow with each item in the matrix
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      # Pass along the "application" and "environment" from the matrix
+      application: "${{ github.workflow }}"
+      environment: "${{ matrix.target }}"
+      action: "${{ matrix.action }}"
+      component: "${{ matrix.component }}"
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
 
-    terraform:
-      needs: strategy
-      if: inputs.action != 'destroy'
-      strategy:
-        fail-fast: false
-        matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-      # Calls the plan/apply reusable workflow with each item in the matrix
-      uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
-      with:
-        # Pass along the "application" and "environment" from the matrix
-        application: "${{ github.workflow }}"
-        environment: "${{ matrix.target }}"
-        action: "${{ matrix.action }}"
-        component: "${{ matrix.component }}"      # If your strategy workflow also outputs "matrix.component"
-      secrets:
-        modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-        pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
-
-    destroy-development:
-      if: inputs.action == 'destroy'
-      uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
-      with:
-        application: "${{ github.workflow }}"
-        environment: "development"
-        action: "plan_apply"
-        plan_apply_tfargs: "-destroy"
-        # If you need component logic on destroy, pass it here as well, e.g. component: ...
-      secrets:
-        modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-        pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+  destroy-development:
+    if: inputs.action == 'destroy'
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
+    with:
+      application: "${{ github.workflow }}"
+      environment: "development"
+      action: "plan_apply"
+      plan_apply_tfargs: "-destroy"
+      # If you need component logic on destroy, pass it here as well, e.g. component: ...
+    secrets:
+      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
+      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
