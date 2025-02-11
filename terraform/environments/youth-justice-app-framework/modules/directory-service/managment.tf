@@ -269,5 +269,13 @@ DOC
 
 resource "aws_ssm_association" "associate_ssm" {
   name        = aws_ssm_document.ssm_document.name
-  instance_id = aws_instance.ad_instance.id
+  targets: [
+    {
+      Key: "InstanceIds",
+      Values: [
+        aws_instance.ad_instance.id
+      ]
+    }
+  ]
+#  instance_id = aws_instance.ad_instance.id
 }
