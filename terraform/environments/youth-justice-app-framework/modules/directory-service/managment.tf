@@ -31,14 +31,14 @@ resource "aws_iam_role_policy_attachment" "join_ad_role_policy_core" {
 }
 
 #data resource to get the latest CIS Microsoft Windows Server 2019 Benchmark - Level 1 ami
-data "aws_ami" "windows_2019" {
+data "aws_ami" "windows_2022" {
   most_recent = true
   # owners      = ["aws-marketplace"] # Use this after Subscription 
    owners      = ["amazon"]
  filter {
     name   = "name"
-  #  values = ["CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*"] # Use this after Subscription 
-  values = ["Windows_Server-2022-English-Full-Base-*"]
+    values = ["CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*"] # Use this after Subscription 
+  # values = ["Windows_Server-2022-English-Full-Base-*"] # to be removed
     
    }
   filter {
