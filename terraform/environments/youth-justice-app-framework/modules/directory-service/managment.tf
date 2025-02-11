@@ -143,14 +143,26 @@ resource "aws_secretsmanager_secret_version" "ad_instance_admin_secret_version" 
 data "template_file" "windows-dc-userdata" {
   template = <<EOF
 <powershell>
+net user Administrator "$${admin_password}"
+$Password = ConvertTo-SecureString "$${admin_password}" -AsPlainText -Force;
+Add-WindowsFeature AD-Domain-Services -IncludeManagementTools
+Install-WindowsFeature -Name GPMC,RSAT-AD-PowerShell,RSAT-AD-AdminCenter,RSAT-ADDS-Tools,RSAT-DNS-Server
+# Get the network adapter interface index
+$adapterIndex = (Get-NetAdapter | Where-Object { $_.Name -like '*Ethernet*' }).InterfaceIndex
+# Set DNS server addresses 
+$dnsServers = $${ad_dns_servers}
+# Set the DNS server addresses for the specified network adapter
+Set-DnsClientServerAddress -InterfaceIndex $adapterIndex -ServerAddresses $dnsServers
 
-# Function to be run on Server Restart
-function Initialise-Server {
-  $transcriptFile = "C:\i2N\Log\Init_Transcript_$(Get-Date -Format "yyyyMMdd hhmm").log"
+# Create some standard folders that will be needed by the Initialisation Script
+New-Item -Path "C:\"    -Name "i2N"      -ItemType Directory
+New-Item -Path "C:\i2N" -Name "Software" -ItemType Directory
+New-Item -Path "C:\i2N" -Name "Log"      -ItemType Directory
+
+# Create a job to run following Restart
+$trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+Register-ScheduledJob -Name  Initialise-Server -Trigger $trigger -ScriptBlock {
   $logFile        = "C:\i2N\Log\Init_LogFile_$(Get-Date -Format "yyyyMMdd hhmm").log"
-  Start-Transcript -Path $logtranscriptFileFile
-
-  Start-Transcript -Path $logtranscriptFileFile
 
   Import-Module -Name International
 
@@ -189,33 +201,12 @@ function Initialise-Server {
   Start-Process "$Download" -Wait -ArgumentList "/VERYSILENT /ALLUSERS /NORESTART"
   Write-Output "$(Get-Date) pgAdmin installed" | Out-File  $logFile -Append
 
-  Write-Output "$(Get-Date) Installes Complete" | Out-File  $logFile -Append
+  Write-Output "$(Get-Date) Installs Complete" | Out-File  $logFile -Append
   
   UnRegister-ScheduledJob -Name  Initialise-Server
-  
-  Stop-Transcript
-}
 
+  Write-Output "$(Get-Date) Initialise-Server Job Unregistered" | Out-File  $logFile -Append
 
-net user Administrator "$${admin_password}"
-$Password = ConvertTo-SecureString "$${admin_password}" -AsPlainText -Force;
-Add-WindowsFeature AD-Domain-Services -IncludeManagementTools
-Install-WindowsFeature -Name GPMC,RSAT-AD-PowerShell,RSAT-AD-AdminCenter,RSAT-ADDS-Tools,RSAT-DNS-Server
-# Get the network adapter interface index
-$adapterIndex = (Get-NetAdapter | Where-Object { $_.Name -like '*Ethernet*' }).InterfaceIndex
-# Set DNS server addresses 
-$dnsServers = $${ad_dns_servers}
-# Set the DNS server addresses for the specified network adapter
-Set-DnsClientServerAddress -InterfaceIndex $adapterIndex -ServerAddresses $dnsServers
-
-# Create some standard folders that will be needed by the Initialisation Script
-New-Item -Path "C:\" -Name "i2N" -ItemType Directory
-New-Item -Path "C:\i2N" -Name "Software" -ItemType Directory
-
-# Create a job to run following Restart
-$trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
-Register-ScheduledJob -Name  Initialise-Server -Trigger $trigger -ScriptBlock {
-  Initialise-Server
 }
 
 Restart-Computer -Force
