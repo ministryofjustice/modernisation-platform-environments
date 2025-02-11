@@ -47,7 +47,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "kms:Encrypt",
       "kms:GenerateDataKey"
     ]
-    resources = ["arn:aws:kms:eu-west-2:593291632749:key/mrk-27fd90a6ddbc463fb78b0a21592fa8a1"]
+    resources = ["arn:aws:kms:eu-west-2:593291632749:key/8894655b-e02c-46d1-aaa0-c219b31eefb1"]
   }
 }
 
