@@ -33,6 +33,17 @@ resource "aws_iam_role" "glue_role" {
   })
 }
 
+resource "aws_lakeformation_permissions" "s3_bucket_permissions_de" {
+  principal = aws_iam_role.glue_role.arn
+
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
+
 # Attach necessary policies to the role
 resource "aws_iam_role_policy_attachment" "glue_service" {
   role       = aws_iam_role.glue_role.name
