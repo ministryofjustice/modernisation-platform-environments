@@ -221,7 +221,7 @@ EOF
 
 #Create an EC2 instance and automatically join the directory (management)
 resource "aws_instance" "ad_instance" {
-  ami                         = data.aws_ami.windows_2019.id
+  ami                         = data.aws_ami.windows_2022.id
   instance_type               = "t3.micro"
   iam_instance_profile        = aws_iam_instance_profile.ad_instance_profile.name
   key_name                    = module.key_pair.key_pair_name
@@ -269,13 +269,10 @@ DOC
 
 resource "aws_ssm_association" "associate_ssm" {
   name        = aws_ssm_document.ssm_document.name
-  targets: [
-    {
-      Key: "InstanceIds",
-      Values: [
-        aws_instance.ad_instance.id
-      ]
+  targets {
+      key    = "InstanceIds"
+      values = [aws_instance.ad_instance.id]
     }
-  ]
+    
 #  instance_id = aws_instance.ad_instance.id
 }
