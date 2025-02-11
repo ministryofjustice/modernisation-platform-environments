@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "s3:GetReplicationConfiguration",
       "s3:ListBucket"
     ]
-    resources = [module.cica_dms_ingress_bucket[0].s3_bucket_arn]
+    resources = length(module.cica_dms_ingress_bucket) > 0 ? [module.cica_dms_ingress_bucket[0].s3_bucket_arn] : []
   }
   statement {
     sid    = "SourceBucketObjectPermissions"
@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
-    resources = ["${module.cica_dms_ingress_bucket[0].s3_bucket_arn}/*"]
+    resources = length(module.cica_dms_ingress_bucket) > 0 ? ["${module.cica_dms_ingress_bucket[0].s3_bucket_arn}/*"] : []
   }
   statement {
     sid    = "SourceBucketKMSKey"
@@ -47,7 +47,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "kms:Encrypt",
       "kms:GenerateDataKey"
     ]
-    resources = ["arn:aws:kms:eu-west-2:593291632749:key/mrk-27fd90a6ddbc463fb78b0a21592fa8a1"]
+    resources = length(module.s3_cica_dms_ingress_kms) > 0 ? [module.s3_cica_dms_ingress_kms[0].key_arn] : []
   }
 }
 
