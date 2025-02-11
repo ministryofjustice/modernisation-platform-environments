@@ -68,7 +68,6 @@ module "s3_bucket_landing_archive_ingestion_curated" {
   bucket_prefix      = each.value
   versioning_enabled = true
   ownership_controls = "BucketOwnerEnforced"
-  bucket_policy      = [data.aws_iam_policy_document.logging_bucket_policy.json]
 
   tags = local.tags
 }
