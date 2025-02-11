@@ -53,9 +53,6 @@ module "cica_dms_ingress_bucket" {
     ]
   }
 
-  attach_policy = true
-  policy        = data.aws_iam_policy_document.cica_dms_ingress_bucket_policy.json
-
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
@@ -63,24 +60,5 @@ module "cica_dms_ingress_bucket" {
         sse_algorithm     = "aws:kms"
       }
     }
-  }
-}
-
-data "aws_iam_policy_document" "cica_dms_ingress_bucket_policy" {
-  statement {
-    sid    = "ReplicationPermissions"
-    effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::471112983409:role/mojap-data-production-cica-dms-ingress-production"] #TODO: Update this / confirm
-    }
-    actions = [
-      "s3:ReplicateObject",
-      "s3:ObjectOwnerOverrideToBucketOwner",
-      "s3:GetObjectVersionTagging",
-      "s3:ReplicateTags",
-      "s3:ReplicateDelete"
-    ]
-    resources = ["arn:aws:s3:::mojap-ingestion-production-cica-dms-ingress/*"]
   }
 }
