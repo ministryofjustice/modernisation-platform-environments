@@ -38,7 +38,7 @@ module "cica_dms_ingress_bucket" {
             owner = "Destination"
           }
           encryption_configuration = {
-            replica_kms_key_id = "arn:aws:kms:eu-west-2:593291632749:key/mrk-0148560792c648ccb8cf051ee32e358c" #TODO: Update this after AP is merged and key is created - also replica?
+            replica_kms_key_id = "arn:aws:kms:eu-west-2:593291632749:key/mrk-27fd90a6ddbc463fb78b0a21592fa8a1"
           }
           metrics = {
             status  = "Enabled"
