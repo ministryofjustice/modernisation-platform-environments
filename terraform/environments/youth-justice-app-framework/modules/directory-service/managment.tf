@@ -301,6 +301,10 @@ resource "aws_ssm_association" "associate_ssm" {
       key    = "InstanceIds"
       values = [aws_instance.ad_instance.id]
     }
+    targets {
+      key    = "directoryId"
+      values = [aws_directory_service_directory.ds_managed_ad.id]
+    }
     
 #  instance_id = aws_instance.ad_instance.id
 }
