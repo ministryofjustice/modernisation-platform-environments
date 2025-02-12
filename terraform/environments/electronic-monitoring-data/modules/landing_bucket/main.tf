@@ -29,13 +29,6 @@ module "this-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : var.logging_bucket.bucket.id,
-    "log_bucket_arn" : var.logging_bucket.bucket.arn,
-    "log_bucket_policy" : var.logging_bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${var.local_bucket_prefix}-land-${var.data_feed}-${var.order_type}/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {

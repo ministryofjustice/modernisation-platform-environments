@@ -237,14 +237,6 @@ module "s3-athena-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-athena-query-results/"
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -315,15 +307,6 @@ module "s3-unzipped-files-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix = "logs/${local.bucket_prefix}-unzipped-files/"
-
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -369,14 +352,6 @@ module "s3-dms-premigrate-assess-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-dms-premigrate-assess/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -448,14 +423,6 @@ module "s3-json-directory-structure-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-json-directory-structure/"
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -524,13 +491,6 @@ module "s3-data-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-data/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -776,15 +736,6 @@ module "s3-received-files-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix = "logs/${local.bucket_prefix}-received-files/"
-
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -846,15 +797,6 @@ module "s3-quarantine-files-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix = "logs/${local.bucket_prefix}-quarantined-files/"
-
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -896,15 +838,6 @@ module "s3-clamav-definitions-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix = "logs/${local.bucket_prefix}-clamav-definitions/"
-
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -950,14 +883,6 @@ module "s3-dms-data-validation-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-dms-data-validation/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -1029,14 +954,6 @@ module "s3-glue-job-script-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-glue-job-store/"
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -1107,14 +1024,6 @@ module "s3-dms-target-store-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/dms-target-store/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -1255,14 +1164,6 @@ module "s3-create-a-derived-table-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/cadt-store/"
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -1332,13 +1233,6 @@ module "s3-raw-formatted-data-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-raw-formatted-data/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
