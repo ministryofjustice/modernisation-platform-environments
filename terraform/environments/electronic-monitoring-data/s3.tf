@@ -41,6 +41,8 @@ module "s3-logging-bucket" {
     aws.bucket-replication = aws
   }
 
+  bucket_policy = [data.aws_iam_policy_document.log_bucket_policy.json]
+
   lifecycle_rule = [
     {
       id      = "main"
@@ -87,28 +89,36 @@ module "s3-logging-bucket" {
 
 data "aws_iam_policy_document" "log_bucket_policy" {
   statement {
-    sid       = "AWSLogDeliveryWrite"
+    sid       = "AllowS3Logging"
     effect    = "Allow"
-    actions   = ["s3:PutObject"]
-    resources = [
-        "${module.s3-metadata-bucket.bucket.arn}/${local.bucket_prefix}-metadata/AWSLogs/*"
-      ]
 
     principals {
       type        = "Service"
       identifiers = ["logging.s3.amazonaws.com"]
     }
 
+    actions = ["s3:PutObject"]
+
+    resources = ["${aws_s3_bucket.logging_bucket.arn}/*"]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [
+        module.s3-metadata-bucket.bucket.arn,
+      ]
+    }
+
     condition {
       test     = "StringEquals"
-      variable = "s3:x-amz-acl"
-      values   = ["bucket-owner-full-control"]
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
     }
   }
 }
 
 resource "aws_s3_bucket_logging" "s3-metadata-bucket" {
-  bucket = module.s3-logging-bucket.bucket.id
+  bucket = module.s3-metadata-bucket.bucket.id
 
   target_bucket = module.log_buckets.bucket.id
   target_prefix = "logs/${local.bucket_prefix}-metadata/"
