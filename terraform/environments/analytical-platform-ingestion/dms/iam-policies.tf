@@ -16,8 +16,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
     effect = "Allow"
     actions = [
       "s3:GetReplicationConfiguration",
-      "s3:ListBucket",
-      "s3:*"
+      "s3:ListBucket"
     ]
     resources = length(module.cica_dms_ingress_bucket) > 0 ? [module.cica_dms_ingress_bucket[0].s3_bucket_arn] : []
   }
@@ -28,8 +27,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "s3:GetObjectVersionForReplication",
       "s3:GetObjectVersionAcl",
       "s3:GetObjectVersionTagging",
-      "s3:ObjectOwnerOverrideToBucketOwner",
-      "s3:*"
+      "s3:ObjectOwnerOverrideToBucketOwner"
     ]
     resources = length(module.cica_dms_ingress_bucket) > 0 ? ["${module.cica_dms_ingress_bucket[0].s3_bucket_arn}/*"] : []
   }
