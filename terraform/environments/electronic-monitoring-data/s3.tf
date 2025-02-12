@@ -27,7 +27,7 @@ locals {
     # [module.s3-mdss-general-landing-bucket.bucket.id, module.s3-mdss-general-landing-bucket.bucket.arn],
     # [module.s3-mdss-ho-landing-bucket.bucket.id, module.s3-mdss-ho-landing-bucket.bucket.arn],
     # [module.s3-mdss-specials-landing-bucket.bucket.id, module.s3-mdss-specials-landing-bucket.bucket.arn],
-    [module.s3-p1-export-bucket.bucket_id, module.s3-p1-export-bucket.bucket_arn],
+    # [module.s3-p1-export-bucket.bucket_id, module.s3-p1-export-bucket.bucket_arn],
     # [module.s3-serco-export-bucket.bucket.id, module.s3-serco-export-bucket.bucket.arn],
     [module.s3-received-files-bucket.bucket.id, module.s3-received-files-bucket.bucket.arn],
     [module.s3-quarantine-files-bucket.bucket.id, module.s3-quarantine-files-bucket.bucket.arn],
