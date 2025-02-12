@@ -54,5 +54,16 @@ locals {
 
     cloudwatch_log_groups = local.ssm_doc_cloudwatch_log_groups
     security_groups       = local.security_groups
+
+    ssm_documents = {
+      test = {
+        document_type   = "Command"
+        document_format = "YAML"
+        content         = file("${path.module}/ssm-documents/test.yaml")
+        tags = {
+          Name = "test"
+        }
+      }
+    }
   }
 }
