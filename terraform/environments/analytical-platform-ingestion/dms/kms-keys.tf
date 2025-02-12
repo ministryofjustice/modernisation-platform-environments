@@ -16,7 +16,6 @@ module "s3_cica_dms_ingress_kms" {
 
 
 module "dms_kms_source_cmk" {
-i
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
