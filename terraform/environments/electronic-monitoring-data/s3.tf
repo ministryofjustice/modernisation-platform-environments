@@ -16,6 +16,26 @@ locals {
 
   buckets_to_log = [
     module.s3-metadata-bucket,
+    module.s3-athena-bucket,
+    module.s3-unzipped-files-bucket,
+    module.s3-dms-premigrate-assess-bucket,
+    module.s3-json-directory-structure-bucket,
+    module.s3-data-bucket,
+    # module.s3-fms-general-landing-bucket,
+    # module.s3-fms-specials-landing-bucket,
+    # module.s3-mdss-general-landing-bucket,
+    # module.s3-mdss-ho-landing-bucket,
+    # module.s3-mdss-specials-landing-bucket,
+    # module.s3-p1-export-bucket,
+    # module.s3-serco-export-bucket,
+    module.s3-received-files-bucket,
+    module.s3-quarantine-files-bucket,
+    module.s3-clamav-definitions-bucket,
+    module.s3-dms-data-validation-bucket,
+    module.s3-glue-job-script-bucket,
+    module.s3-dms-target-store-bucket,
+    module.s3-create-a-derived-table-bucket,
+    module.s3-raw-formatted-data-bucket,
   ]
 }
 
