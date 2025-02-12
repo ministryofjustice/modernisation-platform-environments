@@ -256,17 +256,41 @@ resource "aws_ssm_document" "ssm_document" {
   document_type = "Command"
   content       = <<DOC
 {
-    "schemaVersion": "1.0",
-    "description": "Automatic Domain Join Configuration",
-    "runtimeConfig": {
-        "aws:domainJoin": {
-            "properties": {
-                "directoryId": "${aws_directory_service_directory.ds_managed_ad.id}",
-                "directoryName": "${aws_directory_service_directory.ds_managed_ad.name}",
-                "dnsIpAddresses": ${jsonencode(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)}
-            }
-        }
+  "schemaVersion": "2.2",
+  "description": "aws:domainJoin",
+  "parameters": {
+    "directoryId": {
+      "description": "(Required) The ID of the directory.",
+      "type": "String"
+    },
+    "directoryName": {
+      "description": "(Required) The name of the domain.",
+      "type": "String"
+    },
+    "directoryOU": {
+        "description": "(Optional) The organizational unit to assign the computer object to.",
+        "type": "String"
+      },
+    "dnsIpAddresses": {
+      "description": "(Required) The IP addresses of the DNS servers for your directory.",
+      "type": "StringList"
+    },
+    "hostname": {
+        "description": "(Optional) The hostname you want to assign to the node.",
+        "type": "String"
+      }
+  },
+  "mainSteps": [
+    {
+      "action": "aws:domainJoin",
+      "name": "domainJoin",
+      "inputs": {
+        "directoryId": "${aws_directory_service_directory.ds_managed_ad.id}",
+        "directoryName": "${aws_directory_service_directory.ds_managed_ad.name}",
+        "dnsIpAddresses": ${jsonencode(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)}
+      }
     }
+  ]
 }
 DOC
 }
