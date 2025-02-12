@@ -99,7 +99,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
 
     actions = ["s3:PutObject"]
 
-    resources = ["${aws_s3_bucket.logging_bucket.arn}/*"]
+    resources = ["${module.s3-logging-bucket.bucket.arn}/*"]
 
     condition {
       test     = "ArnLike"
@@ -120,7 +120,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
 resource "aws_s3_bucket_logging" "s3-metadata-bucket" {
   bucket = module.s3-metadata-bucket.bucket.id
 
-  target_bucket = module.log_buckets.bucket.id
+  target_bucket = module.s3-logging-bucket.bucket.id
   target_prefix = "logs/${local.bucket_prefix}-metadata/"
   target_object_key_format {
     partitioned_prefix {
