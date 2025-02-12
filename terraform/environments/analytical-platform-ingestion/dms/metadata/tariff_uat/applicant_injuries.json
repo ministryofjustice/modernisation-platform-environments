@@ -1,0 +1,133 @@
+{
+    "$schema": "https://moj-analytical-services.github.io/metadata_schema/table/v1.4.0.json",
+    "name": "applicant_injuries",
+    "description": "",
+    "data_format": "parquet",
+    "columns": [
+        {
+            "name": "op",
+            "type": "character",
+            "description": "Type of change, for rows added by ongoing replication.",
+            "nullable": true,
+            "enum": [
+                "I",
+                "U",
+                "D"
+            ]
+        },
+        {
+            "name": "amount",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "amount",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ar_ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ar_ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ar_ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "cdec_sequence_number",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "cdec_sequence_number",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "cdec_sequence_number",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "date_injury_added",
+            "type": "date",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "staff_member",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "tariff_injury_code",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "tariff_injury_code",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "tariff_injury_code",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        }
+    ],
+    "location": "APPLICANT_INJURIES/",
+    "primary_key": [
+        "ar_ref_no", "cdec_sequence_number", "ref_year", "tariff_injury_code"
+    ],
+    "partitions": null
+}
+

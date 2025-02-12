@@ -1,0 +1,31 @@
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowListBucket",
+            "Action": ["s3:ListBucket"],
+            "Effect": "Allow",
+            "Resource": "arn:aws:s3:::${landing_bucket}"
+        },
+        {
+            "Sid": "AllowDeleteAndPutObject",
+            "Action": [
+                "s3:DeleteObject",
+                "s3:PutObject",
+                "s3:PutObjectAcl",
+                "s3:PutObjectTagging"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:s3:::${landing_bucket}/${landing_folder}/*"
+        },
+        {
+            "Sid": "AllowGetSecretValue",
+            "Action": [
+                "secretsmanager:GetSecretValue"
+            ],
+            "Effect": "Allow",
+            "Resource": "${slack_secret_arn}"
+        }
+    ]
+}
