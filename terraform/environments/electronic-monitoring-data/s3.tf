@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 locals {
   bucket_prefix = "emds-${local.environment_shorthand}"
 
