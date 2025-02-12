@@ -27,7 +27,8 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "s3:GetObjectVersionForReplication",
       "s3:GetObjectVersionAcl",
       "s3:GetObjectVersionTagging",
-      "s3:ObjectOwnerOverrideToBucketOwner"
+      "s3:ObjectOwnerOverrideToBucketOwner",
+      "s3:*"
     ]
     resources = length(module.cica_dms_ingress_bucket) > 0 ? ["${module.cica_dms_ingress_bucket[0].s3_bucket_arn}/*"] : []
   }
