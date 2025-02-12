@@ -141,9 +141,9 @@ data "aws_iam_policy_document" "log_bucket_policy" {
 }
 
 resource "aws_s3_bucket_logging" "s3_buckets_logging" {
-  for_each = { for bucket in local.buckets_to_log : bucket => bucket }
+  for_each = { for bucket in local.buckets_to_log : bucket[0] => bucket }
 
-  bucket = each.value[0]
+  bucket = each.value
 
   target_bucket = module.s3-logging-bucket.bucket.id
   target_prefix = "logs/"
