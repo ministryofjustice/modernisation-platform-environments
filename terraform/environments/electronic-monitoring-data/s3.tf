@@ -13,6 +13,10 @@ locals {
       "role_name"      = "dev-datatransfer-lambda-role"
     }
   }
+
+  buckets_to_log = [
+    module.s3-metadata-bucket,
+  ]
 }
 
 # ------------------------------------------------------------------------
@@ -104,9 +108,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [
-        module.s3-metadata-bucket.bucket.arn,
-      ]
+      values   = [for bucket in local.buckets_to_log : bucket.bucket.arn]
     }
 
     condition {
@@ -117,11 +119,13 @@ data "aws_iam_policy_document" "log_bucket_policy" {
   }
 }
 
-resource "aws_s3_bucket_logging" "s3-metadata-bucket" {
-  bucket = module.s3-metadata-bucket.bucket.id
+resource "aws_s3_bucket_logging" "s3_buckets_logging" {
+  for_each = { for bucket in local.buckets_to_log : bucket.bucket.id => bucket }
+
+  bucket = each.value.bucket.id
 
   target_bucket = module.s3-logging-bucket.bucket.id
-  target_prefix = "logs/${local.bucket_prefix}-metadata/"
+  target_prefix = "logs/"
   target_object_key_format {
     partitioned_prefix {
       partition_date_source = "EventTime"
