@@ -157,13 +157,13 @@ resource "time_sleep" "wait_cm_custom_script" {
 ######################################
 
 resource "aws_instance" "concurrent_manager" {
-  ami                         = local.application_data.accounts[local.environment].cm_ami_id
+  ami                         = local.application_data.accounts[local.environment].cwa_poc2_cm_ami_id
   availability_zone           = "eu-west-2a"
-  instance_type               = local.application_data.accounts[local.environment].cm_instance_type
+  instance_type               = local.application_data.accounts[local.environment].cwa_poc2_cm_instance_type
   monitoring                  = true
-  vpc_security_group_ids      = [aws_security_group.concurrent_manager.id]
+  vpc_security_group_ids      = [aws_security_group.cwa_poc2_concurrent_manager.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.cwa.id
+  iam_instance_profile        = aws_iam_instance_profile.cwa_poc2.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.cm_userdata)
   user_data_replace_on_change = true
@@ -194,7 +194,7 @@ resource "aws_instance" "concurrent_manager" {
 # concurrent_manager Security Group Rules
 #################################
 
-resource "aws_security_group" "concurrent_manager" {
+resource "aws_security_group" "cwa_poc2_concurrent_manager" {
   name        = "${local.application_name_short}-${local.environment}-cm-security-group"
   description = "Security Group for concurrent_manager"
   vpc_id      = data.aws_vpc.shared.id
@@ -207,13 +207,13 @@ resource "aws_security_group" "concurrent_manager" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "cm_outbound" {
-  security_group_id = aws_security_group.concurrent_manager.id
+  security_group_id = aws_security_group.cwa_poc2_concurrent_manager.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "cm_bastion_ssh" {
-  security_group_id            = aws_security_group.concurrent_manager.id
+  security_group_id            = aws_security_group.cwa_poc2_concurrent_manager.id
   description                  = "SSH from the Bastion"
   referenced_security_group_id = module.bastion_linux.bastion_security_group
   from_port                    = 22
@@ -222,18 +222,18 @@ resource "aws_vpc_security_group_ingress_rule" "cm_bastion_ssh" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "cm_self" {
-  security_group_id            = aws_security_group.concurrent_manager.id
+  security_group_id            = aws_security_group.cwa_poc2_concurrent_manager.id
   description                  = "Access from itself"
-  referenced_security_group_id = aws_security_group.concurrent_manager.id
+  referenced_security_group_id = aws_security_group.cwa_poc2_concurrent_manager.id
   from_port                    = 1676
   ip_protocol                  = "tcp"
   to_port                      = 1676
 }
 
 resource "aws_vpc_security_group_ingress_rule" "cm_app" {
-  security_group_id            = aws_security_group.concurrent_manager.id
+  security_group_id            = aws_security_group.cwa_poc2_concurrent_manager.id
   description                  = "Access from the Application Server"
-  referenced_security_group_id = aws_security_group.app.id
+  referenced_security_group_id = aws_security_group.cwa_poc2_app.id
   from_port                    = 1676
   ip_protocol                  = "tcp"
   to_port                      = 1676
@@ -245,11 +245,11 @@ resource "aws_vpc_security_group_ingress_rule" "cm_app" {
 
 resource "aws_ebs_volume" "concurrent_manager" {
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_concurrent_manager_size
+  size              = local.application_data.accounts[local.environment].cwa_poc2_ebs_concurrent_manager_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].concurrent_manager_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_concurrent_manager_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     replace_triggered_by = [

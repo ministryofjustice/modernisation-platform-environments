@@ -23,12 +23,19 @@
       "cwa_poc2_app_ami_id": "ami-0ef40b85457e0369d",
       "cwa_poc2_app_instance_type": "m4.xlarge",
       "cwa_poc2_ebs_app_size": "200",
-
       "cwa_poc2_app_snapshot_id": "snap-0329caef83f4a6c51",
-      "cm_ami_id": "ami-07e44a593a5c8b851",
-      "cm_instance_type": "m4.xlarge",
-      "ebs_concurrent_manager_size": "200",
-      "concurrent_manager_snapshot_id": "snap-0c6a2f231e84f5e0c"
+      "cwa_poc2_cm_ami_id": "ami-0289054775271c368",
+      "cwa_poc2_cm_instance_type": "m4.xlarge",
+      "cwa_poc2_ebs_concurrent_manager_size": "200",
+      "cwa_poc2_concurrent_manager_snapshot_id": "snap-0d6366a360e73405b",
+      "cwa_poc2_db_ami_id": "cwa_poc2_db_instance_type",
+      "cwa_poc2_db_instance_type": "m4.xlarge",
+      "cwa_poc2_oradata_snapshot_id": "snap-0865afc8902cf3e33",
+      "cwa_poc2_oracle_snapshot_id": "snap-0aa1170623941a0c0",
+      "cwa_poc2_oraarch_snapshot_id": "snap-0cc5afafa1d02dda9",
+      "cwa_poc2_oratmp_snapshot_id": "snap-006681e789612afd5",
+      "cwa_poc2_oraredo_snapshot_id": "snap-02f13c959c57891f1",
+      "cwa_poc2_share_snapshot_id": "snap-02e8ec5eb874dd9e0"
     },
     "test": {
       "example_var": "test-data"

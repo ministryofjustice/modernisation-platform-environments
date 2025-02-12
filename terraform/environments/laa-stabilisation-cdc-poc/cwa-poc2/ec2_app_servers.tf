@@ -317,7 +317,7 @@ resource "aws_vpc_security_group_ingress_rule" "app_self_4" {
 resource "aws_vpc_security_group_ingress_rule" "app_cm_1" {
   security_group_id            = aws_security_group.cwa_poc2_app.id
   description                  = "Access from Concurrent Manager"
-  referenced_security_group_id = aws_security_group.concurrent_manager.id
+  referenced_security_group_id = aws_security_group.cwa_poc2_concurrent_manager.id
   from_port                    = 9050
   ip_protocol                  = "tcp"
   to_port                      = 9050
@@ -326,7 +326,7 @@ resource "aws_vpc_security_group_ingress_rule" "app_cm_1" {
 resource "aws_vpc_security_group_ingress_rule" "app_cm_2" {
   security_group_id            = aws_security_group.cwa_poc2_app.id
   description                  = "Access from Concurrent Manager"
-  referenced_security_group_id = aws_security_group.concurrent_manager.id
+  referenced_security_group_id = aws_security_group.cwa_poc2_concurrent_manager.id
   from_port                    = 8250
   ip_protocol                  = "tcp"
   to_port                      = 8250
@@ -335,7 +335,7 @@ resource "aws_vpc_security_group_ingress_rule" "app_cm_2" {
 resource "aws_vpc_security_group_ingress_rule" "app_cm_3" {
   security_group_id            = aws_security_group.cwa_poc2_app.id
   description                  = "Access from Concurrent Manager"
-  referenced_security_group_id = aws_security_group.concurrent_manager.id
+  referenced_security_group_id = aws_security_group.cwa_poc2_concurrent_manager.id
   from_port                    = 1676
   ip_protocol                  = "tcp"
   to_port                      = 1676
@@ -344,7 +344,7 @@ resource "aws_vpc_security_group_ingress_rule" "app_cm_3" {
 resource "aws_vpc_security_group_ingress_rule" "app_cm_4" {
   security_group_id            = aws_security_group.cwa_poc2_app.id
   description                  = "Access from Concurrent Manager"
-  referenced_security_group_id = aws_security_group.concurrent_manager.id
+  referenced_security_group_id = aws_security_group.cwa_poc2_concurrent_manager.id
   from_port                    = 8050
   ip_protocol                  = "tcp"
   to_port                      = 8050

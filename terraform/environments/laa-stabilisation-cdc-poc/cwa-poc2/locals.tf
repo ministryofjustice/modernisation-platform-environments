@@ -5,6 +5,7 @@ locals {
   environment = var.environment
 
   application_name_short = "cwa-poc2"
+  cloud_platform_cidr            = "172.20.0.0/16"
   database_ec2_name              = "${upper(local.application_name_short)} Database Instance"
   cm_ec2_name                    = "${upper(local.application_name_short)} Concurrent Manager Instance"
   appserver1_ec2_name            = "${upper(local.application_name_short)} App Instance 1"
