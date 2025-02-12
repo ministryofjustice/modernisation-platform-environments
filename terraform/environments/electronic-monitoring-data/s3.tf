@@ -154,13 +154,6 @@ module "s3-metadata-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-metadata/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
