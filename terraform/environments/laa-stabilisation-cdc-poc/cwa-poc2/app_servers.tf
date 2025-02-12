@@ -413,11 +413,11 @@ resource "aws_volume_attachment" "app1" {
 resource "aws_ebs_volume" "app2" {
   count             = contains(["development2", "testing"], local.environment) ? 0 : 1
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_app_size
+  size              = local.application_data.accounts[local.environment].cwa_poc2_ebs_app_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
-  snapshot_id       = local.application_data.accounts[local.environment].app_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_app_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
