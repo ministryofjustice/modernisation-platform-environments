@@ -190,7 +190,7 @@ Register-ScheduledJob -Name  Initialise-Server -Trigger $trigger -ScriptBlock {
   $Download = join-path $Download_Folder npp.8.7.5.Installer.x64.exe
 
   Invoke-WebRequest 'https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.7.5/npp.8.7.5.Installer.x64.exe'  -OutFile $Download
-  Start-Process "$Download_Folder" /S -NoNewWindow -Wait -PassThru -Wait
+  Start-Process "$Download" /S -NoNewWindow -Wait -PassThru -Wait
   Write-Output "$(Get-Date) Notepad++ installed" | Out-File  $logFile -Append
 
 
@@ -202,6 +202,10 @@ Register-ScheduledJob -Name  Initialise-Server -Trigger $trigger -ScriptBlock {
   Write-Output "$(Get-Date) pgAdmin installed" | Out-File  $logFile -Append
 
   Write-Output "$(Get-Date) Installs Complete" | Out-File  $logFile -Append
+
+  # Remove the following module as it prevents the PowerShell command window from accepting kekboard input on W2022
+  Remove-Module PSReadLine
+  Write-Output "$(Get-Date) PowerShell Module PSReadLie removed" | Out-File  $logFile -Append
   
   UnRegister-ScheduledJob -Name  Initialise-Server
 
