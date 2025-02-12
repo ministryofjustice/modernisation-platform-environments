@@ -129,7 +129,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [for bucket_arn in local.buckets_to_log : bucket[1]]
+      values   = [for bucket_arn in local.buckets_to_log : bucket_arn[1]]
     }
 
     condition {
