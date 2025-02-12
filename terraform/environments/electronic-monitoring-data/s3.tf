@@ -85,6 +85,40 @@ module "s3-logging-bucket" {
   tags = merge(local.tags, { resource-type = "logging" })
 }
 
+data "aws_iam_policy_document" "log_bucket_policy" {
+  statement {
+    sid       = "AWSLogDeliveryWrite"
+    effect    = "Allow"
+    actions   = ["s3:PutObject"]
+    resources = [
+        "${module.s3-metadata-bucket.bucket.arn}/${local.bucket_prefix}-metadata/AWSLogs/*"
+      ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "s3-metadata-bucket" {
+  bucket = module.s3-logging-bucket.bucket.id
+
+  target_bucket = module.log_buckets.bucket.id
+  target_prefix = "logs/${local.bucket_prefix}-metadata/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
 # ------------------------------------------------------------------------
 # Metadata Store Bucket
 # ------------------------------------------------------------------------
