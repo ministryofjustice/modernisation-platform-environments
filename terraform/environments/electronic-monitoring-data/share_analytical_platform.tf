@@ -8,7 +8,7 @@ locals {
   admin_roles            = local.is-development ? "sandbox_" : "data-eng"
   suffix                 = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
   live_feed_dbs          = ["serco_fms", "allied_mdss", "staged_fms", "preprocessed_fms"]
-  prod_dbs_to_grant      = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock", "historic_ears_and_sars_int", "historic_ears_and_sars_mart"] : []
+  prod_dbs_to_grant      = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock", "historic_ears_and_sars_int", "historic_ears_and_sars_mart", "emsys_mvp_stg"] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   live_feed_dbs_to_grant = [for db in local.live_feed_dbs : "${db}${local.dbt_suffix}"]
   dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.live_feed_dbs_to_grant]))
