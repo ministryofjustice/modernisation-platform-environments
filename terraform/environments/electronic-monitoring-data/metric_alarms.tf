@@ -38,12 +38,12 @@ module "files_in_fms_land_bucket_alarm" {
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
   version = "5.7.0"
 
-  alarm_name          = "fms-land-no-files"
-  alarm_description   = "Detect when no files land in fms bucket within 24 hours"
+  alarm_name          = "fms-land-not-enough-files"
+  alarm_description   = "Detect when not enough files land in fms bucket within 24 hours"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = 1
-  threshold           = 0
-  period              = 86400
+  threshold           = 51
+  period              = 90000
   unit                = "Count"
 
   namespace   = "AWS/S3"
@@ -83,7 +83,7 @@ locals {
 module "pagerduty_core_alerts" {
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   depends_on = [
-    aws_sns_topic.lambda_failure
+    aws_sns_topic.lambda_failure, aws_sns_topic.fms_land_bucket_count
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [for key, value in local.sns_names_map : value]
