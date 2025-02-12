@@ -26,7 +26,7 @@ locals {
     # module.s3-mdss-general-landing-bucket,
     # module.s3-mdss-ho-landing-bucket,
     # module.s3-mdss-specials-landing-bucket,
-    # module.s3-p1-export-bucket,
+    module.s3-p1-export-bucket,
     # module.s3-serco-export-bucket,
     module.s3-received-files-bucket,
     module.s3-quarantine-files-bucket,
