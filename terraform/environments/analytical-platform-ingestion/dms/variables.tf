@@ -4,6 +4,7 @@
 
 # create a data variable for the dms_kms module in the file ../kms-keys.tf
 
-data "dms_kms" {
-    default = "dms"
-}
+#data "dms_kms" {
+#    default = "dms"
+#
+#}

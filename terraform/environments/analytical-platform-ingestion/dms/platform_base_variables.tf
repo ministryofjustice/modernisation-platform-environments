@@ -6,13 +6,6 @@ variable "networking" {
 
 #####
 
-variable "collaborator_access" {
-  type        = string
-  default     = "developer"
-  description = "Collaborators must specify which access level they are using, eg set an environment variable of export TF_VAR_collaborator_access=migration"
-}
-
-
 variable collaborator_access {
   type        = string
   default     = "developer"
@@ -59,10 +52,6 @@ variable migration_type {
 
 
 # Networking
-
-variable networking {
-  type = list(any)
-}
 
 variable vpc {
   type = string
