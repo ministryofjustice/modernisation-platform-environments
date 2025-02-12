@@ -15,27 +15,28 @@ locals {
   }
 
   buckets_to_log = [
-    module.s3-metadata-bucket,
-    module.s3-athena-bucket,
-    module.s3-unzipped-files-bucket,
-    module.s3-dms-premigrate-assess-bucket,
-    module.s3-json-directory-structure-bucket,
-    module.s3-data-bucket,
-    # module.s3-fms-general-landing-bucket,
-    # module.s3-fms-specials-landing-bucket,
-    # module.s3-mdss-general-landing-bucket,
-    # module.s3-mdss-ho-landing-bucket,
-    # module.s3-mdss-specials-landing-bucket,
-    module.s3-p1-export-bucket,
-    # module.s3-serco-export-bucket,
-    module.s3-received-files-bucket,
-    module.s3-quarantine-files-bucket,
-    module.s3-clamav-definitions-bucket,
-    module.s3-dms-data-validation-bucket,
-    module.s3-glue-job-script-bucket,
-    module.s3-dms-target-store-bucket,
-    module.s3-create-a-derived-table-bucket,
-    module.s3-raw-formatted-data-bucket,
+    # [ bucket id, bucket arn ]
+    [module.s3-metadata-bucket.bucket.id, module.s3-metadata-bucket.bucket.arn],
+    [module.s3-athena-bucket.bucket.id, module.s3-athena-bucket.bucket.arn],
+    [module.s3-unzipped-files-bucket.bucket.id, module.s3-unzipped-files-bucket.bucket.arn],
+    [module.s3-dms-premigrate-assess-bucket.bucket.id, module.s3-dms-premigrate-assess-bucket.bucket.arn],
+    [module.s3-json-directory-structure-bucket.bucket.id, module.s3-json-directory-structure-bucket.bucket.arn],
+    [module.s3-data-bucket.bucket.id, module.s3-data-bucket.bucket.arn],
+    # [module.s3-fms-general-landing-bucket.bucket.id, module.s3-fms-general-landing-bucket.bucket.arn],
+    # [module.s3-fms-specials-landing-bucket.bucket.id, module.s3-fms-specials-landing-bucket.bucket.arn],
+    # [module.s3-mdss-general-landing-bucket.bucket.id, module.s3-mdss-general-landing-bucket.bucket.arn],
+    # [module.s3-mdss-ho-landing-bucket.bucket.id, module.s3-mdss-ho-landing-bucket.bucket.arn],
+    # [module.s3-mdss-specials-landing-bucket.bucket.id, module.s3-mdss-specials-landing-bucket.bucket.arn],
+    [module.s3-p1-export-bucket.bucket_id, module.s3-p1-export-bucket.bucket_arn],
+    # [module.s3-serco-export-bucket.bucket.id, module.s3-serco-export-bucket.bucket.arn],
+    [module.s3-received-files-bucket.bucket.id, module.s3-received-files-bucket.bucket.arn],
+    [module.s3-quarantine-files-bucket.bucket.id, module.s3-quarantine-files-bucket.bucket.arn],
+    [module.s3-clamav-definitions-bucket.bucket.id, module.s3-clamav-definitions-bucket.bucket.arn],
+    [module.s3-dms-data-validation-bucket.bucket.id, module.s3-dms-data-validation-bucket.bucket.arn],
+    [module.s3-glue-job-script-bucket.bucket.id, module.s3-glue-job-script-bucket.bucket.arn],
+    [module.s3-dms-target-store-bucket.bucket.id, module.s3-dms-target-store-bucket.bucket.arn],
+    [module.s3-create-a-derived-table-bucket.bucket.id, module.s3-create-a-derived-table-bucket.bucket.arn],
+    [module.s3-raw-formatted-data-bucket.bucket.id, module.s3-raw-formatted-data-bucket.bucket.arn],
   ]
 }
 
@@ -128,7 +129,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
     condition {
       test     = "ArnLike"
       variable = "aws:SourceArn"
-      values   = [for bucket in local.buckets_to_log : bucket.bucket.arn]
+      values   = [for bucket in local.buckets_to_log : bucket[1]]
     }
 
     condition {
@@ -140,7 +141,7 @@ data "aws_iam_policy_document" "log_bucket_policy" {
 }
 
 resource "aws_s3_bucket_logging" "s3_buckets_logging" {
-  for_each = { for bucket in local.buckets_to_log : bucket.bucket.id => bucket }
+  for_each = { for bucket in local.buckets_to_log : bucket[0] => bucket }
 
   bucket = each.value.bucket.id
 
