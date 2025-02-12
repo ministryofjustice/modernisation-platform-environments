@@ -256,11 +256,11 @@ resource "aws_ssm_document" "ssm_document" {
   document_type = "Command"
   content       = <<DOC
 {
-    "schemaVersion": "1.0",
+    "schemaVersion": "2.2",
     "description": "Automatic Domain Join Configuration",
-    "runtimeConfig": {
+    "mainSteps": {
         "aws:domainJoin": {
-            "properties": {
+            "inputs": {
                 "directoryId": "${aws_directory_service_directory.ds_managed_ad.id}",
                 "directoryName": "${aws_directory_service_directory.ds_managed_ad.name}",
                 "dnsIpAddresses": ${jsonencode(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)}
