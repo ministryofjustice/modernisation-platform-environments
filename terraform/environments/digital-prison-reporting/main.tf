@@ -59,9 +59,10 @@ module "glue_data_quality_spike_job" {
   )
 
   arguments = {
-    "--extra-jars"                = "s3://dpr-artifact-store-development/deequ-quality-poc-1.0-SNAPSHOT-all.jar"
-    "--extra-files"               = local.shared_log4j_properties_path
-    "--class"                     = "uk.gov.justice.digital.DemoJob"
+    "--extra-jars"       = "s3://dpr-artifact-store-development/deequ-quality-poc-1.0-SNAPSHOT-all.jar"
+    "--datalake-formats" = "delta"
+    "--extra-files"      = local.shared_log4j_properties_path
+    "--class"            = "uk.gov.justice.digital.DemoJob"
   }
 }
 
