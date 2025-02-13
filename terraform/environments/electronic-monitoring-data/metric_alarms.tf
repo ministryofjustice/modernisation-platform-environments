@@ -33,16 +33,17 @@ resource "aws_sns_topic" "fms_land_bucket_count" {
 
 # Alarm - "Detect when no files land in fms bucket within 24 hours"
 module "files_in_fms_land_bucket_alarm" {
+  count = local.is-development ? 0 : 1
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
   version = "5.7.0"
 
-  alarm_name          = "fms-land-no-files"
-  alarm_description   = "Detect when no files land in fms bucket within 24 hours"
+  alarm_name          = "fms-land-not-enough-files"
+  alarm_description   = "Detect when not enough files land in fms bucket within 24 hours"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = 1
-  threshold           = 0
-  period              = 86400
+  threshold           = 51
+  period              = 90000
   unit                = "Count"
 
   namespace   = "AWS/S3"
@@ -50,11 +51,11 @@ module "files_in_fms_land_bucket_alarm" {
   statistic   = "Sum"
 
   dimensions = {
-    BucketName  = module.s3-fms-general-landing-bucket.bucket.id
-    StorageType = "AllStorageTypes"
+    BucketName  = module.s3-fms-general-landing-bucket.bucket_id
+    StorageType = "StandardStorage"
   }
 
-  alarm_actions = [aws_sns_topic.land_bucket_count.arn]
+  alarm_actions = [aws_sns_topic.fms_land_bucket_count.arn]
 }
 
 
@@ -72,14 +73,17 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 # Add a local to get the keys
 locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  sns_names_map              = tomap({ "lambda_failure" : aws_sns_topic.lambda_failure.name, "fms_bucket_alarm" : aws_sns_topic.fms_land_bucket_count.name })
+  sns_names_map = tomap({
+    "lambda_failure" : aws_sns_topic.lambda_failure.name
+    "fms_bucket_alarm" : aws_sns_topic.fms_land_bucket_count.name
+  })
 }
 
 # link the sns topic to the service
 module "pagerduty_core_alerts" {
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   depends_on = [
-    aws_sns_topic.lambda_failure
+    aws_sns_topic.lambda_failure, aws_sns_topic.fms_land_bucket_count
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [for key, value in local.sns_names_map : value]
