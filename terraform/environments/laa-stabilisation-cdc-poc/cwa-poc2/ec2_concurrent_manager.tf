@@ -142,7 +142,7 @@ EOF
 resource "aws_s3_object" "cm_custom_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "cm-cw-custom.sh"
-  source      = "./cm-cw-custom.sh"
+  source      = "./cwa-poc2/cm-cw-custom.sh"
   source_hash = filemd5("./cwa-poc2/cm-cw-custom.sh")
 }
 

@@ -142,28 +142,28 @@ EOF
 resource "aws_s3_object" "app_custom_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "app-cw-custom.sh"
-  source      = "./app-cw-custom.sh"
+  source      = "./cwa-poc2/app-cw-custom.sh"
   source_hash = filemd5("./cwa-poc2/app-cw-custom.sh")
 }
 
 resource "aws_s3_object" "app_prereqs_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "app-prereqs.sh"
-  source      = "./scripts/app-prereqs.sh"
+  source      = "./cwa-poc2/scripts/app-prereqs.sh"
   source_hash = filemd5("./cwa-poc2/scripts/app-prereqs.sh")
 }
 
 resource "aws_s3_object" "app_postbuild_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "app-postbuild.sh"
-  source      = "./scripts/app-postbuild.sh"
+  source      = "./cwa-poc2/scripts/app-postbuild.sh"
   source_hash = filemd5("./cwa-poc2/scripts/app-postbuild.sh")
 }
 
 resource "aws_s3_object" "disk_space_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "disk-space-alert.sh"
-  source      = "./scripts/disk-space-alert.sh"
+  source      = "./cwa-poc2/scripts/disk-space-alert.sh"
   source_hash = filemd5("./cwa-poc2/scripts/disk-space-alert.sh")
 }
 

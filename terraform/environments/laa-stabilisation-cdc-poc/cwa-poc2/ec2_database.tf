@@ -152,21 +152,21 @@ EOF
 resource "aws_s3_object" "db_custom_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-cw-custom.sh"
-  source      = "./db-cw-custom.sh"
+  source      = "./cwa-poc2/db-cw-custom.sh"
   source_hash = filemd5("./cwa-poc2/db-cw-custom.sh")
 }
 
 resource "aws_s3_object" "db_prereqs_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-prereqs.sh"
-  source      = "./scripts/db-prereqs.sh"
+  source      = "./cwa-poc2/scripts/db-prereqs.sh"
   source_hash = filemd5("./cwa-poc2/scripts/db-prereqs.sh")
 }
 
 resource "aws_s3_object" "db_postbuild_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-postbuild.sh"
-  source      = "./scripts/db-postbuild.sh"
+  source      = "./cwa-poc2/scripts/db-postbuild.sh"
   source_hash = filemd5("./cwa-poc2/scripts/db-postbuild.sh")
 }
 
