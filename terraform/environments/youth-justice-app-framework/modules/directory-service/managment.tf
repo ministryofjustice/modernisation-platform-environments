@@ -234,6 +234,7 @@ resource "aws_instance" "ad_instance" {
   vpc_security_group_ids      = [aws_security_group.ad_sg.id]
   tags                        = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
   user_data                   = data.template_file.windows-dc-userdata.rendered
+  user_data_replace_on_change = true
   ebs_optimized               = true
   lifecycle {
     ignore_changes = [ami]
@@ -301,10 +302,6 @@ resource "aws_ssm_association" "associate_ssm" {
       key    = "InstanceIds"
       values = [aws_instance.ad_instance.id]
     }
-    parameters = {
-      key    = "directoryId"
-      values = [aws_directory_service_directory.ds_managed_ad.id]
-    }
-    
+ 
 #  instance_id = aws_instance.ad_instance.id
 }
