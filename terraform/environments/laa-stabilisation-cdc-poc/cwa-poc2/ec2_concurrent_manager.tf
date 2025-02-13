@@ -161,7 +161,7 @@ resource "aws_instance" "concurrent_manager" {
   instance_type               = var.application_data.accounts[local.environment].cwa_poc2_cm_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.cwa_poc2_concurrent_manager.id]
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  subnet_id                   = var.private_subnet_a_id
   iam_instance_profile        = aws_iam_instance_profile.cwa_poc2.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.cm_userdata)

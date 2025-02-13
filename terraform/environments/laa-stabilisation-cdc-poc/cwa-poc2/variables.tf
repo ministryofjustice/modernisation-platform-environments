@@ -71,3 +71,8 @@ variable "data_subnet_a_id" {
   description = "Data subnet A ID"
   type        = string
 }
+
+variable "private_subnet_a_id" {
+  description = "Private subnet A ID"
+  type        = string
+}

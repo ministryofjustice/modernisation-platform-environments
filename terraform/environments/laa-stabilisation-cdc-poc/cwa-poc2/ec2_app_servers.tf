@@ -48,7 +48,6 @@ sysfs   /sys    sysfs   defaults        0 0
 proc    /proc   proc    defaults        0 0
 /dev/VolGroup00/LogVol01        swap    swap    defaults        0 0
 /dev/xvdf /CWA/app ext4 defaults 0 0
-# ${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
 ${local.database_hostname}:/CWA/share /CWA/share nfs rw,nolock 0 0
 EOT
 
@@ -184,7 +183,7 @@ resource "aws_instance" "app1" {
   instance_type               = var.application_data.accounts[local.environment].cwa_poc2_app_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.cwa_poc2_app.id]
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  subnet_id                   = var.private_subnet_a_id
   iam_instance_profile        = aws_iam_instance_profile.cwa_poc2.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.app_userdata)
