@@ -31,9 +31,12 @@ resource "aws_iam_policy" "read_s3_install_software" {
 			"Effect": "Allow",
 			"Action": [
 				"s3:GetObject",
-				"s3:GetObjectTagging"
+				"s3:GetObjectTagging",
+				"s3:ListBucket"
 			],
-			"Resource": "arn:aws:s3:::${var.environment_name}-install-files/*"
+			"Resource": ["arn:aws:s3:::${var.environment_name}-install-files/*",
+			             "arn:aws:s3:::${var.environment_name}-install-files"
+      ]
 		}
 	]
   })
@@ -60,12 +63,12 @@ resource "aws_iam_role_policy_attachment" "join_ad_role_policy_core" {
 #data resource to get the latest CIS Microsoft Windows Server 2019 Benchmark - Level 1 ami
 data "aws_ami" "windows_2022" {
   most_recent = true
- #  owners      = ["aws-marketplace"] # Use this after Subscription 
-   owners      = ["amazon"] # to remove
+   owners      = ["aws-marketplace"] # Use this after Subscription 
+ #  owners      = ["amazon"] # to remove
  filter {
     name   = "name"
- #   values = "CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*" # Use this after Subscription 
-   values = ["Windows_Server-2022-English-Full-Base-*"] # to be removed
+    values = "CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*" # Use this after Subscription 
+ #  values = ["Windows_Server-2022-English-Full-Base-*"] # to be removed
     
    }
   filter {
@@ -185,6 +188,7 @@ Set-DnsClientServerAddress -InterfaceIndex $adapterIndex -ServerAddresses $dnsSe
 New-Item -Path "C:\"    -Name "i2N"      -ItemType Directory
 New-Item -Path "C:\i2N" -Name "Software" -ItemType Directory
 New-Item -Path "C:\i2N" -Name "Log"      -ItemType Directory
+New-Item -Path "C:\i2N" -Name "Scripts"  -ItemType Directory
 
 # Create a job to run following Restart
 $trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30

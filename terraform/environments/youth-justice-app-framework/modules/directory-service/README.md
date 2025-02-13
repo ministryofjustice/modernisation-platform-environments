@@ -41,27 +41,44 @@ This section contains instructions for [initialising the AD Management instances
 
 ## Initial configuration
 
-When the instances is created the User-Data script performs some language setup changes (including change the data format to English(UK) and the Timezone) and installs the following software:
+When each instance is created the User-Data script performs some language setup changes (including changing the date format to English(UK) and the Timezone) and install's the following software:
 - Firefox
 - Notepad++
 - pgAdmin
 
 ## Required Manual Configuraiton Changes
 
-Limitaitons in what can be automated mean thagt the following actions must be completed manually. (A change to use W2022 may mean that more can be automated, but this activiuty is being deferred while higher priority re-palatforming activities are completed.)
+Limitaitons in what can be automated mean that the following actions must be completed manually. (A change to use W2022 may mean that more can be automated, but this activiuty is being deferred while higher priority re-palatforming activities are completed.)
 - Installing Language English (UK) and making it the defauls for all users.
+
+On each management instance:
+1. At `Settings > Time & Language > Language` select `Add a language` and add `English (United Kingdom)`.
+2. Wait for it to download and install (could take several minutes).
+3. 
 
 ## Software Install
 A script exists to install the following softare after making the instal files availabel by uploading them to the S3 bucket created for this purpose, `<envioronment>-install-files`.
 
-Manually Upload the following files to folder `Management-Software` in the above bukket:
-- `GoogleChromeStandaloneEnterprise64.msi
-- `putty-64bit-0.82-installer.msi
-- `WinMerge-2.16.46-x64-Setup.exe
-- `WinSCP-6.3.6-Setup.exe
-- `management-server-app-install.ps1
+1. Manually Upload the following files to folder `Management-Software` in the above bukket:
+    - `GoogleChromeStandaloneEnterprise64.msi
+    - `putty-64bit-0.82-installer.msi
+    - `WinMerge-2.16.46-x64-Setup.exe
+    - `WinSCP-6.3.6-Setup.exe
+    - `management-server-app-install.ps1
 
-While on the management instance copy the install script from the bucket using the following command:
+2. Open a `Windows Powershell` command windows with 'Run as administrator`.
+3. If the windows will not accept key board this is most likjlet to be due to a defect in module `PSReadLine` Version 2.0.0 and it can be resolved by pasting and running the following command `Remove-Module PSReadLine`.
+4. Download the application install script using the following PowerShell command:
+
+> `Copy-S3Object -BucketName yjaf-<environment>-install-files -Key Management-Software/management-server-app-install.ps1 -LocalFile c:\i2N\Scripts\management-server-app-install.ps1`
+
+E.g.
+
+> `Copy-S3Object -BucketName yjaf-development-install-files -Key Management-Software/management-server-app-install.ps1 -LocalFile c:\i2N\Scripts\management-server-app-install.ps1`
+
+
+5. gdgf
+
 
 
 
