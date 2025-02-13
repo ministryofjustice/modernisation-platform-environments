@@ -36,3 +36,13 @@ variable "bastion_security_group" {
   description = "The security group ID for the bastion host"
   type        = string
 }
+
+variable "shared_vpc_cidr" {
+  description = "The security group ID for the bastion host"
+  type        = string
+}
+
+variable "current_account_id" {
+  description = "The security group ID for the bastion host"
+  type        = string
+}

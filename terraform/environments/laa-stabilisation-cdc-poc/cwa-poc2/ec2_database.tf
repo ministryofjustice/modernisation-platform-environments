@@ -27,7 +27,7 @@ proc    /proc   proc    defaults        0 0
 /dev/xvd${local.oraredo_device_name_letter} /CWA/oraredo ext4 defaults  0 0
 /dev/xvd${local.oracle_device_name_letter} /CWA/oracle  ext4 defaults  0 0
 /dev/xvd${local.share_device_name_letter} /CWA/share  ext4 defaults  0 0
-${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
+# ${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
 EOT
 
 mount -a
@@ -268,7 +268,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_workspaces_2" {
 resource "aws_vpc_security_group_ingress_rule" "db_local_vpc_1" {
   security_group_id = aws_security_group.cwa_poc2_database.id
   description       = "DB access from local VPC"
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  cidr_ipv4         = var.shared_vpc_cidr #!ImportValue env-VpcCidr
   from_port         = 1571
   ip_protocol       = "tcp"
   to_port           = 1571
@@ -277,7 +277,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_local_vpc_1" {
 resource "aws_vpc_security_group_ingress_rule" "db_local_vpc_2" {
   security_group_id = aws_security_group.cwa_poc2_database.id
   description       = "DB access from local VPC"
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block #!ImportValue env-VpcCidr
+  cidr_ipv4         = var.shared_vpc_cidr #!ImportValue env-VpcCidr
   from_port         = 1521
   ip_protocol       = "tcp"
   to_port           = 1521

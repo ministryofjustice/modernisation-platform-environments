@@ -67,7 +67,7 @@ resource "aws_iam_policy" "cwa_poc2" {
                 "secretsmanager:GetSecretValue"
             ],
             "Resource": [
-                "arn:aws:secretsmanager:eu-west-2:${data.aws_caller_identity.current.account_id}:secret:cwa/app/*"
+                "arn:aws:secretsmanager:eu-west-2:${var.current_account_id}:secret:cwa/app/*"
             ],
             "Effect": "Allow"
         },
@@ -76,7 +76,7 @@ resource "aws_iam_policy" "cwa_poc2" {
             "Action": [
                 "ssm:GetParameter"
             ],
-            "Resource": "arn:aws:ssm:eu-west-2:${data.aws_caller_identity.current.account_id}:parameter/*SLACK_ALERT_URL"
+            "Resource": "arn:aws:ssm:eu-west-2:${var.current_account_id}:parameter/*SLACK_ALERT_URL"
         },
         {
             "Action": [

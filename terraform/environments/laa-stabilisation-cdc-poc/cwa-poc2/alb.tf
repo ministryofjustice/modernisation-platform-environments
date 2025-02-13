@@ -1,5 +1,5 @@
 locals {
-  lb_logs_bucket                = local.application_data.accounts[local.environment].lb_access_logs_existing_bucket_name
+  lb_logs_bucket                = var.application_data.accounts[local.environment].lb_access_logs_existing_bucket_name
   lb_enable_deletion_protection = false
   external_lb_idle_timeout      = 900
   force_destroy_lb_logs_bucket  = true
@@ -189,7 +189,7 @@ resource "aws_lb_target_group" "external" {
   name                          = "${local.application_name_short}-TargetGroup"
   port                          = 8050
   protocol                      = "HTTP"
-  vpc_id                        = data.aws_vpc.shared.id
+  vpc_id                        = var.shared_vpc_id
   deregistration_delay          = 10
   load_balancing_algorithm_type = "least_outstanding_requests"
   health_check {
