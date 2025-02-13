@@ -49,7 +49,6 @@ sysfs   /sys    sysfs   defaults        0 0
 proc    /proc   proc    defaults        0 0
 /dev/VolGroup00/LogVol01        swap    swap    defaults        0 0
 /dev/xvdf /CWA/app ext4 defaults 0 0
-${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
 ${local.database_hostname}:/CWA/share /CWA/share nfs rw,nolock 0 0
 EOT
 

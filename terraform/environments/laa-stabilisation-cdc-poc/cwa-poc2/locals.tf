@@ -25,3 +25,6 @@ locals {
 
 # Removed the line from ec2_database.tf file. Line 30 in the file.
 # ${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
+
+# Removed the line from ec2_concurrent_manager.tf file. Line 52 in the file.
+# ${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2

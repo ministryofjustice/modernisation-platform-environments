@@ -17,6 +17,11 @@ variable "route53_zone_external" {
   type        = string
 }
 
+variable "route53_zone_network_services_id" {
+  description = "The external Route53 zone name"
+  type        = string
+}
+
 variable "route53_zone_external_id" {
   description = "The external Route53 zone id"
   type        = string
@@ -62,3 +67,7 @@ variable "public_subnet_c_id" {
   type        = string
 }
 
+variable "data_subnet_a_id" {
+  description = "Data subnet A ID"
+  type        = string
+}
