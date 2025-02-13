@@ -144,7 +144,7 @@ resource "aws_s3_object" "cm_custom_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "cm-cw-custom.sh"
   source      = "./cm-cw-custom.sh"
-  source_hash = filemd5("./cm-cw-custom.sh")
+  source_hash = filemd5("./cwa-poc2/cm-cw-custom.sh")
 }
 
 resource "time_sleep" "wait_cm_custom_script" {
@@ -197,7 +197,7 @@ resource "aws_instance" "concurrent_manager" {
 resource "aws_security_group" "cwa_poc2_concurrent_manager" {
   name        = "${local.application_name_short}-${local.environment}-cm-security-group"
   description = "Security Group for concurrent_manager"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.shared_vpc_id
 
   tags = merge(
     var.tags,
@@ -248,7 +248,7 @@ resource "aws_ebs_volume" "concurrent_manager" {
   size              = local.application_data.accounts[local.environment].cwa_poc2_ebs_concurrent_manager_size
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
   snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_concurrent_manager_snapshot_id # This is used for when data is being migrated
 
   lifecycle {

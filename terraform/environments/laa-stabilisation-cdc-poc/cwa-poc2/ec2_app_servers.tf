@@ -254,7 +254,7 @@ resource "aws_instance" "app2" {
 resource "aws_security_group" "cwa_poc2_app" {
   name        = "${local.application_name_short}-${local.environment}-app-security-group"
   description = "Security Group for Application Servers"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.shared_vpc_id
 
   tags = merge(
     var.tags,
@@ -388,7 +388,7 @@ resource "aws_ebs_volume" "app1" {
   size              = local.application_data.accounts[local.environment].cwa_poc2_ebs_app_size
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
   snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_app_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
@@ -416,7 +416,7 @@ resource "aws_ebs_volume" "app2" {
   size              = local.application_data.accounts[local.environment].cwa_poc2_ebs_app_size
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
   snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_app_snapshot_id # This is used for when data is being migrated
 
   lifecycle {

@@ -154,21 +154,21 @@ resource "aws_s3_object" "db_custom_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-cw-custom.sh"
   source      = "./db-cw-custom.sh"
-  source_hash = filemd5("./db-cw-custom.sh")
+  source_hash = filemd5("./cwa-poc2/db-cw-custom.sh")
 }
 
 resource "aws_s3_object" "db_prereqs_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-prereqs.sh"
   source      = "./scripts/db-prereqs.sh"
-  source_hash = filemd5("./scripts/db-prereqs.sh")
+  source_hash = filemd5("./cwa-poc2/scripts/db-prereqs.sh")
 }
 
 resource "aws_s3_object" "db_postbuild_script" {
   bucket      = aws_s3_bucket.scripts.id
   key         = "db-postbuild.sh"
   source      = "./scripts/db-postbuild.sh"
-  source_hash = filemd5("./scripts/db-postbuild.sh")
+  source_hash = filemd5("./cwa-poc2/scripts/db-postbuild.sh")
 }
 
 resource "time_sleep" "wait_db_userdata_scripts" {
@@ -223,7 +223,7 @@ resource "aws_key_pair" "cwa" {
 resource "aws_security_group" "cwa_poc2_database" {
   name        = "${local.application_name_short}-${local.environment}-db-security-group"
   description = "Security Group for database"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.shared_vpc_id
 
   tags = merge(
     var.tags,
@@ -412,7 +412,7 @@ resource "aws_ebs_volume" "oradata" {
   size              = local.application_data.accounts[local.environment].ebs_oradata_size
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
   snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oradata_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
@@ -436,7 +436,7 @@ resource "aws_ebs_volume" "oracle" {
   size              = local.application_data.accounts[local.environment].ebs_oracle_size
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
   snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oracle_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
@@ -460,7 +460,7 @@ resource "aws_ebs_volume" "oraarch" {
   size              = local.application_data.accounts[local.environment].ebs_oraarch_size
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
   snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oraarch_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
@@ -484,7 +484,7 @@ resource "aws_ebs_volume" "oratmp" {
   size              = local.application_data.accounts[local.environment].ebs_oratmp_size
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
   snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oratmp_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
@@ -508,7 +508,7 @@ resource "aws_ebs_volume" "oraredo" {
   size              = local.application_data.accounts[local.environment].ebs_oraredo_size
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
   snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oraredo_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
@@ -532,7 +532,7 @@ resource "aws_ebs_volume" "share" {
   size              = local.application_data.accounts[local.environment].ebs_share_size
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
   snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_share_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
