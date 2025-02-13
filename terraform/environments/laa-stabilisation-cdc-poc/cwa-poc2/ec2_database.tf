@@ -73,16 +73,16 @@ sed -i '/${local.database_hostname}$/d' /etc/hosts
 sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
 sed -i '/${local.cm_hostname}$/d' /etc/hosts
 sed -i '/laa-oem-app$/d' /etc/hosts # This is removed for POC
-echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
-echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
-echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
+echo "$PRIVATE_IP	${local.application_name_short}-db.${var.route53_zone_external}		${local.database_hostname}" >> /etc/hosts
+echo "$APP1_IP	${local.application_name_short}-app1.${var.route53_zone_external}		${local.appserver1_hostname}" >> /etc/hosts
+echo "$CM_IP	${local.application_name_short}-app2.${var.route53_zone_external}		${local.cm_hostname}" >> /etc/hosts
 
 ## Update the send mail url
 echo "Update Sendmail configurations"
 sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${local.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.cf
-sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.cf
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.cf
 sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${local.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.mc
-sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /etc/mail/sendmail.mc
+sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
 echo "Update Slack alert URL for Oracle scripts"
@@ -143,7 +143,7 @@ cat <<EOT > /etc/cron.d/custom_cloudwatch_metrics
 EOT
 
 ## Additional DBA steps
-su oracle -c "sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/oracle/product/10.2.0/db_1/appsutil/CWA_cwa-db.xml"
+su oracle -c "sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /CWA/oracle/product/10.2.0/db_1/appsutil/CWA_cwa-db.xml"
 
 EOF
 

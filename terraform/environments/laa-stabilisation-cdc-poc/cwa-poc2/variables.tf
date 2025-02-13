@@ -11,3 +11,8 @@ variable "tags" {
   description = "Tags to apply to resources"
   type        = map(string)
 }
+
+variable "route53_zone_external" {
+  description = "The external Route53 zone name"
+  type        = string
+}
