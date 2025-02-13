@@ -140,14 +140,14 @@ resource "aws_lb" "external" {
 
   access_logs {
     bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
-    prefix  = "${local.application_name}-LoadBalancer"
+    prefix  = "${local.application_name_short}-LoadBalancer"
     enabled = true
   }
 
   tags = merge(
-    local.tags,
+    var.tags,
     {
-      Name = "${local.application_name}-LoadBalancer"
+      Name = "${local.application_name_short}-LoadBalancer"
     },
   )
 }
@@ -165,7 +165,7 @@ resource "aws_lb_listener" "external" {
     target_group_arn = aws_lb_target_group.external.arn
   }
 
-  tags = local.tags
+  tags = var.tags
 
 }
 
@@ -207,9 +207,9 @@ resource "aws_lb_target_group" "external" {
   }
 
   tags = merge(
-    local.tags,
+    var.tags,
     {
-      Name = "${local.application_name}-TargetGroup"
+      Name = "${local.application_name_short}-TargetGroup"
     },
   )
 
@@ -234,9 +234,9 @@ resource "aws_lb_target_group_attachment" "external2" {
 ############################################
 
 resource "aws_security_group" "external_lb" {
-  name        = "${local.application_name}-external-lb-security-group"
-  description = "${local.application_name} ALB Security Group"
-  vpc_id      = data.aws_vpc.shared.id
+  name        = "${local.application_name_short}-external-lb-security-group"
+  description = "${local.application_name_short} ALB Security Group"
+  vpc_id      = var.shared_vpc_id
 }
 
 resource "aws_vpc_security_group_ingress_rule" "external_lb_inbound" {
