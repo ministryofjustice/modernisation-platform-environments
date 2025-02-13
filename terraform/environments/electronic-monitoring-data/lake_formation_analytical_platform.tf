@@ -42,7 +42,7 @@ resource "aws_lakeformation_permissions" "s3_bucket_permissions_for_ap" {
 
 resource "aws_lakeformation_permissions" "grant_account_table_filter_de" {
   count       = local.is-test ? 1 : 0
-  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_AdministratorAccess_48361bdb022cb721"
   permissions = ["SELECT"]
   data_cells_filter {
     database_name    = "staged_fms_test_dbt"
@@ -54,7 +54,7 @@ resource "aws_lakeformation_permissions" "grant_account_table_filter_de" {
 
 resource "aws_lakeformation_permissions" "grant_account_table_de" {
   count       = local.is-test ? 1 : 0
-  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_AdministratorAccess_48361bdb022cb721"
   permissions = ["DESCRIBE"]
   table {
     database_name = "staged_fms_test_dbt"
@@ -64,7 +64,7 @@ resource "aws_lakeformation_permissions" "grant_account_table_de" {
 
 resource "aws_lakeformation_permissions" "grant_account_database_de" {
   count       = local.is-test ? 1 : 0
-  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_AdministratorAccess_48361bdb022cb721"
   permissions = ["DESCRIBE"]
   database {
     name = "staged_fms_test_dbt"
@@ -72,7 +72,7 @@ resource "aws_lakeformation_permissions" "grant_account_database_de" {
 }
 
 resource "aws_lakeformation_permissions" "s3_bucket_permissions_for_ap_de" {
-  principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_AdministratorAccess_48361bdb022cb721"
 
   permissions = ["DATA_LOCATION_ACCESS"]
 
