@@ -21,7 +21,7 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
       eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce"
+      eks_node_version    = "1.32.0-cacc4ce9"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
         kube_proxy             = "v1.32.0-eksbuild.2"
@@ -70,7 +70,7 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce"
+      eks_node_version    = "1.32.0-cacc4ce9"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
         kube_proxy             = "v1.32.0-eksbuild.2"
@@ -119,7 +119,7 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce"
+      eks_node_version    = "1.32.0-cacc4ce9"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
         kube_proxy             = "v1.32.0-eksbuild.2"
