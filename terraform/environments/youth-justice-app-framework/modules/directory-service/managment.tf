@@ -259,29 +259,7 @@ resource "aws_ssm_document" "ssm_document" {
 {
   "schemaVersion": "2.2",
   "description": "aws:domainJoin",
-  "parameters": {
-    "directoryId": {
-      "description": "(Required) The ID of the directory.",
-      "type": "String"
-    },
-    "directoryName": {
-      "description": "(Required) The name of the domain.",
-      "type": "String"
-    },
-    "directoryOU": {
-        "description": "(Optional) The organizational unit to assign the computer object to.",
-        "type": "String"
-      },
-    "dnsIpAddresses": {
-      "description": "(Required) The IP addresses of the DNS servers for your directory.",
-      "type": "StringList"
-    },
-    "hostname": {
-        "description": "(Optional) The hostname you want to assign to the node.",
-        "type": "String"
-      }
-  },
-  "mainSteps": [
+   "mainSteps": [
     {
       "action": "aws:domainJoin",
       "name": "domainJoin",
