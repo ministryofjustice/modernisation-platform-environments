@@ -29,7 +29,7 @@
       "cwa_poc2_cm_instance_type": "m4.xlarge",
       "cwa_poc2_ebs_concurrent_manager_size": "200",
       "cwa_poc2_concurrent_manager_snapshot_id": "snap-0d6366a360e73405b",
-      "cwa_poc2_db_ami_id": "cwa_poc2_db_instance_type",
+      "cwa_poc2_db_ami_id": "ami-056d148e298f95dcc",
       "cwa_poc2_db_instance_type": "m4.xlarge",
       "cwa_poc2_oradata_snapshot_id": "snap-0865afc8902cf3e33",
       "cwa_poc2_oracle_snapshot_id": "snap-0aa1170623941a0c0",
