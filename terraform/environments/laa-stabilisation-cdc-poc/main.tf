@@ -3,7 +3,6 @@ module "cwa-poc2-environment" {
 
   providers = {
     aws = aws
-    aws.core-vpc = aws.core-vpc
   }
 
   environment = local.environment
