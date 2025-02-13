@@ -19,6 +19,33 @@ resource "aws_iam_role" "join_ad_role" {
 EOF
 }
 
+#create a policy to all management instance to download files from the install-files bucket
+resource "aws_iam_policy" "read_s3_install_software" {
+  name = "read_s3_install_software"
+  description = "Use to enable ec2 Instances to retrieve software from S3 bucket <enviroment>-install-files"
+  policy = jsonencode({
+ 	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": [
+				"s3:GetObject",
+				"s3:GetObjectTagging"
+			],
+			"Resource": "arn:aws:s3:::${var.environment_name}-install-files/*"
+		}
+	]
+  })
+}
+
+#attach policies Aread_s3_install_software
+resource "aws_iam_role_policy_attachment" "join_ad_role_policy_s3_access" {
+  role       = aws_iam_role.join_ad_role.name
+  policy_arn = aws_iam_policy.read_s3_install_software.arn
+}
+
+
 #attach policies AmazonSSMDirectoryServiceAccess and AmazonSSMManagedInstanceCore
 resource "aws_iam_role_policy_attachment" "join_ad_role_policy_ad_access" {
   role       = aws_iam_role.join_ad_role.name
@@ -33,12 +60,12 @@ resource "aws_iam_role_policy_attachment" "join_ad_role_policy_core" {
 #data resource to get the latest CIS Microsoft Windows Server 2019 Benchmark - Level 1 ami
 data "aws_ami" "windows_2022" {
   most_recent = true
-   owners      = ["aws-marketplace"] # Use this after Subscription 
-  # owners      = ["amazon"] # to remove
+ #  owners      = ["aws-marketplace"] # Use this after Subscription 
+   owners      = ["amazon"] # to remove
  filter {
     name   = "name"
-    values = ["CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*"] # Use this after Subscription 
-  # values = ["Windows_Server-2022-English-Full-Base-*"] # to be removed
+ #   values = "CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*" # Use this after Subscription 
+   values = ["Windows_Server-2022-English-Full-Base-*"] # to be removed
     
    }
   filter {

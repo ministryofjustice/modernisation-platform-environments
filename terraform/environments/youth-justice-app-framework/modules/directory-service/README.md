@@ -33,7 +33,42 @@ module "managed-ad" {
 }
 ```
 
-## Copy Data from one env to another
+# Cutover and Setup Guidance
+## Introduciton
+This section contains instructions for [initialising the AD Management instances](#managment-server-setup) and [copying active directory users and groups from the old to the new environment](#user-group-copy).
+
+## [Managment Server Setup](#managment-server-setup)
+
+## Initial configuration
+
+When the instances is created the User-Data script performs some language setup changes (including change the data format to English(UK) and the Timezone) and installs the following software:
+- Firefox
+- Notepad++
+- pgAdmin
+
+## Required Manual Configuraiton Changes
+
+Limitaitons in what can be automated mean thagt the following actions must be completed manually. (A change to use W2022 may mean that more can be automated, but this activiuty is being deferred while higher priority re-palatforming activities are completed.)
+- Installing Language English (UK) and making it the defauls for all users.
+
+## Software Install
+A script exists to install the following softare after making the instal files availabel by uploading them to the S3 bucket created for this purpose, `<envioronment>-install-files`.
+
+Manually Upload the following files to folder `Management-Software` in the above bukket:
+- `GoogleChromeStandaloneEnterprise64.msi
+- `putty-64bit-0.82-installer.msi
+- `WinMerge-2.16.46-x64-Setup.exe
+- `WinSCP-6.3.6-Setup.exe
+- `management-server-app-install.ps1
+
+While on the management instance copy the install script from the bucket using the following command:
+
+
+
+
+
+
+## [Copy Users & Groups](#user-group-copy)
 
 The following describes the process of copying data from one environment to another. For example copying from preprod to dev.
 
@@ -173,3 +208,10 @@ Copy the output files to an S3 bucket that can be accessed by your target accoun
 - **ds_managed_ad_ips**: AWS Microsoft Managed AD DNS IPs
 
 - **managed_ad_password_secret_id**: Admin password is set as an entry on AWS Secrets Manager as _managed-ad-fqdn\_admin_
+
+## Initialise Management Instances
+
+Location for User-DAta scripts and log files:
+
+
+C:\Windows\System32\config\systemprofile\AppData\Local\Temp\Amazon\EC2-Windows\Launch\InvokeUserData
