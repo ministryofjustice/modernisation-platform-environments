@@ -16,3 +16,8 @@ variable "route53_zone_external" {
   description = "The external Route53 zone name"
   type        = string
 }
+
+variable "route53_zone_external_id" {
+  description = "The external Route53 zone id"
+  type        = string
+}
