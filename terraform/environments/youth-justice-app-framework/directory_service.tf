@@ -14,6 +14,8 @@ module "ds" {
   project_name = local.project_name
   tags         = merge(local.tags, { Name = "AD Management Server" })
 
+  environment_name = local.application_data.accounts[local.environment].environment_name
+
   ds_managed_ad_directory_name = "i2n.com"
   ds_managed_ad_short_name     = "i2n"
   management_keypair_name      = "ad_management_server"
