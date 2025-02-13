@@ -20,6 +20,15 @@ resource "aws_lakeformation_permissions" "grant_account_table" {
   }
 }
 
+resource "aws_lakeformation_permissions" "grant_account_database" {
+  count       = local.is-test ? 1 : 0
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/alpha_user_matt-heery"
+  permissions = ["DESCRIBE"]
+  database {
+    name = "staged_fms_test_dbt"
+  }
+}
+
 resource "aws_lakeformation_permissions" "s3_bucket_permissions_for_ap" {
   principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/alpha_user_matt-heery"
 
