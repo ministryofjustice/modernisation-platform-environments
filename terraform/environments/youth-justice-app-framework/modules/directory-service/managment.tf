@@ -67,7 +67,7 @@ data "aws_ami" "windows_2022" {
  #  owners      = ["amazon"] # to remove
  filter {
     name   = "name"
-    values = "CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*" # Use this after Subscription 
+    values = ["CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*"] # Use this after Subscription 
  #  values = ["Windows_Server-2022-English-Full-Base-*"] # to be removed
     
    }
