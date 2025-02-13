@@ -64,7 +64,7 @@ module "elb-logs-s3" {
     }
   ]
 
-  tags = local.tags
+  tags = var.tags
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
