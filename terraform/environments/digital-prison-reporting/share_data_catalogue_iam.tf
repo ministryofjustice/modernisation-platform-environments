@@ -12,10 +12,10 @@ data "aws_iam_policy_document" "datahub_read_cadet_bucket" {
       module.s3_structured_historical_bucket.bucket_arn
     ]
     condition {
-      test = "StringLike"
+      test     = "StringLike"
       variable = "s3:prefix"
       values = [
-        "data/${local.environment}/run_artefacts/latest/target/*"
+        "data/${local.environment}/run_artefacts/*"
       ]
     }
   }
@@ -55,7 +55,7 @@ resource "aws_iam_role" "datahub_ingestion_github_actions" {
   name                 = "${local.project}_datahub-ingestion-github-actions"
   assume_role_policy   = data.aws_iam_policy_document.datahub_ingestion_github_actions.json
   max_session_duration = 14400
-  
+
   tags = merge(
     local.tags,
     {

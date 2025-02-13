@@ -2,9 +2,9 @@
 # https://github.com/ministryofjustice/modernisation-platform/blob/main/scripts/provision-member-directories.sh
 
 * @ministryofjustice/modernisation-platform
-/terraform/environments/analytical-platform-common @ministryofjustice/analytical-platform-engineers @ministryofjustice/data-platform-audit-and-security @ministryofjustice/modernisation-platform
-/terraform/environments/analytical-platform-compute @ministryofjustice/analytical-platform-airflow @ministryofjustice/analytical-platform-engineers @ministryofjustice/data-platform-audit-and-security @ministryofjustice/modernisation-platform
-/terraform/environments/analytical-platform-ingestion @ministryofjustice/analytical-platform-engineers @ministryofjustice/data-platform-audit-and-security @ministryofjustice/modernisation-platform
+/terraform/environments/analytical-platform-common @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/analytical-platform-compute @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/analytical-platform-ingestion @ministryofjustice/analytical-platform-engineers @ministryofjustice/modernisation-platform
 /terraform/environments/apex @ministryofjustice/laa-apex-developer @ministryofjustice/laa-aws-infrastructure @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs-upgrade @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform
 /terraform/environments/ccms-ebs @ministryofjustice/laa-ccms-migration-team @ministryofjustice/modernisation-platform-security @ministryofjustice/modernisation-platform
@@ -13,7 +13,7 @@
 /terraform/environments/cica-copilot @ministryofjustice/cica-copilot-llm-maintainers @ministryofjustice/modernisation-platform
 /terraform/environments/cica-data-extraction @ministryofjustice/cica-extract-tool-admins @ministryofjustice/modernisation-platform
 /terraform/environments/cica-tariff @ministryofjustice/cica-mp-tariff @ministryofjustice/modernisation-platform
-/terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/modernisation-platform
+/terraform/environments/contract-work-administration @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cwa-developer @ministryofjustice/laa-pcuam @ministryofjustice/modernisation-platform
 /terraform/environments/cooker @ministryofjustice/modernisation-platform @ministryofjustice/tvm-purple-team @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-information-system @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cis-dbas @ministryofjustice/laa-cis-team @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-migration @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
