@@ -31,3 +31,8 @@ variable "shared_vpc_id" {
   description = "Shared VPC ID"
   type        = string
 }
+
+variable "bastion_security_group" {
+  description = "The security group ID for the bastion host"
+  type        = string
+}

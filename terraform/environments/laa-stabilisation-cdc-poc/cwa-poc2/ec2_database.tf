@@ -241,7 +241,7 @@ resource "aws_vpc_security_group_egress_rule" "db_outbound" {
 resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
   security_group_id            = aws_security_group.cwa_poc2_database.id
   description                  = "SSH from the Bastion"
-  referenced_security_group_id = module.bastion_linux.bastion_security_group
+  referenced_security_group_id = var.bastion_security_group
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22

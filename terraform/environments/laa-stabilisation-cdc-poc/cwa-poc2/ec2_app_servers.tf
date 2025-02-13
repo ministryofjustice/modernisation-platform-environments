@@ -264,7 +264,7 @@ resource "aws_security_group" "cwa_poc2_app" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "app_outbound" {
-  security_group_id = aws_security_group.app.id
+  security_group_id = aws_security_group.cwa_poc2_app.id
   cidr_ipv4         = "0.0.0.0/0"
   ip_protocol       = "-1"
 }
@@ -272,7 +272,7 @@ resource "aws_vpc_security_group_egress_rule" "app_outbound" {
 resource "aws_vpc_security_group_ingress_rule" "app_bastion_ssh" {
   security_group_id            = aws_security_group.cwa_poc2_app.id
   description                  = "SSH from the Bastion"
-  referenced_security_group_id = module.bastion_linux.bastion_security_group
+  referenced_security_group_id = var.bastion_security_group
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22
@@ -353,7 +353,7 @@ resource "aws_vpc_security_group_ingress_rule" "app_cm_4" {
 resource "aws_vpc_security_group_ingress_rule" "app_db_1" {
   security_group_id            = aws_security_group.cwa_poc2_app.id
   description                  = "Access from Database server"
-  referenced_security_group_id = aws_security_group.database.id
+  referenced_security_group_id = aws_security_group.cwa_poc2_database.id
   from_port                    = 8250
   ip_protocol                  = "tcp"
   to_port                      = 8250
@@ -362,7 +362,7 @@ resource "aws_vpc_security_group_ingress_rule" "app_db_1" {
 resource "aws_vpc_security_group_ingress_rule" "app_db_2" {
   security_group_id            = aws_security_group.cwa_poc2_app.id
   description                  = "Access from Database server"
-  referenced_security_group_id = aws_security_group.database.id
+  referenced_security_group_id = aws_security_group.cwa_poc2_database.id
   from_port                    = 9050
   ip_protocol                  = "tcp"
   to_port                      = 9050
