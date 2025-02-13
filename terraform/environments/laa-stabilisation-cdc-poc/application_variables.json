@@ -36,7 +36,9 @@
       "cwa_poc2_oraarch_snapshot_id": "snap-0cc5afafa1d02dda9",
       "cwa_poc2_oratmp_snapshot_id": "snap-006681e789612afd5",
       "cwa_poc2_oraredo_snapshot_id": "snap-02f13c959c57891f1",
-      "cwa_poc2_share_snapshot_id": "snap-02e8ec5eb874dd9e0"
+      "cwa_poc2_share_snapshot_id": "snap-02e8ec5eb874dd9e0",
+      "app_disk_space_alert_threshold": "92",
+      "old_mail_server_url": "mail.aws.tst.legalservices.gov.uk"
     },
     "test": {
       "example_var": "test-data"
