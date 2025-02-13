@@ -1,6 +1,5 @@
 variable "application_data" {
   type = map(any)
-  default = jsondecode(file("${path.module}/../application_variables.json"))
 }
 
 variable "environment" {
