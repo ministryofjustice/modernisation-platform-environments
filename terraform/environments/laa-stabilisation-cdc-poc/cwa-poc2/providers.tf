@@ -1,9 +1,9 @@
 terraform {
   required_providers {
     aws = {
-      version               = "~> 5.0"
-      source                = "hashicorp/aws"
-      configuration_aliases = [aws.share-host, aws.share-tenant]
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+      configuration_aliases = [aws.share-host, aws.share-tenant, aws.core-vpc]
     }
     random = {
       source  = "hashicorp/random"
