@@ -1,13 +1,14 @@
 terraform {
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.0"
+      version               = "~> 5.0"
+      source                = "hashicorp/aws"
+      configuration_aliases = [aws.share-host, aws.share-tenant]
+    }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.4"
     }
   }
-}
-
-provider "aws" {
-  alias  = "core-vpc"
-  region = "eu-west-2"
+  required_version = ">= 1.0.1"
 }

@@ -2,7 +2,8 @@ module "cwa-poc2-environment" {
   source = "./cwa-poc2"
 
   providers = {
-    aws = aws
+    aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
+    aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
   }
 
   environment = local.environment
