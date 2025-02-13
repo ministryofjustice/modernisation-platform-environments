@@ -1,7 +1,6 @@
 #### This file can be used to store locals specific to the member account ####
 #### This file can be used to store locals specific to the member account ####
 locals {
-  application_data = jsondecode(file("${path.module}/../application_variables.json"))
   application_name_short = "cwa-poc"
   database_ec2_name      = "${upper(local.application_name_short)} Database Instance"
 
