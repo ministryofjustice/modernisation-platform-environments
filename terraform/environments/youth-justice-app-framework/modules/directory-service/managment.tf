@@ -301,7 +301,7 @@ resource "aws_ssm_association" "associate_ssm" {
       key    = "InstanceIds"
       values = [aws_instance.ad_instance.id]
     }
-    targets {
+    parameters = {
       key    = "directoryId"
       values = [aws_directory_service_directory.ds_managed_ad.id]
     }
