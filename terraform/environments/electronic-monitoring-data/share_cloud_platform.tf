@@ -150,6 +150,11 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
     ]
   }
+  statement {
+    effect    = "Allow"
+    actions   = ["apigateway:POST"]
+    resources = ["arn:aws:apigateway:eu-west-2::/restapis/${module.get_zipped_file_api_api.api_gateway_resource_id}"]
+  }
 }
 
 resource "aws_iam_policy" "standard_athena_access" {
