@@ -1,6 +1,6 @@
 # resource "aws_lakeformation_permissions" "grant_account_table_filter" {
 #   count       = local.is-test ? 1 : 0
-#   principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/alpha_user_matt-heery"
+#   principal   = local.environment_management.account_ids["analytical-platform-data-production"]
 #   permissions = ["SELECT"]
 #   data_cells_filter {
 #     database_name    = "staged_fms_test_dbt"
@@ -12,7 +12,7 @@
 
 resource "aws_lakeformation_permissions" "grant_account_table" {
   count       = local.is-test ? 1 : 0
-  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/alpha_user_matt-heery"
+  principal   = local.environment_management.account_ids["analytical-platform-data-production"]
   permissions = ["SELECT", "DESCRIBE"]
   table {
     database_name = "staged_fms_test_dbt"
@@ -22,7 +22,7 @@ resource "aws_lakeformation_permissions" "grant_account_table" {
 
 resource "aws_lakeformation_permissions" "grant_account_database" {
   count       = local.is-test ? 1 : 0
-  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/alpha_user_matt-heery"
+  principal   = local.environment_management.account_ids["analytical-platform-data-production"]
   permissions = ["DESCRIBE"]
   database {
     name = "staged_fms_test_dbt"
