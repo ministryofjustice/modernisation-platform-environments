@@ -81,7 +81,7 @@ echo "Running postbuild steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/app-postbuild.sh /userdata/postbuild.sh
 chmod 700 /userdata/postbuild.sh
 sed -i 's/. \/CWA\/app\/appl\/APPSCWA_SERVER_HOSTNAME.env/. \/CWA\/app\/appl\/APPSCWA_${local.cm_hostname}.env/g' /userdata/postbuild.sh
-sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
+sed -i 's/development/${var.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
 . /userdata/postbuild.sh
 
 echo "mp-${local.environment}" > /etc/cwaenv
@@ -97,7 +97,7 @@ export SLACK_ALERT_URL=`/usr/local/bin/aws --region eu-west-2 ssm get-parameter 
 sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/applmgr/scripts/disk_space.sh
 
 cat <<EOT > /home/applmgr/applmgrcrontab.txt
-0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} >/tmp/disk_space.trc 2>&1
+0,30 08-17 * * 1-5 /home/applmgr/scripts/disk_space.sh ${upper(var.application_data.accounts[local.environment].env_short)} ${var.application_data.accounts[local.environment].app_disk_space_alert_threshold} >/tmp/disk_space.trc 2>&1
 EOT
 chown applmgr:applmgr /home/applmgr/applmgrcrontab.txt
 chmod 744 /home/applmgr/applmgrcrontab.txt
@@ -108,10 +108,10 @@ ln -s /bin/mail /bin/mailx
 
 ## Update the send mail url
 echo "Updating the sendmail config"
-sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${local.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.cf
-sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.cf
-sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${local.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.mc
-sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.mc
+sed -i 's/${var.application_data.accounts[local.environment].old_mail_server_url}/${var.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.cf
+sed -i 's/${var.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.cf
+sed -i 's/${var.application_data.accounts[local.environment].old_mail_server_url}/${var.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.mc
+sed -i 's/${var.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
 ## Remove SSH key allowed
@@ -130,9 +130,9 @@ chmod 700 /var/cw-custom.sh
 ## Additional DBA Steps
 echo "Updating CWA_cwa-app2.xml"
 su - applmgr -c "cp /CWA/app/appl/admin/CWA_cwa-app2.xml /CWA/app/appl/admin/CWA_cwa-app2.xml.tf_backup"
-sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
-sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
-sed -i 's/cwa.${local.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/aws.${var.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/${var.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
+sed -i 's/cwa.${var.application_data.accounts[local.environment].old_domain_name}/${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
 sed -i 's/db_admin@legalservices.gov.uk/db_admin@${resource.aws_route53_record.external.name}/g' /CWA/app/appl/admin/CWA_cwa-app2.xml
 
 EOF
@@ -157,9 +157,9 @@ resource "time_sleep" "wait_cm_custom_script" {
 ######################################
 
 resource "aws_instance" "concurrent_manager" {
-  ami                         = local.application_data.accounts[local.environment].cwa_poc2_cm_ami_id
+  ami                         = var.application_data.accounts[local.environment].cwa_poc2_cm_ami_id
   availability_zone           = "eu-west-2a"
-  instance_type               = local.application_data.accounts[local.environment].cwa_poc2_cm_instance_type
+  instance_type               = var.application_data.accounts[local.environment].cwa_poc2_cm_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.cwa_poc2_concurrent_manager.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
@@ -245,11 +245,11 @@ resource "aws_vpc_security_group_ingress_rule" "cm_app" {
 
 resource "aws_ebs_volume" "concurrent_manager" {
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].cwa_poc2_ebs_concurrent_manager_size
+  size              = var.application_data.accounts[local.environment].cwa_poc2_ebs_concurrent_manager_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = var.shared_ebs_kms_key_id
-  snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_concurrent_manager_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = var.application_data.accounts[local.environment].cwa_poc2_concurrent_manager_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     replace_triggered_by = [

@@ -42,7 +42,7 @@ done
 echo "Running postbuild steps to set up instance..."
 /usr/local/bin/aws s3 cp s3://${aws_s3_bucket.scripts.id}/db-postbuild.sh /userdata/postbuild.sh
 chmod 700 /userdata/postbuild.sh
-sed -i 's/development/${local.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
+sed -i 's/development/${var.application_data.accounts[local.environment].env_short}/g' /userdata/postbuild.sh
 . /userdata/postbuild.sh
 
 echo "mp-${local.environment}" > /etc/cwaenv
@@ -79,10 +79,10 @@ echo "$CM_IP	${local.application_name_short}-app2.${var.route53_zone_external}		
 
 ## Update the send mail url
 echo "Update Sendmail configurations"
-sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${local.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.cf
-sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.cf
-sed -i 's/${local.application_data.accounts[local.environment].old_mail_server_url}/${local.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.mc
-sed -i 's/${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.mc
+sed -i 's/${var.application_data.accounts[local.environment].old_mail_server_url}/${var.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.cf
+sed -i 's/${var.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.cf
+sed -i 's/${var.application_data.accounts[local.environment].old_mail_server_url}/${var.application_data.accounts[local.environment].laa_mail_relay_url}/g' /etc/mail/sendmail.mc
+sed -i 's/${var.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /etc/mail/sendmail.mc
 /etc/init.d/sendmail restart
 
 echo "Update Slack alert URL for Oracle scripts"
@@ -99,7 +99,7 @@ echo "Adding disk space script"
 chmod 766 /home/oracle/scripts/disk_space.sh
 sed -i "s/SLACK_ALERT_URL/$SLACK_ALERT_URL/g" /home/oracle/scripts/disk_space.sh
 
-sed -i "/^mail.*tablespace.warning$/c\mailx -s \"\$ORACLE_SID on \$\{hostname\}: ${upper(local.application_data.accounts[local.environment].env_short)} CWA Tablespace Warning\" $SLACK_ALERT_URL < /tmp/tablespace.warning" /home/oracle/scripts/tablespace1.sh
+sed -i "/^mail.*tablespace.warning$/c\mailx -s \"\$ORACLE_SID on \$\{hostname\}: ${upper(var.application_data.accounts[local.environment].env_short)} CWA Tablespace Warning\" $SLACK_ALERT_URL < /tmp/tablespace.warning" /home/oracle/scripts/tablespace1.sh
 
 echo "Setting up AWS EBS backup"
 INSTANCE_ID=$(curl http://169.254.169.254/latest/meta-data/instance-id)
@@ -117,7 +117,7 @@ echo "Setting up cron jobs"
 su oracle -c "crontab -l > /home/oracle/oraclecrontab.txt"
 sed -i '/disk_space.sh/d' /home/oracle/oraclecrontab.txt
 echo "00 02 * * * /home/oracle/scripts/aws_ebs_backup.sh > /tmp/aws_ebs_backup.log" >> /home/oracle/oraclecrontab.txt
-echo "0,30 08-17 * * 1-5 /home/oracle/scripts/disk_space.sh ${upper(local.application_data.accounts[local.environment].env_short)} ${local.application_data.accounts[local.environment].app_disk_space_alert_threshold} >/tmp/disk_space.trc 2>&1" >> /home/oracle/oraclecrontab.txt
+echo "0,30 08-17 * * 1-5 /home/oracle/scripts/disk_space.sh ${upper(var.application_data.accounts[local.environment].env_short)} ${var.application_data.accounts[local.environment].app_disk_space_alert_threshold} >/tmp/disk_space.trc 2>&1" >> /home/oracle/oraclecrontab.txt
 
 chown oracle:oinstall /home/oracle/oraclecrontab.txt
 chmod 744 /home/oracle/oraclecrontab.txt
@@ -143,7 +143,7 @@ cat <<EOT > /etc/cron.d/custom_cloudwatch_metrics
 EOT
 
 ## Additional DBA steps
-su oracle -c "sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /CWA/oracle/product/10.2.0/db_1/appsutil/CWA_cwa-db.xml"
+su oracle -c "sed -i 's/aws.${var.application_data.accounts[local.environment].old_domain_name}/${var.route53_zone_external}/g' /CWA/oracle/product/10.2.0/db_1/appsutil/CWA_cwa-db.xml"
 
 EOF
 
@@ -181,9 +181,9 @@ resource "time_sleep" "wait_db_userdata_scripts" {
 ######################################
 
 resource "aws_instance" "database" {
-  ami                         = local.application_data.accounts[local.environment].cwa_poc2_db_ami_id
+  ami                         = var.application_data.accounts[local.environment].cwa_poc2_db_ami_id
   availability_zone           = "eu-west-2a"
-  instance_type               = local.application_data.accounts[local.environment].cwa_poc2_db_instance_type
+  instance_type               = var.application_data.accounts[local.environment].cwa_poc2_db_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.database.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
@@ -213,7 +213,7 @@ resource "aws_instance" "database" {
 
 resource "aws_key_pair" "cwa" {
   key_name   = "${local.application_name_short}-ssh-key"
-  public_key = local.application_data.accounts[local.environment].cwa_ec2_key
+  public_key = var.application_data.accounts[local.environment].cwa_ec2_key
 }
 
 #################################
@@ -250,7 +250,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
 resource "aws_vpc_security_group_ingress_rule" "db_workspaces_1" {
   security_group_id = aws_security_group.cwa_poc2_database.id
   description       = "DB access for Workspaces"
-  cidr_ipv4         = local.application_data.accounts[local.environment].workspaces_local_cidr1
+  cidr_ipv4         = var.application_data.accounts[local.environment].workspaces_local_cidr1
   from_port         = 1571
   ip_protocol       = "tcp"
   to_port           = 1571
@@ -259,7 +259,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_workspaces_1" {
 resource "aws_vpc_security_group_ingress_rule" "db_workspaces_2" {
   security_group_id = aws_security_group.cwa_poc2_database.id
   description       = "DB access for Workspaces"
-  cidr_ipv4         = local.application_data.accounts[local.environment].workspaces_local_cidr2
+  cidr_ipv4         = var.application_data.accounts[local.environment].workspaces_local_cidr2
   from_port         = 1571
   ip_protocol       = "tcp"
   to_port           = 1571
@@ -409,11 +409,11 @@ resource "aws_vpc_security_group_ingress_rule" "db_cm_6" {
 
 resource "aws_ebs_volume" "oradata" {
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_oradata_size
+  size              = var.application_data.accounts[local.environment].ebs_oradata_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = var.shared_ebs_kms_key_id
-  snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oradata_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = var.application_data.accounts[local.environment].cwa_poc2_oradata_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -433,11 +433,11 @@ resource "aws_volume_attachment" "oradata" {
 
 resource "aws_ebs_volume" "oracle" {
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_oracle_size
+  size              = var.application_data.accounts[local.environment].ebs_oracle_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = var.shared_ebs_kms_key_id
-  snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oracle_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = var.application_data.accounts[local.environment].cwa_poc2_oracle_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -457,11 +457,11 @@ resource "aws_volume_attachment" "oracle" {
 
 resource "aws_ebs_volume" "oraarch" {
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_oraarch_size
+  size              = var.application_data.accounts[local.environment].ebs_oraarch_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = var.shared_ebs_kms_key_id
-  snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oraarch_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = var.application_data.accounts[local.environment].cwa_poc2_oraarch_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -481,11 +481,11 @@ resource "aws_volume_attachment" "oraarch" {
 
 resource "aws_ebs_volume" "oratmp" {
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_oratmp_size
+  size              = var.application_data.accounts[local.environment].ebs_oratmp_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = var.shared_ebs_kms_key_id
-  snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oratmp_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = var.application_data.accounts[local.environment].cwa_poc2_oratmp_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -505,11 +505,11 @@ resource "aws_volume_attachment" "oratmp" {
 
 resource "aws_ebs_volume" "oraredo" {
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_oraredo_size
+  size              = var.application_data.accounts[local.environment].ebs_oraredo_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = var.shared_ebs_kms_key_id
-  snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_oraredo_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = var.application_data.accounts[local.environment].cwa_poc2_oraredo_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -529,11 +529,11 @@ resource "aws_volume_attachment" "oraredo" {
 
 resource "aws_ebs_volume" "share" {
   availability_zone = "eu-west-2a"
-  size              = local.application_data.accounts[local.environment].ebs_share_size
+  size              = var.application_data.accounts[local.environment].ebs_share_size
   type              = "gp2"
   encrypted         = true
   kms_key_id        = var.shared_ebs_kms_key_id
-  snapshot_id       = local.application_data.accounts[local.environment].cwa_poc2_share_snapshot_id # This is used for when data is being migrated
+  snapshot_id       = var.application_data.accounts[local.environment].cwa_poc2_share_snapshot_id # This is used for when data is being migrated
 
   lifecycle {
     ignore_changes = [kms_key_id]

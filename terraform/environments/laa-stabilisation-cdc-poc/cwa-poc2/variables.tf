@@ -1,6 +1,6 @@
-# variable "application_data" {
-#   type = map(any)
-# }
+variable "application_data" {
+  type = map(any)
+}
 
 variable "environment" {
   description = "The environment for the application"
