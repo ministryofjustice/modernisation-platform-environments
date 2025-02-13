@@ -17,5 +17,8 @@ module "cwa-poc2-environment" {
   shared_vpc_cidr = data.aws_vpc.shared.cidr_block
   bastion_security_group    = module.bastion_linux.bastion_security_group
   current_account_id = data.aws_caller_identity.current.account_id
+  public_subnet_a_id = data.aws_subnet.public_subnets_a.id
+  public_subnet_b_id = data.aws_subnet.public_subnets_b.id
+  public_subnet_c_id = data.aws_subnet.public_subnets_c.id
   
 }

@@ -132,7 +132,7 @@ resource "aws_lb" "external" {
   internal                   = false
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.external_lb.id]
-  subnets                    = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
+  subnets                    = [var.public_subnet_a_id, var.public_subnet_b_id, var.public_subnet_c_id]
   enable_deletion_protection = local.lb_enable_deletion_protection
   idle_timeout               = local.external_lb_idle_timeout
   enable_http2               = false

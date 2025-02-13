@@ -184,9 +184,9 @@ resource "aws_instance" "database" {
   availability_zone           = "eu-west-2a"
   instance_type               = var.application_data.accounts[local.environment].cwa_poc2_db_instance_type
   monitoring                  = true
-  vpc_security_group_ids      = [aws_security_group.database.id]
+  vpc_security_group_ids      = [aws_security_group.cwa_poc2_database.id]
   subnet_id                   = data.aws_subnet.data_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.cwa.id
+  iam_instance_profile        = aws_iam_instance_profile.cwa_poc2.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
   user_data_replace_on_change = true

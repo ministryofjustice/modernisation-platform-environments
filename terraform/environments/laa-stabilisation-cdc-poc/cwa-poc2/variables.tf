@@ -38,11 +38,27 @@ variable "bastion_security_group" {
 }
 
 variable "shared_vpc_cidr" {
-  description = "The security group ID for the bastion host"
+  description = "Shared VPC CIDR"
   type        = string
 }
 
 variable "current_account_id" {
-  description = "The security group ID for the bastion host"
+  description = "Current account ID"
   type        = string
 }
+
+variable "public_subnet_a_id" {
+  description = "Public subnet A ID"
+  type        = string
+}
+
+variable "public_subnet_b_id" {
+  description = "Public subnet B ID"
+  type        = string
+}
+
+variable "public_subnet_c_id" {
+  description = "Public subnet C ID"
+  type        = string
+}
+
