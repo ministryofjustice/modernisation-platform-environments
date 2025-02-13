@@ -1,7 +1,6 @@
 #### This file can be used to store locals specific to the member account ####
 #### This file can be used to store locals specific to the member account ####
 locals {
-  application_data = var.application_data
   environment = var.environment
 
   application_name_short = "cwa-poc2"
