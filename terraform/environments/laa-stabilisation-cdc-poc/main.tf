@@ -2,6 +2,7 @@ module "cwa-poc2-environment" {
   source = "./cwa-poc2"
 
   providers = {
+    aws = aws
     aws.core-vpc = aws.core-vpc
   }
 

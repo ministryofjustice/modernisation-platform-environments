@@ -6,8 +6,3 @@ terraform {
     }
   }
 }
-
-provider "aws" {
-  alias  = "core-vpc"
-  region = "eu-west-2"
-}
