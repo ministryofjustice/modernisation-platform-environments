@@ -203,7 +203,7 @@ locals {
             healthy_threshold   = 3
             interval            = 10
             matcher             = "200-399"
-            path                = "/keepalive.htm"
+            path                = "/"
             port                = 7777
             protocol            = "HTTP"
             timeout             = 5
@@ -285,7 +285,7 @@ locals {
             healthy_threshold   = 3
             interval            = 10
             matcher             = "200-399"
-            path                = "/keepalive.htm"
+            path                = "/"
             port                = 7777
             protocol            = "HTTP"
             timeout             = 5
