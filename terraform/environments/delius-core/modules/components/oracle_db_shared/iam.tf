@@ -162,7 +162,9 @@ data "aws_iam_policy_document" "cert_export" {
     sid     = "ExportCert"
     effect  = "Allow"
     actions = [
-      "acm:ExportCertificate"
+      "acm:DescribeCertificate",
+      "acm:ExportCertificate",
+      "acm:ListCertificates"
     ]
     resources = ["*"]
   }
