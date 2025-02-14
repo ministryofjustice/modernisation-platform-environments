@@ -60,30 +60,7 @@ resource "aws_iam_role_policy_attachment" "join_ad_role_policy_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-#data resource to get the latest CIS Microsoft Windows Server 2019 Benchmark - Level 1 ami
-data "aws_ami" "windows_2022" {
-  most_recent = true
-   owners      = ["aws-marketplace"] # Use this after Subscription 
- #  owners      = ["amazon"] # to remove
- filter {
-    name   = "name"
-    values = ["CIS Microsoft Windows Server 2022 Benchmark - Level 1 -*"] # Use this after Subscription 
- #  values = ["Windows_Server-2022-English-Full-Base-*"] # to be removed
-    
-   }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
+
 
 #Create an instance profile for your EC2 instance
 resource "aws_iam_instance_profile" "ad_instance_profile" {
