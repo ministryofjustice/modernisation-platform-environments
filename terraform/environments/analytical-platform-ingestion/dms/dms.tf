@@ -1,15 +1,27 @@
+  # endpoint_id   = "${local.db_creds_source[source_endpoint_id]}"
+  # endpoint_type = "${local.db_creds_source[source_endpoint_type}"
+  # engine_name   = "${local.db_creds_source[source_engine_name]}"
+  # username      = "${local.db_creds_source[source_username]}"
+  # password      = "${local.db_creds_source[source_password]}"
+  # kms_key_arn   = module.dms_kms_source_cmk.key_arn
+  # server_name   = "${local.db_creds_source[source_server_name]}"
+  # port          = "${local.db_creds_source[source_port]}"
+  # database_name = "${local.db_creds_source[source_database_name]}"
+
 # DMS Source Endpoint
 resource "aws_dms_endpoint" "source_endpoint" {
-  endpoint_id   = "${local.db_creds_source.[source_endpoint_id]}"
-  endpoint_type = "${local.db_creds_source.[source_endpoint_type}"
-  engine_name   = "${local.db_creds_source.[source_engine_name]}"
-  username      = "${local.db_creds_source.[source_username]}"
-  password      = "${local.db_creds_source.[source_password]}"
-  kms_key_arn   = "${local.kms_key_id}"
-  server_name   = "${local.db_creds_source.[source_server_name]}"
-  port          = "${local.db_creds_source.[source_port]}"
-  database_name = "${local.db_creds_source.[source_database_name]}"
+  username      = "username-string!87659!"
+  password      = "password-string!87659!"
+  engine_name   = "oracle"
+  port          = "port-string!87659!"
+  database_name = "database-string!87659!"
+  endpoint_id   = "endpoint-id-string!87659!"
+  endpoint_type = "endpoint-type-string!87659!"
+  server_name   = "server-name-string!87659!"
+
 }
+
+
 
 # DMS S3 Target Endpoint
 resource "aws_dms_s3_endpoint" "s3_target_endpoint" {

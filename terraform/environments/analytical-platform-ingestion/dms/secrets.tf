@@ -11,7 +11,8 @@ resource "random_password" "password" {
 # application_data referenced from application variables json imported
 
 resource "aws_secretsmanager_secret" "resource_dms_secret" {
-  name                    = "${local.application_data.accounts[local.environment].db_identifier}_credentials"
+  name = "secret-string78698769876"
+  # name                    = "${local.application_data.accounts[local.environment].db_identifier}_credentials"
   recovery_window_in_days = 0
 }
 
@@ -39,5 +40,5 @@ data "aws_secretsmanager_secret" "resource_dms_secret" {
 
 data "aws_secretsmanager_secret_version" "data_dms_secret_current" {
   depends_on = [aws_secretsmanager_secret_version.resource_dms_secret_current]
-  secret_id  = data.aws_secretsmanager_secret.dms_secret.id
+  secret_id  = data.aws_secretsmanager_secret.resource_dms_secret.id
 }
