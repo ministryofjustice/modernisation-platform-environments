@@ -1,5 +1,5 @@
 resource "aws_dms_s3_endpoint" "target" {
-  count = var.setup_dms_endpoints && var.setup_dms_s3_endpoint ? 1 : 0
+  # count = var.setup_dms_endpoints && var.setup_dms_s3_endpoint ? 1 : 0
 
   endpoint_id                      = "${local.project_id}-dms-${local.short_name}-s3-target-endpoint"
   endpoint_type                    = "target"
@@ -93,7 +93,7 @@ resource "aws_dms_replication_task" "migration-task" {
 resource "aws_dms_replication_instance" "dms" {
   #checkov:skip=CKV_AWS_222: "Ensure DMS replication instance gets all minor upgrade automatically"
   #checkov:skip=CKV_AWS_212: "Ensure DMS replication instance is encrypted by KMS using a customer managed Key (CMK)"
-  count = var.setup_dms_instance ? 1 : 0
+  # count = var.setup_dms_instance ? 1 : 0
 
   allocated_storage             = 200
   apply_immediately             = true
@@ -118,7 +118,7 @@ resource "aws_dms_replication_instance" "dms" {
   }
 
   depends_on = [
-    var.vpc_role_dependency,
+    #var.vpc_role_dependency,
     aws_dms_replication_subnet_group.dms,
     aws_security_group.dms_sec_group
   ]
@@ -129,11 +129,12 @@ data "template_file" "table-mappings" {
 }
 
 resource "aws_dms_replication_task" "dms-replication" {
-  count = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
+  #count = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
 
   migration_type            = var.migration_type
   replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
-  replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}"
+  replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${local.dms_source_name}-${local
+  .dms_target_name}"
   source_endpoint_arn       = aws_dms_endpoint.source[0].endpoint_arn
   target_endpoint_arn       = aws_dms_s3_endpoint.s3_target_endpoint[0].endpoint_arn
   table_mappings            = data.template_file.table-mappings.rendered
@@ -180,11 +181,17 @@ resource "aws_dms_replication_task" "dms-replication" {
 
 # Create a subnet group using existing VPC subnets
 resource "aws_dms_replication_subnet_group" "dms" {
-  count = var.setup_dms_instance ? 1 : 0
+  # count = var.setup_dms_instance ? 1 : 0
 
   replication_subnet_group_description = "DMS replication subnet group"
-  replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-subnet-group"
-  subnet_ids                           = var.subnet_ids
+  replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${local.dms_source_name}-${local
+  .dms_target_name}-subnet-group"
+
+
+  subnet_ids = concat([for subnet in module.isolated_vpc.private_subnets : subnet.id], [
+    for
+    subnet in module.isolated_vpc.private_subnets : subnet.id
+  ])
 }
 
 # Security Groups
@@ -192,16 +199,18 @@ resource "aws_security_group" "dms_sec_group" {
 
   #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-  count = var.setup_dms_instance ? 1 : 0
+  # count = var.setup_dms_instance ? 1 : 0
 
-  name   = "${var.project_id}-dms-${var.short_name}-${var.dms_source_name}-${var.dms_target_name}-security-group"
-  vpc_id = var.vpc
+  name   = "${var.project_id}-dms-${var.short_name}-${local.dms_source_name}-${local.dms_target_name}-security-group"
+  vpc_id = module.isolated_vpc.id
+
 
   ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = var.vpc_cidr_blocks
+
+    cidr_blocks = ["10.202.0.0/20"]
   }
   egress {
     from_port   = 0

@@ -1,6 +1,6 @@
 {
     "$schema": "https://moj-analytical-services.github.io/metadata_schema/table/v1.4.0.json",
-    "name": "pi_type_causes",
+    "name": "causes.pi_type_causes",
     "description": "",
     "data_format": "parquet",
     "columns": [
@@ -28,7 +28,7 @@
             "nullable": false
         }
     ],
-    "location": "PI_TYPE_CAUSES/",
+    "location": "CAUSES.PI_TYPE_CAUSES/",
     "primary_key": [
         "pi_type_cause"
     ],

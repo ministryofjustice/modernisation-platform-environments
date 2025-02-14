@@ -36,6 +36,10 @@ locals {
 
   db_creds_source = jsondecode(aws_secretsmanager_secret_version.resource_dms_secret_current.secret_string)
 
+  dms_source_name = "${db_creds_source.source_endpoint_id}-${db_creds_source.source_database_name}"
+  dms_target_name = "arn:aws:s3:::mojap-raw-hist/cica/${db_creds_source.source_database_name}/"
+
+  replication_task_id = "cica-dms-replication-task"
 
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
   provider_name = "core-vpc-${local.environment}"
