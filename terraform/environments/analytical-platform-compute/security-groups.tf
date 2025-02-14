@@ -3,7 +3,7 @@ module "vpc_endpoints_security_group" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name        = "${module.vpc.name}-vpc-endpoints"
   description = "VPC endpoints security group"
@@ -21,7 +21,7 @@ module "rds_security_group" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name = "rds"
 
@@ -44,7 +44,7 @@ module "quicksight_shared_vpc_security_group" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/security-group/aws"
-  version = "5.2.0"
+  version = "5.3.0"
 
   name = "quicksight-shared-vpc"
 
