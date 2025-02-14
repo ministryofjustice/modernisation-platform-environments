@@ -50,10 +50,10 @@ data "aws_ec2_transit_gateway" "moj_tgw" {
   id = "tgw-026162f1ba39ce704"
 }
 
-data "aws_iam_roles" "eks_sso_access_role" {
-  name_regex  = "AWSReservedSSO_${local.environment_configuration.eks_sso_access_role}_.*"
-  path_prefix = "/aws-reserved/sso.amazonaws.com/"
-}
+# data "aws_iam_roles" "eks_sso_access_role" {
+#   name_regex  = "AWSReservedSSO_${local.environment_configuration.eks_sso_access_role}_.*"
+#   path_prefix = "/aws-reserved/sso.amazonaws.com/"
+# }
 
 data "aws_iam_roles" "data_engineering_sso_role" {
   name_regex  = "AWSReservedSSO_modernisation-platform-data-eng_.*"
