@@ -233,4 +233,57 @@ module "api_gateway_authorizer" {
   }
 }
 
+#-----------------------------------------------------------------------------------
+# Event Logger
+#-----------------------------------------------------------------------------------
 
+module "event_logger" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "event_logger"
+  role_name               = aws_iam_role.event_logger.name
+  role_arn                = aws_iam_role.event_logger.arn
+  handler                 = "event_logger.handler"
+  memory_size             = 4096
+  timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    LOG_GROUP = aws_cloudwatch_log_group.pipeline_logs.name
+  }
+}
+
+# Cross-account log permissions
+resource "aws_lambda_permission" "allow_cross_account_logs" {
+  for_each = tomap({ "analytical-platform-compute-production" : local.environment_management.account_ids["analytical-platform-compute-production"] })
+
+  statement_id  = "AllowCrossAccountLogs-${each.key}"
+  action        = "lambda:InvokeFunction"
+  function_name = module.event_logger.lambda_function_name
+  principal     = each.value
+  source_arn    = "arn:aws:logs:${data.aws_region.current.name}:${each.value}:*"
+}
+
+#-----------------------------------------------------------------------------------
+# Summary Generator
+#-----------------------------------------------------------------------------------
+
+module "summary_generator" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "event_logger"
+  role_name               = aws_iam_role.summary_generator.name
+  role_arn                = aws_iam_role.summary_generator.arn
+  handler                 = "summary_generator.handler"
+  memory_size             = 4096
+  timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables = {
+    LOG_GROUP = aws_cloudwatch_log_group.pipeline_logs.name
+  }
+}
