@@ -182,3 +182,9 @@ variable "inline_ebs" {
   type        = bool
   description = "Whether to create EBS volumes inline with the instance"
 }
+
+variable "shared_ca_name" {
+  default     = "acm-pca-non-live"
+  type        = string
+  description = "Name of the Resource Share in Resource Access Manager for the private cert authority"
+}

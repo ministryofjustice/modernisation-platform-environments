@@ -156,6 +156,21 @@ data "aws_iam_policy_document" "instance_ssm" {
   }
 }
 
+data "aws_iam_policy_document" "cert_export" {
+
+  statement {
+    sid     = "ExportCert"
+    effect  = "Allow"
+    actions = [
+      "acm:DescribeCertificate",
+      "acm:ExportCertificate",
+      "acm:ListCertificates"
+    ]
+    resources = ["*"]
+  }
+}
+
+
 data "aws_iam_policy_document" "combined_instance_policy" {
   source_policy_documents = [
     data.aws_iam_policy_document.core_shared_services_bucket_access.json,
@@ -165,7 +180,8 @@ data "aws_iam_policy_document" "combined_instance_policy" {
     data.aws_iam_policy_document.oracledb_backup_bucket_access.json,
     data.aws_iam_policy_document.db_ssh_keys_s3_policy_document.json,
     data.aws_iam_policy_document.instance_ssm.json,
-    data.aws_iam_policy_document.oracle_ec2_snapshot_backup_role_policy_document.json
+    data.aws_iam_policy_document.oracle_ec2_snapshot_backup_role_policy_document.json,
+    data.aws_iam_policy_document.cert_export.json
   ]
 }
 
