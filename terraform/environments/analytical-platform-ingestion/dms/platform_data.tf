@@ -4,20 +4,17 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 data "aws_vpc" "shared" {
+
   tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}"
+    name = "${local.application_name}-${local.environment}-connected"
   }
 }
 
-data "aws_subnets" "shared_private" {
-  filter {
-    name   = "vpc-id"
-    values = [data.aws_vpc.shared.id]
-  }
-  tags = {
-    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
-  }
-}
+  # subnet_ids = concat([for subnet in module.isolated_vpc.private_subnets : subnet.id], [
+  #   for
+  #   subnet in module.isolated_vpc.private_subnets : subnet.id
+  # ])
+
 
 data "aws_subnet" "shared_private_subnets_a" {
   vpc_id = data.aws_vpc.shared.id
@@ -77,18 +74,18 @@ data "terraform_remote_state" "core_network_services" {
   }
 }
 
-data "aws_secretsmanager_secret" "dms_secret" {
-  name = "dms_secret"
-  id = data.terraform_remote_state.core_network_services.outputs.dms_secret_id
-  secret_string = jsonencode({
-  "username": "username-string!87659!",
-  "password": "password-string!87659!",
-  "engine": "engine-string!87659!",
-  "host": "host-string!87659!",
-  "port": "port-string!87659!",
-  "database_name": "database-string!87659!"
-})
-}
+# data "aws_secretsmanager_secret" "dms_secret" {
+#   name = "dms_secret"
+#   id = data.terraform_remote_state.core_network_services.outputs.dms_secret_id
+#   secret_string = jsonencode({
+#   "username": "username-string!87659!",
+#   "password": "password-string!87659!",
+#   "engine": "engine-string!87659!",
+#   "host": "host-string!87659!",
+#   "port": "port-string!87659!",
+#   "database_name": "database-string!87659!"
+# })
+# }
 
 
 
@@ -121,3 +118,7 @@ data "aws_iam_roles" "data_engineering_sso_role" {
   name_regex  = "AWSReservedSSO_modernisation-platform-data-eng_.*"
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
+
+      # data "s3_bucket" "dms_ingess_bucket" {
+      #   bucket = "mojap-ingestion-production-cica-dms-ingress"
+      # }

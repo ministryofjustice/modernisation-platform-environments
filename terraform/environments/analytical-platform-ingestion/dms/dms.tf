@@ -1,21 +1,21 @@
 # DMS Source Endpoint
 resource "aws_dms_endpoint" "source_endpoint" {
-  endpoint_id   = "${local.db_creds_source.source_endpoint_id}"
-  endpoint_type = "${local.db_creds_source.source_endpoint_type}"
-  engine_name   = "${local.db_creds_source.source_engine_name}"
-  username      = "${local.db_creds_source.source_username}"
-  password      = "${local.db_creds_source.source_password}"
+  endpoint_id   = "${local.db_creds_source.[source_endpoint_id]}"
+  endpoint_type = "${local.db_creds_source.[source_endpoint_type}"
+  engine_name   = "${local.db_creds_source.[source_engine_name]}"
+  username      = "${local.db_creds_source.[source_username]}"
+  password      = "${local.db_creds_source.[source_password]}"
   kms_key_arn   = "${local.kms_key_id}"
-  server_name   = "${local.db_creds_source.source_server_name}"
-  port          = "${local.db_creds_source.source_port}"
-  database_name = "${local.db_creds_source.source_database_name}"
+  server_name   = "${local.db_creds_source.[source_server_name]}"
+  port          = "${local.db_creds_source.[source_port]}"
+  database_name = "${local.db_creds_source.[source_database_name]}"
 }
 
 # DMS S3 Target Endpoint
 resource "aws_dms_s3_endpoint" "s3_target_endpoint" {
-  endpoint_id             = "arn:aws:s3:::mojap-raw-hist/cica/${db_creds_source.source_database_name}/"
+  endpoint_id             = "cica/tariff/"
   endpoint_type           = "target"
-  bucket_name             = "mojap-raw-hist/cica/"
+  bucket_name             = module.cica_dms_ingress_bucket.s3_bucket_id
   service_access_role_arn = module.production_replication_cica_dms_iam_role[0].iam_role_arn
 }
 
@@ -45,7 +45,7 @@ resource "aws_dms_replication_instance" "replication_instance" {
 resource "aws_dms_replication_task" "replication_task" {
   # replication_task_id       = "${replace(${local.db_creds_source.source_database_name}, "_", "-")
   # }-db-migration-task-tf"
-  replication_task_id       = "${replace(tariff, "_", "-")}-db-migration-task-tf"
+  replication_task_id       = "tariff_db_migration_task_tf"
   table_mappings            = file("${path.module}/metadata/tariff_uat")
   migration_type            = "full-load-and-cdc"
   replication_instance_arn  = aws_dms_replication_instance.replication_instance.id

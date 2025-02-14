@@ -23,69 +23,89 @@ resource "aws_dms_s3_endpoint" "target" {
 # convert these vars in source to secret values
 
 resource "aws_dms_endpoint" "source" {
-  database_name = "${local.db_creds_source.source_database_name}"
-  endpoint_id   = "${local.db_creds_source.endpoint_id}"
+  database_name = "${local.db_creds_source.[source_database_name]}"
+  endpoint_id   = "${local.db_creds_source.[endpoint_id]}"
   endpoint_type = "source"
   engine_name   = "oracle"
-  username      = "${local.db_creds_source.source_username}"
-  password      = "${local.db_creds_source.source_password}"
+  username      = "${local.db_creds_source.[source_username]}"
+  password      = "${local.db_creds_source.[source_password]}"
   # kms_key_arn                 = "arn:aws:kms:us-east-1:123456789012:key/ 12345678-1234-1234-1234-123456789012"
-  kms_key_arn   = "${local.kms_key_id}"
+  kms_key_arn   = module.dms_kms_source_cmk.key_arn
   port          = 1521
-  server_name   = "${local.db_creds_source.source_servername}"
+  server_name   = "${local.db_creds_source.[source_servername]}"
   ssl_mode      = "none"
-
-
 }
 
-resource "aws_dms_replication_task" "migration-task" {
-  migration_type           = "full-load"
-  replication_instance_arn = aws_dms_replication_instance.dms.replication_instance_arn
-
-  replication_task_id       = "cica-dms-replication-task"
-  # to be replaced in platform_locals
-  source_endpoint_arn      = aws_dms_endpoint.source.endpoint_arn
-  # to be replaced in platform_locals
-  target_endpoint_arn      = aws_dms_s3_endpoint.target.endpoint_arn
-  start_replication_task   = true
-
-  replication_task_settings = jsonencode({
-    TargetMetadata = {
-      FullLobMode  = true,
-      LobChunkSize = 64
-    },
-    FullLoadSettings = {
-      TargetTablePrepMode = "DO_NOTHING"
-    },
-    ControlTablesSettings = {
-      historyTimeslotInMinutes = 5
-    },
-    ErrorBehavior = {
-      DataErrorPolicy            = "LOG_ERROR"
-      ApplyErrorDeletePolicy     = "LOG_ERROR"
-      ApplyErrorInsertPolicy     = "LOG_ERROR"
-      ApplyErrorUpdatePolicy     = "LOG_ERROR"
-      ApplyErrorEscalationCount  = 0
-      ApplyErrorEscalationPolicy = "LOG_ERROR"
-    }
-  })
-
-  table_mappings = jsonencode({
-    rules = [
-      {
-        "rule-type" = "selection"
-        "rule-id"   = "1"
-        "rule-name" = "1"
-        "object-locator" = {
-          "schema-name" = "dbo"
-          "table-name"  = "%"
-        }
-        "rule-action" = "include"
-      }
-    ]
-  })
-
-}
+# resource "aws_dms_replication_task" "dms-replication" {
+#   #count = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
+#
+#   migration_type            = var.migration_type
+#   replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
+#   replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${local.dms_source_name}-${local
+#   .dms_target_name}"
+#   source_endpoint_arn       = aws_dms_endpoint.source[0].endpoint_arn
+#   target_endpoint_arn       = aws_dms_s3_endpoint.s3_target_endpoint[0].endpoint_arn
+#   table_mappings            = data.template_file.table-mappings.rendered
+#   replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
+#
+#   #lifecycle {
+#   #  ignore_changes = [replication_task_settings]
+#   #}
+#
+#   depends_on = [
+#     aws_dms_replication_instance.dms,
+#     aws_dms_endpoint.source,
+#     aws_dms_s3_endpoint.target
+#   ]
+# }
+#
+# resource "aws_dms_replication_task" "migration-task" {
+#   migration_type           = "full-load"
+#   replication_instance_arn = aws_dms_replication_instance.dms.replication_instance_arn
+#   replication_task_id       = "cica-dms-replication-task"
+#   # to be replaced in platform_locals
+#   source_endpoint_arn      = aws_dms_endpoint.source.endpoint_arn
+#   # to be replaced in platform_locals
+#   target_endpoint_arn      = aws_dms_s3_endpoint.target.endpoint_arn
+#   start_replication_task   = true
+#
+#   replication_task_settings = jsonencode({
+#     TargetMetadata = {
+#       FullLobMode  = true,
+#       LobChunkSize = 64
+#     },
+#     FullLoadSettings = {
+#       TargetTablePrepMode = "DO_NOTHING"
+#     },
+#     ControlTablesSettings = {
+#       historyTimeslotInMinutes = 5
+#     },
+#     ErrorBehavior = {
+#       DataErrorPolicy            = "LOG_ERROR"
+#       ApplyErrorDeletePolicy     = "LOG_ERROR"
+#       ApplyErrorInsertPolicy     = "LOG_ERROR"
+#       ApplyErrorUpdatePolicy     = "LOG_ERROR"
+#       ApplyErrorEscalationCount  = 0
+#       ApplyErrorEscalationPolicy = "LOG_ERROR"
+#     }
+#   })
+#
+#   table_mappings = jsonencode({
+#     rules = [
+#       {
+#         "rule-type" = "selection"
+#         "rule-id"   = "1"
+#         "rule-name" = "1"
+#         "object-locator" = {
+#           "schema-name" = "dbo"
+#           "table-name"  = "%"
+#         }
+#         "rule-action" = "include"
+#       }
+#     ]
+#   })
+#
+# }
 
 
 
@@ -105,7 +125,7 @@ resource "aws_dms_replication_instance" "dms" {
   publicly_accessible           = false
   replication_instance_class    = "dms.t2.large"
   replication_instance_id       = "${var.project_id}-dms-${var.short_name}-replication-instance"
-  kms_key_id                    = "${local.kms_key_id}"
+  kms_key_arn                   = module.dms_kms_source_cmk.key_arn
   replication_subnet_group_id   = aws_dms_replication_subnet_group.dms[0].id
   vpc_security_group_ids        = aws_security_group.dms_sec_group[*].id
 
@@ -128,28 +148,7 @@ data "template_file" "table-mappings" {
   template = file("${path.module}/config/${var.short_name}-table-mappings.json.tpl")
 }
 
-resource "aws_dms_replication_task" "dms-replication" {
-  #count = var.setup_dms_instance && var.enable_replication_task ? 1 : 0
 
-  migration_type            = var.migration_type
-  replication_instance_arn  = aws_dms_replication_instance.dms[0].replication_instance_arn
-  replication_task_id       = "${var.project_id}-dms-task-${var.short_name}-${local.dms_source_name}-${local
-  .dms_target_name}"
-  source_endpoint_arn       = aws_dms_endpoint.source[0].endpoint_arn
-  target_endpoint_arn       = aws_dms_s3_endpoint.s3_target_endpoint[0].endpoint_arn
-  table_mappings            = data.template_file.table-mappings.rendered
-  replication_task_settings = file("${path.module}/config/${var.short_name}-replication-settings.json")
-
-  #lifecycle {
-  #  ignore_changes = [replication_task_settings]
-  #}
-
-  depends_on = [
-    aws_dms_replication_instance.dms,
-    aws_dms_endpoint.source,
-    aws_dms_s3_endpoint.target
-  ]
-}
 
 # Create an endpoint for the source database
 #resource "aws_dms_endpoint" "source" {
@@ -188,10 +187,10 @@ resource "aws_dms_replication_subnet_group" "dms" {
   .dms_target_name}-subnet-group"
 
 
-  subnet_ids = concat([for subnet in module.isolated_vpc.private_subnets : subnet.id], [
-    for
-    subnet in module.isolated_vpc.private_subnets : subnet.id
-  ])
+  # subnet_ids = concat([for subnet in module.isolated_vpc.private_subnets : subnet.id], [
+  #   for
+  #   subnet in module.isolated_vpc.private_subnets : subnet.id
+  # ])
 }
 
 # Security Groups
@@ -202,7 +201,9 @@ resource "aws_security_group" "dms_sec_group" {
   # count = var.setup_dms_instance ? 1 : 0
 
   name   = "${var.project_id}-dms-${var.short_name}-${local.dms_source_name}-${local.dms_target_name}-security-group"
-  vpc_id = module.isolated_vpc.id
+
+  vpc_id = data.aws_vpc.shared.id
+
 
 
   ingress {

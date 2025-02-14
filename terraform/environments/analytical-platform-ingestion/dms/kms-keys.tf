@@ -26,5 +26,5 @@ module "dms_kms_source_cmk" {
 }
 
 output "dms_kms_source_cmk_arn" {
-  value = module.dms_kms_source_cmk.key_id
+  value = module.dms_kms_source_cmk.key_arn
 }

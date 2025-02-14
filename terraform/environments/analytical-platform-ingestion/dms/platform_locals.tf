@@ -24,11 +24,10 @@ locals {
   )
 
   environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
-  vpc_name        = var.networking[0].business-unit
-  subnet_set      = var.networking[0].set
-  vpc_all         = "${local.vpc_name}-${local.environment}"
-  subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
-  kms_key_id      = module.dms_kms_source_cmk.key_id
+  # subnet_set      = var.networking[0].set
+  # vpc_all         = "${local.vpc_name}-${local.environment}"
+  # subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
+  # kms_key_id      = module.dms_kms_source_cmk.key_id
   # set aws_dms_endpoint    = aws_dms_endpoint.source
   # set aws_dms_s3_endpoint = aws_dms_s3_endpoint.target
   project_id      = var.networking[0].project-id
