@@ -3,7 +3,7 @@ module "s3" {
 
   environment_name = local.application_data.accounts[local.environment].environment_name
 
-  bucket_name  = ["cms", "yjsm", "mis", "bedunlock", "bands", "cmm", "incident", "mis", "transfer"]
+  bucket_name  = ["cms", "yjsm", "mis", "bedunlock", "bands", "cmm", "incident", "mis", "transfer", "redshift-yjb-reporting", "install-files"]
   project_name = local.project_name
 
   allow_replication = local.application_data.accounts[local.environment].allow_s3_replication

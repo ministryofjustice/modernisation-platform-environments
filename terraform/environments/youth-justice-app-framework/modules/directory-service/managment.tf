@@ -19,6 +19,36 @@ resource "aws_iam_role" "join_ad_role" {
 EOF
 }
 
+#create a policy to all management instance to download files from the install-files bucket
+resource "aws_iam_policy" "read_s3_install_software" {
+  name = "read_s3_install_software"
+  description = "Use to enable ec2 Instances to retrieve software from S3 bucket <enviroment>-install-files"
+  policy = jsonencode({
+ 	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "VisualEditor0",
+			"Effect": "Allow",
+			"Action": [
+				"s3:GetObject",
+				"s3:GetObjectTagging",
+				"s3:ListBucket"
+			],
+			"Resource": ["arn:aws:s3:::${var.environment_name}-install-files/*",
+			             "arn:aws:s3:::${var.environment_name}-install-files"
+      ]
+		}
+	]
+  })
+}
+
+#attach policies Aread_s3_install_software
+resource "aws_iam_role_policy_attachment" "join_ad_role_policy_s3_access" {
+  role       = aws_iam_role.join_ad_role.name
+  policy_arn = aws_iam_policy.read_s3_install_software.arn
+}
+
+
 #attach policies AmazonSSMDirectoryServiceAccess and AmazonSSMManagedInstanceCore
 resource "aws_iam_role_policy_attachment" "join_ad_role_policy_ad_access" {
   role       = aws_iam_role.join_ad_role.name
@@ -30,27 +60,7 @@ resource "aws_iam_role_policy_attachment" "join_ad_role_policy_core" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-#data resource to get the latest Microsoft Windows Server 2019 Base ami
-data "aws_ami" "windows_2019" {
-  most_recent = true
-  owners      = ["amazon"]
-  filter {
-    name   = "name"
-    values = ["Windows_Server-2019-English-Full-Base-*"]
-  }
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
-  filter {
-    name   = "root-device-type"
-    values = ["ebs"]
-  }
-  filter {
-    name   = "architecture"
-    values = ["x86_64"]
-  }
-}
+
 
 #Create an instance profile for your EC2 instance
 resource "aws_iam_instance_profile" "ad_instance_profile" {
@@ -150,6 +160,67 @@ $adapterIndex = (Get-NetAdapter | Where-Object { $_.Name -like '*Ethernet*' }).I
 $dnsServers = $${ad_dns_servers}
 # Set the DNS server addresses for the specified network adapter
 Set-DnsClientServerAddress -InterfaceIndex $adapterIndex -ServerAddresses $dnsServers
+
+# Create some standard folders that will be needed by the Initialisation Script
+New-Item -Path "C:\"    -Name "i2N"      -ItemType Directory
+New-Item -Path "C:\i2N" -Name "Software" -ItemType Directory
+New-Item -Path "C:\i2N" -Name "Log"      -ItemType Directory
+New-Item -Path "C:\i2N" -Name "Scripts"  -ItemType Directory
+
+# Create a job to run following Restart
+$trigger = New-JobTrigger -AtStartup -RandomDelay 00:00:30
+Register-ScheduledJob -Name  Initialise-Server -Trigger $trigger -ScriptBlock {
+  $logFile        = "C:\i2N\Log\Init_LogFile_$(Get-Date -Format "yyyyMMdd hhmm").log"
+
+  Import-Module -Name International
+
+  Write-Output "$(Get-Date) Set System Locale, etc." | Out-File  $logFile -Append
+
+  Set-WinSystemLocale -SystemLocal en-GB
+  Set-WinUILanguageOverride -Language en-GB
+  Set-WinUserLanguageList -LanguageList en-GB -Force
+  Set-WinSystemLocale en-GB
+  Set-Culture en-GB
+  Set-TimeZone -ID "GMT Standard Time"
+
+  Write-Output "$(Get-Date) Install Software" | Out-File  $logFile -Append
+  $Download_Folder = "C:\i2N\Software"
+ 
+  #Download and install Firefox
+  $Download = join-path $Download_Folder firefox.exe
+
+  Invoke-WebRequest 'https://download.mozilla.org/?product=firefox-latest&os=win64&lang=en-US'  -OutFile $Download
+  Start-Process "$Download" -Wait -ArgumentList "/S"
+  Write-Output "$(Get-Date) Firefox Installed" | Out-File  $logFile -Append
+
+
+  #Download and install Notepad++
+  $Download = join-path $Download_Folder npp.8.7.5.Installer.x64.exe
+
+  Invoke-WebRequest 'https://github.com/notepad-plus-plus/notepad-plus-plus/releases/download/v8.7.5/npp.8.7.5.Installer.x64.exe'  -OutFile $Download
+  Start-Process "$Download" /S -NoNewWindow -Wait -PassThru -Wait
+  Write-Output "$(Get-Date) Notepad++ installed" | Out-File  $logFile -Append
+
+
+  #Download and install pgAdmin 4 v7.8
+  $Download = join-path $Download_Folder pgadmin4-7.8-x64.exe
+
+  Invoke-WebRequest 'https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v7.8/windows/pgadmin4-7.8-x64.exe'  -OutFile $Download
+  Start-Process "$Download" -Wait -ArgumentList "/VERYSILENT /ALLUSERS /NORESTART"
+  Write-Output "$(Get-Date) pgAdmin installed" | Out-File  $logFile -Append
+
+  Write-Output "$(Get-Date) Installs Complete" | Out-File  $logFile -Append
+
+  # Remove the following module as it prevents the PowerShell command window from accepting kekboard input on W2022
+  Remove-Module PSReadLine
+  Write-Output "$(Get-Date) PowerShell Module PSReadLie removed" | Out-File  $logFile -Append
+  
+  UnRegister-ScheduledJob -Name  Initialise-Server
+
+  Write-Output "$(Get-Date) Initialise-Server Job Unregistered" | Out-File  $logFile -Append
+
+}
+
 Restart-Computer -Force
 </powershell>
 EOF
@@ -162,7 +233,7 @@ EOF
 
 #Create an EC2 instance and automatically join the directory (management)
 resource "aws_instance" "ad_instance" {
-  ami                         = data.aws_ami.windows_2019.id
+  ami                         = data.aws_ami.windows_2022.id
   instance_type               = "t3.micro"
   iam_instance_profile        = aws_iam_instance_profile.ad_instance_profile.name
   key_name                    = module.key_pair.key_pair_name
@@ -171,6 +242,7 @@ resource "aws_instance" "ad_instance" {
   vpc_security_group_ids      = [aws_security_group.ad_sg.id]
   tags                        = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
   user_data                   = data.template_file.windows-dc-userdata.rendered
+  user_data_replace_on_change = true
   ebs_optimized               = true
   lifecycle {
     ignore_changes = [ami]
@@ -193,22 +265,29 @@ resource "aws_ssm_document" "ssm_document" {
   document_type = "Command"
   content       = <<DOC
 {
-    "schemaVersion": "1.0",
-    "description": "Automatic Domain Join Configuration",
-    "runtimeConfig": {
-        "aws:domainJoin": {
-            "properties": {
-                "directoryId": "${aws_directory_service_directory.ds_managed_ad.id}",
-                "directoryName": "${aws_directory_service_directory.ds_managed_ad.name}",
-                "dnsIpAddresses": ${jsonencode(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)}
-            }
-        }
+  "schemaVersion": "2.2",
+  "description": "aws:domainJoin",
+   "mainSteps": [
+    {
+      "action": "aws:domainJoin",
+      "name": "domainJoin",
+      "inputs": {
+        "directoryId": "${aws_directory_service_directory.ds_managed_ad.id}",
+        "directoryName": "${aws_directory_service_directory.ds_managed_ad.name}",
+        "dnsIpAddresses": ${jsonencode(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)}
+      }
     }
+  ]
 }
 DOC
 }
 
 resource "aws_ssm_association" "associate_ssm" {
   name        = aws_ssm_document.ssm_document.name
-  instance_id = aws_instance.ad_instance.id
+  targets {
+      key    = "InstanceIds"
+      values = [aws_instance.ad_instance.id]
+    }
+ 
+#  instance_id = aws_instance.ad_instance.id
 }
