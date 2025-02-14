@@ -17,11 +17,13 @@ variable collaborator_access {
 variable project_id {
   type        = string
   description = "(Required) Project Short ID that will be used for resources."
+  default     = "moj-data-platform"
 }
 
 variable short_name {
   type        = string
   description = "(Required) Short name of the project."
+    default     = "moj-data-platform"
 }
 
 variable environment {
@@ -53,83 +55,83 @@ variable migration_type {
 
 # Networking
 
-variable vpc {
-  type = string
-}
-
-variable vpc_security_group_ids {
-  type = list(string)
-}
-
-variable vpc_security_group_id {
-  type = string
-}
-
-variable vpc_cidr_blocks{
-  type = string
-}
-
-variable vpc_role_dependency {
-  type = any
-}
-
-variable subnet_ids {
-    type = list(string)
-}
+# variable vpc {
+#   type = string
+# }
+#
+# variable vpc_security_group_ids {
+#   type = list(string)
+# }
+#
+# variable vpc_security_group_id {
+#   type = string
+# }
+#
+# variable vpc_cidr_blocks{
+#   type = string
+# }
+#
+# variable vpc_role_dependency {
+#   type = any
+# }
+#
+# variable subnet_ids {
+#     type = list(string)
+# }
 
 # DMS - Source
 
-variable source_database {
-  type = object({
-    endpoint_id   = string
-    endpoint_type = string
-    engine_name   = string
-    username      = string
-    password      = string
-    server_name   = string
-    port          = number
-    database_name = string
-  })
-}
-
-variable source_database_name {
-  type = string
-}
-
-variable source_endpoint_id {
-  type = string
-}
-
-variable source_password {
-  type = string
-}
-
-variable source_username {
-  type = string
-}
-
-variable source_server_name {
-  type = string
-}
-
-variable dms_source_name {
-  type = string
-}
-
-variable database_name {
-  type = string
-}
-
-
-variable setup_dms_endpoints {
-  type = bool
-  default = true
-}
-
-variable setup_dms_s3_endpoint {
-  type = bool
-  default = true
-}
+# variable source_database {
+#   type = object({
+#     endpoint_id   = string
+#     endpoint_type = string
+#     engine_name   = string
+#     username      = string
+#     password      = string
+#     server_name   = string
+#     port          = number
+#     database_name = string
+#   })
+# }
+#
+# variable source_database_name {
+#   type = string
+# }
+#
+# variable source_endpoint_id {
+#   type = string
+# }
+#
+# variable source_password {
+#   type = string
+# }
+#
+# variable source_username {
+#   type = string
+# }
+#
+# variable source_server_name {
+#   type = string
+# }
+#
+# variable dms_source_name {
+#   type = string
+# }
+#
+# variable database_name {
+#   type = string
+# }
+#
+#
+# variable setup_dms_endpoints {
+#   type = bool
+#   default = true
+# }
+#
+# variable setup_dms_s3_endpoint {
+#   type = bool
+#   default = true
+# }
 
 
 
@@ -145,69 +147,69 @@ variable dms_kms_source_cmk {
 
 # DMS - General
 
-variable setup_dms_instance {
-  type = bool
-  default = true
-}
-
-variable endpoint_id {
-  type = string
-}
+# variable setup_dms_instance {
+#   type = bool
+#   default = true
+# }
+#
+# variable endpoint_id {
+#   type = string
+# }
 
 # DMS - Replication
 
-variable replication_instance_class {
-  type = string
-}
-
-variable replication_task_id {
-  type = string
-}
-
-variable replication_instance_arn {
-  type = string
-}
-
-variable replication_instance_storage {
-  type = string
-}
-
-variable replication_instance_version {
-  type = string
-}
-
-variable replication_instance_maintenance_window {
-  type = string
-}
-
-variable replication_instance_id {
-  type = string
-}
-
-variable replication_subnet_group_id {
-  type = string
-}
-
-variable replication_instance_name {
-  type = string
-}
-
-variable enable_replication_task {
-  type = bool
-  default = true
-}
+# variable replication_instance_class {
+#   type = string
+# }
+#
+# variable replication_task_id {
+#   type = string
+# }
+#
+# variable replication_instance_arn {
+#   type = string
+# }
+#
+# variable replication_instance_storage {
+#   type = string
+# }
+#
+# variable replication_instance_version {
+#   type = string
+# }
+#
+# variable replication_instance_maintenance_window {
+#   type = string
+# }
+#
+# variable replication_instance_id {
+#   type = string
+# }
+#
+# variable replication_subnet_group_id {
+#   type = string
+# }
+#
+# variable replication_instance_name {
+#   type = string
+# }
+#
+# variable enable_replication_task {
+#   type = bool
+#   default = true
+# }
 
 # S3 target
 
-variable dms_target_name {
-  type = string
-}
-
-variable s3_bucket {
-  type = string
-}
-
-variable bucket_name {
-  type = string
-}
+# variable dms_target_name {
+#   type = string
+# }
+#
+# variable s3_bucket {
+#   type = string
+# }
+#
+# variable bucket_name {
+#   type = string
+# }
 

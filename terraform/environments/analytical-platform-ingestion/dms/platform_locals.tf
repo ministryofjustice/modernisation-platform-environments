@@ -28,12 +28,30 @@ locals {
   subnet_set      = var.networking[0].set
   vpc_all         = "${local.vpc_name}-${local.environment}"
   subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
+  kms_key_id      = module.dms_kms_source_cmk.key_id
+  # set aws_dms_endpoint    = aws_dms_endpoint.source
+  # set aws_dms_s3_endpoint = aws_dms_s3_endpoint.target
+  project_id      = var.networking[0].project-id
+  short_name      = var.networking[0].short-name
+
+  db_creds_source = jsondecode(aws_secretsmanager_secret_version.resource_dms_secret_current.secret_string)
+
 
   is_live       = [substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" || substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-preproduction" ? "live" : "non-live"]
   provider_name = "core-vpc-${local.environment}"
 
+
   # environment specfic variables
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
-  application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+  
+  # originally application data json file was referenced at teh root of the repo  as below:
+
+
+  #application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+  application_data = fileexists("application_variables.json") ? jsondecode(file("application_variables.json")) : null
+  environment_configurations = jsondecode(file("../environment-configuration.tf"))
+}
+
 }

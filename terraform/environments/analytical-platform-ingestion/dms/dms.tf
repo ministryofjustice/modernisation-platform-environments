@@ -1,14 +1,14 @@
 # DMS Source Endpoint
 resource "aws_dms_endpoint" "source_endpoint" {
-  endpoint_id   = var.source_database.endpoint_id
-  endpoint_type = var.source_database.endpoint_type
-  engine_name   = var.source_database.engine_name
-  username      = var.source_database.username
-  password      = var.source_database.password
-  kms_key_arn   = var.dms_kms_source_cmk.type.arn
-  server_name   = var.source_database.server_name
-  port          = var.source_database.port
-  database_name = var.source_database.database_name
+  endpoint_id   = "${local.db_creds_source.source_endpoint_id}"
+  endpoint_type = "${local.db_creds_source.source_endpoint_type}"
+  engine_name   = "${local.db_creds_source.source_engine_name}"
+  username      = "${local.db_creds_source.source_username}"
+  password      = "${local.db_creds_source.source_password}"
+  kms_key_arn   = "${local.kms_key_id}"
+  server_name   = "${local.db_creds_source.source_server_name}"
+  port          = "${local.db_creds_source.source_port}"
+  database_name = "${local.db_creds_source.source_database_name}"
 }
 
 # DMS S3 Target Endpoint

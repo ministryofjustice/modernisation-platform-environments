@@ -9,20 +9,52 @@ data "aws_vpc" "shared" {
   }
 }
 
-data "aws_kms_secret" "dms" {
+data "aws_subnets" "shared_private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
+  }
+}
+
+data "aws_subnet" "shared_private_subnets_a" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}a"
+  }
+}
+
+data "aws_subnet" "shared_private_subnets_b" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}b"
+  }
+}
+
+data "aws_subnet" "shared_private_subnets_c" {
+  vpc_id = data.aws_vpc.shared.id
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private-${data.aws_region.current.name}c"
+  }
+}
+
+data "dms_kms_source_cmk" "dms" {
     provider = aws.core-network-services
-    secret_arn = var.dms_kms_secret_arn
+    # generate an arn for the key
+    key_id = module.dms_kms_source_cmk
     encryption_context = {
     "Key" = "Value"
   }
 }
 
-data "aws_subnet_ids" "private" {
-  vpc_id = data.aws_vpc.shared.id
+data "aws_ec2_transit_gateway" "moj_tgw" {
+  id = "tgw-026162f1ba39ce704"
+}
 
-  tags = {
-    "Name" = "${var.networking[0].business-unit}-${local.environment}"
-  }
+data "aws_availability_zone" "available" {
+    provider = aws.core-network-services
 }
 
 # Route53 DNS data
@@ -45,6 +77,24 @@ data "terraform_remote_state" "core_network_services" {
   }
 }
 
+data "aws_secretsmanager_secret" "dms_secret" {
+  name = "dms_secret"
+  id = data.terraform_remote_state.core_network_services.outputs.dms_secret_id
+  secret_string = jsonencode({
+  "username": "username-string!87659!",
+  "password": "password-string!87659!",
+  "engine": "engine-string!87659!",
+  "host": "host-string!87659!",
+  "port": "port-string!87659!",
+  "database_name": "database-string!87659!"
+})
+}
+
+
+
+#
+
+
 data "aws_organizations_organization" "root_account" {}
 
 # Retrieve information about the modernisation platform account
@@ -65,4 +115,9 @@ data "aws_iam_session_context" "whoami" {
 # Get the environments file from the main repository
 data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
+}
+
+data "aws_iam_roles" "data_engineering_sso_role" {
+  name_regex  = "AWSReservedSSO_modernisation-platform-data-eng_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }

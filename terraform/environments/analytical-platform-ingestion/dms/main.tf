@@ -1,10 +1,10 @@
 resource "aws_dms_s3_endpoint" "target" {
   count = var.setup_dms_endpoints && var.setup_dms_s3_endpoint ? 1 : 0
 
-  endpoint_id                      = "${var.project_id}-dms-${var.short_name}-s3-target-endpoint"
+  endpoint_id                      = "${local.project_id}-dms-${local.short_name}-s3-target-endpoint"
   endpoint_type                    = "target"
-  bucket_name                      = var.bucket_name
-  service_access_role_arn          = aws_iam_role.dms-s3-role[0].arn
+  bucket_name                      = "mojap-raw-hist"
+  service_access_role_arn          = module.production_replication_cica_dms_iam_role.arn
   data_format                      = "parquet"
   cdc_path                         = "cdc"
   timestamp_column_name            = "_timestamp"
@@ -20,27 +20,34 @@ resource "aws_dms_s3_endpoint" "target" {
  })
 }
 
+# convert these vars in source to secret values
+
 resource "aws_dms_endpoint" "source" {
-  database_name = var.source_database_name
-  endpoint_id   = var.source_endpoint_id
+  database_name = "${local.db_creds_source.source_database_name}"
+  endpoint_id   = "${local.db_creds_source.endpoint_id}"
   endpoint_type = "source"
   engine_name   = "oracle"
-  password      = var.source_password
-  kms_key_arn   = var.dms_kms_source_cmk.type.arn
+  username      = "${local.db_creds_source.source_username}"
+  password      = "${local.db_creds_source.source_password}"
+  # kms_key_arn                 = "arn:aws:kms:us-east-1:123456789012:key/ 12345678-1234-1234-1234-123456789012"
+  kms_key_arn   = "${local.kms_key_id}"
   port          = 1521
-  server_name   = var.source_server_name
+  server_name   = "${local.db_creds_source.source_servername}"
   ssl_mode      = "none"
 
-  username = var.source_username
+
 }
 
 resource "aws_dms_replication_task" "migration-task" {
   migration_type           = "full-load"
-  replication_instance_arn = var.replication_instance_arn
-  replication_task_id      = var.replication_task_id
+  replication_instance_arn = aws_dms_replication_instance.dms.replication_instance_arn
+
+  replication_task_id       = "cica-dms-replication-task"
+  # to be replaced in platform_locals
   source_endpoint_arn      = aws_dms_endpoint.source.endpoint_arn
+  # to be replaced in platform_locals
   target_endpoint_arn      = aws_dms_s3_endpoint.target.endpoint_arn
-  start_replication_task   = false
+  start_replication_task   = true
 
   replication_task_settings = jsonencode({
     TargetMetadata = {
@@ -88,17 +95,17 @@ resource "aws_dms_replication_instance" "dms" {
   #checkov:skip=CKV_AWS_212: "Ensure DMS replication instance is encrypted by KMS using a customer managed Key (CMK)"
   count = var.setup_dms_instance ? 1 : 0
 
-  allocated_storage             = var.replication_instance_storage
+  allocated_storage             = 200
   apply_immediately             = true
   auto_minor_version_upgrade    = false
-  availability_zone             = var.availability_zone
-  engine_version                = var.replication_instance_version
+  availability_zone             = "eu-west-2a"
+  engine_version                = "3.5.4"
   multi_az                      = true
-  preferred_maintenance_window  = var.replication_instance_maintenance_window
+  preferred_maintenance_window  = "sun:10:30-sun:14:30"
   publicly_accessible           = false
-  replication_instance_class    = var.replication_instance_class
+  replication_instance_class    = "dms.t2.large"
   replication_instance_id       = "${var.project_id}-dms-${var.short_name}-replication-instance"
-  kms_key_arn                   = var.dms_kms_source_cmk.type.arn
+  kms_key_id                    = "${local.kms_key_id}"
   replication_subnet_group_id   = aws_dms_replication_subnet_group.dms[0].id
   vpc_security_group_ids        = aws_security_group.dms_sec_group[*].id
 
