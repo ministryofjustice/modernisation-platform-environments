@@ -26,31 +26,31 @@ variable short_name {
     default     = "moj-data-platform"
 }
 
-variable environment {
-  type        = string
-  description = "(Required) Environment name."
-}
+# variable environment {
+#   type        = string
+#   description = "(Required) Environment name."
+# }
 
-variable region {
-  type = string
-}
+# variable region {
+#   type = string
+# }
 
-variable account_id {
-  type = string
-}
+# variable account_id {
+#   type = string
+# }
 
 variable tags {
   type = map(string)
 }
 
-variable availability_zone {
-  type = string
-}
+# variable availability_zone {
+#   type = string
+# }
 
 
-variable migration_type {
-  type = string
-}
+# variable migration_type {
+#   type = string
+# }
 
 
 # Networking
