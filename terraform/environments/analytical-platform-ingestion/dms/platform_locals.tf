@@ -58,4 +58,4 @@ locals {
   environment_configurations = jsondecode(file("../environment-configuration.tf"))
 }
 
-}
+

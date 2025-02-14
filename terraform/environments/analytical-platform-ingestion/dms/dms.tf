@@ -43,7 +43,9 @@ resource "aws_dms_replication_instance" "replication_instance" {
 
 # DMS Replication Task
 resource "aws_dms_replication_task" "replication_task" {
-  replication_task_id       = "${replace(${local.db_creds_source.source_database_name}, "_", "-")}-db-migration-task-tf"
+  # replication_task_id       = "${replace(${local.db_creds_source.source_database_name}, "_", "-")
+  # }-db-migration-task-tf"
+  replication_task_id       = "${replace(tariff, "_", "-")}-db-migration-task-tf"
   table_mappings            = file("${path.module}/metadata/tariff_uat")
   migration_type            = "full-load-and-cdc"
   replication_instance_arn  = aws_dms_replication_instance.replication_instance.id
