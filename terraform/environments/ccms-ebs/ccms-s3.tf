@@ -191,7 +191,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
       identifiers = ["logging.s3.amazonaws.com"]
     }
     actions   = ["s3:PutObject"]
-    resources = ["arn:aws:s3:::ccms-ebs-#{local.environment}-logging/*"]
+    resources = ["arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"]
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
