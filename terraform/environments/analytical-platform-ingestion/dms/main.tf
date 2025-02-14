@@ -23,16 +23,21 @@ resource "aws_dms_s3_endpoint" "target" {
 # convert these vars in source to secret values
 
 resource "aws_dms_endpoint" "source" {
-  database_name = "${local.db_creds_source.[source_database_name]}"
-  endpoint_id   = "${local.db_creds_source.[endpoint_id]}"
+  database_name = "database-string!87659!"
+  #database_name = "${local.db_creds_source.[source_database_name]}"
+  #endpoint_id   = "${local.db_creds_source.[endpoint_id]}"
+  endpoint_id   = "endpoint-id-string!87659!"
   endpoint_type = "source"
   engine_name   = "oracle"
-  username      = "${local.db_creds_source.[source_username]}"
-  password      = "${local.db_creds_source.[source_password]}"
+  username      = "username-string!87659!"
+  #username      = "${local.db_creds_source.[source_username]}"
+  password      = "password-string!87659!"
+  #password      = "${local.db_creds_source.[source_password]}"
   # kms_key_arn                 = "arn:aws:kms:us-east-1:123456789012:key/ 12345678-1234-1234-1234-123456789012"
   kms_key_arn   = module.dms_kms_source_cmk.key_arn
   port          = 1521
-  server_name   = "${local.db_creds_source.[source_servername]}"
+  server_name   = "server-name-string!87659!"
+  #server_name   = "${local.db_creds_source.[source_servername]}"
   ssl_mode      = "none"
 }
 
