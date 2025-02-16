@@ -34,6 +34,9 @@ locals {
   # set aws_dms_s3_endpoint = aws_dms_s3_endpoint.target
   project_id      = var.networking[0].project-id
   short_name      = var.networking[0].short-name
+  dms_target_name = "arn:aws:s3:::mojap-raw-hist/cica/${var.networking[0].short-name}/"
+  dms_source_name = "tariff"
+  #dms_source_name = "${var.networking[0].short-name}-${var.networking[0].database-name}"
 
   # not clear how to derive dict in secrets module so below is commented out
   # db_creds_source = jsondecode(aws_secretsmanager_secret_version.resource_dms_secret_current.secret_string)

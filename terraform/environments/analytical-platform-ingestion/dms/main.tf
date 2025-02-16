@@ -5,8 +5,9 @@ resource "aws_dms_s3_endpoint" "target" {
   endpoint_type                    = "target"
   bucket_name                      = "mojap-raw-hist"
   service_access_role_arn          = "arn:aws:iam::593291632749:role/cica-dms-ingress-production-replication"
-  endpoint_arn                     = "arn:aws:dms:eu-west-1:${data.aws_caller_identity.current
-  .account_id}:endpoint/${aws_dms_s3_endpoint.target.endpoint_id}"
+  # for some reason endpoint_id not know until built, check registry if this is essential
+  # endpoint_arn                     = "arn:aws:dms:eu-west-1:${data.aws_caller_identity.current
+  # .account_id}:endpoint/${aws_dms_s3_endpoint.target.endpoint_id}"
   data_format                      = "parquet"
   cdc_path                         = "cdc"
   timestamp_column_name            = "_timestamp"
@@ -199,8 +200,7 @@ resource "aws_dms_replication_subnet_group" "dms" {
   # replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${local.dms_source_name}-${local
   # .dms_target_name}-subnet-group"
 
-
-  # subnet_ids = concat([for subnet in module.isolated_vpc.private_subnets : subnet.id], [
+  subnet_ids = data.aws_subnet.shared_private_subnets_a[*].id
   #   for
   #   subnet in module.isolated_vpc.private_subnets : subnet.id
   # ])

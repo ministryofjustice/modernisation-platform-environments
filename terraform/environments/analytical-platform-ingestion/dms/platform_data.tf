@@ -37,14 +37,14 @@ data "aws_subnet" "shared_private_subnets_c" {
   }
 }
 
-data "dms_kms_source_cmk" "dms" {
-    provider = aws.core-network-services
-    name = "dms"
-    key_id = module.dms_kms_source_cmk.key_id
-    encryption_context = {
-    "Key" = "Value"
-  }
-}
+# data "dms_kms_source_cmk" "dms" {
+#     provider = aws.core-network-services
+#     name = "dms"
+#     key_id = module.dms_kms_source_cmk.key_id
+#     encryption_context = {
+#     "Key" = "Value"
+#   }
+# }
 
 data "aws_ec2_transit_gateway" "moj_tgw" {
   id = "tgw-026162f1ba39ce704"
