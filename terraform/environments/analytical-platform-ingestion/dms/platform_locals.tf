@@ -25,6 +25,8 @@ locals {
 
   environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
   vpc_name        = var.networking[0].business-unit
+  vpc_id          = var.networking[0].vpc_id
+  subnet_ids      = var.networking[0].subnet_ids
   subnet_set      = var.networking[0].set
   vpc_all         = "${local.vpc_name}-${local.environment}"
   subnet_set_name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}"
@@ -33,10 +35,11 @@ locals {
   project_id      = var.networking[0].project-id
   short_name      = var.networking[0].short-name
 
-  db_creds_source = jsondecode(aws_secretsmanager_secret_version.resource_dms_secret_current.secret_string)
-
-  dms_source_name = "${db_creds_source.source_endpoint_id}-${db_creds_source.source_database_name}"
-  dms_target_name = "arn:aws:s3:::mojap-raw-hist/cica/${db_creds_source.source_database_name}/"
+  # not clear how to derive dict in secrets module so below is commented out
+  # db_creds_source = jsondecode(aws_secretsmanager_secret_version.resource_dms_secret_current.secret_string)
+  #
+  # dms_source_name = "${db_creds_source.source_endpoint_id}-${db_creds_source.source_database_name}"
+  # dms_target_name = "arn:aws:s3:::mojap-raw-hist/cica/${db_creds_source.source_database_name}/"
 
   replication_task_id = "cica-dms-replication-task"
 
@@ -47,5 +50,5 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
-  environment_configurations = jsondecode(file("../environment-configuration.tf"))
+  # environment_configurations = jsondecode(file("../environment-configuration.tf"))
 }

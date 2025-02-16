@@ -15,8 +15,8 @@ resource "aws_dms_endpoint" "source_endpoint" {
   engine_name   = "oracle"
   port          = 1521
   database_name = "database-string!87659!"
-  endpoint_id   = "endpoint-id-string!87659!"
-  endpoint_type = "endpoint-type-string!87659!"
+  endpoint_id   = "cica-dms-ingress-production-replication"
+  endpoint_type = "source"
   server_name   = "server-name-string!87659!"
 
 }
@@ -25,7 +25,7 @@ resource "aws_dms_endpoint" "source_endpoint" {
 
 # DMS S3 Target Endpoint
 resource "aws_dms_s3_endpoint" "s3_target_endpoint" {
-  endpoint_id             = "cica/tariff/"
+  endpoint_id             = "tariff_db_migration_task_tf"
   endpoint_type           = "target"
   bucket_name             = "mojap-ingestion-production-cica-dms-ingress/"
   service_access_role_arn = module.production_replication_cica_dms_iam_role[0].iam_role_arn

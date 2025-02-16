@@ -4,7 +4,7 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 data "aws_vpc" "shared" {
-
+  id = "${local.vpc_id}"
   tags = {
     name = "${local.application_name}-${local.environment}-connected"
   }
@@ -38,8 +38,7 @@ data "aws_subnet" "shared_private_subnets_c" {
 }
 
 data "dms_kms_source_cmk" "dms" {
-    provider = aws.core-network-services
-    # generate an arn for the key
+    name = "dms"
     key_id = module.dms_kms_source_cmk
     encryption_context = {
     "Key" = "Value"
