@@ -16,8 +16,11 @@
             ]
         },
         {
-            ["insert_columns_schema"]
+            "name": [
+                "insert column info"
+            ]
         }
+
     ],
     "location": "TABLE_NAME_UPPER/",
     "primary_key": [

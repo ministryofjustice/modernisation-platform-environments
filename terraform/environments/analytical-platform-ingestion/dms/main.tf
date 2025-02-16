@@ -4,7 +4,9 @@ resource "aws_dms_s3_endpoint" "target" {
   endpoint_id                      = "${local.project_id}-dms-${local.short_name}-s3-target-endpoint"
   endpoint_type                    = "target"
   bucket_name                      = "mojap-raw-hist"
-  service_access_role_arn          = module.production_replication_cica_dms_iam_role.arn
+  service_access_role_arn          = "arn:aws:iam::593291632749:role/cica-dms-ingress-production-replication"
+  endpoint_arn                     = "arn:aws:dms:eu-west-1:${data.aws_caller_identity.current
+  .account_id}:endpoint/${aws_dms_s3_endpoint.target.endpoint_id}"
   data_format                      = "parquet"
   cdc_path                         = "cdc"
   timestamp_column_name            = "_timestamp"
@@ -26,7 +28,7 @@ resource "aws_dms_endpoint" "source" {
   database_name = "database-string!87659!"
   #database_name = "${local.db_creds_source.[source_database_name]}"
   #endpoint_id   = "${local.db_creds_source.[endpoint_id]}"
-  endpoint_id   = "endpoint-id-string!87659!"
+  endpoint_id   = "cica-dms-ingress-production-replication"
   endpoint_type = "source"
   engine_name   = "oracle"
   username      = "username-string!87659!"
@@ -123,13 +125,16 @@ resource "aws_dms_replication_instance" "dms" {
   allocated_storage             = 200
   apply_immediately             = true
   auto_minor_version_upgrade    = false
+  arn = "arn:aws:dms:eu-west-1:${data.aws_caller_identity.current.account_id}:rep:3b4b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
+  replication_instance_arn      = aws_dms_replication_instance.dms.replication_instance_arn
   availability_zone             = "eu-west-2a"
   engine_version                = "3.5.4"
   multi_az                      = true
   preferred_maintenance_window  = "sun:10:30-sun:14:30"
   publicly_accessible           = false
   replication_instance_class    = "dms.t2.large"
-  replication_instance_id       = "${var.project_id}-dms-${var.short_name}-replication-instance"
+  replication_instance_id         = "${local.project_id}-dms-${local.short_name}-replication-instance"
+  # replication_instance_id       = "${var.project_id}-dms-${var.short_name}-replication-instance"
   kms_key_arn                   = module.dms_kms_source_cmk.key_arn
   replication_subnet_group_id   = aws_dms_replication_subnet_group.dms[0].id
   vpc_security_group_ids        = aws_security_group.dms_sec_group[*].id
@@ -150,8 +155,10 @@ resource "aws_dms_replication_instance" "dms" {
 }
 
 data "template_file" "table-mappings" {
-  template = file("${path.module}/config/${var.short_name}-table-mappings.json.tpl")
+  template = file("${path.module}/metadata/template.json")
+  # template = file("${path.module}/config/${var.short_name}-table-mappings.json.tpl")
 }
+
 
 
 
@@ -188,8 +195,9 @@ resource "aws_dms_replication_subnet_group" "dms" {
   # count = var.setup_dms_instance ? 1 : 0
 
   replication_subnet_group_description = "DMS replication subnet group"
-  replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${local.dms_source_name}-${local
-  .dms_target_name}-subnet-group"
+  replication_subnet_group_id = "${local.project_id}-dms-${local.short_name}-replication-subnet-group"
+  # replication_subnet_group_id          = "${var.project_id}-dms-${var.short_name}-${local.dms_source_name}-${local
+  # .dms_target_name}-subnet-group"
 
 
   # subnet_ids = concat([for subnet in module.isolated_vpc.private_subnets : subnet.id], [
@@ -205,7 +213,8 @@ resource "aws_security_group" "dms_sec_group" {
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   # count = var.setup_dms_instance ? 1 : 0
 
-  name   = "${var.project_id}-dms-${var.short_name}-${local.dms_source_name}-${local.dms_target_name}-security-group"
+  name   = "${local.project_id}-dms-${local.short_name}-${local.dms_source_name}-${local
+  .dms_target_name}-security-group"
 
   vpc_id = data.aws_vpc.shared.id
 
