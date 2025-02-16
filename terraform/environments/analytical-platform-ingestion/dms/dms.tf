@@ -58,7 +58,7 @@ resource "aws_dms_replication_task" "replication_task" {
   # replication_task_id       = "${replace(${local.db_creds_source.source_database_name}, "_", "-")
   # }-db-migration-task-tf"
   replication_task_id       = "tariff_db_migration_task_tf"
-  table_mappings            = file("${path.module}/metadata/tariff_uat")
+  table_mappings            = file("${path.module}/metadata/tariff_uat/template.json")
   migration_type            = "full-load-and-cdc"
   replication_instance_arn  = aws_dms_replication_instance.replication_instance.id
   source_endpoint_arn       = aws_dms_endpoint.source_endpoint.id

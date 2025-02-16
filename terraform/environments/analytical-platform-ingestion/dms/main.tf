@@ -137,7 +137,7 @@ resource "aws_dms_replication_instance" "dms" {
   replication_instance_id         = "${local.project_id}-dms-${local.short_name}-replication-instance"
   # replication_instance_id       = "${var.project_id}-dms-${var.short_name}-replication-instance"
   kms_key_arn                   = module.dms_kms_source_cmk.key_arn
-  replication_subnet_group_id   = aws_dms_replication_subnet_group.dms[0].id
+  replication_subnet_group_id   = aws_dms_replication_subnet_group.dms.id
   vpc_security_group_ids        = aws_security_group.dms_sec_group[*].id
 
   tags = var.tags
