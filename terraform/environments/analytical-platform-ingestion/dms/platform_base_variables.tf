@@ -12,7 +12,11 @@ variable "collaborator_access" {
   description = "Collaborators must specify which access level they are using, eg set an environment variable of export TF_VAR_collaborator_access=migration"
 }
 
-
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "A map of tags to assign to resources"
+}
 
 variable "dms_kms_source_cmk" {
   default = null
