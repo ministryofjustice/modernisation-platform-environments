@@ -58,7 +58,15 @@ resource "aws_dms_replication_task" "replication_task" {
   # replication_task_id       = "${replace(${local.db_creds_source.source_database_name}, "_", "-")
   # }-db-migration-task-tf"
   replication_task_id       = "tariff_db_migration_task_tf"
-  table_mappings            = file("${path.module}/metadata/tariff_uat/template.json")
+
+  #### tasks = fix table mappings
+#
+#  Invalid value for "path" parameter: no file exists at
+#  "./metadata/tariff_uat/template.json"; this function works only with files
+#  that are distributed as part of the configuration source code, so if this
+#  file will be created by a resource in this configuration you must instead
+# obtain this result from an attribute of that resource.
+  # table_mappings            = file("${path.module}/metadata/tariff_uat/template.json")
   migration_type            = "full-load-and-cdc"
   replication_instance_arn  = aws_dms_replication_instance.replication_instance.id
   source_endpoint_arn       = aws_dms_endpoint.source_endpoint.id

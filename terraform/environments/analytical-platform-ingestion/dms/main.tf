@@ -126,7 +126,6 @@ resource "aws_dms_replication_instance" "dms" {
   allocated_storage             = 200
   apply_immediately             = true
   auto_minor_version_upgrade    = false
-  arn = "arn:aws:dms:eu-west-1:${data.aws_caller_identity.current.account_id}:rep:3b4b3b3b-3b3b-3b3b-3b3b-3b3b3b3b3b3b"
   replication_instance_arn      = aws_dms_replication_instance.dms.replication_instance_arn
   availability_zone             = "eu-west-2a"
   engine_version                = "3.5.4"
