@@ -13,11 +13,11 @@ resource "aws_dms_s3_endpoint" "target" {
   max_file_size          = 120000
   cdc_max_batch_interval = 10
 
-  tags = merge(
-    var.tags,
-    {
-      Resource_Type = "DMS Target Endpoint"
- })
+ #  tags = merge(
+ #    var.tags,
+ #    {
+ #      Resource_Type = "DMS Target Endpoint"
+ # })
 }
 
 # convert these vars in source to secret values

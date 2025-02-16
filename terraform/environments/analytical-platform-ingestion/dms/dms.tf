@@ -13,7 +13,7 @@ resource "aws_dms_endpoint" "source_endpoint" {
   username      = "username-string!87659!"
   password      = "password-string!87659!"
   engine_name   = "oracle"
-  port          = "port-string!87659!"
+  port          = 1521
   database_name = "database-string!87659!"
   endpoint_id   = "endpoint-id-string!87659!"
   endpoint_type = "endpoint-type-string!87659!"
@@ -27,7 +27,7 @@ resource "aws_dms_endpoint" "source_endpoint" {
 resource "aws_dms_s3_endpoint" "s3_target_endpoint" {
   endpoint_id             = "cica/tariff/"
   endpoint_type           = "target"
-  bucket_name             = module.cica_dms_ingress_bucket.s3_bucket_id
+  bucket_name             = "mojap-ingestion-production-cica-dms-ingress/"
   service_access_role_arn = module.production_replication_cica_dms_iam_role[0].iam_role_arn
 }
 
