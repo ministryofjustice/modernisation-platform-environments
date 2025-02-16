@@ -38,8 +38,9 @@ data "aws_subnet" "shared_private_subnets_c" {
 }
 
 data "dms_kms_source_cmk" "dms" {
+    provider = aws.core-network-services
     name = "dms"
-    key_id = module.dms_kms_source_cmk
+    key_id = module.dms_kms_source_cmk.key_id
     encryption_context = {
     "Key" = "Value"
   }
