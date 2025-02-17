@@ -56,11 +56,6 @@ module "log_bucket" {
 }
 
 
-import {
-  to = module.external_alb.module.alb_sg.aws_security_group_rule.ingress_with_cidr_blocks[0]
-  id = "sgr-022b8210cb36ef2f7_ingress_HTTPS_443_443_0.0.0.0/0"
-}
-
 module "alb_sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/security-group/aws"

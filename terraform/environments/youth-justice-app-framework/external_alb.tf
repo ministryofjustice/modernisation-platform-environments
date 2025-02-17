@@ -1,3 +1,8 @@
+import {
+  to = module.external_alb.module.alb_sg.aws_security_group_rule.ingress_with_cidr_blocks[0]
+  id = "sgr-022b8210cb36ef2f7_ingress_HTTPS_443_443_0.0.0.0/0"
+}
+
 #tfsec:ignore:AWS0053 "The load balancer is internet facing by design."
 #tfsec:ignore:AVD-AWS-0053
 module "external_alb" {
