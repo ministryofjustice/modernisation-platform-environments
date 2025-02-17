@@ -36,7 +36,7 @@ sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
 sed -i '/${local.cm_hostname}$/d' /etc/hosts
 echo "$DB_IP	${local.application_name_short}-db.${var.route53_zone_external}		${local.database_hostname}" >> /etc/hosts
 echo "$APP1_IP	${local.application_name_short}-app1.${var.route53_zone_external}		${local.appserver1_hostname}" >> /etc/hosts
-echo "$PRIVATE_IP	${local.application_name_short}-app2.${var.route53_zone_external}		${local.cm_hostname}" >> /etc/hosts
+echo "$PRIVATE_IP	${local.application_name_short}-conc.${var.route53_zone_external}		${local.cm_hostname}" >> /etc/hosts
 
 
 echo "Updating /etc/fstab file and mount"
