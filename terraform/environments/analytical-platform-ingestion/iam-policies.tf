@@ -164,7 +164,7 @@ data "aws_iam_policy_document" "datasync_opg_replication" {
       "kms:Encrypt",
       "kms:GenerateDataKey"
     ]
-    resources = [local.environment_configuration.mojap_land_kms_key] #TODO - Edit this
+    resources = [local.environment_configuration.datasync_opg_target_bucket_kms]
   }
   statement {
     sid    = "SourceBucketKMSKey"
