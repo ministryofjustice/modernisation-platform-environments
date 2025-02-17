@@ -64,6 +64,7 @@
         "dps-alerts",
         "dps-use-of-force",
         "dps-locations",
+        "dps-calculate-release-dates",
         "dps-incentives",
         "dps-non-associations",
         "dps-testing"
@@ -214,7 +215,8 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-locations"
+        "dps-locations",
+        "dps-calculate-release-dates"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -364,7 +366,8 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-locations"
+        "dps-locations",
+        "dps-calculate-release-dates"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -530,7 +533,8 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-locations"
+        "dps-locations",
+        "dps-calculate-release-dates"
       ],
       "alarms": {
         "setup_cw_alarms": true,
