@@ -1,3 +1,4 @@
+#todo remove me
 import {
   to = module.ds.aws_ssm_document.ssm_document
   id = "ssm_document_ad"
@@ -7,7 +8,6 @@ import {
   to = module.ds.aws_cloudformation_stack.pki_quickstart
   id = "MicrosoftPKIQuickStart"
 }
-
 
 module "ds" {
   source = "./modules/directory-service"

@@ -29,7 +29,7 @@ module "log_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 
-  bucket = "${var.alb_name}-${local.alb_suffix}-connection-logs"
+  bucket = "${var.alb_name}-${local.alb_suffix}-${var.environment}-logs"
   acl    = "log-delivery-write"
 
   # For example only
