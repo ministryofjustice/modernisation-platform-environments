@@ -255,7 +255,8 @@ data "aws_iam_policy_document" "guard_duty_malware_protection_iam_policy" {
       "s3:PutObjectTagging",
       "s3:GetObjectTagging",
       "s3:PutObjectVersionTagging",
-      "s3:GetObjectVersionTagging"
+      "s3:GetObjectVersionTagging",
+      "s3:*"
     ]
 
     resources = [
