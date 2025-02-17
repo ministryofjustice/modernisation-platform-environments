@@ -36,7 +36,7 @@ resource "aws_cloudwatch_log_metric_filter" "s3_file_arrivals" {
 
   name           = "fms-land-file-arrivals"
   pattern        = "[timestamp, requestParameters.bucketName, eventName=PutObject]"
-  log_group_name = aws_cloudwatch_log_group.s3_events.name
+  log_group_name = aws_cloudwatch_log_group.s3_events[0].name
 
   metric_transformation {
     name          = "FileArrivals"
