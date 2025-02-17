@@ -51,16 +51,18 @@ resource "aws_route53_record" "email_dkim_records" {
 
 ### SMTP User ###
 
-# checkov:skip=CKV_AWS_273:Required for SMTP
 resource "aws_iam_user" "ses_smtp_user" {
+  # checkov:skip=CKV_AWS_273:Required for SMTP
+
   count = local.is-production == true ? 1 : 0
 
   name = "ses_smtp_user"
 }
 
-# checkov:skip=CKV_AWS_40:Policy attached to User due to Modernisation Platform restrictions
-# checkov:skip=CKV_AWS_290:Policy does not deal with write access
 resource "aws_iam_user_policy" "ses_smtp_user" {
+  # checkov:skip=CKV_AWS_40:Policy attached to User due to Modernisation Platform restrictions
+  # checkov:skip=CKV_AWS_290:Policy does not deal with write access
+
   count = local.is-production == true ? 1 : 0
 
   user = aws_iam_user.ses_smtp_user[0].name
