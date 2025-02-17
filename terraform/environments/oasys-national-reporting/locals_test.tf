@@ -201,7 +201,13 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
-        cloudwatch_metric_alarms = null
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+          local.cloudwatch_metric_alarms.windows,
+          local.cloudwatch_metric_alarms.bods_primary,
+        )
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "t2"
           domain-name                          = "azure.noms.root"
@@ -219,7 +225,13 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type = "m4.xlarge"
         })
-        cloudwatch_metric_alarms = null
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+          local.cloudwatch_metric_alarms.windows,
+          local.cloudwatch_metric_alarms.bods_secondary,
+        )
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "t2"
           domain-name                          = "azure.noms.root"
