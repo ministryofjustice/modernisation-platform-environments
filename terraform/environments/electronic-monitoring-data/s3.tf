@@ -68,7 +68,7 @@ module "s3-logging-bucket" {
 
   bucket_policy = [
     data.aws_iam_policy_document.log_bucket_policy.json,
-    data.aws_iam_policy_document.cloudtrail_bucket_policy.json
+    local.is-development == false ? data.aws_iam_policy_document.cloudtrail_bucket_policy[0].json : null
   ]
 
   lifecycle_rule = [
