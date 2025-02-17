@@ -1,3 +1,8 @@
+moved {
+  from = aws_security_group.ad_sg
+  to   = aws_security_group.mgmt_instance_sg
+}
+
 #Create an instance role to join Windows instances to your AWS Managed Microsoft AD domain
 #trusted entity is ec2, 
 resource "aws_iam_role" "join_ad_role" {
@@ -71,7 +76,7 @@ resource "aws_iam_instance_profile" "ad_instance_profile" {
 #create a security group for your EC2 instance
 resource "aws_security_group" "mgmt_instance_sg" {
   name        = "ad_management_server_sg"
-  description = "Management Servers' Security Group"
+  description = "Management Server Access"
   vpc_id      = var.ds_managed_ad_vpc_id
   
   tags = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
