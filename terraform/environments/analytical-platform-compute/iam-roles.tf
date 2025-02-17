@@ -59,160 +59,160 @@ module "efs_csi_driver_iam_role" {
   tags = local.tags
 }
 
-module "aws_for_fluent_bit_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+# module "aws_for_fluent_bit_iam_role" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.52.2"
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#   version = "5.52.2"
 
-  role_name_prefix = "aws-for-fluent-bit"
+#   role_name_prefix = "aws-for-fluent-bit"
 
-  role_policy_arns = {
-    CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-    EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
-  }
+#   role_policy_arns = {
+#     CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+#     EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
+#   }
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
-    }
-  }
+#   # oidc_providers = {
+#   #   main = {
+#   #     provider_arn               = module.eks.oidc_provider_arn
+#   #     namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
+#   #   }
+#   # }
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-module "amazon_prometheus_proxy_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+# module "amazon_prometheus_proxy_iam_role" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.52.2"
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#   version = "5.52.2"
 
-  role_name_prefix = "amazon-prometheus-proxy"
+#   role_name_prefix = "amazon-prometheus-proxy"
 
-  role_policy_arns = {
-    AmazonManagedPrometheusProxy = module.amazon_prometheus_proxy_iam_policy.arn
-  }
+#   role_policy_arns = {
+#     AmazonManagedPrometheusProxy = module.amazon_prometheus_proxy_iam_policy.arn
+#   }
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
-    }
-  }
+#   oidc_providers = {
+#     main = {
+#       provider_arn               = module.eks.oidc_provider_arn
+#       namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
+#     }
+#   }
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-module "cluster_autoscaler_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+# module "cluster_autoscaler_iam_role" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.52.2"
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#   version = "5.52.2"
 
-  role_name_prefix = "cluster-autoscaler"
+#   role_name_prefix = "cluster-autoscaler"
 
-  attach_cluster_autoscaler_policy = true
-  cluster_autoscaler_cluster_names = [module.eks.cluster_name]
+#   attach_cluster_autoscaler_policy = true
+#   cluster_autoscaler_cluster_names = [module.eks.cluster_name]
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.cluster_autoscaler.metadata[0].name}:cluster-autoscaler"]
-    }
-  }
+#   oidc_providers = {
+#     main = {
+#       provider_arn               = module.eks.oidc_provider_arn
+#       namespace_service_accounts = ["${kubernetes_namespace.cluster_autoscaler.metadata[0].name}:cluster-autoscaler"]
+#     }
+#   }
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-module "external_dns_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+# module "external_dns_iam_role" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.52.2"
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#   version = "5.52.2"
 
-  role_name_prefix              = "external-dns"
-  attach_external_dns_policy    = true
-  external_dns_hosted_zone_arns = [module.route53_zones.route53_zone_zone_arn[local.environment_configuration.route53_zone]]
+#   role_name_prefix              = "external-dns"
+#   attach_external_dns_policy    = true
+#   external_dns_hosted_zone_arns = [module.route53_zones.route53_zone_zone_arn[local.environment_configuration.route53_zone]]
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.external_dns.metadata[0].name}:external-dns"]
-    }
-  }
+#   oidc_providers = {
+#     main = {
+#       provider_arn               = module.eks.oidc_provider_arn
+#       namespace_service_accounts = ["${kubernetes_namespace.external_dns.metadata[0].name}:external-dns"]
+#     }
+#   }
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-module "cert_manager_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+# module "cert_manager_iam_role" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.52.2"
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#   version = "5.52.2"
 
-  role_name_prefix              = "cert-manager"
-  attach_cert_manager_policy    = true
-  cert_manager_hosted_zone_arns = [module.route53_zones.route53_zone_zone_arn[local.environment_configuration.route53_zone]]
+#   role_name_prefix              = "cert-manager"
+#   attach_cert_manager_policy    = true
+#   cert_manager_hosted_zone_arns = [module.route53_zones.route53_zone_zone_arn[local.environment_configuration.route53_zone]]
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.cert_manager.metadata[0].name}:cert-manager"]
-    }
-  }
+#   oidc_providers = {
+#     main = {
+#       provider_arn               = module.eks.oidc_provider_arn
+#       namespace_service_accounts = ["${kubernetes_namespace.cert_manager.metadata[0].name}:cert-manager"]
+#     }
+#   }
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-module "external_secrets_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+# module "external_secrets_iam_role" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.52.2"
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#   version = "5.52.2"
 
-  role_name_prefix               = "external-secrets"
-  attach_external_secrets_policy = true
-  external_secrets_kms_key_arns  = [module.common_secrets_manager_kms.key_arn]
+#   role_name_prefix               = "external-secrets"
+#   attach_external_secrets_policy = true
+#   external_secrets_kms_key_arns  = [module.common_secrets_manager_kms.key_arn]
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.external_secrets.metadata[0].name}:external-secrets"]
-    }
-  }
+#   oidc_providers = {
+#     main = {
+#       provider_arn               = module.eks.oidc_provider_arn
+#       namespace_service_accounts = ["${kubernetes_namespace.external_secrets.metadata[0].name}:external-secrets"]
+#     }
+#   }
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
-module "mlflow_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+# module "mlflow_iam_role" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.52.2"
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#   version = "5.52.2"
 
-  role_name_prefix = "mlflow"
+#   role_name_prefix = "mlflow"
 
-  role_policy_arns = {
-    MlflowPolicy = module.mlflow_iam_policy.arn
-  }
+#   role_policy_arns = {
+#     MlflowPolicy = module.mlflow_iam_policy.arn
+#   }
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.mlflow.metadata[0].name}:mlflow"]
-    }
-  }
+#   oidc_providers = {
+#     main = {
+#       provider_arn               = module.eks.oidc_provider_arn
+#       namespace_service_accounts = ["${kubernetes_namespace.mlflow.metadata[0].name}:mlflow"]
+#     }
+#   }
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
 module "gha_mojas_airflow_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
@@ -259,29 +259,29 @@ module "lake_formation_share_role" {
   tags = local.tags
 }
 
-module "analytical_platform_ui_service_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+# module "analytical_platform_ui_service_role" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.52.2"
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+#   version = "5.52.2"
 
-  create_role = true
+#   create_role = true
 
-  role_name_prefix = "analytical-platform-ui"
+#   role_name_prefix = "analytical-platform-ui"
 
-  oidc_providers = {
-    main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${kubernetes_namespace.ui.metadata[0].name}:ui"]
-    }
-  }
-  role_policy_arns = {
-    "lake_formation_and_quicksight"      = module.analytical_platform_lake_formation_share_policy.arn
-    "lake_formation_cross_account_share" = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
-  }
-  tags = local.tags
-}
+#   oidc_providers = {
+#     main = {
+#       provider_arn               = module.eks.oidc_provider_arn
+#       namespace_service_accounts = ["${kubernetes_namespace.ui.metadata[0].name}:ui"]
+#     }
+#   }
+#   role_policy_arns = {
+#     "lake_formation_and_quicksight"      = module.analytical_platform_lake_formation_share_policy.arn
+#     "lake_formation_cross_account_share" = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
+#   }
+#   tags = local.tags
+# }
 
 module "analytical_platform_control_panel_service_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
