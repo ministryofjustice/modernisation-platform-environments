@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "s3:GetReplicationConfiguration",
       "s3:ListBucket"
     ]
-    resources = [module.datasync_opg_bucket.s3_bucket_arn]
+    resources = [module.datasync_opg_bucket.s3_bucket_arn] # TODO - needs review, had to edit this as I was editing module.datasync_opg_bucket to work in two environments
   }
   statement {
     sid    = "SourceBucketObjectPermissions"
@@ -182,7 +182,7 @@ data "aws_iam_policy_document" "datasync_opg_replication" {
       "s3:GetReplicationConfiguration",
       "s3:ListBucket"
     ]
-    resources = [module.datasync_opg_bucket.s3_bucket_arn]
+    resources = [module.datasync_opg_bucket.s3_bucket_arn] # TODO - review this
   }
   statement {
     sid    = "SourceBucketObjectPermissions"
