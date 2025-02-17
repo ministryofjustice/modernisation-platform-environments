@@ -69,7 +69,7 @@ resource "aws_efs_mount_target" "target_a" {
 resource "aws_security_group" "efs" {
   name        = "${local.application_name_short}-${var.environment}-efs-security-group"
   description = "CWA EFS Mount Target Security Group"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.shared_vpc_id
 }
 
 resource "aws_vpc_security_group_egress_rule" "efs_outbound" {
