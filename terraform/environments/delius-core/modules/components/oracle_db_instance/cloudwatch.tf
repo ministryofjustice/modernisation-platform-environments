@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "status_check_failed_alarm" {
   dimensions = {
     InstanceId = module.instance.aws_instance.id
   }
-  treat_missing_data       = "breaching"
+  treat_missing_data = "breaching"
 }
 
 resource "aws_cloudwatch_log_group" "ec2_status_check_log_group" {
@@ -32,8 +32,8 @@ resource "aws_cloudwatch_event_rule" "ec2_status_check_failed_event" {
     "source" : ["aws.cloudwatch"],
     "detail-type" : ["CloudWatch Alarm State Change"],
     "detail" : {
-      "state": {
-        "value": ["ALARM"]
+      "state" : {
+        "value" : ["ALARM"]
       }
       "alarmName" : ["${local.alarm_name}"]
     }
