@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "s3:GetReplicationConfiguration",
       "s3:ListBucket"
     ]
-    resources = [module.datasync_bucket.s3_bucket_arn]
+    resources = [module.datasync_opg_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "SourceBucketObjectPermissions"
@@ -127,7 +127,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
-    resources = ["${module.datasync_bucket.s3_bucket_arn}/*"]
+    resources = ["${module.datasync_opg_bucket.s3_bucket_arn}/*"]
   }
 }
 
