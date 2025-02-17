@@ -42,6 +42,7 @@ module "aurora" {
       role_arn     = aws_iam_role.rds_export_to_s3_role.arn
       feature_name = "s3Export"
     }
+    
   }
 
   # todo - some of these rules are commented out as the resource doesn't exist yet. 

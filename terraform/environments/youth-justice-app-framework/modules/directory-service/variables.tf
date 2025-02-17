@@ -64,3 +64,8 @@ variable "tags" {
   description = "User defined extra tags to be added to all resources created in the module"
   default     = {}
 }
+
+variable "rds_cluster_security_group_id" {
+  type = string
+  description = "The Id of the Security Grpoip that enables access to the RDS PostgreSQL Cluster."
+}

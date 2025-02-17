@@ -69,62 +69,80 @@ resource "aws_iam_instance_profile" "ad_instance_profile" {
 }
 
 #create a security group for your EC2 instance
-resource "aws_security_group" "ad_sg" {
-  #checkov:skip=CKV_AWS_382:todo add better rules
+resource "aws_security_group" "mgmt_instance_sg" {
   name        = "ad_management_server_sg"
-  description = "Allow AD traffic"
+  description = "Management Servers' Security Group"
   vpc_id      = var.ds_managed_ad_vpc_id
-  ingress { #inbound on 3389 , better rules later, test if actually needed
-    from_port   = 389
-    to_port     = 389
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr_block]
-    description = "LDAP"
-  }
-  ingress { #inbound on 3389 , better rules later, test if actually needed
-    from_port   = 636
-    to_port     = 636
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr_block]
-    description = "LDAP"
-  }
-  ingress { #inbound on mysql adfs service? todo, test removal, test if actually needed
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr_block]
-    description = "ADFS"
-  }
-  ingress { #inbound on 443 for adfs service?  todo, test removal, test if actually needed
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr_block]
-    description = "ADFS"
-  }
-  ingress { #inbound on 3389 , todo better rules later, test if actually needed
-    from_port   = 53
-    to_port     = 53
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr_block]
-    description = "LDAP"
-  }
-  ingress { #inbound on 3389 , todo better rules later, test if actually needed
-    from_port   = 88
-    to_port     = 88
-    protocol    = "tcp"
-    cidr_blocks = [var.vpc_cidr_block]
-    description = "LDAP"
-  }
-  egress { #allow all out #todo filter this down
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow all outbound"
-    protocol    = "-1"
-  }
+  
   tags = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
 }
+
+resource "aws_vpc_security_group_egress_rule" "allow_http_out" { #allow HTTP outbound to everywhere
+  security_group_id = aws_security_group.mgmt_instance_sg.id
+
+    from_port   = 80
+    to_port     = 80
+    cidr_ipv4   = "0.0.0.0/0"
+    description = "Allow HTTP outbound"
+    ip_protocol    = "tcp"
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_https_out" { #allow HTTPS outbound to everywhere
+  security_group_id = aws_security_group.mgmt_instance_sg.id
+
+    from_port   = 443
+    to_port     = 443
+    cidr_ipv4   = "0.0.0.0/0"
+    description = "Allow HTTPS outbound"
+    ip_protocol    = "tcp"
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_any_to_ad" { #allow Unrestricted accedss to AD
+  security_group_id            = aws_security_group.mgmt_instance_sg.id
+  referenced_security_group_id = aws_directory_service_directory.ds_managed_ad.security_group_id
+
+  from_port   = 0
+  to_port     = 0
+  description = "Allow Unrestricted access to AD"
+  ip_protocol    = "-1"
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_out_to_rds" { #allow PostgreSQL outbound to RDS
+  security_group_id            = aws_security_group.mgmt_instance_sg.id
+  referenced_security_group_id = var.rds_cluster_security_group_id
+
+  from_port   = 5432
+  to_port     = 5432
+  description = "Allow Management Instance to RDS PostgreSQL"
+  ip_protocol    = "tcp"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_in_to_rds" { #allow PostgreSQL from AD management to RDS
+  security_group_id            = var.rds_cluster_security_group_id
+  referenced_security_group_id = aws_security_group.mgmt_instance_sg.id
+   from_port   = 5432
+   to_port     = 5432
+   description = "Allow AD Management Instance to RDS PostgreSQL"
+   ip_protocol    = "tcp"
+}
+
+# Retrieve the ID of the Security Group created by Cloud Formation while building the KPI instances.
+data "aws_security_group" "ca_sg" {
+  name = "CertificateAuthoritySecurityGroup"
+
+  depends_on = [aws_cloudformation_stack.pki_quickstart]
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_out_to_ca" { #allow unlimited access to the Certificate Authority
+  security_group_id            = aws_security_group.mgmt_instance_sg.id
+  referenced_security_group_id = data.aws_security_group.ca_sg.id
+
+  from_port   = 0
+  to_port     = 0
+  description = "Allow Management Instance to RDS PostgreSQL"
+  ip_protocol    = "-1"
+}
+
 
 resource "random_password" "ad_instance_admin_password" {
   length           = 16
@@ -239,10 +257,9 @@ resource "aws_instance" "ad_instance" {
   key_name                    = module.key_pair.key_pair_name
   subnet_id                   = var.management_subnet_id
   associate_public_ip_address = false
-  vpc_security_group_ids      = [aws_security_group.ad_sg.id]
+  vpc_security_group_ids      = [aws_security_group.mgmt_instance_sg.id]
   tags                        = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
   user_data                   = data.template_file.windows-dc-userdata.rendered
-  user_data_replace_on_change = true
   ebs_optimized               = true
   lifecycle {
     ignore_changes = [ami]

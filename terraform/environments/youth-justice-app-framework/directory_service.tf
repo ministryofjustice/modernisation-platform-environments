@@ -25,4 +25,8 @@ module "ds" {
   ds_managed_ad_subnet_ids = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id]
   vpc_cidr_block           = data.aws_vpc.shared.cidr_block
   management_subnet_id     = local.private_subnet_list[0].id
+
+  rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
+
+  depends_on = [module.aurora]
 }
