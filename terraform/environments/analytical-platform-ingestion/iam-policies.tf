@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "datasync" {
       "s3:ListBucket",
       "s3:ListBucketMultipartUploads"
     ]
-    resources = [module.datasync_bucket.s3_bucket_arn]
+    resources = [module.datasync_opg_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "AllowS3ObjectActions"
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "datasync" {
       "s3:PutObject",
       "s3:PutObjectTagging"
     ]
-    resources = ["${module.datasync_bucket.s3_bucket_arn}/*"]
+    resources = ["${module.datasync_opg_bucket.s3_bucket_arn}/*"]
   }
 }
 
