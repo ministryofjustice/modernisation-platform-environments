@@ -68,8 +68,8 @@ data "aws_iam_policy_document" "cloudtrail_bucket_policy" {
 
     actions = ["s3:*"]
     resources = [
-      aws_s3_bucket.cloudtrail_logs[0].arn,
-      "${aws_s3_bucket.cloudtrail_logs[0].arn}/*"
+      module.s3-logging-bucket.bucket.arn,
+      "${module.s3-logging-bucket.bucket.arn}/*"
     ]
 
     condition {
@@ -91,8 +91,8 @@ data "aws_iam_policy_document" "cloudtrail_bucket_policy" {
 
     actions = ["s3:*"]
     resources = [
-      aws_s3_bucket.cloudtrail_logs[0].arn,
-      "${aws_s3_bucket.cloudtrail_logs[0].arn}/*"
+      module.s3-logging-bucket.bucket.arn,
+      "${module.s3-logging-bucket.bucket.arn}/*"
     ]
 
     condition {
@@ -112,7 +112,7 @@ data "aws_iam_policy_document" "cloudtrail_bucket_policy" {
     }
 
     actions   = ["s3:GetBucketAcl"]
-    resources = [aws_s3_bucket.cloudtrail_logs[0].arn]
+    resources = [module.s3-logging-bucket.bucket.arn]
   }
 
   statement {
@@ -125,7 +125,7 @@ data "aws_iam_policy_document" "cloudtrail_bucket_policy" {
     }
 
     actions   = ["s3:PutObject"]
-    resources = ["${aws_s3_bucket.cloudtrail_logs[0].arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
+    resources = ["${module.s3-logging-bucket.bucket.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
 
     condition {
       test     = "StringEquals"
