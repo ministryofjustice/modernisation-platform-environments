@@ -66,7 +66,10 @@ module "s3-logging-bucket" {
     aws.bucket-replication = aws
   }
 
-  bucket_policy = [data.aws_iam_policy_document.log_bucket_policy.json]
+  bucket_policy = [
+    data.aws_iam_policy_document.log_bucket_policy.json,
+    data.aws_iam_policy_document.cloudtrail_bucket_policy.json
+  ]
 
   lifecycle_rule = [
     {
@@ -114,8 +117,8 @@ module "s3-logging-bucket" {
 
 data "aws_iam_policy_document" "log_bucket_policy" {
   statement {
-    sid       = "AllowS3Logging"
-    effect    = "Allow"
+    sid    = "AllowS3Logging"
+    effect = "Allow"
 
     principals {
       type        = "Service"

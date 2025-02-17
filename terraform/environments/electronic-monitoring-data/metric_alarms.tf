@@ -35,7 +35,7 @@ resource "aws_cloudwatch_log_metric_filter" "s3_file_arrivals" {
   count = local.is-development ? 0 : 1
 
   name           = "fms-land-file-arrivals"
-  pattern        = "[timestamp, requestParameters.bucketName, eventName=PutObject]"
+  pattern        = "{ $.eventName = PutObject }"
   log_group_name = aws_cloudwatch_log_group.s3_events[0].name
 
   metric_transformation {
@@ -51,6 +51,43 @@ resource "aws_cloudwatch_log_group" "s3_events" {
 
   name              = "/aws/s3/fms-landing"
   retention_in_days = 30
+}
+
+# Bucket policy cloudtrail to dump into log bucket
+data "aws_iam_policy_document" "cloudtrail_bucket_policy" {
+  count = local.is-development ? 0 : 1
+
+  statement {
+    sid    = "AWSCloudTrailAclCheck"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions   = ["s3:GetBucketAcl"]
+    resources = [module.s3-logging-bucket.bucket.arn]
+  }
+
+  statement {
+    sid    = "AWSCloudTrailWrite"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions   = ["s3:PutObject"]
+    resources = ["${module.s3-logging-bucket.bucket.arn}/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+  }
 }
 
 resource "aws_cloudtrail" "s3_events" {
