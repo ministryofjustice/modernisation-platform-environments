@@ -22,7 +22,7 @@ resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
   etag   = filemd5("files/log4j2.properties")
 }
 
-# Glue Job, Create Hive Tables
+# Glue Job, Data Quality Spike
 module "glue_data_quality_spike_job" {
   count                         = local.env == "development" ? 1 : 0
   source                        = "./modules/glue_job"
