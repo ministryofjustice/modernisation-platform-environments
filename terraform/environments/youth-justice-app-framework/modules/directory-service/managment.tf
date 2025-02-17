@@ -1,8 +1,3 @@
-moved {
-  from = aws_security_group.ad_sg
-  to   = aws_security_group.mgmt_instance_sg
-}
-
 #Create an instance role to join Windows instances to your AWS Managed Microsoft AD domain
 #trusted entity is ec2, 
 resource "aws_iam_role" "join_ad_role" {
@@ -74,7 +69,7 @@ resource "aws_iam_instance_profile" "ad_instance_profile" {
 }
 
 #create a security group for your EC2 instance
-resource "aws_security_group" "mgmt_instance_sg" {
+resource "aws_security_group" "ad_sg" {
   name        = "ad_management_server_sg"
   description = "Management Server Access"
   vpc_id      = var.ds_managed_ad_vpc_id
@@ -83,7 +78,7 @@ resource "aws_security_group" "mgmt_instance_sg" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_http_out" { #allow HTTP outbound to everywhere
-  security_group_id = aws_security_group.mgmt_instance_sg.id
+  security_group_id = aws_security_group.ad_sg.id
 
     from_port   = 80
     to_port     = 80
@@ -93,7 +88,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_http_out" { #allow HTTP out
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_https_out" { #allow HTTPS outbound to everywhere
-  security_group_id = aws_security_group.mgmt_instance_sg.id
+  security_group_id = aws_security_group.ad_sg.id
 
     from_port   = 443
     to_port     = 443
@@ -103,7 +98,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_https_out" { #allow HTTPS o
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_any_to_ad" { #allow Unrestricted accedss to AD
-  security_group_id            = aws_security_group.mgmt_instance_sg.id
+  security_group_id            = aws_security_group.ad_sg.id
   referenced_security_group_id = aws_directory_service_directory.ds_managed_ad.security_group_id
 
   from_port   = 0
@@ -113,7 +108,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_any_to_ad" { #allow Unrestr
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_out_to_rds" { #allow PostgreSQL outbound to RDS
-  security_group_id            = aws_security_group.mgmt_instance_sg.id
+  security_group_id            = aws_security_group.ad_sg.id
   referenced_security_group_id = var.rds_cluster_security_group_id
 
   from_port   = 5432
@@ -124,7 +119,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_out_to_rds" { #allow Postgr
 
 resource "aws_vpc_security_group_ingress_rule" "allow_in_to_rds" { #allow PostgreSQL from AD management to RDS
   security_group_id            = var.rds_cluster_security_group_id
-  referenced_security_group_id = aws_security_group.mgmt_instance_sg.id
+  referenced_security_group_id = aws_security_group.ad_sg.id
    from_port   = 5432
    to_port     = 5432
    description = "Allow AD Management Instance to RDS PostgreSQL"
@@ -139,7 +134,7 @@ data "aws_security_group" "ca_sg" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_out_to_ca" { #allow unlimited access to the Certificate Authority
-  security_group_id            = aws_security_group.mgmt_instance_sg.id
+  security_group_id            = aws_security_group.ad_sg.id
   referenced_security_group_id = data.aws_security_group.ca_sg.id
 
   from_port   = 0
