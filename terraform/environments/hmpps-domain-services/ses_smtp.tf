@@ -51,12 +51,15 @@ resource "aws_route53_record" "email_dkim_records" {
 
 ### SMTP User ###
 
+# checkov:skip=CKV_AWS_273:Required for SMTP
 resource "aws_iam_user" "ses_smtp_user" {
   count = local.is-production == true ? 1 : 0
 
   name = "ses_smtp_user"
 }
 
+# checkov:skip=CKV_AWS_40:Policy attached to User due to Modernisation Platform restrictions
+# checkov:skip=CKV_AWS_290:Policy does not deal with write access
 resource "aws_iam_user_policy" "ses_smtp_user" {
   count = local.is-production == true ? 1 : 0
 
@@ -67,7 +70,7 @@ resource "aws_iam_user_policy" "ses_smtp_user" {
       {
         Effect : "Allow"
         Action : "ses:SendRawEmail"
-        Resource : "*"
+        Resource : aws_ses_domain_identity.hmpps_domain[0].arn
       }
     ]
   })
@@ -82,8 +85,9 @@ resource "aws_iam_access_key" "ses_smtp_user" {
 resource "aws_ssm_parameter" "ses_smtp_user" {
   count = local.is-production == true ? 1 : 0
 
-  name = "/ses-smtp-user"
-  type = "SecureString"
+  name   = "/ses-smtp-user"
+  type   = "SecureString"
+  key_id = data.aws_kms_key.general_shared.arn
   value = jsonencode({
     user = aws_iam_user.ses_smtp_user[0].name,
     # The two below are used as a username and password when accessing the
