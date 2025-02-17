@@ -38,6 +38,13 @@ locals {
     [module.s3-create-a-derived-table-bucket.bucket.id, module.s3-create-a-derived-table-bucket.bucket.arn],
     [module.s3-raw-formatted-data-bucket.bucket.id, module.s3-raw-formatted-data-bucket.bucket.arn],
   ]
+
+  log_bucket_policy = local.is-development ? [
+    data.aws_iam_policy_document.log_bucket_policy.json
+    ] : [
+    data.aws_iam_policy_document.log_bucket_policy.json,
+    data.aws_iam_policy_document.cloudtrail_bucket_policy[0].json
+  ]
 }
 
 # ------------------------------------------------------------------------
@@ -66,11 +73,7 @@ module "s3-logging-bucket" {
     aws.bucket-replication = aws
   }
 
-  bucket_policy = [
-    data.aws_iam_policy_document.log_bucket_policy.json,
-    local.is-development == false ? data.aws_iam_policy_document.cloudtrail_bucket_policy[0].json : null
-  ]
-
+  bucket_policy = local.log_bucket_policy
   lifecycle_rule = [
     {
       id      = "main"
