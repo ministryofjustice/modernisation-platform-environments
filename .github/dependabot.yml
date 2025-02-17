@@ -534,6 +534,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/laa-stabilisation-cdc-poc/cwa-poc2"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/long-term-storage"
     schedule:
       interval: "daily"
