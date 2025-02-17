@@ -57,7 +57,7 @@ resource "aws_cloudtrail" "s3_events" {
   count = local.is-development ? 0 : 1
 
   name                          = "fms-landing-file-monitoring"
-  s3_bucket_name                = aws_s3_bucket.cloudtrail_logs.id
+  s3_bucket_name                = module.s3-logging-bucket.bucket.id
   include_global_service_events = false
   is_multi_region_trail         = false
 
