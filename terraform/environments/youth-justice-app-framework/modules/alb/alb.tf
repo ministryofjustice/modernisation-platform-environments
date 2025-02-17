@@ -29,7 +29,7 @@ module "log_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 
-  bucket = "${var.alb_name}-${local.alb_suffix}-connection-logs"
+  bucket = "${var.alb_name}-${local.alb_suffix}-${var.environment}-logs"
   acl    = "log-delivery-write"
 
   # For example only
@@ -55,6 +55,11 @@ module "log_bucket" {
   tags = local.all_tags
 }
 
+
+import {
+  to = module.external_alb.module.alb_sg.aws_security_group_rule.ingress_with_cidr_blocks[0]
+  id = "sgr-022b8210cb36ef2f7_ingress_HTTPS_443_443_0.0.0.0/0"
+}
 
 module "alb_sg" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
