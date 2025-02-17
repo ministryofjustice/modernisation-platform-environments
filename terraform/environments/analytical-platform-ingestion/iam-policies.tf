@@ -98,7 +98,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "kms:Encrypt",
       "kms:GenerateDataKey"
     ]
-    resources = [local.environment_configuration.datasync_target_bucket_kms]
+    resources = [local.environment_configuration.mojap_land_kms_key]
   }
   statement {
     sid    = "SourceBucketKMSKey"
@@ -182,7 +182,7 @@ data "aws_iam_policy_document" "datasync_opg_replication" {
       "s3:GetReplicationConfiguration",
       "s3:ListBucket"
     ]
-    resources = [module.datasync_opg_bucket.s3_bucket_arn] # TODO - review this
+    resources = [module.datasync_opg_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "SourceBucketObjectPermissions"
