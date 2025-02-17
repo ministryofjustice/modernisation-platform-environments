@@ -58,6 +58,51 @@ data "aws_iam_policy_document" "cloudtrail_bucket_policy" {
   count = local.is-development ? 0 : 1
 
   statement {
+    sid    = "DenyNonSecureTransport"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.cloudtrail_logs[0].arn,
+      "${aws_s3_bucket.cloudtrail_logs[0].arn}/*"
+    ]
+
+    condition {
+      test     = "Bool"
+      variable = "aws:SecureTransport"
+      values   = ["false"]
+    }
+  }
+
+  # Deny non-TLS 1.2
+  statement {
+    sid    = "DenyOutdatedTLS"
+    effect = "Deny"
+
+    principals {
+      type        = "*"
+      identifiers = ["*"]
+    }
+
+    actions = ["s3:*"]
+    resources = [
+      aws_s3_bucket.cloudtrail_logs[0].arn,
+      "${aws_s3_bucket.cloudtrail_logs[0].arn}/*"
+    ]
+
+    condition {
+      test     = "NumericLessThan"
+      variable = "s3:TlsVersion"
+      values   = ["1.2"]
+    }
+  }
+
+  statement {
     sid    = "AWSCloudTrailAclCheck"
     effect = "Allow"
 
@@ -67,7 +112,7 @@ data "aws_iam_policy_document" "cloudtrail_bucket_policy" {
     }
 
     actions   = ["s3:GetBucketAcl"]
-    resources = [module.s3-logging-bucket.bucket.arn]
+    resources = [aws_s3_bucket.cloudtrail_logs[0].arn]
   }
 
   statement {
@@ -80,7 +125,7 @@ data "aws_iam_policy_document" "cloudtrail_bucket_policy" {
     }
 
     actions   = ["s3:PutObject"]
-    resources = ["${module.s3-logging-bucket.bucket.arn}/*"]
+    resources = ["${aws_s3_bucket.cloudtrail_logs[0].arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
 
     condition {
       test     = "StringEquals"
