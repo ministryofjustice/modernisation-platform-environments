@@ -11,12 +11,12 @@ locals {
 #todo remove this
 import {
   to = module.datadog.aws_iam_role.datadog_aws_integration
-  id = "DatadogAWSIntegrationRole "
+  id = "DatadogAWSIntegrationRole"
 }
 #todo remove this
 import {
   to = module.datadog.aws_iam_policy.datadog_aws_integration
-  id = "DatadogAWSIntegrationPolicy"
+  id = "arn:aws:iam::225989353474:policy/DatadogAWSIntegrationPolicy"
 }
 
 
