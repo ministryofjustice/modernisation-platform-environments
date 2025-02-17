@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "datasync" {
       "s3:ListBucket",
       "s3:ListBucketMultipartUploads"
     ]
-    resources = [module.datasync_opg_bucket.s3_bucket_arn]
+    resources = [module.datasync_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "AllowS3ObjectActions"
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "datasync" {
       "s3:PutObject",
       "s3:PutObjectTagging"
     ]
-    resources = ["${module.datasync_opg_bucket.s3_bucket_arn}/*"]
+    resources = ["${module.datasync_bucket.s3_bucket_arn}/*"]
   }
 }
 
@@ -88,7 +88,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "s3:ReplicateDelete"
     ]
     resources = [
-      for item in local.environment_configuration.datasync_opg_target_buckets : "arn:aws:s3:::${item}/*"
+      for item in local.environment_configuration.datasync_target_buckets : "arn:aws:s3:::${item}/*"
     ]
   }
   statement {
@@ -98,7 +98,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "kms:Encrypt",
       "kms:GenerateDataKey"
     ]
-    resources = [local.environment_configuration.datasync_opg_target_bucket_kms]
+    resources = [local.environment_configuration.datasync_target_bucket_kms]
   }
   statement {
     sid    = "SourceBucketKMSKey"
@@ -107,7 +107,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "kms:Decrypt",
       "kms:GenerateDataKey"
     ]
-    resources = [module.s3_datasync_opg_kms.key_arn]
+    resources = [module.s3_datasync_kms.key_arn]
   }
   statement {
     sid    = "SourceBucketPermissions"
@@ -116,7 +116,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "s3:GetReplicationConfiguration",
       "s3:ListBucket"
     ]
-    resources = [module.datasync_opg_bucket.s3_bucket_arn]
+    resources = [module.datasync_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "SourceBucketObjectPermissions"
@@ -127,7 +127,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
-    resources = ["${module.datasync_opg_bucket.s3_bucket_arn}/*"]
+    resources = ["${module.datasync_bucket.s3_bucket_arn}/*"]
   }
 }
 
@@ -154,8 +154,8 @@ data "aws_iam_policy_document" "datasync_opg_replication" {
       "s3:ReplicateDelete"
     ]
     resources = [
-      for item in local.environment_configuration.datasync_target_buckets : "arn:aws:s3:::${item}/*"
-    ] #TODO - Edit this
+      for item in local.environment_configuration.datasync_opg_target_buckets : "arn:aws:s3:::${item}/*"
+    ]
   }
   statement {
     sid    = "DestinationBucketKMSKey"
