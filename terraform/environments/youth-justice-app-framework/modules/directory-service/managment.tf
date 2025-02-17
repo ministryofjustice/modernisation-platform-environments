@@ -78,6 +78,10 @@ resource "aws_security_group" "mgmt_instance_sg" {
   name        = "ad_management_server_sg"
   description = "Management Server Access"
   vpc_id      = var.ds_managed_ad_vpc_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
   
   tags = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
 }
