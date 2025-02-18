@@ -66,7 +66,7 @@ resource "aws_s3_bucket_logging" "PPUD" {
   bucket = aws_s3_bucket.PPUD[0].id
 
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
-  target_prefix = "logs/"
+  target_prefix = "s3-logs/ppud-ppud-files-production-logs/"
 }
 
 # S3 block public access
@@ -203,7 +203,7 @@ resource "aws_s3_bucket_logging" "moj-infrastructure" {
   bucket = aws_s3_bucket.moj-infrastructure[0].id
 
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
-  target_prefix = "moj-infrastructure-logs/"
+  target_prefix = "s3-logs/moj-infrastructure-logs/"
 }
 
 resource "aws_s3_bucket_public_access_block" "moj-infrastructure" {
@@ -338,7 +338,7 @@ resource "aws_s3_bucket_logging" "ppud-database-source" {
   bucket = aws_s3_bucket.ppud-database-source[0].id
 
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
-  target_prefix = "ppud-database-source-logs/"
+  target_prefix = "s3-logs/ppud-database-source-logs/"
 }
 
 resource "aws_s3_bucket_public_access_block" "ppud-database-source" {
@@ -360,12 +360,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "ppud-database-source" {
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
-
     noncurrent_version_transition {
       noncurrent_days = 183
       storage_class   = "STANDARD_IA"
     }
-
     transition {
       days          = 183
       storage_class = "STANDARD_IA"
@@ -466,6 +464,13 @@ resource "aws_s3_bucket_versioning" "moj-log-files-prod" {
   }
 }
 
+resource "aws_s3_bucket_logging" "moj-log-files-prod" {
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-log-files-prod[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  target_prefix = "s3-logs/moj-log-files-prod-logs/"
+}
+
 resource "aws_s3_bucket_public_access_block" "moj-log-files-prod" {
   count                   = local.is-production == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-log-files-prod[0].id
@@ -509,7 +514,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 60
+      days = 120
     }
   }
 }

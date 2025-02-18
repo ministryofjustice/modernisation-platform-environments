@@ -29,7 +29,7 @@ today = datetime.now().replace(tzinfo=utc)
 
 # set up time window for alert - default to 45 if its missing
 if os.environ.get('EXPIRY_DAYS') is None:
-    expiry_days = 45
+    expiry_days = 30
 else:
     expiry_days = int(os.environ['EXPIRY_DAYS'])
 
