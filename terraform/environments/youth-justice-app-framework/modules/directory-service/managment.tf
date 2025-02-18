@@ -132,7 +132,7 @@ data "aws_security_group" "rds_sg" {
 } 
 
 resource "aws_vpc_security_group_ingress_rule" "allow_in_to_rds" { #allow PostgreSQL from AD management to RDS
-  security_group_id            = aws_security_group.rds_sg.id
+  security_group_id            = data.aws_security_group.rds_sg.id
   referenced_security_group_id = aws_security_group.mgmt_instance_sg.id
    from_port   = 5432
    to_port     = 5432
