@@ -110,8 +110,6 @@ resource "aws_vpc_security_group_egress_rule" "allow_any_to_ad" { #allow Unrestr
   security_group_id            = aws_security_group.mgmt_instance_sg.id
   referenced_security_group_id = aws_directory_service_directory.ds_managed_ad.security_group_id
 
-  from_port   = 0
-  to_port     = 0
   description = "Allow Unrestricted access to AD"
   ip_protocol    = "-1"
 }
