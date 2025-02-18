@@ -19,7 +19,7 @@
       "ldap_secret_arn": "arn:aws:secretsmanager:eu-west-2:711387140977:secret:LDAP-administration-5fklGs"
     },
     "production": {
-      "environment_name": "jyaf-production",
+      "environment_name": "yjaf-production",
       "allow_s3_replication": true,
       "source_account": "066012302209",
       "ldap_secret_arn": "arn:aws:secretsmanager:eu-west-2:711387140977:secret:LDAP-administration-5fklGs"
