@@ -278,6 +278,15 @@ resource "aws_vpc_security_group_ingress_rule" "app_bastion_ssh" {
   to_port                      = 22
 }
 
+resource "aws_vpc_security_group_ingress_rule" "app_workspace_winscp" {
+  security_group_id            = aws_security_group.app.id
+  description                  = "Allow WorkSpace in LAA LZ to WinSCP"
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
+
 resource "aws_vpc_security_group_ingress_rule" "app_self_1" {
   security_group_id            = aws_security_group.app.id
   description                  = "Access from itself"
