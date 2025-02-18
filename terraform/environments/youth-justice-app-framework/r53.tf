@@ -1,8 +1,3 @@
-#todo remove me 
-#import {
-#  to = aws_route53_record.dbdns
-#  id = "Z08455115FU5NW9YGUX1_db-yjafrds01.test.yjaf_CNAME"
-#}
 #If route53_record_name set do this
 resource "aws_route53_record" "dbdns" {
   provider = aws.core-network-services

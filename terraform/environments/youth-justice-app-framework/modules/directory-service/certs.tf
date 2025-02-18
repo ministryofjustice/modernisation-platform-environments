@@ -24,7 +24,7 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
   template_url = "https://aws-ia-us-east-1.s3.us-east-1.amazonaws.com/cfn-ps-microsoft-pki/templates/microsoft-pki.template.yaml"
 
   capabilities     = ["CAPABILITY_AUTO_EXPAND", "CAPABILITY_IAM"]
-  disable_rollback = false #change to true so we can debug
+  disable_rollback = true
   parameters = {
     "VPCCIDR"                = var.vpc_cidr_block
     "VPCID"                  = var.ds_managed_ad_vpc_id
@@ -49,5 +49,7 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
     update = "60m"
     delete = "2h"
   }
+
+
 }
 

@@ -309,9 +309,6 @@ resource "aws_ssm_document" "ssm_document" {
   ]
 }
 DOC
-#lifecycle {
-#    create_before_destroy = true
-#  }
 }
 
 resource "aws_ssm_association" "associate_ssm" {
