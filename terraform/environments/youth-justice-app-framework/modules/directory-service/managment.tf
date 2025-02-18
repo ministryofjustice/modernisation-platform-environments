@@ -126,8 +126,13 @@ resource "aws_vpc_security_group_egress_rule" "allow_out_to_rds" { #allow Postgr
   ip_protocol    = "tcp"
 }
 
+# Retrieve the RDS SG so that a roule can be addedd to enable access from the Management instance
+data "aws_security_group" "rds_sg" {
+  id = var.rds_cluster_security_group_id
+} 
+
 resource "aws_vpc_security_group_ingress_rule" "allow_in_to_rds" { #allow PostgreSQL from AD management to RDS
-  security_group_id            = var.rds_cluster_security_group_id
+  security_group_id            = aws_security_group.rds_sg.id
   referenced_security_group_id = aws_security_group.mgmt_instance_sg.id
    from_port   = 5432
    to_port     = 5432
@@ -138,8 +143,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_in_to_rds" { #allow Postgr
 # Retrieve the ID of the Security Group created by Cloud Formation while building the KPI instances.
 data "aws_security_group" "ca_sg" {
   tags = {
-    name  = "Name"
-    value = "CertificateAuthoritySecurityGroup"
+    Name = "CertificateAuthoritySecurityGroup"
   }
   
   depends_on = [aws_cloudformation_stack.pki_quickstart]
