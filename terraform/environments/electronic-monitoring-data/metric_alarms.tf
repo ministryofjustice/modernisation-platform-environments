@@ -47,13 +47,6 @@ resource "aws_sns_topic" "land_bucket_count" {
   kms_master_key_id = "alias/aws/sns"
 }
 
-resource "aws_cloudwatch_log_group" "s3_events" {
-  count = local.is-development ? 0 : 1
-
-  name              = "/aws/s3/fms-landing"
-  retention_in_days = 30
-}
-
 
 # Alarm - "Detect when no files land in fms bucket within 24 hours"
 module "files_land_bucket_alarm" {
