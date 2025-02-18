@@ -19,17 +19,11 @@ resource "aws_ses_domain_dkim" "hmpps_domain_dkim" {
 
 ### Route 53 Records ###
 
-data "aws_route53_zone" "hmpps_domain" {
-  count = local.is-production == true ? 1 : 0
-
-  name = local.ses_domain
-}
-
 # SES looks for this record to verify we own the domain.
 resource "aws_route53_record" "ses_verification" {
   count = local.is-production == true ? 1 : 0
 
-  zone_id = data.aws_route53_zone.hmpps_domain[0].zone_id
+  zone_id = module.baseline.route53_zones[local.ses_domain].zone_id
   name    = "_amazonses.${aws_ses_domain_identity.hmpps_domain[0].domain}"
   type    = "TXT"
   ttl     = "600"
@@ -40,7 +34,7 @@ resource "aws_route53_record" "ses_verification" {
 resource "aws_route53_record" "email_dkim_records" {
   count = local.is-production == true ? 3 : 0
 
-  zone_id = data.aws_route53_zone.hmpps_domain[0].zone_id
+  zone_id = module.baseline.route53_zones[local.ses_domain].zone_id
   name    = "${element(aws_ses_domain_dkim.hmpps_domain_dkim[0].dkim_tokens, count.index)}._domainkey.${aws_ses_domain_identity.hmpps_domain[0].domain}"
   type    = "CNAME"
   ttl     = "300"
