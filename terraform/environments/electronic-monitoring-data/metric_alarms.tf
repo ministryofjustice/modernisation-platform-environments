@@ -1,3 +1,22 @@
+# Add a local to get the keys
+locals {
+  suppliers = [
+    "Fms",
+    # "Mdss"
+  ]
+  feeds = [
+    "General",
+    "Specials",
+    # "HO"
+  ]
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  sns_names_map = tomap({
+    "lambda_failure" : aws_sns_topic.lambda_failure.name
+    "fms_bucket_alarm" : aws_sns_topic.fms_land_bucket_count.name
+  })
+}
+
+
 #tfsec:ignore:avd-aws-0136 No encryption is enabled on the SNS topic
 resource "aws_sns_topic" "lambda_failure" {
   name              = "lambda-failures"
@@ -26,8 +45,8 @@ module "all_lambdas_errors_alarm" {
 }
 
 #tfsec:ignore:avd-aws-0136 No encryption is enabled on the SNS topic
-resource "aws_sns_topic" "fms_land_bucket_count" {
-  name              = "fms-land-bucket-count"
+resource "aws_sns_topic" "land_bucket_count" {
+  name              = "land-bucket-count"
   kms_master_key_id = "alias/aws/sns"
 }
 
@@ -40,14 +59,21 @@ resource "aws_cloudwatch_log_group" "s3_events" {
 
 
 # Alarm - "Detect when no files land in fms bucket within 24 hours"
-module "files_in_fms_land_bucket_alarm" {
+module "files_land_bucket_alarm" {
+  for_each = {
+    for supplier in local.suppliers : supplier => {
+      for feed in local.feeds : feed => {
+        name = "${supplier}${feed}FilesLanded"
+      }
+    }
+  }
   count = local.is-development ? 0 : 1
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
   version = "5.7.0"
 
-  alarm_name          = "fms-land-not-enough-files"
-  alarm_description   = "Detect when not enough files land in fms bucket within 24 hours"
+  alarm_name          = each.value
+  alarm_description   = "Detect when not enough files land in bucket within 24 hours"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = 1
   threshold           = 51
@@ -55,10 +81,10 @@ module "files_in_fms_land_bucket_alarm" {
   unit                = "Count"
 
   namespace   = "Custom"
-  metric_name = "FMSGeneralFilesLanded"
+  metric_name = each.value
   statistic   = "Sum"
 
-  alarm_actions = [aws_sns_topic.fms_land_bucket_count.arn]
+  alarm_actions = [aws_sns_topic.land_bucket_count.arn]
 }
 
 
@@ -71,15 +97,6 @@ data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
 data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
-}
-
-# Add a local to get the keys
-locals {
-  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  sns_names_map = tomap({
-    "lambda_failure" : aws_sns_topic.lambda_failure.name
-    "fms_bucket_alarm" : aws_sns_topic.fms_land_bucket_count.name
-  })
 }
 
 # link the sns topic to the service
