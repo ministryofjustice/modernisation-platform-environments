@@ -1,13 +1,10 @@
 # Add a local to get the keys
 locals {
-  suppliers = [
-    "Fms",
-    # "Mdss"
-  ]
   feeds = [
-    "General",
-    "Specials",
-    # "HO"
+    "FmsGeneral",
+    "FmsSpecials",
+    "FmsHO",
+    # "MdssGeneral"
   ]
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   sns_names_map = tomap({
@@ -61,8 +58,8 @@ resource "aws_cloudwatch_log_group" "s3_events" {
 # Alarm - "Detect when no files land in fms bucket within 24 hours"
 module "files_land_bucket_alarm" {
   for_each = {
-    for pair in setproduct(local.suppliers, local.feeds) : "${pair[0]}${pair[1]}" => {
-      name = "${pair[0]}${pair[1]}FilesLanded"
+    for name in local.feeds : name => {
+      name = "${name}FilesLanded"
     }
   }
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
