@@ -12,7 +12,7 @@ locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   sns_names_map = tomap({
     "lambda_failure" : aws_sns_topic.lambda_failure.name
-    "fms_bucket_alarm" : aws_sns_topic.fms_land_bucket_count.name
+    "land_bucket_alarm" : aws_sns_topic.land_bucket_count.name
   })
 }
 
@@ -102,7 +102,7 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 module "pagerduty_core_alerts" {
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   depends_on = [
-    aws_sns_topic.lambda_failure, aws_sns_topic.fms_land_bucket_count
+    aws_sns_topic.lambda_failure, aws_sns_topic.land_bucket_count
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [for key, value in local.sns_names_map : value]
