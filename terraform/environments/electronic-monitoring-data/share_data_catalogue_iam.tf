@@ -49,26 +49,15 @@ data "aws_iam_policy_document" "datahub_ingestion_github_actions" {
       type        = "Federated"
       identifiers = ["arn:aws:iam::${local.env_account_id}:oidc-provider/token.actions.githubusercontent.com"]
     }
-
-    # First condition: Verify the audience claim
     condition {
       test     = "StringEquals"
-      variable = "token.actions.githubusercontent.com:aud"
       values   = ["sts.amazonaws.com"]
+      variable = "token.actions.githubusercontent.com:aud"
     }
-
-    # Second condition: Verify the repository claim with strict formatting
-    condition {
-      test     = "StringEquals"
-      variable = "token.actions.githubusercontent.com:repository"
-      values   = ["ministryofjustice/data-catalogue"]
-    }
-
-    # Third condition: Verify the reference type for additional security
     condition {
       test     = "StringLike"
-      variable = "token.actions.githubusercontent.com:ref"
-      values   = ["refs/heads/main", "refs/tags/*"]
+      values   = ["repo:ministryofjustice/data-catalogue:*"]
+      variable = "token.actions.githubusercontent.com:sub"
     }
   }
 }
