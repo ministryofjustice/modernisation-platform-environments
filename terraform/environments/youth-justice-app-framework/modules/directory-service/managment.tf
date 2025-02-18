@@ -26,24 +26,24 @@ EOF
 
 #create a policy to all management instance to download files from the install-files bucket
 resource "aws_iam_policy" "read_s3_install_software" {
-  name = "read_s3_install_software"
+  name        = "read_s3_install_software"
   description = "Use to enable ec2 Instances to retrieve software from S3 bucket <enviroment>-install-files"
   policy = jsonencode({
- 	"Version": "2012-10-17",
-	"Statement": [
-		{
-			"Sid": "VisualEditor0",
-			"Effect": "Allow",
-			"Action": [
-				"s3:GetObject",
-				"s3:GetObjectTagging",
-				"s3:ListBucket"
-			],
-			"Resource": ["arn:aws:s3:::${var.environment_name}-install-files/*",
-			             "arn:aws:s3:::${var.environment_name}-install-files"
-      ]
-		}
-	]
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "VisualEditor0",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObject",
+          "s3:GetObjectTagging",
+          "s3:ListBucket"
+        ],
+        "Resource" : ["arn:aws:s3:::${var.environment_name}-install-files/*",
+          "arn:aws:s3:::${var.environment_name}-install-files"
+        ]
+      }
+    ]
   })
 }
 
@@ -82,28 +82,28 @@ resource "aws_security_group" "mgmt_instance_sg" {
   lifecycle {
     create_before_destroy = true
   }
-  
+
   tags = merge({ "Name" = "ad_management_server_sg" }, local.tags)
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_http_out" { #allow HTTP outbound to everywhere
   security_group_id = aws_security_group.mgmt_instance_sg.id
 
-    from_port   = 80
-    to_port     = 80
-    cidr_ipv4   = "0.0.0.0/0"
-    description = "Allow HTTP outbound"
-    ip_protocol    = "tcp"
+  from_port   = 80
+  to_port     = 80
+  cidr_ipv4   = "0.0.0.0/0"
+  description = "Allow HTTP outbound"
+  ip_protocol = "tcp"
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_https_out" { #allow HTTPS outbound to everywhere
   security_group_id = aws_security_group.mgmt_instance_sg.id
 
-    from_port   = 443
-    to_port     = 443
-    cidr_ipv4   = "0.0.0.0/0"
-    description = "Allow HTTPS outbound"
-    ip_protocol    = "tcp"
+  from_port   = 443
+  to_port     = 443
+  cidr_ipv4   = "0.0.0.0/0"
+  description = "Allow HTTPS outbound"
+  ip_protocol = "tcp"
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_any_to_ad" { #allow Unrestricted accedss to AD
@@ -111,7 +111,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_any_to_ad" { #allow Unrestr
   referenced_security_group_id = aws_directory_service_directory.ds_managed_ad.security_group_id
 
   description = "Allow Unrestricted access to AD"
-  ip_protocol    = "-1"
+  ip_protocol = "-1"
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_out_to_rds" { #allow PostgreSQL outbound to RDS
@@ -121,21 +121,21 @@ resource "aws_vpc_security_group_egress_rule" "allow_out_to_rds" { #allow Postgr
   from_port   = 5432
   to_port     = 5432
   description = "Allow Management Instance to RDS PostgreSQL"
-  ip_protocol    = "tcp"
+  ip_protocol = "tcp"
 }
 
 # Retrieve the RDS SG so that a roule can be addedd to enable access from the Management instance
 data "aws_security_group" "rds_sg" {
   id = var.rds_cluster_security_group_id
-} 
+}
 
 resource "aws_vpc_security_group_ingress_rule" "allow_in_to_rds" { #allow PostgreSQL from AD management to RDS
   security_group_id            = data.aws_security_group.rds_sg.id
   referenced_security_group_id = aws_security_group.mgmt_instance_sg.id
-   from_port   = 5432
-   to_port     = 5432
-   description = "Allow AD Management Instance to RDS PostgreSQL"
-   ip_protocol    = "tcp"
+  from_port                    = 5432
+  to_port                      = 5432
+  description                  = "Allow AD Management Instance to RDS PostgreSQL"
+  ip_protocol                  = "tcp"
 }
 
 # Retrieve the ID of the Security Group created by Cloud Formation while building the KPI instances.
@@ -143,7 +143,7 @@ data "aws_security_group" "ca_sg" {
   tags = {
     Name = "CertificateAuthoritySecurityGroup"
   }
-  
+
   depends_on = [aws_cloudformation_stack.pki_quickstart]
 }
 
@@ -152,7 +152,7 @@ resource "aws_vpc_security_group_egress_rule" "allow_out_to_ca" { #allow unlimit
   referenced_security_group_id = data.aws_security_group.ca_sg.id
 
   description = "Allow Management Instance to RDS PostgreSQL"
-  ip_protocol    = "-1"
+  ip_protocol = "-1"
 }
 
 
@@ -294,8 +294,8 @@ resource "aws_ssm_document" "ssm_document" {
   document_type = "Command"
   content       = <<DOC
 {
-  "schemaVersion": "2.2",
-  "description": "aws:domainJoin",
+  "schemaVersion": "1.0",
+  "description": "Automatic Domain Join Configuration",
    "mainSteps": [
     {
       "action": "aws:domainJoin",
@@ -312,11 +312,11 @@ DOC
 }
 
 resource "aws_ssm_association" "associate_ssm" {
-  name        = aws_ssm_document.ssm_document.name
+  name = aws_ssm_document.ssm_document.name
   targets {
-      key    = "InstanceIds"
-      values = [aws_instance.ad_instance.id]
-    }
- 
-#  instance_id = aws_instance.ad_instance.id
+    key    = "InstanceIds"
+    values = [aws_instance.ad_instance.id]
+  }
+
+  #  instance_id = aws_instance.ad_instance.id
 }
