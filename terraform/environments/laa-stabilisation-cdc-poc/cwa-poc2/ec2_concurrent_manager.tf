@@ -36,7 +36,7 @@ sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
 sed -i '/${local.cm_hostname}$/d' /etc/hosts
 echo "$DB_IP	${local.application_name_short}-db.${var.route53_zone_external}		${local.database_hostname}" >> /etc/hosts
 echo "$APP1_IP	${local.application_name_short}-app1.${var.route53_zone_external}		${local.appserver1_hostname}" >> /etc/hosts
-echo "$PRIVATE_IP	${local.application_name_short}-app2.${var.route53_zone_external}		${local.cm_hostname}" >> /etc/hosts
+echo "$PRIVATE_IP	${local.application_name_short}-conc.${var.route53_zone_external}		${local.cm_hostname}" >> /etc/hosts
 
 
 echo "Updating /etc/fstab file and mount"
@@ -49,6 +49,7 @@ sysfs   /sys    sysfs   defaults        0 0
 proc    /proc   proc    defaults        0 0
 /dev/VolGroup00/LogVol01        swap    swap    defaults        0 0
 /dev/xvdf /CWA/app ext4 defaults 0 0
+${aws_efs_file_system.cwa.dns_name}:/ /efs nfs4 rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2
 ${local.database_hostname}:/CWA/share /CWA/share nfs rw,nolock 0 0
 EOT
 
@@ -218,6 +219,15 @@ resource "aws_vpc_security_group_ingress_rule" "cm_bastion_ssh" {
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "cm_workspace_ssh" {
+  security_group_id = aws_security_group.cwa_poc2_concurrent_manager.id
+  description       = "SSH access from LZ Workspace"
+  cidr_ipv4         = local.management_cidr
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "cm_self" {

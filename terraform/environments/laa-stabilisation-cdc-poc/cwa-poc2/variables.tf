@@ -76,3 +76,8 @@ variable "private_subnet_a_id" {
   description = "Private subnet A ID"
   type        = string
 }
+
+variable "management_aws_account" {
+  description = "ID of AWS Management account"
+  type        = string
+}
