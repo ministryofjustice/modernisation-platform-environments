@@ -15,7 +15,7 @@ resource "aws_cloudfront_distribution" "external" {
       origin_protocol_policy   = "match-viewer"
       origin_ssl_protocols     = ["TLSv1.2"]
       origin_read_timeout      = 60
-      origin_keepalive_timeout = 5
+      origin_keepalive_timeout = 60
     }
     custom_header {
       name  = "X-Custom-Header"

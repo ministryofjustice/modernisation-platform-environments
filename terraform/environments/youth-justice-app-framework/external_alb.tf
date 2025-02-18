@@ -32,7 +32,8 @@ module "external_alb" {
     }
   ]
 
-  alb_subnets_ids   = local.public_subnet_list[*].id
-  web_acl_arn       = module.waf.waf_arn
-  associate_web_acl = true
+  enable_access_logs = true
+  alb_subnets_ids    = local.public_subnet_list[*].id
+  web_acl_arn        = module.waf.waf_arn
+  associate_web_acl  = true
 }

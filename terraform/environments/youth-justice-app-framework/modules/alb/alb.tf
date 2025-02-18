@@ -22,7 +22,6 @@ module "alb" {
   drop_invalid_header_fields = true
   access_logs                = local.access_logs
 
-  #todo aws config integration missing
   tags = local.all_tags
 }
 
