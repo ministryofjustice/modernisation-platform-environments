@@ -75,15 +75,15 @@ resource "aws_iam_instance_profile" "ad_instance_profile" {
 
 #create a security group for your EC2 instance
 resource "aws_security_group" "mgmt_instance_sg" {
-  name        = "ad_management_server_sg"
+  name_prefix = "ad_management_server_sg"
   description = "Management Server Access"
   vpc_id      = var.ds_managed_ad_vpc_id
 
   lifecycle {
-    create_before_destroy = false
+    create_before_destroy = true
   }
   
-  tags = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
+  tags = merge({ "Name" = "ad_management_server_sg" }, local.tags)
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_http_out" { #allow HTTP outbound to everywhere
@@ -138,7 +138,8 @@ resource "aws_vpc_security_group_ingress_rule" "allow_in_to_rds" { #allow Postgr
 # Retrieve the ID of the Security Group created by Cloud Formation while building the KPI instances.
 data "aws_security_group" "ca_sg" {
   tags = {
-    name = "CertificateAuthoritySecurityGroup"
+    name  = "Name"
+    value = "CertificateAuthoritySecurityGroup"
   }
   
   depends_on = [aws_cloudformation_stack.pki_quickstart]
