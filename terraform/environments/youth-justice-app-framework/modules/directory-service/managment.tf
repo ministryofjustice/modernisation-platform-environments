@@ -294,8 +294,8 @@ resource "aws_ssm_document" "ssm_document" {
   document_type = "Command"
   content       = <<DOC
 {
-  "schemaVersion": "1.0",
-  "description": "Automatic Domain Join Configuration",
+  "schemaVersion": "2.2",
+  "description": "aws:domainJoin",
    "mainSteps": [
     {
       "action": "aws:domainJoin",
