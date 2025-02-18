@@ -61,17 +61,15 @@ resource "aws_cloudwatch_log_group" "s3_events" {
 # Alarm - "Detect when no files land in fms bucket within 24 hours"
 module "files_land_bucket_alarm" {
   for_each = {
-    for supplier in local.suppliers : supplier => {
-      for feed in local.feeds : feed => {
-        name = "${supplier}${feed}FilesLanded"
-      }
+    for pair in setproduct(local.suppliers, local.feeds) : "${pair[0]}${pair[1]}" => {
+      name = "${pair[0]}${pair[1]}FilesLanded"
     }
   }
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
   version = "5.7.0"
 
-  alarm_name          = each.value
+  alarm_name          = each.value.name
   alarm_description   = "Detect when not enough files land in bucket within 24 hours"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = 1
@@ -80,7 +78,7 @@ module "files_land_bucket_alarm" {
   unit                = "Count"
 
   namespace   = "Custom"
-  metric_name = each.value
+  metric_name = each.value.name
   statistic   = "Sum"
 
   alarm_actions = [aws_sns_topic.land_bucket_count.arn]
