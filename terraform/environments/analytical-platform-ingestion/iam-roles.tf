@@ -80,5 +80,5 @@ module "guard_duty_malware_s3_scan_iam_role" {
 
   trusted_role_services = ["malware-protection-plan.guardduty.amazonaws.com"]
 
-  custom_role_policy_arns = [module.datasync_opg_replication_iam_policy.arn]
+  custom_role_policy_arns = [module.guard_duty_s3_malware_protection_iam_policy.arn]
 }
