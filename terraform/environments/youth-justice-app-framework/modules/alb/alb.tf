@@ -15,6 +15,8 @@ module "alb" {
 
   create_security_group = false
   security_groups       = [module.alb_sg.security_group_id]
+  associate_web_acl     = var.associate_web_acl
+  web_acl_arn           = var.web_acl_arn
 
   idle_timeout               = 240
   drop_invalid_header_fields = true
