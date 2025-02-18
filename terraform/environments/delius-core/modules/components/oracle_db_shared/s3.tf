@@ -180,7 +180,6 @@ data "aws_iam_policy_document" "combined" {
 }
 
 resource "aws_iam_policy" "oracledb_backup_bucket_access" {
-
   name        = "${var.env_name}-oracle-${var.db_suffix}-backup-bucket-access"
   description = "Allow access to Oracle DB Backup Bucket"
   policy      = data.aws_iam_policy_document.combined.json
