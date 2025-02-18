@@ -67,7 +67,6 @@ module "files_land_bucket_alarm" {
       }
     }
   }
-  count = local.is-development ? 0 : 1
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
   version = "5.7.0"
