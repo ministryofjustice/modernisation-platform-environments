@@ -290,7 +290,7 @@ resource "aws_instance" "ad_instance" {
 
 
 resource "aws_ssm_document" "ssm_document" {
-  name          = "ssm_document_ad"
+  name          = "ssm_document_ad_schema2.2"
   document_type = "Command"
   content       = <<DOC
 {
@@ -309,6 +309,9 @@ resource "aws_ssm_document" "ssm_document" {
   ]
 }
 DOC
+#lifecycle {
+#    create_before_destroy = true
+#  }
 }
 
 resource "aws_ssm_association" "associate_ssm" {
