@@ -151,8 +151,6 @@ resource "aws_vpc_security_group_egress_rule" "allow_out_to_ca" { #allow unlimit
   security_group_id            = aws_security_group.mgmt_instance_sg.id
   referenced_security_group_id = data.aws_security_group.ca_sg.id
 
-  from_port   = 0
-  to_port     = 0
   description = "Allow Management Instance to RDS PostgreSQL"
   ip_protocol    = "-1"
 }
