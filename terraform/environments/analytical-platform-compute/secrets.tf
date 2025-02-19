@@ -182,8 +182,3 @@ module "airflow_connections_slack_api_default_secret" {
 
   tags = local.tags
 }
-
-import {
-  to = module.airflow_connections_slack_api_default_secret.aws_secretsmanager_secret.this[0]
-  id = "arn:aws:secretsmanager:eu-west-2:381491960855:secret:airflow/connections/slack_api_default-56LAj2"
-}
