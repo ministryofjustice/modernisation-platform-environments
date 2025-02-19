@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "datasync" {
       "kms:DescribeKey",
       "kms:Decrypt",
     ]
-    resources = [module.s3_datasync_kms.key_arn]
+    resources = [module.s3_datasync_opg_kms.key_arn]
   }
   statement {
     sid    = "AllowS3BucketActions"
@@ -107,7 +107,7 @@ data "aws_iam_policy_document" "datasync_replication" {
       "kms:Decrypt",
       "kms:GenerateDataKey"
     ]
-    resources = [module.s3_datasync_kms.key_arn]
+    resources = [module.s3_datasync_opg_kms.key_arn]
   }
   statement {
     sid    = "SourceBucketPermissions"
