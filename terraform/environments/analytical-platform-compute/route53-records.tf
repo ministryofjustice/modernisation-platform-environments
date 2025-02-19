@@ -13,6 +13,12 @@ module "route53_records" {
       type    = "CNAME"
       ttl     = 300
       records = [module.mwaa_alb.dns_name]
+    },
+    {
+      name    = "_amazonses"
+      type    = "TXT"
+      ttl     = 600
+      records = [aws_ses_domain_identity.main.verification_token]
     }
   ]
 }
