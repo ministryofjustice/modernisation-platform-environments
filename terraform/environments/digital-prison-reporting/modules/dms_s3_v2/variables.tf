@@ -1,16 +1,3 @@
-
-variable "account_region" {
-  description = "Current AWS Region."
-  type        = string
-  default     = "eu-west-2"
-}
-
-variable "account_id" {
-  description = "AWS Account ID."
-  type        = string
-  default     = ""
-}
-
 variable "name" {
   description = "DMS Replication name."
   type        = string
@@ -60,41 +47,6 @@ variable "create" {
   default = true
 }
 
-variable "create_iam_roles" {
-  type    = bool
-  default = true
-}
-
-variable "iam_role_permissions_boundary" {
-  description = "ARN of the policy that is used to set the permissions boundary for the role"
-  type        = string
-  default     = null
-}
-
-# Used in tagginga and naming the resources
-
-variable "stack_name" {
-  description = "The name of our application"
-  type        = string
-  default     = "dblink"
-}
-
-variable "owner" {
-  description = "A group email address to be used in tags"
-  type        = string
-  default     = "autobots@ga.gov.au"
-}
-
-#--------------------------------------------------------------
-# DMS general config
-#--------------------------------------------------------------
-
-variable "identifier" {
-  default     = "rds"
-  type        = string
-  description = "Name of the database in the RDS"
-}
-
 #--------------------------------------------------------------
 # DMS Replication Instance
 #--------------------------------------------------------------
@@ -120,7 +72,7 @@ variable "replication_instance_version" {
 variable "replication_instance_class" {
   description = "Instance class of replication instance"
   type        = string
-  default     = "dms.t2.micro"
+  default     = "dms.t3.micro"
 }
 
 variable "allow_major_version_upgrade" {
@@ -138,12 +90,6 @@ variable "dms_log_retention_in_days" {
 #--------------------------------------------------------------
 # Network
 #--------------------------------------------------------------
-
-variable "database_subnet_cidr" {
-  default     = ["10.26.25.208/28", "10.26.25.224/28", "10.26.25.240/28"]
-  type        = list(string)
-  description = "List of subnets to be used for databases"
-}
 
 variable "vpc_cidr" {
   description = "CIDR for the  VPC"
@@ -252,7 +198,6 @@ variable "dms_target_name" {
   default = ""
 }
 
-
 variable "short_name" {
   type    = string
   default = ""
@@ -292,12 +237,6 @@ variable "source_db_port" {
   description = "The port the Application Server will access the database on"
   type        = number
   default     = null
-}
-
-variable "source_engine" {
-  default     = "oracle-se2"
-  type        = string
-  description = "Engine type, example values mysql, postgres"
 }
 
 variable "source_engine_name" {
