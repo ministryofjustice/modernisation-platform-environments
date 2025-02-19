@@ -19,5 +19,5 @@ resource "aws_cloudwatch_event_rule" "this" {
 
 resource "aws_cloudwatch_event_target" "this" {
   rule      = aws_cloudwatch_event_rule.this.name
-  arn       = "arn:aws:logs:eu-west-2:211125434264:log-group:/aws/events/LogsFromOperationsEngineeringAuth0"
+  arn       = var.log_group_arn
 }
