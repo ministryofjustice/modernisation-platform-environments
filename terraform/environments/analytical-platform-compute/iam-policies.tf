@@ -696,7 +696,7 @@ module "airflow_ses_policy" {
   version = "5.52.2"
 
   name   = "mwaa-ses"
-  policy = data.aws_iam_policy_document.airflow_ses_policy.json
+  policy = data.aws_iam_policy_document.mwaa_ses.json
 
   tags = local.tags
 }
