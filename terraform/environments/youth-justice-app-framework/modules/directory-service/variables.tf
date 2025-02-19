@@ -1,3 +1,8 @@
+variable "environment_name" {
+  type        = string
+  description = "Environment name"
+}
+
 variable "ds_managed_ad_directory_name" {
   type        = string
   description = "The fully qualified domain name for the AWS Managed Microsoft AD directory, such as corp.example.com"
@@ -58,4 +63,9 @@ variable "tags" {
   type        = map(string)
   description = "User defined extra tags to be added to all resources created in the module"
   default     = {}
+}
+
+variable "rds_cluster_security_group_id" {
+  type = string
+  description = "The Id of the Security Grpoip that enables access to the RDS PostgreSQL Cluster."
 }

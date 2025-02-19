@@ -33,7 +33,70 @@ module "managed-ad" {
 }
 ```
 
-## Copy Data from one env to another
+# Cutover and Setup Guidance
+## Introduciton
+This section contains instructions for [initialising the AD Management instances](#managment-server-setup) and [copying active directory users and groups from the old to the new environment](#user-group-copy).
+
+## [Managment Server Setup](#managment-server-setup)
+
+## Initial configuration
+
+When each instance is created the User-Data script performs some language setup changes (including changing the date format to English(UK) and the Timezone) and install's the following software:
+- Firefox
+- Notepad++
+- pgAdmin
+
+## Required Manual Configuraiton Changes
+
+Limitaitons in what can be automated mean that the following actions must be completed manually. (A change to use W2022 may mean that more can be automated, but this activity is being deferred while higher priority re-palatforming activities are completed.)
+- Installing Language English (UK) and making it the defauls for all users.
+
+On each management instance:
+1. At `Settings > Time & Language > Language` select `Add a language` and add `English (United Kingdom)`.
+2. Move English (UK) to the top of the Preferred languages list.
+3. Select `Options` for `English (United Kingdom)`:
+    - Download everything.
+    - Under `Regional format` select 'Settings' and change and necessary to ensure all are set to `United Kingdom`.
+4. Return to the Language page and wait a few minities while the language finishes installing.
+5. Change the `Windows display language` to `English (United Kingdom)`.
+6. Remove language `English (Unites States)`.
+7. Select `Administrative language settings` then `Copy settings...` and under `Copy your current settings to:` check both `Welcome screen and system accounts` and `New user accounts` then `OK`.
+8. Restart Windows to that all the above changes become effective.
+
+## Software Install
+A script exists to install the following software after making the install files available by uploading them to the S3 bucket created for this purpose, `<envioronment>-install-files`.
+
+1. Manually Upload the following files to folder `Management-Software` in the above bukket:
+    - `GoogleChromeStandaloneEnterprise64.msi
+    - `putty-64bit-0.82-installer.msi
+    - `WinMerge-2.16.46-x64-Setup.exe
+    - `WinSCP-6.3.6-Setup.exe
+    - `management-server-app-install.ps1
+
+2. Open a `Windows Powershell` command windows with 'Run as administrator`.
+3. If the `Windows Poweshell` command window will not accept key board this is most likley to be due to a defect in module `PSReadLine` Version 2.0.0 and it can be resolved by pasting and running the following command `Remove-Module PSReadLine`.
+4. Download the application install script using the following PowerShell command:
+
+> `Copy-S3Object -BucketName yjaf-<environment>-install-files -Key Management-Software/management-server-app-install.ps1 -LocalFile c:\i2N\Scripts\management-server-app-install.ps1`
+
+E.g.
+
+> `Copy-S3Object -BucketName yjaf-development-install-files -Key Management-Software/management-server-app-install.ps1 -LocalFile c:\i2N\Scripts\management-server-app-install.ps1`
+
+
+5. Run the downloaded script:
+> 'C:\i2N\Scripts\management-server-app-install.ps1 yjaf-<environment>'
+E'g.
+> 'C:\i2N\Scripts\management-server-app-install.ps1 yjaf-development'
+
+
+
+
+
+
+
+
+## [Copy Users & Groups](#user-group-copy)
 
 The following describes the process of copying data from one environment to another. For example copying from preprod to dev.
 
@@ -173,3 +236,10 @@ Copy the output files to an S3 bucket that can be accessed by your target accoun
 - **ds_managed_ad_ips**: AWS Microsoft Managed AD DNS IPs
 
 - **managed_ad_password_secret_id**: Admin password is set as an entry on AWS Secrets Manager as _managed-ad-fqdn\_admin_
+
+## Initialise Management Instances
+
+Location for User-DAta scripts and log files:
+
+
+C:\Windows\System32\config\systemprofile\AppData\Local\Temp\Amazon\EC2-Windows\Launch\InvokeUserData

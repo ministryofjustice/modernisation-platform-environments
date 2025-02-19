@@ -1,3 +1,8 @@
+import {
+  to = module.external_alb.module.alb_sg.aws_security_group_rule.ingress_with_cidr_blocks[0]
+  id = "sg-074abdff1ed588e3d_ingress_tcp_443_443_0.0.0.0/0"
+}
+
 #tfsec:ignore:AWS0053 "The load balancer is internet facing by design."
 #tfsec:ignore:AVD-AWS-0053
 module "external_alb" {
@@ -20,8 +25,15 @@ module "external_alb" {
   listeners              = local.external_listeners
   existing_target_groups = module.internal_alb.target_group_arns
 
+  alb_ingress_with_cidr_blocks_rules = [
+    {
+      rule        = "https-443-tcp"
+      cidr_blocks = "0.0.0.0/0"
+    }
+  ]
 
-  alb_subnets_ids   = local.public_subnet_list[*].id
-  web_acl_arn       = module.waf.waf_arn
-  associate_web_acl = true
+  enable_access_logs = true
+  alb_subnets_ids    = local.public_subnet_list[*].id
+  web_acl_arn        = module.waf.waf_arn
+  associate_web_acl  = true
 }

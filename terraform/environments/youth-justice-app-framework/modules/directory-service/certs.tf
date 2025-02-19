@@ -10,19 +10,26 @@
 #############################
 #Deploy the CA solution from the available AWS cloudformation stack
 
+# Create an SSM parameter for the AMI to be used - an alternative is to change the cloudformation template to accept an aim id instead of an SSM parameter
+resource "aws_ssm_parameter" "w2022_ami" {
+  name  = "/service/ami-windows-latest/CIS_Windows_Server_2022_Benchmark_Level_1"
+  type  = "String"
+  value = data.aws_ami.windows_2022.id
+}
+
 resource "aws_cloudformation_stack" "pki_quickstart" {
   #checkov:skip=CKV_AWS_124: "The template is provided by AWS"
-  name = "MicrosoftPKIQuickStart"
+  name = "MicrosoftPKIQuickStartCA"
 
   template_url = "https://aws-ia-us-east-1.s3.us-east-1.amazonaws.com/cfn-ps-microsoft-pki/templates/microsoft-pki.template.yaml"
 
   capabilities     = ["CAPABILITY_AUTO_EXPAND", "CAPABILITY_IAM"]
-  disable_rollback = false #change to true so we can debug
+  disable_rollback = true
   parameters = {
     "VPCCIDR"                = var.vpc_cidr_block
     "VPCID"                  = var.ds_managed_ad_vpc_id
     "CaServerSubnet"         = var.ds_managed_ad_subnet_ids[0]
-    "DomainMembersSG"        = aws_security_group.ad_sg.id
+    "DomainMembersSG"        = aws_security_group.mgmt_instance_sg.id
     "KeyPairName"            = module.key_pair.key_pair_name
     "DirectoryType"          = "AWSManaged"
     "DomainDNSName"          = aws_directory_service_directory.ds_managed_ad.name
@@ -34,6 +41,7 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
     "UseS3ForCRL"            = "No"
     "EntCaServerNetBIOSName" = "SubordinateCA"
     "OrCaServerNetBIOSName"  = "RootCA"
+    "AMI"                    = aws_ssm_parameter.w2022_ami.name
   }
 
   timeouts {
@@ -41,5 +49,7 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
     update = "60m"
     delete = "2h"
   }
+
+
 }
 

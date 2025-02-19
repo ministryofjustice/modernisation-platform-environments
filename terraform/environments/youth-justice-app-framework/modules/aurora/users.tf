@@ -16,10 +16,28 @@ resource "aws_secretsmanager_secret" "user_admin_secret" {
   kms_key_id  = var.kms_key_id
 }
 
-resource "aws_secretsmanager_secret_version" "user_secret_version" {
-  for_each      = toset(var.user_passwords_to_reset)
-  secret_id     = aws_secretsmanager_secret.user_admin_secret[each.value].id
-  secret_string = random_password.user_password[each.value].result
+resource "aws_secretsmanager_secret_version" "aurora_rotated_user_version" {
+  for_each  = toset(var.user_passwords_to_reset)
+  secret_id = aws_secretsmanager_secret.user_admin_secret[each.value].id
+  secret_string = jsonencode({
+    username            = each.value
+    password            = random_password.user_password[each.value].result
+    engine              = "postgres"
+    host                = module.aurora.cluster_endpoint
+    port                = 5432
+    dbname              = var.db_name
+    dbClusterIdentifier = module.aurora.cluster_id
+  })
+}
+
+resource "aws_secretsmanager_secret_rotation" "aurora_rotated_user" {
+  for_each            = toset(var.user_passwords_to_reset)
+  secret_id           = aws_secretsmanager_secret.user_admin_secret[each.value].id
+  rotation_lambda_arn = aws_lambda_function.rds_secret_rotation.arn
+  rotation_rules {
+    automatically_after_days = 30 # Adjust as needed
+  }
+  depends_on = [aws_lambda_permission.allow_secrets_manager]
 }
 
 data "aws_secretsmanager_secret_version" "master_secret" {
@@ -32,7 +50,7 @@ resource "null_resource" "reset_passwords" {
   provisioner "local-exec" {
     environment = {
       DB_PASSWORD   = jsondecode(data.aws_secretsmanager_secret_version.master_secret.secret_string)["password"]
-      USER_PASSWORD = aws_secretsmanager_secret_version.user_secret_version[each.value].secret_string
+      USER_PASSWORD = jsondecode(aws_secretsmanager_secret_version.aurora_rotated_user_version[each.value].secret_string)["password"]
     }
 
     command = "bash ./modules/aurora/scripts/reset_db_passwords.sh ${module.aurora.cluster_endpoint} ${module.aurora.cluster_master_username} \"$DB_PASSWORD\" ${each.value} \"$USER_PASSWORD\""

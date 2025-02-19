@@ -192,3 +192,14 @@ variable "kms_key_arn" {
   type        = string
   default     = null
 }
+
+variable "db_name" {
+  description = "The name of the database mapped to the RDS instance, used in secret creation"
+  type        = string
+  default     = "yjafrds01"
+}
+
+variable "aws_account_id" {
+  description = "The AWS account ID"
+  type        = string
+}
