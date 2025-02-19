@@ -78,11 +78,6 @@ resource "aws_iam_role_policy_attachment" "rotate_iam_keys" {
   policy_arn = aws_iam_policy.rotate_iam_keys.arn
 }
 
-
-resource "aws_iam_access_key" "supplier" {
-  user = aws_iam_user.supplier.name
-}
-
 module "secrets_manager" {
   #checkov:skip=CKV_TF_1: "Module registry does not support commit hashes for versions"
   source  = "terraform-aws-modules/secrets-manager/aws"
@@ -91,9 +86,11 @@ module "secrets_manager" {
   name        = "iam-${aws_iam_user.supplier.name}"
   description = "IAM user access credentials for ${var.data_feed}-${var.order_type}"
   secret_string = jsonencode({
-    key    = aws_iam_access_key.supplier.id,
-    secret = aws_iam_access_key.supplier.secret
+    key    = "placeholder_key",
+    secret = "placeholder_secret"
   })
+  ignore_secret_changes = true
+
   enable_rotation     = true
   rotation_lambda_arn = var.rotation_lambda.lambda_function_arn
   rotation_rules = {
