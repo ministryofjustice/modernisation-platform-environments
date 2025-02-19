@@ -404,3 +404,4 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"
   ]
 }
+dpr-create-reload-diff-dps-health-medic-development-glue-role

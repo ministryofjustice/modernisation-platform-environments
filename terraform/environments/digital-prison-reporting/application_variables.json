@@ -68,7 +68,7 @@
         "dps-calculate-release-dates",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-medication-api",
+        "dps-health-medic-api",
         "dps-testing"
       ],
       "alarms": {
@@ -218,7 +218,7 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-medication-api",
+        "dps-health-medic-api",
         "dps-locations",
         "dps-calculate-release-dates"
       ],
@@ -371,7 +371,7 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-medication-api",
+        "dps-health-medic-api",
         "dps-locations",
         "dps-calculate-release-dates"
       ],
@@ -540,7 +540,7 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-medication-api",
+        "dps-health-medic-api",
         "dps-locations",
         "dps-calculate-release-dates"
       ],
