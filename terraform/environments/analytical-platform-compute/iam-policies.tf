@@ -582,6 +582,29 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
     actions   = ["eks:DescribeCluster"]
     resources = [module.eks.cluster_arn]
   }
+  statement {
+    sid       = "AllowSecretsManagerKMS"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [module.common_secrets_manager_kms.key_arn]
+  }
+  statement {
+    sid       = "AllowSecretsManagerList"
+    effect    = "Allow"
+    actions   = ["secretsmanager:ListSecrets"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowSecretsManager"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:airflow/*"]
+  }
 }
 
 module "mwaa_execution_iam_policy" {
