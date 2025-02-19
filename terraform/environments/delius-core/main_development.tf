@@ -40,6 +40,4 @@ module "environment_dev" {
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
 
-  shared_ca_name = "acm-pca-non-live"
-
 }

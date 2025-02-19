@@ -1,9 +1,10 @@
 locals {
-    cert_prefix = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-${local.instance_name_index}"
+    cert_prefix    = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-${local.instance_name_index}"
+    shared_ca_name = contains(["prod", "preprod"], var.env_name) ? "acm-pca-live" : "acm-pca-non-live"
 }
 
 data "aws_ram_resource_share" "shared_ca" {
-  name = var.shared_ca_name
+  name = local.shared_ca_name
   resource_owner = "OTHER-ACCOUNTS"
 }
 

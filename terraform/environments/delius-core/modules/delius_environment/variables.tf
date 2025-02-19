@@ -109,8 +109,3 @@ variable "env_name_to_dms_config_map" {
   type        = any
 }
 
-variable "shared_ca_name" {
-  default     = "acm-pca-non-live"
-  type        = string
-  description = "Name of the Resource Share in Resource Access Manager for the private cert authority"
-}
