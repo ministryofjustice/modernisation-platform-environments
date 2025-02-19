@@ -10,7 +10,7 @@ resource "aws_efs_file_system" "cwa" {
   }
 
   tags = merge(
-    local.tags,
+    var.tags,
     { "Name" = "${upper(local.application_name_short)}-EFS" }
   )
 
@@ -28,7 +28,7 @@ resource "aws_kms_key" "efs" {
   description = "KMS key for encrypting EFS"
   #   deletion_window_in_days = 10
   enable_key_rotation = true
-  tags                = local.tags
+  tags                = var.tags
 }
 
 resource "aws_kms_key_policy" "efs" {
@@ -40,7 +40,7 @@ resource "aws_kms_key_policy" "efs" {
         Action = "kms:*"
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"
+          AWS = "arn:aws:iam::${var.management_aws_account}:root"
         }
 
         Resource = "*"
@@ -61,20 +61,20 @@ resource "aws_kms_alias" "efs" {
 resource "aws_efs_mount_target" "target_a" {
 
   file_system_id  = aws_efs_file_system.cwa.id
-  subnet_id       = data.aws_subnet.data_subnets_a.id
+  subnet_id       = var.data_subnet_a_id
   security_groups = [aws_security_group.efs.id]
 }
 
 
 resource "aws_security_group" "efs" {
-  name        = "${local.application_name_short}-${local.environment}-efs-security-group"
+  name        = "${local.application_name_short}-${var.environment}-efs-security-group"
   description = "CWA EFS Mount Target Security Group"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.shared_vpc_id
 }
 
 resource "aws_vpc_security_group_egress_rule" "efs_outbound" {
   security_group_id = aws_security_group.efs.id
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = var.shared_vpc_cidr
   description       = "EFS Rule inbound from local VPC"
   from_port         = 2049
   ip_protocol       = "tcp"
@@ -83,9 +83,33 @@ resource "aws_vpc_security_group_egress_rule" "efs_outbound" {
 
 resource "aws_vpc_security_group_ingress_rule" "efs_inbound" {
   security_group_id = aws_security_group.efs.id
-  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  cidr_ipv4         = var.shared_vpc_cidr
   description       = "EFS Rule outbound to local VPC"
   from_port         = 2049
   ip_protocol       = "tcp"
   to_port           = 2049
 }
+
+# resource "aws_cloudwatch_metric_alarm" "efs_connection_repo_home" {
+#   alarm_name          = "${local.application_name_short}-${var.environment}-efs-connection"
+#   alarm_description   = "If the instance has lost connection with its EFS system, please investigate."
+#   comparison_operator = "LessThanThreshold"
+#   dimensions = {
+#     FileSystemId = aws_efs_file_system.cwa.id
+#   }
+#   evaluation_periods = "3"
+#   metric_name        = "ClientConnections"
+#   namespace          = "AWS/EFS"
+#   period             = "60"
+#   statistic          = "Sum"
+#   threshold          = local.environment == "production" ? 4 : 3
+#   alarm_actions      = [aws_sns_topic.cwa.arn]
+#   ok_actions         = [aws_sns_topic.cwa.arn]
+#   treat_missing_data = "breaching"
+#   tags = merge(
+#     var.tags,
+#     {
+#       Name = "${local.application_name_short}-${var.environment}-efs-connection"
+#     }
+#   )
+# }

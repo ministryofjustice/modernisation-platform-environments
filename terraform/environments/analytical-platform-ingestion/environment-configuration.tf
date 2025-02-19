@@ -27,7 +27,7 @@ locals {
       /* Target Buckets */
       target_buckets              = ["mojap-land-dev"]
       datasync_target_buckets     = ["mojap-land-dev"]
-      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-development"]
+      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
 
       /* Target KMS */
       mojap_land_kms_key             = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/8c53fbac-3106-422a-8f3d-409bb3b0c94d"
@@ -74,7 +74,7 @@ locals {
       /* Target Buckets */
       target_buckets              = ["mojap-land"]
       datasync_target_buckets     = ["mojap-land"]
-      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-production"]
+      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]
 
       /* Target KMS */
       mojap_land_kms_key             = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"

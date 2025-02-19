@@ -221,12 +221,12 @@ resource "aws_lb_target_group_attachment" "external" {
   port             = 8050
 }
 
-resource "aws_lb_target_group_attachment" "external2" {
-  count            = contains(["development", "testing"], local.environment) ? 0 : 1
-  target_group_arn = aws_lb_target_group.external.arn
-  target_id        = aws_instance.app2[0].id
-  port             = 8050
-}
+# resource "aws_lb_target_group_attachment" "external2" {
+#   count            = contains(["development", "testing"], local.environment) ? 0 : 1
+#   target_group_arn = aws_lb_target_group.external.arn
+#   target_id        = aws_instance.app2[0].id
+#   port             = 8050
+# }
 
 
 ############################################

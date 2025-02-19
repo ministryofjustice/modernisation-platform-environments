@@ -22,50 +22,6 @@ resource "aws_s3_object" "glue_job_shared_custom_log4j_properties" {
   etag   = filemd5("files/log4j2.properties")
 }
 
-# Glue Job, Data Quality Spike
-module "glue_data_quality_spike_job" {
-  count                         = local.env == "development" ? 1 : 0
-  source                        = "./modules/glue_job"
-  create_job                    = local.create_job
-  name                          = "${local.project}-data-quality-spike-${local.env}"
-  short_name                    = "${local.project}-data-quality-spike"
-  command_type                  = "glueetl"
-  description                   = "Data Quality Spike Job."
-  create_security_configuration = local.create_sec_conf
-  job_language                  = "scala"
-  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-data-quality-spike-${local.env}/"
-  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-data-quality-spike-${local.env}/"
-  # Placeholder Script Location
-  script_location              = local.glue_placeholder_script_location
-  enable_continuous_log_filter = false
-  project_id                   = local.project
-  aws_kms_key                  = local.s3_kms_arn
-
-  execution_class             = "STANDARD"
-  worker_type                 = "G.1X"
-  number_of_workers           = 2
-  max_concurrent              = 64
-  region                      = local.account_region
-  account                     = local.account_id
-  log_group_retention_in_days = local.glue_log_retention_in_days
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-data-quality-spike-${local.env}"
-      Resource_Type = "Glue Job"
-      Jira          = "DPR2-1448"
-    }
-  )
-
-  arguments = {
-    "--extra-jars"       = "s3://dpr-artifact-store-development/deequ-quality-poc-1.0-SNAPSHOT-all.jar"
-    "--datalake-formats" = "delta"
-    "--extra-files"      = local.shared_log4j_properties_path
-    "--class"            = "uk.gov.justice.digital.DemoJob"
-  }
-}
-
 # Glue Job, Create Hive Tables
 module "glue_hive_table_creation_job" {
   source                        = "./modules/glue_job"
@@ -901,7 +857,6 @@ module "dms_nomis_to_s3_ingestor" {
   source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
   vpc                          = data.aws_vpc.shared.id
   project_id                   = local.project
-  env                          = local.environment
   dms_source_name              = "oracle"
   dms_target_name              = "s3"
   short_name                   = "nomis"

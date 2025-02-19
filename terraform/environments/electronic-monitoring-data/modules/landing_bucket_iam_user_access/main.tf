@@ -60,9 +60,10 @@ data "aws_iam_policy_document" "rotate_iam_keys" {
       "secretsmanager:UpdateSecret",
       "secretsmanager:UpdateSecretVersionStage",
       "secretsmanager:ListSecretVersionIds",
-      "secretsmanager:PutSecretValue"
+      "secretsmanager:PutSecretValue",
+      "secretsmanager:DescribeSecret",
     ]
-    resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}${module.secrets_manager.secret_name}*"]
+    resources = [module.secrets_manager.secret_arn]
   }
 }
 
@@ -96,8 +97,10 @@ module "secrets_manager" {
   enable_rotation     = true
   rotation_lambda_arn = var.rotation_lambda.lambda_function_arn
   rotation_rules = {
-    automatically_after_days = 84
+    # Runs at 10:00 AM on the second Tuesday of Feb, May, Aug, Nov.
+    schedule_expression = "cron(0 10 ? FEB,MAY,AUG,NOV TUE#2 *)"
   }
+
   tags = merge(
     var.local_tags,
     { order_type = var.order_type },
