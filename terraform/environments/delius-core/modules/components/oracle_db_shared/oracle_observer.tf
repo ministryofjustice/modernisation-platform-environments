@@ -1,12 +1,11 @@
 module "oracle_observer" {
-  source          = "../../helpers/delius_microservice"
-  account_config  = var.account_config
-  account_info    = var.account_info
-  certificate_arn = null
-
+  source                = "../../helpers/delius_microservice"
+  account_config        = var.account_config
+  account_info          = var.account_info
+  certificate_arn       = null
+  
   # Do not create an Oracle Observer microservice if it has no configuration
-  count         = lookup(var.delius_microservice_configs, "oracle_observer", null) != null ? 1 : 0
-  desired_count = try(var.delius_microservice_configs.oracle_observer, {}) == {} ? 0 : 1
+  desired_count = try(var.delius_microservice_configs.oracle_observer,{}) == {} ? 0 : 1
 
   container_secrets_env_specific = {}
 
@@ -46,22 +45,26 @@ module "oracle_observer" {
     aws.core-network-services = aws.core-network-services
   }
 
-  log_error_pattern = "FATAL"
-  sns_topic_arn     = var.sns_topic_arn
+  log_error_pattern      = "FATAL"
+  sns_topic_arn          = var.sns_topic_arn
 
   bastion_sg_id = null
 
   container_vars_default = {}
 
+  # FORCE_REDEPLOY is simply to allow us to update the Container version during development
+  # It is not intended for production use.
   container_vars_env_specific = {
-    "PRIMARYDB_HOSTNAME"  = join(".", [var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])
-    "STANDBYDB1_HOSTNAME" = var.oracle_db_server_names["standbydb1"] == "none" ? "none" : join(".", [var.oracle_db_server_names["standbydb1"], var.account_config.route53_inner_zone.name])
-    "STANDBYDB2_HOSTNAME" = var.oracle_db_server_names["standbydb2"] == "none" ? "none" : join(".", [var.oracle_db_server_names["standbydb2"], var.account_config.route53_inner_zone.name])
+    "PRIMARYDB_HOSTNAME"  = join(".",[var.oracle_db_server_names["primarydb"], var.account_config.route53_inner_zone.name])
+    "STANDBYDB1_HOSTNAME" = var.oracle_db_server_names["standbydb1"] == "none" ? "none" : join(".",[var.oracle_db_server_names["standbydb1"], var.account_config.route53_inner_zone.name])
+    "STANDBYDB2_HOSTNAME" = var.oracle_db_server_names["standbydb2"] == "none" ? "none" : join(".",[var.oracle_db_server_names["standbydb2"], var.account_config.route53_inner_zone.name])
     "DATABASE_PORT"       = var.database_port
     "DATABASE_NAME"       = var.database_name
-  }
+    "FORCE_REDLOY"        = timestamp()
+    }
 
   container_secrets_default = {
     "DATABASE_SECRETS_JSON" = "arn:aws:secretsmanager:eu-west-2:${var.account_info.id}:secret:${var.app_name}-${var.env_name}-oracle-db-dba-passwords"
   }
+
 }
