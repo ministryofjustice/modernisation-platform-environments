@@ -71,11 +71,11 @@ done
 echo "Updating /etc/hosts"
 sed -i '/${local.database_hostname}$/d' /etc/hosts
 sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
-sed -i '/${local.cm_hostname}$/d' /etc/hosts
+sed -i '/cwa-app2$/d' /etc/hosts
 sed -i '/laa-oem-app$/d' /etc/hosts # This is removed for POC
-echo "$PRIVATE_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
-echo "$APP1_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
-echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
+echo "$PRIVATE_IP	${local.database_hostname}.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
+echo "$APP1_IP	${local.appserver1_hostname}.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
+echo "$CM_IP	${local.cm_hostname}.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
 ## Update the send mail url
 echo "Update Sendmail configurations"
@@ -141,6 +141,19 @@ cat <<EOT > /etc/cron.d/custom_cloudwatch_metrics
 #!/bin/bash
 */1 * * * * root /var/cw-custom.sh > /dev/null 2>&1
 EOT
+
+## Implement keepalive solution
+
+# Add TCP keepalive time to sysctl.conf ---> keepalive solution
+echo "net.ipv4.tcp_keepalive_time = 300" >> /etc/sysctl.conf
+sysctl -p
+# Add SQLNET.EXPIRE_TIME to sqlnet.ora ---> keepalive solution
+sed -i 's/SQLNET.EXPIRE_TIME= 10/SQLNET.EXPIRE_TIME= 5/g' /CWA/oracle/product/10.2.0/db_1/network/admin/CWA_cwa-db/sqlnet.ora
+# Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
+
+if ! grep -q "(ENABLE=broken)" "/CWA/oracle/product/10.2.0/db_1/network/admin/CWA_cwa-db/tnsnames.ora"; then
+    sed -i '/(DESCRIPTION=/a\\          (ENABLE=broken)' /CWA/oracle/product/10.2.0/db_1/network/admin/CWA_cwa-db/tnsnames.ora
+fi
 
 ## Additional DBA steps
 su oracle -c "sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/oracle/product/10.2.0/db_1/appsutil/CWA_cwa-db.xml"
@@ -242,6 +255,15 @@ resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
   security_group_id            = aws_security_group.database.id
   description                  = "SSH from the Bastion"
   referenced_security_group_id = module.bastion_linux.bastion_security_group
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "db_workspace_winscp" {
+  security_group_id            = aws_security_group.database.id
+  description                  = "Allow WorkSpace in LAA LZ to WinSCP"
+  cidr_ipv4                    = local.application_data.accounts[local.environment].workspaces_laa_lz
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22

@@ -78,6 +78,7 @@ locals {
 
       pp-jump2022-1 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
@@ -91,7 +92,7 @@ locals {
         })
         instance = merge(local.ec2_instances.rdgw.instance, {
           tags = {
-            backup-plan = "daily-and-weekly-vss"
+            backup-plan = "daily-and-weekly"
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {

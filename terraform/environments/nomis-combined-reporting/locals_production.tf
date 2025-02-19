@@ -27,87 +27,56 @@ locals {
       }
     }
 
-    ec2_autoscaling_groups = {
-      pd-ncr-app = merge(local.ec2_autoscaling_groups.bip_app, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_app.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_app.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_app.config.instance_profile_policies, [
-            "Ec2PDReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_app.user_data_cloud_init.args, {
-            branch = "TM-913/align-ncr-and-onr-ansible"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_app.tags, {
-          nomis-combined-reporting-environment = "pd"
-        })
-      })
-
-      pd-ncr-cms = merge(local.ec2_autoscaling_groups.bip_cms, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_cms.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 2
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_cms.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_cms.config.instance_profile_policies, [
-            "Ec2PDReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_cms.user_data_cloud_init.args, {
-            branch = "TM-913/align-ncr-and-onr-ansible"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_cms.tags, {
-          nomis-combined-reporting-environment = "pd"
-        })
-      })
-
-      pd-ncr-webadmin = merge(local.ec2_autoscaling_groups.bip_webadmin, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_webadmin.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_webadmin.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_webadmin.config.instance_profile_policies, [
-            "Ec2PDReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_webadmin.user_data_cloud_init.args, {
-            branch = "TM-913/align-ncr-and-onr-ansible"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_webadmin.tags, {
-          nomis-combined-reporting-environment = "pd"
-        })
-      })
-
-      pd-ncr-web = merge(local.ec2_autoscaling_groups.bip_web, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bip_web.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bip_web.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bip_web.config.instance_profile_policies, [
-            "Ec2PDReportingPolicy",
-          ])
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.bip_web.user_data_cloud_init.args, {
-            branch = "TM-913/align-ncr-and-onr-ansible"
-          })
-        })
-        tags = merge(local.ec2_autoscaling_groups.bip_web.tags, {
-          nomis-combined-reporting-environment = "pd"
-        })
-      })
-    }
-
-
     ec2_instances = {
+
+      pd-ncr-app-1 = merge(local.ec2_instances.bip_app, {
+        config = merge(local.ec2_instances.bip_app.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+      pd-ncr-app-2 = merge(local.ec2_instances.bip_app, {
+        config = merge(local.ec2_instances.bip_app.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+      pd-ncr-app-3 = merge(local.ec2_instances.bip_app, {
+        config = merge(local.ec2_instances.bip_app.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+      pd-ncr-app-4 = merge(local.ec2_instances.bip_app, {
+        config = merge(local.ec2_instances.bip_app.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_app.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_app.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
 
       pd-ncr-db-1-a = merge(local.ec2_instances.db, {
         cloudwatch_metric_alarms = merge(
@@ -150,6 +119,54 @@ locals {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
           oracle-sids                          = "DRBIPSYS DRBIPAUD"
+        })
+      })
+
+      pd-ncr-cms-1 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-cms-2 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-webadmin-1 = merge(local.ec2_instances.bip_webadmin, {
+        config = merge(local.ec2_instances.bip_webadmin.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_webadmin.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_webadmin.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-web-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
         })
       })
     }
@@ -215,11 +232,135 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
+        instance_target_groups = {
+          private-pd-http-7777 = merge(local.lbs.private.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "pd-ncr-web-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.private.listeners, {
+          http-7777 = merge(local.lbs.private.listeners.http-7777, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "private-pd-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "int.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "int.reporting.nomis.service.justice.gov.uk",
+                      "maintenance-int.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
+      })
+
+      public = merge(local.lbs.public, {
+        instance_target_groups = {
+          pd-http-7010 = merge(local.lbs.public.instance_target_groups.http-7010, {
+            attachments = [
+              { ec2_instance_name = "pd-ncr-webadmin-1" },
+            ]
+          })
+          pd-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "pd-ncr-web-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.public.listeners, {
+          https = merge(local.lbs.public.listeners.https, {
+            alarm_target_group_names = []
+            rules = {
+              webadmin = {
+                priority = 100
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-http-7010"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "admin.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "admin.reporting.nomis.service.justice.gov.uk",
+                      "maintenance.reporting.nomis.service.justice.gov.uk",
+                      "reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
       })
     }
 
     route53_zones = {
       "reporting.nomis.service.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
+          { name = "admin", type = "A", lbs_map_key = "public" },
+          { name = "int", type = "A", lbs_map_key = "private" },
+          { name = "maintenance", type = "A", lbs_map_key = "public" },
+          { name = "maintenance-int", type = "A", lbs_map_key = "private" },
+        ]
         ns_records = [
           # use this if NS records can be pulled from terrafrom, otherwise use records variable
           { name = "production", ttl = "86400", zone_name = "production.reporting.nomis.service.justice.gov.uk" }

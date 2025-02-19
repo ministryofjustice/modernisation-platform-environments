@@ -464,6 +464,13 @@ resource "aws_s3_bucket_versioning" "moj-log-files-prod" {
   }
 }
 
+resource "aws_s3_bucket_logging" "moj-log-files-prod" {
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-log-files-prod[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  target_prefix = "s3-logs/moj-log-files-prod-logs/"
+}
+
 resource "aws_s3_bucket_public_access_block" "moj-log-files-prod" {
   count                   = local.is-production == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-log-files-prod[0].id
@@ -507,7 +514,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-log-files-prod" {
       storage_class = "STANDARD_IA"
     }
     expiration {
-      days = 60
+      days = 120
     }
   }
 }
@@ -1089,6 +1096,134 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
         "Resource" : [
           "arn:aws:s3:::moj-lambda-layers-dev",
           "arn:aws:s3:::moj-lambda-layers-dev/*"
+        ],
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role"
+          ]
+        }
+      }
+    ]
+  })
+}
+
+# S3 Bucket for Database Replication to Cloud Platform Team for Development
+
+resource "aws_s3_bucket" "moj-database-source-dev" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
+  count  = local.is-development == true ? 1 : 0
+  bucket = "moj-database-source-dev"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-database-source-dev"
+    }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "moj-database-source-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-database-source-dev[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "moj-database-source-dev" {
+  count                   = local.is-development == true ? 1 : 0
+  bucket                  = aws_s3_bucket.moj-database-source-dev[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-dev" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-database-source-dev[0].id
+  rule {
+    id     = "Move-to-IA-then-delete-moj-database-source-dev"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+    expiration {
+      days = 60
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "moj-database-source-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-database-source-dev[0].id
+
+  policy = jsonencode({
+
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-database-source-dev",
+          "arn:aws:s3:::moj-database-source-dev/*"
+        ],
+        "Principal" : {
+          Service = "logging.s3.amazonaws.com"
+        }
+      },
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-database-source-dev",
+          "arn:aws:s3:::moj-database-source-dev/*"
+        ],
+        "Principal" : {
+          Service = "sns.amazonaws.com"
+        }
+      },
+      {
+        "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-database-source-dev",
+          "arn:aws:s3:::moj-database-source-dev/*"
         ],
         "Principal" : {
           "AWS" : [

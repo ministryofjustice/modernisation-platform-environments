@@ -1,6 +1,6 @@
 # Python script to retrieve cloudwatch metic data (disk information), graph it and email it to end users via the internal mail relay.
 # Nick Buckingham
-# 12 December 2024
+# 10 February 2025
 
 import boto3
 import os
@@ -45,11 +45,12 @@ def parse_disk_info(content):
         r"Current Date\s+:\s+(.+)\n"
         r"Drive Letter\s+:\s+(.+)\n"
         r"Drive Label\s+:\s*(.*)\n"
-        r"File System Type\s+:\s+(.+)\n"
+        r"File System\s+:\s+(.+)\n"
         r"Total Capacity \(GB\)\s+:\s+(.+)\n"
         r"Used Capacity \(GB\)\s+:\s+(.+)\n"
-        r"Total Free Space \(GB\)\s+:\s+(.+)\n"
+        r"Free Capacity \(GB\)\s+:\s+(.+)\n"
         r"% Free Space\s+:\s+(.+)\n"
+        r"Weekly Usage\s+:\s+(.+)\n"
         r"Status\s+:\s+(.+)"
     )
     matches = disk_info_pattern.findall(content)
@@ -70,6 +71,7 @@ def format_disk_info(disk_info):
                             <th style="padding: 8px; text-align: left;">Used Capacity (GB)</th>
                             <th style="padding: 8px; text-align: left;">Free Space (GB)</th>
                             <th style="padding: 8px; text-align: left;">% Free Space</th>
+                            <th style="padding: 8px; text-align: left;">Weekly Usage (GB)</th>
                             <th style="padding: 8px; text-align: left;">Status</th>
                         </tr>"""
 
@@ -77,10 +79,18 @@ def format_disk_info(disk_info):
     for info in sorted_disk_info:
         if current_hostname != info[0]:
             if current_hostname is not None:
-                formatted_info += f"""<tr><td colspan="10" style="height: 20px;"></td></tr>"""
+                formatted_info += f"""<tr><td colspan="11" style="height: 20px;"></td></tr>"""
             current_hostname = info[0]
-    
-        status = info[9].strip().capitalize()
+
+        weekly_usage_value = float(info[9])
+        if weekly_usage_value < 0:
+            weekly_usage_color = 'green'
+        elif weekly_usage_value > 0:
+            weekly_usage_color = 'red'
+        else:
+            weekly_usage_color = 'black'
+
+        status = info[10].strip().capitalize()
         status_color = {
             'Good': 'green',
             'Low': 'teal',
@@ -98,7 +108,8 @@ def format_disk_info(disk_info):
                                 <td style="padding: 8px; text-align: left;">{info[6]}</td>
                                 <td style="padding: 8px; text-align: left;">{info[7]}</td>
                                 <td style="padding: 8px; text-align: left;">{info[8]}</td>
-                                <td style="padding: 8px; text-align: left; background-color: {status_color};">{info[9]}</td>
+                                <td style="padding: 8px; text-align: left; color: {weekly_usage_color}">{info[9]}</td>
+                                <td style="padding: 8px; text-align: left; background-color: {status_color};">{info[10]}</td>
                               </tr>"""
     formatted_info += "</table>"
     return formatted_info
