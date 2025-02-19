@@ -86,8 +86,8 @@ module "secrets_manager" {
   name        = "iam-${aws_iam_user.supplier.name}"
   description = "IAM user access credentials for ${var.data_feed}-${var.order_type}"
   secret_string = jsonencode({
-    key    = aws_iam_access_key.supplier.id,
-    secret = aws_iam_access_key.supplier.secret
+    key    = "placeholder_key",
+    secret = "placeholder_secret"
   })
   ignore_secret_changes = true
 
