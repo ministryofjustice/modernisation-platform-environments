@@ -5,5 +5,5 @@ resource "aws_ses_domain_identity" "main" {
 resource "aws_ses_domain_identity_verification" "main" {
   domain = aws_ses_domain_identity.main.domain
 
-  depends_on = [module.route53_records.aws_route53_record.this["_amazonses TXT"]]
+  depends_on = [module.route53_records]
 }
