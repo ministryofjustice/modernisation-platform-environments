@@ -102,26 +102,26 @@ resource "aws_efs_backup_policy" "efs_backup_policy" {
   }
 }
 
-# resource "aws_cloudwatch_metric_alarm" "efs_connection_repo_home" {
-#   alarm_name          = "${local.application_name_short}-${local.environment}-efs-connection"
-#   alarm_description   = "If the instance has lost connection with its EFS system, please investigate."
-#   comparison_operator = "LessThanThreshold"
-#   dimensions = {
-#     FileSystemId = aws_efs_file_system.efs.id
-#   }
-#   evaluation_periods = "3"
-#   metric_name        = "ClientConnections"
-#   namespace          = "AWS/EFS"
-#   period             = "60"
-#   statistic          = "Sum"
-#   threshold          = local.environment == "production" ? 4 : 3
-#   alarm_actions      = [aws_sns_topic.cis.arn]
-#   ok_actions         = [aws_sns_topic.cis.arn]
-#   treat_missing_data = "breaching"
-#   tags = merge(
-#     local.tags,
-#     {
-#       Name = "${local.application_name_short}-${local.environment}-efs-connection"
-#     }
-#   )
-# }
+resource "aws_cloudwatch_metric_alarm" "efs_connection_repo_home" {
+  alarm_name          = "${local.application_name_short}-${local.environment}-efs-connection"
+  alarm_description   = "If the instance has lost connection with its EFS system, please investigate."
+  comparison_operator = "LessThanThreshold"
+  dimensions = {
+    FileSystemId = aws_efs_file_system.efs.id
+  }
+  evaluation_periods = "3"
+  metric_name        = "ClientConnections"
+  namespace          = "AWS/EFS"
+  period             = local.application_data.accounts[local.environment].alert_period
+  statistic          = "Sum"
+  threshold          = local.environment == "production" ? 4 : 3
+  alarm_actions      = [aws_sns_topic.cis_alerting_topic.arn]
+  ok_actions         = [aws_sns_topic.cis_alerting_topic.arn]
+  treat_missing_data = "breaching"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name_short}-${local.environment}-efs-connection"
+    }
+  )
+}

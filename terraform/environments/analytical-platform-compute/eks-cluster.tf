@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.31.6"
+  version = "20.33.1"
 
   cluster_name    = local.eks_cluster_name
   cluster_version = local.environment_configuration.eks_cluster_version
@@ -176,7 +176,7 @@ module "eks" {
     gha-mojap-common = {
       principal_arn     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/analytical-platform-github-actions"
       username          = "github-actions-moj-ap-airflow"
-      kubernetes_groups = ["mwaa-serviceaccount-management"]
+      kubernetes_groups = ["mwaa-serviceaccount-management", "mwaa-external-secrets"]
     }
     /* Legacy Airflow */
     data-engineering-airflow = {
@@ -200,7 +200,7 @@ module "karpenter" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "20.31.6"
+  version = "20.33.1"
 
   cluster_name = module.eks.cluster_name
 

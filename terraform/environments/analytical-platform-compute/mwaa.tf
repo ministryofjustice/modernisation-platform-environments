@@ -22,6 +22,8 @@ resource "aws_mwaa_environment" "main" {
   webserver_access_mode = "PRIVATE_ONLY"
 
   airflow_configuration_options = {
+    "secrets.backend"                    = "airflow.providers.amazon.aws.secrets.secrets_manager.SecretsManagerBackend"
+    "secrets.backend_kwargs"             = "{\"connections_prefix\": \"airflow/connections\", \"variables_prefix\": \"airflow/variables\"}"
     "webserver.warn_deployment_exposure" = 0
     "webserver.base_url"                 = "airflow.${local.environment_configuration.route53_zone}"
     "webserver.instance_name"            = local.environment_configuration.airflow_webserver_instance_name

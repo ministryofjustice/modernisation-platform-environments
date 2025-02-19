@@ -72,8 +72,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
-    database_name  = "DMDNDA"
-    database_port  = local.db_port
+    database_name = "DMDNDA"
+    database_port = local.db_port
   }
 
   delius_microservices_configs_dev = {

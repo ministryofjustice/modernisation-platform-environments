@@ -9,6 +9,7 @@ on:
     paths:
       - '.github/workflows/generate-dependabot-file.yml'
       - 'scripts/generate-dependabot-file.sh'
+      - 'terraform/environments/**/platform_backend.tf'
   workflow_dispatch:
 
 defaults:

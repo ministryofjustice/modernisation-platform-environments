@@ -3,31 +3,6 @@ output "s3_kms_arn" {
   value       = aws_kms_key.s3.arn
 }
 
-output "kinesis_stream_name" {
-  description = "The unique Stream name "
-  value       = module.kinesis_stream_ingestor.kinesis_stream_name
-}
-
-#output "kinesis_stream_shard_count" {
-#  description = "The count of Shards for this Stream"
-#  value       = module.kinesis_stream_ingestor.kinesis_stream_shard_count
-#}
-
-output "kinesis_stream_arn" {
-  description = "The Amazon Resource Name (ARN) specifying the Stream"
-  value       = module.kinesis_stream_ingestor.kinesis_stream_arn
-}
-
-output "kinesis_stream_iam_policy_read_only_arn" {
-  description = "The IAM Policy (ARN) read only of the Stream"
-  value       = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_read_only_arn
-}
-
-output "kinesis_stream_iam_policy_write_only_arn" {
-  description = "The IAM Policy (ARN) write only of the Stream"
-  value       = module.kinesis_stream_ingestor.kinesis_stream_iam_policy_write_only_arn
-}
-
 ### datamart
 
 output "cluster_arn" {
@@ -141,12 +116,6 @@ output "ec2_private_key" {
   description = "Ec2 Private Key"
   value       = module.ec2_kinesis_agent.private_key
   sensitive   = true
-}
-
-# DMS Subnet ids
-output "dms_subnets" {
-  description = "DMS Subnet IDs"
-  value       = module.dms_nomis_ingestor.dms_subnet_ids
 }
 
 ## Dynamo Domain Registry DB table

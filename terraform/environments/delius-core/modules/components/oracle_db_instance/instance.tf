@@ -17,7 +17,6 @@ locals {
     }
     tags = var.tags
   }
-
 }
 
 module "instance" {
@@ -56,7 +55,6 @@ module "instance" {
       }
     )
   )
-
 
   business_unit     = var.account_info.business_unit
   application_name  = var.account_info.application_name

@@ -62,3 +62,9 @@ variable "data_bucket_lf_resource" {
   type        = string
   description = "The arn of the LakeFormation resource where our parquet files are held"
 }
+
+variable "db_exists" {
+  default     = false
+  type        = bool
+  description = "Whether the database exists"
+}

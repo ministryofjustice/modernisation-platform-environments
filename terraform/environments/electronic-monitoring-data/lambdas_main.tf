@@ -78,8 +78,6 @@ module "rotate_iam_key" {
   role_arn                = aws_iam_role.rotate_iam_keys.arn
   memory_size             = 2048
   timeout                 = 900
-  security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
 }

@@ -15,7 +15,7 @@ locals {
       subnets                          = module.environment.subnets["private"].ids
 
       instance_target_groups = {
-        web = {
+        http-7777 = {
           port     = 7777
           protocol = "HTTP"
           health_check = {
@@ -23,7 +23,7 @@ locals {
             healthy_threshold   = 3
             interval            = 30
             matcher             = "200-399"
-            path                = "/"
+            path                = "/keepalive.htm"
             port                = 7777
             timeout             = 5
             unhealthy_threshold = 5

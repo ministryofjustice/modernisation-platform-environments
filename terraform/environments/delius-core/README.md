@@ -32,7 +32,7 @@ This directory contains the Terraform configuration for the Delius Core environm
   * external interface services
   * serves API endpoints to allow services to interact with Delius data
 * LDAP ECS
-  * used for authenticating users in Delius, MIS, NextCloud, User Management, PWM, and apps in Cloud Platform
+  * used for authenticating users in Delius, MIS, User Management, PWM, and apps in Cloud Platform
 * Password manager (PWM) ECS
 * Oracle EC2 databases
   * used by Weblogic, GDPR (now in CP)

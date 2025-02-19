@@ -67,6 +67,30 @@ resource "aws_instance" "ec2_oracle_ebs" {
   depends_on = [aws_security_group.ec2_sg_ebsdb]
 }
 
+#          onditional
+# /device  C /mount_point
+# --------+-+------------
+# /dev/sda   /      (AMI)
+# /dev/sdb   swap   (AMI)
+# /dev/sdc   /temp  (AMI)
+# /dev/sdd   /home  (AMI)
+# /dev/sdh   /export/home
+# /dev/sdi   /u01
+# /dev/sdj   /CCMS/EBS/arch
+# /dev/sdl   /CCMS/EBS/redoA
+# /dev/sdm   /CCMS/EBS/techst
+# /dev/sdn   /backup
+# /dev/sdo v /dbf2            # commented out
+# /dev/sdo   /CCMS/EBS/redoB
+# /dev/sdp   /CCMS/EBS/diag
+# /dev/sdq   /CCMS/EBS/dbf01
+# /dev/sdr   /CCMS/EBS/dbf02
+# /dev/sds   /CCMS/EBS/dbf03
+# /dev/sdt   /CCMS/EBS/dbf04
+# /dev/sdx   swap2
+# /dev/sdy v /backup_prod
+# /dev/sdz v /backup_clone
+
 resource "aws_ebs_volume" "export_home" {
   lifecycle {
     ignore_changes = [kms_key_id]
@@ -396,6 +420,33 @@ resource "aws_volume_attachment" "dbf04_att" {
   ]
   device_name = "/dev/sdt"
   volume_id   = aws_ebs_volume.dbf04.id
+  instance_id = aws_instance.ec2_oracle_ebs.id
+}
+
+resource "aws_ebs_volume" "swap2" {
+  count = local.is-development ? 1 : 0
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsdb_swap2
+  type              = "io2"
+  iops              = local.application_data.accounts[local.environment].ebs_iops_ebsdb_swap2
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsdb, "swap2")) },
+    { device-name = "/dev/sdx" }
+  )
+}
+
+resource "aws_volume_attachment" "swap2_att" {
+  count = local.is-development ? 1 : 0
+  depends_on = [
+    aws_ebs_volume.swap2
+  ]
+  device_name = "/dev/sdx"
+  volume_id   = aws_ebs_volume.swap2[0].id
   instance_id = aws_instance.ec2_oracle_ebs.id
 }
 
