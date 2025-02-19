@@ -15,6 +15,8 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
 
+Analytical Platform's compute services
+
 ### **Service URLs:**
 
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
