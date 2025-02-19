@@ -1,3 +1,3 @@
-resource "aws_ses_email_identity" "main" {
-  email = local.environment_configuration.route53_zone
+resource "aws_ses_domain_identity" "main" {
+  domain = local.environment_configuration.route53_zone
 }
