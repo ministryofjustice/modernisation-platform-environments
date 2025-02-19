@@ -50,6 +50,9 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
     delete = "2h"
   }
 
+  lifecycle {
+    create_before_destroy = true
+  }
 
 }
 
