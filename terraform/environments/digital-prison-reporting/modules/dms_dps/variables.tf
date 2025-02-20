@@ -20,11 +20,6 @@ variable "project_id" {
   description = "(Required) Project Short ID that will be used for resources."
 }
 
-variable "env" {
-  type        = string
-  description = "Env Type"
-}
-
 variable "tags" {
   type        = map(string)
   default     = {}
@@ -81,93 +76,15 @@ variable "create" {
   default = true
 }
 
-variable "create_iam_roles" {
-  type    = bool
-  default = true
-}
-
-variable "iam_role_permissions_boundary" {
-  description = "ARN of the policy that is used to set the permissions boundary for the role"
-  type        = string
-  default     = null
-}
-
-# Used in tagginga and naming the resources
-
-variable "stack_name" {
-  type        = string
-  description = "The name of our application"
-  default     = "dblink"
-}
-
-variable "owner" {
-  type        = string
-  description = "A group email address to be used in tags"
-  default     = "autobots@ga.gov.au"
-}
-
-#--------------------------------------------------------------
-# DMS general config
-#--------------------------------------------------------------
-
-variable "identifier" {
-  type        = string
-  default     = "rds"
-  description = "Name of the database in the RDS"
-}
-
 #--------------------------------------------------------------
 # DMS target config
 #--------------------------------------------------------------
-
-variable "target_backup_window" {
-  type = string
-  # 12:00AM-03:00AM AEST
-  default     = "14:00-17:00"
-  description = "RDS backup window"
-}
-
-#variable "target_db_name" {
-#  description = "Name of the target database"
-#}
-
-variable "target_db_port" {
-  type        = number
-  description = "The port the Application Server will access the database on"
-  default     = 5432
-}
 
 variable "target_engine" {
   type        = string
   default     = "kinesis"
   description = "Engine type, example values mysql, postgres"
 }
-
-variable "target_engine_version" {
-  type        = string
-  description = "Engine version"
-  default     = "9.3.14"
-}
-
-variable "target_instance_class" {
-  type        = string
-  default     = "db.t2.micro"
-  description = "Instance class"
-}
-
-variable "target_maintenance_window" {
-  type        = string
-  default     = "Mon:00:00-Mon:03:00"
-  description = "RDS maintenance window"
-}
-
-#variable "target_password" {
-#  description = "Password of the target database"
-#}
-
-#variable "target_username" {
-#  description = "Username to access the target database"
-#}
 
 variable "kinesis_settings" {
   type        = map(any)
@@ -188,13 +105,6 @@ variable "source_app_username" {
   description = "Username for the endpoint to access the source database"
 }
 
-variable "source_backup_window" {
-  type = string
-  # 12:00AM-03:00AM AEST
-  default     = "14:00-17:00"
-  description = "RDS backup window"
-}
-
 variable "source_db_name" {
   type        = string
   description = "Name of the target database"
@@ -207,52 +117,10 @@ variable "source_db_port" {
   default     = null
 }
 
-variable "source_engine" {
-  type        = string
-  default     = "oracle-se2"
-  description = "Engine type, example values mysql, postgres"
-}
-
 variable "source_engine_name" {
   type        = string
   default     = ""
   description = "Engine name for DMS"
-}
-
-variable "source_engine_version" {
-  type        = string
-  description = "Engine version"
-  default     = "12.1.0.2.v8"
-}
-
-variable "source_instance_class" {
-  type        = string
-  default     = "db.t2.micro"
-  description = "Instance class"
-}
-
-variable "source_maintenance_window" {
-  type        = string
-  default     = "Mon:00:00-Mon:03:00"
-  description = "RDS maintenance window"
-}
-
-variable "source_password" {
-  type        = string
-  description = "Password of the source database"
-  default     = ""
-}
-
-variable "source_storage_encrypted" {
-  type        = bool
-  description = "Encrypt storage or leave unencrypted"
-  default     = false
-}
-
-variable "source_username" {
-  type        = string
-  description = "Username to access the source database"
-  default     = ""
 }
 
 #--------------------------------------------------------------
@@ -280,18 +148,12 @@ variable "replication_instance_version" {
 variable "replication_instance_class" {
   type        = string
   description = "Instance class of replication instance"
-  default     = "dms.t2.micro"
+  default     = "dms.t3.micro"
 }
 
 #--------------------------------------------------------------
 # Network
 #--------------------------------------------------------------
-
-variable "database_subnet_cidr" {
-  type        = list(string)
-  default     = ["10.26.25.208/28", "10.26.25.224/28", "10.26.25.240/28"]
-  description = "List of subnets to be used for databases"
-}
 
 variable "vpc_cidr" {
   description = "CIDR for the  VPC"

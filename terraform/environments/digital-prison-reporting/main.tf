@@ -857,7 +857,6 @@ module "dms_nomis_to_s3_ingestor" {
   source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
   vpc                          = data.aws_vpc.shared.id
   project_id                   = local.project
-  env                          = local.environment
   dms_source_name              = "oracle"
   dms_target_name              = "s3"
   short_name                   = "nomis"
