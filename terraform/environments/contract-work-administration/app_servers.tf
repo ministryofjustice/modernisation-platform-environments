@@ -33,10 +33,10 @@ done
 echo "Updating /etc/hosts"
 sed -i '/${local.database_hostname}$/d' /etc/hosts
 sed -i '/${local.appserver1_hostname}$/d' /etc/hosts
-sed -i '/${local.cm_hostname}$/d' /etc/hosts
-echo "$DB_IP	${local.application_name_short}-db.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
-echo "$PRIVATE_IP	${local.application_name_short}-app1.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
-echo "$CM_IP	${local.application_name_short}-app2.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
+sed -i '/cwa-app2$/d' /etc/hosts
+echo "$DB_IP	${local.database_hostname}.${data.aws_route53_zone.external.name}		${local.database_hostname}" >> /etc/hosts
+echo "$PRIVATE_IP	${local.appserver1_hostname}.${data.aws_route53_zone.external.name}		${local.appserver1_hostname}" >> /etc/hosts
+echo "$CM_IP	${local.cm_hostname}.${data.aws_route53_zone.external.name}		${local.cm_hostname}" >> /etc/hosts
 
 echo "Updating /etc/fstab file and mount"
 cat <<EOT > /etc/fstab
@@ -240,7 +240,7 @@ resource "aws_instance" "app2" {
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
     { "Name" = "${upper(local.application_name_short)} App Instance 2" },
-    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "yes" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
+    local.environment != "production" ? { "snapshot-with-daily-35-day-retention" = "no" } : { "snapshot-with-hourly-35-day-retention" = "yes" }
   )
 
   depends_on = [time_sleep.wait_app_userdata_scripts] # This resource creation will be delayed to ensure object exists in the bucket
@@ -273,6 +273,15 @@ resource "aws_vpc_security_group_ingress_rule" "app_bastion_ssh" {
   security_group_id            = aws_security_group.app.id
   description                  = "SSH from the Bastion"
   referenced_security_group_id = module.bastion_linux.bastion_security_group
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "app_workspace_winscp" {
+  security_group_id            = aws_security_group.app.id
+  description                  = "Allow WorkSpace in LAA LZ to WinSCP"
+  cidr_ipv4                    = local.application_data.accounts[local.environment].workspaces_laa_lz
   from_port                    = 22
   ip_protocol                  = "tcp"
   to_port                      = 22
