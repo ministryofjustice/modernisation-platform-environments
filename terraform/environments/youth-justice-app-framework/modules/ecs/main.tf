@@ -24,6 +24,7 @@ module "ecs_cluster" {
         minimum_scaling_step_size = 1
         status                    = "ENABLED"
         target_capacity           = 90
+        instance_warmup_period    = 300
       }
     }
   }

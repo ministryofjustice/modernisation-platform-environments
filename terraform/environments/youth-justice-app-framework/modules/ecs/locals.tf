@@ -117,5 +117,25 @@ locals {
     var.additional_ecs_common_security_group_ingress
   )
 
+  autoscaling_policies = {
+    "cpu" : {
+      "policy_type" : "TargetTrackingScaling",
+      "target_tracking_scaling_policy_configuration" : {
+        "predefined_metric_specification" : {
+          "predefined_metric_type" : "ECSServiceAverageCPUUtilization"
+        },
+        "target_value" : 90.0
+      }
+    },
+    "memory" : {
+      "policy_type" : "TargetTrackingScaling",
+      "target_tracking_scaling_policy_configuration" : {
+        "predefined_metric_specification" : {
+          "predefined_metric_type" : "ECSServiceAverageMemoryUtilization"
+        },
+        "target_value" : 90.0
+      }
+    }
+  }
 }
 
