@@ -7,7 +7,7 @@ module "yjsm" {
 
   #Network details
   vpc_id                  = data.aws_vpc.shared.id
-  subnet_id               = element([for s in local.private_subnet_list : s if s.availability_zone == "eu-west-2a"], 0)  # Forces ZONE A
+  subnet_id = one(tolist([for s in local.private_subnet_list : s.id if s.availability_zone == "eu-west-2a"]))
 
 
 
