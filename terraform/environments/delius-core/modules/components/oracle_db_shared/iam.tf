@@ -189,30 +189,3 @@ resource "aws_iam_policy" "combined_instance_policy" {
   name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-combined-instance-policy"
   policy = data.aws_iam_policy_document.combined_instance_policy.json
 }
-
-# Temp resource to resolve state issues - Delete if found
-
-resource "aws_iam_policy" "allow_access_to_ssm_parameter_store" {
-  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ssm-parameter-store-access"
-  policy = data.aws_iam_policy_document.allow_access_to_ssm_parameter_store.json
-}
-
-resource "aws_iam_policy" "core_shared_services_bucket_access" {
-  name   = "${var.env_name}-${var.db_suffix}-core-shared-services-bucket-access-policy"
-  policy = data.aws_iam_policy_document.core_shared_services_bucket_access.json
-}
-
-resource "aws_iam_policy" "db_access_to_secrets_manager" {
-  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-secrets-manager-access"
-  policy = data.aws_iam_policy_document.db_access_to_secrets_manager.json
-}
-
-resource "aws_iam_policy" "ec2_access_for_ansible" {
-  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ansible-ec2-access"
-  policy = data.aws_iam_policy_document.ec2_access_for_ansible.json
-}
-
-resource "aws_iam_policy" "instance_ssm" {
-  name   = "${var.account_info.application_name}-${var.env_name}-${var.db_suffix}-ssm-access"
-  policy = data.aws_iam_policy_document.instance_ssm.json
-}
