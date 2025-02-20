@@ -32,6 +32,17 @@ module "managed-ad" {
   ds_managed_ad_subnet_ids     = ["subnet-12345678", "subnet-87654321"]
 }
 ```
+# Issues and workarounds
+## CouudFormation Template for the KPI Infrastructure
+This does not rollback cleanly following a faulure. The CA instances are removed but artifacts created in the Directory Service are not removed automatically. This causes failures when it is rerun as it cannot create entries that already exist. The folllowing manual actions need to be completed from the Management Instance after a Rollback  which removes the CA Instances:
+
+1. Remove computer SubordinateCA from Activte Directory:
+Open `Active Directory Users and Computers` for domain `i2N.com`. Navigate to OU i2n\Computers and delete `SubordinateCA`.
+2. Remove DNS entries for SubordinateCA and KPI.
+Open `DNS` management comsole and remove DNS entries from the Forward Lookup Zone `i2n.com` for `SubordinateCA` and `KPI`.
+3. Removed `Public Key Services` entries for the CAs.
+Open `Active Directory Sites and Services` and Show the Servics node. At Services\Public Key Services\AIA, Delete `RootCA` and `SubordinateCA`. At Services\Public Key Services\CDP, Delete container `SubordinateCA` with all its contents. 
+
 
 # Cutover and Setup Guidance
 ## Introduciton

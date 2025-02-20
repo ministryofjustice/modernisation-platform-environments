@@ -1,3 +1,7 @@
+resource "terraform_data" "replace" {
+  input = var.kpi_revision
+}
+
 ## Sets Admin secret
 
 resource "random_password" "mad_admin_password" {
@@ -38,6 +42,10 @@ resource "aws_directory_service_directory" "ds_managed_ad" {
   vpc_settings {
     vpc_id     = var.ds_managed_ad_vpc_id
     subnet_ids = var.ds_managed_ad_subnet_ids
+  }
+
+  lifecycle {
+    replace_triggered_by = [ terraform_data.replace]
   }
 }
 
