@@ -9,7 +9,7 @@ locals {
       "arn:aws:iam::572734708359:role/a3s-di-sta-int-moj-ingestion-role-eu-west-2-demo",
       "arn:aws:iam::572734708359:role/a3s-di-wfm-int-moj-ingestion-role-eu-west-2-demo",
       "arn:aws:iam::572734708359:role/a3s-di-ivr-int-moj-ingestion-role-eu-west-2-demo",
-      "arn:aws:iam::572734708359:role/a3s-di-qm-int-moj-ingestion-role-eu-west-2-demo"
+      "arn:aws:iam::572734708359:role/a3s-di-qm-int-moj-ingestion-role-eu-west-2-demo",
     ]
     production = [
       "arn:aws:iam::572734708359:role/a3s-di-core-int-moj-ingestion-role-eu-west-2-demo",
