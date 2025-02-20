@@ -688,7 +688,7 @@ data "aws_iam_policy_document" "mwaa_ses" {
   }
 }
 
-module "airflow_ses_policy" {
+module "mwaa_ses_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
