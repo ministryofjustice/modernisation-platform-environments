@@ -1,32 +1,3 @@
-# data "aws_iam_policy_document" "eks_cluster_logs_kms_access" {
-#   statement {
-#     sid    = "AllowKMS"
-#     effect = "Allow"
-#     actions = [
-#       "kms:Encrypt*",
-#       "kms:Decrypt*",
-#       "kms:ReEncrypt*",
-#       "kms:GenerateDataKey*",
-#       "kms:Describe*"
-#     ]
-#     resources = [module.eks_cluster_logs_kms.key_arn]
-#   }
-# }
-
-# module "eks_cluster_logs_kms_access_iam_policy" {
-#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-#   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-#   version = "5.52.2"
-
-#   name_prefix = "eks-cluster-logs-kms-access"
-
-#   policy = data.aws_iam_policy_document.eks_cluster_logs_kms_access.json
-
-#   tags = local.tags
-# }
-
 data "aws_iam_policy_document" "karpenter_sqs_kms_access" {
   statement {
     sid    = "AllowKMS"
