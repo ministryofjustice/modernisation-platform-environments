@@ -73,23 +73,27 @@ resource "aws_security_group" "rds" {
   description = "Controls access to the PostgreSQL RDS"
   vpc_id      = var.vpc_id
 
-  dynamic "ingress" {
-    for_each = var.rds_security_group_ingress
-    content {
-      from_port       = ingress.value.from_port
-      to_port         = ingress.value.to_port
-      protocol        = ingress.value.protocol
-      cidr_blocks     = ingress.value.cidr_blocks
-      security_groups = ingress.value.source_security_groups
-      description     = ingress.value.description
-    }
-  }
-
-  tags = merge(local.all_tags,
+   tags = merge(local.all_tags,
     {
       Name = "RDS Postgres Security Group"
     }
   )
 }
+
+resource "aws_security_group_rule" "rds" {
+   for_each = var.rds_security_group_ingress
+
+   security_group_id = aws_security_group.rds.id
+   type              = "ingress"
+
+   from_port                = each.value.from_port
+   to_port                  = each.value.to_port
+   protocol                 = each.value.protocol
+   cidr_blocks              = each.value.cidr_blocks
+   source_security_group_id = each.value.source_security_group_id
+   description              = each.value.description
+
+}
+
 
 #todo additional users and their password rotation? can it be done?
