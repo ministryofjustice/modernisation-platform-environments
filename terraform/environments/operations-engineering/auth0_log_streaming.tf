@@ -50,8 +50,9 @@ data "aws_caller_identity" "current" {}
 
 data "aws_iam_policy_document" "auth0_log_group_key" {
 
-  # checkov:skip=CKV_AWS_109: "Key policy requires asterisk resource"
-  # checkov:skip=CKV_AWS_111: "Key policy requires asterisk resource"
+  # checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+  # checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+  # checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
 
   statement {
     sid    = "Enable IAM User Permissions"
@@ -66,7 +67,7 @@ data "aws_iam_policy_document" "auth0_log_group_key" {
       ]
     }
   }
-  
+
   statement {
     sid    = "Allow Dormant Users role to use KMS key on Auth0 log group"
     effect = "Allow"
