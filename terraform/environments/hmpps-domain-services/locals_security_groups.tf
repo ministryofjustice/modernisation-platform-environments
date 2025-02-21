@@ -147,6 +147,13 @@ locals {
           protocol    = "UDP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
+        winrm_rds = {
+          description = "5985: Allow WinRM TCP ingress (powershell remoting) for RDS"
+          from_port   = 5985
+          to_port     = 5986
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
       }
       egress = {
         all = {
