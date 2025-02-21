@@ -1,59 +1,42 @@
+locals {
+  event_sources = {
+    alpha-analytics-moj    = "aws.partner/auth0.com/alpha-analytics-moj-9790e567-420a-48b2-b978-688dd998d26c/auth0.logs"
+    justice-cloud-platform = "aws.partner/auth0.com/justice-cloud-platform-9bea4c89-7006-4060-94f8-ef7ed853d946/auth0.logs"
+    ministryofjustice    = "aws.partner/auth0.com/ministryofjustice-775267e6-72e7-46a5-9059-a396cd0625e7/auth0.logs"
+    operations-engineering = "aws.partner/auth0.com/operations-engineering-4d9a5624-861c-4871-981e-fce33be08149/auth0.logs"
+  }
+}
+
 ## EventBridge
 
 # alpha-analytics-moj
 
 import {
-  to = module.alpha-analytics-moj.aws_cloudwatch_event_bus.this
+  to = module.eventbridge_modules["alpha-analytics-moj"].aws_cloudwatch_event_bus.this
   id = "aws.partner/auth0.com/alpha-analytics-moj-9790e567-420a-48b2-b978-688dd998d26c/auth0.logs"
 }
 
 import {
-  to = module.justice-cloud-platform.aws_cloudwatch_event_bus.this
+  to = module.eventbridge_modules["justice-cloud-platform"].aws_cloudwatch_event_bus.this
   id = "aws.partner/auth0.com/justice-cloud-platform-9bea4c89-7006-4060-94f8-ef7ed853d946/auth0.logs"
 }
 
 import {
-  to = module.ministryofjustice.aws_cloudwatch_event_bus.this
+  to = module.eventbridge_modules["ministryofjustice"].aws_cloudwatch_event_bus.this
   id = "aws.partner/auth0.com/ministryofjustice-775267e6-72e7-46a5-9059-a396cd0625e7/auth0.logs"
 }
 
 import {
-  to = module.operations-engineering.aws_cloudwatch_event_bus.this
+  to = module.eventbridge_modules["operations-engineering"].aws_cloudwatch_event_bus.this
   id = "aws.partner/auth0.com/operations-engineering-4d9a5624-861c-4871-981e-fce33be08149/auth0.logs"
 }
 
-module "alpha-analytics-moj" {
-  source = "./modules/eventbridge"
+module "eventbridge_modules" {
+  for_each = local.event_sources
 
-  event_source = "aws.partner/auth0.com/alpha-analytics-moj-9790e567-420a-48b2-b978-688dd998d26c/auth0.logs"
-  log_group_arn = aws_cloudwatch_log_group.auth0_log_group.arn
-}
-
-# justice-cloud-platform
-
-module "justice-cloud-platform" {
-  source = "./modules/eventbridge"
-
-  event_source = "aws.partner/auth0.com/justice-cloud-platform-9bea4c89-7006-4060-94f8-ef7ed853d946/auth0.logs"
-  log_group_arn = aws_cloudwatch_log_group.auth0_log_group.arn
-}
-
-# ministryofjustice
-
-module "ministryofjustice" {
-  source = "./modules/eventbridge"
-
-  event_source = "aws.partner/auth0.com/ministryofjustice-775267e6-72e7-46a5-9059-a396cd0625e7/auth0.logs"
-  log_group_arn = aws_cloudwatch_log_group.auth0_log_group.arn
-}
-
-# operations-engineering
-
-module "operations-engineering" {
-  source = "./modules/eventbridge"
-
-  event_source = "aws.partner/auth0.com/operations-engineering-4d9a5624-861c-4871-981e-fce33be08149/auth0.logs"
-  log_group_arn = aws_cloudwatch_log_group.auth0_log_group.arn
+  source         = "./modules/eventbridge"
+  event_source   = each.value
+  log_group_arn  = aws_cloudwatch_log_group.auth0_log_group.arn
 }
 
 ## CloudWatch
