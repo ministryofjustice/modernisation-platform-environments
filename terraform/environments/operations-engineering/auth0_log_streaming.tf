@@ -42,3 +42,25 @@ resource "aws_cloudwatch_log_group" "auth0_log_group" {
   name              = "/aws/events/LogsFromOperationsEngineeringAuth0"
   retention_in_days = 90
 }
+
+## IAM
+
+resource "aws_iam_role" "github_dormant_users_role" {
+  name               = "github-dormant-users"
+  assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "github_dormant_users_s3_full_access_attachment" {
+  role       = aws_iam_role.github_dormant_users_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "github_dormant_users_cloudwatch_logs_full_access_attachment" {
+  role       = aws_iam_role.github_dormant_users_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "github_dormant_users_cloudwatch_app_insights_full_access_attachment" {
+  role       = aws_iam_role.github_dormant_users_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchApplicationInsightsFullAccess"
+}
