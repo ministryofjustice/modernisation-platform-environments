@@ -46,8 +46,6 @@ import {
   id = "/aws/events/LogsFromOperationsEngineeringAuth0"
 }
 
-data "aws_caller_identity" "current" {}
-
 data "aws_iam_policy_document" "auth0_log_group_key" {
 
   # checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
