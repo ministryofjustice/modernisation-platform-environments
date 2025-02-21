@@ -14,6 +14,17 @@ data "aws_iam_policy_document" "datahub_read_cadet_bucket" {
       module.s3_structured_historical_bucket.bucket_arn
     ]
   }
+
+  statement {
+    sid    = "AllowKMSDecrypt"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = [
+      local.s3_kms_arn
+    ]
+  }
 }
 
 resource "aws_iam_policy" "datahub_read_cadet_bucket" {
