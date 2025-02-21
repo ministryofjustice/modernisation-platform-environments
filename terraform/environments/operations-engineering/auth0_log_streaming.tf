@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "auth0_log_group_key" {
     condition {
       test     = "ArnEquals"
       variable = "kms:EncryptionContext:aws:logs:arn"
-      values = [ aws_cloudwatch_log_group.auth0_log_group.arn ]
+      values = [ "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-dormant-users" ]
     }
   }
 }
