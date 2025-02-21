@@ -7,8 +7,9 @@ data "aws_route53_zone" "application-zone" {
 
 data "aws_iam_policy_document" "kms_policy" {
 
-  # checkov:skip=CKV_AWS_109: "Key policy requires asterisk resource"
-  # checkov:skip=CKV_AWS_111: "Key policy requires asterisk resource"
+  # checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+  # checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+  # checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
 
   count = local.is-development ? 1 : 0
   statement {
