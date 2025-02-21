@@ -99,11 +99,11 @@ locals {
       #     domain-name = "azure.noms.root"
       #   })
       # }
-      # test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
-      #   tags = merge(local.ec2_autoscaling_groups.rds.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      # }
+      test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
+        tags = merge(local.ec2_autoscaling_groups.rds.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
     }
 
     ec2_instances = {
@@ -122,6 +122,22 @@ locals {
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
+        })
+      })
+
+      # testing only do not use
+      t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-*"
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-916/add-rds-session-host-to-nart-client"
+            }
+          ))
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.noms.root"
@@ -209,4 +225,3 @@ locals {
     }
   }
 }
-
