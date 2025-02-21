@@ -142,6 +142,7 @@ locals {
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.noms.root"
         })
+        cloudwatch_metric_alarms = null
       })
     }
 
