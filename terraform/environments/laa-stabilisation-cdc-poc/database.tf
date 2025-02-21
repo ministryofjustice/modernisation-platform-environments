@@ -105,6 +105,19 @@ cat <<EOT > /etc/cron.d/custom_cloudwatch_metrics
 */1 * * * * root /var/cw-custom.sh > /dev/null 2>&1
 EOT
 
+## Implement keepalive solution
+
+# Add TCP keepalive time to sysctl.conf ---> keepalive solution
+echo "net.ipv4.tcp_keepalive_time = 300" >> /etc/sysctl.conf
+sysctl -p
+# Add SQLNET.EXPIRE_TIME to sqlnet.ora ---> keepalive solution
+sed -i 's/SQLNET.EXPIRE_TIME= 10/SQLNET.EXPIRE_TIME= 5/g' /CWA/oracle/product/10.2.0/db_1/network/admin/CWA_cwa-db/sqlnet.ora
+# Modify tnsnames.ora to insert (ENABLE=broken) ---> keepalive solution
+
+if ! grep -q "(ENABLE=broken)" "/CWA/oracle/product/10.2.0/db_1/network/admin/CWA_cwa-db/tnsnames.ora"; then
+    sed -i '/(DESCRIPTION=/a\\          (ENABLE=broken)' /CWA/oracle/product/10.2.0/db_1/network/admin/CWA_cwa-db/tnsnames.ora
+fi
+
 ## Additional DBA steps
 su oracle -c "sed -i 's/aws.${local.application_data.accounts[local.environment].old_domain_name}/${data.aws_route53_zone.external.name}/g' /CWA/oracle/product/10.2.0/db_1/appsutil/CWA_cwa-db.xml"
 
