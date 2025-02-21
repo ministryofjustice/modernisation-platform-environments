@@ -185,6 +185,13 @@ resource "aws_instance" "database" {
     { "Name" = local.database_ec2_name }
   )
   depends_on = [time_sleep.wait_db_userdata_scripts]
+
+  lifecycle {
+    ignore_changes = [
+      user_data_base64
+    ]
+  }
+  
 }
 
 resource "aws_key_pair" "cwa" {
