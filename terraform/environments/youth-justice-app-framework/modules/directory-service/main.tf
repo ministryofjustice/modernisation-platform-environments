@@ -15,7 +15,7 @@ resource "aws_secretsmanager_secret" "mad_admin_secret" {
   #checkov:skip=CKV_AWS_149: it is added
   name        = "${var.ds_managed_ad_directory_name}_${local.ds_managed_ad_admin_secret_sufix}"
   description = "Administrator Password for AD"
-  #kms_key_id  = var.ds_managed_ad_secret_key
+  kms_key_id  =  "aws/secretsmanager" #var.ds_managed_ad_secret_key
 }
 
 #Store secret as key value pair where key is password
