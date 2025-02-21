@@ -468,7 +468,7 @@ resource "aws_lakeformation_resource" "rds_bucket" {
 }
 
 module "share_non_cadt_dbs_with_roles" {
-  count                   = local.is-production ? 0 : 1
+  count                   = local.is-production ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = ["dms_dbo_g4s_emsys_mvp"]
   data_bucket_lf_resource = aws_lakeformation_resource.rds_bucket.arn
