@@ -93,6 +93,9 @@ resource "aws_security_group_rule" "rds" {
    source_security_group_id = each.value.source_security_group_id
    description              = each.value.description
 
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 
