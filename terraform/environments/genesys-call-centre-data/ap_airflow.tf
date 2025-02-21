@@ -42,7 +42,7 @@ resource "aws_secretsmanager_secret" "airflow_secret" {
 
   count = local.enable_airflow_secret ? 1 : 0
 
-  name = "external/analytical_platform/airflow_auth"
+  name = "external/analytical_platform/airflow_authentication"
 
   recovery_window_in_days = 0
 
