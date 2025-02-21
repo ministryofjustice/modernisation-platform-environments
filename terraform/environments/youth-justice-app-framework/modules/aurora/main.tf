@@ -78,6 +78,10 @@ resource "aws_security_group" "rds" {
       Name = "RDS Postgres Security Group"
     }
   )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_security_group_rule" "rds" {
@@ -93,9 +97,6 @@ resource "aws_security_group_rule" "rds" {
    source_security_group_id = each.value.source_security_group_id
    description              = each.value.description
 
-  lifecycle {
-    create_before_destroy = true
-  }
 }
 
 
