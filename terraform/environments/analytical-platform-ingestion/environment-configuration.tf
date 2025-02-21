@@ -20,16 +20,18 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.4"
-      transfer_image_version = "0.0.19"
-      notify_image_version   = "0.0.20"
+      scan_image_version     = "0.1.5"
+      transfer_image_version = "0.0.20"
+      notify_image_version   = "0.0.21"
 
       /* Target Buckets */
-      target_buckets          = ["mojap-land-dev"]
-      datasync_target_buckets = ["mojap-land-dev"]
+      target_buckets              = ["mojap-land-dev"]
+      datasync_target_buckets     = ["mojap-land-dev"]
+      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-development"]
 
       /* Target KMS */
-      mojap_land_kms_key = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/8c53fbac-3106-422a-8f3d-409bb3b0c94d"
+      mojap_land_kms_key             = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/8c53fbac-3106-422a-8f3d-409bb3b0c94d"
+      datasync_opg_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/38cf3d55-b36d-43e8-b91b-6b239a60cbea"
 
       /* Transfer Server */
       transfer_server_hostname   = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
@@ -65,16 +67,18 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.4"
-      transfer_image_version = "0.0.19"
-      notify_image_version   = "0.0.20"
+      scan_image_version     = "0.1.5"
+      transfer_image_version = "0.0.20"
+      notify_image_version   = "0.0.21"
 
       /* Target Buckets */
-      target_buckets          = ["mojap-land"]
-      datasync_target_buckets = ["mojap-land"]
+      target_buckets              = ["mojap-land"]
+      datasync_target_buckets     = ["mojap-land"]
+      datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]
 
       /* Target KMS */
-      mojap_land_kms_key = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
+      mojap_land_kms_key             = "arn:aws:kms:eu-west-1:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/2855ac30-4e14-482e-85ca-53258e01f64c"
+      datasync_opg_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/96eb04fe-8393-402c-b1f9-71fcece99e75"
 
       /* Transfer Server */
       transfer_server_hostname = "sftp.ingestion.analytical-platform.service.justice.gov.uk"
