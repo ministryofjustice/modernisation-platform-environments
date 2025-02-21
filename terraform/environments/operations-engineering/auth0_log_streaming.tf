@@ -63,9 +63,79 @@ import {
   id = "/aws/events/LogsFromOperationsEngineeringAuth0"
 }
 
+data "aws_caller_identity" "current" {}
+
+data "aws_iam_policy_document" "auth0_log_group_key" {
+  statement {
+    sid    = "Enable IAM User Permissions"
+    effect = "Allow"
+    actions = [
+      "kms:Create*",
+      "kms:Describe*",
+      "kms:Enable*",
+      "kms:List*",
+      "kms:Put*",
+      "kms:Update*",
+      "kms:Revoke*",
+      "kms:Disable*",
+      "kms:Get*",
+      "kms:Delete*",
+      "kms:TagResource",
+      "kms:UntagResource",
+      "kms:ScheduleKeyDeletion",
+      "kms:CancelKeyDeletion",
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+      ]
+    }
+  }
+  statement {
+    sid    = "Allow Dormant Users role to use KMS key on Auth0 log group"
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:Describe",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+
+    principals {
+      type = "AWS"
+      identifiers = [
+        aws_iam_role.github_dormant_users_role.arn
+      ]
+    }
+    condition {
+      test     = "ArnEquals"
+      variable = "kms:EncryptionContext:aws:logs:arn"
+      values = [ aws_cloudwatch_log_group.auth0_log_group.arn ]
+    }
+  }
+}
+
+resource "aws_kms_key" "auth0_log_group_key" {
+  description         = "KMS key to encrypt auth0 cloudwatch log group"
+  policy              = data.aws_iam_policy_document.auth0_log_group_key.json
+  enable_key_rotation = true
+}
+
 resource "aws_cloudwatch_log_group" "auth0_log_group" {
   name              = "/aws/events/LogsFromOperationsEngineeringAuth0"
   retention_in_days = 365
+  kms_key_id        = aws_kms_key.auth0_log_group_key.arn
+
+  depends_on = [ aws_kms_key.auth0_log_group_key ]
 }
 
 ## IAM
@@ -93,6 +163,30 @@ import {
 resource "aws_iam_role" "github_dormant_users_role" {
   name               = "github-dormant-users"
   assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_policy_document.json
+}
+
+data "aws_iam_policy_document" "auth0_kms_policy_document" {
+  statement {
+    sid    = "AllowKMS"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [ aws_kms_key.auth0_log_group_key.arn ]
+  }
+}
+
+resource "aws_iam_policy" "auth0_kms_policy" {
+  name        = "Auth0KMSPolicy"
+  description = "Policy for Auth0 KMS key"
+  policy = data.aws_iam_policy_document.auth0_kms_policy_document
+}
+
+resource "aws_iam_role_policy_attachment" "auth0_kms_attachment" {
+  role       = aws_iam_role.github_dormant_users_role.name
+  policy_arn = aws_iam_policy.auth0_kms_policy.arn
 }
 
 resource "aws_iam_role_policy_attachment" "github_dormant_users_s3_full_access_attachment" {
