@@ -676,10 +676,13 @@ module "gha_moj_ap_airflow_iam_policy" {
 
 data "aws_iam_policy_document" "mwaa_ses" {
   statement {
-    sid       = "AllowSESSendRawEmail"
-    effect    = "Allow"
-    actions   = ["ses:SendRawEmail"]
-    resources = [aws_ses_domain_identity.main.arn]
+    sid    = "AllowSESSendRawEmail"
+    effect = "Allow"
+    actions = [
+      "ses:SendEmail",
+      "ses:SendRawEmail"
+    ]
+    resources = ["*"]
     condition {
       test     = "StringEquals"
       variable = "ses:FromAddress"
