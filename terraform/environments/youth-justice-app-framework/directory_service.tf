@@ -11,8 +11,6 @@ module "ds" {
   project_name = local.project_name
   tags         = merge(local.tags, { Name = "AD Management Server" })
 
-  kpi_revision = 2 # Increase to force replacement of the Directuory Service and KPI Cloudformation Template
-
   environment_name = local.application_data.accounts[local.environment].environment_name
 
   ds_managed_ad_directory_name = "i2n.com"

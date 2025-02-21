@@ -49,9 +49,6 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
     update = "60m"
     delete = "2h"
   }
-
-  lifecycle {
-    replace_triggered_by = [ terraform_data.replace ]
-  }
+  
 }
 
