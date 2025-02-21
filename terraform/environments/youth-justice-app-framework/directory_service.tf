@@ -1,9 +1,8 @@
 
-# commented out for next run on test
-#import {
-#  to = module.ds.aws_cloudformation_stack.pki_quickstart
-#  id = "MicrosoftPKIQuickStartCA"
-#}
+import {
+  to = module.ds.aws_cloudformation_stack.pki_quickstart
+  id = "MicrosoftPKIQuickStartCA"
+}
 
 
 module "ds" {
