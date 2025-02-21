@@ -65,7 +65,7 @@ import {
 
 resource "aws_cloudwatch_log_group" "auth0_log_group" {
   name              = "/aws/events/LogsFromOperationsEngineeringAuth0"
-  retention_in_days = 90
+  retention_in_days = 365
 }
 
 ## IAM
