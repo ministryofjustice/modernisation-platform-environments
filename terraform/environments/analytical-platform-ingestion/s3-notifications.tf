@@ -6,6 +6,8 @@ module "ingestion_landing_bucket_notification" {
 
   bucket = module.landing_bucket.s3_bucket_id
 
+  eventbridge = true
+
   lambda_notifications = {
     ingestion_scan = {
       function_name = module.scan_lambda.lambda_function_name

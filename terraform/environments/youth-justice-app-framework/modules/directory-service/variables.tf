@@ -69,3 +69,9 @@ variable "rds_cluster_security_group_id" {
   type = string
   description = "The Id of the Security Grpoip that enables access to the RDS PostgreSQL Cluster."
 }
+
+variable "kpi_revision" {
+  type = number
+  description = "Increment by 1 for replacement of the Directory Service and the Cloudformation KPI Stack."
+  default = 1
+}

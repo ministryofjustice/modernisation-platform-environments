@@ -582,6 +582,29 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
     actions   = ["eks:DescribeCluster"]
     resources = [module.eks.cluster_arn]
   }
+  statement {
+    sid       = "AllowSecretsManagerKMS"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [module.common_secrets_manager_kms.key_arn]
+  }
+  statement {
+    sid       = "AllowSecretsManagerList"
+    effect    = "Allow"
+    actions   = ["secretsmanager:ListSecrets"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowSecretsManager"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:airflow/*"]
+  }
 }
 
 module "mwaa_execution_iam_policy" {
@@ -647,6 +670,36 @@ module "gha_moj_ap_airflow_iam_policy" {
   name = "github-actions-ministryofjustice-analytical-platform-airflow"
 
   policy = data.aws_iam_policy_document.gha_moj_ap_airflow.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "mwaa_ses" {
+  statement {
+    sid    = "AllowSESSendRawEmail"
+    effect = "Allow"
+    actions = [
+      "ses:SendEmail",
+      "ses:SendRawEmail"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "ses:FromAddress"
+      values   = ["noreply@${local.environment_configuration.route53_zone}"]
+    }
+  }
+}
+
+module "mwaa_ses_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.52.2"
+
+  name   = "mwaa-ses"
+  policy = data.aws_iam_policy_document.mwaa_ses.json
 
   tags = local.tags
 }

@@ -47,14 +47,16 @@ module "aurora" {
 
   # todo - some of these rules are commented out as the resource doesn't exist yet. 
   # It would make more sense the add the rules in their respective modules rather than here
-  rds_security_group_ingress = [
-    {
+  # Default rule for whole VPC needs to be removed later
+  rds_security_group_ingress = {
+    "dummy_rule" = { 
       from_port   = "5432"
       to_port     = "5432"
       protocol    = "tcp"
-      description = "Dummy rule"
+      description = "Allow PosgreSQL access from whole VPC"
       cidr_blocks = [data.aws_vpc.shared.cidr_block] #todo change to real sg rules
     }
+  
     /*
     windows_mgmt_servers = {
       from_port   = "5432"
@@ -106,5 +108,5 @@ module "aurora" {
       description = "Whitelisted mgmt account access"
     }
   */
-  ]
+  }
 }

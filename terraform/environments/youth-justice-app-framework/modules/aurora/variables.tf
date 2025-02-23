@@ -36,13 +36,13 @@ variable "db_cluster_instance_class" {
 
 variable "rds_security_group_ingress" {
   description = "List of ingress rules for the RDS security group"
-  type = list(object({
-    from_port              = number
-    to_port                = number
-    protocol               = string
-    cidr_blocks            = optional(list(string), null)
-    source_security_groups = optional(list(string), null)
-    description            = string
+  type = map(object({
+    from_port                = optional(number,null)
+    to_port                  = optional(number,null)
+    protocol                 = string
+    cidr_blocks              = optional(list(string), null)
+    source_security_group_id = optional(string,null)
+    description              = string
   }))
 }
 
