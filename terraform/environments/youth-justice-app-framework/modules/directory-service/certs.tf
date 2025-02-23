@@ -49,5 +49,9 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
     update = "60m"
     delete = "2h"
   }
+
+  lifecycle {
+    ignore_changes = all
+  }
 }
 
