@@ -9,6 +9,7 @@ resource "aws_cloudwatch_event_bus" "this" {
 
 resource "aws_cloudwatch_event_rule" "this" {
   name        = "all-auth0-to-cloudwatch"
+  event_bus_name = aws_cloudwatch_event_bus.this.name
 
   event_pattern = jsonencode({
     "source": [{
