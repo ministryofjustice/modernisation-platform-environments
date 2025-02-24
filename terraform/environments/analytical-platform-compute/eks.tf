@@ -3,5 +3,5 @@ module "eks" {
 
     cluster_arn = module.eks.cluster_arn
 
-    networking  = {}
+    networking  = []
 }
