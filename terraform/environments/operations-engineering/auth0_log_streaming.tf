@@ -87,7 +87,7 @@ data "aws_iam_policy_document" "auth0_log_group_key" {
     condition {
       test     = "ArnEquals"
       variable = "kms:EncryptionContext:aws:logs:arn"
-      values = [ "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/github-dormant-users" ]
+      values = [ "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/LogsFromOperationsEngineeringAuth0" ]
     }
   }
 }
