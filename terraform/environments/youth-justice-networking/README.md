@@ -15,8 +15,6 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 <!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
 
-Analytical Platform's compute services
-
 ### **Service URLs:**
 
 <!--  The URL(s) of the service’s production environment, and test environments if possible-->
@@ -30,8 +28,6 @@ Analytical Platform's compute services
 <!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
 
 ### **Service team contact:**
-
-<analytical-platform@digital.justice.gov.uk>
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 
