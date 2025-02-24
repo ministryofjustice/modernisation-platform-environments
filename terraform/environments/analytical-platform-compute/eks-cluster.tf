@@ -218,6 +218,11 @@ module "eks" {
   tags = local.tags
 }
 
+import {
+  to = module.eks.aws_eks_access_entry.this["mpe-administrator"]
+  id = "analytical-platform-compute-development:arn:aws:iam::381491960855:role/MemberInfrastructureAccess"
+}
+
 #tfsec:ignore:avd-aws-0104 NACLs not restricted
 module "karpenter" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
