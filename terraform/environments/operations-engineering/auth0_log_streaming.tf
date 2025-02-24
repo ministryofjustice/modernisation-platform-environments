@@ -9,28 +9,6 @@ locals {
 
 ## EventBridge
 
-# alpha-analytics-moj
-
-import {
-  to = module.eventbridge_modules["alpha-analytics-moj"].aws_cloudwatch_event_bus.this
-  id = "aws.partner/auth0.com/alpha-analytics-moj-9790e567-420a-48b2-b978-688dd998d26c/auth0.logs"
-}
-
-import {
-  to = module.eventbridge_modules["justice-cloud-platform"].aws_cloudwatch_event_bus.this
-  id = "aws.partner/auth0.com/justice-cloud-platform-9bea4c89-7006-4060-94f8-ef7ed853d946/auth0.logs"
-}
-
-import {
-  to = module.eventbridge_modules["ministryofjustice"].aws_cloudwatch_event_bus.this
-  id = "aws.partner/auth0.com/ministryofjustice-775267e6-72e7-46a5-9059-a396cd0625e7/auth0.logs"
-}
-
-import {
-  to = module.eventbridge_modules["operations-engineering"].aws_cloudwatch_event_bus.this
-  id = "aws.partner/auth0.com/operations-engineering-4d9a5624-861c-4871-981e-fce33be08149/auth0.logs"
-}
-
 module "eventbridge_modules" {
   for_each = local.event_sources
 
@@ -41,11 +19,6 @@ module "eventbridge_modules" {
 
 ## CloudWatch
 
-import {
-  to = aws_cloudwatch_log_group.auth0_log_group
-  id = "/aws/events/LogsFromOperationsEngineeringAuth0"
-}
-
 resource "aws_cloudwatch_log_group" "auth0_log_group" {
 
   # checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS"
@@ -55,26 +28,6 @@ resource "aws_cloudwatch_log_group" "auth0_log_group" {
 }
 
 ## IAM
-
-import {
-  id = "github-dormant-users"
-  to = aws_iam_role.github_dormant_users_role
-}
-
-import {
-  id = "github-dormant-users/arn:aws:iam::aws:policy/AmazonS3FullAccess"
-  to = aws_iam_role_policy_attachment.github_dormant_users_s3_full_access_attachment
-}
-
-import {
-  id = "github-dormant-users/arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
-  to = aws_iam_role_policy_attachment.github_dormant_users_cloudwatch_logs_full_access_attachment
-}
-
-import {
-  id = "github-dormant-users/arn:aws:iam::aws:policy/CloudWatchApplicationInsightsFullAccess"
-  to = aws_iam_role_policy_attachment.github_dormant_users_cloudwatch_app_insights_full_access_attachment
-}
 
 resource "aws_iam_role" "github_dormant_users_role" {
   name               = "github-dormant-users"
