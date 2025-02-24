@@ -36,7 +36,6 @@ module "vpc" {
     "kubernetes.io/role/elb" = 1
   }
 
-  # TODO - pass cluster name from ???
   private_subnet_tags = {
     "kubernetes.io/role/internal-elb" = 1
     "karpenter.sh/discovery"          = local.eks_cluster_name
