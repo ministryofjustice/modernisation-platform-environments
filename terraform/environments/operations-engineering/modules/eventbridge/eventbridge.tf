@@ -21,4 +21,5 @@ resource "aws_cloudwatch_event_rule" "this" {
 resource "aws_cloudwatch_event_target" "this" {
   rule      = aws_cloudwatch_event_rule.this.name
   arn       = var.log_group_arn
+  event_bus_name = aws_cloudwatch_event_bus.this.name
 }
