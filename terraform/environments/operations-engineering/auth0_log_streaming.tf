@@ -46,64 +46,64 @@ import {
   id = "/aws/events/LogsFromOperationsEngineeringAuth0"
 }
 
-data "aws_iam_policy_document" "auth0_log_group_key" {
+# data "aws_iam_policy_document" "auth0_log_group_key" {
 
-  # checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
-  # checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
-  # checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+#   # checkov:skip=CKV_AWS_109: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
+#   # checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+#   # checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
 
-  statement {
-    sid    = "Enable IAM User Permissions"
-    effect = "Allow"
-    actions = ["kms:*"]
-    resources = ["*"]
+#   statement {
+#     sid    = "Enable IAM User Permissions"
+#     effect = "Allow"
+#     actions = ["kms:*"]
+#     resources = ["*"]
 
-    principals {
-      type = "AWS"
-      identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-      ]
-    }
-  }
+#     principals {
+#       type = "AWS"
+#       identifiers = [
+#         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+#       ]
+#     }
+#   }
 
-  statement {
-    sid    = "Allow Dormant Users role to use KMS key on Auth0 log group"
-    effect = "Allow"
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:Describe",
-      "kms:GenerateDataKey*"
-    ]
-    resources = ["*"]
+#   statement {
+#     sid    = "Allow Dormant Users role to use KMS key on Auth0 log group"
+#     effect = "Allow"
+#     actions = [
+#       "kms:Encrypt",
+#       "kms:Decrypt",
+#       "kms:ReEncrypt*",
+#       "kms:Describe",
+#       "kms:GenerateDataKey*"
+#     ]
+#     resources = ["*"]
 
-    principals {
-      type = "AWS"
-      identifiers = [
-        aws_iam_role.github_dormant_users_role.arn
-      ]
-    }
-    condition {
-      test     = "ArnEquals"
-      variable = "kms:EncryptionContext:aws:logs:arn"
-      values = [ "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/LogsFromOperationsEngineeringAuth0" ]
-    }
-  }
-}
+#     principals {
+#       type = "AWS"
+#       identifiers = [
+#         aws_iam_role.github_dormant_users_role.arn
+#       ]
+#     }
+#     condition {
+#       test     = "ArnEquals"
+#       variable = "kms:EncryptionContext:aws:logs:arn"
+#       values = [ "arn:aws:logs:eu-west-2:${data.aws_caller_identity.current.account_id}:log-group:/aws/events/LogsFromOperationsEngineeringAuth0" ]
+#     }
+#   }
+# }
 
-resource "aws_kms_key" "auth0_log_group_key" {
-  description         = "KMS key to encrypt auth0 cloudwatch log group"
-  policy              = data.aws_iam_policy_document.auth0_log_group_key.json
-  enable_key_rotation = true
-}
+# resource "aws_kms_key" "auth0_log_group_key" {
+#   description         = "KMS key to encrypt auth0 cloudwatch log group"
+#   policy              = data.aws_iam_policy_document.auth0_log_group_key.json
+#   enable_key_rotation = true
+# }
 
 resource "aws_cloudwatch_log_group" "auth0_log_group" {
   name              = "/aws/events/LogsFromOperationsEngineeringAuth0"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.auth0_log_group_key.arn
+  # kms_key_id        = aws_kms_key.auth0_log_group_key.arn
 
-  depends_on = [ aws_kms_key.auth0_log_group_key ]
+  # depends_on = [ aws_kms_key.auth0_log_group_key ]
 }
 
 ## IAM
@@ -133,29 +133,29 @@ resource "aws_iam_role" "github_dormant_users_role" {
   assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_policy_document.json
 }
 
-data "aws_iam_policy_document" "auth0_kms_policy_document" {
-  statement {
-    sid    = "AllowKMS"
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:Encrypt",
-      "kms:GenerateDataKey"
-    ]
-    resources = [ aws_kms_key.auth0_log_group_key.arn ]
-  }
-}
+# data "aws_iam_policy_document" "auth0_kms_policy_document" {
+#   statement {
+#     sid    = "AllowKMS"
+#     effect = "Allow"
+#     actions = [
+#       "kms:Decrypt",
+#       "kms:Encrypt",
+#       "kms:GenerateDataKey"
+#     ]
+#     resources = [ aws_kms_key.auth0_log_group_key.arn ]
+#   }
+# }
 
-resource "aws_iam_policy" "auth0_kms_policy" {
-  name        = "Auth0KMSPolicy"
-  description = "Policy for Auth0 KMS key"
-  policy = data.aws_iam_policy_document.auth0_kms_policy_document.json
-}
+# resource "aws_iam_policy" "auth0_kms_policy" {
+#   name        = "Auth0KMSPolicy"
+#   description = "Policy for Auth0 KMS key"
+#   policy = data.aws_iam_policy_document.auth0_kms_policy_document.json
+# }
 
-resource "aws_iam_role_policy_attachment" "auth0_kms_attachment" {
-  role       = aws_iam_role.github_dormant_users_role.name
-  policy_arn = aws_iam_policy.auth0_kms_policy.arn
-}
+# resource "aws_iam_role_policy_attachment" "auth0_kms_attachment" {
+#   role       = aws_iam_role.github_dormant_users_role.name
+#   policy_arn = aws_iam_policy.auth0_kms_policy.arn
+# }
 
 resource "aws_iam_role_policy_attachment" "github_dormant_users_s3_full_access_attachment" {
   role       = aws_iam_role.github_dormant_users_role.name
