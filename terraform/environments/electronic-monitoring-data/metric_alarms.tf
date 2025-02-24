@@ -63,7 +63,7 @@ module "files_land_bucket_alarm" {
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = 1
   threshold           = 24
-  period              = 10
+  period              = 90000
   unit                = "Count"
 
   namespace   = "LandedFiles"
