@@ -102,7 +102,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   parquet_timestamp_in_millisecond = false
   include_op_for_full_load         = true
 
-  max_file_size          = 120000
+  max_file_size          = 240000
   cdc_max_batch_interval = 10
 
   depends_on = [aws_iam_policy.dms-s3-target-policy, aws_iam_policy.dms-operator-s3-policy]
