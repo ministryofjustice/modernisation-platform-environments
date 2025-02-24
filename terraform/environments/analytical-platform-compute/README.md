@@ -31,7 +31,7 @@ Analytical Platform's compute services
 
 ### **Service team contact:**
 
-analytical-platform@digital.justice.gov.uk
+<analytical-platform@digital.justice.gov.uk>
 
 <!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
 

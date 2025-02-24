@@ -159,8 +159,8 @@ data "aws_iam_policy_document" "instance_ssm" {
 data "aws_iam_policy_document" "cert_export" {
 
   statement {
-    sid     = "ExportCert"
-    effect  = "Allow"
+    sid    = "ExportCert"
+    effect = "Allow"
     actions = [
       "acm:DescribeCertificate",
       "acm:ExportCertificate",
