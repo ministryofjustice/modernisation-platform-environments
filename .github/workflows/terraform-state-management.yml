@@ -1,0 +1,151 @@
+name: Terraform State Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: "State operation to perform"
+        required: true
+        type: choice
+        options:
+          - unlock
+          - import
+          - remove
+      application:
+        description: "Application name (e.g., equip)"
+        required: true
+        type: string
+      workspace:
+        description: "Environment workspace"
+        required: true
+        type: choice
+        options:
+          - development
+          - test
+          - preproduction
+          - production
+      lock_id:
+        description: "Lock ID (required for unlock operation)"
+        required: false
+        type: string
+      resource_addresses:
+        description: "Resource addresses (one per line, required for import/remove operations)"
+        required: false
+        type: string
+      resource_ids:
+        description: "Resource IDs for import (one per line, must match resource_addresses order)"
+        required: false
+        type: string
+
+env:
+  ENVIRONMENT_MANAGEMENT: "${{ secrets.modernisation_platform_environments }}"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  request_operation:
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.workspace }}
+    steps:
+      - name: Validate Inputs
+        run: |
+          if [[ "${{ github.event.inputs.operation }}" == "unlock" && -z "${{ github.event.inputs.lock_id }}" ]]; then
+            echo "Error: lock_id is required for unlock operation"
+            exit 1
+          fi
+
+          if [[ "${{ github.event.inputs.operation }}" != "unlock" && -z "${{ github.event.inputs.resource_addresses }}" ]]; then
+            echo "Error: resource_addresses is required for import/remove operations"
+            exit 1
+          fi
+
+          if [[ "${{ github.event.inputs.operation }}" == "import" && -z "${{ github.event.inputs.resource_ids }}" ]]; then
+            echo "Error: resource_ids is required for import operation"
+            exit 1
+          fi
+
+      - name: Show Operation Details
+        run: |
+          echo "Requested operation: ${{ github.event.inputs.operation }}"
+          echo "Application: ${{ github.event.inputs.application }}"
+          echo "Workspace: ${{ github.event.inputs.workspace }}"
+          echo "Target folder: terraform/${{ github.event.inputs.application }}"
+          echo "Target workspace: ${{ github.event.inputs.application }}-${{ github.event.inputs.workspace }}"
+
+          if [[ "${{ github.event.inputs.operation }}" == "unlock" ]]; then
+            echo "Lock ID: ${{ github.event.inputs.lock_id }}"
+          else
+            echo "Resource Addresses:"
+            echo "${{ github.event.inputs.resource_addresses }}"
+            if [[ "${{ github.event.inputs.operation }}" == "import" ]]; then
+              echo "Resource IDs:"
+              echo "${{ github.event.inputs.resource_ids }}"
+            fi
+          fi
+
+  approve_operation:
+    needs: request_operation
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.inputs.workspace }}-approve
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+        with:
+          terraform_version: "~1"
+
+      - name: Get AWS Account Number
+        run: |
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name ${{ github.event.inputs.application }} '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          echo "::add-mask::$ACCOUNT_NUMBER"
+          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@4fc4975a852c8cd99761e2de1f4ba73402e44dd9 # v4.0.3
+        with:
+          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+          role-session-name: githubactionsrolesession
+          aws-region: "eu-west-2"
+
+      - name: Terraform Init
+        working-directory: terraform/${{ github.event.inputs.application }}
+        run: terraform init
+
+      - name: Select Workspace
+        working-directory: terraform/${{ github.event.inputs.application }}
+        run: terraform workspace select ${{ github.event.inputs.application }}-${{ github.event.inputs.workspace }}
+
+      - name: Perform Unlock Operation
+        if: github.event.inputs.operation == 'unlock'
+        working-directory: terraform/${{ github.event.inputs.application }}
+        run: terraform force-unlock -force ${{ github.event.inputs.lock_id }}
+
+      - name: Write Resource Addresses to File
+        if: github.event.inputs.operation != 'unlock'
+        run: |
+          mkdir -p temp
+          echo "${{ github.event.inputs.resource_addresses }}" > temp/resource_addresses.txt
+
+      - name: Write Resource IDs to File
+        if: github.event.inputs.operation == 'import'
+        run: |
+          echo "${{ github.event.inputs.resource_ids }}" > temp/resource_ids.txt
+
+      - name: Execute Import Script
+        if: github.event.inputs.operation == 'import'
+        run: |
+          scripts/terraform-import.sh \
+            terraform/${{ github.event.inputs.application }} \
+            temp/resource_addresses.txt \
+            temp/resource_ids.txt
+
+      - name: Execute Remove Script
+        if: github.event.inputs.operation == 'remove'
+        run: |
+          scripts/terraform-remove.sh \
+            terraform/${{ github.event.inputs.application }} \
+            temp/resource_addresses.txt
