@@ -149,7 +149,7 @@ data "aws_iam_policy_document" "auth0_kms_policy_document" {
 resource "aws_iam_policy" "auth0_kms_policy" {
   name        = "Auth0KMSPolicy"
   description = "Policy for Auth0 KMS key"
-  policy = data.aws_iam_policy_document.auth0_kms_policy_document
+  policy = data.aws_iam_policy_document.auth0_kms_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "auth0_kms_attachment" {
