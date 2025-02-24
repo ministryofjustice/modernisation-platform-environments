@@ -28,8 +28,8 @@ module "eks" {
     }
   }
 
-  authentication_mode                      = "API"
-  enable_cluster_creator_admin_permissions = true
+  authentication_mode = "API"
+  # enable_cluster_creator_admin_permissions = true
 
   iam_role_use_name_prefix = false
 
@@ -37,11 +37,8 @@ module "eks" {
   cloudwatch_log_group_retention_in_days = local.eks_cloudwatch_log_group_retention_in_days
   cluster_enabled_log_types              = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
-  kms_key_aliases = ["eks/${local.eks_cluster_name}"]
-  kms_key_administrators = [
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
-  ]
+  kms_key_aliases        = ["eks/${local.eks_cluster_name}"]
+  kms_key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"]
 
   cluster_encryption_config = {
     resources = ["secrets"]
