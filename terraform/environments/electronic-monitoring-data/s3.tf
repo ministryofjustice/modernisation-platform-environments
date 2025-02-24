@@ -1167,6 +1167,36 @@ resource "aws_s3_bucket_policy" "data_store" {
 }
 
 
+data "aws_iam_policy_document" "cadt_runner" {
+  statement {
+    sid    = "AllowS3BucketAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [
+      aws_s3_bucket.data_store.arn,
+      "${aws_s3_bucket.data_store.arn}/*"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow_prod_cadet_emds_deploy_historic_transforms"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cadt_runner" {
+  bucket = aws_s3_bucket.data_store.id
+  policy = data.aws_iam_policy_document.cadt_runner.json
+}
 
 module "s3-create-a-derived-table-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
@@ -1177,7 +1207,6 @@ module "s3-create-a-derived-table-bucket" {
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
   acl                = "private"
-
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
