@@ -29,7 +29,6 @@ module "eks" {
   }
 
   authentication_mode = "API"
-  # enable_cluster_creator_admin_permissions = true
 
   iam_role_use_name_prefix = false
 
