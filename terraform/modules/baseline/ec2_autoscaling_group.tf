@@ -15,7 +15,8 @@ module "ec2_autoscaling_group" {
 
   for_each = var.ec2_autoscaling_groups
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=0111618bb1c7c52f59f11790b2f4b68a26b51cb3" # v2.6.1
+  # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=0111618bb1c7c52f59f11790b2f4b68a26b51cb3" # v2.6.1
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=fa80b9a735ef9e9595f9e16fdc3426eda2492323" # ASG test
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -37,18 +38,19 @@ module "ec2_autoscaling_group" {
     ]
   })
 
-  availability_zone             = each.value.config.availability_zone
-  subnet_ids                    = each.value.config.availability_zone == null ? var.environment.subnets[each.value.config.subnet_name].ids : [var.environment.subnet[each.value.config.subnet_name][each.value.config.availability_zone].id]
-  ebs_volumes_copy_all_from_ami = each.value.config.ebs_volumes_copy_all_from_ami
-  ebs_kms_key_id                = coalesce(each.value.config.ebs_kms_key_id, var.environment.kms_keys["ebs"].arn)
-  ebs_volume_config             = each.value.ebs_volume_config
-  ebs_volume_tags               = each.value.ebs_volume_tags
-  ebs_volumes                   = each.value.ebs_volumes
-  user_data_raw                 = each.value.config.user_data_raw
-  user_data_cloud_init          = each.value.user_data_cloud_init
-  ssm_parameters_prefix         = each.value.config.ssm_parameters_prefix
-  secretsmanager_secrets_prefix = each.value.config.secretsmanager_secrets_prefix
-  iam_resource_names_prefix     = each.value.config.iam_resource_names_prefix
+  availability_zone               = each.value.config.availability_zone
+  subnet_ids                      = each.value.config.availability_zone == null ? var.environment.subnets[each.value.config.subnet_name].ids : [var.environment.subnet[each.value.config.subnet_name][each.value.config.availability_zone].id]
+  ebs_volumes_copy_all_from_ami   = each.value.config.ebs_volumes_copy_all_from_ami
+  ebs_kms_key_id                  = coalesce(each.value.config.ebs_kms_key_id, var.environment.kms_keys["ebs"].arn)
+  ebs_volume_config               = each.value.ebs_volume_config
+  ebs_volume_tags                 = each.value.ebs_volume_tags
+  ebs_volumes                     = each.value.ebs_volumes
+  user_data_raw                   = each.value.config.user_data_raw
+  user_data_cloud_init            = each.value.user_data_cloud_init
+  ssm_parameters_prefix           = each.value.config.ssm_parameters_prefix
+  skip_iam_role_policy_attachment = true
+  secretsmanager_secrets_prefix   = each.value.config.secretsmanager_secrets_prefix
+  iam_resource_names_prefix       = each.value.config.iam_resource_names_prefix
 
   # add KMS Key Ids if they are referenced by name
   ssm_parameters = each.value.ssm_parameters == null ? null : {
