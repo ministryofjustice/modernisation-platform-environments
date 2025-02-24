@@ -69,7 +69,7 @@
         "dps-incentives",
         "dps-non-associations",
         "dps-health-and-medi",
-        "dps-match-jobs-appl",
+        "dps-mj-and-ma",
         "dps-testing"
       ],
       "alarms": {
@@ -220,7 +220,7 @@
         "dps-incentives",
         "dps-non-associations",
         "dps-health-and-medi",
-        "dps-match-jobs-appl",
+        "dps-mj-and-ma",
         "dps-locations",
         "dps-calculate-release-dates"
       ],
@@ -374,7 +374,7 @@
         "dps-incentives",
         "dps-non-associations",
         "dps-health-and-medi",
-        "dps-match-jobs-appl",
+        "dps-mj-and-ma",
         "dps-locations",
         "dps-calculate-release-dates"
       ],
@@ -544,7 +544,7 @@
         "dps-incentives",
         "dps-non-associations",
         "dps-health-and-medi",
-        "dps-match-jobs-appl",
+        "dps-mj-and-ma",
         "dps-locations",
         "dps-calculate-release-dates"
       ],
