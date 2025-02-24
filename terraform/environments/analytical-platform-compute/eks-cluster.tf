@@ -38,6 +38,10 @@ module "eks" {
   cluster_enabled_log_types              = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   kms_key_aliases = ["eks/${local.eks_cluster_name}"]
+  kms_key_administrators = [
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess",
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
+  ]
 
   cluster_encryption_config = {
     resources = ["secrets"]
