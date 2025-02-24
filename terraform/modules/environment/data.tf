@@ -104,5 +104,5 @@ data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
 
 # Data source to get the ARN of an existing SNS topic
 data "aws_sns_topic" "backup_failure_topic" {
-  name  = "backup_failure_topic"
+  name = "backup_failure_topic"
 }
