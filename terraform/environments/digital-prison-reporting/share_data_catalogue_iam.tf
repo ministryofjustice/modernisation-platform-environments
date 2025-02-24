@@ -9,15 +9,10 @@ data "aws_iam_policy_document" "datahub_read_cadet_bucket" {
       "s3:Describe*"
     ]
     resources = [
+      "${module.s3_structured_historical_bucket.bucket_arn}/data/prod/run_artefacts/*",
+      "${module.s3_structured_historical_bucket.bucket_arn}/data/preprod/run_artefacts/*",
       module.s3_structured_historical_bucket.bucket_arn
     ]
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-      values = [
-        "data/${local.environment}/run_artefacts/*"
-      ]
-    }
   }
 }
 

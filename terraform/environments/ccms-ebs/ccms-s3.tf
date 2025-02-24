@@ -184,6 +184,20 @@ data "aws_iam_policy_document" "logging_s3_policy" {
     actions   = ["s3:PutObject"]
     resources = ["${module.s3-bucket-logging.bucket.arn}/*"]
   }
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+    actions   = ["s3:PutObject"]
+    resources = ["arn:aws:s3:::ccms-ebs-${local.environment}-logging/*"]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = ["${data.aws_caller_identity.current.account_id}"]
+    }
+  }
 }
 
 # S3 Bucket - R-sync

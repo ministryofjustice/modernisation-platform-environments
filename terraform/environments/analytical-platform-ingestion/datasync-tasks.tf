@@ -1,4 +1,7 @@
 resource "aws_datasync_task" "opg" {
+
+  count = local.environment == "production" ? 1 : 0
+
   name                     = "opg"
   source_location_arn      = aws_datasync_location_smb.opg.arn
   destination_location_arn = aws_datasync_location_s3.opg.arn

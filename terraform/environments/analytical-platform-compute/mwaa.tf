@@ -22,6 +22,14 @@ resource "aws_mwaa_environment" "main" {
   webserver_access_mode = "PRIVATE_ONLY"
 
   airflow_configuration_options = {
+    "secrets.backend"                    = "airflow.providers.amazon.aws.secrets.secrets_manager.SecretsManagerBackend"
+    "secrets.backend_kwargs"             = "{\"connections_prefix\": \"airflow/connections\", \"variables_prefix\": \"airflow/variables\"}"
+    "smtp.smtp_host"                     = "email-smtp.${data.aws_region.current.name}.amazonaws.com"
+    "smtp.smtp_port"                     = 587
+    "smtp.smtp_starttls"                 = 1
+    "smtp.smtp_user"                     = module.mwaa_ses_iam_user.iam_access_key_id
+    "smtp.smtp_password"                 = module.mwaa_ses_iam_user.iam_access_key_ses_smtp_password_v4
+    "smtp.smtp_mail_from"                = "noreply@${local.environment_configuration.route53_zone}"
     "webserver.warn_deployment_exposure" = 0
     "webserver.base_url"                 = "airflow.${local.environment_configuration.route53_zone}"
     "webserver.instance_name"            = local.environment_configuration.airflow_webserver_instance_name

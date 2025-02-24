@@ -112,7 +112,8 @@ module "scan_lambda" {
         "s3:CopyObject",
         "s3:PutObject",
         "s3:DeleteObject",
-        "s3:PutObjectTagging"
+        "s3:PutObjectTagging",
+        "s3:GetObjectTagging"
       ]
       resources = [
         "arn:aws:s3:::${module.definitions_bucket.s3_bucket_id}/*",

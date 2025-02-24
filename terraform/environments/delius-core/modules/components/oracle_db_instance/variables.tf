@@ -182,3 +182,4 @@ variable "inline_ebs" {
   type        = bool
   description = "Whether to create EBS volumes inline with the instance"
 }
+

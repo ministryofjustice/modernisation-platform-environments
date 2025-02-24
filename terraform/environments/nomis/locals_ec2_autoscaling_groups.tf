@@ -192,6 +192,29 @@ locals {
         vpc_security_group_ids       = ["private-web"]
         metadata_options_http_tokens = "required"
       }
+      lb_target_groups = {
+        http-7777 = {
+          deregistration_delay = 30
+          port                 = 7777
+          protocol             = "HTTP"
+
+          health_check = {
+            enabled             = true
+            healthy_threshold   = 3
+            interval            = 10
+            matcher             = "200-399"
+            path                = "/"
+            port                = 7777
+            protocol            = "HTTP"
+            timeout             = 5
+            unhealthy_threshold = 2
+          }
+          stickiness = {
+            enabled = true
+            type    = "lb_cookie"
+          }
+        }
+      }
       user_data_cloud_init = {
         args = {
           branch       = "main"
@@ -250,6 +273,29 @@ locals {
         key_name                     = "ec2-user"
         vpc_security_group_ids       = ["private-web"]
         metadata_options_http_tokens = "required"
+      }
+      lb_target_groups = {
+        http-7777 = {
+          deregistration_delay = 30
+          port                 = 7777
+          protocol             = "HTTP"
+
+          health_check = {
+            enabled             = true
+            healthy_threshold   = 3
+            interval            = 10
+            matcher             = "200-399"
+            path                = "/"
+            port                = 7777
+            protocol            = "HTTP"
+            timeout             = 5
+            unhealthy_threshold = 2
+          }
+          stickiness = {
+            enabled = true
+            type    = "lb_cookie"
+          }
+        }
       }
       user_data_cloud_init = {
         args = {

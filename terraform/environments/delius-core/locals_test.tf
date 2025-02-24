@@ -73,6 +73,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+    database_name = "change_me"
+    database_port = local.db_port
   }
 
   delius_microservices_configs_test = {
