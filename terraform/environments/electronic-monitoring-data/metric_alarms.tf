@@ -30,8 +30,8 @@ module "all_lambdas_errors_alarm" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
   threshold           = 0
+  unit                = "Count"
   period              = 60
-  unit                = "Seconds"
 
   namespace   = "AWS/Lambda"
   metric_name = "Errors"
@@ -64,7 +64,7 @@ module "files_land_bucket_alarm" {
   evaluation_periods  = 1
   threshold           = 24
   period              = 10
-  unit                = "Seconds"
+  unit                = "Count"
 
   namespace   = "Custom"
   metric_name = each.value.name
