@@ -6,9 +6,11 @@
 ENVIRONMENT=$(basename ${PWD})
 STAGE="development"
 ROLE="modernisation-platform-developer"
+APPLY="false"
 
-while getopts s:r: option; do
+while getopts a:s:r: option; do
   case "${option}" in
+    a) APPLY=${OPTARG};;
     s) STAGE="${OPTARG}";;
     r) ROLE="${OPTARG}";;
   esac
@@ -19,11 +21,14 @@ done
 echo "Account: ${ENVIRONMENT}"
 echo "Stage: ${STAGE}"
 echo "Role: ${ROLE}"
+echo "Apply: ${APPLY}"
 
-modernisationPlatformAccountId=$(aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- aws ssm get-parameters --names "modernisation_platform_account_id" --with-decryption --query "Parameters[*].{Value:Value}" --output text)
-
-aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${modernisationPlatformAccountId}:role/modernisation-account-terraform-state-member-access\"}
+aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform init
 
 aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform workspace select ${ENVIRONMENT}-${STAGE}
 
 aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform plan
+
+if [[ "${APPLY}" == "true" ]]; then
+  aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform apply
+fi
