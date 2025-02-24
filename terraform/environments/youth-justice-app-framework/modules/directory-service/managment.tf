@@ -233,9 +233,9 @@ Register-ScheduledJob -Name  Initialise-Server -Trigger $trigger -ScriptBlock {
 
 
   #Download and install pgAdmin 4 v7.8
-  $Download = join-path $Download_Folder pgadmin4-7.8-x64.exe
+  $Download = join-path $Download_Folder pgadmin4-9.0-x64.exe
 
-  Invoke-WebRequest 'https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v7.8/windows/pgadmin4-7.8-x64.exe'  -OutFile $Download
+  Invoke-WebRequest 'https://ftp.postgresql.org/pub/pgadmin/pgadmin4/v9.0/windows/pgadmin4-9.0-x64.exe'  -OutFile $Download
   Start-Process "$Download" -Wait -ArgumentList "/VERYSILENT /ALLUSERS /NORESTART"
   Write-Output "$(Get-Date) pgAdmin installed" | Out-File  $logFile -Append
 
