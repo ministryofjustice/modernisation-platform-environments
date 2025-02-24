@@ -609,6 +609,11 @@ data "archive_file" "zip_the_ppud_elb_report_prod" {
   output_path = "${path.module}/lambda_scripts/ppud_elb_report_prod.zip"
 }
 
+resource "aws_cloudwatch_log_group" "lambda_ppud_elb_report_prod_log_group" {
+  name              = "/aws/lambda/ppud_elb_report"
+  retention_in_days = 30
+}
+
 ###################################################
 # Lambda Function to graph WAM ELB Requests - PROD
 ###################################################
@@ -659,6 +664,11 @@ data "archive_file" "zip_the_wam_elb_report_prod" {
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/wam_elb_report_prod.zip"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_wam_elb_report_prod_log_group" {
+  name              = "/aws/lambda/wam_elb_report"
+  retention_in_days = 30
 }
 
 ####################################################
