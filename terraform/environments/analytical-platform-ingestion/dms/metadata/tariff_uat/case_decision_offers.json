@@ -1,0 +1,121 @@
+{
+    "$schema": "https://moj-analytical-services.github.io/metadata_schema/table/v1.4.0.json",
+    "name": "case_decision_offers",
+    "description": "",
+    "data_format": "parquet",
+    "columns": [
+        {
+            "name": "op",
+            "type": "character",
+            "description": "Type of change, for rows added by ongoing replication.",
+            "nullable": true,
+            "enum": [
+                "I",
+                "U",
+                "D"
+            ]
+        },
+        {
+            "name": "ar_ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ar_ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ar_ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "cde_sequence",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "cde_sequence",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "cde_sequence",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "created_by",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "created_date",
+            "type": "date",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "decision_code",
+            "type": "varchar2",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_no",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "ref_year",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "total_injury",
+            "type": "number",
+            "description": "",
+            "nullable": false
+        },
+        {
+            "name": "total_injury",
+            "type": "number",
+            "description": "",
+            "nullable": true
+        }
+    ],
+    "location": "CASE_DECISION_OFFERS/",
+    "primary_key": [
+        "ar_ref_no", "cde_sequence", "ref_year"
+    ],
+    "partitions": null
+}
+
