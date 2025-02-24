@@ -1,8 +1,6 @@
 name: Terraform State Management
 
 on:
-  push:
-    branches: [ "feature/9150-state-manipulation" ]
   workflow_dispatch:
     inputs:
       operation:
