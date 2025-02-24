@@ -13,10 +13,12 @@ on:
           - unlock
           - import
           - remove
+        default: unlock
       application:
         description: "Application name (e.g., equip)"
         required: true
         type: string
+        default: example
       workspace:
         description: "Environment workspace"
         required: true
@@ -26,6 +28,7 @@ on:
           - test
           - preproduction
           - production
+        default: development
       lock_id:
         description: "Lock ID (required for unlock operation)"
         required: false
