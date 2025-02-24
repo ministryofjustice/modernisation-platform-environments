@@ -102,7 +102,7 @@ jobs:
 
       - name: Get AWS Account Number
         run: |
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${{ github.event.inputs.application }}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${{ github.event.inputs.application }} - ${{ github.event.inputs.workspace }}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           echo "::add-mask::$ACCOUNT_NUMBER"
           echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
