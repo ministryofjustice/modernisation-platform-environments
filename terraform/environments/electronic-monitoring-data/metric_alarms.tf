@@ -62,9 +62,9 @@ module "files_land_bucket_alarm" {
   alarm_description   = "Detect when not enough files land in bucket within 24 hours"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = 1
-  threshold           = 51
+  threshold           = 24
   period              = 90000
-  unit                = "Count"
+  unit                = "Sum"
 
   namespace   = "Custom"
   metric_name = each.value.name
