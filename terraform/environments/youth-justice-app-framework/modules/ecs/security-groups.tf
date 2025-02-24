@@ -85,3 +85,34 @@ resource "aws_security_group_rule" "ecs_to_alb_rule" {
   source_security_group_id = aws_security_group.common_ecs_service_internal.id
   description              = "ALB to ECS service communication"
 }
+
+resource "aws_security_group_rule" "ecs_gateway_to_alb_rule" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = var.internal_alb_security_group_id
+  source_security_group_id = aws_security_group.common_ecs_service_external.id
+  description              = "ALB to ECS gateway service communication"
+}
+
+#allow each ecs sg to talk to eachother
+resource "aws_security_group_rule" "ecsext_to_ecsint_rule" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.common_ecs_service_internal.id
+  source_security_group_id = aws_security_group.common_ecs_service_external.id
+  description              = "ECSext to ECSint communication"
+}
+
+resource "aws_security_group_rule" "ecsint_to_ecsext_rule" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.common_ecs_service_external.id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "ECSint to ECSext communication"
+}
