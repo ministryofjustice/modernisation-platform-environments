@@ -191,7 +191,7 @@ resource "aws_instance" "database" {
       user_data_base64
     ]
   }
-  
+
 }
 
 resource "aws_key_pair" "cwa" {
