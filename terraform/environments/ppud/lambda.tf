@@ -610,6 +610,7 @@ data "archive_file" "zip_the_ppud_elb_report_prod" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda_ppud_elb_report_prod_log_group" {
+  count             = local.is-production == true ? 1 : 0
   name              = "/aws/lambda/ppud_elb_report"
   retention_in_days = 30
 }
@@ -667,6 +668,7 @@ data "archive_file" "zip_the_wam_elb_report_prod" {
 }
 
 resource "aws_cloudwatch_log_group" "lambda_wam_elb_report_prod_log_group" {
+  count             = local.is-production == true ? 1 : 0
   name              = "/aws/lambda/wam_elb_report"
   retention_in_days = 30
 }
