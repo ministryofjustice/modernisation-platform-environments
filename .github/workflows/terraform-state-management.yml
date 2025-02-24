@@ -1,6 +1,7 @@
 name: Terraform State Management
 
 on:
+  pull_request:
   workflow_dispatch:
     inputs:
       operation:
