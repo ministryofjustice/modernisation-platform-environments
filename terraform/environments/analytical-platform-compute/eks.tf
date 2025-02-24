@@ -1,3 +1,3 @@
 module "eks" {
-    source  = "./cluster/eks-cluster"
+    source  = "./cluster"
 }
