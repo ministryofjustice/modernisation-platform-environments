@@ -66,7 +66,7 @@ module "files_land_bucket_alarm" {
   period              = 10
   unit                = "Count"
 
-  namespace   = "Custom"
+  namespace   = "FilesLanded"
   metric_name = each.value.name
   statistic   = "Sum"
 
