@@ -37,6 +37,7 @@ module "ec2_instance" {
   user_data_raw                 = each.value.config.user_data_raw
   user_data_cloud_init          = each.value.user_data_cloud_init
   ssm_parameters_prefix         = each.value.config.ssm_parameters_prefix
+  skip_iam_role_policy_attachment = true
   secretsmanager_secrets_prefix = each.value.config.secretsmanager_secrets_prefix
   iam_resource_names_prefix     = each.value.config.iam_resource_names_prefix
   route53_records               = each.value.route53_records
