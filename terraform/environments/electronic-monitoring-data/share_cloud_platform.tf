@@ -1,10 +1,9 @@
 locals {
   # Setting the IAM name that our Cloud Platform API will use to connect to this role
 
-  iam-dev     = local.environment_shorthand == "dev" ? var.cloud-platform-iam-dev : ""
-  iam-test    = local.environment_shorthand == "test" ? var.cloud-platform-iam-preprod : ""
-  iam-preprod = local.environment_shorthand == "preprod" ? var.cloud-platform-iam-preprod : ""
-  iam-prod    = local.environment_shorthand == "prod" ? var.cloud-platform-iam-prod : ""
+  iam-dev = local.environment_shorthand == "dev" ? [
+    var.cloud-platform-iam-dev
+  ] : null
 
   tables_to_share = [
     "contact_history",
@@ -20,7 +19,32 @@ locals {
   table_filters = {
     for table in local.tables_to_share : table => "specials_flag=0"
   }
+  iam-test = local.environment_shorthand == "test" ? [
+    var.cloud-platform-iam-dev,
+    var.cloud-platform-iam-preprod
+  ] : null
+
+  iam-preprod = local.environment_shorthand == "preprod" ? [
+    var.cloud-platform-iam-preprod
+  ] : null
+
+  iam-prod = local.environment_shorthand == "prod" ? [
+    var.cloud-platform-iam-prod
+  ] : null
+
   resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
+
+  # Setting glue ARNs to limit access to production API mart
+  glue_arns = local.is-production ? [
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
+    ] : [
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/historic_api_mart",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
+  ]
 }
 
 variable "cloud-platform-iam-dev" {
@@ -107,6 +131,18 @@ data "aws_iam_policy_document" "standard_athena_access" {
   }
   statement {
     actions = [
+      "athena:CreatePreparedStatement",
+      "athena:UpdatePreparedStatement",
+      "athena:GetPreparedStatement",
+      "athena:ListPreparedStatements",
+      "athena:DeletePreparedStatement"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+    ]
+  }
+  statement {
+    actions = [
       "athena:ListWorkGroups"
     ]
     resources = [
@@ -145,11 +181,7 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "glue:GetTables",
       "glue:GetTable"
     ]
-    resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
-    ]
+    resources = local.glue_arns
   }
 }
 
