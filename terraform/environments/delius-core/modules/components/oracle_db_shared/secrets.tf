@@ -46,3 +46,13 @@ moved {
   from = aws_secretsmanager_secret.delius_core_application_passwords
   to   = aws_secretsmanager_secret.database_application_passwords
 }
+
+# Probation Integration Secrets
+resource "aws_secretsmanager_secret" "probation_integration_passwords" {
+  #checkov:skip=CKV2_AWS_57
+  count       = "${var.account_info.application_name}-${var.env_name}" == "delius-core-preprod" ? 1 : 0
+  name        = "${var.account_info.application_name}-${var.env_name}-probation-integration"
+  description = "Probation Integration Secrets"
+  kms_key_id  = var.account_config.kms_keys.general_shared
+  tags        = var.tags
+}
