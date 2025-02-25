@@ -1,13 +1,3 @@
-import {
-  to = module.ds.module.key_pair.aws_key_pair.this[0]
-  id = "ad_management_server"
-}
-
-import {
-  to = module.ds.aws_ssm_parameter.w2022_ami
-  id = "/service/ami-windows-latest/CIS_Windows_Server_2022_Benchmark_Level_1"
-}
-
 module "ds" {
   source = "./modules/directory-service"
 
