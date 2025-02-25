@@ -29,15 +29,16 @@ resource "aws_secretsmanager_secret_version" "mad_admin_secret_version" {
 ## MAD deployment
 
 resource "aws_directory_service_directory" "ds_managed_ad" {
-  name       = var.ds_managed_ad_directory_name
-  short_name = var.ds_managed_ad_short_name
-  password   = jsondecode(aws_secretsmanager_secret_version.mad_admin_secret_version.secret_string)["password"]
-  edition    = var.ds_managed_ad_edition
-  type       = local.ds_managed_ad_type
+  name                                 = var.ds_managed_ad_directory_name
+  short_name                           = var.ds_managed_ad_short_name
+  password                             = jsondecode(aws_secretsmanager_secret_version.mad_admin_secret_version.secret_string)["password"]
+  edition                              = var.ds_managed_ad_edition
+  type                                 = local.ds_managed_ad_type
+  desired_number_of_domain_controllers = var.desired_number_of_domain_controllers
 
   vpc_settings {
     vpc_id     = var.ds_managed_ad_vpc_id
-    subnet_ids = var.ds_managed_ad_subnet_ids
+    subnet_ids = [var.private_subnet_ids[0], var.private_subnet_ids[1]]
   }
  }
 

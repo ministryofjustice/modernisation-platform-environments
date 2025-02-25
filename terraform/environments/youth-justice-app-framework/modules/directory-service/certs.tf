@@ -28,7 +28,7 @@ resource "aws_cloudformation_stack" "pki_quickstart" {
   parameters = {
     "VPCCIDR"                = var.vpc_cidr_block
     "VPCID"                  = var.ds_managed_ad_vpc_id
-    "CaServerSubnet"         = var.ds_managed_ad_subnet_ids[0]
+    "CaServerSubnet"         = var.private_subnet_ids[0]
     "DomainMembersSG"        = aws_security_group.mgmt_instance_sg.id
     "KeyPairName"            = module.key_pair.key_pair_name
     "DirectoryType"          = "AWSManaged"
