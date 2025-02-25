@@ -19,6 +19,18 @@ locals {
   ] : null
 
   resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
+
+# Setting glue ARNs to limit access to production API mart
+  glue_arns = local.is-production ? [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
+    ] : [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/historic_api_mart",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
+    ]
 }
 
 variable "cloud-platform-iam-dev" {
@@ -168,11 +180,7 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "glue:GetTables",
       "glue:GetTable"
     ]
-    resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
-    ]
+    resources = local.glue_arns
   }
 }
 
