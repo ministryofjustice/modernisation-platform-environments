@@ -9,6 +9,8 @@ Terraform module which manages AWS Microsoft Managed AD resources.
 
 ## Variables description
 
+- **environment_name (string)**: A short name for the enviroment.
+
 - **ds_managed_ad_directory_name (string)**: Fully Qualified Domain Name (FQDN) for the Managed AD. i.e. "corp.local"
 
 - **ds_managed_ad_short_name (string)**: Active Directory Forest NetBIOS name. i.e. "corp.local"
@@ -17,19 +19,54 @@ Terraform module which manages AWS Microsoft Managed AD resources.
 
 - **ds_managed_ad_vpc_id (string)**: VPC ID where Managed AD should be deployed
 
-- **ds_managed_ad_subnet_ids (list(string))**: Two private subnet IDs where Managed AD Domain Controllers should be set
+- **private_subnet_ids (list(string))**: This of private subnet IDs (at least 2) across which instance will be distributed. The Certificate Authorites will go in the first subnet. The AD Domain Controllers will be distributed oher the first 2 subnets. The management instances will be distributed over all subnets.
+
+**ds_managed_ad_secret_key (string)**: ARN or Id of the AWS KMS key to be used to encrypt the secret values in the versions stored in this secret. Default "aws/secretsmanager".
+
+**management_keypair_name (string)**: The name of the keypair to use for the management server.
+
+**vpc_cidr_block (string)**: The CIDR block for the VPC.
+
+**project_name (string)**: project name within aws
+
+**tags (map(string))**: User defined extra tags to be added to all resources created in the module.
+
+**ad_management_instance_count (number)**: The number of Active Directory Management servers to be created. Default is 2.
+
+**desired_number_of_domain_controllers (number)**: The number of Doamin Coltrollers to create. Default is 2.
+
+**rds_cluster_security_group_id (string)**: The Id of the Security Group that enables access to the RDS PostgreSQL Cluster.
+
 
 ## Usage
 
 ```hcl
 module "managed-ad" {
-  source  = "aws-samples/windows-workloads-on-aws/aws//modules/managed-ad"
-
+  source  = "./modules/directory-service"
+  
+ 
   ds_managed_ad_directory_name = "corp.local"
   ds_managed_ad_short_name     = "corp"
   ds_managed_ad_edition        = "Standard"
   ds_managed_ad_vpc_id         = "vpc-123456789"
   ds_managed_ad_subnet_ids     = ["subnet-12345678", "subnet-87654321"]
+
+  project_name = "yjaf"
+
+  environment_name             = "yjaf-development"
+
+  ds_managed_ad_directory_name = "i2n.com"
+  ds_managed_ad_short_name     = "i2n"
+  management_keypair_name      = "ad_management_server"
+  ds_managed_ad_secret_key     = module.kms.key_arn
+
+  ds_managed_ad_vpc_id     = data.aws_vpc.shared.id
+  private_subnet_ids       = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
+  vpc_cidr_block           = data.aws_vpc.shared.cidr_block
+  
+  rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
+
+  depends_on = [module.aurora]
 }
 ```
 
