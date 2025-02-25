@@ -111,7 +111,7 @@ module "share_data_marts" {
   database_name           = "historic_api_mart"
   data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
   data_bucket_lf_resource = module.s3-athena-bucket.bucket.arn
-  role_arn                = module.cmt_front_end_assumable_role.iam_role_name
+  role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
 }
 
 
