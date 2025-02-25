@@ -18,20 +18,6 @@ locals {
       /* Route53 */
       route53_zone = "compute.development.analytical-platform.service.justice.gov.uk"
 
-      /* EKS */
-      eks_sso_access_role = "modernisation-platform-sandbox"
-      eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce9"
-      eks_cluster_addon_versions = {
-        coredns                = "v1.11.4-eksbuild.2"
-        kube_proxy             = "v1.32.0-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
-        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.5"
-      }
-
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
@@ -67,20 +53,6 @@ locals {
       /* Route53 */
       route53_zone = "compute.test.analytical-platform.service.justice.gov.uk"
 
-      /* EKS */
-      eks_sso_access_role = "modernisation-platform-developer"
-      eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce9"
-      eks_cluster_addon_versions = {
-        coredns                = "v1.11.4-eksbuild.2"
-        kube_proxy             = "v1.32.0-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
-        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.5"
-      }
-
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
@@ -115,20 +87,6 @@ locals {
 
       /* Route53 */
       route53_zone = "compute.analytical-platform.service.justice.gov.uk"
-
-      /* EKS */
-      eks_sso_access_role = "modernisation-platform-developer"
-      eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce9"
-      eks_cluster_addon_versions = {
-        coredns                = "v1.11.4-eksbuild.2"
-        kube_proxy             = "v1.32.0-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
-        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.5"
-      }
 
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-prod-execution-role"
