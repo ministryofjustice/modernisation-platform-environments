@@ -118,7 +118,7 @@ module "share_data_marts" {
   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
 }
 
-module "share_data_marts" {
+module "share_specials_data_marts" {
   source = "./modules/lakeformation_w_data_filter"
 
   count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
