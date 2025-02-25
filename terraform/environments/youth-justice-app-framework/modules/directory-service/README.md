@@ -92,6 +92,8 @@ Open `DNS` management comsole and remove DNS entries from the Forward Lookup Zon
 3. Removed `Public Key Services` entries for the CAs.
 Open `Active Directory Sites and Services` and Show the Servics node. At Services\Public Key Services\AIA, Delete `RootCA` and `SubordinateCA`. At Services\Public Key Services\CDP, Delete container `SubordinateCA` with all its contents. 
 
+## Troublshooting Domain Join
+If loging does worm using the domain `admin` user as an alternative the local `Administrator` user can be used. THe password for the local `Administrator` use is in Secret `ad_instance_password_secret_1`.
 
 # Cutover and Setup Guidance
 ## Introduciton
@@ -106,7 +108,7 @@ When each instance is created the User-Data script performs some language setup 
 - Notepad++
 - pgAdmin
 
-###Location for User-DAta scripts and log files:
+###Location for User-Data scripts and log files:
 
 `C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch<nnnnnnnnn>\`
 This will contin and copy of the User-DAte script as well as err and output log files from running the script.
