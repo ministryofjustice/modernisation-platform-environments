@@ -6,7 +6,6 @@ locals {
   iam-preprod = local.environment_shorthand == "preprod" ? var.cloud-platform-iam-preprod : ""
   iam-prod    = local.environment_shorthand == "prod" ? var.cloud-platform-iam-prod : ""
 
-  resolved-cloud-platform-iam-role = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
   tables_to_share = [
     "contact_history",
     "equipment_details",
@@ -21,6 +20,7 @@ locals {
   table_filters = {
     for table in local.tables_to_share : table => "specials_flag=0"
   }
+  resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
 }
 
 variable "cloud-platform-iam-dev" {
@@ -48,7 +48,7 @@ module "cmt_front_end_assumable_role" {
   version = "5.48.0"
 
   trusted_role_arns = flatten([
-    local.resolved-cloud-platform-iam-role,
+    local.resolved-cloud-platform-iam-roles,
     data.aws_iam_roles.data_engineering_roles.arns
   ])
 
@@ -67,7 +67,7 @@ module "specials_cmt_front_end_assumable_role" {
   version = "5.48.0"
 
   trusted_role_arns = flatten([
-    local.resolved-cloud-platform-iam-role,
+    local.resolved-cloud-platform-iam-roles,
     data.aws_iam_roles.data_engineering_roles.arns
   ])
 
@@ -80,12 +80,14 @@ module "specials_cmt_front_end_assumable_role" {
 }
 
 module "share_data_marts" {
-  count = local.is-development ? 0 : local.is-preproduction 0 : 1
-  table_filters = local.table_filters
-  database_name = "historic_api_mart"
-  data_engineer_role_arn = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  source = "./module/lakeformation_w_data_filters"
+
+  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters           = local.table_filters
+  database_name           = "historic_api_mart"
+  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
   data_bucket_lf_resource = module.s3-athena-bucket.bucket.arn
-  role_arn = module.cmt_front_end_assumable_role.iam_role_name
+  role_arn                = module.cmt_front_end_assumable_role.iam_role_name
 }
 
 
