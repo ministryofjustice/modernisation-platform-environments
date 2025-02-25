@@ -20,7 +20,7 @@ resource "aws_security_group" "example_sg" {
 resource "aws_instance" "example_instance" {
   ami           = "ami-00710ab5544b60cf7" 
   instance_type = "t3.micro"
-  subnet_id     = data.aws_subnets.shared_private.ids[0]
+  subnet_id     = data.aws_subnets.shared-private.ids[0]
   vpc_security_group_ids = [aws_security_group.example_sg.id]
 
   tags = {
