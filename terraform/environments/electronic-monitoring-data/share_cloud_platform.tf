@@ -1,12 +1,24 @@
 locals {
   # Setting the IAM name that our Cloud Platform API will use to connect to this role
 
-  iam-dev     = local.environment_shorthand == "dev" ? var.cloud-platform-iam-dev : ""
-  iam-test    = local.environment_shorthand == "test" ? var.cloud-platform-iam-preprod : ""
-  iam-preprod = local.environment_shorthand == "preprod" ? var.cloud-platform-iam-preprod : ""
-  iam-prod    = local.environment_shorthand == "prod" ? var.cloud-platform-iam-prod : ""
+  iam-dev     = local.environment_shorthand == "dev" ? [
+    var.cloud-platform-iam-dev
+  ] : ""
 
-  resolved-cloud-platform-iam-role = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
+  iam-test    = local.environment_shorthand == "test" ? [
+    var.cloud-platform-iam-dev,
+    var.cloud-platform-iam-preprod
+  ] : ""
+
+  iam-preprod = local.environment_shorthand == "preprod" ? [
+    var.cloud-platform-iam-preprod
+  ] : ""
+
+  iam-prod    = local.environment_shorthand == "prod" ? [
+    var.cloud-platform-iam-prod
+  ] : ""
+
+  resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
 }
 
 variable "cloud-platform-iam-dev" {
@@ -34,7 +46,7 @@ module "cmt_front_end_assumable_role" {
   version = "5.48.0"
 
   trusted_role_arns = flatten([
-    local.resolved-cloud-platform-iam-role,
+    local.resolved-cloud-platform-iam-roles,
     data.aws_iam_roles.data_engineering_roles.arns
   ])
 
@@ -53,7 +65,7 @@ module "specials_cmt_front_end_assumable_role" {
   version = "5.48.0"
 
   trusted_role_arns = flatten([
-    local.resolved-cloud-platform-iam-role,
+    local.resolved-cloud-platform-iam-roles,
     data.aws_iam_roles.data_engineering_roles.arns
   ])
 
@@ -99,6 +111,18 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "athena:GetWorkGroup",
       "athena:StartQueryExecution",
       "athena:StopQueryExecution"
+    ]
+    resources = [
+      "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
+    ]
+  }
+  statement {
+    actions = [
+      "athena:CreatePreparedStatement",
+      "athena:UpdatePreparedStatement",
+      "athena:GetPreparedStatement",
+      "athena:ListPreparedStatements",
+      "athena:DeletePreparedStatement"
     ]
     resources = [
       "arn:aws:athena:${data.aws_region.current.name}:${local.env_account_id}:*/*"
