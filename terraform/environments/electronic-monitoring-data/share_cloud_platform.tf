@@ -19,6 +19,9 @@ locals {
   table_filters = {
     for table in local.tables_to_share : table => "specials_flag=0"
   }
+  specials_table_filters = {
+    for table in local.tables_to_share : table => ""
+  }
   iam-test = local.environment_shorthand == "test" ? [
     var.cloud-platform-iam-dev,
     var.cloud-platform-iam-preprod
@@ -113,6 +116,17 @@ module "share_data_marts" {
   data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
+}
+
+module "share_data_marts" {
+  source = "./modules/lakeformation_w_data_filter"
+
+  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters           = local.specials_table_filters
+  database_name           = "historic_api_mart"
+  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
 }
 
 
