@@ -13,6 +13,30 @@ module "route53_records" {
       type    = "CNAME"
       ttl     = 300
       records = [module.mwaa_alb.dns_name]
+    },
+    {
+      name    = "_amazonses"
+      type    = "TXT"
+      ttl     = 600
+      records = [aws_ses_domain_identity.main.verification_token]
+    },
+    {
+      name    = "${aws_ses_domain_dkim.main.dkim_tokens[0]}._domainkey"
+      type    = "CNAME"
+      ttl     = 300
+      records = ["${aws_ses_domain_dkim.main.dkim_tokens[0]}.dkim.amazonses.com"]
+    },
+    {
+      name    = "${aws_ses_domain_dkim.main.dkim_tokens[1]}._domainkey"
+      type    = "CNAME"
+      ttl     = 300
+      records = ["${aws_ses_domain_dkim.main.dkim_tokens[1]}.dkim.amazonses.com"]
+    },
+    {
+      name    = "${aws_ses_domain_dkim.main.dkim_tokens[2]}._domainkey"
+      type    = "CNAME"
+      ttl     = 300
+      records = ["${aws_ses_domain_dkim.main.dkim_tokens[2]}.dkim.amazonses.com"]
     }
   ]
 }

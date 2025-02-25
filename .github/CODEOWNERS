@@ -18,7 +18,6 @@
 /terraform/environments/corporate-information-system @ministryofjustice/laa-aws-infrastructure @ministryofjustice/laa-cis-dbas @ministryofjustice/laa-cis-team @ministryofjustice/modernisation-platform
 /terraform/environments/corporate-staff-rostering @ministryofjustice/azure-aws-sso-csr-migration @ministryofjustice/azure-aws-sso-digital-studio-operations @ministryofjustice/csr-application-support @ministryofjustice/hosting-migrations @ministryofjustice/studio-webops @ministryofjustice/modernisation-platform
 /terraform/environments/dacp @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
-/terraform/environments/data-and-insights-wepi @ministryofjustice/data-and-insights-hub @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform-apps-and-tools @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/modernisation-platform
 /terraform/environments/data-platform @ministryofjustice/data-platform-apps-and-tools @ministryofjustice/data-platform-labs @ministryofjustice/modernisation-platform
 /terraform/environments/delius-alfresco @ministryofjustice/hosting-migrations @ministryofjustice/modernisation-platform
@@ -68,6 +67,7 @@
 /terraform/environments/wardship @ministryofjustice/dts-legacy @ministryofjustice/modernisation-platform
 /terraform/environments/xhibit-portal @ministryofjustice/cjse-xhibit-portal-discovery @ministryofjustice/xhibit-portal-dev @ministryofjustice/modernisation-platform
 /terraform/environments/youth-justice-app-framework @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
+/terraform/environments/youth-justice-networking @ministryofjustice/modernisation-platform-engineers @ministryofjustice/modernisation-platform
 **/backend.tf @ministryofjustice/modernisation-platform
 **/subnet_share.tf @ministryofjustice/modernisation-platform
 **/networking.auto.tfvars.json @ministryofjustice/modernisation-platform

@@ -261,12 +261,12 @@ resource "aws_vpc_security_group_ingress_rule" "db_bastion_ssh" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_workspace_winscp" {
-  security_group_id            = aws_security_group.database.id
-  description                  = "Allow WorkSpace in LAA LZ to WinSCP"
-  cidr_ipv4                    = local.application_data.accounts[local.environment].workspaces_laa_lz
-  from_port                    = 22
-  ip_protocol                  = "tcp"
-  to_port                      = 22
+  security_group_id = aws_security_group.database.id
+  description       = "Allow WorkSpace in LAA LZ to WinSCP"
+  cidr_ipv4         = local.application_data.accounts[local.environment].workspaces_laa_lz
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_workspaces_1" {
