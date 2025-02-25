@@ -50,7 +50,15 @@ module "kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MicrosoftPKIQuickStartCA-TwoTierCAStac-InstanceRole-*"]
+          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+        }
+      ]
+
+      conditions = [
+        {
+          test     = "StringLike"
+          variable = "aws:PrincipalArn"
+          values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MicrosoftPKIQuickStartCA-TwoTierCAStac-InstanceRole-*"]
         }
       ]
     }
