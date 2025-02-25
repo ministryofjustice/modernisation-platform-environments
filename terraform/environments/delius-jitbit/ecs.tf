@@ -12,7 +12,7 @@ module "ecs_blue" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
 
   environment = local.environment
-  name        = local.application_name
+  name        = "${local.application_name}-blue"
 
   tags = local.tags
 }
@@ -21,7 +21,7 @@ module "ecs_green" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
 
   environment = local.environment
-  name        = local.application_name
+  name        = "${local.application_name}-green"
 
   tags = local.tags
 }
