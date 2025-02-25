@@ -59,7 +59,7 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a"]
-          security_groups    = ["boe"]
+          security_groups    = ["boe", "bip-app"]
         }]
         tags = {
           backup = "false"
