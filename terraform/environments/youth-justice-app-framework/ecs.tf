@@ -39,9 +39,9 @@ module "ecs" {
   ]
 
   #todo should be a ecs specific user instead of root user
-  ecs_service_postgres_secret_arn = "arn:aws:secretsmanager:eu-west-2:012345678:secret:rds!cluster-9e616cc2-98fd-4b4a-af98-44b25c088ff8-KPsJBM"
-
-  ecs_services = local.ecs_services
+  ecs_service_postgres_secret_arn = module.aurora.app_rotated_postgres_secret_arn
+  ecs_allowed_secret_arns         = [module.aurora.app_rotated_postgres_secret_arn, local.application_data.accounts[local.environment].ldap_secret_arn]
+  ecs_services                    = local.ecs_services
 
   project_name = local.project_name
   environment  = local.environment

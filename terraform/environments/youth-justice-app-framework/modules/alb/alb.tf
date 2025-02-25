@@ -15,12 +15,13 @@ module "alb" {
 
   create_security_group = false
   security_groups       = [module.alb_sg.security_group_id]
+  associate_web_acl     = var.associate_web_acl
+  web_acl_arn           = var.web_acl_arn
 
   idle_timeout               = 240
   drop_invalid_header_fields = true
   access_logs                = local.access_logs
 
-  #todo aws config integration missing
   tags = local.all_tags
 }
 
@@ -29,7 +30,7 @@ module "log_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 
-  bucket = "${var.alb_name}-${local.alb_suffix}-connection-logs"
+  bucket = "${var.alb_name}-${local.alb_suffix}-${var.environment}-logs"
   acl    = "log-delivery-write"
 
   # For example only

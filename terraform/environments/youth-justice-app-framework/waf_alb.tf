@@ -48,7 +48,7 @@ module "waf" {
       name     = "GeoIP"
       priority = 3
       geo_match_statement = {
-        country_codes = ["GB", "FR"]
+        country_codes = ["GB", "FR", "IE"]
       }
     }
   ]

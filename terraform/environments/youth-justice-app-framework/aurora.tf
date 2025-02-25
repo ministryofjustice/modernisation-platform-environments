@@ -1,4 +1,3 @@
-
 module "aurora" {
   source       = "./modules/aurora"
   project_name = local.project_name
@@ -19,9 +18,11 @@ module "aurora" {
   snapshot_identifier = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:sharedwithdevencrypt"
 
   user_passwords_to_reset = ["postgres_rotated"]
+  db_name                 = "yjafrds01"
+  aws_account_id          = data.aws_caller_identity.current.account_id
 
   engine          = "aurora-postgresql"
-  engine_version  = "16.2"
+  engine_version  = "16.6"
   master_username = "root"
 
   create_sheduler              = true
@@ -35,6 +36,14 @@ module "aurora" {
   }
   kms_key_arn = module.kms.key_arn
   kms_key_id  = module.kms.key_id
+
+  iam_roles = {
+    rds_export_to_s3_role = {
+      role_arn     = aws_iam_role.rds_export_to_s3_role.arn
+      feature_name = "s3Export"
+    }
+    
+  }
 
   # todo - some of these rules are commented out as the resource doesn't exist yet. 
   # It would make more sense the add the rules in their respective modules rather than here
