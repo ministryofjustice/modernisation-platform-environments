@@ -134,6 +134,27 @@ locals {
       #   })
       # cloudwatch_metric_alarms = {}
       # })
+
+      pp-onr-cms-1 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_cms.instance, {
+          instance_type = "m6i.2xlarge"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "pp"
+        })
+      })
     }
 
     fsx_windows = {
