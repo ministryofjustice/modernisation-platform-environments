@@ -269,8 +269,7 @@ resource "aws_instance" "ad_instance" {
   instance_type               = "t3.micro"
   iam_instance_profile        = aws_iam_instance_profile.ad_instance_profile.name
   key_name                    = module.key_pair.key_pair_name
- # subnet_id                   = var.private_subnet_ids[count.index % length(var.private_subnet_ids)] # 1st in Subnet a, then b, c, a, etc
-  subnet_id                   = var.private_subnet_ids[0] # 1st in Subnet a, then b, c, a, etc
+  subnet_id                   = var.private_subnet_ids[count.index % length(var.private_subnet_ids)] # 1st in Subnet a, then b, c, a, etc
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.mgmt_instance_sg.id]
   tags                        = merge({ "Name" = "mgmt-ad-instance-${count.index + 1}" }, local.tags)
