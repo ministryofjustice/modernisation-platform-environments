@@ -39,28 +39,6 @@ module "kms" {
           ]
         }
       ]
-    },
-    {
-      sid = "AllowEC2InstanceRole"
-      actions = [
-        "kms:Decrypt"
-      ]
-      resources = ["*"]
-
-      principals = [
-        {
-          type        = "AWS"
-          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-        }
-      ]
-
-      conditions = [
-        {
-          test     = "StringLike"
-          variable = "aws:PrincipalArn"
-          values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MicrosoftPKIQuickStartCA-TwoTierCAStac-InstanceRole-*"]
-        }
-      ]
     }
   ]
 
