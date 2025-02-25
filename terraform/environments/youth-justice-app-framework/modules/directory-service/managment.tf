@@ -263,14 +263,17 @@ EOF
 
 #Create an EC2 instance and automatically join the directory (management)
 resource "aws_instance" "ad_instance" {
+  count = var.ad_management_instance_count
+
   ami                         = data.aws_ami.windows_2022.id
   instance_type               = "t3.micro"
   iam_instance_profile        = aws_iam_instance_profile.ad_instance_profile.name
   key_name                    = module.key_pair.key_pair_name
-  subnet_id                   = var.management_subnet_id
+ # subnet_id                   = var.private_subnet_ids[count.index % length(var.private_subnet_ids)] # 1st in Subnet a, then b, c, a, etc
+  subnet_id                   = var.private_subnet_ids[0] # 1st in Subnet a, then b, c, a, etc
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.mgmt_instance_sg.id]
-  tags                        = merge({ "Name" = "mgmt-ad-instance" }, local.tags)
+  tags                        = merge({ "Name" = "mgmt-ad-instance-${count.index + 1}" }, local.tags)
   user_data                   = data.template_file.windows-dc-userdata.rendered
   ebs_optimized               = true
   lifecycle {
@@ -312,10 +315,11 @@ DOC
 }
 
 resource "aws_ssm_association" "associate_ssm" {
+
   name = aws_ssm_document.ssm_document.name
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.ad_instance.id]
+    values = aws_instance.ad_instance[*].id
   }
 
   #  instance_id = aws_instance.ad_instance.id

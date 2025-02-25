@@ -29,9 +29,9 @@ variable "ds_managed_ad_short_name" {
   description = "The NetBIOS name for the AWS Managed Microsoft AD directory, such as CORP"
 }
 
-variable "ds_managed_ad_subnet_ids" {
+variable "private_subnet_ids" {
   type        = list(string)
-  description = "Two private subnet IDs for the AWS Managed Microsoft AD"
+  description = "List of private subnet IDs."
 }
 
 variable "ds_managed_ad_vpc_id" {
@@ -42,11 +42,6 @@ variable "ds_managed_ad_vpc_id" {
 variable "management_keypair_name" {
   type        = string
   description = "The name of the keypair to use for the management server"
-}
-
-variable "management_subnet_id" {
-  type        = string
-  description = "A list of subnet IDs to associate with the management server"
 }
 
 variable "vpc_cidr_block" {
@@ -65,13 +60,19 @@ variable "tags" {
   default     = {}
 }
 
+variable "ad_management_instance_count" {
+  type = number
+  description = "The number of Active Directory Management servers to be created."
+  default = 2
+}
+
+variable "desired_number_of_domain_controllers" {
+  type = number
+  description = "The number of Doamin Coltrollers to create."
+  default = 2
+}
+
 variable "rds_cluster_security_group_id" {
   type = string
   description = "The Id of the Security Grpoip that enables access to the RDS PostgreSQL Cluster."
-}
-
-variable "kpi_revision" {
-  type = number
-  description = "Increment by 1 for replacement of the Directory Service and the Cloudformation KPI Stack."
-  default = 1
 }

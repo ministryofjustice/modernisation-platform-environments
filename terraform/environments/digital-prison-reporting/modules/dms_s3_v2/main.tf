@@ -167,7 +167,7 @@ resource "aws_dms_s3_endpoint" "dms-s3-target-endpoint" {
   parquet_timestamp_in_millisecond = false
   include_op_for_full_load         = true
 
-  max_file_size          = 240000
+  max_file_size          = 120000
   cdc_max_batch_interval = 10
 
   tags = merge(
