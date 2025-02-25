@@ -104,7 +104,7 @@ module "specials_cmt_front_end_assumable_role" {
 }
 
 module "share_data_marts" {
-  source = "./module/lakeformation_w_data_filters"
+  source = "./module/lakeformation_w_data_filter"
 
   count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
   table_filters           = local.table_filters
