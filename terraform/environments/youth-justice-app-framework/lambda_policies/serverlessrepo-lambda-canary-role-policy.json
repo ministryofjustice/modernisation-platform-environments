@@ -1,0 +1,16 @@
+{
+  "Statement": [
+      {
+          "Effect": "Allow",
+          "Resource": "*",
+          "Action": [
+              "ec2:DescribeInstances",
+              "ec2:CreateNetworkInterface",
+              "ec2:AttachNetworkInterface",
+              "ec2:DescribeNetworkInterfaces",
+              "ec2:DeleteNetworkInterface",
+              "autoscaling:CompleteLifecycleAction"
+          ]
+      }
+  ]
+}
