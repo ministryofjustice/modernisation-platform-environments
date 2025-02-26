@@ -272,7 +272,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "pp.test.reporting.oasys.service.justice.gov.uk",
+                      "pp.preproduction.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
