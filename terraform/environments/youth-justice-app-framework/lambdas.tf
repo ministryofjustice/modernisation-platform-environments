@@ -75,7 +75,7 @@ module "serverlessrepo-lambda-canary" {
 resource "aws_cloudwatch_event_rule" "serverlessrepo-lambda-canary" {
   name                = "serverlessrepo-lambda-canary"
   description         = "serverlessrepo-lambda-canary"
-  schedule_expression = "rate(1 minutes)"
+  schedule_expression = "rate(1 minute)"
   tags                = local.tags
 }
 
