@@ -108,8 +108,8 @@ locals {
       image_tag        = "6.2.3-latest"
       container_port   = 389
       slapd_log_level  = "conns,config,stats,stats2"
-      container_cpu    = 2048
-      container_memory = 4096
+      container_cpu    = 8192
+      container_memory = 16384
     }
   }
 
