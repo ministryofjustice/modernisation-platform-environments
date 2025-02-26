@@ -48,7 +48,7 @@ resource "aws_instance" "ec2_oracle_conc" {
 }
 
 resource "aws_ebs_volume" "conc_swap" {
-  count = local.application_data.accounts[local.environment].conc_no_instances > 0 && local.application_data.accounts[local.environment].ebs_size_ebsconc_swap > 0 ? local.application_data.accounts[local.environment].ebs_size_ebsconc_swap : 0
+  count = local.application_data.accounts[local.environment].conc_no_instances > 0 && local.application_data.accounts[local.environment].ebs_size_ebsconc_swap > 0 ? local.application_data.accounts[local.environment].conc_no_instances : 0
   lifecycle {
     ignore_changes = [kms_key_id]
   }
