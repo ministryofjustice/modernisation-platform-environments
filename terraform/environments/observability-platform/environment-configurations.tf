@@ -242,6 +242,24 @@ locals {
               athena_enabled                  = false
             }
           }
+        },
+        "greenops" = {
+          "identity_centre_team" = "greenops",
+          "aws_accounts" = {
+            "example-development" = {
+              cloudwatch_enabled              = false
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                primary = {
+                  database  = "greenops_cur_poc"
+                  workgroup = "primary"
+                }
+              }
+            }
+          }
         }
       }
       grafana_version                 = "10.4"
