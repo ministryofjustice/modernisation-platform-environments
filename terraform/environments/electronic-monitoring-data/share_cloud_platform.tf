@@ -1,11 +1,28 @@
 locals {
   # Setting the IAM name that our Cloud Platform API will use to connect to this role
 
-  iam-dev     = local.environment_shorthand == "dev" ? [
+  iam-dev = local.environment_shorthand == "dev" ? [
     var.cloud-platform-iam-dev
   ] : null
 
-  iam-test    = local.environment_shorthand == "test" ? [
+  tables_to_share = [
+    "contact_history",
+    "equipment_details",
+    "event_history",
+    "incident",
+    "order_details",
+    "services",
+    "suspension_of_visits",
+    "violations",
+    "visit_details"
+  ]
+  table_filters = {
+    for table in local.tables_to_share : table => "specials_flag=0"
+  }
+  specials_table_filters = {
+    for table in local.tables_to_share : table => ""
+  }
+  iam-test = local.environment_shorthand == "test" ? [
     var.cloud-platform-iam-dev,
     var.cloud-platform-iam-preprod
   ] : null
@@ -14,11 +31,24 @@ locals {
     var.cloud-platform-iam-preprod
   ] : null
 
-  iam-prod    = local.environment_shorthand == "prod" ? [
+  iam-prod = local.environment_shorthand == "prod" ? [
     var.cloud-platform-iam-prod
   ] : null
 
   resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
+
+  # Setting glue ARNs to limit access to production API mart
+  glue_arns = local.is-production ? [
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
+    ] : [
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/historic_api_mart",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/historic_api_mart/*",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
+  ]
 }
 
 variable "cloud-platform-iam-dev" {
@@ -77,29 +107,27 @@ module "specials_cmt_front_end_assumable_role" {
   tags = local.tags
 }
 
-# module "share_api_data_marts" {
-#   count = local.is-production ? 1 : 0
-#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-#   source = "github.com/ministryofjustice/terraform-aws-analytical-platform-lakeformation?ref=32525da937012178e430585ac5a00f05193f58eb"
-#   data_locations = [{
-#     data_location = module.s3-create-a-derived-table-bucket.bucket.arn
-#     register      = true
-#     share         = true
-#     hybrid_mode   = false # will be managed exclusively in LakeFormation
-#     principal     = module.cmt_front_end_assumable_role.iam_role_arn
-#   }]
+module "share_data_marts" {
+  source = "./modules/lakeformation_w_data_filter"
 
-#   databases_to_share = [{
-#     name      = "api_data_marts"
-#     principal = module.cmt_front_end_assumable_role.iam_role_arn
-#   }]
+  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters           = local.table_filters
+  database_name           = "historic_api_mart"
+  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
+}
 
-#   providers = {
-#     aws.source      = aws
-#     aws.destination = aws
-#   }
-# }
+module "share_specials_data_marts" {
+  source = "./modules/lakeformation_w_data_filter"
+
+  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters           = local.specials_table_filters
+  database_name           = "historic_api_mart"
+  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
+}
 
 
 data "aws_iam_policy_document" "standard_athena_access" {
@@ -168,11 +196,7 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "glue:GetTables",
       "glue:GetTable"
     ]
-    resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
-    ]
+    resources = local.glue_arns
   }
 }
 
