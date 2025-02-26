@@ -18,7 +18,7 @@ module "ec2_autoscaling_group" {
   # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=0111618bb1c7c52f59f11790b2f4b68a26b51cb3" # v2.6.1
   # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=fa80b9a735ef9e9595f9e16fdc3426eda2492323" # ASG test
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=46abfd5c9b41f87b2afece5e200ff0ae65cf3439" # updated ref for test
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=86134439dd3d38d585201ac344d85429abc4a581" # updated ref for test
 
   providers = {
     aws.core-vpc = aws.core-vpc

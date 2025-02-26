@@ -6,7 +6,7 @@ module "ec2_instance" {
   #source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=ebf373aef70841d1c854689eb034b4e147be1709"
   # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=57296f508067f589ad107684b7c207c2a188ae9d" # Test reference using count
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=15040cb3977eeeb49c97763a1ffb26989ec4e1d5"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=e5463b1bf8a79443b6def1272b673e916acbdd75" # pre-merge hash
 
   providers = {
     aws.core-vpc = aws.core-vpc
