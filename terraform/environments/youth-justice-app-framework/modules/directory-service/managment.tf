@@ -320,6 +320,7 @@ resource "aws_ssm_association" "associate_ssm" {
     key    = "InstanceIds"
     values = aws_instance.ad_instance[*].id
   }
+  max_concurrency = 1 # Tihs might resolved the issue of the first run failing on the 2nd instance.
 
   #  instance_id = aws_instance.ad_instance.id
 }

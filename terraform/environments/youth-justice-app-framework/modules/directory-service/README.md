@@ -21,21 +21,21 @@ Terraform module which manages AWS Microsoft Managed AD resources.
 
 - **private_subnet_ids (list(string))**: This of private subnet IDs (at least 2) across which instance will be distributed. The Certificate Authorites will go in the first subnet. The AD Domain Controllers will be distributed oher the first 2 subnets. The management instances will be distributed over all subnets.
 
-**ds_managed_ad_secret_key (string)**: ARN or Id of the AWS KMS key to be used to encrypt the secret values in the versions stored in this secret. Default "aws/secretsmanager".
+- **ds_managed_ad_secret_key (string)**: ARN or Id of the AWS KMS key to be used to encrypt the secret values in the versions stored in this secret. Default "aws/secretsmanager".
 
-**management_keypair_name (string)**: The name of the keypair to use for the management server.
+- **management_keypair_name (string)**: The name of the keypair to use for the management server.
 
-**vpc_cidr_block (string)**: The CIDR block for the VPC.
+- **vpc_cidr_block (string)**: The CIDR block for the VPC.
 
-**project_name (string)**: project name within aws
+- **project_name (string)**: project name within aws
 
-**tags (map(string))**: User defined extra tags to be added to all resources created in the module.
+- **tags (map(string))**: User defined extra tags to be added to all resources created in the module.
 
-**ad_management_instance_count (number)**: The number of Active Directory Management servers to be created. Default is 2.
+- **ad_management_instance_count (number)**: The number of Active Directory Management servers to be created. Default is 2.
 
-**desired_number_of_domain_controllers (number)**: The number of Doamin Coltrollers to create. Default is 2.
+- **desired_number_of_domain_controllers (number)**: The number of Doamin Coltrollers to create. Default is 2.
 
-**rds_cluster_security_group_id (string)**: The Id of the Security Group that enables access to the RDS PostgreSQL Cluster.
+- **rds_cluster_security_group_id (string)**: The Id of the Security Group that enables access to the RDS PostgreSQL Cluster.
 
 
 ## Usage
@@ -81,7 +81,7 @@ module "managed-ad" {
 
 # Issues and workarounds
 ## CouudFormation Template for the KPI Infrastructure
-It is recommended the rollback on failure is never disable to ensure that the infrastructure is tidied up to a state where a sucessfull rerun is possible when ever a failure occures. This is particurly important in enviroments other than development where a manual rollback may not be possible due to permissions restrictions. 
+It is recommended that rollback on failure is never disable to ensure that the infrastructure is tidied up to a state where a sucessfull rerun is possible when ever a failure occures. This is particurly important in enviroments other than development where a manual rollback may not be possible due to permissions restrictions. 
 
 If automatic rollbck is disabled for any reason the following manuall actions may be needed to tidy up entries in the Directory Sevice that would otherwise prevent a sucessfuly rerun:
 
@@ -93,7 +93,12 @@ Open `DNS` management comsole and remove DNS entries from the Forward Lookup Zon
 Open `Active Directory Sites and Services` and Show the Servics node. At Services\Public Key Services\AIA, Delete `RootCA` and `SubordinateCA`. At Services\Public Key Services\CDP, Delete container `SubordinateCA` with all its contents. 
 
 ## Troublshooting Domain Join
-If loging does worm using the domain `admin` user as an alternative the local `Administrator` user can be used. THe password for the local `Administrator` use is in Secret `ad_instance_password_secret_1`.
+If login doesn't work using the domain `admin` user as an alternative the local `Administrator` user can be used. The password for the local `Administrator` use is in Secret `ad_instance_password_secret_1`.
+
+If the instances hasn't koined the domain, this is probably becuase the domain joint association has not been successfuly. When creating a 2nd instance it has been seen to fail with status `Undetermined`, whithout any other informaiotn regarding the cause. (The cause is probably that it tried to run before the instance was ready.) To identify if this is the cause and resolve via the AWS consoler:
+1. Navigate to `AWS Systems Manager` > `State Manager` and look for the latest association for document `ssm_document_ad_schema2.2`.
+2. Select the above association and use the `Resources` tab to check the status.
+3. Reapply the association using button `Apply association now` and confirm that it is now successful. 
 
 # Cutover and Setup Guidance
 ## Introduciton
@@ -114,7 +119,7 @@ When each instance is created the User-Data script performs some language setup 
 This will contin and copy of the User-DAte script as well as err and output log files from running the script.
 
 ## Enable File Copy via Clipboard
-While files can be uploaded and downloaded via a S3 bucket it may be  more converient to enable file copy via the clipboard by removing a setting in Group Policy. This only need to be done once per environment to enable copy on all domain manbers (the management servers and the Suborginate CA server).
+While files can be uploaded and downloaded via a S3 bucket it may be  more converient to enable file copy via the clipboard by removing a setting in Group Policy. This only needs to be done once per environment to enable copy on all domain menbers (the management servers and the Suborginate CA server).
 
 To amend launch the `Group Policy Editor` (`gpedit.msc`), navigate to `Local Computer Policy \ Computer Configuration \ Administrative Templates \ Windows Components \ Remote Desktop Services \ Remote Desktop Session Host \ Device and Resource Redirection` and change Setting `Do not allow drive redirection` to `Not Configured`.` 
 
@@ -130,10 +135,10 @@ On each management instance:
     - Download everything.
     - Under `Regional format` select 'Settings' and change and necessary to ensure all are set to `United Kingdom`.
 4. Return to the Language page and wait a few minities while the language finishes installing.
-5. Change the `Windows display language` to `English (United Kingdom)`.
+5. Change the `Windows display language` to `English (United Kingdom)`. (Need to signout and log back in for this to become effective.)
 6. Remove language `English (Unites States)`.
 7. Select `Administrative language settings` then `Copy settings...` and under `Copy your current settings to:` check both `Welcome screen and system accounts` and `New user accounts` then `OK`.
-8. Restart Windows to that all the above changes become effective.
+8. Restart Windows so that all the above changes become effective.
 
 ## Software Install
 A script exists to install the following software after making the install files available by uploading them to the S3 bucket created for this purpose, `<envioronment>-install-files`.
@@ -145,7 +150,7 @@ A script exists to install the following software after making the install files
     - `WinSCP-6.3.6-Setup.exe
     - `management-server-app-install.ps1
 
-2. Open a `Windows Powershell` command windows with 'Run as administrator`.
+2. Open a `Windows Powershell` command window with `Run as administrator`.
 3. If the `Windows Poweshell` command window will not accept key board this is most likley to be due to a defect in module `PSReadLine` Version 2.0.0 and it can be resolved by pasting and running the following command `Remove-Module PSReadLine`.
 4. Download the application install script using the following PowerShell command:
 
