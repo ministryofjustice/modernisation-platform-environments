@@ -16,7 +16,9 @@ module "ec2_autoscaling_group" {
   for_each = var.ec2_autoscaling_groups
 
   # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=0111618bb1c7c52f59f11790b2f4b68a26b51cb3" # v2.6.1
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=fa80b9a735ef9e9595f9e16fdc3426eda2492323" # ASG test
+  # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=fa80b9a735ef9e9595f9e16fdc3426eda2492323" # ASG test
+
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-autoscaling-group?ref=46abfd5c9b41f87b2afece5e200ff0ae65cf3439" # updated ref for test
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -48,7 +50,6 @@ module "ec2_autoscaling_group" {
   user_data_raw                   = each.value.config.user_data_raw
   user_data_cloud_init            = each.value.user_data_cloud_init
   ssm_parameters_prefix           = each.value.config.ssm_parameters_prefix
-  skip_iam_role_policy_attachment = true
   secretsmanager_secrets_prefix   = each.value.config.secretsmanager_secrets_prefix
   iam_resource_names_prefix       = each.value.config.iam_resource_names_prefix
 
