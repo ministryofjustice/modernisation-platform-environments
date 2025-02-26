@@ -28,8 +28,7 @@ module "eks" {
     }
   }
 
-  authentication_mode                      = "API"
-  enable_cluster_creator_admin_permissions = true
+  authentication_mode = "API"
 
   iam_role_use_name_prefix = false
 
@@ -37,7 +36,8 @@ module "eks" {
   cloudwatch_log_group_retention_in_days = local.eks_cloudwatch_log_group_retention_in_days
   cluster_enabled_log_types              = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
-  kms_key_aliases = ["eks/${local.eks_cluster_name}"]
+  kms_key_aliases        = ["eks/${local.eks_cluster_name}"]
+  kms_key_administrators = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"]
 
   cluster_encryption_config = {
     resources = ["secrets"]
@@ -154,9 +154,32 @@ module "eks" {
   }
 
   access_entries = {
+    # Modernisation Platform Environments (MemberInfrastructureAccess)access to cluster
+    mpe-administrator = {
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/MemberInfrastructureAccess"
+      policy_associations = {
+        eks-admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
     # Analytical Platform Engineering access to cluster
     sso-administrator = {
       principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.eks_sso_access_role.names)}"
+      policy_associations = {
+        eks-admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
+        }
+      }
+    }
+    sso-platform-engineer-admin = {
+      principal_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.platform_engineer_admin_sso_role.names)}"
       policy_associations = {
         eks-admin = {
           policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"

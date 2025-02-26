@@ -146,10 +146,6 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/data-and-insights-wepi"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
     directory: "/terraform/environments/data-platform"
     schedule:
       interval: "daily"
@@ -510,6 +506,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/genesys-call-centre-data/modules/ap_airflow_iam_role"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/hmpps-domain-services"
     schedule:
       interval: "daily"
@@ -787,6 +787,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/youth-justice-app-framework/modules/waf"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-networking"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

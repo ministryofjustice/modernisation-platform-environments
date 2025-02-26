@@ -21,14 +21,6 @@ module "github-cloudtrail-auditlog" {
   depends_on = [data.external.build_lambdas]
 }
 
-resource "aws_iam_openid_connect_provider" "github" {
-  url = "https://oidc-configuration.audit-log.githubusercontent.com"
-
-  client_id_list = [
-    "sts.amazonaws.com"
-  ]
-}
-
 data "aws_kms_key" "key" {
   key_id = "alias/GitHubCloudTrailOpenEvent"
 }

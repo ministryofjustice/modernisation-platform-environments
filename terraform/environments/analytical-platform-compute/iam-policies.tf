@@ -673,3 +673,33 @@ module "gha_moj_ap_airflow_iam_policy" {
 
   tags = local.tags
 }
+
+data "aws_iam_policy_document" "mwaa_ses" {
+  statement {
+    sid    = "AllowSESSendRawEmail"
+    effect = "Allow"
+    actions = [
+      "ses:SendEmail",
+      "ses:SendRawEmail"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "ses:FromAddress"
+      values   = ["noreply@${local.environment_configuration.route53_zone}"]
+    }
+  }
+}
+
+module "mwaa_ses_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.52.2"
+
+  name   = "mwaa-ses"
+  policy = data.aws_iam_policy_document.mwaa_ses.json
+
+  tags = local.tags
+}

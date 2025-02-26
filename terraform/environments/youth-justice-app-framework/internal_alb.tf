@@ -14,8 +14,9 @@ module "internal_alb" {
   alb_route53_record_name    = "private-lb"
   alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
 
-  listeners     = local.internal_listeners
-  target_groups = local.target_groups
+  listeners          = local.internal_listeners
+  target_groups      = local.target_groups
+  enable_access_logs = true
 
   #pass in provider for creating records on central route53
   providers = {

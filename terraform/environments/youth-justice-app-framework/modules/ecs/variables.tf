@@ -52,8 +52,8 @@ variable "ecs_services" {
     deployment_maximum_percent             = optional(number, 200)
     task_cpu                               = optional(number)
     task_memory                            = optional(number)
-    container_cpu                          = optional(number)
-    container_memory                       = optional(number)
+    container_cpu                          = optional(number, null)
+    container_memory                       = optional(number, null)
     command                                = optional(list(string), [])
     entryPoint                             = optional(list(string), [])
     readonly_root_filesystem               = optional(bool, true)
@@ -65,7 +65,7 @@ variable "ecs_services" {
     })), [])
     volumes = optional(list(object({
       name = string
-      host = map(any)
+      host = optional(map(any))
     })), [])
     additional_environment_variables = optional(list(object({
       name  = string
@@ -99,7 +99,7 @@ variable "ecs_services" {
       })), [])
       volumes = optional(list(object({
         name = string
-        host = map(any)
+        host = optional(map(any))
       })), [])
       environment = optional(list(object({
         name  = string
@@ -268,4 +268,10 @@ variable "spot_overrides" {
     weighted_capacity = string
   }))
   default = []
+}
+
+variable "ecs_allowed_secret_arns" {
+  description = "A list of allowed secret ARNs"
+  type        = list(string)
+  default     = []
 }

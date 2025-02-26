@@ -34,6 +34,15 @@ data "archive_file" "zip_the_stop_instance_code" {
   output_path = "${path.module}/stop-instance/StopEC2Instances.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_stop_lambda_function_prod_log_group" {
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/stop_Lambda_Function"
+  retention_in_days = 365
+}
+
 # Lambda Function for Start of Instance
 
 resource "aws_lambda_function" "terraform_lambda_func_start" {
@@ -62,6 +71,14 @@ data "archive_file" "zip_the_start_instance_code" {
   output_path = "${path.module}/start-instance/StartEC2Instances.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_start_lambda_function_prod_log_group" {
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/start_Lambda_Function"
+  retention_in_days = 365
+}
 
 ####################################################################
 # Lambda functions to disable and enable CPU alarms over the weekend
@@ -98,6 +115,15 @@ data "archive_file" "zip_the_disable_alarm_code" {
   output_path = "${path.module}/lambda_scripts/disable_cpu_alarm.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_disable_cpu_alarm_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/disable_cpu_alarm"
+  retention_in_days = 30
+}
 
 # Enable CPU Alarm
 # Permissions statement is in iam.tf
@@ -130,6 +156,15 @@ data "archive_file" "zip_the_enable_alarm_code" {
   output_path = "${path.module}/lambda_scripts/enable_cpu_alarm.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_enable_cpu_alarm_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/enable_cpu_alarm"
+  retention_in_days = 30
+}
 
 ######################################################
 # Lambda Function to Terminate MS Word Processes - DEV
@@ -255,6 +290,16 @@ data "archive_file" "zip_the_terminate_cpu_process_code_prod" {
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/terminate_cpu_process_prod.zip"
+}
+
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_terminate_cpu_process_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/terminate_cpu_process"
+  retention_in_days = 30
 }
 
 ################################################
@@ -383,6 +428,16 @@ data "archive_file" "zip_the_send_cpu_notification_code_prod" {
   output_path = "${path.module}/lambda_scripts/send_cpu_notification_prod.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_send_cpu_notification_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/send_cpu_notification"
+  retention_in_days = 30
+}
+
 ################################################
 # Lambda Function to graph CPU Utilization - DEV
 ################################################
@@ -494,6 +549,16 @@ data "archive_file" "zip_the_send_cpu_graph_code_prod" {
   output_path = "${path.module}/lambda_scripts/send_cpu_graph_prod.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_send_cpu_graph_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/send_cpu_graph"
+  retention_in_days = 30
+}
+
 # Lambda Layer for Matplotlib
 
 resource "aws_lambda_layer_version" "lambda_layer_matplotlib_prod_new" {
@@ -557,6 +622,16 @@ data "archive_file" "zip_the_ppud_email_report_prod" {
   output_path = "${path.module}/lambda_scripts/ppud_email_report_prod.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_ppud_email_report_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/ppud_email_report"
+  retention_in_days = 30
+}
+
 ###################################################
 # Lambda Function to graph PPUD ELB Requests - PROD
 ###################################################
@@ -607,6 +682,16 @@ data "archive_file" "zip_the_ppud_elb_report_prod" {
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/ppud_elb_report_prod.zip"
+}
+
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_ppud_elb_report_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/ppud_elb_report"
+  retention_in_days = 30
 }
 
 ###################################################
@@ -661,6 +746,16 @@ data "archive_file" "zip_the_wam_elb_report_prod" {
   output_path = "${path.module}/lambda_scripts/wam_elb_report_prod.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_wam_elb_report_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/wam_elb_report"
+  retention_in_days = 30
+}
+
 ####################################################
 # Lambda Function to graph Memory Utilization - PROD
 ####################################################
@@ -711,6 +806,16 @@ data "archive_file" "zip_the_send_memory_graph_code_prod" {
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/send_memory_graph_prod.zip"
+}
+
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_send_memory_graph_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/send_memory_graph"
+  retention_in_days = 30
 }
 
 #################################################
@@ -765,6 +870,16 @@ data "archive_file" "zip_the_disk_info_report_code_prod" {
   output_path = "${path.module}/lambda_scripts/disk_info_report_prod.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_disk_info_report_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/disk_info_report"
+  retention_in_days = 30
+}
+
 #######################################################
 # Lambda Function to send Disk Read Write Report - PROD
 #######################################################
@@ -817,6 +932,16 @@ data "archive_file" "zip_the_disk_read_write_report_code_prod" {
   output_path = "${path.module}/lambda_scripts/disk_read_write_report_prod.zip"
 }
 
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_disk_read_write_report_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/disk_read_write_report"
+  retention_in_days = 30
+}
+
 ################################################
 # Lambda Function for Security Hub Report - PROD
 ################################################
@@ -862,4 +987,14 @@ data "archive_file" "zip_the_securityhub_report_code_prod" {
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
   output_path = "${path.module}/lambda_scripts/securityhub_report_prod.zip"
+}
+
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_security_hub_report_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/security_hub_report"
+  retention_in_days = 30
 }
