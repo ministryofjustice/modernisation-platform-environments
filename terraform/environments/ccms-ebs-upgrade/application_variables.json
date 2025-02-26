@@ -119,7 +119,7 @@
       "ebs_size_ebsconc_home": 100,
       "ebs_size_ebsconc_stage": 100,
       "ebs_size_ebsconc_temp": 100,
-      "ebs_size_ebsconc_swap": 20,
+      "ebs_size_ebsconc_swap": 0,
       "ebs_backup_snapshot_id": "snap-0cdfe4b46c1e34ebb",
       "instance_role_accessgate": "accessgate",
       "instance_role_ebsapps": "apps",
