@@ -6,7 +6,7 @@ module "ec2_instance" {
   #source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=ebf373aef70841d1c854689eb034b4e147be1709"
   # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=57296f508067f589ad107684b7c207c2a188ae9d" # Test reference using count
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=62ae13e33937dec42282fa27c16e4e7be405bb65"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=d7212e2a972d1e6eb19f28a43d18c156dca77e5d"
 
   providers = {
     aws.core-vpc = aws.core-vpc
