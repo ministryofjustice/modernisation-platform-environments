@@ -12,6 +12,13 @@
                 "ec2:DeleteNetworkInterface",
                 "autoscaling:CompleteLifecycleAction"
             ]
+        },
+        {
+            "Action": [
+                "lambda:InvokeFunction"
+            ],
+            "Resource": "arn:aws:lambda:eu-west-2:${account_number}:function:serverlessrepo-lambda-canary-python3*",
+            "Effect": "Allow"
         }
     ]
 }

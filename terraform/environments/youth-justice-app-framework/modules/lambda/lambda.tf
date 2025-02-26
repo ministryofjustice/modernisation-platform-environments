@@ -9,8 +9,18 @@ resource "aws_lambda_function" "main" {
     variables = var.lambda.environment_variables
   }
 
-  memory_size = 128
-  timeout     = 10
+  dynamic "vpc_config" {
+    for_each = var.lambda.vpc_config != null ? [var.lambda.vpc_config] : []
+    content {
+      subnet_ids         = vpc_config.value.subnet_ids
+      security_group_ids = vpc_config.value.security_group_ids
+    }
+  }
+
+  memory_size = var.lambda.lambda_memory_size
+  timeout     = var.lambda.lambda_timeout
+
+  tags = merge(var.tags, local.tags)
 }
 
 resource "aws_iam_role" "lambda_iam_roles" {

@@ -48,6 +48,12 @@ variable "lambda" {
     handler               = string
     iam_role_name         = string
     environment_variables = optional(map(string), {})
+    lambda_memory_size    = optional(number, 128)
+    lambda_timeout        = optional(number, 10)
+    vpc_config = optional(object({
+      subnet_ids         = list(string)
+      security_group_ids = list(string)
+    }), null)
   })
 }
 

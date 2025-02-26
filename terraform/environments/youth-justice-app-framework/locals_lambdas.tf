@@ -1,6 +1,6 @@
 locals {
-  split_ds_managed_ad_ips = tolist(module.ds.ds_managed_ad_ips)
-
+  split-ds-managed-ad-ips             = tolist(module.ds.ds_managed_ad_ips)
+  s3-cross-account-replication-s3-arn = "arn:aws:s3:::redshift-serverless-yjb-${local.environment}-reporting"
   update-dc-names = {
     function_zip_file = "lambda_code/update-dc-names.zip"
     function_name     = "update-dc-names"
@@ -8,16 +8,18 @@ locals {
     iam_role_name     = "update-dc-names-lambda-role"
     environment_variables = {
       LOG_GROUP_NAME = module.ds.cloudwatch_log_group_name
-      LOG_STREAMS    = "${local.split_ds_managed_ad_ips[0]}-SecurityEvents,${local.split_ds_managed_ad_ips[1]}-SecurityEvents"
+      LOG_STREAMS    = "${local.split-ds-managed-ad-ips[0]}-SecurityEvents,${local.split-ds-managed-ad-ips[1]}-SecurityEvents"
       SECRET_NAME    = aws_secretsmanager_secret.LDAP_DC_secret.name
     }
   }
 
   s3-cross-account-replication = {
-    function_zip_file = "lambda_code/s3-cross-account-replication.zip"
-    function_name     = "s3-cross-account-replication"
-    handler           = "s3-cross-account-replication.lambda_handler"
-    iam_role_name     = "s3-cross-account-replication-lambda-role"
+    function_zip_file  = "lambda_code/s3-cross-account-replication.zip"
+    function_name      = "s3-cross-account-replication"
+    handler            = "s3-cross-account-replication.lambda_handler"
+    iam_role_name      = "s3-cross-account-replication-lambda-role"
+    lambda_memory_size = 512
+    lambda_timeout     = 900
   }
 
   serverlessrepo-lambda-canary = {
@@ -43,6 +45,10 @@ locals {
       site_6   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/conversions/../../../actuator/health" #conversions
       site_8   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/dal/../../../actuator/health"         #dal
       site_9   = "http://private-lb.${local.environment}.yjaf:8080/api/v1/documents/../../../actuator/health"   #documents
+    }
+    vpc_config = {
+      subnet_ids         = local.private_subnet_list[*].id
+      security_group_ids = [module.serverlessrepo-lambda-canary-sg.security_group_id]
     }
   }
 
@@ -70,5 +76,8 @@ locals {
     name              = "serverlessrepo-lambda-canary-lambda-role"
     trust_policy_path = "lambda_policies/lambda-role-trust.json"
     iam_policy_path   = "lambda_policies/serverlessrepo-lambda-canary-role-policy.json"
+    policy_template_vars = {
+      account_number = local.environment_management.account_ids[terraform.workspace]
+    }
   }
 }
