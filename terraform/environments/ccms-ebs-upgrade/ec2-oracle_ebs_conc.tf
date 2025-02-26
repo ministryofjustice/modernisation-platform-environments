@@ -65,7 +65,7 @@ resource "aws_ebs_volume" "conc_swap" {
 }
 
 resource "aws_volume_attachment" "conc_swap_att" {
-  count       = local.application_data.accounts[local.environment].conc_no_instances
+  count = local.application_data.accounts[local.environment].conc_no_instances > 0 && local.application_data.accounts[local.environment].ebs_size_ebsconc_swap > 0 ? 1 : 0
   device_name = "/dev/sds" # sdb was taken on the upgrade-dev conc by the AMI swap volume
   volume_id   = aws_ebs_volume.conc_swap[count.index].id
   instance_id = aws_instance.ec2_oracle_conc[count.index].id
