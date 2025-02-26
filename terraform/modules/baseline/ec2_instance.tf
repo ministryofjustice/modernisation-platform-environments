@@ -6,7 +6,7 @@ module "ec2_instance" {
   #source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=ebf373aef70841d1c854689eb034b4e147be1709"
   # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=57296f508067f589ad107684b7c207c2a188ae9d" # Test reference using count
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=d7212e2a972d1e6eb19f28a43d18c156dca77e5d"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=15040cb3977eeeb49c97763a1ffb26989ec4e1d5"
 
   providers = {
     aws.core-vpc = aws.core-vpc
@@ -39,7 +39,6 @@ module "ec2_instance" {
   user_data_raw                   = each.value.config.user_data_raw
   user_data_cloud_init            = each.value.user_data_cloud_init
   ssm_parameters_prefix           = each.value.config.ssm_parameters_prefix
-  skip_iam_role_policy_attachment = true
   secretsmanager_secrets_prefix   = each.value.config.secretsmanager_secrets_prefix
   iam_resource_names_prefix       = each.value.config.iam_resource_names_prefix
   route53_records                 = each.value.route53_records
