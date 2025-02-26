@@ -156,7 +156,7 @@
       "ec2_instance_type_clamav": "c5d.large",
       "clamav_ami_id": "ami-02cb9c4732e6429dd",
       "ebsdb_ami_id": "ami-014b2ba6362f16b1e",
-      "ebsconc_ami_id": "ami-0d4b266f7ae87bbfc",
+      "ebsconc_ami_id": "ami-0afd0cac51d7f8607",
       "ebsapps_ami_id-1": "ami-0a5697caf962d9c33",
       "ebsapps_ami_id-2": "ami-0a5697caf962d9c33",
       "accessgate_ami_id-1": "ami-0aa28dfb61946e273",
