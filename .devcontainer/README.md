@@ -69,12 +69,26 @@ cd terraform/environments/example
 # Run wih default parameters
 # stage=development
 # role=modernisation-platform-developer
-bash ../../../scripts/member-local-plan.sh
+# apply=false
+bash /workspaces/modernisation-platform-environments/scripts/member-local-plan.sh
 
-# Run and override a parameter
+# Run and override the role
 # stage=development
 # role=modernisation-platform-sandbox
-bash ../../../scripts/member-local-plan.sh -r modernisation-platform-sandbox
+# apply=false
+bash /workspaces/modernisation-platform-environments/scripts/member-local-plan.sh -r modernisation-platform-sandbox
+
+# Run and override the stage
+# stage=test
+# role=modernisation-platform-developer
+# apply=false
+bash /workspaces/modernisation-platform-environments/scripts/member-local-plan.sh -s test
+
+# Run and apply (this will only work if you have sufficient permissions in your environments)
+# stage=development
+# role=platform-engineer-amdin
+# apply=true
+bash /workspaces/modernisation-platform-environments/scripts/member-local-plan.sh -r platform-engineer-amdin -a true
 ```
 
 ## Support
