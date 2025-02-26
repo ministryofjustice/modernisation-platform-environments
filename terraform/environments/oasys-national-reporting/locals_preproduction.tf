@@ -272,7 +272,7 @@ locals {
                 conditions = [{
                   host_header = {
                     values = [
-                      "pp.preproduction.reporting.oasys.service.justice.gov.uk",
+                      "preproduction.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -390,7 +390,7 @@ locals {
     route53_zones = {
       "preproduction.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
-          { name = "pp", type = "A", lbs_map_key = "public" },
+          { name = "", type = "A", lbs_map_key = "public" },
           { name = "pp-bods", type = "A", lbs_map_key = "public" }
         ],
       }
