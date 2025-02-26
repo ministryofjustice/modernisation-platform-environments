@@ -75,7 +75,7 @@ module "serverlessrepo-lambda-canary" {
 resource "aws_cloudwatch_event_rule" "serverlessrepo-lambda-canary" {
   name                = "serverlessrepo-lambda-canary"
   description         = "serverlessrepo-lambda-canary"
-  schedule_expression = "rate(15 minutes)"
+  schedule_expression = "rate(1 minutes)"
   tags                = local.tags
 }
 
@@ -110,7 +110,7 @@ module "s3-cross-account-replication" {
 resource "aws_cloudwatch_event_rule" "s3-cross-account-replication" {
   name                = "s3-cross-account-replication"
   description         = "s3-cross-account-replication"
-  schedule_expression = "rate(15 minutes)"
+  schedule_expression = "rate(5 minutes)"
   tags                = local.tags
 }
 
