@@ -34,7 +34,7 @@ resource "aws_lambda_permission" "update-dc-names" {
 
 resource "aws_iam_role_policy_attachment" "lambda_iam_roles_basic_policy" {
   role       = local.update-dc-names-role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/CloudWatchReadOnlyAccess"
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchReadOnlyAccess"
 }
 
 ###Canary testing for yjaf
