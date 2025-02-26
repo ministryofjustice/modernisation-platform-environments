@@ -243,8 +243,8 @@ locals {
             }
           }
         },
-        "greenops" = {
-          "identity_centre_team" = "greenops",
+        "green-ops" = {
+          "identity_centre_team" = "green-ops",
           "aws_accounts" = {
             "example-development" = {
               cloudwatch_enabled              = false
