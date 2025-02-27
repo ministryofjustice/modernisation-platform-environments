@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "quarantine_bucket_policy" {
     effect = "Deny"
     principals {
       type        = "AWS"
-      identifiers = [local.environment == development ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/sandbox" : "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer"]
+      identifiers = [local.environment == "development" ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/sandbox" : "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer"]
     }
     actions = [
       "s3:*"
