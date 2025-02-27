@@ -210,6 +210,7 @@ locals {
                 mod-platform-cur-reports = {
                   database  = "moj-cur-athena-db"
                   workgroup = "mod-platform-cur-reports"
+                  output_location = ""
                 }
               }
             },

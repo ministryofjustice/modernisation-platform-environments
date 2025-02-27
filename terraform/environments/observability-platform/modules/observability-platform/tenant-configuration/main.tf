@@ -45,6 +45,7 @@ locals {
         account_id = nonsensitive(var.environment_management.account_ids[env_name])
         database   = config_data.database
         workgroup  = config_data.workgroup
+        output_location = config_data.output_location
       }
     ] if env_data.athena_enabled == true
   ])
@@ -61,6 +62,7 @@ module "athena_source" {
   account_id       = each.value.account_id
   athena_workgroup = each.value.workgroup
   athena_database  = each.value.database
+  athena_output_location = each.value.output_location
 }
 
 module "prometheus_push" {
