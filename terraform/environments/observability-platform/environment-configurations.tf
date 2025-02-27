@@ -256,7 +256,7 @@ locals {
                 primary = {
                   database  = "greenops_cur_poc"
                   workgroup = "primary"
-                  output_location = "arn:aws:s3:::manual-athena-test-ex"
+                  output_location = "s3://manual-athena-test-ex"
                 }
               }
             }
