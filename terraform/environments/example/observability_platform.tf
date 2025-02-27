@@ -19,26 +19,7 @@ resource "aws_iam_policy" "grafana_athena_full_access_policy" {
         {
             "Effect": "Allow",
             "Action": [
-                "athena:GetDatabase",
-                "athena:GetDataCatalog",
-                "athena:GetTableMetadata",
-                "athena:ListDatabases",
-                "athena:ListDataCatalogs",
-                "athena:ListTableMetadata",
-                "athena:ListWorkGroups"
-            ],
-            "Resource": [
-                "*"
-            ]
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "athena:GetQueryExecution",
-                "athena:GetQueryResults",
-                "athena:GetWorkGroup",
-                "athena:StartQueryExecution",
-                "athena:StopQueryExecution"
+                "athena:*"
             ],
             "Resource": [
                 "*"
@@ -73,7 +54,8 @@ resource "aws_iam_policy" "grafana_athena_full_access_policy" {
                 "s3:PutBucketPublicAccessBlock"
             ],
             "Resource": [
-                "arn:aws:s3:::manual-athena-test-ex"
+                "arn:aws:s3:::manual-athena-test-ex",
+                "arn:aws:s3:::manual-athena-test-ex/*"
             ]
         }
     ]
