@@ -21,5 +21,4 @@ variable "athena_database" {
 
 variable "athena_output_location" {
   type = string
-  default = ""
 }
