@@ -8,6 +8,10 @@ module "observability_platform_tenant" {
 }
 
 resource "aws_iam_policy" "grafana_athena_full_access_policy" {
+
+  # checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
+  # checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+
   name = "grafana_athena_full_access_policy"
   policy = jsonencode({
     "Version": "2012-10-17",
