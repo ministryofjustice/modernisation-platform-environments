@@ -247,7 +247,7 @@ locals {
           "identity_centre_team" = "green-ops",
           "aws_accounts" = {
             "example-development" = {
-              cloudwatch_enabled              = false
+              cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
@@ -256,6 +256,7 @@ locals {
                 primary = {
                   database  = "greenops_cur_poc"
                   workgroup = "primary"
+                  output_location = "s3://manual-athena-test-ex"
                 }
               }
             }
