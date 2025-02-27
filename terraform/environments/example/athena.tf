@@ -7,6 +7,9 @@ resource "aws_athena_workgroup" "primary" {
 
     result_configuration {
       output_location = "s3://manual-athena-test-ex"
+      encryption_configuration {
+        encryption_option = "SSE_S3"
+      }
     }
   }
 }
