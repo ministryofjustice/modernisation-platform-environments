@@ -9,3 +9,9 @@ variable "iam_role_arn" {
   type        = string
   default     = null
 }
+
+variable "arn" {
+  description = "The ARN of the managed_prometheus_kms_access_iam_policy"
+  type        = string
+  default     = null
+}

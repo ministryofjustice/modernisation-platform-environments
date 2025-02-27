@@ -14,3 +14,11 @@ module "observability_platform_tenant" {
 
   tags = local.tags
 }
+
+module "managed_prometheus_kms_access_iam_policy" {
+  source = "./cluster"
+
+  arn = module.managed_prometheus_kms_access_iam_policy.arn
+
+  networking = []
+}
