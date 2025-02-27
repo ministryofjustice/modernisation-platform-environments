@@ -17,6 +17,5 @@ resource "grafana_data_source" "this" {
     assumeRoleArn = "arn:aws:iam::${var.account_id}:role/observability-platform"
     database      = var.athena_database
     workgroup     = var.athena_workgroup
-    output_location = var.athena_output_location
   })
 }
