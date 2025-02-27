@@ -53,7 +53,16 @@ resource "aws_iam_policy" "grafana_athena_full_access_policy" {
                 "s3:PutObject",
                 "s3:PutBucketPublicAccessBlock"
             ],
-            "Resource": [ "*" ]
+            "Resource": [ 
+              "arn:aws:s3:::manual-athena-test-ex",
+              "arn:aws:s3:::manual-athena-test-ex/*",
+              "arn:aws:s3:::mod-plat-greenops-cur-poc",
+              "arn:aws:s3:::mod-plat-greenops-cur-poc/*",
+              "arn:aws:s3:::output-mod-plat-greenops-cur-poc",
+              "arn:aws:s3:::output-mod-plat-greenops-cur-poc/*",
+              "arn:aws:s3:::output-tailpipe-mod-plat-greenops-cur-poc",
+              "arn:aws:s3:::output-tailpipe-mod-plat-greenops-cur-poc/*",
+            ]
         }
     ]
 })
@@ -62,17 +71,4 @@ resource "aws_iam_policy" "grafana_athena_full_access_policy" {
 resource "aws_iam_role_policy_attachment" "observability_platform_role_grafana_athena_full_access_attachment" {
   role       = "observability-platform"
   policy_arn = aws_iam_policy.grafana_athena_full_access_policy.arn
-}
-
-resource "aws_athena_workgroup" "primary" {
-  name = "primary"
-
-  configuration {
-    enforce_workgroup_configuration = true
-    publish_cloudwatch_metrics_enabled = false
-
-    result_configuration {
-      output_location = "s3://manual-athena-test-ex"
-    }
-  }
 }
