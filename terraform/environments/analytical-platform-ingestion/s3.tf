@@ -4,7 +4,7 @@ data "aws_iam_policy_document" "landing_bucket_policy" {
     effect = "Deny"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::*:role/sandbox"]
+      identifiers = [local.environment == development ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/sandbox" : "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer"]
     }
     actions = [
       "s3:*"
@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "quarantine_bucket_policy" {
     effect = "Deny"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::*:role/sandbox"]
+      identifiers = [local.environment == development ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/sandbox" : "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer"]
     }
     actions = [
       "s3:*"
@@ -134,7 +134,7 @@ data "aws_iam_policy_document" "processed_bucket_policy" {
     effect = "Deny"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::*:role/sandbox"]
+      identifiers = [local.environment == development ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/sandbox" : "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer"]
     }
     actions = [
       "s3:*"
@@ -191,7 +191,7 @@ data "aws_iam_policy_document" "bold_egress_bucket_policy" {
     effect = "Deny"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::*:role/sandbox"]
+      identifiers = [local.environment == development ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/sandbox" : "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer"]
     }
     actions = [
       "s3:*"
@@ -238,7 +238,7 @@ data "aws_iam_policy_document" "datasync_opg_policy" {
     effect = "Deny"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::*:role/sandbox"]
+      identifiers = [local.environment == development ? "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/sandbox" : "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:role/developer"]
     }
     actions = [
       "s3:*"
