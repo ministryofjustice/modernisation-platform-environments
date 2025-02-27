@@ -18,7 +18,3 @@ variable "athena_workgroup" {
 variable "athena_database" {
   type = string
 }
-
-variable "athena_output_location" {
-  type = string
-}
