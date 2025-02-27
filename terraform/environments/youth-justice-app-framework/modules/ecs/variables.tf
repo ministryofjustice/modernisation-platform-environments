@@ -275,3 +275,9 @@ variable "ecs_allowed_secret_arns" {
   type        = list(string)
   default     = []
 }
+
+
+variable "rds_postgresql_sg_id" {
+  description = "The ID of the security grouos that conteolls ingress to the PostgreSQL database."
+  type        = string
+}
