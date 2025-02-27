@@ -29,6 +29,6 @@ aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform workspace se
 
 aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform plan
 
-# if [[ "${APPLY}" == "true" ]]; then
-#   aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform apply
-# fi
+if [[ "${APPLY}" == "true" ]]; then
+  aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform apply
+fi
