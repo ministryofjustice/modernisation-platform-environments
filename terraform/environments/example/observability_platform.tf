@@ -85,16 +85,11 @@ resource "aws_iam_role_policy_attachment" "observability_platform_role_grafana_a
   policy_arn = aws_iam_policy.grafana_athena_full_access_policy.arn
 }
 
-import {
-    id = "primary"
-    to = aws_athena_workgroup.primary
-}
-
 resource "aws_athena_workgroup" "primary" {
   name = "primary"
 
   configuration {
-    enforce_workgroup_configuration = false
+    enforce_workgroup_configuration = true
     publish_cloudwatch_metrics_enabled = false
 
     result_configuration {
