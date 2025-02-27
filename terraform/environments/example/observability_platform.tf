@@ -69,7 +69,7 @@ resource "aws_iam_policy" "grafana_athena_full_access_policy" {
                 "s3:PutBucketPublicAccessBlock"
             ],
             "Resource": [
-                "arn:aws:s3:::grafana-athena-query-results-*"
+                "arn:aws:s3:::manual-athena-test-ex"
             ]
         }
     ]
