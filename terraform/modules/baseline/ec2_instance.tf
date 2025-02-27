@@ -3,10 +3,7 @@ module "ec2_instance" {
 
   for_each = var.ec2_instances
 
-  #source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=ebf373aef70841d1c854689eb034b4e147be1709"
-  # source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=57296f508067f589ad107684b7c207c2a188ae9d" # Test reference using count
-
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=e5463b1bf8a79443b6def1272b673e916acbdd75" # pre-merge hash
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1" # replace managed_policy_arns argument in module with aws_iam_role_policy_attachment
 
   providers = {
     aws.core-vpc = aws.core-vpc
