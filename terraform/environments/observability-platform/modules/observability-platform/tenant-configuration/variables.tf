@@ -23,6 +23,7 @@ variable "aws_accounts" {
     athena_config = optional(map(object({
       database  = string
       workgroup = string
+      output_location = string
     })))
   }))
   default = {

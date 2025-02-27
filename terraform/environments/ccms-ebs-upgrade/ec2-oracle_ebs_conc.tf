@@ -47,6 +47,30 @@ resource "aws_instance" "ec2_oracle_conc" {
   depends_on = [aws_security_group.ec2_sg_ebsconc]
 }
 
+resource "aws_ebs_volume" "conc_swap" {
+  count = local.application_data.accounts[local.environment].conc_no_instances > 0 && local.application_data.accounts[local.environment].ebs_size_ebsconc_swap > 0 ? local.application_data.accounts[local.environment].conc_no_instances : 0
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsconc_swap
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsconc, "swap")) },
+    { device-name = "/dev/sdm" }
+  )
+}
+
+resource "aws_volume_attachment" "conc_swap_att" {
+  count = local.application_data.accounts[local.environment].conc_no_instances > 0 && local.application_data.accounts[local.environment].ebs_size_ebsconc_swap > 0 ? 1 : 0
+  device_name = "/dev/sds" # sdb was taken on the upgrade-dev conc by the AMI swap volume
+  volume_id   = aws_ebs_volume.conc_swap[count.index].id
+  instance_id = aws_instance.ec2_oracle_conc[count.index].id
+}
+
 resource "aws_ebs_volume" "conc_export_home" {
   count = local.application_data.accounts[local.environment].conc_no_instances
   lifecycle {
@@ -128,6 +152,7 @@ resource "aws_ebs_volume" "conc_home" {
   size              = local.application_data.accounts[local.environment].ebs_size_ebsconc_home
   type              = "io2"
   iops              = 3000
+  snapshot_id       = length(local.application_data.accounts[local.environment].ebs_home_conc_snapshot_id) > 0 ? local.application_data.accounts[local.environment].ebs_home_conc_snapshot_id : null
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,

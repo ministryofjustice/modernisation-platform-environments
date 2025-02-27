@@ -210,6 +210,7 @@ locals {
                 mod-platform-cur-reports = {
                   database  = "moj-cur-athena-db"
                   workgroup = "mod-platform-cur-reports"
+                  output_location = ""
                 }
               }
             },
@@ -256,6 +257,7 @@ locals {
                 primary = {
                   database  = "greenops_cur_poc"
                   workgroup = "primary"
+                  output_location = "s3://manual-athena-test-ex"
                 }
               }
             }
