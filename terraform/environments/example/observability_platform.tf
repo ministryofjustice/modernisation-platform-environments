@@ -6,3 +6,8 @@ module "observability_platform_tenant" {
 
   tags = local.tags
 }
+
+resource "aws_iam_role_policy_attachment" "observability_platform_role_grafana_athena_full_access_attachment" {
+  role       = "observability-platform"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonGrafanaAthenaAccess"
+}
