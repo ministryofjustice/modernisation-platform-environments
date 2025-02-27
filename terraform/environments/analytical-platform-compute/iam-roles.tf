@@ -282,3 +282,11 @@ module "gha_moj_ap_airflow_iam_role" {
 
   tags = local.tags
 }
+
+module "analytical_platform_ui_service_role" {
+  source = "./cluster"
+
+  iam_role_arn = module.analytical_platform_ui_service_role.iam_role_arn
+
+  networking = []
+}
