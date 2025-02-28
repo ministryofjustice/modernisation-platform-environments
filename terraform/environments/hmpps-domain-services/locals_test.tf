@@ -143,6 +143,9 @@ locals {
         cloudwatch_metric_alarms = null
       })
       test-rds-2-a = merge(local.ec2_instances.rds, {
+        config = merge(local.ec2_instances.rdgw.config, {
+          availability_zone = "eu-west-2b"
+        })
         tags = merge(local.ec2_instances.rds.tags, {
           domain-name = "azure.noms.root"
         })
