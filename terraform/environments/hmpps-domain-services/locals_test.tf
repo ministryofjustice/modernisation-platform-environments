@@ -98,6 +98,7 @@ locals {
         tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
           domain-name = "azure.noms.root"
         })
+        cloudwatch_metric_alarms = null
       })
       test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
         tags = merge(local.ec2_autoscaling_groups.rds.tags, {
