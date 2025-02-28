@@ -4,7 +4,7 @@ module "ds" {
   project_name = local.project_name
   tags         = merge(local.tags, { Name = "AD Management Server" })
 
-  environment_name             = local.application_data.accounts[local.environment].environment_name
+  environment_name             = local.environment_name
   ad_management_instance_count = local.application_data.accounts[local.environment].ad_management_instance_count
 
 
