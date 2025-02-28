@@ -134,6 +134,9 @@ locals {
       # existing comment above but fails in modules/baseline/lb.tf
       # target_id doesn't exist
       test-rdgw-2-a = merge(local.ec2_instances.rdgw, {
+        config = merge(local.ec2_instances.rdgw.config, {
+          availability_zone = "eu-west-2b"
+        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           domain-name = "azure.noms.root"
         })
