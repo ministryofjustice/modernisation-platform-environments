@@ -9,15 +9,21 @@ data "aws_iam_policy_document" "datahub_read_cadet_bucket" {
       "s3:Describe*"
     ]
     resources = [
+      "${module.s3_structured_historical_bucket.bucket_arn}/data/prod/run_artefacts/*",
+      "${module.s3_structured_historical_bucket.bucket_arn}/data/preprod/run_artefacts/*",
       module.s3_structured_historical_bucket.bucket_arn
     ]
-    condition {
-      test = "StringLike"
-      variable = "s3:prefix"
-      values = [
-        "data/${local.environment}/run_artefacts/latest/target/*"
-      ]
-    }
+  }
+
+  statement {
+    sid    = "AllowKMSDecrypt"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = [
+      local.s3_kms_arn
+    ]
   }
 }
 
@@ -55,7 +61,7 @@ resource "aws_iam_role" "datahub_ingestion_github_actions" {
   name                 = "${local.project}_datahub-ingestion-github-actions"
   assume_role_policy   = data.aws_iam_policy_document.datahub_ingestion_github_actions.json
   max_session_duration = 14400
-  
+
   tags = merge(
     local.tags,
     {

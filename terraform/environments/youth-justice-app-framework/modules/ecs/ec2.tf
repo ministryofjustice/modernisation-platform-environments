@@ -35,6 +35,30 @@ locals {
   ecs_optimized_ami = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)
 }
 
+resource "aws_iam_policy" "ecs-fetch-secrets-policy" {
+  name        = "ecs-fetch-secrets-policy"
+  description = "Allows ecs services to fetch secrets from secrets manager"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Sid" : "VisualEditor0",
+        "Effect" : "Allow",
+        "Action" : [
+          "secretsmanager:GetRandomPassword",
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds",
+          "secretsmanager:ListSecrets",
+          "secretsmanager:CancelRotateSecret"
+        ],
+        "Resource" : var.ecs_allowed_secret_arns
+      }
+    ]
+  })
+}
+
 #tfsec:ignore:AVD-AWS-0130
 module "autoscaling" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
@@ -49,6 +73,7 @@ module "autoscaling" {
     AmazonSSMManagedInstanceCore        = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
     AmazonEC2RoleforSSM                 = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
     AmazonEC2ContainerServiceforEC2Role = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
+    ecs-fetch-secrets-policy            = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
   }
   security_groups = [module.autoscaling_sg.security_group_id]
 
@@ -63,6 +88,7 @@ module "autoscaling" {
 
   # Launch template settings
   create_launch_template = true
+  ebs_optimized          = false
   #launch_template_id     = aws_launch_template.this.id #todo try creating within the module instead
   launch_template_name = "${var.cluster_name}-ec2-launch-template"
   image_id             = local.ecs_optimized_ami.image_id #todo change to output of image builder
