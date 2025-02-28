@@ -188,18 +188,18 @@ locals {
           })
 
           # Add new gateway 2 config
-          test-rdgw-2-http = merge(local.lbs.public.instance_target_groups.http, {
-            attachments = [
-              { ec2_instance_name = "test-rdgw-2-a" },
-            ]
-          })
+          # test-rdgw-2-http = merge(local.lbs.public.instance_target_groups.http, {
+          #   attachments = [
+          #     { ec2_instance_name = "test-rdgw-2-b" },
+          #   ]
+          # })
 
           # Add RDS for web access
-          test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
-            attachments = [
-              { ec2_instance_name = "test-rds-2-a" },
-            ]
-          })
+          # test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
+          #   attachments = [
+          #     { ec2_instance_name = "test-rds-2-b" },
+          #   ]
+          # })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -225,36 +225,36 @@ locals {
               }
 
               # Add new gateway 2 rule
-              test-rdgw-2-http = {
-                priority = 110
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rdgw-2-http"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              # test-rdgw-2-http = {
+              #   priority = 110
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "test-rdgw-2-http"
+              #   }]
+              #   conditions = [{
+              #     host_header = {
+              #       values = [
+              #         "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
+              #       ]
+              #     }
+              #   }]
+              # }
 
               # add RDS rule
-              test-rds-2-https = {
-                priority = 120
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rds-2-https"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdweb2.test.hmpps-domain.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              # test-rds-2-https = {
+              #   priority = 120
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "test-rds-2-https"
+              #   }]
+              #   conditions = [{
+              #     host_header = {
+              #       values = [
+              #         "rdweb2.test.hmpps-domain.service.justice.gov.uk",
+              #       ]
+              #     }
+              #   }]
+              # }
             }
           })
         })
@@ -272,8 +272,8 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
-          { name = "rdgateway2", type = "A", lbs_map_key = "public" },
-          { name = "rdweb2", type = "A", lbs_map_key = "public" },
+          # { name = "rdgateway2", type = "A", lbs_map_key = "public" },
+          # { name = "rdweb2", type = "A", lbs_map_key = "public" },
         ]
       }
     }
