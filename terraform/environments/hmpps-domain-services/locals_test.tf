@@ -133,14 +133,15 @@ locals {
       # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
       # existing comment above but fails in modules/baseline/lb.tf
       # target_id doesn't exist
-      test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
-        tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
+      test-rdgw-2-a = merge(local.ec2_instances.rdgw, {
+        config = merge(loca)
+        tags = merge(local.ec2_instances.rdgw.tags, {
           domain-name = "azure.noms.root"
         })
         cloudwatch_metric_alarms = null
       })
-      test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
-        tags = merge(local.ec2_autoscaling_groups.rds.tags, {
+      test-rds-2-a = merge(local.ec2_instances.rds, {
+        tags = merge(local.ec2_instances.rds.tags, {
           domain-name = "azure.noms.root"
         })
         cloudwatch_metric_alarms = null
