@@ -14,7 +14,7 @@ module "s3-log" {
 
   tags = local.tags
 
-  ownership_controls = "BucketOwnerEnforced"
+ # ownership_controls = "BucketOwnerEnforced"
 }
 
 module "s3" {
@@ -22,7 +22,7 @@ module "s3" {
 
   environment_name = local.environment_name
 
-  log_bucket = local.log_bucket
+  log_bucket = "${var.environment_name}-${var.bucket_namelocal.log_bucket}"
 
   bucket_name  = ["redshift-yjb-reporting", "install-files"]
  
