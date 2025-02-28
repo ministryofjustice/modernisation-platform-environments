@@ -14,7 +14,7 @@ module "s3-log" {
 
   tags = local.tags
 
-  acl = "BucketOwnerEnforced"
+  ownership_controls = "BucketOwnerEnforced"
 }
 
 module "s3" {
