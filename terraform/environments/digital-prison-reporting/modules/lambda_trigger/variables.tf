@@ -23,7 +23,6 @@ variable "trigger_event_pattern" {
 variable "trigger_input_event" {
   description = "(Optional) JSON event which will be sent to the lambda"
   type        = string
-
   default = null
 }
 
@@ -35,4 +34,10 @@ variable "lambda_function_name" {
 variable "lambda_function_arn" {
   description = "The lambda arn"
   type        = string
+}
+
+variable "event_bus_name" {
+  description = "Name of the event bus"
+  type        = string
+  default     = "default"
 }
