@@ -13,6 +13,8 @@ module "s3-log" {
   project_name = local.project_name
 
   tags = local.tags
+
+  acl = "BucketOwnerEnforced"
 }
 
 module "s3" {
