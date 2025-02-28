@@ -127,6 +127,12 @@
             "log_group_name": "cwagent-windows-application",
             "log_stream_name": "{instance_id}",
             "event_format": "xml"
+          },
+          {
+            "event_name": "Security",
+            "event_levels": ["INFORMATION", "WARNING", "ERROR", "CRITICAL"],
+            "log_group_name": "cwagent-windows-security",
+            "log_stream_name": "{instance_id}"
           }
         ]
       }

@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      version = "~> 5.0"
+      version = "~> 5.0, != 5.86.0"
       source  = "hashicorp/aws"
     }
   }
@@ -29,13 +29,6 @@ module "this-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : var.logging_bucket.bucket.id,
-    "log_bucket_arn" : var.logging_bucket.bucket.arn,
-    "log_bucket_policy" : var.logging_bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${var.local_bucket_prefix}-export-${var.export_destination}/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {

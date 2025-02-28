@@ -33,7 +33,6 @@ module "oracle_db_shared" {
     aws.core-vpc              = aws.core-vpc
     aws.core-network-services = aws.core-network-services
   }
-
 }
 
 module "oracle_db_dsd" {
@@ -89,7 +88,6 @@ module "oracle_db_dsd" {
     aws.core-network-services = aws.core-network-services
   }
 }
-
 
 module "oracle_db_boe" {
   source         = "../../../delius-core/modules/components/oracle_db_instance"
