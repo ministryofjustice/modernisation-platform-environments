@@ -1,4 +1,4 @@
-# S3 Terraform module
+# SES Terraform module
 
 Terraform module which creates s3 buckets on AWS.
 
