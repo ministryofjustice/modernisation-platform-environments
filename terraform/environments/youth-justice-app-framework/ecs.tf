@@ -47,5 +47,8 @@ module "ecs" {
   environment  = local.environment
   tags         = local.tags
 
-  depends_on = [module.internal_alb, module.external_alb]
+  #RDS Details
+  rds_postgresql_sg_id = module.aurora.rds_cluster_security_group_id
+
+  depends_on = [module.internal_alb, module.external_alb, module.aurora]
 }
