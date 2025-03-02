@@ -74,3 +74,15 @@ resource "aws_sesv2_configuration_set" "ses_configuration_set" {
 
   tags = var.tags
 }
+
+
+### Suppression list import
+resource "null_resource" "import_suppression" {
+  provisioner "local-exec" {
+    command = "./import_suppression.sh"
+  }
+
+  triggers = {
+    always_run = "${timestamp()}" # Ensures it runs every time
+  }
+}
