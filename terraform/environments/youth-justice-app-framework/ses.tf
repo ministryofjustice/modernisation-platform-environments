@@ -5,4 +5,5 @@ module "ses" {
   environment           = local.environment
   tags                  = local.tags
   ses_domain_identities = each.value
+  key_id                = module.kms.key_id
 }

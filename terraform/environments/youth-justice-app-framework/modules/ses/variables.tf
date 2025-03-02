@@ -18,3 +18,8 @@ variable "ses_domain_identities" {
   type        = list(string)
   description = "SES domain identities to verify"
 }
+
+variable "key_id" {
+  type        = string
+  description = "The KMS key ID to use for the secret"
+}

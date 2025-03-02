@@ -1,10 +1,10 @@
 resource "aws_ses_domain_identity" "main" {
-  for_each = var.ses_domain_identities
+  for_each = toset(var.ses_domain_identities)
   domain   = each.value
 }
 
 resource "aws_ses_domain_identity_verification" "main" {
-  for_each = var.ses_domain_identities
+  for_each = toset(var.ses_domain_identities)
   domain   = aws_ses_domain_identity.main[each.value].domain
 
   depends_on = [module.route53_records]
@@ -50,7 +50,7 @@ resource "aws_secretsmanager_secret" "ses_user_secret" {
   #checkov:skip=CKV2_AWS_57:todo add rotation if needed
   name        = "${var.project_name}-ses-user"
   description = "key credentials for ses user"
-  kms_key_id  = module.kms.key_id
+  kms_key_id  = var.key_id
   tags        = var.tags
 }
 
