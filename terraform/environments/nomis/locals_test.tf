@@ -714,7 +714,9 @@ locals {
       "/oracle/database/T3CNOM"   = local.secretsmanager_secrets.db_cnom
 
       "/hmpps/self-signed-serts" = {
-        passwords = { description = "certificate passwords" }
+        secrets = {
+          passwords = { description = "certificate passwords" }
+        }
       }
     }
   }
