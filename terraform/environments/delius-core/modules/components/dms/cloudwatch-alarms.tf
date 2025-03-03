@@ -43,12 +43,6 @@ locals {
       }
     },
     { for k in keys(local.client_account_map) :
-      "business_interaction_inbound_replication_from_${k}" => {
-        replication_task_arn = aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_arn
-        replication_task_id  = aws_dms_replication_task.business_interaction_inbound_replication[k].replication_task_id
-      }
-    },
-    { for k in keys(local.client_account_map) :
       "audited_interaction_inbound_replication_from_${k}" => {
         replication_task_arn = aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_arn
         replication_task_id  = aws_dms_replication_task.audited_interaction_inbound_replication[k].replication_task_id
@@ -70,12 +64,6 @@ locals {
       "user_outbound_replication_to_${k}" => {
         replication_task_arn = aws_dms_replication_task.user_outbound_replication[k].replication_task_arn
         replication_task_id  = aws_dms_replication_task.user_outbound_replication[k].replication_task_id
-      }
-    },
-    try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
-      business_interaction_outbound_replication = {
-        replication_task_arn = aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_arn
-        replication_task_id  = aws_dms_replication_task.business_interaction_outbound_replication[0].replication_task_id
       }
     },
     try(var.dms_config.audit_source_endpoint.read_database, null) == null ? {} : {
