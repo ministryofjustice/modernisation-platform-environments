@@ -50,3 +50,8 @@ data "aws_acm_certificate" "WAM_PROD_ALB" {
   domain   = "wam.ppud.justice.gov.uk"
   statuses = ["ISSUED"]
 }
+
+# Destination S3 Bucket for Database Replication
+data "aws_s3_bucket" "mojap-data-engineering-production-ppud-dev" {
+  bucket = "mojap-data-engineering-production-ppud-dev"
+}
