@@ -681,7 +681,7 @@ locals {
           from_port       = 445
           to_port         = 445
           protocol        = "TCP"
-          security_groups = ["app", "web"]
+          security_groups = ["app", "web", "domain", "jumpserver"]
         }
         winrm_fsx = {
           description = "5985: WinRM 2.0 (Microsoft Windows Remote Management)"
