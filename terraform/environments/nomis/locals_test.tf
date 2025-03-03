@@ -712,6 +712,10 @@ locals {
       "/oracle/database/T2NDH"    = local.secretsmanager_secrets.db
       "/oracle/database/T2TRDAT"  = local.secretsmanager_secrets.db
       "/oracle/database/T3CNOM"   = local.secretsmanager_secrets.db_cnom
+
+      "/hmpps/self-signed-serts" = {
+        passwords = { description = "certificate passwords" }
+      }
     }
   }
 }
