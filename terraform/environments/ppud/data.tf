@@ -55,3 +55,7 @@ data "aws_acm_certificate" "WAM_PROD_ALB" {
 data "aws_s3_bucket" "mojap-data-engineering-production-ppud-dev" {
   bucket = "mojap-data-engineering-production-ppud-dev"
 }
+
+output "mojap-data-engineering-production-ppud-dev" {
+  value = data.aws_s3_bucket.mojap-data-engineering-production-ppud-dev.arn
+}
