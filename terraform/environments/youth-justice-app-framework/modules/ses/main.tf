@@ -80,7 +80,7 @@ resource "aws_sesv2_configuration_set" "ses_configuration_set" {
 ### Suppression list import
 resource "null_resource" "import_suppression" {
   provisioner "local-exec" {
-    command = "./import_suppression.sh"
+    command = "${path.module}/import_suppression.sh"
   }
 
   triggers = {
