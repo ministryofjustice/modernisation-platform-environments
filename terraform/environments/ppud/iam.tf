@@ -1503,7 +1503,7 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_access_policy_to_lambda_ro
 
 resource "aws_iam_role" "iam_role_s3_bucket_moj_database_source_dev" {
   count              = local.is-development == true ? 1 : 0
-  name               = ""
+  name               = "iam_role_s3_bucket_moj_database_source_dev"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -1516,8 +1516,10 @@ resource "aws_iam_role" "iam_role_s3_bucket_moj_database_source_dev" {
       "Action": "sts:AssumeRole"
     }
   ]
+  }
   EOF
 }
+
 
 resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
   count       = local.is-development == true ? 1 : 0
