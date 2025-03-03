@@ -1190,7 +1190,7 @@ resource "aws_s3_bucket_replication_configuration" "moj-database-source-dev-repl
 	}
 
     destination {
-      bucket        = aws_s3_bucket.mojap-data-engineering-production-ppud-dev.arn
+      bucket        = data.aws_s3_bucket.mojap-data-engineering-production-ppud-dev.arn
       storage_class = "STANDARD"
     }
   }
