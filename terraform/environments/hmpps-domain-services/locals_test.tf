@@ -118,24 +118,23 @@ locals {
         })
       })
 
-      # testing only do not use
-      # t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
-      #   config = merge(local.ec2_instances.jumpserver.config, {
-      #     ami_name          = "hmpps_windows_server_2022_release_2025-*"
-      #     availability_zone = "eu-west-2b"
-      #   })
-      #   tags = merge(local.ec2_instances.jumpserver.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
+      # testing only do not use, use Feb AMI, possible issues with March/latest
+      t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          ami_namw          = "hmpps_windows_server_2022_release_2025-02-02T00-00-40.706Z"
+          availability_zone = "eu-west-2b"
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
 
       # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
       # existing comment above but fails in modules/baseline/lb.tf
       # target_id doesn't exist
       # test-rdgw-2-b = merge(local.ec2_instances.rdgw, {
       #   config = merge(local.ec2_instances.rdgw.config, {
-      #     ami_name          = "hmpps_windows_server_2022_release_2025-*"
       #     availability_zone = "eu-west-2b"
       #   })
       #   tags = merge(local.ec2_instances.rdgw.tags, {
@@ -145,7 +144,6 @@ locals {
       # })
       # test-rds-2-b = merge(local.ec2_instances.rds, {
       #   config = merge(local.ec2_instances.rds.config, {
-      #     ami_name          = "hmpps_windows_server_2022_release_2025-*"
       #     availability_zone = "eu-west-2b"
       #     user_data_raw = base64encode(templatefile(
       #       "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
