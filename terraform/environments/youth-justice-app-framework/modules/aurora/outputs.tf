@@ -10,5 +10,5 @@ output "app_rotated_postgres_secret_arn" {
 
 output "rds_cluster_security_group_id" {
   description = "The ID of the Security Groups that is used to controll access to the RDS cluster."
-  value       =  aws_security_group.rds.id
+  value       = aws_security_group.rds.id
 }

@@ -81,7 +81,7 @@ module "managed-ad" {
 
 # Issues and workarounds
 ## CouudFormation Template for the KPI Infrastructure
-It is recommended that rollback on failure is never disable to ensure that the infrastructure is tidied up to a state where a sucessfull rerun is possible when ever a failure occures. This is particurly important in enviroments other than development where a manual rollback may not be possible due to permissions restrictions. 
+It is recommended that rollback on failure is never disable to ensure that the infrastructure is tidied up to a state where a sucessfull rerun is possible when ever a failure occures. This is particurly important in enviroments other than development where a manual rollback may not be possible due to permissions restrictions.
 
 If automatic rollbck is disabled for any reason the following manuall actions may be needed to tidy up entries in the Directory Sevice that would otherwise prevent a sucessfuly rerun:
 
@@ -90,7 +90,7 @@ Open `Active Directory Users and Computers` for domain `i2N.com`. Navigate to OU
 2. Remove DNS entries for SubordinateCA and KPI.
 Open `DNS` management comsole and remove DNS entries from the Forward Lookup Zone `i2n.com` for `SubordinateCA` and `KPI`.
 3. Removed `Public Key Services` entries for the CAs.
-Open `Active Directory Sites and Services` and Show the Servics node. At Services\Public Key Services\AIA, Delete `RootCA` and `SubordinateCA`. At Services\Public Key Services\CDP, Delete container `SubordinateCA` with all its contents. 
+Open `Active Directory Sites and Services` and Show the Servics node. At Services\Public Key Services\AIA, Delete `RootCA` and `SubordinateCA`. At Services\Public Key Services\CDP, Delete container `SubordinateCA` with all its contents.
 
 ## Troublshooting Domain Join
 If login doesn't work using the domain `admin` user as an alternative the local `Administrator` user can be used. The password for the local `Administrator` use is in Secret `ad_instance_password_secret_1`.
@@ -98,7 +98,7 @@ If login doesn't work using the domain `admin` user as an alternative the local 
 If the instances hasn't koined the domain, this is probably becuase the domain joint association has not been successfuly. When creating a 2nd instance it has been seen to fail with status `Undetermined`, whithout any other informaiotn regarding the cause. (The cause is probably that it tried to run before the instance was ready.) To identify if this is the cause and resolve via the AWS consoler:
 1. Navigate to `AWS Systems Manager` > `State Manager` and look for the latest association for document `ssm_document_ad_schema2.2`.
 2. Select the above association and use the `Resources` tab to check the status.
-3. Reapply the association using button `Apply association now` and confirm that it is now successful. 
+3. Reapply the association using button `Apply association now` and confirm that it is now successful.
 
 # Cutover and Setup Guidance
 ## Introduciton
@@ -113,7 +113,7 @@ When each instance is created the User-Data script performs some language setup 
 - Notepad++
 - pgAdmin
 
-###Location for User-Data scripts and log files:
+### Location for User-Data scripts and log files:
 
 `C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch<nnnnnnnnn>\`
 This will contin and copy of the User-DAte script as well as err and output log files from running the script.
@@ -121,7 +121,7 @@ This will contin and copy of the User-DAte script as well as err and output log 
 ## Enable File Copy via Clipboard
 While files can be uploaded and downloaded via a S3 bucket it may be  more converient to enable file copy via the clipboard by removing a setting in Group Policy. This only needs to be done once per environment to enable copy on all domain menbers (the management servers and the Suborginate CA server).
 
-To amend launch the `Group Policy Editor` (`gpedit.msc`), navigate to `Local Computer Policy \ Computer Configuration \ Administrative Templates \ Windows Components \ Remote Desktop Services \ Remote Desktop Session Host \ Device and Resource Redirection` and change Setting `Do not allow drive redirection` to `Not Configured`.` 
+To amend launch the `Group Policy Editor` (`gpedit.msc`), navigate to `Local Computer Policy \ Computer Configuration \ Administrative Templates \ Windows Components \ Remote Desktop Services \ Remote Desktop Session Host \ Device and Resource Redirection` and change Setting `Do not allow drive redirection` to `Not Configured`.`
 
 ## Required Manual Configuraiton Changes
 
@@ -195,7 +195,7 @@ The following describes the process of copying data from one environment to anot
 6. Run powerShell script `.\import-admin-users.ps1`
 Note: Errors relating to admin user should be ignored as this user is created when the infrastructure is built.
 
-### Cutover 
+### Cutover
 For cutover repeat the export and import steps for Yjaf Users only.
 On a source management server:
 1. Run powershell script `export-yjaf-users.ps1`

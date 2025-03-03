@@ -73,7 +73,7 @@ resource "aws_security_group" "rds" {
   description = "Controls access to the PostgreSQL RDS"
   vpc_id      = var.vpc_id
 
-   tags = merge(local.all_tags,
+  tags = merge(local.all_tags,
     {
       Name = "RDS Postgres Security Group"
     }
@@ -85,17 +85,17 @@ resource "aws_security_group" "rds" {
 }
 
 resource "aws_security_group_rule" "rds" {
-   for_each = var.rds_security_group_ingress
+  for_each = var.rds_security_group_ingress
 
-   security_group_id = aws_security_group.rds.id
-   type              = "ingress"
+  security_group_id = aws_security_group.rds.id
+  type              = "ingress"
 
-   from_port                = each.value.from_port
-   to_port                  = each.value.to_port
-   protocol                 = each.value.protocol
-   cidr_blocks              = each.value.cidr_blocks
-   source_security_group_id = each.value.source_security_group_id
-   description              = each.value.description
+  from_port                = each.value.from_port
+  to_port                  = each.value.to_port
+  protocol                 = each.value.protocol
+  cidr_blocks              = each.value.cidr_blocks
+  source_security_group_id = each.value.source_security_group_id
+  description              = each.value.description
 
 }
 
