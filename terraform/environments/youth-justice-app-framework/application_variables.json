@@ -6,7 +6,7 @@
       "ad_management_instance_count": 1,
       "desired_number_of_domain_controllers": 2,
       "ses_domain_identities": [
-        "dev.justice.gov.uk","yjb.gov.uk","dev.yjbservices.yjb.gov.uk"
+        "development.justice.gov.uk","yjb.gov.uk","development.yjbservices.yjb.gov.uk"
       ]
     },
     "test": {

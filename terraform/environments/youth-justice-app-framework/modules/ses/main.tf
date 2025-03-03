@@ -3,12 +3,12 @@ resource "aws_ses_domain_identity" "main" {
   domain   = each.value
 }
 
-resource "aws_ses_domain_identity_verification" "main" {
-  for_each = toset(var.ses_domain_identities)
-  domain   = aws_ses_domain_identity.main[each.value].domain
-
-  depends_on = [module.route53_records]
-}
+#resource "aws_ses_domain_identity_verification" "main" {
+#  for_each = toset(var.ses_domain_identities)
+#  domain   = aws_ses_domain_identity.main[each.value].domain
+#
+#  depends_on = [aws_route53_record.ses_verification, aws_route53_record.ses_dkim, aws_route53_record.ses_dkim_2, aws_route53_record.ses_dkim_3]
+#}
 
 resource "aws_ses_domain_dkim" "main" {
   for_each = toset(var.ses_domain_identities)
