@@ -119,16 +119,16 @@ locals {
       })
 
       # testing only do not use
-      t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
-        config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name          = "hmpps_windows_server_2022_release_2025-*"
-          availability_zone = "eu-west-2b"
-        })
-        tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.noms.root"
-        })
-        cloudwatch_metric_alarms = null
-      })
+      # t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+      #   config = merge(local.ec2_instances.jumpserver.config, {
+      #     ami_name          = "hmpps_windows_server_2022_release_2025-*"
+      #     availability_zone = "eu-west-2b"
+      #   })
+      #   tags = merge(local.ec2_instances.jumpserver.tags, {
+      #     domain-name = "azure.noms.root"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      # })
 
       # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
       # existing comment above but fails in modules/baseline/lb.tf
