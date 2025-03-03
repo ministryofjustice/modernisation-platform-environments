@@ -53,6 +53,7 @@ data "aws_acm_certificate" "WAM_PROD_ALB" {
 
 # Destination S3 Bucket for Database Replication
 data "aws_s3_bucket" "mojap-data-engineering-production-ppud-dev" {
+  count    = local.is-development == true ? 1 : 0
   bucket = "mojap-data-engineering-production-ppud-dev"
 }
 
