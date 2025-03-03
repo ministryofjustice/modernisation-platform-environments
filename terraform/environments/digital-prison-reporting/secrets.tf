@@ -403,6 +403,6 @@ resource "aws_secretsmanager_secret" "ods_dps_inc_reporting_access" {
 }
 
 resource "aws_secretsmanager_secret_version" "ods_dps_inc_reporting_access" {
-  secret_id     = aws_secretsmanager_secret.ods_dps_inc_reporting.id
+  secret_id     = aws_secretsmanager_secret.ods_dps_inc_reporting_access.id
   secret_string = jsonencode(local.ods_access_secret_placeholder)
 }
