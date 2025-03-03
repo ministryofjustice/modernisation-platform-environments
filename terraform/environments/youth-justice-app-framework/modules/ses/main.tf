@@ -11,7 +11,8 @@ resource "aws_ses_domain_identity_verification" "main" {
 }
 
 resource "aws_ses_domain_dkim" "main" {
-  domain = aws_ses_domain_identity.main.domain
+  for_each = toset(var.ses_domain_identities)
+  domain   = aws_ses_domain_identity.main[each.value].domain
 }
 
 
