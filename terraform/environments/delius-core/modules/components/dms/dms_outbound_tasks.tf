@@ -81,7 +81,7 @@ resource "aws_dms_replication_task" "user_outbound_replication" {
 # NB: Since Auited Interaction is a CDC task and Business Interaction is a Full Load / CDC task
 #     these must be defined as separate replication tasks
 resource "aws_dms_replication_task" "business_interaction_outbound_replication" {
-  count               = try(var.dms_config.audit_source_endpoint.read_database, null) == null ? 0 : 1
+  count               = 0
   replication_task_id = "${var.env_name}-business-interaction-outbound-replication-task-for-${lower(var.dms_config.audit_source_endpoint.read_database)}"
   # As this is reference data we can simply reload if required (full-load-and-cdc)
   migration_type = "full-load-and-cdc"
