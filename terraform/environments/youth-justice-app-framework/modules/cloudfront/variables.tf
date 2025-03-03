@@ -47,5 +47,5 @@ variable "kms_key_arn" {
 variable "cloudfront_route53_record_name" {
   description = "The name of the Route 53 record to create for the CloudFront distribution"
   type        = string
-  default = ""
+  default     = ""
 }
