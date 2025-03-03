@@ -362,6 +362,15 @@ locals {
     username            = module.datamart.redshift_master_user
   }
 
+  # Placeholder for unpopulated Operational DataStore access secrets
+  ods_access_secret_placeholder = {
+    host     = module.aurora_operational_db.cluster_endpoint
+    port     = local.operational_db_port
+    database = local.operational_db_default_database
+    username = "placeholder"
+    password = "placeholder"
+  }
+
   analytical_platform_share = can(local.application_data.accounts[local.environment].analytical_platform_share) ? { for share in local.application_data.accounts[local.environment].analytical_platform_share : share.target_account_name => share } : {}
 
   # Observability Platform & Analytical Platform
