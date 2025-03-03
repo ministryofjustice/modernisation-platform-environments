@@ -199,7 +199,7 @@ locals {
             ]
           })
 
-          Add RDS for web access
+          # Add RDS for web access
           test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "test-rds-2-b" },
