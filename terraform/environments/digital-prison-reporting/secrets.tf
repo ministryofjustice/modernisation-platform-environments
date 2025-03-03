@@ -387,22 +387,22 @@ resource "aws_secretsmanager_secret_version" "transfer_component_role_secret_ver
 # Operational DataStore Access Secrets
 
 # Incident Reporting
-resource "aws_secretsmanager_secret" "ods_dps_inc_reporting" {
+resource "aws_secretsmanager_secret" "ods_dps_inc_reporting_access" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
-  name = "dpr-ods-irs-dps-inc-reporting-${local.env}"
+  name = "dpr-ods-dps-inc-reporting-${local.env}"
   tags = merge(
     local.all_tags,
     {
-      Name          = "dpr-ods-irs-dps-inc-reporting-${local.env}"
+      Name          = "dpr-ods-dps-inc-reporting-${local.env}"
       Resource_Type = "Secrets"
       Jira          = "DPR-1751"
     }
   )
 }
 
-resource "aws_secretsmanager_secret_version" "ods_dps_inc_reporting" {
+resource "aws_secretsmanager_secret_version" "ods_dps_inc_reporting_access" {
   secret_id     = aws_secretsmanager_secret.ods_dps_inc_reporting.id
   secret_string = jsonencode(local.ods_access_secret_placeholder)
 }
