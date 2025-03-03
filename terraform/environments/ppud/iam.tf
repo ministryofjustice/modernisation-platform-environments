@@ -1575,10 +1575,7 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
         "Resource" : [
           "arn:aws:s3:::moj-database-source-dev",
           "arn:aws:s3:::moj-database-source-dev/*"
-        ],
-        "Principal" : {
-          Service = "logging.s3.amazonaws.com"
-        }
+        ]
     },
 	{
 		"Sid": "EC2Permissions",
@@ -1595,10 +1592,10 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
           "arn:aws:s3:::moj-database-source-dev",
           "arn:aws:s3:::moj-database-source-dev/*"
         ],
-        "Principal" : {
-          "AWS" : [
-            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role"
-          ]
+        "Condition": {
+          "ArnEquals": {
+            "aws:PrincipalArn": "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role"
+          }
         }
     }
   ]
