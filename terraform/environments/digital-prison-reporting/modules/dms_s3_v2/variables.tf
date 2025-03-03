@@ -47,44 +47,6 @@ variable "create" {
   default = true
 }
 
-<<<<<<< Updated upstream
-=======
-variable "create_iam_roles" {
-  type    = bool
-  default = true
-}
-
-variable "iam_role_permissions_boundary" {
-  description = "ARN of the policy that is used to set the permissions boundary for the role"
-  type        = string
-  default     = null
-}
-
-# Used in tagging and naming the resources
-
-variable "stack_name" {
-  description = "The name of our application"
-  type        = string
-  default     = "dblink"
-}
-
-variable "owner" {
-  description = "A group email address to be used in tags"
-  type        = string
-  default     = "autobots@ga.gov.au"
-}
-
-#--------------------------------------------------------------
-# DMS general config
-#--------------------------------------------------------------
-
-variable "identifier" {
-  default     = "rds"
-  type        = string
-  description = "Name of the database in the RDS"
-}
-
->>>>>>> Stashed changes
 #--------------------------------------------------------------
 # DMS Replication Instance
 #--------------------------------------------------------------
