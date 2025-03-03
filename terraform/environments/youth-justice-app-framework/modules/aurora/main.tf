@@ -73,7 +73,7 @@ resource "aws_security_group" "rds" {
   description = "Controls access to the PostgreSQL RDS"
   vpc_id      = var.vpc_id
 
-   tags = merge(local.all_tags,
+  tags = merge(local.all_tags,
     {
       Name = "RDS Postgres Security Group"
     }
@@ -88,18 +88,18 @@ resource "aws_security_group" "rds" {
 # Retrieve the predefined Prefix List for S3 access
 # TODO Consider replacing the hard coded regon in the prefix name with a variable.
 data "aws_prefix_list" "s3" {
-  name   = "com.amazonaws.eu-west-2.s3"
+  name = "com.amazonaws.eu-west-2.s3"
 }
 resource "aws_security_group_rule" "s3-access" {
 
-   security_group_id = aws_security_group.rds.id
-   type              = "egress"
+  security_group_id = aws_security_group.rds.id
+  type              = "egress"
 
-   from_port         = 443
-   to_port           = 443
-   protocol          = "TCP"
-   prefix_list_ids   = [data.aws_prefix_list.s3.id]
-   description       = "Enable exports to S3"
+  from_port       = 443
+  to_port         = 443
+  protocol        = "TCP"
+  prefix_list_ids = [data.aws_prefix_list.s3.id]
+  description     = "Enable exports to S3"
 
 }
 
