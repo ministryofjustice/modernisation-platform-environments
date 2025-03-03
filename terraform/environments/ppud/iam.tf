@@ -1525,7 +1525,6 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
   path        = "/"
   description = "AWS IAM Policy for allowing s3 bucket cross account replication"
   policy = jsonencode({
-{
   "Version": "2012-10-17",
   "Statement": [
     {
@@ -1601,7 +1600,6 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
         }
     }
   ]
-  }
  })
 }
 
