@@ -677,10 +677,10 @@ locals {
           self        = true
         }
         smb_fsx = {
-          description = "445: Directory Services SMB file sharing"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "TCP"
+          description     = "445: Directory Services SMB file sharing"
+          from_port       = 445
+          to_port         = 445
+          protocol        = "TCP"
           security_groups = ["app", "web"]
         }
         winrm_fsx = {
