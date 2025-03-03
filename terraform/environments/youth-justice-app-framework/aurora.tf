@@ -42,21 +42,21 @@ module "aurora" {
       role_arn     = aws_iam_role.rds_export_to_s3_role.arn
       feature_name = "s3Export"
     }
-    
+
   }
 
   # todo - some of these rules are commented out as the resource doesn't exist yet. 
   # It would make more sense the add the rules in their respective modules rather than here
   # Default rule for whole VPC needs to be removed later
   rds_security_group_ingress = {
-    "dummy_rule" = { 
+    "dummy_rule" = {
       from_port   = "5432"
       to_port     = "5432"
       protocol    = "tcp"
       description = "Allow PosgreSQL access from whole VPC"
       cidr_blocks = [data.aws_vpc.shared.cidr_block] #todo change to real sg rules
     }
-  
+
     /*
     windows_mgmt_servers = {
       from_port   = "5432"

@@ -666,6 +666,41 @@ locals {
         }
       }
     }
+    fsx_windows = {
+      description = "Security group for fsx windows"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        smb_fsx = {
+          description     = "445: Directory Services SMB file sharing"
+          from_port       = 445
+          to_port         = 445
+          protocol        = "TCP"
+          security_groups = ["app", "web"]
+        }
+        winrm_fsx = {
+          description = "5985: WinRM 2.0 (Microsoft Windows Remote Management)"
+          from_port   = 5985
+          to_port     = 5985
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
   }
 }
 
