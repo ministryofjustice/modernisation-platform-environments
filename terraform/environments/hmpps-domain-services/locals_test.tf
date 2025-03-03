@@ -142,15 +142,20 @@ locals {
         })
         cloudwatch_metric_alarms = null
       })
-      test-rds-2-b = merge(local.ec2_instances.rds, {
-        config = merge(local.ec2_instances.rds.config, {
-          availability_zone = "eu-west-2b"
-        })
-        tags = merge(local.ec2_instances.rds.tags, {
-          domain-name = "azure.noms.root"
-        })
-        cloudwatch_metric_alarms = null
-      })
+      # test-rds-2-b = merge(local.ec2_instances.rds, {
+      #   config = merge(local.ec2_instances.rds.config, {
+      #     availability_zone = "eu-west-2b"
+      #     user_data_raw = base64encode(templatefile(
+      #       "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+      #         branch = "TM/TM-916/rdweb-interface-hmpps-domain-services-test"
+      #       }
+      #     ))
+      #   })
+      #   tags = merge(local.ec2_instances.rds.tags, {
+      #     domain-name = "azure.noms.root"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      # })
     }
 
     fsx_windows = {
@@ -195,11 +200,11 @@ locals {
           })
 
           # Add RDS for web access
-          test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
-            attachments = [
-              { ec2_instance_name = "test-rds-2-b" },
-            ]
-          })
+          # test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
+          #   attachments = [
+          #     { ec2_instance_name = "test-rds-2-b" },
+          #   ]
+          # })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -241,20 +246,20 @@ locals {
               }
 
               # add RDS rule
-              test-rds-2-https = {
-                priority = 120
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rds-2-https"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdweb2.test.hmpps-domain.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              # test-rds-2-https = {
+              #   priority = 120
+              #   actions = [{
+              #     type              = "forward"
+              #     target_group_name = "test-rds-2-https"
+              #   }]
+              #   conditions = [{
+              #     host_header = {
+              #       values = [
+              #         "rdweb2.test.hmpps-domain.service.justice.gov.uk",
+              #       ]
+              #     }
+              #   }]
+              # }
             }
           })
         })
