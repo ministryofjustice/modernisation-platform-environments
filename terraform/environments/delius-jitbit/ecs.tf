@@ -7,25 +7,6 @@ module "ecs" {
   tags = local.tags
 }
 
-# used for blue-green deployment
-module "ecs_blue" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
-
-  environment = local.environment
-  name        = "${local.application_name}-blue"
-
-  tags = local.tags
-}
-
-module "ecs_green" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ecs-cluster//cluster?ref=v2.0.1"
-
-  environment = local.environment
-  name        = "${local.application_name}-green"
-
-  tags = local.tags
-}
-
 #Create s3 bucket for deployment state
 module "s3_bucket_app_deployment" {
 
