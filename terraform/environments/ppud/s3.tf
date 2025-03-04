@@ -1166,6 +1166,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-dev" {
   }
 }
 
+resource "aws_s3_bucket_policy" "s3_bucket_policy_moj_database_source_dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-database-source-dev[0].id
+  policy = aws_iam_policy.iam_policy_s3_bucket_moj_database_source_dev[0].id
+}
+
+/*
 resource "aws_s3_bucket_policy" "moj-database-source-dev" {
   count  = local.is-development == true ? 1 : 0
   bucket = aws_s3_bucket.moj-database-source-dev[0].id
@@ -1234,3 +1241,4 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
     ]
   })
 }
+*/

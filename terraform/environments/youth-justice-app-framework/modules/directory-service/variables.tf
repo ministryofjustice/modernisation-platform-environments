@@ -61,18 +61,18 @@ variable "tags" {
 }
 
 variable "ad_management_instance_count" {
-  type = number
+  type        = number
   description = "The number of Active Directory Management servers to be created."
-  default = 2
+  default     = 2
 }
 
 variable "desired_number_of_domain_controllers" {
-  type = number
+  type        = number
   description = "The number of Doamin Coltrollers to create."
-  default = 2
+  default     = 2
 }
 
 variable "rds_cluster_security_group_id" {
-  type = string
+  type        = string
   description = "The Id of the Security Grpoip that enables access to the RDS PostgreSQL Cluster."
 }

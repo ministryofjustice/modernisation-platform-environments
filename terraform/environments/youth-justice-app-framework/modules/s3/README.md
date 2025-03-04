@@ -1,4 +1,4 @@
-# ECS Terraform module
+# S3 Terraform module
 
 Terraform module which creates s3 buckets on AWS.
 
