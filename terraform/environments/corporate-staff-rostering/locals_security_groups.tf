@@ -196,7 +196,7 @@ locals {
           from_port       = 445
           to_port         = 445
           protocol        = "TCP"
-          security_groups = ["app", "database"]
+          security_groups = ["app", "web", "domain", "database", "jumpserver"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         smb_udp_web = {
@@ -204,7 +204,7 @@ locals {
           from_port       = 445
           to_port         = 445
           protocol        = "UDP"
-          security_groups = ["app", "database"]
+          security_groups = ["app", "web", "domain", "database", "jumpserver"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rdp_tcp_web = {
