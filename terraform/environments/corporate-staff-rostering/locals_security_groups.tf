@@ -168,11 +168,18 @@ locals {
           security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
-        netbios_web = {
-          description     = "137-139:  NetBIOS services"
+        netbios_web_tcp = {
+          description     = "137-139: TCP NetBIOS services"
           from_port       = 137
           to_port         = 139
-          protocol        = -1
+          protocol        = "TCP"
+          security_groups = ["app", "web", "domain", "database", "jumpserver"]
+        }
+        netbios_web_udp = {
+          description     = "137-139: UDP NetBIOS services"
+          from_port       = 137
+          to_port         = 139
+          protocol        = "UDP"
           security_groups = ["app", "web", "domain", "database", "jumpserver"]
         }
         https_web = {
