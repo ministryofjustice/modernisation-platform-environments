@@ -8,7 +8,7 @@ locals {
 resource "aws_ssm_parameter" "blue_green" {
   name        = "/blue_green"
   type        = "String"
-  value       = "initial_value"
+  value       = "blue"
   description = "used to check which is being used"
 
   lifecycle {
