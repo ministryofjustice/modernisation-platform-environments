@@ -95,6 +95,9 @@ resource "aws_instance" "defect_dojo" {
               # Update and install dependencies
               sudo apt-get update
               sudo apt-get upgrade
+              cd /home
+              sudo mkdir appsec
+              cd appsec
               sudo git clone https://github.com/DefectDojo/django-DefectDojo.git
               cd django-DefectDojo
               sudo apt install docker.io -y
@@ -165,7 +168,31 @@ resource "aws_security_group" "defect_dojo_sg" {
     protocol    = "tcp"
     cidr_blocks = [var.my_ip]
   }
-  
+
+  # New rules for Local VPN (10.0.0.0/16)
+
+  ingress {
+    description = "Allow TCP/8080 from VPN subnet"
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+
+  ingress {
+    description = "Allow TCP/8080 from VPN subnet"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
+  ingress {
+    description = "Allow TCP/8080 from VPN subnet"
+    from_port   = 8443
+    to_port     = 8443
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16"]
+  }
   egress {
     description = "Allow all traffic outbound"
     from_port   = 0

@@ -108,7 +108,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "PREPROD NCR DATABASE"
           nomis-combined-reporting-environment = "pp"
-          oracle-sids                          = "PPBIPSYS PPBIPAUD"
+          oracle-sids                          = "PPBIPSYS PPBIPAUD PPBISYS PPBIAUD"
           instance-scheduling                  = "skip-scheduling"
         })
       })
@@ -255,7 +255,7 @@ locals {
     lbs = {
       private = merge(local.lbs.private, {
         instance_target_groups = {
-          private-pp-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+          private-pp-http-7777 = merge(local.lbs.private.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "pp-ncr-web-1" },
             ]

@@ -3,12 +3,20 @@
 # This is a convenience script for https://user-guide.modernisation-platform.service.justice.gov.uk/user-guide/running-terraform-plan-locally.html#running-terraform-plan-locally
 # Run it from within the environment directory, e.g. terraform/environments/cooker
 
-ENVIRONMENT=$(basename ${PWD})
+if [[ -z "${REMOTE_CONTAINERS}" ]]; then
+  echo "This script is intended to be run from within the development container"
+  exit 1
+fi
+
+COMPONENT="${PWD#/workspaces/modernisation-platform-environments/terraform/environments/}"
+ACCOUNT="${COMPONENT%%/*}"
 STAGE="development"
 ROLE="modernisation-platform-developer"
+APPLY="false"
 
-while getopts s:r: option; do
+while getopts a:s:r: option; do
   case "${option}" in
+    a) APPLY=${OPTARG};;
     s) STAGE="${OPTARG}";;
     r) ROLE="${OPTARG}";;
   esac
@@ -16,14 +24,22 @@ done
 
 ###
 
-echo "Account: ${ENVIRONMENT}"
+if [[ "${ACCOUNT}" == "${COMPONENT}" ]]; then
+  COMPONENT="root"
+fi
+
+echo "Account: ${ACCOUNT}"
+echo "Component: ${COMPONENT}"
 echo "Stage: ${STAGE}"
 echo "Role: ${ROLE}"
+echo "Apply: ${APPLY}"
 
-modernisationPlatformAccountId=$(aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- aws ssm get-parameters --names "modernisation_platform_account_id" --with-decryption --query "Parameters[*].{Value:Value}" --output text)
+aws-sso exec --profile ${ACCOUNT}-${STAGE}:${ROLE} -- terraform init
 
-aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform init -backend-config=assume_role={role_arn=\"arn:aws:iam::${modernisationPlatformAccountId}:role/modernisation-account-terraform-state-member-access\"}
+aws-sso exec --profile ${ACCOUNT}-${STAGE}:${ROLE} -- terraform workspace select ${ACCOUNT}-${STAGE}
 
-aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform workspace select ${ENVIRONMENT}-${STAGE}
+aws-sso exec --profile ${ACCOUNT}-${STAGE}:${ROLE} -- terraform plan
 
-aws-sso exec --profile ${ENVIRONMENT}-${STAGE}:${ROLE} -- terraform plan
+if [[ "${APPLY}" == "true" ]]; then
+  aws-sso exec --profile ${ACCOUNT}-${STAGE}:${ROLE} -- terraform apply
+fi

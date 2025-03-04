@@ -73,6 +73,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+    database_name = "change_me"
+    database_port = local.db_port
   }
 
   delius_microservices_configs_test = {
@@ -98,7 +100,7 @@ locals {
     }
 
     ldap = {
-      image_tag        = "6.0.3-latest"
+      image_tag        = "6.2.4-latest"
       container_port   = 389
       slapd_log_level  = "conns,config,stats,stats2"
       container_cpu    = 2048

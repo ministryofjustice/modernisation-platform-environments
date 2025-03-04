@@ -100,7 +100,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
-          oracle-sids                          = "PDBIPSYS PDBIPAUD"
+          oracle-sids                          = "PDBIPSYS PDBIPAUD PDBISYS PDBIAUD"
         })
       })
 
@@ -118,7 +118,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
-          oracle-sids                          = "DRBIPSYS DRBIPAUD"
+          oracle-sids                          = "DRBIPSYS DRBIPAUD DRBISYS DRBIAUD"
         })
       })
 
@@ -154,6 +154,18 @@ locals {
           ])
         })
         tags = merge(local.ec2_instances.bip_webadmin.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-web-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
           nomis-combined-reporting-environment = "pd"
         })
       })
@@ -220,6 +232,53 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
+        instance_target_groups = {
+          private-pd-http-7777 = merge(local.lbs.private.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "pd-ncr-web-1" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.private.listeners, {
+          http-7777 = merge(local.lbs.private.listeners.http-7777, {
+            alarm_target_group_names = []
+            rules = {
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "private-pd-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "int.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              maintenance = {
+                priority = 999
+                actions = [{
+                  type = "fixed-response"
+                  fixed_response = {
+                    content_type = "text/html"
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    status_code  = "200"
+                  }
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "int.reporting.nomis.service.justice.gov.uk",
+                      "maintenance-int.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+            }
+          })
+        })
       })
 
       public = merge(local.lbs.public, {
@@ -227,6 +286,11 @@ locals {
           pd-http-7010 = merge(local.lbs.public.instance_target_groups.http-7010, {
             attachments = [
               { ec2_instance_name = "pd-ncr-webadmin-1" },
+            ]
+          })
+          pd-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "pd-ncr-web-1" },
             ]
           })
         }
@@ -244,6 +308,20 @@ locals {
                   host_header = {
                     values = [
                       "admin.reporting.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              web = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "reporting.nomis.service.justice.gov.uk",
                     ]
                   }
                 }]
