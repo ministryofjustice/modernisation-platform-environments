@@ -173,7 +173,7 @@ locals {
           from_port       = 137
           to_port         = 139
           protocol        = "-1"
-          security_groups = ["app", "database"]
+          security_groups = ["app", "web", "domain", "database", "jumpserver"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         https_web = {
