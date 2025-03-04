@@ -1,19 +1,19 @@
 ---
-name: ccms-ebs-upgrade
+name: bacway
 on:
   push:
     branches:
       - main
     paths:
-      - 'terraform/environments/ccms-ebs-upgrade/**'
-      - '.github/workflows/ccms-ebs-upgrade.yml'
-      - '.github/workflows/reusable_terraform_components_strategy.yml'
+      - 'terraform/environments/bacway/**'
+      - '.github/workflows/bacway.yml'
+
   pull_request:
     branches:
       - main
     paths:
-      - 'terraform/environments/ccms-ebs-upgrade/**'
-      - '.github/workflows/ccms-ebs-upgrade.yml'
+      - 'terraform/environments/bacway/**'
+      - '.github/workflows/bacway.yml'
 
   workflow_dispatch:
     inputs:
@@ -37,34 +37,23 @@ permissions:
 
 jobs:
   strategy:
-    # This job generates a matrix of environments (and possibly components) by calling your reusable strategy workflow.
     uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
     with:
       application: "${{ github.workflow }}"
 
-  skipping_terraform:
-      needs: strategy
-      if: ${{ inputs.action != 'destroy' && (needs.strategy.outputs.matrix == '' || toJson(fromJson(needs.strategy.outputs.matrix)) == '[]')}}  # conversion from and to Json standardises output
-      runs-on: ubuntu-latest
-      steps:
-        - name: Skip Terraform
-          run: echo "No terraform changes detected. Skipping Terraform plan/apply."
-
   terraform:
     needs: strategy
-    if: ${{ inputs.action != 'destroy' && needs.strategy.outputs.matrix != '' && toJson(fromJson(needs.strategy.outputs.matrix)) != '[]'}}  # conversion from and to Json standardises output
+    if: inputs.action != 'destroy'
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-    # Calls the plan/apply reusable workflow with each item in the matrix
     uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
-      # Pass along the "application" and "environment" from the matrix
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
       action: "${{ matrix.action }}"
-      component: "${{ matrix.component }}"
+      component: "${{ matrix.component }}"     # If your strategy workflow also outputs "matrix.component"
     secrets:
       modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
       pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
