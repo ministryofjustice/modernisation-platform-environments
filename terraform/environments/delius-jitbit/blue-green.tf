@@ -133,7 +133,7 @@ resource "aws_lb_listener_rule" "blue" {
 
   condition {
     host_header {
-      values = [local.blue_green_url]
+      values = [local.blue_url]
     }
   }
 }
@@ -150,7 +150,7 @@ resource "aws_lb_listener_rule" "green" {
 
   condition {
     host_header {
-      values = [local.blue_green_url]
+      values = [local.green_url]
     }
   }
 }
