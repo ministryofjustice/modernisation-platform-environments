@@ -1520,7 +1520,6 @@ resource "aws_iam_role" "iam_role_s3_bucket_moj_database_source_dev" {
   EOF
 }
 
-
 resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
   count       = local.is-development == true ? 1 : 0
   name        = "iam_policy_s3_bucket_moj_database_source_dev"
@@ -1559,44 +1558,6 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
       "Resource": [
         "arn:aws:s3:::mojap-data-engineering-production-ppud-dev/*"
       ]
-    },
-	{
-		"Sid": "LoggingPermissions",
-		"Effect" : "Allow",
-        "Action" : [
-          "s3:PutBucketNotification",
-          "s3:GetBucketNotification",
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-        "Resource" : [
-          "arn:aws:s3:::moj-database-source-dev",
-          "arn:aws:s3:::moj-database-source-dev/*"
-        ]
-    },
-	{
-		"Sid": "EC2Permissions",
-	    "Effect" : "Allow",
-        "Action" : [
-          "s3:GetBucketAcl",
-          "s3:DeleteObject",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket"
-        ],
-
-        "Resource" : [
-          "arn:aws:s3:::moj-database-source-dev",
-          "arn:aws:s3:::moj-database-source-dev/*"
-        ],
-        "Condition": {
-          "ArnEquals": {
-            "aws:PrincipalArn": "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role"
-          }
-        }
     }
   ]
  })
