@@ -168,6 +168,20 @@ locals {
           security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
+        netbios_web_tcp = {
+          description     = "137-139: TCP NetBIOS services"
+          from_port       = 137
+          to_port         = 139
+          protocol        = "TCP"
+          security_groups = ["app", "web", "domain", "database", "jumpserver"]
+        }
+        netbios_web_udp = {
+          description     = "137-139: UDP NetBIOS services"
+          from_port       = 137
+          to_port         = 139
+          protocol        = "UDP"
+          security_groups = ["app", "web", "domain", "database", "jumpserver"]
+        }
         https_web = {
           description     = "443: enduserclient https ingress"
           from_port       = 443
@@ -182,7 +196,7 @@ locals {
           from_port       = 445
           to_port         = 445
           protocol        = "TCP"
-          security_groups = ["app", "database"]
+          security_groups = ["app", "web", "domain", "database", "jumpserver"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         smb_udp_web = {
@@ -190,7 +204,7 @@ locals {
           from_port       = 445
           to_port         = 445
           protocol        = "UDP"
-          security_groups = ["app", "database"]
+          security_groups = ["app", "web", "domain", "database", "jumpserver"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rdp_tcp_web = {
