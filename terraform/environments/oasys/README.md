@@ -9,68 +9,71 @@ _If you have any questions surrounding this page please post in the `#dso_intern
 
 ### **Last review date:**
 
-<!-- Adding the last date this page was reviewed, with any accompanying information -->
+28/02/2025
 
 ### **Description:**
 
-<!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
-
+It is the Offender Assessment System and is primarily used by prison and probationary staff.
 ### **Service URLs:**
 
-<!--  The URL(s) of the service’s production environment, and test environments if possible-->
+https://oasys.service.justice.gov.uk/
 
 ### **Incident response hours:**
 
-<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+09:00 - 17:00, Mon - Fri
 
 ### **Incident contact details:**
 
-<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
+The best contact point is through slack on (#ask-laa-ops)[https://moj.enterprise.slack.com/archives/CEL68S0LD]
 
 ### **Service team contact:**
 
-<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
+As above. The concierge for the day will contact you directly.
+To contact the team directly they are on digital-studio-operations-team@digital.justice.gov.uk
 
 ### **Hosting environment:**
 
 Modernisation Platform
 
-<!-- If your service is hosted on another MOJ team’s infrastructure, link to their runbook. If your service has another arrangement or runs its own infrastructure, you should list the supplier of that infrastructure (ideally linking to your account’s login page) and describe, simply and briefly, how to raise an issue with them. -->
-
 ## Optional
 
 ### **Other URLs:**
 
-<!--  If you can, provide links to the service’s monitoring dashboard(s), health checks, documentation (ideally describing how to run/work with the service), and main GitHub repository. -->
+N/A
 
 ### **Expected speed and frequency of releases:**
 
-<!-- How often are you able to release changes to your service, and how long do those changes take? -->
+As required by the developers.
 
 ### **Automatic alerts:**
 
-<!-- List, briefly, problems (or types of problem) that will automatically alert your team when they occur. -->
+None
 
 ### **Impact of an outage:**
 
-<!-- A short description of the risks if your service is down for an extended period of time. -->
+An outage could cause issues with accessing the probation details. It is NOT acceptable. 
 
 ### **Out of hours response types:**
 
-<!-- Describe how incidents that page a person on call are responded to. How long are out-of-hours responders expected to spend trying to resolve issues before they stop working, put the service into maintenance mode, and hand the issue to in-hours support? -->
+Contact digital-studio-operations-team@digital.justice.gov.uk
+Support is during work hours (09:00 - 17:00, Mon - Fri) as described above.
 
 ### **Consumers of this service:**
 
-<!-- List which other services (with links to their runbooks) rely on this service. If your service is considered a platform, these may be too numerous to reasonably list. -->
+Prison Staff, Probation Staff, CRC Staff, HQ Staff, Support Staff
 
-### **Services consumed by this:**
+### **Additional details
 
-<!-- List which other services (with links to their runbooks) this service relies on. -->
+OASys is designed to enable a properly trained and qualified individual; often a Probation Officer, to:
 
-### **Restrictions on access:**
+- assess how likely an offender is to be re-convicted
+- identify and classify offending-related needs, including basic personality characteristics and cognitive behavioural problems
+- assess risk of serious harm, risks to the individual and other risks
+- assist with management of risk of harm
+- links the assessment to the supervision or sentence plan
+- indicate the need for further specialist assessments
+- measure change during the period of supervision / sentence.
+OASys comprises a series of computer-based forms on which clinical evaluations are made by staff of Offenders, and supervision and sentence plans for the forthcoming period of supervision are recorded on a periodic basis - typically every 16 weeks for offenders in the community, and less frequently for imprisoned offenders.
 
-<!-- Describe any conditions which restrict access to the service, such as if it’s IP-restricted or only accessible from a private network.-->
-
-### **How to resolve specific issues:**
-
-<!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
+OASys supports the What Works? initiative of the Prison and Probation Services, by providing metrics by which the characteristics of offenders and their offences (inputs) can be analysed alongside information on interventions made (inputs) to the offender, and re-conviction data for offenders (outcomes), in order to enable 
+refinement to be made to interventions (based on a consideration of the relation between inputs and outcomes) as to improve outcomes - in other words, to decrease recidivism rates by ensuring that interventions are as appropriate and purposeful as possible.
