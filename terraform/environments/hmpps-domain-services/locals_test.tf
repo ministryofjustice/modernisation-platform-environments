@@ -164,6 +164,10 @@ locals {
           domain-name = "azure.noms.root"
         })
         cloudwatch_metric_alarms = null
+        route53_records = {
+          create_external_record = true
+          create_internal_record = true
+        }
       })
     }
 
