@@ -1133,6 +1133,13 @@ resource "aws_s3_bucket_versioning" "moj-database-source-dev" {
   }
 }
 
+resource "aws_s3_bucket_logging" "moj-database-source-dev" {
+  count         = local.is-development == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-database-source-dev[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  target_prefix = "s3-logs/moj-database-source-dev-logs/"
+}
+
 resource "aws_s3_bucket_public_access_block" "moj-database-source-dev" {
   count                   = local.is-development == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-database-source-dev[0].id
