@@ -1,6 +1,37 @@
 variable "bucket_name" {
   type        = list(string)
-  description = "S3 bucket name"
+  description = "Names of s3 buckets that are not to be replicated from the old environments."
+  validation {
+    condition = alltrue([
+      for o in var.bucket_name : length(o) < 37
+    ])
+    error_message = "Maximum length of bucket names is 36 characters."
+  }
+}
+
+variable "transfer_bucket_name" {
+  type        = list(string)
+  description = "Names of S3 buckets that are to be transferred as is from the old environments."
+  default     = []
+   validation {
+    condition = alltrue([
+      for o in var.transfer_bucket_name : length(o) < 37
+    ])
+    error_message = "Maximum length of bucket names is 36 characters."
+  }
+
+}
+
+variable "archive_bucket_name" {
+  type        = list(string)
+  description = "Names of S3 buckets that are to repliccated to an archive bucket."
+  default     = []
+   validation {
+    condition = alltrue([
+      for o in var.archive_bucket_name : length(o) < 37
+    ])
+    error_message = "Maximum length of bucket names is 36 characters."
+  }
 }
 
 variable "project_name" {
@@ -33,17 +64,18 @@ variable "acl" {
 
 variable "log_bucket" {
   type        = string
-  description = "Bucket to send logs to"
+  description = "Bucket to send logs to. It will be created by this module."
   default     = null
 }
 
 variable "allow_replication" {
   type        = bool
   description = "Used to indicate that policy should be assigned to enable replication from the equivelent old account."
-  default     = true
+  default     = false
 }
 
 variable "s3_source_account" {
   type        = string
   description = "Source account from whch s3 buckets may be replicated."
+  default     = null
 }

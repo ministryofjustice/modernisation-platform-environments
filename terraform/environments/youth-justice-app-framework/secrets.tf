@@ -12,10 +12,9 @@ resource "aws_secretsmanager_secret" "auto_admit_secret" {
 
 resource "aws_secretsmanager_secret_version" "auto_admit_version" {
   secret_id = aws_secretsmanager_secret.auto_admit_secret.id
-  secret_string = jsonencode({
-    username = "connectivity.postman"
-    user     = "connectivity.postman@i2n.com"
-  })
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 
@@ -29,10 +28,22 @@ resource "aws_secretsmanager_secret" "LDAP_administration_secret" {
 
 resource "aws_secretsmanager_secret_version" "LDAP_administration_version" {
   secret_id = aws_secretsmanager_secret.LDAP_administration_secret.id
-  secret_string = jsonencode({
-    userdn                  = "CN=admin2,OU=Users,OU=Accounts,OU=i2N,DC=i2n,DC=com"
-    user_password_attribute = "unicodePwd"
-  })
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
+resource "aws_secretsmanager_secret" "LDAP_DC_secret" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "LDAP-DC-Connection-String"
+  description = "DC connection string for LDAP"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
 
+resource "aws_secretsmanager_secret_version" "LDAP_DC_version" {
+  secret_id = aws_secretsmanager_secret.LDAP_DC_secret.id
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}

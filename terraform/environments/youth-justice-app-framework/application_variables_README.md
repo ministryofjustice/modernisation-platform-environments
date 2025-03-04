@@ -17,9 +17,6 @@ This contans usage information for parameters in the application_variables.json 
 
 ## Parameters
 
-**environment_name**
-: A unique name for the environment. It is used by the s3 module as a prefix for all S3 bucket names to ensure that they are unique within the AWS region. It should be used whereever an environment specific value is needed.
-
 **allow_s3_replication**
 : Used to indicate that S3 replication from the source environment should be enabled. It is used by the s3 module to indication if a policy is to be applied to each bucket to allow access from the source account. When all data has been transferred (e.g. on Cutover or go-live) it is to be changed to false.
 
