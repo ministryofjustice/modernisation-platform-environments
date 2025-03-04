@@ -13,6 +13,11 @@ import {
   id = "ssm_document_ad_schema2.2"
 }
 
+import {
+  to = module.ds.aws_directory_service_log_subscription.ad-log-policy
+  id = "d-9c675121e9"
+}
+
 module "ds" {
   source = "./modules/directory-service"
 
