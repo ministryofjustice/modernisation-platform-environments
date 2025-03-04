@@ -249,6 +249,7 @@ locals {
                   host_header = {
                     values = [
                       "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
+                      "hmppgw1.justice.gov.uk",
                     ]
                   }
                 }]
