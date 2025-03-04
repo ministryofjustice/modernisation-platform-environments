@@ -137,34 +137,34 @@ locals {
       # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
       # existing comment above but fails in modules/baseline/lb.tf
       # target_id doesn't exist
-      # test-rdgw-2-b = merge(local.ec2_instances.rdgw, {
-      #   config = merge(local.ec2_instances.rdgw.config, {
-      #     availability_zone = "eu-west-2b"
-      #     user_data_raw = base64encode(templatefile(
-      #       "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-      #         branch = "TM/TM-916/rdweb-interface-hmpps-domain-services-test"
-      #       }
-      #     ))
-      #   })
-      #   tags = merge(local.ec2_instances.rdgw.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
-      # test-rds-2-b = merge(local.ec2_instances.rds, {
-      #   config = merge(local.ec2_instances.rds.config, {
-      #     availability_zone = "eu-west-2b"
-      #     user_data_raw = base64encode(templatefile(
-      #       "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-      #         branch = "TM/TM-916/rdweb-interface-hmpps-domain-services-test"
-      #       }
-      #     ))
-      #   })
-      #   tags = merge(local.ec2_instances.rds.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
+      test-rdgw-2-b = merge(local.ec2_instances.rdgw, {
+        config = merge(local.ec2_instances.rdgw.config, {
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-916/rdweb-interface-hmpps-domain-services-test"
+            }
+          ))
+        })
+        tags = merge(local.ec2_instances.rdgw.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
+      test-rds-2-b = merge(local.ec2_instances.rds, {
+        config = merge(local.ec2_instances.rds.config, {
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-916/rdweb-interface-hmpps-domain-services-test"
+            }
+          ))
+        })
+        tags = merge(local.ec2_instances.rds.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
     }
 
     fsx_windows = {
@@ -202,18 +202,18 @@ locals {
           })
 
           # Add new gateway 2 config
-          # test-rdgw-2-http = merge(local.lbs.public.instance_target_groups.http, {
-          #   attachments = [
-          #     { ec2_instance_name = "test-rdgw-2-b" },
-          #   ]
-          # })
+          test-rdgw-2-http = merge(local.lbs.public.instance_target_groups.http, {
+            attachments = [
+              { ec2_instance_name = "test-rdgw-2-b" },
+            ]
+          })
 
           # Add RDS for web access
-          # test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
-          #   attachments = [
-          #     { ec2_instance_name = "test-rds-2-b" },
-          #   ]
-          # })
+          test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "test-rds-2-b" },
+            ]
+          })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -239,36 +239,36 @@ locals {
               }
 
               # Add new gateway 2 rule
-              # test-rdgw-2-http = {
-              #   priority = 110
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "test-rdgw-2-http"
-              #   }]
-              #   conditions = [{
-              #     host_header = {
-              #       values = [
-              #         "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
-              #       ]
-              #     }
-              #   }]
-              # }
+              test-rdgw-2-http = {
+                priority = 110
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgw-2-http"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
 
               # add RDS rule
-              # test-rds-2-https = {
-              #   priority = 120
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "test-rds-2-https"
-              #   }]
-              #   conditions = [{
-              #     host_header = {
-              #       values = [
-              #         "rdweb2.test.hmpps-domain.service.justice.gov.uk",
-              #       ]
-              #     }
-              #   }]
-              # }
+              test-rds-2-https = {
+                priority = 120
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rds-2-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb2.test.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
             }
           })
         })
@@ -286,8 +286,8 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
-          # { name = "rdgateway2", type = "A", lbs_map_key = "public" },
-          # { name = "rdweb2", type = "A", lbs_map_key = "public" },
+          { name = "rdgateway2", type = "A", lbs_map_key = "public" },
+          { name = "rdweb2", type = "A", lbs_map_key = "public" },
         ]
       }
     }
