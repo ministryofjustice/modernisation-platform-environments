@@ -1,6 +1,8 @@
 locals {
     # just used to test for now, will use the default listener rule when properly implemented
     blue_green_url  = "${var.networking[0].application}-blue-green.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
+    blue_url        = "${var.networking[0].application}-blue.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
+    green_url       = "${var.networking[0].application}-green.${var.networking[0].business-unit}-${local.environment}.${local.domain}"
 }
 
 
@@ -109,6 +111,40 @@ resource "aws_lb_listener_rule" "blue_green" {
 
   action {
     target_group_arn = data.aws_ssm_parameter.blue_green.value == "blue" ? aws_lb_target_group.blue.arn : aws_lb_target_group.green.arn
+    type             = "forward"
+  }
+
+  condition {
+    host_header {
+      values = [local.blue_green_url]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "blue" {
+  count        = local.is-development ? 1 : 0
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 21
+
+  action {
+    target_group_arn = aws_lb_target_group.blue.arn
+    type             = "forward"
+  }
+
+  condition {
+    host_header {
+      values = [local.blue_green_url]
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "green" {
+  count        = local.is-development ? 1 : 0
+  listener_arn = aws_lb_listener.listener.arn
+  priority     = 22
+
+  action {
+    target_group_arn = aws_lb_target_group.green.arn
     type             = "forward"
   }
 
