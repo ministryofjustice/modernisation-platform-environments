@@ -40,7 +40,7 @@ module "ecs_green" {
   tags = local.tags
 }
 
-resource "aws_lb_target_group" "target_group_blue" {
+resource "aws_lb_target_group" "blue" {
 
   name                 = "${local.application_name}-blue"
   port                 = local.app_port
@@ -71,7 +71,7 @@ resource "aws_lb_target_group" "target_group_blue" {
   )
 }
 
-resource "aws_lb_target_group" "target_group_green" {
+resource "aws_lb_target_group" "green" {
 
   name                 = "${local.application_name}-green"
   port                 = local.app_port
@@ -108,7 +108,7 @@ resource "aws_lb_listener_rule" "blue_green" {
   priority     = 20
 
   action {
-    target_group_arn = data.aws_ssm_parameter.blue_green.value == "blue" ? aws_lb_target_group.target_group_blue.arn : aws_lb_target_group.target_group_green.arn
+    target_group_arn = data.aws_ssm_parameter.blue_green.value == "blue" ? aws_lb_target_group.blue.arn : aws_lb_target_group.green.arn
     type             = "forward"
   }
 
