@@ -26,8 +26,7 @@ module "s3" {
 
   bucket_name  = ["redshift-yjb-reporting", "install-files"]
  
-  archive_bucket_name  = ["s3-bucket-access-logging", "redshift-yjb-reporting",  
-                          "aws-security-hub-findings-ex-hublog", "tf-webops-config-service", "tableau-alb-logs", "yjaf-ext-external-logs",
+  archive_bucket_name  = ["s3-bucket-access-logging", "redshift-yjb-reporting", "tf-webops-config-service", "tableau-alb-logs", "yjaf-ext-external-logs",
                           "yjaf-int-internal-logs", "cloudfront-logs", "cloudtrail-logs", "guardduty-to-fallanx-archive", "tableau-backups",
                           "aws-glue-assets", "cloudtrail-logs"
                          ]
