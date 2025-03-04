@@ -18,7 +18,7 @@ resource "aws_datasync_task" "opg" {
 
   includes {
     filter_type = "SIMPLE_PATTERN"
-    value       = "/Investigations/Cases/Closed Cases/*"
+    value       = data.aws_secretsmanager_secret_version.datasync_include_paths.secret_string
   }
 
   excludes {
