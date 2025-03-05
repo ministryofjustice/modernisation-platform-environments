@@ -3,7 +3,7 @@
 <!-- This is a template that should be populated by the development team when moving to the modernisation platform, but also reviewed and kept up to date.
 To ensure that people looking at your runbook can get the information they need quickly, your runbook should be short but clear. Throughout, only use acronyms if you’re confident that someone who has just been woken up at 3am would understand them. -->
 
-_If you have any questions surrounding this page please post in the `#dso_internal` channel._
+_If you have any questions surrounding this page please post in the [#ask-digital-studio-ops](https://moj.enterprise.slack.com/archives/C6D94J81E) channel._
 
 ## Mandatory Information
 
@@ -14,6 +14,7 @@ _If you have any questions surrounding this page please post in the `#dso_intern
 ### **Description:**
 
 It is the Offender Assessment System and is primarily used by prison and probationary staff.
+
 ### **Service URLs:**
 
 https://oasys.service.justice.gov.uk/
@@ -24,11 +25,12 @@ https://oasys.service.justice.gov.uk/
 
 ### **Incident contact details:**
 
-The best contact point is through slack on (#ask-laa-ops)[https://moj.enterprise.slack.com/archives/CEL68S0LD]
+The best contact point is through slack on [#ask-digital-studio-ops](https://moj.enterprise.slack.com/archives/C6D94J81E) and [#shef_dba](https://moj.enterprise.slack.com/archives/C8NJZFNPN) or use both.
 
 ### **Service team contact:**
 
-As above. The concierge for the day will contact you directly.
+The concierge for the day will contact you directly if you contact them through slack on [#ask-laa-ops](https://moj.enterprise.slack.com/archives/CEL68S0LD).
+
 To contact the team directly they are on digital-studio-operations-team@digital.justice.gov.uk
 
 ### **Hosting environment:**
@@ -77,3 +79,4 @@ OASys comprises a series of computer-based forms on which clinical evaluations a
 
 OASys supports the What Works? initiative of the Prison and Probation Services, by providing metrics by which the characteristics of offenders and their offences (inputs) can be analysed alongside information on interventions made (inputs) to the offender, and re-conviction data for offenders (outcomes), in order to enable 
 refinement to be made to interventions (based on a consideration of the relation between inputs and outcomes) as to improve outcomes - in other words, to decrease recidivism rates by ensuring that interventions are as appropriate and purposeful as possible.
+
