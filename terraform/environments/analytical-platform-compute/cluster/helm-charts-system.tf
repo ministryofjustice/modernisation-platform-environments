@@ -8,7 +8,7 @@ resource "helm_release" "kyverno" {
   namespace  = kubernetes_namespace.kyverno.metadata[0].name
   values = [
     templatefile(
-      "${path.root}/src/helm/values/kyverno/values.yml.tftpl",
+      "${path.module}/src/helm/values/kyverno/values.yml.tftpl",
       {}
     )
   ]
