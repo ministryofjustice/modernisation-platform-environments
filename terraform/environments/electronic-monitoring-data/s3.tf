@@ -14,6 +14,12 @@ locals {
     }
   }
 
+  # Adding new buckets for logging needs to happen after buckets have been created
+  # as an error occurs otherwise because local.buckets_to_log contains keys that 
+  # are derived  from resource attributes, which are not known until the apply phase.
+  # To resolve this issue, you need to ensure that the keys in local.buckets_to_log
+  # are known during the plan phase. To this end the buckets need to exist  before
+  # the aws_s3_bucket_logging resources for it are created.
   buckets_to_log = [
     { id = module.s3-metadata-bucket.bucket.id,                 arn = module.s3-metadata-bucket.bucket.arn },
     { id = module.s3-athena-bucket.bucket.id,                   arn = module.s3-athena-bucket.bucket.arn },
@@ -22,7 +28,7 @@ locals {
     { id = module.s3-json-directory-structure-bucket.bucket.id, arn = module.s3-json-directory-structure-bucket.bucket.arn },
     { id = module.s3-data-bucket.bucket.id,                     arn = module.s3-data-bucket.bucket.arn },
     { id = module.s3-fms-general-landing-bucket.bucket_id,      arn = module.s3-fms-general-landing-bucket.bucket_arn },
-    # { id = module.s3-fms-ho-landing-bucket.bucket_id,           arn = module.s3-fms-ho-landing-bucket.bucket_arn },
+    { id = module.s3-fms-ho-landing-bucket.bucket_id,           arn = module.s3-fms-ho-landing-bucket.bucket_arn },
     { id = module.s3-fms-specials-landing-bucket.bucket_id,     arn = module.s3-fms-specials-landing-bucket.bucket_arn },
     { id = module.s3-mdss-general-landing-bucket.bucket_id,     arn = module.s3-mdss-general-landing-bucket.bucket_arn },
     { id = module.s3-mdss-ho-landing-bucket.bucket_id,          arn = module.s3-mdss-ho-landing-bucket.bucket_arn },
