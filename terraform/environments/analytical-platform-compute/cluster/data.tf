@@ -51,10 +51,10 @@ data "aws_subnet" "intra_subnet_1" {
   cidr_block = local.environment_configuration.vpc_intra_subnets[0]
 }
 
-data "aws_subnet" "intra_subnet_1" {
+data "aws_subnet" "intra_subnet_2" {
   cidr_block = local.environment_configuration.vpc_intra_subnets[1]
 }
 
-data "aws_subnet" "intra_subnet_1" {
+data "aws_subnet" "intra_subnet_3" {
   cidr_block = local.environment_configuration.vpc_intra_subnets[2]
 }
