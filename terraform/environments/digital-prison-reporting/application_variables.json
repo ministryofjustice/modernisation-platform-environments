@@ -68,7 +68,7 @@
         "dps-calc-rel-date",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-and-medi",
+        "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-testing"
       ],
@@ -219,7 +219,7 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-and-medi",
+        "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date"
@@ -373,7 +373,7 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-and-medi",
+        "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date"
@@ -543,7 +543,7 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-and-medi",
+        "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date"
