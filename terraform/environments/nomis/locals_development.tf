@@ -418,7 +418,7 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_wildcard_cert"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
