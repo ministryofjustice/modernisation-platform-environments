@@ -40,7 +40,7 @@ locals {
       nomis_wildcard_cert_v2 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "*.preproduction.nomis.service.justice.gov.uk"
-        external_validation_records_created = false
+        external_validation_records_created = true
         subject_alternate_names = [
           "*.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
           "*.pp-nomis.az.justice.gov.uk",
@@ -420,7 +420,7 @@ locals {
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             alarm_target_group_names  = [] # don't enable as environments are powered up/down frequently
-            certificate_names_or_arns = ["nomis_wildcard_cert"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
             cloudwatch_metric_alarms  = module.baseline_presets.cloudwatch_metric_alarms.lb
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
