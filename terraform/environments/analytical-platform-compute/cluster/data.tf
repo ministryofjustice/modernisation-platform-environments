@@ -58,3 +58,15 @@ data "aws_subnet" "intra_subnet_2" {
 data "aws_subnet" "intra_subnet_3" {
   cidr_block = local.environment_configuration.vpc_intra_subnets[2]
 }
+
+data "aws_subnet" "private_subnet_1" {
+  cidr_block = local.environment_configuration.vpc_private_subnets[0]
+}
+
+data "aws_subnet" "private_subnet_2" {
+  cidr_block = local.environment_configuration.vpc_private_subnets[1]
+} 
+
+data "aws_subnet" "private_subnet_3" {
+  cidr_block = local.environment_configuration.vpc_private_subnets[2]
+}
