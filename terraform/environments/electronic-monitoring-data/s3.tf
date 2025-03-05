@@ -22,7 +22,7 @@ locals {
     { id = module.s3-json-directory-structure-bucket.bucket.id, arn = module.s3-json-directory-structure-bucket.bucket.arn },
     { id = module.s3-data-bucket.bucket.id,                     arn = module.s3-data-bucket.bucket.arn },
     { id = module.s3-fms-general-landing-bucket.bucket_id,      arn = module.s3-fms-general-landing-bucket.bucket_arn },
-    { id = module.s3-fms-ho-landing-bucket.bucket_id,           arn = module.s3-fms-ho-landing-bucket.bucket_arn },
+    # { id = module.s3-fms-ho-landing-bucket.bucket_id,           arn = module.s3-fms-ho-landing-bucket.bucket_arn },
     { id = module.s3-fms-specials-landing-bucket.bucket_id,     arn = module.s3-fms-specials-landing-bucket.bucket_arn },
     { id = module.s3-mdss-general-landing-bucket.bucket_id,     arn = module.s3-mdss-general-landing-bucket.bucket_arn },
     { id = module.s3-mdss-ho-landing-bucket.bucket_id,          arn = module.s3-mdss-ho-landing-bucket.bucket_arn },
