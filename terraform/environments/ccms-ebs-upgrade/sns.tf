@@ -23,9 +23,6 @@ resource "aws_secretsmanager_secret" "alerts_subscription_email" {
 resource "aws_secretsmanager_secret_version" "alerts_subscription_email" {
   secret_id     = aws_secretsmanager_secret.alerts_subscription_email.id
   secret_string = local.application_data.accounts[local.environment].alerts_subscription_email
-  lifecycle {
-    ignore_changes = [secret_string]
-  }
 }
 
 resource "aws_sns_topic" "cw_alerts" {
