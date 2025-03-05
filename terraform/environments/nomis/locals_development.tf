@@ -31,6 +31,16 @@ locals {
           description = "wildcard cert for nomis development domains"
         }
       }
+      nomis_wildcard_cert_v2 = {
+        cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name              = "*.development.nomis.service.justice.gov.uk"
+        subject_alternate_names = [
+          "*.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for nomis development domains"
+        }
+      }
     }
 
     cloudwatch_dashboards = {
@@ -408,7 +418,7 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_wildcard_cert"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message

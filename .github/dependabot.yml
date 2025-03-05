@@ -74,11 +74,19 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/bacway"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs-upgrade"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/ccms-ebs-upgrade/anonymisation"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -323,6 +331,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/ec2"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/eventbridge"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -662,6 +674,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/operations-engineering/modules/eventbridge"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/panda-cyber-appsec-lab"
     schedule:
       interval: "daily"
@@ -763,6 +779,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/youth-justice-app-framework/modules/codedeploy"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/datadog"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

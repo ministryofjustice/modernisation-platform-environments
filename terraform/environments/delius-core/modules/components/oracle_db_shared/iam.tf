@@ -80,7 +80,7 @@ data "aws_iam_policy_document" "allow_access_to_ssm_parameter_store" {
   }
 }
 
-# Policy document for both Oracle database DBA and application secrets
+# Policy document for both Oracle Database and Probation Integration secrets
 
 data "aws_iam_policy_document" "db_access_to_secrets_manager" {
   statement {
@@ -94,10 +94,9 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
       "secretsmanager:Update*"
     ]
     effect = "Allow"
-    resources = [
-      aws_secretsmanager_secret.database_dba_passwords.arn,
-      aws_secretsmanager_secret.database_application_passwords.arn,
-    ]
+    resources = concat(
+      [aws_secretsmanager_secret.database_dba_passwords.arn, aws_secretsmanager_secret.database_application_passwords.arn],
+    length(aws_secretsmanager_secret.probation_integration_passwords) > 0 ? ["${aws_secretsmanager_secret.probation_integration_passwords[0].arn}"] : [])
   }
 }
 

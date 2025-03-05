@@ -32,6 +32,18 @@ locals {
         tags = {
           description = "wildcard cert for nomis test domains"
         }
+      },
+      nomis_wildcard_cert_v2 = {
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "*.test.nomis.service.justice.gov.uk"
+        external_validation_records_created = true
+        subject_alternate_names = [
+          "*.nomis.hmpps-test.modernisation-platform.service.justice.gov.uk",
+          "*.hmpp-azdt.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for nomis test domains"
+        }
       }
     }
 
@@ -501,7 +513,7 @@ locals {
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             alarm_target_group_names  = [] # don't enable as environments are powered up/down frequently
-            certificate_names_or_arns = ["nomis_wildcard_cert"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
@@ -712,6 +724,12 @@ locals {
       "/oracle/database/T2NDH"    = local.secretsmanager_secrets.db
       "/oracle/database/T2TRDAT"  = local.secretsmanager_secrets.db
       "/oracle/database/T3CNOM"   = local.secretsmanager_secrets.db_cnom
+
+      "/hmpps/self-signed-certs" = {
+        secrets = {
+          passwords = { description = "certificate passwords" }
+        }
+      }
     }
   }
 }

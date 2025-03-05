@@ -3,9 +3,9 @@ locals {
     auth = {
       name                              = "auth"
       image                             = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/auth:preprod"
-      task_cpu                          = 1124
+      task_cpu                          = 1280
       container_cpu                     = 1024
-      task_memory                       = 2248
+      task_memory                       = 2560
       container_memory                  = 2048
       health_check_grace_period_seconds = 300
       additional_environment_variables = [
@@ -37,8 +37,8 @@ locals {
           name          = "etchosts-container"
           image         = "673920839910.dkr.ecr.eu-west-2.amazonaws.com/yjaf/auth:preprod"
           port_mappings = []
-          cpu           = 90
-          memory        = 180
+          cpu           = 256
+          memory        = 512
           mount_points = [
             {
               sourceVolume : "hosts",
@@ -258,6 +258,7 @@ locals {
       task_memory                       = 3072
       desired_count                     = 1
       health_check_grace_period_seconds = 600
+      autoscaling_max_capacity          = 1
       ecs_task_iam_role_name            = "gateway-custom-role"
       deployment_controller             = "ECS"
       #todo add gateway sg
@@ -272,6 +273,36 @@ locals {
         }
       ]
       enable_postgres_secret = false
+      additional_mount_points = [
+        {
+          "sourceVolume" : "logging",
+          "containerPath" : "/root/logging",
+          "readOnly" : false
+        },
+        {
+          "sourceVolume" : "gateway-logs",
+          "containerPath" : "/var/log/yjaf",
+          "readOnly" : false
+        }
+      ]
+      volumes = [
+        {
+          "name" : "logging",
+          "host" : {}
+        },
+        {
+          "name" : "gateway-logs",
+          "dockerVolumeConfiguration" : {
+            "scope" : "shared",
+            "autoprovision" : true,
+            "driver" : "local"
+          }
+        },
+        {
+          "name" : "tmpfs-1",
+          "host" : {}
+        }
+      ]
     },
     placements = {
       name        = "placements"
@@ -405,6 +436,11 @@ locals {
           sourceVolume : "conf",
           containerPath : "/etc/nginx",
           readOnly : false
+        },
+        {
+          sourceVolume : "tmpfs-1",
+          containerPath : "/var/run",
+          readOnly : false
         }
       ]
       volumes = [
@@ -414,6 +450,10 @@ locals {
         },
         {
           "name" : "conf",
+          "host" : {}
+        },
+        {
+          "name" : "tmpfs-1",
           "host" : {}
         }
       ]

@@ -2,6 +2,7 @@
 locals {
   feeds = [
     "FmsGeneral",
+    "FmsHO",
     "FmsSpecials",
     # "MdssGeneral"
   ]
@@ -30,8 +31,8 @@ module "all_lambdas_errors_alarm" {
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
   threshold           = 0
-  period              = 60
   unit                = "Count"
+  period              = 60
 
   namespace   = "AWS/Lambda"
   metric_name = "Errors"
@@ -62,11 +63,11 @@ module "files_land_bucket_alarm" {
   alarm_description   = "Detect when not enough files land in bucket within 24 hours"
   comparison_operator = "LessThanOrEqualToThreshold"
   evaluation_periods  = 1
-  threshold           = 51
+  threshold           = 24
   period              = 90000
   unit                = "Count"
 
-  namespace   = "Custom"
+  namespace   = "LandedFiles"
   metric_name = each.value.name
   statistic   = "Sum"
 
