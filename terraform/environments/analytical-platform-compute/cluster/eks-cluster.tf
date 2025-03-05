@@ -24,9 +24,9 @@ module "eks" {
 
   # subnet_ids = module.vpc.private_subnets
   subnet_ids = [
-    data.aws_private_subnet_1,
-    data.aws_private_subnet_2,
-    data.aws_private_subnet_3
+    data.aws_subnet.aws_private_subnet_1.id,
+    data.aws_subnet.aws_private_subnet_2.id,
+    data.aws_subnet.aws_private_subnet_3.id
     ]
   cluster_security_group_additional_rules = {
     vpc = {
