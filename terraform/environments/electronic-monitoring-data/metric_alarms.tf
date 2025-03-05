@@ -2,6 +2,7 @@
 locals {
   feeds = [
     "FmsGeneral",
+    "FmsHO",
     "FmsSpecials",
     # "MdssGeneral"
   ]
