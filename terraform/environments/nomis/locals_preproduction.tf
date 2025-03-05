@@ -22,21 +22,6 @@ locals {
   baseline_preproduction = {
 
     acm_certificates = {
-      nomis_wildcard_cert = {
-        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                         = "modernisation-platform.service.justice.gov.uk"
-        external_validation_records_created = true
-        subject_alternate_names = [
-          "*.nomis.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
-          "*.preproduction.nomis.service.justice.gov.uk",
-          "*.preproduction.nomis.az.justice.gov.uk",
-          "*.pp-nomis.az.justice.gov.uk",
-          "*.lsast-nomis.az.justice.gov.uk",
-        ]
-        tags = {
-          description = "wildcard cert for nomis preproduction domains"
-        }
-      }
       nomis_wildcard_cert_v2 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "*.preproduction.nomis.service.justice.gov.uk"
