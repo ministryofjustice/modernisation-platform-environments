@@ -17,17 +17,17 @@ module "eks" {
   vpc_id = data.aws_vpc.apc_vpc.id
 
   control_plane_subnet_ids = [
-    data.aws_subnet.intra_subnet_1.id,
-    data.aws_subnet.intra_subnet_2.id,
-    data.aws_subnet.intra_subnet_3.id
+    data.aws_subnet.intra_subnet_a.id,
+    data.aws_subnet.intra_subnet_b.id,
+    data.aws_subnet.intra_subnet_c.id
   ]
 
-  # subnet_ids = module.vpc.private_subnets
   subnet_ids = [
-    data.aws_subnet.private_subnet_1.id,
-    data.aws_subnet.private_subnet_2.id,
-    data.aws_subnet.private_subnet_3.id
-    ]
+    data.aws_subnet.private_subnet_a.id,
+    data.aws_subnet.private_subnet_b.id,
+    data.aws_subnet.private_subnet_c.id
+  ]
+
   cluster_security_group_additional_rules = {
     vpc = {
       description = "Allow traffic from the VPC"

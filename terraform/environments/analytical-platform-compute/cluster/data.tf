@@ -47,26 +47,50 @@ data "aws_vpc" "apc_vpc" {
   }
 }
 
-data "aws_subnet" "intra_subnet_1" {
-  cidr_block = local.environment_configuration.vpc_intra_subnets[0]
+data "aws_subnet" "intra_subnet_a" {
+  vpc_id = data.aws_vpc.apc_vpc.id
+  tags = {
+    "Name" = "${local.our_vpc_name}-${local.environment}-intra-${data.aws_region.current.name}a"
+  }
 }
 
-data "aws_subnet" "intra_subnet_2" {
-  cidr_block = local.environment_configuration.vpc_intra_subnets[1]
+data "aws_subnet" "intra_subnet_b" {
+  vpc_id = data.aws_vpc.apc_vpc.id
+  tags = {
+    "Name" = "${local.our_vpc_name}-${local.environment}-intra-${data.aws_region.current.name}b"
+  }
 }
 
-data "aws_subnet" "intra_subnet_3" {
-  cidr_block = local.environment_configuration.vpc_intra_subnets[2]
+data "aws_subnet" "intra_subnet_c" {
+  vpc_id = data.aws_vpc.apc_vpc.id
+  tags = {
+    "Name" = "${local.our_vpc_name}-${local.environment}-intra-${data.aws_region.current.name}c"
+  }
 }
 
-data "aws_subnet" "private_subnet_1" {
-  cidr_block = local.environment_configuration.vpc_private_subnets[0]
+data "aws_subnet" "private_subnet_a" {
+  vpc_id = data.aws_vpc.apc_vpc.id
+  tags = {
+    "Name" = "${local.our_vpc_name}-${local.environment}-private-${data.aws_region.current.name}a"
+  }
 }
 
-data "aws_subnet" "private_subnet_2" {
-  cidr_block = local.environment_configuration.vpc_private_subnets[1]
-} 
+data "aws_subnet" "private_subnet_b" {
+  vpc_id = data.aws_vpc.apc_vpc.id
+  tags = {
+    "Name" = "${local.our_vpc_name}-${local.environment}-private-${data.aws_region.current.name}b"
+  }
+}
 
-data "aws_subnet" "private_subnet_3" {
-  cidr_block = local.environment_configuration.vpc_private_subnets[2]
+data "aws_subnet" "private_subnet_c" {
+  vpc_id = data.aws_vpc.apc_vpc.id
+  tags = {
+    "Name" = "${local.our_vpc_name}-${local.environment}-private-${data.aws_region.current.name}c"
+  }
+}
+
+data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_runners_github_app" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  secret_id = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
 }
