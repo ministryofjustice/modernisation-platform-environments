@@ -14,9 +14,15 @@ module "eks" {
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
 
-  vpc_id                   = module.vpc.vpc_id
-  control_plane_subnet_ids = module.vpc.intra_subnets
-  subnet_ids               = module.vpc.private_subnets
+  vpc_id = data.aws_vpc.apc_vpc.id
+
+  control_plane_subnet_ids = [
+    data.aws_subnet.intra_subnet_1.id,
+    data.aws_subnet.intra_subnet_2.id,
+    data.aws_subnet.intra_subnet_3.id
+  ]
+
+  subnet_ids = module.vpc.private_subnets
   cluster_security_group_additional_rules = {
     vpc = {
       description = "Allow traffic from the VPC"
@@ -24,7 +30,7 @@ module "eks" {
       to_port     = 65535
       protocol    = "tcp"
       type        = "ingress"
-      cidr_blocks = [module.vpc.vpc_cidr_block]
+      cidr_blocks = [data.aws_vpc.apc_vpc.cidr_block]
     }
   }
 

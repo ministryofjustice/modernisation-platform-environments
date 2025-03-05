@@ -465,7 +465,7 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
     sid       = "AllowEKSDescribeCluster"
     effect    = "Allow"
     actions   = ["eks:DescribeCluster"]
-    resources = [module.eks.cluster_arn]
+    resources = [data.aws_eks_cluster.apc_cluster.arn]
   }
   statement {
     sid       = "AllowSecretsManagerKMS"
@@ -541,7 +541,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
     sid       = "EKSAccess"
     effect    = "Allow"
     actions   = ["eks:DescribeCluster"]
-    resources = [module.eks.cluster_arn]
+    resources = [data.aws_eks_cluster.apc_cluster.arn]
   }
 }
 

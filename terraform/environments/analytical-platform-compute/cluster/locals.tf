@@ -1,4 +1,7 @@
 locals {
+  /* VPC */
+  our_vpc_name = "${local.application_name}-${local.environment}"
+
   /* AMP */
   amp_workspace_alias                        = "${local.application_name}-${local.environment}"
   amp_cloudwatch_log_group_name              = "/aws/amp/${local.amp_workspace_alias}"

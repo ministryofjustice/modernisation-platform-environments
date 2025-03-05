@@ -39,3 +39,30 @@ data "http" "prometheus_operator_crds" {
 
   url = each.value
 }
+
+data "aws_vpc" "apc_vpc" {
+  filter {
+    name   = "tag:Name"
+    values = [local.our_vpc_name]
+  }
+}
+
+data "aws_subnet" "intra_subnet_eu_west_2a" {
+  filter {
+    name   = "tag:Name"
+    values = ["${local.our_vpc_name}-intra-eu-west-2a"]
+  }
+}
+
+data "aws_subnet" "intra_subnet_eu_west_2b" {
+  filter {
+    name   = "tag:Name"
+    values = ["${local.our_vpc_name}-intra-eu-west-2b"]
+  }
+}
+data "aws_subnet" "intra_subnet_eu_west_2c" {
+  filter {
+    name   = "tag:Name"
+    values = ["${local.our_vpc_name}-intra-eu-west-2c"]
+  }
+}
