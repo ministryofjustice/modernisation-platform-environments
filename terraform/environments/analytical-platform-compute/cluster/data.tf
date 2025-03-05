@@ -47,22 +47,14 @@ data "aws_vpc" "apc_vpc" {
   }
 }
 
-data "aws_subnet" "intra_subnet_eu_west_2a" {
-  filter {
-    name   = "tag:Name"
-    values = ["${local.our_vpc_name}-intra-eu-west-2a"]
-  }
+data "aws_subnet" "intra_subnet_1" {
+  cidr_block = local.environment_configuration.vpc_intra_subnets[0]
 }
 
-data "aws_subnet" "intra_subnet_eu_west_2b" {
-  filter {
-    name   = "tag:Name"
-    values = ["${local.our_vpc_name}-intra-eu-west-2b"]
-  }
+data "aws_subnet" "intra_subnet_1" {
+  cidr_block = local.environment_configuration.vpc_intra_subnets[1]
 }
-data "aws_subnet" "intra_subnet_eu_west_2c" {
-  filter {
-    name   = "tag:Name"
-    values = ["${local.our_vpc_name}-intra-eu-west-2c"]
-  }
+
+data "aws_subnet" "intra_subnet_1" {
+  cidr_block = local.environment_configuration.vpc_intra_subnets[2]
 }
