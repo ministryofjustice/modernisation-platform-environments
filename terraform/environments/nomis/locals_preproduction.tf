@@ -486,7 +486,6 @@ locals {
     }
 
     route53_zones = {
-      "preproduction.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
       "preproduction.nomis.service.justice.gov.uk" = {
         records = [
           { name = "lsnomis", type = "CNAME", ttl = "300", records = ["lsnomis-a.preproduction.nomis.service.justice.gov.uk"] },

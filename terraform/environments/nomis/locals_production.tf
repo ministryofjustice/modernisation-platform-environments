@@ -600,8 +600,6 @@ locals {
         ]
       }
 
-      "production.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
-
       "production.nomis.service.justice.gov.uk" = {
         records = [
           { name = "pnomis", type = "CNAME", ttl = "300", records = ["prod-nomis-db-1-a.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk"] },
