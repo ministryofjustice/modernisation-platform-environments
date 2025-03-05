@@ -391,7 +391,7 @@ locals {
   # Placeholder for unpopulated Operational DataStore access secrets
   ods_access_secret_placeholder = {
     host     = module.aurora_operational_db.cluster_endpoint
-    port     = local.operational_db_port
+    port     = tostring(local.operational_db_port)
     database = local.operational_db_default_database
     username = "placeholder"
     password = "placeholder"
