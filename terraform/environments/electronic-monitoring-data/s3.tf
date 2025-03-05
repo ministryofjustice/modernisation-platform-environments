@@ -23,6 +23,7 @@ locals {
     [module.s3-json-directory-structure-bucket.bucket.id, module.s3-json-directory-structure-bucket.bucket.arn],
     [module.s3-data-bucket.bucket.id, module.s3-data-bucket.bucket.arn],
     [module.s3-fms-general-landing-bucket.bucket_id, module.s3-fms-general-landing-bucket.bucket_arn],
+    [module.s3-fms-ho-landing-bucket.bucket_id, module.s3-fms-ho-landing-bucket.bucket_arn],
     [module.s3-fms-specials-landing-bucket.bucket_id, module.s3-fms-specials-landing-bucket.bucket_arn],
     [module.s3-mdss-general-landing-bucket.bucket_id, module.s3-mdss-general-landing-bucket.bucket_arn],
     [module.s3-mdss-ho-landing-bucket.bucket_id, module.s3-mdss-ho-landing-bucket.bucket_arn],
@@ -593,6 +594,39 @@ module "s3-fms-general-landing-bucket-iam-user" {
   order_type = "general"
 
   landing_bucket_arn        = module.s3-fms-general-landing-bucket.bucket_arn
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  rotation_lambda           = module.rotate_iam_key
+  rotation_lambda_role_name = aws_iam_role.rotate_iam_keys.name
+}
+
+module "s3-fms-ho-landing-bucket" {
+  source = "./modules/landing_bucket/"
+
+  data_feed  = "fms"
+  order_type = "ho"
+
+  core_shared_services_id  = local.environment_management.account_ids["core-shared-services-production"]
+  local_bucket_prefix      = local.bucket_prefix
+  local_tags               = local.tags
+  logging_bucket           = module.s3-logging-bucket
+  production_dev           = local.is-production ? "prod" : "dev"
+  received_files_bucket_id = module.s3-received-files-bucket.bucket.id
+  security_group_ids       = [aws_security_group.lambda_generic.id]
+  subnet_ids               = data.aws_subnets.shared-public.ids
+
+  providers = {
+    aws = aws
+  }
+}
+
+module "s3-fms-ho-landing-bucket-iam-user" {
+  source = "./modules/landing_bucket_iam_user_access/"
+
+  data_feed  = "fms"
+  order_type = "ho"
+
+  landing_bucket_arn        = module.s3-fms-ho-landing-bucket.bucket_arn
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
   rotation_lambda           = module.rotate_iam_key
