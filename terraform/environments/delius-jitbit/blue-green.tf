@@ -154,3 +154,13 @@ resource "aws_lb_listener_rule" "green" {
     }
   }
 }
+
+resource "aws_cloudwatch_log_group" "blue" {
+  name              = format("%s-ecs-blue", local.application_name)
+  retention_in_days = 30
+}
+
+resource "aws_cloudwatch_log_group" "green" {
+  name              = format("%s-ecs-green", local.application_name)
+  retention_in_days = 30
+}
