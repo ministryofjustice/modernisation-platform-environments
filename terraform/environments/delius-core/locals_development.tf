@@ -124,7 +124,7 @@ locals {
   dms_config_dev = {
     deploy_dms                 = true
     replication_instance_class = "dms.t3.small"
-    engine_version             = "3.5.2"
+    engine_version             = "3.5.4"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
     # Please ensure any changes made here are consistent with Ansible variables.
     audit_source_endpoint = {

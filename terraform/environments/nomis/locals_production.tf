@@ -38,6 +38,19 @@ locals {
           description = "wildcard cert for nomis production domains"
         }
       }
+      nomis_wildcard_cert_v2 = {
+        cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
+        domain_name                         = "*.nomis.service.justice.gov.uk"
+        external_validation_records_created = false
+        subject_alternate_names = [
+          "*.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk",
+          "*.production.nomis.service.justice.gov.uk",
+          "*.nomis.az.justice.gov.uk",
+        ]
+        tags = {
+          description = "wildcard cert for nomis production domains"
+        }
+      }
     }
 
     cloudwatch_dashboards = {
