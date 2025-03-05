@@ -112,6 +112,33 @@ locals {
     cidr_ipv6s = local.civica_cidr_ipv6s
   }
 
+
+  #----------------------------------------------------------------------------
+  # scram
+  #----------------------------------------------------------------------------
+  scram_ssh_keys = [
+    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBBBXwsFkiYvUwkwadVYgAjSU3L+SyN7AZnWabN+HLLf66PZHagS653rIkbA7PEpZKydTvM3FLCdbKzTZac57AdTwoWArLLnSwWRUyNQRZ+omdbXaUqa8MM1n1gNBpynkIw==",
+  ]
+  scram_cidr_ipv4s = [
+    "172.167.3.97/32",
+  ]
+  scram_cidr_ipv6s = []
+
+  sftp_account_scram_test = {
+    name       = "test"
+    ssh_keys   = local.scram_ssh_keys
+    cidr_ipv4s = local.scram_cidr_ipv4s
+    cidr_ipv6s = local.scram_cidr_ipv6s
+  }
+
+  # sftp_account_scram_orca = {
+  #   name       = "orca"
+  #   ssh_keys   = local.civica_ssh_keys
+  #   cidr_ipv4s = local.civica_cidr_ipv4s
+  #   cidr_ipv6s = local.civica_cidr_ipv6s
+  # }
+
+
   #----------------------------------------------------------------------------
   # G4S
   #----------------------------------------------------------------------------
