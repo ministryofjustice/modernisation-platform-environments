@@ -78,3 +78,7 @@ data "aws_vpc_endpoint" "mwaa_webserver" {
 data "dns_a_record_set" "mwaa_webserver_vpc_endpoint" {
   host = data.aws_vpc_endpoint.mwaa_webserver.dns_entry[0].dns_name
 }
+
+data "aws_eks_cluster" "apc_cluster" {
+  name = local.eks_cluster_name
+}
