@@ -119,6 +119,10 @@ resource "aws_lb_listener_rule" "blue_green" {
       values = [local.blue_green_url]
     }
   }
+
+  tags = {
+    Name = "blue-green"
+  }
 }
 
 resource "aws_lb_listener_rule" "blue" {
