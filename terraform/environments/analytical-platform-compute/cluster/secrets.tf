@@ -78,7 +78,7 @@ module "actions_runners_token_apc_self_hosted_runners_secret" {
 
   name        = "actions-runners/token/apc-self-hosted-runners"
   description = "moj-data-platform-robot: https://github.com/settings/personal-access-tokens/4281036"
-  kms_key_id  = [data.aws_kms_key.common_secrets_manager_kms.arn]
+  kms_key_id  = "data.aws_kms_key.common_secrets_manager_kms.arn"
 
 
   secret_string         = "CHANGEME"
@@ -103,7 +103,7 @@ module "actions_runners_token_apc_self_hosted_runners_github_app" {
 
   name        = "actions-runners/app/apc-self-hosted-runners"
   description = "https://github.com/organizations/moj-analytical-services/settings/installations/57058653"
-  kms_key_id  = [data.aws_kms_key.common_secrets_manager_kms.arn]
+  kms_key_id  = "data.aws_kms_key.common_secrets_manager_kms.arn"
 
 
   secret_string = jsonencode({
@@ -126,7 +126,7 @@ module "ui_sentry_dsn_secret" {
 
   name        = "ui/sentry-dsn"
   description = "Sentry DSN for Analytical Platform UI"
-  kms_key_id  = [data.aws_kms_key.common_secrets_manager_kms.arn]
+  kms_key_id  = "data.aws_kms_key.common_secrets_manager_kms.arn"
 
   secret_string         = "CHANGEME"
   ignore_secret_changes = true
@@ -143,7 +143,7 @@ module "ui_azure_client_secret" {
 
   name        = "ui/azure-client"
   description = "Azure client secret for Analytical Platform UI"
-  kms_key_id  = [data.aws_kms_key.common_secrets_manager_kms.arn]
+  kms_key_id  = "data.aws_kms_key.common_secrets_manager_kms.arn"
 
   secret_string         = "CHANGEME"
   ignore_secret_changes = true
@@ -160,7 +160,7 @@ module "ui_azure_tenant_secret" {
 
   name        = "ui/azure-tenant"
   description = "Azure tenant secret for Analytical Platform UI"
-  kms_key_id  = [data.aws_kms_key.common_secrets_manager_kms.arn]
+  kms_key_id  = "data.aws_kms_key.common_secrets_manager_kms.arn"
 
   secret_string         = "CHANGEME"
   ignore_secret_changes = true
