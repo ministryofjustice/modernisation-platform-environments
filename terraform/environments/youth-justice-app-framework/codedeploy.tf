@@ -1,3 +1,9 @@
+data "aws_instance" "target_ec2" {
+  filter {
+    name   = "tag:Name"
+    values = ["YJSM"]
+  }
+}
 
 module "codedeploy" {
   source       = "./modules/codedeploy"
@@ -5,6 +11,8 @@ module "codedeploy" {
   tags         = local.tags
   cluster_name = "yjaf-cluster"
   environment  = local.environment
+  ec2_enabled        = true
+  ec2_applications   = ["yjsm-hub", "yjsm-hubadmin", "yjsm-ui", "assets"]
   services = [
     { "auth" = "internal" },
     { "bands" = "internal" },
