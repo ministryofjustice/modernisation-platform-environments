@@ -102,6 +102,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/ccms-ebs-upgrade/sandbox"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs/modules"
     schedule:
       interval: "daily"
@@ -263,10 +267,6 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/cw_insights"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/digital-prison-reporting/modules/dms"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
