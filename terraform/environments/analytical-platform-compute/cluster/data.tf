@@ -102,3 +102,7 @@ data "aws_route53_zone" "apc_route53_zone" {
 data "aws_kms_key" "common_secrets_manager_kms" {
   key_id = "alias/secretsmanager/common"
 }
+
+data "aws_iam_policy" "analytical_platform_lake_formation_share_policy" {
+  path_prefix = "analytical-platform-lake-formation-sharing-policy"
+}
