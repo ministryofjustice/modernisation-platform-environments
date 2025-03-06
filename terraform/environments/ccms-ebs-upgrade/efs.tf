@@ -58,9 +58,9 @@ resource "aws_vpc_security_group_ingress_rule" "efs_security_group_egress" {
   description       = "Allow egress traffic from EFS"
   security_group_id = aws_security_group.efs_security_group.id
   cidr_ipv4         = "0.0.0.0/0"
-  from_port         = 0
-  ip_protocol       = -1
-  to_port           = 0
+  # from_port         = 0
+  ip_protocol = -1
+  # to_port           = 0
 
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-efs", local.application_name, local.environment)) }
