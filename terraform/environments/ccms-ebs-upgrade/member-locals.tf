@@ -28,4 +28,10 @@ locals {
   cert_opts    = aws_acm_certificate.external.domain_validation_options
   cert_arn     = aws_acm_certificate.external.arn
   cert_zone_id = data.aws_route53_zone.external.zone_id
+
+  data_subnets_cidr_map = {
+    "a" = data.aws_subnet.data_subnets_a.cidr_block,
+    "b" = data.aws_subnet.data_subnets_b.cidr_block,
+    "c" = data.aws_subnet.data_subnets_c.cidr_block
+  }
 }
