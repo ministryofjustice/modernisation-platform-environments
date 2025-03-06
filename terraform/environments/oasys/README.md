@@ -58,7 +58,9 @@ An outage could cause issues with accessing the probation details. It is NOT acc
 ### **Out of hours response types:**
 
 Contact digital-studio-operations-team@digital.justice.gov.uk
-Support is during work hours (09:00 - 17:00, Mon - Fri) as described above.
+The digital studio operations team (DBA) can be contacted through PagerDuty for out of hours work.
+
+Normal support is during work hours (09:00 - 17:00, Mon - Fri).
 
 ### **Consumers of this service:**
 
