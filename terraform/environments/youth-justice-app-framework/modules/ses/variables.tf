@@ -15,11 +15,19 @@ variable "tags" {
 }
 
 variable "ses_domain_identities" {
-  type        = list(string)
-  description = "SES domain identities to verify"
+  type = map(object({
+    identity       = string
+    create_records = bool
+  }))
+  description = "SES domain identities to create DNS records for"
 }
 
 variable "key_id" {
   type        = string
   description = "The KMS key ID to use for the secret"
+}
+
+variable "private_subnets" {
+  type        = list(string)
+  description = "Private subnets to allow SES SMTP user to send emails"
 }

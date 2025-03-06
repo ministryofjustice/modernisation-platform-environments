@@ -1,43 +1,50 @@
-/*
-resource "aws_route53_record" "ses_verification" {
-  for_each = toset(var.ses_domain_identities)
+data "aws_route53_zone" "zones" {
+  for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }
+  name     = "${each.value.identity}."
+}
 
-  zone_id = module.route53_records[each.value].zone_id
-  name    = "_amazonses.${each.value}"
+resource "aws_route53_record" "ses_verification" {
+  for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }
+
+  zone_id = data.aws_route53_zone.zones[each.value.identity].zone_id
+  name    = "_amazonses.${each.value.identity}"
   type    = "TXT"
   ttl     = 300
-  records = [aws_ses_domain_identity.main[each.value].verification_token]
+  records = [aws_ses_domain_identity.main[each.value.identity].verification_token]
 }
 
 resource "aws_route53_record" "ses_dkim" {
-  for_each = toset(var.ses_domain_identities)
+  for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }
 
-  zone_id = module.route53_records[each.value].zone_id
-  name    = aws_ses_domain_dkim.main[each.value].dkim_tokens[0]  # 3 records required
+  zone_id = data.aws_route53_zone.zones[each.value.identity].zone_id
+  name    = aws_ses_domain_dkim.main[each.value.identity].dkim_tokens[0] # 3 records required
   type    = "CNAME"
   ttl     = 300
-  records = ["${aws_ses_domain_dkim.main[each.value].dkim_tokens[0]}.amazonses.com."]
+  records = ["${aws_ses_domain_dkim.main[each.value.identity].dkim_tokens[0]}.amazonses.com."]
 }
 
 resource "aws_route53_record" "ses_dkim_2" {
-  for_each = toset(var.ses_domain_identities)
+  for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }
 
-  zone_id = module.route53_records[each.value].zone_id
-  name    = aws_ses_domain_dkim.main[each.value].dkim_tokens[1]
+  zone_id = data.aws_route53_zone.zones[each.value.identity].zone_id
+  name    = aws_ses_domain_dkim.main[each.value.identity].dkim_tokens[1]
   type    = "CNAME"
   ttl     = 300
-  records = ["${aws_ses_domain_dkim.main[each.value].dkim_tokens[1]}.amazonses.com."]
+  records = ["${aws_ses_domain_dkim.main[each.value.identity].dkim_tokens[1]}.amazonses.com."]
 }
 
 resource "aws_route53_record" "ses_dkim_3" {
-  for_each = toset(var.ses_domain_identities)
+  for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }
 
-  zone_id = module.route53_records[each.value].zone_id
-  name    = aws_ses_domain_dkim.main[each.value].dkim_tokens[2]
+  zone_id = data.aws_route53_zone.zones[each.value.identity].zone_id
+  name    = aws_ses_domain_dkim.main[each.value.identity].dkim_tokens[2]
   type    = "CNAME"
   ttl     = 300
-  records = ["${aws_ses_domain_dkim.main[each.value].dkim_tokens[2]}.amazonses.com."]
+  records = ["${aws_ses_domain_dkim.main[each.value.identity].dkim_tokens[2]}.amazonses.com."]
 }
 
-"dev.justice.gov.uk","yjb.gov.uk","dev.yjbservices.yjb.gov.uk"
-*/
+# we own this one "dev.justice.gov.uk",
+# we own this one "dev.yjbservices.yjb.gov.uk"
+#moj own this one "yjb.gov.uk",
+
+

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load suppression list from JSON file
-SUPPRESSION_FILE="suppressed-ses.json"
+SUPPRESSION_FILE="modules/ses/suppressed-ses.json"
 
 # Parse JSON and add each suppressed email
 jq -c '.SuppressedDestinations[]' $SUPPRESSION_FILE | while read -r entry; do

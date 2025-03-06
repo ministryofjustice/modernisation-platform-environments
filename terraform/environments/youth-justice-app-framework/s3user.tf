@@ -22,9 +22,26 @@ resource "aws_secretsmanager_secret" "s3_user_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "s3_user_secret" {
-  secret_id = aws_secretsmanager_secret.auto_admit_secret.id
+  secret_id = aws_secretsmanager_secret.s3_user_secret.id
   secret_string = jsonencode({
     username = aws_iam_access_key.s3.id,
     password = aws_iam_access_key.s3.secret
+  })
+}
+
+## S3 user policy
+resource "aws_iam_policy" "s3" {
+  name        = "${local.project_name}-s3-access"
+  description = "Policy for S3 user"
+  policy = templatefile("${path.module}/iam_policies/s3_user_policy.json", {
+    dal_buckets = jsonencode([
+      "arn:aws:s3:::yjaf-${local.environment}-cms/*",
+      "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
+      "arn:aws:s3:::yjaf-${local.environment}-mis/*",
+      "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
+      "arn:aws:s3:::yjaf-${local.environment}-bands/*",
+      "arn:aws:s3:::yjaf-${local.environment}-incident/*",
+      "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
+    ])
   })
 }
