@@ -94,3 +94,7 @@ data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_
 
   secret_id = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
 }
+
+data "aws_route53_zone" "apc_route53_zone" {
+  name = local.environment_configuration.route53_zone
+}

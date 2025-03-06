@@ -137,7 +137,7 @@ module "external_dns_iam_role" {
 
   role_name_prefix              = "external-dns"
   attach_external_dns_policy    = true
-  external_dns_hosted_zone_arns = [module.route53_zones.route53_zone_zone_arn[local.environment_configuration.route53_zone]]
+  external_dns_hosted_zone_arns = [data.aws_route53_zone.apc_route53_zone.arn]
 
   oidc_providers = {
     main = {
