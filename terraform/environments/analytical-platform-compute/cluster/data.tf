@@ -106,3 +106,11 @@ data "aws_kms_key" "common_secrets_manager_kms" {
 data "aws_iam_policy" "analytical_platform_lake_formation_share_policy" {
   path_prefix = "analytical-platform-lake-formation-sharing-policy"
 }
+
+data "aws_db_instance" "mlflow_auth_rds" {
+  db_instance_identifier = "mlflow-auth"
+}
+
+data "aws_db_instance" "mlflow_rds" {
+  db_instance_identifier = "mlflow"
+}
