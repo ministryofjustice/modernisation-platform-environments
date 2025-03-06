@@ -158,7 +158,7 @@ module "cert_manager_iam_role" {
 
   role_name_prefix              = "cert-manager"
   attach_cert_manager_policy    = true
-  cert_manager_hosted_zone_arns = [module.route53_zones.route53_zone_zone_arn[local.environment_configuration.route53_zone]]
+  cert_manager_hosted_zone_arns = [data.aws_route53_zone.apc_route53_zone.arn]
 
   oidc_providers = {
     main = {
@@ -179,7 +179,7 @@ module "external_secrets_iam_role" {
 
   role_name_prefix               = "external-secrets"
   attach_external_secrets_policy = true
-  external_secrets_kms_key_arns  = [module.common_secrets_manager_kms.key_arn]
+  external_secrets_kms_key_arns  = [data.aws_kms_key.common_secrets_manager_kms.arn]
 
   oidc_providers = {
     main = {
