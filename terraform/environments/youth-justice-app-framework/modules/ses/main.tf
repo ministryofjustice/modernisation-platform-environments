@@ -21,6 +21,7 @@ resource "aws_ses_domain_dkim" "main" {
 # SES SMTP User
 #####################
 
+#checkov:skip=CKV_AWS_273: ses user
 resource "aws_iam_user" "ses_smtp_user" {
   name = "${var.environment}-${var.project_name}-smtp-user"
 }
@@ -72,6 +73,6 @@ resource "null_resource" "import_suppression" {
   }
 
   triggers = {
-    always_run = "${timestamp()}" # Ensures it runs every time
+    always_run = ${timestamp()} # Ensures it runs every time
   }
 }

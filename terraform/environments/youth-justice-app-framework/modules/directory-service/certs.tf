@@ -11,6 +11,7 @@
 #Deploy the CA solution from the available AWS cloudformation stack
 
 # Create an SSM parameter for the AMI to be used - an alternative is to change the cloudformation template to accept an aim id instead of an SSM parameter
+# checkov:skip=CKV2_AWS_34: "Not supported by cloudformation below"
 resource "aws_ssm_parameter" "w2022_ami" {
   name  = "/service/ami-windows-latest/CIS_Windows_Server_2022_Benchmark_Level_1"
   type  = "String"
