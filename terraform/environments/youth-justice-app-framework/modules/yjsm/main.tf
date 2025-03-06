@@ -10,6 +10,18 @@ module "key_pair" {
   tags = local.all_tags
 }
 
+
+data "template_file" "userdata" {
+  template = file("${path.module}/ec2-userdata.tftpl")
+  vars = {
+    env          = var.environment
+    tags         = jsonencode(local.all_tags)
+    project      = var.project_name
+  }
+}
+
+
+
 resource "aws_instance" "yjsm" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = "t3a.xlarge"  
@@ -19,6 +31,7 @@ resource "aws_instance" "yjsm" {
   iam_instance_profile   = aws_iam_instance_profile.yjsm_ec2_profile.id
   vpc_security_group_ids = [aws_security_group.yjsm_service.id]
   subnet_id              = var.subnet_id
+  tags                   = local.all_tags
 
 
 
@@ -36,10 +49,7 @@ resource "aws_instance" "yjsm" {
     volume_size           = 60
     volume_type           = "gp2"
   }
-  
-  tags = {
-    Name = "YJSM"
-  }
+
 }
 
 data "aws_ami" "amazon_linux" {
