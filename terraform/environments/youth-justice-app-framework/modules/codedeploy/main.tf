@@ -85,7 +85,7 @@ resource "aws_iam_role" "codedeploy_ec2_service_role" {
 resource "aws_iam_policy_attachment" "codedeploy_ec2_service_role_policy" {
   count      = var.ec2_enabled ? 1 : 0
   name       = "AWSCodeDeployRoleForEC2"
-  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRole"
+  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForEC2"
   roles      = [aws_iam_role.codedeploy_ec2_service_role[0].name]
 }
 
