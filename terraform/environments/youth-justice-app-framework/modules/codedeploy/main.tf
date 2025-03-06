@@ -64,10 +64,9 @@ resource "aws_iam_policy_attachment" "codedeploy_service_role_policy" {
   roles      = [aws_iam_role.codedeploy_service_role.name]
 }
 
+#create EC2 codedeploy service iam role
 resource "aws_iam_role" "codedeploy_ec2_service_role" {
-  count = var.ec2_enabled ? 1 : 0
   name  = "codedeploy-ec2-service-role"
-
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -82,11 +81,11 @@ resource "aws_iam_role" "codedeploy_ec2_service_role" {
   })
 }
 
+#attach AWSCodeDeployRoleForEC2 policy
 resource "aws_iam_policy_attachment" "codedeploy_ec2_service_role_policy" {
-  count      = var.ec2_enabled ? 1 : 0
   name       = "AWSCodeDeployRoleForEC2"
   policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForEC2"
-  roles      = [aws_iam_role.codedeploy_ec2_service_role[0].name]
+  roles      = [aws_iam_role.codedeploy_ec2_service_role.name]
 }
 
 resource "aws_codedeploy_deployment_group" "this" {
@@ -145,7 +144,7 @@ resource "aws_codedeploy_deployment_group" "ec2" {
   deployment_group_name  = var.environment
   app_name               = aws_codedeploy_app.ec2[each.key].name
   deployment_config_name = "CodeDeployDefault.AllAtOnce"
-  service_role_arn       = aws_iam_role.codedeploy_ec2_service_role[0].arn
+  service_role_arn       = aws_iam_role.codedeploy_ec2_service_role.arn
 
   deployment_style {
     deployment_option = "WITHOUT_TRAFFIC_CONTROL"
