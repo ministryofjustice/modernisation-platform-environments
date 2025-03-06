@@ -74,11 +74,19 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/bacway"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs-upgrade"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/ccms-ebs-upgrade/anonymisation"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -91,6 +99,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/ccms-ebs-upgrade/modules/cw-logs"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/ccms-ebs-upgrade/sandbox"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -258,10 +270,6 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
-    directory: "/terraform/environments/digital-prison-reporting/modules/dms"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/dms_dps"
     schedule:
       interval: "daily"
@@ -323,6 +331,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/ec2"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/eventbridge"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

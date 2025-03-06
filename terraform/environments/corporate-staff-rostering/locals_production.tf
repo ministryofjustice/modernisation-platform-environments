@@ -418,7 +418,7 @@ locals {
         deployment_type             = "MULTI_AZ_1"
         security_groups             = ["fsx_windows"]
         skip_final_backup           = true
-        storage_capacity            = 600
+        storage_capacity            = 32
         throughput_capacity         = 8
 
         subnets = [
