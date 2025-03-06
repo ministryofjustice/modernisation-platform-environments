@@ -81,12 +81,13 @@ resource "aws_iam_role" "codedeploy_ec2_service_role" {
   })
 }
 
-#attach AWSCodeDeployRoleForEC2 policy
-resource "aws_iam_policy_attachment" "codedeploy_ec2_service_role_policy" {
-  name       = "AWSCodeDeployRoleForEC2"
-  policy_arn = "arn:aws:iam::aws:policy/AWSCodeDeployRoleForEC2"
-  roles      = [aws_iam_role.codedeploy_ec2_service_role.name]
+# Attach AWSCodeDeployRoleForEC2 policy
+resource "aws_iam_role_policy_attachment" "codedeploy_ec2_service_role_policy" {
+  role       = aws_iam_role.codedeploy_ec2_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
 }
+
+
 
 resource "aws_codedeploy_deployment_group" "this" {
   for_each               = { for pair in var.services : join("", keys(pair)) => pair }
@@ -164,5 +165,5 @@ resource "aws_codedeploy_deployment_group" "ec2" {
     events  = ["DEPLOYMENT_FAILURE"]
   }
 
-  depends_on = [aws_iam_policy_attachment.codedeploy_ec2_service_role_policy]
+  depends_on = [aws_iam_role_policy_attachment.codedeploy_ec2_service_role_policy]
 }
