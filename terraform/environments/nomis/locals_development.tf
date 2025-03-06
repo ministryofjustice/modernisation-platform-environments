@@ -526,7 +526,6 @@ locals {
     }
 
     route53_zones = {
-      "development.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
       "development.nomis.service.justice.gov.uk" = {
         records = [
           # SYSCON
