@@ -13,6 +13,7 @@ locals {
   cidr_cica_onprem_prod = "10.2.30.0/24"
   cidr_cica_ras         = "10.9.14.0/23"
   cidr_cica_lan         = "10.7.11.0/24"
+  cidr_cica_ras_nat     = "10.7.14.224/28"
 
   #get snapshot IDs for each volume. Required to stop instance replacement on apply
   block_device_mapping_xvde = {
