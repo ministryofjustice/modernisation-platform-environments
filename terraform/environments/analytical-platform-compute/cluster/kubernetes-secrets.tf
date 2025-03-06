@@ -50,11 +50,11 @@ resource "kubernetes_secret" "ui_rds" {
 
   type = "Opaque"
   data = {
-    username                   = module.ui_rds.db_instance_username
+    username                   = data.aws_db_instance.ui_rds.master_username
     password                   = random_password.ui_rds.result
-    address                    = module.ui_rds.db_instance_address
-    port                       = module.ui_rds.db_instance_port
-    postgres_connection_string = "postgresql://${module.ui_rds.db_instance_username}:${random_password.ui_rds.result}@${module.ui_rds.db_instance_address}:${module.ui_rds.db_instance_port}/ui"
+    address                    = data.aws_db_instance.ui_rds.address
+    port                       = data.aws_db_instance.ui_rds.db_instance_port
+    postgres_connection_string = "postgresql://${data.aws_db_instance.ui_rds.master_username}:${random_password.ui_rds.result}@${data.aws_db_instance.ui_rds.address}:${data.aws_db_instance.ui_rds.db_instance_port}/ui"
   }
 }
 

@@ -114,3 +114,7 @@ data "aws_db_instance" "mlflow_auth_rds" {
 data "aws_db_instance" "mlflow_rds" {
   db_instance_identifier = "mlflow"
 }
+
+data "aws_db_instance" "ui_rds" {
+  db_instance_identifier = "ui"
+}
