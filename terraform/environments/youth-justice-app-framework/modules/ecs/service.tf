@@ -53,6 +53,8 @@ module "ecs_service" {
   desired_count                      = each.value.desired_count
   deployment_maximum_percent         = each.value.deployment_maximum_percent
   deployment_minimum_healthy_percent = each.value.deployment_minimum_healthy_percent
+  autoscaling_max_capacity           = try(each.value.autoscaling_max_capacity, 4)
+  autoscaling_policies               = local.autoscaling_policies
   #ec2 capacity_provider_strategy  spread (attribute:ecs.availability-zone), spread (instanceId) todo
   # Container definition(s)
   cpu    = try(each.value.task_cpu, each.value.container_cpu)
@@ -88,7 +90,7 @@ module "ecs_service" {
         [
           {
             "name" : "SPRING_PROFILES_ACTIVE",
-            "value" : var.environment
+            "value" : "moj-${var.environment}"
           },
           {
             "name" : "DD_SERVICE",

@@ -4,6 +4,9 @@ locals {
   project              = local.application_data.accounts[local.environment].project_short_id
   analytics_project_id = "analytics"
 
+  # custom event bus
+  event_bus_dpr = "dpr-event_bus"
+
   other_log_retention_in_days = local.application_data.accounts[local.environment].other_log_retention_in_days
 
   # Kinesis Agent
@@ -191,17 +194,14 @@ locals {
   lambda_scheduled_dataset_tracing        = "Active"
   lambda_scheduled_dataset_handler        = "uk.gov.justice.digital.hmpps.scheduled.lambda.ReportSchedulerLambda::handleRequest"
   lambda_scheduled_dataset_code_s3_bucket = module.s3_artifacts_store.bucket_id
-  lambda_scheduled_dataset_jar_version    = "v0.0.8"
-  lambda_scheduled_dataset_code_s3_key = (
-    local.env == "production" || local.env == "preproduction"
-    ? "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}.rel-all.jar"
-    : "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}-all.jar"
-  )
+  lambda_scheduled_dataset_jar_version    = local.application_data.accounts[local.environment].scheduled_dataset_lambda_version
+  lambda_scheduled_dataset_code_s3_key    = "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_scheduled_dataset_jar_version}-all.jar"
   lambda_scheduled_dataset_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     aws_iam_policy.redshift_dataapi_cross_policy.arn,
-    aws_iam_policy.dpd_table_read_policy.arn
+    aws_iam_policy.dpd_table_read_policy.arn,
+    aws_iam_policy.dpr_event_bus_write_events_policy.arn
   ]
   lambda_scheduled_dataset_secret_arn          = module.datamart.credential_secret_arn
   lambda_scheduled_dataset_cluster_id          = module.datamart.cluster_id
@@ -210,6 +210,28 @@ locals {
   lambda_scheduled_dataset_schedule_expression = "rate(1 hour)"
   lambda_scheduled_dataset_timeout_seconds     = 900
   lambda_scheduled_dataset_memory_size         = 1024
+
+  # Generate Dataset Lambda
+  lambda_generate_dataset_enabled        = true
+  lambda_generate_dataset_name           = "${local.project}-generate-dataset"
+  lambda_generate_dataset_runtime        = "java21"
+  lambda_generate_dataset_tracing        = "Active"
+  lambda_generate_dataset_handler        = "uk.gov.justice.digital.hmpps.scheduled.lambda.DatasetGenerateLambda::handleRequest"
+  lambda_generate_dataset_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_generate_dataset_jar_version    = local.application_data.accounts[local.environment].scheduled_dataset_lambda_version
+  lambda_generate_dataset_code_s3_key    = "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_generate_dataset_jar_version}-all.jar"
+  lambda_generate_dataset_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    aws_iam_policy.redshift_dataapi_cross_policy.arn,
+    aws_iam_policy.dpd_table_read_policy.arn
+  ]
+  lambda_generate_dataset_secret_arn          = module.datamart.credential_secret_arn
+  lambda_generate_dataset_cluster_id          = module.datamart.cluster_id
+  lambda_generate_dataset_database_name       = module.datamart.cluster_database_name
+  lambda_generate_dataset_dpd_ddb_table_arn   = module.dynamo_table_dpd.dynamodb_table_arn
+  lambda_generate_dataset_timeout_seconds     = 900
+  lambda_generate_dataset_memory_size         = 1024
 
   s3_redshift_table_expiry_days = local.application_data.accounts[local.environment].redshift_table_expiry_days + 1
 
@@ -364,6 +386,15 @@ locals {
     password            = module.datamart.redshift_master_password
     port                = "5439"
     username            = module.datamart.redshift_master_user
+  }
+
+  # Placeholder for unpopulated Operational DataStore access secrets
+  ods_access_secret_placeholder = {
+    host     = module.aurora_operational_db.cluster_endpoint
+    port     = tostring(local.operational_db_port)
+    database = local.operational_db_default_database
+    username = "placeholder"
+    password = "placeholder"
   }
 
   analytical_platform_share = can(local.application_data.accounts[local.environment].analytical_platform_share) ? { for share in local.application_data.accounts[local.environment].analytical_platform_share : share.target_account_name => share } : {}

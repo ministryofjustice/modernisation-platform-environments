@@ -78,7 +78,7 @@ locals {
 
       pp-jump2022-1 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
+          ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
@@ -172,6 +172,7 @@ locals {
     schedule_alarms_lambda = {
       alarm_patterns = [
         "public-https-*-unhealthy-load-balancer-host",
+        "*-instance-or-cloudwatch-agent-stopped",
       ]
     }
 

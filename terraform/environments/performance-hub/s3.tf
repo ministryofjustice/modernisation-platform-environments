@@ -217,8 +217,8 @@ data "aws_iam_policy_document" "allow_ap_write_to_landing" {
     principals {
       type = "AWS"
       identifiers = [
-        "arn:aws:iam::593291632749:role/service-role/export_prison_incidents-move",
-        "arn:aws:iam::593291632749:role/service-role/export_prison_performance-move"
+        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/service-role/export_prison_incidents-move",
+        "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/service-role/export_prison_performance-move"
       ]
     }
 

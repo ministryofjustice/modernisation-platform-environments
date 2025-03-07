@@ -141,3 +141,8 @@ output "pagerduty_integration_keys" {
   value       = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   sensitive   = true
 }
+
+output "backup_failure_topic" {
+  description = "existing backup failure topic managed by modernisation platform"
+  value       = data.aws_sns_topic.backup_failure_topic
+}
