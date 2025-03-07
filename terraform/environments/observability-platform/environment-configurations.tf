@@ -151,6 +151,53 @@ locals {
             }
           }
         },
+        "ccms-ebs" = {
+          "identity_centre_team" = "laa-ccms-migration-team",
+          "aws_accounts" = {
+            "ccms-ebs-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-preproduction" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-test" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-upgrade-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-upgrade-test" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            }
+          }
+        },
         "data-engineering" = {
           "identity_centre_team" = "data-engineering",
           "aws_accounts" = {
