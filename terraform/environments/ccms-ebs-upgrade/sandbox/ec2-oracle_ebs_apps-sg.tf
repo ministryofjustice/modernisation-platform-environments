@@ -20,7 +20,7 @@ resource "aws_vpc_security_group_ingress_rule" "sandbox_ingress" {
 }
 
 
-# INGRESS Rules
+# EGRESS Rules
 
 resource "aws_vpc_security_group_egress_rule" "sandbox_egress" {
   security_group_id = aws_security_group.ec2_sg_sandbox.id
