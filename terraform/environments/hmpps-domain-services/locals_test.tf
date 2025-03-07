@@ -93,18 +93,7 @@ locals {
         })
       })
 
-      # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
-      # test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
-      #   tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      # }
-      # test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
-      #   tags = merge(local.ec2_autoscaling_groups.rds.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
+
     }
 
     ec2_instances = {
@@ -129,17 +118,57 @@ locals {
         })
       })
 
-      # testing only do not use
-      # t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
-      #   config = merge(local.ec2_instances.jumpserver.config, {
-      #     ami_name          = "hmpps_windows_server_2022_release_2025-*"
-      #     availability_zone = "eu-west-2b"
-      #   })
-      #   tags = merge(local.ec2_instances.jumpserver.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
+      # testing only do not use, use Feb AMI, possible issues with March/latest
+      t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-916/rdweb-interface-hmpps-domain-services-test"
+            }
+          ))
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
+
+      # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
+      # existing comment above but fails in modules/baseline/lb.tf
+      # target_id doesn't exist
+      test-rdgw-2-b = merge(local.ec2_instances.rdgw, {
+        config = merge(local.ec2_instances.rdgw.config, {
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-916/rdweb-interface-hmpps-domain-services-test"
+            }
+          ))
+        })
+        tags = merge(local.ec2_instances.rdgw.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
+      test-rds-2-b = merge(local.ec2_instances.rds, {
+        config = merge(local.ec2_instances.rds.config, {
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-916/rdweb-interface-hmpps-domain-services-test"
+            }
+          ))
+        })
+        tags = merge(local.ec2_instances.rds.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+        route53_records = {
+          create_external_record = true
+          create_internal_record = true
+        }
+      })
     }
 
     fsx_windows = {
@@ -175,12 +204,27 @@ locals {
               { ec2_instance_name = "test-rdgw-1-a" },
             ]
           })
+
+          # Add new gateway 2 config
+          test-rdgw-2-http = merge(local.lbs.public.instance_target_groups.http, {
+            attachments = [
+              { ec2_instance_name = "test-rdgw-2-b" },
+            ]
+          })
+
+          # Add RDS for web access
+          test-rds-2-https = merge(local.lbs.public.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "test-rds-2-b" },
+            ]
+          })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
             alarm_target_group_names = [
               "test-rdgw-1-http",
             ]
+            certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
             rules = {
               test-rdgw-1-http = {
                 priority = 100
@@ -193,6 +237,38 @@ locals {
                     values = [
                       "rdgateway1.test.hmpps-domain.service.justice.gov.uk",
                       "hmppgw1.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+
+              # Add new gateway 2 rule
+              test-rdgw-2-http = {
+                priority = 110
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgw-2-http"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+
+              # add RDS rule
+              test-rds-2-https = {
+                priority = 120
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rds-2-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb2.test.hmpps-domain.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -214,6 +290,8 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
+          { name = "rdgateway2", type = "A", lbs_map_key = "public" },
+          { name = "rdweb2", type = "A", lbs_map_key = "public" },
         ]
       }
     }
