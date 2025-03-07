@@ -13,13 +13,6 @@ locals {
   # please keep resources in alphabetical order
   baseline_production = {
 
-    # Instance Type Defaults for production
-    # instance_type_defaults = {
-    #   web = "m6i.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
-    #   boe = "m4.2xlarge" # 8 vCPUs, 32GB RAM x 2 instances
-    #   bods = "r6i.2xlarge" # 8 vCPUs, 64GB RAM x 2 instance
-    # }
-
     acm_certificates = {
       oasys_national_reporting_wildcard_cert = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
@@ -87,6 +80,61 @@ locals {
           local.cloudwatch_metric_alarms.bods_secondary,
         )
       })
+
+      #pd-onr-cms-1 = merge(local.ec2_instances.bip_cms, {
+      #  config = merge(local.ec2_instances.bip_cms.config, {
+      #    availability_zone = "eu-west-2a"
+      #    instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+      #      "Ec2SecretPolicy",
+      #    ])
+      #  })
+      #  instance = merge(local.ec2_instances.bip_cms.instance, {
+      #    instance_type = "m6i.2xlarge"
+      #  })
+      #  user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
+      #    args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
+      #      branch = "main"
+      #    })
+      #  })
+      #  tags = merge(local.ec2_instances.bip_cms.tags, {
+      #    oasys-national-reporting-environment = "pd"
+      #  })
+      #})
+    }
+
+    efs = {
+      pd-onr-sap-share = {
+        access_points = {
+          root = {
+            posix_user = {
+              gid = 1201 # binstall
+              uid = 1201 # bobj
+            }
+            root_directory = {
+              path = "/"
+              creation_info = {
+                owner_gid   = 1201 # binstall
+                owner_uid   = 1201 # bobj
+                permissions = "0777"
+              }
+            }
+          }
+        }
+        file_system = {
+          lifecycle_policy = {
+            transition_to_ia = "AFTER_30_DAYS"
+          }
+        }
+        mount_targets = [{
+          subnet_name        = "private"
+          availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+          security_groups    = ["boe", "bip-app"]
+        }]
+        tags = {
+          backup      = "false"
+          backup-plan = "daily-and-weekly"
+        }
+      }
     }
 
     fsx_windows = {
@@ -174,111 +222,7 @@ locals {
           })
         })
       })
-
-      # No web instances built yet, not in use
-      # private = {
-      #   drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
-      #   enable_cross_zone_load_balancing = true
-      #   enable_delete_protection         = false
-      #   idle_timeout                     = 3600
-      #   internal_lb                      = true
-      #   load_balancer_type               = "application"
-      #   security_groups                  = ["lb"]
-      #   subnets                          = module.environment.subnets["private"].ids
-
-      #   instance_target_groups = {
-      #     pd-onr-web-1-a = {
-      #       port     = 7777
-      #       protocol = "HTTP"
-      #       health_check = {
-      #         enabled             = true
-      #         healthy_threshold   = 3
-      #         interval            = 30
-      #         matcher             = "200-399"
-      #         path                = "/"
-      #         port                = 7777
-      #         timeout             = 5
-      #         unhealthy_threshold = 5
-      #       }
-      #       stickiness = {
-      #         enabled = true
-      #         type    = "lb_cookie"
-      #       }
-      #       attachments = [
-      #         { ec2_instance_name = "pd-onr-web-1-a" },
-      #       ]
-      #     }
-      #   }
-
-      #   listeners = {
-      #     http = {
-      #       port     = 7777
-      #       protocol = "HTTP"
-
-      #       default_action = {
-      #         type = "fixed-response"
-      #         fixed_response = {
-      #           content_type = "text/plain"
-      #           message_body = "Not implemented"
-      #           status_code  = "501"
-      #         }
-      #       }
-      #       rules = {
-      #         pd-onr-web-1-a = {
-      #           priority = 4000
-
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "pd-onr-web-1-a"
-      #           }]
-
-      #           conditions = [{
-      #             host_header = {
-      #               values = [
-      #                 "pd-onr-web-1-a.oasys-national-reporting.hmpps-production.modernisation-platform.service.justice.gov.uk",
-      #               ]
-      #             }
-      #           }]
-      #         }
-      #       }
-      #     }
-      #     https = {
-      #       certificate_names_or_arns = ["oasys_national_reporting_wildcard_cert"]
-      #       port                      = 443
-      #       protocol                  = "HTTPS"
-      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
-
-      #       default_action = {
-      #         type = "fixed-response"
-      #         fixed_response = {
-      #           content_type = "text/plain"
-      #           message_body = "Not implemented"
-      #           status_code  = "501"
-      #         }
-      #       }
-
-      #       rules = {
-      #         pd-onr-web-1-a = {
-      #           priority = 4580
-
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "pd-onr-web-1-a"
-      #           }]
-
-      #           conditions = [{
-      #             host_header = {
-      #               values = [
-      #                 "pd-onr-web-1-a.oasys-national-reporting.hmpps-production.modernisation-platform.service.justice.gov.uk",
-      #               ]
-      #             }
-      #           }]
-      #         }
-      #       }
-      #     }
-      #   }
-      # }
-    } # end of lbs
+    }
 
     route53_zones = {
       "reporting.oasys.service.justice.gov.uk" = {
