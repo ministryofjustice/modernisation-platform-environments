@@ -11,7 +11,8 @@ resource "aws_secretsmanager_secret" "auto_admit_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "auto_admit_version" {
-  secret_id = aws_secretsmanager_secret.auto_admit_secret.id
+  secret_id     = aws_secretsmanager_secret.auto_admit_secret.id
+  secret_string = "dummy"
   lifecycle {
     ignore_changes = [secret_string]
   }
@@ -27,7 +28,8 @@ resource "aws_secretsmanager_secret" "LDAP_administration_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "LDAP_administration_version" {
-  secret_id = aws_secretsmanager_secret.LDAP_administration_secret.id
+  secret_id     = aws_secretsmanager_secret.LDAP_administration_secret.id
+  secret_string = "dummy"
   lifecycle {
     ignore_changes = [secret_string]
   }
@@ -42,7 +44,40 @@ resource "aws_secretsmanager_secret" "LDAP_DC_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "LDAP_DC_version" {
-  secret_id = aws_secretsmanager_secret.LDAP_DC_secret.id
+  secret_id     = aws_secretsmanager_secret.LDAP_DC_secret.id
+  secret_string = "dummy"
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "Auth_Email_Account" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}_Auth_Email_Account"
+  description = "YJAF Preprod limited user account credentials. Account is used by Auth Service to call Conversion service to send non-YJAF users their temporary passcode."
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "Auth_Email_Account" {
+  secret_id     = aws_secretsmanager_secret.Auth_Email_Account.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "Unit_test" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}_Unit_test"
+  description = "Used within Conversion configuration"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "Unit_test" {
+  secret_id     = aws_secretsmanager_secret.Unit_test.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
   lifecycle {
     ignore_changes = [secret_string]
   }

@@ -9,6 +9,8 @@ locals {
     "module_version"  = local.module_version,
     "module_git_hash" = local.module_git_hash,
     "project_name"    = var.project_name
+    "environment"     = "development"
+    "Name"            = "YJSM"
   }
 
 

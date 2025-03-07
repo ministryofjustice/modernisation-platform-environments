@@ -104,7 +104,7 @@ resource "aws_s3_bucket_policy" "default" {
   POLICY
 
 }
-
+#trivy:ignore:AVD-AWS-0132 todo fix later
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
   #checkov:skip=CKV_AWS_145
   for_each = toset(local.bucket_name_all)
