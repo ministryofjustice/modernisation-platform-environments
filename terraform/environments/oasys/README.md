@@ -78,3 +78,4 @@ OASys comprises a series of computer-based forms on which clinical evaluations a
 
 OASys supports the What Works? initiative of the Prison and Probation Services, by providing metrics by which the characteristics of offenders and their offences (inputs) can be analysed alongside information on interventions made (inputs) to the offender, and re-conviction data for offenders (outcomes), in order to enable 
 refinement to be made to interventions (based on a consideration of the relation between inputs and outcomes) as to improve outcomes - in other words, to decrease recidivism rates by ensuring that interventions are as appropriate and purposeful as possible.
+
