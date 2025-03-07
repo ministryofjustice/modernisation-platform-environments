@@ -1,0 +1,49 @@
+module "tableau_cert" {
+  source = "./modules/dns/certs"
+
+  project_name = local.project_name
+
+  r53_zone_id = module.public_dns_zone.aws_route53_zone_id
+  domain_name = "tableau.${local.environment}.yjbservices.yjb.gov.uk"
+
+  tags = local.tags
+}
+
+
+module "tableau" {
+  source = "./modules/tableau"
+
+  project_name = local.project_name
+ # tags         = merge(local.tags, { Name = "AD Management Server" })
+
+  environment = local.environment
+  test_mode   = local.test_mode
+
+ # environment_name             = local.environment_name
+  
+  #Network details
+  vpc_id            = data.aws_vpc.shared.id
+  tableau_subnet_id = local.private_subnet_list[0].id
+  alb_subnet_ids    = local.public_subnet_list[*].id
+
+
+  # Tableau ec2 instance details
+  instance_type         = "m5.4xlarge"
+
+  # ALB Details
+  certificate_arn = module.tableau_cert.domain_cert_arn
+
+# Security Group IDs
+postgresql_sg_id = module.aurora.rds_cluster_security_group_id
+redshift_sg_id = module.redshift.redshift_security_group_id
+directory_service_sg_id = module.ds.managed_ad_security_group_id
+
+datadog-api-key-name = ""
+availability_schedule = ""
+patch_schedule = ""
+
+ 
+ # rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
+
+  depends_on = [module.tableau_cert, module.aurora, module.redshift, module.ds]
+}

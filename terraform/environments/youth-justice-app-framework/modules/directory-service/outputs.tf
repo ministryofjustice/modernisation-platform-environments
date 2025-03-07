@@ -9,3 +9,11 @@ output "ds_managed_ad_ips" {
 output "managed_ad_password_secret_id" {
   value = aws_secretsmanager_secret.mad_admin_secret.id
 }
+
+output "cloudwatch_log_group_name" {
+  value = aws_cloudwatch_log_group.ds.name
+}
+
+output "managed_ad_security_group_id" {
+  value = aws_directory_service_directory.ds_managed_ad.security_group_id
+}

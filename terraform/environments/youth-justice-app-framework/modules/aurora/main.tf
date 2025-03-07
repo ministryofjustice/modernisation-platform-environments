@@ -84,18 +84,22 @@ resource "aws_security_group" "rds" {
   }
 }
 
-resource "aws_security_group_rule" "rds" {
-  for_each = var.rds_security_group_ingress
+
+# Retrieve the predefined Prefix List for S3 access
+# TODO Consider replacing the hard coded regon in the prefix name with a variable.
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.eu-west-2.s3"
+}
+resource "aws_security_group_rule" "s3-access" {
 
   security_group_id = aws_security_group.rds.id
-  type              = "ingress"
+  type              = "egress"
 
-  from_port                = each.value.from_port
-  to_port                  = each.value.to_port
-  protocol                 = each.value.protocol
-  cidr_blocks              = each.value.cidr_blocks
-  source_security_group_id = each.value.source_security_group_id
-  description              = each.value.description
+  from_port       = 443
+  to_port         = 443
+  protocol        = "TCP"
+  prefix_list_ids = [data.aws_prefix_list.s3.id]
+  description     = "Enable exports to S3"
 
 }
 
