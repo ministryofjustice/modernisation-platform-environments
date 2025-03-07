@@ -10,7 +10,8 @@ locals {
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
-          HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
+          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
+          MAX_CLIENT_BATCH_SIZE = 512
         }
       }
     }
@@ -21,7 +22,8 @@ locals {
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
-          HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
+          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
+          MAX_CLIENT_BATCH_SIZE = 512
         }
       }
       hmpps-probation-search-prod = {
@@ -30,7 +32,8 @@ locals {
         repository_name = "tei"
         image_tag       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
         environment = {
-          HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
+          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
+          MAX_CLIENT_BATCH_SIZE = 512
         }
       }
     }

@@ -38,7 +38,25 @@ resource "aws_security_group" "tariff_app_security_group" {
     protocol    = "tcp"
     from_port   = 1521
     to_port     = 1521
-    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_uat_a, local.cidr_cica_uat_b, local.cidr_cica_onprem_uat]
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ss_a, local.cidr_cica_ss_b, local.cidr_cica_uat_a, local.cidr_cica_uat_b, local.cidr_cica_onprem_uat, local.cidr_cica_dev_a, local.cidr_cica_dev_b, local.cidr_cica_ras, local.cidr_cica_lan, local.cidr_cica_ras_nat]
+
+  }
+
+  #Allow ingress to weblogic
+  ingress {
+    protocol    = "tcp"
+    from_port   = 7001
+    to_port     = 7002
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ras, local.cidr_cica_lan, local.cidr_cica_ras_nat]
+
+  }
+
+  #Allow ingress to reports
+  ingress {
+    protocol    = "tcp"
+    from_port   = 8001
+    to_port     = 8002
+    cidr_blocks = [data.aws_vpc.shared.cidr_block, local.cidr_cica_ras, local.cidr_cica_lan, local.cidr_cica_ras_nat]
 
   }
 
