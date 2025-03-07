@@ -36,13 +36,13 @@ variable "db_cluster_instance_class" {
 
 variable "rds_security_group_ingress" {
   description = "List of ingress rules for the RDS security group"
-  type = list(object({
-    from_port              = number
-    to_port                = number
-    protocol               = string
-    cidr_blocks            = optional(list(string), null)
-    source_security_groups = optional(list(string), null)
-    description            = string
+  type = map(object({
+    from_port                = optional(number, null)
+    to_port                  = optional(number, null)
+    protocol                 = string
+    cidr_blocks              = optional(list(string), null)
+    source_security_group_id = optional(string, null)
+    description              = string
   }))
 }
 
@@ -191,4 +191,15 @@ variable "kms_key_arn" {
   description = "The ARN of the KMS key to use for encryption"
   type        = string
   default     = null
+}
+
+variable "db_name" {
+  description = "The name of the database mapped to the RDS instance, used in secret creation"
+  type        = string
+  default     = "yjafrds01"
+}
+
+variable "aws_account_id" {
+  description = "The AWS account ID"
+  type        = string
 }

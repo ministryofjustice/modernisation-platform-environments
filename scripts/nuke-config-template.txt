@@ -63,6 +63,7 @@ resource-types:
     - SecurityHub
     - Transfer
     - WAFv2WebACL
+    - WAFv2IPSet
 
 accounts:
 $accounts_str
@@ -115,6 +116,11 @@ presets:
         - property: PackageName
           type: glob
           value: "rni*"
+      RDSClusterSnapshot:
+        - property: SnapshotType
+          value: "shared"
+        - property: SnapshotType
+          value: "automated"
       S3Bucket:
         - property: tag:component
           value: "secure-baselines"

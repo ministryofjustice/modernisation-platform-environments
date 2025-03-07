@@ -1133,6 +1133,13 @@ resource "aws_s3_bucket_versioning" "moj-database-source-dev" {
   }
 }
 
+resource "aws_s3_bucket_logging" "moj-database-source-dev" {
+  count         = local.is-development == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-database-source-dev[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  target_prefix = "s3-logs/moj-database-source-dev-logs/"
+}
+
 resource "aws_s3_bucket_public_access_block" "moj-database-source-dev" {
   count                   = local.is-development == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-database-source-dev[0].id
@@ -1162,6 +1169,31 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-dev" {
     }
     expiration {
       days = 60
+    }
+  }
+}
+
+/*
+resource "aws_s3_bucket_policy" "s3_bucket_policy_moj_database_source_dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-database-source-dev[0].id
+  policy = aws_iam_policy.iam_policy_s3_bucket_moj_database_source_dev[0].policy
+}
+*/
+
+resource "aws_s3_bucket_replication_configuration" "moj-database-source-dev-replication" {
+  count  = local.is-development == true ? 1 : 0
+  # Must have bucket versioning enabled first
+  depends_on = [aws_s3_bucket_versioning.moj-database-source-dev]
+  role   = aws_iam_role.iam_role_s3_bucket_moj_database_source_dev[0].arn
+  bucket = aws_s3_bucket.moj-database-source-dev[0].id
+
+  rule {
+    id = "ppud-database-replication-rule-dev"
+    status = "Enabled"
+    destination {
+      bucket        = "arn:aws:s3:::mojap-data-engineering-production-ppud-dev"
+      storage_class = "STANDARD"
     }
   }
 }
@@ -1212,6 +1244,7 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
           Service = "sns.amazonaws.com"
         }
       },
+
       {
         "Action" : [
           "s3:GetBucketAcl",

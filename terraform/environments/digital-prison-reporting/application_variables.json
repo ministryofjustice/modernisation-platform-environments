@@ -65,10 +65,11 @@
         "dps-alerts",
         "dps-use-of-force",
         "dps-locations",
-        "dps-calculate-release-dates",
+        "dps-calc-rel-date",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-and-medi",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
         "dps-testing"
       ],
       "alarms": {
@@ -218,9 +219,10 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-and-medi",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
         "dps-locations",
-        "dps-calculate-release-dates"
+        "dps-calc-rel-date"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -371,9 +373,10 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-and-medi",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
         "dps-locations",
-        "dps-calculate-release-dates"
+        "dps-calc-rel-date"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -540,9 +543,10 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
-        "dps-health-and-medi",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
         "dps-locations",
-        "dps-calculate-release-dates"
+        "dps-calc-rel-date"
       ],
       "alarms": {
         "setup_cw_alarms": true,
