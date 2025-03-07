@@ -1,13 +1,14 @@
 # Lambda function resource
-#checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda" - could be implemented but not required
-#checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit" - seems unnecessary for this module, could be added as reserved_concurrent_executions = 100 or similar (smaller) number.
-#checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)" - not required 
-#checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC" - irrelevant for this module
-#checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS" - not required
-#checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable" - not required
-#checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing" - code signing is not implemented
-#checkov:skip=CKV_AWS_338: "Ensure CloudWatch log groups retains logs for at least 1 year" - only 7 days required, see execution_logs below
+
 resource "aws_lambda_function" "main" {
+  #checkov:skip=CKV_AWS_50: "X-Ray tracing is enabled for Lambda" - could be implemented but not required
+  #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit" - seems unnecessary for this module, could be added as reserved_concurrent_executions = 100 or similar (smaller) number.
+  #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)" - not required 
+  #checkov:skip=CKV_AWS_117: "Ensure that AWS Lambda function is configured inside a VPC" - irrelevant for this module
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS" - not required
+  #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable" - not required
+  #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing" - code signing is not implemented
+  #checkov:skip=CKV_AWS_338: "Ensure CloudWatch log groups retains logs for at least 1 year" - only 7 days required, see execution_logs below
   function_name = var.lambda.function_name
   runtime       = "python3.12"
   handler       = var.lambda.handler

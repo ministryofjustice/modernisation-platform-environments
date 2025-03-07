@@ -1,7 +1,8 @@
 ### Legacy S3 bucket user, to be replaced by iam role before full migration
 
-#checkov:skip=CKV_AWS_273: Will be replaced by iam role
+
 resource "aws_iam_user" "s3" {
+  #checkov:skip=CKV_AWS_273: Will be replaced by iam role
   name = "${local.project_name}-s3-access"
 
   tags = merge(local.tags, {

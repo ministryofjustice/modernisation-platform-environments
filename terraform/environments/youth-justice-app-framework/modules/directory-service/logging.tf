@@ -1,6 +1,7 @@
 resource "aws_cloudwatch_log_group" "ds" {
   name              = "/aws/directoryservice/${aws_directory_service_directory.ds_managed_ad.id}"
   retention_in_days = 365
+  kms_key_id        = var.ds_managed_ad_secret_key
 }
 
 data "aws_iam_policy_document" "ad-log-policy" {

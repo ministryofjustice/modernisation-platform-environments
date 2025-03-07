@@ -21,8 +21,9 @@ resource "aws_ses_domain_dkim" "main" {
 # SES SMTP User
 #####################
 
-#checkov:skip=CKV_AWS_273: ses user
+
 resource "aws_iam_user" "ses_smtp_user" {
+  #checkov:skip=CKV_AWS_273: ses user
   name = "${var.environment}-${var.project_name}-smtp-user"
 }
 
