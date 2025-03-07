@@ -19,13 +19,11 @@ locals {
   baseline_development = {
 
     acm_certificates = {
-      nomis_wildcard_cert = {
+      nomis_wildcard_cert_v2 = {
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name              = "modernisation-platform.service.justice.gov.uk"
+        domain_name              = "*.development.nomis.service.justice.gov.uk"
         subject_alternate_names = [
           "*.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk",
-          "*.development.nomis.service.justice.gov.uk",
-          "*.development.nomis.az.justice.gov.uk",
         ]
         tags = {
           description = "wildcard cert for nomis development domains"
@@ -408,7 +406,7 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_wildcard_cert"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
@@ -528,7 +526,6 @@ locals {
     }
 
     route53_zones = {
-      "development.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
       "development.nomis.service.justice.gov.uk" = {
         records = [
           # SYSCON
