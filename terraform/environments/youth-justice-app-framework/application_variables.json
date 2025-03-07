@@ -38,7 +38,7 @@
         },
         "test.yjbservices.yjb.gov.uk": {
           "identity": "test.yjbservices.yjb.gov.uk",
-          "create_records": true
+          "create_records": false
         }
       }
     },
