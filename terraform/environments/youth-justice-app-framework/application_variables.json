@@ -8,7 +8,7 @@
       "ses_domain_identities": {
         "development.justice.gov.uk": {
           "identity": "development.justice.gov.uk",
-          "create_records": true
+          "create_records": false
         },
         "yjb.gov.uk": {
           "identity": "yjb.gov.uk",
@@ -28,7 +28,7 @@
       "ses_domain_identities": {
         "test.justice.gov.uk": {
           "identity": "test.justice.gov.uk",
-          "create_records": true
+          "create_records": false
         },
         "yjb.gov.uk": {
           "identity": "yjb.gov.uk",
