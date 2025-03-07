@@ -200,6 +200,11 @@ data "aws_iam_policy_document" "standard_athena_access" {
     ]
     resources = local.glue_arns
   }
+  statement {
+    effect    = "Allow"
+    actions   = ["apigateway:POST"]
+    resources = ["arn:aws:apigateway:eu-west-2::/restapis/${module.get_zipped_file_api_api.api_gateway_resource_id}"]
+  }
 }
 
 resource "aws_iam_policy" "standard_athena_access" {
