@@ -95,8 +95,8 @@ data "aws_iam_policy_document" "db_access_to_secrets_manager" {
     ]
     effect = "Allow"
     resources = concat(
-      [aws_secretsmanager_secret.database_dba_passwords.arn,aws_secretsmanager_secret.database_application_passwords.arn],
-      length(aws_secretsmanager_secret.probation_integration_passwords) > 0 ? ["${aws_secretsmanager_secret.probation_integration_passwords[0].arn}"] : [])
+      [aws_secretsmanager_secret.database_dba_passwords.arn, aws_secretsmanager_secret.database_application_passwords.arn],
+    length(aws_secretsmanager_secret.probation_integration_passwords) > 0 ? ["${aws_secretsmanager_secret.probation_integration_passwords[0].arn}"] : [])
   }
 }
 

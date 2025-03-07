@@ -13,3 +13,17 @@ module "s3_cica_dms_ingress_kms" {
 
   deletion_window_in_days = 7
 }
+
+module "cica_dms_credentials_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.0"
+
+  description           = "Used in the CICA DMS Solution to encode secrets"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+}

@@ -57,11 +57,10 @@ resource "aws_s3_bucket_policy" "default" {
 
 
   policy = <<POLICY
-     {
-        "Version": "2012-10-17",
-	"Id": "PolicyForDestinationBucket",
-	"Statement":
-	  [
+{
+  "Version": "2012-10-17",
+  "Id": "PolicyForDestinationBucket",
+  "Statement": [
 		{
 			"Sid": "Permissions to check replication result",
 			"Effect": "Allow",
@@ -99,8 +98,8 @@ resource "aws_s3_bucket_policy" "default" {
 			"Action": "s3:ObjectOwnerOverrideToBucketOwner",
 			"Resource": "arn:aws:s3:::${each.value}/*"
 		}
-	  ]
-	}
+	]
+}
 
   POLICY
 
