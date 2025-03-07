@@ -9,7 +9,7 @@ _If you have any questions surrounding this page please post in the [#ask-digita
 
 ### **Last review date:**
 
-28/02/2025
+07/03/2025
 
 ### **Description:**
 
@@ -28,10 +28,7 @@ https://oasys.service.justice.gov.uk/
 The best contact point is through slack on [#ask-digital-studio-ops](https://moj.enterprise.slack.com/archives/C6D94J81E) and [#shef_dba](https://moj.enterprise.slack.com/archives/C8NJZFNPN) or use both.
 
 ### **Service team contact:**
-
-The concierge for the day will contact you directly if you contact them through slack on [#ask-laa-ops](https://moj.enterprise.slack.com/archives/CEL68S0LD).
-
-To contact the team directly they are on digital-studio-operations-team@digital.justice.gov.uk
+Contact DSO through preferably through slack [#ask-digital-studio-ops](https://moj.enterprise.slack.com/archives/C6D94J81E), otherwise via email digital-studio-operations-team@digital.justice.gov.uk.
 
 ### **Hosting environment:**
 
@@ -57,8 +54,8 @@ An outage could cause issues with accessing the probation details. It is NOT acc
 
 ### **Out of hours response types:**
 
-Contact digital-studio-operations-team@digital.justice.gov.uk
-The DBA team are available on PagerDuty. 
+Out of hours support for OASYS is only through the HMPPS DBAs [#shef_dba](https://moj.enterprise.slack.com/archives/C8NJZFNPN).
+The DBA team are the only available contacts and are recorded in the rota on PagerDuty. 
 
 Normal support is during work hours (09:00 - 17:00, Mon - Fri).
 
