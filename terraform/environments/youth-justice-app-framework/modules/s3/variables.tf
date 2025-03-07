@@ -1,6 +1,7 @@
 variable "bucket_name" {
   type        = list(string)
   description = "Names of s3 buckets that are not to be replicated from the old environments."
+  default     = []
   validation {
     condition = alltrue([
       for o in var.bucket_name : length(o) < 37

@@ -32,3 +32,9 @@ This contans usage information for parameters in the application_variables.json 
 **desired_number_of_domain_controllers**
 : The number of domain controlers to create. Two would be created by default. This allows for 3 in Production to match the old produciton environment.
 
+**ses_domain_identities**
+: [TODO] Add a description.
+
+**test_mode**
+: Used to indicate that all resources should be configured so that they can be replaced and that the destroy command can be used to remove and all resources. To be set to false before go-live of all environments except development.
+
