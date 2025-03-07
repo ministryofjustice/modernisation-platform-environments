@@ -29,5 +29,8 @@ locals {
     cwagent-windows-security = {
       retention_in_days = coalesce(var.options.cloudwatch_log_groups_retention_in_days, local.cloudwatch_log_groups_retention_default)
     }
+    kinesis-agent-windows-security = {
+      retention_in_days = coalesce(var.options.cloudwatch_log_groups_retention_in_days, local.cloudwatch_log_groups_retention_default)
+    }
   }
 }
