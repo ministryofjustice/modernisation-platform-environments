@@ -17,7 +17,7 @@ locals {
             }
           }
         },
-        "test" = {
+        "cooker" = {
           identity_centre_team = "modernisation-platform"
           aws_accounts = {
             "cooker-development" = {
