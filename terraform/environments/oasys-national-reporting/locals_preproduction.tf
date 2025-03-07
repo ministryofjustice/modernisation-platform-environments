@@ -31,7 +31,6 @@ locals {
       }
     }
 
-    # WILL BE MOVING TO HMPPS-DOMAIN-SERVICES Account at a later date
     efs = {
       pp-onr-sap-share = {
         access_points = {
@@ -62,7 +61,8 @@ locals {
           security_groups    = ["boe", "bip-app"]
         }]
         tags = {
-          backup = "false"
+          backup      = "false"
+          backup-plan = "daily-and-weekly"
         }
       }
     }
