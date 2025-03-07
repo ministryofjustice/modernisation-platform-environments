@@ -73,6 +73,6 @@ resource "null_resource" "import_suppression" {
   }
 
   triggers = {
-    always_run = ${timestamp()} # Ensures it runs every time
+    always_run = timestamp() # Ensures it runs every time
   }
 }
