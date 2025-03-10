@@ -120,6 +120,46 @@ locals {
           oasys-national-reporting-environment = "pd"
         })
       })
+
+      pd-onr-web-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "m6i.xlarge"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          oasys-national-reporting-environment = "pd"
+        })
+      })
+
+      pd-onr-web-2 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "m6i.xlarge"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          oasys-national-reporting-environment = "pd"
+        })
+      })
     }
 
     efs = {
@@ -219,6 +259,12 @@ locals {
               { ec2_instance_name = "pd-onr-bods-1" },
             ]
           })
+          pd-onr-web-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "pd-onr-web-1" },
+              { ec2_instance_name = "pd-onr-web-2" },
+            ]
+          })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -234,6 +280,20 @@ locals {
                   host_header = {
                     values = [
                       "bods.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              pd-onr-web-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pd-onr-web-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -256,6 +316,7 @@ locals {
           { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1161.awsdns-17.org", "ns-2014.awsdns-59.co.uk", "ns-487.awsdns-60.com", "ns-919.awsdns-50.net"] },
         ]
         lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
           { name = "bods", type = "A", lbs_map_key = "public" }
         ],
       }
