@@ -9,6 +9,7 @@ data "aws_ami" "app_ami" {
     #  values = ["Windows_Server-2022-English-Full-Base-*"] # to be removed
 
   }
+  /*
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
@@ -21,11 +22,12 @@ data "aws_ami" "app_ami" {
     name   = "architecture"
     values = ["x86_64"]
   }
+  */
 }
 
 
 data "aws_secretsmanager_secret" "datadog-api-key" {
-  name = var.datadog-api-key-name
+  arn = var.datadog-api-key-name
 }
 /*
 data "aws_secretsmanager_secret_version" "current" {
