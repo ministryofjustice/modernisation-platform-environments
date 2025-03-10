@@ -63,7 +63,7 @@ resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
 resource "aws_sagemaker_endpoint_configuration" "probation_search_config" {
   #checkov:skip=CKV_AWS_98:KMS key is not supported for NVMe instance storage.
   for_each    = aws_sagemaker_model.probation_search_huggingface_embedding_model
-  name_prefix = "${each.key}-sagemaker-endpoint-config"
+  name_prefix = "${each.key}-cfg"
   production_variants {
     variant_name           = "AllTraffic"
     model_name             = aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key].name
