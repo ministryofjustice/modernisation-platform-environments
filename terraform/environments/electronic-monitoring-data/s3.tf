@@ -20,7 +20,6 @@ locals {
     "test"          = null
     "development"   = null
   }
-}
 
   # Adding new buckets for logging needs to happen after buckets have been created
   # as an error occurs otherwise because local.buckets_to_log contains keys that 
