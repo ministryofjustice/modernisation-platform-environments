@@ -18,7 +18,7 @@ locals {
   iam-prod = local.environment_shorthand == "prod" ? [
     var.cloud-platform-iam-prod
   ] : null
-  
+
   tables_to_share = [
     "contact_history",
     "equipment_details",
@@ -202,8 +202,8 @@ data "aws_iam_policy_document" "standard_athena_access" {
   }
   statement {
     effect    = "Allow"
-    actions   = ["apigateway:POST"]
-    resources = ["arn:aws:apigateway:eu-west-2::/restapis/${module.get_zipped_file_api_api.api_gateway_resource_id}"]
+    actions   = ["execute-api:Invoke"]
+    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}/${module.get_zipped_file_api_api.api_gateway_resource_id}/*"]
   }
 }
 
