@@ -31,13 +31,6 @@ variable "step_function" {
   type        = object({ id = string, arn = string })
 }
 
-variable "api_key_required" {
-  description = "Whether the API requires a key or not"
-  type        = bool
-}
-
-
-
 variable "stages" {
   description = "Stage settings"
   type = list(

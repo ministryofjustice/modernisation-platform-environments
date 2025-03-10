@@ -28,7 +28,6 @@ resource "aws_api_gateway_method" "method" {
   resource_id          = aws_api_gateway_resource.resource.id
   http_method          = var.http_method
   authorization        = "AWS_IAM"
-  api_key_required     = var.api_key_required
   request_validator_id = aws_api_gateway_request_validator.request_validator.id
   request_models = {
     "application/json" = aws_api_gateway_model.model.name
@@ -224,21 +223,6 @@ resource "aws_api_gateway_usage_plan" "usage_plan" {
   }
 }
 
-
-resource "aws_api_gateway_api_key" "api_key" {
-  for_each = var.api_key_required ? { for stage in var.stages : stage.stage_name => stage } : {}
-
-  name        = "${each.key}DefaultAPIKey"
-  description = "Default API key for ${each.key} stage"
-  enabled     = true
-}
-
-resource "aws_api_gateway_usage_plan_key" "usage_plan_key" {
-  for_each      = var.api_key_required ? { for stage in var.stages : stage.stage_name => stage } : {}
-  key_id        = aws_api_gateway_api_key.api_key[each.key].id
-  key_type      = "API_KEY"
-  usage_plan_id = aws_api_gateway_usage_plan.usage_plan[each.key].id
-}
 
 resource "aws_api_gateway_method_settings" "settings" {
   for_each    = { for stage in var.stages : stage.stage_name => stage }
