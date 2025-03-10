@@ -17,7 +17,7 @@ It is the Offender Assessment System and is primarily used by prison and probati
 
 ### **Service URLs:**
 
-https://oasys.service.justice.gov.uk/
+<https://oasys.service.justice.gov.uk/>
 
 ### **Incident response hours:**
 
@@ -29,7 +29,7 @@ The best contact point is through slack on [#ask-digital-studio-ops](https://moj
 
 ### **Service team contact:**
 
-Contact DSO through preferably through slack [#ask-digital-studio-ops](https://moj.enterprise.slack.com/archives/C6D94J81E), otherwise via email digital-studio-operations-team@digital.justice.gov.uk.
+Contact DSO through preferably through slack [#ask-digital-studio-ops](https://moj.enterprise.slack.com/archives/C6D94J81E), otherwise via email <digital-studio-operations-team@digital.justice.gov.uk>.
 
 ### **Hosting environment:**
 
@@ -51,12 +51,12 @@ None
 
 ### **Impact of an outage:**
 
-An outage could cause issues with accessing the probation details. It is NOT acceptable. 
+An outage could cause issues with accessing the probation details. It is NOT acceptable.
 
 ### **Out of hours response types:**
 
 Out of hours support for OASYS is only through the HMPPS DBAs [#shef_dba](https://moj.enterprise.slack.com/archives/C8NJZFNPN).
-The DBA team are the only available contacts and are recorded in the rota on PagerDuty. 
+The DBA team are the only available contacts and are recorded in the rota on PagerDuty.
 
 Normal support is during work hours (09:00 - 17:00, Mon - Fri).
 
@@ -77,6 +77,6 @@ OASys is designed to enable a properly trained and qualified individual; often a
 - measure change during the period of supervision / sentence.
 OASys comprises a series of computer-based forms on which clinical evaluations are made by staff of Offenders, and supervision and sentence plans for the forthcoming period of supervision are recorded on a periodic basis - typically every 16 weeks for offenders in the community, and less frequently for imprisoned offenders.
 
-OASys supports the What Works? initiative of the Prison and Probation Services, by providing metrics by which the characteristics of offenders and their offences (inputs) can be analysed alongside information on interventions made (inputs) to the offender, and re-conviction data for offenders (outcomes), in order to enable 
+OASys supports the What Works? initiative of the Prison and Probation Services, by providing metrics by which the characteristics of offenders and their offences (inputs) can be analysed alongside information on interventions made (inputs) to the offender, and re-conviction data for offenders (outcomes), in order to enable
 refinement to be made to interventions (based on a consideration of the relation between inputs and outcomes) as to improve outcomes - in other words, to decrease recidivism rates by ensuring that interventions are as appropriate and purposeful as possible.
 

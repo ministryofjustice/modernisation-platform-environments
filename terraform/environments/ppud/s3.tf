@@ -1182,14 +1182,14 @@ resource "aws_s3_bucket_policy" "s3_bucket_policy_moj_database_source_dev" {
 */
 
 resource "aws_s3_bucket_replication_configuration" "moj-database-source-dev-replication" {
-  count  = local.is-development == true ? 1 : 0
+  count = local.is-development == true ? 1 : 0
   # Must have bucket versioning enabled first
   depends_on = [aws_s3_bucket_versioning.moj-database-source-dev]
-  role   = aws_iam_role.iam_role_s3_bucket_moj_database_source_dev[0].arn
-  bucket = aws_s3_bucket.moj-database-source-dev[0].id
+  role       = aws_iam_role.iam_role_s3_bucket_moj_database_source_dev[0].arn
+  bucket     = aws_s3_bucket.moj-database-source-dev[0].id
 
   rule {
-    id = "ppud-database-replication-rule-dev"
+    id     = "ppud-database-replication-rule-dev"
     status = "Enabled"
     destination {
       bucket        = "arn:aws:s3:::mojap-data-engineering-production-ppud-dev"

@@ -226,12 +226,12 @@ locals {
     aws_iam_policy.redshift_dataapi_cross_policy.arn,
     aws_iam_policy.dpd_table_read_policy.arn
   ]
-  lambda_generate_dataset_secret_arn          = module.datamart.credential_secret_arn
-  lambda_generate_dataset_cluster_id          = module.datamart.cluster_id
-  lambda_generate_dataset_database_name       = module.datamart.cluster_database_name
-  lambda_generate_dataset_dpd_ddb_table_arn   = module.dynamo_table_dpd.dynamodb_table_arn
-  lambda_generate_dataset_timeout_seconds     = 900
-  lambda_generate_dataset_memory_size         = 1024
+  lambda_generate_dataset_secret_arn        = module.datamart.credential_secret_arn
+  lambda_generate_dataset_cluster_id        = module.datamart.cluster_id
+  lambda_generate_dataset_database_name     = module.datamart.cluster_database_name
+  lambda_generate_dataset_dpd_ddb_table_arn = module.dynamo_table_dpd.dynamodb_table_arn
+  lambda_generate_dataset_timeout_seconds   = 900
+  lambda_generate_dataset_memory_size       = 1024
 
   s3_redshift_table_expiry_days = local.application_data.accounts[local.environment].redshift_table_expiry_days + 1
 
