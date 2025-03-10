@@ -1,7 +1,7 @@
-#import {
-#  to = "module.ds.aws_cloudformation_stack.pki_quickstart"
-#  id = "MicrosoftPKIQuickStartCA"
-#}
+import {
+  to = "module.ds.aws_cloudformation_stack.pki_quickstart"
+  id = "arn:aws:cloudformation:eu-west-2:711387140977:stack/MicrosoftPKIQuickStartCA/64278f70-fd2b-11ef-9093-02a38affd1e9"
+}
 
 
 module "ds" {
