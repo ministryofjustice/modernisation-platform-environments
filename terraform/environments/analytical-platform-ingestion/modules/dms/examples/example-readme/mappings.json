@@ -1,0 +1,7 @@
+{
+  "schema": "MYDBSCHEMA",
+  "objects_from": "db_identifier",
+  "extraction_date": "2024-06-25T13:47:00.688074",
+  "objects": ["TABLE_NAME"],
+  "blobs": []
+}
