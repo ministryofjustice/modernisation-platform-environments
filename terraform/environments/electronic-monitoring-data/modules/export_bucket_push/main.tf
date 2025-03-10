@@ -54,6 +54,8 @@ module "this-bucket" {
 }
 
 resource "aws_lambda_permission" "allow_bucket" {
+  count         = var.destination_bucket_id != null ? 1 : 0
+
   statement_id  = "AllowExecutionFromS3Bucket-${var.export_destination}"
   action        = "lambda:InvokeFunction"
   function_name = module.push_lambda.lambda_function_arn
@@ -62,6 +64,8 @@ resource "aws_lambda_permission" "allow_bucket" {
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
+  count         = var.destination_bucket_id != null ? 1 : 0
+
   bucket = module.this-bucket.bucket.id
 
   lambda_function {
@@ -77,6 +81,8 @@ resource "aws_s3_bucket_notification" "bucket_notification" {
 #------------------------------------------------------------------------------
 
 module "push_lambda" {
+  count         = var.destination_bucket_id != null ? 1 : 0
+
   source                  = "../lambdas"
   function_name           = "push_data_export_to_${var.export_destination}"
   image_name              = "push_data_export"
@@ -99,11 +105,13 @@ module "push_lambda" {
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "push_lambda" {
+  count         = var.destination_bucket_id != null ? 1 : 0
+
   name               = "${var.export_destination}_export_bucket_files"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-data "aws_iam_policy_document" "push_lambda" {
+data "aws_iam_policy_document" "push_lambda" {  
   statement {
     sid    = "S3PermissionsForExportBucket"
     effect = "Allow"
@@ -129,12 +137,16 @@ data "aws_iam_policy_document" "push_lambda" {
 }
 
 resource "aws_iam_policy" "push_lambda" {
+  count         = var.destination_bucket_id != null ? 1 : 0
+
   name        = "${var.export_destination}_export_bucket_files_policy"
   description = "Policy for Lambda to push file from source to destination S3 location"
   policy      = data.aws_iam_policy_document.push_lambda.json
 }
 
 resource "aws_iam_role_policy_attachment" "push_lambda" {
+  count         = var.destination_bucket_id != null ? 1 : 0
+
   role       = aws_iam_role.push_lambda.name
   policy_arn = aws_iam_policy.push_lambda.arn
 }

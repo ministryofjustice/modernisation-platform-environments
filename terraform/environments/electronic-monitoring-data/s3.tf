@@ -14,6 +14,14 @@ locals {
     }
   }
 
+  p1_export_bucket_destination_mapping = {
+    "production"    = "tct-339712706964-prearrivals"
+    "preproduction" = null
+    "test"          = null
+    "development"   = null
+  }
+}
+
   # Adding new buckets for logging needs to happen after buckets have been created
   # as an error occurs otherwise because local.buckets_to_log contains keys that 
   # are derived  from resource attributes, which are not known until the apply phase.
@@ -746,7 +754,7 @@ module "s3-p1-export-bucket" {
   source = "./modules/export_bucket_push/"
 
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  destination_bucket_id   = "tct-339712706964-prearrivals"
+  destination_bucket_id   = local.p1_export_bucket_destination_mapping[local.environment]
   export_destination      = "p1"
   local_bucket_prefix     = local.bucket_prefix
   local_tags              = local.tags
