@@ -6,13 +6,11 @@ locals {
 module "s3-log" {
   source = "./modules/s3"
 
-  environment_name = local.environment_name
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
 
   bucket_name = [local.log_bucket]
-
-  project_name = local.project_name
-
-  tags = local.tags
 
  # ownership_controls = "BucketOwnerEnforced"
 }
@@ -20,7 +18,9 @@ module "s3-log" {
 module "s3" {
   source = "./modules/s3"
 
-  environment_name = local.environment_name
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
 
   log_bucket = "${local.environment_name}-${local.log_bucket}"
 
@@ -33,13 +33,8 @@ module "s3" {
 
   transfer_bucket_name  = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact",  "yjsm", "transfer"]
  
-                   
-  project_name = local.project_name
-
   allow_replication = local.application_data.accounts[local.environment].allow_s3_replication
   s3_source_account = local.application_data.accounts[local.environment].source_account
-
-  tags = local.tags
 
   depends_on = [ module.s3-log ]
 }

@@ -1,21 +1,9 @@
-#import {
-#  to = module.redshift.aws_redshiftserverless_namespace.default
-#  id = "yjfa-development-test"
-#}
-
-#import {
-#  to = module.redshift.aws_redshiftserverless_workgroup.default
-#  id = "yjaf-development-test"
-#}
-
-
-
 module "redshift" {
   source = "./modules/redshift"
 
-   project_name     = local.project_name
-   environment_name = local.environment_name
-   tags             = local.tags
+   project_name = local.project_name
+   environment  = local.environment
+   tags         = local.tags
 
    #Network details
    vpc_id           = data.aws_vpc.shared.id
@@ -23,7 +11,7 @@ module "redshift" {
 
   rds_secret_rotation_arn = module.aurora.app_rotated_postgres_secret_arn
    
-  
+  postgres_security_group_id = module.aurora.rds_cluster_security_group_id
  
-  depends_on = [ module.aurora, module.s3]
+  depends_on = [ module.aurora, module.s3 ]
 }

@@ -2,7 +2,7 @@ module "log_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 
-  bucket = "${var.project_name}-${var.environment}-tableau-alb-logs"
+  bucket = "${var.project_name}-${var.environment}-${local.alb_access_logs_bucket_name_suffix}"
   acl    = "log-delivery-write"
 
   # For example only

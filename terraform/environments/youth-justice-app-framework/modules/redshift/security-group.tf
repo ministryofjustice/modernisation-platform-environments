@@ -10,5 +10,10 @@ module "redshift_sg" {
   ingress_with_self = [{rule = "all-all"}]
   egress_with_self  = [{rule = "all-all"}]
 
-}
+  ingress_with_source_security_group_id = [{
+    description              = "Redshift ingress from PostgreSQL"
+    rule                     = "redshift-tcp"
+    source_security_group_id = var.postgres_security_group_id
+  }]
 
+}

@@ -3,9 +3,9 @@ variable "project_name" {
   description = "Project name"
 }
 
-variable "environment_name" {
+variable "environment" {
   type        = string
-  description = "Environment name"
+  description = "Environment"
 }
 
 variable "tags" {
@@ -30,3 +30,13 @@ variable "rds_secret_rotation_arn" {
   type        = string
 }
 
+variable "kms_key_id" {
+  type        = string
+  default     = "aws/secretsmanager"
+  description = "ARN or Id of the AWS KMS key to be used to encrypt the secret values in the versions stored by this module."
+}
+
+variable "postgres_security_group_id" {
+  type        = string
+  description = "The ID of the Security group that represents the PostgreSQL instance which required access to Redshift."
+}

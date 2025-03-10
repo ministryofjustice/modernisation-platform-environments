@@ -1,11 +1,15 @@
 
 resource "aws_redshiftserverless_namespace" "default" {
-  namespace_name = "${var.environment_name}-yjbservices"
+  namespace_name = local.namespace_name
   manage_admin_password = true
   
   iam_roles = [
     aws_iam_role.redshift.arn, aws_iam_role.ycs-team.arn, aws_iam_role.yjb-moj-team.arn, aws_iam_role.yjb-team.arn
   ]
+
+  tags = merge(local.all_tags,
+      { Name        = local.namespace_name }
+    )
 }
 
 # Create the Redshift Serverless Workgroup
@@ -21,8 +25,8 @@ resource "aws_redshiftserverless_workgroup" "default" {
   
   #  publicly_accessible = var.redshift_serverless_publicly_accessible
   
-  #tags = {
-  #  Name        = var.redshift_serverless_workgroup_name
-  #  Environment = var.app_environment
-  #}
+  tags = merge(local.all_tags,
+      { Name        = local.namespace_name }
+    )
+
 }

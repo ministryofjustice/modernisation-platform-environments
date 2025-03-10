@@ -125,5 +125,5 @@ resource "aws_security_group_rule" "ecsint_to_rds_rule" {
   protocol                 = "tcp"
   security_group_id        = var.rds_postgresql_sg_id
   source_security_group_id = aws_security_group.common_ecs_service_internal.id
-  description              = "PostgwSQL from ECS Internal"
+  description              = "PostgreSQL from ECS Internal"
 }

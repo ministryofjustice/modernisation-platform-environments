@@ -78,8 +78,8 @@ resource "aws_iam_policy" "redshift-ycs-reporting-s3" {
           "s3:PutObject"
         ],
         "Resource": [
-          "arn:aws:s3:::redshift-serverless-ycs-reporting",
-          "arn:aws:s3:::redshift-serverless-ycs-reporting/*"
+          local.s3-redshift-ycs-reporting-arn,
+          "${local.s3-redshift-ycs-reporting-arn}/*"
         ]
       }
     ]
@@ -105,8 +105,6 @@ resource "aws_iam_role" "ycs-team" {
 EOF
 }
 
-
-
 #attach policies for postgres secret
 resource "aws_iam_role_policy_attachment" "postgres-secret" {
   role       = aws_iam_role.ycs-team.name
@@ -114,7 +112,7 @@ resource "aws_iam_role_policy_attachment" "postgres-secret" {
 }
 
 
-#attach policies AmazonRedss3 access
+#attach policies AmazonRedshift s3 access
 resource "aws_iam_role_policy_attachment" "ycs-postgres-s3" {
   role       = aws_iam_role.ycs-team.name
   policy_arn = aws_iam_policy.redshift-ycs-reporting-s3.arn

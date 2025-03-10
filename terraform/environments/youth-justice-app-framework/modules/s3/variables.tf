@@ -1,3 +1,13 @@
+variable "project_name" {
+  type        = string
+  description = "Project name"
+}
+
+variable "environment" {
+  type        = string
+  description = "Environment"
+}
+
 variable "bucket_name" {
   type        = list(string)
   description = "Names of s3 buckets that are not to be replicated from the old environments."
@@ -33,16 +43,6 @@ variable "archive_bucket_name" {
     ])
     error_message = "Maximum length of bucket names is 36 characters."
   }
-}
-
-variable "project_name" {
-  type        = string
-  description = "Project name"
-}
-
-variable "environment_name" {
-  type        = string
-  description = "Environment name"
 }
 
 variable "tags" {

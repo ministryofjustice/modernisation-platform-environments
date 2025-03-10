@@ -5,7 +5,7 @@ resource "aws_s3_bucket" "default" {
   #checkov:skip=CKV2_AWS_62:  "lift and shift"
   for_each = toset(local.bucket_name_all)
   bucket   = each.value
-  tags     = var.tags
+  tags     = local.all_tags
 }
 
 resource "aws_s3_bucket_ownership_controls" "default" {
