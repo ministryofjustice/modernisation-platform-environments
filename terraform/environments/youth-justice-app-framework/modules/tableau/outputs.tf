@@ -10,6 +10,6 @@ output "tableau_sg_id" {
   value = module.tableau_sg.security_group_id
 }
 
-output "datedog_secret_arn" {
-  value = data.aws_secretsmanager_secret.datadog-api-key.id
-}
+#output "datedog_secret_arn" {
+#  value = data.aws_secretsmanager_secret.datadog-api-key.id
+#}
