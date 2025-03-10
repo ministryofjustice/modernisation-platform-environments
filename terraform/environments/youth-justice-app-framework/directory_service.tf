@@ -1,3 +1,9 @@
+import {
+  to = "module.ds.aws_cloudformation_stack.pki_quickstart"
+  id = "MicrosoftPKIQuickStartCA"
+}
+
+
 module "ds" {
   source = "./modules/directory-service"
 
