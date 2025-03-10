@@ -5,10 +5,10 @@ data "aws_ami" "app_ami" {
   #  owners      = ["amazon"] # to remove
   filter {
     name   = "name"
-    values = ["CIS Hardened Image Level 1 on Amazon Linux 2023*"] # Use this after Subscription 
+    values = ["CIS Amazon Linux 2023 Benchmark - Level 1*"] # Use this after Subscription 
 
   }
-  /*
+  
   filter {
     name   = "virtualization-type"
     values = ["hvm"]
@@ -21,7 +21,7 @@ data "aws_ami" "app_ami" {
     name   = "architecture"
     values = ["x86_64"]
   }
-*/
+
 }
 
 
