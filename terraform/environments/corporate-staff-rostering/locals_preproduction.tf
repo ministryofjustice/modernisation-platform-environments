@@ -412,9 +412,7 @@ locals {
               "s3:GetObjectTagging",
               "s3:ListBucket",
             ]
-            resources = [
-              "arn:aws:s3:::csr-db-backup-bucket*",
-            ]
+            resources = "arn:aws:s3:::csr-db-backup-bucket*",
           },
           {
             effect = "Allow"
