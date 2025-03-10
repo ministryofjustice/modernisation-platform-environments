@@ -107,15 +107,7 @@ presets:
         - property: tag:component
           value: "secure-baselines"
       OSPackage:
-        - property: PackageName
-          type: regex
-          value: "^(opensearch-)?analysis-.+$"
-        - property: PackageName
-          type: glob
-          value: "titaniam-lockbox*"
-        - property: PackageName
-          type: glob
-          value: "rni*"
+        - "*"
       RDSClusterSnapshot:
         - property: SnapshotType
           value: "shared"
