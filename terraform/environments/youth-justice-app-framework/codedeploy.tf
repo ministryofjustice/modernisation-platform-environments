@@ -3,16 +3,19 @@ data "aws_instance" "target_ec2" {
     name   = "tag:Name"
     values = ["YJSM"]
   }
+  depends_on = [
+    module.yjsm
+  ]
 }
 
 module "codedeploy" {
-  source       = "./modules/codedeploy"
-  project_name = local.project_name
-  tags         = local.tags
-  cluster_name = "yjaf-cluster"
-  environment  = local.environment
-  ec2_enabled        = true
-  ec2_applications   = ["yjsm-hub", "yjsm-hubadmin", "yjsm-ui", "assets"]
+  source           = "./modules/codedeploy"
+  project_name     = local.project_name
+  tags             = local.tags
+  cluster_name     = "yjaf-cluster"
+  environment      = local.environment
+  ec2_enabled      = true
+  ec2_applications = ["yjsm-hub", "yjsm-hubadmin", "yjsm-ui", "assets"]
   services = [
     { "auth" = "internal" },
     { "bands" = "internal" },
@@ -40,6 +43,7 @@ module "codedeploy" {
   depends_on = [
     module.internal_alb,
     module.external_alb,
-    module.ecs
+    module.ecs,
+    module.yjsm
   ]
 }

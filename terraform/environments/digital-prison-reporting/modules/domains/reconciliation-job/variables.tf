@@ -24,6 +24,12 @@ variable "create_job" {
   default     = false
 }
 
+variable "create_role" {
+  description = "(Optional) Create AWS IAM role associated with the job."
+  type        = bool
+  default     = false
+}
+
 variable "job_name" {
   description = "Name of the Glue Reconciliation Job"
   type        = string
