@@ -118,15 +118,18 @@ data "aws_iam_policy_document" "push_lambda" {
     ]
   }
 
-  statement {
-    sid    = "S3PermissionsForDestinationBucket"
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-    ]
-    resources = [
-      "arn:aws:s3:::${var.destination_bucket_id}/*",
-    ]
+  dynamic "statement" {
+    for_each = var.destination_bucket_id != null ? [1] : []
+    content {
+      sid    = "S3PermissionsForDestinationBucket"
+      effect = "Allow"
+      actions = [
+        "s3:PutObject",
+      ]
+      resources = [
+        "arn:aws:s3:::${var.destination_bucket_id}/*",
+      ]
+    }
   }
 }
 
