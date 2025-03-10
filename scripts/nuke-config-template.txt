@@ -55,6 +55,7 @@ resource-types:
     - IAMVirtualMFADevice
     - KMSAlias
     - KMSKey
+    - OSPackage
     - S3AccessPoint
     - S3Bucket
     - S3MultipartUpload
@@ -106,10 +107,6 @@ presets:
       KMSKey:
         - property: tag:component
           value: "secure-baselines"
-      OSPackage:
-        - property: PackageName
-          type: regex
-          value: "*"
       RDSClusterSnapshot:
         - property: SnapshotType
           value: "shared"
