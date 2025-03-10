@@ -74,3 +74,8 @@ variable "lambda_function_invoke_arn" {
   description = "ARN of the Lambda function to invoke"
   type        = string
 }
+
+variable "api_version" {
+  description = "The version of the API Gateway"
+  type        = string
+}
