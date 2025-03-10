@@ -1,0 +1,43 @@
+locals {
+    short_resource_name = "tariff-${local.environment}"
+    resource_name = "cica-ap-${local.short_resource_name}"
+}
+
+module "cica_dms_tariff_dms_implementation" {
+
+    source      = "../modules/dms"
+    vpc_id      = data.aws_vpc.connected_vpc.id
+    environment = local.environment
+
+    db          = local.short_resource_name
+
+    dms_replication_instance = {
+        replication_instance_id    = local.resource_name
+        subnet_ids                 = local.environment_configuration.connected_vpc_private_subnets
+        subnet_group_name          = local.resource_name
+        allocated_storage          = 20
+        availability_zone          = data.aws_availability_zones.available.names[0]
+        engine_version             = "3.5.4"
+        kms_key_arn                = module.cica_dms_credentials_kms.key_arn
+        multi_az                   = false
+        replication_instance_class = "dms.t2.micro"
+        inbound_cidr               = "10.202.0.0/20"
+    }
+    dms_source = {
+        engine_name                 = "oracle"
+        secrets_manager_arn         = module.cica_dms_tariff_database_credentials.secret_arn
+        sid                         = local.resource_name
+        extra_connection_attributes = ""
+    #     extra_connection_attributes = "addSupplementalLogging=N;useBfile=Y;useLogminerReader=Y;"
+        cdc_start_time              = "2025-03-10T12:00:00Z"
+    }
+    replication_task_id = {
+      full_load = "${local.resource_name}-full-load"
+      cdc       = "${local.resource_name}-cdc"
+    }
+    dms_mapping_rules     = file("./metadata/cica_tariff.json")
+    # landing_bucket        = modules.cica_dms_ingress_bucket.bucket
+    # landing_bucket_folder = "tariff/"
+
+    tags = local.tags
+}
