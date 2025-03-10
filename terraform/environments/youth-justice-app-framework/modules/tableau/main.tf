@@ -52,7 +52,7 @@ module "tableau-alb" {
   enable_deletion_protection = local.enable_deletion_protection
 
   access_logs = {
-    bucket = local.tableau_alb_logs_arn
+    bucket = "${var.project_name}-${var.environment}-$(local.alb_access_logs_bucket_name_suffix}"
   }
 
   listeners = {
