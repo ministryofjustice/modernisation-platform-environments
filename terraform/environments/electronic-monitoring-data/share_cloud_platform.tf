@@ -203,7 +203,7 @@ data "aws_iam_policy_document" "standard_athena_access" {
   statement {
     effect    = "Allow"
     actions   = ["execute-api:Invoke"]
-    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.get_zipped_file_api_api.api_gateway_id}/${module.get_zipped_file_api_api.api_gateway_stage_name}/*/*"]
+    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.get_zipped_file_api_api.api_gateway_id}/*"]
   }
 }
 
