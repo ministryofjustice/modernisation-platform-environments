@@ -1526,45 +1526,45 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
   path        = "/"
   description = "AWS IAM Policy for allowing s3 bucket cross account replication"
   policy = jsonencode({
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "SourceBucketPermissions",
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObjectRetention",
-        "s3:GetObjectVersionTagging",
-        "s3:GetObjectVersionAcl",
-        "s3:ListBucket",
-        "s3:GetObjectVersionForReplication",
-        "s3:GetObjectLegalHold",
-        "s3:GetReplicationConfiguration"
-      ],
-      "Resource": [
-        "arn:aws:s3:::moj-database-source-dev/*",
-        "arn:aws:s3:::moj-database-source-dev"
-      ]
-    },
-    {
-      "Sid": "DestinationBucketPermissions",
-      "Effect": "Allow",
-      "Action": [
-        "s3:ReplicateObject",
-        "s3:ObjectOwnerOverrideToBucketOwner",
-        "s3:GetObjectVersionTagging",
-        "s3:ReplicateTags",
-        "s3:ReplicateDelete"
-      ],
-      "Resource": [
-        "arn:aws:s3:::mojap-data-engineering-production-ppud-dev/*"
-      ]
-    }
-  ]
- })
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "SourceBucketPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObjectRetention",
+          "s3:GetObjectVersionTagging",
+          "s3:GetObjectVersionAcl",
+          "s3:ListBucket",
+          "s3:GetObjectVersionForReplication",
+          "s3:GetObjectLegalHold",
+          "s3:GetReplicationConfiguration"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::moj-database-source-dev/*",
+          "arn:aws:s3:::moj-database-source-dev"
+        ]
+      },
+      {
+        "Sid" : "DestinationBucketPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ReplicateObject",
+          "s3:ObjectOwnerOverrideToBucketOwner",
+          "s3:GetObjectVersionTagging",
+          "s3:ReplicateTags",
+          "s3:ReplicateDelete"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::mojap-data-engineering-production-ppud-dev/*"
+        ]
+      }
+    ]
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "attach_iam_role_to_iam_policy_s3_bucket_moj_database_source_dev" {
-  count       = local.is-development == true ? 1 : 0
-  role        = aws_iam_role.iam_role_s3_bucket_moj_database_source_dev[0].name
-  policy_arn  = aws_iam_policy.iam_policy_s3_bucket_moj_database_source_dev[0].arn
+  count      = local.is-development == true ? 1 : 0
+  role       = aws_iam_role.iam_role_s3_bucket_moj_database_source_dev[0].name
+  policy_arn = aws_iam_policy.iam_policy_s3_bucket_moj_database_source_dev[0].arn
 }
