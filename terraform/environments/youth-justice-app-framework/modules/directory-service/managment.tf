@@ -147,9 +147,9 @@ resource "aws_vpc_security_group_ingress_rule" "allow_in_to_rds" { #allow Postgr
 
 # Retrieve the ID of the Security Group created by Cloud Formation while building the KPI instances.
 data "aws_security_group" "ca_sg" {
-  tags = merge(local.all_tags,
-    {Name = "CertificateAuthoritySecurityGroup"}
-    )
+  tags = {
+    Name = "CertificateAuthoritySecurityGroup"
+  }
 
   depends_on = [aws_cloudformation_stack.pki_quickstart]
 }
