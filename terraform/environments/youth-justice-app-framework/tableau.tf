@@ -13,6 +13,8 @@ module "tableau_cert" {
 module "tableau" {
   source = "./modules/tableau"
 
+  count = 0
+
   project_name = local.project_name
  # tags         = merge(local.tags, { Name = "AD Management Server" })
 
