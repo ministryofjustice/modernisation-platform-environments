@@ -109,13 +109,7 @@ presets:
       OSPackage:
         - property: PackageName
           type: regex
-          value: "^(opensearch-)?analysis-.+$"
-        - property: PackageName
-          type: glob
-          value: "titaniam-lockbox*"
-        - property: PackageName
-          type: glob
-          value: "rni*"
+          value: "*"
       RDSClusterSnapshot:
         - property: SnapshotType
           value: "shared"
