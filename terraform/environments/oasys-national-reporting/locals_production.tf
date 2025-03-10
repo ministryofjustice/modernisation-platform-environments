@@ -100,6 +100,26 @@ locals {
           oasys-national-reporting-environment = "pd"
         })
       })
+
+      pd-onr-cms-2 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_cms.instance, {
+          instance_type = "m6i.2xlarge"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          oasys-national-reporting-environment = "pd"
+        })
+      })
     }
 
     efs = {
