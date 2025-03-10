@@ -65,6 +65,5 @@ provider "aws" {
 }
 
 provider "random" {
-  default_tags { tags = local.tags }
 
 }
