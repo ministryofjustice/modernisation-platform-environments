@@ -18,7 +18,7 @@ locals {
   iam-prod = local.environment_shorthand == "prod" ? [
     var.cloud-platform-iam-prod
   ] : null
-  
+
   tables_to_share = [
     "contact_history",
     "equipment_details",
