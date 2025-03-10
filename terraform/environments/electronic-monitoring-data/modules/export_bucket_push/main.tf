@@ -105,8 +105,6 @@ module "push_lambda" {
 #------------------------------------------------------------------------------
 
 resource "aws_iam_role" "push_lambda" {
-  count         = var.destination_bucket_id != null ? 1 : 0
-
   name               = "${var.export_destination}_export_bucket_files"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
@@ -137,16 +135,12 @@ data "aws_iam_policy_document" "push_lambda" {
 }
 
 resource "aws_iam_policy" "push_lambda" {
-  count         = var.destination_bucket_id != null ? 1 : 0
-
   name        = "${var.export_destination}_export_bucket_files_policy"
   description = "Policy for Lambda to push file from source to destination S3 location"
   policy      = data.aws_iam_policy_document.push_lambda.json
 }
 
 resource "aws_iam_role_policy_attachment" "push_lambda" {
-  count         = var.destination_bucket_id != null ? 1 : 0
-
   role       = aws_iam_role.push_lambda.name
   policy_arn = aws_iam_policy.push_lambda.arn
 }
