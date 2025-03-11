@@ -66,6 +66,12 @@ variable "dms_mapping_rules" {
   description = "The path to the mapping rules file"
 }
 
+variable "output_bucket" {
+  type        = string
+  default     = ""
+  description = "The name of the output bucket (optional, bucket will be generated if not specified)"
+}
+
 variable "s3_target_config" {
   type = object({
     add_column_name       = bool

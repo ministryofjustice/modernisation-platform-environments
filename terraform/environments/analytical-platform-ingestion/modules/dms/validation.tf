@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "validation_lambda_function" {
     ]
 
     resources = [
-      "${aws_s3_bucket.raw_history.arn}/*",
+      "${data.aws_s3_bucket.raw_history.arn}/*",
       "${aws_s3_bucket.invalid.arn}/*",
     ]
   }
@@ -60,7 +60,7 @@ module "validation_lambda_function" {
 
   environment_variables = {
     ENVIRONMENT      = "sandbox"
-    PASS_BUCKET      = aws_s3_bucket.raw_history.bucket
+    PASS_BUCKET      = data.aws_s3_bucket.raw_history.bucket
     FAIL_BUCKET      = aws_s3_bucket.invalid.bucket
     METADATA_BUCKET  = aws_s3_bucket.validation_metadata.bucket
     METADATA_PATH    = ""
