@@ -39,7 +39,8 @@ module "tableau" {
 # Security Group IDs
 postgresql_sg_id        = module.aurora.rds_cluster_security_group_id
 redshift_sg_id          = module.redshift.security_group_id
-directory_service_sg_id = module.ds.managed_ad_security_group_id
+directory_service_sg_id = module.ds.directory_service_sg_id
+management_server_sg_id = module.ds.management_server_sg_id
 
 datadog-api-key-name = ""
 availability_schedule = ""

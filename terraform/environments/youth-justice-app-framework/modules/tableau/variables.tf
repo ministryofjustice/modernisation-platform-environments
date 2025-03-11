@@ -91,6 +91,11 @@ variable "directory_service_sg_id" {
   description = "The ID of the Active directory Service Security Group. Used to add a rules to aneble ldap & ldaps to AD."
 }
 
+variable "management_server_sg_id" {
+  type        = string
+  description = "The ID of the Management Servers security group."
+}
+
 variable "postgresql_sg_id" {
   type        = string
   description = "The ID of the RDS PostgreSQL Security Group. Used to add a rule to enable Tableau access to PostgreSQL."
