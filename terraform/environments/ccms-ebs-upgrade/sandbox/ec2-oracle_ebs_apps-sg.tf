@@ -12,20 +12,20 @@ resource "aws_security_group" "ec2_sg_sandbox" {
 # INGRESS Rules
 
 resource "aws_vpc_security_group_ingress_rule" "sandbox_ingress" {
-  security_group_id = aws_security_group.ec2_sg_sandbox.id
-  from_port         = 0
-  to_port           = 0
-  ip_protocol       = "tcp"
-  self              = true
+  security_group_id            = aws_security_group.ec2_sg_sandbox.id
+  from_port                    = 0
+  to_port                      = 0
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ec2_sg_sandbox.id
 }
 
 
 # EGRESS Rules
 
 resource "aws_vpc_security_group_egress_rule" "sandbox_egress" {
-  security_group_id = aws_security_group.ec2_sg_sandbox.id
-  from_port         = 0
-  to_port           = 0
-  ip_protocol       = "tcp"
-  self              = true
+  security_group_id            = aws_security_group.ec2_sg_sandbox.id
+  from_port                    = 0
+  to_port                      = 0
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.ec2_sg_sandbox.id
 }
