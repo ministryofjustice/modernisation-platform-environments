@@ -151,18 +151,10 @@ data "aws_secretsmanager_secret_version" "ui_rds" {
   secret_id = data.aws_secretsmanager_secret.ui_rds.id
 }
 
-data "aws_secretsmanager_secret" "ui_rds" {
-  name = "ui/ui_rds"
-}
-
-data "aws_secretsmanager_secret_version" "ui_rds" {
-  secret_id = data.aws_secretsmanager_secret.ui_rds.id
-}
-
 data "aws_secretsmanager_secret" "ui_app_secrets" {
   name = "ui/ui_app_secrets"
 }
 
 data "aws_secretsmanager_secret_version" "ui_app_secrets" {
-  secret_id = data.aws_secretsmanager_secret.values.id
+  secret_id = data.aws_secretsmanager_secret.ui_app_secrets.id
 }
