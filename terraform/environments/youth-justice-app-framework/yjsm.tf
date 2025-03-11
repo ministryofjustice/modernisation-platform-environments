@@ -15,6 +15,9 @@ module "yjsm" {
   environment     = local.environment
   tags            = local.tags
 
+# Security Group IDs
+ecs_service_internal_sg_id = module.ecs.ecs_service_internal_sg_id
+ecs_service_external_sg_id = module.ecs.ecs_service_external_sg_id
+
 }
 
-  

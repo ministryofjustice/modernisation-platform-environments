@@ -23,7 +23,7 @@ data "template_file" "userdata" {
 
 
 resource "aws_instance" "yjsm" {
-  ami                    = data.aws_ami.amazon_linux.id
+  ami                    = "ami-05c1c1277b6f959f9"
   instance_type          = "t3a.xlarge"  
   key_name               = module.key_pair.key_pair_name     
   monitoring             = true

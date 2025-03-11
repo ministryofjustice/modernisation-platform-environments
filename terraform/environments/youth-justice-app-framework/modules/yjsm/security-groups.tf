@@ -11,24 +11,74 @@ resource "aws_security_group" "yjsm_service" {
   )
 }
 
-resource "aws_security_group_rule" "allow_all_internal_group" {
-  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-  type              = "egress"
-  to_port           = 0
-  protocol          = "-1"
-  from_port         = 0
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.yjsm_service.id
-  description       = "Allow all outbound from ecs"
+# (ECS internal to YJSM)
+resource "aws_security_group_rule" "ecs_to_yjsm_internal" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_service_internal_sg_id
 }
 
 
-resource "aws_security_group_rule" "ecs_to_yjsm_rule" {
+
+# (ECS external to YJSMhub)
+resource "aws_security_group_rule" "ecs_to_yjsm_external" {
   type                     = "ingress"
-  from_port                = 8080
-  to_port                  = 8080
+  from_port                = 9091
+  to_port                  = 9091
   protocol                 = "tcp"
-   cidr_blocks             = ["10.0.0.0/16"] # Replace with actual block later
   security_group_id        = aws_security_group.yjsm_service.id
-  description              = "ALB to ECS service communication"
+  source_security_group_id = var.ecs_service_external_sg_id
+}
+
+# (ECS internal to YJSMhub)
+resource "aws_security_group_rule" "ecs_to_yjsmhub_internal" {
+  type                     = "ingress"
+  from_port                = 9091
+  to_port                  = 9091
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_service_internal_sg_id
+}
+
+# (ECS internal to YJSMhub-admin)
+resource "aws_security_group_rule" "ecs_to_yjsmhub_admin" {
+  type                     = "ingress"
+  from_port                = 8401
+  to_port                  = 8401
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_service_internal_sg_id
+}
+
+# (ECS internal to ASSETS)
+resource "aws_security_group_rule" "ecs_to_assets" {
+  type                     = "ingress"
+  from_port                = 8089
+  to_port                  = 8089
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_service_internal_sg_id
+}
+
+# (ASSETS)
+resource "aws_security_group_rule" "assets_443" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = aws_security_group.yjsm_service.id
+}
+
+# (ASSETS)
+resource "aws_security_group_rule" "assets_80" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = aws_security_group.yjsm_service.id
 }
