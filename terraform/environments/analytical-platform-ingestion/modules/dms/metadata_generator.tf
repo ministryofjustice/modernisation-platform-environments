@@ -159,7 +159,7 @@ module "metadata_generator" {
     METADATA_BUCKET    = aws_s3_bucket.validation_metadata.bucket
     LANDING_BUCKET     = aws_s3_bucket.landing.bucket
     INVALID_BUCKET     = aws_s3_bucket.invalid.bucket
-    RAW_HISTORY_BUCKET = aws_s3_bucket.raw_history.bucket
+    RAW_HISTORY_BUCKET = data.aws_s3_bucket.raw_history.bucket
     DB_OBJECTS         = jsonencode(["TEST_DATA"])
     DB_SCHEMA_NAME     = "ADMIN"
   }
