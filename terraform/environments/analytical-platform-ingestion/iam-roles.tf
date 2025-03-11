@@ -2,7 +2,7 @@ module "transfer_server_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.44.1"
+  version = "5.53.0"
 
   create_role = true
 
@@ -21,7 +21,7 @@ module "datasync_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.44.1"
+  version = "5.53.0"
 
   create_role = true
 
@@ -37,7 +37,7 @@ module "datasync_replication_iam_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.44.1"
+  version = "5.53.0"
 
   create_role = true
 
@@ -53,7 +53,7 @@ module "datasync_opg_replication_iam_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.44.1"
+  version = "5.53.0"
 
   create_role = true
 
@@ -71,7 +71,7 @@ module "guard_duty_malware_s3_scan_iam_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.44.1"
+  version = "5.53.0"
 
   create_role = true
 
