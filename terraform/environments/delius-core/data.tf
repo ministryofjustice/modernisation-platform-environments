@@ -1,4 +1,10 @@
 #### This file can be used to store data specific to the member account ####
+data "aws_organizations_organization" "accounts" {}
+
+output "accounts" {
+    value = data.aws_organizations_organization.accounts[*]
+}
+
 data "aws_subnets" "shared-private-a" {
   filter {
     name   = "vpc-id"
