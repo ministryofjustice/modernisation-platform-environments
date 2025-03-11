@@ -118,3 +118,51 @@ data "aws_db_instance" "mlflow_rds" {
 data "aws_db_instance" "ui_rds" {
   db_instance_identifier = "ui"
 }
+
+data "aws_secretsmanager_secret" "mlflow_auth_rds" {
+  name = "mlflow/mlflow_auth_rds"
+}
+
+data "aws_secretsmanager_secret_version" "mlflow_auth_rds" {
+  secret_id = data.aws_secretsmanager_secret.mlflow_auth_rds.id
+}
+
+data "aws_secretsmanager_secret" "mlflow_rds" {
+  name = "mlflow/mlflow_rds"
+}
+
+data "aws_secretsmanager_secret_version" "mlflow_rds" {
+  secret_id = data.aws_secretsmanager_secret.mlflow_rds.id
+}
+
+data "aws_secretsmanager_secret" "mlflow_admin" {
+  name = "mlflow/mlflow_admin"
+}
+
+data "aws_secretsmanager_secret_version" "mlflow_admin" {
+  secret_id = data.aws_secretsmanager_secret.mlflow_admin.id
+}
+
+data "aws_secretsmanager_secret" "ui_rds" {
+  name = "ui/ui_rds"
+}
+
+data "aws_secretsmanager_secret_version" "ui_rds" {
+  secret_id = data.aws_secretsmanager_secret.ui_rds.id
+}
+
+data "aws_secretsmanager_secret" "ui_rds" {
+  name = "ui/ui_rds"
+}
+
+data "aws_secretsmanager_secret_version" "ui_rds" {
+  secret_id = data.aws_secretsmanager_secret.ui_rds.id
+}
+
+data "aws_secretsmanager_secret" "ui_app_secrets" {
+  name = "ui/ui_app_secrets"
+}
+
+data "aws_secretsmanager_secret_version" "ui_app_secrets" {
+  secret_id = data.aws_secretsmanager_secret.values.id
+}
