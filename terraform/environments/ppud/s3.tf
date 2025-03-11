@@ -1164,14 +1164,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-dev" {
   }
 }
 
-/*
-resource "aws_s3_bucket_policy" "s3_bucket_policy_moj_database_source_dev" {
-  count  = local.is-development == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-database-source-dev[0].id
-  policy = aws_iam_policy.iam_policy_s3_bucket_moj_database_source_dev[0].policy
-}
-*/
-
 resource "aws_s3_bucket_replication_configuration" "moj-database-source-dev-replication" {
   count = local.is-development == true ? 1 : 0
   # Must have bucket versioning enabled first
@@ -1286,7 +1278,7 @@ resource "aws_s3_bucket_versioning" "moj-report-source-dev" {
 
 resource "aws_s3_bucket_logging" "moj-report-source-dev" {
   count         = local.is-development == true ? 1 : 0
-  bucket        = aws_s3_bucket.moj-database-report-dev[0].id
+  bucket        = aws_s3_bucket.moj-report-source-dev[0].id
   target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
   target_prefix = "s3-logs/moj-report-source-dev-logs/"
 }
