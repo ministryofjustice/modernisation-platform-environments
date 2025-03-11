@@ -53,7 +53,6 @@ data "aws_sagemaker_prebuilt_ecr_image" "probation_search_huggingface_embedding_
 resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
   #checkov:skip=CKV_AWS_370:Network isolation must be disabled to enable us to pull the model from Huggingface
   for_each           = tomap(local.probation_search_environment)
-  name               = "${each.value.namespace}-sagemaker-hf-model"
   execution_role_arn = aws_iam_role.probation_search_sagemaker_execution_role[each.key].arn
   primary_container {
     image       = data.aws_sagemaker_prebuilt_ecr_image.probation_search_huggingface_embedding_image[each.key].registry_path
@@ -63,20 +62,20 @@ resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
 
 resource "aws_sagemaker_endpoint_configuration" "probation_search_config" {
   #checkov:skip=CKV_AWS_98:KMS key is not supported for NVMe instance storage.
-  for_each = tomap(local.probation_search_environment)
-  name     = "${each.value.namespace}-sagemaker-endpoint-config"
+  for_each    = aws_sagemaker_model.probation_search_huggingface_embedding_model
+  name_prefix = "${each.key}-cfg"
   production_variants {
     variant_name           = "AllTraffic"
     model_name             = aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key].name
     initial_instance_count = 1
-    instance_type          = each.value.instance_type
+    instance_type          = tomap(local.probation_search_environment)[each.key].instance_type
   }
 }
 
 resource "aws_sagemaker_endpoint" "probation_search_endpoint" {
-  for_each             = tomap(local.probation_search_environment)
-  name                 = "${each.value.namespace}-sagemaker-endpoint"
-  endpoint_config_name = aws_sagemaker_endpoint_configuration.probation_search_config[each.key].name
+  for_each             = aws_sagemaker_endpoint_configuration.probation_search_config
+  name                 = "${each.key}-sagemaker-endpoint"
+  endpoint_config_name = each.value.name
 }
 
 
