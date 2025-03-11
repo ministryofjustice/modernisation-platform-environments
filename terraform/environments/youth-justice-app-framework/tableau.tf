@@ -30,7 +30,8 @@ module "tableau" {
 
 
   # Tableau ec2 instance details
-  instance_type         = "m5.4xlarge"
+  instance_type = "m5.4xlarge"
+
 
   # ALB Details
   certificate_arn = module.tableau_cert.domain_cert_arn
@@ -44,8 +45,5 @@ datadog-api-key-name = ""
 availability_schedule = ""
 patch_schedule = ""
 
- 
- # rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
-
-  depends_on = [module.tableau_cert, module.aurora, module.redshift, module.ds]
+depends_on = [module.tableau_cert, module.aurora, module.redshift, module.ds]
 }

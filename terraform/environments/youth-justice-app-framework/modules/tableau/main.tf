@@ -14,6 +14,12 @@ resource "aws_instance" "tableau" {
   key_name             = module.key_pair.key_pair_name 
   iam_instance_profile = aws_iam_instance_profile.tableau.name
 
+  metadata_options {
+    http_tokens = "required"
+  }
+
+  ebs_optimized = true
+
  # user_data = (templatefile("tableau_init.sh.tftpl",
  #   {
  #     dd_api_key_secret_arn = data.aws_secretsmanager_secret.datadog-api-key.id,
@@ -41,6 +47,7 @@ resource "aws_instance" "tableau" {
 
 module "tableau-alb" {
   source = "terraform-aws-modules/alb/aws"
+  version = "9.13.0"
 
   name    = var.alb_name
   vpc_id  = var.vpc_id
