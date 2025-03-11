@@ -30,9 +30,9 @@ variable "rds_secret_rotation_arn" {
   type        = string
 }
 
-variable "kms_key_id" {
+variable "kms_key_arn" {
   type        = string
-  description = "ARN or Id of the AWS KMS key to be used to encrypt the secret values in the versions stored by this module."
+  description = "ARN of the AWS KMS key to be used to encrypt redshift data and the secret values in the versions stored by this module."
 }
 
 variable "postgres_security_group_id" {

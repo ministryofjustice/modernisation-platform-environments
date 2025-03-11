@@ -13,7 +13,7 @@ module "redshift" {
    
   postgres_security_group_id = module.aurora.rds_cluster_security_group_id
 
-  kms_key_id =  module.kms.key_id
+  kms_key_arn =  module.kms.key_arn
  
   depends_on = [ module.aurora, module.s3 ]
 }

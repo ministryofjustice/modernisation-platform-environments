@@ -1,7 +1,7 @@
 resource "aws_secretsmanager_secret" "user_admin" {
   name        = "${var.project_name}/${var.environment}/redshift-serverless/"
   description = "Access to the YJB Services Redshift Serverless "
-  kms_key_id  = var.kms_key_id
+  kms_key_id  = var.kms_key_arn
 }
 
 resource "aws_secretsmanager_secret_version" "user_admin" {
