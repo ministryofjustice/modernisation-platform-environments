@@ -1,6 +1,6 @@
 resource "aws_iam_instance_profile" "tableau" {
     name = "TableauServer"
-    role = "${aws_iam_role.ec2-tableau-role.name}"
+    role = aws_iam_role.ec2-tableau-role.name
 }
 
 resource "aws_instance" "tableau" {
@@ -8,7 +8,7 @@ resource "aws_instance" "tableau" {
   instance_type           = var.instance_type
   subnet_id               = var.tableau_subnet_id
   private_ip              = var.private_ip
-  vpc_security_group_ids  = ["${module.tableau_sg.security_group_id}"]
+  vpc_security_group_ids  = [ module.tableau_sg.security_group_id ]
   disable_api_termination = local.disable_api_termination
 
   key_name             = module.key_pair.key_pair_name 
@@ -37,7 +37,7 @@ resource "aws_instance" "tableau" {
 
   tags = {
     Name          = "Tableau Server"
-    Build         = "${data.aws_ami.app_ami.name}"
+    Build         = data.aws_ami.app_ami.name
     PatchSchedule = var.patch_schedule
     Schedule      = var.availability_schedule
     OS            = "Linux"
@@ -110,7 +110,7 @@ module "alb_sg" {
   egress_with_source_security_group_id = [
     {
       rule                     = "https-443-tcp"
-      source_security_group_id = "${module.tableau_sg.security_group_id}"
+      source_security_group_id = module.tableau_sg.security_group_id
       description              = "Public ALB to Tableau server"
     }
   ]
