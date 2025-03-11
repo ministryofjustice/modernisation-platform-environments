@@ -14,6 +14,8 @@ module "redshift" {
   postgres_security_group_id = module.aurora.rds_cluster_security_group_id
 
   kms_key_arn =  module.kms.key_arn
+
+  data_science_role = "arn:aws:iam::066012302209:role/data_science"
  
   depends_on = [ module.aurora, module.s3 ]
 }

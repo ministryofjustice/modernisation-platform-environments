@@ -150,34 +150,27 @@ resource "aws_iam_policy" "redshift-yjb-reporting-moj-s3" {
 resource "aws_iam_role" "yjb-moj-team" {
   name               = "redshift-serverless-yjb-reporting-moj_ap"
   description        = "Allows Redshift clusters, Events and Data Science roles to call AWS services on your behalf."
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
         {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "redshift.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "events.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        },
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": "arn:aws:iam::066012302209:role/data_science"
-            },
-            "Action": "sts:AssumeRole"
+            Effect = "Allow",
+            Principal = merge(
+              {
+                Service = [
+                   "redshift.amazonaws.com",
+                   "events.amazonaws.com"
+                ]
+              },
+              coalesce( var.data_science_role != null && var.data_science_role != "" ?
+                {
+                  AWS = var.data_science_role
+                } : null, {})
+            ),
+            Action = "sts:AssumeRole"
         }
     ]
-}
-EOF
+  })
 }
 
 #attach policies AmazonEventBridgeFullAccess

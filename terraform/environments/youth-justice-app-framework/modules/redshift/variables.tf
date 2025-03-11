@@ -39,3 +39,9 @@ variable "postgres_security_group_id" {
   type        = string
   description = "The ID of the Security group that represents the PostgreSQL instance which required access to Redshift."
 }
+
+variable "data_science_role" {
+  type = string
+  description = "The arn of a role that is adpopted by YJB Data Scientests."
+  default = null #"arn:aws:iam::066012302209:role/data_science"
+}
