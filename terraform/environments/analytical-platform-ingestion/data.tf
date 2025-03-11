@@ -45,3 +45,7 @@ data "aws_secretsmanager_secret_version" "datasync_dom1" {
 data "aws_secretsmanager_secret_version" "datasync_exclude_path" {
   secret_id = module.datasync_exclude_path_secret.secret_id
 }
+
+data "aws_secretsmanager_secret_version" "datasync_include_paths" {
+  secret_id = module.datasync_include_paths_secret.secret_id
+}

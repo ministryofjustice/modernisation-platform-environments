@@ -55,6 +55,7 @@
       "setup_sonatype_secrets": true,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
+      "scheduled_dataset_lambda_version": "vLatest",
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -64,9 +65,11 @@
         "dps-alerts",
         "dps-use-of-force",
         "dps-locations",
-        "dps-calculate-release-dates",
+        "dps-calc-rel-date",
         "dps-incentives",
         "dps-non-associations",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
         "dps-testing"
       ],
       "alarms": {
@@ -205,6 +208,7 @@
       "setup_sonatype_secrets": false,
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
+      "scheduled_dataset_lambda_version": "vLatest",
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -215,8 +219,10 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
         "dps-locations",
-        "dps-calculate-release-dates"
+        "dps-calc-rel-date"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -356,6 +362,7 @@
       "setup_scheduled_action_iam_role": true,
       "setup_redshift_schedule": true,
       "enable_redshift_health_check": true,
+      "scheduled_dataset_lambda_version": "vLatest",
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -366,8 +373,10 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
         "dps-locations",
-        "dps-calculate-release-dates"
+        "dps-calc-rel-date"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -523,6 +532,7 @@
       "setup_sonatype_secrets": false,
       "setup_scheduled_action_iam_role": false,
       "setup_redshift_schedule": false,
+      "scheduled_dataset_lambda_version": "vLatest",
       "dps_domains": [
         "dps-activities",
         "dps-case-notes",
@@ -533,8 +543,10 @@
         "dps-use-of-force",
         "dps-incentives",
         "dps-non-associations",
+        "dps-health-and-me",
+        "dps-mj-and-ma",
         "dps-locations",
-        "dps-calculate-release-dates"
+        "dps-calc-rel-date"
       ],
       "alarms": {
         "setup_cw_alarms": true,

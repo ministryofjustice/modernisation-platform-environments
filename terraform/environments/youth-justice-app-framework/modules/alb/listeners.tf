@@ -197,4 +197,9 @@ resource "aws_lb_listener_rule" "this" {
   }
 }
 
-
+# Add SNI if certificate_arn is present
+resource "aws_lb_listener_certificate" "sni" {
+  for_each        = { for k, v in var.listeners : k => v if contains(keys(v), "certificate_arn") }
+  listener_arn    = aws_lb_listener.this[each.key].arn
+  certificate_arn = each.value.certificate_arn
+}
