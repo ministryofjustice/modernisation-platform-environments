@@ -44,7 +44,7 @@ resource "aws_instance" "ec2_ebsapps" {
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling-ebsapps },
     { backup = "true" }
   )
-  depends_on = [aws_security_group.ec2_sg_ebsapps]
+  depends_on = [aws_security_group.ec2_sg_sandbox]
 }
 
 resource "aws_ebs_volume" "swap" {
