@@ -6,6 +6,7 @@ variable "core_shared_services_id" {
 variable "destination_bucket_id" {
   description = "The id of the bucket data will be pushed to"
   type        = string
+  default     = null
 }
 
 variable "export_destination" {
