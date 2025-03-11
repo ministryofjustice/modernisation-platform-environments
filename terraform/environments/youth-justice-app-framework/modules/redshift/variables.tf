@@ -32,7 +32,6 @@ variable "rds_secret_rotation_arn" {
 
 variable "kms_key_id" {
   type        = string
-  default     = "aws/secretsmanager"
   description = "ARN or Id of the AWS KMS key to be used to encrypt the secret values in the versions stored by this module."
 }
 
