@@ -117,10 +117,10 @@ locals {
   # scram
   #----------------------------------------------------------------------------
   scram_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBBBXwsFkiYvUwkwadVYgAjSU3L+SyN7AZnWabN+HLLf66PZHagS653rIkbA7PEpZKydTvM3FLCdbKzTZac57AdTwoWArLLnSwWRUyNQRZ+omdbXaUqa8MM1n1gNBpynkIw==",
+    "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACbS3xgiLcHRQsA6HrlGh9/+KUy8JMbkyQoUjacdkQz+0mywL1H4wEBtLi1AX7fLbjkHVuQDWpe/yPfmYwSy5eUSljrwJxV4IsluQVK401VjMdwuFMobu+hE4Iq7S2W5/0xRIFllk3qvJDvY7roFCXONJGhuoXhzRS833M7DtAtmCx0IRwrH4X+MAj7oXbC67ihzbsOtYxLukEsQ0xAC1KyGvmChM3Knr/GnzsmQGD0nKZEr4tIegNjPMHobcF5Zvuub+FBQabrRWsop+BXsP1Dfjzg9yS0joDjqyDx24tFBWK3FheI1mM+auVdnhLVQfje2rGKXbwKFPA37R+v/HlefRzhoxBSBzbSBqFNXVF/3ZJYq2N5/aqUO3TzcAFh+UfjihrQkaVMWmKZADOraiM5H1Cy77hKx5q76/1WpEoVSVAP/BuMBk2DmJCyqheAC9ywL0Q0lfbfLdYOQv0GXiBdgsEd3QmdZu0ZC5xAULNcVBVvNxYiDTVTJ4wKNbm+fF5SNdeO/QBEVQFVb7tF9sMr2J5vKTSAYtaV7r0bY5BXb228r0yh5HaKDsv90YPRgpuZjY+KC9zP5EN+fKwhrkGES3kqyMasYhAoDnvFow1gPTkjL1YLUxr6WGSYIcZgnChNc4nV2NYPs1qX7aM4suubePLMyB+By8Jw+Qi51yCsuUvQA8SBQlAKNDy6bQ7uk90vCrijvw/xKWEyiMDXTxf/GdbrzgXREjs7NqsdK0/Zf+JLfD1+uiYcdeLerAuXYNJ9HdEsGfZ6jbzJGmp4tGoY9NrQ9sXploPjQ+0XhtZvjMlaTBIbavHUVsvsj1cQw== ams\rlentell@AMS-2140-L",
   ]
   scram_cidr_ipv4s = [
-    "172.167.3.97/32",
+    "216.241.100.251",
   ]
   scram_cidr_ipv6s = []
 
@@ -131,12 +131,12 @@ locals {
     cidr_ipv6s = local.scram_cidr_ipv6s
   }
 
-  # sftp_account_scram_orca = {
-  #   name       = "orca"
-  #   ssh_keys   = local.civica_ssh_keys
-  #   cidr_ipv4s = local.civica_cidr_ipv4s
-  #   cidr_ipv6s = local.civica_cidr_ipv6s
-  # }
+  sftp_account_scram_orca = {
+    name       = "orca"
+    ssh_keys   = local.civica_ssh_keys
+    cidr_ipv4s = local.civica_cidr_ipv4s
+    cidr_ipv6s = local.civica_cidr_ipv6s
+  }
 
 
   #----------------------------------------------------------------------------
