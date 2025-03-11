@@ -50,5 +50,16 @@ module "ecs" {
   #RDS Details
   rds_postgresql_sg_id = module.aurora.rds_cluster_security_group_id
 
+  ecs_secrets_access_policy_secret_arns = jsonencode([
+    module.aurora.app_rotated_postgres_secret_arn,
+    aws_secretsmanager_secret.LDAP_administration_secret.arn,
+    aws_secretsmanager_secret.LDAP_DC_secret.arn,
+    aws_secretsmanager_secret.Auth_Email_Account.arn,
+    aws_secretsmanager_secret.auto_admit_secret.arn,
+    aws_secretsmanager_secret.Unit_test.arn,
+    module.ses.ses_secret_arn,
+    aws_secretsmanager_secret.s3_user_secret.arn
+  ])
+
   depends_on = [module.internal_alb, module.external_alb, module.aurora]
 }

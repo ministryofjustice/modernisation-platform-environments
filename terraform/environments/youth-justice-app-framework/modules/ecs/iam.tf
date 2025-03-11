@@ -19,3 +19,11 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
+
+resource "aws_iam_policy" "ecs-secrets-access" {
+  name        = "${var.cluster_name}-ecs-secrets-access"
+  description = "Allows ECS tasks to access secrets in Secrets Manager"
+  policy = templatefile("${path.module}/ecs_secrets_access.json", {
+    secret_arns = var.ecs_secrets_access_policy_secret_arns
+  })
+}

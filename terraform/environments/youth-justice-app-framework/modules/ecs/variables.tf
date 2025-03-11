@@ -281,3 +281,8 @@ variable "rds_postgresql_sg_id" {
   description = "The ID of the security grouos that conteolls ingress to the PostgreSQL database."
   type        = string
 }
+
+variable "ecs_secrets_access_policy_secret_arns" {
+  description = "A list of secret ARNs to allow access to"
+  type        = string
+}
