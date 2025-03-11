@@ -145,24 +145,24 @@ locals {
             },
             "ccms-ebs-preproduction" = {
               cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
+              prometheus_push_enabled         = true
+              amazon_prometheus_query_enabled = true
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
             },
             "ccms-ebs-production" = {
               cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
+              prometheus_push_enabled         = true
+              amazon_prometheus_query_enabled = true
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
             },
             "ccms-ebs-test" = {
               cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
+              prometheus_push_enabled         = true
+              amazon_prometheus_query_enabled = true
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
             },
             "ccms-ebs-upgrade-development" = {
               cloudwatch_enabled              = true
@@ -173,10 +173,10 @@ locals {
             },
             "ccms-ebs-upgrade-test" = {
               cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
+              prometheus_push_enabled         = true
+              amazon_prometheus_query_enabled = true
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
             }
           }
         },
