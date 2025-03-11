@@ -21,7 +21,7 @@ module "cica_dms_tariff_dms_implementation" {
         kms_key_arn                = module.cica_dms_credentials_kms.key_arn
         multi_az                   = false
         replication_instance_class = "dms.t2.micro"
-        inbound_cidr               = "10.202.0.0/20"
+        inbound_cidr               = local.environment_configuration.tariff_cidr
     }
     dms_source = {
         engine_name                 = "oracle"
