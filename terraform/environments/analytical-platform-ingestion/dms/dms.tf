@@ -36,8 +36,7 @@ module "cica_dms_tariff_dms_implementation" {
       cdc       = "${local.resource_name}-cdc"
     }
     dms_mapping_rules     = file("./metadata/cica_tariff.json")
-    # landing_bucket        = modules.cica_dms_ingress_bucket.bucket
-    # landing_bucket_folder = "tariff/"
+    output_bucket         = module.cica_dms_ingress_bucket.s3_bucket_id
 
     tags = local.tags
 }
