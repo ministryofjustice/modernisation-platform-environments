@@ -21,6 +21,7 @@ module "test_ap_airflow" {
 data "aws_iam_policy_document" "p1_export_airflow" {
 
   statement {
+    sid = "AthenaPermissionsForP1Export"
     effect = "Allow"
     actions = [
       "athena:StartQueryExecution",
@@ -34,6 +35,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
+    sid = "S3AthenaQueryBucketPermissionsForP1Export"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -46,6 +48,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     ]
   }
   statement {
+    sid = "GluePermissionsForP1Export"
     effect = "Allow"
     actions = [
       "glue:GetDatabase",
@@ -55,7 +58,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
-    sid    = "P1ExportAirflowS3PutPermissions"
+    sid    = "S3PutPermissionsForP1Export"
     effect = "Allow"
     actions = [
       "s3:PutObject",
@@ -64,7 +67,24 @@ data "aws_iam_policy_document" "p1_export_airflow" {
       "${module.s3-p1-export-bucket.bucket_arn}/*",
     ]
   }
-
+  statement {
+    sid       = "GetDataAccessForLakeFormationForP1Export"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAliasForP1Export"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBucketForP1Export"
+    effect    = "Allow"
+    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    resources = ["*"]
+  }
 }
 
 module "p1_export_airflow" {
