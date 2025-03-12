@@ -5,6 +5,8 @@ locals {
   delete_on_termination = var.test_mode
   # Only enable ALB deletion protection if not in test mode
   enable_deletion_protection = var.test_mode ? false : true
+  # Enable tableau instance replace for user data changes if i test mode
+  user_data_replace_on_change = var.test_mode
 
   instance_key_name = "${var.project_name}-${var.environment}-${var.instance_key_name}"
 

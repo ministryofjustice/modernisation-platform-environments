@@ -26,6 +26,8 @@ resource "aws_instance" "tableau" {
       instance_role         = "tableau"
   }))
 
+  user_data_replace_on_change = local.user_data_replace_on_change
+
   root_block_device {
     delete_on_termination = local.delete_on_termination
     encrypted             = true
