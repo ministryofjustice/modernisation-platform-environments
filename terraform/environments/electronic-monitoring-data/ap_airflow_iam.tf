@@ -41,8 +41,8 @@ data "aws_iam_policy_document" "p1_export_airflow" {
       "s3:ListBucket"
     ]
     resources = [
-      "module.s3-athena-bucket.bucket.arn",
-       "${module.s3-athena-bucket.bucket.arn}/*",
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/*",
     ]
   }
   statement {
