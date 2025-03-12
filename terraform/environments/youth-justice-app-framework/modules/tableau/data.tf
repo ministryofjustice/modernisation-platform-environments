@@ -24,14 +24,3 @@ data "aws_ami" "app_ami" {
   }
 
 }
-
-# [TODO] Commented out until Datadog module development is complete.
-/*
-data "aws_secretsmanager_secret" "datadog-api-key" {
-  arn = var.datadog-api-key-name
-}
-
-data "aws_secretsmanager_secret_version" "current" {
-  secret_id = data.aws_secretsmanager_secret.datadog-api-key.id
-}
-*/

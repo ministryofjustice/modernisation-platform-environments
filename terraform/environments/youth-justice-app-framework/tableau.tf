@@ -42,7 +42,7 @@ redshift_sg_id          = module.redshift.security_group_id
 directory_service_sg_id = module.ds.directory_service_sg_id
 management_server_sg_id = module.ds.management_server_sg_id
 
-datadog-api-key-name = ""
+datadog_api_key_arn = module.datadog.datadog_api_key_arn
 availability_schedule = ""
 patch_schedule = ""
 

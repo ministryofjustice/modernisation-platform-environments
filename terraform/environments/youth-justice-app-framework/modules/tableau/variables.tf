@@ -107,7 +107,7 @@ variable "redshift_sg_id" {
 }
 
 # Datadog Inputs
-variable "datadog-api-key-name" {
+variable "datadog_api_key_arn" {
   type        = string
-  description = "The Name of the Secret that holds the Datagog API Key."
+  description = "The ARN of the Secret that holds the Datadog API Key."
 }

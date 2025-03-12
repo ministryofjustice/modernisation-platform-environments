@@ -20,11 +20,11 @@ resource "aws_instance" "tableau" {
 
   ebs_optimized = true
 
- # user_data = (templatefile("tableau_init.sh.tftpl",
- #   {
- #     dd_api_key_secret_arn = data.aws_secretsmanager_secret.datadog-api-key.id,
- #     instance_role         = "tableau"
- # }))
+  user_data = (templatefile("${path.module}/tableau_init.sh.tftpl",
+    {
+      dd_api_key_secret_arn = var.datadog_api_key_arn,
+      instance_role         = "tableau"
+  }))
 
   root_block_device {
     delete_on_termination = local.delete_on_termination
