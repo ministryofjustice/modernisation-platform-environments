@@ -286,3 +286,9 @@ variable "ecs_secrets_access_policy_secret_arns" {
   description = "A list of secret ARNs to allow access to"
   type        = string
 }
+
+variable "ecs_role_additional_policies_arns" {
+  description = "A list of additional policies to attach to the ECS task role"
+  type        = list(string)
+  default     = []
+}
