@@ -68,7 +68,7 @@ module "ecs" {
 }
 
 resource "aws_iam_policy" "s3-access" {
-  name        = "${local.project_name}-s3-access"
+  name        = "${local.project_name}-ecs-s3-access"
   description = "Policy for ecs task role to access yjaf buckets"
   policy = templatefile("${path.module}/iam_policies/s3_user_policy.json", {
     dal_buckets = jsonencode([
