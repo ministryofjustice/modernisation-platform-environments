@@ -63,7 +63,7 @@ resource "aws_sns_topic" "lambda_failure" {
 module "all_lambdas_errors_alarm" {
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-  version = "5.7.0"
+  version = "5.7.1"
 
   alarm_name          = "all-lambdas-errors"
   alarm_description   = "Lambdas with errors"
@@ -96,7 +96,7 @@ module "files_land_bucket_alarm" {
   }
   #checkov:skip=CKV_TF_1:Ensure Terraform module sources use a commit hash. No commit hash on this module
   source  = "terraform-aws-modules/cloudwatch/aws//modules/metric-alarm"
-  version = "5.7.0"
+  version = "5.7.1"
 
   alarm_name          = each.value.name
   alarm_description   = "Detect when not enough files land in bucket within 24 hours"
