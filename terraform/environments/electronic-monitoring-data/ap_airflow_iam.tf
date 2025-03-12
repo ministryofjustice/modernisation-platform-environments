@@ -58,12 +58,14 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
-    sid    = "S3PutPermissionsForP1Export"
+    sid    = "S3ExportBucketPermissionsForP1Export"
     effect = "Allow"
     actions = [
       "s3:PutObject",
+      "s3:ListBucket"
     ]
     resources = [
+      module.s3-p1-export-bucket.bucket_arn,
       "${module.s3-p1-export-bucket.bucket_arn}/*",
     ]
   }
@@ -80,7 +82,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
-    sid       = "ListAllBucketForP1Export"
+    sid       = "ListAllBuckesForP1Export"
     effect    = "Allow"
     actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
     resources = ["*"]
