@@ -10,7 +10,8 @@ locals {
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
-          HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
+          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
+          MAX_CLIENT_BATCH_SIZE = 512
         }
       }
     }
@@ -21,7 +22,8 @@ locals {
         repository_name = "tei-cpu"
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
         environment = {
-          HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
+          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
+          MAX_CLIENT_BATCH_SIZE = 512
         }
       }
       hmpps-probation-search-prod = {
@@ -30,7 +32,8 @@ locals {
         repository_name = "tei"
         image_tag       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
         environment = {
-          HF_MODEL_ID = "mixedbread-ai/mxbai-embed-large-v1"
+          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
+          MAX_CLIENT_BATCH_SIZE = 512
         }
       }
     }
@@ -68,12 +71,20 @@ resource "aws_sagemaker_endpoint_configuration" "probation_search_config" {
     initial_instance_count = 1
     instance_type          = each.value.instance_type
   }
+
+  lifecycle {
+    replace_triggered_by = [aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key]]
+  }
 }
 
 resource "aws_sagemaker_endpoint" "probation_search_endpoint" {
   for_each             = tomap(local.probation_search_environment)
   name                 = "${each.value.namespace}-sagemaker-endpoint"
   endpoint_config_name = aws_sagemaker_endpoint_configuration.probation_search_config[each.key].name
+
+  lifecycle {
+    replace_triggered_by = [aws_sagemaker_endpoint_configuration.probation_search_config[each.key]]
+  }
 }
 
 

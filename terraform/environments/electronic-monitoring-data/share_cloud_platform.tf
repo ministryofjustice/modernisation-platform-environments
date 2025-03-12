@@ -5,6 +5,20 @@ locals {
     var.cloud-platform-iam-dev
   ] : null
 
+  iam-test = local.environment_shorthand == "test" ? [
+    var.cloud-platform-iam-dev,
+    var.cloud-platform-iam-preprod,
+    var.cloud-platform-iam-prod
+  ] : null
+
+  iam-preprod = local.environment_shorthand == "preprod" ? [
+    var.cloud-platform-iam-preprod
+  ] : null
+
+  iam-prod = local.environment_shorthand == "prod" ? [
+    var.cloud-platform-iam-prod
+  ] : null
+
   tables_to_share = [
     "contact_history",
     "equipment_details",
@@ -22,18 +36,6 @@ locals {
   specials_table_filters = {
     for table in local.tables_to_share : table => ""
   }
-  iam-test = local.environment_shorthand == "test" ? [
-    var.cloud-platform-iam-dev,
-    var.cloud-platform-iam-preprod
-  ] : null
-
-  iam-preprod = local.environment_shorthand == "preprod" ? [
-    var.cloud-platform-iam-preprod
-  ] : null
-
-  iam-prod = local.environment_shorthand == "prod" ? [
-    var.cloud-platform-iam-prod
-  ] : null
 
   resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
 
@@ -197,6 +199,11 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "glue:GetTable"
     ]
     resources = local.glue_arns
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["execute-api:Invoke"]
+    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.get_zipped_file_api_api.api_gateway_id}/*"]
   }
 }
 

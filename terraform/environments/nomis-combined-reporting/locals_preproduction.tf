@@ -108,7 +108,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "PREPROD NCR DATABASE"
           nomis-combined-reporting-environment = "pp"
-          oracle-sids                          = "PPBIPSYS PPBIPAUD"
+          oracle-sids                          = "PPBIPSYS PPBIPAUD PPBISYS PPBIAUD"
           instance-scheduling                  = "skip-scheduling"
         })
       })

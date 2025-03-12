@@ -20,3 +20,13 @@ resource "aws_lakeformation_data_lake_settings" "emds_development" {
     data.aws_iam_role.github_actions_role.arn
   ]
 }
+
+resource "aws_lakeformation_lf_tag" "domain_tag" {
+  key    = "domain"
+  values = ["prisons", "probation", "electonic-monitoring"]
+}
+
+resource "aws_lakeformation_lf_tag" "sensitive_tag" {
+  key    = "sensitive"
+  values = ["true", "false"]
+}

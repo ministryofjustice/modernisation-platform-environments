@@ -84,7 +84,7 @@ locals {
         backup           = "false"
         os-type          = "Windows"
         server-type      = "RDGateway"
-        update-ssm-agent = "patchgroup1"
+        update-ssm-agent = "patchgroup2"
       }
     }
 
@@ -125,7 +125,7 @@ locals {
         backup           = "false"
         os-type          = "Windows"
         server-type      = "RDServices"
-        update-ssm-agent = "patchgroup1"
+        update-ssm-agent = "patchgroup2"
       }
     }
   }

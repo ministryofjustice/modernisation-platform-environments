@@ -100,7 +100,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
-          oracle-sids                          = "PDBIPSYS PDBIPAUD"
+          oracle-sids                          = "PDBIPSYS PDBIPAUD PDBISYS PDBIAUD"
         })
       })
 
@@ -118,7 +118,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "PROD NCR DATABASE"
           nomis-combined-reporting-environment = "pd"
-          oracle-sids                          = "DRBIPSYS DRBIPAUD"
+          oracle-sids                          = "DRBIPSYS DRBIPAUD DRBISYS DRBIAUD"
         })
       })
 

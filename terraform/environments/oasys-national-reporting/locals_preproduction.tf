@@ -31,7 +31,6 @@ locals {
       }
     }
 
-    # WILL BE MOVING TO HMPPS-DOMAIN-SERVICES Account at a later date
     efs = {
       pp-onr-sap-share = {
         access_points = {
@@ -62,7 +61,8 @@ locals {
           security_groups    = ["boe", "bip-app"]
         }]
         tags = {
-          backup = "false"
+          backup      = "false"
+          backup-plan = "daily-and-weekly"
         }
       }
     }
@@ -155,6 +155,27 @@ locals {
           oasys-national-reporting-environment = "pp"
         })
       })
+
+      pp-onr-web-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "m6i.xlarge"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "pp"
+        })
+      })
     }
 
     fsx_windows = {
@@ -218,6 +239,11 @@ locals {
               { ec2_instance_name = "pp-onr-bods-1" },
             ]
           })
+          pp-onr-web-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "pp-onr-web-1" },
+            ]
+          })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
@@ -233,6 +259,20 @@ locals {
                   host_header = {
                     values = [
                       "pp-bods.preproduction.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              pp-onr-web-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-onr-web-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "preproduction.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -350,6 +390,7 @@ locals {
     route53_zones = {
       "preproduction.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
           { name = "pp-bods", type = "A", lbs_map_key = "public" }
         ],
       }

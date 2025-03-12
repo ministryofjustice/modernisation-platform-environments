@@ -172,6 +172,7 @@ locals {
     schedule_alarms_lambda = {
       alarm_patterns = [
         "public-https-*-unhealthy-load-balancer-host",
+        "*-instance-or-cloudwatch-agent-stopped",
       ]
     }
 
