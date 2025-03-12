@@ -27,8 +27,8 @@ resource "aws_iam_policy" "tableau_s3_backup" {
 }
 
 #create a policy to all management instance to download files from the install-files bucket
-resource "aws_iam_policy" "read_s3_install_software" {
-  name        = "read_s3_install_software"
+resource "aws_iam_policy" "read_s3_tableau_software" {
+  name        = "read_s3_tableau_software"
   description = "Use to enable ec2 Instances to retrieve software from S3 bucket <enviroment>-install-files"
   policy = jsonencode({
     "Version" : "2012-10-17",
@@ -105,12 +105,12 @@ locals {
         key2 = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         key3 = aws_iam_policy.tableau_s3_backup.arn
         key4 = aws_iam_policy.datadog_api_read.arn
-        key5 = aws_iam_policy.read_s3_install_software.arn
+        key5 = aws_iam_policy.read_s3_tableau_software.arn
     }
 }
 
 #attach policies 
-resource "aws_iam_role_policy_attachment" "yjb-postgres-secret" {
+resource "aws_iam_role_policy_attachment" "tableau" {
     for_each = local.policy_arns
 
     role       = aws_iam_role.ec2_tableau_role.name
