@@ -60,6 +60,25 @@ module "ecs" {
     module.ses.ses_secret_arn,
     aws_secretsmanager_secret.s3_user_secret.arn
   ])
+  ecs_role_additional_policies_arns = [
+    aws_iam_policy.s3-access.arn
+  ]
 
   depends_on = [module.internal_alb, module.external_alb, module.aurora]
+}
+
+resource "aws_iam_policy" "s3-access" {
+  name        = "${local.project_name}-s3-access"
+  description = "Policy for ecs task role to access yjaf buckets"
+  policy = templatefile("${path.module}/iam_policies/s3_user_policy.json", {
+    dal_buckets = jsonencode([
+      "arn:aws:s3:::yjaf-${local.environment}-cms/*",
+      "arn:aws:s3:::yjaf-${local.environment}-yjsm/*",
+      "arn:aws:s3:::yjaf-${local.environment}-mis/*",
+      "arn:aws:s3:::yjaf-${local.environment}-bedunlock/*",
+      "arn:aws:s3:::yjaf-${local.environment}-bands/*",
+      "arn:aws:s3:::yjaf-${local.environment}-incident/*",
+      "arn:aws:s3:::yjaf-${local.environment}-cmm/*"
+    ])
+  })
 }

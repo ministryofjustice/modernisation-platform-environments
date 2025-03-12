@@ -51,7 +51,8 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy" {
 
 #for each for any other policies
 resource "aws_iam_role_policy_attachment" "ecs_task_role_additional_policies" {
-  for_each   = var.ecs_role_additional_policies_arns
+  for_each = { for idx, arn in var.ecs_role_additional_policies_arns : idx => arn }
+
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = each.value
 }
