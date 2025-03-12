@@ -70,7 +70,8 @@
         "dps-non-associations",
         "dps-health-and-me",
         "dps-mj-and-ma",
-        "dps-testing"
+        "dps-testing",
+        "dps-prison-reg"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -222,7 +223,8 @@
         "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-locations",
-        "dps-calc-rel-date"
+        "dps-calc-rel-date",
+        "dps-prison-reg"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -376,7 +378,8 @@
         "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-locations",
-        "dps-calc-rel-date"
+        "dps-calc-rel-date",
+        "dps-prison-reg"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -546,7 +549,8 @@
         "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-locations",
-        "dps-calc-rel-date"
+        "dps-calc-rel-date",
+        "dps-prison-reg"
       ],
       "alarms": {
         "setup_cw_alarms": true,
