@@ -61,7 +61,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
       "s3:PutObject",
     ]
     resources = [
-      "${module.s3-p1-export-bucket.bucket.arn}/*",
+      "${module.s3-p1-export-bucket.bucket_arn}/*",
     ]
   }
 
