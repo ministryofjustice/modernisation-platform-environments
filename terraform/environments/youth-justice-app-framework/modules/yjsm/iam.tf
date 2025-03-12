@@ -21,7 +21,17 @@ resource "aws_iam_instance_profile" "yjsm_ec2_profile" {
 }
 
 #todo add missing policies to this role
-resource "aws_iam_role_policy_attachment" "yjsm_ec2_policy" {
+resource "aws_iam_role_policy_attachment" "yjsm_ssm_policy" {
   role       = aws_iam_role.yjsm_ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_role_policy_attachment" "yjsm_cloudwatch_policy" {
+  role       = aws_iam_role.yjsm_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "yjsm_ec2_readonly_policy" {
+  role       = aws_iam_role.yjsm_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
