@@ -5,7 +5,8 @@ resource "aws_security_group" "ec2_sg_sandbox" {
   description = "SG for Sandbox EC2 instances"
   vpc_id      = data.aws_vpc.shared.id
   tags = merge(local.tags,
-    { Name = lower(format("ec2-sg-%s", local.component_name)) }
+    { Name = lower(format("ec2-sg-%s", local.component_name)) },
+    { component = local.component_name }
   )
 }
 
@@ -18,7 +19,6 @@ resource "aws_vpc_security_group_ingress_rule" "sandbox_ingress" {
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.ec2_sg_sandbox.id
 }
-
 
 # EGRESS Rules
 
