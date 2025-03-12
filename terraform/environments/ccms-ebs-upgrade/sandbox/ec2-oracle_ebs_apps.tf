@@ -23,7 +23,7 @@ resource "aws_instance" "ec2_ebsapps" {
   }
   user_data_replace_on_change = false
   user_data = base64encode(templatefile("./templates/ec2_user_data_ebs_apps.sh", {
-    hostname = "sandbox-ebs-apps"
+    hostname = "ebs-apps-sandbox"
   }))
 
   # AMI ebs mappings from /dev/sd[a-d]
@@ -40,6 +40,7 @@ resource "aws_instance" "ec2_ebsapps" {
 
   tags = merge(local.tags,
     { Name = lower(format("ccms-ebs-%s-ebsapps-%s", local.component_name, count.index + 1)) },
+    { component = local.component_name },
     { instance-role = local.application_data.accounts[local.environment].instance_role_ebsapps },
     { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
     { backup = "true" }
