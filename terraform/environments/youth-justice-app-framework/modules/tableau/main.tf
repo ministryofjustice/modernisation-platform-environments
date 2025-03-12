@@ -1,6 +1,6 @@
 resource "aws_iam_instance_profile" "tableau" {
     name = "TableauServer"
-    role = aws_iam_role.ec2-tableau-role.name
+    role = aws_iam_role.ec2_tableau_role.name
 }
 
 resource "aws_instance" "tableau" {

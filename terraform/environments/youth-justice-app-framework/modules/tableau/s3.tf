@@ -27,3 +27,20 @@ module "log_bucket" {
   #todo cloudtrail dataevents for this bucket required
   tags = local.all_tags
 }
+
+## s3 bucket for Tableau backups
+module "s3" {
+  source = "../s3"
+
+  project_name = var.project_name
+  environment  = var.environment
+
+  bucket_name = ["tableau-backups"]
+
+   tags = var.tags
+
+}
+
+locals {
+  s3_tableau_backup = module.s3.aws_s3_bucket_arn[0]
+}
