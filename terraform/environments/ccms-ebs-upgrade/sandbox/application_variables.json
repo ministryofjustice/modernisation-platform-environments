@@ -24,6 +24,7 @@
       "lz_aws_workspace_nonprod_subnet_env": "10.200.0.0/20",
       "lz_aws_appstream_subnet_a_b": "10.200.32.0/23",
       "cloud_platform_subnet": "172.20.0.0/16",
+      "ebs_optimized": "true",
       "ebs_default_iops": 12000,
       "ebsapps_no_instances": 2,
       "ebsapps_default_iops": 3000,

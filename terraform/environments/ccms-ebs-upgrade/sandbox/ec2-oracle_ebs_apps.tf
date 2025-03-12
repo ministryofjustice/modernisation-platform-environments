@@ -41,7 +41,7 @@ resource "aws_instance" "ec2_ebsapps" {
   tags = merge(local.tags,
     { Name = lower(format("ccms-ebs-%s-ebsapps-%s", local.component_name, count.index + 1)) },
     { instance-role = local.application_data.accounts[local.environment].instance_role_ebsapps },
-    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling-ebsapps },
+    { instance-scheduling = local.application_data.accounts[local.environment].instance-scheduling },
     { backup = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_sandbox]
