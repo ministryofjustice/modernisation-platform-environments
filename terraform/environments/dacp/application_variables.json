@@ -46,7 +46,7 @@
       "storage_type": "gp2",
       "engine": "postgres",
       "engine_version": "14",
-      "instance_class": "db.t3.micro",
+      "instance_class": "db.t3.medium",
       "server_port_1": "80",
       "lb_listener_protocol_1": "HTTP",
       "server_port_2": "443",
