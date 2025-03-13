@@ -44,3 +44,40 @@ module "s3" {
 locals {
   s3_tableau_backup = module.s3.aws_s3_bucket_arn[0]
 }
+
+
+#Setup a local variable Tableau Identity Store config file content
+locals {
+  file_content = jsonencode({
+ 
+    "configEntities":{
+      "identityStore": {
+        "_type": "identityStoreType",
+    		"type": "activedirectory",
+        "domain": "i2N.com",
+        "nickname": "i2N",
+        "directoryServiceType": "activedirectory",
+        "hostname": "<domain_instance>.i2n.com", 
+        "sslPort": "636",
+        "bind": "simple",
+        "username": "tableau",
+        "password": "<password>"	
+      }
+    }
+  })
+}
+
+
+#Create a Folder for Tableau Instalation files
+resource "aws_s3_object" "install_folder" {
+  bucket           = local.s3_tableau_backup
+  key              = "Install-Files"
+}
+
+#Upload the zip file to s3 bucket under DockerRunFiles folder
+resource "aws_s3_object" "file_upload" {
+  bucket           = local.s3_tableau_backup
+  key              = "Install-Files/identity-store-${var.environment}.json"
+  content          = local.file_content
+}
+

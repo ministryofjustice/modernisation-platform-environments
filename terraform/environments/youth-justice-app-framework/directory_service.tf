@@ -8,9 +8,9 @@ module "ds" {
   source = "./modules/directory-service"
 
   project_name = local.project_name
+  environment  = local.environment
   tags         = merge(local.tags, { Name = "AD Management Server" })
 
-  environment_name             = local.environment_name
   ad_management_instance_count = local.application_data.accounts[local.environment].ad_management_instance_count
 
 

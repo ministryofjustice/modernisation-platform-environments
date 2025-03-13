@@ -42,8 +42,8 @@ resource "aws_iam_policy" "read_s3_install_software" {
           "s3:GetObjectTagging",
           "s3:ListBucket"
         ],
-        "Resource" : ["arn:aws:s3:::${var.environment_name}-install-files/*",
-          "arn:aws:s3:::${var.environment_name}-install-files"
+        "Resource" : ["arn:aws:s3:::${local.environment_name}-install-files/*",
+          "arn:aws:s3:::${local.environment_name}-install-files"
         ]
       }
     ]
