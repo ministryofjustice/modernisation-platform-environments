@@ -6,13 +6,12 @@ locals {
   probation_search_environments = {
     analytical-platform-compute-development = {
       hmpps-probation-search-dev = {
-        namespace       = "hmpps-probation-search-dev"                     # MOJ Cloud Platform namespace where OpenSearch is hosted
-        instance_type   = "ml.t2.large"                                    # SageMaker AI Real-time Inference instance type to use
-        repository_name = "tei-cpu"                                        # "tei" for GPU-accelerated instances, "tei-cpu" for CPU-only instances
-        image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"           # Version of the Hugging Face Text Embeddings Inference image to use. See https://huggingface.co/docs/text-embeddings-inference.
-        #s3_model_key    = "ext/mixedbread-ai/mxbai-embed-large-v1.tar.gz" # To use a local model from S3
-        environment = {                                                    # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
-          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"     # To use a remote model from Hugging Face Hub (takes precedence over s3_model_key above, if present)
+        namespace       = "hmpps-probation-search-dev"                 # MOJ Cloud Platform namespace where OpenSearch is hosted
+        instance_type   = "ml.t2.large"                                # SageMaker AI Real-time Inference instance type to use
+        repository_name = "tei-cpu"                                    # "tei" for GPU-accelerated instances, "tei-cpu" for CPU-only instances
+        image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"       # Version of the Hugging Face Text Embeddings Inference image to use. See https://huggingface.co/docs/text-embeddings-inference.
+        environment = {                                                # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
+          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1" # To use a remote model from Hugging Face Hub (takes precedence over s3_model_key above, if present)
           MAX_CLIENT_BATCH_SIZE = 512
         }
       }
@@ -46,28 +45,39 @@ locals {
 # ------------------------------------------------------------------------------
 # SageMaker
 # ------------------------------------------------------------------------------
+
 data "aws_sagemaker_prebuilt_ecr_image" "probation_search_huggingface_embedding_image" {
-  for_each        = tomap(local.probation_search_environment)
+  for_each = tomap(local.probation_search_environment)
+
   repository_name = each.value.repository_name
   image_tag       = each.value.image_tag
 }
 
 resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
   #checkov:skip=CKV_AWS_370:Network isolation must be disabled to enable us to pull the model from Huggingface
-  for_each           = tomap(local.probation_search_environment)
-  name               = "${each.value.namespace}-sagemaker-hf-model"
-  execution_role_arn = aws_iam_role.probation_search_sagemaker_execution_role[each.key].arn
+
+  for_each = tomap(local.probation_search_environment)
+
+  execution_role_arn = module.probation_search_sagemaker_execution_iam_role[each.key].iam_role_arn
+
   primary_container {
     image          = data.aws_sagemaker_prebuilt_ecr_image.probation_search_huggingface_embedding_image[each.key].registry_path
     environment    = each.value.environment
     model_data_url = can(each.value.s3_model_key) ? "s3://${local.probation_search_model_bucket_name}/${each.value.s3_model_key}" : null
   }
+
+  tags = merge(local.tags, {
+    Name = "${each.value.namespace}-huggingface-embedding-model"
+  })
 }
 
-resource "aws_sagemaker_endpoint_configuration" "probation_search_config" {
-  #checkov:skip=CKV_AWS_98:KMS key is not supported for NVMe instance storage.
-  for_each    = tomap(local.probation_search_environment)
-  name_prefix = "${each.value.namespace}-cfg"
+resource "aws_sagemaker_endpoint_configuration" "probation_search" {
+  #checkov:skip=CKV_AWS_98:KMS key is not supported for NVMe instance storage
+
+  for_each = tomap(local.probation_search_environment)
+
+  name_prefix = each.value.namespace
+
   production_variants {
     variant_name           = "AllTraffic"
     model_name             = aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key].name
@@ -75,122 +85,94 @@ resource "aws_sagemaker_endpoint_configuration" "probation_search_config" {
     instance_type          = each.value.instance_type
   }
 
+  tags = local.tags
+
   lifecycle {
     replace_triggered_by  = [aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key]]
     create_before_destroy = true
   }
 }
 
-resource "aws_sagemaker_endpoint" "probation_search_endpoint" {
-  for_each             = tomap(local.probation_search_environment)
-  name                 = "${each.value.namespace}-sagemaker-endpoint"
-  endpoint_config_name = aws_sagemaker_endpoint_configuration.probation_search_config[each.key].name
-}
+resource "aws_sagemaker_endpoint" "probation_search" {
+  for_each = tomap(local.probation_search_environment)
 
+  name                 = each.value.namespace
+  endpoint_config_name = aws_sagemaker_endpoint_configuration.probation_search[each.key].name
+
+  tags = local.tags
+}
 
 # ------------------------------------------------------------------------------
 # IAM Permissions
 # ------------------------------------------------------------------------------
 
-resource "aws_iam_role" "probation_search_sagemaker_invoke_role" {
-  for_each = tomap(local.probation_search_environment)
-  name     = "${each.value.namespace}-sagemaker-role"
+module "probation_search_sagemaker_execution_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  ## Allow role in Account A (MOJ Cloud Platform account) to assume this role and invoke SageMaker in Account B (Analytical Platform Compute account on MOJ Modernisation Platform)
-  ## See https://github.com/opensearch-project/ml-commons/blob/f741f71fff0d2ef6df7a3a62729cc1cb0953a37c/docs/tutorials/aws/semantic_search_with_bedrock_titan_embedding_model_in_another_account.md
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AssumeFromCloudPlatform"
-        Effect = "Allow"
-        Action = "sts:AssumeRole"
-        Principal = {
-          AWS = "arn:aws:iam::754256621582:role/${each.value.namespace}-xa-opensearch-to-sagemaker"
-        }
-      }
-    ]
-  })
+  for_each = tomap(local.probation_search_environment)
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.54.0"
+
+  create_role = true
+
+  role_name         = "${each.value.namespace}-sagemaker-exec-role"
+  role_requires_mfa = false
+
+  trusted_role_services = ["sagemaker.amazonaws.com"]
+
+  inline_policy_statements = [
+    {
+      sid    = "CloudWatchAccess"
+      effect = "Allow"
+      actions = [
+        "cloudwatch:PutMetricData",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents",
+      ]
+      resources = ["*"]
+    },
+    {
+      sid       = "S3Access"
+      effect    = "Allow"
+      actions   = ["s3:GetObject"]
+      resources = ["arn:aws:s3:::${local.probation_search_model_bucket_name}/*"]
+    }
+  ]
+
+  tags = local.tags
 }
 
-resource "aws_iam_role_policy" "probation_search_sagemaker_invoke_policy" {
+module "probation_search_sagemaker_invocation_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   for_each = tomap(local.probation_search_environment)
-  role     = aws_iam_role.probation_search_sagemaker_invoke_role[each.key].name
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "sagemaker:InvokeEndpointAsync",
-          "sagemaker:InvokeEndpoint"
-        ]
-        Resource = aws_sagemaker_endpoint.probation_search_endpoint[each.key].arn
-      }
-    ]
-  })
-}
 
-resource "aws_iam_role" "probation_search_sagemaker_execution_role" {
-  for_each = tomap(local.probation_search_environment)
-  name     = "${each.value.namespace}-sagemaker-exec-role"
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          Service = "sagemaker.amazonaws.com"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
-}
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.54.0"
 
-resource "aws_iam_role_policy" "probation_search_sagemaker_logs_policy" {
-  #checkov:skip=CKV_AWS_290:Role is only used by SageMaker service
-  #checkov:skip=CKV_AWS_355:Role is only used by SageMaker service
-  for_each = tomap(local.probation_search_environment)
-  role     = aws_iam_role.probation_search_sagemaker_execution_role[each.key].id
+  create_role = true
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "LogsAccess"
-        Effect = "Allow"
-        Action = [
-          "cloudwatch:PutMetricData",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "logs:CreateLogGroup",
-          "logs:DescribeLogStreams"
-        ]
-        Resource = "*"
-      }
-    ]
-  })
-}
+  role_name         = "${each.value.namespace}-sagemaker-role"
+  role_requires_mfa = false
 
+  trusted_role_arns = ["arn:aws:iam::754256621582:role/${each.value.namespace}-xa-opensearch-to-sagemaker"]
 
-resource "aws_iam_role_policy" "probation_search_sagemaker_s3_policy" {
-  #checkov:skip=CKV_AWS_290:Role is only used by SageMaker service
-  #checkov:skip=CKV_AWS_355:Role is only used by SageMaker service
-  for_each = tomap(local.probation_search_environment)
-  role     = aws_iam_role.probation_search_sagemaker_execution_role[each.key].id
+  inline_policy_statements = [
+    {
+      sid    = "SageMakerAccess"
+      effect = "Allow"
+      actions = [
+        "sagemaker:InvokeEndpoint",
+        "sagemaker:InvokeEndpointAsync",
+      ]
+      resources = [aws_sagemaker_endpoint.probation_search[each.key].arn]
+    }
+  ]
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "S3Access"
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject"
-        ]
-        Resource = ["arn:aws:s3:::${local.probation_search_model_bucket_name}/*"]
-      }
-    ]
-  })
+  tags = local.tags
 }
