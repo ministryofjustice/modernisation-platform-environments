@@ -103,7 +103,7 @@ resource "aws_secretsmanager_secret_version" "ad_credentials" {
   )
 
   lifecycle {
-    ignore_changes = [secret_string.Password]
+    ignore_changes = [secret_string]
   }
 }
 
@@ -124,7 +124,7 @@ resource "aws_secretsmanager_secret_version" "tableau_admin" {
   )
 
   lifecycle {
-    ignore_changes = [secret_string.tableau-ad_read_password]
+    ignore_changes = [secret_string]
   }
 }
 
