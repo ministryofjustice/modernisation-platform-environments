@@ -132,53 +132,53 @@ resource "aws_iam_role_policy_attachment" "cw_logging_policy" {
   policy_arn = aws_iam_policy.cw_logging_policy.arn
 }
 
-# # RMAN policy
-# resource "aws_iam_policy" "rman_to_s3" {
-#   name        = "ec2_to_s3_policy-${local.component_name}"
-#   description = "Allows EC2 to write to S3 for Sandbox"
+# RMAN policy
+resource "aws_iam_policy" "rman_to_s3" {
+  name        = "ec2_to_s3_policy-${local.component_name}"
+  description = "Allows EC2 to write to S3 for Sandbox"
 
-#   policy = jsonencode(
-#     {
-#       "Version" : "2012-10-17",
-#       "Statement" : [
-#         {
-#           "Effect" : "Allow",
-#           "Action" : [
-#             "s3:GetBucketLocation",
-#             "s3:ListAllMyBuckets"
-#           ],
-#           "Resource" : "arn:aws:s3:::*"
-#         },
-#         {
-#           "Effect" : "Allow",
-#           "Action" : ["s3:ListBucket"],
-#           "Resource" : [
-#             "arn:aws:s3:::ccms-ebs-*-dbbackup",
-#             "arn:aws:s3:::ccms-ebs-*-dbbackup/*"
-#           ]
-#         },
-#         {
-#           "Effect" : "Allow",
-#           "Action" : [
-#             "s3:PutObject",
-#             "s3:GetObject",
-#             "s3:ListBucket",
-#             "s3:DeleteObject"
-#           ],
-#           "Resource" : [
-#             "arn:aws:s3:::ccms-ebs-*-dbbackup",
-#             "arn:aws:s3:::ccms-ebs-*-dbbackup/*"
-#           ]
-#         }
-#       ]
-#     }
-#   )
-# }
+  policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:GetBucketLocation",
+            "s3:ListAllMyBuckets"
+          ],
+          "Resource" : "arn:aws:s3:::*"
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : ["s3:ListBucket"],
+          "Resource" : [
+            "arn:aws:s3:::ccms-ebs-${local.component_name}-dbbackup",
+            "arn:aws:s3:::ccms-ebs-${local.component_name}-dbbackup/*"
+          ]
+        },
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "s3:PutObject",
+            "s3:GetObject",
+            "s3:ListBucket",
+            "s3:DeleteObject"
+          ],
+          "Resource" : [
+            "arn:aws:s3:::ccms-ebs-${local.component_name}-dbbackup",
+            "arn:aws:s3:::ccms-ebs-${local.component_name}-dbbackup/*"
+          ]
+        }
+      ]
+    }
+  )
+}
 
-# resource "aws_iam_role_policy_attachment" "rman_to_s3_policy" {
-#   role       = aws_iam_role.role_stsassume_oracle_base.name
-#   policy_arn = aws_iam_policy.rman_to_s3.arn
-# }
+resource "aws_iam_role_policy_attachment" "rman_to_s3_policy" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = aws_iam_policy.rman_to_s3.arn
+}
 
 # # Oracle Licensing policy
 # resource "aws_iam_policy" "oracle_licensing" {
@@ -279,35 +279,35 @@ resource "aws_iam_role_policy_attachment" "ec2_operations_policy_att" {
   policy_arn = aws_iam_policy.ec2_operations_policy.arn
 }
 
-# # S3 shared bucket
+# S3 shared bucket
 
-# data "aws_iam_policy_document" "ccms_ebs_shared_s3" {
-#   statement {
-#     effect = "Allow"
-#     actions = [
-#       "s3:CopyObject",
-#       "s3:DeleteObject",
-#       "s3:DeleteObjects",
-#       "s3:GetObject",
-#       "s3:ListObjects",
-#       "s3:ListObjectsV2",
-#       "s3:ListBucket",
-#       "s3:PutObject"
-#     ]
-#     resources = [
-#       aws_s3_bucket.ccms_ebs_shared.arn,
-#       "${aws_s3_bucket.ccms_ebs_shared.arn}/*"
-#     ]
-#   }
-# }
+data "aws_iam_policy_document" "ccms_ebs_shared_s3" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "s3:CopyObject",
+      "s3:DeleteObject",
+      "s3:DeleteObjects",
+      "s3:GetObject",
+      "s3:ListObjects",
+      "s3:ListObjectsV2",
+      "s3:ListBucket",
+      "s3:PutObject"
+    ]
+    resources = [
+      aws_s3_bucket.ccms_ebs_shared.arn,
+      "${aws_s3_bucket.ccms_ebs_shared.arn}/*"
+    ]
+  }
+}
 
-# resource "aws_iam_policy" "ccms_ebs_shared_s3" {
-#   description = "Policy to allow operations in ${aws_s3_bucket.ccms_ebs_shared.id}"
-#   name        = "ccms_ebs_shared_s3-${local.environment}"
-#   policy      = data.aws_iam_policy_document.ccms_ebs_shared_s3.json
-# }
+resource "aws_iam_policy" "ccms_ebs_shared_s3" {
+  description = "Policy to allow operations in ${aws_s3_bucket.ccms_ebs_shared.id}"
+  name        = "ccms_ebs_shared_s3-${local.component_name}"
+  policy      = data.aws_iam_policy_document.ccms_ebs_shared_s3.json
+}
 
-# resource "aws_iam_role_policy_attachment" "ccms_ebs_shared_s3" {
-#   role       = aws_iam_role.role_stsassume_oracle_base.name
-#   policy_arn = aws_iam_policy.ccms_ebs_shared_s3.arn
-# }
+resource "aws_iam_role_policy_attachment" "ccms_ebs_shared_s3" {
+  role       = aws_iam_role.role_stsassume_oracle_base.name
+  policy_arn = aws_iam_policy.ccms_ebs_shared_s3.arn
+}

@@ -1,11 +1,11 @@
 #### This file can be used to store locals specific to the member account ####
 locals {
-  artefact_bucket_name       = "${local.application_name}-${local.environment}-artefacts"
-  logging_bucket_name        = "${local.application_name}-${local.environment}-logging"
-  rsync_bucket_name          = "${local.application_name}-${local.environment}-dbbackup"
-  lb_log_prefix_ebsapp       = "ebsapps-lb"
-  lb_log_prefix_wgate        = "wgate-lb"
-  lb_log_prefix_wgate_public = "wgate-lb-public"
+  artefact_bucket_name       = "ccms-ebs-${local.component_name}-artefacts"
+  logging_bucket_name        = "ccms-ebs-${local.component_name}-logging"
+  rsync_bucket_name          = "ccms-ebs-${local.component_name}-dbbackup"
+  lb_log_prefix_ebsapp       = "${local.component_name}-ebsapps-lb"
+  lb_log_prefix_wgate        = "${local.component_name}-wgate-lb"
+  lb_log_prefix_wgate_public = "${local.component_name}-wgate-lb-public"
 
   data_subnets = [
     data.aws_subnet.data_subnets_a.id,
