@@ -103,7 +103,7 @@ resource "aws_secretsmanager_secret_version" "ad_credentials" {
   )
 
   lifecycle {
-    ignore_changes = [secret_string.Password]
+    ignore_changes = [secret_string]
   }
 }
 
