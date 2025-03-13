@@ -3,7 +3,7 @@ module "vpc_cni_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.52.2"
+  version = "5.54.0"
 
   role_name_prefix      = "vpc-cni"
   attach_vpc_cni_policy = true
