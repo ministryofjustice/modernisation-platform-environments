@@ -36,15 +36,21 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
+    sid = "S3AthenaQueryBucketListPermissionsForP1Export"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = [module.s3-athena-bucket.bucket.arn]
+  }
+  statement {
     sid = "S3AthenaQueryBucketPermissionsForP1Export"
     effect = "Allow"
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:ListBucket"
     ]
     resources = [
-      "${module.s3-athena-bucket.bucket.arn}/outputs/airflow_export_em_data_p1",
       "${module.s3-athena-bucket.bucket.arn}/outputs/airflow_export_em_data_p1/*",
     ]
   }
