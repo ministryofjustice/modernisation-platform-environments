@@ -141,42 +141,78 @@ locals {
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
+              athena_config = {
+                 primary = {
+                   database  = "grafana_db"
+                   workgroup = "grafana-dashboard"
+                 }
+               }
             },
             "ccms-ebs-preproduction" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
+              athena_config = {
+                 primary = {
+                   database  = "grafana_db"
+                   workgroup = "grafana-dashboard"
+                 }
+               }
             },
             "ccms-ebs-production" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
+              athena_config = {
+                 primary = {
+                   database  = "grafana_db"
+                   workgroup = "grafana-dashboard"
+                 }
+               }
             },
             "ccms-ebs-test" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
+              athena_config = {
+                 primary = {
+                   database  = "grafana_db"
+                   workgroup = "grafana-dashboard"
+                 }
+               }
             },
             "ccms-ebs-upgrade-development" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
+              athena_config = {
+                 primary = {
+                   database  = "grafana_db"
+                   workgroup = "grafana-dashboard"
+                 }
+               }
             },
             "ccms-ebs-upgrade-test" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
-              athena_enabled                  = false
+              athena_enabled                  = true
+              athena_config = {
+                 primary = {
+                   database  = "grafana_db"
+                   workgroup = "grafana-dashboard"
+                 }
+               }
             }
           }
         },
