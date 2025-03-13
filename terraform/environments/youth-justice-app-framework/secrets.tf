@@ -82,3 +82,69 @@ resource "aws_secretsmanager_secret_version" "Unit_test" {
     ignore_changes = [secret_string]
   }
 }
+
+### Tableau Secrets ###
+## Secret to hold Tableau administration details
+resource "aws_secretsmanager_secret" "ad_credentials" {
+  name        = "${local.environment}/Tableau/Administration"
+  description = "Tableau Administration, site, group, user and password."
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+# The password will be polulatd durring tableau instalation
+resource "aws_secretsmanager_secret_version" "ad_credentials" {
+  secret_id = aws_secretsmanager_secret.ad_credentials.id
+  secret_string = jsonencode(
+    { "Tableau Admin Group" = "tsmadmin"
+      "Admin Username"      = "tabadmin"
+      "Password"            = "changeme"}
+  )
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+## Secret to hold the tableau domain user and its passoword
+resource "aws_secretsmanager_secret" "tableau_admin" {
+  name        = "tableau_ad_read_credentials"
+  description = "The tableau user that is used to read ad users and groups. It also acts as the initial Tableau System Administrator on install."
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+# The password will be polulated after the user is imported to AD and before Tableau instalation.
+resource "aws_secretsmanager_secret_version" "tableau_admin" {
+  secret_id = aws_secretsmanager_secret.tableau_admin.id
+  secret_string = jsonencode(
+    { tableau_ad_read_account = "tableau"
+      tableau-ad_read_password = "changeme"}
+  )
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+## Secret to hold the credentials used by YJAF to access tableau
+resource "aws_secretsmanager_secret" "yjaf_credentials" {
+  name        = "${local.environment}/Tableau/app/yjb"
+  description = "Tableau secrets for embedding report into YJAF. Used by Auth service."
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+# The values will be populated after installing Tableau. And may need to be refreshed following cutover.
+resource "aws_secretsmanager_secret_version" "yjaf_credentials" {
+  secret_id = aws_secretsmanager_secret.yjaf_credentials.id
+  secret_string = jsonencode(
+    { ClientID = "changeme"
+      SecretID = "changeme"
+      Value    = "changeme"}
+  )
+
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}

@@ -111,3 +111,4 @@ variable "datadog_api_key_arn" {
   type        = string
   description = "The ARN of the Secret that holds the Datadog API Key."
 }
+
