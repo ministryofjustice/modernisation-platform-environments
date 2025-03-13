@@ -9,7 +9,7 @@ data "grafana_data_source" "this" {
 
 resource "grafana_data_source" "this" {
   type = "grafana-athena-datasource"
-  name = "${local.name}"
+  name = local.name
   json_data_encoded = jsonencode({
     defaultRegion = "eu-west-2"
     catalog       = "AwsDataCatalog"
