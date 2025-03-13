@@ -417,6 +417,14 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       ]
     ])
   }
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = [aws_secretsmanager_secret.airflow_ssh_secret.arn]
+  }
 }
 
 # This is not referenced anywhere else aha
