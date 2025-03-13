@@ -500,3 +500,47 @@ module "share_non_cadt_dbs_with_roles" {
   role_arn                = aws_iam_role.dataapi_cross_role.arn
   de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 }
+
+
+data "aws_secretsmanager_secret" "airflow_ssh_secret" {
+  name = aws_secretsmanager_secret.airflow_secret[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.airflow_ssh_secret]
+}
+
+data "aws_secretsmanager_secret_version" "airflow_ssh_secret" {
+  secret_id = data.aws_secretsmanager_secret.airflow_secret.id
+
+  depends_on = [aws_secretsmanager_secret.airflow_ssh_secret]
+}
+
+
+## DBT Analytics EKS Cluster Identifier
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "airflow_ssh_secret" {
+  count = local.is-preproduction || local.is-production ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.airflow_ssh_secret[0].id
+  secret_string = jsonencode(local.airflow_secret_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+
+  depends_on = [aws_secretsmanager_secret.airflow_ssh_secret]
+}
+
+resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+
+  count = local.is-preproduction || local.is-production ? 1 : 0
+
+  name = "/alpha/airflow/airflow_cadet_deployments/cadet_repo_key/"
+
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.tags
+  )
+}
