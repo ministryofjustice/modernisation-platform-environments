@@ -83,6 +83,7 @@ resource "aws_secretsmanager_secret_version" "Unit_test" {
   }
 }
 
+/*
 ### Tableau Secrets ###
 ## Secret to hold Tableau administration details
 resource "aws_secretsmanager_secret" "ad_credentials" {
@@ -102,7 +103,7 @@ resource "aws_secretsmanager_secret_version" "ad_credentials" {
   )
 
   lifecycle {
-    ignore_changes = [secret_string]
+    ignore_changes = [secret_string.Password]
   }
 }
 
@@ -123,7 +124,7 @@ resource "aws_secretsmanager_secret_version" "tableau_admin" {
   )
 
   lifecycle {
-    ignore_changes = [secret_string]
+    ignore_changes = [secret_string.tableau-ad_read_password]
   }
 }
 
@@ -148,3 +149,4 @@ resource "aws_secretsmanager_secret_version" "yjaf_credentials" {
     ignore_changes = [secret_string]
   }
 }
+*/
