@@ -3,6 +3,10 @@ data "aws_instance" "target_ec2" {
     name   = "tag:Name"
     values = ["YJSM"]
   }
+  filter {
+    name   = "instance-state-name"
+    values = ["running"]
+  }
   depends_on = [
     module.yjsm
   ]
