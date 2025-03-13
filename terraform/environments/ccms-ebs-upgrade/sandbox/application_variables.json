@@ -20,7 +20,7 @@
       "restored_db_image": "ami-0df5f31cae1c86635",
       "orace_base_prereqs_ami_name": "Oracle79-prereqs-v2_0",
       "orace_db_ami_name": "Oracle79-prereqs-v1_8",
-      "key_name": "oracle-base-dev",
+      "key_name": "",
       "lz_aws_workspace_nonprod_subnet_env": "10.200.0.0/20",
       "lz_aws_appstream_subnet_a_b": "10.200.32.0/23",
       "cloud_platform_subnet": "172.20.0.0/16",
