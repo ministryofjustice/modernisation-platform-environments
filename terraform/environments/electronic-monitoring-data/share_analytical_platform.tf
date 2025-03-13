@@ -423,7 +423,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret"
     ]
-    resources = [aws_secretsmanager_secret.airflow_ssh_secret.arn]
+    resources = [aws_secretsmanager_secret.airflow_ssh_secret[0].arn]
   }
 }
 
