@@ -281,7 +281,13 @@ resource "aws_instance" "ad_instance" {
   subnet_id                   = var.private_subnet_ids[count.index % length(var.private_subnet_ids)] # 1st in Subnet a, then b, c, a, etc
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.mgmt_instance_sg.id]
-  tags                        = merge({ "Name" = "mgmt-ad-instance-${count.index + 1}" }, local.tags)
+ 
+  tags = merge(local.all_tags,
+    { "Name"             = "mgmt-ad-instance-${count.index + 1}" },
+    { "OS"               = "Windows"},
+    { "PatchingSchedule" = "Windows1"}
+  )
+
   user_data                   = data.template_file.windows-dc-userdata.rendered
   ebs_optimized               = true
   lifecycle {

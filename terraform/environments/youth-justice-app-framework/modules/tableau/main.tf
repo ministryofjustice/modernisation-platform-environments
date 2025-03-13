@@ -37,14 +37,14 @@ resource "aws_instance" "tableau" {
     }
   }
 
-  tags = {
-    Name          = "Tableau Server"
-    Build         = data.aws_ami.app_ami.name
-    PatchSchedule = var.patch_schedule
-    Schedule      = var.availability_schedule
-    OS            = "Linux"
-    Owner         = "Devops"
-  }
+  tags = merge(local.all_tags,
+    { "Name"          = "Tableau Server" },
+    { "Build"         = data.aws_ami.app_ami.name },
+    { "PatchSchedule" = var.patch_schedule },
+    { "OS"            = "Linux" },
+    { "Owner"         = "Devops" }
+  )
+
 }
 
 module "tableau-alb" {
