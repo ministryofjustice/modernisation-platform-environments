@@ -46,5 +46,8 @@ datadog_api_key_arn = module.datadog.datadog_api_key_arn
 availability_schedule = ""
 patch_schedule = ""
 
+kms_key_arn =  module.kms.key_arn
+
+
 depends_on = [module.tableau_cert, module.aurora, module.redshift, module.ds]
 }

@@ -51,6 +51,12 @@ resource "aws_iam_policy" "datadog_api_read" {
             "Effect": "Allow",
             "Action": "secretsmanager:GetSecretValue"
             "Resource": var.datadog_api_key_arn
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": "kms:Decrypt"
+            "Resource": var.kms_key_arn
         }
     ]
  })

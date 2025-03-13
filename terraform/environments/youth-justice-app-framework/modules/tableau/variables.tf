@@ -112,3 +112,7 @@ variable "datadog_api_key_arn" {
   description = "The ARN of the Secret that holds the Datadog API Key."
 }
 
+variable "kms_key_arn" {
+  type        = string
+  description = "ARN of the AWS KMS key to be used to encrypt secret values."
+}
