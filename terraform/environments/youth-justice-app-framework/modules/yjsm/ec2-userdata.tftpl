@@ -1,5 +1,25 @@
 #!/bin/bash
 
+
+# Stop and remove the existing SSM Agent
+sudo systemctl stop amazon-ssm-agent
+sudo yum remove -y amazon-ssm-agent || sudo snap remove amazon-ssm-agent
+
+# Install the latest SSM Agent
+if [[ -f "/etc/os-release" ]]; then
+    source /etc/os-release
+    if [[ "$ID" == "ubuntu" ]]; then
+        sudo snap install amazon-ssm-agent --classic
+    else
+        sudo yum install -y amazon-ssm-agent
+    fi
+else
+    sudo yum install -y amazon-ssm-agent
+fi
+
+# Start SSM Agent
+sudo systemctl enable amazon-ssm-agent
+sudo systemctl start amazon-ssm-agent
 yum update -y
 yum install -y ruby wget
 cd /home/ec2-user
