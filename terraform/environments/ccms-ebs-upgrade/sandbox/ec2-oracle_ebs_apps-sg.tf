@@ -29,3 +29,11 @@ resource "aws_vpc_security_group_egress_rule" "sandbox_egress" {
   ip_protocol                  = "tcp"
   referenced_security_group_id = aws_security_group.ec2_sg_sandbox.id
 }
+
+resource "aws_vpc_security_group_egress_rule" "sandbox_egress_443" {
+  security_group_id = aws_security_group.ec2_sg_sandbox.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+}
