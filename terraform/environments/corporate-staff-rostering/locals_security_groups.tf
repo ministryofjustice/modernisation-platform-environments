@@ -691,18 +691,18 @@ locals {
           self        = true
         }
         netbios_fsx = {
-          description     = "139: NetBIOS Session Service"
-          from_port       = 139
-          to_port         = 139
-          protocol        = "TCP"
-          security_groups = ["app", "web", "domain", "jumpserver"]
+          description = "139: NetBIOS Session Service"
+          from_port   = 139
+          to_port     = 139
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
         smb_fsx = {
-          description     = "445: Directory Services SMB file sharing"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "TCP"
-          security_groups = ["app", "web", "domain", "jumpserver"]
+          description = "445: Directory Services SMB file sharing"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
         winrm_fsx = {
           description = "5985-5986: WinRM 2.0 (Microsoft Windows Remote Management)"
