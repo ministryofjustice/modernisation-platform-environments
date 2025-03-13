@@ -39,6 +39,7 @@ locals {
           port_mappings = []
           cpu           = 256
           memory        = 512
+          essential     = false
           mount_points = [
             {
               sourceVolume : "hosts",
@@ -91,8 +92,8 @@ locals {
               "value" : "http://private-lb.${local.environment}.yjaf:8080"
             }
           ]
-          entryPoint = ["/bin/sh", "-c"]
-          command    = ["scripts/set-hosts.sh"]
+          entry_point = ["/bin/sh", "-c"]
+          command     = ["scripts/set-hosts.sh"]
         }
       }
     },

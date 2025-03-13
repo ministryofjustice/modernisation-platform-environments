@@ -50,6 +50,7 @@ module "ecs" {
   #RDS Details
   rds_postgresql_sg_id = module.aurora.rds_cluster_security_group_id
 
+  secret_kms_key_arn = module.kms.key_arn
   ecs_secrets_access_policy_secret_arns = jsonencode([
     module.aurora.app_rotated_postgres_secret_arn,
     aws_secretsmanager_secret.LDAP_administration_secret.arn,
