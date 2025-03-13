@@ -417,13 +417,18 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       ]
     ])
   }
+}
+
+data "aws_iam_policy_document" "allow_airflow_ssh_key" {
+  count = local.is-preproduction || local.is-production ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret"
+      "secretsmanager:GetSecretValue"
     ]
-    resources = [aws_secretsmanager_secret.airflow_ssh_secret[0].arn]
+    resources = [
+      data.aws_secretsmanager_secret.airflow_ssh_secret.arn
+    ]
   }
 }
 
@@ -452,6 +457,13 @@ resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
   for_each = local.analytical_platform_share
 
   name   = "${each.value.target_account_name}-share-policy"
+  role   = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
+}
+
+resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
+  count  = local.is-preproduction || local.is-production ? 1 : 0
+  name   = "${each.value.target_account_name}-secrets-allow-policy"
   role   = aws_iam_role.analytical_platform_share_role[each.key].name
   policy = data.aws_iam_policy_document.analytical_platform_share_policy[each.key].json
 }
