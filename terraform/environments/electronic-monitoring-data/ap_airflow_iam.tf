@@ -44,8 +44,8 @@ data "aws_iam_policy_document" "p1_export_airflow" {
       "s3:ListBucket"
     ]
     resources = [
-      module.s3-athena-bucket.bucket.arn,
-      "${module.s3-athena-bucket.bucket.arn}/*",
+      "${module.s3-athena-bucket.bucket.arn}/outputs/airflow_export_em_data_p1",
+      "${module.s3-athena-bucket.bucket.arn}/outputs/airflow_export_em_data_p1/*",
     ]
   }
   statement {
@@ -85,7 +85,10 @@ data "aws_iam_policy_document" "p1_export_airflow" {
   statement {
     sid       = "ListAllBuckesForP1Export"
     effect    = "Allow"
-    actions   = ["s3:ListAllMyBuckets", "s3:GetBucketLocation"]
+    actions   = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
     resources = ["*"]
   }
 }
