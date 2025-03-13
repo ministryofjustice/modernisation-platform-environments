@@ -77,6 +77,24 @@ module "directory_service_sg" {
   ]
 }
 
+module "management_service_sg" {
+  source  = "terraform-aws-modules/security-group/aws"
+  version = "4.13.0"
+
+  vpc_id            = var.vpc_id
+  security_group_id = var.management_server_sg_id
+  create_sg         = false
+
+  egress_with_source_security_group_id = [
+    {
+      to_port = "8850"
+      from_port = "8850"
+      protocol = "tcp"
+      source_security_group_id = module.tableau_sg.security_group_id
+    }
+  ]
+}
+
 module "postgresql_sg" {
   source = "./add_rules_to_sg"
 
