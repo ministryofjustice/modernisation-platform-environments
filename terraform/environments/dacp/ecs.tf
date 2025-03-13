@@ -24,13 +24,13 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
   cpu                      = 2048
-  memory                   = 4096
+  memory                   = 8192
   container_definitions = jsonencode([
     {
       name                   = "dacp-container"
       image                  = "${aws_ecr_repository.dacp_ecr_repo.repository_url}:latest"
       cpu                    = 2048
-      memory                 = 4096
+      memory                 = 8192
       essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {

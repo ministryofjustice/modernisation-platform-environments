@@ -23,7 +23,7 @@ variable "trigger_event_pattern" {
 variable "trigger_input_event" {
   description = "(Optional) JSON event which will be sent to the lambda"
   type        = string
-  default = null
+  default     = null
 }
 
 variable "lambda_function_name" {

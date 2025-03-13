@@ -1114,7 +1114,6 @@ resource "aws_s3_bucket" "moj-database-source-dev" {
   # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
   # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
-  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
   count  = local.is-development == true ? 1 : 0
   bucket = "moj-database-source-dev"
   tags = merge(
@@ -1159,37 +1158,21 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-dev" {
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
-    noncurrent_version_transition {
-      noncurrent_days = 30
-      storage_class   = "STANDARD_IA"
-    }
-    transition {
-      days          = 30
-      storage_class = "STANDARD_IA"
-    }
     expiration {
-      days = 60
+      days = 14
     }
   }
 }
 
-/*
-resource "aws_s3_bucket_policy" "s3_bucket_policy_moj_database_source_dev" {
-  count  = local.is-development == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-database-source-dev[0].id
-  policy = aws_iam_policy.iam_policy_s3_bucket_moj_database_source_dev[0].policy
-}
-*/
-
 resource "aws_s3_bucket_replication_configuration" "moj-database-source-dev-replication" {
-  count  = local.is-development == true ? 1 : 0
+  count = local.is-development == true ? 1 : 0
   # Must have bucket versioning enabled first
   depends_on = [aws_s3_bucket_versioning.moj-database-source-dev]
-  role   = aws_iam_role.iam_role_s3_bucket_moj_database_source_dev[0].arn
-  bucket = aws_s3_bucket.moj-database-source-dev[0].id
+  role       = aws_iam_role.iam_role_s3_bucket_moj_database_source_dev[0].arn
+  bucket     = aws_s3_bucket.moj-database-source-dev[0].id
 
   rule {
-    id = "ppud-database-replication-rule-dev"
+    id     = "ppud-database-replication-rule-dev"
     status = "Enabled"
     destination {
       bucket        = "arn:aws:s3:::mojap-data-engineering-production-ppud-dev"
@@ -1257,6 +1240,151 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
         "Resource" : [
           "arn:aws:s3:::moj-database-source-dev",
           "arn:aws:s3:::moj-database-source-dev/*"
+        ],
+        "Principal" : {
+          "AWS" : [
+            "arn:aws:iam::${local.environment_management.account_ids["ppud-development"]}:role/ec2-iam-role"
+          ]
+        }
+      }
+    ]
+  })
+}
+
+# S3 Bucket for Report Replication to MPC Service for Development
+
+resource "aws_s3_bucket" "moj-report-source-dev" {
+  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
+  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
+  # checkov:skip=CKV_AWS_144: "PPUD has a UK Sovereignty requirement so cross region replication is prohibited"
+  count  = local.is-development == true ? 1 : 0
+  bucket = "moj-report-source-dev"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-moj-report-source-dev"
+    }
+  )
+}
+
+resource "aws_s3_bucket_versioning" "moj-report-source-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-report-source-dev[0].id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_logging" "moj-report-source-dev" {
+  count         = local.is-development == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-report-source-dev[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  target_prefix = "s3-logs/moj-report-source-dev-logs/"
+}
+
+resource "aws_s3_bucket_public_access_block" "moj-report-source-dev" {
+  count                   = local.is-development == true ? 1 : 0
+  bucket                  = aws_s3_bucket.moj-report-source-dev[0].id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-dev" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-report-source-dev[0].id
+  rule {
+    id     = "delete-moj-report-source-dev"
+    status = "Enabled"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+    expiration {
+      days = 14
+    }
+  }
+}
+
+
+resource "aws_s3_bucket_replication_configuration" "moj-report-source-dev-replication" {
+  count = local.is-development == true ? 1 : 0
+  # Must have bucket versioning enabled first
+  depends_on = [aws_s3_bucket_versioning.moj-report-source-dev]
+  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_dev[0].arn
+  bucket     = aws_s3_bucket.moj-report-source-dev[0].id
+
+  rule {
+    id     = "ppud-report-replication-rule-dev"
+    status = "Enabled"
+    destination {
+      bucket        = "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9"
+      storage_class = "STANDARD"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "moj-report-source-dev" {
+  count  = local.is-development == true ? 1 : 0
+  bucket = aws_s3_bucket.moj-report-source-dev[0].id
+
+  policy = jsonencode({
+
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-report-source-dev",
+          "arn:aws:s3:::moj-report-source-dev/*"
+        ],
+        "Principal" : {
+          Service = "logging.s3.amazonaws.com"
+        }
+      },
+      {
+        "Action" : [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-report-source-dev",
+          "arn:aws:s3:::moj-report-source-dev/*"
+        ],
+        "Principal" : {
+          Service = "sns.amazonaws.com"
+        }
+      },
+
+      {
+        "Action" : [
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Effect" : "Allow",
+        "Resource" : [
+          "arn:aws:s3:::moj-report-source-dev",
+          "arn:aws:s3:::moj-report-source-dev/*"
         ],
         "Principal" : {
           "AWS" : [

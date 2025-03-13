@@ -147,6 +147,25 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}:aud"
     }
   }
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.analytical_platform_compute.arn]
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["system:serviceaccount:airflow:*"]
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:sub"
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["sts.amazonaws.com"]
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:aud"
+    }
+  }
 }
 
 # Role used in create a derived table 
@@ -438,7 +457,12 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
 }
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = flatten([[for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn], data.aws_iam_session_context.current.issuer_arn, try(one(data.aws_iam_roles.data_engineering_roles.arns), [])])
+  admins = flatten([
+    [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
+    data.aws_iam_session_context.current.issuer_arn,
+    try(one(data.aws_iam_roles.data_engineering_roles.arns),
+    [])]
+  )
 
   # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
   # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal

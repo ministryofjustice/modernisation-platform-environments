@@ -18,7 +18,7 @@ locals {
   iam-prod = local.environment_shorthand == "prod" ? [
     var.cloud-platform-iam-prod
   ] : null
-  
+
   tables_to_share = [
     "contact_history",
     "equipment_details",
@@ -199,6 +199,11 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "glue:GetTable"
     ]
     resources = local.glue_arns
+  }
+  statement {
+    effect    = "Allow"
+    actions   = ["execute-api:Invoke"]
+    resources = ["arn:aws:execute-api:${data.aws_region.current.name}:${local.env_account_id}:${module.get_zipped_file_api_api.api_gateway_id}/*"]
   }
 }
 
