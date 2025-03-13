@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     ]
     resources = [
       module.s3-athena-bucket.bucket.arn,
-      "${module.s3-athena-bucket.bucket.arn}/outputs/airflow_export_em_data_p1/*",
+      "${module.s3-athena-bucket.bucket.arn}/output/airflow_export_em_data_p1/*",
     ]
   }
   statement {
