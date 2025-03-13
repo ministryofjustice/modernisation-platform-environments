@@ -5,7 +5,8 @@ module "oracle_observer" {
   certificate_arn = null
 
   # Do not create an Oracle Observer microservice if it has no configuration
-  count         = lookup(var.delius_microservice_configs, "oracle_observer", null) != null ? 1 : 0
+  count         = 0
+  # count         = lookup(var.delius_microservice_configs, "oracle_observer", null) != null ? 1 : 0
   desired_count = try(var.delius_microservice_configs.oracle_observer, {}) == {} ? 0 : 1
 
   container_secrets_env_specific = {}
