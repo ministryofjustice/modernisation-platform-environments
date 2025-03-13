@@ -87,7 +87,7 @@ resource "aws_secretsmanager_secret_version" "Unit_test" {
 ### Tableau Secrets ###
 ## Secret to hold Tableau administration details
 resource "aws_secretsmanager_secret" "ad_credentials" {
-  name        = "${local.environment} "
+  name        = "${local.environment}/Tableau/Administration "
   description = "Tableau Administration, site, group, user and password."
   kms_key_id  = module.kms.key_id
   tags        = local.tags
@@ -103,7 +103,7 @@ resource "aws_secretsmanager_secret_version" "ad_credentials" {
   )
 
   lifecycle {
-    ignore_changes = [secret_string]
+    ignore_changes = [secret_string.Password]
   }
 }
 
