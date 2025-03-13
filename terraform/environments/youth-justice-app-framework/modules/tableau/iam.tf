@@ -26,30 +26,6 @@ resource "aws_iam_policy" "tableau_s3_backup" {
  })
 }
 
-#create a policy to all management instance to download files from the install-files bucket
-resource "aws_iam_policy" "read_s3_tableau_software" {
-  name        = "read_s3_tableau_software"
-  description = "Use to enable ec2 Instances to retrieve software from S3 bucket <enviroment>-install-files"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "VisualEditor0",
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:GetObject",
-          "s3:GetObjectTagging",
-          "s3:ListBucket"
-        ],
-        "Resource" : ["arn:aws:s3:::${var.project_name}-${var.environment}-install-files/*",
-          "arn:aws:s3:::${var.project_name}-${var.environment}-install-files"
-        ]
-      }
-    ]
-  })
-
-  tags = local.all_tags
-}
 
 ## Policy to enable reading of the Datadog API Key
 resource "aws_iam_policy" "datadog_api_read" {
@@ -63,16 +39,17 @@ resource "aws_iam_policy" "datadog_api_read" {
             "Sid": "VisualEditor0",
             "Effect": "Allow",
             "Action": [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:DeleteObject"
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:ListSecretVersionIds",
+                "secretsmanager:ListSecrets"
             ],
-            "Resource": var.datadog_api_key_arn
+            "Resource": ["*"]
         },
         {
             "Sid": "VisualEditor1",
             "Effect": "Allow",
-            "Action": "s3:ListBucket",
+            "Action": "secretsmanager:GetSecretValue"
             "Resource": var.datadog_api_key_arn
         }
     ]
@@ -105,7 +82,6 @@ locals {
         key2 = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
         key3 = aws_iam_policy.tableau_s3_backup.arn
         key4 = aws_iam_policy.datadog_api_read.arn
-        key5 = aws_iam_policy.read_s3_tableau_software.arn
     }
 }
 
