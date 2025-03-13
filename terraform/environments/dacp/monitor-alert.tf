@@ -17,7 +17,7 @@ resource "aws_sns_topic" "dacp_utilisation_alarm" {
 # SNS Topic Subscriptions to configure alarm actions
 resource "aws_sns_topic_subscription" "email_subscription" {
   count     = local.is-development ? 0 : 1
-  topic_arn = aws_sns_topic.email_topic.arn
+  topic_arn = aws_sns_topic.email_topic[0].arn
   protocol  = "email"
   endpoint  = local.application_data.accounts[local.environment].support_email
 }
@@ -35,9 +35,9 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_high_ram_alarm" {
   threshold           = 1500
   alarm_description   = "This alarm monitors Memory utilization of an ECS Fargate service (in MB)"
   alarm_actions       = [
-                          aws_appautoscaling_policy.scale_up_amber.arn,
+                          aws_appautoscaling_policy.scale_up_amber[0].arn,
                           aws_sns_topic.dacp_utilisation_alarm[0].arn,
-                          aws_sns_topic.email_topic.arn
+                          aws_sns_topic.email_topic[0].arn
   ]
   dimensions = {
     ClusterName = "dacp_cluster"
@@ -57,9 +57,9 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_normal_ram_alarm" {
   threshold           = 1500
   alarm_description   = "This alarm monitors Memory utilization of an ECS Fargate service"
   alarm_actions       = [
-    aws_appautoscaling_policy.scale_down_amber.arn,
+    aws_appautoscaling_policy.scale_down_amber[0].arn,
     aws_sns_topic.dacp_utilisation_alarm[0].arn,
-    aws_sns_topic.email_topic.arn
+    aws_sns_topic.email_topic[0].arn
   ]
   dimensions = {
     ClusterName = "dacp_cluster"
