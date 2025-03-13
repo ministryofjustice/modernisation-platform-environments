@@ -48,7 +48,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_high_ram_alarm" {
 resource "aws_cloudwatch_metric_alarm" "ecs_service_normal_ram_alarm" {
   count               = local.is-development ? 0 : 1
   alarm_name          = "ecs_service_normal_ram_alarm"
-  comparison_operator = "LowerThanThreshold"
+  comparison_operator = "LessThanThreshold"
   evaluation_periods  = 3
   metric_name         = "MemoryUtilized"
   namespace           = "ECS/ContainerInsights"
