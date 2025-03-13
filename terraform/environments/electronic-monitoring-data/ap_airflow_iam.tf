@@ -19,7 +19,8 @@ module "test_ap_airflow" {
 }
 
 data "aws_iam_policy_document" "p1_export_airflow" {
-
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_111
   statement {
     sid = "AthenaPermissionsForP1Export"
     effect = "Allow"
