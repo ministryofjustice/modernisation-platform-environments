@@ -1,0 +1,43 @@
+resource "aws_appautoscaling_target" "ecs_service" {
+  service_namespace  = "ecs"
+  resource_id        = "service/dacp_cluster/dacp"
+  scalable_dimension = "ecs:service:DesiredCount"
+  min_capacity       = 2
+  max_capacity       = 4
+}
+
+resource "aws_appautoscaling_policy" "scale_up_amber" {
+  name                   = "scale-up-amber"
+  service_namespace      = "ecs"
+  resource_id            = aws_appautoscaling_target.ecs_service.resource_id
+  scalable_dimension     = "ecs:service:DesiredCount"
+  policy_type            = "StepScaling"
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 120
+
+    step_adjustment {
+      scaling_adjustment    = 1
+      metric_interval_lower_bound = 0
+    }
+  }
+}
+
+resource "aws_appautoscaling_policy" "scale_down_amber" {
+  name                   = "scale-down-amber"
+  service_namespace      = "ecs"
+  resource_id            = aws_appautoscaling_target.ecs_service.resource_id
+  scalable_dimension     = "ecs:service:DesiredCount"
+  policy_type            = "StepScaling"
+
+  step_scaling_policy_configuration {
+    adjustment_type         = "ChangeInCapacity"
+    cooldown                = 120
+
+    step_adjustment {
+      scaling_adjustment    = -1
+      metric_interval_lower_bound = 0
+    }
+  }
+}
