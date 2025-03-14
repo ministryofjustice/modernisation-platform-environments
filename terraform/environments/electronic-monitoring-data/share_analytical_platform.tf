@@ -461,7 +461,7 @@ resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
   policy = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
 }
 
-resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
+resource "aws_iam_role_policy" "analytical_platform_secret_share_policy_attachment" {
   count  = local.is-preproduction || local.is-production ? 1 : 0
   name   = "${each.value.target_account_name}-secrets-allow-policy"
   role   = aws_iam_role.analytical_platform_share_role["analytical-platform-data-production"].name
