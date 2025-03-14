@@ -959,7 +959,7 @@ resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-production == true ? 1 : 0
   filename                       = "${path.module}/lambda_scripts/securityhub_report_prod.zip"
-  function_name                  = "securityhub_report"
+  function_name                  = "securityhub_report_prod"
   role                           = aws_iam_role.lambda_role_securityhub_get_data_prod[0].arn
   handler                        = "securityhub_report_prod.lambda_handler"
   runtime                        = "python3.12"
@@ -1013,10 +1013,11 @@ resource "aws_lambda_permission" "allow_lambda_to_query_securityhub_securityhub_
 }
 
 resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-development == true ? 1 : 0
   filename                       = "${path.module}/lambda_scripts/securityhub_report_dev.zip"
-  function_name                  = "securityhub_report"
+  function_name                  = "securityhub_report_dev"
   role                           = aws_iam_role.lambda_role_securityhub_get_data_dev[0].arn
   handler                        = "securityhub_report_dev.lambda_handler"
   runtime                        = "python3.12"

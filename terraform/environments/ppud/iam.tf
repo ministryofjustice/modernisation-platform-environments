@@ -1565,6 +1565,17 @@ resource "aws_iam_policy" "iam_policy_for_lambda_securityhub_get_data_dev" {
         "Resource" : [
           "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
         ]
+      },
+      {
+        "Sid" : "SESPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "ses:*"
+        ],
+        "Resource" : [
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
+        ]
       }
     ]
   })
