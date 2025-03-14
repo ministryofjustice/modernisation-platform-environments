@@ -998,3 +998,55 @@ resource "aws_cloudwatch_log_group" "lambda_security_hub_report_prod_log_group" 
   name              = "/aws/lambda/security_hub_report"
   retention_in_days = 30
 }
+
+###############################################
+# Lambda Function for Security Hub Report - DEV
+###############################################
+
+resource "aws_lambda_permission" "allow_lambda_to_query_securityhub_securityhub_report_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowAccesstoSecurityHub"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_securityhub_report_dev[0].function_name
+  principal     = "securityhub.amazonaws.com"
+  source_arn    = "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+}
+
+resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_dev" {
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
+  count                          = local.is-development == true ? 1 : 0
+  filename                       = "${path.module}/lambda_scripts/securityhub_report_dev.zip"
+  function_name                  = "securityhub_report"
+  role                           = aws_iam_role.lambda_role_securityhub_get_data_dev[0].arn
+  handler                        = "securityhub_report_dev.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_dev]
+  reserved_concurrent_executions = 5
+  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+}
+
+# Archive the zip file
+
+data "archive_file" "zip_the_securityhub_report_code_dev" {
+  count       = local.is-development == true ? 1 : 0
+  type        = "zip"
+  source_dir  = "${path.module}/lambda_scripts/"
+  output_path = "${path.module}/lambda_scripts/securityhub_report_dev.zip"
+}
+
+# Cloudwatch log group for the lambda function
+
+resource "aws_cloudwatch_log_group" "lambda_security_hub_report_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/securityhub_report_dev"
+  retention_in_days = 30
+}
