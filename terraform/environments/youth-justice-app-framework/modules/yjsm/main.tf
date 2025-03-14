@@ -21,7 +21,6 @@ data "template_file" "userdata" {
 }
 
 
-
 resource "aws_instance" "yjsm" {
   ami                    = "ami-0beda59d2c535524f"
   instance_type          = "t3a.xlarge"  
@@ -32,9 +31,6 @@ resource "aws_instance" "yjsm" {
   vpc_security_group_ids = [aws_security_group.yjsm_service.id]
   subnet_id              = var.subnet_id
   tags                   = local.all_tags
-
-
-
 
 
   metadata_options {
