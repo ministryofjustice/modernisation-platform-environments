@@ -285,7 +285,6 @@ resource "aws_iam_role_policy" "app_execution" {
                "secretsmanager:GetSecretValue"
            ],
           "Resource": "arn:aws:secretsmanager:*:${local.modernisation_platform_account_id}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
-arn:aws:secretsmanager:eu-west-2:500540837707:secret:rds-password-jgHdi8
           "Effect": "Allow"
       }
     ]
