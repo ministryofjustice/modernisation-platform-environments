@@ -15,6 +15,7 @@ on:
   schedule:
     # * is a special character in YAML so you have to quote this string
     # trigger every sunday at 12:00am
+    # Some dummy text to trigger a dry run....
     - cron: '0 12 * * 0'
   workflow_dispatch:
 env:
