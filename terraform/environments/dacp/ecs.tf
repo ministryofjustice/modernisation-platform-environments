@@ -264,12 +264,29 @@ resource "aws_iam_role_policy" "app_execution" {
     "Statement": [
       {
            "Action": [
-              "ecr:*",
-              "logs:*",
-              "secretsmanager:GetSecretValue"
+               "logs:CreateLogStream",
+               "logs:PutLogEvents",
+               "ecr:GetAuthorizationToken"
            ],
            "Resource": "*",
            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:BatchCheckLayerAvailability",
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:BatchGetImage"
+            ],
+            "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:repository/${aws_ecr_repository.dacp_ecr_repo.arn}",
+            "Effect": "Allow"
+      },
+      {
+          "Action": [
+               "secretsmanager:GetSecretValue"
+           ],
+          "Resource": "arn:aws:secretsmanager:*:${local.modernisation_platform_account_id}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
+arn:aws:secretsmanager:eu-west-2:500540837707:secret:rds-password-jgHdi8
+          "Effect": "Allow"
       }
     ]
   }

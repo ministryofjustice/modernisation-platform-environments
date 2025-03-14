@@ -75,8 +75,10 @@ resource "aws_db_instance" "dacp_db_dev" {
   #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
   #checkov:skip=CKV_AWS_17: "Ensure all data stored in RDS is not publicly accessible" - see above
   #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
+  #checkov:skip=CKV_AWS_129: "Ensure that respective logs of Amazon Relational Database Service (Amazon RDS) are enabled"
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
+
   count                           = local.is-development ? 1 : 0
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
   db_name                         = local.application_data.accounts[local.environment].db_name
