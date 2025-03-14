@@ -132,7 +132,7 @@ locals {
   }
 
   sftp_account_scram_am = {
-    name       = "am"
+    name       = "alcohol_monitoring"
     ssh_keys   = local.scram_ssh_keys
     cidr_ipv4s = local.scram_cidr_ipv4s
     cidr_ipv6s = local.scram_cidr_ipv6s
