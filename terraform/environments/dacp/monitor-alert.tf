@@ -1,21 +1,19 @@
 # SNS Topics for linking to Alarms
 resource "aws_sns_topic" "email_topic" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
   count = local.is-development ? 0 : 1
   name  = "email-topic"
 }
 
-resource "aws_sns_topic" "ddos_alarm" {
-  count = local.is-development ? 0 : 1
-  name  = "dacp_ddos_alarm"
-}
-
 resource "aws_sns_topic" "dacp_utilisation_alarm" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
   count = local.is-development ? 0 : 1
   name  = "dacp_utilisation_alarm"
 }
 
 # SNS Topic Subscriptions to configure alarm actions
 resource "aws_sns_topic_subscription" "email_subscription" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
   count     = local.is-development ? 0 : 1
   topic_arn = aws_sns_topic.email_topic[0].arn
   protocol  = "email"
@@ -81,24 +79,6 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
   alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]
   dimensions = {
     ClusterName = aws_ecs_cluster.dacp_cluster.name
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
-  count               = local.is-development ? 0 : 1
-  alarm_name          = "DDoSDetected"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "3"
-  metric_name         = "DDoSDetected"
-  namespace           = "AWS/DDoSProtection"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "0"
-  alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
-  treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.ddos_alarm[0].arn]
-  dimensions = {
-    ResourceArn = aws_lb.dacp_lb.arn
   }
 }
 

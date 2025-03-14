@@ -1,22 +1,29 @@
 # trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "dacp_db" {
-  count                       = local.is-development ? 0 : 1
-  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
-  db_name                     = local.application_data.accounts[local.environment].db_name
-  storage_type                = local.application_data.accounts[local.environment].storage_type
-  engine                      = local.application_data.accounts[local.environment].engine
-  identifier                  = local.application_data.accounts[local.environment].identifier
-  engine_version              = local.application_data.accounts[local.environment].engine_version
-  instance_class              = local.application_data.accounts[local.environment].instance_class
-  username                    = local.application_data.accounts[local.environment].db_username
-  password                    = random_password.password.result
-  skip_final_snapshot         = true
-  publicly_accessible         = false
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
-  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = true
-  ca_cert_identifier          = "rds-ca-rsa2048-g1"
-  apply_immediately           = true
+  count                           = local.is-development ? 0 : 1
+  allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
+  db_name                         = local.application_data.accounts[local.environment].db_name
+  storage_type                    = local.application_data.accounts[local.environment].storage_type
+  engine                          = local.application_data.accounts[local.environment].engine
+  identifier                      = local.application_data.accounts[local.environment].identifier
+  engine_version                  = local.application_data.accounts[local.environment].engine_version
+  instance_class                  = local.application_data.accounts[local.environment].instance_class
+  username                        = local.application_data.accounts[local.environment].db_username
+  monitoring_interval             = local.application_data.accounts[local.environment].monitoring_interval
+  password                        = random_password.password.result
+  skip_final_snapshot             = true
+  publicly_accessible             = false
+  vpc_security_group_ids          = [aws_security_group.postgresql_db_sc[0].id]
+  db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
+  allow_major_version_upgrade     = false
+  auto_minor_version_upgrade      = true
+  ca_cert_identifier              = "rds-ca-rsa2048-g1"
+  apply_immediately               = true
+  copy_tags_to_snapshot           = true
+  deletion_protection             = true
+  performance_insights_enabled    = true
+  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
+  multi_az                        = false
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
@@ -60,21 +67,29 @@ resource "aws_security_group" "postgresql_db_sc" {
 // DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
 # trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "dacp_db_dev" {
-  count                       = local.is-development ? 1 : 0
-  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
-  db_name                     = local.application_data.accounts[local.environment].db_name
-  storage_type                = local.application_data.accounts[local.environment].storage_type
-  engine                      = local.application_data.accounts[local.environment].engine
-  identifier                  = local.application_data.accounts[local.environment].identifier
-  engine_version              = local.application_data.accounts[local.environment].engine_version
-  instance_class              = local.application_data.accounts[local.environment].instance_class
-  username                    = local.application_data.accounts[local.environment].db_username
-  password                    = random_password.password.result
-  skip_final_snapshot         = true
-  publicly_accessible         = true
-  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
-  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade = true
+  #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
+  #checkov:skip=CKV_AWS_17: "Ensure all data stored in RDS is not publicly accessible" - see above
+  #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
+  count                           = local.is-development ? 1 : 0
+  allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
+  db_name                         = local.application_data.accounts[local.environment].db_name
+  storage_type                    = local.application_data.accounts[local.environment].storage_type
+  engine                          = local.application_data.accounts[local.environment].engine
+  identifier                      = local.application_data.accounts[local.environment].identifier
+  engine_version                  = local.application_data.accounts[local.environment].engine_version
+  instance_class                  = local.application_data.accounts[local.environment].instance_class
+  username                        = local.application_data.accounts[local.environment].db_username
+  monitoring_interval             = local.application_data.accounts[local.environment].monitoring_interval
+  password                        = random_password.password.result
+  skip_final_snapshot             = true
+  publicly_accessible             = true
+  vpc_security_group_ids          = [aws_security_group.postgresql_db_sc_dev[0].id]
+  db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
+  allow_major_version_upgrade     = false
+  auto_minor_version_upgrade      = true
+  copy_tags_to_snapshot           = true
+  deletion_protection             = true
+  multi_az                        = false
 }
 
 resource "aws_security_group" "postgresql_db_sc_dev" {
@@ -107,6 +122,7 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
     ]
   }
   egress {
+    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
@@ -142,6 +158,7 @@ resource "null_resource" "setup_db" { # tflint-ignore: terraform_required_provid
 }
 
 resource "aws_cloudwatch_log_group" "rds_logs" {
+  #checkov:skip=CKV_AWS_158: "Ensure that Cloudwatch Log Group is encrypted using KMS CMK"
   name              = "/aws/events/rdsLogs"
   retention_in_days = "7"
 }

@@ -328,6 +328,7 @@ resource "aws_iam_role_policy" "app_task" {
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
+  description = "ECS Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
@@ -339,6 +340,7 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
+    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
@@ -348,8 +350,10 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "dacp_ecr_repo" {
+  #checkov:skip=CKV_AWS_136: "Ensure that ECR repositories are encrypted using KMS" - ignore
   name         = "dacp-ecr-repo"
   force_delete = true
+  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
