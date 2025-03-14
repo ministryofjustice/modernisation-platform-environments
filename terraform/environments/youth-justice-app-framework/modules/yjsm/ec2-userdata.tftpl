@@ -1,21 +1,14 @@
 #!/bin/bash
 
+# Remove any existing installation of the amazon-ssm-agent
+sudo yum remove -y amazon-ssm-agent
 
-# Stop and remove the existing SSM Agent
-sudo systemctl stop amazon-ssm-agent
-sudo yum remove -y amazon-ssm-agent || sudo snap remove amazon-ssm-agent
+# Install amazon-ssm-agent
+sudo yum install -y amazon-ssm-agent
 
-# Install the latest SSM Agent
-if [[ -f "/etc/os-release" ]]; then
-    source /etc/os-release
-    if [[ "$ID" == "ubuntu" ]]; then
-        sudo snap install amazon-ssm-agent --classic
-    else
-        sudo yum install -y amazon-ssm-agent
-    fi
-else
-    sudo yum install -y amazon-ssm-agent
-fi
+# Enable and start the amazon-ssm-agent service
+sudo systemctl enable amazon-ssm-agent
+sudo systemctl start amazon-ssm-agent
 
 # Start SSM Agent
 sudo systemctl enable amazon-ssm-agent
