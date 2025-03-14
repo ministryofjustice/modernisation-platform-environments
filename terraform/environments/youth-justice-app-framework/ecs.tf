@@ -20,7 +20,7 @@ module "ecs" {
   ec2_instance_type    = "m5.xlarge"
   ec2_min_size         = 1
   ec2_max_size         = 8
-  ec2_desired_capacity = 5
+  ec2_desired_capacity = 8
   nameserver           = join(".", [split(".", data.aws_vpc.shared.cidr_block)[0], split(".", data.aws_vpc.shared.cidr_block)[1], "0", "2"]) #eg "10.23.0.2"
 
   spot_overrides = [
@@ -59,7 +59,8 @@ module "ecs" {
     aws_secretsmanager_secret.auto_admit_secret.arn,
     aws_secretsmanager_secret.Unit_test.arn,
     module.ses.ses_secret_arn,
-    aws_secretsmanager_secret.s3_user_secret.arn
+    aws_secretsmanager_secret.s3_user_secret.arn,
+    aws_secretsmanager_secret.yjaf_credentials.arn
   ])
   ecs_role_additional_policies_arns = [
     aws_iam_policy.s3-access.arn
