@@ -7,7 +7,7 @@ module "vpc" {
   azs             = local.availability_zones
   cidr            = local.application_data.accounts[local.environment].vpc_cidr
   private_subnets = local.private_subnets
-  
+
   # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
   enable_flow_log                      = true
   create_flow_log_cloudwatch_log_group = true
@@ -93,5 +93,7 @@ resource "aws_subnet" "vsrx_subnets" {
   availability_zone       = each.value.az
   map_public_ip_on_launch = false
 
-  tags = local.tags
+  tags = merge(local.tags, {
+    Name = each.key
+  })
 }
