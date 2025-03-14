@@ -1,7 +1,7 @@
 ## AWS Resolver Endpoint security group
 resource "aws_security_group" "aws_dns_resolver" {
   provider    = aws.core-vpc
-  name        = "dns_resolver"
+  name        = "yjaf-dns-resolver"
   description = "Security Group for DNS resolver request"
   vpc_id      = data.aws_vpc.shared.id
 }
