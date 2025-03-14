@@ -267,7 +267,7 @@ resource "aws_iam_role_policy" "app_execution" {
                "logs:CreateLogStream",
                "logs:PutLogEvents"
            ],
-           "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:log-group:*",
+           "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:log-group:*",
            "Effect": "Allow"
       },
       {
@@ -335,7 +335,7 @@ resource "aws_iam_role_policy" "app_task" {
           "iam:*",
           "ec2:*"
         ],
-       "Resource": "*"
+       "Resource": "arn:aws:*:*:${local.modernisation_platform_account_id}:*"
      }
    ]
   }

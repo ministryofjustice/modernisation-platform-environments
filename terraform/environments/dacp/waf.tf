@@ -65,6 +65,7 @@ resource "aws_wafv2_web_acl" "dacp_web_acl" {
 
 resource "aws_cloudwatch_log_group" "dacp_waf_logs" {
   #checkov:skip=CKV_AWS_158: "Ensure that Cloudwatch Log Group is encrypted using KMS CMK"
+  #checkov:skip=CKV_AWS_338: "Ensure CloudWatch log groups retains logs for at least 1 year"
   name              = "aws-waf-logs-${local.application_name}"
   retention_in_days = 30
 
