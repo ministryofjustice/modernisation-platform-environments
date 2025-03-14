@@ -1,24 +1,49 @@
-module "route53_endpoint_sg" {
-    source  = "terraform-aws-modules/security-group/aws"
-    version = "4.13.0"
-  
-    vpc_id      = data.aws_vpc.shared.id
-    name        = "Route53 to Local DNS"
-    description = "Control access from Route 53 to the Directory Service."
-  
-    egress_with_source_security_group_id = [{
-      description              = "Route53 to Local DNS TCP"
-      rule                     = "dns-tcp"
-      source_security_group_id = module.ds.directory_service_sg_id
-    },
-    {
-      description              = "Route53 to Local DNS UDP"
-      rule                     = "dns-udp"
-      source_security_group_id = module.ds.directory_service_sg_id
-    }]
-  
+## AWS Resolver Endpoint security group
+resource "aws_security_group" "aws_dns_resolver" {
+  provider    = aws.core-vpc
+  name        = "dns_resolver"
+  description = "Security Group for DNS resolver request"
+  vpc_id      = data.aws_vpc.shared.id
 }
 
+locals {
+  dns_endpoint_rules = {
+    "TCP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "TCP"
+    },
+    "UDP_53": {
+      "from_port": 53,
+      "to_port": 53,
+      "protocol": "UDP"
+    }
+  }
+}
+
+resource "aws_security_group_rule" "ingress_dns_endpoint_traffic" {
+  provider          = aws.core-vpc
+  for_each          = local.dns_endpoint_rules
+  description       = format("VPC to DNS Endpoint traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.aws_dns_resolver.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
+  provider          = aws.core-vpc
+  for_each          = local.dns_endpoint_rules
+  description       = format("DNS Endpoint to Domain Controller traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.aws_dns_resolver.id
+  to_port           = each.value.to_port
+  type              = "egress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
 
 resource "aws_route53_resolver_endpoint" "vpc" {
   provider = aws.core-vpc
@@ -27,13 +52,17 @@ resource "aws_route53_resolver_endpoint" "vpc" {
   direction              = "OUTBOUND"
   resolver_endpoint_type = "IPV4"
 
-  security_group_ids = [ module.route53_endpoint_sg.security_group_id ]
+  security_group_ids = [ aws_security_group.aws_dns_resolver.id ]
 
   ip_address { subnet_id = data.aws_subnet.private_subnets_a.id }
   ip_address { subnet_id = data.aws_subnet.private_subnets_b.id}
   ip_address { subnet_id = data.aws_subnet.private_subnets_c.id }
 
   protocols = ["Do53"]
+
+  timeouts {
+    create = "10m"
+  }
 }
 
 locals {
