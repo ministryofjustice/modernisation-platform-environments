@@ -94,5 +94,7 @@ resource "aws_subnet" "vsrx_subnets" {
   availability_zone       = each.value.az
   map_public_ip_on_launch = false
 
-  tags = local.tags
+  tags = merge(local.tags, {
+    Name = each.key
+  })
 }
