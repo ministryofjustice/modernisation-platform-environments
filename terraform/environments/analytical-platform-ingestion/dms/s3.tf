@@ -6,7 +6,7 @@ module "cica_dms_ingress_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "mojap-ingestion-production-cica-dms-ingress-${local.environment}"
+  bucket = "mojap-ingestion-${local.environment}-cica-dms-ingress"
 
   force_destroy = true
 
@@ -16,7 +16,7 @@ module "cica_dms_ingress_bucket" {
 
   replication_configuration = {
     count = local.environment == "production" ? 1 : 0
-    role = module.production_replication_cica_dms_iam_role.iam_role_arn
+    role  = module.production_replication_cica_dms_iam_role.iam_role_arn
     rules = [
       {
         id                        = "mojap-ingestion-cica-dms-ingress"
