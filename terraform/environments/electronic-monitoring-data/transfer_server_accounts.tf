@@ -70,7 +70,7 @@ module "scram" {
     local.sftp_account_dev,
 
     # Test account for supplier.
-    local.sftp_account_scram_orca,
+    local.sftp_account_scram_am,
   ]
 
   data_store_bucket = module.s3-data-bucket.bucket
