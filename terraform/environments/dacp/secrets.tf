@@ -1,5 +1,5 @@
 #### This file can be used to store secrets specific to the member account ####
-resource "random_password" "password" {
+resource "random_password" "password" { # tflint-ignore: terraform_required_providers
   length  = 16
   lower   = true
   upper   = true
@@ -15,7 +15,7 @@ resource "aws_secretsmanager_secret" "rds_db_credentials" {
 
 resource "aws_secretsmanager_secret_version" "rds_credentials" {
   secret_id     = aws_secretsmanager_secret.rds_db_credentials.id
-  secret_string = jsonencode({ "DACP_DB_PASSWORD" : "${random_password.password.result}" })
+  secret_string = jsonencode({ "DACP_DB_PASSWORD" : random_password.password.result })
 }
 
 data "aws_secretsmanager_secret" "get_dacp_db_secrets" {

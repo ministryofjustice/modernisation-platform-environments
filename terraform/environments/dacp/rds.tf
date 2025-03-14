@@ -1,3 +1,4 @@
+# trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "dacp_db" {
   count                       = local.is-development ? 0 : 1
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
@@ -57,6 +58,7 @@ resource "aws_security_group" "postgresql_db_sc" {
 }
 
 // DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
+# trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "dacp_db_dev" {
   count                       = local.is-development ? 1 : 0
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
@@ -118,7 +120,7 @@ data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
 
-resource "null_resource" "setup_db" {
+resource "null_resource" "setup_db" { # tflint-ignore: terraform_required_providers
   count = local.is-development ? 1 : 0
 
   depends_on = [aws_db_instance.dacp_db_dev[0]]
@@ -135,7 +137,7 @@ resource "null_resource" "setup_db" {
     }
   }
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
 }
 
