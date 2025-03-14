@@ -1,18 +1,4 @@
 #!/bin/bash
-
-# Remove any existing installation of the amazon-ssm-agent
-sudo yum remove -y amazon-ssm-agent
-
-# Install amazon-ssm-agent
-sudo yum install -y amazon-ssm-agent
-
-# Enable and start the amazon-ssm-agent service
-sudo systemctl enable amazon-ssm-agent
-sudo systemctl start amazon-ssm-agent
-
-# Start SSM Agent
-sudo systemctl enable amazon-ssm-agent
-sudo systemctl start amazon-ssm-agent
 yum update -y
 yum install -y ruby wget
 cd /home/ec2-user
