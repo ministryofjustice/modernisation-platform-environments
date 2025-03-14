@@ -265,17 +265,18 @@ resource "aws_iam_role_policy" "app_execution" {
       {
            "Action": [
                "logs:CreateLogStream",
-               "logs:PutLogEvents",
-               "ecr:GetAuthorizationToken"
+               "logs:PutLogEvents"
+
            ],
-           "Resource": "*",
+           "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:log-group:*",
            "Effect": "Allow"
       },
       {
             "Action": [
               "ecr:BatchCheckLayerAvailability",
               "ecr:GetDownloadUrlForLayer",
-              "ecr:BatchGetImage"
+              "ecr:BatchGetImage",
+              "ecr:GetAuthorizationToken"
             ],
             "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:repository/${aws_ecr_repository.dacp_ecr_repo.arn}",
             "Effect": "Allow"
