@@ -2,45 +2,49 @@ module "route53_endpoint_sg" {
     source  = "terraform-aws-modules/security-group/aws"
     version = "4.13.0"
   
-    vpc_id      = var.ds_managed_ad_vpc_id
+    vpc_id      = data.aws_vpc.shared.id
     name        = "Route53 to Local DNS"
     description = "Control access from Route 53 to the Directory Service."
   
     egress_with_source_security_group_id = [{
       description              = "Route53 to Local DNS TCP"
       rule                     = "dns-tcp"
-      source_security_group_id = aws_directory_service_directory.ds_managed_ad.security_group_id
+      source_security_group_id = module.ds.directory_service_sg_id
     },
     {
-        description              = "Route53 to Local DNS UDP"
-        rule                     = "dns-udp"
-        source_security_group_id = aws_directory_service_directory.ds_managed_ad.security_group_id
-      }]
+      description              = "Route53 to Local DNS UDP"
+      rule                     = "dns-udp"
+      source_security_group_id = module.ds.directory_service_sg_id
+    }]
   
 }
 
 
 resource "aws_route53_resolver_endpoint" "vpc" {
+  provider = aws.core-vpc
+
   name                   = "local"
   direction              = "OUTBOUND"
   resolver_endpoint_type = "IPV4"
 
   security_group_ids = [ module.route53_endpoint_sg.security_group_id ]
 
-  ip_address { subnet_id = var.private_subnet_ids[0] }
-  ip_address { subnet_id = var.private_subnet_ids[1] }
-  ip_address { subnet_id = var.private_subnet_ids[2] }
+  ip_address { subnet_id = data.aws_subnet.private_subnets_a.id }
+  ip_address { subnet_id = data.aws_subnet.private_subnets_b.id}
+  ip_address { subnet_id = data.aws_subnet.private_subnets_c.id }
 
   protocols = ["Do53"]
 }
 
 locals {
-  dns_ip_addresses = tolist(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)
-  ip_address_count = length(aws_directory_service_directory.ds_managed_ad.dns_ip_addresses)
+  dns_ip_addresses = tolist(module.ds.dns_ip_addresses)
+  ip_address_count = length(module.ds.dns_ip_addresses)
 }
   
 
-resource "aws_route53_resolver_rule" "local" {
+resource "aws_route53_resolver_rule" "i2n" {
+  provider = aws.core-vpc
+
   domain_name          = "i2n.com"
   name                 = "directory"
   rule_type            = "FORWARD"
@@ -49,6 +53,11 @@ resource "aws_route53_resolver_rule" "local" {
   target_ip { ip = local.dns_ip_addresses[0] }
   target_ip { ip = local.dns_ip_addresses[1] }
   target_ip { ip = local.ip_address_count > 2 ? local.dns_ip_addresses[2] : null}
+}
 
-  tags = local.all_tags
+resource "aws_route53_resolver_rule_association" "i2n" {
+  provider = aws.core-vpc
+
+  resolver_rule_id = aws_route53_resolver_rule.i2n.id
+  vpc_id           = data.aws_vpc.shared.id
 }

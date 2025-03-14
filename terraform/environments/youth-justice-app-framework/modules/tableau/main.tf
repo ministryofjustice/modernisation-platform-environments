@@ -45,6 +45,11 @@ resource "aws_instance" "tableau" {
     { "Owner"         = "Devops" }
   )
 
+## Create using the latest version of the ami but do not replace when a new version is repeased. 
+  lifecycle {
+    ignore_changes = [ami]
+  }
+
 }
 
 module "tableau-alb" {
