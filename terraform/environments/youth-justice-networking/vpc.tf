@@ -6,7 +6,7 @@ module "vpc" {
   name            = "${local.application_name}-${local.environment}"
   azs             = local.availability_zones
   cidr            = local.application_data.accounts[local.environment].vpc_cidr
-  private_subnets = local.private_subnets
+  private_subnets = values({ for k, v in aws_subnet.vsrx_subnets : k => v.cidr_block })
 
   # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
   enable_flow_log                      = true
@@ -23,7 +23,8 @@ module "vpc_endpoints" {
   source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
 
   security_group_ids = [aws_security_group.vpc_endpoints.id]
-  subnet_ids         = module.vpc.private_subnets
+  subnet_ids = values(aws_subnet.vsrx_subnets)[*].id
+
   vpc_id             = module.vpc.vpc_id
 
   endpoints = {
