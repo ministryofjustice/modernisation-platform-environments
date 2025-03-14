@@ -227,62 +227,62 @@ jobs:
       #   with:
       #     sourceDir: test/src
 
-  apply:
-    name: "apply"
-    needs: plan
-    if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2'
-    runs-on: ubuntu-latest
-    environment: "${{ inputs.application }}-${{ inputs.environment }}"
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+  # apply:
+  #   name: "apply"
+  #   needs: plan
+  #   if: inputs.action == 'plan_apply' && needs.plan.outputs.plan_exitcode == '2'
+  #   runs-on: ubuntu-latest
+  #   environment: "${{ inputs.application }}-${{ inputs.environment }}"
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
-      - name: Get AWS Account Number
-        run: |
-          ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
-          echo "::add-mask::$ACCOUNT_NUMBER"
-          echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
+  #     - name: Get AWS Account Number
+  #       run: |
+  #         ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
+  #         echo "::add-mask::$ACCOUNT_NUMBER"
+  #         echo "ACCOUNT_NUMBER=${ACCOUNT_NUMBER}" >> $GITHUB_ENV
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@4fc4975a852c8cd99761e2de1f4ba73402e44dd9 # v4.0.3
-        with:
-          role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
-          role-session-name: githubactionsrolesession
-          aws-region: "eu-west-2"
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@4fc4975a852c8cd99761e2de1f4ba73402e44dd9 # v4.0.3
+  #       with:
+  #         role-to-assume: "arn:aws:iam::${{ env.ACCOUNT_NUMBER }}:role/github-actions"
+  #         role-session-name: githubactionsrolesession
+  #         aws-region: "eu-west-2"
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
-        with:
-          terraform_version: "${{ inputs.terraform_version }}"
-          terraform_wrapper: false
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+  #       with:
+  #         terraform_version: "${{ inputs.terraform_version }}"
+  #         terraform_wrapper: false
 
-      - name: Terraform Init
-        working-directory: "terraform/environments/${{ inputs.application }}"
-        run: |
-          terraform --version
-          echo "terraform init"
-          terraform init
+  #     - name: Terraform Init
+  #       working-directory: "terraform/environments/${{ inputs.application }}"
+  #       run: |
+  #         terraform --version
+  #         echo "terraform init"
+  #         terraform init
 
-      - name: Terraform Workspace Select
-        working-directory: "terraform/environments/${{ inputs.application }}"
-        run: |
-          terraform workspace select "${WORKSPACE_NAME}"
+  #     - name: Terraform Workspace Select
+  #       working-directory: "terraform/environments/${{ inputs.application }}"
+  #       run: |
+  #         terraform workspace select "${WORKSPACE_NAME}"
 
-      - name: Terraform Plan
-        working-directory: "terraform/environments/${{ inputs.application }}"
-        run: |
-          set -o pipefail
-          tf_args="-out x.tfplan ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.plan_apply_tfargs }}"
-          echo "terraform plan ${tf_args}"
-          terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+  #     - name: Terraform Plan
+  #       working-directory: "terraform/environments/${{ inputs.application }}"
+  #       run: |
+  #         set -o pipefail
+  #         tf_args="-out x.tfplan ${{ inputs.init_plan_apply_tfargs }} ${{ inputs.plan_apply_tfargs }}"
+  #         echo "terraform plan ${tf_args}"
+  #         terraform plan ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
-      - name: Terraform Apply
-        working-directory: "terraform/environments/${{ inputs.application }}"
-        run: |
-          set -o pipefail
-          tf_args="${{ inputs.init_plan_apply_tfargs }} ${{ inputs.plan_apply_tfargs }} x.tfplan"
-          echo "terraform apply ${tf_args}"
-          terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
+  #     - name: Terraform Apply
+  #       working-directory: "terraform/environments/${{ inputs.application }}"
+  #       run: |
+  #         set -o pipefail
+  #         tf_args="${{ inputs.init_plan_apply_tfargs }} ${{ inputs.plan_apply_tfargs }} x.tfplan"
+  #         echo "terraform apply ${tf_args}"
+  #         terraform apply ${tf_args} | bash ${GITHUB_WORKSPACE}/scripts/redact-output.sh
 
   smoketest:
     name: "smoketest"
