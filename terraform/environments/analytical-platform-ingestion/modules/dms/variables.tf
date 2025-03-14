@@ -37,7 +37,7 @@ variable "dms_replication_instance" {
 variable "replication_task_id" {
   type = object({
     full_load = string
-    cdc       = string
+    cdc       = optional(string)
   })
 }
 
