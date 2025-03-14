@@ -82,13 +82,13 @@ resource "aws_s3_bucket_logging" "staging_bucket_logging" {
 
 # Data source for the member-access IAM role
 # This is created by the mod platform team
-data "aws_iam_role" "member_access" {
-  name = "MemberInfrastructureAccess"
+data "aws_iam_role" "guardduty_malware_protection_role" {
+  name = "GuardDutyS3MalwareProtectionRole"
 }
 
 # Create guardduty malware protection plan for the staging bucket
 resource "aws_guardduty_malware_protection_plan" "s3_bucket_staging" {
-  role = data.aws_iam_role.member_access.arn
+  role = data.aws_iam_role.guardduty_malware_protection_role.arn
 
   protected_resource {
     s3_bucket {
