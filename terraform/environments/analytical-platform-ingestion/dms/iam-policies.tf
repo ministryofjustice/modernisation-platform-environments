@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "s3:GetReplicationConfiguration",
       "s3:ListBucket"
     ]
-    resources = length(module.cica_dms_ingress_bucket) > 0 ? [module.cica_dms_ingress_bucket[0].s3_bucket_arn] : []
+    resources = length(module.cica_dms_ingress_bucket) > 0 ? [module.cica_dms_ingress_bucket.s3_bucket_arn] : []
   }
   statement {
     sid    = "SourceBucketObjectPermissions"
@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
-    resources = length(module.cica_dms_ingress_bucket) > 0 ? ["${module.cica_dms_ingress_bucket[0].s3_bucket_arn}/*"] : []
+    resources = length(module.cica_dms_ingress_bucket) > 0 ? ["${module.cica_dms_ingress_bucket.s3_bucket_arn}/*"] : []
   }
   statement {
     sid    = "SourceBucketKMSKey"
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "kms:Decrypt",
       "kms:GenerateDataKey"
     ]
-    resources = length(module.s3_cica_dms_ingress_kms) > 0 ? [module.s3_cica_dms_ingress_kms[0].key_arn] : []
+    resources = length(module.s3_cica_dms_ingress_kms) > 0 ? [module.s3_cica_dms_ingress_kms.key_arn] : []
   }
   statement {
     sid    = "DestinationBucketKMSKey"
@@ -54,8 +54,6 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
 module "production_replication_cica_dms_iam_policy" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.52.2"

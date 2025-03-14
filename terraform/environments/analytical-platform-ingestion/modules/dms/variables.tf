@@ -37,7 +37,7 @@ variable "dms_replication_instance" {
 variable "replication_task_id" {
   type = object({
     full_load = string
-    cdc       = string
+    cdc       = optional(string)
   })
 }
 
@@ -64,6 +64,12 @@ variable "dms_source" {
 variable "dms_mapping_rules" {
   type        = string
   description = "The path to the mapping rules file"
+}
+
+variable "output_bucket" {
+  type        = string
+  default     = ""
+  description = "The name of the output bucket (optional, bucket will be generated if not specified)"
 }
 
 variable "s3_target_config" {

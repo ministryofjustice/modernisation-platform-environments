@@ -11,8 +11,8 @@ locals {
         rule-name   = "include-${lower(obj)}"
         rule-action = "explicit"
         object-locator = {
-          schema-name = local.input_data.schema
-          table-name  = obj
+          schema-name = length(split(".", obj)) > 1 ? split(".", obj)[0] : local.input_data.schema
+          table-name  = length(split(".", obj)) > 1 ? split(".", obj)[1] : obj
         }
       }
     ],
@@ -30,8 +30,8 @@ locals {
           length = 50
         }
         object-locator = {
-          schema-name = local.input_data.schema
-          table-name  = obj
+          schema-name = length(split(".", obj)) > 1 ? split(".", obj)[0] : local.input_data.schema
+          table-name  = length(split(".", obj)) > 1 ? split(".", obj)[1] : obj
         }
       }
     ],
@@ -44,8 +44,8 @@ locals {
         rule-action = "remove-column"
         rule-target = "column"
         object-locator = {
-          schema-name = local.input_data.schema
-          table-name  = blob.object_name
+          schema-name = length(split(".", blob.object_name)) > 1 ? split(".", blob.object_name)[0] : local.input_data.schema
+          table-name  = length(split(".", blob.object_name)) > 1 ? split(".", blob.object_name)[1] : blob.object_name
           column-name = blob.column_name
         }
       }
@@ -89,6 +89,7 @@ resource "aws_dms_replication_task" "full_load_replication_task" {
 }
 
 resource "aws_dms_replication_task" "cdc_replication_task" {
+  count                     = lookup(var.replication_task_id, "cdc", null) == null ? 0 : 1
   migration_type            = "cdc"
   cdc_start_time            = var.dms_source.cdc_start_time
   replication_instance_arn  = aws_dms_replication_instance.instance.replication_instance_arn
