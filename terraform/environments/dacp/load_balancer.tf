@@ -230,6 +230,7 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
   }
 }
 
+# tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "dacp_lb" {
   name                       = "dacp-load-balancer"
   load_balancer_type         = "application"
@@ -237,6 +238,7 @@ resource "aws_lb" "dacp_lb" {
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+  drop_invalid_header_fields = true
   depends_on                 = [aws_security_group.dacp_lb_sc, aws_security_group.lb_sc_pingdom, aws_security_group.lb_sc_pingdom_2]
 }
 

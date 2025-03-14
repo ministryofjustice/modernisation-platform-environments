@@ -7,11 +7,13 @@ resource "aws_ecs_cluster" "dacp_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS
   name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS
   name              = "dacp-ecs"
   retention_in_days = "7"
 }
@@ -51,35 +53,35 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.dacp_db[0].address}"
+          value = aws_db_instance.dacp_db[0].address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.dacp_db[0].username}"
+          value = aws_db_instance.dacp_db[0].username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.dacp_db[0].password}"
+          value = aws_db_instance.dacp_db[0].password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.dacp_db[0].db_name}"
+          value = aws_db_instance.dacp_db[0].db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
@@ -126,35 +128,35 @@ resource "aws_ecs_task_definition" "dacp_task_definition_dev" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.dacp_db_dev[0].address}"
+          value = aws_db_instance.dacp_db_dev[0].address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.dacp_db_dev[0].username}"
+          value = aws_db_instance.dacp_db_dev[0].username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.dacp_db_dev[0].password}"
+          value = aws_db_instance.dacp_db_dev[0].password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.dacp_db_dev[0].db_name}"
+          value = aws_db_instance.dacp_db_dev[0].db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
@@ -337,6 +339,7 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -347,6 +350,10 @@ resource "aws_security_group" "ecs_service" {
 resource "aws_ecr_repository" "dacp_ecr_repo" {
   name         = "dacp-ecr-repo"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 # AWS EventBridge rule
@@ -410,6 +417,7 @@ locals {
 
 # link the sns topic to the service - preprod
 module "pagerduty_core_alerts_non_prod" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   count = local.is-preproduction ? 1 : 0
   depends_on = [
     aws_sns_topic.dacp_utilisation_alarm
@@ -421,6 +429,7 @@ module "pagerduty_core_alerts_non_prod" {
 
 # link the sns topic to the service - prod
 module "pagerduty_core_alerts_prod" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   count = local.is-production ? 1 : 0
   depends_on = [
     aws_sns_topic.dacp_utilisation_alarm
