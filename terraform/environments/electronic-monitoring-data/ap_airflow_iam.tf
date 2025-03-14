@@ -18,6 +18,92 @@ module "test_ap_airflow" {
   oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
 }
 
+data "aws_iam_policy_document" "p1_export_airflow" {
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_111
+  statement {
+    sid = "AthenaPermissionsForP1Export"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution",
+      "athena:ListQueryExecutions",
+      "athena:GetWorkGroup",
+      "athena:ListWorkGroups"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid = "S3AthenaQueryBucketPermissionsForP1Export"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/output/airflow_export_em_data_p1/*",
+    ]
+  }
+  statement {
+    sid = "GluePermissionsForP1Export"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:GetPartitions"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "S3ExportBucketPermissionsForP1Export"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.s3-p1-export-bucket.bucket_arn,
+      "${module.s3-p1-export-bucket.bucket_arn}/*",
+    ]
+  }
+  statement {
+    sid       = "GetDataAccessForLakeFormationForP1Export"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAliasForP1Export"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAllBuckesForP1Export"
+    effect    = "Allow"
+    actions   = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
+}
+
+module "p1_export_airflow" {
+  source = "./modules/ap_airflow_iam_role"
+
+  environment         = local.environment
+  role_name_suffix    = "export-em-data-p1"
+  role_description    = "Permissions to generate P1 export data"
+  iam_policy_document = data.aws_iam_policy_document.p1_export_airflow.json
+  secret_code         = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+}
+
 module "load_alcohol_monitoring_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
