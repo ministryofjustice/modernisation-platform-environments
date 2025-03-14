@@ -266,7 +266,6 @@ resource "aws_iam_role_policy" "app_execution" {
            "Action": [
                "logs:CreateLogStream",
                "logs:PutLogEvents"
-
            ],
            "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:log-group:*",
            "Effect": "Allow"
