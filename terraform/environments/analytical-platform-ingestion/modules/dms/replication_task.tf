@@ -89,6 +89,7 @@ resource "aws_dms_replication_task" "full_load_replication_task" {
 }
 
 resource "aws_dms_replication_task" "cdc_replication_task" {
+  count                     = lookup(var.replication_task_id, "cdc", null) == null ? 0 : 1
   migration_type            = "cdc"
   cdc_start_time            = var.dms_source.cdc_start_time
   replication_instance_arn  = aws_dms_replication_instance.instance.replication_instance_arn
