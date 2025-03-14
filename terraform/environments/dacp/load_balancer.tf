@@ -21,7 +21,7 @@ resource "aws_security_group" "dacp_lb_sc" {
 
   // whitelist user IPs
   ingress {
-    description  "Allow list for individual ips"
+    description = "Allow list for individual ips"
     from_port = 443
     to_port   = 443
     protocol  = "tcp"
