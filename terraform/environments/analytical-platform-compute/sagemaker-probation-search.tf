@@ -45,108 +45,25 @@ locals {
 # ------------------------------------------------------------------------------
 # SageMaker
 # ------------------------------------------------------------------------------
-
-data "aws_sagemaker_prebuilt_ecr_image" "probation_search_huggingface_embedding_image" {
+module "probation_search_sagemaker_endpoint" {
   for_each = tomap(local.probation_search_environment)
 
-  repository_name = each.value.repository_name
-  image_tag       = each.value.image_tag
-}
+  source = "./modules/sagemaker_endpoint"
 
-resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
-  #checkov:skip=CKV_AWS_370:Network isolation must be disabled to enable us to pull the model from Huggingface
-
-  for_each = tomap(local.probation_search_environment)
-
-  execution_role_arn = module.probation_search_sagemaker_execution_iam_role[each.key].iam_role_arn
-
-  primary_container {
-    image          = data.aws_sagemaker_prebuilt_ecr_image.probation_search_huggingface_embedding_image[each.key].registry_path
-    environment    = each.value.environment
-    model_data_url = can(each.value.s3_model_key) ? "s3://${local.probation_search_model_bucket_name}/${each.value.s3_model_key}" : null
-  }
-
-  tags = merge(local.tags, {
-    Name = "${each.value.namespace}-huggingface-embedding-model"
-  })
-}
-
-resource "aws_sagemaker_endpoint_configuration" "probation_search" {
-  #checkov:skip=CKV_AWS_98:KMS key is not supported for NVMe instance storage
-
-  for_each = tomap(local.probation_search_environment)
-
-  name_prefix = each.value.namespace
-
-  production_variants {
-    variant_name           = "AllTraffic"
-    model_name             = aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key].name
-    initial_instance_count = 1
-    instance_type          = each.value.instance_type
-  }
-
-  tags = local.tags
-
-  lifecycle {
-    replace_triggered_by  = [aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key]]
-    create_before_destroy = true
-  }
-}
-
-resource "aws_sagemaker_endpoint" "probation_search" {
-  for_each = tomap(local.probation_search_environment)
-
+  s3_model_bucket_name = local.probation_search_model_bucket_name
+  s3_model_key         = try(each.value.s3_model_key, null)
   name                 = each.value.namespace
-  endpoint_config_name = aws_sagemaker_endpoint_configuration.probation_search[each.key].name
-
-  tags = local.tags
+  instance_type        = each.value.instance_type
+  repository_name      = each.value.repository_name
+  image_tag            = each.value.image_tag
+  environment          = each.value.environment
+  tags                 = local.tags
 }
 
 # ------------------------------------------------------------------------------
-# IAM Permissions
+# IAM
 # ------------------------------------------------------------------------------
-
-module "probation_search_sagemaker_execution_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  for_each = tomap(local.probation_search_environment)
-
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
-
-  create_role = true
-
-  role_name         = "${each.value.namespace}-sagemaker-exec-role"
-  role_requires_mfa = false
-
-  trusted_role_services = ["sagemaker.amazonaws.com"]
-
-  inline_policy_statements = [
-    {
-      sid    = "CloudWatchAccess"
-      effect = "Allow"
-      actions = [
-        "cloudwatch:PutMetricData",
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:DescribeLogStreams",
-        "logs:PutLogEvents",
-      ]
-      resources = ["*"]
-    },
-    {
-      sid       = "S3Access"
-      effect    = "Allow"
-      actions   = ["s3:GetObject"]
-      resources = ["arn:aws:s3:::${local.probation_search_model_bucket_name}/*"]
-    }
-  ]
-
-  tags = local.tags
-}
-
-module "probation_search_sagemaker_invocation_iam_role" {
+module "probation_search_cross_account_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
@@ -170,9 +87,10 @@ module "probation_search_sagemaker_invocation_iam_role" {
         "sagemaker:InvokeEndpoint",
         "sagemaker:InvokeEndpointAsync",
       ]
-      resources = [aws_sagemaker_endpoint.probation_search[each.key].arn]
+      resources = [module.probation_search_sagemaker_endpoint[each.key].sagemaker_endpoint_arn]
     }
   ]
 
   tags = local.tags
 }
+
