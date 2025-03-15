@@ -99,16 +99,16 @@ module "autoscaling" {
   #}
 
   # Mixed instances
-  use_mixed_instances_policy = true
-  mixed_instances_policy = {
-    instances_distribution = {
-      on_demand_base_capacity                  = 0
-      on_demand_percentage_above_base_capacity = 10
-      spot_allocation_strategy                 = "capacity-optimized"
-    }
+  use_mixed_instances_policy = false #no spot instances
+  #mixed_instances_policy = { #uncomment for spot instances
+  #  instances_distribution = {
+  #    on_demand_base_capacity                  = 0
+  #    on_demand_percentage_above_base_capacity = 10
+  #    spot_allocation_strategy                 = "capacity-optimized"
+  #  }
 
-    override = var.spot_overrides
-  }
+  #  override = var.spot_overrides
+  #}
 
   block_device_mappings = [
     {

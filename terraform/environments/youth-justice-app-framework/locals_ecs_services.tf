@@ -8,10 +8,17 @@ locals {
       task_memory                       = 2560
       container_memory                  = 2048
       health_check_grace_period_seconds = 300
+      health_check = {
+        command      = null
+        interval     = null
+        timeout      = null
+        retries      = null
+        start_period = null
+      }
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -39,6 +46,7 @@ locals {
           port_mappings = []
           cpu           = 256
           memory        = 512
+          essential     = false
           mount_points = [
             {
               sourceVolume : "hosts",
@@ -88,11 +96,11 @@ locals {
             },
             {
               "name" : "GATEWAY_SERVICE_URI",
-              "value" : "gateway.yjaf:8080"
+              "value" : "http://private-lb.${local.environment}.yjaf:8080"
             }
           ]
-          entryPoint = ["/bin/sh", "-c"]
-          command    = ["scripts/set-hosts.sh"]
+          entry_point = ["/bin/sh", "-c"]
+          command     = ["scripts/set-hosts.sh"]
         }
       }
     },
@@ -104,7 +112,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -121,7 +129,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -138,7 +146,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -155,7 +163,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -172,7 +180,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -190,7 +198,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -207,7 +215,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JVM_OPTS",
@@ -224,7 +232,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -241,7 +249,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -265,7 +273,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -312,7 +320,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -329,7 +337,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -347,7 +355,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -365,7 +373,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -382,7 +390,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -400,7 +408,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -418,7 +426,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JVM_OPTS",
@@ -466,7 +474,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",
@@ -484,7 +492,7 @@ locals {
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
-          "value" : "gateway.yjaf:8080"
+          "value" : "http://private-lb.${local.environment}.yjaf:8080"
         },
         {
           "name" : "JAVA_OPTS",

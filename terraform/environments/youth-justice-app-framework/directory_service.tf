@@ -1,10 +1,16 @@
+import {
+  to = module.ds.aws_cloudformation_stack.pki_quickstart
+  id = "arn:aws:cloudformation:eu-west-2:711387140977:stack/MicrosoftPKIQuickStartCA/64278f70-fd2b-11ef-9093-02a38affd1e9"
+}
+
+
 module "ds" {
   source = "./modules/directory-service"
 
   project_name = local.project_name
+  environment  = local.environment
   tags         = merge(local.tags, { Name = "AD Management Server" })
 
-  environment_name             = local.application_data.accounts[local.environment].environment_name
   ad_management_instance_count = local.application_data.accounts[local.environment].ad_management_instance_count
 
 

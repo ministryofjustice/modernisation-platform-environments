@@ -1,0 +1,27 @@
+{
+    "Role": "arn:aws:iam::account-id:role/s3-replication-role",
+    "Rules": [
+      {
+        "ID": "s3-replication-to-modinisation-test",
+        "Status": "Enabled",
+        "Prefix": "",
+        "ExistingObjectReplication": {
+
+        }
+        "Destination": {
+          "Bucket": "arn:aws:s3:::yjaf-test-cmm",
+          "Account": "225989353474",
+          "AccessControlTranslation": {
+            "Owner": "Destination"
+          },
+          "ReplicationTime": {
+            "Status": "Enabled"
+          },
+          "DeleteMarkerReplication": {
+            "Status": "Enabled"
+          }
+        }
+      }
+    ]
+  }
+  

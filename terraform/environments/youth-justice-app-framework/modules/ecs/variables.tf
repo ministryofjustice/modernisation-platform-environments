@@ -167,13 +167,13 @@ variable "disable_overnight_scheduler" {
 variable "morning_cron_schedule" {
   description = "The cron schedule for the morning scheduler"
   type        = string
-  default     = "0 7 * * *"
+  default     = "0 7 * * 1-5"
 }
 
 variable "overnight_cron_schedule" {
   description = "The cron schedule for the overnight scheduler"
   type        = string
-  default     = "0 19 * * *"
+  default     = "0 19 * * 1-5"
 }
 
 variable "ec2_instance_type" {
@@ -274,4 +274,26 @@ variable "ecs_allowed_secret_arns" {
   description = "A list of allowed secret ARNs"
   type        = list(string)
   default     = []
+}
+
+
+variable "rds_postgresql_sg_id" {
+  description = "The ID of the security grouos that conteolls ingress to the PostgreSQL database."
+  type        = string
+}
+
+variable "ecs_secrets_access_policy_secret_arns" {
+  description = "A list of secret ARNs to allow access to"
+  type        = string
+}
+
+variable "ecs_role_additional_policies_arns" {
+  description = "A list of additional policies to attach to the ECS task role"
+  type        = list(string)
+  default     = []
+}
+
+variable "secret_kms_key_arn" {
+  description = "The ARN of the KMS key to use for secrets"
+  type        = string
 }

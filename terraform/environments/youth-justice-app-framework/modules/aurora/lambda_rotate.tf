@@ -8,7 +8,7 @@ resource "aws_lambda_function" "rds_secret_rotation" {
   #checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-  function_name = "rds-secret-rotation"
+  function_name = "rds-secrets-rotation"
   role          = aws_iam_role.rds_secret_rotation.arn
   runtime       = "python3.9"
   handler       = "lambda_function.lambda_handler"
