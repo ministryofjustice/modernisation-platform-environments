@@ -23,6 +23,12 @@ variable "nameserver" {
   type        = string
 }
 
+variable "enable_healthcheck" {
+  description = "Enable the healthcheck for the ECS cluster"
+  type        = bool
+  default     = true
+}
+
 variable "ecs_services" {
   description = "A list of ECS services to create. Will create the main container definition for the app itself"
   type = map(object({

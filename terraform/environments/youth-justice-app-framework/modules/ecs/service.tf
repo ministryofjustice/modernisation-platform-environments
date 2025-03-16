@@ -113,9 +113,9 @@ module "ecs_service" {
         "com.datadoghq.tags.service" : each.value.name,
         "com.datadoghq.tags.env" : var.environment,
       })
-      health_check = {
+      health_check = enable_healthcheck ? {
         command = each.value.health_check.command
-      }
+      } : null
       command    = each.value.command
       entryPoint = each.value.entryPoint
     }
