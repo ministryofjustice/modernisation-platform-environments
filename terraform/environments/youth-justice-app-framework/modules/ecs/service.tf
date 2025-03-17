@@ -75,7 +75,7 @@ module "ecs_service" {
 
       cpu                      = try(each.value.container_cpu, each.value.task_cpu - 20)
       memory                   = try(each.value.container_memory, each.value.task_memory - 40)
-      essential                = true
+      essential                = try(each.value.essential, true)
       mount_points             = concat(each.value.additional_mount_points, local.default_mountpoints)
       readonly_root_filesystem = each.value.readonly_root_filesystem
 
@@ -116,8 +116,8 @@ module "ecs_service" {
       health_check = each.value.enable_healthcheck ? {
         command = each.value.health_check.command
       } : {}
-      command    = each.value.command
-      entryPoint = each.value.entryPoint
+      command     = each.value.command
+      entry_point = each.value.entry_point
     }
   })
   ignore_task_definition_changes = true

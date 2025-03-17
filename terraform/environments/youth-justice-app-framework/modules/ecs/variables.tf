@@ -47,6 +47,7 @@ variable "ecs_services" {
       start_period = 60
     })
     desired_count                          = optional(number, 2)
+    autoscaling_max_capacity               = optional(number, 4)
     health_check_grace_period_seconds      = optional(number, 360)
     stop_timeout                           = optional(number, 30)
     deployment_minimum_healthy_percent     = optional(number, 100)
@@ -56,7 +57,7 @@ variable "ecs_services" {
     container_cpu                          = optional(number, null)
     container_memory                       = optional(number, null)
     command                                = optional(list(string), [])
-    entryPoint                             = optional(list(string), [])
+    entry_point                            = optional(list(string), [])
     readonly_root_filesystem               = optional(bool, true)
     cloudwatch_log_group_retention_in_days = optional(number, 400)
     additional_mount_points = optional(list(object({

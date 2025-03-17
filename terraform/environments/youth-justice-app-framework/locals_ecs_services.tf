@@ -8,7 +8,7 @@ locals {
       task_memory                       = 2560
       container_memory                  = 2048
       health_check_grace_period_seconds = 300
-      enable_healthcheck = false
+      enable_healthcheck                = false
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
