@@ -1594,6 +1594,103 @@ resource "aws_iam_policy_attachment" "attach_lambda_securityhub_readonly_dev" {
   policy_arn = "arn:aws:iam::aws:policy/AWSSecurityHubReadOnlyAccess"
 }
 
+################################################
+# IAM Role & Policy for Security Hub report- UAT
+################################################
+
+resource "aws_iam_role" "lambda_role_securityhub_get_data_uat"{
+  count              = local.is-preproduction == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Securityhub_Get_Data_UAT"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_for_lambda_securityhub_get_data_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name        = "aws_iam_policy_for_terraform_aws_lambda_role_securityhub_get_data_uat"
+  path        = "/"
+  description = "AWS IAM Policy for managing aws lambda role securityhub get data production"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [{
+      "Sid" : "SecurityHubPolicy",
+      "Effect" : "Allow",
+      "Action" : [
+        "securityhub:*"
+      ],
+      "Resource" : [
+        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+      ]
+      },
+      {
+        "Sid" : "LogPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogStream",
+          "logs:CreateLogGroup",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
+      },
+      {
+        "Sid" : "SQSPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
+      },
+      {
+        "Sid" : "SESPolicy",
+        "Effect" : "Allow",
+        "Action" : [
+          "ses:*"
+        ],
+        "Resource" : [
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*",
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:identity/uat.ppud.justice.gov.uk"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_uat" {
+  count      = local.is-preproduction == true ? 1 : 0
+  role       = aws_iam_role.lambda_role_securityhub_get_data_uat[0].name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda_securityhub_get_data_uat[0].arn
+}
+
+resource "aws_iam_policy_attachment" "attach_lambda_securityhub_readonly_uat" {
+  count      = local.is-preproduction == true ? 1 : 0
+  name       = "lambda-securityhub-readonly-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_securityhub_get_data_uat[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/AWSSecurityHubReadOnlyAccess"
+}
+
 #########################################################
 # IAM Role & Policy for S3 Bucket Replication to CP - DEV
 #########################################################

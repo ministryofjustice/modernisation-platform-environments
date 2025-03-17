@@ -177,6 +177,30 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_securityhub_report
   arn       = aws_lambda_function.terraform_lambda_func_securityhub_report_dev[0].arn
 }
 
+# Eventbridge rule to invoke the Security Hub Report UAT lambda function every Monday to Friday at 07:00
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_securityhub_report_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_securityhub_report_uat[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_schedule_securityhub_report_uat[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "daily_schedule_securityhub_report_uat" {
+  count               = local.is-preproduction == true ? 1 : 0
+  name                = "securityhub-report-daily-schedule"
+  description         = "Trigger Lambda at 07:00 UTC each Monday through Friday"
+  schedule_expression = "cron(0 7 ? * MON-FRI *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_securityhub_report_uat" {
+  count     = local.is-preproduction == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.daily_schedule_securityhub_report_uat[0].name
+  target_id = "securityhub_report"
+  arn       = aws_lambda_function.terraform_lambda_func_securityhub_report_uat[0].arn
+}
 
 # Eventbridge Rule to Disable CPU Alarms each Friday at 20:00
 

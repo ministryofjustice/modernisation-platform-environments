@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
   #checkov:skip=CKV_AWS_356
   #checkov:skip=CKV_AWS_111
   statement {
-    sid = "AthenaPermissionsForP1Export"
+    sid    = "AthenaPermissionsForP1Export"
     effect = "Allow"
     actions = [
       "athena:StartQueryExecution",
@@ -36,7 +36,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
-    sid = "S3AthenaQueryBucketPermissionsForP1Export"
+    sid    = "S3AthenaQueryBucketPermissionsForP1Export"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     ]
   }
   statement {
-    sid = "GluePermissionsForP1Export"
+    sid    = "GluePermissionsForP1Export"
     effect = "Allow"
     actions = [
       "glue:GetDatabase",
@@ -83,9 +83,9 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
-    sid       = "ListAllBuckesForP1Export"
-    effect    = "Allow"
-    actions   = [
+    sid    = "ListAllBuckesForP1Export"
+    effect = "Allow"
+    actions = [
       "s3:ListAllMyBuckets",
       "s3:GetBucketLocation"
     ]
