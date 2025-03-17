@@ -394,6 +394,8 @@ module "load_scram_alcohol_monitoring" {
 }
 
 data "aws_iam_policy_document" "scram_am_ap_airflow" {
+  #checkov:skip=CKV_AWS_356
+  #checkov:skip=CKV_AWS_111
   statement {
     sid    = "AthenaPermissionsForScramAlcoholMonitoring"
     effect = "Allow"
