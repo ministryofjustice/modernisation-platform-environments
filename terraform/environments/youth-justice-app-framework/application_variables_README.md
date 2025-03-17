@@ -38,3 +38,6 @@ This contans usage information for parameters in the application_variables.json 
 **test_mode**
 : Used to indicate that all resources should be configured so that they can be replaced and that the destroy command can be used to remove and all resources. To be set to false before go-live of all environments except development.
 
+**tableau_website_name**
+THe name used in URLS for external access to the Tableau website."
+

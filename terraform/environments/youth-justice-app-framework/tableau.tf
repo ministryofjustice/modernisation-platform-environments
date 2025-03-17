@@ -4,7 +4,7 @@ module "tableau_cert" {
   project_name = local.project_name
 
   r53_zone_id = module.public_dns_zone.aws_route53_zone_id
-  domain_name = "tableau.${local.environment}.yjbservices.yjb.gov.uk"
+  domain_name = local.application_data.accounts[local.environment].tableau_website_name
 
   tags = local.tags
 }
