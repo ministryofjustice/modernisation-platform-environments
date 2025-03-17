@@ -78,10 +78,10 @@ resource "aws_security_group_rule" "allow_all_vpc" {
 
 resource "aws_subnet" "vsrx_subnets" {
   for_each = {
-    "vSRX01 Management Range"    = { cidr = "10.100.105.0/24", az = "eu-west-2a" }
-    "vSRX01 PSK External Range"  = { cidr = "10.100.110.0/24", az = "eu-west-2a" }
-    "vSRX01 Cert External Range" = { cidr = "10.100.115.0/24", az = "eu-west-2a" }
-    "vSRX01 Internal Range"      = { cidr = "10.100.120.0/24", az = "eu-west-2a" }
+    "vSRX01 Management Rangexxx"    = { cidr = "10.100.105.0/24", az = "eu-west-2a" }
+    "vSRX01 PSK External Rangexxx"  = { cidr = "10.100.110.0/24", az = "eu-west-2a" }
+    "vSRX01 Cert External Rangexxx" = { cidr = "10.100.115.0/24", az = "eu-west-2a" }
+    "vSRX01 Internal Rangexxx"      = { cidr = "10.100.120.0/24", az = "eu-west-2a" }
     "Juniper Management & KMS"   = { cidr = "10.100.50.0/24", az = "eu-west-2a" }
     "vSRX02 Management Range"    = { cidr = "10.100.205.0/24", az = "eu-west-2b" }
     "vSRX02 PSK External Range"  = { cidr = "10.100.210.0/24", az = "eu-west-2b" }
