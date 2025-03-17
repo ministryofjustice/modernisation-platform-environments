@@ -458,7 +458,7 @@ resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
 
   name   = "${each.value.target_account_name}-share-policy"
   role   = aws_iam_role.analytical_platform_share_role[each.key].name
-  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
+  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[0].json
 }
 
 resource "aws_iam_role_policy" "analytical_platform_secret_share_policy_attachment" {
