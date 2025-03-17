@@ -115,7 +115,7 @@ module "ecs_service" {
       })
       health_check = each.value.enable_healthcheck ? {
         command = each.value.health_check.command
-      } : null
+      } : {}
       command    = each.value.command
       entryPoint = each.value.entryPoint
     }
