@@ -380,3 +380,22 @@ module "load_mdss" {
   cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
   db_exists          = true
 }
+
+module "load_scram_alcohol_monitoring" {
+  count  = local.is-development ? 0 : 1
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
+  name               = "mdss"
+  environment        = local.environment
+  database_name      = "allied-mdss"
+  path_to_data       = "/allied/mdss"
+  source_data_bucket = module.s3-raw-formatted-data-bucket.bucket
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  db_exists          = true
+}
