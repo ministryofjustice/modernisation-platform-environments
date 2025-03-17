@@ -122,7 +122,7 @@ locals {
           from_port   = 3391
           to_port     = 3391
           protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
         }
         winrm_rds = {
           description = "5985/6: Allow WinRM TCP ingress (powershell remoting) for RDS"
@@ -189,12 +189,26 @@ locals {
           protocol    = "UDP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
+        ldap_rds_ad = {
+          description = "389: Allow LDAP ingress from AD to authenticate users"
+          from_port   = 389
+          to_port     = 389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.domain_controllers
+        }
         rpc_tcp_rds_cb = {
           description = "445: Allow RPC TCP ingress from Connection Broker"
           from_port   = 445
           to_port     = 445
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+        ldaps_rds_ad = {
+          description = "636: Allow LDAPS ingress from RDS to AD to authenticate users"
+          from_port   = 636
+          to_port     = 636
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.domain_controllers
         }
         rdp_tcp_web = {
           description = "3389: Allow RDP TCP ingress"
