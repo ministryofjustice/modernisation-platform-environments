@@ -1,3 +1,14 @@
+
+import {
+  to = aws_route53_resolver_rule
+  id = "rslvr-rr-534317bb27d044dda"
+}
+
+import {
+  to = aws_route53_resolver_rule_association.i2n
+  id = "rslvr-rrassoc-615763f9e2c242519"
+}
+
 ## AWS Resolver Endpoint security group
 resource "aws_security_group" "aws_dns_resolver" {
   provider    = aws.core-vpc
@@ -75,7 +86,7 @@ resource "aws_route53_resolver_rule" "i2n" {
   provider = aws.core-vpc
 
   domain_name          = "i2n.com"
-  name                 = "${local.project_name}-${local.environment}-local"
+  name                 = "${local.project_name}-${local.environment}-directory"
   rule_type            = "FORWARD"
   resolver_endpoint_id = aws_route53_resolver_endpoint.vpc.id
 
@@ -91,5 +102,5 @@ resource "aws_route53_resolver_rule_association" "i2n" {
 
   resolver_rule_id = aws_route53_resolver_rule.i2n.id
   vpc_id           = data.aws_vpc.shared.id
-  name             = "${local.project_name}-${local.environment}-local"
+  name             = "${local.project_name}-${local.environment}-association"
 }
