@@ -23,7 +23,7 @@ data "template_file" "userdata" {
 
 
 resource "aws_instance" "esb" {
-  ami                    = "ami-057a7dcc59260e570"
+  ami                    = "ami-0ceb4143abb58a14a"
   instance_type          = "t3a.xlarge"  
   key_name               = module.key_pair.key_pair_name     
   monitoring             = true
