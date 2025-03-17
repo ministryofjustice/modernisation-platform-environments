@@ -1,3 +1,8 @@
+import {
+  to = module.update-dc-names.aws_lambda_function.main
+  id = "update-dc-names"
+}
+
 ###Update DC Names so auth can properly use ldaps
 module "update-dc-names" {
   source         = "./modules/lambda"
