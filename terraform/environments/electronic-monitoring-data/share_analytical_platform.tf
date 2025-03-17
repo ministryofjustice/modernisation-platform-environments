@@ -209,6 +209,7 @@ data "aws_iam_policy_document" "lake_formation_data_access" {
 # Policy Document
 
 data "aws_iam_policy_document" "lake_formation_lftag_access" {
+      #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
   statement {
     actions = [
       "lakeformation:AddLFTagsToResource",
