@@ -23,9 +23,9 @@ module "vpc_endpoints" {
   source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
 
   security_group_ids = [aws_security_group.vpc_endpoints.id]
-  subnet_ids = values(aws_subnet.vsrx_subnets)[*].id
+  subnet_ids         = values(aws_subnet.vsrx_subnets)[*].id
 
-  vpc_id             = module.vpc.vpc_id
+  vpc_id = module.vpc.vpc_id
 
   endpoints = {
     logs = {
