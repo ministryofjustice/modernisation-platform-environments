@@ -104,6 +104,7 @@ resource "aws_subnet" "vsrx_subnets" {
     Name = each.key
   })
 }
+
 # Create Network Interfaces for vSRX01 (eu-west-2a)
 resource "aws_network_interface" "vsrx01_enis" {
   for_each = {
@@ -115,7 +116,7 @@ resource "aws_network_interface" "vsrx01_enis" {
 
   subnet_id         = aws_subnet.vsrx_subnets[each.value].id
   source_dest_check = false # Disable Source/Destination Check
-  security_groups   = contains(["vSRX01 PSK External Interface", "vSRX01 Cert External Interface"], each.key) ? [aws_security_group.external_sg.id] : [aws_security_group.internal_sg.id]
+  security_groups   = each.key == "vSRX01 Internal Interface" ? [aws_security_group.internal_sg.id] : [aws_security_group.external_sg.id]
 
   tags = merge(local.tags, {
     Name = each.key
@@ -133,7 +134,7 @@ resource "aws_network_interface" "vsrx02_enis" {
 
   subnet_id         = aws_subnet.vsrx_subnets[each.value].id
   source_dest_check = false # Disable Source/Destination Check
-  security_groups   = contains(["vSRX02 PSK External Interface", "vSRX02 Cert External Interface"], each.key) ? [aws_security_group.external_sg.id] : [aws_security_group.internal_sg.id]
+  security_groups   = each.key == "vSRX02 Internal Interface" ? [aws_security_group.internal_sg.id] : [aws_security_group.external_sg.id]
 
   tags = merge(local.tags, {
     Name = each.key

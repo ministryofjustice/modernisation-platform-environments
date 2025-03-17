@@ -59,15 +59,32 @@ resource "aws_security_group" "internal_sg" {
 resource "aws_instance" "vsrx01" {
   ami                         = "ami-0ad7c5b240d3318e2"  # Replace with correct AMI ID
   instance_type               = "c5.xlarge"
-#   key_name                    = "your-key-pair"          # Replace with your SSH key name
-  subnet_id                   = aws_subnet.vsrx_subnets["vSRX01 Management Range"].id
+  key_name                    = "Juniper_KeyPair"       # Replace with your SSH key name
+#   subnet_id                   = aws_subnet.vsrx_subnets["vSRX01 Management Range"].id
 
-  # Attach security groups
-  vpc_security_group_ids = [
-    aws_security_group.external_sg.id,
-    aws_security_group.internal_sg.id
-  ]
+  # Attach the Management Interface
+  network_interface {
+    network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 Management Interface"].id
+    device_index         = 0  # Primary interface (eth0)
+  }
 
+  # Attach the PSK External Interface
+  network_interface {
+    network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 PSK External Interface"].id
+    device_index         = 1  # Secondary interface (eth1)
+  }
+
+  # Attach the Cert External Interface
+  network_interface {
+    network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 Cert External Interface"].id
+    device_index         = 2  # Tertiary interface (eth2)
+  }
+
+  # Attach the Internal Interface
+  network_interface {
+    network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 Internal Interface"].id
+    device_index         = 3  # Quaternary interface (eth3)
+  }
 
   tags = merge(local.tags, {
     Name = "Juniper vSRX01"
