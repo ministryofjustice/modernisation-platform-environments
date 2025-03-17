@@ -3,17 +3,17 @@
     "development": {
       "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark.butler@hmcts.net",
       "mkolakowski": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL73/Le9uGDjmXiVpPFtMmjbM2JkGmj3XVB9VPD6hweb mateusz.kolakowski@justice.gov.uk",
-      "nhalwathura": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPv2gty2/YnE5VqaLq082HUHoCwyD/YwNB+JMTFthI6K nisali.halwathura@hmcts.net"
+      "tolubusi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMkw1lp7lwX72Ng7/rOPjx95ArMJW0/CYDftgimT5x0 timi.olubusi@hmcts.net"
     },
     "preproduction": {
       "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark.butler@hmcts.net",
       "mkolakowski": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL73/Le9uGDjmXiVpPFtMmjbM2JkGmj3XVB9VPD6hweb mateusz.kolakowski@justice.gov.uk",
-      "nhalwathura": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPv2gty2/YnE5VqaLq082HUHoCwyD/YwNB+JMTFthI6K nisali.halwathura@hmcts.net"
+      "tolubusi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMkw1lp7lwX72Ng7/rOPjx95ArMJW0/CYDftgimT5x0 timi.olubusi@hmcts.net"
     },
     "production": {
       "mgbutler": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDeRxdAAvyFpWSShknO5QoWnGeWYFDkJgvmgnuWXeLuW mark.butler@hmcts.net",
       "mkolakowski": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIL73/Le9uGDjmXiVpPFtMmjbM2JkGmj3XVB9VPD6hweb mateusz.kolakowski@justice.gov.uk",
-      "nhalwathura": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPv2gty2/YnE5VqaLq082HUHoCwyD/YwNB+JMTFthI6K nisali.halwathura@hmcts.net"
+      "tolubusi": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEMkw1lp7lwX72Ng7/rOPjx95ArMJW0/CYDftgimT5x0 timi.olubusi@hmcts.net"
     }
   }
 }

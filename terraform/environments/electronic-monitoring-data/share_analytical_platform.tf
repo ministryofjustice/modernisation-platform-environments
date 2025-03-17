@@ -204,6 +204,28 @@ data "aws_iam_policy_document" "lake_formation_data_access" {
   }
 }
 
+
+# LakeFormation LFTag permissions
+# Policy Document
+
+data "aws_iam_policy_document" "lake_formation_lftag_access" {
+      #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  statement {
+    actions = [
+      "lakeformation:AddLFTagsToResource",
+      "lakeformation:RemoveLFTagsFromResource",
+      "lakeformation:GetResourceLFTags",
+      "lakeformation:ListLFTags",
+      "lakeformation:GetLFTag",
+      "lakeformation:SearchTablesByLFTags",
+      "lakeformation:SearchDatabasesByLFTags"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
 # access glue tables and start athena queries
 data "aws_iam_policy_document" "unlimited_athena_query" {
   #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
@@ -328,6 +350,12 @@ resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
   policy_arn = aws_iam_policy.lake_formation_data_access.arn
 }
 
+# Lake Formation LFTag Access Attachement
+resource "aws_iam_role_policy_attachment" "lake_formation_lftag_access" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_lftag_access.arn
+}
+
 # Athena Access Attachement
 resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
   role       = aws_iam_role.dataapi_cross_role.name
@@ -345,6 +373,12 @@ resource "aws_iam_policy" "lake_formation_data_access" {
   name        = "${local.environment_shorthand}-lake-formation-data-access"
   description = "LakeFormation Get Data Access Policy"
   policy      = data.aws_iam_policy_document.lake_formation_data_access.json
+}
+
+resource "aws_iam_policy" "lake_formation_lftag_access" {
+  name        = "${local.environment_shorthand}-lake-formation-lftag-access"
+  description = "LakeFormation LFTag Access Policy"
+  policy      = data.aws_iam_policy_document.lake_formation_lftag_access.json
 }
 
 # Analytical Platform Share Policy & Role
