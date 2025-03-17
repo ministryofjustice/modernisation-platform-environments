@@ -453,6 +453,19 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   }
 }
 
+data "aws_iam_policy_document" "allow_airflow_ssh_key" {
+  for_each = local.analytical_platform_share
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [
+      data.aws_secretsmanager_secret.airflow_ssh_secret.arn
+    ]
+  }
+}
+
 # This is not referenced anywhere else aha
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
@@ -479,7 +492,14 @@ resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
 
   name   = "${each.value.target_account_name}-share-policy"
   role   = aws_iam_role.analytical_platform_share_role[each.key].name
-  policy = data.aws_iam_policy_document.analytical_platform_share_policy[each.key].json
+  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
+}
+
+resource "aws_iam_role_policy" "analytical_platform_secret_share_policy_attachment" {
+  for_each = local.analytical_platform_share
+  name     = "analytical-platform-data-production-secrets-allow-policy"
+  role     = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy   = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
 }
 
 # ref: https://docs.aws.amazon.com/lake-formation/latest/dg/cross-account-prereqs.html
@@ -533,4 +553,48 @@ module "share_non_cadt_dbs_with_roles" {
   data_bucket_lf_resource = aws_lakeformation_resource.rds_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
   de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+}
+
+
+data "aws_secretsmanager_secret" "airflow_ssh_secret" {
+  name = aws_secretsmanager_secret.airflow_secret[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.airflow_ssh_secret]
+}
+
+data "aws_secretsmanager_secret_version" "airflow_ssh_secret" {
+  secret_id = data.aws_secretsmanager_secret.airflow_secret.id
+
+  depends_on = [aws_secretsmanager_secret.airflow_ssh_secret]
+}
+
+
+## DBT Analytics EKS Cluster Identifier
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "airflow_ssh_secret" {
+  count = local.is-preproduction || local.is-production ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.airflow_ssh_secret[0].id
+  secret_string = jsonencode(local.airflow_secret_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+
+  depends_on = [aws_secretsmanager_secret.airflow_ssh_secret]
+}
+
+resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+
+  count = local.is-preproduction || local.is-production ? 1 : 0
+
+  name = "/alpha/airflow/airflow_cadet_deployments/cadet_repo_key/"
+
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.tags
+  )
 }
