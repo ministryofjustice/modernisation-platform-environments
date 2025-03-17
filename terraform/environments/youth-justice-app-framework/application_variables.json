@@ -6,10 +6,10 @@
       "ad_management_instance_count": 1,
       "desired_number_of_domain_controllers": 2,
       "test_mode": true,
-      "tableau_website_name": "",
+      "tableau_website_name": "tableau.development.justice.gov.uk",
       "ses_domain_identities": {
         "development.justice.gov.uk": {
-          "identity": "tableau.development.justice.gov.uk",
+          "identity": "development.justice.gov.uk",
           "create_records": false
         },
         "yjb.gov.uk": {
@@ -28,7 +28,7 @@
       "ad_management_instance_count": 2,
       "desired_number_of_domain_controllers": 2,
       "test_mode": true,
-      "tableau_website_name": "tableau.sandpit.yjbservices.yjb.gov.uk ",
+      "tableau_website_name": "tableau.test.yjbservices.yjb.gov.uk ",
       "ses_domain_identities": {
         "test.justice.gov.uk": {
           "identity": "test.justice.gov.uk",
