@@ -382,20 +382,98 @@ module "load_mdss" {
 }
 
 module "load_scram_alcohol_monitoring" {
-  count  = local.is-development ? 0 : 1
-  source = "./modules/ap_airflow_load_data_iam_role"
+  count  = local.is-production ? 1 : 0
+  source = "./modules/ap_airflow_iam_role"
 
-  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  environment         = local.environment
+  role_name_suffix    = "load-scram-alcohol-monitoring"
+  role_description    = "Permissions to load data from SCRAM alcohol monitoring"
+  iam_policy_document = data.aws_iam_policy_document.scram_am_ap_airflow.json
+  secret_code         = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn            = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+}
 
-  name               = "mdss"
-  environment        = local.environment
-  database_name      = "allied-mdss"
-  path_to_data       = "/allied/mdss"
-  source_data_bucket = module.s3-raw-formatted-data-bucket.bucket
-  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
-  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
-  athena_dump_bucket = module.s3-athena-bucket.bucket
-  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
-  db_exists          = true
+data "aws_iam_policy_document" "scram_am_ap_airflow" {
+  statement {
+    sid    = "AthenaPermissionsForScramAlcoholMonitoring"
+    effect = "Allow"
+    actions = [
+      "athena:StartQueryExecution",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:StopQueryExecution",
+      "athena:ListQueryExecutions",
+      "athena:GetWorkGroup",
+      "athena:ListWorkGroups"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "S3AthenaQueryBucketPermissionsForScramAlcoholMonitoring"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.s3-athena-bucket.bucket.arn,
+      "${module.s3-athena-bucket.bucket.arn}/output/scram_am/*",
+    ]
+  }
+  statement {
+    sid    = "GluePermissionsForScramAlcoholMonitoring"
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTable",
+      "glue:GetPartitions"
+    ]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "S3BucketPermissionsForScramAlcoholMonitoring"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.s3-data-bucket.bucket_arn,
+      "${module.s3-data-bucket.bucket_arn}/scram/alcohol_monitoring/*",
+    ]
+  }
+  statement {
+    sid    = "S3PutBucketPermissionsForScramAlcoholMonitoring"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:ListBucket"
+    ]
+    resources = [
+      module.s3-cadt-bucket.bucket_arn,
+      "${module.s3-cadt-bucket.bucket_arn}/*",
+    ]
+  }
+  statement {
+    sid       = "GetDataAccessForLakeFormationForScramAlcoholMonitoring"
+    effect    = "Allow"
+    actions   = ["lakeformation:GetDataAccess"]
+    resources = ["*"]
+  }
+  statement {
+    sid       = "ListAccountAliasForScramAlcoholMonitoring"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "ListAllBuckesForScramAlcoholMonitoring"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
 }
