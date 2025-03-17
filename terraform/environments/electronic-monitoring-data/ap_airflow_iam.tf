@@ -22,7 +22,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
   #checkov:skip=CKV_AWS_356
   #checkov:skip=CKV_AWS_111
   statement {
-    sid = "AthenaPermissionsForP1Export"
+    sid    = "AthenaPermissionsForP1Export"
     effect = "Allow"
     actions = [
       "athena:StartQueryExecution",
@@ -36,7 +36,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
-    sid = "S3AthenaQueryBucketPermissionsForP1Export"
+    sid    = "S3AthenaQueryBucketPermissionsForP1Export"
     effect = "Allow"
     actions = [
       "s3:GetObject",
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     ]
   }
   statement {
-    sid = "GluePermissionsForP1Export"
+    sid    = "GluePermissionsForP1Export"
     effect = "Allow"
     actions = [
       "glue:GetDatabase",
@@ -83,9 +83,9 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     resources = ["*"]
   }
   statement {
-    sid       = "ListAllBuckesForP1Export"
-    effect    = "Allow"
-    actions   = [
+    sid    = "ListAllBuckesForP1Export"
+    effect = "Allow"
+    actions = [
       "s3:ListAllMyBuckets",
       "s3:GetBucketLocation"
     ]
@@ -363,6 +363,25 @@ module "load_fms" {
 
 
 module "load_mdss" {
+  count  = local.is-development ? 0 : 1
+  source = "./modules/ap_airflow_load_data_iam_role"
+
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
+  name               = "mdss"
+  environment        = local.environment
+  database_name      = "allied-mdss"
+  path_to_data       = "/allied/mdss"
+  source_data_bucket = module.s3-raw-formatted-data-bucket.bucket
+  secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
+  oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
+  athena_dump_bucket = module.s3-athena-bucket.bucket
+  cadt_bucket        = module.s3-create-a-derived-table-bucket.bucket
+  db_exists          = true
+}
+
+module "load_scram_alcohol_monitoring" {
   count  = local.is-development ? 0 : 1
   source = "./modules/ap_airflow_load_data_iam_role"
 
