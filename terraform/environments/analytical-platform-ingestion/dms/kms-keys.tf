@@ -1,8 +1,6 @@
 module "s3_cica_dms_ingress_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
-  count = 1 # Needed (as originally conditional) to avoid destroy-create
-
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 

@@ -3,8 +3,6 @@
 module "cica_dms_ingress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
-  count = 1 # Needed (as originally conditional) to avoid destroy-create
-
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
@@ -20,7 +18,7 @@ module "cica_dms_ingress_bucket" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.s3_cica_dms_ingress_kms[0].key_arn
+        kms_master_key_id = module.s3_cica_dms_ingress_kms.key_arn
         sse_algorithm     = "aws:kms"
       }
     }
@@ -30,7 +28,7 @@ module "cica_dms_ingress_bucket" {
 resource "aws_s3_bucket_replication_configuration" "cica_dms_ingress_bucket_replication" {
   count = local.environment == "production" ? 1 : 0
   role = module.production_replication_cica_dms_iam_role[0].iam_role_arn
-  bucket = module.cica_dms_ingress_bucket[0].s3_bucket_id
+  bucket = module.cica_dms_ingress_bucket.s3_bucket_id
   rule {
     id                        = "mojap-ingestion-cica-dms-ingress"
     status                    = "Enabled"
