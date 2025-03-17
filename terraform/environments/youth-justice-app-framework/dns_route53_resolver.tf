@@ -1,9 +1,11 @@
 ## AWS Resolver Endpoint security group
 resource "aws_security_group" "aws_dns_resolver" {
   provider    = aws.core-vpc
-  name        = "yjaf-dns-resolver"
+  name        = "${local.project_name}-${local.environment}-dns-resolver"
   description = "Security Group for DNS resolver request"
   vpc_id      = data.aws_vpc.shared.id
+
+  tags = local.tags
 }
 
 locals {
@@ -48,7 +50,7 @@ resource "aws_security_group_rule" "egress_dns_endpoint_traffic" {
 resource "aws_route53_resolver_endpoint" "vpc" {
   provider = aws.core-vpc
 
-  name                   = "local"
+  name                   = "${local.project_name}-${local.environment}-local"
   direction              = "OUTBOUND"
   resolver_endpoint_type = "IPV4"
 
@@ -60,9 +62,7 @@ resource "aws_route53_resolver_endpoint" "vpc" {
 
   protocols = ["Do53"]
 
-  timeouts {
-    create = "10m"
-  }
+  tags = local.tags
 }
 
 locals {
@@ -75,13 +75,15 @@ resource "aws_route53_resolver_rule" "i2n" {
   provider = aws.core-vpc
 
   domain_name          = "i2n.com"
-  name                 = "directory"
+  name                 = "${local.project_name}-${local.environment}-directory"
   rule_type            = "FORWARD"
   resolver_endpoint_id = aws_route53_resolver_endpoint.vpc.id
 
   target_ip { ip = local.dns_ip_addresses[0] }
   target_ip { ip = local.dns_ip_addresses[1] }
   target_ip { ip = local.ip_address_count > 2 ? local.dns_ip_addresses[2] : null}
+
+  tags = local.tags
 }
 
 resource "aws_route53_resolver_rule_association" "i2n" {
@@ -89,4 +91,5 @@ resource "aws_route53_resolver_rule_association" "i2n" {
 
   resolver_rule_id = aws_route53_resolver_rule.i2n.id
   vpc_id           = data.aws_vpc.shared.id
+  name             = "${local.project_name}-${local.environment}-association"
 }
