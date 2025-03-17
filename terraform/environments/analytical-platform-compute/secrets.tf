@@ -152,7 +152,7 @@ module "actions_runners_token_apc_self_hosted_runners_github_app" {
   version = "1.3.1"
 
   name        = "actions-runners/app/apc-self-hosted-runners"
-  description = "https://github.com/organizations/moj-analytical-services/settings/installations/57058653"
+  description = "https://github.com/organizations/moj-analytical-services/settings/apps/analytical-platform-runners"
   kms_key_id  = module.common_secrets_manager_kms.key_arn
 
   secret_string = jsonencode({
