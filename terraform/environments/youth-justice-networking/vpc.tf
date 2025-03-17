@@ -73,12 +73,21 @@ module "vpc" {
    type              = "ingress"
  }
 
+ # Create Internet Gateway
+resource "aws_internet_gateway" "main" {
+  vpc_id = module.vpc.vpc_id
+
+  tags = {
+    Name = "${local.application_name}-${local.environment}-igw"
+  }
+}
+
 resource "aws_subnet" "vsrx_subnets" {
   for_each = {
-    "vSRX01 Management Rangexxx"    = { cidr = "10.100.105.0/24", az = "eu-west-2a" }
-    "vSRX01 PSK External Rangexxx"  = { cidr = "10.100.110.0/24", az = "eu-west-2a" }
-    "vSRX01 Cert External Rangexxx" = { cidr = "10.100.115.0/24", az = "eu-west-2a" }
-    "vSRX01 Internal Rangexxx"      = { cidr = "10.100.120.0/24", az = "eu-west-2a" }
+    "vSRX01 Management Range"    = { cidr = "10.100.105.0/24", az = "eu-west-2a" }
+    "vSRX01 PSK External Range"  = { cidr = "10.100.110.0/24", az = "eu-west-2a" }
+    "vSRX01 Cert External Range" = { cidr = "10.100.115.0/24", az = "eu-west-2a" }
+    "vSRX01 Internal Range"      = { cidr = "10.100.120.0/24", az = "eu-west-2a" }
     "Juniper Management & KMS"   = { cidr = "10.100.50.0/24", az = "eu-west-2a" }
     "vSRX02 Management Range"    = { cidr = "10.100.205.0/24", az = "eu-west-2b" }
     "vSRX02 PSK External Range"  = { cidr = "10.100.210.0/24", az = "eu-west-2b" }
@@ -90,6 +99,41 @@ resource "aws_subnet" "vsrx_subnets" {
   cidr_block              = each.value.cidr
   availability_zone       = each.value.az
   map_public_ip_on_launch = false
+
+  tags = merge(local.tags, {
+    Name = each.key
+  })
+}
+# Create Network Interfaces for vSRX01 (eu-west-2a)
+resource "aws_network_interface" "vsrx01_enis" {
+  for_each = {
+    "vSRX01 Management Interface"    = "vSRX01 Management Range"
+    "vSRX01 PSK External Interface"  = "vSRX01 PSK External Range"
+    "vSRX01 Cert External Interface" = "vSRX01 Cert External Range"
+    "vSRX01 Internal Interface"      = "vSRX01 Internal Range"
+  }
+
+  subnet_id         = aws_subnet.vsrx_subnets[each.value].id
+  source_dest_check = false # Disable Source/Destination Check
+  security_groups   = contains(["vSRX01 PSK External Interface", "vSRX01 Cert External Interface"], each.key) ? [aws_security_group.external_sg.id] : [aws_security_group.internal_sg.id]
+
+  tags = merge(local.tags, {
+    Name = each.key
+  })
+}
+
+# Create Network Interfaces for vSRX02 (eu-west-2b)
+resource "aws_network_interface" "vsrx02_enis" {
+  for_each = {
+    "vSRX02 Management Interface"    = "vSRX02 Management Range"
+    "vSRX02 PSK External Interface"  = "vSRX02 PSK External Range"
+    "vSRX02 Cert External Interface" = "vSRX02 Cert External Range"
+    "vSRX02 Internal Interface"      = "vSRX02 Internal Range"
+  }
+
+  subnet_id         = aws_subnet.vsrx_subnets[each.value].id
+  source_dest_check = false # Disable Source/Destination Check
+  security_groups   = contains(["vSRX02 PSK External Interface", "vSRX02 Cert External Interface"], each.key) ? [aws_security_group.external_sg.id] : [aws_security_group.internal_sg.id]
 
   tags = merge(local.tags, {
     Name = each.key
