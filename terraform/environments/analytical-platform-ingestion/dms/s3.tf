@@ -3,7 +3,7 @@
 module "cica_dms_ingress_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
-  count = local.environment == "production" ? 1 : 0
+  count = 1 # Needed (as originally conditional) to avoid destroy-create
 
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
@@ -16,7 +16,7 @@ module "cica_dms_ingress_bucket" {
     enabled = true
   }
 
-  replication_configuration = {
+  replication_configuration = local.environment == "production" ? {
     role = module.production_replication_cica_dms_iam_role[0].iam_role_arn
     rules = [
       {
@@ -51,7 +51,7 @@ module "cica_dms_ingress_bucket" {
         }
       }
     ]
-  }
+  } : {}
 
   server_side_encryption_configuration = {
     rule = {
