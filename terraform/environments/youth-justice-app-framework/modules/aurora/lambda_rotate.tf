@@ -81,6 +81,17 @@ resource "aws_iam_policy" "rds_secret_rotation_policy" {
         ],
         "Resource" : "*",
         "Effect" : "Allow"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ],
+        "Resource" : var.kms_key_arn
       }
     ]
   })
