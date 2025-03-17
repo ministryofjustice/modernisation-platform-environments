@@ -56,5 +56,10 @@ resource "null_resource" "reset_passwords" {
     command = "bash ./modules/aurora/scripts/reset_db_passwords.sh ${module.aurora.cluster_endpoint} ${module.aurora.cluster_master_username} \"$DB_PASSWORD\" ${each.value} \"$USER_PASSWORD\""
   }
 
+  #run everytime
+  triggers = {
+    always_run = timestamp()
+  }
+
   depends_on = [module.aurora]
 }
