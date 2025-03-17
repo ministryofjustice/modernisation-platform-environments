@@ -420,7 +420,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 }
 
 data "aws_iam_policy_document" "allow_airflow_ssh_key" {
-  count = local.is-preproduction || local.is-production ? 1 : 0
+  for_each = local.analytical_platform_share
   statement {
     effect = "Allow"
     actions = [
@@ -458,14 +458,14 @@ resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
 
   name   = "${each.value.target_account_name}-share-policy"
   role   = aws_iam_role.analytical_platform_share_role[each.key].name
-  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[0].json
+  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
 }
 
 resource "aws_iam_role_policy" "analytical_platform_secret_share_policy_attachment" {
-  count  = local.is-preproduction || local.is-production ? 1 : 0
-  name   = "analytical-platform-data-production-secrets-allow-policy"
-  role   = aws_iam_role.analytical_platform_share_role["analytical-platform-data-production"].name
-  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[0].json
+  for_each = local.analytical_platform_share
+  name     = "analytical-platform-data-production-secrets-allow-policy"
+  role     = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy   = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
 }
 
 # ref: https://docs.aws.amazon.com/lake-formation/latest/dg/cross-account-prereqs.html
