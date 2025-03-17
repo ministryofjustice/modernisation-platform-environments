@@ -1,6 +1,6 @@
 
 import {
-  to = aws_route53_resolver_rule
+  to = aws_route53_resolver_rule,i2n
   id = "rslvr-rr-534317bb27d044dda"
 }
 
