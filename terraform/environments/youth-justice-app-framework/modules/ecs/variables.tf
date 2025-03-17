@@ -23,12 +23,6 @@ variable "nameserver" {
   type        = string
 }
 
-variable "enable_healthcheck" {
-  description = "Enable the healthcheck for the ECS cluster"
-  type        = bool
-  default     = true
-}
-
 variable "ecs_services" {
   description = "A list of ECS services to create. Will create the main container definition for the app itself"
   type = map(object({
@@ -38,6 +32,7 @@ variable "ecs_services" {
     deployment_controller    = optional(string, "CODE_DEPLOY")
     internal_only            = optional(bool, true)
     additional_port_mappings = optional(any, [])
+    enable_healthcheck       = optional(bool, true)
     health_check = optional(object({
       command      = list(string)
       interval     = number
