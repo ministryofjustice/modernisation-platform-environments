@@ -451,8 +451,8 @@ data "aws_iam_policy_document" "scram_am_ap_airflow" {
       "s3:ListBucket"
     ]
     resources = [
-      module.s3-cadt-bucket.bucket_arn,
-      "${module.s3-cadt-bucket.bucket_arn}/*",
+      module.s3-create-a-derived-table-bucket.bucket_arn,
+      "${module.s3-create-a-derived-table-bucket.bucket_arn}/*",
     ]
   }
   statement {
