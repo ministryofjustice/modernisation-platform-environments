@@ -49,8 +49,8 @@ resource "null_resource" "reset_passwords" {
 
   provisioner "local-exec" {
     environment = {
-      DB_PASSWORD   = jsondecode(data.aws_secretsmanager_secret_version.master_secret.secret_string)["password"]
-      USER_PASSWORD = jsondecode(aws_secretsmanager_secret_version.aurora_rotated_user_version[each.value].secret_string)["password"]
+      DB_PASSWORD   = "test"
+      USER_PASSWORD = "test"
     }
 
     command = "bash ./modules/aurora/scripts/reset_db_passwords.sh ${module.aurora.cluster_endpoint} ${module.aurora.cluster_master_username} \"$DB_PASSWORD\" ${each.value} \"$USER_PASSWORD\""
