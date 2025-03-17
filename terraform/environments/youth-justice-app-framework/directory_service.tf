@@ -1,3 +1,21 @@
+import {
+  to = module.ds.aws_cloudformation_stack.pki_quickstart
+  id = "MicrosoftPKIQuickStartCA"
+}
+
+import {
+  to = module.ds.aws_cloudwatch_log_group.ds
+  id = "/aws/directoryservice/d-9c67503609"
+
+}
+
+import {
+  to = module.ds.aws_ssm_document.ssm_document
+  id = "ssm_document_ad_schema2.2"
+
+}
+
+
 module "ds" {
   source = "./modules/directory-service"
 
