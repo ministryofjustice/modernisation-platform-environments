@@ -439,8 +439,8 @@ data "aws_iam_policy_document" "scram_am_ap_airflow" {
       "s3:ListBucket"
     ]
     resources = [
-      module.s3-data-bucket.bucket_arn,
-      "${module.s3-data-bucket.bucket_arn}/scram/alcohol_monitoring/*",
+      module.s3-data-bucket.bucket.arn,
+      "${module.s3-data-bucket.bucket.arn}/scram/alcohol_monitoring/*",
     ]
   }
   statement {
@@ -451,8 +451,8 @@ data "aws_iam_policy_document" "scram_am_ap_airflow" {
       "s3:ListBucket"
     ]
     resources = [
-      module.s3-create-a-derived-table-bucket.bucket_arn,
-      "${module.s3-create-a-derived-table-bucket.bucket_arn}/*",
+      module.s3-create-a-derived-table-bucket.bucket.arn,
+      "${module.s3-create-a-derived-table-bucket.bucket.arn}/*",
     ]
   }
   statement {
