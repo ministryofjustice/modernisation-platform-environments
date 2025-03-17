@@ -62,7 +62,7 @@ resource "aws_lambda_permission" "allow_bucket" {
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
-  count         = var.destination_bucket_id != null ? 1 : 0
+  count = var.destination_bucket_id != null ? 1 : 0
 
   bucket = module.this-bucket.bucket.id
 
@@ -105,7 +105,7 @@ resource "aws_iam_role" "push_lambda" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-data "aws_iam_policy_document" "push_lambda" {  
+data "aws_iam_policy_document" "push_lambda" {
   statement {
     sid    = "S3PermissionsForExportBucket"
     effect = "Allow"
