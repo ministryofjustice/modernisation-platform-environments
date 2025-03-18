@@ -1,3 +1,4 @@
+
 variable "project_name" {
   type        = string
   description = "project name within aws"
@@ -40,7 +41,7 @@ variable "instance_type" {
 }
 
 variable "instance_volume_size" {
-  description = "The size of the volumne to ba allotages to the Tableau instance."
+  description = "The size of the volumne to be allocated to the Tableau instance."
   type        = number
   default     = 500
 }
