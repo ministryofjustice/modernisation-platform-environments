@@ -1,9 +1,11 @@
 
-/*import {
+/*
+## Import Statements that were used to deal with issues arising following the last Development Service Destroy. They may not be needed in future.
+import {
   to = module.ds.aws_cloudformation_stack.pki_quickstart
   id = "MicrosoftPKIQuickStartCA"
 }
-*/
+
 import {
   to = module.ds.aws_cloudwatch_log_group.ds
   id = "/aws/directoryservice/d-9c67503609"
@@ -14,8 +16,6 @@ import {
   id = "ssm_document_ad_schema2.2"
 }
 */
-
-
 
 module "ds" {
   source = "./modules/directory-service"
