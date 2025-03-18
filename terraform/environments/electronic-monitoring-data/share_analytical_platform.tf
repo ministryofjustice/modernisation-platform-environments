@@ -329,8 +329,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 
     ]
     resources = [
-      #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
-      "arn:aws:lakeformation:${data.aws_region.current.name}:${local.env_account_id}:catalog:${local.env_account_id}"
+      "arn:aws:lakeformation:${data.aws_region.current.name}:${local.env_account_id}:catalog:${local.env_account_id}",
+      module.s3-create-a-derived-table-bucket.bucket.arn
     ]
   }
 
