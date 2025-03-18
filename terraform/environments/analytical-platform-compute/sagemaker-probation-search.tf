@@ -147,7 +147,13 @@ module "probation_search_sagemaker_execution_iam_role" {
       resources = [local.probation_search_model_kms_arn]
     },
     {
-      sid       = "S3Access"
+      sid       = "S3BucketAccess"
+      effect    = "Allow"
+      actions   = ["s3:ListBucket"]
+      resources = ["arn:aws:s3:::${local.probation_search_model_bucket_name}"]
+    },
+    {
+      sid       = "S3ObjectAccess"
       effect    = "Allow"
       actions   = ["s3:GetObject"]
       resources = ["arn:aws:s3:::${local.probation_search_model_bucket_name}/*"]
