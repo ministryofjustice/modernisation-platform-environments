@@ -6,12 +6,13 @@ locals {
   probation_search_environments = {
     analytical-platform-compute-development = {
       hmpps-probation-search-dev = {
-        namespace       = "hmpps-probation-search-dev"                 # MOJ Cloud Platform namespace where OpenSearch is hosted
-        instance_type   = "ml.t2.large"                                # SageMaker AI Real-time Inference instance type to use
-        repository_name = "tei-cpu"                                    # "tei" for GPU-accelerated instances, "tei-cpu" for CPU-only instances
-        image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"       # Version of the Hugging Face Text Embeddings Inference image to use. See https://huggingface.co/docs/text-embeddings-inference.
-        environment = {                                                # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
-          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1" # To use a remote model from Hugging Face Hub (takes precedence over s3_model_key above, if present)
+        namespace       = "hmpps-probation-search-dev"                    # MOJ Cloud Platform namespace where OpenSearch is hosted
+        instance_type   = "ml.t2.large"                                   # SageMaker AI Real-time Inference instance type to use
+        repository_name = "tei-cpu"                                       # "tei" for GPU-accelerated instances, "tei-cpu" for CPU-only instances
+        image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"          # Version of the Hugging Face Text Embeddings Inference image to use. See https://huggingface.co/docs/text-embeddings-inference.
+        s3_model_key    = "ext/mixedbread-ai/mxbai-embed-large-v1.tar.gz" # To use a local model from S3
+        environment = {                                                   # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
+          #HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"    # To use a remote model from Hugging Face Hub (takes precedence over s3_model_key above, if present)
           MAX_CLIENT_BATCH_SIZE = 512
         }
       }
