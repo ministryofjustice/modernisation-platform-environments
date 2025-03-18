@@ -6,7 +6,7 @@ module "cica_dms_ingress_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "mojap-ingestion-production-cica-dms-ingress"
+  bucket = "mojap-ingestion-${local.environment}-cica-dms-ingress"
 
   force_destroy = true
 
