@@ -181,6 +181,7 @@ locals {
     fsx_windows = {
 
       pp-bods-win-share = {
+        aliases             = ["pp-onr-fs.azure.noms.root"]
         deployment_type     = "SINGLE_AZ_1"
         security_groups     = ["bods"]
         skip_final_backup   = true
