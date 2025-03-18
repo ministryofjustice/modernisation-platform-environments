@@ -127,12 +127,12 @@ module "autoscaling" {
   update_default_version = true
   user_data              = base64encode(data.template_file.userdata.rendered)
 
-  #Networking
-  network_interfaces = [
-    {
-      ipv4_address_count = 10 # Assign 10 secondary IPs
-    }
-  ]
+  #Networking this adds more secondary ips but doesn't solve the max eni issues
+  #network_interfaces = [
+  #  {
+  #    ipv4_address_count = 10 # Assign 10 secondary IPs
+  #  }
+  #]
 
 
   # Scaling policies and tags
