@@ -10,7 +10,7 @@ resource "aws_security_group" "external_sg" {
     to_port     = 65535
     protocol    = "udp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow inbound IPSec"
+    description = "Allow inbound IKE"
   }
 
   ingress {
@@ -26,7 +26,7 @@ resource "aws_security_group" "external_sg" {
     to_port     = 65535
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-    description = "Allow inbound IKE"
+    description = "Allow inbound IPSec"
   }
 
   # Outbound Rule (Allow all)

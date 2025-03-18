@@ -6,74 +6,18 @@ module "vpc" {
    name            = "${local.application_name}-${local.environment}"
    azs             = local.availability_zones
    cidr            = local.application_data.accounts[local.environment].vpc_cidr
-   private_subnets = local.private_subnets
+  #  private_subnets = local.private_subnets
  
    # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
-   enable_flow_log                      = true
-   create_flow_log_cloudwatch_log_group = true
-   create_flow_log_cloudwatch_iam_role  = true
+   enable_flow_log                      = false
+   create_flow_log_cloudwatch_log_group = false
+   create_flow_log_cloudwatch_iam_role  = false
    flow_log_max_aggregation_interval    = 60
  
    tags = local.tags
  }
- 
- module "vpc_endpoints" {
-   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
- 
-   source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
- 
-   security_group_ids = [aws_security_group.vpc_endpoints.id]
-   subnet_ids         = module.vpc.private_subnets
-   vpc_id             = module.vpc.vpc_id
- 
-   endpoints = {
-     logs = {
-       service      = "logs"
-       service_type = "Interface"
-       tags = merge(
-         local.tags,
-         { Name = format("%s-logs-api-vpc-endpoint", local.application_name) }
-       )
-     },
-     sts = {
-       service      = "sts"
-       service_type = "Interface"
-       tags = merge(
-         local.tags,
-         { Name = format("%s-sts-vpc-endpoint", local.application_name) }
-       )
-     },
-     s3 = {
-       service         = "s3"
-       service_type    = "Gateway"
-       route_table_ids = module.vpc.private_route_table_ids
-       tags = merge(
-         local.tags,
-         { Name = format("%s-s3-vpc-endpoint", local.application_name) }
-       )
-     }
-   }
- }
- 
- resource "aws_security_group" "vpc_endpoints" {
-   #checkov:skip=CKV2_AWS_5:skip "Ensure that Security Groups are attached to another resource"
-   description = "Security Group for controlling all VPC endpoint traffic"
-   name        = format("%s-vpc-endpoint-sg", local.application_name)
-   vpc_id      = module.vpc.vpc_id
-   tags        = local.tags
- }
- 
- resource "aws_security_group_rule" "allow_all_vpc" {
-   cidr_blocks       = [module.vpc.vpc_cidr_block]
-   description       = "Allow all traffic in from VPC CIDR"
-   from_port         = 0
-   protocol          = -1
-   security_group_id = aws_security_group.vpc_endpoints.id
-   to_port           = 65535
-   type              = "ingress"
- }
 
- # Create Internet Gateway
+# Create Internet Gateway
 resource "aws_internet_gateway" "main" {
   vpc_id = module.vpc.vpc_id
 
@@ -139,4 +83,69 @@ resource "aws_network_interface" "vsrx02_enis" {
   tags = merge(local.tags, {
     Name = each.key
   })
+}
+
+
+# Create the route table
+resource "aws_route_table" "juniper_route_table" {
+  vpc_id = module.vpc.vpc_id
+
+  tags = merge(local.tags, {
+    Name = "Juniper Route Table"
+  })
+}
+
+# Add a route to the Internet Gateway
+resource "aws_route" "juniper_igw_route" {
+  route_table_id         = aws_route_table.juniper_route_table.id
+  destination_cidr_block = "0.0.0.0/0"  # Route all internet-bound traffic
+  gateway_id             = aws_internet_gateway.main.id  # Reference to the IGW
+}
+
+
+# Attach subnets to the route table (excluding "Juniper Management & KMS")
+resource "aws_route_table_association" "juniper_route_table_association" {
+  for_each = {
+    for k, v in aws_subnet.vsrx_subnets : k => v.id if k != "Juniper Management & KMS"
+  }
+
+  subnet_id      = each.value
+  route_table_id = aws_route_table.juniper_route_table.id
+}
+
+# Create Elastic IPs
+resource "aws_eip" "eips" {
+  count = 6
+  tags = {
+    Name = [
+      "Temp vSRX1 Mgt Interface",
+      "Temp vSRX1 PSK Interface",
+      "Temp vSRX1 Cert Interface",
+      "Temp vSRX2 Mgt Interface",
+      "Temp vSRX2 PSK Interface",
+      "Temp vSRX2 Cert Interface"
+    ][count.index]
+  }
+}
+
+# Associate the first 3 EIPs to vsrx01's network interfaces
+resource "aws_eip_association" "vsrx01_eip_associations" {
+  count               = 3
+  network_interface_id = [
+    aws_network_interface.vsrx01_enis["vSRX01 Management Interface"].id,
+    aws_network_interface.vsrx01_enis["vSRX01 PSK External Interface"].id,
+    aws_network_interface.vsrx01_enis["vSRX01 Cert External Interface"].id
+  ][count.index]
+  allocation_id        = aws_eip.eips[count.index].id
+}
+
+# Associate the next 3 EIPs to vsrx02's network interfaces
+resource "aws_eip_association" "vsrx02_eip_associations" {
+  count               = 3
+  network_interface_id = [
+    aws_network_interface.vsrx02_enis["vSRX02 Management Interface"].id,
+    aws_network_interface.vsrx02_enis["vSRX02 PSK External Interface"].id,
+    aws_network_interface.vsrx02_enis["vSRX02 Cert External Interface"].id
+  ][count.index]
+  allocation_id        = aws_eip.eips[count.index + 3].id
 }
