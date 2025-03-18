@@ -632,3 +632,27 @@ resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
     local.tags
   )
 }
+
+
+# Grant permissions to the cross-account role
+resource "aws_lakeformation_permissions" "cross_account_glue" {
+  principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/GlobalGitHubActionAdmin"
+
+  permissions = ["ALTER", "UPDATE"]
+
+  database {
+    name = "staged_fms_test_dbt"
+  }
+}
+
+# Additional permissions for tables if needed
+resource "aws_lakeformation_permissions" "cross_account_glue_tables" {
+  principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/GlobalGitHubActionAdmin"
+
+  permissions = ["ALTER", "UPDATE"]
+
+  table {
+    database_name = "staged_fms_test_dbt"
+    name          = "*"
+  }
+}
