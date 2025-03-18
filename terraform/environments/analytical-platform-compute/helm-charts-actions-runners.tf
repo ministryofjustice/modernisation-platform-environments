@@ -231,7 +231,7 @@ resource "helm_release" "actions_runner_moj_data_catalogue" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-moj-data-catalogue"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.322.0"
+  version    = "2.322.0-1"
   chart      = "actions-runner"
   namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
