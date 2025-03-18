@@ -235,7 +235,7 @@ data "aws_iam_policy_document" "lake_formation_filter_access" {
   statement {
     actions = [
       "lakeformation:GetDataCellsFilter",
-      "lakeformation:CreateDataCellsFilter"
+      "lakeformation:CreateDataCellsFilter",
       "lakeformation:GrantPermissions",
       "lakeformation:RevokePermissions",
       "lakeformation:BatchGrantPermissions",
