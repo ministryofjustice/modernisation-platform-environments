@@ -1,4 +1,6 @@
 
+/*
+## Import Statements that were used to deal with issues arising following the last Development Service Destroy. They may not be needed in future.
 import {
   to = aws_route53_resolver_rule.i2n
   id = "rslvr-rr-534317bb27d044dda"
@@ -8,6 +10,7 @@ import {
   to = aws_route53_resolver_rule_association.i2n
   id = "rslvr-rrassoc-615763f9e2c242519"
 }
+*/
 
 ## AWS Resolver Endpoint security group
 resource "aws_security_group" "aws_dns_resolver" {
