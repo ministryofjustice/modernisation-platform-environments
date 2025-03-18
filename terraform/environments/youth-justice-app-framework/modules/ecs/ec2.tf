@@ -127,6 +127,14 @@ module "autoscaling" {
   update_default_version = true
   user_data              = base64encode(data.template_file.userdata.rendered)
 
+  #Networking
+  network_interfaces = [
+    {
+      ipv4_address_count = 10 # Assign 10 secondary IPs
+    }
+  ]
+
+
   # Scaling policies and tags
   schedules = local.schedules
   tags      = local.all_tags
