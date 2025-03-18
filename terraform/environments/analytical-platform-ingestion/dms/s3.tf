@@ -32,6 +32,7 @@ resource "aws_s3_bucket_replication_configuration" "cica_dms_ingress_bucket_repl
   rule {
     id                        = "mojap-ingestion-cica-dms-ingress"
     status                    = "Enabled"
+    prefix                    = ""
     delete_marker_replication {
       status = "Enabled"
     }
