@@ -11,16 +11,6 @@ resource "aws_security_group" "yjsm_service" {
   )
 }
 
-# (ECS internal to YJSM)
-resource "aws_security_group_rule" "ecs_to_yjsm_internal" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.yjsm_service.id
-  source_security_group_id = var.ecs_service_internal_sg_id
-}
-
 
 
 # (ECS external to YJSMhub)
@@ -31,6 +21,16 @@ resource "aws_security_group_rule" "ecs_to_yjsm_external" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_external_sg_id
+}
+
+# (ECS internal to YJSM)
+resource "aws_security_group_rule" "ecs_to_yjsm_internal" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.ecs_service_internal_sg_id
 }
 
 # (ECS internal to YJSMhub)
@@ -82,3 +82,20 @@ resource "aws_security_group_rule" "assets_80" {
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = aws_security_group.yjsm_service.id
 }
+
+# (ESB)
+resource "aws_security_group_rule" "esb_80" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.esb_service_sg_id
+}
+
+
+
+### TO DO LIST 
+### CUG SUBNETS
+### SERVICE MONITORING/ENG
+### 

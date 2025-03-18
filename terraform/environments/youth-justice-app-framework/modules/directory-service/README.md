@@ -102,7 +102,7 @@ If the instances hasn't koined the domain, this is probably becuase the domain j
 
 # Cutover and Setup Guidance
 ## Introduciton
-This section contains instructions for [initialising the AD Management instances](#managment-server-setup) and [copying active directory users and groups from the old to the new environment](#user-group-copy).
+This section contains instructions for [initialising the AD Management instances](#managment-server-setup), [copying active directory users and groups from the old to the new environment](#user-group-copy) and [Certificate Authority SetUp](#ca-setup).
 
 ## [Managment Server Setup](#managment-server-setup)
 
@@ -203,3 +203,19 @@ On a source management server:
 On a destination management server:
 1. Delete all Users from OU `i2N\Accounts\Users`.
 2. Run powerShell script import-yjaf-users.ps1
+
+## [Certificate Authority SetUp](#ca-setup)
+
+The additional configuration described in Confluance page https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642508592/DOE+LDAPS+and+Certificate+chaining#Domain-Controllers-Server-Certificates-AutoEnrol has not been completed as the AD servers have auto-enroled for LDAPS certificates and LDAPS appears to be working successfully. This may need to be reconsidered following testing in Preproduction (or Test).
+
+In addition the RootCA and SubordinateCA cetificates have been left with their default exiptiy periods of 10 and 5 years respectively, rather thn changeing them to 20 and 10 years as mentioned in the above document.
+
+A template needs to be created on the SubordinateCA server for Tableaus web site HTTPS access as follows:
+1. Launch the Certificate Templates snapin.
+2. Duplicate template `Web Server` to `Tableau Web Server` and make the following changes:
+    - On the `General` tab set the `Valitory period` to 1 year and 6 weeks.
+    - On the `Security` tab add Group `AWS Delegated Administrators`, remove `Allow` `Read` and add `Allow` `Write` and `Enroll`.
+3. Launch Server Tool `Certificate Authority`, right click on `Certificate Templates`, choose option `New` > `Certificate Template to Issue`, highlight `Tableau Web Server` and `OK`.
+
+
+

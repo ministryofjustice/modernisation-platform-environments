@@ -3,7 +3,7 @@ output "instance_id" {
   value       = aws_instance.esb.id
 }
 
-output "security_group_id" {
+output "esb_security_group_id" {
   description = "Security Group ID for esb"
   value       = aws_security_group.esb_service.id
 }

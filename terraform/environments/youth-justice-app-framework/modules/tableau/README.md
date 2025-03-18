@@ -9,87 +9,77 @@ This module manages the Tableau instance and Application load balancer and assoc
 - A Secutity Group for the Load Balancer.
 - PostgreSQL and Redshift security group rules to enable access from Tableau Server.
 - Directory Service security group rules to enable LDAP & LDAPS access from Tableau Server.
+- IAM policies, roles and instance role for Tableau Server.
+- A key-pair for Tableau server.
+- S3 buckets for ALB logs and Tableau backups.
 
 ## Inputs:
 
-| Input | Description |
-| -------- | ----------- |
-| environment | Deployment environment. (Not currently used.) |
-| test_mode | (Optional) When test mode is true the destroy command can be used to remove all items. Remove or set to false for production mode. |
-| vpc_id | VPC ID as output by the VPC module |
-| **Instance Inputs** |
-| subnet_id | ID of the Subnet where the instance is to be created. From a VPC module. |
-| instance_type | (Optional) Type of EC2 instance to provision. Defalt is t3.nano.
-| iam_instance_profile | (Optional) The IAM Role to be assigned to the Tableau instance. Default is TableauSvr.
-| instance_volume_size | (Optinal) The size of the volumne to be allocated to the Tableau instance in GB. Defalt 500.
-| tableaU_ami_image_id | (Optional) The image ID of the AMI to be used to build the Tableau server instance. It should be set to that of a recent version of CIS Amazon Linux 2 ... Level 1...`. It must have already been approved.
-| instance_key_name |The name of the Key Pair to uesd for the Tableau instance. *In future may be created by this module. Alternatively it should be an output from the module that creates it*" |
-| private_ip | The IP address to be assigned to the Tablau instance. It is important to retian this value for Tableau licencing. |
-| patch_schedule |The required value for the PatchSchedule tag. |
-| availability_schedule | The required value for the Schedule tag. |
-| **ALB Inputs** |
-| alb_name | (Optional) The name of the aplplication Load Balancer that provides access to Tableau server. Default "tableau-alb"
-| alb_subnets | List of subnets IDs to which the Tableau applcation load balancer will be assigned. From a VPC module. |
-| certificate_arn | The arn of the SSL cetificate to use for external access to Tableau. *May be created by this module in future. Otherwise it should be an output from the module that creates it.*   |
-| s3_bucket_for_alb_access_logs | The name of the S3 bucket that is to be used for the Tableau application load balancer. *May be creatd by this module in future. Otherwise is should be an output from the module that creates it.* |
-| **Tableau security group inputs** |
-| directory_service_sg_id | The ID of the Active directory Service Security Group. Used to add a rules to eneble ldap & ldaps to AD. From a directory Servce module.|
-| postgresql_sg_id | The ID of the RDS PostgreSQL Security Group. Used to add a rule to enable Tableau access to PostgreSQL. From a PostgreSQL module.|
-| redshift_sg_id | The ID of the Redshift Serverless Security Group. Used to add a rule to enable Tableau access to Redshift. |From a Redshift module.|
-| aws_services_sg_id | The ID of the AWS Services Serverless Security Group. Used to add a rule to enable Tableau access to AWS Systems Manager. |
-| **Datagog Inputs** |
-| datadog-api-key-name | The Name of the Secret that holds the Datagog API Key. |
+**project_name**: (string) Project name within aws.
+**environment**: (string) Deployment environment.
+**test_mode**: (string) (Optional) When test mode is true the destroy command can be used to remove all items. Default false.
+**tags** (map(string)) User defined extra tags to be added to all resources created in the module. Default is an empty map.**
+**vpc_id**: (string) VPC ID.
+### Tableasu Instance Inputs
+**tableau_subnet_id**: (string) ID of the Subnet where the tableau instance is to be created.
+**instance_type**: (string) Type of EC2 instance to provision for Tableau. Default "t3.nano".
+**instance_volume_size**: (number) The size of the volumne to be alocated to the Tableau instance. Default 500.
+**instance_key_name**: (string) The name suffix for the Key Pair to used for the Tableau instance. It will be suffixed with the project and environment name. Default "ec2-instance-keypair".
+**private_ip**: (string) The IP address to be assigned to the Tablau instance. It is important to retaian this value for Tableau licencing. If not specified a new value will be assigned. Default null.
+**patch_schedule**: (string) The required value for the PatchSchedule tag.
+**availability_schedule**: (string) The required value for the Schedule tag.
+### ALB Inputs
+**alb_name**: (string) The name of the aplplication Load Balancer that publishes the Tableau server. Default "tableau-alb".
+**alb_subnet_ids** (list(string)) List of subnet IDs to which the Tableau applcation load bbalancer will be assigned.
+**certificate_arn** (string) The arn of the SSL cetificate to use for external access to Tableau.
+###Tableau security gropup inputs
+**directory_service_sg_id**: (string) The ID of the Active directory Service Security Group. Used to add a rules to aneble ldap & ldaps to AD.
+**management_server_sg_id**: (string) The ID of the Management Servers security group.
+**postgresql_sg_id**: (string) The ID of the RDS PostgreSQL Security Group. Used to add a rule to enable Tableau access to PostgreSQL.
+**redshift_sg_id**: (string) The ID of the Redshift Serverless Security Group. Used to add a rule to enable Tableau access to Redshift.
+### Datadog Inputs
+**datadog_api_key_arn**: (string) The ARN of the Secret that holds the Datadog API Key.
 
-
+**kms_key_arn**: (string) ARN of the AWS KMS key to be used to encrypt secret values.
 
 ## Outputs
 
-| Output | Description |
-| ------ | ----------- |
-|instance_ami | AMI of the Tableau ec2 Instance. |
-| instance_arn | ARN for the Tableau ec2 instance. |
-| tableau_sg_id | Tableasu security group ID. |
-| datedog_secret_arn | ARN for the Secret the holds the Datadog API Key. |
+**instance_ami**: The AMI of the Tableaue ec2 instance.
+**instance_arn**: The ARN of the Tableau ec2 instance.{
+**tableau_sg_id**: The ID of the Security Group hat controlls access to the Tableau ec3 instnce.
 
-*Other outputs to be added when required by other modules.*
+# Cutover and Setup Guidance
+## Introduction
+The process for restoring Tableaus from backup is followed with some variations descripbed below to deal with differences between the old and new environments.
+## Install and Restore
+The process for recovery of Tableau from backups is outlined in Confluance at https://yjb.atlassian.net/wiki/spaces/YAM/pages/5191794714/DOE+Tableau+Backup+and+Recovery#Recovery.1 which refers to detailed instructions in https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642507957/DOE+Tableau+Server+Install+Guide?atlOrigin=eyJpIjoiODA0MTExZDI0YjRhNGU0N2EwMGE1ZmQxOTBmYWEzNmMiLCJwIjoiYyJ9 and its subordinate documents.
 
-## Import Command examples
+The process will be followed but with changes, particurally to the process for restoring Tableau settings, to account for difference between the old and ned environments. In outline:
 
-### Import Command format:
+1. A new server is provisioned by Terraform.
+2. Make Backup Files available.
+3. Create a new installation of Tableau as outlined in the Recovery instructions.
+4. Restore settings as described below. This is a variation of the the Setting Restore process in the Recovery instructions to account for differences between the environments.
+5. Enable External HTTPS with a servicicate signed by the new Subordinate CA.
+6. Restore the Respostory as described in the Recovery instructions using file `repository_for_restore.tsbak` copied below.
 
-- `terragrunt import aws_instance.tableau` <*instance ID*>
-- `terragrunt import module.tableau_sg.aws_security_group.this` <*Security group ID*>
-- `terragrunt import module.postgresql_sg.aws_security_group_rule.ingress_with_source_security_group_id[0]` <*Security Group Rule ID*>
+### Make Backup Files Available
+The latest Tableau backup files should have been replicated to S3 bucket `yjaf-<envoronment>-tableau-backups-archive`. The latest settings and repository files need to be copied to s3 location  `yjaf-<envoronment>-tableau-backups/Install_Files` and renamed to `settings_for_restore.json` and `repository_for_restore.tsbak`.
 
-*Note: The rule import did not cause it to be replaced due to confguration preventing changes to the SG. The new rule will simply be added. Not sure what will happen after the new rules have been applied.*
+### Tableau Settings Restore
+The process is as documented in the Recovey instructions but file `settings_for_restore.json` must first be eddited to reflect the new environment. Make the changes after Tableaus instalation and setup when the new values are known. Change values of config keys as described below:
 
-### Sandpit Examples:
-- `terragrunt import module.tableau_sg.aws_security_group.this_name_prefix[0] sg-06b19b0386aabd11d`
-- `terragrunt import module.tableau_sg.aws_security_group_rule.egress_rules[0] sgr-0fc23d49306fe9f56`
-- `terragrunt import module.tableau_sg.aws_security_group_rule.ingress_with_cidr_blocks[0] sg-06b19b0386aabd11d_ingress_tcp_443_443_10.20.10.0/24`
-- `terragrunt import module.tableau_sg.aws_security_group_rule.ingress_with_cidr_blocks[1] sg-06b19b0386aabd11d_ingress_tcp_8850_8850_10.20.10.0/24`
-- `terragrunt import module.tableau_sg.aws_security_group_rule.ingress_with_source_security_group_id[0] sgr-011c898d7ac4ef764`
+**wgserver.domain.password**: To be set to the valuse assigned to the tableau domain user. The value can be copied from file `identify-store.json`.
+**wgserver.domain.port**: If present this config key must be removed.
+**wgserver.domain.ldap.hostname**: Copy from `identify-store.json`.
+**wgserver.domain.ssl_port**: Add if not already present and set the value to `636`.
+**vizportal.rest_api.cors.allow_origin**: Need to be populated with a comma seperated list of external URL for the YJAF and Tableau websites. It will probable not need to be changes in `preproduction` and `production`.
 
-- `terragrunt import module.postgresql_sg.module.destination_sg.aws_security_group_rule.ingress_with_source_security_group_id[0] sg-000bced3a1d876af2_ingress_tcp_5432_5432_sg-06b19b0386aabd11d`
-- `terragrunt import module.redshift_sg.module.destination_sg aws_security_group_rule.ingress_with_source_security_group_id[0] sg-00add31e86dcf820d_ingress_tcp_5439_5439_sg-06b19b0386aabd11d`
+After restoring the setting thaey shoudl not be applied to Tableau until External HTTPs has been enabled as described in the next section.
 
+### Enable External HTTPS
+The process for this is described in Confluance document https://yjb.atlassian.net/wiki/spaces/YAM/pages/4729470989/DOE+Tableau+Enable+External+HTTPS?atlOrigin=eyJpIjoiNWQyNjA4YTQxYjRlNGRiNDk3NjU0ZWJhNWM4Mzg3NGUiLCJwIjoiYyJ9.
 
-- `terragrunt import module.tableau-alb.aws_lb.this[0] arn:aws:elasticloadbalancing:eu-west-2:856879713508:loadbalancer/app/tableau-alb/04851a42a910ba15`
-- `terragrunt import 'module.tableau-alb.aws_lb_listener.this["ex-https"]' arn:aws:elasticloadbalancing:eu-west-2:856879713508:listener/app/tableau-alb/04851a42a910ba15/6361b65e4a41b4bc`
-- `terragrunt import 'module.tableau-alb.aws_lb_target_group.this["tableau-instance"]' arn:aws:elasticloadbalancing:eu-west-2:856879713508:targetgroup/tableauhttps/f32fdc5500359183`
+A copy of openssl-tableau.conf will already be available. The Siging Request and Certificate files can be copied beteen the Tableau and SubordinateCA servers via s3 location `yjaf-<envoronment>-tableau-backups/Install_Files`.
 
-- `terragrunt import module.alb_sg.aws_security_group.this_name_prefix[0] sg-04172da8d003ad3e1`
-- `terragrunt import module.alb_sg.aws_security_group_rule.egress_with_source_security_group_id[0]sg-04172da8d003ad3e1_egress_tcp_443_443_sg-06b19b0386aabd11d`
-
-- `terragrunt import module.alb_sg.aws_security_group_rule.ingress_rules[0] sg-04172da8d003ad3e1_ingress_tcp_80_80_0.0.0.0/0`
-- `terragrunt import module.alb_sg.aws_security_group_rule.ingress_rules[1] sg-04172da8d003ad3e1_ingress_tcp_443_443_0.0.0.0/0`
-
-### Check Status Examples:
-
-- `terragrunt state list`
-- `terragrunt state show module.tableau_sg.aws_security_group.this_name_prefix[0]`
-
-### Remove an incorrectly imported item examples:
-- `terragrunt state rm module.tableau_sg.aws_security_group.this_name_prefix[0]`
-- `terragrunt state rm module.postgresql_sg.module.destination_sg.aws_security_group_rule.ingress_with_source_security_group_id[0]`
-
+Review the proposed Tableau settings change and if they look OK apply them.
