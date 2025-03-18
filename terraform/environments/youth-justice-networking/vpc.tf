@@ -16,8 +16,10 @@ module "vpc" {
  
    tags = local.tags
  }
+ 
 
-# Create Internet Gateway
+
+ # Create Internet Gateway
 resource "aws_internet_gateway" "main" {
   vpc_id = module.vpc.vpc_id
 
@@ -32,7 +34,7 @@ resource "aws_subnet" "vsrx_subnets" {
     "vSRX01 PSK External Range"  = { cidr = "10.100.110.0/24", az = "eu-west-2a" }
     "vSRX01 Cert External Range" = { cidr = "10.100.115.0/24", az = "eu-west-2a" }
     "vSRX01 Internal Range"      = { cidr = "10.100.120.0/24", az = "eu-west-2a" }
-    "Juniper Management & KMS Range"   = { cidr = "10.100.50.0/24", az = "eu-west-2a" }
+    "Juniper Management & KMS"   = { cidr = "10.100.50.0/24", az = "eu-west-2a" }
     "vSRX02 Management Range"    = { cidr = "10.100.205.0/24", az = "eu-west-2b" }
     "vSRX02 PSK External Range"  = { cidr = "10.100.210.0/24", az = "eu-west-2b" }
     "vSRX02 Cert External Range" = { cidr = "10.100.215.0/24", az = "eu-west-2b" }
