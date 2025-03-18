@@ -632,32 +632,3 @@ resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
     local.tags
   )
 }
-
-
-data "aws_iam_policy_document" "ap_github_permissions" {
-  statement {
-    effect = "Allow"
-    sid    = "APGHUpdateGluePermissions"
-    actions = [
-      "glue:UpdateTable",
-      "glue:UpdateSchema",
-      "glue:UpdatePartition",
-      "glue:UpdateDatabase",
-    ]
-    resources = [
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:schema/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*",
-      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/GlobalGitHubActionAdmin"]
-    }
-  }
-}
-
-resource "aws_iam_policy" "ap_github_permissions_policy" {
-  name   = "ap-github-permissions-policy"
-  policy = data.aws_iam_policy_document.ap_github_permissions.json
-}
