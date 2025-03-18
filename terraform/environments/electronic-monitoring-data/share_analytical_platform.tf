@@ -632,25 +632,3 @@ resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
     local.tags
   )
 }
-
-
-resource "aws_lakeformation_permissions" "cross_account_glue" {
-  principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/GlobalGitHubActionAdmin"
-
-  permissions = ["SELECT", "DESCRIBE"]
-
-  database {
-    name = "staged_fms_test_dbt"
-  }
-}
-
-resource "aws_lakeformation_permissions" "cross_account_glue_tables" {
-  principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/GlobalGitHubActionAdmin"
-
-  permissions = ["SELECT", "DESCRIBE"]
-
-  table {
-    database_name = "staged_fms_test_dbt"
-    name          = "account"
-  }
-}
