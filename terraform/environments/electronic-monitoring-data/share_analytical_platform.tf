@@ -209,7 +209,7 @@ data "aws_iam_policy_document" "lake_formation_data_access" {
 # Policy Document
 
 data "aws_iam_policy_document" "lake_formation_lftag_access" {
-      #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
   statement {
     actions = [
       "lakeformation:AddLFTagsToResource",
@@ -231,7 +231,7 @@ data "aws_iam_policy_document" "lake_formation_lftag_access" {
 # Policy Document
 
 data "aws_iam_policy_document" "lake_formation_filter_access" {
-      #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
   statement {
     actions = [
       "lakeformation:GetDataCellsFilter",
@@ -526,7 +526,7 @@ resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
 
   name   = "${each.value.target_account_name}-share-policy"
   role   = aws_iam_role.analytical_platform_share_role[each.key].name
-  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
+  policy = data.aws_iam_policy_document.analytical_platform_share_policy[each.key].json
 }
 
 resource "aws_iam_role_policy" "analytical_platform_secret_share_policy_attachment" {
