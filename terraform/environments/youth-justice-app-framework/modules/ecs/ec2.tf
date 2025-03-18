@@ -188,17 +188,22 @@ module "autoscaling_sg" {
 }
 
 resource "aws_iam_policy" "ecs-eni-policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
-  name = "${local.application_name}-${local.environment}-ecs-eni"
-  tags = local.all_tags
+  name   = "${var.cluster_name}-ecs-eni"
+  tags   = local.all_tags
   policy = <<EOF
 {
     "Version" : "2012-10-17",
     "Statement": [
       {
         "Action": [
+          "ec2:CreateNetworkInterface",
+          "ec2:CreateNetworkInterfacePermission",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeInstances",
+          "ec2:AttachNetworkInterface",
           "ec2:AssignPrivateIpAddresses",
           "ec2:UnassignPrivateIpAddresses",
-          "ec2:DescribeNetworkInterfaces"
+          "ec2:ModifyNetworkInterfaceAttribute"
         ],
         "Effect": "Allow",
         "Resource": "*"
