@@ -168,6 +168,20 @@ locals {
           security_groups = ["app", "database"]
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
+        netbios_web_tcp = {
+          description = "137-139: TCP NetBIOS services"
+          from_port   = 137
+          to_port     = 139
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        netbios_web_udp = {
+          description = "137-139: UDP NetBIOS services"
+          from_port   = 137
+          to_port     = 139
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
         https_web = {
           description     = "443: enduserclient https ingress"
           from_port       = 443
@@ -178,19 +192,19 @@ locals {
           # IMPORTANT: this doesn't seem to be part of the existing Azure SG's? NEEDS CHECKING
         }
         smb_tcp_web = {
-          description     = "445: TCP SMB allow ingress from app and db servers"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "TCP"
-          security_groups = ["app", "database"]
+          description = "445: TCP SMB allow ingress from 10.0.0.0/8"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         smb_udp_web = {
-          description     = "445: UDP SMB allow ingress from app and db servers"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "UDP"
-          security_groups = ["app", "database"]
+          description = "445: UDP SMB allow ingress from 10.0.0.0/8"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "UDP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
           # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rdp_tcp_web = {
@@ -654,6 +668,48 @@ locals {
           to_port     = 65535
           protocol    = "TCP"
           cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+    fsx_windows = {
+      description = "Security group for fsx windows"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        netbios_fsx = {
+          description = "139: NetBIOS Session Service"
+          from_port   = 139
+          to_port     = 139
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        smb_fsx = {
+          description = "445: Directory Services SMB file sharing"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient
+        }
+        winrm_fsx = {
+          description = "5985-5986: WinRM 2.0 (Microsoft Windows Remote Management)"
+          from_port   = 5985
+          to_port     = 5986
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.jumpservers
         }
       }
       egress = {

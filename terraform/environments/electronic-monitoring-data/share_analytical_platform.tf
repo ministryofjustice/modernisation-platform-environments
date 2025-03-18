@@ -4,11 +4,28 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  dbt_suffix             = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
-  admin_roles            = local.is-development ? "sandbox_" : "data-eng"
-  suffix                 = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
-  live_feed_dbs          = ["serco_fms", "allied_mdss", "staged_fms", "preprocessed_fms"]
-  prod_dbs_to_grant      = local.is-production ? ["am_stg", "cap_dw_stg", "emd_historic_int", "historic_api_mart", "historic_api_mart_mock", "historic_ears_and_sars_int", "historic_ears_and_sars_mart", "emsys_mvp_stg"] : []
+  dbt_suffix  = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
+  admin_roles = local.is-development ? "sandbox_" : "data-eng"
+  suffix      = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
+  live_feed_dbs = [
+    "serco_fms",
+    "allied_mdss",
+    "staged_fms",
+    "preprocessed_fms",
+    "staging",
+    "intermediate",
+    "mart",
+    "testing"
+  ]
+  prod_dbs_to_grant = local.is-production ? ["am_stg",
+    "cap_dw_stg",
+    "emd_historic_int",
+    "historic_api_mart",
+    "historic_api_mart_mock",
+    "historic_ears_and_sars_int",
+    "historic_ears_and_sars_mart",
+    "emsys_mvp_stg",
+  "sar_ear_reports_mart"] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   live_feed_dbs_to_grant = [for db in local.live_feed_dbs : "${db}${local.dbt_suffix}"]
   dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.live_feed_dbs_to_grant]))
@@ -130,6 +147,25 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.dbt_secrets.secret_string)["oidc_cluster_identifier"]}:aud"
     }
   }
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.analytical_platform_compute.arn]
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["system:serviceaccount:airflow:*"]
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:sub"
+    }
+    condition {
+      test     = "StringEquals"
+      values   = ["sts.amazonaws.com"]
+      variable = "oidc.eks.eu-west-2.amazonaws.com/id/${jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]}:aud"
+    }
+  }
 }
 
 # Role used in create a derived table 
@@ -161,6 +197,50 @@ data "aws_iam_policy_document" "lake_formation_data_access" {
   statement {
     actions = [
       "lakeformation:GetDataAccess"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+
+# LakeFormation LFTag permissions
+# Policy Document
+
+data "aws_iam_policy_document" "lake_formation_lftag_access" {
+      #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  statement {
+    actions = [
+      "lakeformation:AddLFTagsToResource",
+      "lakeformation:RemoveLFTagsFromResource",
+      "lakeformation:GetResourceLFTags",
+      "lakeformation:ListLFTags",
+      "lakeformation:GetLFTag",
+      "lakeformation:SearchTablesByLFTags",
+      "lakeformation:SearchDatabasesByLFTags",
+      "lakeformation:ListDataCellsFilter"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+# LakeFormation Data Cells Filter permissions
+# Policy Document
+
+data "aws_iam_policy_document" "lake_formation_filter_access" {
+      #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  statement {
+    actions = [
+      "lakeformation:GetDataCellsFilter",
+      "lakeformation:CreateDataCellsFilter",
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:ListPermissions"
     ]
     resources = [
       "*"
@@ -292,6 +372,18 @@ resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
   policy_arn = aws_iam_policy.lake_formation_data_access.arn
 }
 
+# Lake Formation LFTag Access Attachement
+resource "aws_iam_role_policy_attachment" "lake_formation_lftag_access" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_lftag_access.arn
+}
+
+# Lake Formation Data Cells Filter Access Attachement
+resource "aws_iam_role_policy_attachment" "lake_formation_filter_access" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_filter_access.arn
+}
+
 # Athena Access Attachement
 resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
   role       = aws_iam_role.dataapi_cross_role.name
@@ -309,6 +401,18 @@ resource "aws_iam_policy" "lake_formation_data_access" {
   name        = "${local.environment_shorthand}-lake-formation-data-access"
   description = "LakeFormation Get Data Access Policy"
   policy      = data.aws_iam_policy_document.lake_formation_data_access.json
+}
+
+resource "aws_iam_policy" "lake_formation_lftag_access" {
+  name        = "${local.environment_shorthand}-lake-formation-lftag-access"
+  description = "LakeFormation LFTag Access Policy"
+  policy      = data.aws_iam_policy_document.lake_formation_lftag_access.json
+}
+
+resource "aws_iam_policy" "lake_formation_filter_access" {
+  name        = "${local.environment_shorthand}-lake-formation-filter-access"
+  description = "LakeFormation Data Cell Filter Access Policy"
+  policy      = data.aws_iam_policy_document.lake_formation_filter_access.json
 }
 
 # Analytical Platform Share Policy & Role
@@ -383,6 +487,19 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   }
 }
 
+data "aws_iam_policy_document" "allow_airflow_ssh_key" {
+  for_each = local.analytical_platform_share
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue"
+    ]
+    resources = [
+      data.aws_secretsmanager_secret.airflow_ssh_secret.arn
+    ]
+  }
+}
+
 # This is not referenced anywhere else aha
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
@@ -409,7 +526,14 @@ resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
 
   name   = "${each.value.target_account_name}-share-policy"
   role   = aws_iam_role.analytical_platform_share_role[each.key].name
-  policy = data.aws_iam_policy_document.analytical_platform_share_policy[each.key].json
+  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
+}
+
+resource "aws_iam_role_policy" "analytical_platform_secret_share_policy_attachment" {
+  for_each = local.analytical_platform_share
+  name     = "analytical-platform-data-production-secrets-allow-policy"
+  role     = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy   = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
 }
 
 # ref: https://docs.aws.amazon.com/lake-formation/latest/dg/cross-account-prereqs.html
@@ -421,7 +545,12 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
 }
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = flatten([[for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn], data.aws_iam_session_context.current.issuer_arn, try(one(data.aws_iam_roles.data_engineering_roles.arns), [])])
+  admins = flatten([
+    [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
+    data.aws_iam_session_context.current.issuer_arn,
+    try(one(data.aws_iam_roles.data_engineering_roles.arns),
+    [])]
+  )
 
   # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
   # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
@@ -445,4 +574,61 @@ module "share_dbs_with_roles" {
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
   de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+}
+
+resource "aws_lakeformation_resource" "rds_bucket" {
+  arn = module.s3-dms-target-store-bucket.bucket.arn
+}
+
+module "share_non_cadt_dbs_with_roles" {
+  count                   = local.is-production ? 1 : 0
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = ["dms_dbo_g4s_emsys_mvp"]
+  data_bucket_lf_resource = aws_lakeformation_resource.rds_bucket.arn
+  role_arn                = aws_iam_role.dataapi_cross_role.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+}
+
+
+data "aws_secretsmanager_secret" "airflow_ssh_secret" {
+  name = aws_secretsmanager_secret.airflow_secret[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.airflow_ssh_secret]
+}
+
+data "aws_secretsmanager_secret_version" "airflow_ssh_secret" {
+  secret_id = data.aws_secretsmanager_secret.airflow_secret.id
+
+  depends_on = [aws_secretsmanager_secret.airflow_ssh_secret]
+}
+
+
+## DBT Analytics EKS Cluster Identifier
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "airflow_ssh_secret" {
+  count = local.is-preproduction || local.is-production ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.airflow_ssh_secret[0].id
+  secret_string = jsonencode(local.airflow_secret_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+
+  depends_on = [aws_secretsmanager_secret.airflow_ssh_secret]
+}
+
+resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+
+  count = local.is-preproduction || local.is-production ? 1 : 0
+
+  name = "/alpha/airflow/airflow_cadet_deployments/cadet_repo_key/"
+
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.tags
+  )
 }

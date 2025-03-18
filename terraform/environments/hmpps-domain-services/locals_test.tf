@@ -103,7 +103,8 @@ locals {
       #   tags = merge(local.ec2_autoscaling_groups.rds.tags, {
       #     domain-name = "azure.noms.root"
       #   })
-      # }
+      #   cloudwatch_metric_alarms = null
+      # })
     }
 
     ec2_instances = {
@@ -120,13 +121,25 @@ locals {
 
       t1-jump2022-1 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
+          ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.noms.root"
         })
       })
+
+      # testing only do not use
+      # t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+      #   config = merge(local.ec2_instances.jumpserver.config, {
+      #     ami_name          = "hmpps_windows_server_2022_release_2025-*"
+      #     availability_zone = "eu-west-2b"
+      #   })
+      #   tags = merge(local.ec2_instances.jumpserver.tags, {
+      #     domain-name = "azure.noms.root"
+      #   })
+      #   cloudwatch_metric_alarms = null
+      # })
     }
 
     fsx_windows = {
@@ -193,6 +206,7 @@ locals {
     schedule_alarms_lambda = {
       alarm_patterns = [
         "public-https-*-unhealthy-load-balancer-host",
+        "*-instance-or-cloudwatch-agent-stopped",
       ]
     }
 
@@ -209,4 +223,3 @@ locals {
     }
   }
 }
-

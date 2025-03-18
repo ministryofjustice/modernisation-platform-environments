@@ -893,7 +893,7 @@ variable "s3_buckets" {
     custom_kms_key             = optional(string)
     custom_replication_kms_key = optional(string)
     lifecycle_rule             = any # see module baseline_presets.s3 for examples
-    log_bucket                 = optional(string, "")
+    log_bucket                 = optional(string)
     log_prefix                 = optional(string, "")
     replication_role_arn       = optional(string, "")
     force_destroy              = optional(bool, false)

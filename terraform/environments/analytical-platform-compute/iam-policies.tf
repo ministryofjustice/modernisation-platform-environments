@@ -18,7 +18,7 @@ module "eks_cluster_logs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "eks-cluster-logs-kms-access"
 
@@ -47,7 +47,7 @@ module "karpenter_sqs_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "karpenter-sqs-kms-access"
 
@@ -75,7 +75,7 @@ module "amazon_prometheus_proxy_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "amazon-prometheus-proxy"
 
@@ -104,7 +104,7 @@ module "managed_prometheus_kms_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "managed-prometheus-kms-access"
 
@@ -155,7 +155,7 @@ module "mlflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "mlflow"
 
@@ -178,7 +178,7 @@ module "gha_mojas_airflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "github-actions-mojas-airflow"
 
@@ -268,7 +268,7 @@ module "analytical_platform_lake_formation_share_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "analytical-platform-lake-formation-sharing-policy"
 
@@ -299,7 +299,7 @@ module "quicksight_vpc_connection_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "quicksight-vpc-connection"
 
@@ -346,7 +346,7 @@ module "data_production_mojap_derived_bucket_lake_formation_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "analytical-platform-data-bucket-lake-formation-policy"
 
@@ -451,7 +451,7 @@ module "copy_apdp_cadet_metadata_to_compute_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "copy-apdp-cadet-metadata-to-compute-"
 
@@ -488,7 +488,7 @@ module "find_moj_data_quicksight_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name_prefix = "find-moj-data-quicksight-policy-"
 
@@ -582,6 +582,29 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
     actions   = ["eks:DescribeCluster"]
     resources = [module.eks.cluster_arn]
   }
+  statement {
+    sid       = "AllowSecretsManagerKMS"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [module.common_secrets_manager_kms.key_arn]
+  }
+  statement {
+    sid       = "AllowSecretsManagerList"
+    effect    = "Allow"
+    actions   = ["secretsmanager:ListSecrets"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "AllowSecretsManager"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetResourcePolicy",
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+      "secretsmanager:ListSecretVersionIds"
+    ]
+    resources = ["arn:aws:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:airflow/*"]
+  }
 }
 
 module "mwaa_execution_iam_policy" {
@@ -589,7 +612,7 @@ module "mwaa_execution_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.2"
+  version = "5.54.0"
 
   name   = "mwaa-execution"
   policy = data.aws_iam_policy_document.mwaa_execution_policy.json
@@ -642,11 +665,41 @@ module "gha_moj_ap_airflow_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.1"
+  version = "5.54.0"
 
   name = "github-actions-ministryofjustice-analytical-platform-airflow"
 
   policy = data.aws_iam_policy_document.gha_moj_ap_airflow.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "mwaa_ses" {
+  statement {
+    sid    = "AllowSESSendRawEmail"
+    effect = "Allow"
+    actions = [
+      "ses:SendEmail",
+      "ses:SendRawEmail"
+    ]
+    resources = ["*"]
+    condition {
+      test     = "StringEquals"
+      variable = "ses:FromAddress"
+      values   = ["noreply@${local.environment_configuration.route53_zone}"]
+    }
+  }
+}
+
+module "mwaa_ses_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.54.0"
+
+  name   = "mwaa-ses"
+  policy = data.aws_iam_policy_document.mwaa_ses.json
 
   tags = local.tags
 }
