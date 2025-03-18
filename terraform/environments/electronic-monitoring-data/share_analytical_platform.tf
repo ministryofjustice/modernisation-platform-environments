@@ -219,9 +219,28 @@ data "aws_iam_policy_document" "lake_formation_lftag_access" {
       "lakeformation:GetLFTag",
       "lakeformation:SearchTablesByLFTags",
       "lakeformation:SearchDatabasesByLFTags",
-      "lakeformation:ListDataCellsFilter",
+      "lakeformation:ListDataCellsFilter"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+# LakeFormation Data Cells Filter permissions
+# Policy Document
+
+data "aws_iam_policy_document" "lake_formation_filter_access" {
+      #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  statement {
+    actions = [
       "lakeformation:GetDataCellsFilter",
       "lakeformation:CreateDataCellsFilter"
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:ListPermissions"
     ]
     resources = [
       "*"
@@ -359,6 +378,12 @@ resource "aws_iam_role_policy_attachment" "lake_formation_lftag_access" {
   policy_arn = aws_iam_policy.lake_formation_lftag_access.arn
 }
 
+# Lake Formation Data Cells Filter Access Attachement
+resource "aws_iam_role_policy_attachment" "lake_formation_filter_access" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_filter_access.arn
+}
+
 # Athena Access Attachement
 resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
   role       = aws_iam_role.dataapi_cross_role.name
@@ -382,6 +407,12 @@ resource "aws_iam_policy" "lake_formation_lftag_access" {
   name        = "${local.environment_shorthand}-lake-formation-lftag-access"
   description = "LakeFormation LFTag Access Policy"
   policy      = data.aws_iam_policy_document.lake_formation_lftag_access.json
+}
+
+resource "aws_iam_policy" "lake_formation_filter_access" {
+  name        = "${local.environment_shorthand}-lake-formation-filter-access"
+  description = "LakeFormation Data Cell Filter Access Policy"
+  policy      = data.aws_iam_policy_document.lake_formation_filter_access.json
 }
 
 # Analytical Platform Share Policy & Role
