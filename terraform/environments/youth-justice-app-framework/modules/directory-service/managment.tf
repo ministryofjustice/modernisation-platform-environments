@@ -291,7 +291,7 @@ resource "aws_instance" "ad_instance" {
   user_data                   = data.template_file.windows-dc-userdata.rendered
   ebs_optimized               = true
   lifecycle {
-    ignore_changes = [ami]
+    ignore_changes = [ami, user_data]
   }
   metadata_options {
     http_tokens = "required"
