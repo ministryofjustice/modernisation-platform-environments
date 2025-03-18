@@ -93,9 +93,16 @@ resource "aws_route53_resolver_rule" "i2n" {
   rule_type            = "FORWARD"
   resolver_endpoint_id = aws_route53_resolver_endpoint.vpc.id
 
-  target_ip { ip = local.dns_ip_addresses[0] }
-  target_ip { ip = local.dns_ip_addresses[1] }
-  target_ip { ip = local.ip_address_count > 2 ? local.dns_ip_addresses[2] : null}
+  dynamic "target_ip" {
+    for_each = local.dns_ip_addresses
+    content {
+      ip = target_ip.value
+    }
+    
+  }
+#  target_ip { ip = local.dns_ip_addresses[0] }
+#  target_ip { ip = local.dns_ip_addresses[1] }
+#  target_ip { ip = local.ip_address_count > 2 ? local.dns_ip_addresses[2] : null}
 
   tags = local.tags
 }
