@@ -14,6 +14,10 @@ locals {
   has_mis_environment = lookup(var.environment_config, "has_mis_environment", false)
 
   oracle_statistics_map = {
+    "poc" = {
+      #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+      #       "target_environment" = "test"
+    },
     "dev" = {
       #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
       #       "target_environment" = "test"
@@ -37,6 +41,10 @@ locals {
   }
 
   oracle_duplicate_map = {
+    "poc" = {
+      #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+      #       "target_environment" = "test"
+    },
     "dev" = {
       #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
       #       "target_environment" = "test"
