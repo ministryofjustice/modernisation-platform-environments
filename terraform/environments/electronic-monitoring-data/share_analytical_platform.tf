@@ -218,7 +218,9 @@ data "aws_iam_policy_document" "lake_formation_lftag_access" {
       "lakeformation:ListLFTags",
       "lakeformation:GetLFTag",
       "lakeformation:SearchTablesByLFTags",
-      "lakeformation:SearchDatabasesByLFTags"
+      "lakeformation:SearchDatabasesByLFTags",
+      "lakeformation:ListDataCellsFilter",
+      "lakeformation:GetDataCellsFilter"
     ]
     resources = [
       "*"
