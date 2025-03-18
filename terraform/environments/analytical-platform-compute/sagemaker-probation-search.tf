@@ -2,7 +2,8 @@
 # Cloud Platform namespace mapping
 # ------------------------------------------------------------------------------
 locals {
-  probation_search_model_bucket_name = "mojap-probation-search-model-export"
+  probation_search_model_bucket_name = "mojap-data-production-sagemaker-ai-probation-search-models"
+  probation_search_model_kms_arn     = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/55286d64-9b9d-4473-8750-0546f583f19e"
   probation_search_environments = {
     analytical-platform-compute-development = {
       hmpps-probation-search-dev = {
@@ -135,6 +136,15 @@ module "probation_search_sagemaker_execution_iam_role" {
         "logs:PutLogEvents",
       ]
       resources = ["*"]
+    },
+    {
+      sid    = "KMSAccess"
+      effect = "Allow"
+      actions = [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ]
+      resources = [local.probation_search_model_kms_arn]
     },
     {
       sid       = "S3Access"
