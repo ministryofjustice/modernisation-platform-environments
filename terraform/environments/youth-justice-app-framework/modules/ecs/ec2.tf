@@ -74,6 +74,7 @@ module "autoscaling" {
     AmazonEC2RoleforSSM                 = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
     AmazonEC2ContainerServiceforEC2Role = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
     ecs-fetch-secrets-policy            = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+    ecs-eni-policy                      = aws_iam_policy.ecs-eni-policy.arn
   }
   security_groups = [module.autoscaling_sg.security_group_id]
 
@@ -184,4 +185,25 @@ module "autoscaling_sg" {
   egress_rules = ["all-all"]
 
   tags = local.all_tags
+}
+
+resource "aws_iam_policy" "ecs-eni-policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  name = "${local.application_name}-${local.environment}-ecs-eni"
+  tags = local.all_tags
+  policy = <<EOF
+{
+    "Version" : "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:UnassignPrivateIpAddresses",
+          "ec2:DescribeNetworkInterfaces"
+        ],
+        "Effect": "Allow",
+        "Resource": "*"
+      }
+    ]
+}
+EOF
 }
