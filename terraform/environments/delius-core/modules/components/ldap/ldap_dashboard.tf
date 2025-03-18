@@ -37,7 +37,7 @@ resource "aws_cloudwatch_dashboard" "ldap_dashboard" {
             | stats count_distinct(user_cn) as unique_users by bin(5m)
           EOT
           "logGroupNames" = [
-            "prod/ldap"
+            "${var.env_name}/ldap"
           ],
           "region" = "eu-west-2",
           "title"  = "Unique User Logins in past 1 hour"
@@ -57,7 +57,7 @@ resource "aws_cloudwatch_dashboard" "ldap_dashboard" {
             | stats avg(etime) as avg_response_time, max(etime) as max_response_time by bin(5m)
           EOT
           "logGroupNames" = [
-            "prod/ldap"
+            "${var.env_name}/ldap"
           ],
           "region" = "eu-west-2",
           "title"  = "Average & Max Elapsed / Response time"
@@ -77,7 +77,7 @@ resource "aws_cloudwatch_dashboard" "ldap_dashboard" {
             | stats avg(qtime) as avg_queue_time by bin(5m)
           EOT
           "logGroupNames" = [
-            "prod/ldap"
+            "${var.env_name}/ldap"
           ],
           "region" = "eu-west-2",
           "title"  = "Average Query Time"
@@ -97,7 +97,7 @@ resource "aws_cloudwatch_dashboard" "ldap_dashboard" {
             | stats avg(etime) as avg_search_response_time, max(etime) as max_search_resp_time by bin(5m)
           EOT
           "logGroupNames" = [
-            "prod/ldap"
+            "${var.env_name}/ldap"
           ],
           "region" = "eu-west-2",
           "title"  = "Average & Max Response Times for Searches"
@@ -117,10 +117,50 @@ resource "aws_cloudwatch_dashboard" "ldap_dashboard" {
             | stats avg(qtime) as avg_queue_time by bin(5m)
           EOT
           "logGroupNames" = [
-            "prod/ldap"
+            "${var.env_name}/ldap"
           ],
           "region" = "eu-west-2",
           "title"  = "Average Query Times for Searches"
+        }
+      },
+      {
+        "type"   = "log",
+        "x"      = 0,
+        "y"      = 0,
+        "width"  = 12,
+        "height" = 6,
+        "properties" = {
+          "query" = <<-EOT
+            fields @timestamp, @message
+            | parse @message 'conn=* op=* SRCH base=* scope=* deref=* filter="*"' as conn_id, op_id, base, scope, deref, filter
+            | filter @message like /SRCH base=/
+            | stats count(*) as total_searches, count_distinct(filter) as unique_searches
+          EOT
+          "logGroupNames" = [
+            "${var.env_name}/ldap"
+          ],
+          "region" = "eu-west-2",
+          "title"  = "Total number of Searches / unique ones"
+        }
+      },
+      {
+        "type"   = "log",
+        "x"      = 0,
+        "y"      = 0,
+        "width"  = 12,
+        "height" = 6,
+        "properties" = {
+          "query" = <<-EOT
+            fields @timestamp, @message
+            | parse @message 'conn=* op=* SRCH base=* scope=* deref=* filter="*"' as conn_id, op_id, base, scope, deref, filter
+            | filter @message like /SRCH base=/
+            | stats count(*) as total_searches, count_distinct(filter) as unique_searches by bin(1h)
+          EOT
+          "logGroupNames" = [
+            "${var.env_name}/ldap"
+          ],
+          "region" = "eu-west-2",
+          "title"  = "Search Counts By Time (half hourly)"
         }
       }
     ]
