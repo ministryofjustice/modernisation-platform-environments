@@ -636,7 +636,7 @@ resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
 resource "aws_lakeformation_permissions" "cross_account_glue" {
   principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/GlobalGitHubActionAdmin"
 
-  permissions = ["SELECT", "DESCRIBE"]
+  permissions = ["DESCRIBE"]
 
   database {
     name = "staged_fms_test_dbt"
