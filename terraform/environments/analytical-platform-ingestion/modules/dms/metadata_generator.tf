@@ -165,7 +165,6 @@ module "metadata_generator" {
 
   source_path = [{
     path             = "${path.module}/lambda-functions/metadata_generator/main.py"
-    pip_tmp_dir      = "${path.module}/lambda-functions/metadata_generator/fixtures"
     pip_requirements = "${path.module}/lambda-functions/metadata_generator/requirements.txt"
   }]
 
