@@ -126,6 +126,17 @@ resource "aws_security_group" "metadata_generator_lambda_function" {
   }
 }
 
+data "aws_subnets" "subnet_ids_vpc_subnets" {
+  filter {
+    name = "vpc-id"
+    values = [var.vpc_id]
+  }
+  filter {
+    name = "cidr-block"
+    values = var.dms_replication_instance.subnet_ids
+  }
+}
+
 module "metadata_generator" {
   # Commit hash for v7.20.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=84dfbfddf9483bc56afa0aff516177c03652f0c7"
@@ -145,7 +156,7 @@ module "metadata_generator" {
 
   # Lambda function will be attached to the VPC to access the source database
   vpc_security_group_ids = [aws_security_group.metadata_generator_lambda_function.id]
-  vpc_subnet_ids         = var.dms_replication_instance.subnet_ids
+  vpc_subnet_ids         = data.aws_subnets.subnet_ids_vpc_subnets.ids
   attach_network_policy  = true
 
 
