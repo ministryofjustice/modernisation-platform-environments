@@ -68,7 +68,6 @@ module "validation_lambda_function" {
 
   source_path = [{
     path             = "${path.module}/lambda-functions/validation/main.py"
-    pip_tmp_dir      = "${path.module}/lambda-functions/validation/fixtures"
     pip_requirements = "${path.module}/lambda-functions/validation/requirements.txt"
     # Exclude tests and dist-info directories from the deployment package
     patterns = [
