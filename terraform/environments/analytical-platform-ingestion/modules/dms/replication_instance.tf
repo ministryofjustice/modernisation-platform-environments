@@ -41,7 +41,7 @@ resource "aws_dms_replication_subnet_group" "replication_subnet_group" {
   replication_subnet_group_description = "Subnet group for DMS replication instances"
   replication_subnet_group_id          = var.dms_replication_instance.subnet_group_name == null ? "${data.aws_region.current.name}-${var.environment}" : var.dms_replication_instance.subnet_group_name
   # these would come from the core stack once created
-  subnet_ids = var.dms_replication_instance.subnet_ids
+  subnet_ids = data.aws_subnets.subnet_ids_vpc_subnets.ids
 
   tags = merge(var.tags,
     {
