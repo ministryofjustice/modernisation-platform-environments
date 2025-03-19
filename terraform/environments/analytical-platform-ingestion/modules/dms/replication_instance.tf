@@ -49,6 +49,10 @@ resource "aws_dms_replication_subnet_group" "replication_subnet_group" {
       application = "Data Engineering"
     }
   )
+
+  depends_on = [
+    aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
+  ]
 }
 
 resource "aws_dms_replication_instance" "instance" {
