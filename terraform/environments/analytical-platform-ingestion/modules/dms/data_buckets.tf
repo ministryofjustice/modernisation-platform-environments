@@ -95,6 +95,8 @@ resource "aws_s3_bucket_notification" "landing" {
 }
 
 # Bucket to store validated data
+# This can be passed in from outside the module
+# but in that case it is assumed all related aws_s3_bucket_* resources are being managed externally
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "raw_history" {
   count = length(var.output_bucket) > 0 ? 0 : 1
@@ -106,6 +108,7 @@ data "aws_s3_bucket" "raw_history" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "raw_history" {
+  count = length(var.output_bucket) > 0 ? 0 : 1
   bucket = data.aws_s3_bucket.raw_history.id
   rule {
     object_ownership = "BucketOwnerEnforced"
@@ -113,6 +116,7 @@ resource "aws_s3_bucket_ownership_controls" "raw_history" {
 }
 
 resource "aws_s3_bucket_public_access_block" "raw_history" {
+  count = length(var.output_bucket) > 0 ? 0 : 1
   bucket = data.aws_s3_bucket.raw_history.id
 
   block_public_acls       = true
@@ -123,6 +127,7 @@ resource "aws_s3_bucket_public_access_block" "raw_history" {
 
 #trivy:ignore:AVD-AWS-0090: Versioning not needed
 resource "aws_s3_bucket_versioning" "raw_history" {
+  count = length(var.output_bucket) > 0 ? 0 : 1
   bucket = data.aws_s3_bucket.raw_history.id
   versioning_configuration {
     status = "Disabled"
@@ -131,6 +136,7 @@ resource "aws_s3_bucket_versioning" "raw_history" {
 
 #trivy:ignore:AVD-AWS-0132: Uses AES256 encryption
 resource "aws_s3_bucket_server_side_encryption_configuration" "raw_history" {
+  count = length(var.output_bucket) > 0 ? 0 : 1
   bucket = data.aws_s3_bucket.raw_history.id
 
   rule {

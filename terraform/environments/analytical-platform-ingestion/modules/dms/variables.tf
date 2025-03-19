@@ -69,7 +69,10 @@ variable "dms_mapping_rules" {
 variable "output_bucket" {
   type        = string
   default     = ""
-  description = "The name of the output bucket (optional, bucket will be generated if not specified)"
+  description = <<EOF
+    The name of the output bucket (optional, bucket will be generated if not specified)
+    Note that if this is specified, it is assumed all related aws_s3_bucket_* resources are being managed externally and so will not be generated within this module
+  EOF
 }
 
 variable "s3_target_config" {
