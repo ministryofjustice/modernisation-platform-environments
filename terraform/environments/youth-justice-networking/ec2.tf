@@ -66,12 +66,165 @@ resource "aws_security_group" "internal_sg" {
     description = "Branch Juniper PSK Interface 1 access to KMS Server on port 80"
   }
 
+ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.24.0/24"]
+    description = "Branch Juniper PSK Interface 2 access to KMS Server on port 443"
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.24.0/24"]
+    description = "Branch Juniper PSK Interface 2 access to KMS Server on port 80"
+  }
+
   ingress {
     from_port   = 8080
     to_port     = 8090
     protocol    = "tcp"
     cidr_blocks = ["10.26.144.0/24"]
     description = "Sandpit YJSM to CUG Junipers port 8080 - 8090"
+  }
+
+ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.26.144.0/24"]
+    description = "Sandpit YJSM to CUG Junipers port 80"
+  }
+
+ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.26.144.0/24"]
+    description = "Sandpit YJSM to CUG Junipers port 443"
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8090
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.144.0/24"]
+    description = "Pre-Prod YJSM to CUG Junipers port 8080 - 8090"
+  }
+
+ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.144.0/24"]
+    description = "Pre-Prod YJSM to CUG Junipers port 80"
+  }
+
+ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.144.0/24"]
+    description = "Pre-Prod YJSM to CUG Junipers port 443"
+  }
+
+ingress {
+    from_port   = 9103
+    to_port     = 9103
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.144.0/24"]
+    description = "Pre-Prod YJSM to CUG Junipers port 9103"
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8090
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.152.0/24"]
+    description = "Prod YJSM to CUG Junipers port 8080 - 8090"
+  }
+
+ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.152.0/24"]
+    description = "Prod YJSM to CUG Junipers port 80"
+  }
+
+ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.152.0/24"]
+    description = "Prod YJSM to CUG Junipers port 443"
+  }
+
+ingress {
+    from_port   = 9103
+    to_port     = 9103
+    protocol    = "tcp"
+    cidr_blocks = ["10.27.152.0/24"]
+    description = "Prod YJSM to CUG Junipers port 9103"
+  }
+
+ingress {
+    from_port   = 514
+    to_port     = 514
+    protocol    = "udp"
+    cidr_blocks = ["10.100.120.0/24"]
+    description = "Internal Juniper vSRX01 access to syslog server"
+  }
+  
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.100.120.0/24"]
+    description = "Internal Juniper vSRX01 access to KMS website on port 80"
+  }
+  
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.100.120.0/24"]
+    description = "Internal Juniper vSRX01 access to KMS website on port 443"
+  }
+  
+  ingress {
+    from_port   = 514
+    to_port     = 514
+    protocol    = "udp"
+    cidr_blocks = ["10.100.220.0/24"]
+    description = "Internal Juniper vSRX02 access to syslog server"
+  }
+  
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.100.220.0/24"]
+    description = "Internal Juniper vSRX02 access to KMS website on port 80"
+  }
+  
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.100.220.0/24"]
+    description = "Internal Juniper vSRX02 access to KMS website on port 443
+"
+  }
+  
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.100.50.0/24"]
+    description = "Internal Juniper access to KMS website on port 80"
   }
 
   tags = merge(local.tags, {
