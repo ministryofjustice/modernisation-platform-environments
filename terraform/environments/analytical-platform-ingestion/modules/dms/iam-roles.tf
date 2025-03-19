@@ -99,3 +99,14 @@ resource "aws_iam_role_policy" "dms_source" {
     ]
   })
 }
+
+resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
+  role       = aws_iam_role.dms.name
+
+  # It takes some time for these attachments to work, and creating the aws_dms_replication_subnet_group fails if this attachment hasn't completed.
+  provisioner "local-exec" {
+    command = "sleep 30"
+  }
+}
+
