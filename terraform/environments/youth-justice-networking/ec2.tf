@@ -63,24 +63,7 @@ resource "aws_security_group" "internal_sg" {
     to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["10.0.22.0/24"]
-    description = "Branch Juniper PSK Interface 1 access to KMS Server on port 80
-"
-  }
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.24.0/24"]
-    description = "Branch Juniper PSK Interface 2 access to KMS Server on port 80"
-  }
-
-  ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["10.0.22.0/24"]
-    description = "Branch Juniper PSK Interface 2 access to KMS Server on port 443"
+    description = "Branch Juniper PSK Interface 1 access to KMS Server on port 80"
   }
 
   ingress {
