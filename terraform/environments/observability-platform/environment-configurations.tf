@@ -308,7 +308,7 @@ locals {
               athena_enabled                  = false
             }
           }
-        },        
+        },
         "green-ops" = {
           "identity_centre_team" = "green-ops",
           "aws_accounts" = {
