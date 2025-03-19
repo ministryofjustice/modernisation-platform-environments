@@ -1,4 +1,4 @@
-data "aws_iam_policy_document" "c" {
+data "aws_iam_policy_document" "quicksight_vpc_connection" {
   #checkov:skip=CKV_AWS_111:Policy suggested by AWS documentation
   #checkov:skip=CKV_AWS_356:Policy suggested by AWS documentation
   statement {

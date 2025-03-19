@@ -11,3 +11,20 @@ data "aws_ssoadmin_instances" "main" {
 data "aws_security_group" "quicksight_shared_vpc_security_group" {
   id = "quicksight-shared-vpc"
 }
+
+# Shared VPC and Subnets
+data "aws_vpc" "shared" {
+  tags = {
+    "Name" = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+data "aws_subnets" "shared_private" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.shared.id]
+  }
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}-${var.networking[0].set}-private*"
+  }
+}
