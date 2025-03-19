@@ -522,6 +522,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/genesys-call-centre-data/modules/ap_airflow_load_data_iam_role"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/hmpps-domain-services"
     schedule:
       interval: "daily"
