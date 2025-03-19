@@ -22,6 +22,17 @@ variable "create_job" {
   description = "Enable Reconciliation Job, True or False"
   type        = bool
   default     = false
+
+  validation {
+    condition     = !var.batch_only
+    error_message = "Reconciliation job can only be created for batch_only = false"
+  }
+}
+
+variable "batch_only" {
+  description = "Determines if the pipeline is batch only, True or False?"
+  type        = bool
+  default     = false
 }
 
 variable "create_role" {
