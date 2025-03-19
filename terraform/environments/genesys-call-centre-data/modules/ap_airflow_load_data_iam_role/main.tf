@@ -118,11 +118,11 @@ module "ap_database_sharing" {
   max_session_duration = var.max_session_duration
 }
 
-module "share_dbs_with_roles" {
-  source                  = "../lakeformation_database_share"
-  dbs_to_grant            = toset([local.snake-database])
-  data_bucket_lf_resource = var.data_bucket_lf_resource
-  role_arn                = module.ap_database_sharing.iam_role.arn
-  de_role_arn             = var.de_role_arn
-  db_exists               = var.db_exists
-}
+# module "share_dbs_with_roles" {
+#   source                  = "../lakeformation_database_share"
+#   dbs_to_grant            = toset([local.snake-database])
+#   data_bucket_lf_resource = var.data_bucket_lf_resource
+#   role_arn                = module.ap_database_sharing.iam_role.arn
+#   de_role_arn             = var.de_role_arn
+#   db_exists               = var.db_exists
+# }
