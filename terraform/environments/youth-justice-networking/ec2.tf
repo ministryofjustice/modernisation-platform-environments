@@ -215,8 +215,7 @@ ingress {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["10.100.220.0/24"]
-    description = "Internal Juniper vSRX02 access to KMS website on port 443
-"
+    description = "Internal Juniper vSRX02 access to KMS website on port 443"
   }
   
   ingress {
