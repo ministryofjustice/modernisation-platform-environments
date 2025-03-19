@@ -387,6 +387,7 @@ locals {
     username            = module.datamart.redshift_master_user
   }
 
+
   # Placeholder for unpopulated Operational DataStore access secrets
   ods_access_secret_placeholder = {
     host     = module.aurora_operational_db.cluster_endpoint
