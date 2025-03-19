@@ -209,7 +209,7 @@ data "aws_iam_policy_document" "lake_formation_data_access" {
 # Policy Document
 
 data "aws_iam_policy_document" "lake_formation_lftag_access" {
-      #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
   statement {
     actions = [
       "lakeformation:AddLFTagsToResource",
@@ -575,7 +575,7 @@ resource "aws_secretsmanager_secret_version" "airflow_ssh_secret" {
   count = local.is-preproduction || local.is-production ? 1 : 0
 
   secret_id     = aws_secretsmanager_secret.airflow_ssh_secret[0].id
-  secret_string = jsonencode(local.airflow_secret_placeholder)
+  secret_string = jsonencode(local.airflow_cadt_secret_placeholder)
 
   lifecycle {
     ignore_changes = [secret_string, ]
