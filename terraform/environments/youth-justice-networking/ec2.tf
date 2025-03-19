@@ -49,7 +49,48 @@ resource "aws_security_group" "internal_sg" {
   description = "Internal Juniper Security Group (Placeholder)"
   vpc_id      = module.vpc.vpc_id
 
-  # No rules defined yet, will update in the future
+  # Inbound Rules
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.22.0/24"]
+    description = "Branch Juniper PSK Interface 1 access to KMS Server on port 443"
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.22.0/24"]
+    description = "Branch Juniper PSK Interface 1 access to KMS Server on port 80
+"
+  }
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.24.0/24"]
+    description = "Branch Juniper PSK Interface 2 access to KMS Server on port 80"
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.22.0/24"]
+    description = "Branch Juniper PSK Interface 2 access to KMS Server on port 443"
+  }
+
+  ingress {
+    from_port   = 8080
+    to_port     = 8090
+    protocol    = "tcp"
+    cidr_blocks = ["10.26.144.0/24"]
+    description = "Sandpit YJSM to CUG Junipers port 8080 - 8090"
+  }
+
   tags = merge(local.tags, {
     Name = "YJBJuniperINT-SG"
   })
