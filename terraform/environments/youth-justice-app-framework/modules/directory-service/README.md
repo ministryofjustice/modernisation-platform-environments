@@ -195,13 +195,18 @@ The following describes the process of copying data from one environment to anot
 6. Run powerShell script `.\import-admin-users.ps1`
 Note: Errors relating to admin user should be ignored as this user is created when the infrastructure is built.
 
+### Correct the YJAF LDAP user
+See secret `LDAP-administration-user` for details of the yjaf ldap user (in DEveoment the name is admin2 and is is expected that this will be consistent across all environment).
+1. Ensure that the yjaf ldap user has the password recording in the secret.
+2. Ensure that the admin user is a member of group `AWS Delegated Administrators`.
+
 ### Cutover
 For cutover repeat the export and import steps for Yjaf Users only.
 On a source management server:
 1. Run powershell script `export-yjaf-users.ps1`
 2. Copy the files users.csv, groups.csv and roles.csv created by the above scripts to a management server in the destination environment.
 On a destination management server:
-1. Delete all Users from OU `i2N\Accounts\Users`.
+1. Delete all Users from OU `i2N\Accounts\Users` and all Groups from `i2N\Accounts\Groups` and `i2N\Accounts\Roles`.
 2. Run powerShell script import-yjaf-users.ps1
 
 ## [Certificate Authority SetUp](#ca-setup)
