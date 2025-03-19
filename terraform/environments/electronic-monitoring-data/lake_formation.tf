@@ -23,7 +23,7 @@ resource "aws_lakeformation_data_lake_settings" "emds_development" {
 
 resource "aws_lakeformation_lf_tag" "domain_tag" {
   key    = "domain"
-  values = ["prisons", "probation", "electonic-monitoring"]
+  values = ["prisons", "probation", "electronic-monitoring"]
 }
 
 resource "aws_lakeformation_lf_tag" "sensitive_tag" {

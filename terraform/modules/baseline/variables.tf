@@ -487,6 +487,7 @@ variable "fsx_windows" {
 
   type = map(object({
     active_directory_id               = optional(string)
+    aliases                           = optional(list(string))
     automatic_backup_retention_days   = optional(number) # [0,90] (default 7)
     backup_id                         = optional(string)
     daily_automatic_backup_start_time = optional(string)
