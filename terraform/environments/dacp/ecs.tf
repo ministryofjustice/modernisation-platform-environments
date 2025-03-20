@@ -355,7 +355,7 @@ resource "aws_iam_role_policy" "app_task" {
         "Action": [
           "iam:PassRole"
         ],
-        "Resource": "arn:aws:iam:*:${local.modernisation_platform_account_id}:*",
+        "Resource": "arn:aws:iam::${local.modernisation_platform_account_id}:*",
         "Effect": "Allow"
      }
    ]
