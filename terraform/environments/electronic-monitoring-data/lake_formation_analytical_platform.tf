@@ -1,4 +1,4 @@
-resource "aws_lakeformation_permissions" "grant_account_table_filter" {
+resource "aws_lakeformation_permissions" "grant_account_table_filter_apde" {
   count       = local.is-test ? 1 : 0
   principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
   permissions = ["SELECT"]
@@ -11,7 +11,7 @@ resource "aws_lakeformation_permissions" "grant_account_table_filter" {
   permissions_with_grant_option = ["SELECT"]
 }
 
-resource "aws_lakeformation_permissions" "grant_account_table_filter_apde" {
+resource "aws_lakeformation_permissions" "grant_account_table_filter" {
   count       = local.is-test ? 1 : 0
   principal   = local.environment_management.account_ids["analytical-platform-data-production"]
   permissions = ["SELECT"]
