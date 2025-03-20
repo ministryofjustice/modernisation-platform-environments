@@ -43,6 +43,7 @@ resource "aws_security_group" "postgresql_db_sc" {
 }
 
 resource "aws_security_group_rule" "ecs_to_db" {
+    count                     = local.is-development ? 0 : 1
     type                      = "ingress"
     from_port                 = 5432
     to_port                   = 5432
@@ -58,6 +59,7 @@ resource "aws_security_group_rule" "ecs_to_db" {
 }
 
 resource "aws_security_group_rule" "bastion_to_db" {
+    count                     = local.is-development ? 0 : 1
     type                      = "ingress"
     protocol                  = "tcp"
     description               = "Allow PSQL traffic from bastion"
@@ -69,6 +71,7 @@ resource "aws_security_group_rule" "bastion_to_db" {
 
 resource "aws_security_group_rule" "db_out" {
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+  count             = local.is-development ? 0 : 1
   type              = "egress"
   description       = "allow all outbound traffic"
   from_port         = 0
