@@ -93,3 +93,9 @@ variable "s3_target_config" {
 variable "tags" {
   type = map(string)
 }
+
+variable "create_premigration_assessement_resources" {
+  type = bool
+  default = false
+  description = "whether to create pre-requisites for DMS PreMigration Assessment to be run manually"
+}

@@ -186,3 +186,49 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "invalid" {
     }
   }
 }
+
+# Bucket to store premigration-assessment
+#trivy:ignore:AVD-AWS-0089: No logging required
+resource "aws_s3_bucket" "premigration_assessment" {
+  count = var.create_premigration_assessement_resources ? 0 : 1
+  bucket_prefix = "${var.db}-premigration-assessment-"
+}
+
+resource "aws_s3_bucket_ownership_controls" "premigration_assessment" {
+  count = var.create_premigration_assessement_resources ? 0 : 1
+  bucket = aws_s3_bucket.premigration_assessment[0].id
+  rule {
+    object_ownership = "BucketOwnerEnforced"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "premigration_assessment" {
+  count = var.create_premigration_assessement_resources ? 0 : 1
+  bucket = aws_s3_bucket.premigration_assessment[0].id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+#trivy:ignore:AVD-AWS-0090: Versioning not needed
+resource "aws_s3_bucket_versioning" "premigration_assessment" {
+  count = var.create_premigration_assessement_resources ? 0 : 1
+  bucket = aws_s3_bucket.premigration_assessment[0].id
+  versioning_configuration {
+    status = "Disabled"
+  }
+}
+
+#trivy:ignore:AVD-AWS-0132: Uses AES256 encryption
+resource "aws_s3_bucket_server_side_encryption_configuration" "premigration_assessment" {
+  count = var.create_premigration_assessement_resources ? 0 : 1
+  bucket = aws_s3_bucket.premigration_assessment[0].id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
