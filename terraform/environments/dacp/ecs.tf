@@ -330,18 +330,32 @@ resource "aws_iam_role_policy" "app_task" {
      {
 
         "Action": [
-          "logs:*",
-          "ecr:*",
+          "logs:*"
+        ],
+        "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
+     },
+     {
+
+        "Action": [
+          "ecr:*"
+        ],
+        "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
+     },
+     {
+
+        "Action": [
           "ec2:*"
         ],
-        "Resource": "arn:aws:::${local.modernisation_platform_account_id}:*",
+        "Resource": "arn:aws:ec2:*:${local.modernisation_platform_account_id}:*",
         "Effect": "Allow"
      },
      {
         "Action": [
           "iam:PassRole"
         ],
-        "Resource": "arn:aws:iam::${local.modernisation_platform_account_id}:*",
+        "Resource": "arn:aws:iam:*:${local.modernisation_platform_account_id}:*",
         "Effect": "Allow"
      }
    ]
