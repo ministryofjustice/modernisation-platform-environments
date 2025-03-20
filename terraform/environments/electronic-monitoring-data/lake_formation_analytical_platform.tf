@@ -8,7 +8,6 @@ resource "aws_lakeformation_permissions" "grant_account_table_filter_apde" {
     table_catalog_id = data.aws_caller_identity.current.account_id
     name             = module.share_current_version[0].data_filter_id[0]
   }
-  permissions_with_grant_option = ["SELECT"]
 }
 
 resource "aws_lakeformation_permissions" "grant_account_table_filter" {
