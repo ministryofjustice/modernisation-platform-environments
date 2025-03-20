@@ -102,11 +102,25 @@ resource "aws_iam_role_policy_attachment" "backup_restore_policy" {
 
 resource "aws_iam_policy" "backup_selection_permissions" {
   name        = "BackupSelectionPermissions"
-  description = "Permissions for backup selection, including EC2, RDS, backup storage, and KMS"
+  description = "Permissions for AWS Backup, including full backup access and storage"
 
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "backup:*"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "backup-storage:MountCapsule"
+        ],
+        Resource = "*"
+      },
       {
         Effect   = "Allow",
         Action   = [
@@ -117,24 +131,6 @@ resource "aws_iam_policy" "backup_selection_permissions" {
           "rds:DescribeDBClusters",
           "rds:DescribeDBSnapshots",
           "rds:ListTagsForResource"
-        ],
-        Resource = "*"
-      },
-      {
-        Effect   = "Allow",
-        Action   = [
-          "backup:CreateBackupSelection",
-          "backup:DescribeBackupSelection",
-          "backup:ListBackupSelections",
-          "backup:DeleteBackupSelection",
-          "backup:CreateBackupVault"
-        ],
-        Resource = "*"
-      },
-      {
-        Effect   = "Allow",
-        Action   = [
-          "backup-storage:MountCapsule" 
         ],
         Resource = "*"
       },
