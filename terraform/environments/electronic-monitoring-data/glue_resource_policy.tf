@@ -1,22 +1,15 @@
 ## Glue DB Default Policy
 resource "aws_glue_resource_policy" "glue_policy" {
   policy        = data.aws_iam_policy_document.glue-policy-data.json
-  enable_hybrid = "TRUE"
+  enable_hybrid = "FALSE"
 }
 
 data "aws_iam_policy_document" "glue-policy-data" {
-  #checkov:skip=CKV_AWS_283: "Ensure no IAM policies documents allow ALL or any AWS principal permissions to the resource"
   statement {
-    actions = [
-      "glue:CreateTable",
-      "glue:DeleteTable",
-      "glue:CreateSchema",
-      "glue:DeleteSchema",
-      "glue:UpdateTable",
-    ]
+    actions   = ["glue:*"]
     resources = ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:*"]
     principals {
-      identifiers = ["*"]
+      identifiers = [local.envionment_management.account_ids["analytical-platform-data-production"]]
       type        = "AWS"
     }
   }
