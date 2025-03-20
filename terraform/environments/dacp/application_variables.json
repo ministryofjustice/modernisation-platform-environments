@@ -38,7 +38,7 @@
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
       "domain_name": "modernisation-platform.service.justice.gov.uk",
-      "monitoring_interval": "60"
+      "monitoring_interval": "0"
     },
     "production": {
       "db_name": "dacp_db_prod",
@@ -58,7 +58,7 @@
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
       "domain_name": "divorce-section-search.service.justice.gov.uk",
-      "monitoring_interval": "5"
+      "monitoring_interval": "0"
     }
   }
 }
