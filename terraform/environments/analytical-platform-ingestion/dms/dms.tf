@@ -20,7 +20,7 @@ module "cica_dms_tariff_dms_implementation" {
         engine_version             = "3.5.4"
         kms_key_arn                = module.cica_dms_credentials_kms.key_arn
         multi_az                   = false
-        replication_instance_class = "dms.t2.micro"
+        replication_instance_class = "dms.t3.micro"
         inbound_cidr               = local.environment_configuration.tariff_cidr
     }
     dms_source = {
