@@ -141,7 +141,7 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
 
 # IAM Role for DMS Premigration Assessmeent
 resource "aws_iam_role" "dms_premigration" {
-  count = var.create_premigration_assessement_resources ? 0 : 1
+  count = var.create_premigration_assessement_resources ? 1 : 0
   name = "dms-premigration-assessment-role"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
@@ -164,7 +164,7 @@ resource "aws_iam_role" "dms_premigration" {
 
 
 resource "aws_iam_role_policy" "dms_premigration" {
-  count = var.create_premigration_assessement_resources ? 0 : 1
+  count = var.create_premigration_assessement_resources ? 1 : 0
   name = "${var.db}-dms-premigration-${var.environment}"
   role = aws_iam_role.dms_premigration[0].id
 
