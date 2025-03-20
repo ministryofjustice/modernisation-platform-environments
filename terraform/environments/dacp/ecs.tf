@@ -288,8 +288,8 @@ resource "aws_iam_role_policy" "app_execution" {
           "Effect": "Allow"
       }
     ]
-  }
-  EOF
+}
+EOF
 }
 
 resource "aws_iam_role" "app_task" {
@@ -308,8 +308,8 @@ resource "aws_iam_role" "app_task" {
       "Sid": ""
     }
   ]
-  }
-  EOF
+}
+EOF
 
   tags = merge(
     local.tags,
@@ -345,8 +345,8 @@ resource "aws_iam_role_policy" "app_task" {
         "Effect": "Allow"
      }
    ]
-  }
-  EOF
+}
+EOF
 }
 
 resource "aws_security_group" "ecs_service" {
