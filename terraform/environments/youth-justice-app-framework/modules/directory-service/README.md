@@ -196,7 +196,7 @@ The following describes the process of copying data from one environment to anot
 Note: Errors relating to admin user should be ignored as this user is created when the infrastructure is built.
 
 ### Correct YJAF users
-Passwords need to be rest for yjaf acconunts identified in the following secrets so that they match the value recorded in the secret:
+Passwords need to be rest for yjaf acconunts identified in the following secrets so that they match the value recorded in the secret and the accounts need to be configured to never expire the password:
 - `LDAP-administration-user`
 - `yjaf-auto-admit`
 - `yjaf_Auth_Email_Account`
