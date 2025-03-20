@@ -38,4 +38,5 @@ module "cica_dms_tariff_dms_implementation" {
     output_bucket         = module.cica_dms_ingress_bucket.s3_bucket_id
 
     tags = local.tags
+    create_premigration_assessement_resources = local.environment == "development" ? true : false
 }
