@@ -1,7 +1,7 @@
 ## Glue DB Default Policy
 resource "aws_glue_resource_policy" "glue_policy" {
   policy        = data.aws_iam_policy_document.glue-policy-data.json
-  enable_hybrid = "FALSE"
+  enable_hybrid = "TRUE"
 }
 
 data "aws_iam_policy_document" "glue-policy-data" {
