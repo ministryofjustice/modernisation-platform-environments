@@ -18,10 +18,19 @@ module "cica_dms_credentials_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
+  aliases               = ["dms/cica-source-credentials"]
   description           = "Used in the CICA DMS Solution to encode secrets"
   enable_default_policy = true
 
   deletion_window_in_days = 7
+
+  # Grants
+  grants = {
+    dms_source = {
+      grantee_principal = module.cica_dms_tariff_dms_implementation.dms_source_role_arn
+      operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+    }
+  }
 
   tags = local.tags
 }

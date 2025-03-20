@@ -1,7 +1,6 @@
 module "production_replication_cica_dms_iam_role" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
@@ -14,5 +13,5 @@ module "production_replication_cica_dms_iam_role" {
 
   trusted_role_services = ["s3.amazonaws.com"]
 
-  custom_role_policy_arns = [module.production_replication_cica_dms_iam_policy[0].arn]
+  custom_role_policy_arns = [module.production_replication_cica_dms_iam_policy.arn]
 }
