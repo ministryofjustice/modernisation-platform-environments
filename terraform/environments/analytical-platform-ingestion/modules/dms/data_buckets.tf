@@ -191,7 +191,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "invalid" {
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "premigration_assessment" {
   count = var.create_premigration_assessement_resources ? 0 : 1
-  bucket_prefix = "${var.db}-premigration-assessment-"
+  bucket_prefix = "${var.db}-pma-"
 }
 
 resource "aws_s3_bucket_ownership_controls" "premigration_assessment" {
