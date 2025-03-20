@@ -19,6 +19,27 @@ resource "aws_route53_record" "private_alb" {
   records = [module.internal_alb.dns_name]
 }
 
+locals {
+  dns_a_records = {
+    assets = [module.yjsm.yjsm_instance_private_ip]
+    mule   = [module.esb.esb_instance_private_ip]
+    ldap   = module.ds.dns_ip_addresses
+  }
+}
+
+resource "aws_route53_record" "type_a" {
+  provider = aws.core-network-services
+
+  for_each = local.dns_a_records
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = each.key
+  type    = "A"
+  ttl     = 300
+  records = each.value
+}
+
+/*
 resource "aws_route53_record" "assets" {
   provider = aws.core-network-services
 
@@ -28,3 +49,25 @@ resource "aws_route53_record" "assets" {
   ttl     = 300
   records = [module.yjsm.yjsm_instance_private_ip]
 }
+
+resource "aws_route53_record" "mule" {
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = "mule"
+  type    = "A"
+  ttl     = 300
+  records = [module.esb.esb_instance_private_ip]
+}
+
+
+resource "aws_route53_record" "ldap" {
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = "ldap"
+  type    = "A"
+  ttl     = 300
+  records = [module.ds.dns_ip_addresses]
+}
+*/

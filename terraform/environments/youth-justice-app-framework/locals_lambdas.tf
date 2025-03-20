@@ -1,5 +1,5 @@
 locals {
-  split-ds-managed-ad-ips             = tolist(module.ds.ds_managed_ad_ips)
+  split-ds-managed-ad-ips             = tolist(module.ds.dns_ip_addresses)
   s3-cross-account-replication-s3-arn = "arn:aws:s3:::redshift-serverless-yjb-${local.environment}-reporting"
   update-dc-names = {
     function_zip_file = "lambda_code/update-dc-names.zip"

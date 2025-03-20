@@ -11,3 +11,7 @@ output "esb_security_group_id" {
 output "esb_instance_profile" {
   value = aws_iam_instance_profile.esb_ec2_profile.name
 }
+
+output "esb_instance_private_ip" {
+  value = aws_instance.esb.private_ip
+}
