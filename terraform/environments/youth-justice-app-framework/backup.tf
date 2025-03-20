@@ -98,3 +98,69 @@ resource "aws_iam_role_policy_attachment" "backup_restore_policy" {
   role       = aws_iam_role.backup_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
 }
+
+resource "aws_iam_policy" "backup_selection_permissions" {
+  name        = "BackupSelectionPermissions"
+  description = "Custom permissions for accessing EC2, RDS, etc., for backup selection"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "ec2:DescribeInstances",
+          "ec2:DescribeVolumes",
+          "ec2:DescribeTags",
+          "rds:DescribeDBInstances",
+          "rds:DescribeDBClusters",
+          "rds:DescribeDBSnapshots",
+          "rds:ListTagsForResource"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
+          "backup:CreateBackupSelection",
+          "backup:DescribeBackupSelection",
+          "backup:ListBackupSelections",
+          "backup:DeleteBackupSelection"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "backup_selection_permissions_attachment" {
+  role       = aws_iam_role.backup_role.name
+  policy_arn = aws_iam_policy.backup_selection_permissions.arn
+}
+
+
+resource "aws_iam_policy" "secrets_kms_policy" {
+  name        = "SecretsManagerKMSAccess"
+  description = "Policy to access SecretsManager and KMS for backups"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "kms:Decrypt*",
+          "kms:Encrypt*"
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "secrets_kms_policy_attachment" {
+  role       = aws_iam_role.backup_role.name
+  policy_arn = aws_iam_policy.secrets_kms_policy.arn
+}
