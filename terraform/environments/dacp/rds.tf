@@ -67,7 +67,7 @@ resource "aws_security_group_rule" "bastion_to_db" {
     source_security_group_id  = module.bastion_linux.bastion_security_group #module output variable which stores the security group id
 }
 
-resource "aws_security_group_rule" "ecs_out" {
+resource "aws_security_group_rule" "db_out" {
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   type        = "egress"
   description = "allow all outbound traffic"
