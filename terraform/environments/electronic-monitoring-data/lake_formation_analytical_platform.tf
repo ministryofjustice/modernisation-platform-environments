@@ -1,5 +1,18 @@
 resource "aws_lakeformation_permissions" "grant_account_table_filter" {
   count       = local.is-test ? 1 : 0
+  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["SELECT"]
+  data_cells_filter {
+    database_name    = "staged_fms_test_dbt"
+    table_name       = "account"
+    table_catalog_id = data.aws_caller_identity.current.account_id
+    name             = module.share_current_version[0].data_filter_id[0]
+  }
+  permissions_with_grant_option = ["SELECT"]
+}
+
+resource "aws_lakeformation_permissions" "grant_account_table_filter" {
+  count       = local.is-test ? 1 : 0
   principal   = local.environment_management.account_ids["analytical-platform-data-production"]
   permissions = ["SELECT"]
   data_cells_filter {
