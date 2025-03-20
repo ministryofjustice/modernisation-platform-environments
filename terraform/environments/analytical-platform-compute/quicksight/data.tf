@@ -9,7 +9,10 @@ data "aws_ssoadmin_instances" "main" {
 }
 
 data "aws_security_group" "quicksight_shared_vpc_security_group" {
-  name = "quicksight-shared-vpc"
+  filter {
+    name   = "tag:Name"
+    values = ["quicksight-shared-vpc"]
+  }
 }
 
 # Shared VPC and Subnets
