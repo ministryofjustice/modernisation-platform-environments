@@ -36,7 +36,7 @@ resource "aws_wafv2_web_acl" "dacp_web_acl" {
 
   rule {
     name     = "AWSManagedRulesKnownBadInputsRuleSet"
-    priority = 1
+    priority = 2
 
     override_action {
       none {}

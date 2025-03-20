@@ -258,8 +258,8 @@ resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
 
-  policy = <<-EOF
-  {
+  policy = <<EOF
+{
     "Version": "2012-10-17",
     "Statement": [
       {
@@ -308,8 +308,8 @@ resource "aws_iam_role" "app_task" {
       "Sid": ""
     }
   ]
-}
-EOF
+  }
+  EOF
 
   tags = merge(
     local.tags,
@@ -323,8 +323,8 @@ resource "aws_iam_role_policy" "app_task" {
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
 
-  policy = <<-EOF
-  {
+  policy = <<EOF
+{
    "Version": "2012-10-17",
    "Statement": [
      {
