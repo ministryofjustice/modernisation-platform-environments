@@ -138,3 +138,61 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
   role       = aws_iam_role.dms_cloudwatch.name
 }
+
+# IAM Role for DMS Premigration Assessmeent
+resource "aws_iam_role" "dms_premigration" {
+  count = var.create_premigration_assessement_resources ? 0 : 1
+  name = "dms-premigration-assessment-role"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "dms.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = merge(
+    { Name = "dms-premigration-assessment-role" },
+    var.tags
+  )
+}
+
+
+resource "aws_iam_role_policy" "dms_premigration" {
+  count = var.create_premigration_assessement_resources ? 0 : 1
+  name = "${var.db}-dms-premigration-${var.environment}"
+  role = aws_iam_role.dms_premigration[0].id
+
+  policy = jsonencode({
+    "Version":"2012-10-17",
+    "Statement":[
+      {
+        "Effect":"Allow",
+        "Action":[
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObjectTagging"
+        ],
+        "Resource":[
+          aws_s3_bucket.premigration_assessment[0].arn
+        ]
+      },
+      {
+        "Effect":"Allow",
+        "Action":[
+          "s3:ListBucket",
+          "s3:GetBucketLocation"
+         ],
+        "Resource":[
+          aws_s3_bucket.premigration_assessment[0].arn
+        ]
+      }
+    ]
+  })
+}
