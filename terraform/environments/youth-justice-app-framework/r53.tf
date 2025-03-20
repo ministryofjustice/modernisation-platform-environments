@@ -18,3 +18,13 @@ resource "aws_route53_record" "private_alb" {
   ttl     = 300
   records = [module.internal_alb.dns_name]
 }
+
+resource "aws_route53_record" "assets" {
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = "assets"
+  type    = "A"
+  ttl     = 300
+  records = [module.yjsm.yjsm_instance_private_ip]
+}

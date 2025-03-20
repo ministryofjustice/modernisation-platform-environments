@@ -11,3 +11,7 @@ output "security_group_id" {
 output "yjsm_instance_profile" {
   value = aws_iam_instance_profile.yjsm_ec2_profile.name
 }
+
+output "yjsm_instance_private_ip" {
+  value = aws_instance.yjsm.private_ip
+}
