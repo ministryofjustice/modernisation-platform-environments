@@ -98,6 +98,9 @@ module "load_genesys_laa_database" {
   count  = local.is-production ? 1 : 0
   source = "./modules/ap_airflow_load_data_iam_role"
 
+  # data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  # de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+
   name               = "genesys_laa"
   environment        = local.environment
   database_name      = "genesys-laa"
