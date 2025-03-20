@@ -195,10 +195,16 @@ The following describes the process of copying data from one environment to anot
 6. Run powerShell script `.\import-admin-users.ps1`
 Note: Errors relating to admin user should be ignored as this user is created when the infrastructure is built.
 
-### Correct the YJAF LDAP user
-See secret `LDAP-administration-user` for details of the yjaf ldap user (in DEveoment the name is admin2 and is is expected that this will be consistent across all environment).
-1. Ensure that the yjaf ldap user has the password recording in the secret.
-2. Ensure that the admin user is a member of group `AWS Delegated Administrators`.
+### Correct YJAF users
+Passwords need to be rest for yjaf acconunts identified in the following secrets so that they match the value recorded in the secret and the accounts need to be configured to never expire the password:
+- `LDAP-administration-user`
+- `yjaf-auto-admit`
+- `yjaf_Auth_Email_Account`
+
+
+In addtion the user identified in `LDAP-administration-user` needs to be made a member of group `AWS Delegated Administrators`.
+
+**[TODO]** Consider writing a script to make these change automatically for efficiency and to ensure that the changes are always made correctly.
 
 ### Cutover
 For cutover repeat the export and import steps for Yjaf Users only.
