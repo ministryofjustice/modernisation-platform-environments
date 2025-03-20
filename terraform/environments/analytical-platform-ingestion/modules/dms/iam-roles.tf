@@ -18,7 +18,7 @@ resource "aws_iam_role" "dms" {
   })
 
   tags = merge(
-    { Name = "${var.db}-dms-${var.environment}" },
+    { Name = "dms-vpc-role" },
     var.tags
   )
 }
@@ -111,3 +111,30 @@ resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRo
   }
 }
 
+# IAM Role for DMS Cloudwatch Access
+resource "aws_iam_role" "dms_cloudwatch" {
+  # This has to be a specific name for some reason
+  name = "dms-cloudwatch-logs-role"
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "dms.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+
+  tags = merge(
+    { Name = "dms-cloudwatch-logs-role" },
+    var.tags
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
+  role       = aws_iam_role.dms_cloudwatch.name
+}
