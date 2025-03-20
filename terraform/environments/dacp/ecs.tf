@@ -365,7 +365,7 @@ EOF
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
-  description = "ECS Security Group"
+  description = "ECS Service Security Group"
   vpc_id      = data.aws_vpc.shared.id
 }
 
