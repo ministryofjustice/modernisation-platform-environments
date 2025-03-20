@@ -384,6 +384,11 @@ resource "aws_security_group" "ecs_service" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  depends_on = [aws_security_group.dacp_lb_sc]
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_ecr_repository" "dacp_ecr_repo" {
