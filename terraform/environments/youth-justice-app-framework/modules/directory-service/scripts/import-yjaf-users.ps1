@@ -56,7 +56,7 @@ Write-Output "$(Get-Date) Starting User Import from ${usersFilePath}" | Tee-Obje
 
 #Import Account usersvto OU i2n|Accounts\Users
 Import-Csv -Path "${usersFilePath}" | ForEach-Object { #for each line in csv add AD user
-    New-ADUser -Name $_.Name `
+    $user = New-ADUser -Name $_.Name `
             -SamAccountName $_.SamAccountName `
             -UserPrincipalName $_.UserPrincipalName `
             -GivenName $_.GivenName `
@@ -66,7 +66,12 @@ Import-Csv -Path "${usersFilePath}" | ForEach-Object { #for each line in csv add
             -EmailAddress $_.mail `
             -Path "OU=Users,OU=Accounts,OU=i2N,DC=i2n,DC=com" `
             -AccountPassword $secure `
-            -Enabled ($_.Enabled -eq "True")
+            -Enabled ($_.Enabled -eq "True") `
+            -PassThru
+    if ($_.uid) {
+        $user | Set-AdUser -Add @{uid=$_.uid}
+    }
+
 }
 
 Write-Output "$(Get-Date) Starting Group Membership Import from ${groupMembersFilePath}" | Tee-Object -FilePath $logFile -Append

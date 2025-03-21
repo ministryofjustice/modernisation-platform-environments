@@ -12,6 +12,5 @@ locals {
     "project_name" = var.project_name
   }
 
-
-  all_tags = merge(var.tags, local.tags, local.tags)
+  all_tags = merge(var.tags, local.tags)
 }

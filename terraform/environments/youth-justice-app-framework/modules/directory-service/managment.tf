@@ -22,6 +22,9 @@ resource "aws_iam_role" "join_ad_role" {
   ]
 }
 EOF
+
+  tags = local.all_tags
+
 }
 
 #create a policy to all management instance to download files from the install-files bucket
@@ -39,12 +42,14 @@ resource "aws_iam_policy" "read_s3_install_software" {
           "s3:GetObjectTagging",
           "s3:ListBucket"
         ],
-        "Resource" : ["arn:aws:s3:::${var.environment_name}-install-files/*",
-          "arn:aws:s3:::${var.environment_name}-install-files"
+        "Resource" : ["arn:aws:s3:::${local.environment_name}-install-files/*",
+          "arn:aws:s3:::${local.environment_name}-install-files"
         ]
       }
     ]
   })
+
+  tags = local.all_tags
 }
 
 #attach policies Aread_s3_install_software
@@ -83,7 +88,7 @@ resource "aws_security_group" "mgmt_instance_sg" {
     create_before_destroy = true
   }
 
-  tags = merge({ "Name" = "ad_management_server_sg" }, local.tags)
+  tags = merge({ "Name" = "ad_management_server_sg" }, local.all_tags)
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_http_out" { #allow HTTP outbound to everywhere
@@ -136,6 +141,8 @@ resource "aws_vpc_security_group_ingress_rule" "allow_in_to_rds" { #allow Postgr
   to_port                      = 5432
   description                  = "Allow AD Management Instance to RDS PostgreSQL"
   ip_protocol                  = "tcp"
+
+  tags = local.all_tags
 }
 
 # Retrieve the ID of the Security Group created by Cloud Formation while building the KPI instances.
@@ -169,6 +176,8 @@ resource "aws_secretsmanager_secret" "ad_instance_admin_secret" {
   name        = "ad_instance_password_secret_1"
   description = "Local Admin for management instance" #todo do I need this?
   kms_key_id  = var.ds_managed_ad_secret_key
+
+  tags = local.all_tags
 }
 
 resource "aws_secretsmanager_secret_version" "ad_instance_admin_secret_version" {
@@ -266,13 +275,19 @@ resource "aws_instance" "ad_instance" {
   count = var.ad_management_instance_count
 
   ami                         = data.aws_ami.windows_2022.id
-  instance_type               = "t3.micro"
+  instance_type               = "t2.medium"
   iam_instance_profile        = aws_iam_instance_profile.ad_instance_profile.name
   key_name                    = module.key_pair.key_pair_name
   subnet_id                   = var.private_subnet_ids[count.index % length(var.private_subnet_ids)] # 1st in Subnet a, then b, c, a, etc
   associate_public_ip_address = false
   vpc_security_group_ids      = [aws_security_group.mgmt_instance_sg.id]
-  tags                        = merge({ "Name" = "mgmt-ad-instance-${count.index + 1}" }, local.tags)
+ 
+  tags = merge(local.all_tags,
+    { "Name"             = "mgmt-ad-instance-${count.index + 1}" },
+    { "OS"               = "Windows"},
+    { "PatchingSchedule" = "Windows1"}
+  )
+
   user_data                   = data.template_file.windows-dc-userdata.rendered
   ebs_optimized               = true
   lifecycle {
@@ -283,7 +298,7 @@ resource "aws_instance" "ad_instance" {
   }
   root_block_device {
     encrypted = true
-    tags = merge(local.tags,
+    tags = merge(local.all_tags,
       { Name = "root-device-mgmt-ad-instance" },
       { device-name = "/dev/sda1" }
     )

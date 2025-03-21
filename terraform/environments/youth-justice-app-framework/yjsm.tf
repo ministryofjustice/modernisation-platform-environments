@@ -1,0 +1,25 @@
+
+# YJSM EC2 Instance
+
+
+module "yjsm" {
+  source  = "./modules/yjsm"
+
+  #Network details
+  vpc_id                  = data.aws_vpc.shared.id
+  subnet_id = one(tolist([for s in local.private_subnet_list : s.id if s.availability_zone == "eu-west-2a"]))
+
+
+
+  project_name    = local.project_name
+  environment     = local.environment
+  tags            = local.tags
+
+# Security Group IDs
+ecs_service_internal_sg_id    = module.ecs.ecs_service_internal_sg_id
+ecs_service_external_sg_id    = module.ecs.ecs_service_external_sg_id
+esb_service_sg_id             = module.esb.esb_security_group_id
+rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
+alb_security_group_id         = module.internal_alb.alb_security_group_id
+}
+

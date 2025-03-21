@@ -14,3 +14,14 @@ variable "datadog_integration_external_id" {
   description = "The external ID for the Datadog integration"
   type        = string
 }
+
+variable "datadog_api_kpi_secret_name" {
+  description = "The name of the Secret that will hold the Datadog Api Key."
+  type        = string
+  default     = "DdApiKeySecret-hN6hCIq7xwr1"
+}
+
+variable "kms_key_arn" {
+  type        = string
+  description = "ARN of the AWS KMS key to be used to encrypt secret values."
+}
