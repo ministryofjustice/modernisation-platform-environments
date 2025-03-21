@@ -11,4 +11,7 @@ module "esb" {
   project_name    = local.project_name
   environment     = local.environment
   tags            = local.tags
+
+  yjsm_service_sg_id             = module.yjsm.yjsm_security_group_id
+
 }

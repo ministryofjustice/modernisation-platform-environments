@@ -24,3 +24,8 @@ variable "environment" {
   description = "The environment for the ECS cluster"
   type        = string
 }
+
+variable "yjsm_service_sg_id" {
+  description = "Security Group ID for ESB"
+  type        = string
+}

@@ -11,6 +11,16 @@ resource "aws_security_group" "yjsm_service" {
   )
 }
 
+resource "aws_security_group_rule" "yjsm_allow_all_internal_group" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+  type              = "egress"
+  to_port           = 0
+  protocol          = "-1"
+  from_port         = 0
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.yjsm_service.id
+  description       = "Allow all outbound from yjsm"
+}
 
 
 # (ECS external to YJSMhub)

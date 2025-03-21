@@ -32,3 +32,23 @@ resource "aws_security_group_rule" "ecs_to_esb_rule" {
   security_group_id        = aws_security_group.esb_service.id
   description              = "ALB to ECS service communication"
 }
+
+# YJSM
+resource "aws_security_group_rule" "yjsm_8090" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.esb_service.id
+  source_security_group_id = var.yjsm_service_sg_id
+}
+
+# YJSM
+resource "aws_security_group_rule" "yjsm_8092" {
+  type                     = "ingress"
+  from_port                = 80
+  to_port                  = 80
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.esb_service.id
+  source_security_group_id = var.yjsm_service_sg_id
+}
