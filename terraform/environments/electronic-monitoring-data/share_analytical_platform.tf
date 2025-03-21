@@ -218,7 +218,29 @@ data "aws_iam_policy_document" "lake_formation_lftag_access" {
       "lakeformation:ListLFTags",
       "lakeformation:GetLFTag",
       "lakeformation:SearchTablesByLFTags",
-      "lakeformation:SearchDatabasesByLFTags"
+      "lakeformation:SearchDatabasesByLFTags",
+      "lakeformation:ListDataCellsFilter"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+# LakeFormation Data Cells Filter permissions
+# Policy Document
+
+data "aws_iam_policy_document" "lake_formation_filter_access" {
+  #checkov:skip=CKV_AWS_111:Ensure IAM policies does not allow write access without constraints
+  statement {
+    actions = [
+      "lakeformation:GetDataCellsFilter",
+      "lakeformation:CreateDataCellsFilter",
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:ListPermissions"
     ]
     resources = [
       "*"
@@ -356,6 +378,12 @@ resource "aws_iam_role_policy_attachment" "lake_formation_lftag_access" {
   policy_arn = aws_iam_policy.lake_formation_lftag_access.arn
 }
 
+# Lake Formation Data Cells Filter Access Attachement
+resource "aws_iam_role_policy_attachment" "lake_formation_filter_access" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_filter_access.arn
+}
+
 # Athena Access Attachement
 resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
   role       = aws_iam_role.dataapi_cross_role.name
@@ -381,6 +409,12 @@ resource "aws_iam_policy" "lake_formation_lftag_access" {
   policy      = data.aws_iam_policy_document.lake_formation_lftag_access.json
 }
 
+resource "aws_iam_policy" "lake_formation_filter_access" {
+  name        = "${local.environment_shorthand}-lake-formation-filter-access"
+  description = "LakeFormation Data Cell Filter Access Policy"
+  policy      = data.aws_iam_policy_document.lake_formation_filter_access.json
+}
+
 # Analytical Platform Share Policy & Role
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
   for_each = local.analytical_platform_share
@@ -399,8 +433,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 
     ]
     resources = [
-      #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
-      "arn:aws:lakeformation:${data.aws_region.current.name}:${local.env_account_id}:catalog:${local.env_account_id}"
+      "arn:aws:lakeformation:${data.aws_region.current.name}:${local.env_account_id}:catalog:${local.env_account_id}",
+      module.s3-create-a-derived-table-bucket.bucket.arn
     ]
   }
 
@@ -492,7 +526,7 @@ resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
 
   name   = "${each.value.target_account_name}-share-policy"
   role   = aws_iam_role.analytical_platform_share_role[each.key].name
-  policy = data.aws_iam_policy_document.allow_airflow_ssh_key[each.key].json
+  policy = data.aws_iam_policy_document.analytical_platform_share_policy[each.key].json
 }
 
 resource "aws_iam_role_policy" "analytical_platform_secret_share_policy_attachment" {
@@ -517,20 +551,6 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     try(one(data.aws_iam_roles.data_engineering_roles.arns),
     [])]
   )
-
-  # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
-  # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
-  create_database_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
-
-  create_table_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
 }
 
 module "share_dbs_with_roles" {
@@ -598,3 +618,25 @@ resource "aws_secretsmanager_secret" "airflow_ssh_secret" {
     local.tags
   )
 }
+
+resource "aws_lakeformation_permissions" "cross_account_glue" {
+  principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/GlobalGitHubActionAdmin"
+
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "staged_fms_test_dbt"
+  }
+}
+
+resource "aws_lakeformation_permissions" "cross_account_glue_tables" {
+  principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/GlobalGitHubActionAdmin"
+
+  permissions = ["SELECT", "DESCRIBE"]
+
+  table {
+    database_name = "staged_fms_test_dbt"
+    name          = "account"
+  }
+}
+
