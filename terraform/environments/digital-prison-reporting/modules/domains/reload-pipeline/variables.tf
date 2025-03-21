@@ -4,6 +4,12 @@ variable "setup_reload_pipeline" {
   default     = false
 }
 
+variable "batch_only" {
+  description = "Determines if the pipeline is batch only, True or False?"
+  type        = bool
+  default     = false
+}
+
 variable "reload_pipeline" {
   description = "Name for the Reload Pipeline"
   type        = string

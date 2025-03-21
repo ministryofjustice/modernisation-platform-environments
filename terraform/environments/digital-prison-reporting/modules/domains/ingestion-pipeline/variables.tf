@@ -5,6 +5,12 @@ variable "setup_data_ingestion_pipeline" {
   default     = false
 }
 
+variable "batch_only" {
+  description = "Determines if the pipeline is batch only, True or False?"
+  type        = bool
+  default     = false
+}
+
 variable "data_ingestion_pipeline" {
   description = "Name for Data Ingestion Pipeline"
   type        = string
