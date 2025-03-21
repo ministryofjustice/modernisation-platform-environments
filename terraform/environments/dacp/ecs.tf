@@ -326,6 +326,7 @@ resource "aws_iam_role_policy" "app_task" {
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
+  description = "ECS Service Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
