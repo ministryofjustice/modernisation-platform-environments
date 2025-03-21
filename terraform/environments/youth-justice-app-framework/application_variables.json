@@ -4,7 +4,7 @@
        "allow_s3_replication": true,
       "source_account": "856879713508",
       "ad_management_instance_count": 1,
-      "desired_number_of_domain_controllers": 2,
+      "desired_number_of_domain_controllers": 3,
       "test_mode": true,
       "tableau_website_name": "tableau.development.yjbservices.yjb.gov.uk",
       "ses_domain_identities": {
