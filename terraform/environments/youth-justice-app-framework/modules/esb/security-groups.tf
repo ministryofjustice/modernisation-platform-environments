@@ -36,7 +36,7 @@ resource "aws_security_group_rule" "ecs_to_esb_rule" {
 # YJSM
 resource "aws_security_group_rule" "yjsm_8090" {
   type                     = "ingress"
-  from_port                = 80
+  from_port                = 8090
   to_port                  = 80
   protocol                 = "tcp"
   security_group_id        = aws_security_group.esb_service.id
@@ -46,7 +46,7 @@ resource "aws_security_group_rule" "yjsm_8090" {
 # YJSM
 resource "aws_security_group_rule" "yjsm_8092" {
   type                     = "ingress"
-  from_port                = 80
+  from_port                = 8092
   to_port                  = 80
   protocol                 = "tcp"
   security_group_id        = aws_security_group.esb_service.id
