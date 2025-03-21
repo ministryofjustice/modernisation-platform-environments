@@ -130,12 +130,36 @@ locals {
       })
 
       # testing only do not use
-      # t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
-      #   config = merge(local.ec2_instances.jumpserver.config, {
+      t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-*"
+          availability_zone = "eu-west-2b"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+              branch = "TM/TM-1080/move-rds-instances-to-their-own-ou"
+            }
+          ))
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
+      # testing only do not use
+      # test-rds-2-b = merge(local.ec2_instances.rds, {
+      #   config = merge(local.ec2_instances.rds.config, {
       #     ami_name          = "hmpps_windows_server_2022_release_2025-*"
       #     availability_zone = "eu-west-2b"
+      #     user_data_raw = base64encode(templatefile(
+      #       "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+      #         branch = "TM/TM-1080/move-rds-instances-to-their-own-ou"
+      #       }
+      #     ))
+      #     instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
+      #       "Ec2SecretPolicy"]
+      #     )
       #   })
-      #   tags = merge(local.ec2_instances.jumpserver.tags, {
+      #   tags = merge(local.ec2_instances.rds.tags, {
       #     domain-name = "azure.noms.root"
       #   })
       #   cloudwatch_metric_alarms = null
@@ -165,6 +189,24 @@ locals {
       #     password_secret_name = "/microsoft/AD/azure.noms.root/shared-passwords"
       #   }
       # }
+    }
+
+    iam_policies = {
+      Ec2SecretPolicy = {
+        description = "Permissions required for secret value access by instances"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/microsoft/AD/azure.noms.root/shared-passwords-*",
+            ]
+          }
+        ]
+      }
     }
 
     lbs = {
