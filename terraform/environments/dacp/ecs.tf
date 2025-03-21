@@ -258,8 +258,8 @@ resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
 
-  policy = <<-EOF
-  {
+  policy = <<EOF
+{
     "Version": "2012-10-17",
     "Statement": [
       {
@@ -288,8 +288,8 @@ resource "aws_iam_role_policy" "app_execution" {
           "Effect": "Allow"
       }
     ]
-  }
-  EOF
+}
+EOF
 }
 
 resource "aws_iam_role" "app_task" {
@@ -323,30 +323,44 @@ resource "aws_iam_role_policy" "app_task" {
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
 
-  policy = <<-EOF
-  {
+  policy = <<EOF
+{
    "Version": "2012-10-17",
    "Statement": [
      {
 
         "Action": [
-          "logs:*",
-          "ecr:*",
+          "logs:*"
+        ],
+        "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
+     },
+     {
+
+        "Action": [
+          "ecr:*"
+        ],
+        "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
+     },
+     {
+
+        "Action": [
           "ec2:*"
         ],
-        "Resource": "arn:aws:*:*:${local.modernisation_platform_account_id}:*",
+        "Resource": "arn:aws:ec2:*:${local.modernisation_platform_account_id}:*",
         "Effect": "Allow"
      },
      {
         "Action": [
           "iam:PassRole"
         ],
-        "Resource": "arn:aws:iam:*:${local.modernisation_platform_account_id}:*",
+        "Resource": "arn:aws:iam::${local.modernisation_platform_account_id}:*",
         "Effect": "Allow"
      }
    ]
-  }
-  EOF
+}
+EOF
 }
 
 resource "aws_security_group" "ecs_service" {
@@ -369,6 +383,11 @@ resource "aws_security_group" "ecs_service" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  depends_on = [aws_security_group.dacp_lb_sc]
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

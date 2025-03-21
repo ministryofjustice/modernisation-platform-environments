@@ -382,8 +382,12 @@ locals {
     secretsmanager_secrets = {
       "/oracle/database/PDBIPSYS" = local.secretsmanager_secrets.db # Azure Live System DB
       "/oracle/database/PDBIPAUD" = local.secretsmanager_secrets.db # Azure Live Audit DB
-      "/oracle/database/PDBISYS"  = local.secretsmanager_secrets.db
-      "/oracle/database/PDBIAUD"  = local.secretsmanager_secrets.db
+      "/oracle/database/PDBISYS"  = local.secretsmanager_secrets.db # AWS System DB
+      "/oracle/database/PDBIAUD"  = local.secretsmanager_secrets.db # AWS Audit DB
+      "/oracle/database/DRBIPSYS" = local.secretsmanager_secrets.db
+      "/oracle/database/DRBIPAUD" = local.secretsmanager_secrets.db
+      "/oracle/database/DRBISYS"  = local.secretsmanager_secrets.db
+      "/oracle/database/DRBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/pd"               = local.secretsmanager_secrets.bip
       "/sap/bods/pd"              = local.secretsmanager_secrets.bods
     }

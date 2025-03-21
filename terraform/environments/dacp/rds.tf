@@ -67,6 +67,11 @@ resource "aws_security_group" "postgresql_db_sc" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  depends_on = [aws_security_group.ecs_service]
+  lifecycle {
+    create_before_destroy = true
+  }
+
 }
 
 // DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
