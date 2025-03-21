@@ -365,31 +365,35 @@ EOF
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
-  description = "ECS Security Group"
+  description = "ECS Service Security Group"
   vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.dacp_lb_sc.id]
-  }
-
-  egress {
-    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-    description = "Allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  depends_on = [aws_security_group.dacp_lb_sc]
-  lifecycle {
-    create_before_destroy = true
-  }
 }
+
+resource "aws_security_group_rule" "lb_to_ecs" {
+    type                      = "ingress"
+    description               = "Allow traffic on port 80 from load balancer"
+    from_port                 = 80
+    to_port                   = 80
+    protocol                  = "tcp"
+    security_group_id         = aws_security_group.ecs_service.id
+    source_security_group_id  = aws_security_group.dacp_lb_sc.id
+
+    depends_on = [aws_security_group.dacp_lb_sc]
+    lifecycle {
+      create_before_destroy = true
+    }
+}
+
+resource "aws_security_group_rule" "ecs_out" {
+    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+    type              = "egress"
+    description       = "Allow all outbound traffic"
+    from_port         = 0
+    to_port           = 0
+    protocol          = "-1"
+    cidr_blocks       = ["0.0.0.0/0"]
+    security_group_id = aws_security_group.ecs_service.id
+  }
 
 resource "aws_ecr_repository" "dacp_ecr_repo" {
   #checkov:skip=CKV_AWS_136: "Ensure that ECR repositories are encrypted using KMS" - ignore
