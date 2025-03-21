@@ -16,9 +16,10 @@ module "yjsm" {
   tags            = local.tags
 
 # Security Group IDs
-ecs_service_internal_sg_id = module.ecs.ecs_service_internal_sg_id
-ecs_service_external_sg_id = module.ecs.ecs_service_external_sg_id
-esb_service_sg_id          = module.esb.esb_security_group_id
-
+ecs_service_internal_sg_id    = module.ecs.ecs_service_internal_sg_id
+ecs_service_external_sg_id    = module.ecs.ecs_service_external_sg_id
+esb_service_sg_id             = module.esb.esb_security_group_id
+rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
+alb_security_group_id         = module.internal_alb.alb_security_group_id
 }
 

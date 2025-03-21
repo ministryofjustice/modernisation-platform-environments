@@ -3,7 +3,7 @@ output "instance_id" {
   value       = aws_instance.yjsm.id
 }
 
-output "security_group_id" {
+output "yjsm_security_group_id" {
   description = "Security Group ID for YJSM"
   value       = aws_security_group.yjsm_service.id
 }

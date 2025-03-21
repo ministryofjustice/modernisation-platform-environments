@@ -94,6 +94,38 @@ resource "aws_security_group_rule" "esb_80" {
 }
 
 
+# YJSM to RDS
+resource "aws_security_group_rule" "allow_postgres_from_yjsm" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = var.rds_cluster_security_group_id
+  source_security_group_id = aws_security_group.yjsm_service.id                    
+}
+
+# YJSM to ALB
+resource "aws_security_group_rule" "allow_alb_from_yjsm" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = var.alb_security_group_id
+  source_security_group_id = aws_security_group.yjsm_service.id                  
+}
+
+
+#YJSM to ECS
+resource "aws_security_group_rule" "yjsm_to_ecsint_rule" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = var.ecs_service_internal_sg_id
+  source_security_group_id = aws_security_group.yjsm_service.id
+  description              = "YJSM to ECSint communication"
+}
+
 
 ### TO DO LIST 
 ### CUG SUBNETS

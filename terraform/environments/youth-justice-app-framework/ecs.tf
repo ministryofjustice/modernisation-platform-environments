@@ -70,6 +70,7 @@ module "ecs" {
   depends_on = [module.internal_alb, module.external_alb, module.aurora]
 }
 
+
 resource "aws_iam_policy" "s3-access" {
   name        = "${local.project_name}-ecs-s3-access"
   description = "Policy for ecs task role to access yjaf buckets"

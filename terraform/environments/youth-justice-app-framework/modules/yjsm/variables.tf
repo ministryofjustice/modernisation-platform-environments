@@ -39,3 +39,13 @@ variable "esb_service_sg_id" {
   description = "Security Group ID for ESB"
   type        = string
 }
+
+variable "rds_cluster_security_group_id" {
+  description = "Security Group ID for RDS"
+  type        = string
+}
+
+variable "alb_security_group_id" {
+  description = "Security Group ID for ALB"
+  type        = string
+}
