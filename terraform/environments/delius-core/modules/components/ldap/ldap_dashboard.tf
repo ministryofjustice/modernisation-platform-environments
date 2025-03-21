@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_dashboard" "ldap_dashboard" {
-  dashboard_name = "LDAPDashboard"
+  dashboard_name = "${var.env_name}-LDAPDashboard"
 
   dashboard_body = jsonencode({
     "widgets" = [
