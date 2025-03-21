@@ -48,7 +48,7 @@ This module manages the Tableau instance and Application load balancer and assoc
 **instance_arn**: The ARN of the Tableau ec2 instance.{
 **tableau_sg_id**: The ID of the Security Group hat controlls access to the Tableau ec3 instnce.
 
-# Cutover and Setup Guidance
+# Tableau Install and Setup
 ## Introduction
 The process for restoring Tableaus from backup is followed with some variations descripbed below to deal with differences between the old and new environments.
 ## Install and Restore
@@ -83,3 +83,15 @@ The process for this is described in Confluance document https://yjb.atlassian.n
 A copy of openssl-tableau.conf will already be available. The Siging Request and Certificate files can be copied beteen the Tableau and SubordinateCA servers via s3 location `yjaf-<envoronment>-tableau-backups/Install_Files`.
 
 Review the proposed Tableau settings change and if they look OK apply them.
+
+### Restore the Repositiory
+See the restore instuctions referenced above.
+
+# Cutover
+
+## Final Backup
+1. On the old Tableaus server, manually run the Tableau backup job.
+2. In the new environment wait for the backup files to appear in S3 bucket `yjaf-<envoronment>-tableau-backups-archive`.
+
+## Restore the Repository
+As described above.

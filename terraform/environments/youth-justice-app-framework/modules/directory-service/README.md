@@ -80,7 +80,7 @@ module "managed-ad" {
 
 
 # Issues and workarounds
-## CouudFormation Template for the KPI Infrastructure
+## CloudFormation Template for the KPI Infrastructure
 It is recommended that rollback on failure is never disable to ensure that the infrastructure is tidied up to a state where a sucessfull rerun is possible when ever a failure occures. This is particurly important in enviroments other than development where a manual rollback may not be possible due to permissions restrictions.
 
 If automatic rollbck is disabled for any reason the following manuall actions may be needed to tidy up entries in the Directory Sevice that would otherwise prevent a sucessfuly rerun:
@@ -100,7 +100,7 @@ If the instances hasn't koined the domain, this is probably becuase the domain j
 2. Select the above association and use the `Resources` tab to check the status.
 3. Reapply the association using button `Apply association now` and confirm that it is now successful.
 
-# Cutover and Setup Guidance
+# Management Server Setup
 ## Introduciton
 This section contains instructions for [initialising the AD Management instances](#managment-server-setup), [copying active directory users and groups from the old to the new environment](#user-group-copy) and [Certificate Authority SetUp](#ca-setup).
 
@@ -166,12 +166,24 @@ E.g.
 E'g.
 > 'C:\i2N\Scripts\management-server-app-install.ps1 yjaf-development'
 
+# [Certificate Authority SetUp](#ca-setup)
 
-## [Copy Users & Groups](#user-group-copy)
+The additional configuration described in Confluance page https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642508592/DOE+LDAPS+and+Certificate+chaining#Domain-Controllers-Server-Certificates-AutoEnrol has not been completed as the AD servers have auto-enroled for LDAPS certificates and LDAPS appears to be working successfully. This may need to be reconsidered following testing in Preproduction (or Test).
+
+In addition the RootCA and SubordinateCA cetificates have been left with their default exiptiy periods of 10 and 5 years respectively, rather thn changeing them to 20 and 10 years as mentioned in the above document.
+
+A template needs to be created on the SubordinateCA server for Tableaus web site HTTPS access as follows:
+1. Launch the Certificate Templates snapin.
+2. Duplicate template `Web Server` to `Tableau Web Server` and make the following changes:
+    - On the `General` tab set the `Valitory period` to 1 year and 6 weeks.
+    - On the `Security` tab add Group `AWS Delegated Administrators`, remove `Allow` `Read` and add `Allow` `Write` and `Enroll`.
+3. Launch Server Tool `Certificate Authority`, right click on `Certificate Templates`, choose option `New` > `Certificate Template to Issue`, highlight `Tableau Web Server` and `OK`.
+
+# [User and Group Migration](#user-group-copy)
 
 The following describes the process of copying data from one environment to another. For example copying from Sandpit to Test.
 
-### Export All
+## Export All
 1. RDP onto a management server in the source environment.
 2. Create folder `C:\i2N\AD_Files`.
 3. Copy the following files to the folder just created: export-admin-users.ps1 and export-yjaf-users.ps1.
@@ -184,7 +196,7 @@ The following describes the process of copying data from one environment to anot
     - `groups.csv`
     - `roles.csv`
 
-### Import All
+## Import All
 1. RDP onto a management server in the destination environment as the initial docmin user `admin` whose password is in Secret `i2n.com_admin_secret_2`.
 2. Create folder `C:\i2N\AD_Files`.
 3. Copy all the exported AD files to the above folder.
@@ -195,7 +207,7 @@ The following describes the process of copying data from one environment to anot
 6. Run powerShell script `.\import-admin-users.ps1`
 Note: Errors relating to admin user should be ignored as this user is created when the infrastructure is built.
 
-### Correct YJAF users
+## Correct YJAF users
 Passwords need to be rest for yjaf acconunts identified in the following secrets so that they match the value recorded in the secret and the accounts need to be configured to never expire the password:
 - `LDAP-administration-user`
 - `yjaf-auto-admit`
@@ -206,7 +218,7 @@ In addtion the user identified in `LDAP-administration-user` needs to be made a 
 
 **[TODO]** Consider writing a script to make these change automatically for efficiency and to ensure that the changes are always made correctly.
 
-### Cutover
+# Cutover
 For cutover repeat the export and import steps for Yjaf Users only.
 On a source management server:
 1. Run powershell script `export-yjaf-users.ps1`
@@ -215,18 +227,6 @@ On a destination management server:
 1. Delete all Users from OU `i2N\Accounts\Users` and all Groups from `i2N\Accounts\Groups` and `i2N\Accounts\Roles`.
 2. Run powerShell script import-yjaf-users.ps1
 
-## [Certificate Authority SetUp](#ca-setup)
-
-The additional configuration described in Confluance page https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642508592/DOE+LDAPS+and+Certificate+chaining#Domain-Controllers-Server-Certificates-AutoEnrol has not been completed as the AD servers have auto-enroled for LDAPS certificates and LDAPS appears to be working successfully. This may need to be reconsidered following testing in Preproduction (or Test).
-
-In addition the RootCA and SubordinateCA cetificates have been left with their default exiptiy periods of 10 and 5 years respectively, rather thn changeing them to 20 and 10 years as mentioned in the above document.
-
-A template needs to be created on the SubordinateCA server for Tableaus web site HTTPS access as follows:
-1. Launch the Certificate Templates snapin.
-2. Duplicate template `Web Server` to `Tableau Web Server` and make the following changes:
-    - On the `General` tab set the `Valitory period` to 1 year and 6 weeks.
-    - On the `Security` tab add Group `AWS Delegated Administrators`, remove `Allow` `Read` and add `Allow` `Write` and `Enroll`.
-3. Launch Server Tool `Certificate Authority`, right click on `Certificate Templates`, choose option `New` > `Certificate Template to Issue`, highlight `Tableau Web Server` and `OK`.
 
 
 
