@@ -26,7 +26,15 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-compute/lakeformation"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-compute/modules/routes"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-compute/quicksight"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
