@@ -108,14 +108,14 @@ locals {
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
         }
         rdp-session-host-udp = {
           description = "Allow connection to RD Session Host and internal RD Resources"
           from_port   = 3389
           to_port     = 3389
           protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
         }
         rdp-udp = {
           description = "RDP over UDP from external RD Clients to the Gateway"
