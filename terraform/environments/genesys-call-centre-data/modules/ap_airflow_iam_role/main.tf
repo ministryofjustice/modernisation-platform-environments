@@ -15,7 +15,10 @@ locals {
 data "aws_iam_policy_document" "oidc_assume_role_policy" {
   statement {
     effect  = "Allow"
-    actions = ["sts:AssumeRoleWithWebIdentity"]
+    actions = [
+      "sts:AssumeRoleWithWebIdentity",
+      "s3:*"
+    ]
     principals {
       type        = "Federated"
       identifiers = [var.oidc_arn]
