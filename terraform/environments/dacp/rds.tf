@@ -1,33 +1,21 @@
-# trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "dacp_db" {
-  #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
-  #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances" - false error
-  #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
-  #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
-  count                           = local.is-development ? 0 : 1
-  allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
-  db_name                         = local.application_data.accounts[local.environment].db_name
-  storage_type                    = local.application_data.accounts[local.environment].storage_type
-  engine                          = local.application_data.accounts[local.environment].engine
-  identifier                      = local.application_data.accounts[local.environment].identifier
-  engine_version                  = local.application_data.accounts[local.environment].engine_version
-  instance_class                  = local.application_data.accounts[local.environment].instance_class
-  username                        = local.application_data.accounts[local.environment].db_username
-  monitoring_interval             = local.application_data.accounts[local.environment].monitoring_interval
-  password                        = random_password.password.result
-  skip_final_snapshot             = true
-  publicly_accessible             = false
-  vpc_security_group_ids          = [aws_security_group.postgresql_db_sc[0].id]
-  db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade     = false
-  auto_minor_version_upgrade      = true
-  ca_cert_identifier              = "rds-ca-rsa2048-g1"
-  apply_immediately               = true
-  copy_tags_to_snapshot           = true
-  deletion_protection             = true
-  performance_insights_enabled    = true
-  enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-  multi_az                        = false
+  count                       = local.is-development ? 0 : 1
+  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
+  db_name                     = local.application_data.accounts[local.environment].db_name
+  storage_type                = local.application_data.accounts[local.environment].storage_type
+  engine                      = local.application_data.accounts[local.environment].engine
+  identifier                  = local.application_data.accounts[local.environment].identifier
+  engine_version              = local.application_data.accounts[local.environment].engine_version
+  instance_class              = local.application_data.accounts[local.environment].instance_class
+  username                    = local.application_data.accounts[local.environment].db_username
+  password                    = random_password.password.result
+  skip_final_snapshot         = true
+  publicly_accessible         = false
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
+  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
+  allow_major_version_upgrade = true
+  ca_cert_identifier          = "rds-ca-rsa2048-g1"
+  apply_immediately           = true
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
@@ -40,78 +28,51 @@ resource "aws_security_group" "postgresql_db_sc" {
   name        = "postgres_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
+  ingress {
+    from_port       = 5432
+    to_port         = 5432
+    protocol        = "tcp"
+    description     = "Allows ECS service to access RDS"
+    security_groups = [aws_security_group.ecs_service.id]
+  }
+
+  ingress {
+    protocol    = "tcp"
+    description = "Allow PSQL traffic from bastion"
+    from_port   = 5432
+    to_port     = 5432
+    security_groups = [
+      module.bastion_linux.bastion_security_group
+    ]
+  }
+
+  egress {
+    description = "allow all outbound traffic"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
 }
-
-resource "aws_security_group_rule" "ecs_to_db" {
-    count                     = local.is-development ? 0 : 1
-    type                      = "ingress"
-    from_port                 = 5432
-    to_port                   = 5432
-    protocol                  = "tcp"
-    description               = "Allows ECS service to access RDS"
-    security_group_id         = aws_security_group.postgresql_db_sc[0].id
-    source_security_group_id  = aws_security_group.ecs_service.id
-
-    depends_on = [aws_security_group.ecs_service]
-    lifecycle {
-      create_before_destroy = true
-    }
-}
-
-resource "aws_security_group_rule" "bastion_to_db" {
-    count                     = local.is-development ? 0 : 1
-    type                      = "ingress"
-    protocol                  = "tcp"
-    description               = "Allow PSQL traffic from bastion"
-    from_port                 = 5432
-    to_port                   = 5432
-    security_group_id         = aws_security_group.postgresql_db_sc[0].id
-    source_security_group_id  = module.bastion_linux.bastion_security_group #module output variable which stores the security group id
-}
-
-resource "aws_security_group_rule" "db_out" {
-  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-  count             = local.is-development ? 0 : 1
-  type              = "egress"
-  description       = "allow all outbound traffic"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.postgresql_db_sc[0].id
-}
-
 
 // DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
-# trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "dacp_db_dev" {
-  #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
-  #checkov:skip=CKV_AWS_17: "Ensure all data stored in RDS is not publicly accessible" - see above
-  #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
-  #checkov:skip=CKV_AWS_129: "Ensure that respective logs of Amazon Relational Database Service (Amazon RDS) are enabled"
-  #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
-  #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
-
-  count                           = local.is-development ? 1 : 0
-  allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
-  db_name                         = local.application_data.accounts[local.environment].db_name
-  storage_type                    = local.application_data.accounts[local.environment].storage_type
-  engine                          = local.application_data.accounts[local.environment].engine
-  identifier                      = local.application_data.accounts[local.environment].identifier
-  engine_version                  = local.application_data.accounts[local.environment].engine_version
-  instance_class                  = local.application_data.accounts[local.environment].instance_class
-  username                        = local.application_data.accounts[local.environment].db_username
-  monitoring_interval             = local.application_data.accounts[local.environment].monitoring_interval
-  password                        = random_password.password.result
-  skip_final_snapshot             = true
-  publicly_accessible             = true
-  vpc_security_group_ids          = [aws_security_group.postgresql_db_sc_dev[0].id]
-  db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade     = false
-  auto_minor_version_upgrade      = true
-  copy_tags_to_snapshot           = true
-  deletion_protection             = true
-  multi_az                        = false
+  count                       = local.is-development ? 1 : 0
+  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
+  db_name                     = local.application_data.accounts[local.environment].db_name
+  storage_type                = local.application_data.accounts[local.environment].storage_type
+  engine                      = local.application_data.accounts[local.environment].engine
+  identifier                  = local.application_data.accounts[local.environment].identifier
+  engine_version              = local.application_data.accounts[local.environment].engine_version
+  instance_class              = local.application_data.accounts[local.environment].instance_class
+  username                    = local.application_data.accounts[local.environment].db_username
+  password                    = random_password.password.result
+  skip_final_snapshot         = true
+  publicly_accessible         = true
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
+  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
+  allow_major_version_upgrade = true
 }
 
 resource "aws_security_group" "postgresql_db_sc_dev" {
@@ -144,7 +105,6 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
     ]
   }
   egress {
-    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
@@ -158,7 +118,7 @@ data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
 
-resource "null_resource" "setup_db" { # tflint-ignore: terraform_required_providers
+resource "null_resource" "setup_db" {
   count = local.is-development ? 1 : 0
 
   depends_on = [aws_db_instance.dacp_db_dev[0]]
@@ -175,12 +135,11 @@ resource "null_resource" "setup_db" { # tflint-ignore: terraform_required_provid
     }
   }
   triggers = {
-    always_run = timestamp()
+    always_run = "${timestamp()}"
   }
 }
 
 resource "aws_cloudwatch_log_group" "rds_logs" {
-  #checkov:skip=CKV_AWS_158: "Ensure that Cloudwatch Log Group is encrypted using KMS CMK"
   name              = "/aws/events/rdsLogs"
   retention_in_days = "7"
 }
