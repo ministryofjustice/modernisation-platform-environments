@@ -26,6 +26,32 @@ resource "aws_secretsmanager_secret_version" "nomis" {
     ignore_changes = [secret_string, ]
   }
 }
+# Nomis Test Source Secrets (for Unit Test)
+resource "aws_secretsmanager_secret" "nomis-test" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+
+  name = "external/${local.project}-nomis-testing-source-secrets"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-nomis-testing-source-secrets"
+      Resource_Type = "Secrets"
+      Jira          = "DPR2-1159"
+    }
+  )
+}
+
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "nomis-test" {
+  secret_id     = aws_secretsmanager_secret.nomis-test.id
+  secret_string = jsonencode(local.nomis_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
 
 # Nomis Source Secrets
 resource "aws_secretsmanager_secret" "bodmis" {
