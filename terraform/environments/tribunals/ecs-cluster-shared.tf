@@ -162,8 +162,3 @@ resource "aws_security_group" "ecs_service_sftp" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
-
-resource "aws_ecr_repository" "tribunals-ecr-repo" {
-  name         = "tribunals-ecr-repo"
-  force_delete = true
-}

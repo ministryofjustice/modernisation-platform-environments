@@ -173,6 +173,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
     ebs {
       volume_size = 80
       volume_type = "gp2"
+      encrypted   = true
     }
   }
   ebs_optimized = true
@@ -183,6 +184,10 @@ resource "aws_launch_template" "tribunals-all-lt" {
     subnet_id                   = data.aws_subnet.public_subnets_a.id
     delete_on_termination       = true
     associate_public_ip_address = true
+  }
+
+  metadata_options {
+    http_tokens = "required"
   }
 
   tag_specifications {
@@ -213,6 +218,7 @@ resource "aws_launch_template" "tribunals-backup-lt" {
     ebs {
       volume_size = 80
       volume_type = "gp2"
+      encrypted   = true
     }
   }
   ebs_optimized = true
@@ -223,6 +229,10 @@ resource "aws_launch_template" "tribunals-backup-lt" {
     subnet_id                   = data.aws_subnet.public_subnets_b.id
     delete_on_termination       = true
     associate_public_ip_address = true
+  }
+
+  metadata_options {
+    http_tokens = "required"
   }
 
   tag_specifications {

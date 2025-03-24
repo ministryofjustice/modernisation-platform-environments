@@ -129,7 +129,11 @@ EOF
 
 resource "aws_ecr_repository" "app-ecr-repo" {
   name         = "${local.app}-ecr-repo"
-  force_delete = true
+  force_delete = false
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 ####################### ECS Task #########################################
