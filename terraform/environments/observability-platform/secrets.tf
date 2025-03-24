@@ -43,5 +43,5 @@ resource "aws_secretsmanager_secret" "modernisation_platform_github_pat" {
   #checkov:skip=CKV_AWS_149:CMK not required currently
   #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
 
-  name = "observability-platform/nmodernisation-platform-github-pat"
+  name = "observability-platform/modernisation-platform-github-pat"
 }

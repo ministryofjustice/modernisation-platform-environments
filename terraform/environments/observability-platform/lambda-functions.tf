@@ -67,7 +67,7 @@ module "modernisation_platform_github_graphql" {
 
   # Set the env var to reference the Secrets Manager value (deferred to runtime)
   environment_variables = {
-    GITHUB_PAT = "/aws/reference/secretsmanager/modernisation_platform_github_pat/pat:token"
+    GITHUB_PAT = "/aws/reference/secretsmanager/modernisation-platform-github-pat/pat:token"
   }
 
   attach_policy_json = true
