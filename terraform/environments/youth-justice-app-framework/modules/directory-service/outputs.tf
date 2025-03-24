@@ -19,5 +19,5 @@ output "management_server_sg_id" {
 }
 
 output "dns_ip_addresses" {
-  value = aws_directory_service_directory.ds_managed_ad.dns_ip_addresses
+  value = data.aws_directory_service_directory.built_ad.dns_ip_addresses
 }
