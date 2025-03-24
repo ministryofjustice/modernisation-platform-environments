@@ -1,6 +1,7 @@
 locals {
 
-  application_name = "genesys-call-centre-data"
+  application_name = "analytical-platform-compute"
+  component_name   = "lakeformation"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
@@ -23,15 +24,6 @@ locals {
   )
 
   environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
-  environment_map = {
-    "production"    = "prod"
-    "preproduction" = "preprod"
-    "test"          = "test"
-    "development"   = "dev"
-    "default"       = ""
-  }
-  environment_shorthand = local.environment_map[local.environment]
-  
   vpc_name        = var.networking[0].business-unit
   subnet_set      = var.networking[0].set
   vpc_all         = "${local.vpc_name}-${local.environment}"
