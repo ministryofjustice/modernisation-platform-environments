@@ -29,7 +29,7 @@ EOF
 
 #create a policy to all management instance to download files from the install-files bucket
 resource "aws_iam_policy" "read_s3" {
-  name        = "read_s3_install_software"
+  name        = "read_s3_transfer_and_install_files"
   description = "Use to enable ec2 Instances to retrieve software from S3 bucket <enviroment>-install-files"
   policy = jsonencode({
     "Version" : "2012-10-17",
