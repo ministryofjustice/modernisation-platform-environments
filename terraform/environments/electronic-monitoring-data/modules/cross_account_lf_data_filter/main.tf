@@ -9,17 +9,8 @@ resource "aws_lakeformation_data_cells_filter" "data_filter" {
     column_wildcard {
       excluded_column_names = []
     }
-    dynamic "row_filter" {
-      for_each = var.table_filter != "" ? [for k, v in var.table_filter : k] : []
-      content {
-        filter_expression = var.table_filter
-      }
-    }
-    dynamic "row_filter" {
-      for_each = var.table_filter == "" ? [for k, v in var.table_filter : k] : []
-      content {
-        all_rows_wildcard {}
-      }
+    row_filter {
+      filter_expression = var.table_filter
     }
   }
 }
