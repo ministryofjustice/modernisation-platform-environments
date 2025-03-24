@@ -21,10 +21,11 @@ locals {
 
 module "share_marts" {
   for_each                     = { for idx, share in local.ap_shares_filtered : idx => share }
-  source                       = "../modules/cross_account_lf_data_filter"
+  source                       = "./modules/cross_account_lf_data_filter"
   destination_account_id       = local.environment_management.account_ids["analytical-platform-data-production"]
   destination_account_role_arn = "arn:aws:iam:${local.environment_management.account_ids["analytical-platform-data-production"]}:role/alpha_user_${each.value.user_name}"
-  table_filters                = each.value.table_name
+  table_name                   = each.value.table_name
   table_filter                 = each.value.filter
   data_bucket_lf_arn           = aws_lakeformation_resource.data_bucket.arn
+  database_name                = local.ap_shares.database_name
 }
