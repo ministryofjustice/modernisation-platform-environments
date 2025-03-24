@@ -13,6 +13,9 @@ resource "aws_lakeformation_data_cells_filter" "data_filter" {
       filter_expression = var.table_filter
     }
   }
+  timeouts {
+    create = "5m"
+  }
 }
 
 
