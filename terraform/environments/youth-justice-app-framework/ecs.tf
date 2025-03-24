@@ -18,10 +18,10 @@ module "ecs" {
 
   #ECS details
   cluster_name         = "yjaf-cluster"
-  ec2_instance_type    = "m5.xlarge"
-  ec2_min_size         = 1
-  ec2_max_size         = 8
-  ec2_desired_capacity = 8
+  ec2_instance_type    = "m5.large"
+  ec2_min_size         = 14
+  ec2_max_size         = 14
+  ec2_desired_capacity = 14
   nameserver           = join(".", [split(".", data.aws_vpc.shared.cidr_block)[0], split(".", data.aws_vpc.shared.cidr_block)[1], "0", "2"]) #eg "10.23.0.2"
 
   spot_overrides = [
