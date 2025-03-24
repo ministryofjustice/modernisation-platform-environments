@@ -9,7 +9,15 @@ module "yjsm" {
   vpc_id                  = data.aws_vpc.shared.id
   subnet_id = one(tolist([for s in local.private_subnet_list : s.id if s.availability_zone == "eu-west-2a"]))
 
-
+  # Assigning private IP based on environment
+  private_ip = lookup(
+    {
+      development = "10.26.144.61"
+      # Add more environments when IP is known
+    },
+    local.environment,
+    null # Default to null, allowing AWS to auto-assign an IP
+  )
 
   project_name    = local.project_name
   environment     = local.environment
@@ -22,4 +30,3 @@ esb_service_sg_id             = module.esb.esb_security_group_id
 rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
 alb_security_group_id         = module.internal_alb.alb_security_group_id
 }
-

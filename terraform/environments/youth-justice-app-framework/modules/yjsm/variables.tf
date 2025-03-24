@@ -49,3 +49,8 @@ variable "alb_security_group_id" {
   description = "Security Group ID for ALB"
   type        = string
 }
+
+variable "private_ip" {
+  description = "Private IP for the instance"
+  type        = string
+}
