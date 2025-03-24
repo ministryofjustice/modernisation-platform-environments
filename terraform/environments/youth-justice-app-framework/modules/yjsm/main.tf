@@ -22,7 +22,7 @@ data "template_file" "userdata" {
 
 
 resource "aws_instance" "yjsm" {
-  ami                    = "ami-08c741ea60d22cf14"
+  ami                    = "ami-0165ab84499655148"
   instance_type          = "t3a.xlarge"  
   key_name               = module.key_pair.key_pair_name     
   monitoring             = true
@@ -30,6 +30,7 @@ resource "aws_instance" "yjsm" {
   iam_instance_profile   = aws_iam_instance_profile.yjsm_ec2_profile.id
   vpc_security_group_ids = [aws_security_group.yjsm_service.id]
   subnet_id              = var.subnet_id
+  private_ip             = var.private_ip
   tags                   = local.all_tags
 
 
