@@ -28,7 +28,7 @@ EOF
 }
 
 #create a policy to all management instance to download files from the install-files bucket
-resource "aws_iam_policy" "read_s3_install_software" {
+resource "aws_iam_policy" "read_s3" {
   name        = "read_s3_install_software"
   description = "Use to enable ec2 Instances to retrieve software from S3 bucket <enviroment>-install-files"
   policy = jsonencode({
@@ -42,8 +42,11 @@ resource "aws_iam_policy" "read_s3_install_software" {
           "s3:GetObjectTagging",
           "s3:ListBucket"
         ],
-        "Resource" : ["arn:aws:s3:::${local.environment_name}-install-files/*",
-          "arn:aws:s3:::${local.environment_name}-install-files"
+        "Resource" : [
+          "arn:aws:s3:::${local.environment_name}-install-files/*",
+          "arn:aws:s3:::${local.environment_name}-install-files",
+          "arn:aws:s3:::${local.environment_name}-transfer/*",
+          "arn:aws:s3:::${local.environment_name}-transfer"
         ]
       }
     ]

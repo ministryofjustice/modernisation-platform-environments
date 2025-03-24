@@ -116,7 +116,7 @@ When each instance is created the User-Data script performs some language setup 
 ### Location for User-Data scripts and log files
 
 `C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch<nnnnnnnnn>\`
-This will contin and copy of the User-DAte script as well as err and output log files from running the script.
+This will contin and copy of the User-Data script as well as error and output log files from running the script.
 
 ## Enable File Copy via Clipboard
 While files can be uploaded and downloaded via a S3 bucket it may be  more converient to enable file copy via the clipboard by removing a setting in Group Policy. This only needs to be done once per environment to enable copy on all domain menbers (the management servers and the Suborginate CA server).
@@ -133,7 +133,7 @@ On each management instance:
 2. Move English (UK) to the top of the Preferred languages list.
 3. Select `Options` for `English (United Kingdom)`:
     - Download everything.
-    - Under `Regional format` select 'Settings' and change and necessary to ensure all are set to `United Kingdom`.
+    - Under `Regional format` select 'Settings' and change as necessary to ensure all are set to `United Kingdom`.
 4. Return to the Language page and wait a few minities while the language finishes installing.
 5. Change the `Windows display language` to `English (United Kingdom)`. (Need to signout and log back in for this to become effective.)
 6. Remove language `English (Unites States)`.
@@ -168,11 +168,11 @@ E'g.
 
 # [Certificate Authority SetUp](#ca-setup)
 
-The additional configuration described in Confluance page https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642508592/DOE+LDAPS+and+Certificate+chaining#Domain-Controllers-Server-Certificates-AutoEnrol has not been completed as the AD servers have auto-enroled for LDAPS certificates and LDAPS appears to be working successfully. This may need to be reconsidered following testing in Preproduction (or Test).
+The additional configuration described in Confluence page https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642508592/DOE+LDAPS+and+Certificate+chaining#Domain-Controllers-Server-Certificates-AutoEnrol has not been completed as the AD servers have auto-enroled for LDAPS certificates and LDAPS appears to be working successfully. This may need to be reconsidered following testing in Preproduction (or Test).
 
-In addition the RootCA and SubordinateCA cetificates have been left with their default exiptiy periods of 10 and 5 years respectively, rather thn changeing them to 20 and 10 years as mentioned in the above document.
+In addition the RootCA and SubordinateCA cetificates have been left with their default exiptiy periods of 10 and 5 years respectively, rather than changeing them to 20 and 10 years as mentioned in the above document.
 
-A template needs to be created on the SubordinateCA server for Tableaus web site HTTPS access as follows:
+A template needs to be created on the SubordinateCA server for Tableau web site HTTPS access as follows:
 1. Launch the Certificate Templates snapin.
 2. Duplicate template `Web Server` to `Tableau Web Server` and make the following changes:
     - On the `General` tab set the `Valitory period` to 1 year and 6 weeks.
@@ -195,6 +195,9 @@ The following describes the process of copying data from one environment to anot
     - `users.csv`
     - `groups.csv`
     - `roles.csv`
+
+7. Copy the files to the Transfer S3 bucket, e.g. run a Powershell command like:
+    `Write-S3Object -BucketName yjaf-sandpit-replication-source -KeyPrefix AD_Files -Folder C:\i2n\AD_Files\`
 
 ## Import All
 1. RDP onto a management server in the destination environment as the initial docmin user `admin` whose password is in Secret `i2n.com_admin_secret_2`.

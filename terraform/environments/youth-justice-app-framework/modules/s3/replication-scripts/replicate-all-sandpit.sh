@@ -10,7 +10,7 @@
 ./replication.sh yyjaf-sandpit-bedunlock 856879713508 yjaf-test-bedunlock 225989353474
 #./replication.sh yjaf-sandpit-cloudfront-logs 856879713508 yjaf-test-cloudfront-logs-archive 225989353474
 ./replication.sh yjaf-sandpit-cloudtrail-logs 856879713508 yjaf-test-cloudtrail-logs-archive 225989353474
-./replication.sh yjaf-sandpit-cmm 856879713508 yjaf-test-cmm(225989353474
+./replication.sh yjaf-sandpit-cmm 856879713508 yjaf-test-cmm 225989353474
 ./replication.sh yjaf-sandpit-cms 856879713508 yjaf-sandpit-cms 225989353474
 ./replication.sh yjaf-sandpit-guardduty-global-findings-logs 856879713508 yjaf-test-guardduty-to-fallanx-archive-archive 225989353474
 ./replication.sh yjaf-sandpit-mis 856879713508 yjaf-test-mis 225989353474
