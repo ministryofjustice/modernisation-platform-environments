@@ -1,3 +1,4 @@
+
 data "aws_iam_policy_document" "amazon_managed_grafana_remote_cloudwatch" {
   statement {
     sid     = "AllowAssumeRole"
@@ -22,4 +23,32 @@ module "amazon_managed_grafana_remote_cloudwatch_iam_policy" {
   name_prefix = "amazon-managed-grafana-remote-cloudwatch"
 
   policy = data.aws_iam_policy_document.amazon_managed_grafana_remote_cloudwatch.json
+}
+
+
+# Added to support invokation of local lambda
+data "aws_iam_policy_document" "grafana_lambda_invoke" {
+  statement {
+    sid    = "InvokeLocalLambdaFromGrafana"
+    effect = "Allow"
+    actions = [
+      "lambda:InvokeFunction"
+    ]
+    resources = [
+      "arn:aws:lambda:${local.application_data.accounts[local.environment].region}:${local.environment_management.account_ids[terraform.workspace]}:function:modernisation-platform-github-graphql"
+    ]
+  }
+}
+
+module "grafana_lambda_invoke_policy" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "~> 5.0"
+
+  name        = "grafana-lambda-invoke-policy"
+  path        = "/"
+  description = "Allow Grafana to invoke local Lambda functions"
+  policy      = data.aws_iam_policy_document.grafana_lambda_invoke.json
 }

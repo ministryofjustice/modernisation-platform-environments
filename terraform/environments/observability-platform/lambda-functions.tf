@@ -50,3 +50,48 @@ module "grafana_api_key_rotator" {
     }
   }
 }
+
+
+module "modernisation_platform_github_graphql" {
+  source  = "terraform-aws-modules/lambda/aws"
+  version = "~> 6.0"
+
+  function_name = "modernisation-platform-github-graphql"
+  handler       = "modernisation_platform_github_graphql.lambda_handler"
+  runtime       = "python3.9"
+  source_path   = "lambda"
+
+  memory_size = 256
+  timeout     = 10
+  publish     = true
+
+  # Set the env var to reference the Secrets Manager value (deferred to runtime)
+  environment_variables = {
+    GITHUB_PAT = "/aws/reference/secretsmanager/modernisation_platform_github_pat/pat:token"
+  }
+
+  attach_policy_json = true
+  policy_json = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ],
+        Resource = aws_secretsmanager_secret.modernisation_platform_github_pat.arn
+      }
+    ]
+  })
+}
+
+
