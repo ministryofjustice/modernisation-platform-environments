@@ -58,7 +58,7 @@ resource "aws_iam_policy" "read_s3" {
 #attach policies Aread_s3_install_software
 resource "aws_iam_role_policy_attachment" "join_ad_role_policy_s3_access" {
   role       = aws_iam_role.join_ad_role.name
-  policy_arn = aws_iam_policy.read_s3_install_software.arn
+  policy_arn = aws_iam_policy.read_s3.arn
 }
 
 
