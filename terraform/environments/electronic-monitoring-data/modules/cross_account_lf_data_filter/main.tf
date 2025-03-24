@@ -3,7 +3,7 @@ data "aws_caller_identity" "current" {}
 resource "aws_lakeformation_data_cells_filter" "data_filter" {
   table_data {
     database_name    = var.database_name
-    name             = "filter-${var.table_name}-${random_id.suffix.hex}"
+    name             = "filter-${var.table_name}"
     table_catalog_id = data.aws_caller_identity.current.account_id
     table_name       = var.table_name
     column_wildcard {
@@ -32,7 +32,7 @@ resource "aws_lakeformation_permissions" "grant_account_table_filter_role" {
     database_name    = var.database_name
     table_name       = var.table_name
     table_catalog_id = data.aws_caller_identity.current.account_id
-    name             = module.share_current_version[0].data_filter_id[0]
+    name             = aws_lakeformation_data_cells_filter.data_filter.table_data[0].name
   }
 }
 
