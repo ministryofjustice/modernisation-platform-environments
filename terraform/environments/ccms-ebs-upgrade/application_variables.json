@@ -125,7 +125,8 @@
       "instance_role_ebsapps": "apps",
       "instance_role_ebsconc": "conc",
       "instance_role_ebsdb": "db",
-      "instance_role_webgate": "webgate"
+      "instance_role_webgate": "webgate",
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
     },
     "test": {
       "short_env": "test",
@@ -253,7 +254,8 @@
       "instance_role_ebsconc": "conc",
       "instance_role_ebsdb": "db",
       "instance_role_ftp": "ftp",
-      "instance_role_webgate": "webgate"
+      "instance_role_webgate": "webgate",
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
     }
   },
   "webgate_ebs": {
