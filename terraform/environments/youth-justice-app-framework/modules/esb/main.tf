@@ -23,7 +23,7 @@ data "template_file" "userdata" {
 
 
 resource "aws_instance" "esb" {
-  ami                    = "ami-0fc27ddcf3e4e76af"
+  ami                    = var.ami
   instance_type          = "t3a.xlarge"  
   key_name               = module.key_pair.key_pair_name     
   monitoring             = true
@@ -31,6 +31,7 @@ resource "aws_instance" "esb" {
   iam_instance_profile   = aws_iam_instance_profile.esb_ec2_profile.id
   vpc_security_group_ids = [aws_security_group.esb_service.id]
   subnet_id              = var.subnet_id
+  private_ip             = var.private_ip
   tags                   = local.all_tags
 
 

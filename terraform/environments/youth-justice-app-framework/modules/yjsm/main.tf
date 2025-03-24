@@ -22,7 +22,7 @@ data "template_file" "userdata" {
 
 
 resource "aws_instance" "yjsm" {
-  ami                    = "ami-0165ab84499655148"
+  ami                    = var.ami
   instance_type          = "t3a.xlarge"  
   key_name               = module.key_pair.key_pair_name     
   monitoring             = true

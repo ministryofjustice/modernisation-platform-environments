@@ -29,3 +29,13 @@ variable "yjsm_service_sg_id" {
   description = "Security Group ID for ESB"
   type        = string
 }
+
+variable "private_ip" {
+  description = "Private IP for the instance"
+  type        = string
+}
+
+variable "ami" {
+  description = "AMI for the instance"
+  type        = string
+}

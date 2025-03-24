@@ -19,6 +19,15 @@ module "yjsm" {
     null # Default to null, allowing AWS to auto-assign an IP
   )
 
+  ami = lookup(
+    {
+      development = "ami-0165ab84499655148"
+      # Add more environments when AMIs are known
+    },
+    local.environment,
+    "ami-01426769db5cd0a43" # Default AMI
+  )
+
   project_name    = local.project_name
   environment     = local.environment
   tags            = local.tags
