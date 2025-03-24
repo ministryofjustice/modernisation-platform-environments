@@ -1,7 +1,7 @@
 locals {
   ap_shares = {
     database_name = "mart${local.dbt_suffix}"
-    tables        = { "visit" : "is_general=true" }
+    tables        = { "visits" : "is_general=true" }
     github_user_names = [
       "matt-heery",
     ]
