@@ -1,10 +1,10 @@
 locals {
   #if envinment is dev set to dev, prod set to prod, preprod set to preprod
   datadog_integration_external_id = {
-    "prod"        = ""
-    "preprod"     = ""
-    "development" = "a43e2b2de71041889dbb5d2cd8170356"
-    "test"        = ""
+    "production"    = ""
+    "preproduction" = ""
+    "development"   = "a43e2b2de71041889dbb5d2cd8170356"
+    "test"          = ""
   }
 }
 
