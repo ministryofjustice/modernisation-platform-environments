@@ -1,54 +1,30 @@
-resource "aws_lakeformation_permissions" "grant_account_table_filter_apde" {
-  count       = local.is-test ? 1 : 0
-  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
-  permissions = ["SELECT"]
-  data_cells_filter {
-    database_name    = "staged_fms_test_dbt"
-    table_name       = "account"
-    table_catalog_id = data.aws_caller_identity.current.account_id
-    name             = module.share_current_version[0].data_filter_id[0]
+locals {
+  ap_shares = {
+    database_name = "mart${local.dbt_suffix}"
+    tables        = { "visit" : "is_general=true" }
+    github_user_names = [
+      "matt-heery",
+    ]
   }
+  ap_shares_combined = flatten([
+    for table_name, filter in local.ap_shares.tables : [
+      for user_name in local.ap_shares.github_user_names : {
+        table_name = table_name
+        filter     = filter
+        user_name  = user_name
+      }
+    ]
+  ])
+  ap_shares_filtered = local.is-development ? [] : local.ap_shares_combined
 }
 
-resource "aws_lakeformation_permissions" "grant_account_table_filter" {
-  count       = local.is-test ? 1 : 0
-  principal   = local.environment_management.account_ids["analytical-platform-data-production"]
-  permissions = ["SELECT"]
-  data_cells_filter {
-    database_name    = "staged_fms_test_dbt"
-    table_name       = "account"
-    table_catalog_id = data.aws_caller_identity.current.account_id
-    name             = module.share_current_version[0].data_filter_id[0]
-  }
-  permissions_with_grant_option = ["SELECT"]
-}
 
-resource "aws_lakeformation_permissions" "grant_account_table" {
-  count       = local.is-test ? 1 : 0
-  principal   = local.environment_management.account_ids["analytical-platform-data-production"]
-  permissions = ["DESCRIBE"]
-  table {
-    database_name = "staged_fms_test_dbt"
-    name          = "account"
-  }
-  permissions_with_grant_option = ["DESCRIBE"]
-}
-
-resource "aws_lakeformation_permissions" "grant_account_database" {
-  count       = local.is-test ? 1 : 0
-  principal   = local.environment_management.account_ids["analytical-platform-data-production"]
-  permissions = ["DESCRIBE"]
-  database {
-    name = "staged_fms_test_dbt"
-  }
-  permissions_with_grant_option = ["DESCRIBE"]
-}
-
-resource "aws_lakeformation_permissions" "s3_bucket_permissions_for_ap" {
-  principal   = local.environment_management.account_ids["analytical-platform-data-production"]
-  permissions = ["DATA_LOCATION_ACCESS"]
-
-  data_location {
-    arn = aws_lakeformation_resource.data_bucket.arn
-  }
+module "share_marts" {
+  for_each                     = { for idx, share in local.ap_shares_filtered : idx => share }
+  source                       = "../modules/cross_account_lf_data_filter"
+  destination_account_id       = local.environment_management.account_ids["analytical-platform-data-production"]
+  destination_account_role_arn = "arn:aws:iam:${local.environment_management.account_ids["analytical-platform-data-production"]}:role/alpha_user_${each.value.user_name}"
+  table_filters                = each.value.table_name
+  table_filter                 = each.value.filter
+  data_bucket_lf_arn           = aws_lakeformation_resource.data_bucket.arn
 }
