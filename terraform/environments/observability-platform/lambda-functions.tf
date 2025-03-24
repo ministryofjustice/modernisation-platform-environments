@@ -53,6 +53,9 @@ module "grafana_api_key_rotator" {
 
 
 module "modernisation_platform_github_graphql" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+  #checkov:skip=CKV_AWS_258:Function is not invoked by URL
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 6.0"
 
