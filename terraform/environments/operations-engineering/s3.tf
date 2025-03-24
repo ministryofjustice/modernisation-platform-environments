@@ -7,6 +7,7 @@ module "cur_v2_hourly" {
   bucket = "cur-v2-hourly"
 
   force_destroy = true
+  attach_deny_insecure_transport_policy = true
 
   server_side_encryption_configuration = {
     rule = {
