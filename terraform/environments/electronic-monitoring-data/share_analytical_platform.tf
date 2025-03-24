@@ -552,7 +552,7 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
       one(data.aws_iam_roles.data_engineering_roles.arns),
       []
     ),
-    aws_iam_role.dataapi_cross_role.arn]
+    ]
   )
 }
 

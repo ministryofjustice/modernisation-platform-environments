@@ -21,6 +21,36 @@ resource "aws_lakeformation_data_lake_settings" "emds_development" {
   ]
 }
 
+
+resource "aws_lakeformation_permissions" "admin_permissions_dbt_test_tables" {
+  principal   = one(data.aws_iam_roles.data_engineering_roles.arns)
+  permissions = ["ALL"]
+
+  table {
+    database_name = "dbt_test__audit${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "admin_permissions_dbt_test_db" {
+  principal   = one(data.aws_iam_roles.data_engineering_roles.arns)
+  permissions = ["ALL"]
+
+  database {
+    name = "dbt_test__audit${local.dbt_suffix}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "admin_permissions" {
+  principal   = aws_iam_role.dataapi_cross_role.arn
+  permissions = ["ALL"]
+
+  table {
+    database_name = "dbt_test__audit${local.dbt_suffix}"
+    wildcard      = true
+  }
+}
+
 resource "aws_lakeformation_lf_tag" "domain_tag" {
   key    = "domain"
   values = ["prisons", "probation", "electronic-monitoring"]
