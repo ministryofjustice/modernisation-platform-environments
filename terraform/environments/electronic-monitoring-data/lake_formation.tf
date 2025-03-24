@@ -22,12 +22,25 @@ resource "aws_lakeformation_data_lake_settings" "emds_development" {
 }
 
 
+resource "aws_glue_catalog_database" "dbt_test__audit" {
+  name = "dbt_test__audit${local.dbt_suffix}"
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      description,
+      location_uri,
+      parameters,
+      target_database
+    ]
+  }
+}
+
 resource "aws_lakeformation_permissions" "admin_permissions_dbt_test_tables" {
   principal   = one(data.aws_iam_roles.data_engineering_roles.arns)
   permissions = ["ALL"]
 
   table {
-    database_name = "dbt_test__audit${local.dbt_suffix}"
+    database_name = aws_glue_catalog_database.dbt_test__audit.name
     wildcard      = true
   }
 }
@@ -37,17 +50,7 @@ resource "aws_lakeformation_permissions" "admin_permissions_dbt_test_db" {
   permissions = ["ALL"]
 
   database {
-    name = "dbt_test__audit${local.dbt_suffix}"
-  }
-}
-
-resource "aws_lakeformation_permissions" "admin_permissions" {
-  principal   = aws_iam_role.dataapi_cross_role.arn
-  permissions = ["ALL"]
-
-  table {
-    database_name = "dbt_test__audit${local.dbt_suffix}"
-    wildcard      = true
+    name = aws_glue_catalog_database.dbt_test__audit.name
   }
 }
 
