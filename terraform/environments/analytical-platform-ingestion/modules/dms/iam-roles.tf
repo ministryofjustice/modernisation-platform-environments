@@ -180,7 +180,7 @@ resource "aws_iam_role_policy" "dms_premigration" {
           "s3:PutObjectTagging"
         ],
         "Resource":[
-          aws_s3_bucket.premigration_assessment[0].arn
+          "${aws_s3_bucket.premigration_assessment[0].arn}/*"
         ]
       },
       {
