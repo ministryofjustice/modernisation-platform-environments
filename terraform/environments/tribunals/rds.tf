@@ -9,7 +9,6 @@ resource "aws_db_instance" "rdsdb" {
   username          = local.application_data.accounts[local.environment].username
   password          = random_password.password.result
   port              = 1433
-  storage_encrypted = true
 
   skip_final_snapshot = true
 
