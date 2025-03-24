@@ -1598,7 +1598,7 @@ resource "aws_iam_policy_attachment" "attach_lambda_securityhub_readonly_dev" {
 # IAM Role & Policy for Security Hub report- UAT
 ################################################
 
-resource "aws_iam_role" "lambda_role_securityhub_get_data_uat"{
+resource "aws_iam_role" "lambda_role_securityhub_get_data_uat" {
   count              = local.is-preproduction == true ? 1 : 0
   name               = "PPUD_Lambda_Function_Role_Securityhub_Get_Data_UAT"
   assume_role_policy = <<EOF
