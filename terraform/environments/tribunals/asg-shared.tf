@@ -273,6 +273,10 @@ resource "aws_instance" "tribunals_backup" {
     version = "$Latest"
   }
 
+  root_block_device {
+    encrypted = true
+  }
+
   tags = {
     Environment = local.environment
     Name        = "tribunals-backup-instance"

@@ -27,3 +27,26 @@ resource "aws_s3_bucket_policy" "backup_bucket_policy" {
     ]
   })
 }
+
+resource "aws_s3_bucket_public_access_block" "ebs_backup_block_policy" {
+  bucket = aws_s3_bucket.ebs_backup.id
+
+  block_public_acls = true
+  block_public_policy = true
+}
+
+resource "aws_kms_key" "s3_encryption_key" {
+  description             = "This key is used to encrypt bucket objects"
+  deletion_window_in_days = 10
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "ebs_backup_encryption" {
+  bucket = aws_s3_bucket.ebs_backup.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.s3_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}

@@ -39,7 +39,8 @@ resource "aws_lb" "tribunals_lb" {
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
-  internal                   = false
+  internal                   = true
+  drop_invalid_header_fields = true
 }
 
 resource "aws_security_group" "tribunals_lb_sc" {

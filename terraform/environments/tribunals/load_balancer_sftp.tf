@@ -8,7 +8,6 @@ resource "aws_lb" "tribunals_lb_sftp" {
   security_groups            = [aws_security_group.tribunals_lb_sc_sftp.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
-  internal                   = false
 }
 
 resource "aws_security_group" "tribunals_lb_sc_sftp" {
