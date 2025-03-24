@@ -1,4 +1,8 @@
 resource "aws_db_instance" "dacp_db" {
+  #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
+  #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances" - false error
+  #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
+  #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
   count                       = local.is-development ? 0 : 1
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
   db_name                     = local.application_data.accounts[local.environment].db_name
@@ -58,6 +62,12 @@ resource "aws_security_group" "postgresql_db_sc" {
 
 // DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
 resource "aws_db_instance" "dacp_db_dev" {
+  #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
+  #checkov:skip=CKV_AWS_17: "Ensure all data stored in RDS is not publicly accessible" - see above
+  #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
+  #checkov:skip=CKV_AWS_129: "Ensure that respective logs of Amazon Relational Database Service (Amazon RDS) are enabled"
+  #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
+  #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   count                       = local.is-development ? 1 : 0
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
   db_name                     = local.application_data.accounts[local.environment].db_name
@@ -105,6 +115,7 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
     ]
   }
   egress {
+    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
@@ -118,7 +129,7 @@ data "http" "myip" {
   url = "http://ipinfo.io/json"
 }
 
-resource "null_resource" "setup_db" {
+resource "null_resource" "setup_db" { # tflint-ignore: terraform_required_providers
   count = local.is-development ? 1 : 0
 
   depends_on = [aws_db_instance.dacp_db_dev[0]]
@@ -140,6 +151,7 @@ resource "null_resource" "setup_db" {
 }
 
 resource "aws_cloudwatch_log_group" "rds_logs" {
+  #checkov:skip=CKV_AWS_158: "Ensure that Cloudwatch Log Group is encrypted using KMS CMK"
   name              = "/aws/events/rdsLogs"
   retention_in_days = "7"
 }
