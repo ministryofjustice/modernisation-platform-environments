@@ -181,9 +181,6 @@ class MetadataExtractor:
 
 
 def handler(event, context):  # pylint: disable=unused-argument
-    # TODO: PASS IN AS ENV VARS
-    os.environ["RAW_HISTORY_BUCKET"] = "dms-test-raw-history-20250221145111054600000001"
-
     metadata_bucket = os.getenv("METADATA_BUCKET")
     db_secret_arn = os.getenv("DB_SECRET_ARN")
     db_secret_response = secretsmanager.get_secret_value(SecretId=db_secret_arn)
