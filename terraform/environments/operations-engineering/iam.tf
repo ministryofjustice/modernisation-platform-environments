@@ -1,3 +1,11 @@
+resource "aws_iam_user" "s3_migration_user" {
+  name = "s3-migration-user"
+}
+
+resource "aws_iam_access_key" "s3_migration_user_key" {
+  user = aws_iam_user.s3_migration_user.name
+}
+
 resource "aws_iam_role" "s3_migration_role" {
   name               = "S3MigrationRole"
   assume_role_policy = <<EOF
@@ -7,14 +15,10 @@ resource "aws_iam_role" "s3_migration_role" {
         {
             "Effect": "Allow",
             "Principal": {
-                "Federated": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:saml-provider/AWSSSO_5dfd7055f9da0d49_DO_NOT_DELETE"
+                "AWS": "arn:aws:iam::${data.aws_caller_identity.current.account_id}:user/s3-migration-user"
             },
-            "Action": "sts:AssumeRoleWithSAML",
-            "Condition": {
-                "StringEquals": {
-                    "SAML:aud": "https://signin.aws.amazon.com/saml"
-                }
-            }
+            "Action": "sts:AssumeRole",
+            "Condition": {}
         }
     ]
 }
