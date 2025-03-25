@@ -280,3 +280,8 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
 }
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-development-logging"]
+}

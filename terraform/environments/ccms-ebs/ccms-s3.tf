@@ -307,3 +307,18 @@ resource "aws_s3_bucket" "ccms_ebs_shared" {
 resource "aws_s3_bucket" "lambda_payment_load" {
   bucket = "${local.application_name}-${local.environment}-payment-load"
 }
+
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-development-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-development-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-development-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-development-logging"]
+}
+
+moved {
+  from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-development-logging"]
+  to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-development-logging"]
+}
