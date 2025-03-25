@@ -96,7 +96,3 @@ resource "aws_iam_policy" "grafana_lambda_policy" {
   policy = data.aws_iam_policy_document.grafana_lambda_invoke.json
 }
 
-resource "aws_iam_role_policy_attachment" "grafana_can_invoke_lambda_url" {
-  role       = module.managed_grafana.workspace_iam_role_name
-  policy_arn = aws_iam_policy.grafana_lambda_policy.arn
-}
