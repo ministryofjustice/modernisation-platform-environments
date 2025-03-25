@@ -13,6 +13,8 @@ GITHUB_TOKEN = os.environ.get("GITHUB_PAT")
 REPO_OWNER = "ministryofjustice"
 REPO_NAME = "modernisation-platform"
 
+logger.info("Building query")
+
 def build_query(after_cursor=None):
     after = f', after: "{after_cursor}"' if after_cursor else ''
     return f"""
@@ -68,6 +70,9 @@ def fetch_all_runs():
 def lambda_handler(event, context):
     today = datetime.now(timezone.utc).date()
     try:
+    
+        logger.info(f"Fetching all workflow runs for: {today} from {REPO_OWNER}/{REPO_NAME}")
+
         all_runs = fetch_all_runs()
 
         # Log every workflow run's ID and timestamp for debugging
