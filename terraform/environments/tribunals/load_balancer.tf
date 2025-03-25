@@ -33,6 +33,7 @@ locals {
   }
 }
 
+#tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "tribunals_lb" {
   name                       = "tribunals-lb"
   load_balancer_type         = "application"

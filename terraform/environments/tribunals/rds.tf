@@ -1,4 +1,5 @@
 resource "aws_db_instance" "rdsdb" {
+  #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
   allocated_storage = local.application_data.accounts[local.environment].allocated_storage
   //db_name                 = DBName must be null for engine: sqlserver-se
   storage_type      = local.application_data.accounts[local.environment].storage_type

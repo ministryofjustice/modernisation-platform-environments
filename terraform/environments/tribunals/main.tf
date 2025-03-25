@@ -37,9 +37,7 @@ module "appeals" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   target_group_attachment_port = var.services["appeals"].port
   target_group_arns            = local.target_group_arns
@@ -76,9 +74,7 @@ module "ahmlr" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
   target_group_attachment_port = var.services["ahmlr"].port
   target_group_arns            = local.target_group_arns
@@ -115,9 +111,7 @@ module "care_standards" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
   target_group_attachment_port = var.services["care_standards"].port
   target_group_arns            = local.target_group_arns
@@ -154,9 +148,7 @@ module "cicap" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "CaseFiles"
   target_group_attachment_port = var.services["cicap"].port
   target_group_arns            = local.target_group_arns
@@ -194,9 +186,7 @@ module "employment_appeals" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Public/Upload"
   target_group_attachment_port = var.services["employment_appeals"].port
   target_group_arns            = local.target_group_arns
@@ -234,9 +224,7 @@ module "finance_and_tax" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   target_group_attachment_port = var.services["finance_and_tax"].port
   target_group_arns            = local.target_group_arns
@@ -274,9 +262,7 @@ module "immigration_services" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   target_group_attachment_port = var.services["immigration_services"].port
   target_group_arns            = local.target_group_arns
@@ -314,9 +300,7 @@ module "information_tribunal" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "DBFiles"
   target_group_attachment_port = var.services["information_tribunal"].port
   target_group_arns            = local.target_group_arns
@@ -354,9 +338,7 @@ module "lands_tribunal" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   target_group_attachment_port = var.services["lands_tribunal"].port
   target_group_arns            = local.target_group_arns
@@ -394,9 +376,7 @@ module "transport" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "JudgmentFiles"
   target_group_attachment_port = var.services["transport"].port
   target_group_arns            = local.target_group_arns
@@ -434,9 +414,7 @@ module "asylum_support" {
   server_port                  = local.application_data.accounts[local.environment].server_port_1
   cluster_id                   = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                 = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                = data.aws_vpc.shared.id
   subnets_shared_public_ids    = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external = aws_acm_certificate.external
   documents_location           = "Judgments"
   target_group_attachment_port = var.services["asylum_support"].port
   target_group_arns            = local.target_group_arns
@@ -462,9 +440,7 @@ module "charity_tribunal_decisions" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "documents"
   target_group_attachment_port      = var.services["charity_tribunal_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["charity_tribunal_decisions"].sftp_port
@@ -490,9 +466,7 @@ module "claims_management_decisions" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
   target_group_attachment_port      = var.services["claims_management_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["claims_management_decisions"].sftp_port
@@ -518,9 +492,7 @@ module "consumer_credit_appeals" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
   target_group_attachment_port      = var.services["consumer_credit_appeals"].port
   target_group_attachment_port_sftp = var.sftp_services["consumer_credit_appeals"].sftp_port
@@ -546,9 +518,7 @@ module "estate_agent_appeals" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
   target_group_attachment_port      = var.services["estate_agent_appeals"].port
   target_group_attachment_port_sftp = var.sftp_services["estate_agent_appeals"].sftp_port
@@ -574,9 +544,7 @@ module "primary_health_lists" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
   target_group_attachment_port      = var.services["primary_health_lists"].port
   target_group_attachment_port_sftp = var.sftp_services["primary_health_lists"].sftp_port
@@ -602,9 +570,7 @@ module "siac" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
   target_group_attachment_port      = var.services["siac"].port
   target_group_attachment_port_sftp = var.sftp_services["siac"].sftp_port
@@ -630,9 +596,7 @@ module "sscs_venue_pages" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
   target_group_attachment_port      = var.services["sscs_venue_pages"].port
   target_group_attachment_port_sftp = var.sftp_services["sscs_venue_pages"].sftp_port
@@ -658,9 +622,7 @@ module "tax_chancery_decisions" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
   target_group_attachment_port      = var.services["tax_chancery_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["tax_chancery_decisions"].sftp_port
@@ -686,9 +648,7 @@ module "tax_tribunal_decisions" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
   target_group_attachment_port      = var.services["tax_tribunal_decisions"].port
   target_group_attachment_port_sftp = var.sftp_services["tax_tribunal_decisions"].sftp_port
@@ -714,9 +674,7 @@ module "ftp_admin_appeals" {
   server_port                       = local.application_data.accounts[local.environment].server_port_1
   cluster_id                        = aws_ecs_cluster.tribunals_cluster.id
   cluster_name                      = aws_ecs_cluster.tribunals_cluster.name
-  vpc_shared_id                     = data.aws_vpc.shared.id
   subnets_shared_public_ids         = data.aws_subnets.shared-public.ids
-  aws_acm_certificate_external      = aws_acm_certificate.external
   documents_location                = "Documents"
   target_group_attachment_port      = var.services["ftp_admin_appeals"].port
   target_group_attachment_port_sftp = var.sftp_services["ftp_admin_appeals"].sftp_port

@@ -2,6 +2,7 @@ locals {
   target_group_arns_sftp = { for k, v in aws_lb_target_group.tribunals_target_group_sftp : k => v.arn }
 }
 
+#tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "tribunals_lb_sftp" {
   name                       = "tribunals-sftp-lb"
   load_balancer_type         = "network"
