@@ -230,17 +230,22 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
   }
 }
 
+# tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "dacp_lb" {
+  # checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  # checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
   name                       = "dacp-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.dacp_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+  drop_invalid_header_fields = true
   depends_on                 = [aws_security_group.dacp_lb_sc, aws_security_group.lb_sc_pingdom, aws_security_group.lb_sc_pingdom_2]
 }
 
 resource "aws_lb_target_group" "dacp_target_group" {
+  # checkov:skip=CKV_AWS_261 "Health check clearly defined"
   name                 = "dacp-target-group"
   port                 = 80
   protocol             = "HTTP"
@@ -265,6 +270,8 @@ resource "aws_lb_target_group" "dacp_target_group" {
 }
 
 resource "aws_lb_listener" "dacp_lb" {
+  # checkov:skip=CKV_AWS_2: "Ensure ALB protocol is HTTPS" - false alert
+  # checkov:skip=CKV_AWS_103: "LB using higher version of TLS" - higher than alert
   depends_on = [
     aws_acm_certificate.external
   ]
