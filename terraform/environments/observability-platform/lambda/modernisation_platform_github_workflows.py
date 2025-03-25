@@ -1,7 +1,8 @@
 import os
 import json
 import logging
-import requests
+import urllib.request
+import urllib.parse
 from datetime import datetime, timezone
 
 # Setup logger
@@ -26,17 +27,22 @@ def fetch_all_runs():
     }
 
     while True:
-        url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs"
-        params = {"per_page": per_page, "page": page}
-        response = requests.get(url, headers=headers, params=params)
+        # Build the URL with query params
+        params = urllib.parse.urlencode({"per_page": per_page, "page": page})
+        url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/actions/runs?{params}"
 
-        if response.status_code != 200:
-            logger.error(f"GitHub API error {response.status_code}: {response.text}")
-            raise Exception("GitHub API request failed")
+        req = urllib.request.Request(url, headers=headers)
 
-        data = response.json()
+        try:
+            with urllib.request.urlopen(req) as response:
+                body = response.read()
+                data = json.loads(body)
+                link_header = response.headers.get("Link", "")
+        except Exception as e:
+            logger.error(f"GitHub API request failed: {e}")
+            raise
+
         runs = data.get("workflow_runs", [])
-
         logger.info(f"📄 Retrieved {len(runs)} runs on page {page}")
 
         found_older = False
@@ -49,7 +55,8 @@ def fetch_all_runs():
                 found_older = True
                 break
 
-        if found_older or "next" not in response.links:
+        # Stop if we found older runs or there's no "next" link
+        if found_older or 'rel="next"' not in link_header:
             break
 
         page += 1
