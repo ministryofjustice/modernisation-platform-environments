@@ -106,7 +106,7 @@ resource "aws_lambda_function_url" "github_workflow_lambda_url" {
   authorization_type = "AWS_IAM"
 
   cors {
-    allow_origins     = ["https://${module.grafana_workspace.workspace_id}.grafana-workspace.eu-west-2.amazonaws.com"]
+    allow_origins     = ["https://${module.managed_grafana.workspace_id}.grafana-workspace.eu-west-2.amazonaws.com"]
     allow_methods     = ["GET"]
     allow_headers     = ["*"]
   }
