@@ -94,6 +94,6 @@ resource "aws_lambda_permission" "allow_grafana_url" {
   statement_id            = "AllowGrafanaWorkspaceToInvokeFunctionUrl"
   action                  = "lambda:InvokeFunctionUrl"
   function_name           = module.modernisation_platform_github.lambda_function_name
-  principal               = "iam.amazonaws.com"
+  principal               = "grafana.amazonaws.com"
   function_url_auth_type  = "AWS_IAM"
 }
