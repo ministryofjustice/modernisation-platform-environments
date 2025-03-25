@@ -70,7 +70,7 @@ module "modernisation_platform_github_graphql" {
 
   # Set the env var to reference the Secrets Manager value (deferred to runtime)
   environment_variables = {
-    GITHUB_PAT = "/aws/reference/secretsmanager/modernisation-platform-github-pat"
+    GITHUB_PAT = "/aws/reference/secretsmanager/observability-platform/modernisation-platform-github-pat:pat"
   }
 
   attach_policy_json = true
