@@ -5,7 +5,7 @@ variable "setup_maintenance_pipeline" {
 
   validation {
     condition     = var.setup_maintenance_pipeline ? !var.batch_only : true
-    error_message = "CDC Glue security configurMaintenance pipeline can only be created when batch_only = false"
+    error_message = "Maintenance pipeline can only be created when batch_only = false"
   }
 }
 

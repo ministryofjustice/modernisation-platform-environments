@@ -22,11 +22,6 @@ variable "create_job" {
   description = "Enable Reconciliation Job, True or False"
   type        = bool
   default     = false
-
-  validation {
-    condition     = var.create_job ? !var.batch_only : true
-    error_message = "Reconciliation job can only be created when batch_only = false"
-  }
 }
 
 variable "batch_only" {
@@ -150,6 +145,11 @@ variable "job_schedule" {
   description = "Cron schedule for the reconciliation job. Leave unset for no schedule."
   default     = ""
   type        = string
+
+  validation {
+    condition     = var.batch_only && (var.job_schedule != "") ? false : true
+    error_message = "Reconciliation job can only be scheduled when batch_only = false"
+  }
 }
 
 variable "enable_spark_ui" {

@@ -466,6 +466,25 @@ locals {
     }
   }
 
+  run_reconciliation_job = {
+    "StepName" : "Run Reconciliation Job",
+    "StepDefinition" : {
+      "Type" : "Task",
+      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters" : {
+        "JobName" : var.glue_reconciliation_job,
+        "Arguments" : {
+          "--dpr.reconciliation.checks.to.run" : "current_state_counts",
+          "--dpr.config.s3.bucket" : var.s3_glue_bucket_id,
+          "--dpr.config.key" : var.domain
+        },
+        "NumberOfWorkers" : var.glue_reconciliation_job_num_workers,
+        "WorkerType" : var.glue_reconciliation_job_worker_type
+      },
+      "Next" : local.switch_hive_tables_for_prisons_to_curated.StepName
+    }
+  }
+
   switch_hive_tables_for_prisons_to_curated = {
     "StepName" : "Switch Hive Tables for Prisons to Curated",
     "StepDefinition" : {
@@ -549,6 +568,7 @@ module "reload_pipeline" {
         (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
         (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
         (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
+        (local.run_reconciliation_job.StepName) : local.run_reconciliation_job.StepDefinition,
         (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
