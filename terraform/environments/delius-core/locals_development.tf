@@ -72,6 +72,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+    database_name = "DMDNDA"
+    database_port = local.db_port
   }
 
   delius_microservices_configs_dev = {
@@ -98,9 +100,15 @@ locals {
     }
 
     ldap = {
-      image_tag        = "6.0.3-latest"
+      image_tag        = "6.1.3-latest"
       container_port   = 389
       slapd_log_level  = "stats"
+      container_cpu    = 512
+      container_memory = 1024
+    }
+
+    oracle_observer = {
+      image_tag        = "latest"
       container_cpu    = 512
       container_memory = 1024
     }
@@ -116,19 +124,19 @@ locals {
   dms_config_dev = {
     deploy_dms                 = true
     replication_instance_class = "dms.t3.small"
-    engine_version             = "3.5.2"
+    engine_version             = "3.5.4"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
     # Please ensure any changes made here are consistent with Ansible variables.
     audit_source_endpoint = {
       read_host     = "standbydb2"
-      read_database = "DMDNDAS2"
+      read_database = "${local.db_config_dev.database_name}S2"
     }
     audit_target_endpoint = {
       write_environment = "test"
     }
     user_source_endpoint = {}
     user_target_endpoint = {
-      write_database = "DMDNDA"
+      write_database = local.db_config_dev.database_name
     }
     is-production = false
   }

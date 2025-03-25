@@ -13,6 +13,44 @@ locals {
       "role_name"      = "dev-datatransfer-lambda-role"
     }
   }
+
+  p1_export_bucket_destination_mapping = {
+    "production"    = "tct-339712706964-prearrivals"
+    "preproduction" = null
+    "test"          = null
+    "development"   = null
+  }
+
+  # Adding new buckets for logging needs to happen after buckets have been created
+  # as an error occurs otherwise because local.buckets_to_log contains keys that 
+  # are derived  from resource attributes, which are not known until the apply phase.
+  # To resolve this issue, you need to ensure that the keys in local.buckets_to_log
+  # are known during the plan phase. To this end the buckets need to exist  before
+  # the aws_s3_bucket_logging resources for it are created.
+  buckets_to_log = [
+    { id = module.s3-metadata-bucket.bucket.id, arn = module.s3-metadata-bucket.bucket.arn },
+    { id = module.s3-athena-bucket.bucket.id, arn = module.s3-athena-bucket.bucket.arn },
+    { id = module.s3-unzipped-files-bucket.bucket.id, arn = module.s3-unzipped-files-bucket.bucket.arn },
+    { id = module.s3-dms-premigrate-assess-bucket.bucket.id, arn = module.s3-dms-premigrate-assess-bucket.bucket.arn },
+    { id = module.s3-json-directory-structure-bucket.bucket.id, arn = module.s3-json-directory-structure-bucket.bucket.arn },
+    { id = module.s3-data-bucket.bucket.id, arn = module.s3-data-bucket.bucket.arn },
+    { id = module.s3-fms-general-landing-bucket.bucket_id, arn = module.s3-fms-general-landing-bucket.bucket_arn },
+    { id = module.s3-fms-ho-landing-bucket.bucket_id, arn = module.s3-fms-ho-landing-bucket.bucket_arn },
+    { id = module.s3-fms-specials-landing-bucket.bucket_id, arn = module.s3-fms-specials-landing-bucket.bucket_arn },
+    { id = module.s3-mdss-general-landing-bucket.bucket_id, arn = module.s3-mdss-general-landing-bucket.bucket_arn },
+    { id = module.s3-mdss-ho-landing-bucket.bucket_id, arn = module.s3-mdss-ho-landing-bucket.bucket_arn },
+    { id = module.s3-mdss-specials-landing-bucket.bucket_id, arn = module.s3-mdss-specials-landing-bucket.bucket_arn },
+    { id = module.s3-p1-export-bucket.bucket_id, arn = module.s3-p1-export-bucket.bucket_arn },
+    { id = module.s3-serco-export-bucket.bucket_id, arn = module.s3-serco-export-bucket.bucket_arn },
+    { id = module.s3-received-files-bucket.bucket.id, arn = module.s3-received-files-bucket.bucket.arn },
+    { id = module.s3-quarantine-files-bucket.bucket.id, arn = module.s3-quarantine-files-bucket.bucket.arn },
+    { id = module.s3-clamav-definitions-bucket.bucket.id, arn = module.s3-clamav-definitions-bucket.bucket.arn },
+    { id = module.s3-dms-data-validation-bucket.bucket.id, arn = module.s3-dms-data-validation-bucket.bucket.arn },
+    { id = module.s3-glue-job-script-bucket.bucket.id, arn = module.s3-glue-job-script-bucket.bucket.arn },
+    { id = module.s3-dms-target-store-bucket.bucket.id, arn = module.s3-dms-target-store-bucket.bucket.arn },
+    { id = module.s3-create-a-derived-table-bucket.bucket.id, arn = module.s3-create-a-derived-table-bucket.bucket.arn },
+    { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn }
+  ]
 }
 
 # ------------------------------------------------------------------------
@@ -41,6 +79,9 @@ module "s3-logging-bucket" {
     aws.bucket-replication = aws
   }
 
+  bucket_policy = [
+    data.aws_iam_policy_document.log_bucket_policy.json
+  ]
   lifecycle_rule = [
     {
       id      = "main"
@@ -85,6 +126,48 @@ module "s3-logging-bucket" {
   tags = merge(local.tags, { resource-type = "logging" })
 }
 
+data "aws_iam_policy_document" "log_bucket_policy" {
+  statement {
+    sid    = "AllowS3Logging"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["logging.s3.amazonaws.com"]
+    }
+
+    actions = ["s3:PutObject"]
+
+    resources = ["${module.s3-logging-bucket.bucket.arn}/*"]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values   = [for bucket in local.buckets_to_log : bucket.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceAccount"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "s3_buckets_logging" {
+  for_each = { for bucket in local.buckets_to_log : bucket.id => bucket }
+
+  bucket = each.value.id
+
+  target_bucket = module.s3-logging-bucket.bucket.id
+  target_prefix = "logs/"
+  target_object_key_format {
+    partitioned_prefix {
+      partition_date_source = "EventTime"
+    }
+  }
+}
+
 # ------------------------------------------------------------------------
 # Metadata Store Bucket
 # ------------------------------------------------------------------------
@@ -110,13 +193,6 @@ module "s3-metadata-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-metadata/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -200,14 +276,6 @@ module "s3-athena-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-athena-query-results/"
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -278,15 +346,6 @@ module "s3-unzipped-files-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix = "logs/${local.bucket_prefix}-unzipped-files/"
-
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -332,14 +391,6 @@ module "s3-dms-premigrate-assess-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-dms-premigrate-assess/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -411,14 +462,6 @@ module "s3-json-directory-structure-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-json-directory-structure/"
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -487,13 +530,6 @@ module "s3-data-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-data/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -570,6 +606,39 @@ module "s3-fms-general-landing-bucket-iam-user" {
   order_type = "general"
 
   landing_bucket_arn        = module.s3-fms-general-landing-bucket.bucket_arn
+  local_bucket_prefix       = local.bucket_prefix
+  local_tags                = local.tags
+  rotation_lambda           = module.rotate_iam_key
+  rotation_lambda_role_name = aws_iam_role.rotate_iam_keys.name
+}
+
+module "s3-fms-ho-landing-bucket" {
+  source = "./modules/landing_bucket/"
+
+  data_feed  = "fms"
+  order_type = "ho"
+
+  core_shared_services_id  = local.environment_management.account_ids["core-shared-services-production"]
+  local_bucket_prefix      = local.bucket_prefix
+  local_tags               = local.tags
+  logging_bucket           = module.s3-logging-bucket
+  production_dev           = local.is-production ? "prod" : "dev"
+  received_files_bucket_id = module.s3-received-files-bucket.bucket.id
+  security_group_ids       = [aws_security_group.lambda_generic.id]
+  subnet_ids               = data.aws_subnets.shared-public.ids
+
+  providers = {
+    aws = aws
+  }
+}
+
+module "s3-fms-ho-landing-bucket-iam-user" {
+  source = "./modules/landing_bucket_iam_user_access/"
+
+  data_feed  = "fms"
+  order_type = "ho"
+
+  landing_bucket_arn        = module.s3-fms-ho-landing-bucket.bucket_arn
   local_bucket_prefix       = local.bucket_prefix
   local_tags                = local.tags
   rotation_lambda           = module.rotate_iam_key
@@ -684,7 +753,7 @@ module "s3-p1-export-bucket" {
   source = "./modules/export_bucket_push/"
 
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  destination_bucket_id   = "tct-339712706964-prearrivals"
+  destination_bucket_id   = local.p1_export_bucket_destination_mapping[local.environment]
   export_destination      = "p1"
   local_bucket_prefix     = local.bucket_prefix
   local_tags              = local.tags
@@ -701,7 +770,7 @@ module "s3-p1-export-bucket" {
 module "s3-serco-export-bucket" {
   source = "./modules/export_bucket_presigned_url/"
 
-  allowed_ips         = ["137.83.234.93/32", "130.41.187.248/32"]
+  allowed_ips         = ["137.83.234.77/32"]
   export_destination  = "serco-historic"
   local_bucket_prefix = local.bucket_prefix
   local_tags          = local.tags
@@ -738,15 +807,6 @@ module "s3-received-files-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix = "logs/${local.bucket_prefix}-received-files/"
-
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -809,15 +869,6 @@ module "s3-quarantine-files-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix = "logs/${local.bucket_prefix}-quarantined-files/"
-
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -859,15 +910,6 @@ module "s3-clamav-definitions-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix = "logs/${local.bucket_prefix}-clamav-definitions/"
-
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -913,14 +955,6 @@ module "s3-dms-data-validation-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-dms-data-validation/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -992,14 +1026,6 @@ module "s3-glue-job-script-bucket" {
     aws.bucket-replication = aws
   }
 
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-glue-job-store/"
-  log_partition_date_source = "EventTime"
-
   lifecycle_rule = [
     {
       id      = "main"
@@ -1070,14 +1096,6 @@ module "s3-dms-target-store-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/dms-target-store/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -1195,6 +1213,36 @@ resource "aws_s3_bucket_policy" "data_store" {
 }
 
 
+data "aws_iam_policy_document" "cadt_runner" {
+  statement {
+    sid    = "AllowS3BucketAccess"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [
+      aws_s3_bucket.data_store.arn,
+      "${aws_s3_bucket.data_store.arn}/*"
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow_prod_cadet_emds_deploy_historic_transforms"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cadt_runner" {
+  bucket = aws_s3_bucket.data_store.id
+  policy = data.aws_iam_policy_document.cadt_runner.json
+}
 
 module "s3-create-a-derived-table-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
@@ -1205,7 +1253,6 @@ module "s3-create-a-derived-table-bucket" {
   # to disable ACLs in preference of BucketOwnership controls as per https://aws.amazon.com/blogs/aws/heads-up-amazon-s3-security-changes-are-coming-in-april-of-2023/ set:
   ownership_controls = "BucketOwnerEnforced"
   acl                = "private"
-
   # Refer to the below section "Replication" before enabling replication
   replication_enabled = false
   # Below variable and providers configuration is only relevant if 'replication_enabled' is set to true
@@ -1217,14 +1264,6 @@ module "s3-create-a-derived-table-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/cadt-store/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -1295,13 +1334,6 @@ module "s3-raw-formatted-data-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : module.s3-logging-bucket.bucket.id,
-    "log_bucket_arn" : module.s3-logging-bucket.bucket.arn,
-    "log_bucket_policy" : module.s3-logging-bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${local.bucket_prefix}-raw-formatted-data/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {

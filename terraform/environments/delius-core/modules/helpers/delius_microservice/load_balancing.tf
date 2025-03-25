@@ -1,4 +1,5 @@
 resource "random_id" "suffix" {
+  count = length(var.container_port_config) == 0 ? 0 : 1
   keepers = {
     protocol         = var.target_group_protocol
     port             = var.container_port_config[0].containerPort
@@ -13,10 +14,10 @@ resource "aws_lb_target_group" "frontend" {
   count = var.microservice_lb != null ? 1 : 0
   #checkov:skip=CKV_AWS_261 "ignore"
   # https://github.com/hashicorp/terraform-provider-aws/issues/16889
-  name                 = "${var.env_name}-${var.name}-${random_id.suffix.hex}"
-  port                 = random_id.suffix.keepers.port
-  protocol             = random_id.suffix.keepers.protocol
-  protocol_version     = random_id.suffix.keepers.protocol_version
+  name                 = "${var.env_name}-${var.name}-${random_id.suffix[0].hex}"
+  port                 = random_id.suffix[0].keepers.port
+  protocol             = random_id.suffix[0].keepers.protocol
+  protocol_version     = random_id.suffix[0].keepers.protocol_version
   vpc_id               = var.account_config.shared_vpc_id
   target_type          = "ip"
   deregistration_delay = 30
@@ -88,6 +89,7 @@ resource "aws_route53_record" "alb_r53_record" {
 # NLB for service interconnectivity
 
 resource "aws_lb" "delius_microservices" {
+  count                      = length(var.container_port_config) == 0 ? 0 : 1
   name                       = "${var.name}-${var.env_name}-service-nlb"
   internal                   = true
   load_balancer_type         = "network"
@@ -137,7 +139,7 @@ resource "aws_lb_target_group" "service" {
 resource "aws_lb_listener" "services" {
   for_each = toset([for _, v in var.container_port_config : tostring(v.containerPort)])
 
-  load_balancer_arn = aws_lb.delius_microservices.arn
+  load_balancer_arn = aws_lb.delius_microservices[0].arn
   port              = each.value
   protocol          = "TCP"
 
@@ -148,14 +150,15 @@ resource "aws_lb_listener" "services" {
 }
 
 resource "aws_route53_record" "services_nlb_r53_record" {
+  count    = length(var.container_port_config) == 0 ? 0 : 1
   provider = aws.core-vpc
   zone_id  = var.account_config.route53_inner_zone.zone_id
   name     = "${var.name}.service.${var.env_name}"
   type     = "A"
   alias {
     evaluate_target_health = false
-    name                   = aws_lb.delius_microservices.dns_name
-    zone_id                = aws_lb.delius_microservices.zone_id
+    name                   = aws_lb.delius_microservices[0].dns_name
+    zone_id                = aws_lb.delius_microservices[0].zone_id
   }
 }
 

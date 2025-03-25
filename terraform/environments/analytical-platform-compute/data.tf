@@ -60,6 +60,11 @@ data "aws_iam_roles" "data_engineering_sso_role" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
+data "aws_iam_roles" "platform_engineer_admin_sso_role" {
+  name_regex  = "AWSReservedSSO_platform-engineer-admin_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
 data "http" "prometheus_operator_crds" {
   for_each = {
     alertmanagerconfigs = "https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/${local.prometheus_operator_crd_version}/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml"
@@ -81,4 +86,12 @@ data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   secret_id = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
+}
+
+data "aws_vpc_endpoint" "mwaa_webserver" {
+  service_name = aws_mwaa_environment.main.webserver_vpc_endpoint_service
+}
+
+data "dns_a_record_set" "mwaa_webserver_vpc_endpoint" {
+  host = data.aws_vpc_endpoint.mwaa_webserver.dns_entry[0].dns_name
 }

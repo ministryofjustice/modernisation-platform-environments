@@ -81,6 +81,8 @@
       "ebs_size_ebsdb_techst": 100,
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
+      "ebs_iops_ebsdb_swap2": 3000,
+      "ebs_size_ebsdb_swap2": 64,
       "ebs_default_iops_test": 9000,
       "dbf_device": "nvme5n1",
       "dbf_path": "/CCMS/EBS/dbf",
@@ -102,7 +104,9 @@
       "s3_lifecycle_days_transition_noncurrent_glacier": 365,
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "certificate_expiry_days": 45,
-      "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
     },
     "test": {
       "short_env": "tst",
@@ -182,6 +186,8 @@
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
+      "ebs_iops_ebsdb_swap2": 3000,
+      "ebs_size_ebsdb_swap2": 16,
       "dbf_device": "nvme2n1",
       "dbf_path": "/CCMS/EBS/dbf",
       "ebs_type_ebsdb_backup": "io2",
@@ -202,7 +208,9 @@
       "s3_lifecycle_days_transition_noncurrent_glacier": 365,
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "certificate_expiry_days": 30,
-      "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
     },
     "preproduction": {
       "short_env": "prep",
@@ -282,6 +290,8 @@
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
+      "ebs_iops_ebsdb_swap2": 3000,
+      "ebs_size_ebsdb_swap2": 16,
       "dbf_device": "nvme3n1",
       "dbf_path": "/CCMS/EBS/dbf",
       "ebs_type_ebsdb_backup": "io2",
@@ -302,7 +312,9 @@
       "s3_lifecycle_days_transition_noncurrent_glacier": 365,
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "certificate_expiry_days": 30,
-      "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
     },
     "production": {
       "short_env": "prod",
@@ -376,12 +388,14 @@
       "ebs_iops_ebsdb_dbf03": 12000,
       "ebs_size_ebsdb_dbf03": 3000,
       "ebs_iops_ebsdb_dbf04": 28000,
-      "ebs_size_ebsdb_dbf04": 1000,
+      "ebs_size_ebsdb_dbf04": 1250,
       "ebs_size_ebsdb_redoA": 100,
       "ebs_size_ebsdb_redoB": 50,
       "ebs_size_ebsdb_techst": 50,
       "ebs_size_ebsdb_backup": 8000,
       "ebs_size_ebsdb_diag": 50,
+      "ebs_iops_ebsdb_swap2": 3000,
+      "ebs_size_ebsdb_swap2": 16,
       "dbf_device": "nvme8n1",
       "dbf_path": "/CCMS/EBSPROD/dbf",
       "ebs_size_ebsdb_dbf2": 9000,
@@ -404,7 +418,9 @@
       "s3_lifecycle_days_transition_noncurrent_glacier": 365,
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "certificate_expiry_days": 30,
-      "certificate_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com"
+      "certificate_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
+      "payment_load_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
+      "alerts_subscription_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com"
     }
   },
   "webgate_ebs": {

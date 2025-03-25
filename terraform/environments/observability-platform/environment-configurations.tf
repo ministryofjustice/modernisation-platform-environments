@@ -3,6 +3,25 @@ locals {
   environment_configurations = {
     development = {
       tenant_configuration = {
+        "modernisation-platform" = {
+          identity_centre_team = "modernisation-platform"
+          slack_channels       = ["mod-plat-observ-test"]
+          aws_accounts = {
+            "cooker-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                primary = {
+                  database  = "grafana_db"
+                  workgroup = "grafana-dashboard"
+                }
+              }
+            }
+          }
+        },
         "observability-platform" = {
           identity_centre_team = "observability-platform"
           slack_channels       = ["observability-platform-development-alerts"]
@@ -39,6 +58,13 @@ locals {
         "analytical-platform" = {
           identity_centre_team = "analytical-platform"
           aws_accounts = {
+            "analytical-platform-common-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
             "analytical-platform-compute-development" = {
               cloudwatch_enabled                 = true
               prometheus_push_enabled            = false
@@ -118,6 +144,53 @@ locals {
               athena_enabled                  = false
             },
             "analytical-platform-management-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            }
+          }
+        },
+        "ccms-ebs" = {
+          "identity_centre_team" = "laa-ccms-migration-team",
+          "aws_accounts" = {
+            "ccms-ebs-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-preproduction" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-test" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-upgrade-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = false
+            },
+            "ccms-ebs-upgrade-test" = {
               cloudwatch_enabled              = true
               prometheus_push_enabled         = false
               amazon_prometheus_query_enabled = false
@@ -233,6 +306,24 @@ locals {
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
               athena_enabled                  = false
+            }
+          }
+        },
+        "green-ops" = {
+          "identity_centre_team" = "green-ops",
+          "aws_accounts" = {
+            "example-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                primary = {
+                  database  = "greenops_cur_poc"
+                  workgroup = "primary"
+                }
+              }
             }
           }
         }

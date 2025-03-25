@@ -13,23 +13,26 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = ["10.0.0.0/8"]
+      transit_gateway_routes = [
+        "10.0.0.0/8",
+        "172.20.0.0/16"
+      ]
 
       /* Route53 */
       route53_zone = "compute.development.analytical-platform.service.justice.gov.uk"
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
-      eks_cluster_version = "1.31"
-      eks_node_version    = "1.29.0-c55d099c"
+      eks_cluster_version = "1.32"
+      eks_node_version    = "1.32.0-cacc4ce9"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
-        kube_proxy             = "v1.31.3-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.38.1-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.3-eksbuild.1"
+        kube_proxy             = "v1.32.0-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
         aws_guardduty_agent    = "v1.8.1-eksbuild.2"
         eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.1"
+        vpc_cni                = "v1.19.2-eksbuild.5"
       }
 
       /* Data Engineering Airflow */
@@ -44,6 +47,10 @@ locals {
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
+      /* MWAA */
+      airflow_version                 = "2.10.3"
+      airflow_environment_class       = "mw1.small"
+      airflow_webserver_instance_name = "Development"
     }
     test = {
       /* VPC */
@@ -58,23 +65,26 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = ["10.0.0.0/8"]
+      transit_gateway_routes = [
+        "10.0.0.0/8",
+        "172.20.0.0/16"
+      ]
 
       /* Route53 */
       route53_zone = "compute.test.analytical-platform.service.justice.gov.uk"
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
-      eks_cluster_version = "1.31"
-      eks_node_version    = "1.29.0-c55d099c"
+      eks_cluster_version = "1.32"
+      eks_node_version    = "1.32.0-cacc4ce9"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
-        kube_proxy             = "v1.31.3-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.38.1-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.3-eksbuild.1"
+        kube_proxy             = "v1.32.0-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
         aws_guardduty_agent    = "v1.8.1-eksbuild.2"
         eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.1"
+        vpc_cni                = "v1.19.2-eksbuild.5"
       }
 
       /* Data Engineering Airflow */
@@ -88,6 +98,11 @@ locals {
 
       /* UI */
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
+
+      /* MWAA */
+      airflow_version                 = "2.10.3"
+      airflow_environment_class       = "mw1.medium"
+      airflow_webserver_instance_name = "Test"
     }
     production = {
       /* VPC */
@@ -102,23 +117,26 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = ["10.0.0.0/8"]
+      transit_gateway_routes = [
+        "10.0.0.0/8",
+        "172.20.0.0/16"
+      ]
 
       /* Route53 */
       route53_zone = "compute.analytical-platform.service.justice.gov.uk"
 
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
-      eks_cluster_version = "1.31"
-      eks_node_version    = "1.29.0-c55d099c"
+      eks_cluster_version = "1.32"
+      eks_node_version    = "1.32.0-cacc4ce9"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
-        kube_proxy             = "v1.31.3-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.38.1-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.3-eksbuild.1"
+        kube_proxy             = "v1.32.0-eksbuild.2"
+        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
         aws_guardduty_agent    = "v1.8.1-eksbuild.2"
         eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.1"
+        vpc_cni                = "v1.19.2-eksbuild.5"
       }
 
       /* Data Engineering Airflow */
@@ -133,9 +151,14 @@ locals {
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
 
+      /* MWAA */
+      airflow_version                 = "2.10.3"
+      airflow_environment_class       = "mw1.medium"
+      airflow_webserver_instance_name = "Production"
+
       /* LF Domain Tags */
       cadet_lf_tags = {
-        domain = ["bold", "civil", "courts", "general", "criminal_history", "development_sandpit", "electronic_monitoring", "finance", "interventions", "opg", "performance", "risk", "people", "prison", "probation", "staging", "victims", "victims_case_management"] # extracted from bucket paths
+        domain = ["bold", "civil", "courts", "general", "criminal_history", "development_sandpit", "electronic_monitoring", "finance", "interventions", "opg", "performance", "risk", "people", "prison", "probation", "staging", "victims", "victims_case_management", "cica", "data_first", "laa"] # extracted from bucket paths
       }
     }
   }

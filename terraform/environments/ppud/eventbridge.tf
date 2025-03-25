@@ -127,7 +127,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_disk_info_report_p
   arn       = aws_lambda_function.terraform_lambda_func_disk_info_report_prod[0].arn
 }
 
-# Eventbridge rule to invoke the Security Hub Report lambda function every Monday at 07:00
+# Eventbridge rule to invoke the Security Hub Report Production lambda function every Monday to Friday at 07:00
 
 resource "aws_lambda_permission" "allow_eventbridge_invoke_securityhub_report_prod" {
   count         = local.is-production == true ? 1 : 0
@@ -135,30 +135,80 @@ resource "aws_lambda_permission" "allow_eventbridge_invoke_securityhub_report_pr
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.terraform_lambda_func_securityhub_report_prod[0].function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.weekly_schedule_securityhub_report_prod[0].arn
+  source_arn    = aws_cloudwatch_event_rule.daily_schedule_securityhub_report_prod[0].arn
 }
 
-resource "aws_cloudwatch_event_rule" "weekly_schedule_securityhub_report_prod" {
+resource "aws_cloudwatch_event_rule" "daily_schedule_securityhub_report_prod" {
   count               = local.is-production == true ? 1 : 0
-  name                = "securityhub-report-weekly-schedule"
-  description         = "Trigger Lambda at 07:00 UTC each Monday"
-  schedule_expression = "cron(0 7 ? * MON *)"
+  name                = "securityhub-report-daily-schedule"
+  description         = "Trigger Lambda at 07:00 UTC each Monday through Friday"
+  schedule_expression = "cron(0 7 ? * MON-FRI *)"
 }
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_target_securityhub_report_prod" {
   count     = local.is-production == true ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.weekly_schedule_securityhub_report_prod[0].name
+  rule      = aws_cloudwatch_event_rule.daily_schedule_securityhub_report_prod[0].name
   target_id = "securityhub_report"
   arn       = aws_lambda_function.terraform_lambda_func_securityhub_report_prod[0].arn
 }
 
-# Eventbridge Rule to Disable CPU Alarms each Friday at 23:00
+# Eventbridge rule to invoke the Security Hub Report Dev lambda function every Monday to Friday at 07:00
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_securityhub_report_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_securityhub_report_dev[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_schedule_securityhub_report_dev[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "daily_schedule_securityhub_report_dev" {
+  count               = local.is-development == true ? 1 : 0
+  name                = "securityhub-report-daily-schedule"
+  description         = "Trigger Lambda at 07:00 UTC each Monday through Friday"
+  schedule_expression = "cron(0 7 ? * MON-FRI *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_securityhub_report_dev" {
+  count     = local.is-development == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.daily_schedule_securityhub_report_dev[0].name
+  target_id = "securityhub_report"
+  arn       = aws_lambda_function.terraform_lambda_func_securityhub_report_dev[0].arn
+}
+
+# Eventbridge rule to invoke the Security Hub Report UAT lambda function every Monday to Friday at 07:00
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_securityhub_report_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_securityhub_report_uat[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_schedule_securityhub_report_uat[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "daily_schedule_securityhub_report_uat" {
+  count               = local.is-preproduction == true ? 1 : 0
+  name                = "securityhub-report-daily-schedule"
+  description         = "Trigger Lambda at 07:00 UTC each Monday through Friday"
+  schedule_expression = "cron(0 7 ? * MON-FRI *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_securityhub_report_uat" {
+  count     = local.is-preproduction == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.daily_schedule_securityhub_report_uat[0].name
+  target_id = "securityhub_report"
+  arn       = aws_lambda_function.terraform_lambda_func_securityhub_report_uat[0].arn
+}
+
+# Eventbridge Rule to Disable CPU Alarms each Friday at 20:00
 
 resource "aws_cloudwatch_event_rule" "disable_cpu_alarm" {
   count               = local.is-production == true ? 1 : 0
   name                = "disable_cpu_alarm"
-  description         = "Runs Weekly every Saturday at 00:00 am"
-  schedule_expression = "cron(0 23 ? * FRI *)" # Time Zone is in UTC
+  description         = "Runs Weekly every Friday at 20:00"
+  schedule_expression = "cron(0 20 ? * FRI *)" # Time Zone is in UTC
   # schedule_expression = "cron(0 0 ? * SAT *)" # Time Zone is in UTC
 }
 
@@ -178,13 +228,13 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_disable_cpu_alarm" {
   source_arn    = aws_cloudwatch_event_rule.disable_cpu_alarm[0].arn
 }
 
-# Eventbridge Rule to Enable CPU Alarms each Monday at 05:00
+# Eventbridge Rule to Enable CPU Alarms each Monday at 08:00
 
 resource "aws_cloudwatch_event_rule" "enable_cpu_alarm" {
   count               = local.is-production == true ? 1 : 0
   name                = "enable_cpu_alarm"
-  description         = "Runs Weekly every Monday at 05:00 am"
-  schedule_expression = "cron(0 5 ? * MON *)" # Time Zone is in UTC
+  description         = "Runs Weekly every Monday at 08:00 am"
+  schedule_expression = "cron(0 8 ? * MON *)" # Time Zone is in UTC
   # schedule_expression = "cron(0 0 ? * MON *)" # Time Zone is in UTC
 }
 

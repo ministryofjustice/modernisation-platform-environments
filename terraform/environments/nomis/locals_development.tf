@@ -19,13 +19,11 @@ locals {
   baseline_development = {
 
     acm_certificates = {
-      nomis_wildcard_cert = {
+      nomis_wildcard_cert_v2 = {
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name              = "modernisation-platform.service.justice.gov.uk"
+        domain_name              = "*.development.nomis.service.justice.gov.uk"
         subject_alternate_names = [
           "*.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk",
-          "*.development.nomis.service.justice.gov.uk",
-          "*.development.nomis.az.justice.gov.uk",
         ]
         tags = {
           description = "wildcard cert for nomis development domains"
@@ -408,7 +406,7 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_wildcard_cert"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
@@ -458,6 +456,48 @@ locals {
                   }
                 }]
               }
+              dev-nomis-web19c-a-http-7777 = {
+                priority = 400
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "dev-nomis-web19c-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "dev-nomis-web19c-a.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              dev-nomis-web19c-b-http-7777 = {
+                priority = 410
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "dev-nomis-web19c-b-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "dev-nomis-web19c-b.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              qa11g-nomis-web12-a-http-7777 = {
+                priority = 500
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "qa11g-nomis-web12-a-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "qa11g-nomis-web12-a.development.nomis.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
               maintenance = {
                 priority = 999
                 actions = [{
@@ -486,7 +526,6 @@ locals {
     }
 
     route53_zones = {
-      "development.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
       "development.nomis.service.justice.gov.uk" = {
         records = [
           # SYSCON
@@ -508,6 +547,10 @@ locals {
           { name = "qa11r-nomis-web-a", type = "A", lbs_map_key = "private" },
           { name = "qa11r-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-qa11r", type = "A", lbs_map_key = "private" },
+          # weblogic 12
+          { name = "dev-nomis-web19c-a", type = "A", lbs_map_key = "private" },
+          { name = "dev-nomis-web19c-b", type = "A", lbs_map_key = "private" },
+          { name = "qa11g-nomis-web12-a", type = "A", lbs_map_key = "private" },
         ]
       }
     }

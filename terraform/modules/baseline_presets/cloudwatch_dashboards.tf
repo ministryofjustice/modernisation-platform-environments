@@ -31,6 +31,42 @@ locals {
           }
         }
       }
+      network-in-bandwidth = {
+        type              = "metric"
+        expression        = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkIn\"','Sum')/(125000*300),SUM,DESC)"
+        expression_period = 300
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 network-in-5min-average"
+          stat    = "Average"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "Mbps"
+            }
+          }
+        }
+      }
+      network-out-bandwidth = {
+        type              = "metric"
+        expression        = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"NetworkOut\"','Sum')/(125000*300),SUM,DESC)"
+        expression_period = 300
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 network-out-5min-average"
+          stat    = "Average"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "Mbps"
+            }
+          }
+        }
+      }
       instance-status-check-failed = {
         type            = "metric"
         alarm_threshold = 1
@@ -58,6 +94,24 @@ locals {
           stacked = true
           region  = "eu-west-2"
           title   = "EC2 system-status-check-failed"
+          stat    = "Maximum"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "exitcode"
+            }
+          }
+        }
+      }
+      attached-ebs-status-check-failed = {
+        type            = "metric"
+        alarm_threshold = 1
+        expression      = "SORT(SEARCH('{AWS/EC2,InstanceId} MetricName=\"StatusCheckFailed_AttachedEBS\"','Maximum'),MAX,DESC)"
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "EC2 attached-ebs-status-check-failed"
           stat    = "Maximum"
           yAxis = {
             left = {
@@ -652,6 +706,24 @@ locals {
           }
         }
       }
+      load-balancer-processed-bandwidth = {
+        type              = "metric"
+        expression        = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer} MetricName=\"ProcessedBytes\"','Sum')/(125000*300),SUM,DESC)"
+        expression_period = 300
+        properties = {
+          view    = "timeSeries"
+          stacked = true
+          region  = "eu-west-2"
+          title   = "ALB processed-data-5min-average"
+          stat    = "Average"
+          yAxis = {
+            left = {
+              showUnits = false,
+              label     = "Mbps"
+            }
+          }
+        }
+      }
       unhealthy-load-balancer-host = {
         type            = "metric"
         expression      = "SORT(SEARCH('{AWS/ApplicationELB,LoadBalancer,TargetGroup} MetricName=\"UnHealthyHostCount\"','Maximum'),MAX,DESC)"
@@ -758,19 +830,20 @@ locals {
           }
         }
       }
-      load-balancer-processed-bytes = {
-        type       = "metric"
-        expression = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedBytes\"','Sum'),SUM,DESC)"
+      load-balancer-processed-bandwidth = {
+        type              = "metric"
+        expression        = "SORT(SEARCH('{AWS/NetworkELB,LoadBalancer,LoadBalancer} MetricName=\"ProcessedBytes\"','Sum')/(125000*300),SUM,DESC)"
+        expression_period = 300
         properties = {
           view    = "timeSeries"
           stacked = true
           region  = "eu-west-2"
-          title   = "NLB processed-bytes"
-          stat    = "Sum"
+          title   = "NLB processed-data-5min-average"
+          stat    = "Average"
           yAxis = {
             left = {
               showUnits = false,
-              label     = "processed bytes"
+              label     = "Mbps"
             }
           }
         }
@@ -965,8 +1038,11 @@ locals {
       height          = 8
       widgets = [
         local.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+        local.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+        local.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
         local.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
         local.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+        local.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed
       ]
     }
     ec2_windows = {
@@ -1072,15 +1148,15 @@ locals {
         local.cloudwatch_dashboard_widgets.lb.load-balancer-requests,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-http-4XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-http-5XXs,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-processed-bandwidth,
+        local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
+        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-requests,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-4XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-group-http-5XXs,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-active-connections,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-new-connections,
         local.cloudwatch_dashboard_widgets.lb.load-balancer-target-connection-errors,
-        local.cloudwatch_dashboard_widgets.lb.unhealthy-load-balancer-host,
-        local.cloudwatch_dashboard_widgets.lb.load-balancer-target-response-time,
-        null,
       ]
     }
     network_lb = {
@@ -1091,7 +1167,7 @@ locals {
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-unhealthy-host-count,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-active-flow-count,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-new-flow-count,
-        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-bytes,
+        local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-bandwidth,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-processed-packets,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-peak-packets-per-second,
         local.cloudwatch_dashboard_widgets.network_lb.load-balancer-port-allocation-error-count,

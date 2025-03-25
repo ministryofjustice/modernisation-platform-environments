@@ -4,9 +4,9 @@
 # tags demonstrate inheritance due to merges in the module
 locals {
   environment_config_preprod = {
-    migration_environment_private_cidr     = ["10.160.32.0/22", "10.160.36.0/22", "10.160.40.0/22"]
+    migration_environment_private_cidr     = ["10.160.0.0/22", "10.160.4.0/22", "10.160.8.0/22"]
     migration_environment_vpc_cidr         = "10.160.0.0/20"
-    migration_environment_db_cidr          = ["10.160.44.0/24", "10.160.45.0/24", "10.160.46.0/25"]
+    migration_environment_db_cidr          = ["10.160.12.0/24", "10.160.13.0/24", "10.160.14.0/25"]
     migration_environment_full_name        = "del-pre-prod"
     migration_environment_abbreviated_name = "del"
     migration_environment_short_name       = "pre-prod"
@@ -77,6 +77,8 @@ locals {
       ansible_repo_basedir = "ansible"
       ansible_args         = "oracle_19c_install"
     }
+    database_name = "change_me"
+    database_port = local.db_port
   }
 
   delius_microservices_configs_preprod = {
@@ -103,11 +105,11 @@ locals {
     }
 
     ldap = {
-      image_tag        = "6.0.3-latest"
+      image_tag        = "6.2.4-latest"
       container_port   = 389
       slapd_log_level  = "conns,config,stats,stats2"
-      container_cpu    = 2048
-      container_memory = 4096
+      container_cpu    = 16384
+      container_memory = 32768
     }
   }
 
@@ -122,7 +124,7 @@ locals {
     deploy_dms                 = false
     replication_enabled        = false
     replication_instance_class = "dms.t3.medium"
-    engine_version             = "3.5.2"
+    engine_version             = "3.5.4"
     # This map overlaps with the Ansible database configuration in delius-environment-configuration-management/ansible/group_vars
     # Please ensure any changes made here are consistent with Ansible variables.
     audit_source_endpoint = {

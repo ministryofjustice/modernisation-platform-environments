@@ -8,7 +8,6 @@ locals {
 
   baseline_presets_production = {
     options = {
-      cloudwatch_log_groups_retention_in_days = 90
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -24,15 +23,13 @@ locals {
   baseline_production = {
 
     acm_certificates = {
-      nomis_wildcard_cert = {
+      nomis_wildcard_cert_v2 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name                         = "modernisation-platform.service.justice.gov.uk"
+        domain_name                         = "*.nomis.service.justice.gov.uk"
         external_validation_records_created = true
         subject_alternate_names = [
           "*.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk",
           "*.production.nomis.service.justice.gov.uk",
-          "*.production.nomis.az.justice.gov.uk",
-          "*.nomis.service.justice.gov.uk",
           "*.nomis.az.justice.gov.uk",
         ]
         tags = {
@@ -64,8 +61,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-1-a" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -108,8 +108,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-1-b" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -141,8 +144,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-2-a" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -185,8 +191,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "prod-nomis-db-2-b" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -229,7 +238,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
+            branch = "753de472568b54954ea0cb8fe6fb8d28ecf33aa3" # 2025-01-14 nomis release
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -243,7 +252,7 @@ locals {
       # ACTIVE (green deployment)
       prod-nomis-web-b = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 5
+          desired_capacity = 6
           max_size         = 6
 
           initial_lifecycle_hooks = {
@@ -272,7 +281,7 @@ locals {
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
             # Comment in instance refresh above if changing branch + want automated instance refresh
-            branch = "86471c5730194674959e03fff043a6b4d2d1a92f" # DSOS-2838 memory fix
+            branch = "753de472568b54954ea0cb8fe6fb8d28ecf33aa3" # 2025-01-14 nomis release
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -503,7 +512,7 @@ locals {
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_wildcard_cert"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
 
             alarm_target_group_names = [
               # "prod-nomis-web-a-http-7777",
@@ -590,8 +599,6 @@ locals {
           { name = "ndh", type = "NS", ttl = "86400", records = ["ns-1106.awsdns-10.org", "ns-1904.awsdns-46.co.uk", "ns-44.awsdns-05.com", "ns-799.awsdns-35.net"] },
         ]
       }
-
-      "production.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
 
       "production.nomis.service.justice.gov.uk" = {
         records = [

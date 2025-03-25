@@ -36,8 +36,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-db-a" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -69,8 +72,11 @@ locals {
             search_filter = { ec2_tag = [{ tag_name = "Name", tag_value = "pd-csr-db-b" }] }
             widgets = [
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.cpu-utilization-high,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-in-bandwidth,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.network-out-bandwidth,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.instance-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2.system-status-check-failed,
+              module.baseline_presets.cloudwatch_dashboard_widgets.ec2.attached-ebs-status-check-failed,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.free-disk-space-low,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.high-memory-usage,
               module.baseline_presets.cloudwatch_dashboard_widgets.ec2_cwagent_linux.cpu-iowait-high,
@@ -405,6 +411,40 @@ locals {
       })
     }
 
+    fsx_windows = {
+
+      pd-csr-win-share = {
+        aliases                     = ["prisoner-retail.azure.hmpp.root"]
+        preferred_availability_zone = "eu-west-2a"
+        deployment_type             = "MULTI_AZ_1"
+        security_groups             = ["fsx_windows"]
+        skip_final_backup           = true
+        storage_capacity            = 32
+        throughput_capacity         = 8
+
+        subnets = [
+          {
+            name               = "private"
+            availability_zones = ["eu-west-2a", "eu-west-2b"]
+          }
+        ]
+
+        self_managed_active_directory = {
+          dns_ips = [
+            module.ip_addresses.azure_fixngo_ip.PCMCW0011,
+            module.ip_addresses.azure_fixngo_ip.PCMCW0012,
+          ]
+          domain_name                      = "azure.hmpp.root"
+          username                         = "svc_fsx_windows"
+          password_secret_name             = "/fsx_windows/passwords"
+          file_system_administrators_group = "Domain Join"
+        }
+        tags = {
+          backup = true
+        }
+      }
+    }
+
     iam_policies = {
       Ec2ProdDatabasePolicy = {
         description = "Permissions required for prod Database EC2s"
@@ -672,6 +712,11 @@ locals {
       "/oracle/database/DIWFM" = {
         secrets = {
           passwords = { description = "database passwords" }
+        }
+      }
+      "/fsx_windows" = {
+        secrets = {
+          passwords = { description = "fsx passwords" }
         }
       }
     }

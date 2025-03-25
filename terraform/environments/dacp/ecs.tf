@@ -7,11 +7,13 @@ resource "aws_ecs_cluster" "dacp_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS
   name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS
   name              = "dacp-ecs"
   retention_in_days = "7"
 }
@@ -24,13 +26,13 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
   cpu                      = 2048
-  memory                   = 4096
+  memory                   = 8192
   container_definitions = jsonencode([
     {
       name                   = "dacp-container"
       image                  = "${aws_ecr_repository.dacp_ecr_repo.repository_url}:latest"
       cpu                    = 2048
-      memory                 = 4096
+      memory                 = 8192
       essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {
@@ -51,35 +53,35 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.dacp_db[0].address}"
+          value = aws_db_instance.dacp_db[0].address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.dacp_db[0].username}"
+          value = aws_db_instance.dacp_db[0].username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.dacp_db[0].password}"
+          value = aws_db_instance.dacp_db[0].password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.dacp_db[0].db_name}"
+          value = aws_db_instance.dacp_db[0].db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
@@ -126,35 +128,35 @@ resource "aws_ecs_task_definition" "dacp_task_definition_dev" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.dacp_db_dev[0].address}"
+          value = aws_db_instance.dacp_db_dev[0].address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.dacp_db_dev[0].username}"
+          value = aws_db_instance.dacp_db_dev[0].username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.dacp_db_dev[0].password}"
+          value = aws_db_instance.dacp_db_dev[0].password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.dacp_db_dev[0].db_name}"
+          value = aws_db_instance.dacp_db_dev[0].db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
@@ -345,6 +347,7 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "dacp_ecr_repo" {
+  #checkov:skip=CKV_AWS_136: "Ensure that ECR repositories are encrypted using KMS" - ignore
   name         = "dacp-ecr-repo"
   force_delete = true
 }
@@ -391,68 +394,6 @@ resource "aws_cloudwatch_log_resource_policy" "ecs_logging_policy" {
   policy_name = "TrustEventsToStoreLogEvents"
 }
 
-resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
-  count               = local.is-development ? 0 : 1
-  alarm_name          = "ecs-cpu-utilization-alarm"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "CpuUtilized"
-  namespace           = "ECS/ContainerInsights"
-  period              = "120"
-  statistic           = "Average"
-  threshold           = "80"
-  alarm_description   = "This metric checks if CPU utilization is high - threshold set to 80%"
-  alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]
-  dimensions = {
-    ClusterName = aws_ecs_cluster.dacp_cluster.name
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "ecs_memory_alarm" {
-  count               = local.is-development ? 0 : 1
-  alarm_name          = "ecs-memory-utilization-alarm"
-  comparison_operator = "GreaterThanOrEqualToThreshold"
-  evaluation_periods  = "2"
-  metric_name         = "MemoryUtilized"
-  namespace           = "ECS/ContainerInsights"
-  period              = "120"
-  statistic           = "Average"
-  threshold           = "1600"
-  alarm_description   = "This metric checks if memory utilization is high - threshold set to 1600MB"
-  alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]
-  dimensions = {
-    ClusterName = aws_ecs_cluster.dacp_cluster.name
-  }
-}
-
-resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
-  count               = local.is-development ? 0 : 1
-  alarm_name          = "DDoSDetected"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "3"
-  metric_name         = "DDoSDetected"
-  namespace           = "AWS/DDoSProtection"
-  period              = "60"
-  statistic           = "Average"
-  threshold           = "0"
-  alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
-  treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.ddos_alarm[0].arn]
-  dimensions = {
-    ResourceArn = aws_lb.dacp_lb.arn
-  }
-}
-
-resource "aws_sns_topic" "ddos_alarm" {
-  count = local.is-development ? 0 : 1
-  name  = "dacp_ddos_alarm"
-}
-
-resource "aws_sns_topic" "dacp_utilisation_alarm" {
-  count = local.is-development ? 0 : 1
-  name  = "dacp_utilisation_alarm"
-}
-
 # Pager duty integration
 
 # Get the map of pagerduty integration keys from the modernisation platform account
@@ -472,6 +413,7 @@ locals {
 
 # link the sns topic to the service - preprod
 module "pagerduty_core_alerts_non_prod" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   count = local.is-preproduction ? 1 : 0
   depends_on = [
     aws_sns_topic.dacp_utilisation_alarm
@@ -483,6 +425,7 @@ module "pagerduty_core_alerts_non_prod" {
 
 # link the sns topic to the service - prod
 module "pagerduty_core_alerts_prod" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   count = local.is-production ? 1 : 0
   depends_on = [
     aws_sns_topic.dacp_utilisation_alarm

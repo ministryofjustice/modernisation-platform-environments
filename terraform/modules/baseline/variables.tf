@@ -104,6 +104,14 @@ variable "cloudwatch_dashboards" {
   default = {}
 }
 
+variable "cloudwatch_event_rules" {
+  type = map(object({
+    event_pattern         = optional(string)
+    sns_topic_name_or_arn = optional(string)
+  }))
+  default = {}
+}
+
 variable "cloudwatch_log_groups" {
   description = "set of cloudwatch log groups to create where the key is the name of the group"
   type = map(object({
@@ -487,6 +495,7 @@ variable "fsx_windows" {
 
   type = map(object({
     active_directory_id               = optional(string)
+    aliases                           = optional(list(string))
     automatic_backup_retention_days   = optional(number) # [0,90] (default 7)
     backup_id                         = optional(string)
     daily_automatic_backup_start_time = optional(string)
@@ -893,7 +902,7 @@ variable "s3_buckets" {
     custom_kms_key             = optional(string)
     custom_replication_kms_key = optional(string)
     lifecycle_rule             = any # see module baseline_presets.s3 for examples
-    log_bucket                 = optional(string, "")
+    log_bucket                 = optional(string)
     log_prefix                 = optional(string, "")
     replication_role_arn       = optional(string, "")
     force_destroy              = optional(bool, false)
@@ -1105,6 +1114,7 @@ variable "ssm_parameters" {
     parameters = map(object({
       description = optional(string)
       type        = optional(string, "SecureString")
+      tier        = optional(string)
       kms_key_id  = optional(string)
       file        = optional(string)
       random = optional(object({

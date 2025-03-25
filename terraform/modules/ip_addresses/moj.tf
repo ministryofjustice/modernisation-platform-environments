@@ -13,7 +13,7 @@ locals {
     ]
 
     # for MOJ Official devices
-    mojo_aws_globalprotect_vpc = "10.184.0.0/16"
+    mojo_aws_globalprotect_vpc = "10.184.0.0/14"
     mojo_wifi                  = "10.154.0.0/15"
 
     # for MOJ Official devices internet access

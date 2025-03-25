@@ -1,7 +1,7 @@
 terraform {
   required_providers {
     aws = {
-      version = "~> 5.0"
+      version = "~> 5.0, != 5.86.0"
       source  = "hashicorp/aws"
     }
   }
@@ -29,13 +29,6 @@ module "this-bucket" {
     # Leave this provider block in even if you are not using replication
     aws.bucket-replication = aws
   }
-  log_buckets = tomap({
-    "log_bucket_name" : var.logging_bucket.bucket.id,
-    "log_bucket_arn" : var.logging_bucket.bucket.arn,
-    "log_bucket_policy" : var.logging_bucket.bucket_policy.policy,
-  })
-  log_prefix                = "logs/${var.local_bucket_prefix}-export-${var.export_destination}/"
-  log_partition_date_source = "EventTime"
 
   lifecycle_rule = [
     {
@@ -69,6 +62,8 @@ resource "aws_lambda_permission" "allow_bucket" {
 }
 
 resource "aws_s3_bucket_notification" "bucket_notification" {
+  count = var.destination_bucket_id != null ? 1 : 0
+
   bucket = module.this-bucket.bucket.id
 
   lambda_function {
@@ -123,15 +118,18 @@ data "aws_iam_policy_document" "push_lambda" {
     ]
   }
 
-  statement {
-    sid    = "S3PermissionsForDestinationBucket"
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-    ]
-    resources = [
-      "arn:aws:s3:::${var.destination_bucket_id}/*",
-    ]
+  dynamic "statement" {
+    for_each = var.destination_bucket_id != null ? [1] : []
+    content {
+      sid    = "S3PermissionsForDestinationBucket"
+      effect = "Allow"
+      actions = [
+        "s3:PutObject",
+      ]
+      resources = [
+        "arn:aws:s3:::${var.destination_bucket_id}/*",
+      ]
+    }
   }
 }
 

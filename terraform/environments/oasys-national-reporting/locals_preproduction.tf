@@ -31,7 +31,6 @@ locals {
       }
     }
 
-    # WILL BE MOVING TO HMPPS-DOMAIN-SERVICES Account at a later date
     efs = {
       pp-onr-sap-share = {
         access_points = {
@@ -59,10 +58,11 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a"]
-          security_groups    = ["boe"]
+          security_groups    = ["boe", "bip-app"]
         }]
         tags = {
-          backup = "false"
+          backup      = "false"
+          backup-plan = "daily-and-weekly"
         }
       }
     }
@@ -102,6 +102,13 @@ locals {
           oasys-national-reporting-environment = "pp"
           domain-name                          = "azure.hmpp.root"
         })
+        cloudwatch_metric_alarms = merge(
+          module.baseline_presets.cloudwatch_metric_alarms.ec2,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_windows,
+          module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_or_cwagent_stopped_windows,
+          local.cloudwatch_metric_alarms.windows,
+          local.cloudwatch_metric_alarms.bods_primary,
+        )
       })
 
       # Pending sorting out cluster install of Bods in modernisation-platform-configuration-management repo
@@ -127,11 +134,54 @@ locals {
       #   })
       # cloudwatch_metric_alarms = {}
       # })
+
+      pp-onr-cms-1 = merge(local.ec2_instances.bip_cms, {
+        config = merge(local.ec2_instances.bip_cms.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_cms.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_cms.instance, {
+          instance_type = "m6i.2xlarge"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_cms.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_cms.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_cms.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "pp"
+        })
+      })
+
+      pp-onr-web-1 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.bip_web.instance, {
+          instance_type = "m6i.xlarge"
+        })
+        user_data_cloud_init = merge(local.ec2_instances.bip_web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.bip_web.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          instance-scheduling                  = "skip-scheduling"
+          oasys-national-reporting-environment = "pp"
+        })
+      })
     }
 
     fsx_windows = {
 
       pp-bods-win-share = {
+        aliases             = ["pp-onr-fs.azure.hmpp.root"]
         deployment_type     = "SINGLE_AZ_1"
         security_groups     = ["bods"]
         skip_final_backup   = true
@@ -181,13 +231,18 @@ locals {
       }
     }
 
-    # DO NOT DEPLOY YET AS OTHER THINGS AREN'T READY
+    # DO NOT FULLY DEPLOY YET AS WEB INSTANCES ARE NOT IN USE
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
           pp-onr-bods-http28080 = merge(local.lbs.public.instance_target_groups.http28080, {
             attachments = [
               { ec2_instance_name = "pp-onr-bods-1" },
+            ]
+          })
+          pp-onr-web-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
+            attachments = [
+              { ec2_instance_name = "pp-onr-web-1" },
             ]
           })
         }
@@ -205,6 +260,20 @@ locals {
                   host_header = {
                     values = [
                       "pp-bods.preproduction.reporting.oasys.service.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              pp-onr-web-http-7777 = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "pp-onr-web-http-7777"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "preproduction.reporting.oasys.service.justice.gov.uk",
                     ]
                   }
                 }]
@@ -274,7 +343,7 @@ locals {
       #           conditions = [{
       #             host_header = {
       #               values = [
-      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-test.modernisation-platform.service.justice.gov.uk",
+      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
       #               ]
       #             }
       #           }]
@@ -322,6 +391,7 @@ locals {
     route53_zones = {
       "preproduction.reporting.oasys.service.justice.gov.uk" = {
         lb_alias_records = [
+          { name = "", type = "A", lbs_map_key = "public" },
           { name = "pp-bods", type = "A", lbs_map_key = "public" }
         ],
       }

@@ -6,9 +6,10 @@ terraform {
       configuration_aliases = [aws.core-vpc, aws.core-network-services, aws.us-east-1]
     }
     random = {
-      version = "~> 3.6.3"
+      version = "~> 3.7.1"
       source  = "hashicorp/random"
     }
   }
-  required_version = "~> 1.5"
+  required_version = "~> 1.10"
 }
+

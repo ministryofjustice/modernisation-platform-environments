@@ -23,6 +23,7 @@ module "fsx_windows" {
 
   name                              = each.key
   active_directory_id               = each.value.active_directory_id
+  aliases                           = each.value.aliases
   automatic_backup_retention_days   = each.value.automatic_backup_retention_days
   backup_id                         = each.value.backup_id
   daily_automatic_backup_start_time = each.value.daily_automatic_backup_start_time

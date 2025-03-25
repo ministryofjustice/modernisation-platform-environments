@@ -1,0 +1,157 @@
+---
+name: terraform strategy
+
+on:
+  workflow_call:
+    inputs:
+      application:
+        type: string
+        required: true
+        description: "Application name for which this strategy matrix pipeline should run."
+    outputs:
+      matrix:
+        description: "Matrix JSON string to feed that can be used as strategy in a separate terraform job"
+        value: ${{ jobs.strategy.outputs.matrix }}
+
+jobs:
+  strategy:
+    name: "strategy"
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: "${{ steps.strategy.outputs.matrix }}"
+    steps:
+      - name: Check out Repo
+        uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b
+        with:
+          fetch-depth: 0    # Ensure the full history is fetched so that commits are available.
+
+      - name: Generate Strategy Matrix
+        id: strategy
+        run: |
+          set -euo pipefail
+
+          # --------------------------------------------------------------------
+          # 1. Fetch the main branch for comparison.
+          # --------------------------------------------------------------------
+          git fetch origin main
+
+          # Determine the commit to use as the tip of the branch.
+          # For pull request events, use the PR's head commit; otherwise, use HEAD.
+          if [[ "${GITHUB_REF}" == refs/pull/* ]]; then
+            head_commit=$(jq --raw-output .pull_request.head.sha "$GITHUB_EVENT_PATH")
+          else
+            head_commit=HEAD
+          fi
+
+          # --------------------------------------------------------------------
+          # 2. Fetch environment data from <application>.json.
+          # --------------------------------------------------------------------
+          if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+            # On a branch: production gets "plan", others get "plan_apply".
+            curl -s -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
+              | jq -c '.environments[] as $env |
+                  if $env.name | contains("production") then
+                    {"target": $env.name, "action": "plan"}
+                  else
+                    {"target": $env.name, "action": "plan_apply"}
+                  end' > envlist.json
+          else
+            # On main: all accounts get "plan_apply".
+            curl -s -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
+              | jq -c '.environments[] | {"target": .name, "action": "plan_apply"}' > envlist.json
+          fi
+
+          # --------------------------------------------------------------------
+          # 3. Discover valid subfolders that contain a platform_backend.tf file.
+          #     Always include the application folder itself as "root".
+          # --------------------------------------------------------------------
+          COMPONENTS="root"
+          app_dir="terraform/environments/${{ inputs.application }}"
+          if [ -d "$app_dir" ]; then
+            for d in $(find "$app_dir" -mindepth 1 -maxdepth 1 -type d); do
+              subfolder=$(basename "$d")
+              if [ -f "$d/platform_backend.tf" ] && [ "$subfolder" != ".terraform" ]; then
+                COMPONENTS="$COMPONENTS $subfolder"
+              fi
+            done
+          fi
+
+          echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
+
+          # --------------------------------------------------------------------
+          # 4. Build the final matrix by checking each component independently.
+          # --------------------------------------------------------------------
+          echo "[" > final-list.json
+          firstEntry=true
+
+          while IFS= read -r envobj; do
+            for comp in $COMPONENTS; do
+              if [ "$comp" = "root" ]; then
+                folder="$app_dir"
+                # For "root", only count changes to files directly in the app folder.
+                if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+                  merge_base=$(git merge-base origin/main "$head_commit")
+                  changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
+                else
+                  changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
+                fi
+                top_level_changed=false
+                prefix="$folder/"
+                for f in $changed_files; do
+                  # Remove the folder prefix.
+                  rel="${f#$prefix}"
+                  # If the relative path has no "/" and is not empty, it's a top-level change.
+                  if [[ "$rel" != */* ]] && [ -n "$rel" ]; then
+                    top_level_changed=true
+                    break
+                  fi
+                done
+                if ! $top_level_changed; then
+                  echo "No top-level changes in '$folder'; skipping 'root'"
+                  continue
+                fi
+              else
+                # For non-root components, use the standard diff check.
+                folder="$app_dir/$comp"
+                if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+                  merge_base=$(git merge-base origin/main "$head_commit")
+                  if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
+                    echo "No changes in '$folder' (branch compared to merge base); skipping '$comp'"
+                    continue
+                  fi
+                else
+                  if git diff --quiet HEAD~1 HEAD -- "$folder"; then
+                    echo "No changes in '$folder' (main branch); skipping '$comp'"
+                    continue
+                  fi
+                fi
+              fi
+
+              # Add an entry for this component if changes are detected.
+              if [ "$firstEntry" = true ]; then
+                firstEntry=false
+              else
+                echo "," >> final-list.json
+              fi
+              echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
+            done
+          done < envlist.json
+          echo "]" >> final-list.json
+
+          # --------------------------------------------------------------------
+          # 5. Wrap the JSON array in a matrix object.
+          # --------------------------------------------------------------------
+          echo -n '{"include":' > matrix.out
+          cat final-list.json >> matrix.out
+          echo '}' >> matrix.out
+
+          matrix=$(cat matrix.out | jq -r)
+          echo "Matrix is:"
+          echo "$matrix"
+
+          # --------------------------------------------------------------------
+          # 6. Output the matrix for subsequent jobs.
+          # --------------------------------------------------------------------
+          echo 'matrix<<EOF' >> $GITHUB_OUTPUT
+          echo "${matrix}" >> $GITHUB_OUTPUT
+          echo 'EOF' >> $GITHUB_OUTPUT
