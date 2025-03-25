@@ -86,28 +86,6 @@ locals {
   }
 }
 
-######################## DMS #############################################
-
-module "app_dms" {
-  source                   = "../dms"
-  replication_instance_arn = var.dms_instance_arn
-  replication_task_id      = "${local.app}-migration-task"
-  #target_db_instance          = 0
-  target_endpoint_id   = "${local.app}-target"
-  target_database_name = local.app_db_name
-  target_server_name   = local.app_rds_url
-  target_username      = local.app_rds_user
-  target_password      = local.app_rds_password
-  source_endpoint_id   = "${local.app}-source"
-  source_database_name = local.app_source_db_name
-  source_server_name   = local.app_source_db_url
-  source_username      = local.app_source_db_user
-  source_password      = local.app_source_db_password
-
-}
-
-############################################################################
-
 resource "aws_secretsmanager_secret" "app_db_credentials" {
   name                    = "${local.app}-credentials-db-2"
   recovery_window_in_days = 0

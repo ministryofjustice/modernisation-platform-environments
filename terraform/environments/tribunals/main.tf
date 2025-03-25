@@ -27,7 +27,6 @@ module "appeals" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -64,7 +63,6 @@ module "ahmlr" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -101,7 +99,6 @@ module "care_standards" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -138,7 +135,6 @@ module "cicap" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -176,7 +172,6 @@ module "employment_appeals" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -214,7 +209,6 @@ module "finance_and_tax" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -252,7 +246,6 @@ module "immigration_services" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -290,7 +283,6 @@ module "information_tribunal" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -328,7 +320,6 @@ module "lands_tribunal" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -366,7 +357,6 @@ module "transport" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -404,7 +394,6 @@ module "asylum_support" {
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
-  dms_instance_arn             = aws_dms_replication_instance.tribunals_replication_instance.replication_instance_arn
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity

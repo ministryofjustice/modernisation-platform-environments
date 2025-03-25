@@ -48,9 +48,6 @@ variable "application_data" {
 variable "tags" {
 }
 
-variable "dms_instance_arn" {
-}
-
 variable "task_definition_volume" {
 }
 
