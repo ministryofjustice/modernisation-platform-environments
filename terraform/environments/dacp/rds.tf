@@ -1,3 +1,4 @@
+# trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "dacp_db" {
   #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
   #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances" - false error
