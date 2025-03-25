@@ -2,10 +2,6 @@ resource "aws_iam_user" "s3_migration_user" {
   name = "s3-migration-user"
 }
 
-resource "aws_iam_access_key" "s3_migration_user_key" {
-  user = aws_iam_user.s3_migration_user.name
-}
-
 resource "aws_iam_role" "s3_migration_role" {
   name               = "S3MigrationRole"
   assume_role_policy = <<EOF
