@@ -1,7 +1,11 @@
 import json
 import os
 import urllib.request
+import logging
 from datetime import datetime, timezone
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 GITHUB_API_URL = "https://api.github.com/graphql"
 GITHUB_TOKEN = os.environ.get("GITHUB_PAT")
@@ -66,11 +70,31 @@ def lambda_handler(event, context):
     try:
         all_runs = fetch_all_runs()
 
+        # Log every workflow run's ID and timestamp for debugging
+        for run in all_runs:
+            run_id = run.get("id")
+            started_at = run.get("runStartedAt")
+            logger.info(f"Workflow ID: {run_id}, Started At: {started_at}")
+
+        # Filter for failed/cancelled/timed out runs from today
         filtered_runs = [
             run for run in all_runs
             if run["conclusion"] in ["failure", "cancelled", "timed_out"]
             and datetime.fromisoformat(run["runStartedAt"].replace("Z", "+00:00")).date() == today
         ]
+
+        detailed_runs = [
+            {
+                "id": run.get("id"),
+                "name": run.get("name"),
+                "status": run.get("status"),
+                "conclusion": run.get("conclusion"),
+                "run_started_at": run.get("runStartedAt"),
+                "html_url": run.get("html_url")
+            }
+            for run in filtered_runs
+        ]
+
 
         return {
             "statusCode": 200,
