@@ -21,7 +21,7 @@ resource "aws_instance" "ec2_oracle_ebs" {
   #}
   lifecycle {
     ignore_changes = [
-      cpu_core_count,
+      cpu_options["core_count"],
       ebs_block_device,
       ebs_optimized,
       user_data,

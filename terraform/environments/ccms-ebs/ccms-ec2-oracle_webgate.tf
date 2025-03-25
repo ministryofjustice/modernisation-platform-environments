@@ -22,7 +22,7 @@ resource "aws_instance" "ec2_webgate" {
     ignore_changes = [
       ebs_block_device,
       ebs_optimized,
-      cpu_core_count,
+      cpu_options["core_count"],
       user_data,
       user_data_replace_on_change
     ]
