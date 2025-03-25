@@ -20,9 +20,6 @@
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80
     },
-    "test": {
-      "example_var": "test-data"
-    },
     "preproduction": {
       "allocated_storage": "20",
       "storage_type": "gp2",
