@@ -26,6 +26,8 @@ module "amazon_managed_grafana_remote_cloudwatch_iam_policy" {
 }
 
 
+# Additional policies for Grafana to invoke the lambda module.modernisation_platform_github
+
 # IAM Role for Lambda Execution
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda-exec-role"
@@ -96,3 +98,7 @@ resource "aws_iam_policy" "grafana_lambda_policy" {
   policy = data.aws_iam_policy_document.grafana_lambda_invoke.json
 }
 
+resource "aws_iam_role_policy_attachment" "grafana_lambda_invoke_policy_attachment" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.grafana_lambda_policy.arn
+}
