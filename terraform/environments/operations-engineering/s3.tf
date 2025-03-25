@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "s3_root_account_write_policy" {
     resources = ["arn:aws:s3:::cur-v2-hourly/*"]
     principals {
       type = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/developer"]
+      identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:root"]
     }
   }
 }
