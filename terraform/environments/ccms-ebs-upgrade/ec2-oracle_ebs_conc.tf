@@ -10,8 +10,10 @@ resource "aws_instance" "ec2_oracle_conc" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
-  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsconc
-  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsconc
+  cpu_options {
+    core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsconc
+    threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsconc
+  }
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below.
   #lifecycle {
@@ -19,7 +21,7 @@ resource "aws_instance" "ec2_oracle_conc" {
   #}
   lifecycle {
     ignore_changes = [
-      cpu_core_count,
+      cpu_options["core_count"],
       ebs_block_device,
       ebs_optimized,
       user_data,
