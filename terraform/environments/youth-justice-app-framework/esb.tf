@@ -12,6 +12,7 @@ module "esb" {
   private_ip = lookup(
     {
       development = "10.26.144.217"
+      test        = "10.26.152.88"
       # Add more environments when IP is known
     },
     local.environment,

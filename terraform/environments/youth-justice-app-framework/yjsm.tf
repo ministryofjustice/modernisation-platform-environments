@@ -13,6 +13,7 @@ module "yjsm" {
   private_ip = lookup(
     {
       development = "10.26.144.61"
+      test        = "10.26.152.172"
       # Add more environments when IP is known
     },
     local.environment,
