@@ -118,7 +118,7 @@ resource "aws_lambda_permission" "allow_grafana_url" {
   function_name           = module.modernisation_platform_github.lambda_function_name
   principal               = "iam.amazonaws.com"
   function_url_auth_type  = "AWS_IAM"
-  source_arn              = module.managed_grafana.workspace_role_arn
+  source_arn              = module.managed_grafana.workspace_iam_role_arn
 }
 
 # IAM Role for Lambda Execution
