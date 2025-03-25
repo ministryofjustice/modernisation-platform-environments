@@ -31,7 +31,7 @@ def fetch_all_runs():
     per_page = 100
     today = datetime.now(timezone.utc).date()
 
-    GITHUB_TOKEN = get_github_pat
+    GITHUB_TOKEN = get_github_pat()
 
     if not GITHUB_TOKEN:
         raise ValueError("GitHub PAT not found in Secrets")
