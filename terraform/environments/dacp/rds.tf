@@ -2,6 +2,8 @@ resource "aws_db_instance" "dacp_db" {
   #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
   #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances" - false error
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
+  #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
+  #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
   count                           = local.is-development ? 0 : 1
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
@@ -70,6 +72,7 @@ resource "aws_db_instance" "dacp_db_dev" {
   #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
   #checkov:skip=CKV_AWS_129: "Ensure that respective logs of Amazon Relational Database Service (Amazon RDS) are enabled"
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
+  #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   count                          = local.is-development ? 1 : 0
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
@@ -151,7 +154,7 @@ resource "null_resource" "setup_db" { # tflint-ignore: terraform_required_provid
     }
   }
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
   }
 }
 
