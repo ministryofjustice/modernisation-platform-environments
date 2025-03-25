@@ -29,14 +29,19 @@ module "amazon_managed_grafana_remote_cloudwatch_iam_policy" {
 # Added to support invokation of local lambda
 data "aws_iam_policy_document" "grafana_lambda_invoke" {
   statement {
-    sid    = "InvokeLocalLambdaFromGrafana"
+    sid    = "InvokeLambdaFunctionURLFromGrafana"
     effect = "Allow"
     actions = [
-      "lambda:InvokeFunction"
+      "lambda:InvokeFunctionUrl"
     ]
     resources = [
       "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:function:modernisation-platform-github-graphql"
     ]
+    condition {
+      test     = "StringEquals"
+      variable = "lambda:FunctionUrlAuthType"
+      values   = ["AWS_IAM"]
+    }
   }
 }
 
