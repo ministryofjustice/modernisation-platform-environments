@@ -10,7 +10,12 @@ data "aws_iam_policy_document" "genesys_ap_airflow" {
       "s3:PutObject",
       "s3:CopyObject"
     ]
-    resources = ["arn:aws:s3:::*"]
+    resources = [
+      "arn:aws:s3:::*",
+      "arn:aws:s3:::call-centre-staging-20250207153716741400000001/*",
+      "arn:aws:s3:::call-centre-archive-20250210151406831300000002/*",
+      "arn:aws:s3:::call-centre-ingestion-20250210151406834100000004/*"
+    ]
   }
 }
 
