@@ -1,7 +1,7 @@
 locals {
 
   application_name = "analytical-platform-ingestion"
-  component_name   = "family-transfer"
+  component_name   = "transfer-family"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
