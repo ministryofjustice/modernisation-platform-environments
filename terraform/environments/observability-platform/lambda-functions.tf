@@ -59,8 +59,8 @@ module "modernisation_platform_github_graphql" {
   source  = "terraform-aws-modules/lambda/aws"
   version = "~> 6.0"
 
-  function_name = "modernisation-platform-github-graphql"
-  handler       = "modernisation_platform_github_graphql.lambda_handler"
+  function_name = "modernisation-platform-github-workflows"
+  handler       = "modernisation_platform_github_workflows.lambda_handler"
   runtime       = "python3.9"
   source_path   = "lambda"
 
