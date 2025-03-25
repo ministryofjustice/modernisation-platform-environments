@@ -15,60 +15,104 @@ resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-polic
       Name = local.ec2_instance_policy
     }
   )
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:DetachVolume",
-                "ec2:AttachVolume",
-                "ec2:DescribeVolumes",
-                "ec2:DescribeTags",
-                "ec2:DescribeInstances",
-                "ecs:CreateCluster",
-                "ecs:DeregisterContainerInstance",
-                "ecs:DiscoverPollEndpoint",
-                "ecs:Poll",
-                "ecs:RegisterContainerInstance",
-                "ecs:StartTelemetrySession",
-                "ecs:UpdateContainerInstancesState",
-                "ecs:Submit*",
-                "ecs:TagResource",
-                "ecr:*",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "logs:CreateLogGroup",
-                "logs:DescribeLogStreams",
-                "s3:ListBucket",
-                "s3:*Object*",
-                "kms:Decrypt",
-                "kms:Encrypt",
-                "kms:GenerateDataKey",
-                "kms:ReEncrypt",
-                "kms:GenerateDataKey",
-                "kms:DescribeKey",
-                "xray:*"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": "ecs:TagResource",
-            "Resource": "*",
-            "Condition": {
-                "StringEquals": {
-                    "ecs:CreateAction": [
-                        "CreateCluster",
-                        "RegisterContainerInstance"
-                    ]
-                }
-            }
-        }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DetachVolume",
+          "ec2:AttachVolume",
+          "ec2:DescribeVolumes",
+          "ec2:DescribeTags",
+          "ec2:DescribeInstances"
+        ]
+        Resource = [
+          "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:volume/*",
+          "arn:aws:ec2:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:instance/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:CreateCluster",
+          "ecs:DeregisterContainerInstance",
+          "ecs:DiscoverPollEndpoint",
+          "ecs:Poll",
+          "ecs:RegisterContainerInstance",
+          "ecs:StartTelemetrySession",
+          "ecs:UpdateContainerInstancesState",
+          "ecs:Submit*"
+        ]
+        Resource = "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:PutImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload"
+        ]
+        Resource = "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:CreateLogGroup",
+          "logs:DescribeLogStreams"
+        ]
+        Resource = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = [
+          "arn:aws:s3:::*",
+          "arn:aws:s3:::*/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey",
+          "kms:ReEncrypt*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "xray:PutTraceSegments",
+          "xray:PutTelemetryRecords",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:GetSamplingStatisticSummaries"
+        ]
+        Resource = "*"
+      }
     ]
-}
-EOF
+  })
 }
 
 # Create the IAM role to which the custom and predefined policies will be attached
@@ -155,8 +199,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
   name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized"
 }
 
-# Create the Launch Template and assign the instance profile
-# Comment out the aws_launch_template and aws_autoscaling_group if you ever need to delete and recreate the ec2 instance
+#checkov:skip=CKV_AWS_88:"EC2 instances require public IPs"
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix            = "tribunals-all"
   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
@@ -202,6 +245,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
   user_data = filebase64("ec2-shared-user-data.sh")
 }
 
+#checkov:skip=CKV_AWS_88:"EC2 backup instance requires public IP as it is an internet-facing application server"
 resource "aws_launch_template" "tribunals-backup-lt" {
   name_prefix            = "tribunals-backup"
   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]

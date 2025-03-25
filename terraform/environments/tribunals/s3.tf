@@ -28,11 +28,15 @@ resource "aws_s3_bucket_policy" "backup_bucket_policy" {
   })
 }
 
+#tfsec:ignore:aws-s3-ignore-public-acls
+#tfsec:ignore:aws-s3-no-public-buckets
 resource "aws_s3_bucket_public_access_block" "ebs_backup_block_policy" {
   bucket = aws_s3_bucket.ebs_backup.id
 
-  block_public_acls = true
-  block_public_policy = true
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_kms_key" "s3_encryption_key" {
