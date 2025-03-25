@@ -153,6 +153,17 @@ variable "setup_cdc_job" {
   description = "Enable CDC Job, True or False"
   type        = bool
   default     = false
+
+  validation {
+    condition     = var.setup_cdc_job ? !var.batch_only : true
+    error_message = "CDC Glue job can only be created when batch_only = false"
+  }
+}
+
+variable "batch_only" {
+  description = "Determines if the pipeline is batch only, True or False?"
+  type        = bool
+  default     = false
 }
 
 variable "glue_cdc_job_name" {
@@ -177,6 +188,11 @@ variable "glue_cdc_create_sec_conf" {
   type        = bool
   default     = false
   description = "(Optional) Create AWS Glue Security Configuration associated with the job."
+
+  validation {
+    condition     = var.glue_cdc_create_sec_conf ? !var.batch_only : true
+    error_message = "CDC Glue security configuration can only be created when batch_only = false"
+  }
 }
 
 variable "glue_cdc_language" {
@@ -276,6 +292,11 @@ variable "glue_cdc_create_role" {
   type        = bool
   default     = false
   description = "(Optional) Create AWS IAM role associated with the job."
+
+  validation {
+    condition     = var.glue_cdc_create_role ? !var.batch_only : true
+    error_message = "CDC Glue job role can only be created when batch_only = false"
+  }
 }
 
 
@@ -284,6 +305,11 @@ variable "setup_unprocessed_raw_files_check_job" {
   description = "Enable Job to Check If All Raw Files Have Been Processed, True or False"
   type        = bool
   default     = false
+
+  validation {
+    condition     = var.setup_unprocessed_raw_files_check_job ? !var.batch_only : true
+    error_message = "Unprocessed raw files check job can only be created when batch_only = false"
+  }
 }
 
 variable "glue_unprocessed_raw_files_check_job_name" {
@@ -308,6 +334,11 @@ variable "glue_unprocessed_raw_files_check_create_sec_conf" {
   type        = bool
   default     = false
   description = "(Optional) Create AWS Glue Security Configuration associated with the job."
+
+  validation {
+    condition     = var.glue_unprocessed_raw_files_check_create_sec_conf ? !var.batch_only : true
+    error_message = "Glue unprocessed raw files check job security configuration can only be created when batch_only = false"
+  }
 }
 
 variable "glue_unprocessed_raw_files_check_language" {
@@ -354,6 +385,7 @@ variable "glue_unprocessed_raw_files_check_enable_cont_log_filter" {
 variable "glue_unprocessed_raw_files_check_execution_class" {
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
+  type        = string
 }
 
 variable "glue_unprocessed_raw_files_check_job_worker_type" {
@@ -389,6 +421,11 @@ variable "glue_unprocessed_raw_files_check_create_role" {
   type        = bool
   default     = false
   description = "(Optional) Create AWS IAM role associated with the job."
+
+  validation {
+    condition     = var.glue_unprocessed_raw_files_check_create_role ? !var.batch_only : true
+    error_message = "Glue unprocessed raw files check job role can only be created when batch_only = false"
+  }
 }
 
 variable "glue_unprocessed_raw_files_check_arguments" {
@@ -402,6 +439,11 @@ variable "setup_archive_job" {
   description = "Enable Archive Job, True or False"
   type        = bool
   default     = false
+
+  validation {
+    condition     = var.setup_archive_job ? !var.batch_only : true
+    error_message = "Archive job can only be created when batch_only = false"
+  }
 }
 
 variable "glue_archive_job_schedule" {
@@ -432,6 +474,11 @@ variable "glue_archive_create_sec_conf" {
   type        = bool
   default     = false
   description = "(Optional) Create AWS Glue Security Configuration associated with the job."
+
+  validation {
+    condition     = var.glue_archive_create_sec_conf ? !var.batch_only : true
+    error_message = "Glue archive job security configuration can only be created when batch_only = false"
+  }
 }
 
 variable "glue_archive_language" {
@@ -478,6 +525,7 @@ variable "glue_archive_enable_cont_log_filter" {
 variable "glue_archive_execution_class" {
   default     = "STANDARD"
   description = "Execution CLass Standard or FLex"
+  type        = string
 }
 
 variable "glue_archive_job_worker_type" {
@@ -513,6 +561,11 @@ variable "glue_archive_create_role" {
   type        = bool
   default     = false
   description = "(Optional) Create AWS IAM role associated with the job."
+
+  validation {
+    condition     = var.glue_archive_create_role ? !var.batch_only : true
+    error_message = "Glue archive job role can only be created when batch_only = false"
+  }
 }
 
 variable "glue_archive_arguments" {
