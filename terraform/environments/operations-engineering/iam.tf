@@ -39,8 +39,8 @@ resource "aws_iam_policy" "s3_access_policy" {
                 "s3:GetObjectVersionTagging"
             ],
             "Resource": [
-                "arn:aws:s3:::amazon-s3-demo-source-bucket",
-                "arn:aws:s3:::amazon-s3-demo-source-bucket/*"
+                "arn:aws:s3:::moj-cur-reports-v2-hourly",
+                "arn:aws:s3:::moj-cur-reports-v2-hourly?/*"
             ]
         },
         {
@@ -55,8 +55,8 @@ resource "aws_iam_policy" "s3_access_policy" {
                 "s3:GetObjectVersionTagging"
             ],
             "Resource": [
-                "arn:aws:s3:::amazon-s3-demo-destination-bucket",
-                "arn:aws:s3:::amazon-s3-demo-destination-bucket/*"
+                "arn:aws:s3:::cur-v2-hourly",
+                "arn:aws:s3:::cur-v2-hourly/*"
             ]
         }
     ]
