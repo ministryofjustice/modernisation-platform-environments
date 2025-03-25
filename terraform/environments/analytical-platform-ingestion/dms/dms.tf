@@ -20,7 +20,7 @@ module "cica_dms_tariff_dms_implementation" {
         engine_version             = "3.5.4"
         kms_key_arn                = module.cica_dms_credentials_kms.key_arn
         multi_az                   = false
-        replication_instance_class = "dms.t3.micro"
+        replication_instance_class = "dms.t3.large"
         inbound_cidr               = local.environment_configuration.tariff_cidr
     }
     dms_source = {
@@ -28,7 +28,6 @@ module "cica_dms_tariff_dms_implementation" {
         secrets_manager_arn         = module.cica_dms_tariff_database_credentials.secret_arn
         sid                         = local.environment_configuration.source_database_sid
         extra_connection_attributes = ""
-    #     extra_connection_attributes = "addSupplementalLogging=N;useBfile=Y;useLogminerReader=Y;"
         cdc_start_time              = "2025-03-10T12:00:00Z"
     }
     replication_task_id = {
