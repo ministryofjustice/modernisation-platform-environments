@@ -105,7 +105,8 @@
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "certificate_expiry_days": 45,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
     },
     "test": {
       "short_env": "tst",
@@ -208,7 +209,8 @@
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "certificate_expiry_days": 30,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
     },
     "preproduction": {
       "short_env": "prep",
@@ -311,7 +313,8 @@
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "certificate_expiry_days": 30,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
     },
     "production": {
       "short_env": "prod",
@@ -416,7 +419,8 @@
       "s3_lifecycle_days_transition_noncurrent_standard": 90,
       "certificate_expiry_days": 30,
       "certificate_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
-      "payment_load_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com"
+      "payment_load_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
+      "alerts_subscription_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com"
     }
   },
   "webgate_ebs": {

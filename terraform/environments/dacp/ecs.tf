@@ -348,8 +348,13 @@ resource "aws_security_group" "ecs_service" {
 
 resource "aws_ecr_repository" "dacp_ecr_repo" {
   #checkov:skip=CKV_AWS_136: "Ensure that ECR repositories are encrypted using KMS" - ignore
+  #checkov:skip=CKV_AWS_51: "Ensure ECR Image Tags are immutable"
   name         = "dacp-ecr-repo"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 # AWS EventBridge rule

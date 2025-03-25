@@ -30,8 +30,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_high_ram_alarm" {
   namespace           = "ECS/ContainerInsights"
   period              = 60
   statistic           = "Average"
-  threshold           = 1500
-  alarm_description   = "This alarm monitors Memory utilization of an ECS Fargate service (in MB)"
+  threshold           = 2500
+  alarm_description   = "DACP ECS scaling up as memory has exceeded the threshold"
   alarm_actions       = [
     aws_appautoscaling_policy.scale_up_amber[0].arn,
     aws_sns_topic.dacp_utilisation_alarm[0].arn,
@@ -52,8 +52,8 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_normal_ram_alarm" {
   namespace           = "ECS/ContainerInsights"
   period              = 60
   statistic           = "Average"
-  threshold           = 1500
-  alarm_description   = "This alarm monitors Memory utilization of an ECS Fargate service"
+  threshold           = 2500
+  alarm_description   = "DACP ECS scaling down as memory has returned to normal levels"
   alarm_actions       = [
     aws_appautoscaling_policy.scale_down_amber[0].arn,
     aws_sns_topic.dacp_utilisation_alarm[0].arn,
@@ -74,7 +74,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_cpu_alarm" {
   namespace           = "ECS/ContainerInsights"
   period              = "120"
   statistic           = "Average"
-  threshold           = "500"
+  threshold           = "100"
   alarm_description   = "This metric checks if CPU utilization is high - threshold set to 80%"
   alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]
   dimensions = {
