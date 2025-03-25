@@ -22,6 +22,7 @@ module "cica_dms_tariff_dms_implementation" {
         multi_az                   = false
         replication_instance_class = "dms.t3.large"
         inbound_cidr               = local.environment_configuration.tariff_cidr
+        apply_immediately          = true
     }
     dms_source = {
         engine_name                 = "oracle"
