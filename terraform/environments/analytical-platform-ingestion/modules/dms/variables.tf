@@ -15,17 +15,19 @@ variable "db" {
 
 variable "dms_replication_instance" {
   type = object({
-    replication_instance_id    = string
-    subnet_group_id            = optional(string)
-    subnet_group_name          = optional(string)
-    subnet_ids                 = optional(list(string))
-    allocated_storage          = number
-    availability_zone          = string
-    engine_version             = string
-    kms_key_arn                = optional(string)
-    multi_az                   = bool
-    replication_instance_class = string
-    inbound_cidr               = string
+    replication_instance_id      = string
+    subnet_group_id              = optional(string)
+    subnet_group_name            = optional(string)
+    subnet_ids                   = optional(list(string))
+    allocated_storage            = number
+    availability_zone            = string
+    engine_version               = string
+    kms_key_arn                  = optional(string)
+    multi_az                     = bool
+    replication_instance_class   = string
+    inbound_cidr                 = string
+    apply_immediately            = optional(bool, false)
+    preferred_maintenance_window = optional(string, "sun:10:30-sun:14:30")
   })
 
   validation {
