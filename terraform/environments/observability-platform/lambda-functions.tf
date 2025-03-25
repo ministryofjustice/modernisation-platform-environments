@@ -65,7 +65,7 @@ module "modernisation_platform_github" {
   source_path   = "lambda"
 
   memory_size = 256
-  timeout     = 10
+  timeout     = 30
   publish     = true
 
   create_role = false
