@@ -160,7 +160,7 @@ resource "aws_iam_role_policy" "ec2_s3_access" {
           "s3:ListBucket"
         ],
         Resource = [
-          "${aws_s3_bucket.ebs_backup.arn}",
+          aws_s3_bucket.ebs_backup.arn,
           "${aws_s3_bucket.ebs_backup.arn}/*"
         ]
       }

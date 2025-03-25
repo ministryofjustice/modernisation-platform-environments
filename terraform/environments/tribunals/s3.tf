@@ -11,7 +11,7 @@ resource "aws_s3_bucket_policy" "backup_bucket_policy" {
       {
         Effect = "Allow",
         Principal = {
-          "AWS" : "${aws_iam_role.ec2_instance_role.arn}"
+          "AWS" : aws_iam_role.ec2_instance_role.arn
         },
         Action = [
           "s3:GetObject",
@@ -20,7 +20,7 @@ resource "aws_s3_bucket_policy" "backup_bucket_policy" {
           "s3:ListBucket"
         ],
         Resource = [
-          "${aws_s3_bucket.ebs_backup.arn}",
+          aws_s3_bucket.ebs_backup.arn,
           "${aws_s3_bucket.ebs_backup.arn}/*"
         ]
       }
