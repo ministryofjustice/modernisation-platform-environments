@@ -7,7 +7,8 @@ data "aws_iam_policy_document" "genesys_ap_airflow" {
       "s3:ListAllMyBuckets", 
       "s3:ListBucket",
       "s3:GetObject",
-      "s3:PutObject"
+      "s3:PutObject",
+      "s3:CopyObject"
     ]
     resources = ["arn:aws:s3:::*"]
   }
