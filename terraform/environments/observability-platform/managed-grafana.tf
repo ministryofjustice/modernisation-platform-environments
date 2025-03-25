@@ -18,7 +18,7 @@ module "managed_grafana" {
   data_sources              = ["CLOUDWATCH", "PROMETHEUS"]
   notification_destinations = ["SNS"]
 
-  iam_role_policy_arns = [module.amazon_managed_grafana_remote_cloudwatch_iam_policy.arn, module.grafana_lambda_invoke_policy.arn]
+  iam_role_policy_arns = [module.amazon_managed_grafana_remote_cloudwatch_iam_policy.arn, aws_iam_policy.grafana_lambda_invoke_policy.arn]
 
   configuration = jsonencode({
     unifiedAlerting = {
