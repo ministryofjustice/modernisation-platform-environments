@@ -5,14 +5,10 @@ locals {
   module_name                  = var.module_name
   app_db_name                  = var.app_db_name
   app_db_login_name            = var.app_db_login_name
-  app_source_db_name           = var.app_source_db_name
   app_rds_url                  = var.app_rds_url
   app_rds_user                 = var.app_rds_user
   app_rds_port                 = var.app_rds_port
   app_rds_password             = var.app_rds_password
-  app_source_db_url            = var.app_source_db_url
-  app_source_db_user           = var.app_source_db_user
-  app_source_db_password       = var.app_source_db_password
   documents_location           = var.documents_location
   app_container_definition = jsonencode([{
     command : [

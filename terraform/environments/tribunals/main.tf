@@ -2,9 +2,6 @@ locals {
   rds_user           = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["username"]
   rds_port           = "1433"
   rds_password       = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
-  source_db_url      = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["host"]
-  source_db_user     = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["username"]
-  source_db_password = jsondecode(data.aws_secretsmanager_secret_version.source_db_secret_current.secret_string)["password"]
 }
 
 module "appeals" {
@@ -16,14 +13,10 @@ module "appeals" {
   module_name                  = "appeals"
   app_db_name                  = "ossc"
   app_db_login_name            = "ossc-app"
-  app_source_db_name           = "Ossc"
   app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -52,14 +45,10 @@ module "ahmlr" {
   module_name                  = "ahmlr"
   app_db_name                  = "hmlands"
   app_db_login_name            = "hmlands-app"
-  app_source_db_name           = "hmlands"
   app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -88,14 +77,10 @@ module "care_standards" {
   app_url                      = "carestandards"
   app_db_name                  = "carestandards"
   app_db_login_name            = "carestandards-app"
-  app_source_db_name           = "carestandards"
   app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -124,14 +109,10 @@ module "cicap" {
   module_name                  = "cicap"
   app_db_name                  = "cicap"
   app_db_login_name            = "cicap-app"
-  app_source_db_name           = "cicap"
   app_rds_url                  = aws_db_instance.rdsdb.address
   app_rds_user                 = local.rds_user
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -160,15 +141,11 @@ module "employment_appeals" {
   module_name        = "employment_appeals"
   app_db_name        = "eat"
   app_db_login_name  = "eat-app"
-  app_source_db_name = "eat"
   app_rds_url        = aws_db_instance.rdsdb.address
   app_rds_user       = local.rds_user
   app_rds_port       = local.rds_port
   app_rds_password   = local.rds_password
 
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -197,15 +174,11 @@ module "finance_and_tax" {
   module_name        = "finance_and_tax"
   app_db_name        = "ftt"
   app_db_login_name  = "ftt-app"
-  app_source_db_name = "ftt"
   app_rds_url        = aws_db_instance.rdsdb.address
   app_rds_user       = local.rds_user
   app_rds_port       = local.rds_port
   app_rds_password   = local.rds_password
 
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -234,15 +207,11 @@ module "immigration_services" {
   module_name        = "immigration_services"
   app_db_name        = "imset"
   app_db_login_name  = "imset-app"
-  app_source_db_name = "imset"
   app_rds_url        = aws_db_instance.rdsdb.address
   app_rds_user       = local.rds_user
   app_rds_port       = local.rds_port
   app_rds_password   = local.rds_password
 
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -271,15 +240,11 @@ module "information_tribunal" {
   module_name        = "information_tribunal"
   app_db_name        = "it"
   app_db_login_name  = "it-app"
-  app_source_db_name = "it"
   app_rds_url        = aws_db_instance.rdsdb.address
   app_rds_user       = local.rds_user
   app_rds_port       = local.rds_port
   app_rds_password   = local.rds_password
 
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -308,15 +273,11 @@ module "lands_tribunal" {
   module_name        = "lands_tribunal"
   app_db_name        = "lands"
   app_db_login_name  = "lands-app"
-  app_source_db_name = "lands"
   app_rds_url        = aws_db_instance.rdsdb.address
   app_rds_user       = local.rds_user
   app_rds_port       = local.rds_port
   app_rds_password   = local.rds_password
 
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -345,15 +306,11 @@ module "transport" {
   module_name        = "transport"
   app_db_name        = "transport"
   app_db_login_name  = "transport-app"
-  app_source_db_name = "Transport"
   app_rds_url        = aws_db_instance.rdsdb.address
   app_rds_user       = local.rds_user
   app_rds_port       = local.rds_port
   app_rds_password   = local.rds_password
 
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
@@ -382,15 +339,11 @@ module "asylum_support" {
   module_name        = "asylum_support"
   app_db_name        = "asadj"
   app_db_login_name  = "asadj-app"
-  app_source_db_name = "asadj"
   app_rds_url        = aws_db_instance.rdsdb.address
   app_rds_user       = local.rds_user
   app_rds_port       = local.rds_port
   app_rds_password   = local.rds_password
 
-  app_source_db_url            = local.source_db_url
-  app_source_db_user           = local.source_db_user
-  app_source_db_password       = local.source_db_password
   environment                  = local.environment
   application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
