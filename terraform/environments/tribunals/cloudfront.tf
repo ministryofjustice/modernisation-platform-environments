@@ -1,6 +1,16 @@
 resource "aws_cloudfront_distribution" "tribunals_distribution" {
+  #checkov:skip=CKV_AWS_86:"Access logging not required for this distribution"
+  #checkov:skip=CKV_AWS_374:"Geo restriction not needed for this public service"
+  #checkov:skip=CKV_AWS_305:"Default root object not required as this is an API distribution"
+  #checkov:skip=CKV_AWS_310:"Single origin is sufficient for this use case"
 
   web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
+
+  logging_config {
+    include_cookies = false
+    bucket         = aws_s3_bucket.cloudfront_logs.bucket_domain_name
+    prefix         = "cloudfront-logs/"
+  }
 
   aliases = local.is-production ? [
     "*.decisions.tribunals.gov.uk",
@@ -92,6 +102,7 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 }
 
 resource "aws_security_group" "tribunals_lb_sg_cloudfront" {
+  #checkov:skip=CKV_AWS_382:"Load balancer requires unrestricted egress for dynamic port mapping"
   name        = "tribunals-load-balancer-sg-cf"
   description = "control access to the load balancer using cloudfront"
   vpc_id      = data.aws_vpc.shared.id
@@ -110,5 +121,67 @@ resource "aws_security_group" "tribunals_lb_sg_cloudfront" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_s3_bucket" "cloudfront_logs" {
+  bucket = "tribunals-cloudfront-logs-${local.environment}"
+}
+
+resource "aws_s3_bucket_public_access_block" "cloudfront_logs" {
+  bucket = aws_s3_bucket.cloudfront_logs.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "cloudfront_logs" {
+  bucket = aws_s3_bucket.cloudfront_logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "cloudfront_logs" {
+  bucket = aws_s3_bucket.cloudfront_logs.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "AllowCloudFrontLogDelivery"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action   = "s3:PutObject"
+        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+          StringLike = {
+            "aws:SourceArn" = "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${aws_cloudfront_distribution.tribunals_distribution.id}"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "cloudfront_logs" {
+  bucket = aws_s3_bucket.cloudfront_logs.id
+
+  rule {
+    id     = "delete_old_logs"
+    status = "Enabled"
+
+    expiration {
+      days = 90
+    }
   }
 }

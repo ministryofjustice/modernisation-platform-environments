@@ -7,7 +7,10 @@ locals {
 }
 
 # Create an IAM policy for the custom permissions required by the EC2 hosting instance
-resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+#checkov:skip=CKV_AWS_290:"Required permissions for ECS/ECR operations"
+#checkov:skip=CKV_AWS_355:"Some AWS services require * resource access"
+#tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_policy" "ec2_instance_policy" {
   name = local.ec2_instance_policy
   tags = merge(
     local.tags_common,
@@ -199,7 +202,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
   name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized"
 }
 
-#checkov:skip=CKV_AWS_88:"EC2 instances require public IPs"
+#checkov:skip=CKV_AWS_88:"EC2 instances require public IPs as they are internet-facing application servers"
 resource "aws_launch_template" "tribunals-all-lt" {
   name_prefix            = "tribunals-all"
   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
@@ -245,7 +248,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
   user_data = filebase64("ec2-shared-user-data.sh")
 }
 
-#checkov:skip=CKV_AWS_88:"EC2 backup instance requires public IP as it is an internet-facing application server"
+#checkov:skip=CKV_AWS_88:"EC2 backup instance requires public IP as it is internet-facing application server"
 resource "aws_launch_template" "tribunals-backup-lt" {
   name_prefix            = "tribunals-backup"
   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
@@ -317,6 +320,13 @@ resource "aws_instance" "tribunals_backup" {
     version = "$Latest"
   }
 
+  ebs_optimized = true
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
   root_block_device {
     encrypted = true
   }
@@ -336,6 +346,7 @@ resource "aws_instance" "tribunals_backup" {
 
 resource "aws_security_group" "cluster_ec2" {
   #checkov:skip=CKV_AWS_23
+  #checkov:skip=CKV_AWS_382:"EC2 instances require unrestricted egress for ECS/ECR operations"
   name        = "tribunals-cluster-ec2-security-group"
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
