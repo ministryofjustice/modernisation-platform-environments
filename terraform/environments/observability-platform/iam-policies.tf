@@ -26,16 +26,62 @@ module "amazon_managed_grafana_remote_cloudwatch_iam_policy" {
 }
 
 
-# Added to support invokation of local lambda
+# IAM Role for Lambda Execution
+resource "aws_iam_role" "lambda_exec" {
+  name = "lambda-exec-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_exec_policy" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy" "lambda_exec_secrets_access" {
+  name = "lambda-exec-secrets-access"
+  role = aws_iam_role.lambda_exec.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ],
+        Resource = aws_secretsmanager_secret.modernisation_platform_github_pat.arn
+      }
+    ]
+  })
+}
+
+# IAM Policy for Grafana to Invoke Lambda
 data "aws_iam_policy_document" "grafana_lambda_invoke" {
   statement {
-    sid    = "InvokeLambdaFunctionURLFromGrafana"
-    effect = "Allow"
-    actions = [
-      "lambda:InvokeFunctionUrl"
-    ]
+    sid     = "AllowInvokeLambdaFunctionURL"
+    effect  = "Allow"
+    actions = ["lambda:InvokeFunctionUrl"]
     resources = [
-      "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:function:modernisation-platform-github"
+      module.modernisation_platform_github.lambda_function_arn
     ]
     condition {
       test     = "StringEquals"
@@ -45,15 +91,12 @@ data "aws_iam_policy_document" "grafana_lambda_invoke" {
   }
 }
 
-module "grafana_lambda_invoke_policy" {
-  #checkov:skip=CKV_TF_1:Module is from Terraform registry
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+resource "aws_iam_policy" "grafana_lambda_policy" {
+  name   = "grafana-invoke-lambda-url"
+  policy = data.aws_iam_policy_document.grafana_lambda_invoke.json
+}
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "~> 5.0"
-
-  name        = "grafana-lambda-invoke-policy"
-  path        = "/"
-  description = "Allow Grafana to invoke local Lambda functions"
-  policy      = data.aws_iam_policy_document.grafana_lambda_invoke.json
+resource "aws_iam_role_policy_attachment" "grafana_can_invoke_lambda_url" {
+  role       = module.managed_grafana.workspace_iam_role_name
+  policy_arn = aws_iam_policy.grafana_lambda_policy.arn
 }
