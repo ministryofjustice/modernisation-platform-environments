@@ -1,4 +1,5 @@
 import os
+import boto3
 import json
 import logging
 import urllib.request
@@ -12,13 +13,28 @@ logger.setLevel(logging.INFO)
 # Config
 REPO_OWNER = "ministryofjustice"
 REPO_NAME = "modernisation-platform"
-GITHUB_TOKEN = os.environ.get("GITHUB_PAT")
+
+def get_github_pat():
+    secret_name = "observability-platform/modernisation-platform-github-pat"
+    region_name = os.environ.get("AWS_REGION", "eu-west-2")
+
+    client = boto3.client("secretsmanager", region_name=region_name)
+    response = client.get_secret_value(SecretId=secret_name)
+
+    secret = response["SecretString"]
+    secret_dict = json.loads(secret)
+    return secret_dict.get("pat")
 
 def fetch_all_runs():
     all_runs = []
     page = 1
     per_page = 100
     today = datetime.now(timezone.utc).date()
+
+    GITHUB_TOKEN = get_github_pat
+
+    if not GITHUB_TOKEN:
+        raise ValueError("GitHub PAT not found in Secrets")
 
     headers = {
         "Authorization": f"Bearer {GITHUB_TOKEN}",
@@ -82,8 +98,6 @@ def lambda_handler(event, context):
     logger.info(f"📅 Fetching today's workflow runs from {REPO_OWNER}/{REPO_NAME} for {today}")
 
     try:
-        if not GITHUB_TOKEN:
-            raise Exception("GITHUB_PAT environment variable is not set.")
 
         all_runs = fetch_all_runs()
 
