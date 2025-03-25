@@ -72,8 +72,7 @@ variable "documents_location" {
 }
 
 variable "application_data" {
-  type = object({
-    accounts = map(object({
+  type = map(object({
       allocated_storage         = string
       storage_type              = string
       db_identifier             = string
@@ -94,7 +93,6 @@ variable "application_data" {
       ecs_scaling_cpu_threshold = number
       ecs_scaling_mem_threshold = number
     }))
-  })
 }
 
 variable "tags" {
