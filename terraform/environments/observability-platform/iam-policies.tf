@@ -35,7 +35,7 @@ data "aws_iam_policy_document" "grafana_lambda_invoke" {
       "lambda:InvokeFunctionUrl"
     ]
     resources = [
-      "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:function:modernisation-platform-github-graphql"
+      "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:function:modernisation-platform-github"
     ]
     condition {
       test     = "StringEquals"

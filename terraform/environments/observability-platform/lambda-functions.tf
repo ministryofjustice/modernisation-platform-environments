@@ -76,28 +76,6 @@ module "modernisation_platform_github" {
     GITHUB_PAT = "/aws/reference/secretsmanager/observability-platform/modernisation-platform-github-pat:pat"
   }
 
-  attach_policy_json = true
-  policy_json = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        Resource = "*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "secretsmanager:GetSecretValue"
-        ],
-        Resource = aws_secretsmanager_secret.modernisation_platform_github_pat.arn
-      }
-    ]
-  })
 }
 
 # Function URL for calling the lambda from grafana
@@ -143,3 +121,30 @@ resource "aws_iam_role_policy_attachment" "lambda_exec_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+# SecretsManager access
+resource "aws_iam_role_policy" "lambda_exec_secrets_access" {
+  name = "lambda-exec-secrets-access"
+  role = aws_iam_role.lambda_exec.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ],
+        Resource = aws_secretsmanager_secret.modernisation_platform_github_pat.arn
+      }
+    ]
+  })
+}
