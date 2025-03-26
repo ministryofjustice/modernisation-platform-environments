@@ -93,7 +93,7 @@ class MetadataExtractor:
         self.database_identifier = db_options["identifier"]
         self.schema_name = db_options["schema"].lower()
         self.dialect = db_options["dialect"]
-        self.tables = db_options["objects"]
+        self.objects = db_options["objects"]
         self.deleted_tables = db_options.get("deleted_tables", [])
 
         self.emc = EtlManagerConverter()
@@ -150,8 +150,8 @@ class MetadataExtractor:
         etl_dict["partitions"] = None
         return json.dumps(etl_dict)
 
-    def get_table_metadata(self, table) -> Metadata:
-        table_meta = self.sqlc.generate_to_meta(table.lower(), self.schema_name)
+    def get_table_metadata(self, schema, table) -> Metadata:
+        table_meta = self.sqlc.generate_to_meta(table.lower(), schema)
         table_meta = self._manage_blob_columns(table_meta)
         table_meta = self._convert_int_columns(table_meta)
         table_meta = self._rename_materialised_view(table_meta)
@@ -164,7 +164,7 @@ class MetadataExtractor:
         database_objects = {
             "objects_from": self.database_identifier,
             "extraction_date": datetime.now().isoformat(),
-            "objects": sorted(self.tables),
+            "objects": sorted(self.objects),
             "blobs": self.blobs,
             "deleted_tables": sorted(self.deleted_tables),
         }
@@ -174,8 +174,24 @@ class MetadataExtractor:
             Key="objects.json",
         )
 
+    def get_schema_and_table_from_object(self, obj_str: str) -> 'tuple[str, str]':
+        """get_table_specific_schema.
+
+        :param object: database object string in format `table` or `schema.table`
+        :type object: str
+        :rtype: dict(str, str)
+        :return: Tuple of (schema_name , table_name)
+        """
+        object_list = obj_str.split(".")
+        if len(object_list) == 2:
+            return tuple(object_list)
+        elif len(object_list) == 1:
+            return self.schema_name, object_list[0]
+        else:
+            raise ValueError(f"Expected object to be of format `table` or `schema.table` but got {obj_str}")
+
     def get_database_metadata(self, output_bucket):
-        tables = [self.get_table_metadata(table) for table in self.tables]
+        tables = [self.get_table_metadata (*self.get_schema_and_table_from_object(obj)) for obj in self.objects]
         self._write_database_objects(output_bucket)
         return tables
 
@@ -185,12 +201,12 @@ def handler(event, context):  # pylint: disable=unused-argument
     db_secret_arn = os.getenv("DB_SECRET_ARN")
     db_secret_response = secretsmanager.get_secret_value(SecretId=db_secret_arn)
     db_secret = json.loads(db_secret_response["SecretString"])
-    db_identifier = db_secret["dbInstanceIdentifier"]
+    db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog
     username = db_secret["username"]
     password = db_secret["password"]
-    engine = db_secret["engine"]
+    engine = db_secret.get("engine", os.getenv("ENGINE"))
     host = db_secret["host"]
-    db_name = db_secret["dbname"]
+    db_name = db_secret.get("dbname", os.getenv("DATABASE_NAME"))
     raw_history_bucket = os.getenv("RAW_HISTORY_BUCKET")
 
     # TODO: Works for oracle databases. Need to add support for other databases
@@ -201,7 +217,7 @@ def handler(event, context):  # pylint: disable=unused-argument
     engine = create_engine(db_string)
 
     db_objects = [obj.lower() for obj in json.loads(os.getenv("DB_OBJECTS", "[]"))]
-    schema_name = os.getenv("DB_SCHEMA_NAME").lower()
+    schema_name = os.getenv("DB_SCHEMA_NAME").lower() # May be empty string if schema specified on per-table basis
 
     db_options = {
         "database": db_name,
@@ -215,10 +231,10 @@ def handler(event, context):  # pylint: disable=unused-argument
     # Get the glue database to check if it exists. handle EntityNotFoundException
     try:
         glue.get_database(Name=db_identifier)
-        logger.info(f"Database {db_identifier} already exists")
+        logger.info(f"Database {db_identifier} already exists in Glue Catalog")
     except glue.exceptions.EntityNotFoundException:
         # Create the database if it does not exist. Fails is it cannot be created
-        logger.info(f"Database {db_identifier} does not exist. Creating it now")
+        logger.info(f"Database {db_identifier} does not exist in Glue Catalog. Creating it now")
         response = glue.create_database(
             DatabaseInput={
                 "Name": db_identifier,
