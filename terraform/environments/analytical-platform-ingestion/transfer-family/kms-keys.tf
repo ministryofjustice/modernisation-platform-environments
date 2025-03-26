@@ -37,3 +37,29 @@ module "transfer_logs_kms" {
 
   deletion_window_in_days = 7
 }
+
+module "s3_transfer_landing_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.0"
+
+  aliases               = ["s3/transfer/landing"]
+  description           = "Family SFTP Server, Landing S3 KMS Key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
+
+module "supplier_data_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.0"
+
+  aliases               = ["secretsmanager/transfer/supplier-data"]
+  description           = "Key for SFTP supplier data"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
