@@ -424,7 +424,7 @@ module "pagerduty_core_alerts_non_prod" {
     aws_sns_topic.dacp_utilisation_alarm
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.dacp_utilisation_alarm[0].name]
+  sns_topics                = [aws_sns_topic.dacp_utilisation_alarm.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["dacp_non_prod_alarms"]
 }
 
@@ -436,6 +436,6 @@ module "pagerduty_core_alerts_prod" {
     aws_sns_topic.dacp_utilisation_alarm
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.dacp_utilisation_alarm[0].name]
+  sns_topics                = [aws_sns_topic.dacp_utilisation_alarm.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["dacp_prod_alarms"]
 }

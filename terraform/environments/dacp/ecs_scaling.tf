@@ -1,5 +1,4 @@
 resource "aws_appautoscaling_target" "ecs_service" {
-  count               = local.is-development ? 0 : 1
   service_namespace  = "ecs"
   resource_id        = "service/dacp_cluster/dacp"
   scalable_dimension = "ecs:service:DesiredCount"
@@ -8,7 +7,6 @@ resource "aws_appautoscaling_target" "ecs_service" {
 }
 
 resource "aws_appautoscaling_policy" "scale_up_amber" {
-  count                  = local.is-development ? 0 : 1
   name                   = "scale-up-amber"
   service_namespace      = "ecs"
   resource_id            = aws_appautoscaling_target.ecs_service[0].resource_id
@@ -34,7 +32,6 @@ resource "aws_appautoscaling_policy" "scale_up_amber" {
 }
 
 resource "aws_appautoscaling_policy" "scale_down_amber" {
-  count                  = local.is-development ? 0 : 1
   name                   = "scale-down-amber"
   service_namespace      = "ecs"
   resource_id            = aws_appautoscaling_target.ecs_service[0].resource_id
