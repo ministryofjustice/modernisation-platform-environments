@@ -35,8 +35,8 @@ variable "lambda_runtime" {
   default     = "java11"
 }
 
-variable "extra_lambda_policies" {
-  description = "An List of extra Lambda Policies"
+variable "lambda_policies" {
+  description = "A List of IAM Policies to apply to the lambda"
   type        = list(string)
   default     = []
 }
@@ -77,14 +77,8 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
-variable "heartbeat_endpoint_secret_id" {
-  description = "The secret ID of the secret containing the heartbeat endpoint details"
-  type        = string
-  default     = ""
-}
-
-variable "additional_env_vars" {
-  description = "Map of additional environment variables to set on the lambda"
+variable "env_vars" {
+  description = "Map of environment variables to set on the lambda"
   type        = map(any)
   default     = {}
 }
