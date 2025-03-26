@@ -51,6 +51,8 @@ resource "aws_instance" "tableau" {
 }
 
 module "tableau-alb" {
+  #trivy:ignore:AVD-AWS-0053: "Exposed publicly by design"
+ 
   source = "terraform-aws-modules/alb/aws"
   version = "9.13.0"
 
