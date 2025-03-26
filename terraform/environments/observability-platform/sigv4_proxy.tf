@@ -23,7 +23,7 @@ resource "aws_lambda_function_url" "sigv4_proxy_url" {
   authorization_type = "AWS_IAM"
   cors {
     allow_origins     = ["https://${module.managed_grafana.workspace_id}.grafana-workspace.eu-west-2.amazonaws.com"]
-    allow_methods     = ["POST", "GET", "OPTIONS"]
+    allow_methods     = ["POST", "OPTIONS"]
     allow_headers     = ["*"]
   }
 }
