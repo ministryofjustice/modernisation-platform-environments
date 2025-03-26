@@ -82,3 +82,9 @@ variable "env_vars" {
   type        = map(any)
   default     = {}
 }
+
+variable "secret_arns" {
+  description = "ARNs of the secrets this Lambda will require Get access to"
+  type        = list(string)
+  default     = []
+}
