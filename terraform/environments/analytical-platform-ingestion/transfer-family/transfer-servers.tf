@@ -5,8 +5,8 @@ resource "aws_transfer_server" "this" {
 
   endpoint_type = "VPC"
   endpoint_details {
-    vpc_id     = local.environment_configuration.isolated_vpc_id
-    subnet_ids = local.environment_configuration.isolated_vpc_public_subnet_ids
+    vpc_id     = data.aws_vpc.isolated.id
+    subnet_ids = data.aws_subnets.isolated_public.ids
     address_allocation_ids = [
       aws_eip.transfer_server[0].id,
       aws_eip.transfer_server[1].id,

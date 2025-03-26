@@ -1,5 +1,5 @@
 resource "aws_eip" "transfer_server" {
-  count = length(local.environment_configuration.isolated_vpc_public_subnets)
+  count = length(data.aws_subnets.isolated_public.ids)
 
   domain = "vpc"
 
