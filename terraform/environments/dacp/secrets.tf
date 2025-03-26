@@ -1,4 +1,5 @@
-resource "random_password" "password" { # tflint-ignore: terraform_required_providers
+#### This file can be used to store secrets specific to the member account ####
+resource "random_password" "password" {
   length  = 16
   lower   = true
   upper   = true

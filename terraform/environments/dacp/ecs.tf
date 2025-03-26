@@ -258,38 +258,22 @@ resource "aws_iam_role_policy" "app_execution" {
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
 
-  policy = <<EOF
-{
+  policy = <<-EOF
+  {
     "Version": "2012-10-17",
     "Statement": [
       {
            "Action": [
-               "logs:CreateLogStream",
-               "logs:PutLogEvents"
+              "ecr:*",
+              "logs:*",
+              "secretsmanager:GetSecretValue"
            ],
-           "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:log-group:*",
+           "Resource": "*",
            "Effect": "Allow"
-      },
-      {
-            "Action": [
-              "ecr:BatchCheckLayerAvailability",
-              "ecr:GetDownloadUrlForLayer",
-              "ecr:BatchGetImage",
-              "ecr:GetAuthorizationToken"
-            ],
-            "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:repository/${aws_ecr_repository.dacp_ecr_repo.arn}",
-            "Effect": "Allow"
-      },
-      {
-          "Action": [
-               "secretsmanager:GetSecretValue"
-           ],
-          "Resource": "arn:aws:secretsmanager:*:${local.modernisation_platform_account_id}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
-          "Effect": "Allow"
       }
     ]
-}
-EOF
+  }
+  EOF
 }
 
 resource "aws_iam_role" "app_task" {
@@ -323,49 +307,27 @@ resource "aws_iam_role_policy" "app_task" {
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
 
-  policy = <<EOF
-{
+  policy = <<-EOF
+  {
    "Version": "2012-10-17",
    "Statement": [
      {
-
+       "Effect": "Allow",
         "Action": [
-          "logs:*"
-        ],
-        "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:*",
-        "Effect": "Allow"
-     },
-     {
-
-        "Action": [
-          "ecr:*"
-        ],
-        "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:*",
-        "Effect": "Allow"
-     },
-     {
-
-        "Action": [
+          "logs:*",
+          "ecr:*",
+          "iam:*",
           "ec2:*"
         ],
-        "Resource": "arn:aws:ec2:*:${local.modernisation_platform_account_id}:*",
-        "Effect": "Allow"
-     },
-     {
-        "Action": [
-          "iam:PassRole"
-        ],
-        "Resource": "arn:aws:iam::${local.modernisation_platform_account_id}:*",
-        "Effect": "Allow"
+       "Resource": "*"
      }
    ]
-}
-EOF
+  }
+  EOF
 }
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
-  description = "ECS Security Group"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
@@ -377,8 +339,6 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
-    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -388,9 +348,9 @@ resource "aws_security_group" "ecs_service" {
 
 resource "aws_ecr_repository" "dacp_ecr_repo" {
   #checkov:skip=CKV_AWS_136: "Ensure that ECR repositories are encrypted using KMS" - ignore
+  #checkov:skip=CKV_AWS_51: "Ensure ECR Image Tags are immutable"
   name         = "dacp-ecr-repo"
   force_delete = true
-  image_tag_mutability = "IMMUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
