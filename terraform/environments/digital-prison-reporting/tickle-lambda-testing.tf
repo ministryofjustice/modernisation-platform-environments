@@ -1,0 +1,13 @@
+# Postgres Tickle Lambda used to ensure the DMS Postgres replication slot on read replicas keeps moving
+module "postgres-tickle-lambda-testing" {
+  source = "./modules/domains/postgres-tickle-lambda"
+
+
+  setup_postgres_tickle_lambda = true
+  postgres_tickle_lambda_name  = "dpr-postgres-tickle-function-testing"
+  lambda_code_s3_bucket        = module.s3_artifacts_store.bucket_id
+  lambda_code_s3_key           = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
+  lambda_subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
+  lambda_security_group_ids    = [aws_security_group.lambda_generic[0].id]
+  secret_arns                  = [for s in data.aws_secretsmanager_secret.dps : s.arn]
+}
