@@ -308,6 +308,7 @@ resource "aws_s3_bucket" "lambda_payment_load" {
   bucket = "${local.application_name}-${local.environment}-payment-load"
 }
 
+# Development
 moved {
   from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-development-logging"]
   to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-development-logging"]
@@ -321,4 +322,52 @@ moved {
 moved {
   from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-development-logging"]
   to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-development-logging"]
+}
+
+# Test
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-test-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-test-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-test-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-test-logging"]
+}
+
+moved {
+  from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-test-logging"]
+  to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-test-logging"]
+}
+
+# Preproduction
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-preproduction-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-preproduction-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-preproduction-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-preproduction-logging"]
+}
+
+moved {
+  from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-preproduction-logging"]
+  to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-preproduction-logging"]
+}
+
+# Production
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-production-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-production-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-production-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-production-logging"]
+}
+
+moved {
+  from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-production-logging"]
+  to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-production-logging"]
 }

@@ -281,7 +281,14 @@ resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
 }
 
+# Development
 moved {
   from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]
   to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-development-logging"]
+}
+
+# Test
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-upgrade-test-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-test-logging"]
 }
