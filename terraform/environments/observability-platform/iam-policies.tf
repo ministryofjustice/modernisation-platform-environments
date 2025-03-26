@@ -100,6 +100,14 @@ data "aws_iam_policy_document" "grafana_lambda_invoke" {
       values   = ["AWS_IAM"]
     }
   }
+  statement {
+    sid     = "AllowAssumeLambdaRole"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    resources = [
+      aws_iam_role.lambda_exec.arn
+    ]
+  }
 }
 
 resource "aws_iam_policy" "grafana_lambda_policy" {
