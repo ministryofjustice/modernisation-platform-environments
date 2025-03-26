@@ -163,7 +163,7 @@ module "metadata_generator" {
     DB_SCHEMA_NAME             = lookup(jsondecode(var.dms_mapping_rules), "schema", "")
     ENGINE                     = var.dms_source.engine_name
     DATABASE_NAME              = var.dms_source.sid
-    GLUE_CATALOG_DATABASE_NAME = var.db
+    # GLUE_CATALOG_DATABASE_NAME = var.db # Omit whilst testing
   }
 
   source_path = [{
