@@ -6,8 +6,6 @@ resource "aws_transfer_server" "this" {
 
   endpoint_type = "VPC"
   endpoint_details {
-    # vpc_id     = module.isolated_vpc.vpc_id
-    # subnet_ids = module.isolated_vpc.public_subnets
     vpc_id     = local.environment_configuration.isolated_vpc_id
     subnet_ids = local.environment_configuration.isolated_vpc_public_subnets
     address_allocation_ids = [
