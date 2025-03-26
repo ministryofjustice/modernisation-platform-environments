@@ -4,7 +4,7 @@ locals {
     development = {
       /* VPC */
       isolated_vpc_public_subnets    = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]                                     #TODO Create outputs and reference them
-      isolated_vpc_public_subnet_ids = ["subnet-0a1b2a8647688f313", "subnet-0c74ecc529e4fd455", "subnet-0969caa397ccc53cb"] #TODO Create outputs and reference them
+      isolated_vpc_public_subnet_ids = ["subnet-0b819e39d2e79a6a0", "subnet-044bd21727c196013", "subnet-0661d2cbfdf4220d7"] #TODO Create outputs and reference them
       isolated_vpc_private_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]                                        #TODO Create outputs and reference them
       isolated_vpc_id                = "vpc-0902ef7a6188ef9a0"                                                              #TODO Create outputs and reference them
 
