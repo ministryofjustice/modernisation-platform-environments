@@ -1,6 +1,5 @@
 # Lambda which is designed to ensure Postgres replication slots keep moving when there is no activity to read from that slot
 module "postgres_tickle_lambda" {
-  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
   source = "../../lambdas/generic"
 
   enable_lambda = var.setup_postgres_tickle_lambda
