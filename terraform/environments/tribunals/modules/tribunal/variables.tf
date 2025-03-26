@@ -13,9 +13,11 @@ variable "app_db_name" {
 }
 
 variable "app_db_login_name" {
+  type = string
 }
 
 variable "app_rds_url" {
+  type = string
 }
 
 variable "app_rds_password" {
@@ -23,6 +25,7 @@ variable "app_rds_password" {
 }
 
 variable "environment" {
+  type = string
 }
 
 variable "support_team" {
@@ -38,21 +41,34 @@ variable "curserver" {
 }
 
 variable "tags" {
+  description = "tags to apply to resources"
+  type        = map(any)
+  default     = {}
 }
 
 variable "task_definition_volume" {
+  type        = string
+  description = "Name of the volume referenced in the sourceVolume parameter of container definition in the mountPoints section"
 }
 
 variable "appscaling_min_capacity" {
+  type        = number
+  description = "Minimum capacity of the application scaling target"
 }
 
 variable "appscaling_max_capacity" {
+  type        = number
+  description = "Maximum capacity of the application scaling target"
 }
 
 variable "ecs_scaling_cpu_threshold" {
+  type        = number
+  description = "The cpu threshold for ecs cluster scaling"
 }
 
 variable "ecs_scaling_mem_threshold" {
+  type        = number
+  description = "The utilised memory threshold for ec2 cluster scaling"
 }
 
 variable "app_count" {
@@ -66,25 +82,34 @@ variable "server_port" {
 }
 
 variable "cluster_id" {
+  type        = string
+  description = "The ID of the ECS cluster"
 }
 
 variable "cluster_name" {
+  type = string
+  description = "Name of the cluster"
 }
 
 variable "subnets_shared_public_ids" {
+  type        = list(string)
+  description = "Public subnets"
 }
 
 variable "documents_location" {
-  type = string
+  description = "location of the documents"
+  type        = string
 }
 
 variable "is_ftp_app" {
   description = "Determines if it is an ftp app or not"
+  type        = bool
 }
 
 variable "target_group_attachment_port" {
   type        = number
   description = "The port of the target group"
+  type        = number
 }
 
 variable "target_group_arns" {
@@ -99,4 +124,5 @@ variable "target_group_arns_sftp" {
 
 variable "new_db_password" {
   description = "Randomly generated password for each db"
+  type = string
 }

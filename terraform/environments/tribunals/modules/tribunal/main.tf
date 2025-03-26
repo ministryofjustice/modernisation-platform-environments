@@ -33,15 +33,15 @@ locals {
     environment : [
       {
         name : "supportEmail",
-        value : "${var.support_email}"
+        value : var.support_email
       },
       {
         name : "supportTeam",
-        value : "${var.support_team}"
+        value : var.support_team
       },
       {
         name : "CurServer",
-        value : "${var.curserver}"
+        value : var.curserver
       },
       {
         name : "RDS_PASSWORD",

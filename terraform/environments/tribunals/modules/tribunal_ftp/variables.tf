@@ -64,7 +64,7 @@ variable "subnets_shared_public_ids" {
 
 variable "tags" {
   description = "tags to apply to resources"
-  type        = map(string)
+  type        = map(any)
   default     = {}
 }
 
