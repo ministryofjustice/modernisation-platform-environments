@@ -169,6 +169,29 @@ locals {
       })
     }
 
+    patch_manager = {
+      windows = {
+        patch_schedules = {
+          group1 = "cron(00 03 ? * WED *)"
+          group2 = "cron(00 03 ? * THU *)"
+        }
+        maintenance_window_duration = 4
+        maintenance_window_cutoff   = 1
+        operating_system            = "WINDOWS"
+        approval_days               = 0
+      }
+      redhat = {
+        patch_schedules = {
+          group1 = "cron(00 03 ? * WED *)"
+          group2 = "cron(00 03 ? * THU *)"
+        }
+        maintenance_window_duration = 4
+        maintenance_window_cutoff   = 1
+        operating_system            = "REDHAT_ENTERPRISE_LINUX"
+        approval_days               = 0
+      }
+    }
+
     schedule_alarms_lambda = {
       alarm_patterns = [
         "public-https-*-unhealthy-load-balancer-host",

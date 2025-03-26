@@ -832,6 +832,55 @@ variable "options" {
   }
 }
 
+# variable "patch_manager" {
+#   description = "Patch manager configuration per OS"
+#   type = map(object({
+#     patch_schedules = optional(map(object({
+#       group_name                  = optional(string)
+#       cron_schedule               = optional(string)
+#       maintenance_window_duration = optional(number)
+#       maintenance_window_cutoff   = optional(number)
+#     })), {})
+#   }))
+#   default = {}
+# }
+
+variable "patch_manager" {
+  description = "Patch manager configuration per OS"
+  type = map(object({
+    patch_schedules = map(string)
+    maintenance_window_duration = number
+    maintenance_window_cutoff   = number
+    operating_system            = string
+    approval_days               = number
+    use_existing_bucket         = bool
+  }))
+  default = {
+    windows = {
+      patch_schedules = {
+        group1 = "cron(00 03 ? * WED *)"
+        group2 = "cron(00 03 ? * THU *)"
+      }
+      maintenance_window_duration = 4
+      maintenance_window_cutoff   = 1
+      operating_system            = "WINDOWS"
+      approval_days               = 0
+      use_existing_bucket         = false
+    }
+    redhat = {
+      patch_schedules = {
+        group1 = "cron(00 03 ? * WED *)"
+        group2 = "cron(00 03 ? * THU *)"
+      }
+      maintenance_window_duration = 4
+      maintenance_window_cutoff   = 1
+      operating_system            = "REDHAT_ENTERPRISE_LINUX"
+      approval_days               = 0
+      use_existing_bucket         = true # this can only be true if the windows map exists and builds the bucket, assumptions are made on the name to link the config to an initially unknown name
+    }
+  }
+}
+
 variable "route53_resolvers" {
   description = "map of resolver endpoints and associated rules to configure, where map keys are the names of the resources.  The application name is automatically added as a prefix to the resource names"
   type = map(object({
