@@ -102,7 +102,7 @@ resource "aws_iam_role_policy_attachment" "backup_restore_policy" {
 
 resource "aws_iam_policy" "backup_selection_permissions" {
   name        = "BackupSelectionPermissions"
-  description = "Permissions for AWS Backup, including full backup access and storage"
+  description = "Permissions for AWS Backup, including scoped backup access and storage"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -110,16 +110,27 @@ resource "aws_iam_policy" "backup_selection_permissions" {
       {
         Effect   = "Allow",
         Action   = [
-          "backup:*"
+          "backup:StartBackupJob",
+          "backup:StartCopyJob",
+          "backup:StartRestoreJob",
+          "backup:GetBackupVaultAccessPolicy",
+          "backup:GetBackupVaultNotifications",
+          "backup:ListBackupJobs",
+          "backup:ListBackupVaults"
         ],
-        Resource = "*"
+         Resource = aws_backup_vault.yjaf_backup_vault.arn
+        Condition = {
+          StringEquals = {
+            "aws:RequestedRegion": "<region>"
+          }
+        }
       },
       {
         Effect   = "Allow",
         Action   = [
           "backup-storage:MountCapsule"
         ],
-        Resource = "*"
+        Resource = aws_backup_vault.yjaf_backup_vault.arn
       },
       {
         Effect   = "Allow",
@@ -154,10 +165,9 @@ resource "aws_iam_role_policy_attachment" "backup_selection_permissions_attachme
   policy_arn = aws_iam_policy.backup_selection_permissions.arn
 }
 
-# Policy for Secrets Manager and KMS access
 resource "aws_iam_policy" "secrets_kms_policy" {
   name        = "SecretsManagerKMSAccess"
-  description = "Policy to access SecretsManager and KMS for backups"
+  description = "Policy to access SecretsManager secrets and KMS keys for backups"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -166,15 +176,32 @@ resource "aws_iam_policy" "secrets_kms_policy" {
         Effect   = "Allow",
         Action   = [
           "secretsmanager:GetSecretValue",
-          "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecrets",
+          "secretsmanager:DescribeSecret"
+        ],
+        Resource = [
+          "arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:backup/*"
+        ],
+        Condition = {
+          StringEquals = {
+            "aws:RequestedRegion": data.aws_region.current.name
+          }
+        }
+      },
+      {
+        Effect   = "Allow",
+        Action   = [
           "kms:Decrypt",
           "kms:Encrypt",
           "kms:ReEncrypt*",
           "kms:GenerateDataKey*",
           "kms:DescribeKey"
         ],
-        Resource = "*"
+        Resource = aws_kms_key.backup_kms_key.arn,
+        Condition = {
+          StringEquals = {
+            "kms:ViaService": "backup.amazonaws.com"
+          }
+        }
       }
     ]
   })
