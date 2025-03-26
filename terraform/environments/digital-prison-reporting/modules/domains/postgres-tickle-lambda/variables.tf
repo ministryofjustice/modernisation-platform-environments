@@ -77,8 +77,14 @@ variable "tags" {
   description = "(Optional) Key-value map of resource tags."
 }
 
-variable "env_vars" {
-  description = "Map of environment variables to set on the lambda."
+variable "heartbeat_endpoint_secret_id" {
+  description = "The secret ID of the secret containing the heartbeat endpoint details"
+  type        = string
+  default     = ""
+}
+
+variable "additional_env_vars" {
+  description = "Map of additional environment variables to set on the lambda"
   type        = map(any)
   default     = {}
 }

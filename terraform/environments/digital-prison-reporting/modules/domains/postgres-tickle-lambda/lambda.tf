@@ -10,7 +10,9 @@ module "postgres_tickle_lambda" {
   runtime       = var.lambda_runtime
   policies      = var.lambda_policies
   tracing       = var.lambda_tracing
-  env_vars      = var.env_vars
+  env_vars      = merge(var.additional_env_vars, {
+    HEARTBEAT_ENDPOINT_SECRET_ID = var.heartbeat_endpoint_secret_id
+  })
   timeout       = 60 # in seconds
 
   log_retention_in_days = var.lambda_log_retention_in_days
