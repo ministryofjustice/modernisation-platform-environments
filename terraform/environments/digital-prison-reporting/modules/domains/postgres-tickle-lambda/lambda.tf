@@ -8,10 +8,11 @@ module "postgres_tickle_lambda" {
   s3_key        = var.lambda_code_s3_key
   handler       = var.lambda_handler
   runtime       = var.lambda_runtime
-  policies      = concat(var.lambda_policies, [aws_iam_policy.secret_access_policy.arn])
+  policies      = var.lambda_policies
   tracing       = var.lambda_tracing
   timeout       = var.lambda_timeout_in_seconds
   env_vars      = var.env_vars
+  secret_arns   = var.secret_arns
 
   log_retention_in_days = var.lambda_log_retention_in_days
 
