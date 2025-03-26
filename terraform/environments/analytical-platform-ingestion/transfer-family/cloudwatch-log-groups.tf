@@ -1,4 +1,4 @@
-module "transfer_structured_logs" {
+module "transfer_family_structured_logs" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"

@@ -21,7 +21,7 @@ resource "aws_transfer_server" "this" {
   security_policy_name = "TransferSecurityPolicy-2024-01"
 
   logging_role                = module.transfer_server_iam_role.iam_role_arn
-  structured_log_destinations = ["${module.transfer_structured_logs.cloudwatch_log_group_arn}:*"]
+  structured_log_destinations = ["${module.transfer_family_structured_logs.cloudwatch_log_group_arn}:*"]
 }
 
 resource "aws_transfer_tag" "this" {

@@ -1,4 +1,4 @@
-module "transfer_logs_kms" {
+module "transfer_family_logs_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
@@ -29,7 +29,7 @@ module "transfer_logs_kms" {
         {
           test     = "ArnEquals"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/transfer-structured-logs"]
+          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/transfer-family-structured-logs"]
         }
       ]
     }
