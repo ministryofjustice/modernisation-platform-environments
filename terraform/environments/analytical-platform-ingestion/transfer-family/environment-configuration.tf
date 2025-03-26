@@ -3,10 +3,10 @@ locals {
   environment_configurations = {
     development = {
       /* VPC */
-      isolated_vpc_public_subnets    = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
-      isolated_vpc_public_subnet_ids = ["subnet-0a1b2a8647688f313", "subnet-0c74ecc529e4fd455", "subnet-0969caa397ccc53cb"] #TODO reference this properly
-      isolated_vpc_private_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-      isolated_vpc_id                = "vpc-0902ef7a6188ef9a0"
+      isolated_vpc_public_subnets    = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]                                     #TODO Create outputs and reference them
+      isolated_vpc_public_subnet_ids = ["subnet-0a1b2a8647688f313", "subnet-0c74ecc529e4fd455", "subnet-0969caa397ccc53cb"] #TODO Create outputs and reference them
+      isolated_vpc_private_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]                                        #TODO Create outputs and reference them
+      isolated_vpc_id                = "vpc-0902ef7a6188ef9a0"                                                              #TODO Create outputs and reference them
 
       /* Transfer Server */
       transfer_server_hostname = "sftp.development.transfer.analytical-platform.service.justice.gov.uk"
@@ -27,10 +27,10 @@ locals {
     }
     production = {
       /* VPC */
-      isolated_vpc_public_subnets    = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
-      isolated_vpc_public_subnet_ids = [] # TODO reference this properly
-      isolated_vpc_private_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-      isolated_vpc_id                = "vpc-0f4dc457524b863f8"
+      isolated_vpc_public_subnets    = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"] #TODO Create outputs and reference them
+      isolated_vpc_public_subnet_ids = []                                               #TODO Create outputs and reference them
+      isolated_vpc_private_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]    #TODO Create outputs and reference them
+      isolated_vpc_id                = "vpc-0f4dc457524b863f8"                          #TODO Create outputs and reference them
 
       /* Transfer Server */
       transfer_server_hostname = "sftp.development.transfer.analytical-platform.service.justice.gov.uk"
