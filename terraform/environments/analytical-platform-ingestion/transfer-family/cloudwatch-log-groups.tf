@@ -5,6 +5,6 @@ module "transfer_family_structured_logs" {
   version = "5.6.0"
 
   name              = "/aws/transfer-family-structured-logs"
-  kms_key_id        = module.transfer_logs_kms.key_arn
+  kms_key_id        = module.transfer_family_logs_kms.key_arn
   retention_in_days = 400
 }

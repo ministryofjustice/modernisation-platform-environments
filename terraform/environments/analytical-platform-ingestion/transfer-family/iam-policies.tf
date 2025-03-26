@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "transfer_server" {
       "kms:DescribeKey",
       "kms:Decrypt",
     ]
-    resources = [module.transfer_logs_kms.key_arn]
+    resources = [module.transfer_family_logs_kms.key_arn]
   }
 }
 
