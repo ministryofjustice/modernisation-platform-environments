@@ -74,10 +74,11 @@ resource "aws_security_group" "tribunals_lb_sc" {
   }
 }
 
-#checkov:skip=CKV_AWS_378: Allow HTTP protocol for transport
+
 resource "aws_lb_target_group" "tribunals_target_group" {
   for_each             = var.services
   name                 = "${each.value.module_key}-tg"
+  #checkov:skip=CKV_AWS_378: Allow HTTP protocol for transport
   port                 = each.value.port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -91,6 +92,7 @@ resource "aws_lb_target_group" "tribunals_target_group" {
   health_check {
     healthy_threshold   = "3"
     interval            = "15"
+    #checkov:skip=CKV_AWS_378: Allow HTTP protocol for transport
     protocol            = "HTTP"
     unhealthy_threshold = "3"
     matcher             = "200-499"
