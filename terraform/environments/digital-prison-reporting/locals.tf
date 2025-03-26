@@ -325,11 +325,12 @@ locals {
   # DPS Secrets PlaceHolder
   dps_domains_list = local.application_data.accounts[local.environment].dps_domains
   dps_secrets_placeholder = {
-    db_name  = "dps"
-    password = "placeholder"
-    user     = "placeholder"
-    endpoint = "0.0.0.0"
-    port     = "5432"
+    db_name             = "dps"
+    password            = "placeholder"
+    user                = "placeholder"
+    endpoint            = "0.0.0.0"
+    port                = "5432"
+    heartbeat_endpoint  = "0.0.0.0"
   }
 
   # Operational DataStore Secrets PlaceHolder
