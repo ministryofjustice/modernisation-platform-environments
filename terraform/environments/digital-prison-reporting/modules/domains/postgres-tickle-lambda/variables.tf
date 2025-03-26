@@ -35,8 +35,8 @@ variable "lambda_runtime" {
   default     = "java11"
 }
 
-variable "lambda_policies" {
-  description = "An List of Notification Lambda Policies"
+variable "extra_lambda_policies" {
+  description = "An List of extra Lambda Policies"
   type        = list(string)
   default     = []
 }
@@ -47,16 +47,16 @@ variable "lambda_tracing" {
   default     = "Active"
 }
 
-variable "lambda_trigger" {
-  description = "Name for Notification Lambda Trigger Name"
-  type        = string
-  default     = ""
-}
-
 variable "lambda_log_retention_in_days" {
   description = "Lambda log retention in number of days."
   type        = number
   default     = 7
+}
+
+variable "lambda_timeout_in_seconds" {
+  description = "Lambda timeout in seconds."
+  type        = number
+  default     = 60
 }
 
 variable "lambda_subnet_ids" {
