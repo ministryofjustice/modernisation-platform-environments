@@ -51,6 +51,7 @@ resource "aws_appautoscaling_policy" "scale_down_amber" {
     #Scale down the final instance if memory drops back to the orginal threshold of 2500 or anything below
     step_adjustment {
       scaling_adjustment    = -1
+      metric_interval_lower_bound = null
       metric_interval_upper_bound = -2000
     }
   }
