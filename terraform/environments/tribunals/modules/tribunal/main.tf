@@ -11,7 +11,7 @@ locals {
     essential : true,
     portMappings : [
       {
-        hostPort : "${var.target_group_attachment_port}",
+        hostPort : var.target_group_attachment_port,
         containerPort : 80,
         protocol : "tcp"
       }
@@ -45,7 +45,7 @@ locals {
       },
       {
         name : "RDS_PASSWORD",
-        value : "${var.app_rds_password}"
+        value : var.app_rds_password
       }
     ]
   }])
@@ -96,6 +96,6 @@ module "app_ecs_task" {
   cluster_id                = var.cluster_id
   cluster_name              = var.cluster_name
   is_ftp_app                = var.is_ftp_app
-  lb_tg_arn                 = var.target_group_arns["${var.module_name}"]
+  lb_tg_arn                 = var.target_group_arns[var.module_name]
   sftp_lb_tg_arn            = ""
 }
