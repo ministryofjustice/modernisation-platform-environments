@@ -198,4 +198,12 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudfront_logs" {
       days = 90
     }
   }
+  rule {
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+    filter {}
+    id = "log"
+    status = "Enabled"
+  }
 }

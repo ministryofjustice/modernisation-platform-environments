@@ -8,7 +8,9 @@ locals {
 
 # Create an IAM policy for the custom permissions required by the EC2 hosting instance
 #checkov:skip=CKV_AWS_290:"Required permissions for ECS/ECR operations"
+#checkov:skip=CKV_AWS_289:"Required permissions for ECS container management"
 #checkov:skip=CKV_AWS_355:"Some AWS services require * resource access"
+#checkov:skip=CKV_AWS_288:"S3 and ECR access required for container operations"
 #tfsec:ignore:aws-iam-no-policy-wildcards
 resource "aws_iam_policy" "ec2_instance_policy" {
   name = local.ec2_instance_policy

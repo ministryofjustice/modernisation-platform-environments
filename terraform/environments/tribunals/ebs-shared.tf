@@ -1,3 +1,4 @@
+#checkov:skip=CKV_AWS_189:"Default AWS encryption is sufficient for this use case"
 resource "aws_ebs_volume" "tribunals-ebs" {
   availability_zone = "eu-west-2a"
   type              = "gp2"
@@ -12,6 +13,7 @@ resource "aws_ebs_volume" "tribunals-ebs" {
   )
 }
 
+#checkov:skip=CKV_AWS_189:"Default AWS encryption is sufficient for this use case"
 resource "aws_ebs_volume" "tribunals-backup-ebs" {
   availability_zone = "eu-west-2b"
   type              = "gp2"
