@@ -87,7 +87,7 @@ resource "aws_secretsmanager_secret_version" "Unit_test" {
 ### Tableau Secrets ###
 ## Secret to hold Tableau administration details
 resource "aws_secretsmanager_secret" "ad_credentials" {
-  # checkov:skip=CKV_TF_57: "Rotation needs to be coprdinated with changes to Tableau configuration."
+  # checkov:skip=CKV2_AWS_57: "Rotation needs to be coprdinated with changes to Tableau configuration."
 
   name        = "${local.environment}/Tableau/Administration"
   description = "Tableau Administration, site, group, user and password."
@@ -97,7 +97,7 @@ resource "aws_secretsmanager_secret" "ad_credentials" {
 
 # The password will be polulatd durring tableau instalation
 resource "aws_secretsmanager_secret_version" "ad_credentials" {
-  # checkov:skip=CKV_TF_57: "Rotation needs to be coprdinated with changes to Tableau configuration."
+  # checkov:skip=CKV2_AWS_57: "Rotation needs to be coordinated with changes to Tableau configuration."
 
   secret_id = aws_secretsmanager_secret.ad_credentials.id
   secret_string = jsonencode(
@@ -113,7 +113,7 @@ resource "aws_secretsmanager_secret_version" "ad_credentials" {
 
 ## Secret to hold the tableau domain user and its passoword
 resource "aws_secretsmanager_secret" "tableau_admin" {
-  # checkov:skip=CKV_TF_57: "Rotation needs to be coprdinated with changes to Tableau configuration."
+  # checkov:skip=CKV2_AWS_57: "Rotation needs to be coordinated with changes to Tableau configuration."
 
   name        = "tableau_ad_read_credentials"
   description = "The tableau user that is used to read ad users and groups. It also acts as the initial Tableau System Administrator on install."
@@ -136,6 +136,8 @@ resource "aws_secretsmanager_secret_version" "tableau_admin" {
 
 ## Secret to hold the credentials used by YJAF to access tableau
 resource "aws_secretsmanager_secret" "yjaf_credentials" {
+  # checkov:skip=CKV2_AWS_57: "Rotation needs to be coordinated with changes to Tableau configuration."
+
   name        = "${local.environment}/Tableau/app/yjb"
   description = "Tableau secrets for embedding report into YJAF. Used by Auth service."
   kms_key_id  = module.kms.key_id
