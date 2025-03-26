@@ -2,6 +2,15 @@
 # Lake Formation - admin permissions
 # https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/adding-admin-data-lake-formation-permissions.html
 # ------------------------------------------------------------------------
+locals {
+  dbt_principals = flatten(
+    [
+      one(data.aws_iam_roles.data_engineering_roles.arns),
+      aws_iame_role.dataapi_cross_role.arn
+    ]
+  )
+}
+
 
 data "aws_iam_role" "github_actions_role" {
   name = "github-actions"
@@ -35,8 +44,22 @@ resource "aws_glue_catalog_database" "dbt_test__audit" {
   }
 }
 
+resource "aws_glue_catalog_database" "audit_test_database" {
+  name = "testing${local.dbt_suffix}"
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes = [
+      description,
+      location_uri,
+      parameters,
+      target_database
+    ]
+  }
+}
+
 resource "aws_lakeformation_permissions" "admin_permissions_dbt_test_tables" {
-  principal   = one(data.aws_iam_roles.data_engineering_roles.arns)
+  for_each    = toset(local.dbt_principals)
+  principal   = each.key
   permissions = ["ALL"]
 
   table {
@@ -46,11 +69,32 @@ resource "aws_lakeformation_permissions" "admin_permissions_dbt_test_tables" {
 }
 
 resource "aws_lakeformation_permissions" "admin_permissions_dbt_test_db" {
-  principal   = one(data.aws_iam_roles.data_engineering_roles.arns)
+  for_each    = toset(local.dbt_principals)
+  principal   = each.key
   permissions = ["ALL"]
 
   database {
     name = aws_glue_catalog_database.dbt_test__audit.name
+  }
+}
+
+resource "aws_lakeformation_permissions" "admin_permissions_dbt_testing_audit" {
+  for_each    = toset(local.dbt_principals)
+  principal   = each.key
+  permissions = ["ALL"]
+  table {
+    database_name = aws_glue_catalog_database.audit_test_database.name
+    wildcard      = true
+  }
+}
+
+resource "aws_lakeformation_permissions" "admin_permissions_dbt_testing_audit_db" {
+  for_each    = toset(local.dbt_principals)
+  principal   = each.key
+  permissions = ["ALL"]
+
+  database {
+    name = aws_glue_catalog_database.audit_test_database.name
   }
 }
 
