@@ -94,11 +94,11 @@ data "aws_iam_policy_document" "grafana_lambda_invoke" {
     resources = [
       module.modernisation_platform_github.lambda_function_arn
     ]
-    condition {
-      test     = "StringEquals"
-      variable = "lambda:FunctionUrlAuthType"
-      values   = ["AWS_IAM"]
-    }
+    # condition {
+    #   test     = "StringEquals"
+    #   variable = "lambda:FunctionUrlAuthType"
+    #   values   = ["AWS_IAM"]
+    # }
   }
   statement {
     sid     = "AllowAssumeLambdaRole"
