@@ -20,7 +20,7 @@ locals {
       /* VPC */
       isolated_vpc_public_subnets  = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
       isolated_vpc_private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-      isolated_vpc_cidr            = ""
+      isolated_vpc_cidr            = "vpc-0f4dc457524b863f8"
 
       /* Transfer Server */
       transfer_server_hostname = "sftp.development.transfer.analytical-platform.service.justice.gov.uk"
