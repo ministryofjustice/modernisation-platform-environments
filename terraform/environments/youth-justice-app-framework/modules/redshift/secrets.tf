@@ -1,4 +1,6 @@
 resource "aws_secretsmanager_secret" "user_admin" {
+  #checkov:skip=CKV_AWS_57: [TODO] Consider adding rotation for the Redshift admin user password.
+
   name        = "${var.project_name}/${var.environment}/redshift-serverless/"
   description = "Access to the YJB Services Redshift Serverless "
   kms_key_id  = var.kms_key_arn

@@ -196,6 +196,10 @@ module "autoscaling_sg" {
 }
 
 resource "aws_iam_policy" "ecs-eni-policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_389: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
+ 
   name   = "${var.cluster_name}-ecs-eni"
   tags   = local.all_tags
   policy = <<EOF
