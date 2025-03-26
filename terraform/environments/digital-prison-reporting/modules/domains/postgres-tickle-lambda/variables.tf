@@ -76,3 +76,9 @@ variable "tags" {
   default     = {}
   description = "(Optional) Key-value map of resource tags."
 }
+
+variable "env_vars" {
+  description = "Map of environment variables to set on the lambda."
+  type        = map(any)
+  default     = {}
+}
