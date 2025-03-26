@@ -44,7 +44,7 @@ resource "aws_iam_policy" "datadog_api_read" {
                 "secretsmanager:ListSecretVersionIds",
                 "secretsmanager:ListSecrets"
             ],
-            "Resource": ["*"]
+            "Resource": ["arn:aws:ec2:eu-west-2:*:instance/*"]
         },
         {
             "Sid": "VisualEditor1",

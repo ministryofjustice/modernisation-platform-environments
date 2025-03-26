@@ -31,6 +31,7 @@ resource "aws_security_group_rule" "ecs_to_yjsm_external" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_external_sg_id
+  description              = "ECS external to YJSMHub"
 }
 
 # (ECS internal to YJSM)
@@ -41,6 +42,7 @@ resource "aws_security_group_rule" "ecs_to_yjsm_internal" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_internal_sg_id
+  description              = "ECS internal to YJSM"
 }
 
 # (ECS internal to YJSMhub)
@@ -51,6 +53,7 @@ resource "aws_security_group_rule" "ecs_to_yjsmhub_internal" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_internal_sg_id
+  description              = "ECS internal to YJSMHub"
 }
 
 # (ECS internal to YJSMhub-admin)
@@ -61,6 +64,7 @@ resource "aws_security_group_rule" "ecs_to_yjsmhub_admin" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_internal_sg_id
+  description              = "ECS internal to YJSMHub-admin"
 }
 
 # (ECS internal to ASSETS)
@@ -71,26 +75,7 @@ resource "aws_security_group_rule" "ecs_to_assets" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.ecs_service_internal_sg_id
-}
-
-# (ASSETS)
-resource "aws_security_group_rule" "assets_443" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.yjsm_service.id
-  source_security_group_id = aws_security_group.yjsm_service.id
-}
-
-# (ASSETS)
-resource "aws_security_group_rule" "assets_80" {
-  type                     = "ingress"
-  from_port                = 80
-  to_port                  = 80
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.yjsm_service.id
-  source_security_group_id = aws_security_group.yjsm_service.id
+  description              = "ECS internal to ASSETS"
 }
 
 # (ESB)
@@ -101,6 +86,7 @@ resource "aws_security_group_rule" "esb_80" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.esb_service_sg_id
+  description              = "YJSM to ESB"
 }
 
 
@@ -111,7 +97,8 @@ resource "aws_security_group_rule" "allow_postgres_from_yjsm" {
   to_port                  = 5432
   protocol                 = "tcp"
   security_group_id        = var.rds_cluster_security_group_id
-  source_security_group_id = aws_security_group.yjsm_service.id                    
+  source_security_group_id = aws_security_group.yjsm_service.id
+  description              = "YJSM to RDS"
 }
 
 # YJSM to ALB
@@ -121,7 +108,8 @@ resource "aws_security_group_rule" "allow_alb_from_yjsm" {
   to_port                  = 8080
   protocol                 = "tcp"
   security_group_id        = var.alb_security_group_id
-  source_security_group_id = aws_security_group.yjsm_service.id                  
+  source_security_group_id = aws_security_group.yjsm_service.id
+  description              = "YJSM to YJAF Internal ALB"
 }
 
 
