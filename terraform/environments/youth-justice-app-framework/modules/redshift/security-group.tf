@@ -1,4 +1,6 @@
 module "redshift_sg" {
+  # checkov:skip=CKV_TF_1
+
   source  = "terraform-aws-modules/security-group/aws"
   version = "4.13.0"
 

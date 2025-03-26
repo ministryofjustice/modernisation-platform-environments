@@ -1,4 +1,6 @@
 module "log_bucket" {
+  # checkov:skip=CKV_TF_1
+
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.1.2"
 

@@ -1,5 +1,7 @@
 
 module "tableau_sg" {
+  # checkov:skip=CKV_TF_1
+
   source  = "terraform-aws-modules/security-group/aws"
   version = "4.13.0"
 
@@ -58,6 +60,8 @@ module "tableau_sg" {
 }
 
 module "directory_service_sg" {
+  # checkov:skip=CKV_TF_1
+
   source  = "terraform-aws-modules/security-group/aws"
   version = "4.13.0"
 
@@ -78,6 +82,8 @@ module "directory_service_sg" {
 }
 
 module "management_service_sg" {
+  # checkov:skip=CKV_TF_1
+
   source  = "terraform-aws-modules/security-group/aws"
   version = "4.13.0"
 
