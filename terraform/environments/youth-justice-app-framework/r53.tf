@@ -28,6 +28,8 @@ locals {
 }
 
 resource "aws_route53_record" "type_a" {
+  # checkov:skip=CKV_23: "Referenced resources are in a different account."
+
   provider = aws.core-network-services
 
   for_each = local.dns_a_records
