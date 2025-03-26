@@ -59,7 +59,8 @@ locals {
           security_groups    = ["boe", "bip-app"]
         }]
         tags = {
-          backup = "false"
+          backup      = "false"
+          backup-plan = "daily-and-weekly"
         }
       }
     }
@@ -327,6 +328,7 @@ locals {
 
     fsx_windows = {
       t2-bods-win-share = {
+        aliases             = ["t2-onr-fs.azure.noms.root"]
         deployment_type     = "SINGLE_AZ_1"
         security_groups     = ["bods"]
         skip_final_backup   = true

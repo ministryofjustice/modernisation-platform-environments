@@ -34,7 +34,7 @@ locals {
       datasync_opg_target_bucket_kms = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:key/38cf3d55-b36d-43e8-b91b-6b239a60cbea"
 
       /* Transfer Server */
-      transfer_server_hostname   = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
+      transfer_server_hostname = "sftp.development.ingestion.analytical-platform.service.justice.gov.uk"
       transfer_server_sftp_users = {
         "opg-restore-ocr" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWz7ue/saomMAKrVgo6FifjpGQfl7B4fs2s/MJa2jhpBVWXk9tquGDXp1/Yfk4C7FIneGKfh8fWHz9FPS+u6h3a9hMW8d/5onNuSr9S6T2mN7ydZQzGez5qyG2vNFLyip3ls6mQjIpXSo2aow7+3Y2lbDe8UamiYNVgvvWB+hVl5RJjcaReDDbi0xwdjGjep0LcvgAyKa8evmcEbFVkrLhWyc30xn1+OesqPWSpoIb/IlBDFxCqR46GW/zlOldEIatONhXWgvJ6dS5T1YmHsE4U0Py3BV8O5zvc+XRYjr/3w9LOwmTHS1xbzlhNBjO1o6O9hSBsowBjsWLL5aNWcdBH0DiWfIWkoq9Fy8VEAa/T5v7GCaKvDs9pGBpjQSQsWyKXbwP0Z2RGyU2CSGVzMM6gzrjaxanOK9QbLOqCpTSSIYWfokt+MNrHcQU+9mBTjq20URF7RW6tsM8GvzGRNk0hlkX3ueq86uLpQzRctGBTjN74qBba0WbauIcSl4OIrc+NEwjaFTmuIs0NIG5aoAop8WHOC8cxFAST2XjMF30eEh6/W9Gh0uPor4L5tUqJ/JuI2wcfYLuk1KLDcOUVin79QficX93zbaTPNXWW052ct50B0KnCmZyvQORwOH8gBFgkFe5MO/bqevG9Xpof/QvpCLKEON/fBAW4bEdIIv5qw=="
@@ -95,6 +95,10 @@ locals {
         "opg-restore-ocr" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCWz7ue/saomMAKrVgo6FifjpGQfl7B4fs2s/MJa2jhpBVWXk9tquGDXp1/Yfk4C7FIneGKfh8fWHz9FPS+u6h3a9hMW8d/5onNuSr9S6T2mN7ydZQzGez5qyG2vNFLyip3ls6mQjIpXSo2aow7+3Y2lbDe8UamiYNVgvvWB+hVl5RJjcaReDDbi0xwdjGjep0LcvgAyKa8evmcEbFVkrLhWyc30xn1+OesqPWSpoIb/IlBDFxCqR46GW/zlOldEIatONhXWgvJ6dS5T1YmHsE4U0Py3BV8O5zvc+XRYjr/3w9LOwmTHS1xbzlhNBjO1o6O9hSBsowBjsWLL5aNWcdBH0DiWfIWkoq9Fy8VEAa/T5v7GCaKvDs9pGBpjQSQsWyKXbwP0Z2RGyU2CSGVzMM6gzrjaxanOK9QbLOqCpTSSIYWfokt+MNrHcQU+9mBTjq20URF7RW6tsM8GvzGRNk0hlkX3ueq86uLpQzRctGBTjN74qBba0WbauIcSl4OIrc+NEwjaFTmuIs0NIG5aoAop8WHOC8cxFAST2XjMF30eEh6/W9Gh0uPor4L5tUqJ/JuI2wcfYLuk1KLDcOUVin79QficX93zbaTPNXWW052ct50B0KnCmZyvQORwOH8gBFgkFe5MO/bqevG9Xpof/QvpCLKEON/fBAW4bEdIIv5qw=="
           cidr_blocks = ["20.117.187.79/32"]
+        }
+        "cgi-cps" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDXxYA8eLvZ1spaM2LUl/EmBhqsLUPUDM1DwjoLD/eDnDnR+DQQ/F7fCNihYML44vgjVmXXMIVkLuvtjJZ5YUmss38UwcMg1FKGG/iMC5CF3nFtDig7sDc3mfMHM5phGM1BPu1lB5K4K/DGnvSUBvim8iOlZV72X832m9QtH3FQXKM7j2O9M9Y65C50OeDJF1KFPjYbsJWRpCDD5eifSV5tfJIgmm9VcLqMLXDelQGuYStok4dh47fF+LhdKHDyNjzc24LvU/p6r5sY26FuVuEoSsL+MGBs/Kiu8KllVkapM0Edztsz/oHh2WwrZFyNMXuuPrMbEoY2KXwzYmvj7mXxxYlj1NLzYxoFVdv1SUhCkBB1WOJMqbbpQT7Nlcyn5n48oUrf+DmRk7PAR/EUZ250mlPhRSqZpaBPghXLg/LXQ/KqVLccVBr3RdlJKhNCIO5NFkE9vfVCgLLKof0LRcAmduI+rn4RrRm1cMH6zdx2ZfVKpWOf4svRg23N+alV/zfUZGdoG8FcEyb6Hcgp/jw5UHGmgUc86HZnfX2Llxz5YCMUDF3Q0qNl2rZR/lS9zxvH+XhrYq8pYvSWilaeU8ZsxJj8GLkxuMrJHt+eT7s+EuHoPoptlMvzqjFKh6ut92sBuXb+XsvtreeBhln9jb+g1xUZnjlArjOxNXRFL7YjUw=="
+          cidr_blocks = ["185.157.224.141/32", "185.157.225.141/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {

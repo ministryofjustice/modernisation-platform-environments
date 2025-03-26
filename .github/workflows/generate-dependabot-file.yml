@@ -27,12 +27,17 @@ jobs:
       - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Generate file
         run: bash ./scripts/generate-dependabot-file.sh
-      - name: Commit changes to GitHub
+        
+      - name: Set up git user
         run: bash ./scripts/git-setup.sh
-      - run: bash ./scripts/git-commit.sh .github
-      - run: bash ./scripts/git-pull-request.sh dependabot
-        env:
-          SECRET: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit and Create PR with Signed Commit
+        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@14db114ed50a5ab565c3a134cf9efac0627e75e6 # v2.0.1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "Automated Update: Dependabot File"
+          pr_body: "This PR updates the Dependabot configuration file."
+
       - name: Slack failure notification
         uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v1.26.0
         with:

@@ -113,7 +113,7 @@ When each instance is created the User-Data script performs some language setup 
 - Notepad++
 - pgAdmin
 
-### Location for User-Data scripts and log files:
+### Location for User-Data scripts and log files
 
 `C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch<nnnnnnnnn>\`
 This will contin and copy of the User-DAte script as well as err and output log files from running the script.

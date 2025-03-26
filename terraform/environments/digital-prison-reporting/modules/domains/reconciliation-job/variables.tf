@@ -24,6 +24,18 @@ variable "create_job" {
   default     = false
 }
 
+variable "batch_only" {
+  description = "Determines if the pipeline is batch only, True or False?"
+  type        = bool
+  default     = false
+}
+
+variable "create_role" {
+  description = "(Optional) Create AWS IAM role associated with the job."
+  type        = bool
+  default     = false
+}
+
 variable "job_name" {
   description = "Name of the Glue Reconciliation Job"
   type        = string
@@ -133,6 +145,11 @@ variable "job_schedule" {
   description = "Cron schedule for the reconciliation job. Leave unset for no schedule."
   default     = ""
   type        = string
+
+  validation {
+    condition     = var.batch_only && (var.job_schedule != "") ? false : true
+    error_message = "Reconciliation job can only be scheduled when batch_only = false"
+  }
 }
 
 variable "enable_spark_ui" {

@@ -1,5 +1,6 @@
 resource "aws_fsx_windows_file_system" "this" {
   active_directory_id               = var.active_directory_id
+  aliases                           = var.aliases
   automatic_backup_retention_days   = var.automatic_backup_retention_days
   backup_id                         = var.backup_id
   daily_automatic_backup_start_time = var.daily_automatic_backup_start_time

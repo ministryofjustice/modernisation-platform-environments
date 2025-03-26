@@ -14,6 +14,13 @@ locals {
     }
   }
 
+  p1_export_bucket_destination_mapping = {
+    "production"    = "tct-339712706964-prearrivals"
+    "preproduction" = null
+    "test"          = null
+    "development"   = null
+  }
+
   # Adding new buckets for logging needs to happen after buckets have been created
   # as an error occurs otherwise because local.buckets_to_log contains keys that 
   # are derived  from resource attributes, which are not known until the apply phase.
@@ -21,28 +28,28 @@ locals {
   # are known during the plan phase. To this end the buckets need to exist  before
   # the aws_s3_bucket_logging resources for it are created.
   buckets_to_log = [
-    { id = module.s3-metadata-bucket.bucket.id,                 arn = module.s3-metadata-bucket.bucket.arn },
-    { id = module.s3-athena-bucket.bucket.id,                   arn = module.s3-athena-bucket.bucket.arn },
-    { id = module.s3-unzipped-files-bucket.bucket.id,           arn = module.s3-unzipped-files-bucket.bucket.arn },
-    { id = module.s3-dms-premigrate-assess-bucket.bucket.id,    arn = module.s3-dms-premigrate-assess-bucket.bucket.arn },
+    { id = module.s3-metadata-bucket.bucket.id, arn = module.s3-metadata-bucket.bucket.arn },
+    { id = module.s3-athena-bucket.bucket.id, arn = module.s3-athena-bucket.bucket.arn },
+    { id = module.s3-unzipped-files-bucket.bucket.id, arn = module.s3-unzipped-files-bucket.bucket.arn },
+    { id = module.s3-dms-premigrate-assess-bucket.bucket.id, arn = module.s3-dms-premigrate-assess-bucket.bucket.arn },
     { id = module.s3-json-directory-structure-bucket.bucket.id, arn = module.s3-json-directory-structure-bucket.bucket.arn },
-    { id = module.s3-data-bucket.bucket.id,                     arn = module.s3-data-bucket.bucket.arn },
-    { id = module.s3-fms-general-landing-bucket.bucket_id,      arn = module.s3-fms-general-landing-bucket.bucket_arn },
-    { id = module.s3-fms-ho-landing-bucket.bucket_id,           arn = module.s3-fms-ho-landing-bucket.bucket_arn },
-    { id = module.s3-fms-specials-landing-bucket.bucket_id,     arn = module.s3-fms-specials-landing-bucket.bucket_arn },
-    { id = module.s3-mdss-general-landing-bucket.bucket_id,     arn = module.s3-mdss-general-landing-bucket.bucket_arn },
-    { id = module.s3-mdss-ho-landing-bucket.bucket_id,          arn = module.s3-mdss-ho-landing-bucket.bucket_arn },
-    { id = module.s3-mdss-specials-landing-bucket.bucket_id,    arn = module.s3-mdss-specials-landing-bucket.bucket_arn },
-    { id = module.s3-p1-export-bucket.bucket_id,                arn = module.s3-p1-export-bucket.bucket_arn },
-    { id = module.s3-serco-export-bucket.bucket_id,             arn = module.s3-serco-export-bucket.bucket_arn },
-    { id = module.s3-received-files-bucket.bucket.id,           arn = module.s3-received-files-bucket.bucket.arn },
-    { id = module.s3-quarantine-files-bucket.bucket.id,         arn = module.s3-quarantine-files-bucket.bucket.arn },
-    { id = module.s3-clamav-definitions-bucket.bucket.id,       arn = module.s3-clamav-definitions-bucket.bucket.arn },
-    { id = module.s3-dms-data-validation-bucket.bucket.id,      arn = module.s3-dms-data-validation-bucket.bucket.arn },
-    { id = module.s3-glue-job-script-bucket.bucket.id,          arn = module.s3-glue-job-script-bucket.bucket.arn },
-    { id = module.s3-dms-target-store-bucket.bucket.id,         arn = module.s3-dms-target-store-bucket.bucket.arn },
-    { id = module.s3-create-a-derived-table-bucket.bucket.id,   arn = module.s3-create-a-derived-table-bucket.bucket.arn },
-    { id = module.s3-raw-formatted-data-bucket.bucket.id,       arn = module.s3-raw-formatted-data-bucket.bucket.arn }
+    { id = module.s3-data-bucket.bucket.id, arn = module.s3-data-bucket.bucket.arn },
+    { id = module.s3-fms-general-landing-bucket.bucket_id, arn = module.s3-fms-general-landing-bucket.bucket_arn },
+    { id = module.s3-fms-ho-landing-bucket.bucket_id, arn = module.s3-fms-ho-landing-bucket.bucket_arn },
+    { id = module.s3-fms-specials-landing-bucket.bucket_id, arn = module.s3-fms-specials-landing-bucket.bucket_arn },
+    { id = module.s3-mdss-general-landing-bucket.bucket_id, arn = module.s3-mdss-general-landing-bucket.bucket_arn },
+    { id = module.s3-mdss-ho-landing-bucket.bucket_id, arn = module.s3-mdss-ho-landing-bucket.bucket_arn },
+    { id = module.s3-mdss-specials-landing-bucket.bucket_id, arn = module.s3-mdss-specials-landing-bucket.bucket_arn },
+    { id = module.s3-p1-export-bucket.bucket_id, arn = module.s3-p1-export-bucket.bucket_arn },
+    { id = module.s3-serco-export-bucket.bucket_id, arn = module.s3-serco-export-bucket.bucket_arn },
+    { id = module.s3-received-files-bucket.bucket.id, arn = module.s3-received-files-bucket.bucket.arn },
+    { id = module.s3-quarantine-files-bucket.bucket.id, arn = module.s3-quarantine-files-bucket.bucket.arn },
+    { id = module.s3-clamav-definitions-bucket.bucket.id, arn = module.s3-clamav-definitions-bucket.bucket.arn },
+    { id = module.s3-dms-data-validation-bucket.bucket.id, arn = module.s3-dms-data-validation-bucket.bucket.arn },
+    { id = module.s3-glue-job-script-bucket.bucket.id, arn = module.s3-glue-job-script-bucket.bucket.arn },
+    { id = module.s3-dms-target-store-bucket.bucket.id, arn = module.s3-dms-target-store-bucket.bucket.arn },
+    { id = module.s3-create-a-derived-table-bucket.bucket.id, arn = module.s3-create-a-derived-table-bucket.bucket.arn },
+    { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn }
   ]
 }
 
@@ -746,7 +753,7 @@ module "s3-p1-export-bucket" {
   source = "./modules/export_bucket_push/"
 
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  destination_bucket_id   = "tct-339712706964-prearrivals"
+  destination_bucket_id   = local.p1_export_bucket_destination_mapping[local.environment]
   export_destination      = "p1"
   local_bucket_prefix     = local.bucket_prefix
   local_tags              = local.tags
