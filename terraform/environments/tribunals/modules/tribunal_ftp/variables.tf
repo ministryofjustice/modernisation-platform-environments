@@ -8,10 +8,6 @@ variable "module_name" {
   description = "Name of the module"
 }
 
-variable "app_url" {
-  type        = string
-}
-
 variable "environment" {
   type        = string
 }
@@ -64,11 +60,6 @@ variable "cluster_name" {
 variable "subnets_shared_public_ids" {
   type        = list(string)
   description = "Public subnets"
-}
-
-variable "documents_location" {
-  type        = string
-  description = "location of the documents"
 }
 
 variable "tags" {

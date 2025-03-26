@@ -1,15 +1,15 @@
 variable "app_name" {
+  type        = string
   description = "Name of the application"
 }
 
 variable "module_name" {
+  type = string
   description = "Name of the module"
 }
 
-variable "app_url" {
-}
-
 variable "app_db_name" {
+  type = string
 }
 
 variable "app_db_login_name" {
@@ -18,13 +18,8 @@ variable "app_db_login_name" {
 variable "app_rds_url" {
 }
 
-variable "app_rds_user" {
-}
-
-variable "app_rds_port" {
-}
-
 variable "app_rds_password" {
+  type = string
 }
 
 variable "environment" {
@@ -80,6 +75,7 @@ variable "subnets_shared_public_ids" {
 }
 
 variable "documents_location" {
+  type = string
 }
 
 variable "is_ftp_app" {
@@ -87,6 +83,7 @@ variable "is_ftp_app" {
 }
 
 variable "target_group_attachment_port" {
+  type        = number
   description = "The port of the target group"
 }
 

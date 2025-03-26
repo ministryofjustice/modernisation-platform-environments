@@ -1,28 +1,17 @@
 locals {
-  target_group_attachment_port = var.target_group_attachment_port
-  app                          = var.app_name
-  app_url                      = var.app_url
-  module_name                  = var.module_name
-  app_db_name                  = var.app_db_name
-  app_db_login_name            = var.app_db_login_name
-  app_rds_url                  = var.app_rds_url
-  app_rds_user                 = var.app_rds_user
-  app_rds_port                 = var.app_rds_port
-  app_rds_password             = var.app_rds_password
-  documents_location           = var.documents_location
   app_container_definition = jsonencode([{
     command : [
       "New-Item -Path C:\\inetpub\\wwwroot\\index.html -Type file -Value '<html> <head> <title>Amazon ECS Sample App</title> <style>body {margin-top: 40px; background-color: #333;} </style> </head><body> <div style=color:white;text-align:center> <h1>Amazon ECS Sample App</h1> <h2>Congratulations!</h2> <p>Your application is now running on a container in Amazon ECS.</p>'; C:\\ServiceMonitor.exe w3svc"
     ],
     entryPoint : ["powershell", "-Command"],
-    name : "${local.app}-container",
+    name : "${var.app_name}-container",
     image : "${aws_ecr_repository.app-ecr-repo.repository_url}:latest",
     cpu : 512,
     memory : 1024,
     essential : true,
     portMappings : [
       {
-        hostPort : "${local.target_group_attachment_port}",
+        hostPort : "${var.target_group_attachment_port}",
         containerPort : 80,
         protocol : "tcp"
       }
@@ -30,7 +19,7 @@ locals {
     logConfiguration : {
       logDriver : "awslogs",
       options : {
-        "awslogs-group" : "${local.app}-ecs-log-group",
+        "awslogs-group" : "${var.app_name}-ecs-log-group",
         "awslogs-region" : "eu-west-2",
         "awslogs-stream-prefix" : "ecs"
       }
@@ -38,7 +27,7 @@ locals {
     mountPoints : [
       {
         sourceVolume : "tribunals",
-        containerPath : "C:/inetpub/wwwroot/${local.documents_location}"
+        containerPath : "C:/inetpub/wwwroot/${var.documents_location}"
       }
     ],
     environment : [
@@ -56,34 +45,14 @@ locals {
       },
       {
         name : "RDS_PASSWORD",
-        value : "${local.app_rds_password}"
+        value : "${var.app_rds_password}"
       }
     ]
   }])
-  app_ec2_ingress_rules = {
-    "cluster_ec2_lb_ingress_2" = {
-      description     = "Cluster EC2 ingress rule 2"
-      from_port       = 0
-      to_port         = 0
-      protocol        = "-1"
-      cidr_blocks     = ["0.0.0.0/0"]
-      security_groups = []
-    }
-  }
-  app_ec2_egress_rules = {
-    "cluster_ec2_lb_egress" = {
-      description     = "Cluster EC2 loadbalancer egress rule"
-      from_port       = 0
-      to_port         = 0
-      protocol        = "-1"
-      cidr_blocks     = ["0.0.0.0/0"]
-      security_groups = []
-    }
-  }
 }
 
 resource "aws_secretsmanager_secret" "app_db_credentials" {
-  name                    = "${local.app}-credentials-db-2"
+  name                    = "${var.app_name}-credentials-db-2"
   recovery_window_in_days = 0
 }
 
@@ -91,10 +60,10 @@ resource "aws_secretsmanager_secret_version" "app_db_credentials_version" {
   secret_id     = aws_secretsmanager_secret.app_db_credentials.id
   secret_string = <<EOF
 {
-  "username": "${local.app_db_login_name}",
+  "username": "${var.app_db_login_name}",
   "password": "${var.new_db_password}",
-  "host": "${local.app_rds_url}",
-  "database_name": "${local.app_db_name}"
+  "host": "${var.app_rds_url}",
+  "database_name": "${var.app_db_name}"
 }
 EOF
 }
@@ -102,7 +71,7 @@ EOF
 ####################### ECR #########################################
 
 resource "aws_ecr_repository" "app-ecr-repo" {
-  name         = "${local.app}-ecr-repo"
+  name         = "${var.app_name}-ecr-repo"
   force_delete = false
 
   image_scanning_configuration {
@@ -114,7 +83,7 @@ resource "aws_ecr_repository" "app-ecr-repo" {
 
 module "app_ecs_task" {
   source                    = "../ecs_task"
-  app_name                  = local.app
+  app_name                  = var.app_name
   task_definition_volume    = var.task_definition_volume
   container_definition      = local.app_container_definition
   tags_common               = var.tags
@@ -127,6 +96,6 @@ module "app_ecs_task" {
   cluster_id                = var.cluster_id
   cluster_name              = var.cluster_name
   is_ftp_app                = var.is_ftp_app
-  lb_tg_arn                 = var.target_group_arns["${local.module_name}"]
+  lb_tg_arn                 = var.target_group_arns["${var.module_name}"]
   sftp_lb_tg_arn            = ""
 }

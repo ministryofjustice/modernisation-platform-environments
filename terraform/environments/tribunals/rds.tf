@@ -17,7 +17,8 @@ resource "aws_db_instance" "rdsdb" {
   password          = random_password.password.result
   port              = 1433
 
-  skip_final_snapshot = true
+  auto_minor_version_upgrade = true
+  skip_final_snapshot        = true
 
   license_model       = "license-included"
   publicly_accessible = false
