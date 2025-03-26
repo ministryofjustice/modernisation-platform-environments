@@ -50,8 +50,8 @@ resource "aws_instance" "tableau" {
 
 }
 
+#trivy:ignore:AVD-AWS-0053
 module "tableau-alb" {
-  #trivy:ignore:AVD-AWS-0053: "Exposed publicly by design"
   # checkov:skip=CKV_TF_1
  
   source = "terraform-aws-modules/alb/aws"
