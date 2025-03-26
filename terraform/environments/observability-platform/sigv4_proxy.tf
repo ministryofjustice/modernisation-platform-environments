@@ -11,7 +11,7 @@ resource "aws_lambda_function" "sigv4_proxy" {
 
   environment {
     variables = {
-      TARGET_URL = aws_lambda_function_url.github_workflow_lambda_url
+      TARGET_URL = "${module.modernisation_platform_github.lambda_function_url}"
       REGION     = "eu-west-2"
       SERVICE    = "lambda"
     }
