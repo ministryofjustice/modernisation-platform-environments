@@ -1,6 +1,6 @@
 # Postgres Tickle Lambda used to ensure the DMS Postgres replication slot on read replicas keeps moving
 module "postgres-tickle-lambda-testing" {
-  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+  #checkov:skip=CKV_AWS_338: "Ensure CloudWatch log groups retains logs for at least 1 year"
   source = "./modules/domains/postgres-tickle-lambda"
 
 
