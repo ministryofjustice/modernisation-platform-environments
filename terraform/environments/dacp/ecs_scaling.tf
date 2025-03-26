@@ -9,7 +9,7 @@ resource "aws_appautoscaling_target" "ecs_service" {
 resource "aws_appautoscaling_policy" "scale_up_amber" {
   name                   = "scale-up-amber"
   service_namespace      = "ecs"
-  resource_id            = aws_appautoscaling_target.ecs_service[0].resource_id
+  resource_id            = aws_appautoscaling_target.ecs_service.resource_id
   scalable_dimension     = "ecs:service:DesiredCount"
   policy_type            = "StepScaling"
 
@@ -34,7 +34,7 @@ resource "aws_appautoscaling_policy" "scale_up_amber" {
 resource "aws_appautoscaling_policy" "scale_down_amber" {
   name                   = "scale-down-amber"
   service_namespace      = "ecs"
-  resource_id            = aws_appautoscaling_target.ecs_service[0].resource_id
+  resource_id            = aws_appautoscaling_target.ecs_service.resource_id
   scalable_dimension     = "ecs:service:DesiredCount"
   policy_type            = "StepScaling"
 
