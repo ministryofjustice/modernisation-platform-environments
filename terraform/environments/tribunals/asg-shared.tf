@@ -117,6 +117,51 @@ resource "aws_iam_policy" "ec2_instance_policy" {
           "xray:GetSamplingStatisticSummaries"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:CreateService",
+          "ecs:DeleteService",
+          "ecs:DescribeServices",
+          "ecs:UpdateService",
+          "ecs:ListTasks",
+          "ecs:DescribeTasks",
+          "ecs:RunTask",
+          "ecs:StartTask",
+          "ecs:StopTask"
+        ]
+        Resource = [
+          "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:service/*",
+          "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:task/*"
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "iam:PassRole"
+        ]
+        Resource = "*"
+        Condition = {
+          StringLike = {
+            "iam:PassedToService": "ecs-tasks.amazonaws.com"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ecs:TagResource"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "ecs:CreateAction": [
+              "CreateCluster",
+              "RegisterContainerInstance"
+            ]
+          }
+        }
       }
     ]
   })
