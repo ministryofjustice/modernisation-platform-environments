@@ -225,6 +225,7 @@ resource "aws_kms_key_policy" "backup_kms_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
+      # Allow AWS Backup Service to use the key
       {
         Sid    = "AllowBackupServiceAccess",
         Effect = "Allow",
@@ -237,6 +238,16 @@ resource "aws_kms_key_policy" "backup_kms_policy" {
           "kms:DescribeKey",
           "kms:GenerateDataKey"
         ],
+        Resource = aws_kms_key.backup_kms_key.arn
+      },
+      # Allow Full Access (Prevents Lockout)
+      {
+        Sid    = "AllowAccountRootUserFullAccess",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action = "kms:*",
         Resource = aws_kms_key.backup_kms_key.arn
       }
     ]
