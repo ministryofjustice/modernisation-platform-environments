@@ -87,6 +87,8 @@ resource "aws_secretsmanager_secret_version" "Unit_test" {
 ### Tableau Secrets ###
 ## Secret to hold Tableau administration details
 resource "aws_secretsmanager_secret" "ad_credentials" {
+  # checkov:skip=CKV_TF_57: "Rotation needs to be coprdinated with changes to Tableau configuration."
+
   name        = "${local.environment}/Tableau/Administration"
   description = "Tableau Administration, site, group, user and password."
   kms_key_id  = module.kms.key_id
@@ -95,6 +97,8 @@ resource "aws_secretsmanager_secret" "ad_credentials" {
 
 # The password will be polulatd durring tableau instalation
 resource "aws_secretsmanager_secret_version" "ad_credentials" {
+  # checkov:skip=CKV_TF_57: "Rotation needs to be coprdinated with changes to Tableau configuration."
+
   secret_id = aws_secretsmanager_secret.ad_credentials.id
   secret_string = jsonencode(
     { "Tableau Admin Group" = "tsmadmin"
@@ -109,6 +113,8 @@ resource "aws_secretsmanager_secret_version" "ad_credentials" {
 
 ## Secret to hold the tableau domain user and its passoword
 resource "aws_secretsmanager_secret" "tableau_admin" {
+  # checkov:skip=CKV_TF_57: "Rotation needs to be coprdinated with changes to Tableau configuration."
+
   name        = "tableau_ad_read_credentials"
   description = "The tableau user that is used to read ad users and groups. It also acts as the initial Tableau System Administrator on install."
   kms_key_id  = module.kms.key_id
