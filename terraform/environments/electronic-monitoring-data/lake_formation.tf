@@ -6,7 +6,7 @@ locals {
   dbt_principals = flatten(
     [
       one(data.aws_iam_roles.data_engineering_roles.arns),
-      aws_iame_role.dataapi_cross_role.arn
+      aws_iam_role.dataapi_cross_role.arn
     ]
   )
 }
