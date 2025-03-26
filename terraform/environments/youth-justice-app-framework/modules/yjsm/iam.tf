@@ -14,6 +14,7 @@ resource "aws_iam_role" "yjsm_ec2_role" {
   })
 }
 
+data "aws_secretsmanager_secrets" "all_secrets" {}
 
 resource "aws_iam_instance_profile" "yjsm_ec2_profile" {
   name = "yjsm-ec2-instance"
@@ -56,9 +57,7 @@ resource "aws_iam_policy" "secrets_manager_policy" {
           "secretsmanager:ListSecrets"
         ]
         Effect   = "Allow"
-        Resource = [
-          "*"
-        ]
+        Resource = data.aws_secretsmanager_secrets.all_secrets.arns
       }
     ]
   })
