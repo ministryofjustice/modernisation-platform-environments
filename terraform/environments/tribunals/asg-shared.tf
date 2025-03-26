@@ -45,27 +45,31 @@ resource "aws_iam_policy" "ec2_instance_policy" {
           "ecs:RegisterContainerInstance",
           "ecs:StartTelemetrySession",
           "ecs:UpdateContainerInstancesState",
-          "ecs:Submit*"
+          "ecs:Submit*",
+          "ecs:TagResource",
+          "ecs:ListClusters",
+          "ecs:ListContainerInstances",
+          "ecs:ListServices"
         ]
-        Resource = "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/*"
+        Resource = [
+          "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/tribunals-all-cluster",
+          "arn:aws:ecs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/*"
+        ]
       },
       {
         Effect = "Allow"
         Action = [
-          "ecr:GetAuthorizationToken"
-        ]
-        Resource = "*"
-      },
-      {
-        Effect = "Allow"
-        Action = [
+          "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage",
           "ecr:PutImage",
           "ecr:InitiateLayerUpload",
           "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload"
+          "ecr:CompleteLayerUpload",
+          "ecr:ListImages",
+          "ecr:DescribeRepositories",
+          "ecr:GetRepositoryPolicy"
         ]
         Resource = "arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"
       },
