@@ -3,9 +3,10 @@ locals {
   environment_configurations = {
     development = {
       /* VPC */
-      isolated_vpc_public_subnets  = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
-      isolated_vpc_private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-      isolated_vpc_id              = "vpc-0902ef7a6188ef9a0"
+      isolated_vpc_public_subnets    = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+      isolated_vpc_public_subnet_ids = ["subnet-0a1b2a8647688f313", "subnet-0c74ecc529e4fd455", "subnet-0969caa397ccc53cb"] #TODO reference this properly
+      isolated_vpc_private_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+      isolated_vpc_id                = "vpc-0902ef7a6188ef9a0"
 
       /* Transfer Server */
       transfer_server_hostname = "sftp.development.transfer.analytical-platform.service.justice.gov.uk"
@@ -18,7 +19,7 @@ locals {
       transfer_server_sftp_users_with_egress = {
         "gary-test-egress" = {
           ssh_key               = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCpNyYzfbqmy4QkViLRyASRqxrEK7G34o3Bc6Jdp8vK555/oBuAUXUxfavtenZnxuxdxsrBYBSCBFcU4+igeXN/nN2kVfaUlt1xBZBCRUaajinhmt+3CLbr8bWmHR/5vL/DhxHH+j/+gDH5A244XN/ybZQvCGX/ilgKiae8s0tiOZD2hmX0fhRTCohQFG/DIu06gqKIyxUQoHBoBJxjzaDvjqioJgqmD9893DN+Gx1KozmaQWHM+0f7iK1UFp8BkdeFBVkj8TOfx60o/EmAjWQ/U+WSHblaXo0nI+LQKZYkW52uTEnfSkbkyvs/vj8E8+vagwYi0noyTVmb5qReSuk1kyuqEP2ycKIaWKt+Z4LnwxHm7KO51SMMeBgpiFHaUTQWXZHYuU2aXVfFIgJkCtHdEjG7Qe2P8K5XU5rG+CrQ/Y9PxPrKQHk+2nox9dLfCWo2Eho1N85z9/rA7A0oNwsHkjWAl3k87lWdpg7y3VNLzqsMNF4M4HjpQV60MH73dUU= essex-police@kpvmshift04app.netr.ecis.police.uk"
-          cidr_blocks           = ["1.2.3.4/32"]
+          cidr_blocks           = ["1.1.2.3./32"]
           egress_bucket         = module.transfer_landing_bucket.s3_bucket_id # this is wrong. purely for testing
           egress_bucket_kms_key = module.s3_transfer_landing_kms.key_arn      # this is wrong. purely for testing
         }
@@ -26,9 +27,10 @@ locals {
     }
     production = {
       /* VPC */
-      isolated_vpc_public_subnets  = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
-      isolated_vpc_private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
-      isolated_vpc_id              = "vpc-0f4dc457524b863f8"
+      isolated_vpc_public_subnets    = ["10.0.11.0/24", "10.0.12.0/24", "10.0.13.0/24"]
+      isolated_vpc_public_subnet_ids = [] # TODO reference this properly
+      isolated_vpc_private_subnets   = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+      isolated_vpc_id                = "vpc-0f4dc457524b863f8"
 
       /* Transfer Server */
       transfer_server_hostname = "sftp.development.transfer.analytical-platform.service.justice.gov.uk"

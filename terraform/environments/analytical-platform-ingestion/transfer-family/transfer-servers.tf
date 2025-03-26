@@ -1,4 +1,3 @@
-
 resource "aws_transfer_server" "this" {
   protocols              = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
@@ -7,7 +6,7 @@ resource "aws_transfer_server" "this" {
   endpoint_type = "VPC"
   endpoint_details {
     vpc_id     = local.environment_configuration.isolated_vpc_id
-    subnet_ids = local.environment_configuration.isolated_vpc_public_subnets
+    subnet_ids = local.environment_configuration.isolated_vpc_public_subnet_ids
     address_allocation_ids = [
       aws_eip.transfer_server[0].id,
       aws_eip.transfer_server[1].id,
