@@ -17,7 +17,6 @@ module "transfer_server_iam_role" {
   ]
 }
 
-
 module "datasync_iam_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
