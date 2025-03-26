@@ -84,7 +84,7 @@ resource "aws_iam_policy" "lambda_execution" {
 }
 
 resource "aws_iam_policy" "secret_access" {
-  count = var.enable_lambda ? 1 : 0
+  count = var.enable_lambda && length(var.secret_arns) > 0 ? 1 : 0
 
   name        = "${var.name}-secret-read-policy"
   description = "Extra Policy for reading required secrets"
@@ -106,7 +106,7 @@ resource "aws_iam_role_policy_attachment" "lambda_execution" {
 }
 
 resource "aws_iam_role_policy_attachment" "secret_access" {
-  count = var.enable_lambda ? 1 : 0
+  count = var.enable_lambda && length(var.secret_arns) > 0 ? 1 : 0
 
   role       = aws_iam_role.this[0].id
   policy_arn = aws_iam_policy.secret_access[0].arn
