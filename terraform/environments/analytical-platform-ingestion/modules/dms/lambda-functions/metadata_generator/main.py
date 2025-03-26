@@ -201,7 +201,10 @@ def handler(event, context):  # pylint: disable=unused-argument
     db_secret_arn = os.getenv("DB_SECRET_ARN")
     db_secret_response = secretsmanager.get_secret_value(SecretId=db_secret_arn)
     db_secret = json.loads(db_secret_response["SecretString"])
-    db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog
+    db_identifier = db_secret.get( # identifies database in glue catalog
+        "dbInstanceIdentifier",
+        os.getenv("GLUE_CATALOG_DATABASE_NAME", "") # If empty/missing assume glue connectivity not desired
+    )
     username = db_secret["username"]
     password = db_secret["password"]
     engine = db_secret.get("engine", os.getenv("ENGINE"))
@@ -228,19 +231,23 @@ def handler(event, context):  # pylint: disable=unused-argument
         "dialect": engine,
     }
 
-    # Get the glue database to check if it exists. handle EntityNotFoundException
-    try:
-        glue.get_database(Name=db_identifier)
-        logger.info(f"Database {db_identifier} already exists in Glue Catalog")
-    except glue.exceptions.EntityNotFoundException:
-        # Create the database if it does not exist. Fails is it cannot be created
-        logger.info(f"Database {db_identifier} does not exist in Glue Catalog. Creating it now")
-        response = glue.create_database(
-            DatabaseInput={
-                "Name": db_identifier,
-                "Description": f"{db_identifier} - DMS Pipeline",
-            }
-        )
+    if db_identifier:
+        # Get the glue database to check if it exists. handle EntityNotFoundException
+        try:
+            # TODO add `CatalogId` parameter here, if populating analytical-platform-data-* glue catalog
+            glue.get_database(Name=db_identifier)
+            logger.info(f"Database {db_identifier} already exists in Glue Catalog")
+        except glue.exceptions.EntityNotFoundException:
+            # Create the database if it does not exist. Fails is it cannot be created
+            logger.info(f"Database {db_identifier} does not exist in Glue Catalog. Creating it now")
+            response = glue.create_database(
+                DatabaseInput={
+                    "Name": db_identifier,
+                    "Description": f"{db_identifier} - DMS Pipeline",
+                }
+            )
+    else:
+        logger.info(f"Not contacting glue catalog, as db_identifier defined as {db_identifier}")
 
     metadata = MetadataExtractor(db_options, engine)
     db_metadata = metadata.get_database_metadata(metadata_bucket)
@@ -256,21 +263,24 @@ def handler(event, context):  # pylint: disable=unused-argument
         for table in db_metadata
     ]
 
-    for table in glue_table_definitions:
-        try:
-            glue.get_table(DatabaseName=db_identifier, Name=table["TableInput"]["Name"])
-            logger.info(f"Table {table['TableInput']['Name']} already exists")
-            # Update the table if it exists
-            logger.info(f"Updating table {table['TableInput']['Name']}")
-            glue.update_table(
-                DatabaseName=db_identifier, TableInput=table["TableInput"]
-            )
-        except glue.exceptions.EntityNotFoundException:
-            logger.info(
-                f"Table {table['TableInput']['Name']} does not exist. Creating it now"
-            )
-            response = glue.create_table(**table)
-            logger.debug(response)
+    if db_identifier:
+        for table in glue_table_definitions:
+            try:
+                glue.get_table(DatabaseName=db_identifier, Name=table["TableInput"]["Name"])
+                logger.info(f"Table {table['TableInput']['Name']} already exists")
+                # Update the table if it exists
+                logger.info(f"Updating table {table['TableInput']['Name']}")
+                glue.update_table(
+                    DatabaseName=db_identifier, TableInput=table["TableInput"]
+                )
+            except glue.exceptions.EntityNotFoundException:
+                logger.info(
+                    f"Table {table['TableInput']['Name']} does not exist. Creating it now"
+                )
+                response = glue.create_table(**table) # TODO add exception management to this API call
+                logger.debug(response)
+    else:
+        logger.info(f"Not contacting glue catalog, as db_identifier defined as {db_identifier}")
 
     # Output json metadata to S3
     for table in db_metadata:
