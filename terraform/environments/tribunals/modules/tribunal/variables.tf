@@ -107,7 +107,6 @@ variable "is_ftp_app" {
 }
 
 variable "target_group_attachment_port" {
-  type        = number
   description = "The port of the target group"
   type        = number
 }
