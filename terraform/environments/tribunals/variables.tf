@@ -249,29 +249,3 @@ variable "sftp_services" {
     }
   }
 }
-
-variable "application_data" {
-  type = object({
-    accounts = map(object({
-      allocated_storage         = string
-      storage_type             = string
-      db_identifier            = string
-      engine                   = string
-      engine_version           = string
-      instance_class           = string
-      username                 = string
-      curserver               = string
-      support_team            = string
-      support_email           = string
-      server_port_1           = string
-      task_definition_volume  = string
-      server_port             = number
-      app_count               = number
-      appscaling_min_capacity = number
-      appscaling_max_capacity = number
-      ecs_scaling_cpu_threshold = number
-      ecs_scaling_mem_threshold = number
-    }))
-  })
-  description = "Application configuration data from application_variables.json"
-}

@@ -18,8 +18,10 @@ module "appeals" {
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -50,8 +52,10 @@ module "ahmlr" {
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -82,8 +86,10 @@ module "care_standards" {
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -114,8 +120,10 @@ module "cicap" {
   app_rds_port                 = local.rds_port
   app_rds_password             = local.rds_password
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -147,8 +155,10 @@ module "employment_appeals" {
   app_rds_password   = local.rds_password
 
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -180,8 +190,10 @@ module "finance_and_tax" {
   app_rds_password   = local.rds_password
 
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -213,8 +225,10 @@ module "immigration_services" {
   app_rds_password   = local.rds_password
 
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -246,8 +260,10 @@ module "information_tribunal" {
   app_rds_password   = local.rds_password
 
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -279,8 +295,10 @@ module "lands_tribunal" {
   app_rds_password   = local.rds_password
 
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -312,8 +330,10 @@ module "transport" {
   app_rds_password   = local.rds_password
 
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -345,8 +365,10 @@ module "asylum_support" {
   app_rds_password   = local.rds_password
 
   environment                  = local.environment
-  application_data             = local.application_data.accounts[local.environment]
   tags                         = local.tags
+  support_email                = local.application_data.accounts[local.environment].support_email
+  support_team                 = local.application_data.accounts[local.environment].support_team
+  curserver                    = local.application_data.accounts[local.environment].curserver
   task_definition_volume       = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity      = local.application_data.accounts[local.environment].appscaling_min_capacity
   appscaling_max_capacity      = local.application_data.accounts[local.environment].appscaling_max_capacity
@@ -371,7 +393,6 @@ module "charity_tribunal_decisions" {
   app_url                           = "charitytribunal"
   module_name                       = "charity_tribunal_decisions"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
@@ -397,7 +418,6 @@ module "claims_management_decisions" {
   app_url                           = "claimsmanagement"
   module_name                       = "claims_management_decisions"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
@@ -423,7 +443,6 @@ module "consumer_credit_appeals" {
   app_url                           = "consumercreditappeals"
   module_name                       = "consumer_credit_appeals"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
@@ -449,7 +468,6 @@ module "estate_agent_appeals" {
   app_url                           = "estateagentappeals"
   module_name                       = "estate_agent_appeals"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
@@ -475,7 +493,6 @@ module "primary_health_lists" {
   app_url                           = "primaryhealthlists"
   module_name                       = "primary_health_lists"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
@@ -501,7 +518,6 @@ module "siac" {
   app_url                           = "siac"
   module_name                       = "siac"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
@@ -527,7 +543,6 @@ module "sscs_venue_pages" {
   app_url                           = "sscsvenues"
   module_name                       = "sscs_venue_pages"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
@@ -553,7 +568,6 @@ module "tax_chancery_decisions" {
   app_url                           = "taxchancerydecisions"
   module_name                       = "tax_chancery_decisions"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
@@ -579,7 +593,6 @@ module "tax_tribunal_decisions" {
   app_url                           = "taxtribunaldecisions"
   module_name                       = "tax_tribunal_decisions"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity
@@ -605,7 +618,6 @@ module "ftp_admin_appeals" {
   app_url                           = "adminappealsreports"
   module_name                       = "ftp_admin_appeals"
   environment                       = local.environment
-  application_data                  = local.application_data.accounts[local.environment]
   tags                              = local.tags
   task_definition_volume            = local.application_data.accounts[local.environment].task_definition_volume
   appscaling_min_capacity           = local.application_data.accounts[local.environment].appscaling_min_capacity

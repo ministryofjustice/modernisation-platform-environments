@@ -44,15 +44,15 @@ locals {
     environment : [
       {
         name : "supportEmail",
-        value : "${var.application_data.support_email}"
+        value : "${var.support_email}"
       },
       {
         name : "supportTeam",
-        value : "${var.application_data.support_team}"
+        value : "${var.support_team}"
       },
       {
         name : "CurServer",
-        value : "${var.application_data.curserver}"
+        value : "${var.curserver}"
       },
       {
         name : "RDS_PASSWORD",
