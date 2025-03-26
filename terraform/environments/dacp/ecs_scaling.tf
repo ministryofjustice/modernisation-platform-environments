@@ -28,7 +28,7 @@ resource "aws_appautoscaling_policy" "scale_up_amber" {
     #Scale up one more instance if memory exceeds the 2500 threshold by 2000 or more
     step_adjustment {
       scaling_adjustment    = 1
-      metric_interval_lower_bound = 2000
+      metric_interval_lower_bound = 2001
     }
   }
 }
@@ -49,7 +49,7 @@ resource "aws_appautoscaling_policy" "scale_down_amber" {
     step_adjustment {
       scaling_adjustment    = -1
       metric_interval_lower_bound = -2000
-      metric_interval_upper_bound = 0
+      metric_interval_upper_bound = 1
     }
     #Scale down the final instance if memory drops back to the orginal threshold of 2500 or anything below
     step_adjustment {
