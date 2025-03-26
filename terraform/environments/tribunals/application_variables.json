@@ -60,17 +60,5 @@
       "ecs_scaling_cpu_threshold": 80,
       "ecs_scaling_mem_threshold": 80
     }
-  },
-  "ec2_sg_rules": {
-    "TCP_80": {
-      "from_port": 80,
-      "to_port": 80,
-      "protocol": "TCP"
-    },
-    "TCP_443": {
-      "from_port": 443,
-      "to_port": 443,
-      "protocol": "TCP"
-    }
   }
 }
