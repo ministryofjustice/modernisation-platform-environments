@@ -15,13 +15,14 @@ data "aws_iam_policy_document" "transfer_landing_bucket_policy" {
     ]
   }
 }
+
 module "transfer_landing_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "mojap-transfer-landing-${local.environment}-landing"
+  bucket = "mojap-transfer-${local.environment}-landing"
 
   force_destroy = true
   attach_policy = true

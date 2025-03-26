@@ -4,7 +4,7 @@ module "transfer_logs_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.0"
 
-  aliases               = ["logs/transfer"]
+  aliases               = ["logs/transfer-family"]
   description           = "CloudWatch Logs for the Transfer Server"
   enable_default_policy = true
   key_statements = [
