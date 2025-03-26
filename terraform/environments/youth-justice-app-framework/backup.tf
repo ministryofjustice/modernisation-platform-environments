@@ -213,29 +213,25 @@ resource "aws_iam_role_policy_attachment" "secrets_kms_policy_attachment" {
 }
 
 
-# Create a new KMS key for AWS Backup
 resource "aws_kms_key" "backup_kms_key" {
   description             = "KMS key for encrypting AWS Backup vault"
   deletion_window_in_days = 30
   enable_key_rotation     = true
 }
 
-# Create an alias for easier identification
-resource "aws_kms_alias" "backup_kms_alias" {
-  name          = "alias/aws-backup-key"
-  target_key_id = aws_kms_key.backup_kms_key.key_id
-}
-
-resource "aws_iam_policy" "kms_backup_policy" {
-  name        = "KMSBackupPolicy"
-  description = "Allows AWS Backup to use KMS key for encryption"
+resource "aws_kms_key_policy" "backup_kms_policy" {
+  key_id = aws_kms_key.backup_kms_key.id
 
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = [
+        Sid    = "AllowBackupServiceAccess",
+        Effect = "Allow",
+        Principal = {
+          Service = "backup.amazonaws.com"
+        },
+        Action = [
           "kms:Encrypt",
           "kms:Decrypt",
           "kms:DescribeKey",
@@ -247,7 +243,8 @@ resource "aws_iam_policy" "kms_backup_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "kms_backup_policy_attachment" {
-  role       = aws_iam_role.backup_role.name
-  policy_arn = aws_iam_policy.kms_backup_policy.arn
+# Create an alias for easier identification
+resource "aws_kms_alias" "backup_kms_alias" {
+  name          = "alias/aws-backup-key"
+  target_key_id = aws_kms_key.backup_kms_key.key_id
 }
