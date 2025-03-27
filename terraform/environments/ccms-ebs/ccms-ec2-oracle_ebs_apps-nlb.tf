@@ -1,6 +1,6 @@
 # Elastic IPs for EBS NLB
 resource "aws_eip" "ebs_eip" {
-  count = local.is-production ? 6 : 3
+  count  = local.is-production ? 6 : 3
   domain = "vpc"
 
   lifecycle {
