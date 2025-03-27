@@ -102,6 +102,7 @@ class MetadataExtractor:
         self.upper_case_dialects = ["oracle"]
 
     def _manage_blob_columns(self, metadata: Metadata) -> Metadata:
+        logger.info("Managing blob columns for metadata: %s", metadata)
         for column_name in metadata.column_names:
             if metadata.get_column(column_name)["type"] in ["binary"]:
                 metadata.remove_column(column_name)
@@ -122,6 +123,7 @@ class MetadataExtractor:
         return metadata
 
     def _convert_int_columns(self, metadata: Metadata) -> Metadata:
+        logger.info("Converting int columns for metadata: %s", metadata)
         for column_name in metadata.column_names:
             if metadata.get_column(column_name)["type"].startswith("int"):
                 column_int = metadata.get_column(column_name)
@@ -130,11 +132,13 @@ class MetadataExtractor:
         return metadata
 
     def _rename_materialised_view(self, metadata: Metadata) -> Metadata:
+        logger.info("Renaming materialised view for metadata: %s", metadata)
         if metadata.name.lower().endswith("_mv"):
             metadata.name = metadata.name[:-3]
         return metadata
 
     def _add_reference_columns(self, metadata: Metadata) -> Metadata:
+        logger.info("Adding reference columns to metadata: %s", metadata)
         for column in extraction_columns:
             metadata.update_column(column, append=False)
         for column in curation_columns:
@@ -142,6 +146,7 @@ class MetadataExtractor:
         return metadata
 
     def convert_metadata(self, metadata: Metadata):
+        logger.info("Converting metadata: %s", metadata)
         metadata.file_format = "parquet"
         etlmeta = self.emc.generate_from_meta(metadata=metadata)
         if self.dialect in self.upper_case_dialects:
@@ -151,6 +156,7 @@ class MetadataExtractor:
         return json.dumps(etl_dict)
 
     def get_table_metadata(self, schema, table) -> Metadata:
+        logger.info("Getting table metadata for table %s in schema %s", table, schema)
         table_meta = self.sqlc.generate_to_meta(table.lower(), schema)
         table_meta = self._manage_blob_columns(table_meta)
         table_meta = self._convert_int_columns(table_meta)
@@ -182,6 +188,7 @@ class MetadataExtractor:
         :rtype: dict(str, str)
         :return: Tuple of (schema_name , table_name)
         """
+        logger.info("Extracting schema (if exists) and table from %s", obj_str)
         object_list = obj_str.split(".")
         if len(object_list) == 2:
             return tuple(object_list)
@@ -278,7 +285,7 @@ def handler(event, context):  # pylint: disable=unused-argument
                 response = glue.create_table(**table) # TODO add exception management to this API call
                 logger.debug(response)
     else:
-        logger.info(f"Not contacting glue catalog, as db_identifier defined as {db_identifier}")
+        logger.info(f"Not contacting glue catalog, as use_glue_catalog is {use_glue_catalog}")
 
     # Output json metadata to S3
     for table in db_metadata:
