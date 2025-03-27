@@ -24,7 +24,6 @@ resource "aws_lakeformation_permissions" "grant_account_database_role" {
   database {
     name = var.database_name
   }
-  permissions_with_grant_option = ["DESCRIBE"]
 }
 
 resource "aws_lakeformation_permissions" "grant_account_table_filter_role" {
