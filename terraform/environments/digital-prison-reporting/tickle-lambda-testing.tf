@@ -5,7 +5,7 @@ module "postgres-tickle-lambda-testing" {
 
 
   setup_postgres_tickle_lambda = true
-  postgres_tickle_lambda_name  = "dpr-postgres-tickle-function-testing"
+  postgres_tickle_lambda_name  = "dpr-postgres-tickle-testing"
   lambda_code_s3_bucket        = module.s3_artifacts_store.bucket_id
   lambda_code_s3_key           = "build-artifacts/dev-sandbox/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
   lambda_subnet_ids            = [data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id]
