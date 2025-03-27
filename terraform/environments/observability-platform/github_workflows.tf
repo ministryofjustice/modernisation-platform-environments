@@ -188,7 +188,7 @@ resource "aws_lambda_function" "sigv4_proxy" {
 
 resource "aws_lambda_function_url" "sigv4_proxy_url" {
   function_name      = aws_lambda_function.sigv4_proxy.function_name
-  authorization_type = "AWS_IAM"
+  authorization_type = "NONE"
   cors {
     allow_origins     = ["https://${module.managed_grafana.workspace_id}.grafana-workspace.eu-west-2.amazonaws.com"]
     allow_methods     = ["GET"]
@@ -201,7 +201,6 @@ resource "aws_lambda_permission" "allow_sigv4_url" {
   action                  = "lambda:InvokeFunctionUrl"
   function_name           = aws_lambda_function.sigv4_proxy.function_name
   principal               = "iam.amazonaws.com"
-  function_url_auth_type  = "AWS_IAM"
   source_arn              = module.managed_grafana.workspace_iam_role_arn
 }
 
