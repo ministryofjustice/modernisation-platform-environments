@@ -251,5 +251,5 @@ resource "aws_iam_role_policy" "allow_ecr_pull" {
 # Outputs
 
 output "lambda_function_url" {
-  value = module.modernisation_platform_github.function_url
+  value = module.modernisation_platform_github.lambda_function_url
 }
