@@ -33,9 +33,9 @@ locals {
   }
 }
 
-#checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"
-#checkov:skip=CKV_AWS_150:"Deletion protection not needed in this environment"
 resource "aws_lb" "tribunals_lb" {
+  #checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"
+  #checkov:skip=CKV_AWS_150:"Deletion protection not needed in this environment"
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
@@ -45,9 +45,9 @@ resource "aws_lb" "tribunals_lb" {
   drop_invalid_header_fields = true
 }
 
-#checkov:skip=CKV_AWS_260:"Public access required for web application"
-#checkov:skip=CKV_AWS_382:"Full egress access required for dynamic port mapping"
 resource "aws_security_group" "tribunals_lb_sc" {
+  #checkov:skip=CKV_AWS_260:"Public access required for web application"
+  #checkov:skip=CKV_AWS_382:"Full egress access required for dynamic port mapping"
   name        = "tribunals-load-balancer-sg"
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -77,8 +77,8 @@ resource "aws_security_group" "tribunals_lb_sc" {
   }
 }
 
-#checkov:skip=CKV_AWS_261:"Health check is properly configured with path and matcher"
 resource "aws_lb_target_group" "tribunals_target_group" {
+  #checkov:skip=CKV_AWS_261:"Health check is properly configured with path and matcher"
   for_each             = var.services
   name                 = "${each.value.module_key}-tg"
   #checkov:skip=CKV_AWS_378: Allow HTTP protocol for transport

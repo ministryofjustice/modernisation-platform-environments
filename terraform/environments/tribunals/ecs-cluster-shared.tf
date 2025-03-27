@@ -6,8 +6,8 @@ resource "aws_ecs_cluster" "tribunals_cluster" {
   }
 }
 
-#checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
 resource "aws_cloudwatch_log_group" "tribunalsFamily_logs" {
+  #checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
   name              = "/ecs/tribunalsFamily"
   retention_in_days = 365
 }
@@ -39,11 +39,11 @@ EOF
   )
 }
 
-#checkov:skip=CKV_AWS_290:"Required permissions for ECS execution role"
-#checkov:skip=CKV_AWS_289:"Required permissions for ECS execution role"
-#checkov:skip=CKV_AWS_355:"Required broad resource access for ECS execution role"
-#checkov:skip=CKV_AWS_288:"Required permissions for ECS operations"
 resource "aws_iam_role_policy" "app_execution" {
+  #checkov:skip=CKV_AWS_290:"Required permissions for ECS execution role"
+  #checkov:skip=CKV_AWS_289:"Required permissions for ECS execution role"
+  #checkov:skip=CKV_AWS_355:"Required broad resource access for ECS execution role"
+  #checkov:skip=CKV_AWS_288:"Required permissions for ECS operations"
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
 
