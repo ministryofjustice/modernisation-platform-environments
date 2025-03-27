@@ -45,3 +45,11 @@ resource "aws_secretsmanager_secret" "modernisation_platform_github_pat" {
 
   name = "observability-platform/modernisation-platform-github-pat"
 }
+
+#tfsec:ignore:avd-aws-0098 CMK not required currently
+resource "aws_secretsmanager_secret" "modernisation_platform_sigv4_token" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
+
+  name = "observability-platform/modernisation-platform-sigv4-token"
+}
