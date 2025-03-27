@@ -38,7 +38,7 @@ module "cur_v2_hourly" {
 
 # GitHub repositories Terraform state bucket
 
-module "github_repos_state_bucket" {
+module "github_repos_tfstate_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
