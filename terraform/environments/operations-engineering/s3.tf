@@ -44,7 +44,7 @@ module "github_repos_state_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "github_repos_state_bucket"
+  bucket = "github-repos-state-bucket"
 
   force_destroy = true
   attach_policy = true

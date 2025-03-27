@@ -21,7 +21,7 @@ module "github_repos_s3_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.1"
 
-  aliases               = ["s3/cur"]
+  aliases               = ["s3/github-repos"]
   description           = "S3 github repos terraform KMS key"
   enable_default_policy = true
 
