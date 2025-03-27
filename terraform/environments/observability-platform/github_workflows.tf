@@ -1,8 +1,37 @@
 locals {
-
   target_function_url = module.modernisation_platform_github.lambda_function_url
+    sigv4_api_key = jsondecode(data.aws_secretsmanager_secret_version.sigv4_token_value.secret_string)["token"]
 
 }
+
+
+# Secrets
+
+#tfsec:ignore:avd-aws-0098 CMK not required currently
+resource "aws_secretsmanager_secret" "modernisation_platform_github_pat" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
+
+  name = "observability-platform/modernisation-platform-github-pat"
+}
+
+#tfsec:ignore:avd-aws-0098 CMK not required currently
+resource "aws_secretsmanager_secret" "modernisation_platform_sigv4_token" {
+  #checkov:skip=CKV_AWS_149:CMK not required currently
+  #checkov:skip=CKV2_AWS_57:Rotation of secrets not required currently
+
+  name = "observability-platform/modernisation-platform-sigv4-token"
+}
+
+data "aws_secretsmanager_secret" "sigv4_token" {
+  name = "observability-platform/modernisation-platform-sigv4-token"
+}
+
+data "aws_secretsmanager_secret_version" "sigv4_token_value" {
+  secret_id = data.aws_secretsmanager_secret.sigv4_token.id
+}
+
+
 
 #################################################
 # Lambda Function for GitHub Workflow Data
@@ -160,6 +189,7 @@ resource "aws_lambda_function" "sigv4_proxy" {
 
   environment {
     variables = {
+      GRAFANA_PROXY_API_KEY = local.sigv4_api_key
       TARGET_URL = "https://el7n7n7d4he7eqp7ahjs64nk440ygztq.lambda-url.eu-west-2.on.aws/"
       REGION     = "eu-west-2"
       SERVICE    = "lambda"
@@ -197,6 +227,20 @@ resource "aws_iam_role" "sigv4_proxy_role" {
       Effect    = "Allow",
       Principal = { Service = "lambda.amazonaws.com" },
       Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "allow_sigv4_secret" {
+  name = "AllowSigv4SecretAccess"
+  role = aws_iam_role.sigv4_proxy_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = ["secretsmanager:GetSecretValue"],
+      Resource = data.aws_secretsmanager_secret.sigv4_token.arn
     }]
   })
 }
