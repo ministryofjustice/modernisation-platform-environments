@@ -219,6 +219,11 @@ resource "aws_iam_role" "sigv4_proxy_role" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "sigv4_lambda_exec_policy" {
+  role       = aws_iam_role.sigv4_proxy_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 resource "aws_iam_role_policy" "allow_sigv4_secret" {
   name = "AllowSigv4SecretAccess"
   role = aws_iam_role.sigv4_proxy_role.id
