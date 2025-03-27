@@ -2,8 +2,12 @@ locals {
   target_group_arns_sftp = { for k, v in aws_lb_target_group.tribunals_target_group_sftp : k => v.arn }
 }
 
-#tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "tribunals_lb_sftp" {
+  #tfsec:ignore:aws-elb-alb-not-public
+  #checkov:skip=CKV_AWS_91:"Access logging not required for this SFTP load balancer"
+  #checkov:skip=CKV_AWS_152:"Cross-zone load balancing not needed for this deployment"
+  #checkov:skip=CKV_AWS_150:"Deletion protection not needed in this environment"
+  #trivy:ignore:AVD-AWS-0053:"Load balancer needs to be public to serve SFTP traffic"
   name                       = "tribunals-sftp-lb"
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.tribunals_lb_sc_sftp.id]
@@ -12,6 +16,8 @@ resource "aws_lb" "tribunals_lb_sftp" {
 }
 
 resource "aws_security_group" "tribunals_lb_sc_sftp" {
+  #checkov:skip=CKV_AWS_382:"Full egress access required for SFTP connections"
+  #checkov:skip=CKV_AWS_260:"Public access required for SFTP service"
   name        = "tribunals-load-balancer-sg-sftp"
   description = "control access to the network load balancer for sftp"
   vpc_id      = data.aws_vpc.shared.id

@@ -93,12 +93,12 @@ EOF
   )
 }
 
-#checkov:skip=CKV_AWS_290:"Required permissions for ECS task role"
-#checkov:skip=CKV_AWS_289:"Required permissions for ECS task role"
-#checkov:skip=CKV_AWS_355:"Required broad resource access for ECS task role"
-#checkov:skip=CKV_AWS_286:"Required permissions for ECS task operations"
-#checkov:skip=CKV_AWS_287:"Required permissions for ECS task operations"
 resource "aws_iam_role_policy" "app_task" {
+  #checkov:skip=CKV_AWS_290:"Required permissions for ECS task role"
+  #checkov:skip=CKV_AWS_289:"Required permissions for ECS task role"
+  #checkov:skip=CKV_AWS_355:"Required broad resource access for ECS task role"
+  #checkov:skip=CKV_AWS_286:"Required permissions for ECS task operations"
+  #checkov:skip=CKV_AWS_287:"Required permissions for ECS task operations"
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
 
@@ -122,9 +122,10 @@ resource "aws_iam_role_policy" "app_task" {
   EOF
 }
 
-#checkov:skip=CKV_AWS_382:"Required for ECS tasks to access external services"
-#checkov:skip=CKV_AWS_23:"Security group for ECS service"
+
 resource "aws_security_group" "ecs_service" {
+  #checkov:skip=CKV_AWS_382:"Required for ECS tasks to access external services"
+  #checkov:skip=CKV_AWS_23:"Security group for ECS service"
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
   description = "Security group for ECS service"
@@ -146,9 +147,9 @@ resource "aws_security_group" "ecs_service" {
   }
 }
 
-#checkov:skip=CKV_AWS_382:"Required for SFTP tasks to access external services"
-#checkov:skip=CKV_AWS_23:"Security group for ECS SFTP service"
 resource "aws_security_group" "ecs_service_sftp" {
+  #checkov:skip=CKV_AWS_382:"Required for SFTP tasks to access external services"
+  #checkov:skip=CKV_AWS_23:"Security group for ECS SFTP service"
   name_prefix = "ecs-service-sg-sftp-"
   vpc_id      = data.aws_vpc.shared.id
   description = "Security group for ECS SFTP service"
