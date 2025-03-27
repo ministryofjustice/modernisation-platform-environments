@@ -1,7 +1,5 @@
 locals {
   target_function_url = module.modernisation_platform_github.lambda_function_url
-    sigv4_api_key = jsondecode(data.aws_secretsmanager_secret_version.sigv4_token_value.secret_string)["token"]
-
 }
 
 
@@ -22,15 +20,6 @@ resource "aws_secretsmanager_secret" "modernisation_platform_sigv4_token" {
 
   name = "observability-platform/modernisation-platform-sigv4-token"
 }
-
-data "aws_secretsmanager_secret" "sigv4_token" {
-  name = "observability-platform/modernisation-platform-sigv4-token"
-}
-
-data "aws_secretsmanager_secret_version" "sigv4_token_value" {
-  secret_id = data.aws_secretsmanager_secret.sigv4_token.id
-}
-
 
 
 #################################################
@@ -189,7 +178,7 @@ resource "aws_lambda_function" "sigv4_proxy" {
 
   environment {
     variables = {
-      GRAFANA_PROXY_API_KEY = local.sigv4_api_key
+      GRAFANA_PROXY_API_KEY = "/aws/reference/secretsmanager/observability-platform/modernisation_platform_sigv4_token:token"
       TARGET_URL = "https://el7n7n7d4he7eqp7ahjs64nk440ygztq.lambda-url.eu-west-2.on.aws/"
       REGION     = "eu-west-2"
       SERVICE    = "lambda"
@@ -240,7 +229,7 @@ resource "aws_iam_role_policy" "allow_sigv4_secret" {
     Statement = [{
       Effect   = "Allow",
       Action   = ["secretsmanager:GetSecretValue"],
-      Resource = data.aws_secretsmanager_secret.sigv4_token.arn
+      Resource = "${aws_secretsmanager_secret.sigv4_token.arn}"
     }]
   })
 }
