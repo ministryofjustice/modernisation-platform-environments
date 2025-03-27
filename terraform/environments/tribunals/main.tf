@@ -615,13 +615,14 @@ resource "aws_security_group" "nginx_lb_sg" {
 }
 
 module "nginx" {
-  count               = local.is-development ? 1 : 0
-  source              = "./modules/nginx_ec2_pair"
-  nginx_lb_sg_id      = aws_security_group.nginx_lb_sg[0].id
-  vpc_shared_id       = data.aws_vpc.shared.id
-  public_subnets_a_id = data.aws_subnet.public_subnets_a.id
-  public_subnets_b_id = data.aws_subnet.public_subnets_b.id
-  environment         = local.environment
+  count                   = local.is-development ? 1 : 0
+  source                  = "./modules/nginx_ec2_pair"
+  nginx_lb_sg_id          = aws_security_group.nginx_lb_sg[0].id
+  vpc_shared_id           = data.aws_vpc.shared.id
+  public_subnets_a_id     = data.aws_subnet.public_subnets_a.id
+  public_subnets_b_id     = data.aws_subnet.public_subnets_b.id
+  environment             = local.environment
+  s3_encryption_key_arn   = aws_kms_key.s3_encryption_key.arn
 }
 
 module "nginx_load_balancer" {

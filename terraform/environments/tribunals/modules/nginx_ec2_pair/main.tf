@@ -13,12 +13,19 @@ variable "vpc_shared_id" {
 }
 
 variable "public_subnets_a_id" {
+  type = string
 }
 
 variable "public_subnets_b_id" {
+  type = string
 }
 
 variable "environment" {
+  type = string
+}
+
+variable "s3_encryption_key_arn" {
+  type = string
 }
 
 data "aws_ami" "latest_linux" {
@@ -111,7 +118,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "nginx_config_encr
   rule {
 
     apply_server_side_encryption_by_default {
-      kms_master_key_id = aws_kms_key.s3_encryption_key.arn
+      kms_master_key_id = var.s3_encryption_key_arn
       sse_algorithm     = "aws:kms"
     }
   }
