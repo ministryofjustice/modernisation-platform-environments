@@ -12,8 +12,8 @@ To learn more about how the Modernisation Platform works, please see our main re
 
 To request an environment, a new feature, or to report a bug, please [create an issue](https://github.com/ministryofjustice/modernisation-platform/issues/new/choose) on our main repo using the relevant issue template.
 
-[Standards Link]: https://github-community.cloud-platform.service.justice.gov.uk/repository-standards/modernisation-platform-environments "Repo standards badge."
-[Standards Icon]: https://github-community.cloud-platform.service.justice.gov.uk/repository-standards/api/modernisation-platform-environments/badge
+[Standards Link]: https://github-community.service.justice.gov.uk/repository-standards/modernisation-platform-environments "Repo standards badge."
+[Standards Icon]: https://github-community.service.justice.gov.uk/repository-standards/api/modernisation-platform-environments/badge
 [Format Code Icon]: https://img.shields.io/github/actions/workflow/status/ministryofjustice/modernisation-platform-environments/format-code.yml?labelColor=231f20&style=for-the-badge&label=Formate%20Code
 [Format Code Link]: https://github.com/ministryofjustice/modernisation-platform-environments/actions/workflows/format-code.yml
 [Scorecards Icon]: https://img.shields.io/github/actions/workflow/status/ministryofjustice/modernisation-platform-environments/scorecards.yml?branch=main&labelColor=231f20&style=for-the-badge&label=Scorecards
