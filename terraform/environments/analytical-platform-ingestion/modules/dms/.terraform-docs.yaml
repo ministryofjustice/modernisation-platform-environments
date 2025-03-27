@@ -1,0 +1,38 @@
+# .terraform-docs.yaml
+formatter: markdown table
+sections:
+  hide-all: true
+  show:
+    - providers
+    - inputs
+    - outputs
+    - resources
+
+output:
+  file: README.md
+  mode: replace
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+    {{- printf "\n" -}}
+
+content: |-
+  # RDS Export Terraform Module
+
+  ## Example
+
+  ```hcl
+  {{ include "examples/example-readme/main.tf" }}
+  ```
+
+  ## Note
+
+  Update the mappings.json to specify the mappings for the DMS task.
+  This will be used to select the tables to be migrated.
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+  {{ .Resources }}
