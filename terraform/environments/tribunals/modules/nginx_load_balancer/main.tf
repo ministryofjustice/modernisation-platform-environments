@@ -1,12 +1,14 @@
 resource "aws_lb" "nginx_lb" {
   #checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"
   #checkov:skip=CKV_AWS_150:"Deletion protection not needed in this environment"
-  #trivy:ignore:AVD-AWS-0053:"Load balancer needs to be public to serve traffic"
-  name               = "tribunals-nginx"
-  internal           = false
-  load_balancer_type = "application"
-  security_groups    = [var.nginx_lb_sg_id]
-  subnets            = var.subnets_shared_public_ids
+  #tfsec:ignore:AVD-AWS-0053
+  name                       = "tribunals-nginx"
+  internal                   = false
+  load_balancer_type         = "application"
+  security_groups            = [var.nginx_lb_sg_id]
+  subnets                    = var.subnets_shared_public_ids
+  enable_deletion_protection = true
+  drop_invalid_header_fields = true
 }
 
 resource "aws_lb_target_group" "nginx_lb_tg" {

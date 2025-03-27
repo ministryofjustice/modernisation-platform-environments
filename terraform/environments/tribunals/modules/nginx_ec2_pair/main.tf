@@ -105,6 +105,27 @@ resource "aws_s3_bucket" "nginx_config" {
   bucket = "tribunals-nginx-config-files-${var.environment}"
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "nginx_config_encryption" {
+  bucket = aws_s3_bucket.nginx_config.id
+
+  rule {
+
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.s3_encryption_key.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "nginx_config_access_block" {
+  bucket = aws_s3_bucket.nginx_config.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_s3_object" "sites_available" {
   for_each = fileset("${path.module}/sites-available", "*")
 
