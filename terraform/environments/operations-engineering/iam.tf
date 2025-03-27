@@ -12,8 +12,8 @@ data "aws_iam_policy_document" "s3_access_policy_document" {
     effect  = "Allow"
     actions = ["s3:*"]
     resources = [
-      module.github_repos_state_bucket.s3_bucket_arn,
-      "${module.github_repos_state_bucket.s3_bucket_arn}/*"
+      module.github_repos_tfstate_bucket.s3_bucket_arn,
+      "${module.github_repos_tfstate_bucket.s3_bucket_arn}/*"
     ]
   }
 
