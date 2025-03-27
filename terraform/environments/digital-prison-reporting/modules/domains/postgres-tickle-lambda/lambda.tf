@@ -11,6 +11,7 @@ module "postgres_tickle_lambda" {
   policies      = var.lambda_policies
   tracing       = var.lambda_tracing
   timeout       = var.lambda_timeout_in_seconds
+  memory_size   = var.memory_size
   env_vars      = var.env_vars
   secret_arns   = var.secret_arns
 
