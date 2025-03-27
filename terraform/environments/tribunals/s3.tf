@@ -3,7 +3,7 @@ resource "aws_s3_bucket" "ebs_backup" {
   bucket = "tribunals-ebs-backup-${local.environment}"
 }
 
-resource "aws_s3_bucket_versioning" "example" {
+resource "aws_s3_bucket_versioning" "ebs_bucket_versioning" {
   bucket = aws_s3_bucket.ebs_backup.id
   versioning_configuration {
     status = "Enabled"

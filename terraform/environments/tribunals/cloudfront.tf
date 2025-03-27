@@ -129,7 +129,7 @@ resource "aws_s3_bucket" "cloudfront_logs" {
   bucket = "tribunals-cloudfront-logs-${local.environment}"
 }
 
-resource "aws_s3_bucket_versioning" "example" {
+resource "aws_s3_bucket_versioning" "cloudfront_bucket_versioning" {
   bucket = aws_s3_bucket.cloudfront_logs.id
   versioning_configuration {
     status = "Enabled"

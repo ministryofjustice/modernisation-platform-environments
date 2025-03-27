@@ -113,7 +113,7 @@ resource "aws_s3_bucket" "nginx_config" {
   bucket = "tribunals-nginx-config-files-${var.environment}"
 }
 
-resource "aws_s3_bucket_versioning" "example" {
+resource "aws_s3_bucket_versioning" "nginx_bucket_versioning" {
   bucket = aws_s3_bucket.nginx_config.id
   versioning_configuration {
     status = "Enabled"
