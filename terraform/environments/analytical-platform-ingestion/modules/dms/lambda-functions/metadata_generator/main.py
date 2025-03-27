@@ -201,10 +201,8 @@ def handler(event, context):  # pylint: disable=unused-argument
     db_secret_arn = os.getenv("DB_SECRET_ARN")
     db_secret_response = secretsmanager.get_secret_value(SecretId=db_secret_arn)
     db_secret = json.loads(db_secret_response["SecretString"])
-    db_identifier = db_secret.get( # identifies database in glue catalog
-        "dbInstanceIdentifier",
-        os.getenv("GLUE_CATALOG_DATABASE_NAME", "") # If empty/missing assume glue connectivity not desired
-    )
+    db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog
+    use_glue_catalog = os.getenv("USE_GLUE_CATALOG", "true").lower() == "true"
     username = db_secret["username"]
     password = db_secret["password"]
     engine = db_secret.get("engine", os.getenv("ENGINE"))
@@ -231,7 +229,7 @@ def handler(event, context):  # pylint: disable=unused-argument
         "dialect": engine,
     }
 
-    if db_identifier:
+    if use_glue_catalog:
         # Get the glue database to check if it exists. handle EntityNotFoundException
         try:
             # TODO add `CatalogId` parameter here, if populating analytical-platform-data-* glue catalog
@@ -263,7 +261,7 @@ def handler(event, context):  # pylint: disable=unused-argument
         for table in db_metadata
     ]
 
-    if db_identifier:
+    if use_glue_catalog:
         for table in glue_table_definitions:
             try:
                 glue.get_table(DatabaseName=db_identifier, Name=table["TableInput"]["Name"])
