@@ -201,12 +201,13 @@ resource "aws_lambda_function_url" "sigv4_proxy_url" {
   }
 }
 
+# This is set to public as the Grafana workspace will be calling this function
 resource "aws_lambda_permission" "allow_sigv4_url" {
   statement_id            = "AllowSigv4ToInvokeFunctionUrl"
   action                  = "lambda:InvokeFunctionUrl"
   function_name           = aws_lambda_function.sigv4_proxy.function_name
-  principal               = "iam.amazonaws.com"
-  source_arn              = module.managed_grafana.workspace_iam_role_arn
+  principal               = "*"
+  function_url_auth_type = "NONE"
 }
 
 # IAM Role & Policies
