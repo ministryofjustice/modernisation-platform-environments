@@ -12,8 +12,8 @@ data "aws_iam_policy_document" "s3_access_policy_document" {
     effect  = "Allow"
     actions = ["s3:*"]
     resources = [
-      module.github_repos_state_bucket.bucket_arn,
-      "${module.github_repos_state_bucket.bucket_arn}/*"
+      module.github_repos_state_bucket.arn,
+      "${module.github_repos_state_bucket.arn}/*"
     ]
   }
 
@@ -37,7 +37,7 @@ data "aws_iam_policy_document" "dynamodb_state_lock_policy" {
       "dynamodb:Scan"
     ]
     resources = [
-      aws_dynamodb_table.github_repos_state_lock.table_arn
+      aws_dynamodb_table.github_repos_state_lock.arn
     ]
   }
 }
