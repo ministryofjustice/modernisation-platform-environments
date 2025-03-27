@@ -1,4 +1,7 @@
 resource "aws_lb" "nginx_lb" {
+  #checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"
+  #checkov:skip=CKV_AWS_150:"Deletion protection not needed in this environment"
+  #trivy:ignore:AVD-AWS-0053:"Load balancer needs to be public to serve traffic"
   name               = "tribunals-nginx"
   internal           = false
   load_balancer_type = "application"
@@ -7,6 +10,7 @@ resource "aws_lb" "nginx_lb" {
 }
 
 resource "aws_lb_target_group" "nginx_lb_tg" {
+  #checkov:skip=CKV_AWS_261:"Health check properly configured with matcher for redirect"
   name     = "tribunals-nginx"
   port     = 80
   protocol = "HTTP"
@@ -33,6 +37,8 @@ variable "nginx_lb_sg_id" {
 }
 
 variable "subnets_shared_public_ids" {
+  type        = list(string)
+  description = "Public subnets"
 }
 
 variable "vpc_shared_id" {

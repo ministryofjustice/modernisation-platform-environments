@@ -5,14 +5,17 @@ locals {
 resource "aws_lb" "tribunals_lb_sftp" {
   #tfsec:ignore:aws-elb-alb-not-public
   #checkov:skip=CKV_AWS_91:"Access logging not required for this SFTP load balancer"
-  #checkov:skip=CKV_AWS_152:"Cross-zone load balancing not needed for this deployment"
-  #checkov:skip=CKV_AWS_150:"Deletion protection not needed in this environment"
-  #trivy:ignore:AVD-AWS-0053:"Load balancer needs to be public to serve SFTP traffic"
+  #checkov:skip=CKV_AWS_152:"Cross-zone load balancing not needed for this deployment"enable_deletion_protection = true
+  #trivy:ignore:AVD-AWS-0053
+  /*
+    Public-facing load balancer is required to serve SFTP traffic
+    for the tribunals applications. This is an intentional configuration.
+  */
   name                       = "tribunals-sftp-lb"
   load_balancer_type         = "network"
   security_groups            = [aws_security_group.tribunals_lb_sc_sftp.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = false
+  enable_deletion_protection = true
 }
 
 resource "aws_security_group" "tribunals_lb_sc_sftp" {

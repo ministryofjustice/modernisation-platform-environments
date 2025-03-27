@@ -31,6 +31,7 @@ data "aws_ami" "latest_linux" {
 }
 
 resource "aws_instance" "nginx" {
+  #checkov:skip=CKV_AWS_88:"EC2 instances require public IPs as they are internet-facing nginx servers"
   for_each = toset(["eu-west-2a", "eu-west-2b"])
 
   ami                         = data.aws_ami.latest_linux.id
@@ -38,6 +39,14 @@ resource "aws_instance" "nginx" {
   subnet_id                   = each.key == "eu-west-2a" ? var.public_subnets_a_id : var.public_subnets_b_id
   instance_type               = "t2.micro"
   availability_zone           = each.value
+  ebs_optimized               = true
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+  root_block_device {
+    encrypted = true
+  }
   tags = {
     Name = "tribunals-nginx-${each.value}"
   }
@@ -68,20 +77,23 @@ resource "aws_instance" "nginx" {
 }
 
 resource "aws_security_group" "allow_ssm" {
+  #checkov:skip=CKV_AWS_382:"EC2 instances require unrestricted egress"
   name        = "allow_ssm"
   description = "Allow SSM connection"
   vpc_id      = var.vpc_shared_id
 
   ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    description     = "Allow traffic from load balancer"
+    from_port       = 0
+    to_port         = 0
+    protocol        = "-1"
     security_groups = [
       var.nginx_lb_sg_id
     ]
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"

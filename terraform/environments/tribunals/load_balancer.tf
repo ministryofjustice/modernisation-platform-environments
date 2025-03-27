@@ -35,14 +35,17 @@ locals {
 
 resource "aws_lb" "tribunals_lb" {
   #checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"
-  #checkov:skip=CKV_AWS_150:"Deletion protection not needed in this environment"
   #tfsec:ignore:aws-elb-alb-not-public
-  #trivy:ignore:AVD-AWS-0053:"Load balancer needs to be public to serve web traffic"
+  #trivy:ignore:AVD-AWS-0053
+  /*
+    Public-facing load balancer is required to serve web traffic
+    for the tribunals applications. This is an intentional configuration.
+  */
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = false
+  enable_deletion_protection = true
   internal                   = false
   drop_invalid_header_fields = true
 }

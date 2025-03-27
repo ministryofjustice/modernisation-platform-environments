@@ -9,6 +9,7 @@ resource "random_password" "password" {
 }
 
 resource "aws_secretsmanager_secret" "resource_rds_secret" {
+  #checkov:skip=CKV_AWS_149:"Using default AWS encryption for Secrets Manager which is sufficient for our needs"
   name                    = "${local.application_data.accounts[local.environment].db_identifier}_credentials"
   recovery_window_in_days = 0
 }
@@ -41,6 +42,7 @@ data "aws_secretsmanager_secret_version" "data_rds_secret_current" {
 //admin site credentials secret definition, will be filled manually
 //employment appeals (eat) uses a different encryption method for the password
 resource "aws_secretsmanager_secret" "tribunals_admin_site_credentials" {
+  #checkov:skip=CKV_AWS_149:"Using default AWS encryption for Secrets Manager which is sufficient for our needs"
   name                    = "tribunals-admin-site-credentials"
   recovery_window_in_days = 0
 }
