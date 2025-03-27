@@ -48,58 +48,93 @@
 #   # other bucket configurations
 # }
 
+# module "patch_manager" {
+#   for_each = local.baseline_preproduction.patch_manager
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions; this is an internal module so commit hashes are not needed
+#   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=923fb9c6e7a6d28d14289e3767869c228bf1fd7f"
+#   # count  = local.is-preproduction == true ? 1 : 0
+#   # for_each = toset(local.patch_schedules) #   for_each = var.ec2_instances # typically this is where our 'for_each loop would be, but we don't want a full set of resources for every schedule, so their is a for_each in the module
+
+#   providers = {
+#     aws.bucket-replication = aws
+#   }
+#   use_existing_bucket     = true
+#   existing_bucket_name    = "davetest" # Optional, existing bucket name. If no bucket is provided one will be created for reports.	(string)
+#   daily_definition_update = false
+#   account_number          = local.environment_management.account_ids[terraform.workspace] # Required, Account number of current environment, (string)
+#   application_name        = local.application_name                                        # Required, Name of application, (string) 
+#   approval_days           = "5"                                                           # Optional, Number of days before the package is approved, used by the approval rule only, not required for the automation script, (string)???, 	default 5.
+#   # compliance_level	    # Optional, used by the approval rule only, not required for the automation script, (string), default "CRITICAL"
+#   # force_destroy_bucket	# Optional, boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error, default false
+#   # product	              # Optional, the specific product the patch is applicable for e.g. RedhatEnterpriseLinux8.5, WindowsServer2022.	list(string), default	["*"].
+#   # rejected_patches	    # Optional, list of patches to be rejected, type list(string), default [].
+#   # severity	            # Optional, severity of the patch e.g. Critical, Important, Medium, Low.  Type list(string),	default ["*"].
+#   # patch_tag_key = "patch-manager" # Optional, defaults as tag:Patching, but can be customised if other tags and values should be used, (string), default	"patch-manager".
+#   patch_schedules             = each.value.patch_schedules
+#   maintenance_window_cutoff   = each.value.maintenance_window_cutoff
+#   maintenance_window_duration = each.value.maintenance_window_duration
+#   operating_system            = each.value.operating_system     //"WINDOWS" # Optional, used by the approval rule only, not required for the automation script, (string), default "CENTOS".
+#   patch_classification        = each.value.patch_classification //["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"] # CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades.  Default ["*"]
+#   tags                        = merge(local.tags, { name = "ssm-patching-module" }, )
+# }
+
 module "patch_manager" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions; this is an internal module so commit hashes are not needed
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=923fb9c6e7a6d28d14289e3767869c228bf1fd7f"
-  # count  = local.is-preproduction == true ? 1 : 0
-  # for_each = toset(local.patch_schedules) #   for_each = var.ec2_instances # typically this is where our 'for_each loop would be, but we don't want a full set of resources for every schedule, so their is a for_each in the module
-
   providers = {
     aws.bucket-replication = aws
   }
-  # use_existing_bucket     = true
-  # existing_bucket_name    = "davetest" # Optional, existing bucket name. If no bucket is provided one will be created for reports.	(string)
   daily_definition_update = false
   account_number          = local.environment_management.account_ids[terraform.workspace] # Required, Account number of current environment, (string)
   application_name        = local.application_name                                        # Required, Name of application, (string) 
-  approval_days           = "5"                                                           # Optional, Number of days before the package is approved, used by the approval rule only, not required for the automation script, (string)???, 	default 5.
+  environment             = local.environment
+  approval_days = {
+    development   = 0
+    test          = 3
+    preproduction = 5
+    production    = 7
+  }
   # compliance_level	    # Optional, used by the approval rule only, not required for the automation script, (string), default "CRITICAL"
   # force_destroy_bucket	# Optional, boolean that indicates all objects (including any locked objects) should be deleted from the bucket so that the bucket can be destroyed without error, default false
   # product	              # Optional, the specific product the patch is applicable for e.g. RedhatEnterpriseLinux8.5, WindowsServer2022.	list(string), default	["*"].
   # rejected_patches	    # Optional, list of patches to be rejected, type list(string), default [].
   # severity	            # Optional, severity of the patch e.g. Critical, Important, Medium, Low.  Type list(string),	default ["*"].
   # patch_tag_key = "patch-manager" # Optional, defaults as tag:Patching, but can be customised if other tags and values should be used, (string), default	"patch-manager".
-  patch_schedules             = local.baseline_preproduction.patch_manager.windows.patch_schedules
-  maintenance_window_cutoff   = local.baseline_preproduction.patch_manager.windows.maintenance_window_cutoff
-  maintenance_window_duration = local.baseline_preproduction.patch_manager.windows.maintenance_window_duration
-  operating_system            = "WINDOWS"                                                   # Optional, used by the approval rule only, not required for the automation script, (string), default "CENTOS".
-  patch_classification        = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"] # CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades.  Default ["*"]
-  tags                        = merge(local.tags, { Name = "ssm-patching-module" }, )
+  patch_schedules = {
+    group1 = "cron(00 03 ? * WED *)"
+    group2 = "cron(00 03 ? * THU *)"
+  }
+  maintenance_window_cutoff   = 4
+  maintenance_window_duration = 2
+  patch_classifications = {
+    WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
+    REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)	
+  }
+  tags = merge(local.tags, { name = "ssm-patching-module" }, )
 }
 
-module "patch_manager_redhat" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  # This is an internal module so commit hashes are not needed
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=923fb9c6e7a6d28d14289e3767869c228bf1fd7f"
-  providers = {
-    aws.bucket-replication = aws
-  }
-  use_existing_bucket  = true
-  existing_bucket_name = module.patch_manager.s3_report_bucket_name                    # Optional, existing bucket name. If no bucket is provided one will be created.	(string)
-  account_number       = local.environment_management.account_ids[terraform.workspace] # Required, Account number of current environment, (string)
-  application_name     = local.application_name                                        # Required, Name of application, (string) 
-  approval_days        = "5"                                                           # Optional, Number of days before the package is approved, used by the approval rule only, not required for the automation script, (string)???, 	default 5.
-  # compliance_level	    # Optional, used by the approval rule only, not required for the automation script, (string), default "CRITICAL"
-  # product	              # Optional, the specific product the patch is applicable for e.g. RedhatEnterpriseLinux8.5, WindowsServer2022.	list(string), default	["*"].
-  severity                    = ["Critical", "Important"] # Optional, severity of the patch e.g. Critical, Important, Medium, Low.  Type list(string),	default ["*"].
-  patch_schedules             = local.baseline_preproduction.patch_manager.redhat.patch_schedules
-  maintenance_window_cutoff   = local.baseline_preproduction.patch_manager.redhat.maintenance_window_cutoff
-  maintenance_window_duration = local.baseline_preproduction.patch_manager.redhat.maintenance_window_duration
-  operating_system            = "REDHAT_ENTERPRISE_LINUX" # Optional, used by the approval rule only, not required for the automation script, (string), default "CENTOS".
-  patch_classification        = ["Security", "Bugfix"]    # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)	
-  tags                        = merge(local.tags, { Name = "ssm-patching-module" }, )
-  depends_on                  = [module.patch_manager]
-}
+# module "patch_manager_redhat" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions; this is an internal module so commit hashes are not needed
+#   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=923fb9c6e7a6d28d14289e3767869c228bf1fd7f"
+#   providers = {
+#     aws.bucket-replication = aws
+#   }
+#   use_existing_bucket  = true
+#   existing_bucket_name = module.patch_manager.s3_report_bucket_name                    # Optional, existing bucket name. If no bucket is provided one will be created.	(string)
+#   account_number       = local.environment_management.account_ids[terraform.workspace] # Required, Account number of current environment, (string)
+#   application_name     = local.application_name                                        # Required, Name of application, (string) 
+#   approval_days        = "5"                                                           # Optional, Number of days before the package is approved, used by the approval rule only, not required for the automation script, (string)???, 	default 5.
+#   # compliance_level	    # Optional, used by the approval rule only, not required for the automation script, (string), default "CRITICAL"
+#   # product	              # Optional, the specific product the patch is applicable for e.g. RedhatEnterpriseLinux8.5, WindowsServer2022.	list(string), default	["*"].
+              #   severity                    = ["Critical", "Important"] # Optional, severity of the patch e.g. Critical, Important, Medium, Low.  Type list(string),	default ["*"].
+#   patch_schedules             = local.baseline_preproduction.patch_manager.redhat.patch_schedules
+#   maintenance_window_cutoff   = local.baseline_preproduction.patch_manager.redhat.maintenance_window_cutoff
+#   maintenance_window_duration = local.baseline_preproduction.patch_manager.redhat.maintenance_window_duration
+#   operating_system            = "REDHAT_ENTERPRISE_LINUX" # Optional, used by the approval rule only, not required for the automation script, (string), default "CENTOS".
+#   patch_classification        = ["Security", "Bugfix"]    
+#   tags                        = merge(local.tags, { name = "ssm-patching-module" }, )
+#   depends_on                  = [module.patch_manager]
+# }
 
 # module "development" {
 #   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
