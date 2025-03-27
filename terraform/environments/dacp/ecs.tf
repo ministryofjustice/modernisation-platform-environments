@@ -25,14 +25,14 @@ resource "aws_ecs_task_definition" "dacp_task_definition" {
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
-  cpu                      = 2048
-  memory                   = 8192
+  cpu                      = local.application_data.accounts[local.environment].ecs_cpu
+  memory                   = local.application_data.accounts[local.environment].ecs_memory
   container_definitions = jsonencode([
     {
       name                   = "dacp-container"
       image                  = "${aws_ecr_repository.dacp_ecr_repo.repository_url}:latest"
-      cpu                    = 2048
-      memory                 = 8192
+      cpu                    = local.application_data.accounts[local.environment].ecs_cpu
+      memory                 = local.application_data.accounts[local.environment].ecs_memory
       essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {
@@ -100,14 +100,14 @@ resource "aws_ecs_task_definition" "dacp_task_definition_dev" {
   network_mode             = "awsvpc"
   execution_role_arn       = aws_iam_role.app_execution.arn
   task_role_arn            = aws_iam_role.app_task.arn
-  cpu                      = 2048
-  memory                   = 4096
+  cpu                      = local.application_data.accounts[local.environment].ecs_cpu
+  memory                   = local.application_data.accounts[local.environment].ecs_memory
   container_definitions = jsonencode([
     {
       name                   = "dacp-container"
       image                  = "${aws_ecr_repository.dacp_ecr_repo.repository_url}:latest"
-      cpu                    = 2048
-      memory                 = 4096
+      cpu                    = local.application_data.accounts[local.environment].ecs_cpu
+      memory                 = local.application_data.accounts[local.environment].ecs_memory
       essential              = true
       ReadonlyRootFilesystem = true
       logConfiguration = {
