@@ -44,7 +44,7 @@ module "github_repos_tfstate_bucket" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "github-repos-state-bucket"
+  bucket = "github-repos-tfstate-bucket"
 
   force_destroy = true
   attach_policy = true
