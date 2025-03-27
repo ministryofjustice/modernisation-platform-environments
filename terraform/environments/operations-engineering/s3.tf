@@ -47,8 +47,6 @@ module "github_repos_tfstate_bucket" {
   bucket = "github-repos-tfstate-bucket"
 
   force_destroy = true
-  attach_policy = true
-  policy = data.aws_iam_policy_document.s3_root_account_write_policy.json
   
   attach_deny_insecure_transport_policy = true
 
