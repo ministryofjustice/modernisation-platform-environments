@@ -51,7 +51,7 @@
 # module "patch_manager" {
 #   for_each = local.baseline_preproduction.patch_manager
 #   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions; this is an internal module so commit hashes are not needed
-#   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=923fb9c6e7a6d28d14289e3767869c228bf1fd7f"
+#   source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=84c877fd74622df7551944eaffb6f10a8265f43e"
 #   # count  = local.is-preproduction == true ? 1 : 0
 #   # for_each = toset(local.patch_schedules) #   for_each = var.ec2_instances # typically this is where our 'for_each loop would be, but we don't want a full set of resources for every schedule, so their is a for_each in the module
 
@@ -80,7 +80,7 @@
 
 module "patch_manager" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions; this is an internal module so commit hashes are not needed
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=923fb9c6e7a6d28d14289e3767869c228bf1fd7f"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=84c877fd74622df7551944eaffb6f10a8265f43e"
   providers = {
     aws.bucket-replication = aws
   }
