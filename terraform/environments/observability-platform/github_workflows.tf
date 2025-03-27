@@ -162,7 +162,7 @@ resource "aws_lambda_function" "sigv4_proxy" {
 
   environment {
     variables = {
-      TARGET_URL = "${local.target_function_url}"
+      TARGET_URL = "https://el7n7n7d4he7eqp7ahjs64nk440ygztq.lambda-url.eu-west-2.on.aws/"
       REGION     = "eu-west-2"
       SERVICE    = "lambda"
     }
