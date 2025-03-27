@@ -229,7 +229,7 @@ resource "aws_iam_role_policy" "allow_sigv4_secret" {
     Statement = [{
       Effect   = "Allow",
       Action   = ["secretsmanager:GetSecretValue"],
-      Resource = "${aws_secretsmanager_secret.sigv4_token.arn}"
+      Resource = "${aws_secretsmanager_secret.modernisation_platform_sigv4_token.arn}"
     }]
   })
 }
