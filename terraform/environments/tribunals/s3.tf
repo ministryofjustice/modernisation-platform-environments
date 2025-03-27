@@ -1,7 +1,14 @@
 resource "aws_s3_bucket" "ebs_backup" {
+  #checkov:skip=CKV2_AWS_62:"Event notifications not required for this bucket"
   bucket = "tribunals-ebs-backup-${local.environment}"
 }
 
+resource "aws_s3_bucket_versioning" "example" {
+  bucket = aws_s3_bucket.ebs_backup.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 resource "aws_s3_bucket_policy" "backup_bucket_policy" {
   bucket = aws_s3_bucket.ebs_backup.id
 

@@ -125,13 +125,21 @@ resource "aws_security_group" "tribunals_lb_sg_cloudfront" {
 }
 
 resource "aws_s3_bucket" "cloudfront_logs" {
+  #checkov:skip=CKV2_AWS_62:"Event notifications not required for CloudFront logs bucket"
   bucket = "tribunals-cloudfront-logs-${local.environment}"
+}
+
+resource "aws_s3_bucket_versioning" "example" {
+  bucket = aws_s3_bucket.cloudfront_logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_ownership_controls" "cloudfront_logs" {
   bucket = aws_s3_bucket.cloudfront_logs.id
   rule {
-    object_ownership = "BucketOwnerPreferred"
+    object_ownership = "BucketOwnerEnforced"
   }
 }
 

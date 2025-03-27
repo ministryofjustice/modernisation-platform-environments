@@ -53,6 +53,7 @@ locals {
 
 resource "aws_secretsmanager_secret" "app_db_credentials" {
   #checkov:skip=CKV_AWS_149:"Using default AWS encryption for Secrets Manager which is sufficient for our needs"
+  #checkov:skip=CKV2_AWS_57:"Automatic rotation not required for this application's DB credentials"
   name                    = "${var.app_name}-credentials-db-2"
   recovery_window_in_days = 0
 }

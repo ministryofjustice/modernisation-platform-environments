@@ -109,7 +109,15 @@ resource "aws_security_group" "allow_ssm" {
 }
 
 resource "aws_s3_bucket" "nginx_config" {
+  #checkov:skip=CKV2_AWS_62:"Event notifications not required for this bucket"
   bucket = "tribunals-nginx-config-files-${var.environment}"
+}
+
+resource "aws_s3_bucket_versioning" "example" {
+  bucket = aws_s3_bucket.nginx_config.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "nginx_config_encryption" {

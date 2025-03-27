@@ -99,6 +99,7 @@ resource "aws_iam_role_policy" "app_task" {
   #checkov:skip=CKV_AWS_355:"Required broad resource access for ECS task role"
   #checkov:skip=CKV_AWS_286:"Required permissions for ECS task operations"
   #checkov:skip=CKV_AWS_287:"Required permissions for ECS task operations"
+  #checkov:skip=CKV2_AWS_40:"Broad IAM permissions required for ECS task functionality"
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
 
