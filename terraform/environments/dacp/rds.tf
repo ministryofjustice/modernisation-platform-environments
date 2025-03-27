@@ -200,7 +200,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_connections_alarm" {
   statistic           = "Average"
   threshold           = "50" # Set desired threshold for high connections
   alarm_description   = "This metric checks if RDS database connections are high - threshold set to 50"
-  alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]
+  alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm.arn]
 
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.dacp_db[0].identifier
