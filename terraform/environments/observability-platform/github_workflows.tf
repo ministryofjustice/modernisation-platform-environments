@@ -183,7 +183,7 @@ resource "aws_lambda_permission" "allow_sigv4_url" {
   function_name           = aws_lambda_function.sigv4_proxy.function_name
   principal               = "iam.amazonaws.com"
   function_url_auth_type  = "AWS_IAM"
-  source_arn              = module.managed_grafana.workspace_role_arn
+  source_arn              = module.managed_grafana.workspace_iam_role_arn
 }
 
 # IAM Role & Policies
