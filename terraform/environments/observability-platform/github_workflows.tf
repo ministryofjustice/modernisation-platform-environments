@@ -1,5 +1,9 @@
 locals {
+
   grafana_workspace_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/service-role/AmazonGrafana-WorkspaceRole-${module.managed_grafana.workspace_id}"
+
+  target_function_url = module.modernisation_platform_github.lambda_function_url
+
 }
 
 #################################################
@@ -158,7 +162,7 @@ resource "aws_lambda_function" "sigv4_proxy" {
 
   environment {
     variables = {
-      TARGET_URL = "${module.modernisation_platform_github.lambda_function_url}"
+      TARGET_URL = "${local.target_function_url}"
       REGION     = "eu-west-2"
       SERVICE    = "lambda"
     }
@@ -242,4 +246,10 @@ resource "aws_iam_role_policy" "allow_ecr_pull" {
       }
     ]
   })
+}
+
+# Outputs
+
+output "lambda_function_url" {
+  value = module.modernisation_platform_github.function_url
 }
