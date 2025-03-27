@@ -41,9 +41,6 @@ locals {
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-development"
 
-      /* QuickSight */
-      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
-
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
@@ -93,9 +90,6 @@ locals {
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-test"
 
-      /* QuickSight */
-      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
-
       /* UI */
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
 
@@ -144,9 +138,6 @@ locals {
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"
-
-      /* QuickSight */
-      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
 
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
