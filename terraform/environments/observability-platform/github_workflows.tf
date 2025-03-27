@@ -1,7 +1,5 @@
 locals {
 
-  grafana_workspace_role_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/service-role/AmazonGrafana-WorkspaceRole-${module.managed_grafana.workspace_id}"
-
   target_function_url = module.modernisation_platform_github.lambda_function_url
 
 }
@@ -185,7 +183,7 @@ resource "aws_lambda_permission" "allow_sigv4_url" {
   function_name           = aws_lambda_function.sigv4_proxy.function_name
   principal               = "iam.amazonaws.com"
   function_url_auth_type  = "AWS_IAM"
-  source_arn              = local.grafana_workspace_role_arn
+  source_arn              = module.managed_grafana.workspace_role_arn
 }
 
 # IAM Role & Policies
