@@ -206,7 +206,7 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "s3:ListBucketMultipartUploads",
       "s3:ListMultipartUploadParts"
     ]
-    resources = [module.s3-athena-bucket.bucket.arn]
+    resources = [module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn]
   }
   statement {
     actions = [
@@ -217,7 +217,7 @@ data "aws_iam_policy_document" "standard_athena_access" {
       "s3:ListBucketMultipartUploads",
       "s3:ListMultipartUploadParts"
     ]
-    resources = ["${module.s3-athena-bucket.bucket.arn}/*"]
+    resources = ["${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/*"]
   }
   statement {
     effect = "Allow"
