@@ -62,7 +62,7 @@ variable "lambda_timeout_in_seconds" {
 variable "memory_size" {
   description = "Amount of memory to allocate to the lambda function."
   type        = number
-  default     = 128
+  default     = 256
 }
 
 variable "lambda_subnet_ids" {
