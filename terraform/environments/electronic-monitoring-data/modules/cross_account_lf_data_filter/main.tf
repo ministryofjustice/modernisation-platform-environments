@@ -18,6 +18,14 @@ resource "aws_lakeformation_data_cells_filter" "data_filter" {
   }
 }
 
+resource "aws_lakeformation_permissions" "grant_account_database_role" {
+  principal   = var.destination_account_role_arn
+  permissions = ["DESCRIBE"]
+  database {
+    name = var.database_name
+  }
+  permissions_with_grant_option = ["DESCRIBE"]
+}
 
 resource "aws_lakeformation_permissions" "grant_account_table_filter_role" {
   principal   = var.destination_account_role_arn
