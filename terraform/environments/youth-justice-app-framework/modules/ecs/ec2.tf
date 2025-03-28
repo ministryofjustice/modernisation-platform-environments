@@ -234,41 +234,39 @@ resource "aws_iam_policy" "ecs-secrets-policy" { #tfsec:ignore:aws-iam-no-policy
  
   name   = "${var.cluster_name}-ecs-secrets"
   tags   = local.all_tags
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": [
-                "secretsmanager:GetRandomPassword",
-                "secretsmanager:GetResourcePolicy",
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-                "secretsmanager:ListSecretVersionIds",
-                "secretsmanager:ListSecrets",
-                "secretsmanager:CancelRotateSecret"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
-           },
-           {
-            "Effect": "Allow",
-            "Action": [
-                "kms:Decrypt",
-                "kms:DescribeKey"
-            ],
-            Resource = var.secret_kms_key_arn
-            },
-            {
-            "Action": [
-                "ec2:AssignPrivateIpAddresses",
-                "ec2:UnassignPrivateIpAddresses",
-                "ec2:DescribeNetworkInterfaces"
-            ],
-            "Effect": "Allow",
-            "Resource": "*"
-        }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "secretsmanager:GetRandomPassword",
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds",
+          "secretsmanager:ListSecrets",
+          "secretsmanager:CancelRotateSecret"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "kms:Decrypt",
+          "kms:DescribeKey"
+        ]
+        Resource = var.secret_kms_key_arn
+      },
+      {
+        Effect   = "Allow"
+        Action   = [
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:UnassignPrivateIpAddresses",
+          "ec2:DescribeNetworkInterfaces"
+        ]
+        Resource = "*"
+      }
     ]
-}
-EOF
+  })
 }
