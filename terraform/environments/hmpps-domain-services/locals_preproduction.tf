@@ -171,13 +171,13 @@ locals {
 
     patch_manager = {
       patch_schedules = {
-        group1 = "cron(00 03 ? * WED *)"
-        group2 = "cron(00 03 ? * THU *)"
+        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown  
+        group2 = "cron(00 06 ? * THU *)" # 3am thu for prod
       }
-      maintenance_window_duration = 4
-      maintenance_window_cutoff   = 1
+      maintenance_window_duration = 2 # 4 for prod
+      maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"]
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
         WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
       }
     }
