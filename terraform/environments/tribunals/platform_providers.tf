@@ -56,8 +56,3 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
 }
-# Configure the GitHub Provider to use 6.2.2 (6.2.3 seems to have a  bug)
-# https://github.com/integrations/terraform-provider-github/issues/2357
-provider "github" {
-  version = "6.2.2"
-}
