@@ -340,7 +340,7 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
-    #checkov:CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"

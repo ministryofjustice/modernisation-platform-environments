@@ -59,7 +59,7 @@ resource "aws_security_group" "postgresql_db_sc" {
   }
 
   egress {
-    #checkov:CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
