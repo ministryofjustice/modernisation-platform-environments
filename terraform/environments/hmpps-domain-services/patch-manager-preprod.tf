@@ -104,7 +104,7 @@ module "patch_manager" {
     group1 = "cron(00 10 ? * FRI *)"
     group2 = "cron(00 03 ? * THU *)"
   }
-  maintenance_window_cutoff   = 4
+  maintenance_window_cutoff   = 1
   maintenance_window_duration = 2
   patch_classifications = {
     WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
