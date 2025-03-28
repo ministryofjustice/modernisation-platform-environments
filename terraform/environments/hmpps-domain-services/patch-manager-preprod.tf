@@ -80,7 +80,7 @@
 
 module "patch_manager" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions; this is an internal module so commit hashes are not needed
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=e6dc50e106ede45ceb17fcf77662ab6a6ba1701e"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=6c791d630f287c03143ca872808af340b372fbd6"
   providers = {
     aws.bucket-replication = aws
   }
