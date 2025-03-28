@@ -1,5 +1,5 @@
 {
-    "Role": "arn:aws:iam::856879713508:role/cross-account-bucket-replication-role",
+    "Role": "arn:aws:iam::${source_account_number}:role/cross-account-bucket-replication-role",
     "Rules": [
       {
         "ID": "s3-replication-to-modinisation",
