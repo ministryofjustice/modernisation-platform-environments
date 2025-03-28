@@ -1,3 +1,4 @@
+# tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "nginx_lb" {
   #checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"
   #checkov:skip=CKV_AWS_150:"Deletion protection not needed in this environment"

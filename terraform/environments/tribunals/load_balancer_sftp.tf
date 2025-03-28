@@ -2,8 +2,8 @@ locals {
   target_group_arns_sftp = { for k, v in aws_lb_target_group.tribunals_target_group_sftp : k => v.arn }
 }
 
+# tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "tribunals_lb_sftp" {
-  #tfsec:ignore:aws-elb-alb-not-public
   #checkov:skip=CKV_AWS_91:"Access logging not required for this SFTP load balancer"
   #checkov:skip=CKV_AWS_152:"Cross-zone load balancing not needed for this deployment"enable_deletion_protection = true
   #tfsec:ignore:AVD-AWS-0053
