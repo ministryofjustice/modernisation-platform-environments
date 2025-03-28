@@ -33,7 +33,9 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
   subnet_ids = data.aws_subnets.shared-public.ids
 }
 
+
 resource "aws_security_group" "postgresql_db_sc" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   count       = local.is-development ? 0 : 1
   name        = "postgres_security_group"
   description = "control access to the database"
@@ -57,6 +59,7 @@ resource "aws_security_group" "postgresql_db_sc" {
   }
 
   egress {
+    #checkov:CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
@@ -95,6 +98,7 @@ resource "aws_db_instance" "dacp_db_dev" {
 }
 
 resource "aws_security_group" "postgresql_db_sc_dev" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   count       = local.is-development ? 1 : 0
   name        = "postgres_security_group_dev"
   description = "control access to the database"

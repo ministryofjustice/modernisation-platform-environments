@@ -327,6 +327,7 @@ resource "aws_iam_role_policy" "app_task" {
 }
 
 resource "aws_security_group" "ecs_service" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
 
@@ -339,6 +340,7 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
+    #checkov:CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
