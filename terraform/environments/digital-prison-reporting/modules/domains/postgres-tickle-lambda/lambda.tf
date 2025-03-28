@@ -2,6 +2,7 @@
 module "postgres_tickle_lambda" {
   source = "../../lambdas/generic"
 
+
   enable_lambda = var.setup_postgres_tickle_lambda
   name          = var.postgres_tickle_lambda_name
   s3_bucket     = var.lambda_code_s3_bucket
