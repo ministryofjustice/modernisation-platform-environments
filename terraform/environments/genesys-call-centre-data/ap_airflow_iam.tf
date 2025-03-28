@@ -2,8 +2,20 @@ data "aws_iam_policy_document" "genesys_ap_airflow" {
   statement {
     sid       = "GenesysAPAirflowPermissionsListBuckets"
     effect    = "Allow"
-    actions   = ["s3:GetBucketLocation", "s3:ListAllMyBuckets", "s3:ListBucket"]
-    resources = ["arn:aws:s3:::*"]
+    actions   = [
+      "s3:GetBucketLocation", 
+      "s3:ListAllMyBuckets", 
+      "s3:ListBucket",
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:CopyObject"
+    ]
+    resources = [
+      "arn:aws:s3:::*",
+      "arn:aws:s3:::call-centre-staging-20250207153716741400000001/*",
+      "arn:aws:s3:::call-centre-archive-20250210151406831300000002/*",
+      "arn:aws:s3:::call-centre-ingestion-20250210151406834100000004/*"
+    ]
   }
 }
 
@@ -41,12 +53,15 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     actions = [
       "s3:GetObject",
       "s3:PutObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:CopyObject"
     ]
     resources = [
       module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn,
       "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/bronze/*",
       "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/silver/*",
+      module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn,
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn}/*"
     ]
   }
   statement {
@@ -64,11 +79,14 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     effect = "Allow"
     actions = [
       "s3:PutObject",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:CopyObject"
     ]
     resources = [
       module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn,
       "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/*",
+      module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn,
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn}/*",
     ]
   }
   statement {
@@ -88,7 +106,8 @@ data "aws_iam_policy_document" "p1_export_airflow" {
     effect = "Allow"
     actions = [
       "s3:ListAllMyBuckets",
-      "s3:GetBucketLocation"
+      "s3:GetBucketLocation",
+      "s3:CopyObject"
     ]
     resources = ["*"]
   }
