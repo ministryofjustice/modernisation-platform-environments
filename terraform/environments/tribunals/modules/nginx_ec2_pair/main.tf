@@ -110,6 +110,9 @@ resource "aws_security_group" "allow_ssm" {
 
 resource "aws_s3_bucket" "nginx_config" {
   #checkov:skip=CKV2_AWS_62:"Event notifications not required for this bucket"
+  #checkov:skip=CKV_AWS_144:"Cross-region replication not required"
+  #checkov:skip=CKV_AWS_18:"Access logging not required"
+  #checkov:skip=CKV2_AWS_61:"Lifecycle configuration not required for nginx config files that need to be retained"
   bucket = "tribunals-nginx-config-files-${var.environment}"
 }
 

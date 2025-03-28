@@ -127,6 +127,7 @@ resource "aws_iam_role_policy" "app_task" {
 resource "aws_security_group" "ecs_service" {
   #checkov:skip=CKV_AWS_382:"Required for ECS tasks to access external services"
   #checkov:skip=CKV_AWS_23:"Security group for ECS service"
+  #checkov:skip=CKV2_AWS_5:"Security group is attached to the tribunals load balancer"
   name_prefix = "ecs-service-sg-"
   vpc_id      = data.aws_vpc.shared.id
   description = "Security group for ECS service"
@@ -151,6 +152,7 @@ resource "aws_security_group" "ecs_service" {
 resource "aws_security_group" "ecs_service_sftp" {
   #checkov:skip=CKV_AWS_382:"Required for SFTP tasks to access external services"
   #checkov:skip=CKV_AWS_23:"Security group for ECS SFTP service"
+  #checkov:skip=CKV2_AWS_5:"Security group is attached to the tribunals load balancer"
   name_prefix = "ecs-service-sg-sftp-"
   vpc_id      = data.aws_vpc.shared.id
   description = "Security group for ECS SFTP service"

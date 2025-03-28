@@ -4,6 +4,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   #checkov:skip=CKV_AWS_305:"Default root object not required as this is an API distribution"
   #checkov:skip=CKV_AWS_310:"Single origin is sufficient for this use case"
   #checkov:skip=CKV2_AWS_47:"Skip Log4j protection as it is handled via WAF"
+  #checkov:skip=CKV2_AWS_46:"Origin Access Identity not applicable as origin is ALB, not S3"
 
   web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
 
@@ -40,8 +41,9 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   default_cache_behavior {
     target_origin_id = "tribunalsOrigin"
 
-    cache_policy_id          = data.aws_cloudfront_cache_policy.caching_disabled.id
-    origin_request_policy_id = data.aws_cloudfront_origin_request_policy.all_viewer.id
+    cache_policy_id            = data.aws_cloudfront_cache_policy.caching_disabled.id
+    origin_request_policy_id   = data.aws_cloudfront_origin_request_policy.all_viewer.id
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.security_headers_policy.id
 
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
@@ -104,6 +106,7 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 resource "aws_security_group" "tribunals_lb_sg_cloudfront" {
   #checkov:skip=CKV_AWS_382:"Load balancer requires unrestricted egress for dynamic port mapping"
+  #checkov:skip=CKV2_AWS_5:"Security group is attached to the tribunals load balancer"
   name        = "tribunals-load-balancer-sg-cf"
   description = "control access to the load balancer using cloudfront"
   vpc_id      = data.aws_vpc.shared.id
@@ -127,6 +130,8 @@ resource "aws_security_group" "tribunals_lb_sg_cloudfront" {
 
 resource "aws_s3_bucket" "cloudfront_logs" {
   #checkov:skip=CKV2_AWS_62:"Event notifications not required for CloudFront logs bucket"
+  #checkov:skip=CKV_AWS_144:"Cross-region replication not required"
+  #checkov:skip=CKV_AWS_18:"Access logging not required for CloudFront logs bucket to avoid logging loop"
   bucket = "tribunals-cloudfront-logs-${local.environment}"
 }
 
@@ -214,5 +219,39 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudfront_logs" {
     filter {}
     id = "log"
     status = "Enabled"
+  }
+}
+
+resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
+  name    = "tribunals-security-headers-policy"
+  comment = "Security headers policy for tribunals CloudFront distribution"
+
+  security_headers_config {
+    content_security_policy {
+      content_security_policy = "default-src 'self'"
+      override = true
+    }
+    strict_transport_security {
+      access_control_max_age_sec = 31536000
+      include_subdomains         = true
+      preload                    = true
+      override                   = true
+    }
+    content_type_options {
+      override = true
+    }
+    frame_options {
+      frame_option = "DENY"
+      override     = true
+    }
+    referrer_policy {
+      referrer_policy = "strict-origin-when-cross-origin"
+      override        = true
+    }
+    xss_protection {
+      mode_block = true
+      protection = true
+      override   = true
+    }
   }
 }

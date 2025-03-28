@@ -1,5 +1,8 @@
 resource "aws_s3_bucket" "ebs_backup" {
   #checkov:skip=CKV2_AWS_62:"Event notifications not required for this bucket"
+  #checkov:skip=CKV_AWS_144:"Cross-region replication not required"
+  #checkov:skip=CKV_AWS_18:"Access logging not required"
+  #checkov:skip=CKV2_AWS_61:"Lifecycle configuration not required"
   bucket = "tribunals-ebs-backup-${local.environment}"
 }
 
@@ -50,6 +53,45 @@ resource "aws_kms_key" "s3_encryption_key" {
   description             = "This key is used to encrypt bucket objects"
   deletion_window_in_days = 10
   enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "Enable IAM User Permissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow CloudFront to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "delivery.logs.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow EC2 to use the key"
+        Effect = "Allow"
+        Principal = {
+          AWS = aws_iam_role.ec2_instance_role.arn
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "ebs_backup_encryption" {
