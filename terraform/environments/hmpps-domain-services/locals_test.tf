@@ -116,6 +116,7 @@ locals {
         tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.noms.root domain"
           domain-name = "azure.noms.root"
+          patch-manager = "group1"
         })
       })
 
@@ -126,6 +127,7 @@ locals {
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.noms.root"
+          patch-manager = "group2"
         })
       })
 
