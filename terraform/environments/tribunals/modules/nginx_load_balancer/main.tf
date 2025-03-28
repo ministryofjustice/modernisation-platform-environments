@@ -60,6 +60,7 @@ resource "aws_lb_target_group_attachment" "nginx_lb_tg_attachment" {
   port             = 80
 }
 
+#trivy:ignore:AVD-AWS-0054:"HTTP listener is required for HTTP to HTTPS redirection"
 resource "aws_lb_listener" "nginx_lb_listener" {
   load_balancer_arn = aws_lb.nginx_lb.arn
   port              = "80"

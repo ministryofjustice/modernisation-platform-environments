@@ -40,8 +40,8 @@ locals {
 
 ####################### ECR #########################################
 
-#checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
 resource "aws_ecr_repository" "app-ecr-repo" {
+  #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
   name                 = "${var.app_name}-ecr-repo"
   force_delete         = false
   image_tag_mutability = "IMMUTABLE"

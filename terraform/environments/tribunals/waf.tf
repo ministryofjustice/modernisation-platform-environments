@@ -13,6 +13,7 @@ resource "aws_wafv2_ip_set" "allowed_ip_set" {
 }
 
 resource "aws_wafv2_web_acl" "tribunals_web_acl" {
+  #checkov:skip=CKV2_AWS_31:"WAF logging is not required for this implementation as we use CloudWatch metrics for monitoring"
   provider = aws.us-east-1
   name     = "tribunals-web-acl"
   scope    = "CLOUDFRONT"
