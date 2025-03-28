@@ -84,7 +84,7 @@ module "patch_manager" {
   providers = {
     aws.bucket-replication = aws
   }
-  daily_definition_update = false
+  daily_definition_update = true
   account_number          = local.environment_management.account_ids[terraform.workspace] # Required, Account number of current environment, (string)
   application_name        = local.application_name                                        # Required, Name of application, (string) 
   environment             = local.environment
@@ -101,7 +101,7 @@ module "patch_manager" {
   # severity	            # Optional, severity of the patch e.g. Critical, Important, Medium, Low.  Type list(string),	default ["*"].
   # patch_tag_key = "patch-manager" # Optional, defaults as tag:Patching, but can be customised if other tags and values should be used, (string), default	"patch-manager".
   patch_schedules = {
-    group1 = "cron(00 03 ? * WED *)"
+    group1 = "cron(00 10 ? * FRI *)"
     group2 = "cron(00 03 ? * THU *)"
   }
   maintenance_window_cutoff   = 4
