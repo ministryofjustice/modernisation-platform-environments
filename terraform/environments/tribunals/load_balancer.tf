@@ -36,6 +36,7 @@ locals {
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "tribunals_lb" {
   #checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"
+  #checkov:skip=CKV2_AWS_28:"WAF protection is handled at CloudFront level"
   #tfsec:ignore:AVD-AWS-0053
   name                       = "tribunals-lb"
   load_balancer_type         = "application"

@@ -6,6 +6,8 @@ resource "aws_db_instance" "rdsdb" {
   #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
+  #checkov:skip=CKV_AWS_129: "RDS logging not required for this database instance"
+  #checkov:skip=CKV2_AWS_60: "Copy tags to snapshots not required as final snapshots are disabled"
   allocated_storage = local.application_data.accounts[local.environment].allocated_storage
   //db_name                 = DBName must be null for engine: sqlserver-se
   storage_type      = local.application_data.accounts[local.environment].storage_type
@@ -38,6 +40,7 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 }
 
 resource "aws_security_group" "sqlserver_db_sc" {
+  #checkov:skip=CKV_AWS_382:"RDS required unrestricted egress"
   name        = "sqlserver_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id

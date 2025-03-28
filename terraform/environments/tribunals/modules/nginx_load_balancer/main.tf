@@ -2,7 +2,9 @@
 resource "aws_lb" "nginx_lb" {
   #checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"
   #checkov:skip=CKV_AWS_150:"Deletion protection not needed in this environment"
+  #checkov:skip=CKV2_AWS_20:"HTTP to HTTPS redirection is handled at the listener level"
   #tfsec:ignore:AVD-AWS-0053
+  #checkov:skip=CKV2_AWS_28:"WAF protection is handled at CloudFront level"
   name                       = "tribunals-nginx"
   internal                   = false
   load_balancer_type         = "application"
@@ -62,6 +64,7 @@ resource "aws_lb_target_group_attachment" "nginx_lb_tg_attachment" {
 
 #trivy:ignore:AVD-AWS-0054:"HTTP listener is required for HTTP to HTTPS redirection"
 resource "aws_lb_listener" "nginx_lb_listener" {
+  #checkov:skip=CKV_AWS_2:"HTTP listener is required for HTTP to HTTPS redirection"
   load_balancer_arn = aws_lb.nginx_lb.arn
   port              = "80"
   protocol          = "HTTP"
