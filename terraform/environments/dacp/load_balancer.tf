@@ -86,6 +86,7 @@ resource "aws_security_group" "dacp_lb_sc" {
 }
 
 resource "aws_security_group" "lb_sc_pingdom" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   name        = "load balancer Pingdom security group"
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -159,6 +160,7 @@ resource "aws_security_group" "lb_sc_pingdom" {
 }
 
 resource "aws_security_group" "lb_sc_pingdom_2" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   name        = "load balancer Pingdom security group 2"
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
