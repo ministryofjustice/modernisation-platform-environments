@@ -23,28 +23,6 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
   }
 
   rule {
-    name     = "AWSManagedIPReputationList"
-    priority = 0
-
-    override_action {
-      none {}
-    }
-
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesAmazonIpReputationList"
-        vendor_name = "AWS"
-      }
-    }
-
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "AWSManagedIPReputationListMetrics"
-      sampled_requests_enabled   = true
-    }
-  }
-
-  rule {
     name     = "log4j-mitigation"
     priority = 1
 

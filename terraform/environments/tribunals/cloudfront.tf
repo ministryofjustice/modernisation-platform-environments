@@ -3,6 +3,7 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
   #checkov:skip=CKV_AWS_374:"Geo restriction not needed for this public service"
   #checkov:skip=CKV_AWS_305:"Default root object not required as this is an API distribution"
   #checkov:skip=CKV_AWS_310:"Single origin is sufficient for this use case"
+  #checkov:skip=CKV2_AWS_47:"Skip Log4j protection as it is handled via WAF"
 
   web_acl_id = aws_wafv2_web_acl.tribunals_web_acl.arn
 
