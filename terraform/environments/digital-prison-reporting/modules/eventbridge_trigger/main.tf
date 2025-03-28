@@ -1,8 +1,8 @@
 resource "aws_scheduler_schedule" "schedule" {
-  count = var.create_pipeline_schedule ? 1 : 0
+  count = var.create_eventbridge_schedule ? 1 : 0
 
-  state       = var.enable_pipeline_schedule ? "ENABLED" : "DISABLED"
-  name        = var.pipeline_name
+  state       = var.enable_eventbridge_schedule ? "ENABLED" : "DISABLED"
+  name        = var.eventbridge_trigger_name
   description = var.description
   flexible_time_window {
     mode                      = var.time_window_mode
@@ -13,12 +13,8 @@ resource "aws_scheduler_schedule" "schedule" {
   schedule_expression_timezone = var.schedule_expression_timezone
 
   target {
-    arn      = var.state_machine_arn
-    role_arn = var.step_function_execution_role_arn
-
-    input = jsonencode({
-      StateMachineArn = var.state_machine_arn
-      Input           = ""
-    })
+    arn      = var.arn
+    role_arn = var.role_arn
+    input    = var.input
   }
 }

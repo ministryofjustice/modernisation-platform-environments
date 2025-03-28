@@ -75,6 +75,7 @@ module "autoscaling" {
     AmazonEC2ContainerServiceforEC2Role = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
     ecs-fetch-secrets-policy            = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
     ecs-eni-policy                      = aws_iam_policy.ecs-eni-policy.arn
+    ecs-secrets-policy                  = aws_iam_policy.ecs-secrets-policy.arn
   }
   security_groups = [module.autoscaling_sg.security_group_id]
 
@@ -220,6 +221,36 @@ resource "aws_iam_policy" "ecs-eni-policy" { #tfsec:ignore:aws-iam-no-policy-wil
         "Effect": "Allow",
         "Resource": "*"
       }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "ecs-secrets-policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
+ 
+  name   = "${var.cluster_name}-ecs-secrets"
+  tags   = local.all_tags
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "secretsmanager:GetRandomPassword",
+                "secretsmanager:GetResourcePolicy",
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+                "secretsmanager:ListSecretVersionIds",
+                "secretsmanager:ListSecrets",
+                "secretsmanager:CancelRotateSecret"
+            ],
+            "Resource": "*"
+           }
     ]
 }
 EOF
