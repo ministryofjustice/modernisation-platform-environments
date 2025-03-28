@@ -12,5 +12,5 @@ locals {
   }
 
 
-  all_tags = merge(var.tags, local.tags, local.tags)
+  all_tags = merge(var.tags, local.tags)
 }

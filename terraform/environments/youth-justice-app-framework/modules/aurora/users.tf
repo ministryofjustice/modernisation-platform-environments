@@ -44,17 +44,22 @@ data "aws_secretsmanager_secret_version" "master_secret" {
   secret_id = module.aurora.cluster_master_user_secret[0].secret_arn
 }
 
-resource "null_resource" "reset_passwords" {
-  for_each = toset(var.user_passwords_to_reset)
+#resource "null_resource" "reset_passwords" { # doesn't work because we need access to rds from github runner
+#  for_each = toset(var.user_passwords_to_reset)
 
-  provisioner "local-exec" {
-    environment = {
-      DB_PASSWORD   = jsondecode(data.aws_secretsmanager_secret_version.master_secret.secret_string)["password"]
-      USER_PASSWORD = jsondecode(aws_secretsmanager_secret_version.aurora_rotated_user_version[each.value].secret_string)["password"]
-    }
+#  provisioner "local-exec" {
+#    environment = {
+#      DB_PASSWORD   = jsondecode(data.aws_secretsmanager_secret_version.master_secret.secret_string)["password"]
+#      USER_PASSWORD = jsondecode(aws_secretsmanager_secret_version.aurora_rotated_user_version[each.value].secret_string)["password"]
+#    }
 
-    command = "bash ./modules/aurora/scripts/reset_db_passwords.sh ${module.aurora.cluster_endpoint} ${module.aurora.cluster_master_username} \"$DB_PASSWORD\" ${each.value} \"$USER_PASSWORD\""
-  }
+#    command = "bash ./modules/aurora/scripts/reset_db_passwords.sh ${module.aurora.cluster_endpoint} ${module.aurora.cluster_master_username} \"$DB_PASSWORD\" ${each.value} \"$USER_PASSWORD\""
+#  }
 
-  depends_on = [module.aurora]
-}
+#run everytime
+#  triggers = {
+#    always_run = timestamp()
+#  }
+
+#  depends_on = [module.aurora]
+#}

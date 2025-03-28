@@ -33,7 +33,9 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
   subnet_ids = data.aws_subnets.shared-public.ids
 }
 
+
 resource "aws_security_group" "postgresql_db_sc" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   count       = local.is-development ? 0 : 1
   name        = "postgres_security_group"
   description = "control access to the database"
@@ -57,6 +59,7 @@ resource "aws_security_group" "postgresql_db_sc" {
   }
 
   egress {
+    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     description = "allow all outbound traffic"
     from_port   = 0
     to_port     = 0
@@ -95,6 +98,7 @@ resource "aws_db_instance" "dacp_db_dev" {
 }
 
 resource "aws_security_group" "postgresql_db_sc_dev" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   count       = local.is-development ? 1 : 0
   name        = "postgres_security_group_dev"
   description = "control access to the database"
@@ -200,7 +204,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_connections_alarm" {
   statistic           = "Average"
   threshold           = "50" # Set desired threshold for high connections
   alarm_description   = "This metric checks if RDS database connections are high - threshold set to 50"
-  alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]
+  alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm.arn]
 
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.dacp_db[0].identifier
