@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 1.0.0"
+}
+
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "nginx_lb" {
   #checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"

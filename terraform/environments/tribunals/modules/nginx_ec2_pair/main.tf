@@ -1,3 +1,7 @@
+terraform {
+  required_version = ">= 1.0.0"
+}
+
 output "instance_ids" {
   value = tomap({
     for k, inst in aws_instance.nginx : k => inst.id
