@@ -12,8 +12,9 @@ module "yjsm" {
   # Assigning private IP based on environment
   private_ip = lookup(
     {
-      development = "10.26.144.61"
-      test        = "10.26.152.172"
+      development     = "10.26.144.61"
+      test            = "10.26.152.172"
+      preproduction   = "10.27.144.83"
       # Add more environments when IP is known
     },
     local.environment,
@@ -22,7 +23,8 @@ module "yjsm" {
 
   ami = lookup(
     {
-      development = "ami-0165ab84499655148"
+      development   = "ami-0165ab84499655148"
+      preproduction = "ami-04ee6bb49367c4dd9"
       # Add more environments when AMIs are known
     },
     local.environment,
@@ -39,4 +41,5 @@ module "yjsm" {
   esb_service_sg_id             = module.esb.esb_security_group_id
   rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
   alb_security_group_id         = module.internal_alb.alb_security_group_id
+  tableau_sg_id                 = module.tableau.tableau_sg_id
 }
