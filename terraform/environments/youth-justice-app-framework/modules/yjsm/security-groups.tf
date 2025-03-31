@@ -129,7 +129,7 @@ resource "aws_security_group_rule" "tableau_to_yjsm_ssh" {
   type                     = "ingress"
   from_port                = 22
   to_port                  = 22
-  protocol                 = "ssh"
+  protocol                 = "tcp"
   security_group_id        = aws_security_group.yjsm_service.id
   source_security_group_id = var.tableau_sg_id
   description              = "tableau to yjsm ssh temp"
