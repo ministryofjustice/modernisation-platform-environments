@@ -8,10 +8,15 @@ data "aws_iam_policy_document" "genesys_ap_airflow" {
       "s3:ListBucket",
       "s3:GetObject",
       "s3:PutObject",
-      "s3:CopyObject"
+      "s3:PutObjectAcl"
     ]
     resources = [
-      "arn:aws:s3:::*"
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/*",
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}",
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn}/*",
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn}",
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-staging-"].bucket.arn}/*",
+      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-staging-"].bucket.arn}"
     ]
   }
 }
