@@ -58,6 +58,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-ingestion/transfer-family"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/apex"
     schedule:
       interval: "daily"
@@ -314,6 +318,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/domains/postgres-tickle-lambda"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/domains/reconciliation-job"
     schedule:
       interval: "daily"
@@ -343,6 +351,10 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/eventbridge"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/digital-prison-reporting/modules/eventbridge_trigger"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -395,10 +407,6 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/digital-prison-reporting/modules/notifications/sns"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/digital-prison-reporting/modules/pipeline_trigger"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
@@ -814,11 +822,39 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/esb"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/lambda"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/redshift"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/youth-justice-app-framework/modules/s3"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/ses"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/tableau"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/tableau/add_rules_to_sg"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/youth-justice-app-framework/modules/waf"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
+    directory: "/terraform/environments/youth-justice-app-framework/modules/yjsm"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"

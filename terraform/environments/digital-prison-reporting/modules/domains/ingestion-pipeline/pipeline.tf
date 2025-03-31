@@ -301,7 +301,7 @@ locals {
         "NumberOfWorkers" : var.retention_curated_num_workers,
         "WorkerType" : var.retention_curated_worker_type
       },
-      "Next" : var.batch_only ? local.switch_hive_tables_for_prisons_to_curated.StepName : local.resume_dms_replication_task.StepName
+      "Next" : var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName
     }
   }
 
@@ -436,7 +436,7 @@ module "data_ingestion_pipeline" {
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }
-  ) : jsonencode(
+    ) : jsonencode(
     {
       "Comment" : "Data Ingestion Pipeline Step Function",
       "StartAt" : local.deactivate_archive_trigger.StepName,

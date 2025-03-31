@@ -184,7 +184,7 @@ data "aws_iam_policy_document" "logging_s3_policy" {
 
 # S3 Bucket - R-sync
 module "s3-bucket-dbbackup" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.0"
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
@@ -279,4 +279,16 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
 
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
+}
+
+# Development
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-development-logging"]
+}
+
+# Test
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-upgrade-test-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-test-logging"]
 }

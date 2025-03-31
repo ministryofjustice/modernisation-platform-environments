@@ -1,0 +1,41 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "logs:CreateLogGroup",
+      "Resource": "arn:aws:logs:eu-west-2:${account_number}:*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["logs:CreateLogStream", "logs:PutLogEvents"],
+      "Resource": [
+        "arn:aws:logs:eu-west-2:${account_number}:log-group:/aws/lambda/S3-cross-account-replication:*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:GetObjectTagging",
+        "s3:DeleteObjectVersion",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::mojap-youth-justice-board",
+        "arn:aws:s3:::mojap-youth-justice-board/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::redshift-serverless-yjb-reporting/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:PutObjectAcl"],
+      "Resource": "arn:aws:s3:::mojap-youth-justice-board/*"
+    }
+  ]
+}

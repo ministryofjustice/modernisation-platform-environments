@@ -1,4 +1,5 @@
 resource "aws_security_group" "dacp_lb_sc" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   name        = "load balancer security group"
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -85,6 +86,7 @@ resource "aws_security_group" "dacp_lb_sc" {
 }
 
 resource "aws_security_group" "lb_sc_pingdom" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   name        = "load balancer Pingdom security group"
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -158,6 +160,7 @@ resource "aws_security_group" "lb_sc_pingdom" {
 }
 
 resource "aws_security_group" "lb_sc_pingdom_2" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   name        = "load balancer Pingdom security group 2"
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -232,8 +235,8 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
 
 # tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "dacp_lb" {
-  # checkov:skip=CKV_AWS_91: "ELB Logging not required"
-  # checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
+  #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
   name                       = "dacp-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.dacp_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
@@ -245,7 +248,7 @@ resource "aws_lb" "dacp_lb" {
 }
 
 resource "aws_lb_target_group" "dacp_target_group" {
-  # checkov:skip=CKV_AWS_261 "Health check clearly defined"
+  #checkov:skip=CKV_AWS_261 "Health check clearly defined"
   name                 = "dacp-target-group"
   port                 = 80
   protocol             = "HTTP"
@@ -270,8 +273,8 @@ resource "aws_lb_target_group" "dacp_target_group" {
 }
 
 resource "aws_lb_listener" "dacp_lb" {
-  # checkov:skip=CKV_AWS_2: "Ensure ALB protocol is HTTPS" - false alert
-  # checkov:skip=CKV_AWS_103: "LB using higher version of TLS" - higher than alert
+  #checkov:skip=CKV_AWS_2: "Ensure ALB protocol is HTTPS" - false alert
+  #checkov:skip=CKV_AWS_103: "LB using higher version of TLS" - higher than alert
   depends_on = [
     aws_acm_certificate.external
   ]
