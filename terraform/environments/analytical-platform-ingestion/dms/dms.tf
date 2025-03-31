@@ -34,7 +34,7 @@ module "cica_dms_tariff_dms_implementation" {
     replication_task_id = {
       full_load = "${local.resource_name}-full-load"
     }
-    dms_mapping_rules     = file("./metadata/cica_tariff.json")
+    dms_mapping_rules     = "./metadata/cica_tariff.json"
     output_bucket         = module.cica_dms_ingress_bucket.s3_bucket_id
 
     tags = local.tags
