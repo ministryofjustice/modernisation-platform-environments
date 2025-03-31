@@ -98,10 +98,12 @@ module "management_service_sg" {
       protocol                 = "tcp"
       source_security_group_id = module.tableau_sg.security_group_id
     },
+    /*
     {
       rule = "ssh-tcp"
       source_security_group_id = module.tableau_sg.security_group_id
     },
+    */
     {
       rule = "ssh-tcp"
       source_security_group_id = var.yjsm_sg_id
