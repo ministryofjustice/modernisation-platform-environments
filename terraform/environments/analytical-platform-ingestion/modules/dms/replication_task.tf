@@ -1,6 +1,6 @@
 # Local to parse the JSON
 locals {
-  input_data         = jsondecode(var.dms_mapping_rules)
+  input_data         = jsondecode(file(var.dms_mapping_rules))
   objects            = [for object in local.input_data.objects : replace(object, "-", "_")]
   blobs              = local.input_data.blobs
   columns_to_exclude = local.input_data.columns_to_exclude

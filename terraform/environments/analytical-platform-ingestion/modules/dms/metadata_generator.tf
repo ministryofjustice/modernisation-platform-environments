@@ -70,6 +70,19 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
     ]
   }
 
+  # Lambda can access configuration files placed in its own bucket
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+    ]
+
+    resources = [
+      aws_s3_bucket.lambda.arn,
+      "${aws_s3_bucket.lambda.arn}/*"
+    ]
+  }
+
   # Lambda can reprocess data in the invalid bucket
   statement {
     actions = [
@@ -166,11 +179,11 @@ module "metadata_generator" {
     INVALID_BUCKET                       = aws_s3_bucket.invalid.bucket
     RAW_HISTORY_BUCKET                   = data.aws_s3_bucket.raw_history.bucket
     LAMBDA_BUCKET                        = aws_s3_bucket.lambda.bucket
-    DB_OBJECTS                           = jsonencode(jsondecode(var.dms_mapping_rules)["objects"])
-    DB_SCHEMA_NAME                       = lookup(jsondecode(var.dms_mapping_rules), "schema", "")
+    DB_OBJECTS                           = jsonencode(jsondecode(file(var.dms_mapping_rules))["objects"])
+    DB_SCHEMA_NAME                       = lookup(jsondecode(file(var.dms_mapping_rules)), "schema", "")
     ENGINE                               = var.dms_source.engine_name
     DATABASE_NAME                        = var.dms_source.sid
-    GLUE_CATALOG_DATABASE_NAME           = lookup(jsondecode(var.dms_mapping_rules), "objects_from", var.db)
+    GLUE_CATALOG_DATABASE_NAME           = lookup(jsondecode(file(var.dms_mapping_rules)), "objects_from", var.db)
     USE_GLUE_CATALOG                     = var.write_metadata_to_glue_catalog
     PATH_TO_DMS_MAPPING_RULES            = aws_s3_object.dms_mapping_rules.key
     RETRY_FAILED_AFTER_RECREATE_METADATA = var.retry_failed_after_recreate_metadata

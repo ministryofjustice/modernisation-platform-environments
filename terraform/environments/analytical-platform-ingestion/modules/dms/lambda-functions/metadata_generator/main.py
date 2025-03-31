@@ -101,10 +101,10 @@ class MetadataExtractor:
         if path_to_dms_mapping_rules:
             logger.info("Loading columns to exclude from %s", path_to_dms_mapping_rules)
             response = s3.get_object(
-                bucket=lambda_bucket_name,
-                path=path_to_dms_mapping_rules
+                Bucket=lambda_bucket_name,
+                Key=path_to_dms_mapping_rules
             )
-            self.dms_mapping_rules = json.loads("".join(response['body'].readlines()))
+            self.dms_mapping_rules = json.loads(b"".join(response['Body'].readlines()).decode("utf-8"))
         self.excluded_columns_by_object = defaultdict(set)
         for object_column in self.dms_mapping_rules.get("columns_to_exclude", []):
             self.excluded_columns_by_object[object_column["object_name"]].add(object_column["column_name"])
@@ -268,7 +268,7 @@ def handler(event, context):  # pylint: disable=unused-argument
 
     db_objects = [obj.lower() for obj in json.loads(os.getenv("DB_OBJECTS", "[]"))]
     schema_name = os.getenv("DB_SCHEMA_NAME").lower() # May be empty string if schema specified on per-table basis
-    path_to_dms_mapping_rules = json.loads(os.environ.get("PATH_TO_DMS_MAPPING_RULES", "{}"))
+    path_to_dms_mapping_rules = os.environ.get("PATH_TO_DMS_MAPPING_RULES", "")
 
     db_options = {
         "database": db_name,
