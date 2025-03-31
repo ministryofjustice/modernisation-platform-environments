@@ -97,6 +97,14 @@ module "management_service_sg" {
       from_port = "8850"
       protocol = "tcp"
       source_security_group_id = module.tableau_sg.security_group_id
+    },
+    {
+      rule = "ssh-tcp"
+      source_security_group_id = module.tableau_sg.security_group_id
+    },
+    {
+      rule = "ssh-tcp"
+      source_security_group_id = var.yjsm_sg_id
     }
   ]
 }
@@ -119,5 +127,16 @@ module "redshift_sg" {
   target_sg_id = var.redshift_sg_id
   rule         = "redshift-tcp"
   description  = "Redshift from Tableau Server."
+
+}
+
+module "yjsm_sg" {
+  source = "./add_rules_to_sg"
+
+  vpc_id       = var.vpc_id
+  source_sg_id = module.tableau_sg.security_group_id
+  target_sg_id = var.yjsm_sg_id
+  rule         = "ssh-tcp"
+  description  = "SSH to YJSM from Tableau Server."
 
 }

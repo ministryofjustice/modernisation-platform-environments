@@ -107,6 +107,11 @@ variable "redshift_sg_id" {
   description = "The ID of the Redshift Serverless Security Group. Used to add a rule to enable Tableau access to Redshift."
 }
 
+variable "yjsm_sg_id" {
+  type        = string
+  description = "The ID of the YJSM Server Security Group. Used to add a rule to enable Tableau ssh to yjsm."
+}
+
 # Datadog Inputs
 variable "datadog_api_key_arn" {
   type        = string
