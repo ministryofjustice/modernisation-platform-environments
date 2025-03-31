@@ -4,12 +4,12 @@ data "aws_ami" "app_ami" {
   owners      = ["aws-marketplace"] # Use this after Subscription 
   #owners      = ["amazon"] # to remove
   filter {
-    name   = "name" #"description" # "name"
+    name   = "name"                                         #"description" # "name"
     values = ["CIS Amazon Linux 2023 Benchmark - Level 1*"] # Use this after Subscription 
-  #  values = ["Amazon Linux 2023*"]
+    #  values = ["Amazon Linux 2023*"]
 
   }
-  
+
   filter {
     name   = "virtualization-type"
     values = ["hvm"]

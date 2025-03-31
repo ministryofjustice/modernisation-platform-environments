@@ -11,11 +11,11 @@ resource "aws_secretsmanager_secret" "auto_admit_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "auto_admit_version" {
-  secret_id     = aws_secretsmanager_secret.auto_admit_secret.id
+  secret_id = aws_secretsmanager_secret.auto_admit_secret.id
   secret_string = jsonencode(
     { "password" = "changeme"
       "username" = "connectivity.postman"
-      "user"     = "connectivity.postman@i2n.com"}
+    "user" = "connectivity.postman@i2n.com" }
   )
   lifecycle {
     ignore_changes = [secret_string]
@@ -32,11 +32,11 @@ resource "aws_secretsmanager_secret" "LDAP_administration_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "LDAP_administration_version" {
-  secret_id     = aws_secretsmanager_secret.LDAP_administration_secret.id
+  secret_id = aws_secretsmanager_secret.LDAP_administration_secret.id
   secret_string = jsonencode(
     { "user_password_attribute" = "unicodePwd"
       "userdn"                  = "CN=admin2,OU=Users,OU=Accounts,OU=i2N,DC=i2n,DC=com"
-      "password"                = "changeme"}
+    "password" = "changeme" }
   )
   lifecycle {
     ignore_changes = [secret_string]
@@ -68,10 +68,10 @@ resource "aws_secretsmanager_secret" "Auth_Email_Account" {
 }
 
 resource "aws_secretsmanager_secret_version" "Auth_Email_Account" {
-  secret_id     = aws_secretsmanager_secret.Auth_Email_Account.id
+  secret_id = aws_secretsmanager_secret.Auth_Email_Account.id
   secret_string = jsonencode(
     { "username" = "auth.service@i2n.com"
-      "password" = "changeme"}
+    "password" = "changeme" }
   )
   lifecycle {
     ignore_changes = [secret_string]
@@ -114,7 +114,7 @@ resource "aws_secretsmanager_secret_version" "ad_credentials" {
   secret_string = jsonencode(
     { "Tableau Admin Group" = "tsmadmin"
       "Admin Username"      = "tabadmin"
-      "Password"            = "changeme"}
+    "Password" = "changeme" }
   )
 
   lifecycle {
@@ -137,7 +137,7 @@ resource "aws_secretsmanager_secret_version" "tableau_admin" {
   secret_id = aws_secretsmanager_secret.tableau_admin.id
   secret_string = jsonencode(
     { tableau_ad_read_account = "tableau"
-      tableau-ad_read_password = "changeme"}
+    tableau-ad_read_password = "changeme" }
   )
 
   lifecycle {
@@ -161,7 +161,7 @@ resource "aws_secretsmanager_secret_version" "yjaf_credentials" {
   secret_string = jsonencode(
     { ClientID = "changeme"
       SecretID = "changeme"
-      Value    = "changeme"}
+    Value = "changeme" }
   )
 
   lifecycle {

@@ -1,12 +1,12 @@
 # SNS Topics for linking to Alarms
 resource "aws_sns_topic" "email_topic" {
   #checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
-  name  = "email-topic"
+  name = "email-topic"
 }
 
 resource "aws_sns_topic" "dacp_utilisation_alarm" {
   #checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
-  name  = "dacp_utilisation_alarm"
+  name = "dacp_utilisation_alarm"
 }
 
 # SNS Topic Subscriptions to configure alarm actions
@@ -28,7 +28,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_high_ram_alarm" {
   statistic           = "Average"
   threshold           = 2500
   alarm_description   = "DACP ECS scaling up as memory has exceeded the threshold"
-  alarm_actions       = [
+  alarm_actions = [
     aws_appautoscaling_policy.scale_up_amber.arn,
     aws_sns_topic.dacp_utilisation_alarm.arn,
     aws_sns_topic.email_topic.arn
@@ -49,7 +49,7 @@ resource "aws_cloudwatch_metric_alarm" "ecs_service_normal_ram_alarm" {
   statistic           = "Average"
   threshold           = 2500
   alarm_description   = "DACP ECS scaling down as memory has returned to normal levels"
-  alarm_actions       = [
+  alarm_actions = [
     aws_appautoscaling_policy.scale_down_amber.arn,
     aws_sns_topic.dacp_utilisation_alarm.arn,
     aws_sns_topic.email_topic.arn
