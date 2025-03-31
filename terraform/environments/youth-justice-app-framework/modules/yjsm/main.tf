@@ -1,6 +1,5 @@
 #create keypair for ec2 instances
 module "key_pair" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/key-pair/aws"
   version = "2.0.3"
 
@@ -10,14 +9,19 @@ module "key_pair" {
   tags = local.all_tags
 }
 
+# Output the private key so we can store it
+output "private_key_pem" {
+  value     = module.key_pair.private_key_pem
+  sensitive = true
+}
 
-data "template_file" "userdata" {
-  template = file("${path.module}/ec2-userdata.tftpl")
-  vars = {
-    env     = var.environment
-    tags    = jsonencode(local.all_tags)
-    project = var.project_name
-  }
+resource "aws_ssm_parameter" "private_key" {
+  name        = "/ec2/keypairs/yjsm-private-key"
+  description = "EC2 Private Key for yjsm-keypair"
+  type        = "SecureString"
+  value       = module.key_pair.private_key_pem
+
+  tags = local.all_tags
 }
 
 
