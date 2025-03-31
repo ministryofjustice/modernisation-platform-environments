@@ -231,8 +231,8 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
 }
 
 
+#tfsec:ignore:AVD-AWS-0053
 resource "aws_lb" "wardship_lb" {
-  #tfsec:ignore:AVD-AWS-0053
   name                       = "wardship-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.wardship_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
