@@ -51,39 +51,39 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.wardship_db[0].address}"
+          value = aws_db_instance.wardship_db[0].address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.wardship_db[0].username}"
+          value = aws_db_instance.wardship_db[0].username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.wardship_db[0].password}"
+          value = aws_db_instance.wardship_db[0].password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.wardship_db[0].db_name}"
+          value = aws_db_instance.wardship_db[0].db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].curserver}"
+          value = local.application_data.accounts[local.environment].curserver
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
@@ -130,39 +130,39 @@ resource "aws_ecs_task_definition" "wardship_task_definition_dev" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.wardship_db_dev[0].address}"
+          value = aws_db_instance.wardship_db_dev[0].address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.wardship_db_dev[0].username}"
+          value = aws_db_instance.wardship_db_dev[0].username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.wardship_db_dev[0].password}"
+          value = aws_db_instance.wardship_db_dev[0].password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.wardship_db_dev[0].db_name}"
+          value = aws_db_instance.wardship_db_dev[0].db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].curserver}"
+          value = local.application_data.accounts[local.environment].curserver
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
