@@ -180,9 +180,12 @@ class MetadataExtractor:
         else:
             return metadata
 
-        for column_name in set(metadata.column_names).union(map(str.lower, self.excluded_columns_by_object[exclusion_key])):
+        for column_name in set(metadata.column_names).intersection(map(str.lower, self.excluded_columns_by_object[exclusion_key])):
             logger.info("Removing column %s from table %s in schema %s in metadata", column_name, table, schema)
             metadata.remove_column(column_name)
+            if column_name in metadata._data["primary_key"]:
+                logger.info("Unsetting primary key of %s on %s.%s so as not to break metadata.validate()", column_name, schema, table)
+                metadata._data["primary_key"].remove(column_name)
 
         return metadata
 
@@ -199,6 +202,7 @@ class MetadataExtractor:
     def get_table_metadata(self, schema, table) -> Metadata:
         logger.info("Getting table metadata for table %s in schema %s", table, schema)
         table_meta = self.sqlc.generate_to_meta(table.lower(), schema)
+        logger.info("Primary key of %s.%s is %s", schema, table, table_meta.primary_key)
         table_meta = self._manage_blob_columns(table_meta)
         table_meta = self._convert_int_columns(table_meta)
         table_meta = self._rename_materialised_view(table_meta)
