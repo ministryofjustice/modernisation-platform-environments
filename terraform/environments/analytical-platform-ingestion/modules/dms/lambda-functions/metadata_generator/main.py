@@ -1,3 +1,4 @@
+from collections import defaultdict
 import json
 import logging
 import os
@@ -95,6 +96,10 @@ class MetadataExtractor:
         self.dialect = db_options["dialect"]
         self.objects = db_options["objects"]
         self.deleted_tables = db_options.get("deleted_tables", [])
+        self.columns_to_exclude = db_options.get("columns_to_exclude", {})
+        self.excluded_columns_by_object = defaultdict(set)
+        for object_column in self.columns_to_exclude:
+            self.excluded_columns_by_object[object_column["object_name"]].add(object_column["column_name"])
 
         self.emc = EtlManagerConverter()
         self.sqlc = SQLAlchemyConverter(engine)
@@ -145,6 +150,32 @@ class MetadataExtractor:
             metadata.update_column(column)
         return metadata
 
+    def _process_exclusions(self, metadata: Metadata, schema: str, table: str) -> Metadata:
+        """
+        Remove relevant entries from column exclusion list from metadata
+
+        :param metadata: collection of metadata about table
+        :type metadata: Metadata
+        :param schema: Name of schema table is contained within
+        :type schema: str
+        :param table: Name of table metadata pertains to
+        :type table: str
+        :rtype: Metadata
+        """
+        exclusion_key = ""
+        if f"{schema}.{table}" in self.excluded_columns_by_object:
+            exclusion_key = f"{schema}.{table}"
+        elif table in self.excluded_columns_by_object:
+            exclusion_key = table
+        else:
+            return metadata
+
+        for column_name in set(metadata.columns).union(self.excluded_columns_by_object[exclusion_key]):
+            logger.info("Removing column %s from table %s in schema %s in metadata", column_name, table, schema)
+            metadata.remove_column(column_name)
+
+        return metadata
+
     def convert_metadata(self, metadata: Metadata):
         logger.info("Converting metadata: %s", metadata)
         metadata.file_format = "parquet"
@@ -162,6 +193,7 @@ class MetadataExtractor:
         table_meta = self._convert_int_columns(table_meta)
         table_meta = self._rename_materialised_view(table_meta)
         table_meta = self._add_reference_columns(table_meta)
+        table_meta = self._process_exclusions(table_meta, schema, table)
         # table_meta = self._convert_metadata(table_meta)
         table_meta.file_format = "parquet"
         return table_meta
@@ -173,6 +205,7 @@ class MetadataExtractor:
             "objects": sorted(self.objects),
             "blobs": self.blobs,
             "deleted_tables": sorted(self.deleted_tables),
+            "columns_to_exclude": self.columns_to_exclude
         }
         s3.put_object(
             Body=json.dumps(database_objects),
@@ -226,6 +259,7 @@ def handler(event, context):  # pylint: disable=unused-argument
 
     db_objects = [obj.lower() for obj in json.loads(os.getenv("DB_OBJECTS", "[]"))]
     schema_name = os.getenv("DB_SCHEMA_NAME").lower() # May be empty string if schema specified on per-table basis
+    columns_to_exclude = json.loads(os.environ.get("COLUMNS_TO_EXCLUDE", "{}"))
 
     db_options = {
         "database": db_name,
@@ -234,6 +268,7 @@ def handler(event, context):  # pylint: disable=unused-argument
         "objects": db_objects,
         "include_derived_columns": True,
         "dialect": engine,
+        "columns_to_exclude": columns_to_exclude
     }
 
     if use_glue_catalog:

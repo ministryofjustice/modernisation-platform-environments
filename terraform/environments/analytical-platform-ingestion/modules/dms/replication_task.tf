@@ -1,8 +1,9 @@
 # Local to parse the JSON
 locals {
-  input_data = jsondecode(var.dms_mapping_rules)
-  objects    = [for object in local.input_data.objects : replace(object, "-", "_")]
-  blobs      = local.input_data.blobs
+  input_data         = jsondecode(var.dms_mapping_rules)
+  objects            = [for object in local.input_data.objects : replace(object, "-", "_")]
+  blobs              = local.input_data.blobs
+  columns_to_exclude = local.input_data.columns_to_exclude
   rules = flatten(concat(
     [
       for idx, obj in local.objects : {
@@ -47,6 +48,21 @@ locals {
           schema-name = length(split(".", blob.object_name)) > 1 ? split(".", blob.object_name)[0] : local.input_data.schema
           table-name  = length(split(".", blob.object_name)) > 1 ? split(".", blob.object_name)[1] : blob.object_name
           column-name = blob.column_name
+        }
+      }
+    ],
+    [
+      # Generate transformation rules for removing columns
+      for idx, column_to_exclude in local.columns_to_exclude : {
+        rule-type   = "transformation"
+        rule-id     = (length(local.objects) * 2) + idx + 1
+        rule-name   = "remove-${lower(column_to_exclude.column_name)}-from-${lower(column_to_exclude.object_name)}"
+        rule-action = "remove-column"
+        rule-target = "column"
+        object-locator = {
+          schema-name = length(split(".", column_to_exclude.object_name)) > 1 ? split(".", column_to_exclude.object_name)[0] : local.input_data.schema
+          table-name  = length(split(".", column_to_exclude.object_name)) > 1 ? split(".", column_to_exclude.object_name)[1] : column_to_exclude.object_name
+          column-name = column_to_exclude.column_name
         }
       }
     ],

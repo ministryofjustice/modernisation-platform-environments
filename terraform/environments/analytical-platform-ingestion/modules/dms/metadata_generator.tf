@@ -165,6 +165,7 @@ module "metadata_generator" {
     DATABASE_NAME              = var.dms_source.sid
     GLUE_CATALOG_DATABASE_NAME = lookup(jsondecode(var.dms_mapping_rules), "objects_from", var.db)
     USE_GLUE_CATALOG           = "false"
+    COLUMNS_TO_EXCLUDE         = jsonencode(lookup(jsondecode(var.dms_mapping_rules), "columns_to_exclude", []))
   }
 
   source_path = [{

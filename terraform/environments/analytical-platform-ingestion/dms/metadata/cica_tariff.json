@@ -29,7 +29,8 @@
         "CLAIMS.TARIFF_REASON_TYPES",
         "CLAIMS.TARIFF_STATUS_TYPES"
     ],
-    "blobs": [
+    "blobs": [],
+    "columns_to_exclude": [
         {
             "object_name": "CLAIMS.APPLICANT_INJURIES",
             "column_name": "APPLY_EX_PER"
