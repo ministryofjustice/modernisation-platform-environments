@@ -10,7 +10,7 @@ data "aws_iam_policy_document" "genesys_ap_airflow" {
       "s3:PutObject",
       "s3:PutObjectAcl",
       "s3:GetObjectTagging",
-      "s3:PutObjectTagging"
+      "s3:PutObjectTagging",
     ]
     resources = [
       module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn,
