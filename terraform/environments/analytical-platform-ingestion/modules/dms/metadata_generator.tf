@@ -126,6 +126,12 @@ resource "aws_security_group" "metadata_generator_lambda_function" {
   }
 }
 
+resource "aws_s3_object" "dms_mapping_rules" {
+  bucket = aws_s3_bucket.lambda.bucket
+  key    = "metadata-generator/config/dms_mapping_rules.json"
+  source = var.dms_mapping_rules
+}
+
 module "metadata_generator" {
   # Commit hash for v7.20.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=84dfbfddf9483bc56afa0aff516177c03652f0c7"
@@ -159,13 +165,14 @@ module "metadata_generator" {
     LANDING_BUCKET                       = aws_s3_bucket.landing.bucket
     INVALID_BUCKET                       = aws_s3_bucket.invalid.bucket
     RAW_HISTORY_BUCKET                   = data.aws_s3_bucket.raw_history.bucket
+    LAMBDA_BUCKET                        = aws_s3_bucket.lambda.bucket
     DB_OBJECTS                           = jsonencode(jsondecode(var.dms_mapping_rules)["objects"])
     DB_SCHEMA_NAME                       = lookup(jsondecode(var.dms_mapping_rules), "schema", "")
     ENGINE                               = var.dms_source.engine_name
     DATABASE_NAME                        = var.dms_source.sid
     GLUE_CATALOG_DATABASE_NAME           = lookup(jsondecode(var.dms_mapping_rules), "objects_from", var.db)
     USE_GLUE_CATALOG                     = var.write_metadata_to_glue_catalog
-    COLUMNS_TO_EXCLUDE                   = jsonencode(lookup(jsondecode(var.dms_mapping_rules), "columns_to_exclude", []))
+    PATH_TO_DMS_MAPPING_RULES            = aws_s3_object.dms_mapping_rules.key
     RETRY_FAILED_AFTER_RECREATE_METADATA = var.retry_failed_after_recreate_metadata
   }
 
