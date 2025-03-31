@@ -37,5 +37,5 @@ resource "aws_cloudwatch_log_group" "step-function-log-group" {
     var.tags,
     {
       name = "log-group-${var.step_function_name}"
-    })
+  })
 }

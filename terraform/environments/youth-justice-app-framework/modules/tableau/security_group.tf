@@ -14,18 +14,18 @@ module "tableau_sg" {
       rule                     = "https-443-tcp"
       source_security_group_id = module.alb_sg.security_group_id
     },
-   {
+    {
       rule                     = "ssh-tcp"
       source_security_group_id = var.management_server_sg_id
     },
-   {
+    {
       rule                     = "https-443-tcp"
       source_security_group_id = var.management_server_sg_id
     },
-   {
-      from_port   = 8850
-      to_port     = 8850
-      protocol    = "tcp"
+    {
+      from_port                = 8850
+      to_port                  = 8850
+      protocol                 = "tcp"
       source_security_group_id = var.management_server_sg_id
     },
 
@@ -93,9 +93,9 @@ module "management_service_sg" {
 
   egress_with_source_security_group_id = [
     {
-      to_port = "8850"
-      from_port = "8850"
-      protocol = "tcp"
+      to_port                  = "8850"
+      from_port                = "8850"
+      protocol                 = "tcp"
       source_security_group_id = module.tableau_sg.security_group_id
     },
     {

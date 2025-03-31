@@ -262,7 +262,7 @@ resource "aws_instance" "s609693lo6vw109" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-013198324453e6dc3"
+  ami                    = "ami-05d3600bb677c98cd"
   instance_type          = "m5.large"
   vpc_security_group_ids = [aws_security_group.SCR-Team-Foundation-Server[0].id]
   source_dest_check      = false

@@ -2,17 +2,18 @@
 
 
 module "esb" {
-  source  = "./modules/esb"
+  source = "./modules/esb"
 
   #Network details
-  vpc_id                  = data.aws_vpc.shared.id
+  vpc_id    = data.aws_vpc.shared.id
   subnet_id = one(tolist([for s in local.private_subnet_list : s.id if s.availability_zone == "eu-west-2a"]))
 
   # Assigning private IP based on environment
   private_ip = lookup(
     {
-      development = "10.26.144.217"
-      test        = "10.26.152.88"
+      development     = "10.26.144.217"
+      test            = "10.26.152.88"
+      preproduction   = "10.27.144.238"
       # Add more environments when IP is known
     },
     local.environment,
@@ -21,17 +22,21 @@ module "esb" {
 
   ami = lookup(
     {
-      development = "ami-0fc27ddcf3e4e76af"
+      development   = "ami-0fc27ddcf3e4e76af"
+      preproduction = "ami-04a6fa2443473cfd5"
       # Add more environments when AMIs are known
     },
     local.environment,
     "ami-01426769db5cd0a43" # Default AMI
   )
 
-  project_name    = local.project_name
-  environment     = local.environment
-  tags            = local.tags
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
 
-  yjsm_service_sg_id             = module.yjsm.yjsm_security_group_id
+  yjsm_service_sg_id = module.yjsm.yjsm_security_group_id
+  
+  #Keep until prod images are done
+  tableau_sg_id                 = module.tableau.tableau_sg_id
 
 }

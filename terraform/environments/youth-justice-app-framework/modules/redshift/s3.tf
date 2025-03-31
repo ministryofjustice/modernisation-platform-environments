@@ -6,7 +6,7 @@ module "s3" {
 
   transfer_bucket_name = ["redshift-yjb-reporting", "redshift-ycs-reporting"]
 
-   tags = var.tags
+  tags = var.tags
 
 }
 

@@ -1,6 +1,6 @@
 locals {
- 
- esb_security_group_ingress = [
+
+  esb_security_group_ingress = [
     {
       from_port   = 8401
       to_port     = 8401

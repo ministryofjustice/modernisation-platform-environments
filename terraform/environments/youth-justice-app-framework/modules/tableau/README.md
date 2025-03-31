@@ -13,7 +13,7 @@ This module manages the Tableau instance and Application load balancer and assoc
 - A key-pair for Tableau server.
 - S3 buckets for ALB logs and Tableau backups.
 
-## Inputs:
+## Inputs
 
 **project_name**: (string) Project name within aws.
 **environment**: (string) Deployment environment.
@@ -32,7 +32,7 @@ This module manages the Tableau instance and Application load balancer and assoc
 **alb_name**: (string) The name of the aplplication Load Balancer that publishes the Tableau server. Default "tableau-alb".
 **alb_subnet_ids** (list(string)) List of subnet IDs to which the Tableau applcation load bbalancer will be assigned.
 **certificate_arn** (string) The arn of the SSL cetificate to use for external access to Tableau.
-###Tableau security gropup inputs
+### Tableau security gropup inputs
 **directory_service_sg_id**: (string) The ID of the Active directory Service Security Group. Used to add a rules to aneble ldap & ldaps to AD.
 **management_server_sg_id**: (string) The ID of the Management Servers security group.
 **postgresql_sg_id**: (string) The ID of the RDS PostgreSQL Security Group. Used to add a rule to enable Tableau access to PostgreSQL.
@@ -52,7 +52,7 @@ This module manages the Tableau instance and Application load balancer and assoc
 ## Introduction
 The process for restoring Tableaus from backup is followed with some variations descripbed below to deal with differences between the old and new environments.
 ## Install and Restore
-The process for recovery of Tableau from backups is outlined in Confluance at https://yjb.atlassian.net/wiki/spaces/YAM/pages/5191794714/DOE+Tableau+Backup+and+Recovery#Recovery.1 which refers to detailed instructions in https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642507957/DOE+Tableau+Server+Install+Guide?atlOrigin=eyJpIjoiODA0MTExZDI0YjRhNGU0N2EwMGE1ZmQxOTBmYWEzNmMiLCJwIjoiYyJ9 and its subordinate documents.
+The process for recovery of Tableau from backups is outlined in Confluance at <https://yjb.atlassian.net/wiki/spaces/YAM/pages/5191794714/DOE+Tableau+Backup+and+Recovery#Recovery.1> which refers to detailed instructions in <https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642507957/DOE+Tableau+Server+Install+Guide?atlOrigin=eyJpIjoiODA0MTExZDI0YjRhNGU0N2EwMGE1ZmQxOTBmYWEzNmMiLCJwIjoiYyJ9> and its subordinate documents.
 
 The process will be followed but with changes, particurally to the process for restoring Tableau settings, to account for difference between the old and ned environments. In outline:
 
@@ -78,7 +78,7 @@ The process is as documented in the Recovey instructions but file `settings_for_
 After restoring the setting thaey shoudl not be applied to Tableau until External HTTPs has been enabled as described in the next section.
 
 ### Enable External HTTPS
-The process for this is described in Confluance document https://yjb.atlassian.net/wiki/spaces/YAM/pages/4729470989/DOE+Tableau+Enable+External+HTTPS?atlOrigin=eyJpIjoiNWQyNjA4YTQxYjRlNGRiNDk3NjU0ZWJhNWM4Mzg3NGUiLCJwIjoiYyJ9.
+The process for this is described in Confluance document <https://yjb.atlassian.net/wiki/spaces/YAM/pages/4729470989/DOE+Tableau+Enable+External+HTTPS?atlOrigin=eyJpIjoiNWQyNjA4YTQxYjRlNGRiNDk3NjU0ZWJhNWM4Mzg3NGUiLCJwIjoiYyJ9>.
 
 A copy of openssl-tableau.conf will already be available. The Siging Request and Certificate files can be copied beteen the Tableau and SubordinateCA servers via s3 location `yjaf-<envoronment>-tableau-backups/Install_Files`.
 
