@@ -25,8 +25,8 @@ module "postgres_tickle_lambda" {
   tags = merge(
     var.tags,
     {
-      Resource_Type  = "Lambda"
-      Name           = var.postgres_tickle_lambda_name
+      Resource_Type = "Lambda"
+      Name          = var.postgres_tickle_lambda_name
     }
   )
 }

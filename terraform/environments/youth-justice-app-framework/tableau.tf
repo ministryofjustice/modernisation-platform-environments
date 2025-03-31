@@ -13,16 +13,16 @@ module "tableau_cert" {
 module "tableau" {
   source = "./modules/tableau"
 
- # count = 0
+  # count = 0
 
   project_name = local.project_name
- # tags         = merge(local.tags, { Name = "AD Management Server" })
+  # tags         = merge(local.tags, { Name = "AD Management Server" })
 
   environment = local.environment
   test_mode   = local.test_mode
 
- # environment_name             = local.environment_name
-  
+  # environment_name             = local.environment_name
+
   #Network details
   vpc_id            = data.aws_vpc.shared.id
   tableau_subnet_id = local.private_subnet_list[0].id
@@ -36,18 +36,18 @@ module "tableau" {
   # ALB Details
   certificate_arn = module.tableau_cert.domain_cert_arn
 
-# Security Group IDs
-postgresql_sg_id        = module.aurora.rds_cluster_security_group_id
-redshift_sg_id          = module.redshift.security_group_id
-directory_service_sg_id = module.ds.directory_service_sg_id
-management_server_sg_id = module.ds.management_server_sg_id
+  # Security Group IDs
+  postgresql_sg_id        = module.aurora.rds_cluster_security_group_id
+  redshift_sg_id          = module.redshift.security_group_id
+  directory_service_sg_id = module.ds.directory_service_sg_id
+  management_server_sg_id = module.ds.management_server_sg_id
 
-datadog_api_key_arn = module.datadog.datadog_api_key_arn
-availability_schedule = ""
-patch_schedule = ""
+  datadog_api_key_arn   = module.datadog.datadog_api_key_arn
+  availability_schedule = ""
+  patch_schedule        = ""
 
-kms_key_arn =  module.kms.key_arn
+  kms_key_arn = module.kms.key_arn
 
 
-depends_on = [module.tableau_cert, module.aurora, module.redshift, module.ds]
+  depends_on = [module.tableau_cert, module.aurora, module.redshift, module.ds]
 }

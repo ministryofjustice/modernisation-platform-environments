@@ -30,7 +30,7 @@ resource "aws_security_group_rule" "yjsm_8090" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.esb_service.id
   source_security_group_id = var.yjsm_service_sg_id
-  description = "ESB Hub Page from YJSM Instance"
+  description              = "ESB Hub Page from YJSM Instance"
 }
 
 # YJSM
@@ -41,5 +41,5 @@ resource "aws_security_group_rule" "yjsm_8092" {
   protocol                 = "tcp"
   security_group_id        = aws_security_group.esb_service.id
   source_security_group_id = var.yjsm_service_sg_id
-  description = "ESB Mule 2 from YJSM"
+  description              = "ESB Mule 2 from YJSM"
 }
