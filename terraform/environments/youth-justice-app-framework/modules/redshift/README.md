@@ -24,7 +24,7 @@ Cutover involves creating a manual snapshot in the source account, making the sn
 3. Under `Provide access to servless accounts`, select `Add AWS account`, enter the destination account number and `Save changes`.
 4. There is likle to be a delay before it becomes available in the other account.
 
-As, currently, the default AWS key is used for encryption, permissions are not needed to enable the destination account decrypt the snapshot. 
+As, currently, the default AWS key is used for encryption, permissions are not needed to enable the destination account decrypt the snapshot.
 
 ### Restore the Cluster from the Snapshot ###
 1. In the AWS Management Console for the destination account, on the `Servless dashboard`, click on the `Total snapshots` link to view the `Snapshots`.
@@ -34,7 +34,7 @@ As, currently, the default AWS key is used for encryption, permissions are not n
 4. Wait to the snapshort restore to complete.
 
 ### Generate admin Passwordd and store in Secret ###
-1. In the AWS Management Console for the destination account, on the `Namespace`, and from the `Actions` menu select `click on the `Total snapshots` link to view the `Snapshots`.
+1. In the AWS Management Console for the destination account, on the `Namespace`, and from the `Actions` menu select `click on the`Total snapshots` link to view the `Snapshots`.
 2. Select `Generate a password` and `Show password` then copy the password to the clipboard beofre `Save changes`.
 3. In `AWS Secrets Manager`, select secret `yjaf/<env>/resshift-servless/`, `Retrieve secret value`, `Edit`, paste the password into the passowrd field value and `Save`.
 

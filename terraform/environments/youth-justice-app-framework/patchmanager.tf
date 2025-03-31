@@ -1,5 +1,5 @@
 resource "aws_ssm_patch_baseline" "yjaf_amazon_linux_2" {
-  name            = "YJAF-AmazonLinux2PatchBaseline"
+  name             = "YJAF-AmazonLinux2PatchBaseline"
   operating_system = "AMAZON_LINUX_2"
   description      = "YJAF Patch Baseline for Amazon Linux 2."
 
@@ -56,7 +56,7 @@ resource "aws_ssm_patch_group" "yjaf_amazon_linux_2_patch_group" {
 }
 
 resource "aws_ssm_patch_baseline" "yjaf_ubuntu_patch_baseline" {
-  name            = "YJAF-UbuntuPatchBaseline"
+  name             = "YJAF-UbuntuPatchBaseline"
   operating_system = "UBUNTU"
   description      = "YJAF Patch Baseline for Ubuntu"
 
@@ -92,7 +92,7 @@ resource "aws_ssm_patch_group" "yjaf_ubuntu_patch_group" {
 }
 
 resource "aws_ssm_patch_baseline" "yjaf_windows_patch_baseline" {
-  name            = "YJAF-WindowsPatchBaseline"
+  name             = "YJAF-WindowsPatchBaseline"
   operating_system = "WINDOWS"
   description      = "YJAF Patch Baseline for Windows Server"
 

@@ -1,7 +1,7 @@
 {
   "accounts": {
     "development": {
-       "allow_s3_replication": true,
+      "allow_s3_replication": true,
       "source_account": "856879713508",
       "ad_management_instance_count": 1,
       "desired_number_of_domain_controllers": 3,
@@ -18,12 +18,12 @@
         },
         "development.yjbservices.yjb.gov.uk": {
           "identity": "development.yjbservices.yjb.gov.uk",
-          "create_records": true 
+          "create_records": true
         }
       }
     },
     "test": {
-       "allow_s3_replication": true,
+      "allow_s3_replication": true,
       "source_account": "856879713508",
       "ad_management_instance_count": 2,
       "desired_number_of_domain_controllers": 2,

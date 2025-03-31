@@ -25,7 +25,7 @@ None
 # Bucket Replication
 A set of scripts have been written to facilitate setup of Replication from the old to new environments as follows:
 
-- **`replication-configuration.json.template`**: Defines the required replication configuraiton. Has place holders for the destination account number and bucket name. 
+- **`replication-configuration.json.template`**: Defines the required replication configuraiton. Has place holders for the destination account number and bucket name.
 - **`manifest-generator.json.template`**: Defins the maifest to be used for a job to copy the current contens of each bucket. Has place holders for the source account number and bucket name.
 - **`replication.sh`**: Must be called with 4 parameters: source bucket name, source account number , destination bucket name and destination account number. It will instantiate the above templates, enable versinong on the source bucket, create a replication rule on the source bucket and create a job to copy the buckets current contents.
 - **`replicate-all-<env>.sh`**: A version of this file exists for each version that has been rprpolulated with parameters for each bucket to be replicated.

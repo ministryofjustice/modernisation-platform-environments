@@ -81,7 +81,7 @@ module "ecs_service" {
 
       enable_cloudwatch_logging              = true
       create_cloudwatch_log_group            = true
-      cloudwatch_log_group_name              = "/aws/ecs/${each.value.name}"
+      cloudwatch_log_group_name              = "/ecs/${each.value.name}"
       cloudwatch_log_group_retention_in_days = each.value.cloudwatch_log_group_retention_in_days
 
       log_configuration = {
