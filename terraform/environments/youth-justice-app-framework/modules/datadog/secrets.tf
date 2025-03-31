@@ -7,7 +7,7 @@ resource "aws_secretsmanager_secret" "datadog_api" {
 }
 
 resource "aws_secretsmanager_secret_version" "datadog_api" {
-  secret_id = aws_secretsmanager_secret.datadog_api.id
+  secret_id     = aws_secretsmanager_secret.datadog_api.id
   secret_string = "changeme"
 }
 

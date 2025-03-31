@@ -200,7 +200,7 @@ resource "aws_iam_policy" "ecs-eni-policy" { #tfsec:ignore:aws-iam-no-policy-wil
   #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
   #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
   #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
- 
+
   name   = "${var.cluster_name}-ecs-eni"
   tags   = local.all_tags
   policy = <<EOF
@@ -231,15 +231,15 @@ resource "aws_iam_policy" "ecs-secrets-policy" { #tfsec:ignore:aws-iam-no-policy
   #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
   #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
   #checkov:skip=CKV_AWS_288: [TODO] Ensure IAM policies does not allow data exfiltration
- 
-  name   = "${var.cluster_name}-ecs-secrets"
-  tags   = local.all_tags
+
+  name = "${var.cluster_name}-ecs-secrets"
+  tags = local.all_tags
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "secretsmanager:GetRandomPassword",
           "secretsmanager:GetResourcePolicy",
           "secretsmanager:GetSecretValue",
@@ -251,16 +251,16 @@ resource "aws_iam_policy" "ecs-secrets-policy" { #tfsec:ignore:aws-iam-no-policy
         Resource = "*"
       },
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "kms:Decrypt",
           "kms:DescribeKey"
         ]
         Resource = var.secret_kms_key_arn
       },
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "ec2:AssignPrivateIpAddresses",
           "ec2:UnassignPrivateIpAddresses",
           "ec2:DescribeNetworkInterfaces"
