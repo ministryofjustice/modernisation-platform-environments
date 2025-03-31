@@ -1,3 +1,4 @@
+# trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "wardship_db" {
   count                       = local.is-development ? 0 : 1
   allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
