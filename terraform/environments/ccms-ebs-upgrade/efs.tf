@@ -63,7 +63,6 @@ resource "aws_security_group" "efs-security-group" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
-  name              = "efs-security-group-egress"
   description       = "Allow outgoing traffic"
   security_group_id = aws_security_group.efs-security-group.id
   ip_protocol       = "-1"
@@ -78,7 +77,6 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
 
 resource "aws_vpc_security_group_ingress_rule" "efs-security-group-ingress" {
   count             = length(local.data_subnets_cidr_blocks)
-  name              = "efs-security-group-ingress"
   description       = "Allow inbound access from container instances"
   security_group_id = aws_security_group.efs-security-group.id
   ip_protocol       = "tcp"
