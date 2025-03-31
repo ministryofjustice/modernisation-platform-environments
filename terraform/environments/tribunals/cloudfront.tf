@@ -208,17 +208,26 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudfront_logs" {
     id     = "delete_old_logs"
     status = "Enabled"
 
+    filter {
+      prefix = "cloudfront-logs/"
+    }
+
     expiration {
       days = 90
     }
   }
+
   rule {
+    id     = "abort-multipart"
+    status = "Enabled"
+
+    filter {
+      prefix = ""  //Empty prefix means apply to all objects
+    }
+
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
-    filter {}
-    id = "log"
-    status = "Enabled"
   }
 }
 
