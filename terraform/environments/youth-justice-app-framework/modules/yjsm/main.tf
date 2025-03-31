@@ -10,6 +10,14 @@ module "key_pair" {
   tags = local.all_tags
 }
 
+resource "aws_ssm_parameter" "private_key" {
+  name        = "/ec2/keypairs/yjsm-private-key"
+  description = "EC2 Private Key for yjsm-keypair"
+  type        = "SecureString"
+  value       = module.key_pair.private_key_pem
+
+  tags = local.all_tags
+}
 
 data "template_file" "userdata" {
   template = file("${path.module}/ec2-userdata.tftpl")
