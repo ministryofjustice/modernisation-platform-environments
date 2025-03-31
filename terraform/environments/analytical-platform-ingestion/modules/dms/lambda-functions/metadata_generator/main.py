@@ -107,8 +107,9 @@ class MetadataExtractor:
             self.dms_mapping_rules = json.loads(b"".join(response['Body'].readlines()).decode("utf-8"))
         self.excluded_columns_by_object = defaultdict(set)
         for object_column in self.dms_mapping_rules.get("columns_to_exclude", []):
-            self.excluded_columns_by_object[object_column["object_name"]].add(object_column["column_name"])
+            self.excluded_columns_by_object[object_column["object_name"].upper()].add(object_column["column_name"].upper())
 
+        logger.info("Excluded columns loaded as %s", self.excluded_columns_by_object)
         self.emc = EtlManagerConverter()
         self.sqlc = SQLAlchemyConverter(engine)
         self.blobs = []
@@ -171,14 +172,15 @@ class MetadataExtractor:
         :rtype: Metadata
         """
         exclusion_key = ""
-        if f"{schema}.{table}" in self.excluded_columns_by_object:
-            exclusion_key = f"{schema}.{table}"
-        elif table in self.excluded_columns_by_object:
-            exclusion_key = table
+        logger.info("Looking for excluded columns for keys %s.%s and %s", schema, table, table)
+        if f"{schema}.{table}".upper() in self.excluded_columns_by_object:
+            exclusion_key = f"{schema}.{table}".upper()
+        elif table.upper() in self.excluded_columns_by_object:
+            exclusion_key = table.upper()
         else:
             return metadata
 
-        for column_name in set(metadata.columns).union(self.excluded_columns_by_object[exclusion_key]):
+        for column_name in set(metadata.column_names).union(map(str.lower, self.excluded_columns_by_object[exclusion_key])):
             logger.info("Removing column %s from table %s in schema %s in metadata", column_name, table, schema)
             metadata.remove_column(column_name)
 
