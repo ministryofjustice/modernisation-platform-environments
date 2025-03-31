@@ -11,8 +11,9 @@ module "esb" {
   # Assigning private IP based on environment
   private_ip = lookup(
     {
-      development = "10.26.144.217"
-      test        = "10.26.152.88"
+      development     = "10.26.144.217"
+      test            = "10.26.152.88"
+      preproduction   = "10.27.144.238"
       # Add more environments when IP is known
     },
     local.environment,
@@ -21,7 +22,8 @@ module "esb" {
 
   ami = lookup(
     {
-      development = "ami-0fc27ddcf3e4e76af"
+      development   = "ami-0fc27ddcf3e4e76af"
+      preproduction = "ami-04a6fa2443473cfd5"
       # Add more environments when AMIs are known
     },
     local.environment,
