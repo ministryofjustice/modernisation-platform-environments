@@ -101,3 +101,15 @@ variable "create_premigration_assessement_resources" {
   default = false
   description = "whether to create pre-requisites for DMS PreMigration Assessment to be run manually"
 }
+
+variable "retry_failed_after_recreate_metadata" {
+  type = bool
+  default = true
+  description = "Whether to retry validation of failures after regenerating metadata"
+}
+
+variable "write_metadata_to_glue_catalog" {
+  type = bool
+  default = true
+  description = "Whether to write metdata to glue catalog"
+}

@@ -243,6 +243,7 @@ def handler(event, context):  # pylint: disable=unused-argument
     db_secret = json.loads(db_secret_response["SecretString"])
     db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog
     use_glue_catalog = os.getenv("USE_GLUE_CATALOG", "true").lower() == "true"
+    retry_failed_after_recreate_metadata = os.getenv("RETRY_FAILED_AFTER_RECREATE_METADATA", "true").lower() == "true"
     username = db_secret["username"]
     password = db_secret["password"]
     engine = db_secret.get("engine", os.getenv("ENGINE"))
@@ -329,7 +330,11 @@ def handler(event, context):  # pylint: disable=unused-argument
             Bucket=metadata_bucket,
             Key=f"{table.name}.json",
         )
+    if retry_failed_after_recreate_metadata:
+        reprocess_failed_records()
 
+
+def reprocess_failed_records():
     logger.info("Reprocessing failed records")
     # Reprocess failed records
     invalid_bucket_name = os.getenv("INVALID_BUCKET")
