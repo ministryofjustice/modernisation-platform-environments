@@ -135,17 +135,17 @@ output "aws_efs_mount_target_mount_c_owner_id" {
 
 #
 
-output "aws_security_group_efs_security-group_arn" {
-  description = "aws_security_group efs_security-group arn"
-  value = aws_security_group.efs_security-group.arn
+output "aws_security_group_efs-security-group_arn" {
+  description = "aws_security_group efs-security-group arn"
+  value = aws_security_group.efs-security-group.arn
 }
 
-output "aws_security_group_efs_security-group_id" {
-  description = "aws_security_group efs_security-group id"
-  value = aws_security_group.efs_security-group.id
+output "aws_security_group_efs-security-group_id" {
+  description = "aws_security_group efs-security-group id"
+  value = aws_security_group.efs-security-group.id
 }
 
-output "aws_security_group_efs_security-group_owner_id" {
-  description = "aws_security_group efs_security-group owner_id"
-  value = aws_security_group.efs_security-group.owner_id
+output "aws_security_group_efs-security-group_owner_id" {
+  description = "aws_security_group efs-security-group owner_id"
+  value = aws_security_group.efs-security-group.owner_id
 }
