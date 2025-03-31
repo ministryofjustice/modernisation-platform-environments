@@ -12,7 +12,7 @@ module "s3-log" {
 
   bucket_name = [local.log_bucket]
 
- # ownership_controls = "BucketOwnerEnforced"
+  # ownership_controls = "BucketOwnerEnforced"
 }
 
 module "s3" {
@@ -24,17 +24,17 @@ module "s3" {
 
   log_bucket = "${local.environment_name}-${local.log_bucket}"
 
-  bucket_name  = ["install-files"]
- 
-  archive_bucket_name  = ["s3-bucket-access-logging", "redshift-yjb-reporting", "tf-webops-config-service", "tableau-alb-logs", "yjaf-ext-external-logs",
-                          "yjaf-int-internal-logs", "cloudfront-logs", "cloudtrail-logs", "guardduty-to-fallanx-archive", "tableau-backups",
-                          "aws-glue-assets", "cloudtrail-logs"
-                         ]
+  bucket_name = ["install-files"]
 
-  transfer_bucket_name  = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact",  "yjsm", "transfer"]
- 
+  archive_bucket_name = ["s3-bucket-access-logging", "redshift-yjb-reporting", "tf-webops-config-service", "tableau-alb-logs", "yjaf-ext-external-logs",
+    "yjaf-int-internal-logs", "cloudfront-logs", "cloudtrail-logs", "guardduty-to-fallanx-archive", "tableau-backups",
+    "aws-glue-assets", "cloudtrail-logs"
+  ]
+
+  transfer_bucket_name = ["bands", "bedunlock", "cmm", "cms", "incident", "mis", "reporting", "yjsm-artefact", "yjsm", "transfer"]
+
   allow_replication = local.application_data.accounts[local.environment].allow_s3_replication
   s3_source_account = local.application_data.accounts[local.environment].source_account
 
-  depends_on = [ module.s3-log ]
+  depends_on = [module.s3-log]
 }

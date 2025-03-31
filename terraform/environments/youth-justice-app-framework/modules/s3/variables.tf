@@ -24,7 +24,7 @@ variable "transfer_bucket_name" {
   type        = list(string)
   description = "Names of S3 buckets that are to be transferred as is from the old environments."
   default     = []
-   validation {
+  validation {
     condition = alltrue([
       for o in var.transfer_bucket_name : length(o) < 37
     ])
@@ -37,7 +37,7 @@ variable "archive_bucket_name" {
   type        = list(string)
   description = "Names of S3 buckets that are to repliccated to an archive bucket."
   default     = []
-   validation {
+  validation {
     condition = alltrue([
       for o in var.archive_bucket_name : length(o) < 37
     ])

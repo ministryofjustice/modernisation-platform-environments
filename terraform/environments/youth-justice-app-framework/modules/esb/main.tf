@@ -14,9 +14,9 @@ module "key_pair" {
 data "template_file" "userdata" {
   template = file("${path.module}/ec2-userdata.tftpl")
   vars = {
-    env          = var.environment
-    tags         = jsonencode(local.all_tags)
-    project      = var.project_name
+    env     = var.environment
+    tags    = jsonencode(local.all_tags)
+    project = var.project_name
   }
 }
 
@@ -24,8 +24,8 @@ data "template_file" "userdata" {
 
 resource "aws_instance" "esb" {
   ami                    = var.ami
-  instance_type          = "t3a.xlarge"  
-  key_name               = module.key_pair.key_pair_name     
+  instance_type          = "t3a.xlarge"
+  key_name               = module.key_pair.key_pair_name
   monitoring             = true
   ebs_optimized          = true
   iam_instance_profile   = aws_iam_instance_profile.esb_ec2_profile.id
@@ -41,9 +41,9 @@ resource "aws_instance" "esb" {
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
-  }   
-  
-  
+  }
+
+
   root_block_device {
     encrypted             = true
     delete_on_termination = false
