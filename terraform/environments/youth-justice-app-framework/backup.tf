@@ -45,7 +45,7 @@ resource "aws_backup_plan" "yjaf_backup_plan" {
 resource "aws_backup_selection" "linux_backup_selection" {
   name         = "linux-backup-selection"
   plan_id      = aws_backup_plan.yjaf_backup_plan.id
-  iam_role_arn = aws_iam_role.backup_role.arn  # Updated role reference
+  iam_role_arn = aws_iam_role.backup_role.arn # Updated role reference
 
   resources = [
     "arn:aws:ec2:*:*:instance/*"
@@ -55,7 +55,7 @@ resource "aws_backup_selection" "linux_backup_selection" {
 resource "aws_backup_selection" "windows_backup_selection" {
   name         = "windows-backup-selection"
   plan_id      = aws_backup_plan.yjaf_backup_plan.id
-  iam_role_arn = aws_iam_role.backup_role.arn  # Updated role reference
+  iam_role_arn = aws_iam_role.backup_role.arn # Updated role reference
 
   resources = [
     "arn:aws:ec2:*:*:instance/*"
@@ -65,7 +65,7 @@ resource "aws_backup_selection" "windows_backup_selection" {
 resource "aws_backup_selection" "rds_backup_selection" {
   name         = "rds-backup-selection"
   plan_id      = aws_backup_plan.yjaf_backup_plan.id
-  iam_role_arn = aws_iam_role.backup_role.arn  # Updated role reference
+  iam_role_arn = aws_iam_role.backup_role.arn # Updated role reference
 
   resources = [
     "arn:aws:rds:*:*:db:*"
@@ -108,8 +108,8 @@ resource "aws_iam_policy" "backup_selection_permissions" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "backup:StartBackupJob",
           "backup:StartCopyJob",
           "backup:StartRestoreJob",
@@ -118,23 +118,23 @@ resource "aws_iam_policy" "backup_selection_permissions" {
           "backup:ListBackupJobs",
           "backup:ListBackupVaults"
         ],
-         Resource = aws_backup_vault.yjaf_backup_vault.arn
+        Resource = aws_backup_vault.yjaf_backup_vault.arn
         Condition = {
           StringEquals = {
-            "aws:RequestedRegion": "<region>"
+            "aws:RequestedRegion" : "<region>"
           }
         }
       },
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "backup-storage:MountCapsule"
         ],
         Resource = aws_backup_vault.yjaf_backup_vault.arn
       },
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "ec2:DescribeInstances",
           "ec2:DescribeVolumes",
           "ec2:DescribeTags",
@@ -146,8 +146,8 @@ resource "aws_iam_policy" "backup_selection_permissions" {
         Resource = "*"
       },
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "kms:CreateGrant",
           "kms:DescribeKey",
           "kms:RetireGrant",
@@ -173,8 +173,8 @@ resource "aws_iam_policy" "secrets_kms_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ],
@@ -183,13 +183,13 @@ resource "aws_iam_policy" "secrets_kms_policy" {
         ],
         Condition = {
           StringEquals = {
-            "aws:RequestedRegion": data.aws_region.current.name
+            "aws:RequestedRegion" : data.aws_region.current.name
           }
         }
       },
       {
-        Effect   = "Allow",
-        Action   = [
+        Effect = "Allow",
+        Action = [
           "kms:Decrypt",
           "kms:Encrypt",
           "kms:ReEncrypt*",
@@ -199,7 +199,7 @@ resource "aws_iam_policy" "secrets_kms_policy" {
         Resource = aws_kms_key.backup_kms_key.arn,
         Condition = {
           StringEquals = {
-            "kms:ViaService": "backup.amazonaws.com"
+            "kms:ViaService" : "backup.amazonaws.com"
           }
         }
       }
@@ -247,7 +247,7 @@ resource "aws_kms_key_policy" "backup_kms_policy" {
         Principal = {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
-        Action = "kms:*",
+        Action   = "kms:*",
         Resource = aws_kms_key.backup_kms_key.arn
       }
     ]

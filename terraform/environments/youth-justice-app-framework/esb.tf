@@ -2,10 +2,10 @@
 
 
 module "esb" {
-  source  = "./modules/esb"
+  source = "./modules/esb"
 
   #Network details
-  vpc_id                  = data.aws_vpc.shared.id
+  vpc_id    = data.aws_vpc.shared.id
   subnet_id = one(tolist([for s in local.private_subnet_list : s.id if s.availability_zone == "eu-west-2a"]))
 
   # Assigning private IP based on environment
@@ -28,10 +28,10 @@ module "esb" {
     "ami-01426769db5cd0a43" # Default AMI
   )
 
-  project_name    = local.project_name
-  environment     = local.environment
-  tags            = local.tags
+  project_name = local.project_name
+  environment  = local.environment
+  tags         = local.tags
 
-  yjsm_service_sg_id             = module.yjsm.yjsm_security_group_id
+  yjsm_service_sg_id = module.yjsm.yjsm_security_group_id
 
 }

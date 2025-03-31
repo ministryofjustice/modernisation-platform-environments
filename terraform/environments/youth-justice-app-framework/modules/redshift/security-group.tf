@@ -8,9 +8,9 @@ module "redshift_sg" {
   name        = "Redshift Serverless"
   description = "Control access to and from Redshift Servless"
 
-  
-  ingress_with_self = [{rule = "all-all"}]
-  egress_with_self  = [{rule = "all-all"}]
+
+  ingress_with_self = [{ rule = "all-all" }]
+  egress_with_self  = [{ rule = "all-all" }]
 
   ingress_with_source_security_group_id = [{
     description              = "Redshift ingress from PostgreSQL"

@@ -5,7 +5,7 @@ locals {
   delete_on_termination = var.test_mode
   # Only enable ALB deletion protection if not in test mode
   enable_deletion_protection = var.test_mode ? false : true
-  
+
   instance_key_name = "${var.project_name}-${var.environment}-${var.instance_key_name}"
 
   alb_access_logs_bucket_name_suffix = "tableau-alb-logs"

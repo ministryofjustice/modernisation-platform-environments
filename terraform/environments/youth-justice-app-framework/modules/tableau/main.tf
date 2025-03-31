@@ -1,6 +1,6 @@
 resource "aws_iam_instance_profile" "tableau" {
-    name = "TableauServer"
-    role = aws_iam_role.ec2_tableau_role.name
+  name = "TableauServer"
+  role = aws_iam_role.ec2_tableau_role.name
 }
 
 resource "aws_instance" "tableau" {
@@ -8,10 +8,10 @@ resource "aws_instance" "tableau" {
   instance_type           = var.instance_type
   subnet_id               = var.tableau_subnet_id
   private_ip              = var.private_ip
-  vpc_security_group_ids  = [ module.tableau_sg.security_group_id ]
+  vpc_security_group_ids  = [module.tableau_sg.security_group_id]
   disable_api_termination = local.disable_api_termination
 
-  key_name             = module.key_pair.key_pair_name 
+  key_name             = module.key_pair.key_pair_name
   iam_instance_profile = aws_iam_instance_profile.tableau.name
 
   metadata_options {
@@ -36,14 +36,14 @@ resource "aws_instance" "tableau" {
   }
 
   tags = merge(local.all_tags,
-    { "Name"          = "Tableau Server" },
-    { "Build"         = data.aws_ami.app_ami.name },
+    { "Name" = "Tableau Server" },
+    { "Build" = data.aws_ami.app_ami.name },
     { "PatchSchedule" = var.patch_schedule },
-    { "OS"            = "Linux" },
-    { "Owner"         = "Devops" }
+    { "OS" = "Linux" },
+    { "Owner" = "Devops" }
   )
 
-## Create using the latest version of the ami but do not replace when a new version is repeased. 
+  ## Create using the latest version of the ami but do not replace when a new version is repeased. 
   lifecycle {
     ignore_changes = [ami]
   }
@@ -53,8 +53,8 @@ resource "aws_instance" "tableau" {
 #trivy:ignore:AVD-AWS-0053
 module "tableau-alb" {
   # checkov:skip=CKV_TF_1
- 
-  source = "terraform-aws-modules/alb/aws"
+
+  source  = "terraform-aws-modules/alb/aws"
   version = "9.13.0"
 
   name    = var.alb_name

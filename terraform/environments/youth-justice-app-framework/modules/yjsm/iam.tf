@@ -46,7 +46,7 @@ resource "aws_iam_role_policy_attachment" "yjsm_s3_readonly_policy" {
 resource "aws_iam_policy" "secrets_manager_policy" {
   name        = "secrets_manager_access"
   description = "Policy to allow access to specific secrets in Secrets Manager"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
