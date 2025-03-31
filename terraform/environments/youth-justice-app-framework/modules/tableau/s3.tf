@@ -39,7 +39,7 @@ module "s3" {
 
   bucket_name = ["tableau-backups"]
 
-   tags = var.tags
+  tags = var.tags
 
 }
 

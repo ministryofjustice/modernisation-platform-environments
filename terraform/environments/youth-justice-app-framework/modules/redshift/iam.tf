@@ -21,8 +21,8 @@ EOF
 
 #attach policies AmazonRedshiftFullAccess
 resource "aws_iam_role_policy_attachment" "redshift_full_access" {
-  role        = aws_iam_role.redshift.name
-  policy_arn  = "arn:aws:iam::aws:policy/AmazonRedshiftFullAccess"
+  role       = aws_iam_role.redshift.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRedshiftFullAccess"
 }
 
 
@@ -33,29 +33,29 @@ resource "aws_iam_policy" "rds-aurora-postgres-secret" {
   name        = "rds-aurora-postgres-secret"
   description = "Enables retrieval of the RDS Postgres secret."
   policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
-        "Sid": "AccessSecret",
-        "Effect": "Allow",
-        "Action": [
+        "Sid" : "AccessSecret",
+        "Effect" : "Allow",
+        "Action" : [
           "secretsmanager:GetResourcePolicy",
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds"
         ],
-        "Resource": [
+        "Resource" : [
           var.rds_secret_rotation_arn
         ]
       },
       {
-        "Sid": "VisualEditor1",
-        "Effect": "Allow",
-        "Action": [
+        "Sid" : "VisualEditor1",
+        "Effect" : "Allow",
+        "Action" : [
           "secretsmanager:GetRandomPassword",
           "secretsmanager:ListSecrets"
         ],
-        "Resource": "*"
+        "Resource" : "*"
       }
     ]
   })
@@ -67,23 +67,23 @@ resource "aws_iam_policy" "redshift-ycs-reporting-s3" {
   name        = "redshift-serverless-ycs-reporting"
   description = "Enables access to YCS s3 reporting buckets."
   policy = jsonencode({
- 
-    "Version": "2012-10-17",
-    "Statement": [
+
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
-        "Effect": "Allow",
-        "Action": [
+        "Effect" : "Allow",
+        "Action" : [
           "s3:Get*",
           "s3:List*",
           "s3:PutObject"
         ],
-        "Resource": [
+        "Resource" : [
           local.s3-redshift-ycs-reporting-arn,
           "${local.s3-redshift-ycs-reporting-arn}/*"
         ]
       }
     ]
- })
+  })
 }
 
 resource "aws_iam_role" "ycs-team" {
@@ -126,49 +126,49 @@ resource "aws_iam_policy" "redshift-yjb-reporting-moj-s3" {
   name        = "redshift-serverless-yjb-reporting-moj_ap"
   description = "Enables access to YJB s3 reporting buckets."
   policy = jsonencode({
-     "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "s3:Get*",
-                "s3:List*",
-                "s3:PutObject",
-                "s3:DeleteObject"
-            ],
-            "Resource": [
-                local.s3-redshift-yjb-reporting-arn,
-                "${local.s3-redshift-yjb-reporting-arn}/moj_ap/*",
-                "${local.s3-redshift-yjb-reporting-arn}/landing/*"
-            ]
-        }
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:Get*",
+          "s3:List*",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        "Resource" : [
+          local.s3-redshift-yjb-reporting-arn,
+          "${local.s3-redshift-yjb-reporting-arn}/moj_ap/*",
+          "${local.s3-redshift-yjb-reporting-arn}/landing/*"
+        ]
+      }
     ]
- })
+  })
 }
 
 ## TODO replace role arn with a variable
 resource "aws_iam_role" "yjb-moj-team" {
-  name               = "redshift-serverless-yjb-reporting-moj_ap"
-  description        = "Allows Redshift clusters, Events and Data Science roles to call AWS services on your behalf."
+  name        = "redshift-serverless-yjb-reporting-moj_ap"
+  description = "Allows Redshift clusters, Events and Data Science roles to call AWS services on your behalf."
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
-        {
-            Effect = "Allow",
-            Principal = merge(
-              {
-                Service = [
-                   "redshift.amazonaws.com",
-                   "events.amazonaws.com"
-                ]
-              },
-              coalesce( var.data_science_role != null && var.data_science_role != "" ?
-                {
-                  AWS = var.data_science_role
-                } : null, {})
-            ),
-            Action = "sts:AssumeRole"
-        }
+      {
+        Effect = "Allow",
+        Principal = merge(
+          {
+            Service = [
+              "redshift.amazonaws.com",
+              "events.amazonaws.com"
+            ]
+          },
+          coalesce(var.data_science_role != null && var.data_science_role != "" ?
+            {
+              AWS = var.data_science_role
+          } : null, {})
+        ),
+        Action = "sts:AssumeRole"
+      }
     ]
   })
 }
@@ -198,23 +198,23 @@ resource "aws_iam_policy" "redshift-yjb-reporting-s3" {
   name        = "redshift-serverless-yjb-reporting"
   description = "Enables access to YJB s3 reporting buckets."
   policy = jsonencode({
- 
-    "Version": "2012-10-17",
-    "Statement": [
+
+    "Version" : "2012-10-17",
+    "Statement" : [
       {
-        "Effect": "Allow",
-        "Action": [
+        "Effect" : "Allow",
+        "Action" : [
           "s3:Get*",
           "s3:List*",
           "s3:PutObject"
         ],
-        "Resource": [
+        "Resource" : [
           local.s3-redshift-yjb-reporting-arn,
           "${local.s3-redshift-yjb-reporting-arn}/*"
         ]
       }
     ]
- })
+  })
 }
 
 resource "aws_iam_role" "yjb-team" {

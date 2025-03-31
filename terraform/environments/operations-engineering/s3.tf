@@ -6,7 +6,7 @@ data "aws_iam_policy_document" "s3_root_account_write_policy" {
     actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::cur-v2-hourly/*"]
     principals {
-      type = "AWS"
+      type        = "AWS"
       identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:root"]
     }
   }
@@ -22,8 +22,8 @@ module "cur_v2_hourly" {
 
   force_destroy = true
   attach_policy = true
-  policy = data.aws_iam_policy_document.s3_root_account_write_policy.json
-  
+  policy        = data.aws_iam_policy_document.s3_root_account_write_policy.json
+
   attach_deny_insecure_transport_policy = true
 
   server_side_encryption_configuration = {

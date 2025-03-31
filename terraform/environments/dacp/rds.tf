@@ -78,23 +78,23 @@ resource "aws_db_instance" "dacp_db_dev" {
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
   #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
-  count                          = local.is-development ? 1 : 0
-  allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
-  db_name                         = local.application_data.accounts[local.environment].db_name
-  storage_type                    = local.application_data.accounts[local.environment].storage_type
-  engine                          = local.application_data.accounts[local.environment].engine
-  identifier                      = local.application_data.accounts[local.environment].identifier
-  engine_version                  = local.application_data.accounts[local.environment].engine_version
-  instance_class                  = local.application_data.accounts[local.environment].instance_class
-  username                        = local.application_data.accounts[local.environment].db_username
-  password                        = random_password.password.result
-  skip_final_snapshot             = true
-  publicly_accessible             = true
-  vpc_security_group_ids          = [aws_security_group.postgresql_db_sc_dev[0].id]
-  db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade     = false
-  auto_minor_version_upgrade      = true
-  copy_tags_to_snapshot           = true
+  count                       = local.is-development ? 1 : 0
+  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
+  db_name                     = local.application_data.accounts[local.environment].db_name
+  storage_type                = local.application_data.accounts[local.environment].storage_type
+  engine                      = local.application_data.accounts[local.environment].engine
+  identifier                  = local.application_data.accounts[local.environment].identifier
+  engine_version              = local.application_data.accounts[local.environment].engine_version
+  instance_class              = local.application_data.accounts[local.environment].instance_class
+  username                    = local.application_data.accounts[local.environment].db_username
+  password                    = random_password.password.result
+  skip_final_snapshot         = true
+  publicly_accessible         = true
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
+  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
+  allow_major_version_upgrade = false
+  auto_minor_version_upgrade  = true
+  copy_tags_to_snapshot       = true
 }
 
 resource "aws_security_group" "postgresql_db_sc_dev" {

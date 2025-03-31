@@ -44,7 +44,7 @@ variable "schedule_expression_timezone" {
 }
 
 variable "arn" {
-  type = string
+  type        = string
   description = "The ARN of the eventbridge target"
 }
 
@@ -54,6 +54,6 @@ variable "role_arn" {
 }
 
 variable "input" {
-  type = string
+  type        = string
   description = "The input string of eventbridge target"
 }
