@@ -3,12 +3,14 @@ data "aws_iam_policy_document" "genesys_ap_airflow" {
     sid       = "GenesysAPAirflowPermissionsListBuckets"
     effect    = "Allow"
     actions   = [
-      "s3:GetBucketLocation", 
-      "s3:ListAllMyBuckets", 
+      "s3:GetBucketLocation",
+      "s3:ListAllMyBuckets",
       "s3:ListBucket",
       "s3:GetObject",
       "s3:PutObject",
-      "s3:PutObjectAcl"
+      "s3:PutObjectAcl",
+      "s3:GetObjectTagging",
+      "s3:PutObjectTagging"
     ]
     resources = [
       "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/*",
