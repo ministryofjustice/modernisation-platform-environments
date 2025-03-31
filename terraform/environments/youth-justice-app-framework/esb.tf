@@ -35,5 +35,8 @@ module "esb" {
   tags         = local.tags
 
   yjsm_service_sg_id = module.yjsm.yjsm_security_group_id
+  
+  #Keep until prod images are done
+  tableau_sg_id                 = module.tableau.tableau_sg_id
 
 }
