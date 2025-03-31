@@ -153,19 +153,20 @@ module "metadata_generator" {
   policy_json        = data.aws_iam_policy_document.metadata_generator_lambda_function.json
 
   environment_variables = {
-    ENVIRONMENT                = var.environment
-    DB_SECRET_ARN              = aws_secretsmanager_secret.dms_source.arn
-    METADATA_BUCKET            = aws_s3_bucket.validation_metadata.bucket
-    LANDING_BUCKET             = aws_s3_bucket.landing.bucket
-    INVALID_BUCKET             = aws_s3_bucket.invalid.bucket
-    RAW_HISTORY_BUCKET         = data.aws_s3_bucket.raw_history.bucket
-    DB_OBJECTS                 = jsonencode(jsondecode(var.dms_mapping_rules)["objects"])
-    DB_SCHEMA_NAME             = lookup(jsondecode(var.dms_mapping_rules), "schema", "")
-    ENGINE                     = var.dms_source.engine_name
-    DATABASE_NAME              = var.dms_source.sid
-    GLUE_CATALOG_DATABASE_NAME = lookup(jsondecode(var.dms_mapping_rules), "objects_from", var.db)
-    USE_GLUE_CATALOG           = "false"
-    COLUMNS_TO_EXCLUDE         = jsonencode(lookup(jsondecode(var.dms_mapping_rules), "columns_to_exclude", []))
+    ENVIRONMENT                          = var.environment
+    DB_SECRET_ARN                        = aws_secretsmanager_secret.dms_source.arn
+    METADATA_BUCKET                      = aws_s3_bucket.validation_metadata.bucket
+    LANDING_BUCKET                       = aws_s3_bucket.landing.bucket
+    INVALID_BUCKET                       = aws_s3_bucket.invalid.bucket
+    RAW_HISTORY_BUCKET                   = data.aws_s3_bucket.raw_history.bucket
+    DB_OBJECTS                           = jsonencode(jsondecode(var.dms_mapping_rules)["objects"])
+    DB_SCHEMA_NAME                       = lookup(jsondecode(var.dms_mapping_rules), "schema", "")
+    ENGINE                               = var.dms_source.engine_name
+    DATABASE_NAME                        = var.dms_source.sid
+    GLUE_CATALOG_DATABASE_NAME           = lookup(jsondecode(var.dms_mapping_rules), "objects_from", var.db)
+    USE_GLUE_CATALOG                     = var.write_metadata_to_glue_catalog
+    COLUMNS_TO_EXCLUDE                   = jsonencode(lookup(jsondecode(var.dms_mapping_rules), "columns_to_exclude", []))
+    RETRY_FAILED_AFTER_RECREATE_METADATA = var.retry_failed_after_recreate_metadata
   }
 
   source_path = [{
