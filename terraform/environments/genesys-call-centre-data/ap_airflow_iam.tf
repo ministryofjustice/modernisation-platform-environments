@@ -17,8 +17,8 @@ data "aws_iam_policy_document" "genesys_ap_airflow" {
       "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-ingestion-"].bucket.arn}/*",
       module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn,
       "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-archive-"].bucket.arn}/*",
-      module.s3_bucket_landing_archive_ingestion_curated["call-centre-staging-"].bucket.arn,
-      "${module.s3_bucket_landing_archive_ingestion_curated["call-centre-staging-"].bucket.arn}/*",
+      module.s3_bucket_staging.bucket.arn,
+      "${module.s3_bucket_staging.bucket.arn}/*",
     ]
   }
 }
