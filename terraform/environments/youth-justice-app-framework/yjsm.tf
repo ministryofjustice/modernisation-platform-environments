@@ -12,8 +12,9 @@ module "yjsm" {
   # Assigning private IP based on environment
   private_ip = lookup(
     {
-      development = "10.26.144.61"
-      test        = "10.26.152.172"
+      development     = "10.26.144.61"
+      test            = "10.26.152.172"
+      preproduction   = "10.27.144.83"
       # Add more environments when IP is known
     },
     local.environment,
@@ -22,7 +23,8 @@ module "yjsm" {
 
   ami = lookup(
     {
-      development = "ami-0165ab84499655148"
+      development   = "ami-0165ab84499655148"
+      preproduction = "ami-04ee6bb49367c4dd9"
       # Add more environments when AMIs are known
     },
     local.environment,
