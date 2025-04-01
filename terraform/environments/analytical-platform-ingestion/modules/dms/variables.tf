@@ -113,3 +113,9 @@ variable "write_metadata_to_glue_catalog" {
   default = true
   description = "Whether to write metdata to glue catalog"
 }
+
+variable "valid_files_mutable" {
+  type = bool
+  default = false
+  description = "If false, copy valid files to their destination bucket with a datetime infix"
+}
