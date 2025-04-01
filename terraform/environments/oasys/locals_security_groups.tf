@@ -116,6 +116,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.azure_studio_hosting_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_data_engineering_prod,
+      module.ip_addresses.moj_cidr.aws_data_engineering_dev,
     ])
     oracle_oem_agent = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
