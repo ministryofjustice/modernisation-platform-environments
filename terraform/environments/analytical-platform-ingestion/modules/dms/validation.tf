@@ -58,12 +58,13 @@ module "validation_lambda_function" {
   policy_json        = data.aws_iam_policy_document.validation_lambda_function.json
 
   environment_variables = {
-    ENVIRONMENT      = "sandbox"
-    PASS_BUCKET      = data.aws_s3_bucket.raw_history.bucket
-    FAIL_BUCKET      = aws_s3_bucket.invalid.bucket
-    METADATA_BUCKET  = aws_s3_bucket.validation_metadata.bucket
-    METADATA_PATH    = ""
-    SLACK_SECRET_KEY = "" # TODO: Handle properly
+    ENVIRONMENT         = var.environment
+    PASS_BUCKET         = data.aws_s3_bucket.raw_history.bucket
+    FAIL_BUCKET         = aws_s3_bucket.invalid.bucket
+    METADATA_BUCKET     = aws_s3_bucket.validation_metadata.bucket
+    METADATA_PATH       = ""
+    SLACK_SECRET_KEY    = "" # TODO: Handle properly
+    VALID_FILES_MUTABLE = var.valid_files_mutable
   }
 
   source_path = [{
