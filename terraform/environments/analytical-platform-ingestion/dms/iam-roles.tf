@@ -15,3 +15,22 @@ module "production_replication_cica_dms_iam_role" {
 
   custom_role_policy_arns = [module.production_replication_cica_dms_iam_policy.arn]
 }
+
+resource "aws_iam_role" "eventbridge_dms_full_load_task_role" {
+  name = "tariff_dms_eventbridge_full_load_task_role"
+  assume_role_policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": [
+            "scheduler.amazonaws.com",
+            "apidestinations.events.amazonaws.com"
+          ]
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  })
+}
