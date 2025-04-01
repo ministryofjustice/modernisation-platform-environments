@@ -39,3 +39,8 @@ variable "ami" {
   description = "AMI for the instance"
   type        = string
 }
+
+variable "tableau_sg_id" {
+  description = "Security group ID for Tableau"
+  type        = string
+}
