@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Resource": "*",
+      "Action": [
+        "ec2:DescribeInstances",
+        "ec2:CreateNetworkInterface",
+        "ec2:AttachNetworkInterface",
+        "ec2:DescribeNetworkInterfaces",
+        "ec2:DeleteNetworkInterface",
+        "autoscaling:CompleteLifecycleAction"
+      ]
+    },
+    {
+      "Action": ["lambda:InvokeFunction"],
+      "Resource": "arn:aws:lambda:eu-west-2:${account_number}:function:serverlessrepo-lambda-canary-python3*",
+      "Effect": "Allow"
+    }
+  ]
+}

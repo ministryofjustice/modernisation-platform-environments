@@ -414,6 +414,7 @@ locals {
     fsx_windows = {
 
       pd-csr-win-share = {
+        aliases                     = ["prisoner-retail.azure.hmpp.root"]
         preferred_availability_zone = "eu-west-2a"
         deployment_type             = "MULTI_AZ_1"
         security_groups             = ["fsx_windows"]

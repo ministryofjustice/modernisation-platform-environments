@@ -26,19 +26,22 @@ module "cica_dms_ingress_bucket" {
 }
 
 resource "aws_s3_bucket_replication_configuration" "cica_dms_ingress_bucket_replication" {
-  count = local.environment == "production" ? 1 : 0
-  role = module.production_replication_cica_dms_iam_role[0].iam_role_arn
+  count  = local.environment == "production" ? 1 : 0
+  role   = module.production_replication_cica_dms_iam_role[0].iam_role_arn
   bucket = module.cica_dms_ingress_bucket.s3_bucket_id
   rule {
-    id                        = "mojap-ingestion-cica-dms-ingress"
-    status                    = "Enabled"
+    id     = "mojap-ingestion-cica-dms-ingress"
+    status = "Enabled"
+    filter {
+    }
+
     delete_marker_replication {
       status = "Enabled"
     }
 
     source_selection_criteria {
       sse_kms_encrypted_objects {
-        status  = "Enabled"
+        status = "Enabled"
       }
     }
 
@@ -53,13 +56,13 @@ resource "aws_s3_bucket_replication_configuration" "cica_dms_ingress_bucket_repl
         replica_kms_key_id = "arn:aws:kms:eu-west-2:593291632749:key/8894655b-e02c-46d1-aaa0-c219b31eefb1"
       }
       metrics {
-        status  = "Enabled"
+        status = "Enabled"
         event_threshold {
           minutes = 15
         }
       }
       replication_time {
-        status  = "Enabled"
+        status = "Enabled"
         time {
           minutes = 15
         }

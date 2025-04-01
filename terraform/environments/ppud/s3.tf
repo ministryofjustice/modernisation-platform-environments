@@ -1156,10 +1156,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-database-source-dev" {
     id     = "Move-to-IA-then-delete-moj-database-source-dev"
     status = "Enabled"
     abort_incomplete_multipart_upload {
-      days_after_initiation = 7
+      days_after_initiation = 3
     }
     expiration {
-      days = 14
+      days = 6
     }
   }
 }
@@ -1300,10 +1300,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-dev" {
     id     = "delete-moj-report-source-dev"
     status = "Enabled"
     abort_incomplete_multipart_upload {
-      days_after_initiation = 7
+      days_after_initiation = 3
     }
     expiration {
-      days = 14
+      days = 6
     }
   }
 }

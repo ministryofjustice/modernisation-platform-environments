@@ -1,0 +1,41 @@
+{
+    "Role": "arn:aws:iam::${source_account_number}:role/cross-account-bucket-replication-role",
+    "Rules": [
+      {
+        "ID": "s3-replication-to-modinisation",
+        "Status": "Enabled",
+        "Priority": 1,
+        "Filter": {
+          "Prefix": ""
+        },
+        "SourceSelectionCriteria": {
+           "ReplicaModifications":{
+             "Status": "Enabled"
+            }
+        },
+        "Destination": {
+          "Bucket": "arn:aws:s3:::${dest_bucket_name}",
+          "Account": "${dest_account_number}",
+          "AccessControlTranslation": {
+            "Owner": "Destination"
+          },
+          "ReplicationTime": {
+            "Status": "Enabled",
+            "Time": {
+              "Minutes": 15
+            }
+          },
+          "Metrics": {
+            "Status": "Enabled",
+            "EventThreshold": {
+              "Minutes": 15
+            }
+          }
+        },
+        "DeleteMarkerReplication": {
+          "Status": "Enabled"
+        }
+      }
+    ]
+  }
+  

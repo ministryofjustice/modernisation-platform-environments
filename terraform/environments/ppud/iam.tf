@@ -1598,7 +1598,7 @@ resource "aws_iam_policy_attachment" "attach_lambda_securityhub_readonly_dev" {
 # IAM Role & Policy for Security Hub report- UAT
 ################################################
 
-resource "aws_iam_role" "lambda_role_securityhub_get_data_uat"{
+resource "aws_iam_role" "lambda_role_securityhub_get_data_uat" {
   count              = local.is-preproduction == true ? 1 : 0
   name               = "PPUD_Lambda_Function_Role_Securityhub_Get_Data_UAT"
   assume_role_policy = <<EOF
@@ -1736,10 +1736,9 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
           "s3:GetReplicationConfiguration"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-database-source-dev/*",
           "arn:aws:s3:::moj-database-source-dev",
-          "arn:aws:s3:::mojap-data-engineering-production-ppud-dev",
-          "arn:aws:s3:::mojap-data-engineering-production-ppud-dev/*"
+          "arn:aws:s3:::moj-database-source-dev/*"
+
         ]
       },
       {
@@ -1753,8 +1752,6 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
           "s3:ReplicateDelete"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-database-source-dev/*",
-          "arn:aws:s3:::moj-database-source-dev",
           "arn:aws:s3:::mojap-data-engineering-production-ppud-dev",
           "arn:aws:s3:::mojap-data-engineering-production-ppud-dev/*"
         ]
@@ -1776,6 +1773,7 @@ resource "aws_iam_role_policy_attachment" "attach_iam_role_to_iam_policy_s3_buck
 resource "aws_iam_role" "iam_role_s3_bucket_moj_report_source_dev" {
   count              = local.is-development == true ? 1 : 0
   name               = "iam_role_s3_bucket_moj_report_source_dev"
+  path               = "/service-role/"
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -1813,8 +1811,9 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_report_source_dev" {
           "s3:GetReplicationConfiguration"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-report-source-dev/*",
-          "arn:aws:s3:::moj-report-source-dev"
+          "arn:aws:s3:::moj-report-source-dev",
+          "arn:aws:s3:::moj-report-source-dev/*"
+
         ]
       },
       {
@@ -1828,6 +1827,7 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_report_source_dev" {
           "s3:ReplicateDelete"
         ],
         "Resource" : [
+          "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9",
           "arn:aws:s3:::cloud-platform-db973d65892f599f6e78cb90252d7dc9/*"
         ]
       }
