@@ -7,11 +7,13 @@ resource "aws_ecs_cluster" "wardship_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
+  #checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
   name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
+  #checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
   name              = "wardship-ecs"
   retention_in_days = "7"
 }
@@ -352,11 +354,13 @@ resource "aws_security_group" "ecs_service" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
+    description = "Allow all outbound traffic"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 resource "aws_ecr_repository" "wardship_ecr_repo" {
+  #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
   name         = "wardship-ecr-repo"
   force_delete = true
 
@@ -460,6 +464,7 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 }
 
 resource "aws_sns_topic" "ddos_alarm" {
+  # checkov:skip=CKV_AWS_26: SNS encryption not required for this use case
   count = local.is-development ? 0 : 1
   name  = "wardship_ddos_alarm"
 }
@@ -492,7 +497,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.wardship_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration.git?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_non_prod_alarms"]
 }
@@ -503,7 +508,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.wardship_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration.git?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
 }
