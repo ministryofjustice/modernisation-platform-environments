@@ -7,11 +7,14 @@ resource "aws_redshiftserverless_namespace" "default" {
     aws_iam_role.redshift.arn, aws_iam_role.ycs-team.arn, aws_iam_role.yjb-moj-team.arn, aws_iam_role.yjb-team.arn
   ]
 
-  kms_key_id = var.kms_key_arn
+  #kms_key_id = var.kms_key_arn
+
+  log_exports = ["userlog", "connectionlog", "useractivitylog"]
 
   tags = merge(local.all_tags,
     { Name = local.namespace_name }
   )
+
 }
 
 # Create the Redshift Serverless Workgroup
