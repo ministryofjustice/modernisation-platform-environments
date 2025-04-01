@@ -237,7 +237,7 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
 
   security_headers_config {
     content_security_policy {
-      content_security_policy = "default-src 'self'"
+      content_security_policy = "default-src 'self'; style-src 'self' 'unsafe-inline'"
       override = true
     }
     strict_transport_security {
