@@ -1,7 +1,7 @@
 module "sftp_users" {
   for_each = local.environment_configuration.transfer_server_sftp_users
 
-  source = "../modules/transfer-family/user"
+  source = "./modules/transfer-family/user"
 
   name        = each.key
   ssh_key     = each.value.ssh_key
@@ -17,7 +17,7 @@ module "sftp_users" {
 module "sftp_users_with_egress" {
   for_each = local.environment_configuration.transfer_server_sftp_users_with_egress
 
-  source = "../modules/transfer-family/user-with-egress"
+  source = "./modules/transfer-family/user-with-egress"
 
   name        = each.key
   ssh_key     = each.value.ssh_key
