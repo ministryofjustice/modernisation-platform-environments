@@ -169,7 +169,7 @@ resource "aws_ecs_service" "ecs_service" {
 
   placement_constraints {
     type       = "memberOf"
-    expression = "attribute:Role == Backup"
+    expression = "attribute:Role == Primary"
   }
 
   depends_on = [
@@ -219,7 +219,7 @@ resource "aws_ecs_service" "ecs_service_sftp" {
 
   placement_constraints {
     type       = "memberOf"
-    expression = "attribute:Role == Backup"
+    expression = "attribute:Role == Primary"
   }
 
   depends_on = [
