@@ -21,7 +21,7 @@ locals {
     }
     production = {
       /* Transfer Server */
-      transfer_server_hostname = "sftp.development.transfer.analytical-platform.service.justice.gov.uk"
+      transfer_server_hostname = "sftp.transfer.analytical-platform.service.justice.gov.uk"
       transfer_server_sftp_users = {
 
       }
