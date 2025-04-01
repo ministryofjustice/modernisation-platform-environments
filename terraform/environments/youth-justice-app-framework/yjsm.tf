@@ -41,5 +41,6 @@ module "yjsm" {
   esb_service_sg_id             = module.esb.esb_security_group_id
   rds_cluster_security_group_id = module.aurora.rds_cluster_security_group_id
   alb_security_group_id         = module.internal_alb.alb_security_group_id
+  #Keep until prod images are done
   tableau_sg_id                 = module.tableau.tableau_sg_id
 }
