@@ -1,5 +1,6 @@
-# tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "bastion_linux" {
+  # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
+  #checkov:skip=CKV_TF_1:"Using version tag v4.0.0 instead of commit hash for better readability and version tracking"
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.0.0"
 
   providers = {
