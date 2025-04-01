@@ -34,7 +34,7 @@ type_lookup = {
 }
 
 
-def move_object(bucket_to: str, bucket_from: str, key: str):
+def move_object(bucket_to: str, bucket_from: str, key: str, mutable: bool=False):
     """The function will copy the object in S3 to the "bucket_to" bucket,
     while adding a timestamp to the filename. It will then
     delete the original object from "bucket_from".
@@ -46,11 +46,13 @@ def move_object(bucket_to: str, bucket_from: str, key: str):
         The bucket where the S3 object is.
     key : str
         The object S3 key.
+    mutable: bool
+        If False, insert datetime infix into destination path
     """
     client = boto3.client("s3")
     # Provides timestamp like '20210217_121400'
     event_time = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    if "LOAD" in key:
+    if "LOAD" in key and not mutable:
         # This will return a key of the form 'Load000000001_[DATE]_[TIME].parquet'
         new_key = key.split(".")[0] + "_" + event_time + ".parquet"
     else:
@@ -171,6 +173,7 @@ class FileValidator:
         parquet_table_name: str,
         metadata_s3_keys: dict,
         metadata_bucket: str,
+        valid_files_mutable: bool=False
     ):
         """
         Parameters
@@ -190,6 +193,8 @@ class FileValidator:
             keys as values.
         metadata_bucket : str
             The name of the bucket where the metadata is located.
+        valid_files_mutable: bool
+            If false, copy valid files to their destination bucket with a datetime infix
         """
         self.key = key
         self.fail_bucket = fail_bucket
@@ -199,6 +204,7 @@ class FileValidator:
         self.metadata_s3_keys = metadata_s3_keys
         self.metadata_bucket = metadata_bucket
         self.errors: list[str] = []
+        self.valid_files_mutable = valid_files_mutable
 
     def _add_error(self, error: str):
         """Collects and aggregates error messages into a list.
@@ -276,7 +282,7 @@ class FileValidator:
             #    method="POST", url=url, body=encoded_payload
             # )
         else:
-            move_object(self.bucket_to, self.bucket_from, self.key)
+            move_object(self.bucket_to, self.bucket_from, self.key, self.valid_files_mutable)
 
     def _validate_file(self, path, fs=fs, validate_column_attributes: bool = True):
         """
@@ -299,7 +305,7 @@ class FileValidator:
                 return
         if self.parquet_table_name not in self.metadata_s3_keys.keys():
             self._add_error(
-                error=f"'{self.parquet_table_name}' is an invalid table name."
+                error=f"'{self.parquet_table_name}' is an not in the list of keys in the metadata bucket"
             )
         elif validate_column_attributes:
             self._validate_column_attributes(parquet_file=self.parquet_file)
@@ -448,6 +454,7 @@ def handler(event, context):  # noqa: C901 pylint: disable=unused-argument
     fail_bucket = os.environ["FAIL_BUCKET"]
     metadata_bucket = os.environ["METADATA_BUCKET"]
     metadata_path = os.environ["METADATA_PATH"]
+    valid_files_mutable = os.environ.get("VALID_FILES_MUTABLE", "false").lower() == "true"
 
     logger.info(f"Event: {event}")
     logger.info("Binary solo: 0001110101010111")
@@ -491,6 +498,7 @@ def handler(event, context):  # noqa: C901 pylint: disable=unused-argument
             parquet_table_name=parquet_table_name,
             metadata_s3_keys=metadata_s3_keys,
             metadata_bucket=metadata_bucket,
+            valid_files_mutable=valid_files_mutable
         )
     except Exception as e:
         logger.exception(f"Error creating FileValidator: {e}")
