@@ -251,10 +251,12 @@ resource "aws_launch_template" "tribunals-backup-lt" {
 }
 
 # # Finally, create the Auto scaling group for the launch template
+# Temporarily increase the ASG capacity to allow a new instance to come up alongside the old one (in new subnet, no public ip)
+# Then, decrease the ASG capacity back to 1 to terminate the old instance
 resource "aws_autoscaling_group" "tribunals-all-asg" {
   vpc_zone_identifier = [data.aws_subnet.private_subnets_a.id]
-  desired_capacity    = 1
-  max_size            = 1
+  desired_capacity    = 2
+  max_size            = 2
   min_size            = 1
   name                = local.app_name
 
@@ -270,30 +272,31 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   }
 }
 
-resource "aws_instance" "tribunals_backup" {
-  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
-  launch_template {
-    id      = aws_launch_template.tribunals-backup-lt.id
-    version = "$Latest"
-  }
+# temporarirly delete backup instance to move subents and delete public ip address
+# resource "aws_instance" "tribunals_backup" {
+#   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
+#   launch_template {
+#     id      = aws_launch_template.tribunals-backup-lt.id
+#     version = "$Latest"
+#   }
 
-  ebs_optimized = true
+#   ebs_optimized = true
 
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
+#   metadata_options {
+#     http_endpoint = "enabled"
+#     http_tokens   = "required"
+#   }
 
-  root_block_device {
-    encrypted = true
-  }
+#   root_block_device {
+#     encrypted = true
+#   }
 
-  tags = {
-    Environment = local.environment
-    Name        = "tribunals-backup-instance"
-    Role        = "Backup"
-  }
-}
+#   tags = {
+#     Environment = local.environment
+#     Name        = "tribunals-backup-instance"
+#     Role        = "Backup"
+#   }
+# }
 
 ###########################################################################
 
