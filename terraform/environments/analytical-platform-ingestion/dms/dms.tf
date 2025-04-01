@@ -42,4 +42,5 @@ module "cica_dms_tariff_dms_implementation" {
     create_premigration_assessement_resources = local.environment == "development" ? true : false
     write_metadata_to_glue_catalog            = false
     retry_failed_after_recreate_metadata      = false
+    valid_files_mutable                       = true
 }
