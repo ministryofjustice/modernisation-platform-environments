@@ -1,36 +1,38 @@
 resource "aws_efs_file_system" "appshare" {
   encrypted        = true
-  throughput_mode  = "bursting"
+  kms_key_id       = data.aws_kms_key.ebs_shared.key_id
   performance_mode = "maxIO"
+  throughput_mode  = "bursting"
+
   tags = merge(local.tags,
     { Name = "appshare" }
   )
 }
 
-resource "aws_efs_mount_target" "mount_a" {
-  file_system_id = aws_efs_file_system.appshare.id
-  subnet_id      = data.aws_subnet.data_subnets_a.id
-  security_groups = [
-    aws_security_group.efs-security-group.id
-  ]
-}
-
-resource "aws_efs_mount_target" "mount_b" {
-  file_system_id = aws_efs_file_system.appshare.id
-  subnet_id      = data.aws_subnet.data_subnets_b.id
-  security_groups = [
-    aws_security_group.efs-security-group.id
-  ]
-}
-
-resource "aws_efs_mount_target" "mount_c" {
-  file_system_id = aws_efs_file_system.appshare.id
-  subnet_id      = data.aws_subnet.data_subnets_c.id
-  security_groups = [
-    aws_security_group.efs-security-group.id
-  ]
-}
-
+# resource "aws_efs_mount_target" "mount_a" {
+#   file_system_id = aws_efs_file_system.appshare.id
+#   subnet_id      = data.aws_subnet.data_subnets_a.id
+#   security_groups = [
+#     aws_security_group.efs-security-group.id
+#   ]
+# }
+# 
+# resource "aws_efs_mount_target" "mount_b" {
+#   file_system_id = aws_efs_file_system.appshare.id
+#   subnet_id      = data.aws_subnet.data_subnets_b.id
+#   security_groups = [
+#     aws_security_group.efs-security-group.id
+#   ]
+# }
+# 
+# resource "aws_efs_mount_target" "mount_c" {
+#   file_system_id = aws_efs_file_system.appshare.id
+#   subnet_id      = data.aws_subnet.data_subnets_c.id
+#   security_groups = [
+#     aws_security_group.efs-security-group.id
+#   ]
+# }
+# 
 # resource "aws_security_group" "efs-security-group" {
 #   name_prefix = "efs-security-group"
 #   description = "allow inbound access from ebsdb and ebsconc"
