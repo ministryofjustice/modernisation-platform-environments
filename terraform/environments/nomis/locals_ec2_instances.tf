@@ -114,17 +114,16 @@ locals {
         ]
       }
       tags = {
-        ami                         = "nomis_rhel_7_9_oracledb_11_2"
-        backup                      = "false" # disable mod platform backup since we use our own policies
-        component                   = "data"
-        instance-access-policy      = "limited"
-        licence-requirements        = "Oracle Database"
-        OracleDbLTS-ManagedInstance = true # oracle license tracking
-        os-major-version            = 7
-        os-type                     = "Linux"
-        os-version                  = "RHEL 7.9"
-        server-type                 = "nomis-db"
-        update-ssm-agent            = "patchgroup1"
+        ami                    = "nomis_rhel_7_9_oracledb_11_2"
+        backup                 = "false" # disable mod platform backup since we use our own policies
+        component              = "data"
+        instance-access-policy = "limited"
+        licence-requirements   = "Oracle Database"
+        os-major-version       = 7
+        os-type                = "Linux"
+        os-version             = "RHEL 7.9"
+        server-type            = "nomis-db"
+        update-ssm-agent       = "patchgroup1"
       }
     }
 
@@ -189,17 +188,16 @@ locals {
         ]
       }
       tags = {
-        ami                         = "hmpps_ol_8_5_oracledb_19c"
-        backup                      = "false" # disable mod platform backup since we use our own policies
-        component                   = "data"
-        instance-access-policy      = "limited"
-        licence-requirements        = "Oracle Database"
-        OracleDbLTS-ManagedInstance = true # oracle license tracking
-        os-major-version            = 8
-        os-type                     = "Linux"
-        os-version                  = "OL 8.5"
-        server-type                 = "nomis-db19c"
-        update-ssm-agent            = "patchgroup1"
+        ami                    = "hmpps_ol_8_5_oracledb_19c"
+        backup                 = "false" # disable mod platform backup since we use our own policies
+        component              = "data"
+        instance-access-policy = "limited"
+        licence-requirements   = "Oracle Database"
+        os-major-version       = 8
+        os-type                = "Linux"
+        os-version             = "OL 8.5"
+        server-type            = "nomis-db19c"
+        update-ssm-agent       = "patchgroup1"
       }
     }
 
