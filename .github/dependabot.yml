@@ -150,6 +150,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/coat"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/contract-work-administration"
     schedule:
       interval: "daily"
