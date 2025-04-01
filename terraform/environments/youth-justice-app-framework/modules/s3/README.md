@@ -23,6 +23,9 @@ Version using version.txt file for now, we will move to remote modules and git r
 None
 
 # Bucket Replication
+
+## Replication Scripts
+
 A set of scripts have been written to facilitate setup of Replication from the old to new environments as follows:
 
 - **`replication-configuration.json.template`**: Defines the required replication configuraiton. Has place holders for the destination account number and bucket name.
@@ -31,3 +34,9 @@ A set of scripts have been written to facilitate setup of Replication from the o
 - **`replicate-all-<env>.sh`**: A version of this file exists for each version that has been rprpolulated with parameters for each bucket to be replicated.
 
 Before running `replicate-all-<env>.sh` short term credentials must first be generated for the source account and used to populate the standard aws cli envirnment variables.
+
+## Manuall Action after running the Scripts
+
+Bucket `preprod preprod-redshift-serverless-yjb-reporting` did not replicate automatically after running the above scripts. It was necessary to Edit the Replication rule and select `Replicate objects encrypted with AWS Key Management Service (AWS KMS)` with Key `aws\s3`. After which a new Replicaation batch job was successfuly in replicaing all objects in the bucket.
+
+It is assumed that this will also be necessary when replicating production buckets.
