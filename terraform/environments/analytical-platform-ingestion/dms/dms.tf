@@ -43,4 +43,5 @@ module "cica_dms_tariff_dms_implementation" {
     write_metadata_to_glue_catalog            = false
     retry_failed_after_recreate_metadata      = false
     valid_files_mutable                       = true
+    glue_catalog_arn                          = local.environment_configuration.ap_data_glue_catalog_arn
 }
