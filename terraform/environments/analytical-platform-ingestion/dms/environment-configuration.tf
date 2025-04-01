@@ -9,6 +9,8 @@ locals {
 
       /* CICA Source databases */
       source_database_sid           = "orauat6.eu-west-2.compute.internal"
+      /* analytical-plafrom-ingestion-development resources */
+      ap_data_glue_catalog_arn = "arn:aws:glue:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-development"]}:catalog"
     }
     production = {
       /* VPC */
@@ -18,6 +20,8 @@ locals {
 
       /* CICA Source databases */
       source_database_sid           = "AddProductionDatabaseHere"
+      /* analytical-plafrom-ingestion-production resources */
+      ap_data_glue_catalog_arn = "arn:aws:glue:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:catalog"
     }
   }
 }
