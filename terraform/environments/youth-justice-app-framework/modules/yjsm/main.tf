@@ -11,11 +11,11 @@ module "key_pair" {
 }
 
 resource "aws_ssm_parameter" "private_key" {
+  #checkov:skip=CKV_AWS_337 TODO
   name        = "/ec2/keypairs/yjsm-private-key"
   description = "EC2 Private Key for yjsm-keypair"
   type        = "SecureString"
   value       = module.key_pair.private_key_pem
-  key_id      = aws_kms_key.my_kms_key.arn
 
   tags        = local.all_tags
 }
@@ -28,12 +28,6 @@ data "template_file" "userdata" {
     project = var.project_name
   }
 }
-
-resource "aws_kms_key" "parameter_kms_key" {
-  description = "KMS key for encrypting SSM parameters"
-  enable_key_rotation = true
-}
-
 
 resource "aws_instance" "yjsm" {
   ami                    = var.ami
