@@ -271,7 +271,7 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   }
 }
 
-# temporarirly delete backup instance to move subents and delete public ip address
+# temporarily delete backup instance to move subents and delete public ip address
 # resource "aws_instance" "tribunals_backup" {
 #   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
 #   launch_template {
