@@ -62,3 +62,18 @@ module "production_replication_cica_dms_iam_policy" {
 
   policy = data.aws_iam_policy_document.production_cica_dms_replication.json
 }
+
+resource "aws_iam_role_policy" "eventbridge_dms_full_load_task_role" {
+  role = aws_iam_role.eventbridge_dms_full_load_task_role.name
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "AllowWildcardDmsAccess",
+        "Effect": "Allow",
+        "Action": "dms:*",
+        "Resource": "*"
+      }
+    ]
+  })
+}
