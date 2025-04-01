@@ -2,6 +2,7 @@ from collections import defaultdict
 import json
 import logging
 import os
+import re
 import sys
 from datetime import datetime
 
@@ -257,6 +258,7 @@ def handler(event, context):  # pylint: disable=unused-argument
     db_secret = json.loads(db_secret_response["SecretString"])
     db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog
     use_glue_catalog = os.getenv("USE_GLUE_CATALOG", "true").lower() == "true"
+    glue_catalog_arn = os.getenv("GLUE_CATALOG_ARN", "")
     retry_failed_after_recreate_metadata = os.getenv("RETRY_FAILED_AFTER_RECREATE_METADATA", "true").lower() == "true"
     username = db_secret["username"]
     password = db_secret["password"]
@@ -288,9 +290,14 @@ def handler(event, context):  # pylint: disable=unused-argument
 
     if use_glue_catalog:
         # Get the glue database to check if it exists. handle EntityNotFoundException
+        glue_kwargs = {}
+        if glue_catalog_arn:
+            # Get account name from glue catalog arn to use as catalogId
+            catalogId = re.match(r"^arn:aws:glue:[\w-]+:(\d+):catalog", glue_catalog_arn).groups()
+            assert len(catalogId) == 1
+            glue_kwargs["CatalogId"] = catalogId[0]
         try:
-            # TODO add `CatalogId` parameter here, if populating analytical-platform-data-* glue catalog
-            glue.get_database(Name=db_identifier)
+            glue.get_database(Name=db_identifier, **glue_kwargs)
             logger.info(f"Database {db_identifier} already exists in Glue Catalog")
         except glue.exceptions.EntityNotFoundException:
             # Create the database if it does not exist. Fails is it cannot be created
@@ -299,7 +306,8 @@ def handler(event, context):  # pylint: disable=unused-argument
                 DatabaseInput={
                     "Name": db_identifier,
                     "Description": f"{db_identifier} - DMS Pipeline",
-                }
+                },
+                **glue_kwargs
             )
     else:
         logger.info(f"Not contacting glue catalog, as db_identifier defined as {db_identifier}")
@@ -321,19 +329,23 @@ def handler(event, context):  # pylint: disable=unused-argument
     if use_glue_catalog:
         for table in glue_table_definitions:
             try:
-                glue.get_table(DatabaseName=db_identifier, Name=table["TableInput"]["Name"])
+                glue.get_table(DatabaseName=db_identifier, Name=table["TableInput"]["Name"], **glue_kwargs)
                 logger.info(f"Table {table['TableInput']['Name']} already exists")
                 # Update the table if it exists
                 logger.info(f"Updating table {table['TableInput']['Name']}")
                 glue.update_table(
-                    DatabaseName=db_identifier, TableInput=table["TableInput"]
+                    DatabaseName=db_identifier, TableInput=table["TableInput"], **glue_kwargs
                 )
             except glue.exceptions.EntityNotFoundException:
-                logger.info(
-                    f"Table {table['TableInput']['Name']} does not exist. Creating it now"
-                )
-                response = glue.create_table(**table) # TODO add exception management to this API call
-                logger.debug(response)
+                try:
+                    logger.info(
+                        f"Table {table['TableInput']['Name']} does not exist. Creating it now"
+                    )
+                    response = glue.create_table(**table | glue_kwargs)
+                    logger.debug(response)
+                except Exception as e:
+                    logger.exception("Create table failed: %s", table)
+                    raise e
     else:
         logger.info(f"Not contacting glue catalog, as use_glue_catalog is {use_glue_catalog}")
 
