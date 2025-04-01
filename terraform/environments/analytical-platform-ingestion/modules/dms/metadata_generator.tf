@@ -102,7 +102,7 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
     ]
 
     resources = [
-      aws_secretsmanager_secret.dms_source.arn
+      var.dms_source.secrets_manager_arn
     ]
   }
 
@@ -175,7 +175,7 @@ module "metadata_generator" {
 
   environment_variables = {
     ENVIRONMENT                          = var.environment
-    DB_SECRET_ARN                        = aws_secretsmanager_secret.dms_source.arn
+    DB_SECRET_ARN                        = var.dms_source.secrets_manager_arn
     METADATA_BUCKET                      = aws_s3_bucket.validation_metadata.bucket
     LANDING_BUCKET                       = aws_s3_bucket.landing.bucket
     INVALID_BUCKET                       = aws_s3_bucket.invalid.bucket
