@@ -26,6 +26,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
+    directory: "/terraform/environments/analytical-platform-compute/central-digital-bedrock"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "terraform"
     directory: "/terraform/environments/analytical-platform-compute/lakeformation"
     schedule:
       interval: "daily"
@@ -751,10 +755,6 @@ updates:
       interval: "daily"
   - package-ecosystem: "terraform"
     directory: "/terraform/environments/tribunals"
-    schedule:
-      interval: "daily"
-  - package-ecosystem: "terraform"
-    directory: "/terraform/environments/tribunals/modules/dms"
     schedule:
       interval: "daily"
   - package-ecosystem: "terraform"
