@@ -1,5 +1,10 @@
 variable "name" {
-  type = string
+  type        = string
+  description = "Name variable that must be in kebab case (lowercase words separated by hyphens)."
+  validation {
+    condition     = can(regex("^([a-z]+(-[a-z]+)*)$", var.name))
+    error_message = "The name must be in kebab case (lowercase words separated by hyphens)."
+  }
 }
 
 variable "ssh_key" {
