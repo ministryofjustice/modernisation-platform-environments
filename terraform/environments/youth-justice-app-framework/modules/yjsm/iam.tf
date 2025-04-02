@@ -51,10 +51,13 @@ resource "aws_iam_policy" "secrets_manager_policy" {
     Statement = [
       {
         Action = [
+          "secretsmanager:GetRandomPassword",
           "secretsmanager:GetResourcePolicy",
+          "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret",
           "secretsmanager:ListSecretVersionIds",
-          "secretsmanager:ListSecrets"
+          "secretsmanager:ListSecrets",
+          "secretsmanager:CancelRotateSecret"
         ]
         Effect   = "Allow"
         Resource = data.aws_secretsmanager_secrets.all_secrets.arns
