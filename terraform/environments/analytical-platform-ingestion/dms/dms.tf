@@ -27,6 +27,7 @@ module "cica_dms_tariff_dms_implementation" {
     dms_source = {
         engine_name                 = "oracle"
         secrets_manager_arn         = module.cica_dms_tariff_database_credentials.secret_arn
+        secrets_manager_kms_arn     = module.cica_dms_credentials_kms.key_arn
         sid                         = local.environment_configuration.source_database_sid
         extra_connection_attributes = ""
         cdc_start_time              = "2025-03-10T12:00:00Z"
