@@ -106,6 +106,24 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
     ]
   }
 
+  # Lambda needs permissions on the KMS key to access the above secret
+  statement {
+    actions = [
+      "kms:DescribeKey",
+      "kms:Decrypt"
+    ]
+    resources = [
+      var.dms_source.secrets_manager_kms_arn
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values = [
+        "secretsmanager.${data.aws_region.current.name}.amazonaws.com",
+      ]
+    }
+  }
+
   # Lambda can create glue database/table
   # checkov:skip=CKV_AWS_111: The resource is not publicly accessible
   # checkov:skip=CKV_AWS_356: Required glue permissions for the lambda
