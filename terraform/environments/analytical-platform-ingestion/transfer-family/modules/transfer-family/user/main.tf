@@ -70,11 +70,18 @@ resource "aws_transfer_ssh_key" "this" {
   body      = var.ssh_key
 }
 
-resource "aws_secretsmanager_secret" "this" {
-  #checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
+module "this" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.3.1"
 
   for_each = toset(["technical-contact", "data-contact", "target-bucket", "slack-channel"])
 
-  name       = "ingestion/sftp/${var.name}/${each.key}"
+  name       = "transfer/sftp/${var.name}/${each.key}"
   kms_key_id = var.supplier_data_kms_key
+
+  ignore_secret_changes = true
+  secret_string         = "CHANGEME"
 }
