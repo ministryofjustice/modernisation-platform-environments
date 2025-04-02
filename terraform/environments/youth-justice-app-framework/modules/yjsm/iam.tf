@@ -66,10 +66,19 @@ resource "aws_iam_policy" "secrets_manager_policy" {
         ]
         Effect   = "Allow"
         Resource = data.aws_secretsmanager_secrets.all_secrets.arns
+      },
+      {
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey"
+        ]
+        Effect   = "Allow"
+        Resource = var.secret_kms_key_arn
       }
     ]
   })
 }
+
 
 resource "aws_iam_role_policy_attachment" "attach_secrets_manager_policy" {
   role       = aws_iam_role.yjsm_ec2_role.name
