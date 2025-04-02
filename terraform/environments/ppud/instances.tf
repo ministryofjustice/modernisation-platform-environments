@@ -467,10 +467,10 @@ resource "aws_instance" "s618358rgvw028" {
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-preproduction == true ? 1 : 0
   ami                    = "ami-0cbeb839e55dbb65e"
-  instance_type          = "m5.large"
+  instance_type          = "m5.xlarge"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.UAT-Document-Service[0].id]
+  vpc_security_group_ids = [aws_security_group.UAT-Document-Servers[0].id]
   subnet_id              = data.aws_subnet.data_subnets_b.id
 
   metadata_options {
