@@ -64,3 +64,8 @@ variable "tableau_sg_id" {
   description = "Security group ID for Tableau"
   type        = string
 }
+
+variable "secret_kms_key_arn" {
+  description = "The ARN of the KMS key to use for secrets"
+  type        = string
+}
