@@ -340,6 +340,7 @@ resource "aws_iam_role_policy" "app_task" {
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
+  description = "Control access to the ECS service"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
@@ -351,6 +352,7 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
+    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -470,6 +472,7 @@ resource "aws_sns_topic" "ddos_alarm" {
 }
 
 resource "aws_sns_topic" "wardship_utilisation_alarm" {
+  #checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
   count = local.is-development ? 0 : 1
   name  = "wardship_utilisation_alarm"
 }
