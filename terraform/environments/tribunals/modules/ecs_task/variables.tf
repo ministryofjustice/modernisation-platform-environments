@@ -56,13 +56,18 @@ variable "server_port" {
 }
 
 variable "cluster_id" {
+  type        = string
+  description = "The ID of the ECS cluster"
 }
 
 variable "cluster_name" {
+  type        = string
+  description = "The name of the ECS cluster"
 }
 
 variable "is_ftp_app" {
   description = "Determines if it is an ftp app or not"
+  type        = bool
 }
 
 variable "sftp_lb_tg_arn" {
