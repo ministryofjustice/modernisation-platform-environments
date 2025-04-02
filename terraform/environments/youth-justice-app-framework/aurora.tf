@@ -15,7 +15,7 @@ module "aurora" {
   alb_route53_record_name    = "db-yjafrds01"
 
   #one time restore from a shared snapshot on preprod
-  snapshot_identifier = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:sharedwithdevencrypt"
+  snapshot_identifier = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:encryptedmojpreproduction"
 
   user_passwords_to_reset = ["postgres_rotated"]
   db_name                 = "yjafrds01"
