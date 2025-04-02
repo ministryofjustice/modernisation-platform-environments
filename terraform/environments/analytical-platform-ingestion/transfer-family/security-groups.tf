@@ -1,11 +1,3 @@
-# resource "aws_security_group" "transfer_server" {
-#   description = "Security Group for Transfer Server"
-#   name        = "transfer-family-server"
-#   vpc_id      = data.aws_vpc.isolated.id
-#   tags        = local.tags
-# }
-
-
 module "transfer_server_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "5.3.0"
