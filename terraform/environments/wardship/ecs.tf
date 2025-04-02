@@ -319,6 +319,7 @@ EOF
 }
 
 resource "aws_iam_role_policy" "app_task" {
+  #checkov:skip=CKV2_AWS_40:"Broad IAM permissions required for ECS task functionality"
   #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
   #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
   #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
@@ -507,7 +508,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.wardship_utilisation_alarm
   ]
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration.git?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_non_prod_alarms"]
 }
@@ -518,7 +519,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.wardship_utilisation_alarm
   ]
-  source                    = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration.git?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
 }
