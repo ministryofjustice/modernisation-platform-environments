@@ -133,7 +133,7 @@ data "aws_iam_policy_document" "oracledb_backup_bucket_access" {
 
 
 data "aws_iam_policy_document" "oracle_remote_statistics_bucket_access" {
-  count = lookup(local.oracle_statistics_map[var.env_name], "source_id", null) != null ? 1 : 0
+  count = lookup(local.oracle_statistics_map[var.env_name], "source_account_id", null) != null ? 1 : 0
   statement {
     sid    = "allowAccessToListOracleStatistics${title(local.oracle_statistics_map[var.env_name]["source_environment"])}Bucket"
     effect = "Allow"
