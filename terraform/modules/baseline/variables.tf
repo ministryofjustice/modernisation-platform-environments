@@ -832,6 +832,57 @@ variable "options" {
   }
 }
 
+# variable "patch_manager" {
+#   description = "Patch manager configuration per OS"
+#   type = map(object({
+#     patch_schedules = optional(map(object({
+#       group_name                  = optional(string)
+#       cron_schedule               = optional(string)
+#       maintenance_window_duration = optional(number)
+#       maintenance_window_cutoff   = optional(number)
+#     })), {})
+#   }))
+#   default = {}
+# }
+
+# variable "patch_manager" {
+#   description = "Patch manager configuration per OS"
+#   type = map(object({
+#     patch_schedules             = map(string)
+#     maintenance_window_duration = number
+#     maintenance_window_cutoff   = number
+#     operating_system            = string
+#     patch_classification        = list(string)
+#     severity                    = list(string)
+#     approval_days               = number
+#     use_existing_bucket         = bool
+#   }))
+#   default = {
+#     windows = {
+#       patch_schedules = {
+#         group1 = "cron(00 03 ? * WED *)"
+#         group2 = "cron(00 03 ? * THU *)"
+#       }
+#       maintenance_window_duration = 4
+#       maintenance_window_cutoff   = 1
+#       operating_system            = "WINDOWS"
+#       patch_classification        = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"] # CriticalUpdates,SecurityUpdates,DefinitionUpdates,Drivers,FeaturePacks,ServicePacks,Tools,UpdateRollups,Updates,Upgrades.  Module Default ["*"]
+#       severity                    = ["*"]
+#     }
+#     redhat = {
+#       patch_schedules = {
+#         group1 = "cron(00 03 ? * WED *)"
+#         group2 = "cron(00 03 ? * THU *)"
+#       }
+#       maintenance_window_duration = 4
+#       maintenance_window_cutoff   = 1
+#       operating_system            = "REDHAT_ENTERPRISE_LINUX"
+#       patch_classification        = ["Security", "Bugfix"]    # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+#       severity                    = ["Critical", "Important"] # Optional, severity of the patch e.g. Critical, Important, Medium, Low.  Type list(string),	Module default ["*"].
+#     }
+#   }
+# }
+
 variable "route53_resolvers" {
   description = "map of resolver endpoints and associated rules to configure, where map keys are the names of the resources.  The application name is automatically added as a prefix to the resource names"
   type = map(object({

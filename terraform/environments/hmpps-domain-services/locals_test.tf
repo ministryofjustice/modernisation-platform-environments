@@ -114,8 +114,9 @@ locals {
           availability_zone = "eu-west-2a"
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.noms.root domain"
-          domain-name = "azure.noms.root"
+          description   = "Remote Desktop Gateway for azure.noms.root domain"
+          domain-name   = "azure.noms.root"
+          patch-manager = "group1"
         })
       })
 
@@ -125,7 +126,8 @@ locals {
           availability_zone = "eu-west-2a"
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.noms.root"
+          domain-name   = "azure.noms.root"
+          patch-manager = "group2"
         })
       })
 
@@ -201,6 +203,19 @@ locals {
           })
         })
       })
+    }
+
+    patch_manager = {
+      patch_schedules = {
+        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown  
+        group2 = "cron(00 06 ? * THU *)" # 3am thu for prod
+      }
+      maintenance_window_duration = 2 # 4 for prod
+      maintenance_window_cutoff   = 1 # 2 for prod
+      patch_classifications = {
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
+      }
     }
 
     schedule_alarms_lambda = {
