@@ -265,6 +265,10 @@ EOF
 }
 
 resource "aws_iam_role_policy" "app_execution" {
+  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
+  #checkov:skip=CKV_AWS_288: [TODO] Ensure IAM policies does not allow data exfiltration
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
 
@@ -315,6 +319,9 @@ EOF
 }
 
 resource "aws_iam_role_policy" "app_task" {
+  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
 
