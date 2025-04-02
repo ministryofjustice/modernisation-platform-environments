@@ -8,13 +8,6 @@ data "aws_ssoadmin_instances" "main" {
   provider = aws.sso-readonly
 }
 
-data "aws_security_group" "quicksight_shared_vpc_security_group" {
-  filter {
-    name   = "tag:Name"
-    values = ["quicksight-shared-vpc"]
-  }
-}
-
 # Shared VPC and Subnets
 data "aws_vpc" "shared" {
   tags = {
