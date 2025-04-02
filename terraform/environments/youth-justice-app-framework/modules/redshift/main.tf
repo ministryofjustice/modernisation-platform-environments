@@ -9,9 +9,12 @@ resource "aws_redshiftserverless_namespace" "default" {
 
   kms_key_id = var.kms_key_arn
 
+  log_exports = ["userlog", "connectionlog", "useractivitylog"]
+
   tags = merge(local.all_tags,
     { Name = local.namespace_name }
   )
+
 }
 
 # Create the Redshift Serverless Workgroup
