@@ -7,7 +7,12 @@ locals {
 }
 
 # Create an IAM policy for the custom permissions required by the EC2 hosting instance
-resource "aws_iam_policy" "ec2_instance_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+#tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_policy" "ec2_instance_policy" {
+  #checkov:skip=CKV_AWS_290:"Required permissions for ECS/ECR operations"
+  #checkov:skip=CKV_AWS_289:"Required permissions for ECS container management"
+  #checkov:skip=CKV_AWS_355:"Some AWS services require * resource access"
+  #checkov:skip=CKV_AWS_288:"S3 and ECR access required for container operations"
   name = local.ec2_instance_policy
   tags = merge(
     local.tags_common,
@@ -113,7 +118,7 @@ resource "aws_iam_role_policy" "ec2_s3_access" {
           "s3:ListBucket"
         ],
         Resource = [
-          "${aws_s3_bucket.ebs_backup.arn}",
+          aws_s3_bucket.ebs_backup.arn,
           "${aws_s3_bucket.ebs_backup.arn}/*"
         ]
       }
@@ -155,9 +160,8 @@ data "aws_ssm_parameter" "ecs_optimized_ami" {
   name = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-ECS_Optimized"
 }
 
-# Create the Launch Template and assign the instance profile
-# Comment out the aws_launch_template and aws_autoscaling_group if you ever need to delete and recreate the ec2 instance
 resource "aws_launch_template" "tribunals-all-lt" {
+  #checkov:skip=CKV_AWS_88:"EC2 instances require public IPs as they are internet-facing application servers"
   name_prefix            = "tribunals-all"
   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type          = "m5.4xlarge"
@@ -173,6 +177,7 @@ resource "aws_launch_template" "tribunals-all-lt" {
     ebs {
       volume_size = 80
       volume_type = "gp2"
+      encrypted   = true
     }
   }
   ebs_optimized = true
@@ -183,6 +188,10 @@ resource "aws_launch_template" "tribunals-all-lt" {
     subnet_id                   = data.aws_subnet.public_subnets_a.id
     delete_on_termination       = true
     associate_public_ip_address = true
+  }
+
+  metadata_options {
+    http_tokens = "required"
   }
 
   tag_specifications {
@@ -197,45 +206,50 @@ resource "aws_launch_template" "tribunals-all-lt" {
   user_data = filebase64("ec2-shared-user-data.sh")
 }
 
-resource "aws_launch_template" "tribunals-backup-lt" {
-  name_prefix            = "tribunals-backup"
-  image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
-  instance_type          = "m5.4xlarge"
-  update_default_version = true
+# resource "aws_launch_template" "tribunals-backup-lt" {
+#   name_prefix            = "tribunals-backup"
+#   image_id               = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+#   instance_type          = "m5.4xlarge"
+#   update_default_version = true
 
-  iam_instance_profile {
-    name = aws_iam_instance_profile.ec2_instance_profile.name
-  }
+#   iam_instance_profile {
+#     name = aws_iam_instance_profile.ec2_instance_profile.name
+#   }
 
-  block_device_mappings {
-    device_name = "/dev/sda1"
+#   block_device_mappings {
+#     device_name = "/dev/sda1"
 
-    ebs {
-      volume_size = 80
-      volume_type = "gp2"
-    }
-  }
-  ebs_optimized = true
+#     ebs {
+#       volume_size = 80
+#       volume_type = "gp2"
+#       encrypted   = true
+#     }
+#   }
+#   ebs_optimized = true
 
-  network_interfaces {
-    device_index                = 0
-    security_groups             = [aws_security_group.cluster_ec2.id]
-    subnet_id                   = data.aws_subnet.public_subnets_b.id
-    delete_on_termination       = true
-    associate_public_ip_address = true
-  }
+#   network_interfaces {
+#     device_index                = 0
+#     security_groups             = [aws_security_group.cluster_ec2.id]
+#     subnet_id                   = data.aws_subnet.private_subnets_b.id
+#     delete_on_termination       = true
+#     associate_public_ip_address = false
+#   }
 
-  tag_specifications {
-    resource_type = "instance"
-    tags = {
-      Environment = local.environment
-      Name        = "tribunals-backup-instance"
-      Role        = "Backup"
-    }
-  }
+#   metadata_options {
+#     http_tokens = "required"
+#   }
 
-  user_data = filebase64("ec2-backup-instance-user-data.sh")
-}
+#   tag_specifications {
+#     resource_type = "instance"
+#     tags = {
+#       Environment = local.environment
+#       Name        = "tribunals-backup-instance"
+#       Role        = "Backup"
+#     }
+#   }
+
+#   user_data = filebase64("ec2-backup-instance-user-data.sh")
+# }
 
 # # Finally, create the Auto scaling group for the launch template
 resource "aws_autoscaling_group" "tribunals-all-asg" {
@@ -257,18 +271,32 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   }
 }
 
-resource "aws_instance" "tribunals_backup" {
-  launch_template {
-    id      = aws_launch_template.tribunals-backup-lt.id
-    version = "$Latest"
-  }
+# temporarily delete backup instance to move subents and delete public ip address
+# resource "aws_instance" "tribunals_backup" {
+#   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
+#   launch_template {
+#     id      = aws_launch_template.tribunals-backup-lt.id
+#     version = "$Latest"
+#   }
 
-  tags = {
-    Environment = local.environment
-    Name        = "tribunals-backup-instance"
-    Role        = "Backup"
-  }
-}
+#   ebs_optimized = true
+
+
+#   metadata_options {
+#     http_endpoint = "enabled"
+#     http_tokens   = "required"
+#   }
+
+#   root_block_device {
+#     encrypted = true
+#   }
+
+#   tags = {
+#     Environment = local.environment
+#     Name        = "tribunals-backup-instance"
+#     Role        = "Backup"
+#   }
+# }
 
 ###########################################################################
 
@@ -278,6 +306,7 @@ resource "aws_instance" "tribunals_backup" {
 
 resource "aws_security_group" "cluster_ec2" {
   #checkov:skip=CKV_AWS_23
+  #checkov:skip=CKV_AWS_382:"EC2 instances require unrestricted egress for ECS/ECR operations"
   name        = "tribunals-cluster-ec2-security-group"
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
