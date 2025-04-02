@@ -42,7 +42,12 @@ resource "aws_iam_role_policy_attachment" "yjsm_s3_readonly_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
+resource "aws_iam_role_policy_attachment" "yjsm_s3_readonly_policy" {
+  role       = aws_iam_role.yjsm_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/SecretsManagerReadWrite"
+}
 
+# TODO FIX POLICY SO WE CAN REMOVE SecretsManagerReadWrite
 resource "aws_iam_policy" "secrets_manager_policy" {
   name        = "secrets_manager_access"
   description = "Policy to allow access to specific secrets in Secrets Manager"
