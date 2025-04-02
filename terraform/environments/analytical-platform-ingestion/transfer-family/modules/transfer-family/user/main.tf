@@ -70,7 +70,7 @@ resource "aws_transfer_ssh_key" "this" {
   body      = var.ssh_key
 }
 
-module "this" {
+module "secret" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
