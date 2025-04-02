@@ -47,6 +47,7 @@ variable "dms_source" {
   type = object({
     engine_name                 = string,
     secrets_manager_arn         = string,
+    secrets_manager_kms_arn     = string,
     sid                         = string,
     extra_connection_attributes = optional(string)
     cdc_start_time              = optional(string)
