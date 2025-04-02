@@ -2,7 +2,7 @@ module "transfer_server_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "5.3.0"
 
-  name        = "transfer-family-server"
+  name        = "transfer-server"
   description = "Security Group for Transfer Server"
   vpc_id      = data.aws_vpc.isolated.id
 }
