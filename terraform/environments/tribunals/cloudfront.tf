@@ -143,16 +143,17 @@ resource "aws_s3_bucket_versioning" "cloudfront_bucket_versioning" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "cloudfront_logs" {
+  #checkov:skip=CKV2_AWS_65:"ACLs are required for CloudFront logging to work"
   bucket = aws_s3_bucket.cloudfront_logs.id
   rule {
-    object_ownership = "BucketOwnerEnforced"
+    object_ownership = "BucketOwnerPreferred"
   }
 }
 
 resource "aws_s3_bucket_acl" "cloudfront_logs" {
   depends_on = [aws_s3_bucket_ownership_controls.cloudfront_logs]
   bucket     = aws_s3_bucket.cloudfront_logs.id
-  acl        = "private"
+  acl        = "log-delivery-write"
 }
 
 resource "aws_s3_bucket_public_access_block" "cloudfront_logs" {
@@ -186,8 +187,15 @@ resource "aws_s3_bucket_policy" "cloudfront_logs" {
         Principal = {
           Service = "delivery.logs.amazonaws.com"
         }
-        Action   = "s3:PutObject"
-        Resource = "${aws_s3_bucket.cloudfront_logs.arn}/*"
+        Action = [
+          "s3:PutObject",
+          "s3:GetBucketAcl",
+          "s3:PutBucketAcl"
+        ]
+        Resource = [
+          aws_s3_bucket.cloudfront_logs.arn,
+          "${aws_s3_bucket.cloudfront_logs.arn}/*"
+        ]
         Condition = {
           StringEquals = {
             "aws:SourceAccount" = data.aws_caller_identity.current.account_id

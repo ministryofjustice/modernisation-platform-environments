@@ -35,6 +35,8 @@ module "yjsm" {
   environment  = local.environment
   tags         = local.tags
 
+
+  secret_kms_key_arn = module.kms.key_arn
   # Security Group IDs
   ecs_service_internal_sg_id    = module.ecs.ecs_service_internal_sg_id
   ecs_service_external_sg_id    = module.ecs.ecs_service_external_sg_id
