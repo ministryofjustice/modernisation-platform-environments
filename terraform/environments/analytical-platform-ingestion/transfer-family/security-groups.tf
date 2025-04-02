@@ -8,6 +8,8 @@ module "transfer_server_security_group" {
 }
 
 resource "aws_security_group_rule" "this" {
+  count = length(local.all_cidr_blocks) > 0 ? 1 : 0
+
   description       = "Allow inbound SFTP traffic to Transfer Server"
   type              = "ingress"
   from_port         = 2222
