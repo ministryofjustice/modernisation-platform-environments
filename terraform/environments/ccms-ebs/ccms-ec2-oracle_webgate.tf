@@ -32,6 +32,11 @@ resource "aws_instance" "ec2_webgate" {
     hostname = "webgate"
   }))
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
   # AMI ebs mappings from /dev/sd[a-d]
   # root
   # Increase the volume size of the root volume
