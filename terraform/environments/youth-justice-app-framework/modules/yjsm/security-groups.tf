@@ -135,8 +135,46 @@ resource "aws_security_group_rule" "tableau_to_yjsm_ssh" {
   description              = "tableau to yjsm ssh temp"
 }
 
+# (Subnet A to ASSETS)
+resource "aws_security_group_rule" "ecs_to_assets_a" {
+  type              = "ingress"
+  from_port         = 8089
+  to_port           = 8089
+  protocol          = "tcp"
+  security_group_id = aws_security_group.yjsm_service.id
+  cidr_blocks       = ["10.27.144.0/24"]
+  description       = "ECS internal to ASSETS (Subnet A)"
+}
+
+# (Subnet B to ASSETS)
+resource "aws_security_group_rule" "ecs_to_assets_b" {
+  type              = "ingress"
+  from_port         = 8089
+  to_port           = 8089
+  protocol          = "tcp"
+  security_group_id = aws_security_group.yjsm_service.id
+  cidr_blocks       = ["10.27.145.0/24"]
+  description       = "ECS internal to ASSETS (Subnet B)"
+}
+
+# (Subnet C to ASSETS)
+resource "aws_security_group_rule" "ecs_to_assets_c" {
+  type              = "ingress"
+  from_port         = 8089
+  to_port           = 8089
+  protocol          = "tcp"
+  security_group_id = aws_security_group.yjsm_service.id
+  cidr_blocks       = ["10.27.146.0/24"]
+  description       = "ECS internal to ASSETS (Subnet C)"
+}
+
 
 ### TO DO LIST 
 ### CUG SUBNETS
 ### SERVICE MONITORING/ENG
 ### 
+
+
+10.27.144.0/24  - a
+10.27.145.0/24  - b
+10.27.146.0/24  - c
