@@ -15,8 +15,8 @@ module "transfer_service_lambda" {
   timeout                = 900
   image_uri              = "374269020027.dkr.ecr.eu-west-2.amazonaws.com/analytical-platform-ingestion-transfer:${local.environment_configuration.transfer_service_image_version}"
 
-  vpc_subnet_ids         = module.isolated_vpc.private_subnets
-  vpc_security_group_ids = [module.transfer_lambda_security_group.security_group_id]
+  vpc_subnet_ids         = data.aws_subnets.isolated_private.ids
+  vpc_security_group_ids = [module.transfer_service_lambda_security_group.security_group_id]
   attach_network_policy  = true
 
   environment_variables = {
