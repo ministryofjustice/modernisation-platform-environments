@@ -217,19 +217,19 @@ locals {
               { ec2_instance_name = "test-rdgw-1-a" },
             ]
           })
-          # test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
-          #   attachments = [
-          #     { ec2_instance_name = "test-rds-2-b" },
-          #   ]
-          # })
+          test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "test-rds-2-b" },
+            ]
+          })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
             alarm_target_group_names = [
               "test-rdgw-1-http",
-#              "test-rds-1-https",
+             "test-rds-1-https",
             ]
-#            certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
+           certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
             rules = {
               test-rdgw-1-http = {
                 priority = 100
@@ -246,20 +246,20 @@ locals {
                   }
                 }]
               }
-              # test-rds-1-https = {
-              #   priority = 200
-              #   actions = [{
-              #     type              = "forward"
-              #     target_group_name = "test-rds-1-https"
-              #   }]
-              #   conditions = [{
-              #     host_header = {
-              #       values = [
-              #         "rdweb1.test.hmpps-domain.service.justice.gov.uk"
-              #       ]
-              #     }
-              #   }]                
-              # }
+              test-rds-1-https = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rds-1-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb1.test.hmpps-domain.service.justice.gov.uk"
+                    ]
+                  }
+                }]                
+              }
             }
           })
         })
@@ -277,7 +277,7 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
-          # { name = "rdweb1", type = "A", lbs_map_key = "public" },
+          { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
       }
     }
