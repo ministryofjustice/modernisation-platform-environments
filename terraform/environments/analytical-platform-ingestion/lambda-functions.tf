@@ -467,7 +467,7 @@ module "transfer_service_lambda" {
       actions = [
         "sns:Publish"
       ]
-      resources = [module.transfer_service_topic.topic_arn]
+      resources = "arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:transfer-service*"
     }
   }
 }
