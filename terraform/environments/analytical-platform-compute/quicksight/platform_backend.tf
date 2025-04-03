@@ -10,4 +10,5 @@ terraform {
     region               = "eu-west-2"
     use_lockfile         = true
     workspace_key_prefix = "environments/members/analytical-platform-compute/quicksight" # This will store the object as environments/members/<application>/<component>/${workspace}/terraform.tfstate
-    
+  }
+}
