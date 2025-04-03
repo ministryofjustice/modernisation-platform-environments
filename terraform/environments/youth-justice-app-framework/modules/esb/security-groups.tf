@@ -43,3 +43,14 @@ resource "aws_security_group_rule" "yjsm_8092" {
   source_security_group_id = var.yjsm_service_sg_id
   description              = "ESB Mule 2 from YJSM"
 }
+
+#TEMP RULE FOR FIXING AMI KEEP UNTIL DONE IN PROD
+resource "aws_security_group_rule" "tableau_to_esb_ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.esb_service.id
+  source_security_group_id = var.tableau_sg_id
+  description              = "tableau to esb ssh temp"
+}

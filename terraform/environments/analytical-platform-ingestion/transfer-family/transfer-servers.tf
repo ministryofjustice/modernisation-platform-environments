@@ -13,14 +13,14 @@ resource "aws_transfer_server" "this" {
       aws_eip.transfer_server[2].id,
     ]
     security_group_ids = [
-      aws_security_group.transfer_server.id
+      module.transfer_server_security_group.security_group_id
     ]
   }
 
   security_policy_name = "TransferSecurityPolicy-2024-01"
 
   logging_role                = module.transfer_server_iam_role.iam_role_arn
-  structured_log_destinations = ["${module.transfer_family_structured_logs.cloudwatch_log_group_arn}:*"]
+  structured_log_destinations = ["${module.transfer_server_structured_logs.cloudwatch_log_group_arn}:*"]
 }
 
 resource "aws_transfer_tag" "this" {
