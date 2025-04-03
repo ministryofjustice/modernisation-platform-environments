@@ -188,19 +188,6 @@ module "transferred_sns_kms" {
   deletion_window_in_days = 7
 }
 
-module "transfer_service_sns_kms" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-
-  source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
-
-  aliases               = ["sns/transfer-service"]
-  description           = "Key for Transfer Service Lambda"
-  enable_default_policy = true
-
-  deletion_window_in_days = 7
-}
-
 module "govuk_notify_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
