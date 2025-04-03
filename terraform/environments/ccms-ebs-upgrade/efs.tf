@@ -72,9 +72,9 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
   description       = "Allow outgoing traffic"
   security_group_id = aws_security_group.efs-security-group.id
   ip_protocol       = "-1"
-  from_port         = 0
-  to_port           = 0
-  cidr_ipv4         = "0.0.0.0/0"
+  # from_port         = 0
+  # to_port           = 0
+  cidr_ipv4 = "0.0.0.0/0"
 
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-efs", local.application_name, local.environment)) }
