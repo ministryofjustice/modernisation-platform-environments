@@ -150,8 +150,8 @@ jobs:
   #       env:
   #         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   #       if: ${{ failure() }}
-    # env:
-    #   ACCOUNT_NAME: ${{ matrix.nuke_accts }}
+    env:
+      ACCOUNT_NAME: ${{ matrix.nuke_accts }}
 
   # testing-test account is not set up with OIDC because it is used to terratest OIDC-related resources. Therefore it's handled as a special case
   # using testing-ci user static credentials.
@@ -204,9 +204,10 @@ jobs:
                 echo "Failed to assume role"
                 exit 1
             }
-            export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' creds.json)
-            export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' creds.json)
-            export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' creds.json)
+            echo "Exporting assumed credentials to environment..."
+            echo "AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' creds.json)" >> $GITHUB_ENV
+            echo "AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' creds.json)" >> $GITHUB_ENV
+            echo "AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' creds.json)" >> $GITHUB_ENV
             echo "Verifying identity..."
             aws sts get-caller-identity || {
               echo "Invalid credentials"
