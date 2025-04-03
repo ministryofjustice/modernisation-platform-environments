@@ -438,4 +438,6 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"
   ]
+
+  create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 }

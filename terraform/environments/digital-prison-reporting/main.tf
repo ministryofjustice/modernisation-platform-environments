@@ -987,3 +987,66 @@ module "dynamo_tab_application_tf_state" {
     }
   )
 }
+
+# Glue Job, Temporary Job to Generate Test Data to the DPR Read-Replica Testing Postgres
+module "generate_test_postgres_data" {
+  count = local.create_postgres_load_generator_job ? 1 : 0
+
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-load-generator-job-${local.env}"
+  short_name                    = "${local.project}-load-generator-job"
+  command_type                  = "glueetl"
+  description                   = "Inserts a given number of records to postgres database.\nArguments:\n--dpr.test.database.secret.id: (Required) The Id of the secret to connect to the Postgres database\n--dpr.test.data.batch.size: (Optional) Total number of records to insert per batch\n--dpr.test.data.parallelism: (Optional) Total number of parallel batches\n--dpr.test.data.inter.batch.delay.millis: (Optional) Amount of milliseconds to wait between batches\n--dpr.test.data.run.duration.millis: (Optional) Total run duration of data generation in milliseconds"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-load-generator-job-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-load-generator-job-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  connections                  = ["dpr-dps-testing2-connection"]
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 1
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-load-generator-job-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-1876"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                               = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--extra-files"                              = local.shared_log4j_properties_path
+    "--class"                                    = "uk.gov.justice.digital.job.generator.PostgresLoadGeneratorJob"
+    "--dpr.aws.region"                           = local.account_region
+    "--dpr.log.level"                            = local.glue_job_common_log_level
+    "--dpr.test.database.secret.id"              = "external/dpr-dps-testing2-source-secrets"
+    "--dpr.test.data.batch.size"                 = 100
+    "--dpr.test.data.parallelism"                = 5
+  }
+}
+
+# Glue Trigger, Temporary Glue Trigger for the Postgres Test Data Generation Job
+resource "aws_glue_trigger" "glue_postgres_data_generator_job_trigger" {
+  count = local.create_postgres_load_generator_job ? 1 : 0
+
+  name     = "${module.generate_test_postgres_data[0].name}-trigger"
+  schedule = "cron(0 0/2 ? * * *)" # runs every 2 hours
+  type     = "SCHEDULED"
+
+  actions {
+    job_name = module.generate_test_postgres_data[0].name
+  }
+}
