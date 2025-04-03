@@ -90,6 +90,19 @@ module "s3_quarantine_kms" {
   deletion_window_in_days = 7
 }
 
+module "s3_transfer_quarantine_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.0"
+
+  aliases               = ["s3/transfer-quarantine"]
+  description           = "Transfer, Quarantine S3 KMS Key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}
+
 module "s3_definitions_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
