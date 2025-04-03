@@ -18,13 +18,37 @@ from sqlalchemy import create_engine
 
 patch_all()
 
+def _get_glue_client():
+    """
+    Return a glue client with an appropriate role
+    """
+    glue_client_kwargs = {}
+    glue_role_arn = os.getenv("GLUE_CATALOG_ROLE_ARN")
+    if glue_role_arn:
+        sts_connection = boto3.client('sts')
+        acct_b = sts_connection.assume_role(
+            RoleArn=glue_role_arn,
+            RoleSessionName="cross_acct_lambda"
+        )
+        glue_client_kwargs.update({
+            'aws_access_key_id': acct_b['Credentials']['AccessKeyId'],
+            'aws_secret_access_key': acct_b['Credentials']['SecretAccessKey'],
+            'aws_session_token': acct_b['Credentials']['SessionToken'],
+        })
+    else:
+        logger.info(f"Not assuming role, as GLUE_CATALOG_ROLE_ARN={glue_role_arn}")
+    return boto3.client(
+        'glue',
+        **glue_client_kwargs
+    )
+
 logger = logging.getLogger()
 log_level = os.getenv("LOG_LEVEL", "INFO")
 logger.setLevel(log_level)
 
 secretsmanager = boto3.client("secretsmanager")
 s3 = boto3.client("s3")
-glue = boto3.client("glue")
+glue = _get_glue_client()
 oracledb.version = "8.3.0"
 sys.modules["cx_Oracle"] = oracledb
 load_dotenv()

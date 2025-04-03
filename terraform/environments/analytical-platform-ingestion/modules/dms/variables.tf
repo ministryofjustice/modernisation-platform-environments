@@ -126,3 +126,9 @@ variable "glue_catalog_arn" {
   default = ""
   description = "Which glue catalog to grant metadata generator permissions to (optional)"
 }
+
+variable "glue_catalog_role_arn" {
+  type = string
+  default = ""
+  description = "Which role to use to access glue catalog (optional)"
+}

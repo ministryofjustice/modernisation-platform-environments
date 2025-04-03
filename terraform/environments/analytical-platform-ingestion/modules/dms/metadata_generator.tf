@@ -204,6 +204,7 @@ module "metadata_generator" {
     ENGINE                               = var.dms_source.engine_name
     DATABASE_NAME                        = var.dms_source.sid
     GLUE_CATALOG_ARN                     = var.glue_catalog_arn
+    GLUE_CATALOG_ROLE_ARN                = var.glue_catalog_role_arn
     GLUE_CATALOG_DATABASE_NAME           = lookup(jsondecode(file(var.dms_mapping_rules)), "objects_from", var.db)
     USE_GLUE_CATALOG                     = var.write_metadata_to_glue_catalog
     PATH_TO_DMS_MAPPING_RULES            = aws_s3_object.dms_mapping_rules.key
