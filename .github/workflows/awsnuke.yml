@@ -221,7 +221,6 @@ jobs:
       - name: Nuke Apply (Destructive)
         # if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
         run: |
-           run: |
             echo "Verifying identity (again)..."
             aws sts get-caller-identity || {
              echo "Missing or invalid credentials from dry run"
