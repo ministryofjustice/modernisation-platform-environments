@@ -301,11 +301,24 @@ resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
 }
 
+resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
+  bucket                  = aws_s3_bucket.ccms_ebs_shared.id
+  block_public_acls       = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+}
 
 ### S3 Bucket for Payment Load
 
 resource "aws_s3_bucket" "lambda_payment_load" {
   bucket = "${local.application_name}-${local.environment}-payment-load"
+}
+
+resource "aws_s3_bucket_public_access_block" "lambda_payment_load" {
+  bucket                  = aws_s3_bucket.lambda_payment_load.id
+  block_public_acls       = true
+  block_public_policy     = true
+  restrict_public_buckets = true
 }
 
 # Development

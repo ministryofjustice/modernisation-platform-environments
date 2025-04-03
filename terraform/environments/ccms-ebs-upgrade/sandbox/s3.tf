@@ -279,3 +279,10 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "ccms-ebs-${local.component_name}-shared"
 }
+
+resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
+  bucket                  = aws_s3_bucket.ccms_ebs_shared.id
+  block_public_acls       = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+}
