@@ -1,6 +1,7 @@
 locals {
 
   application_name = "analytical-platform-compute"
+  component_name   = "quicksight"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 
