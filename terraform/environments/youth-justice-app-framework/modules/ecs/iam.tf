@@ -63,3 +63,30 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_additional_policies" {
   role       = aws_iam_role.ecs_task_role.name
   policy_arn = each.value
 }
+
+
+resource "aws_iam_policy" "datadog_policy" {
+  name        = "datadog-policy"
+  description = "IAM policy for Datadog agent on ECS"
+  policy      = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "logs:DescribeLogStreams",
+          "logs:GetLogEvents",
+          "logs:PutLogEvents",
+          "ecs:DescribeTasks",
+          "ecs:ListTasks"
+        ],
+        "Resource": "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "datadog_policy_attachment" {
+  role       = aws_iam_role.ecs_task_role.name
+  policy_arn = aws_iam_policy.datadog_policy.arn
+}
