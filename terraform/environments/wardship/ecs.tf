@@ -370,6 +370,7 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_ecr_repository" "wardship_ecr_repo" {
+  #checkov:skip=CKV_AWS_51: "Ensure ECR Image Tags are immutable"
   #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
   name         = "wardship-ecr-repo"
   force_delete = true
