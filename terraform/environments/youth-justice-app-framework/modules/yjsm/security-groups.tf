@@ -173,8 +173,3 @@ resource "aws_security_group_rule" "ecs_to_assets_c" {
 ### CUG SUBNETS
 ### SERVICE MONITORING/ENG
 ### 
-
-
-10.27.144.0/24  - a
-10.27.145.0/24  - b
-10.27.146.0/24  - c
