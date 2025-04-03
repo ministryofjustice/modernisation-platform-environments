@@ -107,11 +107,6 @@ locals {
       container_memory = 1024
     }
 
-    oracle_observer = {
-      image_tag        = "latest"
-      container_cpu    = 512
-      container_memory = 1024
-    }
   }
 
   bastion_config_poc = {
