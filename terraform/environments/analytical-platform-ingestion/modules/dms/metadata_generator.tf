@@ -70,6 +70,19 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
     ]
   }
 
+  # Lambda can access configuration files placed in its own bucket
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+    ]
+
+    resources = [
+      aws_s3_bucket.lambda.arn,
+      "${aws_s3_bucket.lambda.arn}/*"
+    ]
+  }
+
   # Lambda can reprocess data in the invalid bucket
   statement {
     actions = [
@@ -89,8 +102,26 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
     ]
 
     resources = [
-      aws_secretsmanager_secret.dms_source.arn
+      var.dms_source.secrets_manager_arn
     ]
+  }
+
+  # Lambda needs permissions on the KMS key to access the above secret
+  statement {
+    actions = [
+      "kms:DescribeKey",
+      "kms:Decrypt"
+    ]
+    resources = [
+      var.dms_source.secrets_manager_kms_arn
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values = [
+        "secretsmanager.${data.aws_region.current.name}.amazonaws.com",
+      ]
+    }
   }
 
   # Lambda can create glue database/table
@@ -105,7 +136,9 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
       "glue:UpdateTable",
     ]
 
-    resources = ["*"]
+    resources = [
+      var.glue_catalog_arn
+    ]
   }
 }
 
@@ -126,6 +159,12 @@ resource "aws_security_group" "metadata_generator_lambda_function" {
   }
 }
 
+resource "aws_s3_object" "dms_mapping_rules" {
+  bucket = aws_s3_bucket.lambda.bucket
+  key    = "metadata-generator/config/dms_mapping_rules.json"
+  source = var.dms_mapping_rules
+}
+
 module "metadata_generator" {
   # Commit hash for v7.20.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=84dfbfddf9483bc56afa0aff516177c03652f0c7"
@@ -137,8 +176,7 @@ module "metadata_generator" {
   memory_size             = 512
   timeout                 = 60
   architectures           = ["x86_64"]
-  build_in_docker         = true
-  docker_image            = "test-dms"
+  build_in_docker         = false
   store_on_s3             = true
   s3_bucket               = aws_s3_bucket.lambda.bucket
   s3_object_storage_class = "STANDARD"
@@ -146,7 +184,7 @@ module "metadata_generator" {
 
   # Lambda function will be attached to the VPC to access the source database
   vpc_security_group_ids = [aws_security_group.metadata_generator_lambda_function.id]
-  vpc_subnet_ids         = var.dms_replication_instance.subnet_ids
+  vpc_subnet_ids         = data.aws_subnets.subnet_ids_vpc_subnets.ids
   attach_network_policy  = true
 
 
@@ -154,19 +192,27 @@ module "metadata_generator" {
   policy_json        = data.aws_iam_policy_document.metadata_generator_lambda_function.json
 
   environment_variables = {
-    ENVIRONMENT        = "sandbox"
-    DB_SECRET_ARN      = aws_secretsmanager_secret.dms_source.arn
-    METADATA_BUCKET    = aws_s3_bucket.validation_metadata.bucket
-    LANDING_BUCKET     = aws_s3_bucket.landing.bucket
-    INVALID_BUCKET     = aws_s3_bucket.invalid.bucket
-    RAW_HISTORY_BUCKET = aws_s3_bucket.raw_history.bucket
-    DB_OBJECTS         = jsonencode(["TEST_DATA"])
-    DB_SCHEMA_NAME     = "ADMIN"
+    ENVIRONMENT                          = var.environment
+    DB_SECRET_ARN                        = var.dms_source.secrets_manager_arn
+    METADATA_BUCKET                      = aws_s3_bucket.validation_metadata.bucket
+    LANDING_BUCKET                       = aws_s3_bucket.landing.bucket
+    INVALID_BUCKET                       = aws_s3_bucket.invalid.bucket
+    RAW_HISTORY_BUCKET                   = data.aws_s3_bucket.raw_history.bucket
+    LAMBDA_BUCKET                        = aws_s3_bucket.lambda.bucket
+    DB_OBJECTS                           = jsonencode(jsondecode(file(var.dms_mapping_rules))["objects"])
+    DB_SCHEMA_NAME                       = lookup(jsondecode(file(var.dms_mapping_rules)), "schema", "")
+    ENGINE                               = var.dms_source.engine_name
+    DATABASE_NAME                        = var.dms_source.sid
+    GLUE_CATALOG_ARN                     = var.glue_catalog_arn
+    GLUE_CATALOG_ROLE_ARN                = var.glue_catalog_role_arn
+    GLUE_CATALOG_DATABASE_NAME           = lookup(jsondecode(file(var.dms_mapping_rules)), "objects_from", var.db)
+    USE_GLUE_CATALOG                     = var.write_metadata_to_glue_catalog
+    PATH_TO_DMS_MAPPING_RULES            = aws_s3_object.dms_mapping_rules.key
+    RETRY_FAILED_AFTER_RECREATE_METADATA = var.retry_failed_after_recreate_metadata
   }
 
   source_path = [{
     path             = "${path.module}/lambda-functions/metadata_generator/main.py"
-    pip_tmp_dir      = "${path.module}/lambda-functions/metadata_generator/fixtures"
     pip_requirements = "${path.module}/lambda-functions/metadata_generator/requirements.txt"
   }]
 
