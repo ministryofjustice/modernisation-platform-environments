@@ -77,7 +77,7 @@ module "secret" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.3.1"
 
-  for_each = toset(["technical-contact", "data-contact", "target-bucket", "slack-channel"])
+  for_each = toset(["technical-contact", "data-contact", "target-bucket"])
 
   name       = "transfer/sftp/${var.name}/${each.key}"
   kms_key_id = var.supplier_data_kms_key
