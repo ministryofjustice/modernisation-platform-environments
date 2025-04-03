@@ -20,7 +20,7 @@ module "cur_v2_hourly" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "coat-cur-v2-hourly"
+  bucket = "coat-${local.environment}-cur-v2-hourly"
 
   force_destroy = true
 
