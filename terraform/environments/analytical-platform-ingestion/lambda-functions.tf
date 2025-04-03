@@ -392,8 +392,8 @@ module "transfer_service_lambda" {
   attach_network_policy  = true
 
   environment_variables = {
-    LANDING_BUCKET_NAME    = module.transfer_service_landing_bucket.s3_bucket_id
-    QUARANTINE_BUCKET_NAME = module.quarantine_bucket.s3_bucket_id
+    LANDING_BUCKET_NAME    = module.transfer_landing_bucket.s3_bucket_id
+    QUARANTINE_BUCKET_NAME = module.transfer_quarantine_bucket.s3_bucket_id
     SNS_TOPIC_ARN          = module.transfer_service_topic.topic_arn
   }
 
@@ -430,7 +430,7 @@ module "transfer_service_lambda" {
         "s3:DeleteObject",
         "s3:GetObjectTagging"
       ],
-      resources = ["arn:aws:s3:::${module.transfer_service_landing_bucket.s3_bucket_id}/*"]
+      resources = ["arn:aws:s3:::${module.transfer_landing_bucket.s3_bucket_id}/*"]
     },
     s3_source_bucket = {
       sid    = "AllowSourceBucket"
@@ -438,7 +438,7 @@ module "transfer_service_lambda" {
       actions = [
         "s3:ListBucket"
       ],
-      resources = ["arn:aws:s3:::${module.transfer_service_landing_bucket.s3_bucket_id}"]
+      resources = ["arn:aws:s3:::${module.transfer_landing_bucket.s3_bucket_id}"]
     },
     s3_destination_object = {
       sid    = "AllowDestinationObject"
