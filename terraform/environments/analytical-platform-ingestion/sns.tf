@@ -58,22 +58,3 @@ module "transferred_topic" {
     }
   }
 }
-
-module "transfer_service_topic" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  source  = "terraform-aws-modules/sns/aws"
-  version = "6.1.0"
-
-  name              = "transfer-service"
-  display_name      = "transfer-service"
-  signature_version = 2
-
-  kms_master_key_id = module.transfer_service_sns_kms.key_id
-
-  subscriptions = {
-    lambda = {
-      protocol = "lambda"
-      endpoint = module.transfer_service_lambda.lambda_function_arn
-    }
-  }
-}
