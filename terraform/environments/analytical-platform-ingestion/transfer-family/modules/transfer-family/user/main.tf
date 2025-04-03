@@ -104,4 +104,3 @@ module "transfer_service_topic" {
     }
   }
 }
-}
