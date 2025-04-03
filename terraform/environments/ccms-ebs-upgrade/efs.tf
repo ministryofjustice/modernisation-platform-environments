@@ -4,6 +4,10 @@ resource "aws_efs_file_system" "appshare" {
   performance_mode = "maxIO"
   throughput_mode  = "bursting"
 
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+
   tags = merge(local.tags,
     { Name = "appshare" }
   )
@@ -38,7 +42,7 @@ resource "aws_security_group" "efs-security-group" {
   description = "allow inbound access from ebsdb and ebsconc"
   vpc_id      = data.aws_vpc.shared.id
 
-  #  # Allow inbound access from container instances	
+  #  # Allow inbound access from container instances
   #  ingress {
   #    protocol  = "tcp"
   #    from_port = 2049
