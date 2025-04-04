@@ -4,7 +4,7 @@ module "tableau_cert" {
   project_name = local.project_name
 
   r53_zone_id = module.public_dns_zone.aws_route53_zone_id
-  domain_name = local.application_data.accounts[local.environment].tableau_website_name
+  domain_name = "${local.application_data.accounts[local.environment].tableau_website_name}.${local.environment}.yjbservices.yjb.gov.uk"
 
   tags = local.tags
 }
@@ -21,8 +21,6 @@ module "tableau" {
   environment = local.environment
   test_mode   = local.test_mode
 
-  # environment_name             = local.environment_name
-
   #Network details
   vpc_id            = data.aws_vpc.shared.id
   tableau_subnet_id = local.private_subnet_list[0].id
@@ -35,6 +33,9 @@ module "tableau" {
 
   # ALB Details
   certificate_arn = module.tableau_cert.domain_cert_arn
+  r53_zone_id = module.public_dns_zone.aws_route53_zone_id
+  tableau_website_name = local.application_data.accounts[local.environment].tableau_website_name
+
 
 # Security Group IDs
 postgresql_sg_id        = module.aurora.rds_cluster_security_group_id
