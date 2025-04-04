@@ -203,9 +203,3 @@ variable "aws_account_id" {
   description = "The AWS account ID"
   type        = string
 }
-
-variable "force_restore" {
-  description = "Bump this to force RDS cluster recreate from snapshot"
-  type        = string
-  default     = "v1"
-}

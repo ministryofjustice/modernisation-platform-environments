@@ -110,3 +110,10 @@ module "aurora" {
   */
   }
 }
+
+
+variable "force_restore" {
+  description = "Bump this to force RDS cluster recreate from snapshot"
+  type        = string
+  default     = "v1"  
+}
