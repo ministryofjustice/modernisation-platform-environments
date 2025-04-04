@@ -82,7 +82,8 @@ locals {
           availability_zone = "eu-west-2a"
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.hmpp.root"
+          domain-name   = "azure.hmpp.root"
+          patch-manager = "group2"
         })
       })
 
@@ -96,8 +97,9 @@ locals {
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.hmpp.root domain"
-          domain-name = "azure.hmpp.root"
+          description   = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name   = "azure.hmpp.root"
+          patch-manager = "group1"
         })
       })
 
@@ -106,8 +108,9 @@ locals {
           availability_zone = "eu-west-2a"
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          description = "Remote Desktop Services for azure.hmpp.root domain"
-          domain-name = "azure.hmpp.root"
+          description   = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name   = "azure.hmpp.root"
+          patch-manager = "group2"
         })
       })
     }
@@ -177,8 +180,8 @@ locals {
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
+        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
       }
     }
 

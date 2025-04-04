@@ -126,6 +126,7 @@ locals {
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.noms.root"
+          patch-manager = "group1"
         })
         cloudwatch_metric_alarms = null
       })
@@ -140,6 +141,7 @@ locals {
         })
         tags = merge(local.ec2_instances.rds.tags, {
           domain-name = "azure.noms.root"
+          patch-manager = "group2"
         })
         cloudwatch_metric_alarms = null
       })
@@ -206,9 +208,9 @@ locals {
           https = merge(local.lbs.public.listeners.https, {
             alarm_target_group_names = [
               "test-rdgw-1-http",
-             "test-rds-1-https",
+              "test-rds-1-https",
             ]
-           certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
+            certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
             rules = {
               test-rdgw-1-http = {
                 priority = 100
@@ -237,7 +239,7 @@ locals {
                       "rdweb1.test.hmpps-domain.service.justice.gov.uk"
                     ]
                   }
-                }]                
+                }]
               }
             }
           })
@@ -253,8 +255,8 @@ locals {
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
+        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
       }
     }
 
