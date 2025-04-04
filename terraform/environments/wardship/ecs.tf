@@ -265,10 +265,6 @@ EOF
 }
 
 resource "aws_iam_role_policy" "app_execution" {
-  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
-  #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
-  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
-  #checkov:skip=CKV_AWS_288: [TODO] Ensure IAM policies does not allow data exfiltration
   name = "execution-${var.networking[0].application}"
   role = aws_iam_role.app_execution.id
 
@@ -278,13 +274,28 @@ resource "aws_iam_role_policy" "app_execution" {
     "Statement": [
       {
            "Action": [
-              "ecr:*",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "secretsmanager:GetSecretValue"
+               "logs:CreateLogStream",
+               "logs:PutLogEvents"
            ],
-           "Resource": "*",
+           "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:log-group:*",
            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:BatchCheckLayerAvailability",
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:BatchGetImage",
+              "ecr:GetAuthorizationToken"
+            ],
+            "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:repository/${aws_ecr_repository.wardship_ecr_repo.arn}",
+            "Effect": "Allow"
+      },
+      {
+          "Action": [
+               "secretsmanager:GetSecretValue"
+           ],
+          "Resource": "arn:aws:secretsmanager:*:${local.modernisation_platform_account_id}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
+          "Effect": "Allow"
       }
     ]
   }
@@ -319,10 +330,6 @@ EOF
 }
 
 resource "aws_iam_role_policy" "app_task" {
-  #checkov:skip=CKV2_AWS_40:"Broad IAM permissions required for ECS task functionality"
-  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
-  #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
-  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
 
@@ -331,15 +338,21 @@ resource "aws_iam_role_policy" "app_task" {
    "Version": "2012-10-17",
    "Statement": [
      {
-       "Effect": "Allow",
         "Action": [
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "ecr:*",
-          "iam:*",
           "ec2:*"
         ],
-       "Resource": "*"
+        "Resource": "arn:aws:*:*:${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
+     },
+     {
+        "Action": [
+          "iam:PassRole"
+        ],
+        "Resource": "arn:aws:iam:*:${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
      }
    ]
   }
