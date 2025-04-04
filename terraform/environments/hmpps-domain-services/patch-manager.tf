@@ -1,6 +1,6 @@
 module "patch_manager" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions; this is an internal module so commit hashes are not needed
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=75bf5d60b75d6ada907703a34921503c65d4e6b6"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-ssm-patching.git?ref=aeb25bbec66ae3575d9435841792c333f46fe614" # v4.0.0
   providers = {
     aws.bucket-replication = aws
   }
@@ -10,9 +10,9 @@ module "patch_manager" {
   environment             = local.environment
   approval_days = {
     development   = 0
-    test          = 3
-    preproduction = 5
-    production    = 7
+    test          = 6
+    preproduction = 10
+    production    = 14
   }
   patch_schedules             = local.baseline_environment_specific.patch_manager.patch_schedules
   maintenance_window_cutoff   = local.baseline_environment_specific.patch_manager.maintenance_window_cutoff
