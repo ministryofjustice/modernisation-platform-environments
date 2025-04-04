@@ -7,8 +7,7 @@ module "aurora" {
   database_subnets           = local.data_subnet_list[*].id
   alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
 
-
-  name                       = "yjafrds01-cluster-restore"
+  name                       = "yjafrds01-cluster-${var.force_restore}"
   azs                        = ["eu-west-2a", "eu-west-2b"]
   db_cluster_instance_class  = "db.t4g.medium"
   database_subnet_group_name = "yjaf-db-subnet-group"
