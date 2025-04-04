@@ -26,7 +26,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_secrets_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "ecs_task_s3_policy" {
-  role       = aws_iam_role.yjsm_ec2_role.name
+  role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
