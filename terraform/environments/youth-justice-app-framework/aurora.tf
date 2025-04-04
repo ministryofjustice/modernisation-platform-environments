@@ -16,13 +16,14 @@ module "aurora" {
 
   #one time restore from a shared snapshot on preprod
   snapshot_identifier = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:encryptedmojpreproduction"
+  
 
   user_passwords_to_reset = ["postgres_rotated"]
   db_name                 = "yjafrds01"
   aws_account_id          = data.aws_caller_identity.current.account_id
 
   engine          = "aurora-postgresql"
-  engine_version  = "17.4"
+
   master_username = "root"
 
   create_sheduler              = true
