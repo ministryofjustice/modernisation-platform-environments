@@ -75,16 +75,13 @@ resource "aws_security_group" "rds" {
 
   tags = merge(local.all_tags,
     {
-      Name = "RDS Postgres Security Group"
+      Name              = "RDS Postgres Security Group"
+      recreate_trigger  = "force-apr-04" # dummy value
     }
   )
 
 
   restore_to_point_in_time = null
-
-  tags = merge(local.all_tags, {
-    recreate_trigger = "force-apr-04" # dummy value
-  })
 
   lifecycle {
     create_before_destroy = false
