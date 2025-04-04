@@ -340,7 +340,7 @@ resource "aws_iam_role_policy" "app_task" {
      {
         "Action": [
           "logs:CreateLogStream",
-          "logs:PutLogEvents",
+          "logs:PutLogEvents"
         ],
         "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:*",
         "Effect": "Allow"
