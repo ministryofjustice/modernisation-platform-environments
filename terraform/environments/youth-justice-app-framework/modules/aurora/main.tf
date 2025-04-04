@@ -79,6 +79,13 @@ resource "aws_security_group" "rds" {
     }
   )
 
+
+  restore_to_point_in_time = null
+
+  tags = merge(local.all_tags, {
+    recreate_trigger = "force-apr-04" # dummy value
+  })
+
   lifecycle {
     create_before_destroy = false
   }
