@@ -271,31 +271,31 @@ resource "aws_autoscaling_group" "tribunals-all-asg" {
   }
 }
 
-resource "aws_instance" "tribunals_backup" {
-  iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
-  launch_template {
-    id      = aws_launch_template.tribunals-backup-lt.id
-    version = "$Latest"
-  }
+# resource "aws_instance" "tribunals_backup" {
+#   iam_instance_profile = aws_iam_instance_profile.ec2_instance_profile.name
+#   launch_template {
+#     id      = aws_launch_template.tribunals-backup-lt.id
+#     version = "$Latest"
+#   }
 
-  ebs_optimized = true
+#   ebs_optimized = true
 
 
-  metadata_options {
-    http_endpoint = "enabled"
-    http_tokens   = "required"
-  }
+#   metadata_options {
+#     http_endpoint = "enabled"
+#     http_tokens   = "required"
+#   }
 
-  root_block_device {
-    encrypted = true
-  }
+#   root_block_device {
+#     encrypted = true
+#   }
 
-  tags = {
-    Environment = local.environment
-    Name        = "tribunals-backup-instance"
-    Role        = "Backup"
-  }
-}
+#   tags = {
+#     Environment = local.environment
+#     Name        = "tribunals-backup-instance"
+#     Role        = "Backup"
+#   }
+# }
 
 ###########################################################################
 
