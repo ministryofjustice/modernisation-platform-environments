@@ -80,9 +80,6 @@ resource "aws_security_group" "rds" {
     }
   )
 
-
-  restore_to_point_in_time = null
-
   lifecycle {
     create_before_destroy = false
   }
