@@ -120,7 +120,6 @@ locals {
       })
 
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
-        autoscaling_schedules = {} # disable overnight scale down
       })
 
       dev-nomis-web19c-b = merge(local.ec2_autoscaling_groups.web19c, {

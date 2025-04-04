@@ -92,19 +92,6 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
-
-      # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
-      # test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
-      #   tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      # }
-      # test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
-      #   tags = merge(local.ec2_autoscaling_groups.rds.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
     }
 
     ec2_instances = {
@@ -131,17 +118,31 @@ locals {
         })
       })
 
-      # testing only do not use
-      # t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
-      #   config = merge(local.ec2_instances.jumpserver.config, {
-      #     ami_name          = "hmpps_windows_server_2022_release_2025-*"
-      #     availability_zone = "eu-west-2b"
-      #   })
-      #   tags = merge(local.ec2_instances.jumpserver.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
+      # NOTE: will likely be rebuilt again, needs deploying BEFORE associated rds instance!
+      t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
+          availability_zone = "eu-west-2b"
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
+
+      test-rds-2-b = merge(local.ec2_instances.rds, {
+        config = merge(local.ec2_instances.rds.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
+            "Ec2SecretPolicy"]
+          )
+        })
+        tags = merge(local.ec2_instances.rds.tags, {
+          domain-name = "azure.noms.root"
+        })
+        cloudwatch_metric_alarms = null
+      })
     }
 
     fsx_windows = {
@@ -169,6 +170,24 @@ locals {
       # }
     }
 
+    iam_policies = {
+      Ec2SecretPolicy = {
+        description = "Permissions required for secret value access by instances"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/microsoft/AD/azure.noms.root/shared-passwords-*",
+            ]
+          }
+        ]
+      }
+    }
+
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
@@ -177,12 +196,19 @@ locals {
               { ec2_instance_name = "test-rdgw-1-a" },
             ]
           })
+          test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
+            attachments = [
+              { ec2_instance_name = "test-rds-2-b" },
+            ]
+          })
         }
         listeners = merge(local.lbs.public.listeners, {
           https = merge(local.lbs.public.listeners.https, {
             alarm_target_group_names = [
               "test-rdgw-1-http",
+             "test-rds-1-https",
             ]
+           certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
             rules = {
               test-rdgw-1-http = {
                 priority = 100
@@ -198,6 +224,20 @@ locals {
                     ]
                   }
                 }]
+              }
+              test-rds-1-https = {
+                priority = 200
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rds-1-https"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdweb1.test.hmpps-domain.service.justice.gov.uk"
+                    ]
+                  }
+                }]                
               }
             }
           })
@@ -229,6 +269,7 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
+          { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
       }
     }
