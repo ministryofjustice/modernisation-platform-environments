@@ -7,14 +7,14 @@ module "aurora" {
   database_subnets           = local.data_subnet_list[*].id
   alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
 
-  name                       = "yjafrds01-cluster-${var.force_restore}"
+  name                       = "yjafrds01-cluster"
   azs                        = ["eu-west-2a", "eu-west-2b"]
   db_cluster_instance_class  = "db.t4g.medium"
   database_subnet_group_name = "yjaf-db-subnet-group"
   alb_route53_record_name    = "db-yjafrds01"
 
   #one time restore from a shared snapshot on preprod
-  snapshot_identifier = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:encryptedmojpreproduction"
+  snapshot_identifier        = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:encryptedmojpreproduction"
   
 
   user_passwords_to_reset = ["postgres_rotated"]
@@ -22,7 +22,7 @@ module "aurora" {
   aws_account_id          = data.aws_caller_identity.current.account_id
 
   engine          = "aurora-postgresql"
-  engine_version  = "15.4"
+  engine_version  = "16.8"
   master_username = "root"
 
   create_sheduler              = true
@@ -109,11 +109,4 @@ module "aurora" {
     }
   */
   }
-}
-
-
-variable "force_restore" {
-  description = "Bump this to force RDS cluster recreate from snapshot"
-  type        = string
-  default     = "v1"  
 }

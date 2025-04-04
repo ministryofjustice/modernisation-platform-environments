@@ -64,6 +64,10 @@ module "aurora" {
       "schedule" = "lambda" #allows lambda scheduler to target this rds for overnight shutdown
     }
   ) : local.all_tags
+
+  lifecycle {
+    create_before_destroy = false
+  }
 }
 
 #todo match yjaf production security group
