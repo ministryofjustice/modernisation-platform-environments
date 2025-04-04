@@ -64,6 +64,15 @@ module "aurora" {
       "schedule" = "lambda" #allows lambda scheduler to target this rds for overnight shutdown
     }
   ) : local.all_tags
+
+  cluster_parameters = [
+  {
+    apply_method = "immediate"
+    name         = "force_recreation"
+    value        = "v1" # Change this value to trigger recreation
+  }
+]
+
 }
 
 #todo match yjaf production security group
