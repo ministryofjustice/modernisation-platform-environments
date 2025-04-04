@@ -14,7 +14,7 @@ module "aurora" {
   engine              = var.engine         #"aurora-postgresql"
   engine_version      = var.engine_version #16.1
   snapshot_identifier = var.snapshot_identifier
-
+  
   # Master user and Auth
   master_username                                        = var.master_username #"root"
   manage_master_user_password_rotation                   = true
@@ -80,7 +80,7 @@ resource "aws_security_group" "rds" {
   )
 
   lifecycle {
-    create_before_destroy = true
+    create_before_destroy = false
   }
 }
 
