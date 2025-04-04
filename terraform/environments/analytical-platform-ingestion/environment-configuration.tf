@@ -20,9 +20,10 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.5"
-      transfer_image_version = "0.0.20"
-      notify_image_version   = "0.0.21"
+      scan_image_version             = "0.1.5"
+      transfer_image_version         = "0.0.20"
+      transfer_service_image_version = "0.0.20-rc1"
+      notify_image_version           = "0.0.21"
 
       /* Target Buckets */
       target_buckets              = ["mojap-land-dev"]
@@ -72,9 +73,10 @@ locals {
       ]
 
       /* Image Versions */
-      scan_image_version     = "0.1.5"
-      transfer_image_version = "0.0.20"
-      notify_image_version   = "0.0.21"
+      scan_image_version             = "0.1.5"
+      transfer_image_version         = "0.0.20"
+      transfer_service_image_version = "0.0.20-rc1"
+      notify_image_version           = "0.0.21"
 
       /* Target Buckets */
       target_buckets              = ["mojap-land"]
