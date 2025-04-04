@@ -42,6 +42,11 @@ resource "aws_directory_service_directory" "ds_managed_ad" {
   }
 }
 
+# Retrieve the current DNS IP addresses as output of the above module are not refreshed when they change.
+data "aws_directory_service_directory" "built_ad" {
+  directory_id = aws_directory_service_directory.ds_managed_ad.id
+}
+
 ## Sets MAD security group egress
 /* #todo duplicate rule?
 resource "aws_security_group_rule" "ds_managed_ad_secgroup" {

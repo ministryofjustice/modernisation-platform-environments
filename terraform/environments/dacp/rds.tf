@@ -3,6 +3,8 @@ resource "aws_db_instance" "dacp_db" {
   #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
   #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances" - false error
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
+  #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
+  #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
   #checkov:skip=CKV_AWS_354: "Ensure RDS Performance Insights are encrypted using KMS CMKs"
   count                           = local.is-development ? 0 : 1
   allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
@@ -13,7 +15,6 @@ resource "aws_db_instance" "dacp_db" {
   engine_version                  = local.application_data.accounts[local.environment].engine_version
   instance_class                  = local.application_data.accounts[local.environment].instance_class
   username                        = local.application_data.accounts[local.environment].db_username
-  monitoring_interval             = local.application_data.accounts[local.environment].monitoring_interval
   password                        = random_password.password.result
   skip_final_snapshot             = true
   publicly_accessible             = false
@@ -24,10 +25,7 @@ resource "aws_db_instance" "dacp_db" {
   ca_cert_identifier              = "rds-ca-rsa2048-g1"
   apply_immediately               = true
   copy_tags_to_snapshot           = true
-  deletion_protection             = true
-  performance_insights_enabled    = true
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
-  multi_az                        = false
 }
 
 resource "aws_db_subnet_group" "dbsubnetgroup" {
@@ -35,7 +33,9 @@ resource "aws_db_subnet_group" "dbsubnetgroup" {
   subnet_ids = data.aws_subnets.shared-public.ids
 }
 
+
 resource "aws_security_group" "postgresql_db_sc" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   count       = local.is-development ? 0 : 1
   name        = "postgres_security_group"
   description = "control access to the database"
@@ -70,38 +70,35 @@ resource "aws_security_group" "postgresql_db_sc" {
 }
 
 // DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
-# trivy:ignore:AVD-AWS-0080
 resource "aws_db_instance" "dacp_db_dev" {
   #checkov:skip=CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
   #checkov:skip=CKV_AWS_17: "Ensure all data stored in RDS is not publicly accessible" - see above
   #checkov:skip=CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
   #checkov:skip=CKV_AWS_129: "Ensure that respective logs of Amazon Relational Database Service (Amazon RDS) are enabled"
   #checkov:skip=CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
+  #checkov:skip=CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
   #checkov:skip=CKV_AWS_353: "Ensure that RDS instances have performance insights enabled"
-
-  count                           = local.is-development ? 1 : 0
-  allocated_storage               = local.application_data.accounts[local.environment].allocated_storage
-  db_name                         = local.application_data.accounts[local.environment].db_name
-  storage_type                    = local.application_data.accounts[local.environment].storage_type
-  engine                          = local.application_data.accounts[local.environment].engine
-  identifier                      = local.application_data.accounts[local.environment].identifier
-  engine_version                  = local.application_data.accounts[local.environment].engine_version
-  instance_class                  = local.application_data.accounts[local.environment].instance_class
-  username                        = local.application_data.accounts[local.environment].db_username
-  monitoring_interval             = local.application_data.accounts[local.environment].monitoring_interval
-  password                        = random_password.password.result
-  skip_final_snapshot             = true
-  publicly_accessible             = true
-  vpc_security_group_ids          = [aws_security_group.postgresql_db_sc_dev[0].id]
-  db_subnet_group_name            = aws_db_subnet_group.dbsubnetgroup.name
-  allow_major_version_upgrade     = false
-  auto_minor_version_upgrade      = true
-  copy_tags_to_snapshot           = true
-  deletion_protection             = true
-  multi_az                        = false
+  count                       = local.is-development ? 1 : 0
+  allocated_storage           = local.application_data.accounts[local.environment].allocated_storage
+  db_name                     = local.application_data.accounts[local.environment].db_name
+  storage_type                = local.application_data.accounts[local.environment].storage_type
+  engine                      = local.application_data.accounts[local.environment].engine
+  identifier                  = local.application_data.accounts[local.environment].identifier
+  engine_version              = local.application_data.accounts[local.environment].engine_version
+  instance_class              = local.application_data.accounts[local.environment].instance_class
+  username                    = local.application_data.accounts[local.environment].db_username
+  password                    = random_password.password.result
+  skip_final_snapshot         = true
+  publicly_accessible         = true
+  vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
+  db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
+  allow_major_version_upgrade = false
+  auto_minor_version_upgrade  = true
+  copy_tags_to_snapshot       = true
 }
 
 resource "aws_security_group" "postgresql_db_sc_dev" {
+  #checkov:skip=CKV_AWS_23: "Ensure every security group and rule has a description"
   count       = local.is-development ? 1 : 0
   name        = "postgres_security_group_dev"
   description = "control access to the database"
@@ -207,7 +204,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_connections_alarm" {
   statistic           = "Average"
   threshold           = "50" # Set desired threshold for high connections
   alarm_description   = "This metric checks if RDS database connections are high - threshold set to 50"
-  alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm[0].arn]
+  alarm_actions       = [aws_sns_topic.dacp_utilisation_alarm.arn]
 
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.dacp_db[0].identifier

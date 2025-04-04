@@ -4,7 +4,7 @@ locals {
       port     = 8080
       protocol = "HTTP"
       forward = {
-        target_group_key = "dal-target-group-1"
+        target_group_key = "ui-target-group-1"
       }
       rules = {
         ui = {

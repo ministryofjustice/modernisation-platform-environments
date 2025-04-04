@@ -142,6 +142,21 @@ locals {
       })
     }
 
+
+    patch_manager = {
+      patch_schedules = {
+        group1 = "cron(00 03 ? * WED *)"
+        group2 = "cron(00 03 ? * THU *)"
+      }
+      maintenance_window_duration = 4
+      maintenance_window_cutoff   = 2
+      patch_classifications = {
+        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
+      }
+    }
+
+
     route53_zones = {
       "hmpps-domain.service.justice.gov.uk" = {
         records = [

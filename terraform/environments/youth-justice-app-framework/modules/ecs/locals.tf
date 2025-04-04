@@ -44,7 +44,7 @@ locals {
     },
     {
       sourceVolume : "tmp",
-      containerPath : "/root/tmp",
+      containerPath : "/tmp",
       readOnly : false
     }
   ]

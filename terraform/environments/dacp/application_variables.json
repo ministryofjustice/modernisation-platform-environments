@@ -18,7 +18,8 @@
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
       "domain_name": "modernisation-platform.service.justice.gov.uk",
-      "monitoring_interval": "0"
+      "ecs_memory": 4096,
+      "ecs_cpu": 2048
     },
     "preproduction": {
       "db_name": "dacp_db_pre_prod",
@@ -38,7 +39,8 @@
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
       "domain_name": "modernisation-platform.service.justice.gov.uk",
-      "monitoring_interval": "60"
+      "ecs_memory": 4096,
+      "ecs_cpu": 2048
     },
     "production": {
       "db_name": "dacp_db_prod",
@@ -58,7 +60,8 @@
       "support_email": "dts-legacy-apps-support-team@hmcts.net",
       "rds_port": "5432",
       "domain_name": "divorce-section-search.service.justice.gov.uk",
-      "monitoring_interval": "5"
+      "ecs_memory": 8192,
+      "ecs_cpu": 2048
     }
   }
 }

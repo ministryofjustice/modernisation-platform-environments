@@ -2,22 +2,21 @@
 
 set -euo pipefail
 
-dependabot_file=.github/dependabot.yml
+dependabot_file=".github/dependabot.yml"
 
 # Clear the dependabot file
-> $dependabot_file
+> "$dependabot_file"
 
-# Get a list of Terraform folders
-all_tf_folders=`find . -type f -name '*.tf' | sed 's#/[^/]*$##' | sed 's/.\///'| sort | uniq`
+# Get a list of unique Terraform directories, excluding `.terraform` folders
+all_tf_folders=$(find . -type f -name '*.tf' ! -path "*/.terraform/*" | sed 's#/[^/]*$##' | sed 's|^\./||' | sort -u)
+
 echo
-echo "All TF folders"
-echo $all_tf_folders
+echo "Filtered Terraform folders:"
+printf '%s\n' "$all_tf_folders"
 
 echo "Writing dependabot.yml file"
-# Creates a dependabot file to avoid having to manually add each new TF folder
-# Add any additional fixed entries in this top section
-  cat > $dependabot_file << EOL
-# This file is auto-generated here, do not manually amend.
+cat > "$dependabot_file" << EOL
+# This file is auto-generated, do not manually amend.
 # scripts/generate-dependabot.sh
 
 version: 2
@@ -33,16 +32,18 @@ updates:
       interval: "daily"
     reviewers:
       - "ministryofjustice/devcontainer-community"
-  # Dependabot doesn't currently support wildcard or multiple directory declarations within
-  # a dependabot configuration, so we need to add all directories individually
-  # See: github.com/dependabot/dependabot-core/issues/2178
+  - package-ecosystem: "terraform"
+    directories:
 EOL
 
-for folder in $all_tf_folders
-do
-echo "Generating entry for ${folder}"
-echo "  - package-ecosystem: \"terraform\"" >> $dependabot_file
-echo "    directory: \"/${folder}\"" >> $dependabot_file
-echo "    schedule:" >> $dependabot_file
-echo "      interval: \"daily\"" >> $dependabot_file
-done
+# Append Terraform directories with correct YAML indentation
+while IFS= read -r folder; do
+  echo "    - \"/$folder\"" >> "$dependabot_file"
+done <<< "$all_tf_folders"
+
+cat >> "$dependabot_file" << EOL
+    schedule:
+      interval: "daily"
+EOL
+
+echo "dependabot.yml has been generated successfully."

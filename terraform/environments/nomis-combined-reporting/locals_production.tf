@@ -171,9 +171,39 @@ locals {
       })
     }
 
-    # Comment out till needed for deployment
     efs = {
-      pd-ncr-sap-share = local.efs.sap_share
+      pd-ncr-sap-share-multiaz = {
+        access_points = {
+          root = {
+            posix_user = {
+              gid = 1201 # binstall
+              uid = 1201 # bobj
+            }
+            root_directory = {
+              path = "/"
+              creation_info = {
+                owner_gid   = 1201 # binstall
+                owner_uid   = 1201 # bobj
+                permissions = "0777"
+              }
+            }
+          }
+        }
+        file_system = {
+          lifecycle_policy = {
+            transition_to_ia = "AFTER_30_DAYS"
+          }
+        }
+        mount_targets = [{
+          subnet_name        = "private"
+          availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+          security_groups    = ["bip"]
+        }]
+        tags = {
+          backup      = "false"
+          backup-plan = "daily-and-weekly"
+        }
+      }
     }
 
     iam_policies = {
@@ -382,8 +412,12 @@ locals {
     secretsmanager_secrets = {
       "/oracle/database/PDBIPSYS" = local.secretsmanager_secrets.db # Azure Live System DB
       "/oracle/database/PDBIPAUD" = local.secretsmanager_secrets.db # Azure Live Audit DB
-      "/oracle/database/PDBISYS"  = local.secretsmanager_secrets.db
-      "/oracle/database/PDBIAUD"  = local.secretsmanager_secrets.db
+      "/oracle/database/PDBISYS"  = local.secretsmanager_secrets.db # AWS System DB
+      "/oracle/database/PDBIAUD"  = local.secretsmanager_secrets.db # AWS Audit DB
+      "/oracle/database/DRBIPSYS" = local.secretsmanager_secrets.db
+      "/oracle/database/DRBIPAUD" = local.secretsmanager_secrets.db
+      "/oracle/database/DRBISYS"  = local.secretsmanager_secrets.db
+      "/oracle/database/DRBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/pd"               = local.secretsmanager_secrets.bip
       "/sap/bods/pd"              = local.secretsmanager_secrets.bods
     }
