@@ -112,7 +112,7 @@ resource "aws_security_group_rule" "s3-access" {
 
 
 resource "aws_rds_cluster_parameter_group" "force_recreation" {
-  name        = "aurora-pg-${var.environment}"
+  name        = "aurora-pg-preprod"
   family      = "aurora-postgresql16"
   description = "Forces recreation when value changes"
 
