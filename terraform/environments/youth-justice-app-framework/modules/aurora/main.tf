@@ -12,6 +12,7 @@ module "aurora" {
   name                = var.name #yjafrds01
   vpc_id              = var.vpc_id
   engine              = var.engine         #"aurora-postgresql"
+  engine_version      = var.engine_version #17.4
   snapshot_identifier = var.snapshot_identifier
   
   # Master user and Auth

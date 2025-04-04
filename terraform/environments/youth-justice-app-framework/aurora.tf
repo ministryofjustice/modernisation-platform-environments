@@ -23,7 +23,7 @@ module "aurora" {
   aws_account_id          = data.aws_caller_identity.current.account_id
 
   engine          = "aurora-postgresql"
-
+  engine_version  = "15.4"
   master_username = "root"
 
   create_sheduler              = true
