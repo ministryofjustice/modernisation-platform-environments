@@ -12,7 +12,7 @@ module "aurora" {
   name                = var.name #yjafrds01
   vpc_id              = var.vpc_id
   engine              = var.engine         #"aurora-postgresql"
-  engine_version      = var.engine_version #17.4
+  engine_version      = var.engine_version #16.8
   snapshot_identifier = var.snapshot_identifier
   
   # Master user and Auth
@@ -64,10 +64,6 @@ module "aurora" {
       "schedule" = "lambda" #allows lambda scheduler to target this rds for overnight shutdown
     }
   ) : local.all_tags
-
-  lifecycle {
-    create_before_destroy = false
-  }
 }
 
 #todo match yjaf production security group

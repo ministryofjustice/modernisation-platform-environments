@@ -1,3 +1,11 @@
+resource "null_resource" "force_recreate" {
+  triggers = {
+    snapshot_identifier = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:encryptedmojpreproduction"
+  }
+
+  # This resource will always force a recreation if the snapshot identifier changes
+}
+
 module "aurora" {
   source       = "./modules/aurora"
   project_name = local.project_name
@@ -16,6 +24,8 @@ module "aurora" {
   #one time restore from a shared snapshot on preprod
   snapshot_identifier        = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:encryptedmojpreproduction"
   
+  # Force the cluster to be recreated by adding the null_resource as a dependency
+  depends_on = [null_resource.force_recreate]
 
   user_passwords_to_reset = ["postgres_rotated"]
   db_name                 = "yjafrds01"
