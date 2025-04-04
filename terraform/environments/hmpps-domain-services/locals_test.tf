@@ -92,19 +92,6 @@ locals {
           domain-name = "azure.noms.root"
         })
       })
-
-      # RDGW/RDS infra can be build as ASG now (1 server only for RDS)
-      # test-rdgw-2-a = merge(local.ec2_autoscaling_groups.rdgw, {
-      #   tags = merge(local.ec2_autoscaling_groups.rdgw.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      # }
-      # test-rds-2-a = merge(local.ec2_autoscaling_groups.rds, {
-      #   tags = merge(local.ec2_autoscaling_groups.rds.tags, {
-      #     domain-name = "azure.noms.root"
-      #   })
-      #   cloudwatch_metric_alarms = null
-      # })
     }
 
     ec2_instances = {
@@ -129,32 +116,22 @@ locals {
         })
       })
 
-      # testing only do not use
+      # NOTE: will likely be rebuilt again, needs deploying BEFORE associated rds instance!
       t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name          = "hmpps_windows_server_2022_release_2025-*"
+          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
           availability_zone = "eu-west-2b"
-          user_data_raw = base64encode(templatefile(
-            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-              branch = "TM/TM-1080/move-rds-instances-to-their-own-ou"
-            }
-          ))
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.noms.root"
         })
         cloudwatch_metric_alarms = null
       })
-      # testing only do not use
+
       test-rds-2-b = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
-          ami_name          = "hmpps_windows_server_2022_release_2025-*"
+          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
           availability_zone = "eu-west-2b"
-          user_data_raw = base64encode(templatefile(
-            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-              branch = "TM/TM-1080/move-rds-instances-to-their-own-ou"
-            }
-          ))
           instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
             "Ec2SecretPolicy"]
           )
