@@ -8,6 +8,10 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
+    grafana = {
+      source  = "grafana/grafana"
+      version = ">= 1.29.0"
+    }    
   }
   required_version = "~> 1.10"
 }
