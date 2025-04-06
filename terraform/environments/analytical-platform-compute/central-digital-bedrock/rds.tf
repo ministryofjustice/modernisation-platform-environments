@@ -16,7 +16,7 @@ module "vector_db" {
   name                     = "bedrock-vector-db-${random_string.vector_db_suffix.result}"
   engine                   = "aurora-postgresql"
   engine_version           = "16.1"
-  instance_class           = "db.t4g.medium"
+  instance_class           = "db.r6g.large" # smallest current gen instance that supports Data API I think
   autoscaling_enabled      = true
   autoscaling_min_capacity = local.is-production ? 1 : 0 # I only want replicas in prod, not dev
   autoscaling_max_capacity = local.is-production ? 1 : 0 # I only want replicas in prod, not dev
@@ -26,6 +26,7 @@ module "vector_db" {
     }
   }
 
+  enable_http_endpoint = true
 
   vpc_id                 = data.aws_vpc.shared.id
   db_subnet_group_name   = aws_db_subnet_group.vector_db_subnet_group.name
@@ -52,30 +53,26 @@ module "vector_db" {
   db_cluster_parameter_group_family = "aurora-postgresql16"
   db_cluster_parameter_group_parameters = [
     {
-      name         = "shared_preload_libraries"
-      value        = "pg_stat_statements,pg_tle,pgaudit"
-      apply_method = "pending-reboot"
+      name         = "log_min_duration_statement"
+      value        = 4000
+      apply_method = "immediate"
     },
     {
       name         = "rds.force_ssl"
-      value        = "1"
-      apply_method = "pending-reboot"
+      value        = 1
+      apply_method = "immediate"
     }
   ]
 
   db_parameter_group_family = "aurora-postgresql16"
   db_parameter_group_parameters = [
     {
-      name  = "log_statement"
-      value = "all"
-    },
-    {
       name  = "log_hostname"
-      value = "1"
+      value = 1
     },
     {
       name  = "log_connections"
-      value = "1"
+      value = 1
     }
   ]
 
@@ -86,7 +83,7 @@ module "vector_db" {
   iam_role_use_name_prefix            = true
   iam_role_description                = "Enhanced Monitoring for Bedrock Vector Database"
 
-  apply_immediately            = false
+  apply_immediately            = true
   skip_final_snapshot          = !local.is-production
   deletion_protection          = local.is-production
   backup_retention_period      = 7
