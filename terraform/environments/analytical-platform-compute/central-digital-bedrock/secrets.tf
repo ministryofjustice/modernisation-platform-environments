@@ -13,9 +13,9 @@ resource "aws_secretsmanager_secret_version" "vector_db_credentials" {
     username            = "bedrock_${random_string.vector_db_username.result}"
     password            = random_password.vector_db.result
     engine              = "postgres"
-    host                = module.vector_db.db_instance_address
+    host                = module.vector_db.cluster_endpoint
     port                = 5432
     dbname              = "vectordb"
-    dbClusterIdentifier = module.vector_db.db_instance_identifier
+    dbClusterIdentifier = module.vector_db.cluster_id
   })
 }
