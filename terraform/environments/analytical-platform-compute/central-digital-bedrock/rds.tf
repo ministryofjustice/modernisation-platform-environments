@@ -32,12 +32,12 @@ module "vector_db" {
   db_subnet_group_name   = aws_db_subnet_group.vector_db_subnet_group.name
   vpc_security_group_ids = [module.rds_security_group.security_group_id]
 
-  database_name   = "vectordb"
-  master_username = "bedrock_${random_string.vector_db_username.result}"
-  master_password = random_password.vector_db.result
-
-  storage_encrypted = true
-  kms_key_id        = aws_kms_key.vector_db_kms.arn
+  database_name               = "vectordb"
+  master_username             = "bedrock_${random_string.vector_db_username.result}"
+  master_password             = random_password.vector_db.result
+  manage_master_user_password = false
+  storage_encrypted           = true
+  kms_key_id                  = aws_kms_key.vector_db_kms.arn
 
   create_db_parameter_group         = true
   create_db_cluster_parameter_group = true
