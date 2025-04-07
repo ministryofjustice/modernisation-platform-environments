@@ -1840,3 +1840,78 @@ resource "aws_iam_role_policy_attachment" "attach_iam_role_to_iam_policy_s3_buck
   role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_dev[0].name
   policy_arn = aws_iam_policy.iam_policy_s3_bucket_moj_report_source_dev[0].arn
 }
+
+##########################################################
+# IAM Role & Policy for S3 Bucket Replication to MPC - UAT
+##########################################################
+
+resource "aws_iam_role" "iam_role_s3_bucket_moj_report_source_uat" {
+  count              = local.is-preproduction == true ? 1 : 0
+  name               = "iam_role_s3_bucket_moj_report_source_uat"
+  path               = "/service-role/"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "s3.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+  }
+  EOF
+}
+
+resource "aws_iam_policy" "iam_policy_s3_bucket_moj_report_source_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name        = "iam_policy_s3_bucket_moj_report_source_uat"
+  path        = "/"
+  description = "AWS IAM Policy for allowing s3 bucket cross account replication"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "SourceBucketPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObjectRetention",
+          "s3:GetObjectVersionTagging",
+          "s3:GetObjectVersionAcl",
+          "s3:ListBucket",
+          "s3:GetObjectVersionForReplication",
+          "s3:GetObjectLegalHold",
+          "s3:GetReplicationConfiguration"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::moj-report-source-uat",
+          "arn:aws:s3:::moj-report-source-uat/*"
+
+        ]
+      },
+      {
+        "Sid" : "DestinationBucketPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ReplicateObject",
+          "s3:ObjectOwnerOverrideToBucketOwner",
+          "s3:GetObjectVersionTagging",
+          "s3:ReplicateTags",
+          "s3:ReplicateDelete"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::cloud-platform-ffbd9073e2d0d537d825ebea31b441fc",
+          "arn:aws:s3:::cloud-platform-ffbd9073e2d0d537d825ebea31b441fc/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_iam_role_to_iam_policy_s3_bucket_moj_report_source_uat" {
+  count      = local.is-preproduction == true ? 1 : 0
+  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_uat[0].name
+  policy_arn = aws_iam_policy.iam_policy_s3_bucket_moj_report_source_uat[0].arn
+}
