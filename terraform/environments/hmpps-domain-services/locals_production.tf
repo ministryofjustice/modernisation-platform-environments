@@ -75,11 +75,11 @@ locals {
         })
         instance = merge(local.ec2_instances.rds.instance, {
           instance_type = "t3.large"
+          # patch-manager = "group2"
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description   = "Remote Desktop Services for azure.hmpp.root domain"
           domain-name   = "azure.hmpp.root"
-          patch-manager = "group2"
         })
       })
     }

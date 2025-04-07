@@ -93,13 +93,13 @@ locals {
         })
         instance = merge(local.ec2_instances.rdgw.instance, {
           tags = {
-            backup-plan = "daily-and-weekly"
+            backup-plan   = "daily-and-weekly"
+            patch-manager = "group1"
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
-          description   = "Remote Desktop Gateway for azure.hmpp.root domain"
-          domain-name   = "azure.hmpp.root"
-          patch-manager = "group1"
+          description = "Remote Desktop Gateway for azure.hmpp.root domain"
+          domain-name = "azure.hmpp.root"
         })
       })
 
