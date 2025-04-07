@@ -41,8 +41,8 @@ locals {
         ]
       }
       tags = {
-        backup           = "false"
-        os-type          = "Linux"
+        backup  = "false"
+        os-type = "Linux"
         # Patching         = "Yes"
         server-type      = "hmpps-domain-services"
         update-ssm-agent = "patchgroup1"
@@ -85,11 +85,13 @@ locals {
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["rds-ec2s"]
+        tags = {
+          patch-manager = "group2"
+        }
       }
       tags = {
         backup           = "false"
         os-type          = "Windows"
-        Patching         = "Yes"
         server-type      = "HmppsDomainServicesTest"
         update-ssm-agent = "patchgroup1"
       }

@@ -41,6 +41,9 @@ locals {
         })
         instance = merge(local.ec2_autoscaling_groups.base_linux.instance, {
           instance_type = "t3.medium"
+          tags = {
+            patch-manager = "group2"
+          }
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.base_linux.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.base_linux.user_data_cloud_init.args, {
