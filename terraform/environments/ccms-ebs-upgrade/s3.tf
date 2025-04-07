@@ -281,6 +281,13 @@ resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
 }
 
+resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
+  bucket                  = aws_s3_bucket.ccms_ebs_shared.id
+  block_public_acls       = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+}
+
 # Development
 moved {
   from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]

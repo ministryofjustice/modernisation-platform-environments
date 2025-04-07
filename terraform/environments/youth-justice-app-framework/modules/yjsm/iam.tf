@@ -37,9 +37,9 @@ resource "aws_iam_role_policy_attachment" "yjsm_ec2_readonly_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
 
-resource "aws_iam_role_policy_attachment" "yjsm_s3_readonly_policy" {
+resource "aws_iam_role_policy_attachment" "yjsm_s3_policy" {
   role       = aws_iam_role.yjsm_ec2_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
 }
 
 resource "aws_iam_role_policy_attachment" "yjsm_secret_tmp_policy" {
