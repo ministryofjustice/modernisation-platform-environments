@@ -29,7 +29,7 @@ module "share_current_version" {
   count  = local.is-test ? 1 : 0
   source = "./modules/lakeformation_w_data_filter"
   table_filters = {
-    "account" = "__current=true"
+    "account_order" = "__current=true"
   }
   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
   database_name           = "staged_fms_${local.env_}dbt"

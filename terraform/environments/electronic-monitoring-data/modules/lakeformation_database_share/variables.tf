@@ -17,6 +17,8 @@ variable "role_arn" {
 variable "de_role_arn" {
   description = "DE Role to grant permissions to"
   type        = string
+  nullable    = true
+  default     = null
 }
 
 variable "db_exists" {

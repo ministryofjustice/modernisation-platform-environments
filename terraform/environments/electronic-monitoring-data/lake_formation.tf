@@ -52,3 +52,25 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
   }
 
 }
+
+resource "aws_lakeformation_permissions" "sensitive_grant_airflow" {
+  principal   = aws_iam_role.airflow_cadt_cross_assume_role.arn
+  permissions = ["DESCRIBE", "ASSOCIATE", "GRANT_WITH_LF_TAG_EXPRESSION"]
+
+  lf_tag {
+    key    = aws_lakeformation_lf_tag.sensitive_tag.key
+    values = aws_lakeformation_lf_tag.sensitive_tag.values
+  }
+
+}
+
+resource "aws_lakeformation_permissions" "domain_grant_airflow" {
+  principal   = aws_iam_role.airflow_cadt_cross_assume_role.arn
+  permissions = ["DESCRIBE", "ASSOCIATE", "GRANT_WITH_LF_TAG_EXPRESSION"]
+
+  lf_tag {
+    key    = aws_lakeformation_lf_tag.domain_tag.key
+    values = aws_lakeformation_lf_tag.domain_tag.values
+  }
+
+}
