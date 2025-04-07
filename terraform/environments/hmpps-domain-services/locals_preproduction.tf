@@ -81,6 +81,11 @@ locals {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
         })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
+        })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.hmpp.root"
         })
@@ -92,7 +97,8 @@ locals {
         })
         instance = merge(local.ec2_instances.rdgw.instance, {
           tags = {
-            backup-plan = "daily-and-weekly"
+            backup-plan   = "daily-and-weekly"
+            patch-manager = "group1"
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
@@ -104,6 +110,11 @@ locals {
       pp-rds-1-a = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.rds.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description = "Remote Desktop Services for azure.hmpp.root domain"
@@ -177,8 +188,8 @@ locals {
       maintenance_window_duration = 2 # 4 for prod
       maintenance_window_cutoff   = 1 # 2 for prod
       patch_classifications = {
-        REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
-        WINDOWS                 = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
+        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
       }
     }
 
