@@ -17,7 +17,7 @@ module "aurora" {
   #one time restore from a shared snapshot on preprod
   snapshot_identifier = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:encryptedmojpreproduction"
 
-  user_passwords_to_reset = ["postgres_rotated"]
+  user_passwords_to_reset = ["postgres_rotated", "redshift_readonly"]
   db_name                 = "yjafrds01"
   aws_account_id          = data.aws_caller_identity.current.account_id
 

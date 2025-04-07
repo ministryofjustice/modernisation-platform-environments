@@ -1,13 +1,15 @@
 
 resource "aws_redshiftserverless_namespace" "default" {
   namespace_name        = local.namespace_name
+
+  admin_username        = "admin"
   manage_admin_password = true
 
   iam_roles = [
     aws_iam_role.redshift.arn, aws_iam_role.ycs-team.arn, aws_iam_role.yjb-moj-team.arn, aws_iam_role.yjb-team.arn
   ]
 
-  #kms_key_id = var.kms_key_arn
+  kms_key_id = var.kms_key_arn
 
   log_exports = ["userlog", "connectionlog", "useractivitylog"]
 
