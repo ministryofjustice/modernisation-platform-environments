@@ -6,6 +6,10 @@ locals {
   bodmis_host              = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["endpoint"]
   bodmis_service_name      = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["db_name"]
   connection_string_bodmis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.bodmis.name}}@//${local.bodmis_host}:1522/${local.bodmis_service_name}"
+  oasys_host               = jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["endpoint"]
+  oasys_port               = jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["port"]
+  oasys_service_name       = jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["db_name"]
+  connection_string_oasys  = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.oasys.name}}@//${local.oasys_host}:${local.oasys_port}/${local.oasys_service_name}"
 }
 
 module "athena_federated_query_connector_oracle" {
@@ -27,7 +31,11 @@ module "athena_federated_query_connector_oracle" {
   connector_jar_bucket_key              = "third-party/athena-connectors/athena-oracle-2022.47.1.jar"
   connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
   spill_bucket_name                     = module.s3_working_bucket.bucket_id
-  credentials_secret_arns               = [aws_secretsmanager_secret.nomis.arn, aws_secretsmanager_secret.bodmis.arn]
+  credentials_secret_arns               = [
+    aws_secretsmanager_secret.nomis.arn,
+    aws_secretsmanager_secret.bodmis.arn,
+    aws_secretsmanager_secret.oasys.arn
+  ]
   project_prefix                        = local.project
   account_id                            = local.account_id
   region                                = local.account_region
@@ -41,6 +49,7 @@ module "athena_federated_query_connector_oracle" {
   connection_strings = {
     nomis  = local.connection_string_nomis
     bodmis = local.connection_string_bodmis
+    oasys  = local.connection_string_oasys
   }
 }
 
@@ -60,6 +69,17 @@ resource "aws_athena_data_catalog" "nomis_catalog" {
 resource "aws_athena_data_catalog" "bodmis_catalog" {
   name        = "bodmis"
   description = "BODMIS Athena data catalog"
+  type        = "LAMBDA"
+
+  parameters = {
+    "function" = module.athena_federated_query_connector_oracle.lambda_function_arn
+  }
+}
+
+# Adds an Athena data source / catalog for OASys
+resource "aws_athena_data_catalog" "oasys_catalog" {
+  name        = "oasys"
+  description = "OASys Athena data catalog"
   type        = "LAMBDA"
 
   parameters = {
