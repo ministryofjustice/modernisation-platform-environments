@@ -1958,7 +1958,8 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_report_source_prod" {
           "s3:GetReplicationConfiguration"
         ],
         "Resource" : [
-		      "${aws_s3_bucket.moj-report-source-prod[0].arn}",
+        "Resource" : [
+          aws_s3_bucket.moj-report-source-prod[0].arn,
           "${aws_s3_bucket.moj-report-source-prod[0].arn}/*"
 
         ]
