@@ -17,15 +17,15 @@ module "cur_s3_kms" {
 data "aws_iam_policy_document" "data_exports_write_policy" {
   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
   statement {
-    sid       = "data_exports_write_policy"
-    effect    = "Allow"
-    actions   = ["s3:PutObject", "s3:ListBucket", "s3:GetBucketLocation"]
+    sid     = "data_exports_write_policy"
+    effect  = "Allow"
+    actions = ["s3:PutObject", "s3:ListBucket", "s3:GetBucketLocation"]
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
     ]
     principals {
-      type = "Service"
+      type        = "Service"
       identifiers = ["bcm-data-exports.amazonaws.com"]
     }
   }
@@ -42,8 +42,8 @@ module "cur_v2_hourly" {
   force_destroy = true
 
   attach_deny_insecure_transport_policy = true
-  attach_policy = true
-  policy        = data.aws_iam_policy_document.data_exports_write_policy.json
+  attach_policy                         = true
+  policy                                = data.aws_iam_policy_document.data_exports_write_policy.json
 
   server_side_encryption_configuration = {
     rule = {
