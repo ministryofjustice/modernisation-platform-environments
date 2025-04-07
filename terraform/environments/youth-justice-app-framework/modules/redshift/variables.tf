@@ -25,8 +25,8 @@ variable "database_subnets" {
 }
 
 ## 
-variable "rds_secret_rotation_arn" {
-  description = "The ARN of the rotated postgres secret."
+variable "rds_redshift_secret_arn" {
+  description = "The ARN of the secret created to provide read only access to Redshift.."
   type        = string
 }
 
