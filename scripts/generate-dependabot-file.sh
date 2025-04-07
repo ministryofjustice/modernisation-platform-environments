@@ -8,16 +8,17 @@ dependabot_file=".github/dependabot.yml"
 > "$dependabot_file"
 
 # Get a list of unique Terraform directories, excluding `.terraform` folders
-all_tf_folders=$(find . -type f -name '*.tf' ! -path "*/.terraform/*" | sed 's#/[^/]*$##' | sed 's|^\./||' | sort -u)
+tf_dirs=$(find . -type f -name '*.tf' ! -path "*/.terraform/*" | sed 's#/[^/]*$##' | sed 's|^\./||' | sort -u)
 
-echo
-echo "Filtered Terraform folders:"
-printf '%s\n' "$all_tf_folders"
+# Get a list of unique Go module directories, excluding `.terraform`
+gomod_dirs=$(find . -type f -name 'go.mod' ! -path "*/.terraform/*" | sed 's#/[^/]*$##' | sed 's|^\./||' | sort -u)
 
 echo "Writing dependabot.yml file"
+
 cat > "$dependabot_file" << EOL
 # This file is auto-generated, do not manually amend.
-# scripts/generate-dependabot.sh
+# https://github.com/ministryofjustice/modernisation-platform-environments/blob/main/scripts/generate-dependabot-file.sh
+
 
 version: 2
 
@@ -32,18 +33,38 @@ updates:
       interval: "daily"
     reviewers:
       - "ministryofjustice/devcontainer-community"
-  - package-ecosystem: "terraform"
-    directories:
 EOL
 
-# Append Terraform directories with correct YAML indentation
-while IFS= read -r folder; do
-  echo "    - \"/$folder\"" >> "$dependabot_file"
-done <<< "$all_tf_folders"
+# Add Terraform ecosystem entries (dynamically only for top-level directories containing .tf files)
+if [[ -n "$tf_dirs" ]]; then
+  echo "Generating Terraform ecosystem entry..."
+  echo "  - package-ecosystem: \"terraform\"" >> "$dependabot_file"
+  echo "    directories:" >> "$dependabot_file"
 
-cat >> "$dependabot_file" << EOL
-    schedule:
-      interval: "daily"
-EOL
+  # Extract only top-level directories and ensure we don't add duplicates
+  echo "$tf_dirs" | awk -F/ '{print $1}' | sort -u | while IFS= read -r dir; do
+    echo "      - \"$dir/**/*\"" >> "$dependabot_file"
+  done
+  
+  echo "    schedule:" >> "$dependabot_file"
+  echo "      interval: \"daily\"" >> "$dependabot_file"
+  echo "    ignore:" >> "$dependabot_file"
+  echo "      - dependency-name: \"integrations/github\"" >> "$dependabot_file"
+fi
 
-echo "dependabot.yml has been generated successfully."
+# Add Go module ecosystem entries (dynamically only for top-level directories containing go.mod)
+if [[ -n "$gomod_dirs" ]]; then
+  echo "Generating Go module ecosystem entry..."
+  echo "  - package-ecosystem: \"gomod\"" >> "$dependabot_file"
+  echo "    directories:" >> "$dependabot_file"
+
+  # Extract only top-level directories and ensure we don't add duplicates
+  echo "$gomod_dirs" | awk -F/ '{print $1}' | sort -u | while IFS= read -r dir; do
+    echo "      - \"$dir/**/*\"" >> "$dependabot_file"
+  done
+
+  echo "    schedule:" >> "$dependabot_file"
+  echo "      interval: \"daily\"" >> "$dependabot_file"
+fi
+
+echo "dependabot.yml has been successfully generated."
