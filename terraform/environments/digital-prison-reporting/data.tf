@@ -31,15 +31,19 @@ data "aws_secretsmanager_secret_version" "bodmis" {
 
 # Source OASys Secrets
 data "aws_secretsmanager_secret" "oasys" {
-  name = aws_secretsmanager_secret.oasys.id
+  count = local.is-development || local.is-test ? 1 : 0
 
-  depends_on = [aws_secretsmanager_secret_version.oasys]
+  name = aws_secretsmanager_secret.oasys[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.oasys[0]]
 }
 
 data "aws_secretsmanager_secret_version" "oasys" {
-  secret_id = data.aws_secretsmanager_secret.oasys.id
+  count = local.is-development || local.is-test ? 1 : 0
 
-  depends_on = [aws_secretsmanager_secret.oasys]
+  secret_id = data.aws_secretsmanager_secret.oasys[0].id
+
+  depends_on = [aws_secretsmanager_secret.oasys[0]]
 }
 
 # Source DataMart Secrets

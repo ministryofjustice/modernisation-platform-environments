@@ -84,6 +84,7 @@ resource "aws_secretsmanager_secret_version" "bodmis" {
 resource "aws_secretsmanager_secret" "oasys" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+  count = local.is-development || local.is-test ? 1 : 0
 
   name = "external/${local.project}-oasys-source-secret"
 
@@ -98,7 +99,9 @@ resource "aws_secretsmanager_secret" "oasys" {
 
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret_version" "oasys" {
-  secret_id     = aws_secretsmanager_secret.oasys.id
+  count = local.is-development || local.is-test ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.oasys[0].id
   secret_string = jsonencode(local.oasys_secrets_placeholder)
 
   lifecycle {

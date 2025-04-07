@@ -10,6 +10,25 @@ locals {
   oasys_port               = jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["port"]
   oasys_service_name       = jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["db_name"]
   connection_string_oasys  = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.oasys.name}}@//${local.oasys_host}:${local.oasys_port}/${local.oasys_service_name}"
+
+  # OASys is currently only included in Dev and Test
+  federated_query_connection_strings_map = local.is-development || local.is-test ? {
+    nomis  = local.connection_string_nomis
+    bodmis = local.connection_string_bodmis
+    oasys  = local.connection_string_oasys
+  } : {
+    nomis  = local.connection_string_nomis
+    bodmis = local.connection_string_bodmis
+  }
+
+  federated_query_credentials_secret_arns = local.is-development || local.is-test ? [
+    aws_secretsmanager_secret.nomis.arn,
+    aws_secretsmanager_secret.bodmis.arn,
+    aws_secretsmanager_secret.oasys.arn
+  ] : [
+    aws_secretsmanager_secret.nomis.arn,
+    aws_secretsmanager_secret.bodmis.arn
+  ]
 }
 
 module "athena_federated_query_connector_oracle" {
@@ -31,11 +50,7 @@ module "athena_federated_query_connector_oracle" {
   connector_jar_bucket_key              = "third-party/athena-connectors/athena-oracle-2022.47.1.jar"
   connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
   spill_bucket_name                     = module.s3_working_bucket.bucket_id
-  credentials_secret_arns               = [
-    aws_secretsmanager_secret.nomis.arn,
-    aws_secretsmanager_secret.bodmis.arn,
-    aws_secretsmanager_secret.oasys.arn
-  ]
+  credentials_secret_arns               = local.federated_query_credentials_secret_arns
   project_prefix                        = local.project
   account_id                            = local.account_id
   region                                = local.account_region
@@ -46,11 +61,7 @@ module "athena_federated_query_connector_oracle" {
   lambda_reserved_concurrent_executions = local.federated_query_lambda_concurrent_executions
 
   # A map that links catalog names to database connection strings
-  connection_strings = {
-    nomis  = local.connection_string_nomis
-    bodmis = local.connection_string_bodmis
-    oasys  = local.connection_string_oasys
-  }
+  connection_strings = local.federated_query_connection_strings_map
 }
 
 # Adds an Athena data source / catalog for NOMIS
@@ -78,6 +89,8 @@ resource "aws_athena_data_catalog" "bodmis_catalog" {
 
 # Adds an Athena data source / catalog for OASys
 resource "aws_athena_data_catalog" "oasys_catalog" {
+  count = local.is-development || local.is-test ? 1 : 0
+
   name        = "oasys"
   description = "OASys Athena data catalog"
   type        = "LAMBDA"
