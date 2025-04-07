@@ -45,7 +45,7 @@ resource "aws_security_group_rule" "egress_all" {
   from_port         = 0
   to_port           = 0
   protocol          = "-1" #--Any
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.lambda_security_group.id
 }
 
