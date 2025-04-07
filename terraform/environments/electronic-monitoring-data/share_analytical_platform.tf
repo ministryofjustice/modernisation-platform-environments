@@ -398,19 +398,19 @@ resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
 }
 
 # Lake Formation Data Access Attachement
-resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
+resource "aws_iam_role_policy_attachment" "lake_formation_data_access_airflow" {
   role       = aws_iam_role.airflow_cadt_cross_assume_role.name
   policy_arn = aws_iam_policy.lake_formation_data_access.arn
 }
 
 # Lake Formation LFTag Access Attachement
-resource "aws_iam_role_policy_attachment" "lake_formation_lftag_access" {
+resource "aws_iam_role_policy_attachment" "lake_formation_lftag_access_airflow" {
   role       = aws_iam_role.airflow_cadt_cross_assume_role.name
   policy_arn = aws_iam_policy.lake_formation_lftag_access.arn
 }
 
 # Athena Access Attachement
-resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
+resource "aws_iam_role_policy_attachment" "unlimited_athena_query_airflow" {
   role       = aws_iam_role.airflow_cadt_cross_assume_role.name
   policy_arn = aws_iam_policy.unlimited_athena_query.arn
 }
