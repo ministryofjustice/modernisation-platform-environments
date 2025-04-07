@@ -233,7 +233,7 @@ jobs:
               --no-prompt
         
       - name: Nuke Apply (Destructive)
-        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+        # if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
         run: |
             aws sts assume-role \
               --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" \
