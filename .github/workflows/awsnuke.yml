@@ -122,55 +122,50 @@ jobs:
           export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' creds.json)
           export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' creds.json)
 
-          echo "🔍 Verifying identity..."
+          echo "Verifying identity..."
           aws sts get-caller-identity || {
             echo "Invalid credentials"
             exit 1
           }
           echo "Running AWS Nuke (dry run)..."
-          echo "${ACCOUNT_NAME}" | $HOME/bin/aws-nuke run \
+          $HOME/bin/aws-nuke run \
             --config nuke-config.yml \
             --no-prompt
 
-      # - name: Nuke Apply (Destructive)
-      #   if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
-      #   run: |
-      #     # The environment gets reset between steps, so the role needs to be re-assumed.
-      #     aws sts assume-role \
-      #       --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" \
-      #       --role-session-name githubactionsgoliveapply > creds.json || {
-      #         echo "Failed to assume role"
-      #         exit 1
-      #     }
-      #     export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' creds.json)
-      #     export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' creds.json)
-      #     export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' creds.json)
+      - name: Nuke Apply (Destructive)
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+        run: |
+          # The environment gets reset between steps, so the role needs to be re-assumed.
+          aws sts assume-role \
+            --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" \
+            --role-session-name githubactionsgoliveapply > creds.json || {
+              echo "Failed to assume role"
+              exit 1
+          }
+          export AWS_ACCESS_KEY_ID=$(jq -r '.Credentials.AccessKeyId' creds.json)
+          export AWS_SECRET_ACCESS_KEY=$(jq -r '.Credentials.SecretAccessKey' creds.json)
+          export AWS_SESSION_TOKEN=$(jq -r '.Credentials.SessionToken' creds.json)
 
-      #     echo "Verifying identity..."
-      #     aws sts get-caller-identity || {
-      #       echo "Invalid credentials"
-      #       exit 1
-      #     }
-      #     echo "Running AWS Nuke (full apply)..."
-      #     $HOME/bin/aws-nuke run \
-      #       --config nuke-config.yml \
-      #       --force \
-      #     $HOME/bin/aws-nuke --access-key-id "$AWS_ACCESS_KEY_ID" \
-      #       --secret-access-key "$AWS_SECRET_ACCESS_KEY" \
-      #       --session-token "$AWS_SESSION_TOKEN" \
-      #       --config nuke-config.yml \
-      #       --no-prompt \
-      #       --no-dry-run
+          echo "Verifying identity..."
+          aws sts get-caller-identity || {
+            echo "Invalid credentials"
+            exit 1
+          }
+          echo "Running AWS Nuke (full apply)..."
+           $HOME/bin/aws-nuke run \
+            --config nuke-config.yml \
+            --no-prompt \
+            --no-dry-run
 
-      # - name: Slack failure notification
-      #   uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
-      #   with:
-      #     webhook-type: incoming-webhook
-      #     payload: |
-      #       {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      #   if: ${{ failure() }}
+      - name: Slack failure notification
+        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
+        with:
+          webhook-type: incoming-webhook
+          payload: |
+            {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: ${{ failure() }}
     env:
       ACCOUNT_NAME: ${{ matrix.nuke_accts }}
 
@@ -239,12 +234,12 @@ jobs:
             exit 1
           }
           echo "Running AWS Nuke (dry run)..."
-          echo "${ACCOUNT_NAME}" | $HOME/bin/aws-nuke run \
+           $HOME/bin/aws-nuke run \
             --config nuke-config.yml \
             --no-prompt
 
       - name: Nuke Apply (Destructive)
-        # if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
+        if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
         run: |
           aws sts assume-role \
             --role-arn "arn:aws:iam::${ACCOUNT_NUMBER}:role/MemberInfrastructureAccess" \
@@ -267,15 +262,15 @@ jobs:
             --no-prompt \
             --no-dry-run
 
-      # - name: Slack failure notification
-      #   uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
-      #   with:
-      #     webhook-type: incoming-webhook
-      #     payload: |
-      #       {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      #   if: ${{ failure() }}
+      - name: Slack failure notification
+        uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
+        with:
+          webhook-type: incoming-webhook
+          payload: |
+            {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: ${{ failure() }}
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.TESTING_AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.TESTING_AWS_SECRET_ACCESS_KEY }}
