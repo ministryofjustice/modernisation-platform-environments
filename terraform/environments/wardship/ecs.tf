@@ -7,11 +7,13 @@ resource "aws_ecs_cluster" "wardship_cluster" {
 }
 
 resource "aws_cloudwatch_log_group" "deployment_logs" {
+  #checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
   name              = "/aws/events/deploymentLogs"
   retention_in_days = "7"
 }
 
 resource "aws_cloudwatch_log_group" "ecs_logs" {
+  #checkov:skip=CKV_AWS_158:"Using default AWS encryption for CloudWatch logs which is sufficient for our needs"
   name              = "wardship-ecs"
   retention_in_days = "7"
 }
@@ -51,39 +53,39 @@ resource "aws_ecs_task_definition" "wardship_task_definition" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.wardship_db[0].address}"
+          value = aws_db_instance.wardship_db[0].address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.wardship_db[0].username}"
+          value = aws_db_instance.wardship_db[0].username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.wardship_db[0].password}"
+          value = aws_db_instance.wardship_db[0].password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.wardship_db[0].db_name}"
+          value = aws_db_instance.wardship_db[0].db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].curserver}"
+          value = local.application_data.accounts[local.environment].curserver
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
@@ -130,39 +132,39 @@ resource "aws_ecs_task_definition" "wardship_task_definition_dev" {
       environment = [
         {
           name  = "RDS_HOSTNAME"
-          value = "${aws_db_instance.wardship_db_dev[0].address}"
+          value = aws_db_instance.wardship_db_dev[0].address
         },
         {
           name  = "RDS_PORT"
-          value = "${local.application_data.accounts[local.environment].rds_port}"
+          value = local.application_data.accounts[local.environment].rds_port
         },
         {
           name  = "RDS_USERNAME"
-          value = "${aws_db_instance.wardship_db_dev[0].username}"
+          value = aws_db_instance.wardship_db_dev[0].username
         },
         {
           name  = "RDS_PASSWORD"
-          value = "${aws_db_instance.wardship_db_dev[0].password}"
+          value = aws_db_instance.wardship_db_dev[0].password
         },
         {
           name  = "DB_NAME"
-          value = "${aws_db_instance.wardship_db_dev[0].db_name}"
+          value = aws_db_instance.wardship_db_dev[0].db_name
         },
         {
           name  = "supportEmail"
-          value = "${local.application_data.accounts[local.environment].support_email}"
+          value = local.application_data.accounts[local.environment].support_email
         },
         {
           name  = "supportTeam"
-          value = "${local.application_data.accounts[local.environment].support_team}"
+          value = local.application_data.accounts[local.environment].support_team
         },
         {
           name  = "CurServer"
-          value = "${local.application_data.accounts[local.environment].curserver}"
+          value = local.application_data.accounts[local.environment].curserver
         },
         {
           name  = "ida:ClientId"
-          value = "${local.application_data.accounts[local.environment].client_id}"
+          value = local.application_data.accounts[local.environment].client_id
         }
       ]
     }
@@ -272,13 +274,37 @@ resource "aws_iam_role_policy" "app_execution" {
     "Statement": [
       {
            "Action": [
-              "ecr:*",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "secretsmanager:GetSecretValue"
+               "logs:CreateLogStream",
+               "logs:PutLogEvents"
            ],
-           "Resource": "*",
+           "Resource": [
+               "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:log-group:*:*",
+               "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:log-group:*:log-stream:*"
+           ],
            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:GetAuthorizationToken"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:BatchCheckLayerAvailability",
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:BatchGetImage"
+            ],
+            "Resource": "arn:aws:ecr:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:repository/wardship-ecr-repo",
+            "Effect": "Allow"
+      },
+      {
+          "Action": [
+               "secretsmanager:GetSecretValue"
+           ],
+          "Resource": "arn:aws:secretsmanager:*:${local.environment_management.account_ids[terraform.workspace]}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
+          "Effect": "Allow"
       }
     ]
   }
@@ -316,28 +342,47 @@ resource "aws_iam_role_policy" "app_task" {
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
 
-  policy = <<-EOF
-  {
+  policy = <<EOF
+{
    "Version": "2012-10-17",
    "Statement": [
      {
-       "Effect": "Allow",
         "Action": [
           "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "ecr:*",
-          "iam:*",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
+        "Effect": "Allow"
+     },
+     {
+        "Action": [
+          "ecr:*"
+        ],
+        "Resource": "arn:aws:ecr:*:${local.environment_management.account_ids[terraform.workspace]}:*",
+        "Effect": "Allow"
+     },
+     {
+        "Action": [
           "ec2:*"
         ],
-       "Resource": "*"
+        "Resource": "arn:aws:ec2:*:${local.environment_management.account_ids[terraform.workspace]}:*",
+        "Effect": "Allow"
+     },
+     {
+        "Action": [
+          "iam:PassRole"
+        ],
+        "Resource": "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:*",
+        "Effect": "Allow"
      }
    ]
-  }
-  EOF
+}
+EOF
 }
 
 resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
+  description = "Control access to the ECS service"
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
@@ -349,16 +394,24 @@ resource "aws_security_group" "ecs_service" {
   }
 
   egress {
+    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
+    description = "Allow all outbound traffic"
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
 resource "aws_ecr_repository" "wardship_ecr_repo" {
+  #checkov:skip=CKV_AWS_51: "Ensure ECR Image Tags are immutable"
+  #checkov:skip=CKV_AWS_136:"Using default AWS encryption for ECR which is sufficient for our needs"
   name         = "wardship-ecr-repo"
   force_delete = true
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
 }
 
 # AWS EventBridge rule
@@ -456,11 +509,13 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
 }
 
 resource "aws_sns_topic" "ddos_alarm" {
+  # checkov:skip=CKV_AWS_26: SNS encryption not required for this use case
   count = local.is-development ? 0 : 1
   name  = "wardship_ddos_alarm"
 }
 
 resource "aws_sns_topic" "wardship_utilisation_alarm" {
+  #checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
   count = local.is-development ? 0 : 1
   name  = "wardship_utilisation_alarm"
 }
@@ -488,7 +543,7 @@ module "pagerduty_core_alerts_non_prod" {
   depends_on = [
     aws_sns_topic.wardship_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_non_prod_alarms"]
 }
@@ -499,7 +554,7 @@ module "pagerduty_core_alerts_prod" {
   depends_on = [
     aws_sns_topic.wardship_utilisation_alarm
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
   sns_topics                = [aws_sns_topic.wardship_utilisation_alarm[0].name]
   pagerduty_integration_key = local.pagerduty_integration_keys["wardship_prod_alarms"]
 }
