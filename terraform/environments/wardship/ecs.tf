@@ -292,9 +292,11 @@ resource "aws_iam_role_policy" "app_execution" {
       },
       {
             "Action": [
-              "ecr:*"
+              "ecr:BatchCheckLayerAvailability",
+              "ecr:GetDownloadUrlForLayer",
+              "ecr:BatchGetImage"
             ],
-            "Resource": "arn:aws:ecr:*:${local.environment_management.account_ids[terraform.workspace]}:repository/${aws_ecr_repository.wardship_ecr_repo.arn}",
+            "Resource": "arn:aws:ecr:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:repository/wardship-ecr-repo",
             "Effect": "Allow"
       },
       {
