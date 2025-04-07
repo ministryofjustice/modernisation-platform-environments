@@ -28,6 +28,9 @@ locals {
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["rds-ec2s"]
+        tags = {
+          patch-manager = "group2"
+        }
       }
       user_data_cloud_init = {
         args = {
@@ -41,9 +44,8 @@ locals {
         ]
       }
       tags = {
-        backup  = "false"
-        os-type = "Linux"
-        # Patching         = "Yes"
+        backup           = "false"
+        os-type          = "Linux"
         server-type      = "hmpps-domain-services"
         update-ssm-agent = "patchgroup1"
       }
@@ -139,6 +141,9 @@ locals {
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["rds-ec2s"]
+        tags = {
+          patch-manager = "group2"
+        }
       }
       lb_target_groups = {
         http = local.lbs.public.instance_target_groups.http
@@ -148,7 +153,6 @@ locals {
         description      = "Remote Desktop Gateway Windows Server 2022"
         os-type          = "Windows"
         server-type      = "RDGateway"
-        Patching         = "Yes"
         update-ssm-agent = "patchgroup1"
       }
     }
@@ -196,6 +200,9 @@ locals {
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["rds-ec2s"]
+        tags = {
+          patch-manager = "group2"
+        }
       }
       lb_target_groups = {
         https = local.lbs.public.instance_target_groups.https
@@ -205,7 +212,6 @@ locals {
         description      = "Remote Desktop Services Connection Broker and Web Windows Server 2022"
         os-type          = "Windows"
         server-type      = "RDServices"
-        Patching         = "Yes"
         update-ssm-agent = "patchgroup1"
       }
     }
