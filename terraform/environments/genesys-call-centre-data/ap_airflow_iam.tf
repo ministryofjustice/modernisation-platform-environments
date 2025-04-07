@@ -1,8 +1,8 @@
 data "aws_iam_policy_document" "genesys_ap_airflow" {
   statement {
-    sid       = "GenesysAPAirflowPermissionsListBuckets"
-    effect    = "Allow"
-    actions   = [
+    sid    = "GenesysAPAirflowPermissionsListBuckets"
+    effect = "Allow"
+    actions = [
       "s3:GetBucketLocation",
       "s3:ListAllMyBuckets",
       "s3:ListBucket",

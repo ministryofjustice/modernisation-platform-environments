@@ -1,3 +1,3 @@
 provider "aws" {
-  alias      = "mojdsd"
+  alias = "mojdsd"
 }

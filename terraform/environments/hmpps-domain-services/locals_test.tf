@@ -206,9 +206,9 @@ locals {
           https = merge(local.lbs.public.listeners.https, {
             alarm_target_group_names = [
               "test-rdgw-1-http",
-             "test-rds-1-https",
+              "test-rds-1-https",
             ]
-           certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
+            certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
             rules = {
               test-rdgw-1-http = {
                 priority = 100
@@ -237,7 +237,7 @@ locals {
                       "rdweb1.test.hmpps-domain.service.justice.gov.uk"
                     ]
                   }
-                }]                
+                }]
               }
             }
           })

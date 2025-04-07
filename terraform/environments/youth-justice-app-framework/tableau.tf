@@ -32,17 +32,17 @@ module "tableau" {
 
 
   # ALB Details
-  certificate_arn = module.tableau_cert.domain_cert_arn
-  r53_zone_id = module.public_dns_zone.aws_route53_zone_id
+  certificate_arn      = module.tableau_cert.domain_cert_arn
+  r53_zone_id          = module.public_dns_zone.aws_route53_zone_id
   tableau_website_name = local.application_data.accounts[local.environment].tableau_website_name
 
 
-# Security Group IDs
-postgresql_sg_id        = module.aurora.rds_cluster_security_group_id
-redshift_sg_id          = module.redshift.security_group_id
-directory_service_sg_id = module.ds.directory_service_sg_id
-management_server_sg_id = module.ds.management_server_sg_id
-yjsm_sg_id              = module.yjsm.yjsm_security_group_id
+  # Security Group IDs
+  postgresql_sg_id        = module.aurora.rds_cluster_security_group_id
+  redshift_sg_id          = module.redshift.security_group_id
+  directory_service_sg_id = module.ds.directory_service_sg_id
+  management_server_sg_id = module.ds.management_server_sg_id
+  yjsm_sg_id              = module.yjsm.yjsm_security_group_id
 
 
   datadog_api_key_arn   = module.datadog.datadog_api_key_arn
