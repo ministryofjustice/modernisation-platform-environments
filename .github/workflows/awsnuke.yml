@@ -216,7 +216,7 @@ jobs:
             echo "Running AWS Nuke (dry run)..."
             echo "${ACCOUNT_NAME}" | $HOME/bin/aws-nuke run \
               --config nuke-config.yml \
-              --force
+              --no-prompt
         
       - name: Nuke Apply (Destructive)
         # if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
@@ -229,7 +229,7 @@ jobs:
             echo "☠️ Running AWS Nuke (full apply)..."
             $HOME/bin/aws-nuke run \
               --config nuke-config.yml \
-              --force \
+              --no-prompt \
               --no-dry-run
 
       #   - name: Slack failure notification
