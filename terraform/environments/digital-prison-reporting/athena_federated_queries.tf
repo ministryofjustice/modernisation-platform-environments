@@ -6,13 +6,13 @@ locals {
   bodmis_host              = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["endpoint"]
   bodmis_service_name      = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["db_name"]
   connection_string_bodmis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.bodmis.name}}@//${local.bodmis_host}:1522/${local.bodmis_service_name}"
-  oasys_host               = jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["endpoint"]
-  oasys_port               = jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["port"]
-  oasys_service_name       = jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["db_name"]
-  connection_string_oasys  = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.oasys.name}}@//${local.oasys_host}:${local.oasys_port}/${local.oasys_service_name}"
+  oasys_host               = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["endpoint"] : ""
+  oasys_port               = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["port"]: ""
+  oasys_service_name       = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys.secret_string)["db_name"]: ""
+  connection_string_oasys  = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.oasys.name}}@//${local.oasys_host}:${local.oasys_port}/${local.oasys_service_name}": ""
 
   # OASys is currently only included in Dev and Test
-  federated_query_connection_strings_map = local.is-development || local.is-test ? {
+  federated_query_connection_strings_map = local.is_dev_or_test ? {
     nomis  = local.connection_string_nomis
     bodmis = local.connection_string_bodmis
     oasys  = local.connection_string_oasys
@@ -21,7 +21,7 @@ locals {
     bodmis = local.connection_string_bodmis
   }
 
-  federated_query_credentials_secret_arns = local.is-development || local.is-test ? [
+  federated_query_credentials_secret_arns = local.is_dev_or_test ? [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
     aws_secretsmanager_secret.oasys.arn
@@ -89,7 +89,7 @@ resource "aws_athena_data_catalog" "bodmis_catalog" {
 
 # Adds an Athena data source / catalog for OASys
 resource "aws_athena_data_catalog" "oasys_catalog" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count = local.is_dev_or_test ? 1 : 0
 
   name        = "oasys"
   description = "OASys Athena data catalog"

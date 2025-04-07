@@ -1,6 +1,8 @@
 #### This file can be used to store locals specific to the member account ####
 #### DPR Specific ####
 locals {
+
+  is_dev_or_test       = local.is-development || local.is-test
   project              = local.application_data.accounts[local.environment].project_short_id
   analytics_project_id = "analytics"
 

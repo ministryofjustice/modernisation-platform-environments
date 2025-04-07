@@ -31,7 +31,7 @@ data "aws_secretsmanager_secret_version" "bodmis" {
 
 # Source OASys Secrets
 data "aws_secretsmanager_secret" "oasys" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count = local.is_dev_or_test ? 1 : 0
 
   name = aws_secretsmanager_secret.oasys[0].id
 
@@ -39,7 +39,7 @@ data "aws_secretsmanager_secret" "oasys" {
 }
 
 data "aws_secretsmanager_secret_version" "oasys" {
-  count = local.is-development || local.is-test ? 1 : 0
+  count = local.is_dev_or_test ? 1 : 0
 
   secret_id = data.aws_secretsmanager_secret.oasys[0].id
 
