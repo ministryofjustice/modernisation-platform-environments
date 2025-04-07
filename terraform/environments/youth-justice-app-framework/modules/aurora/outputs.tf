@@ -10,7 +10,7 @@ output "app_rotated_postgres_secret_arn" {
 
 output "rds_redshift_secret_arn" {
   description = "The ARN of the rotated postgres secret"
-  value       = aws_secretsmanager_secret..user_admin_secret["redshift_readonly"].arn
+  value       = aws_secretsmanager_secret.user_admin_secret["redshift_readonly"].arn
 }
 
 output "rds_cluster_security_group_id" {
