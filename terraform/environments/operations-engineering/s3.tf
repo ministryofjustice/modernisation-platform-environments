@@ -55,7 +55,7 @@ module "github_repos_tfstate_bucket" {
   bucket = "github-repos-tfstate-bucket"
 
   force_destroy = true
-  
+
   attach_deny_insecure_transport_policy = true
 
   server_side_encryption_configuration = {
@@ -79,7 +79,7 @@ module "auth0_tfstate_bucket" {
   bucket = "auth0-tfstate-bucket"
 
   force_destroy = true
-  
+
   attach_deny_insecure_transport_policy = true
 
   server_side_encryption_configuration = {

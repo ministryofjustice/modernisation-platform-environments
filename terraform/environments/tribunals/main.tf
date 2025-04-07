@@ -1,5 +1,5 @@
 locals {
-  rds_password       = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
+  rds_password = jsondecode(data.aws_secretsmanager_secret_version.data_rds_secret_current.secret_string)["password"]
 }
 
 module "appeals" {
@@ -128,14 +128,14 @@ module "cicap" {
 }
 
 module "employment_appeals" {
-  is_ftp_app         = false
-  source             = "./modules/tribunal"
-  app_name           = "employment-appeals"
-  module_name        = "employment_appeals"
-  app_db_name        = "eat"
-  app_db_login_name  = "eat-app"
-  app_rds_url        = aws_db_instance.rdsdb.address
-  app_rds_password   = local.rds_password
+  is_ftp_app        = false
+  source            = "./modules/tribunal"
+  app_name          = "employment-appeals"
+  module_name       = "employment_appeals"
+  app_db_name       = "eat"
+  app_db_login_name = "eat-app"
+  app_rds_url       = aws_db_instance.rdsdb.address
+  app_rds_password  = local.rds_password
 
   environment                  = local.environment
   tags                         = local.tags
@@ -160,14 +160,14 @@ module "employment_appeals" {
 }
 
 module "finance_and_tax" {
-  is_ftp_app         = false
-  source             = "./modules/tribunal"
-  app_name           = "finance-and-tax"
-  module_name        = "finance_and_tax"
-  app_db_name        = "ftt"
-  app_db_login_name  = "ftt-app"
-  app_rds_url        = aws_db_instance.rdsdb.address
-  app_rds_password   = local.rds_password
+  is_ftp_app        = false
+  source            = "./modules/tribunal"
+  app_name          = "finance-and-tax"
+  module_name       = "finance_and_tax"
+  app_db_name       = "ftt"
+  app_db_login_name = "ftt-app"
+  app_rds_url       = aws_db_instance.rdsdb.address
+  app_rds_password  = local.rds_password
 
   environment                  = local.environment
   tags                         = local.tags
@@ -192,14 +192,14 @@ module "finance_and_tax" {
 }
 
 module "immigration_services" {
-  is_ftp_app         = false
-  source             = "./modules/tribunal"
-  app_name           = "immigration-services"
-  module_name        = "immigration_services"
-  app_db_name        = "imset"
-  app_db_login_name  = "imset-app"
-  app_rds_url        = aws_db_instance.rdsdb.address
-  app_rds_password   = local.rds_password
+  is_ftp_app        = false
+  source            = "./modules/tribunal"
+  app_name          = "immigration-services"
+  module_name       = "immigration_services"
+  app_db_name       = "imset"
+  app_db_login_name = "imset-app"
+  app_rds_url       = aws_db_instance.rdsdb.address
+  app_rds_password  = local.rds_password
 
   environment                  = local.environment
   tags                         = local.tags
@@ -224,14 +224,14 @@ module "immigration_services" {
 }
 
 module "information_tribunal" {
-  is_ftp_app         = false
-  source             = "./modules/tribunal"
-  app_name           = "information-tribunal"
-  module_name        = "information_tribunal"
-  app_db_name        = "it"
-  app_db_login_name  = "it-app"
-  app_rds_url        = aws_db_instance.rdsdb.address
-  app_rds_password   = local.rds_password
+  is_ftp_app        = false
+  source            = "./modules/tribunal"
+  app_name          = "information-tribunal"
+  module_name       = "information_tribunal"
+  app_db_name       = "it"
+  app_db_login_name = "it-app"
+  app_rds_url       = aws_db_instance.rdsdb.address
+  app_rds_password  = local.rds_password
 
   environment                  = local.environment
   tags                         = local.tags
@@ -256,14 +256,14 @@ module "information_tribunal" {
 }
 
 module "lands_tribunal" {
-  is_ftp_app         = false
-  source             = "./modules/tribunal"
-  app_name           = "lands-chamber"
-  module_name        = "lands_tribunal"
-  app_db_name        = "lands"
-  app_db_login_name  = "lands-app"
-  app_rds_url        = aws_db_instance.rdsdb.address
-  app_rds_password   = local.rds_password
+  is_ftp_app        = false
+  source            = "./modules/tribunal"
+  app_name          = "lands-chamber"
+  module_name       = "lands_tribunal"
+  app_db_name       = "lands"
+  app_db_login_name = "lands-app"
+  app_rds_url       = aws_db_instance.rdsdb.address
+  app_rds_password  = local.rds_password
 
   environment                  = local.environment
   tags                         = local.tags
@@ -288,14 +288,14 @@ module "lands_tribunal" {
 }
 
 module "transport" {
-  is_ftp_app         = false
-  source             = "./modules/tribunal"
-  app_name           = "transport"
-  module_name        = "transport"
-  app_db_name        = "transport"
-  app_db_login_name  = "transport-app"
-  app_rds_url        = aws_db_instance.rdsdb.address
-  app_rds_password   = local.rds_password
+  is_ftp_app        = false
+  source            = "./modules/tribunal"
+  app_name          = "transport"
+  module_name       = "transport"
+  app_db_name       = "transport"
+  app_db_login_name = "transport-app"
+  app_rds_url       = aws_db_instance.rdsdb.address
+  app_rds_password  = local.rds_password
 
   environment                  = local.environment
   tags                         = local.tags
@@ -320,14 +320,14 @@ module "transport" {
 }
 
 module "asylum_support" {
-  is_ftp_app         = false
-  source             = "./modules/tribunal"
-  app_name           = "asylum-support"
-  module_name        = "asylum_support"
-  app_db_name        = "asadj"
-  app_db_login_name  = "asadj-app"
-  app_rds_url        = aws_db_instance.rdsdb.address
-  app_rds_password   = local.rds_password
+  is_ftp_app        = false
+  source            = "./modules/tribunal"
+  app_name          = "asylum-support"
+  module_name       = "asylum_support"
+  app_db_name       = "asadj"
+  app_db_login_name = "asadj-app"
+  app_rds_url       = aws_db_instance.rdsdb.address
+  app_rds_password  = local.rds_password
 
   environment                  = local.environment
   tags                         = local.tags
@@ -615,14 +615,14 @@ resource "aws_security_group" "nginx_lb_sg" {
 }
 
 module "nginx" {
-  count                   = local.is-development ? 1 : 0
-  source                  = "./modules/nginx_ec2_pair"
-  nginx_lb_sg_id          = aws_security_group.nginx_lb_sg[0].id
-  vpc_shared_id           = data.aws_vpc.shared.id
-  public_subnets_a_id     = data.aws_subnet.public_subnets_a.id
-  public_subnets_b_id     = data.aws_subnet.public_subnets_b.id
-  environment             = local.environment
-  s3_encryption_key_arn   = aws_kms_key.s3_encryption_key.arn
+  count                 = local.is-development ? 1 : 0
+  source                = "./modules/nginx_ec2_pair"
+  nginx_lb_sg_id        = aws_security_group.nginx_lb_sg[0].id
+  vpc_shared_id         = data.aws_vpc.shared.id
+  public_subnets_a_id   = data.aws_subnet.public_subnets_a.id
+  public_subnets_b_id   = data.aws_subnet.public_subnets_b.id
+  environment           = local.environment
+  s3_encryption_key_arn = aws_kms_key.s3_encryption_key.arn
 }
 
 module "nginx_load_balancer" {

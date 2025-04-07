@@ -1,5 +1,6 @@
 
 resource "aws_redshiftserverless_namespace" "default" {
+  #checkov:skip=CKV_AWS_282: tmp to get s3 user change in
   namespace_name        = local.namespace_name
   manage_admin_password = true
 

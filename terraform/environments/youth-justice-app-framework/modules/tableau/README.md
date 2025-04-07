@@ -65,16 +65,16 @@ The process will be followed but with changes, particurally to the process for r
 
 ### Make Install and Backup Files Available
 Upload the following files to S3 bucket `yjaf-<envoronment>-tableau-backups-archive`, folder `Install_Files`:
-    - `AmazonRedshiftODBC-64-bit-1.5.9.1011-1.x86_64.rpm` 
-    - `identity-store-template.json` 
-    - `odbc.ini` 
-    - `odbcinst.ini` 
-    - `openssl-tableau.conf` 
-    - `postgresql-42.7.3.jar` 
-    - `registration.json` 
-    - `tableau_redshift_odbc.sh` 
-    - `tableau-backup.sh` 
-    - `tableau-server-2024-2-2.x86_64.rpm` 
+    - `AmazonRedshiftODBC-64-bit-1.5.9.1011-1.x86_64.rpm`
+    - `identity-store-template.json`
+    - `odbc.ini`
+    - `odbcinst.ini`
+    - `openssl-tableau.conf`
+    - `postgresql-42.7.3.jar`
+    - `registration.json`
+    - `tableau_redshift_odbc.sh`
+    - `tableau-backup.sh`
+    - `tableau-server-2024-2-2.x86_64.rpm`
 
 The latest Tableau backup files should have been replicated to S3 bucket `yjaf-<envoronment>-tableau-backups-archive`. The latest settings and repository files need to be copied to s3 location  `yjaf-<envoronment>-tableau-backups/Install_Files` and renamed to `settings_for_restore.json` and `repository_for_restore.tsbak`.
 

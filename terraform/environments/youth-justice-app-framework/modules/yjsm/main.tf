@@ -17,7 +17,7 @@ resource "aws_ssm_parameter" "private_key" {
   type        = "SecureString"
   value       = module.key_pair.private_key_pem
 
-  tags        = local.all_tags
+  tags = local.all_tags
 }
 
 data "template_file" "userdata" {
