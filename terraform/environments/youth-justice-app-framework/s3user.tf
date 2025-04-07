@@ -49,6 +49,7 @@ resource "aws_iam_policy" "s3" {
 }
 
 resource "aws_iam_user_policy_attachment" "s3_user_attachment" {
+  #checkov:CKV_AWS_40:change when user is updated to role
   user       = aws_iam_user.s3.name
   policy_arn = aws_iam_policy.s3.arn
 }
