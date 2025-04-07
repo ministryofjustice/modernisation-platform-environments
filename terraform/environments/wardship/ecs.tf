@@ -278,8 +278,8 @@ resource "aws_iam_role_policy" "app_execution" {
                "logs:PutLogEvents"
            ],
            "Resource": [
-               "arn:aws:logs:*:${local.modernisation_platform_account_id}:log-group:*:*",
-               "arn:aws:logs:*:${local.modernisation_platform_account_id}:log-group:*:log-stream:*"
+               "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:log-group:*:*",
+               "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:log-group:*:log-stream:*"
            ],
            "Effect": "Allow"
       },
@@ -294,14 +294,14 @@ resource "aws_iam_role_policy" "app_execution" {
             "Action": [
               "ecr:*"
             ],
-            "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:repository/${aws_ecr_repository.wardship_ecr_repo.arn}",
+            "Resource": "arn:aws:ecr:*:${local.environment_management.account_ids[terraform.workspace]}:repository/${aws_ecr_repository.wardship_ecr_repo.arn}",
             "Effect": "Allow"
       },
       {
           "Action": [
                "secretsmanager:GetSecretValue"
            ],
-          "Resource": "arn:aws:secretsmanager:*:${local.modernisation_platform_account_id}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
+          "Resource": "arn:aws:secretsmanager:*:${local.environment_management.account_ids[terraform.workspace]}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
           "Effect": "Allow"
       }
     ]
@@ -349,28 +349,28 @@ resource "aws_iam_role_policy" "app_task" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:*",
+        "Resource": "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
      },
      {
         "Action": [
           "ecr:*"
         ],
-        "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:*",
+        "Resource": "arn:aws:ecr:*:${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
      },
      {
         "Action": [
           "ec2:*"
         ],
-        "Resource": "arn:aws:ec2:*:${local.modernisation_platform_account_id}:*",
+        "Resource": "arn:aws:ec2:*:${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
      },
      {
         "Action": [
           "iam:PassRole"
         ],
-        "Resource": "arn:aws:iam::${local.modernisation_platform_account_id}:*",
+        "Resource": "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:*",
         "Effect": "Allow"
      }
    ]
