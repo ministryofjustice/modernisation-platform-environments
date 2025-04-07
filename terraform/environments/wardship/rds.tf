@@ -107,14 +107,6 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
     security_groups = [aws_security_group.ecs_service.id]
   }
   ingress {
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    description = "Allows Github Actions to access RDS"
-    cidr_blocks = ["${jsondecode(data.http.myip.response_body)["ip"]}/32"]
-  }
-
-  ingress {
     protocol    = "tcp"
     description = "Allow PSQL traffic from bastion"
     from_port   = 5432
@@ -132,29 +124,4 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-}
-
-data "http" "myip" {
-  url = "http://ipinfo.io/json"
-}
-
-resource "null_resource" "setup_dev_db" {
-  count = local.is-development ? 1 : 0
-
-  depends_on = [aws_db_instance.wardship_db_dev[0]]
-
-  provisioner "local-exec" {
-    interpreter = ["bash", "-c"]
-    command     = "chmod +x ./setup-dev-db.sh; ./setup-dev-db.sh"
-
-    environment = {
-      DB_HOSTNAME          = aws_db_instance.wardship_db_dev[0].address
-      DB_NAME              = aws_db_instance.wardship_db_dev[0].db_name
-      WARDSHIP_DB_USERNAME = aws_db_instance.wardship_db_dev[0].username
-      WARDSHIP_DB_PASSWORD = random_password.password.result
-    }
-  }
-  triggers = {
-    always_run = timestamp()
-  }
 }
