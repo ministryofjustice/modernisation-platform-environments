@@ -4,7 +4,7 @@ variable "app_name" {
 }
 
 variable "module_name" {
-  type = string
+  type        = string
   description = "Name of the module"
 }
 
@@ -87,7 +87,7 @@ variable "cluster_id" {
 }
 
 variable "cluster_name" {
-  type = string
+  type        = string
   description = "Name of the cluster"
 }
 
@@ -123,5 +123,5 @@ variable "target_group_arns_sftp" {
 
 variable "new_db_password" {
   description = "Randomly generated password for each db"
-  type = string
+  type        = string
 }

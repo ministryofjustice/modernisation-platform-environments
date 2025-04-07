@@ -100,6 +100,11 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
         })
+        instance = merge(local.ec2_instances.rdgw.instance, {
+          tags = {
+            patch-manager = "group1"
+          }
+        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.noms.root domain"
           domain-name = "azure.noms.root"
@@ -111,6 +116,11 @@ locals {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
         })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
+        })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.noms.root"
         })
@@ -121,6 +131,11 @@ locals {
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
           availability_zone = "eu-west-2b"
+        })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          tags = {
+            patch-manager = "group1"
+          }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.noms.root"
@@ -135,6 +150,11 @@ locals {
           instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
             "Ec2SecretPolicy"]
           )
+        })
+        instance = merge(local.ec2_instances.rds.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
         })
         tags = merge(local.ec2_instances.rds.tags, {
           domain-name = "azure.noms.root"
@@ -204,9 +224,9 @@ locals {
           https = merge(local.lbs.public.listeners.https, {
             alarm_target_group_names = [
               "test-rdgw-1-http",
-             "test-rds-1-https",
+              "test-rds-1-https",
             ]
-           certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
+            certificate_names_or_arns = ["remote_desktop_wildcard_cert"]
             rules = {
               test-rdgw-1-http = {
                 priority = 100
@@ -235,12 +255,25 @@ locals {
                       "rdweb1.test.hmpps-domain.service.justice.gov.uk"
                     ]
                   }
-                }]                
+                }]
               }
             }
           })
         })
       })
+    }
+
+    patch_manager = {
+      patch_schedules = {
+        group1 = "cron(00 06 ? * WED *)" # 3am wed for prod for non-prod env's we have to work around the overnight shutdown  
+        group2 = "cron(00 06 ? * THU *)" # 3am thu for prod
+      }
+      maintenance_window_duration = 2 # 4 for prod
+      maintenance_window_cutoff   = 1 # 2 for prod
+      patch_classifications = {
+        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates", "DefinitionUpdates"]
+      }
     }
 
     schedule_alarms_lambda = {
