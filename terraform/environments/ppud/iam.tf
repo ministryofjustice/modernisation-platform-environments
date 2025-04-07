@@ -1736,9 +1736,8 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
           "s3:GetReplicationConfiguration"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-database-source-dev",
-          "arn:aws:s3:::moj-database-source-dev/*"
-
+          aws_s3_bucket.moj-database-source-dev[0].arn,
+          "${aws_s3_bucket.moj-database-source-dev[0].arn}/*"
         ]
       },
       {
@@ -1811,9 +1810,8 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_report_source_dev" {
           "s3:GetReplicationConfiguration"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-report-source-dev",
-          "arn:aws:s3:::moj-report-source-dev/*"
-
+          aws_s3_bucket.moj-report-source-dev[0].arn,
+          "${aws_s3_bucket.moj-report-source-dev[0].arn}/*"
         ]
       },
       {
@@ -1886,9 +1884,8 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_report_source_uat" {
           "s3:GetReplicationConfiguration"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-report-source-uat",
-          "arn:aws:s3:::moj-report-source-uat/*"
-
+          aws_s3_bucket.moj-report-source-uat[0].arn,
+          "${aws_s3_bucket.moj-report-source-uat[0].arn}/*"
         ]
       },
       {
@@ -1914,4 +1911,79 @@ resource "aws_iam_role_policy_attachment" "attach_iam_role_to_iam_policy_s3_buck
   count      = local.is-preproduction == true ? 1 : 0
   role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_uat[0].name
   policy_arn = aws_iam_policy.iam_policy_s3_bucket_moj_report_source_uat[0].arn
+}
+
+###########################################################
+# IAM Role & Policy for S3 Bucket Replication to MPC - PROD
+###########################################################
+
+resource "aws_iam_role" "iam_role_s3_bucket_moj_report_source_prod" {
+  count              = local.is-production == true ? 1 : 0
+  name               = "iam_role_s3_bucket_moj_report_source_prod"
+  path               = "/service-role/"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "s3.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+  }
+  EOF
+}
+
+resource "aws_iam_policy" "iam_policy_s3_bucket_moj_report_source_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "iam_policy_s3_bucket_moj_report_source_prod"
+  path        = "/"
+  description = "AWS IAM Policy for allowing s3 bucket cross account replication"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Sid" : "SourceBucketPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObjectRetention",
+          "s3:GetObjectVersionTagging",
+          "s3:GetObjectVersionAcl",
+          "s3:ListBucket",
+          "s3:GetObjectVersionForReplication",
+          "s3:GetObjectLegalHold",
+          "s3:GetReplicationConfiguration"
+        ],
+        "Resource" : [
+          aws_s3_bucket.moj-report-source-prod[0].arn,
+          "${aws_s3_bucket.moj-report-source-prod[0].arn}/*"
+
+        ]
+      },
+      {
+        "Sid" : "DestinationBucketPermissions",
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:ReplicateObject",
+          "s3:ObjectOwnerOverrideToBucketOwner",
+          "s3:GetObjectVersionTagging",
+          "s3:ReplicateTags",
+          "s3:ReplicateDelete"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671",
+          "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_iam_role_to_iam_policy_s3_bucket_moj_report_source_prod" {
+  count      = local.is-production == true ? 1 : 0
+  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_prod[0].name
+  policy_arn = aws_iam_policy.iam_policy_s3_bucket_moj_report_source_prod[0].arn
 }
