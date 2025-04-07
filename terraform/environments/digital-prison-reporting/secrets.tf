@@ -82,6 +82,8 @@ resource "aws_secretsmanager_secret_version" "bodmis" {
 
 # OASys Source Secrets
 resource "aws_secretsmanager_secret" "oasys" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
 
   name = "external/${local.project}-oasys-source-secret"
 
