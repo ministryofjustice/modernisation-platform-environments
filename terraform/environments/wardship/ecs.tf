@@ -282,6 +282,13 @@ resource "aws_iam_role_policy" "app_execution" {
       },
       {
             "Action": [
+              "ecr:GetAuthorizationToken"
+            ],
+            "Resource": "*",
+            "Effect": "Allow"
+      },
+      {
+            "Action": [
               "ecr:*"
             ],
             "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:repository/${aws_ecr_repository.wardship_ecr_repo.arn}",
