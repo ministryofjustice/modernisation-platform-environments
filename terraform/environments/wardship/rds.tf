@@ -21,7 +21,7 @@ resource "aws_db_instance" "wardship_db" {
   vpc_security_group_ids      = [aws_security_group.postgresql_db_sc[0].id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
   auto_minor_version_upgrade  = true
-  allow_major_version_upgrade = true
+  allow_major_version_upgrade = false
   ca_cert_identifier          = "rds-ca-rsa2048-g1"
   apply_immediately           = true
   copy_tags_to_snapshot           = true
@@ -90,7 +90,7 @@ resource "aws_db_instance" "wardship_db_dev" {
   vpc_security_group_ids      = [aws_security_group.postgresql_db_sc_dev[0].id]
   db_subnet_group_name        = aws_db_subnet_group.dbsubnetgroup.name
   auto_minor_version_upgrade  = true
-  allow_major_version_upgrade = true
+  allow_major_version_upgrade = false
   copy_tags_to_snapshot       = true
 }
 

@@ -240,7 +240,7 @@ resource "aws_lb" "wardship_lb" {
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.wardship_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = true
+  enable_deletion_protection = false
   internal                   = false
   drop_invalid_header_fields = true
   depends_on                 = [aws_security_group.wardship_lb_sc, aws_security_group.lb_sc_pingdom, aws_security_group.lb_sc_pingdom_2]
