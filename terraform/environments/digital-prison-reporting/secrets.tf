@@ -80,6 +80,31 @@ resource "aws_secretsmanager_secret_version" "bodmis" {
   }
 }
 
+# OASys Source Secrets
+resource "aws_secretsmanager_secret" "oasys" {
+
+  name = "external/${local.project}-oasys-source-secret"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-oasys-source-secret"
+      Resource_Type = "Secrets"
+    }
+  )
+}
+
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "oasys" {
+  secret_id     = aws_secretsmanager_secret.oasys.id
+  secret_string = jsonencode(local.oasys_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
+
 # DPS Source Secrets
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "dps" {

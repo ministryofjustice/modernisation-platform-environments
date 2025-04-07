@@ -29,6 +29,19 @@ data "aws_secretsmanager_secret_version" "bodmis" {
   depends_on = [aws_secretsmanager_secret.bodmis]
 }
 
+# Source OASys Secrets
+data "aws_secretsmanager_secret" "oasys" {
+  name = aws_secretsmanager_secret.oasys.id
+
+  depends_on = [aws_secretsmanager_secret_version.oasys]
+}
+
+data "aws_secretsmanager_secret_version" "oasys" {
+  secret_id = data.aws_secretsmanager_secret.oasys.id
+
+  depends_on = [aws_secretsmanager_secret.oasys]
+}
+
 # Source DataMart Secrets
 data "aws_secretsmanager_secret" "datamart" {
   name = aws_secretsmanager_secret.redshift.id
