@@ -40,9 +40,13 @@ locals {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
         })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          tags = {
+            # patch-manager = "group2"
+          }
+        })
         tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name   = "azure.hmpp.root"
-          patch-manager = "group2"
+          domain-name = "azure.hmpp.root"
         })
       })
 
@@ -52,7 +56,7 @@ locals {
         })
         instance = merge(local.ec2_instances.rdgw.instance, {
           tags = {
-            patch-manager = "group1"
+            # patch-manager = "group1"
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
@@ -65,6 +69,11 @@ locals {
       pd-rdgw-1-b = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2b"
+        })
+        instance = merge(local.ec2_instances.rdgw.instance, {
+          tags = {
+            # patch-manager = "group2"
+          }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description      = "Remote Desktop Gateway for azure.hmpp.root domain"
