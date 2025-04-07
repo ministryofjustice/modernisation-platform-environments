@@ -601,7 +601,7 @@ module "share_dbs_with_airflow_cadt_roles" {
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.airflow_cadt_cross_assume_role.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  db_exists               = true
 }
 
 resource "aws_lakeformation_resource" "rds_bucket" {

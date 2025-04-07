@@ -1,6 +1,8 @@
 locals {
   dbs_to_create = var.db_exists ? toset([]) : toset(var.dbs_to_grant)
+  dbs           = var.db_exists ? { for db in var.dbs_to_grant : db => db } : { for k, v in aws_glue_catalog_database.cadt_databases : k => v.name }
 }
+
 data "aws_caller_identity" "current" {}
 
 resource "aws_lakeformation_permissions" "s3_bucket_permissions" {
@@ -13,9 +15,8 @@ resource "aws_lakeformation_permissions" "s3_bucket_permissions" {
   }
 }
 
-
 resource "aws_lakeformation_permissions" "grant_cadt_databases" {
-  for_each    = { for k, v in aws_glue_catalog_database.cadt_databases : k => v.name }
+  for_each    = dbs
   principal   = var.role_arn
   permissions = ["ALL"]
   database {
@@ -24,7 +25,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_databases" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_tables" {
-  for_each    = { for k, v in aws_glue_catalog_database.cadt_databases : k => v.name }
+  for_each    = dbs
   principal   = var.role_arn
   permissions = ["ALL"]
   table {
@@ -34,6 +35,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_tables" {
 }
 
 resource "aws_lakeformation_permissions" "s3_bucket_permissions_de" {
+  count     = var.de_role_arn != null ? 1 : 0
   principal = var.de_role_arn
 
   permissions = ["DATA_LOCATION_ACCESS"]
@@ -45,7 +47,7 @@ resource "aws_lakeformation_permissions" "s3_bucket_permissions_de" {
 
 
 resource "aws_lakeformation_permissions" "grant_cadt_databases_de" {
-  for_each    = { for k, v in aws_glue_catalog_database.cadt_databases : k => v.name }
+  for_each    = var.de_role_arn != null ? dbs : {}
   principal   = var.de_role_arn
   permissions = ["ALL"]
   database {
@@ -54,7 +56,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_databases_de" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_tables_de" {
-  for_each    = { for k, v in aws_glue_catalog_database.cadt_databases : k => v.name }
+  for_each    = var.de_role_arn != null ? dbs : {}
   principal   = var.de_role_arn
   permissions = ["ALL"]
   table {
