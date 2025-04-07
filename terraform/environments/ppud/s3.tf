@@ -386,7 +386,7 @@ resource "aws_s3_bucket_policy" "moj-database-source-prod" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-		      "${aws_s3_bucket.moj-database-source-prod[0].arn}",
+          aws_s3_bucket.moj-database-source-prod[0].arn,
           "${aws_s3_bucket.moj-database-source-prod[0].arn}/*"
         ],
         "Principal" : {
@@ -407,7 +407,7 @@ resource "aws_s3_bucket_policy" "moj-database-source-prod" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-		      "${aws_s3_bucket.moj-database-source-prod[0].arn}",
+          aws_s3_bucket.moj-database-source-prod[0].arn,
           "${aws_s3_bucket.moj-database-source-prod[0].arn}/*"
         ],
         "Principal" : {
@@ -426,7 +426,7 @@ resource "aws_s3_bucket_policy" "moj-database-source-prod" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-		      "${aws_s3_bucket.moj-database-source-prod[0].arn}",
+          aws_s3_bucket.moj-database-source-prod[0].arn,
           "${aws_s3_bucket.moj-database-source-prod[0].arn}/*"
         ],
         "Principal" : {
@@ -512,7 +512,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-prod" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-		      "${aws_s3_bucket.moj-report-source-prod[0].arn}",
+          aws_s3_bucket.moj-report-source-prod[0].arn,
           "${aws_s3_bucket.moj-report-source-prod[0].arn}/*"
         ],
         "Principal" : {
@@ -533,7 +533,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-prod" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-		      "${aws_s3_bucket.moj-report-source-prod[0].arn}",
+          aws_s3_bucket.moj-report-source-prod[0].arn,
           "${aws_s3_bucket.moj-report-source-prod[0].arn}/*"
         ],
         "Principal" : {
@@ -552,7 +552,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-prod" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-		      "${aws_s3_bucket.moj-report-source-prod[0].arn}",
+          aws_s3_bucket.moj-report-source-prod[0].arn,
           "${aws_s3_bucket.moj-report-source-prod[0].arn}/*"
         ],
         "Principal" : {
@@ -1025,7 +1025,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-uat" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "${aws_s3_bucket.moj-report-source-uat[0].arn}",
+          aws_s3_bucket.moj-report-source-uat[0].arn,
           "${aws_s3_bucket.moj-report-source-uat[0].arn}/*"
         ],
         "Principal" : {
@@ -1044,7 +1044,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-uat" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "${aws_s3_bucket.moj-report-source-uat[0].arn}",
+          aws_s3_bucket.moj-report-source-uat[0].arn,
           "${aws_s3_bucket.moj-report-source-uat[0].arn}/*"
         ],
         "Principal" : {
@@ -1062,7 +1062,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-uat" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "${aws_s3_bucket.moj-report-source-uat[0].arn}",
+          aws_s3_bucket.moj-report-source-uat[0].arn,
           "${aws_s3_bucket.moj-report-source-uat[0].arn}/*"
         ],
         "Principal" : {
@@ -1479,7 +1479,7 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-		      "${aws_s3_bucket.moj-database-source-dev[0].arn}",
+          aws_s3_bucket.moj-database-source-dev[0].arn,
           "${aws_s3_bucket.moj-database-source-dev[0].arn}/*"
         ],
         "Principal" : {
@@ -1498,7 +1498,7 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-		      "${aws_s3_bucket.moj-database-source-dev[0].arn}",
+          aws_s3_bucket.moj-database-source-dev[0].arn,
           "${aws_s3_bucket.moj-database-source-dev[0].arn}/*"
         ],
         "Principal" : {
@@ -1516,7 +1516,7 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-		      "${aws_s3_bucket.moj-database-source-dev[0].arn}",
+          aws_s3_bucket.moj-database-source-dev[0].arn,
           "${aws_s3_bucket.moj-database-source-dev[0].arn}/*"
         ],
         "Principal" : {
@@ -1624,7 +1624,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "${aws_s3_bucket.moj-report-source-dev[0].arn}",
+          aws_s3_bucket.moj-report-source-dev[0].arn,
           "${aws_s3_bucket.moj-report-source-dev[0].arn}/*"
         ],
         "Principal" : {
@@ -1643,7 +1643,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "${aws_s3_bucket.moj-report-source-dev[0].arn}",
+          aws_s3_bucket.moj-report-source-dev[0].arn,
           "${aws_s3_bucket.moj-report-source-dev[0].arn}/*"
         ],
         "Principal" : {
@@ -1661,7 +1661,7 @@ resource "aws_s3_bucket_policy" "moj-report-source-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "${aws_s3_bucket.moj-report-source-dev[0].arn}",
+          aws_s3_bucket.moj-report-source-dev[0].arn,
           "${aws_s3_bucket.moj-report-source-dev[0].arn}/*"
         ],
         "Principal" : {

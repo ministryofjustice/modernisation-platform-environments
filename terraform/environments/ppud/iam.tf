@@ -1736,9 +1736,8 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_database_source_dev" {
           "s3:GetReplicationConfiguration"
         ],
         "Resource" : [
-          "arn:aws:s3:::moj-database-source-dev",
-          "arn:aws:s3:::moj-database-source-dev/*"
-
+          aws_s3_bucket.moj-database-source-dev[0].arn,
+          "${aws_s3_bucket.moj-database-source-dev[0].arn}/*"
         ]
       },
       {
@@ -1811,7 +1810,7 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_report_source_dev" {
           "s3:GetReplicationConfiguration"
         ],
         "Resource" : [
-		      "${aws_s3_bucket.moj-report-source-dev[0].arn}",
+          aws_s3_bucket.moj-report-source-dev[0].arn,
           "${aws_s3_bucket.moj-report-source-dev[0].arn}/*"
         ]
       },
@@ -1885,7 +1884,7 @@ resource "aws_iam_policy" "iam_policy_s3_bucket_moj_report_source_uat" {
           "s3:GetReplicationConfiguration"
         ],
         "Resource" : [
-		      "${aws_s3_bucket.moj-report-source-uat[0].arn}",
+          aws_s3_bucket.moj-report-source-uat[0].arn,
           "${aws_s3_bucket.moj-report-source-uat[0].arn}/*"
         ]
       },
