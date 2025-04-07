@@ -397,6 +397,24 @@ resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
   policy_arn = aws_iam_policy.unlimited_athena_query.arn
 }
 
+# Lake Formation Data Access Attachement
+resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
+  role       = aws_iam_role.airflow_cadt_cross_assume_role.name
+  policy_arn = aws_iam_policy.lake_formation_data_access.arn
+}
+
+# Lake Formation LFTag Access Attachement
+resource "aws_iam_role_policy_attachment" "lake_formation_lftag_access" {
+  role       = aws_iam_role.airflow_cadt_cross_assume_role.name
+  policy_arn = aws_iam_policy.lake_formation_lftag_access.arn
+}
+
+# Athena Access Attachement
+resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
+  role       = aws_iam_role.airflow_cadt_cross_assume_role.name
+  policy_arn = aws_iam_policy.unlimited_athena_query.arn
+}
+
 resource "aws_iam_policy" "unlimited_athena_query" {
   name        = "${local.environment_shorthand}-unlimited-athena-query"
   description = "Athena Access Policy"
@@ -574,6 +592,15 @@ module "share_dbs_with_roles" {
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
+  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+}
+
+module "share_dbs_with_airflow_cadt_roles" {
+  count                   = local.is-development ? 0 : 1
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = local.dbs_to_grant
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = aws_iam_role.airflow_cadt_cross_assume_role.arn
   de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
 }
 
