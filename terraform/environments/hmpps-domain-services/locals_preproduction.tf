@@ -107,10 +107,14 @@ locals {
         config = merge(local.ec2_instances.rds.config, {
           availability_zone = "eu-west-2a"
         })
+        instance = merge(local.ec2_instances.rds.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
+        })
         tags = merge(local.ec2_instances.rds.tags, {
-          description   = "Remote Desktop Services for azure.hmpp.root domain"
-          domain-name   = "azure.hmpp.root"
-          patch-manager = "group2"
+          description = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name = "azure.hmpp.root"
         })
       })
     }

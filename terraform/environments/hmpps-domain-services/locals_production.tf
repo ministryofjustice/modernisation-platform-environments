@@ -50,11 +50,15 @@ locals {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
         })
+        instance = merge(local.ec2_instances.rdgw.instance, {
+          tags = {
+            patch-manager = "group1"
+          }
+        })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description      = "Remote Desktop Gateway for azure.hmpp.root domain"
           domain-name      = "azure.hmpp.root"
           update-ssm-agent = "patchgroup1"
-          patch-manager    = "group1"
         })
       })
 
@@ -78,8 +82,8 @@ locals {
           # patch-manager = "group2"
         })
         tags = merge(local.ec2_instances.rds.tags, {
-          description   = "Remote Desktop Services for azure.hmpp.root domain"
-          domain-name   = "azure.hmpp.root"
+          description = "Remote Desktop Services for azure.hmpp.root domain"
+          domain-name = "azure.hmpp.root"
         })
       })
     }
