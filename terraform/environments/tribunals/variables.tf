@@ -1,8 +1,8 @@
 variable "services" {
   type = map(object({
-    name_prefix    = string
-    module_key     = string
-    port           = number
+    name_prefix = string
+    module_key  = string
+    port        = number
   }))
   default = {
     "appeals" = {
@@ -115,77 +115,77 @@ variable "services" {
 
 variable "web_app_services" {
   type = map(object({
-    name_prefix    = string
-    module_key     = string
-    port           = number
-    app_db_name    = string
+    name_prefix = string
+    module_key  = string
+    port        = number
+    app_db_name = string
   }))
   default = {
     "appeals" = {
-      name_prefix    = "administrativeappeals"
-      module_key     = "appeals"
-      port           = 49100
-      app_db_name    = "ossc"
+      name_prefix = "administrativeappeals"
+      module_key  = "appeals"
+      port        = 49100
+      app_db_name = "ossc"
     },
     "ahmlr" = {
-      name_prefix    = "landregistrationdivision"
-      module_key     = "ahmlr"
-      port           = 49101
-      app_db_name    = "hmlands"
+      name_prefix = "landregistrationdivision"
+      module_key  = "ahmlr"
+      port        = 49101
+      app_db_name = "hmlands"
     }
     "care_standards" = {
-      name_prefix    = "carestandards"
-      module_key     = "care_standards"
-      port           = 49102
-      app_db_name    = "carestandards"
+      name_prefix = "carestandards"
+      module_key  = "care_standards"
+      port        = 49102
+      app_db_name = "carestandards"
     },
     "cicap" = {
-      name_prefix    = "cicap"
-      module_key     = "cicap"
-      port           = 49103
-      app_db_name    = "cicap"
+      name_prefix = "cicap"
+      module_key  = "cicap"
+      port        = 49103
+      app_db_name = "cicap"
     },
     "employment_appeals" = {
-      name_prefix    = "employmentappeals"
-      module_key     = "employment_appeals"
-      port           = 49104
-      app_db_name    = "eat"
+      name_prefix = "employmentappeals"
+      module_key  = "employment_appeals"
+      port        = 49104
+      app_db_name = "eat"
     },
     "finance_and_tax" = {
-      name_prefix    = "financeandtax"
-      module_key     = "finance_and_tax"
-      port           = 49105
-      app_db_name    = "ftt"
+      name_prefix = "financeandtax"
+      module_key  = "finance_and_tax"
+      port        = 49105
+      app_db_name = "ftt"
     },
     "immigration_services" = {
-      name_prefix    = "immigrationservices"
-      module_key     = "immigration_services"
-      port           = 49106
-      app_db_name    = "imset"
+      name_prefix = "immigrationservices"
+      module_key  = "immigration_services"
+      port        = 49106
+      app_db_name = "imset"
     },
     "information_tribunal" = {
-      name_prefix    = "informationrights"
-      module_key     = "information_tribunal"
-      port           = 49107
-      app_db_name    = "it"
+      name_prefix = "informationrights"
+      module_key  = "information_tribunal"
+      port        = 49107
+      app_db_name = "it"
     },
     "lands_tribunal" = {
-      name_prefix    = "landschamber"
-      module_key     = "lands_tribunal"
-      port           = 49108
-      app_db_name    = "lands"
+      name_prefix = "landschamber"
+      module_key  = "lands_tribunal"
+      port        = 49108
+      app_db_name = "lands"
     },
     "transport" = {
-      name_prefix    = "transportappeals"
-      module_key     = "transport"
-      port           = 49109
-      app_db_name    = "transport"
+      name_prefix = "transportappeals"
+      module_key  = "transport"
+      port        = 49109
+      app_db_name = "transport"
     },
     "asylum_support" = {
-      name_prefix    = "asylumsupport"
-      module_key     = "asylum_support"
-      port           = 49120
-      app_db_name    = "asadj"
+      name_prefix = "asylumsupport"
+      module_key  = "asylum_support"
+      port        = 49120
+      app_db_name = "asadj"
     }
   }
 }

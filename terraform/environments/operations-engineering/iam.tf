@@ -18,15 +18,15 @@ data "aws_iam_policy_document" "s3_access_policy_document" {
   }
 
   statement {
-    effect  = "Allow"
-    actions = ["kms:Decrypt"]
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
     resources = ["*"]
   }
 }
 
 resource "aws_iam_policy" "s3_access_policy" {
-  name        = "github_role_prod_s3_access_policy"
-  policy      = data.aws_iam_policy_document.s3_access_policy_document.json
+  name   = "github_role_prod_s3_access_policy"
+  policy = data.aws_iam_policy_document.s3_access_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "github_role_perms_attachment" {
@@ -55,15 +55,15 @@ data "aws_iam_policy_document" "auth0_s3_access_policy_document" {
   }
 
   statement {
-    effect  = "Allow"
-    actions = ["kms:Decrypt"]
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
     resources = ["*"]
   }
 }
 
 resource "aws_iam_policy" "auth0_s3_access_policy" {
-  name        = "auth0_role_prod_s3_access_policy"
-  policy      = data.aws_iam_policy_document.auth0_s3_access_policy_document.json
+  name   = "auth0_role_prod_s3_access_policy"
+  policy = data.aws_iam_policy_document.auth0_s3_access_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "auth0_role_perms_attachment" {

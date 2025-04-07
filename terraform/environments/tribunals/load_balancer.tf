@@ -81,8 +81,8 @@ resource "aws_security_group" "tribunals_lb_sc" {
 
 resource "aws_lb_target_group" "tribunals_target_group" {
   #checkov:skip=CKV_AWS_261:"Health check is properly configured with path and matcher"
-  for_each             = var.services
-  name                 = "${each.value.module_key}-tg"
+  for_each = var.services
+  name     = "${each.value.module_key}-tg"
   #checkov:skip=CKV_AWS_378: Allow HTTP protocol for transport
   port                 = each.value.port
   protocol             = "HTTP"
@@ -95,8 +95,8 @@ resource "aws_lb_target_group" "tribunals_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "15"
+    healthy_threshold = "3"
+    interval          = "15"
     #checkov:skip=CKV_AWS_378: Allow HTTP protocol for transport
     protocol            = "HTTP"
     unhealthy_threshold = "3"
