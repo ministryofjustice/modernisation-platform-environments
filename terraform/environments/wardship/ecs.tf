@@ -274,13 +274,25 @@ resource "aws_iam_role_policy" "app_execution" {
     "Statement": [
       {
            "Action": [
-              "ecr:*",
-              "logs:CreateLogStream",
-              "logs:PutLogEvents",
-              "secretsmanager:GetSecretValue"
+               "logs:CreateLogStream",
+               "logs:PutLogEvents"
            ],
-           "Resource": "*",
+           "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:log-group:*",
            "Effect": "Allow"
+      },
+      {
+            "Action": [
+              "ecr:*"
+            ],
+            "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:repository/${aws_ecr_repository.wardship_ecr_repo.arn}",
+            "Effect": "Allow"
+      },
+      {
+          "Action": [
+               "secretsmanager:GetSecretValue"
+           ],
+          "Resource": "arn:aws:secretsmanager:*:${local.modernisation_platform_account_id}:secret:${aws_secretsmanager_secret.rds_db_credentials.arn}",
+          "Effect": "Allow"
       }
     ]
   }
@@ -318,24 +330,42 @@ resource "aws_iam_role_policy" "app_task" {
   name = "task-${var.networking[0].application}"
   role = aws_iam_role.app_task.id
 
-  policy = <<-EOF
-  {
+  policy = <<EOF
+{
    "Version": "2012-10-17",
    "Statement": [
      {
-       "Effect": "Allow",
         "Action": [
           "logs:CreateLogStream",
-          "logs:PutLogEvents",
-          "ecr:*",
-          "iam:*",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:*:${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
+     },
+     {
+        "Action": [
+          "ecr:*"
+        ],
+        "Resource": "arn:aws:ecr:*:${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
+     },
+     {
+        "Action": [
           "ec2:*"
         ],
-       "Resource": "*"
+        "Resource": "arn:aws:ec2:*:${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
+     },
+     {
+        "Action": [
+          "iam:PassRole"
+        ],
+        "Resource": "arn:aws:iam::${local.modernisation_platform_account_id}:*",
+        "Effect": "Allow"
      }
    ]
-  }
-  EOF
+}
+EOF
 }
 
 resource "aws_security_group" "ecs_service" {
