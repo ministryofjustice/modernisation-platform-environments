@@ -16,7 +16,7 @@ resource "aws_lakeformation_permissions" "s3_bucket_permissions" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_databases" {
-  for_each    = dbs
+  for_each    = local.dbs
   principal   = var.role_arn
   permissions = ["ALL"]
   database {
@@ -25,7 +25,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_databases" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_tables" {
-  for_each    = dbs
+  for_each    = local.dbs
   principal   = var.role_arn
   permissions = ["ALL"]
   table {
@@ -47,7 +47,7 @@ resource "aws_lakeformation_permissions" "s3_bucket_permissions_de" {
 
 
 resource "aws_lakeformation_permissions" "grant_cadt_databases_de" {
-  for_each    = var.de_role_arn != null ? dbs : {}
+  for_each    = var.de_role_arn != null ? local.dbs : {}
   principal   = var.de_role_arn
   permissions = ["ALL"]
   database {
@@ -56,7 +56,7 @@ resource "aws_lakeformation_permissions" "grant_cadt_databases_de" {
 }
 
 resource "aws_lakeformation_permissions" "grant_cadt_tables_de" {
-  for_each    = var.de_role_arn != null ? dbs : {}
+  for_each    = var.de_role_arn != null ? local.dbs : {}
   principal   = var.de_role_arn
   permissions = ["ALL"]
   table {
