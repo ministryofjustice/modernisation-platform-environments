@@ -43,7 +43,7 @@ locals {
       tags = {
         backup           = "false"
         os-type          = "Linux"
-        Patching         = "Yes"
+        # Patching         = "Yes"
         server-type      = "hmpps-domain-services"
         update-ssm-agent = "patchgroup1"
       }
