@@ -24,7 +24,7 @@ locals {
   federated_query_credentials_secret_arns = local.is_dev_or_test ? [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
-    aws_secretsmanager_secret.oasys.arn
+    aws_secretsmanager_secret.oasys[0].arn
   ] : [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn
