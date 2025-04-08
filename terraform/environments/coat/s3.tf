@@ -82,7 +82,7 @@ module "focus_s3_kms" {
         principals = [
           {
             type        = "AWS"
-            identifiers = ["arn:aws:iam::295814833350:role/focus-reports-replication-role"]
+            identifiers = ["*"]
           }
         ]
       }
