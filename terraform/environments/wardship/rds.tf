@@ -38,32 +38,39 @@ resource "aws_security_group" "postgresql_db_sc" {
   name        = "postgres_security_group"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    description     = "Allows ECS service to access RDS"
-    security_groups = [aws_security_group.ecs_service.id]
+  lifecycle {
+    create_before_destroy = true
   }
+}
 
-  ingress {
-    protocol    = "tcp"
-    description = "Allow PSQL traffic from bastion"
-    from_port   = 5432
-    to_port     = 5432
-    security_groups = [
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-  egress {
-    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-    description = "allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_1" {
+  count                        = local.is-development ? 0 : 1
+  security_group_id            = aws_security_group.postgresql_db_sc[0].id
+  from_port                    = 5432
+  to_port                      = 5432
+  ip_protocol                  = "tcp"
+  description                  = "Allows ECS service to access RDS"
+  referenced_security_group_id = aws_security_group.ecs_service.id
+}
 
+resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_2" {
+  count                        = local.is-development ? 0 : 1
+  security_group_id            = aws_security_group.postgresql_db_sc[0].id
+  from_port                    = 5432
+  to_port                      = 5432
+  ip_protocol                  = "tcp"
+  description                  = "Allow PSQL traffic from bastion"
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
+}
+
+resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+  count                        = local.is-development ? 0 : 1
+  security_group_id            = aws_security_group.postgresql_db_sc[0].id
+  from_port                    = 0
+  to_port                      = 0
+  ip_protocol                  = "-1"
+  description                  = "allow all outbound traffic"
 }
 
 // DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
@@ -99,29 +106,37 @@ resource "aws_security_group" "postgresql_db_sc_dev" {
   name        = "postgres_security_group_dev"
   description = "control access to the database"
   vpc_id      = data.aws_vpc.shared.id
-  ingress {
-    from_port       = 5432
-    to_port         = 5432
-    protocol        = "tcp"
-    description     = "Allows ECS service to access RDS"
-    security_groups = [aws_security_group.ecs_service.id]
+  lifecycle {
+    create_before_destroy = true
   }
-  ingress {
-    protocol    = "tcp"
-    description = "Allow PSQL traffic from bastion"
-    from_port   = 5432
-    to_port     = 5432
-    security_groups = [
-      module.bastion_linux.bastion_security_group
-    ]
-  }
-  egress {
-    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-    description = "allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+}
 
+resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_1_dev" {
+  count                        = local.is-development ? 1 : 0
+  security_group_id            = aws_security_group.postgresql_db_sc_dev[0].id
+  from_port                    = 5432
+  to_port                      = 5432
+  ip_protocol                  = "tcp"
+  description                  = "Allows ECS service to access RDS"
+  referenced_security_group_id = aws_security_group.ecs_service.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_2_dev" {
+  count                        = local.is-development ? 1 : 0
+  security_group_id            = aws_security_group.postgresql_db_sc_dev[0].id
+  from_port                    = 5432
+  to_port                      = 5432
+  ip_protocol                  = "tcp"
+  description                  = "Allow PSQL traffic from bastion"
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
+}
+
+resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1_dev" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+  count                        = local.is-development ? 1 : 0
+  security_group_id            = aws_security_group.postgresql_db_sc_dev[0].id
+  from_port                    = 0
+  to_port                      = 0
+  ip_protocol                  = "-1"
+  description                  = "allow all outbound traffic"
 }

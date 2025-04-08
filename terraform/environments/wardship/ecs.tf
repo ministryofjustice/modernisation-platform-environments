@@ -384,23 +384,27 @@ resource "aws_security_group" "ecs_service" {
   name_prefix = "ecs-service-sg-"
   description = "Control access to the ECS service"
   vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    description     = "Allow traffic on port 80 from load balancer"
-    security_groups = [aws_security_group.wardship_lb_sc.id]
+  lifecycle {
+    create_before_destroy = true
   }
+}
 
-  egress {
-    #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    description = "Allow all outbound traffic"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+resource "aws_vpc_security_group_ingress_rule" "ecs_ingress" {
+  security_group_id            = aws_security_group.ecs_service.id
+  from_port                    = 80
+  to_port                      = 80
+  ip_protocol                  = "tcp"
+  description                  = "Allow traffic on port 80 from load balancer"
+  referenced_security_group_id = aws_security_group.wardship_lb_sc.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "ecs_egress" {
+  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+  security_group_id            = aws_security_group.ecs_service.id
+  from_port                    = 0
+  to_port                      = 0
+  ip_protocol                  = "-1"
+  description                  = "Allow all outbound traffic"
 }
 
 resource "aws_ecr_repository" "wardship_ecr_repo" {
