@@ -67,7 +67,7 @@ resource "aws_sesv2_configuration_set" "ses_configuration_set" {
 }
 
 data "external" "smtp_password" {
-  program = ["python3", "${path.module}/scripts/smtp_password.py"]
+  program = ["python3", "${path.module}/smtp_password.py"]
   query = {
     secret_access_key = aws_iam_access_key.ses_smtp_user.secret
   }
