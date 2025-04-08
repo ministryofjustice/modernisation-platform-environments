@@ -390,6 +390,7 @@ resource "aws_security_group" "ecs_service" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ecs_ingress" {
+  #checkov:skip=CKV_AWS_260: "Rule not applicable - ingress is restricted to load balancer security group only"
   security_group_id            = aws_security_group.ecs_service.id
   from_port                    = 80
   to_port                      = 80
