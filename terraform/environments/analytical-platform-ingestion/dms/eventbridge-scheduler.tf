@@ -1,5 +1,6 @@
 resource "aws_scheduler_schedule" "dms_nightly_full_load" {
   name = "tariff-dms-nightly-full-load"
+  group_name = aws_scheduler_schedule_group.dms_nightly_full_load.name
 
   flexible_time_window {
     mode = "OFF"
@@ -17,4 +18,9 @@ resource "aws_scheduler_schedule" "dms_nightly_full_load" {
       StartReplicationTaskType = "resume-processing"
     })
   }
+}
+
+resource "aws_scheduler_schedule_group" "dms_nightly_full_load" {
+  name = "tariff-dms-nightly-full-load"
+  tags = local.tags
 }

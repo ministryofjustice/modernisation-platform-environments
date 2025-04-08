@@ -29,7 +29,13 @@ resource "aws_iam_role" "eventbridge_dms_full_load_task_role" {
             "apidestinations.events.amazonaws.com"
           ]
         },
-        "Action": "sts:AssumeRole"
+        "Action": "sts:AssumeRole",
+        "Condition": {
+          "StringEquals": {
+            "aws:SourceAccount": data.aws_iam_account_alias.current.id,
+            "aws:SourceArn": aws_scheduler_schedule_group.dms_nightly_full_load.arn
+          }
+        }
       }
     ]
   })
