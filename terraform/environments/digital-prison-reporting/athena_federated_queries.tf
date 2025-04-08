@@ -26,6 +26,7 @@ locals {
     bodmis = local.connection_string_bodmis
   }
 
+
   federated_query_credentials_secret_arns = local.is_dev_or_test ? [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
