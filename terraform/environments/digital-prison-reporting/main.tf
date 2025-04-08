@@ -1033,8 +1033,9 @@ module "generate_test_postgres_data" {
     "--dpr.aws.region"                           = local.account_region
     "--dpr.log.level"                            = local.glue_job_common_log_level
     "--dpr.test.database.secret.id"              = "external/dpr-dps-testing2-source-secrets"
-    "--dpr.test.data.batch.size"                 = 100
+    "--dpr.test.data.batch.size"                 = 10
     "--dpr.test.data.parallelism"                = 5
+    "--dpr.test.data.inter.batch.delay.millis"   = 100
   }
 }
 
