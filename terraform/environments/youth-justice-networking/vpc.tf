@@ -1,25 +1,25 @@
 module "vpc" {
-   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
- 
-   source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
- 
-   name            = "${local.application_name}-${local.environment}"
-   azs             = local.availability_zones
-   cidr            = local.application_data.accounts[local.environment].vpc_cidr
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
+
+  name = "${local.application_name}-${local.environment}"
+  azs  = local.availability_zones
+  cidr = local.application_data.accounts[local.environment].vpc_cidr
   #  private_subnets = local.private_subnets
- 
-   # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
-   enable_flow_log                      = false
-   create_flow_log_cloudwatch_log_group = false
-   create_flow_log_cloudwatch_iam_role  = false
-   flow_log_max_aggregation_interval    = 60
- 
-   tags = local.tags
- }
- 
+
+  # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
+  enable_flow_log                      = false
+  create_flow_log_cloudwatch_log_group = false
+  create_flow_log_cloudwatch_iam_role  = false
+  flow_log_max_aggregation_interval    = 60
+
+  tags = local.tags
+}
 
 
- # Create Internet Gateway
+
+# Create Internet Gateway
 resource "aws_internet_gateway" "main" {
   vpc_id = module.vpc.vpc_id
 
@@ -100,8 +100,8 @@ resource "aws_route_table" "juniper_route_table" {
 # Add a route to the Internet Gateway
 resource "aws_route" "juniper_igw_route" {
   route_table_id         = aws_route_table.juniper_route_table.id
-  destination_cidr_block = "0.0.0.0/0"  # Route all internet-bound traffic
-  gateway_id             = aws_internet_gateway.main.id  # Reference to the IGW
+  destination_cidr_block = "0.0.0.0/0"                  # Route all internet-bound traffic
+  gateway_id             = aws_internet_gateway.main.id # Reference to the IGW
 }
 
 
@@ -128,26 +128,29 @@ resource "aws_eip" "eips" {
       "Temp vSRX2 Cert Interface"
     ][count.index]
   }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 # Associate the first 3 EIPs to vsrx01's network interfaces
 resource "aws_eip_association" "vsrx01_eip_associations" {
-  count               = 3
+  count = 3
   network_interface_id = [
     aws_network_interface.vsrx01_enis["vSRX01 Management Interface"].id,
     aws_network_interface.vsrx01_enis["vSRX01 PSK External Interface"].id,
     aws_network_interface.vsrx01_enis["vSRX01 Cert External Interface"].id
   ][count.index]
-  allocation_id        = aws_eip.eips[count.index].id
+  allocation_id = aws_eip.eips[count.index].id
 }
 
 # Associate the next 3 EIPs to vsrx02's network interfaces
 resource "aws_eip_association" "vsrx02_eip_associations" {
-  count               = 3
+  count = 3
   network_interface_id = [
     aws_network_interface.vsrx02_enis["vSRX02 Management Interface"].id,
     aws_network_interface.vsrx02_enis["vSRX02 PSK External Interface"].id,
     aws_network_interface.vsrx02_enis["vSRX02 Cert External Interface"].id
   ][count.index]
-  allocation_id        = aws_eip.eips[count.index + 3].id
+  allocation_id = aws_eip.eips[count.index + 3].id
 }
