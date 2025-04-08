@@ -136,4 +136,14 @@ module "focus_reports" {
   versioning = {
     status = "Enabled"
   }
+
+  lifecycle_rule = [
+    {
+      id      = "DeleteOldVersions"
+      enabled = "Enabled"
+      noncurrent_version_expiration = {
+        days = 1
+      }
+    }
+  ]
 }
