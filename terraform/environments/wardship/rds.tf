@@ -67,8 +67,6 @@ resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1" {
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   count                        = local.is-development ? 0 : 1
   security_group_id            = aws_security_group.postgresql_db_sc[0].id
-  from_port                    = 0
-  to_port                      = 0
   ip_protocol                  = "-1"
   description                  = "allow all outbound traffic"
   cidr_ipv4                    = "0.0.0.0/0"
@@ -134,11 +132,9 @@ resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_2_dev" {
 
 resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1_dev" {
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
-  count                        = local.is-development ? 1 : 0
-  security_group_id            = aws_security_group.postgresql_db_sc_dev[0].id
-  from_port                    = 0
-  to_port                      = 0
-  ip_protocol                  = "-1"
-  description                  = "allow all outbound traffic"
-  cidr_ipv4                    = "0.0.0.0/0"
+  count             = local.is-development ? 1 : 0
+  security_group_id = aws_security_group.postgresql_db_sc_dev[0].id
+  ip_protocol      = "-1"
+  description      = "allow all outbound traffic"
+  cidr_ipv4        = "0.0.0.0/0"
 }
