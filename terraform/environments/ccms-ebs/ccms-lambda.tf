@@ -33,7 +33,7 @@ resource "aws_security_group" "lambda_security_group" {
 resource "aws_security_group_rule" "ingress_oracledb" {
   type              = "ingress"
   from_port         = 1521
-  to_port           = 1521
+  to_port           = 1522
   protocol          = "tcp"
   cidr_blocks       = [data.aws_vpc.shared.cidr_block]
   security_group_id = aws_security_group.lambda_security_group.id
