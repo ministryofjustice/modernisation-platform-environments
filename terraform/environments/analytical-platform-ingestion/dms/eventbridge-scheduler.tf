@@ -13,7 +13,7 @@ resource "aws_scheduler_schedule" "dms_nightly_full_load" {
 
     input = jsonencode({
       ReplicationTaskArn       = module.cica_dms_tariff_dms_implementation.dms_full_load_task_arn
-      StartReplicationTaskType = "start-replication"
+      StartReplicationTaskType = "resume-processing"
     })
   }
 }
