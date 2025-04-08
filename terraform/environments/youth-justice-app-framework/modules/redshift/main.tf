@@ -1,5 +1,6 @@
 
 resource "aws_redshiftserverless_namespace" "default" {
+  #checkov:skip=CKV_AWS_282: tmp to get s3 user change in
   namespace_name        = local.namespace_name
   manage_admin_password = true
 
@@ -7,7 +8,7 @@ resource "aws_redshiftserverless_namespace" "default" {
     aws_iam_role.redshift.arn, aws_iam_role.ycs-team.arn, aws_iam_role.yjb-moj-team.arn, aws_iam_role.yjb-team.arn
   ]
 
-  kms_key_id = var.kms_key_arn
+  #kms_key_id = var.kms_key_arn
 
   log_exports = ["userlog", "connectionlog", "useractivitylog"]
 

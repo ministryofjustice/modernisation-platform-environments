@@ -74,6 +74,7 @@ module "autoscaling" {
     AmazonEC2RoleforSSM                 = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
     AmazonEC2ContainerServiceforEC2Role = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
     ecs-fetch-secrets-policy            = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+    AmazonS3FullAccess                  = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
     ecs-eni-policy                      = aws_iam_policy.ecs-eni-policy.arn
     ecs-secrets-policy                  = aws_iam_policy.ecs-secrets-policy.arn
   }

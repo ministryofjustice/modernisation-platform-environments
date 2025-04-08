@@ -10,14 +10,14 @@ resource "aws_db_instance" "rdsdb" {
   #checkov:skip=CKV2_AWS_60: "Copy tags to snapshots not required as final snapshots are disabled"
   allocated_storage = local.application_data.accounts[local.environment].allocated_storage
   //db_name                 = DBName must be null for engine: sqlserver-se
-  storage_type      = local.application_data.accounts[local.environment].storage_type
-  identifier        = local.application_data.accounts[local.environment].db_identifier
-  engine            = local.application_data.accounts[local.environment].engine
-  engine_version    = local.application_data.accounts[local.environment].engine_version
-  instance_class    = local.application_data.accounts[local.environment].instance_class
-  username          = local.application_data.accounts[local.environment].username
-  password          = random_password.password.result
-  port              = 1433
+  storage_type   = local.application_data.accounts[local.environment].storage_type
+  identifier     = local.application_data.accounts[local.environment].db_identifier
+  engine         = local.application_data.accounts[local.environment].engine
+  engine_version = local.application_data.accounts[local.environment].engine_version
+  instance_class = local.application_data.accounts[local.environment].instance_class
+  username       = local.application_data.accounts[local.environment].username
+  password       = random_password.password.result
+  port           = 1433
 
   auto_minor_version_upgrade = true
   skip_final_snapshot        = true
@@ -25,8 +25,8 @@ resource "aws_db_instance" "rdsdb" {
   license_model       = "license-included"
   publicly_accessible = false
 
-  multi_az             = false
-  db_subnet_group_name = aws_db_subnet_group.db_subnet_group.name
+  multi_az               = false
+  db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
   vpc_security_group_ids = [aws_security_group.sqlserver_db_sc.id]
 
   tags = {
@@ -54,17 +54,17 @@ resource "aws_security_group" "sqlserver_db_sc" {
     ]
   }
   ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    description = "Allows ECS cluster to access RDS"
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows ECS cluster to access RDS"
     security_groups = [aws_security_group.cluster_ec2.id]
   }
   ingress {
-    from_port   = 1433
-    to_port     = 1433
-    protocol    = "tcp"
-    description = "Allows each Tribunal ECS service to access RDS"
+    from_port       = 1433
+    to_port         = 1433
+    protocol        = "tcp"
+    description     = "Allows each Tribunal ECS service to access RDS"
     security_groups = [aws_security_group.ecs_service.id]
   }
   egress {

@@ -1,6 +1,8 @@
 #### This file can be used to store locals specific to the member account ####
 #### DPR Specific ####
 locals {
+
+  is_dev_or_test       = local.is-development || local.is-test
   project              = local.application_data.accounts[local.environment].project_short_id
   analytics_project_id = "analytics"
 
@@ -322,6 +324,16 @@ locals {
     port     = "1522"
   }
 
+  # OASys Secrets PlaceHolder
+  oasys_secrets_placeholder = {
+    db_name  = "oasys"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
   # DPS Secrets PlaceHolder
   dps_domains_list = local.application_data.accounts[local.environment].dps_domains
   dps_secrets_placeholder = {
@@ -438,4 +450,6 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"
   ]
+
+  create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 }
