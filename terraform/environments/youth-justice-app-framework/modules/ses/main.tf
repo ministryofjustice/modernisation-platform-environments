@@ -1,3 +1,12 @@
+terraform {
+  required_providers {
+    external = {
+      source  = "hashicorp/external"
+      version = "~> 2.3"
+    }
+  }
+}
+
 resource "aws_ses_domain_identity" "main" {
   for_each = var.ses_domain_identities
 
