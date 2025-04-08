@@ -10,12 +10,17 @@ locals {
   oasys_port               = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["port"]: ""
   oasys_service_name       = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["db_name"]: ""
   connection_string_oasys  = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.oasys[0].name}}@//${local.oasys_host}:${local.oasys_port}/${local.oasys_service_name}": ""
+  onr_host                 = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["endpoint"] : ""
+  onr_port                 = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["port"]: ""
+  onr_service_name         = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["db_name"]: ""
+  connection_string_onr    = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.onr[0].name}}@//${local.onr_host}:${local.onr_port}/${local.onr_service_name}": ""
 
   # OASys is currently only included in Dev and Test
   federated_query_connection_strings_map = local.is_dev_or_test ? {
     nomis  = local.connection_string_nomis
     bodmis = local.connection_string_bodmis
     oasys  = local.connection_string_oasys
+    onr    = local.connection_string_onr
   } : {
     nomis  = local.connection_string_nomis
     bodmis = local.connection_string_bodmis
@@ -24,7 +29,8 @@ locals {
   federated_query_credentials_secret_arns = local.is_dev_or_test ? [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
-    aws_secretsmanager_secret.oasys[0].arn
+    aws_secretsmanager_secret.oasys[0].arn,
+    aws_secretsmanager_secret.onr[0].arn
   ] : [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn
@@ -93,6 +99,19 @@ resource "aws_athena_data_catalog" "oasys_catalog" {
 
   name        = "oasys"
   description = "OASys Athena data catalog"
+  type        = "LAMBDA"
+
+  parameters = {
+    "function" = module.athena_federated_query_connector_oracle.lambda_function_arn
+  }
+}
+
+# Adds an Athena data source / catalog for ONR
+resource "aws_athena_data_catalog" "onr_catalog" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  name        = "onr"
+  description = "ONR Athena data catalog"
   type        = "LAMBDA"
 
   parameters = {
