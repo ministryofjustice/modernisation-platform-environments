@@ -10,6 +10,8 @@ module "s3_cica_dms_ingress_kms" {
   multi_region          = true
 
   deletion_window_in_days = 7
+
+  tags = local.tags
 }
 
 module "cica_dms_credentials_kms" {
@@ -28,6 +30,29 @@ module "cica_dms_credentials_kms" {
   grants = {
     dms_source = {
       grantee_principal = module.cica_dms_tariff_dms_implementation.dms_source_role_arn
+      operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+    }
+  }
+
+  tags = local.tags
+}
+
+module "cica_dms_eventscheduler_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.0"
+
+  aliases               = ["dms/cica-eventscheduler"]
+  description           = "Used in the CICA DMS Solution EventScheduler to encode EventBridge Scheduler"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  # Grants
+  grants = {
+    dms_source = {
+      grantee_principal = aws_iam_role.eventbridge_dms_full_load_task_role.arn
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
   }
