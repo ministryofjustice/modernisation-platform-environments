@@ -112,4 +112,8 @@ module "focus_reports" {
       }
     }
   }
+
+  versioning = {
+    status = "Enabled"
+  }
 }
