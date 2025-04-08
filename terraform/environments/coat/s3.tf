@@ -97,7 +97,7 @@ module "focus_reports" {
   version = "4.3.0"
 
   bucket = "coat-${local.environment}-focus-reports"
-
+  object_ownership = "BucketOwnerEnforced"
   force_destroy = true
 
   attach_deny_insecure_transport_policy = true
