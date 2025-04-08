@@ -66,7 +66,7 @@ resource "aws_security_group" "internal_sg" {
     description = "Branch Juniper PSK Interface 1 access to KMS Server on port 80"
   }
 
-ingress {
+  ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -90,7 +90,7 @@ ingress {
     description = "Sandpit YJSM to CUG Junipers port 8080 - 8090"
   }
 
-ingress {
+  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -98,7 +98,7 @@ ingress {
     description = "Sandpit YJSM to CUG Junipers port 80"
   }
 
-ingress {
+  ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -114,7 +114,7 @@ ingress {
     description = "Pre-Prod YJSM to CUG Junipers port 8080 - 8090"
   }
 
-ingress {
+  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -122,7 +122,7 @@ ingress {
     description = "Pre-Prod YJSM to CUG Junipers port 80"
   }
 
-ingress {
+  ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -130,7 +130,7 @@ ingress {
     description = "Pre-Prod YJSM to CUG Junipers port 443"
   }
 
-ingress {
+  ingress {
     from_port   = 9103
     to_port     = 9103
     protocol    = "tcp"
@@ -146,7 +146,7 @@ ingress {
     description = "Prod YJSM to CUG Junipers port 8080 - 8090"
   }
 
-ingress {
+  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -154,7 +154,7 @@ ingress {
     description = "Prod YJSM to CUG Junipers port 80"
   }
 
-ingress {
+  ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
@@ -162,7 +162,7 @@ ingress {
     description = "Prod YJSM to CUG Junipers port 443"
   }
 
-ingress {
+  ingress {
     from_port   = 9103
     to_port     = 9103
     protocol    = "tcp"
@@ -170,14 +170,14 @@ ingress {
     description = "Prod YJSM to CUG Junipers port 9103"
   }
 
-ingress {
+  ingress {
     from_port   = 514
     to_port     = 514
     protocol    = "udp"
     cidr_blocks = ["10.100.120.0/24"]
     description = "Internal Juniper vSRX01 access to syslog server"
   }
-  
+
   ingress {
     from_port   = 80
     to_port     = 80
@@ -185,7 +185,7 @@ ingress {
     cidr_blocks = ["10.100.120.0/24"]
     description = "Internal Juniper vSRX01 access to KMS website on port 80"
   }
-  
+
   ingress {
     from_port   = 443
     to_port     = 443
@@ -193,7 +193,7 @@ ingress {
     cidr_blocks = ["10.100.120.0/24"]
     description = "Internal Juniper vSRX01 access to KMS website on port 443"
   }
-  
+
   ingress {
     from_port   = 514
     to_port     = 514
@@ -201,7 +201,7 @@ ingress {
     cidr_blocks = ["10.100.220.0/24"]
     description = "Internal Juniper vSRX02 access to syslog server"
   }
-  
+
   ingress {
     from_port   = 80
     to_port     = 80
@@ -209,7 +209,7 @@ ingress {
     cidr_blocks = ["10.100.220.0/24"]
     description = "Internal Juniper vSRX02 access to KMS website on port 80"
   }
-  
+
   ingress {
     from_port   = 443
     to_port     = 443
@@ -217,7 +217,7 @@ ingress {
     cidr_blocks = ["10.100.220.0/24"]
     description = "Internal Juniper vSRX02 access to KMS website on port 443"
   }
-  
+
   ingress {
     from_port   = 80
     to_port     = 80
@@ -233,32 +233,32 @@ ingress {
 
 # EC2 Instance (vSRX01)
 resource "aws_instance" "vsrx01" {
-  ami                         = "ami-0ad7c5b240d3318e2"  # Replace with correct AMI ID
-  instance_type               = "c5.xlarge"
-  key_name                    = "Juniper_KeyPair"       # Replace with your SSH key name
+  ami           = "ami-0ad7c5b240d3318e2" # Replace with correct AMI ID
+  instance_type = "c5.xlarge"
+  key_name      = "Juniper_KeyPair" # Replace with your SSH key name
 
   # Attach the Management Interface
   network_interface {
     network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 Management Interface"].id
-    device_index         = 0  # Primary interface (eth0)
+    device_index         = 0 # Primary interface (eth0)
   }
 
   # Attach the PSK External Interface
   network_interface {
     network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 PSK External Interface"].id
-    device_index         = 1  # Secondary interface (eth1)
-  }
-
-  # Attach the Cert External Interface
-  network_interface {
-    network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 Cert External Interface"].id
-    device_index         = 2  # Tertiary interface (eth2)
+    device_index         = 1 # Secondary interface (eth1)
   }
 
   # Attach the Internal Interface
   network_interface {
     network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 Internal Interface"].id
-    device_index         = 3  # Quaternary interface (eth3)
+    device_index         = 2 # Quaternary interface (eth2)
+  }
+
+  # Attach the Cert External Interface
+  network_interface {
+    network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 Cert External Interface"].id
+    device_index         = 3 # Tertiary interface (eth3)
   }
 
   tags = merge(local.tags, {
@@ -268,33 +268,35 @@ resource "aws_instance" "vsrx01" {
 
 # EC2 Instance (vSRX02)
 resource "aws_instance" "vsrx02" {
-  ami                         = "ami-0ad7c5b240d3318e2"  # Replace with correct AMI ID
-  instance_type               = "c5.xlarge"
-  key_name                    = "Juniper_KeyPair"       # Replace with your SSH key name
+  ami           = "ami-0ad7c5b240d3318e2" # Replace with correct AMI ID
+  instance_type = "c5.xlarge"
+  key_name      = "Juniper_KeyPair" # Replace with your SSH key name
 
   # Attach the Management Interface
   network_interface {
     network_interface_id = aws_network_interface.vsrx02_enis["vSRX02 Management Interface"].id
-    device_index         = 0  # Primary interface (eth0)
+    device_index         = 0 # Primary interface (eth0)
   }
 
   # Attach the PSK External Interface
   network_interface {
     network_interface_id = aws_network_interface.vsrx02_enis["vSRX02 PSK External Interface"].id
-    device_index         = 1  # Secondary interface (eth1)
-  }
-
-  # Attach the Cert External Interface
-  network_interface {
-    network_interface_id = aws_network_interface.vsrx02_enis["vSRX02 Cert External Interface"].id
-    device_index         = 2  # Tertiary interface (eth2)
+    device_index         = 1 # Secondary interface (eth1)
   }
 
   # Attach the Internal Interface
   network_interface {
     network_interface_id = aws_network_interface.vsrx02_enis["vSRX02 Internal Interface"].id
-    device_index         = 3  # Quaternary interface (eth3)
+    device_index         = 2 # Quaternary interface (eth2)
   }
+
+  # Attach the Cert External Interface
+  network_interface {
+    network_interface_id = aws_network_interface.vsrx02_enis["vSRX02 Cert External Interface"].id
+    device_index         = 3 # Tertiary interface (eth3)
+  }
+
+
 
   tags = merge(local.tags, {
     Name = "Juniper vSRX02"
