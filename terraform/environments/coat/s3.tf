@@ -67,6 +67,26 @@ module "focus_s3_kms" {
   aliases               = ["s3/focus"]
   description           = "S3 FOCUS KMS key"
   enable_default_policy = true
+    key_statements = [
+      {
+        sid = "AllowReplicationRole"
+        actions = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        resources = ["*"]
+        effect    = "Allow"
+        principals = [
+          {
+            type        = "AWS"
+            identifiers = ["arn:aws:iam::295814833350:role/focus-reports-replication-role"]
+          }
+        ]
+      }
+    ]
 
   deletion_window_in_days = 7
 
