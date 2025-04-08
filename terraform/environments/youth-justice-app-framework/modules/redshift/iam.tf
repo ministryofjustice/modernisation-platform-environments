@@ -42,7 +42,8 @@ resource "aws_iam_policy" "rds-aurora-postgres-secret" {
           "secretsmanager:GetResourcePolicy",
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret",
-          "secretsmanager:ListSecretVersionIds"
+          "secretsmanager:ListSecretVersionIds",
+          
         ],
         "Resource" : [
           var.rds_redshift_secret_arn
@@ -56,6 +57,14 @@ resource "aws_iam_policy" "rds-aurora-postgres-secret" {
           "secretsmanager:ListSecrets"
         ],
         "Resource" : "*"
+      },
+      {
+        "Sid" : "AccessSecretKey",
+        "Effect" : "Allow",
+        "Action" : [
+          "kms:Decrypt"
+        ],
+        "Resource" : var.kms_key_arn
       }
     ]
   })
