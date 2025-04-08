@@ -1,6 +1,10 @@
 # S3 bucket to store lambda code/packages
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "lambda" {
+  #checkov:skip=CKV_AWS_18:Logging not needed
+  #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
+  #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required
   bucket_prefix = "${var.db}-lambda-functions-"
 
   tags = var.tags
@@ -37,6 +41,10 @@ resource "aws_s3_bucket_versioning" "lambda" {
 # S3 bucket - Landing
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "landing" {
+  #checkov:skip=CKV_AWS_18:Logging not needed
+  #checkov:skip=CKV_AWS_21:Versioning not needed
+  #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required
   bucket_prefix = "${var.db}-landing-"
 }
 
@@ -99,6 +107,11 @@ resource "aws_s3_bucket_notification" "landing" {
 # but in that case it is assumed all related aws_s3_bucket_* resources are being managed externally
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "raw_history" {
+  #checkov:skip=CKV_AWS_18:Logging not needed
+  #checkov:skip=CKV_AWS_21:Versioning not needed
+  #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
+  #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required
   count = length(var.output_bucket) > 0 ? 0 : 1
   bucket_prefix = "${var.db}-raw-history-"
 }
@@ -149,6 +162,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "raw_history" {
 # Invalid bucket
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "invalid" {
+  #checkov:skip=CKV_AWS_18:Logging not needed
+  #checkov:skip=CKV_AWS_21:Versioning not needed
+  #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
+  #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required
   bucket_prefix = "${var.db}-invalid-"
 }
 
@@ -190,6 +208,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "invalid" {
 # Bucket to store premigration-assessment
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "premigration_assessment" {
+  #checkov:skip=CKV_AWS_18:Logging not needed
+  #checkov:skip=CKV_AWS_21:Versioning not needed
+  #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
+  #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required
   count = var.create_premigration_assessement_resources ? 1 : 0
   bucket_prefix = "${var.db}-pma-"
 }
