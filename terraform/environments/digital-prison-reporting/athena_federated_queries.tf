@@ -15,7 +15,7 @@ locals {
   onr_service_name         = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["db_name"]: ""
   connection_string_onr    = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.onr[0].name}}@//${local.onr_host}:${local.onr_port}/${local.onr_service_name}": ""
 
-  # OASys is currently only included in Dev and Test
+  # OASys and ONR are currently only included in Dev and Test
   federated_query_connection_strings_map = local.is_dev_or_test ? {
     nomis  = local.connection_string_nomis
     bodmis = local.connection_string_bodmis
