@@ -29,26 +29,6 @@ resource "aws_security_group" "lambda_security_group" {
   )
 }
 
-#--Ingresses
-resource "aws_security_group_rule" "ingress_oracledb" {
-  type              = "ingress"
-  from_port         = 1521
-  to_port           = 1522
-  protocol          = "tcp"
-  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
-  security_group_id = aws_security_group.lambda_security_group.id
-}
-
-#--Egresses
-resource "aws_security_group_rule" "egress_all" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1" #--Any
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.lambda_security_group.id
-}
-
 # Lambda Function
 resource "aws_lambda_function" "lambda_function" {
   function_name = "${local.application_name}-${local.environment}-payment-load"
