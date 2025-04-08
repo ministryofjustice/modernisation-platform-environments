@@ -1,6 +1,10 @@
 #S3 bucket to store source metadata
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "validation_metadata" {
+  #checkov:skip=CKV_AWS_18:Logging not needed
+  #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
+  #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required
   bucket_prefix = "${var.db}-metadata-"
 
   tags = var.tags
@@ -145,6 +149,7 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
 # Create security group for Lambda function
 #trivy:ignore:AVD-AWS-0104: Allow all egress traffic
 resource "aws_security_group" "metadata_generator_lambda_function" {
+  #checkov:skip=CKV2_AWS_5: False positive, see https://github.com/bridgecrewio/checkov/issues/3010
   #checkov:skip=CKV_AWS_382: Allow all egress traffic
   name        = "${var.db}-metadata-generator-lambda-function"
   vpc_id      = var.vpc_id
