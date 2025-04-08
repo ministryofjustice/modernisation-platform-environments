@@ -69,10 +69,10 @@ resource "aws_iam_role_policy" "eventbridge_dms_full_load_task_role" {
     "Version": "2012-10-17",
     "Statement": [
       {
-        "Sid": "AllowWildcardDmsAccess",
+        "Sid": "AllowDmsTaskAccess",
         "Effect": "Allow",
-        "Action": "dms:*",
-        "Resource": "*"
+        "Action": "dms:StartReplicationTask",
+        "Resource": module.cica_dms_tariff_dms_implementation.dms_full_load_task_arn
       }
     ]
   })
