@@ -107,11 +107,13 @@ resource "aws_s3_bucket_notification" "landing" {
 # but in that case it is assumed all related aws_s3_bucket_* resources are being managed externally
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "raw_history" {
+  #checkov:skip=CKV2_AWS_6:False positive, Public access block attached via data.raw_history instead of resource
   #checkov:skip=CKV_AWS_18:Logging not needed
   #checkov:skip=CKV_AWS_21:Versioning not needed
   #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
   #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
   #checkov:skip=CKV_AWS_144:Cross-region replication not required
+  #checkov:skip=CKV_AWS_145:False positive, KMS envryption attached via data.raw_history instead of resource
   count = length(var.output_bucket) > 0 ? 0 : 1
   bucket_prefix = "${var.db}-raw-history-"
 }
