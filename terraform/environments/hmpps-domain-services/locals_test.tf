@@ -223,7 +223,7 @@ locals {
                 test     = "StringEquals"
                 variable = "aws:userId"
                 values   = [
-                  "arn:aws:iam::*:user/modernisation-platform-developer"
+                  "arn:aws:iam::*:user/sso-*"
                 ]
               }
             ]
