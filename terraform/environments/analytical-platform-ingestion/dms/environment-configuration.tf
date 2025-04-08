@@ -19,7 +19,7 @@ locals {
       tariff_cidr                   = "10.27.80.0/21"
 
       /* CICA Source databases */
-      source_database_sid           = "AddProductionDatabaseHere"
+      source_database_sid           = "live.cica.gov.uk"
       /* analytical-plafrom-ingestion-production resources */
       ap_data_glue_catalog_arn = "arn:aws:glue:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:catalog"
     }
