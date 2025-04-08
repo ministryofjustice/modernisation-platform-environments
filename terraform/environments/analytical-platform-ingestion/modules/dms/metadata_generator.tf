@@ -178,7 +178,7 @@ module "metadata_generator" {
   function_name           = "${var.db}-metadata-generator"
   description             = "Lambda to generate metadata for ${var.db} DMS data output"
   handler                 = "main.handler"
-  runtime                 = "python3.12"
+  runtime                 = "python3.13"
   memory_size             = 512
   timeout                 = 60
   architectures           = ["x86_64"]
