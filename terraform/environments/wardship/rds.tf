@@ -71,6 +71,7 @@ resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1" {
   to_port                      = 0
   ip_protocol                  = "-1"
   description                  = "allow all outbound traffic"
+  cidr_ipv4                    = "0.0.0.0/0"
 }
 
 // DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
@@ -139,4 +140,5 @@ resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1_dev" {
   to_port                      = 0
   ip_protocol                  = "-1"
   description                  = "allow all outbound traffic"
+  cidr_ipv4                    = "0.0.0.0/0"
 }

@@ -405,6 +405,7 @@ resource "aws_vpc_security_group_egress_rule" "ecs_egress" {
   to_port                      = 0
   ip_protocol                  = "-1"
   description                  = "Allow all outbound traffic"
+  cidr_ipv4                    = "0.0.0.0/0"
 }
 
 resource "aws_ecr_repository" "wardship_ecr_repo" {
