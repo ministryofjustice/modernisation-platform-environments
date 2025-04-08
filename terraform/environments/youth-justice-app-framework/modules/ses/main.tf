@@ -70,5 +70,6 @@ data "external" "smtp_password" {
   program = ["python3", "${path.module}/smtp_password.py"]
   query = {
     secret_access_key = aws_iam_access_key.ses_smtp_user.secret
+    region            = "eu-west-2"
   }
 }
