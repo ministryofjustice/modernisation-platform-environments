@@ -213,20 +213,19 @@ locals {
           {
             effect = "Deny"
             actions = [
-              "ssm:StartSession",
+              "ec2:*",
             ]
             resources = [
               "arn:aws:ec2:*:*:instance/i-0a5ade7b4aed30541",
-              "arn:aws:ssm:*:*:managed-instance/i-0a5ade7b4aed30541",
-              "arn:aws:ssm:*:*:document/AWSFleetManager-GetDiskInformation",
-              "arn:aws:ssm:*:*:document/AWSFleetManager-GetFileContent",
-              "arn:aws:ssm:*:*:document/AWSFleetManager-GetFileSystemContent",
-              "arn:aws:ssm:*:*:document/AWSFleetManager-GetGroups",
-              "arn:aws:ssm:*:*:document/AWSFleetManager-GetPerformanceCounters",
-              "arn:aws:ssm:*:*:document/AWSFleetManager-GetProcessDetails",
-              "arn:aws:ssm:*:*:document/AWSFleetManager-GetUsers",
-              "arn:aws:ssm:*:*:document/AWSFleetManager-GetWindowsEvents",
-              "arn:aws:ssm:*:*:document/AWSFleetManager-GetWindowsRegistryContent"
+            ]
+            conditions = [
+              {
+                test     = "StringEquals"
+                variable = "aws:userId"
+                values   = [
+                  "arn:aws:iam::*:user/sso-user"
+                ]
+              }
             ]
           }
         ]
