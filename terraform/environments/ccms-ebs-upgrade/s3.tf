@@ -293,6 +293,11 @@ resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
 
 # Development
 moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-development-logging"]
+}
+
+moved {
   from = module.s3-bucket-artefacts.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]
   to   = module.s3-bucket-artefacts.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-development-logging"]
 }
@@ -303,6 +308,11 @@ moved {
 }
 
 # Test
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-upgrade-test-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-test-logging"]
+}
+
 moved {
   from = module.s3-bucket-artefacts.aws_s3_bucket_logging.default["ccms-ebs-upgrade-test-logging"]
   to   = module.s3-bucket-artefacts.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-test-logging"]
