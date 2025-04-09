@@ -299,8 +299,8 @@ moved {
 }
 
 moved {
-  from = module.s3-bucket-artefacts.aws_s3_bucket_logging.default["ccms-ebs-sandbox-logging"]
-  to   = module.s3-bucket-artefacts.aws_s3_bucket_logging.default_single_name["ccms-ebs-sandbox-logging"]
+  from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-sandbox-logging"]
+  to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-sandbox-logging"]
 }
 
 moved {
