@@ -9,11 +9,12 @@ locals {
     "production"    = ""
     "preproduction" = "-pp"
     "test"          = ""
-    "development"   = "-dev"
+    "development"   = ""
   }
-  camel-sid      = join("", [for word in split("-", var.name) : title(word)])
-  suffix         = var.environment != "production" ? "_${local.env_map[var.environment]}" : ""
-  snake-database = "${replace(var.database_name, "-", "_")}${local.suffix}"
+  camel-sid        = join("", [for word in split("-", var.name) : title(word)])
+  suffix           = var.environment != "production" ? "_${local.env_map[var.environment]}" : ""
+  snake-database   = "${replace(var.database_name, "-", "_")}${local.suffix}"
+  role_name_suffix = var.full_reload ? "full-reload-${var.name}${local.env_suffixes[var.environment]}" : "load-${var.name}${local.env_suffixes[var.environment]}"
 }
 
 data "aws_region" "current" {}

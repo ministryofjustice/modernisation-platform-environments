@@ -2,10 +2,11 @@ locals {
   account_map = {
     "production"    = "prod"
     "preproduction" = "prod"
-    "test"          = "dev"
+    "test"          = "test"
     "development"   = "dev"
   }
-  role_name = "airflow-${local.account_map[var.environment]}-${var.role_name_suffix}"
+
+  role_name = var.new_airflow ? "mwaa:airflow-${local.account_map[var.environment]}-electronic-monitoring-data-store-${var.role_name_suffix}" : "airflow-${local.account_map[var.environment]}-${var.role_name_suffix}"
 }
 
 # --------------------------------------------
