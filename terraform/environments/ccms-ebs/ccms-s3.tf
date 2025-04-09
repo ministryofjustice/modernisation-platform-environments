@@ -1,6 +1,7 @@
 # S3 Bucket - Artefacts
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.0"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name = local.artefact_bucket_name
   #  bucket_prefix      = "s3-bucket-example"
@@ -96,7 +97,8 @@ data "aws_iam_policy_document" "artefacts_s3_policy" {
 
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.0"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
@@ -202,7 +204,8 @@ data "aws_iam_policy_document" "logging_s3_policy" {
 
 # S3 Bucket - R-sync
 module "s3-bucket-dbbackup" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.0"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = true
