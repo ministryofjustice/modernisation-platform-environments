@@ -117,6 +117,7 @@ module "ap_database_sharing" {
   secret_code          = var.secret_code
   oidc_arn             = var.oidc_arn
   max_session_duration = var.max_session_duration
+  new_airflow          = var.new_airflow
 }
 
 module "share_dbs_with_roles" {
