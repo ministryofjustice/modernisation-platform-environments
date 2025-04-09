@@ -13,7 +13,7 @@ module "cica_dms_tariff_dms_implementation" {
 
     dms_replication_instance = {
         replication_instance_id    = local.resource_name
-        subnet_ids                 = local.environment_configuration.connected_vpc_private_subnets
+        subnet_cidrs               = local.environment_configuration.connected_vpc_private_subnets
         subnet_group_name          = local.resource_name
         allocated_storage          = 20
         availability_zone          = data.aws_availability_zones.available.names[0]

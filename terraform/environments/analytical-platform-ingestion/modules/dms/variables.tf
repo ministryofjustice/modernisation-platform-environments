@@ -18,7 +18,7 @@ variable "dms_replication_instance" {
     replication_instance_id      = string
     subnet_group_id              = optional(string)
     subnet_group_name            = optional(string)
-    subnet_ids                   = optional(list(string))
+    subnet_cidrs                 = optional(list(string))
     allocated_storage            = number
     availability_zone            = string
     engine_version               = string
