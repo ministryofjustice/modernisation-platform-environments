@@ -19,8 +19,8 @@ locals {
       #       "target_environment" = "test"
     },
     "dev" = {
-      #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
-      #       "target_environment" = "test"
+      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+      "target_environment" = "test"
     },
     "test" = {
       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]

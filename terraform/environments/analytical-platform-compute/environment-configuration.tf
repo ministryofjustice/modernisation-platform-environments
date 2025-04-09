@@ -13,7 +13,10 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = ["10.0.0.0/8"]
+      transit_gateway_routes = [
+        "10.0.0.0/8",
+        "172.20.0.0/16"
+      ]
 
       /* Route53 */
       route53_zone = "compute.development.analytical-platform.service.justice.gov.uk"
@@ -38,9 +41,6 @@ locals {
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-development"
 
-      /* QuickSight */
-      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
-
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
@@ -62,7 +62,10 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = ["10.0.0.0/8"]
+      transit_gateway_routes = [
+        "10.0.0.0/8",
+        "172.20.0.0/16"
+      ]
 
       /* Route53 */
       route53_zone = "compute.test.analytical-platform.service.justice.gov.uk"
@@ -87,9 +90,6 @@ locals {
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-test"
 
-      /* QuickSight */
-      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
-
       /* UI */
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
 
@@ -111,7 +111,10 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = ["10.0.0.0/8"]
+      transit_gateway_routes = [
+        "10.0.0.0/8",
+        "172.20.0.0/16"
+      ]
 
       /* Route53 */
       route53_zone = "compute.analytical-platform.service.justice.gov.uk"
@@ -136,9 +139,6 @@ locals {
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"
 
-      /* QuickSight */
-      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
-
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
 
@@ -149,7 +149,7 @@ locals {
 
       /* LF Domain Tags */
       cadet_lf_tags = {
-        domain = ["bold", "civil", "courts", "general", "criminal_history", "development_sandpit", "electronic_monitoring", "finance", "interventions", "opg", "performance", "risk", "people", "prison", "probation", "staging", "victims", "victims_case_management", "cica", "data_first", "laa"] # extracted from bucket paths
+        domain = ["bold", "civil", "courts", "general", "criminal_history", "development_sandpit", "electronic_monitoring", "finance", "interventions", "opg", "performance", "risk", "people", "prison", "probation", "staging", "victims", "victims_case_management", "cica", "data_first", "laa", "corporate", "property"] # extracted from bucket paths
       }
     }
   }
