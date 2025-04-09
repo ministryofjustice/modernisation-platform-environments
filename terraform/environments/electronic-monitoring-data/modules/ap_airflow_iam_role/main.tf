@@ -5,8 +5,8 @@ locals {
     "test"          = "test"
     "development"   = "dev"
   }
-
-  role_name = var.new_airflow ? "mwaa:airflow-${local.account_map[var.environment]}-electronic-monitoring-data-store-${var.role_name_suffix}" : "airflow-${local.account_map[var.environment]}-${var.role_name_suffix}"
+  mwaa      = var.new_airflow ? "mwaa:" : ""
+  role_name = var.new_airflow ? "airflow-${local.account_map[var.environment]}-electronic-monitoring-data-store-${var.role_name_suffix}" : "airflow-${local.account_map[var.environment]}-${var.role_name_suffix}"
 }
 
 # --------------------------------------------
@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "oidc_assume_role_policy" {
     }
     condition {
       test     = "StringEquals"
-      values   = ["system:serviceaccount:airflow:${local.role_name}"]
+      values   = ["system:serviceaccount:airflow:${local.mwaa}${local.role_name}"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${var.secret_code}:sub"
     }
     condition {
