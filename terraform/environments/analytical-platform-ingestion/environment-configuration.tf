@@ -22,7 +22,6 @@ locals {
       /* Image Versions */
       scan_image_version             = "0.1.5"
       transfer_image_version         = "0.0.20"
-      transfer_service_image_version = "0.1.0-rc2"
       notify_image_version           = "0.0.21"
 
       /* Target Buckets */
@@ -75,7 +74,6 @@ locals {
       /* Image Versions */
       scan_image_version             = "0.1.5"
       transfer_image_version         = "0.0.20"
-      transfer_service_image_version = "0.1.0-rc2"
       notify_image_version           = "0.0.21"
 
       /* Target Buckets */
