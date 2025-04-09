@@ -1,6 +1,8 @@
 #### This file can be used to store locals specific to the member account ####
 #### DPR Specific ####
 locals {
+
+  is_dev_or_test       = local.is-development || local.is-test
   project              = local.application_data.accounts[local.environment].project_short_id
   analytics_project_id = "analytics"
 
@@ -320,6 +322,26 @@ locals {
     username = "placeholder"
     endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
     port     = "1522"
+  }
+
+  # OASys Secrets PlaceHolder
+  oasys_secrets_placeholder = {
+    db_name  = "oasys"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
+  # ONR Secrets PlaceHolder
+  onr_secrets_placeholder = {
+    db_name  = "onr"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
   }
 
   # DPS Secrets PlaceHolder
