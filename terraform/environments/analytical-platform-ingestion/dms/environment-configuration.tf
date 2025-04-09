@@ -9,8 +9,8 @@ locals {
 
       /* CICA Source databases */
       source_database_sid           = "orauat6.eu-west-2.compute.internal"
-      /* analytical-plafrom-ingestion-development resources */
-      ap_data_glue_catalog_arn = "arn:aws:glue:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-development"]}:catalog"
+      /* analytical-plafrom-ingestion-production resources */
+      ap_data_glue_catalog_role = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-dms-ingress-development"
     }
     production = {
       /* VPC */
@@ -21,7 +21,7 @@ locals {
       /* CICA Source databases */
       source_database_sid           = "live.cica.gov.uk"
       /* analytical-plafrom-ingestion-production resources */
-      ap_data_glue_catalog_arn = "arn:aws:glue:eu-west-2:${local.environment_management.account_ids["analytical-platform-data-production"]}:catalog"
+      ap_data_glue_catalog_role = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/mojap-data-production-dms-ingress-production"
     }
   }
 }

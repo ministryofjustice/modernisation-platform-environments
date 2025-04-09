@@ -282,7 +282,7 @@ def handler(event, context):  # pylint: disable=unused-argument
     db_secret = json.loads(db_secret_response["SecretString"])
     db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog
     use_glue_catalog = os.getenv("USE_GLUE_CATALOG", "true").lower() == "true"
-    glue_catalog_arn = os.getenv("GLUE_CATALOG_ARN", "")
+    glue_catalog_account_id = os.getenv("GLUE_CATALOG_ACCOUNT_ID", "")
     retry_failed_after_recreate_metadata = os.getenv("RETRY_FAILED_AFTER_RECREATE_METADATA", "true").lower() == "true"
     username = db_secret["username"]
     password = db_secret["password"]
@@ -315,11 +315,8 @@ def handler(event, context):  # pylint: disable=unused-argument
     if use_glue_catalog:
         # Get the glue database to check if it exists. handle EntityNotFoundException
         glue_kwargs = {}
-        if glue_catalog_arn:
-            # Get account name from glue catalog arn to use as catalogId
-            catalogId = re.match(r"^arn:aws:glue:[\w-]+:(\d+):catalog", glue_catalog_arn).groups()
-            assert len(catalogId) == 1
-            glue_kwargs["CatalogId"] = catalogId[0]
+        if glue_catalog_account_id:
+            glue_kwargs["CatalogId"] = glue_catalog_account_id
         try:
             glue.get_database(Name=db_identifier, **glue_kwargs)
             logger.info(f"Database {db_identifier} already exists in Glue Catalog")
