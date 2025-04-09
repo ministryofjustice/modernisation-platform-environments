@@ -312,6 +312,14 @@ resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 ### S3 Bucket for Payment Load
 
 resource "aws_s3_bucket" "lambda_payment_load" {
@@ -324,6 +332,14 @@ resource "aws_s3_bucket_public_access_block" "lambda_payment_load" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "lambda_payment_load" {
+  bucket = aws_s3_bucket.lambda_payment_load.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 # Development
