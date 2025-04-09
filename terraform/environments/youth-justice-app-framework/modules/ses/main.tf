@@ -52,7 +52,7 @@ resource "aws_secretsmanager_secret_version" "ses_user_secret" {
   secret_id = aws_secretsmanager_secret.ses_user_secret.id
   secret_string = jsonencode({
     username = aws_iam_access_key.ses_smtp_user.id,
-    password = data.external.smtp_password.result.smtp_password
+    password = aws_iam_access_key.ses_smtp_user.secret
   })
 }
 
@@ -66,10 +66,10 @@ resource "aws_sesv2_configuration_set" "ses_configuration_set" {
   tags = var.tags
 }
 
-data "external" "smtp_password" {
-  program = ["python3", "${path.module}/smtp_password.py"]
-  query = {
-    secret_access_key = aws_iam_access_key.ses_smtp_user.secret
-    region            = "eu-west-2"
-  }
-}
+#data "external" "smtp_password" {
+#  program = ["python3", "${path.module}/smtp_password.py"]
+#  query = {
+#    secret_access_key = aws_iam_access_key.ses_smtp_user.secret
+#    region            = "eu-west-2"
+#  }
+#}
