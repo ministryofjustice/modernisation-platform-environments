@@ -305,6 +305,7 @@ resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
   bucket                  = aws_s3_bucket.ccms_ebs_shared.id
   block_public_acls       = true
   block_public_policy     = true
+  ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
@@ -318,6 +319,7 @@ resource "aws_s3_bucket_public_access_block" "lambda_payment_load" {
   bucket                  = aws_s3_bucket.lambda_payment_load.id
   block_public_acls       = true
   block_public_policy     = true
+  ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
