@@ -17,8 +17,6 @@ module "vpc" {
   tags = local.tags
 }
 
-
-
 # Create Internet Gateway
 resource "aws_internet_gateway" "main" {
   vpc_id = module.vpc.vpc_id
@@ -28,18 +26,22 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
-resource "aws_subnet" "vsrx_subnets" {
-  for_each = {
-    "vSRX01 Management Range"    = { cidr = "10.100.105.0/24", az = "eu-west-2a" }
-    "vSRX01 PSK External Range"  = { cidr = "10.100.110.0/24", az = "eu-west-2a" }
-    "vSRX01 Cert External Range" = { cidr = "10.100.115.0/24", az = "eu-west-2a" }
-    "vSRX01 Internal Range"      = { cidr = "10.100.120.0/24", az = "eu-west-2a" }
+locals {
+  vsrx_subnet_config = {
+    "vSRX01 Management Range"    = { cidr = "10.100.105.0/24", az = "eu-west-2a", eni_ip = ["10.100.105.100"] }
+    "vSRX01 PSK External Range"  = { cidr = "10.100.110.0/24", az = "eu-west-2a", eni_ip = ["10.100.110.100"] }
+    "vSRX01 Cert External Range" = { cidr = "10.100.115.0/24", az = "eu-west-2a", eni_ip = ["10.100.115.100"] }
+    "vSRX01 Internal Range"      = { cidr = "10.100.120.0/24", az = "eu-west-2a", eni_ip = ["10.100.120.100"] }
     "Juniper Management & KMS"   = { cidr = "10.100.50.0/24", az = "eu-west-2a" }
-    "vSRX02 Management Range"    = { cidr = "10.100.205.0/24", az = "eu-west-2b" }
-    "vSRX02 PSK External Range"  = { cidr = "10.100.210.0/24", az = "eu-west-2b" }
-    "vSRX02 Cert External Range" = { cidr = "10.100.215.0/24", az = "eu-west-2b" }
-    "vSRX02 Internal Range"      = { cidr = "10.100.220.0/24", az = "eu-west-2b" }
+    "vSRX02 Management Range"    = { cidr = "10.100.205.0/24", az = "eu-west-2b", eni_ip = ["10.100.205.100"] }
+    "vSRX02 PSK External Range"  = { cidr = "10.100.210.0/24", az = "eu-west-2b", eni_ip = ["10.100.210.100"] }
+    "vSRX02 Cert External Range" = { cidr = "10.100.215.0/24", az = "eu-west-2b", eni_ip = ["10.100.215.100"] }
+    "vSRX02 Internal Range"      = { cidr = "10.100.220.0/24", az = "eu-west-2b", eni_ip = ["10.100.220.100"] }
   }
+}
+
+resource "aws_subnet" "vsrx_subnets" {
+  for_each = local.vsrx_subnet_config
 
   vpc_id                  = module.vpc.vpc_id
   cidr_block              = each.value.cidr
@@ -61,7 +63,8 @@ resource "aws_network_interface" "vsrx01_enis" {
   }
 
   subnet_id         = aws_subnet.vsrx_subnets[each.value].id
-  source_dest_check = false # Disable Source/Destination Check
+  private_ips       = local.vsrx_subnet_config[each.value].eni_ip # Assign the specified private IP to the ENI
+  source_dest_check = false                                       # Disable Source/Destination Check
   security_groups   = each.key == "vSRX01 Internal Interface" ? [aws_security_group.internal_sg.id] : [aws_security_group.external_sg.id]
 
   tags = merge(local.tags, {
@@ -79,7 +82,8 @@ resource "aws_network_interface" "vsrx02_enis" {
   }
 
   subnet_id         = aws_subnet.vsrx_subnets[each.value].id
-  source_dest_check = false # Disable Source/Destination Check
+  private_ips       = local.vsrx_subnet_config[each.value].eni_ip # Assign the specified private IP to the ENI
+  source_dest_check = false                                       # Disable Source/Destination Check
   security_groups   = each.key == "vSRX02 Internal Interface" ? [aws_security_group.internal_sg.id] : [aws_security_group.external_sg.id]
 
   tags = merge(local.tags, {
