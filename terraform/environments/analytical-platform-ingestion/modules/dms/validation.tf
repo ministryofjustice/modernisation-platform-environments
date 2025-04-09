@@ -45,7 +45,7 @@ module "validation_lambda_function" {
   function_name           = "${var.db}-validation"
   description             = "Lambda to validate DMS data output"
   handler                 = "main.handler"
-  runtime                 = "python3.13"
+  runtime                 = "python3.12"
   timeout                 = 60
   architectures           = ["x86_64"]
   build_in_docker         = false
