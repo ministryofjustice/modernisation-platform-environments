@@ -71,6 +71,7 @@
         "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-testing",
+        "dps-testing2",
         "dps-prison-reg"
       ],
       "alarms": {
@@ -152,7 +153,8 @@
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
-      "enable_s3_data_migrate_lambda": true
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -305,7 +307,8 @@
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
-      "enable_s3_data_migrate_lambda": true
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -478,7 +481,8 @@
         }
       ],
       "redshift_table_expiry_days": 7,
-      "enable_s3_data_migrate_lambda": true
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -646,7 +650,8 @@
         }
       ],
       "redshift_table_expiry_days": 1,
-      "enable_s3_data_migrate_lambda": false
+      "enable_s3_data_migrate_lambda": false,
+      "create_postgres_load_generator_job": false
     }
   }
 }

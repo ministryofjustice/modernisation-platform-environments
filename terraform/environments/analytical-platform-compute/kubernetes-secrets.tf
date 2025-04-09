@@ -42,6 +42,18 @@ resource "kubernetes_secret" "mlflow_admin" {
   }
 }
 
+resource "kubernetes_secret" "mlflow_flask_server_secret_key" {
+  metadata {
+    name      = "mlflow-flask-server-secret-key"
+    namespace = kubernetes_namespace.mlflow.metadata[0].name
+  }
+
+  type = "Opaque"
+  data = {
+    secret-key = random_password.mlflow_flask_server_secret_key.result
+  }
+}
+
 resource "kubernetes_secret" "ui_rds" {
   metadata {
     name      = "ui-rds"
