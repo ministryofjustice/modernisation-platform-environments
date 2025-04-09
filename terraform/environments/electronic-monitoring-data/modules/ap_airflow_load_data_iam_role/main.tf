@@ -111,7 +111,7 @@ module "ap_database_sharing" {
   source = "../ap_airflow_iam_role"
 
   environment          = var.environment
-  role_name_suffix     = "load-${var.name}${local.env_suffixes[var.environment]}"
+  role_name_suffix     = local.role_name_suffix
   role_description     = "${var.name} database permissions"
   iam_policy_document  = data.aws_iam_policy_document.load_data.json
   secret_code          = var.secret_code
