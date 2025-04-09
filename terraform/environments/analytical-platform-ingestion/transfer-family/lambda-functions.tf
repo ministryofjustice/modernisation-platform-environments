@@ -39,8 +39,7 @@ module "transfer_service_lambda" {
       resources = [
         module.s3_transfer_landing_kms.key_arn,
         local.environment_configuration.mojap_land_kms_key,
-        module.supplier_data_kms.key_arn,
-        module.transfer_service_sns_kms.key_arn
+        module.supplier_data_kms.key_arn
       ]
     },
     secretsmanager_access = {
@@ -87,14 +86,6 @@ module "transfer_service_lambda" {
         "s3:ListBucket"
       ]
       resources = formatlist("arn:aws:s3:::%s", local.environment_configuration.target_buckets)
-    },
-    sns = {
-      sid    = "AllowSNS"
-      effect = "Allow"
-      actions = [
-        "sns:Publish"
-      ]
-      resources = ["arn:aws:sns:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:transfer-service*"]
     }
   }
 }

@@ -83,24 +83,5 @@ module "secret" {
   kms_key_id = var.supplier_data_kms_key
 
   ignore_secret_changes = true
-  secret_string         = "CHANGEME"
-}
-
-module "transfer_service_topic" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  source  = "terraform-aws-modules/sns/aws"
-  version = "6.1.0"
-
-  name              = "transfer-service-${var.name}"
-  display_name      = "transfer-service-${var.name}"
-  signature_version = 2
-
-  kms_master_key_id = module.transfer_service_sns_kms.key_id
-
-  subscriptions = {
-    email = {
-      protocol = "email"
-      endpoint = "transfer/sftp/${var.name}/technical-contact" #TODO: un-hardcode
-    }
-  }
+  secret_string         = "CHANGE@ME.com"
 }
