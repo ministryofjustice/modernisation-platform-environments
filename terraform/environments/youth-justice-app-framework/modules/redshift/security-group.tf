@@ -12,6 +12,14 @@ module "redshift_sg" {
   ingress_with_self = [{ rule = "all-all" }]
   egress_with_self  = [{ rule = "all-all" }]
 
+  egress_with_cidr_blocks = [
+    {
+      rule = "https-443-tcp"
+      cidr_blocks = var.vpc_cidr
+      description = "Redshift to Secrets Manager"
+    }
+  ]
+
   egress_with_source_security_group_id = [
     {
       rule                     = "postgresql-tcp"

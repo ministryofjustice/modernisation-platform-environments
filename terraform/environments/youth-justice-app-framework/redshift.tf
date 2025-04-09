@@ -15,6 +15,8 @@ module "redshift" {
 
   kms_key_arn = module.kms.key_arn
 
+  vpc_cidr = data.aws_vpc.vpc_cidr
+
   # [TODO] Replace the role below with the equicelent in the new environment
   # data_science_role = "arn:aws:iam::066012302209:role/data_science"
 
