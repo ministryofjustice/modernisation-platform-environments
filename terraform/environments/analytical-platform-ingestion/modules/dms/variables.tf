@@ -121,7 +121,7 @@ variable "valid_files_mutable" {
   description = "If false, copy valid files to their destination bucket with a datetime infix"
 }
 
-variable "glue_catalog_arn" {
+variable "glue_catalog_account_id" {
   type = string
   default = ""
   description = "Which glue catalog to grant metadata generator permissions to (optional)"
@@ -131,4 +131,10 @@ variable "glue_catalog_role_arn" {
   type = string
   default = ""
   description = "Which role to use to access glue catalog (optional)"
+}
+
+variable "glue_catalog_database_name" {
+  type = string
+  default = ""
+  description = "Which database to write to in glue catalog (optional)"
 }

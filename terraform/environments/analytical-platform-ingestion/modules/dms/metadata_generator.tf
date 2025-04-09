@@ -128,23 +128,6 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
       ]
     }
   }
-
-  # Lambda can create glue database/table
-  # checkov:skip=CKV_AWS_111: The resource is not publicly accessible
-  # checkov:skip=CKV_AWS_356: Required glue permissions for the lambda
-  statement {
-    actions = [
-      "glue:GetDatabase",
-      "glue:CreateDatabase",
-      "glue:GetTable",
-      "glue:CreateTable",
-      "glue:UpdateTable",
-    ]
-
-    resources = [
-      var.glue_catalog_arn
-    ]
-  }
 }
 
 # Create security group for Lambda function
@@ -209,9 +192,9 @@ module "metadata_generator" {
     DB_SCHEMA_NAME                       = lookup(jsondecode(file(var.dms_mapping_rules)), "schema", "")
     ENGINE                               = var.dms_source.engine_name
     DATABASE_NAME                        = var.dms_source.sid
-    GLUE_CATALOG_ARN                     = var.glue_catalog_arn
+    GLUE_CATALOG_ACCOUNT_ID              = var.glue_catalog_account_id
     GLUE_CATALOG_ROLE_ARN                = var.glue_catalog_role_arn
-    GLUE_CATALOG_DATABASE_NAME           = lookup(jsondecode(file(var.dms_mapping_rules)), "objects_from", var.db)
+    GLUE_CATALOG_DATABASE_NAME           = var.glue_catalog_database_name
     USE_GLUE_CATALOG                     = var.write_metadata_to_glue_catalog
     PATH_TO_DMS_MAPPING_RULES            = aws_s3_object.dms_mapping_rules.key
     RETRY_FAILED_AFTER_RECREATE_METADATA = var.retry_failed_after_recreate_metadata
