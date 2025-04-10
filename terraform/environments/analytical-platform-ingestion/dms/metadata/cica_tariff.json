@@ -1,6 +1,6 @@
 {
     "objects_from": "cica_tariff",
-    "extraction_date": "2025-03-04T17:17:42.909758",
+    "extraction_date": "2025-04-09T17:34:25.447138",
     "objects": [
         "CLAIMS.APPLICANT_INJURIES",
         "CLAIMS.APPLICATION_INCIDENT",
@@ -9,7 +9,6 @@
         "CLAIMS.CASE_DECISION_OFFERS",
         "CLAIMS.CASE_IN_CASE_TYPES",
         "CLAIMS.CASE_REASONS",
-        "CLAIMS.CASE_REASONS_TEXT",
         "CLAIMS.CASE_TYPES",
         "CLAIMS.DECISION_STATUSES",
         "CLAIMS.INJURY_IN_TARIFF_CATEGORIES",
@@ -46,6 +45,10 @@
         {
             "object_name": "CLAIMS.APPLICANT_INJURIES",
             "column_name": "STAFF_MEMBER"
+        },
+        {
+            "object_name": "CLAIMS.APPLICATION_INCIDENT",
+            "column_name": "OTHER_INCIDENT"
         },
         {
             "object_name": "CLAIMS.CASES",
@@ -925,10 +928,6 @@
         },
         {
             "object_name": "CLAIMS.CASES",
-            "column_name": "SPP_CASE_ID"
-        },
-        {
-            "object_name": "CLAIMS.CASES",
             "column_name": "SPP_ID"
         },
         {
@@ -970,10 +969,6 @@
         {
             "object_name": "CLAIMS.CASES",
             "column_name": "TREATMENT_STILL_RECEIVED"
-        },
-        {
-            "object_name": "CLAIMS.CASES",
-            "column_name": "TRUST"
         },
         {
             "object_name": "CLAIMS.CASES",
@@ -1026,10 +1021,6 @@
         {
             "object_name": "CLAIMS.CASE_DECISIONS",
             "column_name": "DATE_PAID"
-        },
-        {
-            "object_name": "CLAIMS.CASE_DECISIONS",
-            "column_name": "DECISION_MAKER"
         },
         {
             "object_name": "CLAIMS.CASE_DECISIONS",
@@ -1156,16 +1147,28 @@
             "column_name": "STAGE_CODE"
         },
         {
-            "object_name": "CLAIMS.CASE_REASONS_TEXT",
-            "column_name": "PARA_TYPE"
-        },
-        {
             "object_name": "CLAIMS.CASE_TYPES",
             "column_name": "CURR"
         },
         {
             "object_name": "CLAIMS.CASE_TYPES",
             "column_name": "SPP_ALERT"
+        },
+        {
+            "object_name": "CLAIMS.DECISION_STATUSES",
+            "column_name": "REASON_CODE"
+        },
+        {
+            "object_name": "CLAIMS.DECISION_STATUSES",
+            "column_name": "RETURN_CODE"
+        },
+        {
+            "object_name": "CLAIMS.DECISION_STATUSES",
+            "column_name": "STAFF_MEMBER"
+        },
+        {
+            "object_name": "CLAIMS.DECISION_STATUSES",
+            "column_name": "SUBMITTED_DEC_MKR"
         },
         {
             "object_name": "CLAIMS.INJURY_IN_TARIFF_CATEGORIES",
@@ -1349,10 +1352,6 @@
         },
         {
             "object_name": "CLAIMS.INVOLVED_BODIES",
-            "column_name": "SUB_TYPE"
-        },
-        {
-            "object_name": "CLAIMS.INVOLVED_BODIES",
             "column_name": "SUR_SOUND"
         },
         {
@@ -1397,14 +1396,6 @@
         },
         {
             "object_name": "CLAIMS.INVOLVEMENTS",
-            "column_name": "INV_CODE"
-        },
-        {
-            "object_name": "CLAIMS.INVOLVEMENTS",
-            "column_name": "PER_ID"
-        },
-        {
-            "object_name": "CLAIMS.INVOLVEMENTS",
             "column_name": "START_DATE_QUAL"
         },
         {
@@ -1414,130 +1405,6 @@
         {
             "object_name": "CLAIMS.INVOLVEMENT_TYPE_CODES",
             "column_name": "CURR"
-        },
-        {
-            "object_name": "CLAIMS.INVOLVEMENT_TYPE_CODES",
-            "column_name": "INV_TYPE"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "ADD_1"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "ADD_2"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "ADD_3"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "ADD_4"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "ADD_5"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "CLOCK_NO"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "DATE_OF_BIRTH"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "DATE_OF_BIRTH_QUAL"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "DATE_OF_DEATH"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "DATE_OF_DEATH_QUAL"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "DATE_OF_DEATH_QUAL1"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "ETHNIC_ORIGIN"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "FORENAMES"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "FOR_SOUND"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "HOME_TEL"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "INITIALS"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "IVB_ID"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "MARITAL_STATUS"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "NI_NO"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "OCC_TYPE"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "PER_ID"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "POSTCODE"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "PREV_CONVS"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "RESTRICTED"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "SEX"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "SURNAME"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "SUR_SOUND"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "TELEPHONE"
-        },
-        {
-            "object_name": "CLAIMS.PEOPLE",
-            "column_name": "TITLE"
-        },
-        {
-            "object_name": "CLAIMS.PI_TYPE_CAUSES",
-            "column_name": "DESCRIPTION"
         },
         {
             "object_name": "CLAIMS.POST_HOLDERS",
@@ -1680,36 +1547,120 @@
             "column_name": "START_DATE"
         },
         {
+            "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+            "column_name": "ADDITIONAL_COMP"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+            "column_name": "APPLY_REDUC"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+            "column_name": "DEFAULT_AMOUNT"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+            "column_name": "END_DATE"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+            "column_name": "PAST_FUTURE"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+            "column_name": "PI_FATAL"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+            "column_name": "POST_HOLDER"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+            "column_name": "SIGNE"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+            "column_name": "START_DATE"
+        },
+        {
             "object_name": "CLAIMS.TARIFF_DECISION_TYPES",
             "column_name": "CURR"
         },
         {
-            "object_name": "CLAIMS.TARIFF_STATUS_TYPES",
-            "column_name": "CURR"
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "AMENDED_DATE"
         },
         {
-            "object_name": "CLAIMS.TEAMS",
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "COMMENTS"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "CREATION_DATE"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "DECISION_MAKER"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_INJURIES",
             "column_name": "END_DATE"
         },
         {
-            "object_name": "CLAIMS.TEAMS",
-            "column_name": "NAME"
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "FULL_DESCRIPTION"
         },
         {
-            "object_name": "CLAIMS.TEAMS",
-            "column_name": "SECTION_REF"
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "GUIDELINES"
         },
         {
-            "object_name": "CLAIMS.TEAMS",
-            "column_name": "SEC_LOCATION"
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "INJ_TYPE"
         },
         {
-            "object_name": "CLAIMS.TEAMS",
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "INTERIM_FLAG"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "MEDICAL_NAME"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "SCHEME_BAND_2012"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "SERIOUS_HEAD_SPINAL_INJ"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_INJURIES",
+            "column_name": "STAFF_MEMBER"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_INJURIES",
             "column_name": "START_DATE"
         },
         {
-            "object_name": "CLAIMS.TEAMS",
-            "column_name": "TEAM_NO"
+            "object_name": "CLAIMS.TARIFF_REASON_TYPES",
+            "column_name": "CORR_RECIPIENT"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_REASON_TYPES",
+            "column_name": "CURR"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_REASON_TYPES",
+            "column_name": "REMOVED_DATE"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_REASON_TYPES",
+            "column_name": "SCHEME"
+        },
+        {
+            "object_name": "CLAIMS.TARIFF_STATUS_TYPES",
+            "column_name": "CURR"
         }
     ]
 }
