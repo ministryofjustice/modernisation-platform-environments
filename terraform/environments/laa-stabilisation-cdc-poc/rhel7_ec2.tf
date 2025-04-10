@@ -43,7 +43,7 @@ resource "aws_instance" "rhel7_instance_1" {
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.rhel7_instance.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
-  iam_instance_profile        = aws_iam_instance_profile.cwa.id
+  iam_instance_profile        = aws_iam_instance_profile.rhel7.id
   user_data_base64            = base64encode(local.rhel7_userdata)
   user_data_replace_on_change = false
 
