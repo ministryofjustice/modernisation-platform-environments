@@ -82,7 +82,7 @@ module "focus_s3_kms" {
         principals = [
           {
             type        = "AWS"
-            identifiers = ["*"]
+            identifiers = ["arn:aws:iam::295814833350:role/focus-reports-replication-role"]
           }
         ]
       }
@@ -105,7 +105,7 @@ data "aws_iam_policy_document" "focus_bucket_replication_policy" {
     ]
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = ["arn:aws:iam::295814833350:role/focus-reports-replication-role"]
     }
   }
 }
