@@ -14,13 +14,13 @@ EOF
 #################################
 
 resource "aws_security_group" "rhel7_instance" {
-  name        = "rhel7-${local.environment}-rhel7-security-group"
-  description = "Security group for RHEL 7 EC2 for CWA POC"
+  name        = "${local.application_name_short}-rhel7-${local.environment}-security-group"
+  description = "Security group for RHEL 7 EC2 for Portal POC"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
     local.tags,
-    { "Name" = "rhel7-${local.environment}-rhel7-security-group" }
+    { "Name" = "${local.application_name_short}-rhel7-${local.environment}-rhel7-security-group" }
   )
 
 }
@@ -51,14 +51,14 @@ resource "aws_instance" "rhel7_instance_1" {
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },
       local.tags,
-      { "Name" = "rhel7-instance-root" }
+      { "Name" = "${local.application_name_short}-rhel7-instance-root" }
     )
   }
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
     local.tags,
-    { "Name" = "rhel7 Instance 1" }
+    { "Name" = "${local.application_name_short} rhel7 Instance 1" }
   )
 }
 
@@ -79,7 +79,7 @@ resource "aws_ebs_volume" "rhel7_volume1" {
 
   tags = merge(
     local.tags,
-    { "Name" = "rhel7-volume1" },
+    { "Name" = "${local.application_name_short}-rhel7-volume1" },
   )
 }
 

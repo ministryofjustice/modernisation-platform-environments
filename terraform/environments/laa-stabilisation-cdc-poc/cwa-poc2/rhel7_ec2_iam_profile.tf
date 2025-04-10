@@ -5,22 +5,22 @@
 # IAM Role, policy and instance profile (to attach the role to the EC2)
 
 resource "aws_iam_instance_profile" "rhel7" {
-  name = "rhel7-ec2-instance-profile"
+  name = "${local.application_name_short}-rhel7-ec2-instance-profile"
   role = aws_iam_role.rhel7.name
   tags = merge(
     local.tags,
     {
-      Name = "rhel7-ec2-instance-profile"
+      Name = "${local.application_name_short}-rhel7-ec2-instance-profile"
     }
   )
 }
 
 resource "aws_iam_role" "rhel7" {
-  name = "rhel7-ec2-instance-role"
+  name = "${local.application_name_short}-rhel7-ec2-instance-role"
   tags = merge(
     local.tags,
     {
-      Name = "rhel7-ec2-instance-role"
+      Name = "${local.application_name_short}-rhel7-ec2-instance-role"
     }
   )
   path               = "/"
@@ -42,11 +42,11 @@ EOF
 }
 
 resource "aws_iam_policy" "rhel7" {
-  name = "rhel7-ec2-service"
+  name = "${local.application_name_short}-rhel7-ec2-service"
   tags = merge(
     local.tags,
     {
-      Name = "rhel7-ec2-service"
+      Name = "${local.application_name_short}-rhel7-ec2-service"
     }
   )
   policy = <<EOF
@@ -80,7 +80,7 @@ resource "aws_iam_role_policy_attachment" "rhel7" {
   policy_arn = aws_iam_policy.rhel7.arn
 }
 
-resource "aws_iam_role_policy_attachment" "ssm" {
+resource "aws_iam_role_policy_attachment" "rhel7_ssm" {
   role       = aws_iam_role.rhel7.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
