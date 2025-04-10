@@ -16,7 +16,7 @@ module "observability_platform_tenant" {
 }
 
 module "analytical_platform_observability" {
-  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=1.0.0"
+  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=875fbc699f51c77a2d4cbb77c2366acd4b343cd9" # 1.0.0
 
   tags = local.tags
 }
