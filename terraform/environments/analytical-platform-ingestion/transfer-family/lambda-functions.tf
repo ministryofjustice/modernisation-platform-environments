@@ -20,8 +20,10 @@ module "transfer_service_lambda" {
   attach_network_policy  = true
 
   environment_variables = {
-    LANDING_BUCKET_NAME    = module.transfer_landing_bucket.s3_bucket_id
-    QUARANTINE_BUCKET_NAME = module.transfer_quarantine_bucket.s3_bucket_id
+    LANDING_BUCKET_NAME           = module.transfer_landing_bucket.s3_bucket_id
+    QUARANTINE_BUCKET_NAME        = module.transfer_quarantine_bucket.s3_bucket_id
+    GOVUK_NOTIFY_API_KEY_SECRET   = "make a call to secets manager to get the api key"
+    GOVUK_NOTIFY_TEMPLATES_SECRET = "make a call to secrets manager to get the templates"
   }
 
   attach_policy_statements = true
