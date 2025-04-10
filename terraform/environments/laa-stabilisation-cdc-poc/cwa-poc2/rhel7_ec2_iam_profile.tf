@@ -8,7 +8,7 @@ resource "aws_iam_instance_profile" "rhel7" {
   name = "${local.application_name_short}-rhel7-ec2-instance-profile"
   role = aws_iam_role.rhel7.name
   tags = merge(
-    local.tags,
+    var.tags,
     {
       Name = "${local.application_name_short}-rhel7-ec2-instance-profile"
     }
@@ -18,7 +18,7 @@ resource "aws_iam_instance_profile" "rhel7" {
 resource "aws_iam_role" "rhel7" {
   name = "${local.application_name_short}-rhel7-ec2-instance-role"
   tags = merge(
-    local.tags,
+    var.tags,
     {
       Name = "${local.application_name_short}-rhel7-ec2-instance-role"
     }
@@ -44,7 +44,7 @@ EOF
 resource "aws_iam_policy" "rhel7" {
   name = "${local.application_name_short}-rhel7-ec2-service"
   tags = merge(
-    local.tags,
+    var.tags,
     {
       Name = "${local.application_name_short}-rhel7-ec2-service"
     }
