@@ -57,11 +57,12 @@ resource "aws_vpc_security_group_egress_rule" "lambda_security_group_egress" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "lambda_security_group_ingress" {
-  description = "Allow traffic to port 1521"
-  from_port   = 1521
-  to_port     = 1522
-  ip_protocol = "tcp"
-  cidr_ipv4   = data.aws_vpc.shared.cidr_block
+  description       = "Allow traffic to port 1521"
+  security_group_id = aws_security_group.lambda_security_group.id
+  from_port         = 1521
+  to_port           = 1522
+  ip_protocol       = "tcp"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
 
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-sg" }
