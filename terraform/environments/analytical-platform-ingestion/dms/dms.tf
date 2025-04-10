@@ -46,4 +46,5 @@ module "cica_dms_tariff_dms_implementation" {
     valid_files_mutable                       = true
     glue_catalog_account_id                   = local.environment_management.account_ids["analytical-platform-data-production"]
     glue_catalog_database_name                = "cica_tariff_${local.environment}"
+    glue_catalog_role_arn                     = local.environment_configuration.ap_data_glue_catalog_role
 }
