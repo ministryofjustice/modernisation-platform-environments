@@ -91,4 +91,18 @@ module "focus_reports" {
       }
     }
   }
+
+  versioning = {
+    status = "Enabled"
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "DeleteOldVersions"
+      enabled = true
+      noncurrent_version_expiration = {
+        days = 1
+      }
+    }
+  ]
 }
