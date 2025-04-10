@@ -131,6 +131,9 @@ locals {
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
           availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.rds.config.instance_profile_policies, [
+            "Ec2SSODeny"]
+          )
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
           tags = {
@@ -200,6 +203,29 @@ locals {
             ]
             resources = [
               "arn:aws:secretsmanager:*:*:secret:/microsoft/AD/azure.noms.root/shared-passwords-*",
+            ]
+          }
+        ]
+      }
+      Ec2SSODeny = {
+        description = "Deny SSO access to EC2 instances"
+        statements = [
+          {
+            effect = "Deny"
+            actions = [
+              "ec2:*",
+            ]
+            resources = [
+              "arn:aws:ec2:*:*:instance/i-0a5ade7b4aed30541",
+            ]
+            conditions = [
+              {
+                test     = "StringEquals"
+                variable = "aws:userId"
+                values   = [
+                  "arn:aws:iam::*:user/sso-*"
+                ]
+              }
             ]
           }
         ]
