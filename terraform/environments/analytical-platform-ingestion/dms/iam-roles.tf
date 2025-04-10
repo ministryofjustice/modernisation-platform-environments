@@ -32,7 +32,7 @@ resource "aws_iam_role" "eventbridge_dms_full_load_task_role" {
         "Action": "sts:AssumeRole",
         "Condition": {
           "StringEquals": {
-            "aws:SourceAccount": data.aws_iam_account_alias.current.id,
+            "aws:SourceAccount": data.aws_caller_identity.current.account_id,
             "aws:SourceArn": aws_scheduler_schedule_group.dms_nightly_full_load.arn
           }
         }
