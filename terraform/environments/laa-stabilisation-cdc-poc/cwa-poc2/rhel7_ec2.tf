@@ -16,10 +16,10 @@ EOF
 resource "aws_security_group" "rhel7_instance" {
   name        = "${local.application_name_short}-rhel7-${local.environment}-security-group"
   description = "Security group for RHEL 7 EC2 for Portal POC"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = var.shared_vpc_id
 
   tags = merge(
-    local.tags,
+    var.tags,
     { "Name" = "${local.application_name_short}-rhel7-${local.environment}-rhel7-security-group" }
   )
 
@@ -50,14 +50,14 @@ resource "aws_instance" "rhel7_instance_1" {
   root_block_device {
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },
-      local.tags,
+      var.tags,
       { "Name" = "${local.application_name_short}-rhel7-instance-root" }
     )
   }
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
-    local.tags,
+    var.tags,
     { "Name" = "${local.application_name_short} rhel7 Instance 1" }
   )
 }
@@ -71,14 +71,14 @@ resource "aws_ebs_volume" "rhel7_volume1" {
   size              = "50"
   type              = "gp2"
   encrypted         = true
-  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  kms_key_id        = var.shared_ebs_kms_key_id
 
   lifecycle {
     ignore_changes = [kms_key_id]
   }
 
   tags = merge(
-    local.tags,
+    var.tags,
     { "Name" = "${local.application_name_short}-rhel7-volume1" },
   )
 }
