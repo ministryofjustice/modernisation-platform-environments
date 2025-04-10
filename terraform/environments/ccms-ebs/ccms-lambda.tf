@@ -24,25 +24,49 @@ resource "aws_security_group" "lambda_security_group" {
   description = "SG traffic control for Payment Load Lambda"
   vpc_id      = data.aws_vpc.shared.id
 
-  ingress {
-    from_port   = 1521
-    to_port     = 1522
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_vpc.shared.cidr_block]
-  }
+  # ingress {
+  #   description = "Allow traffic to port 1521"
+  #   from_port   = 1521
+  #   to_port     = 1522
+  #   protocol    = "tcp"
+  #   cidr_blocks = [data.aws_vpc.shared.cidr_block]
+  # }
 
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  # egress {
+  #   description = "Allow outgoing traffic"
+  #   from_port   = 0
+  #   to_port     = 0
+  #   protocol    = "-1"
+  #   cidr_blocks = ["0.0.0.0/0"]
+  # }
 
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-sg" }
   )
 }
 
+resource "aws_vpc_security_group_egress_rule" "lambda_security_group_egress" {
+  description       = "Allow outgoing traffic"
+  security_group_id = aws_security_group.lambda_security_group.id
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+
+  tags = merge(local.tags,
+    { Name = "${local.application_name}-${local.environment}-lambda-sg" }
+  )
+}
+
+resource "aws_vpc_security_group_ingress_rule" "lambda_security_group_ingress" {
+  description = "Allow traffic to port 1521"
+  from_port   = 1521
+  to_port     = 1522
+  ip_protocol = "tcp"
+  cidr_ipv4   = data.aws_vpc.shared.cidr_block
+
+  tags = merge(local.tags,
+    { Name = "${local.application_name}-${local.environment}-lambda-sg" }
+  )
+}
 
 # Lambda Function
 resource "aws_lambda_function" "lambda_function" {
