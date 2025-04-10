@@ -291,6 +291,14 @@ resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 # Development
 moved {
   from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]
