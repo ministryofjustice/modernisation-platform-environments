@@ -80,6 +80,65 @@ resource "aws_secretsmanager_secret_version" "bodmis" {
   }
 }
 
+# OASys Source Secrets
+resource "aws_secretsmanager_secret" "oasys" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+  count = local.is_dev_or_test ? 1 : 0
+
+  name = "external/${local.project}-oasys-source-secret"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-oasys-source-secret"
+      Resource_Type = "Secrets"
+    }
+  )
+}
+
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "oasys" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.oasys[0].id
+  secret_string = jsonencode(local.oasys_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
+# ONR Source Secrets
+resource "aws_secretsmanager_secret" "onr" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+  count = local.is_dev_or_test ? 1 : 0
+
+  name = "external/${local.project}-onr-source-secret"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-onr-source-secret"
+      Resource_Type = "Secrets"
+    }
+  )
+}
+
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "onr" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.onr[0].id
+  secret_string = jsonencode(local.onr_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
+
 # DPS Source Secrets
 # PlaceHolder Secrets
 resource "aws_secretsmanager_secret" "dps" {

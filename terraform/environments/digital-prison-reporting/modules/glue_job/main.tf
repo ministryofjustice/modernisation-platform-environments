@@ -153,7 +153,8 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "secretsmanager:DescribeSecret"
     ]
     resources = concat(var.additional_secret_arns, [
-      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*"
+      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*",
+      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:external/${var.project_id}-dps-*"
     ])
   }
   statement {

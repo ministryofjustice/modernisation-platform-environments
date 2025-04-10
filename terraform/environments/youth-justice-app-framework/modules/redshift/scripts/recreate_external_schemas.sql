@@ -1,0 +1,28 @@
+
+DROP SCHEMA IF EXISTS yjaf_kpi_returns;
+CREATE EXTERNAL SCHEMA yjaf_kpi_returns FROM POSTGRES DATABASE 'yjaf' SCHEMA 'kpi_return' URI '${postgres_uri}' IAM_ROLE '${iam_role}' SECRET_ARN '${secret_arn}';
+GRANT USAGE ON SCHEMA yjaf_kpi_returns TO GROUP yjb_ianda_team;
+
+DROP SCHEMA IF EXISTS yjaf_refdata;
+CREATE EXTERNAL SCHEMA yjaf_refdata FROM POSTGRES DATABASE 'yjaf' SCHEMA 'refdata' URI '${postgres_uri}' IAM_ROLE '${iam_role}' SECRET_ARN '${secret_arn}';
+GRANT USAGE ON SCHEMA yjaf_refdata TO GROUP yjb_ianda_team;
+
+DROP SCHEMA IF EXISTS welsh_youth_justice_indicators;
+CREATE EXTERNAL SCHEMA welsh_youth_justice_indicators FROM POSTGRES DATABASE 'YJB_Summary_Reporting' SCHEMA 'yjb_summary_data_model' URI '${postgres_uri}' IAM_ROLE '${iam_role}' SECRET_ARN '${secret_arn}';
+GRANT USAGE ON SCHEMA welsh_youth_justice_indicators TO GROUP yjb_ianda_team;
+
+DROP SCHEMA IF EXISTS rds_ingest_ext;
+CREATE EXTERNAL SCHEMA rds_ingest_ext FROM POSTGRES DATABASE 'YJB_Case_Reporting' SCHEMA 'redshift' URI '${postgres_uri}' IAM_ROLE '${iam_role}' SECRET_ARN '${secret_arn}';
+GRANT USAGE ON SCHEMA rds_ingest_ext TO GROUP yjb_ianda_team;
+
+DROP SCHEMA IF EXISTS yjb_case_reporting_stg_sam;
+CREATE EXTERNAL SCHEMA yjb_case_reporting_stg_sam FROM POSTGRES DATABASE 'YJB_Case_Reporting' SCHEMA 'stg' URI '${postgres_uri}' IAM_ROLE '${iam_role}' SECRET_ARN '${secret_arn}';
+GRANT USAGE ON SCHEMA yjb_case_reporting_stg_sam TO GROUP yjb_ianda_team;
+
+DROP SCHEMA IF EXISTS yjb_case_reporting_stg;
+CREATE EXTERNAL SCHEMA yjb_case_reporting_stg FROM POSTGRES DATABASE 'YJB_Case_Reporting' SCHEMA 'stg' URI '${postgres_uri}' IAM_ROLE '${iam_role}' SECRET_ARN '${secret_arn}';
+GRANT USAGE ON SCHEMA yjb_case_reporting_stg TO GROUP yjb_ianda_team;
+
+DROP SCHEMA IF EXISTS yjaf_bands;
+CREATE EXTERNAL SCHEMA yjaf_bands FROM POSTGRES DATABASE 'yjaf' SCHEMA 'bands' URI '${postgres_uri}' IAM_ROLE '${iam_role}' SECRET_ARN '${secret_arn}';
+GRANT USAGE ON SCHEMA yjaf_bands TO GROUP yjb_ianda_team;

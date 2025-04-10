@@ -11,7 +11,7 @@ locals {
         instance_type   = "ml.t2.large"                                           # SageMaker AI Real-time Inference instance type to use
         repository_name = "tei-cpu"                                               # "tei" for GPU-accelerated instances, "tei-cpu" for CPU-only instances
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"                  # Version of the Hugging Face Text Embeddings Inference image to use. See https://huggingface.co/docs/text-embeddings-inference.
-        s3_model_key    = "ext/mixedbread-ai/mixedbread-ai_mxbai-embed-large-v1/" # To use a local model from S3
+        s3_model_key    = "ext/fine_tune_testing/fine_tune_test_senttrans_mixedbread-ai_mxbai-embed-large-v1/" # To use a local model from S3
         environment = {                                                           # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
           HF_MODEL_ID           = "/opt/ml/model"                                 # Specifies the model to load from Hugging Face Hub, if you are specifying s3_model_key, this should be set to "/opt/ml/model"
           MAX_CLIENT_BATCH_SIZE = 512

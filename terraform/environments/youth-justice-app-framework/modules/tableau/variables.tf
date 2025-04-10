@@ -86,6 +86,16 @@ variable "certificate_arn" {
   description = "The arn of the SSL cetificate to use for external access to Tableau."
 }
 
+variable "r53_zone_id" {
+  type        = string
+  description = "The Route 53 Zone where thhe public DNS record is to be created."
+}
+
+variable "tableau_website_name" {
+  type        = string
+  description = "The name of the tableau website."
+}
+
 #Tableau security gropup inputs
 variable "directory_service_sg_id" {
   type        = string

@@ -26,6 +26,11 @@ resource "aws_instance" "ec2_ebsapps" {
     hostname = "ebs-apps-sandbox"
   }))
 
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
   # AMI ebs mappings from /dev/sd[a-d]
   # root
   root_block_device {
