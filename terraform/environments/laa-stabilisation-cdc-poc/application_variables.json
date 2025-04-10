@@ -39,7 +39,9 @@
       "cwa_poc2_share_snapshot_id": "snap-02e8ec5eb874dd9e0",
       "app_disk_space_alert_threshold": "92",
       "old_mail_server_url": "mail.aws.tst.legalservices.gov.uk",
-      "laa_mail_relay_url": "laa-mail.laa-development.modernisation-platform.service.justice.gov.uk"
+      "laa_mail_relay_url": "laa-mail.laa-development.modernisation-platform.service.justice.gov.uk",
+      "rhel7_ami_id": "ami-0e5f1571c6f046b98",
+      "rhel7_instance_type": "m4.xlarge"
     },
     "test": {
       "example_var": "test-data"
