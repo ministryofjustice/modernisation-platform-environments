@@ -64,6 +64,9 @@ module "aurora" {
       "schedule" = "lambda" #allows lambda scheduler to target this rds for overnight shutdown
     }
   ) : local.all_tags
+
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.force_recreation.name
+
 }
 
 #todo match yjaf production security group
@@ -105,3 +108,17 @@ resource "aws_security_group_rule" "s3-access" {
 
 
 #todo additional users and their password rotation? can it be done?
+
+
+
+resource "aws_rds_cluster_parameter_group" "force_recreation" {
+  name        = "aurora-pg-preprod"
+  family      = "aurora-postgresql16"
+  description = "Forces recreation when value changes"
+
+  parameter {
+    name  = "rds.force_recreation"
+    value = "v2" # Change this to "v2", "v3", etc., to force recreation
+    apply_method = "immediate"
+  }
+}
