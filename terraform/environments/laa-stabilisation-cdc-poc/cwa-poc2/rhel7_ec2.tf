@@ -37,9 +37,9 @@ resource "aws_vpc_security_group_egress_rule" "rhel7_outbound" {
 ######################################
 
 resource "aws_instance" "rhel7_instance_1" {
-  ami                         = local.application_data.accounts[local.environment].rhel7_ami_id
+  ami                         = var.application_data.accounts[local.environment].rhel7_ami_id
   availability_zone           = "eu-west-2a"
-  instance_type               = local.application_data.accounts[local.environment].rhel7_instance_type
+  instance_type               = var.application_data.accounts[local.environment].rhel7_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.rhel7_instance.id]
   subnet_id                   = var.data_subnet_a_id
