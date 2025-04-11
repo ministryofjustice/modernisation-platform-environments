@@ -11,7 +11,7 @@ resource "aws_scheduler_schedule" "dms_nightly_full_load" {
 
   target {
     arn      = "arn:aws:scheduler:::aws-sdk:databasemigration:startReplicationTask"
-    role_arn = aws_iam_role.eventbridge_dms_full_load_task_role.arn
+    role_arn = module.cica_dms_tariff_dms_implementation.dms_full_load_task_arn
 
     input = jsonencode({
       ReplicationTaskArn       = module.cica_dms_tariff_dms_implementation.dms_full_load_task_arn

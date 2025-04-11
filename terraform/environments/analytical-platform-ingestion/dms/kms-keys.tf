@@ -52,7 +52,7 @@ module "cica_dms_eventscheduler_kms" {
   # Grants
   grants = {
     dms_source = {
-      grantee_principal = aws_iam_role.eventbridge_dms_full_load_task_role.arn
+      grantee_principal = module.cica_dms_tariff_dms_implementation.dms_full_load_task_arn
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
   }
