@@ -2,7 +2,7 @@ module "s3_cica_dms_ingress_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["s3/cica-dms-ingress"]
   description           = "Used in the CICA DMS Ingress Solution"
@@ -18,7 +18,7 @@ module "cica_dms_credentials_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["dms/cica-source-credentials"]
   description           = "Used in the CICA DMS Solution to encode secrets"
@@ -41,7 +41,7 @@ module "cica_dms_eventscheduler_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["dms/cica-eventscheduler"]
   description           = "Used in the CICA DMS Solution EventScheduler to encode EventBridge Scheduler"
