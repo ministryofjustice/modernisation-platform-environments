@@ -496,3 +496,67 @@ resource "aws_iam_role" "api_gateway_authorizer" {
   name               = "api_gateway_authorizer"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
+
+# -----------------------------------------------------------------------------------
+# Event logger
+# -----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "event_logger" {
+  name               = "pipeline-logger-role-fms"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "lamba_logger_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "s3:GetObject"
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.pipeline_logs.arn}:*",
+      "${module.s3-fms-general-landing-bucket.bucket.arn}}/*"
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "lambda_logger_policy" {
+  name   = "pipeline-logger-policy"
+  role   = aws_iam_role.event_logger.id
+  policy = data.aws_iam_policy_document.lamba_logger_policy_document.json
+}
+
+# -----------------------------------------------------------------------------------
+# Event Summary
+# -----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "summary_generator" {
+  name               = "pipeline-summary-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "lambda_summary_policy_document" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents",
+      "logs:StartQuery",
+      "logs:GetQueryResults",
+      "lambda:InvokeFunction"
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.pipeline_logs.arn}:*",
+      module.summary_generator.lambda_function_arn
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "lambda_summary_policy" {
+  name   = "pipeline-summary-policy"
+  role   = aws_iam_role.summary_generator.id
+  policy = data.aws_iam_policy_document.lambda_summary_policy_document.json
+}
