@@ -130,6 +130,21 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
   }
 }
 
+# Role policy to conditionally allow lambda to assume role
+resource "aws_iam_role_policy" "metadata_generator_lambda_function_assume_role" {
+  count = (var.glue_catalog_role_arn != "") ? 1 : 0
+  role = module.metadata_generator.lambda_role_name
+
+  policy = jsonencode({
+    actions = [
+      "sts.AssumeRole"
+    ]
+    resources = [
+      var.glue_catalog_role_arn
+    ]
+  })
+}
+
 # Create security group for Lambda function
 #trivy:ignore:AVD-AWS-0104: Allow all egress traffic
 resource "aws_security_group" "metadata_generator_lambda_function" {
@@ -176,7 +191,7 @@ module "metadata_generator" {
   vpc_subnet_ids         = data.aws_subnets.subnet_ids_vpc_subnets.ids
   attach_network_policy  = true
 
-
+  # Lambda function role will have the attached policies
   attach_policy_json = true
   policy_json        = data.aws_iam_policy_document.metadata_generator_lambda_function.json
 
