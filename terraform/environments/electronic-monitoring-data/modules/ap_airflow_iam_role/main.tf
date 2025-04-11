@@ -5,8 +5,15 @@ locals {
     "test"          = "test"
     "development"   = "dev"
   }
-  mwaa      = var.new_airflow ? "mwaa:electronic-monitoring-data-store-${var.role_name_suffix}" : "airflow:${local.role_name}"
-  role_name = "airflow-${local.account_map[var.environment]}-${var.role_name_suffix}"
+  env_suffixes = {
+    "production"    = ""
+    "preproduction" = "-pp"
+    "test"          = ""
+    "development"   = ""
+  }
+  role_name_suffix = var.environment == "preproduction" ? trimsuffix(var.role_name_suffix, "-pp") : var.role_name_suffix
+  mwaa             = var.new_airflow ? "mwaa:electronic-monitoring-data-store${local.env_suffixes[var.environment]}-${local.role_name_suffix}" : "airflow:${local.role_name}"
+  role_name        = "airflow-${local.account_map[var.environment]}-${var.role_name_suffix}"
 }
 
 # --------------------------------------------
