@@ -49,7 +49,7 @@ variable "dms_source" {
     secrets_manager_arn         = string,
     secrets_manager_kms_arn     = string,
     sid                         = string,
-    extra_connection_attributes = optional(string)
+    extra_connection_attributes = optional(string, "")
     cdc_start_time              = optional(string)
   })
 
