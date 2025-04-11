@@ -21,14 +21,9 @@ resource "aws_ses_domain_dkim" "main" {
 # SES SMTP User
 #####################
 
-
 resource "aws_iam_user" "ses_smtp_user" {
   #checkov:skip=CKV_AWS_273: ses user
   name = "${var.environment}-${var.project_name}-smtp-user"
-}
-
-resource "aws_iam_access_key" "ses_smtp_user" {
-  user = aws_iam_user.ses_smtp_user.name
 }
 
 resource "aws_iam_user_policy" "ses_smtp_user" {
@@ -40,19 +35,27 @@ resource "aws_iam_user_policy" "ses_smtp_user" {
   })
 }
 
+# Generates SES SMTP credentials directly (username and password)
+resource "aws_iam_service_specific_credential" "smtp" {
+  user_name     = aws_iam_user.ses_smtp_user.name
+  service_name  = "ses.amazonaws.com"
+  depends_on    = [aws_iam_user_policy.ses_smtp_user]
+}
+
+# Secret to store SMTP credentials securely
 resource "aws_secretsmanager_secret" "ses_user_secret" {
   #checkov:skip=CKV2_AWS_57:todo add rotation if needed
   name        = "${var.project_name}-ses-user"
-  description = "key credentials for ses user"
+  description = "SMTP credentials for SES user"
   kms_key_id  = var.key_id
   tags        = var.tags
 }
 
-resource "aws_secretsmanager_secret_version" "ses_user_secret" {
+resource "aws_secretsmanager_secret_version" "ses_user_secret_version" {
   secret_id = aws_secretsmanager_secret.ses_user_secret.id
   secret_string = jsonencode({
-    username = aws_iam_access_key.ses_smtp_user.id,
-    password = aws_iam_access_key.ses_smtp_user.secret
+    username = aws_iam_service_specific_credential.smtp.service_user_name,
+    password = aws_iam_service_specific_credential.smtp.service_password
   })
 }
 
