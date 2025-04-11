@@ -1,7 +1,9 @@
 import json
+import logging
 import os
 import re
 from datetime import datetime
+from pprint import pformat
 from typing import Optional
 from urllib.parse import unquote_plus
 
@@ -13,6 +15,10 @@ from pyarrow.parquet import ParquetFile
 from urllib3 import PoolManager
 
 patch_all()
+
+logger = logging.getLogger()
+log_level = os.getenv("LOG_LEVEL", "INFO")
+logger.setLevel(log_level)
 
 client = boto3.client("s3")
 fs = s3fs.S3FileSystem()
@@ -28,7 +34,7 @@ type_lookup = {
 }
 
 
-def move_object(bucket_to: str, bucket_from: str, key: str):
+def move_object(bucket_to: str, bucket_from: str, key: str, mutable: bool=False):
     """The function will copy the object in S3 to the "bucket_to" bucket,
     while adding a timestamp to the filename. It will then
     delete the original object from "bucket_from".
@@ -40,11 +46,13 @@ def move_object(bucket_to: str, bucket_from: str, key: str):
         The bucket where the S3 object is.
     key : str
         The object S3 key.
+    mutable: bool
+        If False, insert datetime infix into destination path
     """
     client = boto3.client("s3")
     # Provides timestamp like '20210217_121400'
     event_time = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
-    if "LOAD" in key:
+    if "LOAD" in key and not mutable:
         # This will return a key of the form 'Load000000001_[DATE]_[TIME].parquet'
         new_key = key.split(".")[0] + "_" + event_time + ".parquet"
     else:
@@ -66,7 +74,7 @@ def move_object(bucket_to: str, bucket_from: str, key: str):
         copy_params["Metadata"] = current_metadata
         copy_params["MetadataDirective"] = "REPLACE"
 
-    print("COPY PARAMS:", copy_params)
+    logger.info("COPY PARAMS:", copy_params)
 
     client.copy_object(**copy_params)
     client.delete_object(Bucket=bucket_from, Key=key)
@@ -150,7 +158,7 @@ class FileValidator:
     parquet_table_name : str
         The table name corresponding to the given Parquet file.
     metadata_s3_keys : dict
-        Dictionar containing the table names as keys and their corresponding AWS S3
+        Dictionary containing the table names as keys and their corresponding AWS S3
         keys as values.
     metadata_bucket : str
         The name of the bucket where the metadata is located.
@@ -165,6 +173,7 @@ class FileValidator:
         parquet_table_name: str,
         metadata_s3_keys: dict,
         metadata_bucket: str,
+        valid_files_mutable: bool=False
     ):
         """
         Parameters
@@ -180,10 +189,12 @@ class FileValidator:
         parquet_table_name : str
             The table name corresponding to the given Parquet file.
         metadata_s3_keys : dict
-            Dictionar containing the table names as keys and their corresponding AWS S3
+            Dictionary containing the table names as keys and their corresponding AWS S3
             keys as values.
         metadata_bucket : str
             The name of the bucket where the metadata is located.
+        valid_files_mutable: bool
+            If false, copy valid files to their destination bucket with a datetime infix
         """
         self.key = key
         self.fail_bucket = fail_bucket
@@ -193,9 +204,10 @@ class FileValidator:
         self.metadata_s3_keys = metadata_s3_keys
         self.metadata_bucket = metadata_bucket
         self.errors: list[str] = []
+        self.valid_files_mutable = valid_files_mutable
 
     def _add_error(self, error: str):
-        """Collects and aggregates error messges into a list.
+        """Collects and aggregates error messages into a list.
         Parameters
         ----------
         error : str
@@ -251,12 +263,13 @@ class FileValidator:
             #    ],
             # }
 
+            logger.error(f"{self.key} failed validation with errors: {pformat(self.errors, indent=2)}")
             self.bucket_to = self.fail_bucket
             move_object(self.bucket_to, self.bucket_from, self.key)
 
             # More slack notification code
             # for error in self.errors:
-            #    print(
+            #    logger.info(
             #        f"VALIDATION ERROR\n"
             #        f"File {self.key} failed validation\r"
             #        f"File moved to {location}\r"
@@ -269,18 +282,18 @@ class FileValidator:
             #    method="POST", url=url, body=encoded_payload
             # )
         else:
-            move_object(self.bucket_to, self.bucket_from, self.key)
+            move_object(self.bucket_to, self.bucket_from, self.key, self.valid_files_mutable)
 
     def _validate_file(self, path, fs=fs, validate_column_attributes: bool = True):
         """
         Parameters
         ----------
         path : [type]
-            The file path to the Paruet file to be validated.
+            The file path to the Parquet file to be validated.
         fs : [type], optional
             The file system to use (either local or s3fs).
         validate_column_attributes : bool, optional
-            Set to false so that validate_colunm_attributes is not called when testing,
+            Set to false so that validate_column_attributes is not called when testing,
             by default True..
         """
         open_function = fs.open if fs is not None else open
@@ -292,7 +305,7 @@ class FileValidator:
                 return
         if self.parquet_table_name not in self.metadata_s3_keys.keys():
             self._add_error(
-                error=f"'{self.parquet_table_name}' is an invalid table name."
+                error=f"'{self.parquet_table_name}' is an not in the list of keys in the metadata bucket"
             )
         elif validate_column_attributes:
             self._validate_column_attributes(parquet_file=self.parquet_file)
@@ -441,17 +454,18 @@ def handler(event, context):  # noqa: C901 pylint: disable=unused-argument
     fail_bucket = os.environ["FAIL_BUCKET"]
     metadata_bucket = os.environ["METADATA_BUCKET"]
     metadata_path = os.environ["METADATA_PATH"]
+    valid_files_mutable = os.environ.get("VALID_FILES_MUTABLE", "false").lower() == "true"
 
-    print(f"Event: {event}")
-    print("Binary solo: 0001110101010111")
+    logger.info(f"Event: {event}")
+    logger.info("Binary solo: 0001110101010111")
 
     # Get the bucket and key from the event
     record = event["Records"][0]
     bucket_from = record["s3"]["bucket"]["name"]
     key = unquote_plus(record["s3"]["object"]["key"])
 
-    print(f"Bucket from: {bucket_from}")
-    print(f"Key: {key}")
+    logger.info(f"Bucket from: {bucket_from}")
+    logger.info(f"Key: {key}")
 
     paginator = client.get_paginator("list_objects_v2")
     page_iterator = paginator.paginate(Bucket=metadata_bucket, Prefix=metadata_path)
@@ -465,15 +479,15 @@ def handler(event, context):  # noqa: C901 pylint: disable=unused-argument
     metadata_s3_keys = {}
     for object_ in contents:
         metadata_s3_key = object_["Key"]
-        print(f"Metadata S3 key: {metadata_s3_key}")
+        logger.info(f"Metadata S3 key: {metadata_s3_key}")
         metadata_table_name = metadata_s3_key.rsplit("/", 1)[-1].rsplit(".", 1)[0]
         metadata_s3_keys[metadata_table_name] = metadata_s3_key
 
-    print(f"key: {key}")
+    logger.info(f"key: {key}")
     parquet_table_name = key.rsplit("/", 2)[1].lower()
 
-    print(f"Metadata S3 keys: {metadata_s3_keys}")
-    print(f"Parquet table name: {parquet_table_name}")
+    logger.info(f"Metadata S3 keys: {metadata_s3_keys}")
+    logger.info(f"Parquet table name: {parquet_table_name}")
 
     try:
         fileValidator = FileValidator(
@@ -484,9 +498,10 @@ def handler(event, context):  # noqa: C901 pylint: disable=unused-argument
             parquet_table_name=parquet_table_name,
             metadata_s3_keys=metadata_s3_keys,
             metadata_bucket=metadata_bucket,
+            valid_files_mutable=valid_files_mutable
         )
     except Exception as e:
-        print(f"Error creating FileValidator: {e}")
+        logger.exception(f"Error creating FileValidator: {e}")
         # Raise exception to stop the Lambda function
         raise e
 
