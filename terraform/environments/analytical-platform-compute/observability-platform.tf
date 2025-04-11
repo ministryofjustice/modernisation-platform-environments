@@ -16,7 +16,15 @@ module "observability_platform_tenant" {
 }
 
 module "analytical_platform_observability" {
-  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=875fbc699f51c77a2d4cbb77c2366acd4b343cd9" # 1.0.0
+  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=840c2351c6d8ee16b36e8138e77bb9ae5d1e8442" # TEST
+
+  enable_cloudwatch_read_only_access    = true
+  enable_amazon_prometheus_query_access = true
+  enable_aws_xray_read_only_access      = true
+
+  additional_policies = {
+    managed_prometheus_kms_access = module.managed_prometheus_kms_access_iam_policy.arn
+  }
 
   tags = local.tags
 }
