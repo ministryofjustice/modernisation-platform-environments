@@ -68,3 +68,17 @@ variable "db_exists" {
   type        = bool
   description = "Whether the database exists"
 }
+
+variable "full_reload" {
+  type        = bool
+  description = "whether for full reload job"
+  nullable    = true
+  default     = false
+}
+
+variable "new_airflow" {
+  type        = bool
+  description = "whether we are using new airflow or not"
+  nullable    = true
+  default     = false
+}
