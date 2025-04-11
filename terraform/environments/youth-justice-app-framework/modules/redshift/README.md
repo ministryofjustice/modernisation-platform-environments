@@ -33,10 +33,24 @@ As, currently, the default AWS key is used for encryption, permissions are not n
 4. Confirm that you want to replace all databases in your namespace.
 4. Wait to the snapshort restore to complete.
 
-### Generate admin Passwordd and store in Secret ###
+### Copy account passwords from old to new secrets ###
 1. In the AWS Management Console for the destination account, on the `Namespace`, and from the `Actions` menu select `click on the`Total snapshots` link to view the `Snapshots`.
 2. Select `Generate a password` and `Show password` then copy the password to the clipboard beofre `Save changes`.
 3. In `AWS Secrets Manager`, select secret `yjaf/<env>/resshift-servless/`, `Retrieve secret value`, `Edit`, paste the password into the passowrd field value and `Save`.
+
+### Recreate the External Schemas ###
+1. Ensure you have the folowing informaition for the destination account:
+    - Postgres Read only URI
+    - ARN of the AMI Redshift role created for the YJB Team with name `Redshift-Serverless-YJB-Team`.
+    - ARN of the Secrret created to hold the redshift read only crednetials with name `yjafrds01-cluster-db-redshift_readonly-password`.
+
+2. In the AWS Management Console for the destination account, launch `Redshift query editor v2`. This can be done using the `Quryy data` link on the `Amazon Redshift Serverless` `Namespace configuration` page.
+3. On environments, except production, create a user for the IAM role used by the YJB team but running the following command:
+    `CREATE USER "IAMR:redshift-serverless-yjb-reporting-moj_ap" PASSWORD DISABLE`
+4. Generate Definitions for materalised views that refernt external schema `yjb_case_reporting_stg` using the command below and save them to file `<env>_mv_before.sql`.
+    `select view_definition from information_schema.views where view_definition like '%yjb_case_reporting_stg%' order by table_name`
+5. Run script `recreate_external_schemas.sql` to recreate the External Schemas.
+6. They above script will fail to remove and recreate `yjb_case_reporting_stg` due to the materalised views. First check that script `recreate_views.sql` contna definition to all the affected materalised views. The drop `yjb_case_reporting_stg` manula and rerun that section of the script to recreate it.
 
 
 
