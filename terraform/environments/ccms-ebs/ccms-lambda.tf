@@ -43,23 +43,20 @@ resource "aws_security_group" "lambda_security_group" {
   )
 }
 
-
 # Lambda Function
 resource "aws_lambda_function" "lambda_function" {
-  function_name = "${local.application_name}-${local.environment}-payment-load"
-  filename      = "lambda/functionV2.zip"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.10"
-  role          = aws_iam_role.lambda_execution_role.arn
-  layers        = [aws_lambda_layer_version.lambda_layer.arn]
-  architectures = ["x86_64"]
-  memory_size   = 128
-  timeout       = 120
+  depends_on       = [aws_lambda_layer_version.lambda_layer]
+  function_name    = "${local.application_name}-${local.environment}-payment-load"
+  filename         = "lambda/functionV2.zip"
+  source_code_hash = filebase64sha256("./lambda/functionV2.zip")
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.10"
+  role             = aws_iam_role.lambda_execution_role.arn
+  layers           = [aws_lambda_layer_version.lambda_layer.arn]
+  architectures    = ["x86_64"]
+  memory_size      = 128
+  timeout          = 120
 
-  vpc_config {
-    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
-    security_group_ids = [aws_security_group.lambda_security_group.id]
-  }
   environment {
     variables = {
       IS_PRODUCTION   = local.is-production ? "true" : "false"
@@ -68,17 +65,25 @@ resource "aws_lambda_function" "lambda_function" {
       SECRET_NAME     = aws_secretsmanager_secret.secret_lambda_s3.name
     }
   }
+
   logging_config {
     log_format            = "JSON"
     application_log_level = "INFO"
     system_log_level      = "INFO"
   }
 
+  tracing_config {
+    mode = "Active"
+  }
+
+  vpc_config {
+    subnet_ids         = [data.aws_subnet.data_subnets_a.id]
+    security_group_ids = [aws_security_group.lambda_security_group.id]
+  }
+
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-payment-load"
   })
-
-  depends_on = [aws_lambda_layer_version.lambda_layer]
 }
 
 resource "aws_lambda_permission" "allow_bucket" {
