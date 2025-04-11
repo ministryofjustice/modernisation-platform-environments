@@ -45,16 +45,17 @@ resource "aws_security_group" "lambda_security_group" {
 
 # Lambda Function
 resource "aws_lambda_function" "lambda_function" {
-  depends_on    = [aws_lambda_layer_version.lambda_layer]
-  function_name = "${local.application_name}-${local.environment}-payment-load"
-  filename      = "lambda/functionV2.zip"
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.10"
-  role          = aws_iam_role.lambda_execution_role.arn
-  layers        = [aws_lambda_layer_version.lambda_layer.arn]
-  architectures = ["x86_64"]
-  memory_size   = 128
-  timeout       = 120
+  depends_on       = [aws_lambda_layer_version.lambda_layer]
+  function_name    = "${local.application_name}-${local.environment}-payment-load"
+  filename         = "lambda/functionV2.zip"
+  source_code_hash = filebase64sha256("./lambda/functionV2.zip")
+  handler          = "lambda_function.lambda_handler"
+  runtime          = "python3.10"
+  role             = aws_iam_role.lambda_execution_role.arn
+  layers           = [aws_lambda_layer_version.lambda_layer.arn]
+  architectures    = ["x86_64"]
+  memory_size      = 128
+  timeout          = 120
 
   environment {
     variables = {
