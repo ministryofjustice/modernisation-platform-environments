@@ -42,7 +42,7 @@ locals {
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
           tags = {
-            # patch-manager = "group2"
+            patch-manager = "group1"
           }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
@@ -56,7 +56,7 @@ locals {
         })
         instance = merge(local.ec2_instances.rdgw.instance, {
           tags = {
-            # patch-manager = "group1"
+            patch-manager = "group1"
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
@@ -72,7 +72,7 @@ locals {
         })
         instance = merge(local.ec2_instances.rdgw.instance, {
           tags = {
-            # patch-manager = "group2"
+            patch-manager = "group2"
           }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
@@ -89,7 +89,7 @@ locals {
         instance = merge(local.ec2_instances.rds.instance, {
           instance_type = "t3.large"
           tags = {
-            # patch-manager = "group2"
+            patch-manager = "group2"
           }
         })
         tags = merge(local.ec2_instances.rds.tags, {
