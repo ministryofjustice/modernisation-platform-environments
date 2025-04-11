@@ -5,7 +5,7 @@ resource "aws_instance" "ec2_ftp" {
   vpc_security_group_ids      = [aws_security_group.ec2_sg_ftp.id]
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   monitoring                  = true
-  ebs_optimized               = false
+  ebs_optimized               = true
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
