@@ -16,7 +16,7 @@ module "observability_platform_tenant" {
 }
 
 module "analytical_platform_observability" {
-  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=840c2351c6d8ee16b36e8138e77bb9ae5d1e8442" # TEST
+  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=bd09ac68fb3050ddd9992fe4326148aa5d2b1c9b" # 1.1.0
 
   enable_cloudwatch_read_only_access    = true
   enable_amazon_prometheus_query_access = true
