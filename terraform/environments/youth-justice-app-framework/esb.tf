@@ -24,7 +24,7 @@ module "esb" {
   ami = coalesce(
     lookup(
       {
-        development   = "ami-0fc27ddcf3e4e76af"
+        development   = "ami-0cc0dad47bc769c08"
         preproduction = "ami-04a6fa2443473cfd5"
       },
       local.environment,
