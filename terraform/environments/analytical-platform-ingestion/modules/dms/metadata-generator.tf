@@ -169,6 +169,7 @@ resource "aws_s3_object" "dms_mapping_rules" {
   bucket = aws_s3_bucket.lambda.bucket
   key    = "metadata-generator/config/dms_mapping_rules.json"
   source = var.dms_mapping_rules
+  etag = filemd5(var.dms_mapping_rules)
 }
 
 module "metadata_generator" {
