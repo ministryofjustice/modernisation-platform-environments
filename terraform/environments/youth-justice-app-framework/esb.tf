@@ -21,14 +21,18 @@ module "esb" {
   )
 
   ami = lookup(
-    {
-      development   = "ami-0fc27ddcf3e4e76af"
-      preproduction = "ami-04a6fa2443473cfd5"
-      # Add more environments when AMIs are known
-    },
-    local.environment,
-    "ami-01426769db5cd0a43" # Default AMI
-  )
+  {
+    development   = "ami-0fc27ddcf3e4e76af"
+    preproduction = "ami-04a6fa2443473cfd5"
+  },
+  local.environment,
+  null  # If the environment is unknown, fallback to the default AMI
+)
+
+  # Fallback to default AMI if the lookup returns null
+  ami = coalesce(ami, "ami-01426769db5cd0a43")  # Default AMI
+
+  
 
   project_name = local.project_name
   environment  = local.environment
