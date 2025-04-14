@@ -48,6 +48,7 @@ module "codedeploy" {
     module.internal_alb,
     module.external_alb,
     module.ecs,
-    module.yjsm
+    module.yjsm,
+    module.esb
   ]
 }
