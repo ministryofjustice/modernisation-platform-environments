@@ -139,7 +139,7 @@ resource "aws_iam_role_policy" "metadata_generator_lambda_function_assume_role" 
     Version = "2012-10-17"
     Statement = [
       {
-        Action = ["sts.AssumeRole"]
+        Action = ["sts:AssumeRole"]
         Effect = "Allow"
         Resource = "${var.glue_catalog_role_arn}"
       },
