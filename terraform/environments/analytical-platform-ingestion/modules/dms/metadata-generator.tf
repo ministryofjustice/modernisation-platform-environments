@@ -136,11 +136,13 @@ resource "aws_iam_role_policy" "metadata_generator_lambda_function_assume_role" 
   role = module.metadata_generator.lambda_role_name
 
   policy = jsonencode({
-    actions = [
-      "sts.AssumeRole"
-    ]
-    resources = [
-      var.glue_catalog_role_arn
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = ["sts.AssumeRole"]
+        Effect = "Allow"
+        Resource = "${var.glue_catalog_role_arn}"
+      },
     ]
   })
 }
