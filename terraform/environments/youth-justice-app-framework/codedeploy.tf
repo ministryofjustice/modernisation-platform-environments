@@ -8,7 +8,7 @@ data "aws_instance" "target_ec2" {
     values = ["running"]
   }
   depends_on = [
-    module.yjsm
+    module.yjsm, module.esb
   ]
 }
 
