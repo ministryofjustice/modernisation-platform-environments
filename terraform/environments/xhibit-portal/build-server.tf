@@ -1,5 +1,5 @@
 resource "aws_instance" "build-server" {
-  # checkov:skip=Check: CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+  # checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
   # checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   depends_on                  = [aws_security_group.build_server]
   instance_type               = "t2.medium"
@@ -45,9 +45,7 @@ resource "aws_instance" "build-server" {
 }
 
 resource "aws_ebs_volume" "build-disk1" {
-  
-  # checkov:skip=Check: CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
-  
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
   depends_on        = [aws_instance.build-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
