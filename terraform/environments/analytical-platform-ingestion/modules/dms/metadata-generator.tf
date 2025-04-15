@@ -213,6 +213,8 @@ module "metadata_generator" {
     GLUE_CATALOG_ACCOUNT_ID              = var.glue_catalog_account_id
     GLUE_CATALOG_ROLE_ARN                = var.glue_catalog_role_arn
     GLUE_CATALOG_DATABASE_NAME           = var.glue_catalog_database_name
+    GLUE_DESTINATION_BUCKET              = var.glue_destination_bucket != "" ? var.glue_destination_bucket : data.aws_s3_bucket.raw_history.bucket
+    GLUE_DESTINATION_PREFIX              = var.dms_target_prefix
     USE_GLUE_CATALOG                     = var.write_metadata_to_glue_catalog
     PATH_TO_DMS_MAPPING_RULES            = aws_s3_object.dms_mapping_rules.key
     RETRY_FAILED_AFTER_RECREATE_METADATA = var.retry_failed_after_recreate_metadata

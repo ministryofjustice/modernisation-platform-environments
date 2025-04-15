@@ -64,6 +64,12 @@ variable "dms_source" {
   EOF
 }
 
+variable "dms_target_prefix" {
+  type        = string
+  default     = ""
+  description = "The prefix for the s3 target endpoint (optional)"
+}
+
 variable "dms_mapping_rules" {
   type        = string
   description = "The path to the mapping rules file"
@@ -137,4 +143,13 @@ variable "glue_catalog_database_name" {
   type = string
   default = ""
   description = "Which database to write to in glue catalog (optional)"
+}
+
+variable "glue_destination_bucket" {
+  type        = string
+  default     = ""
+  description = <<EOF
+    The name of the bucket pointed to in the glue metadata (optional)
+    This is useful if this parameter must be different to the output bucket, e.g. because of bucket replication
+  EOF
 }
