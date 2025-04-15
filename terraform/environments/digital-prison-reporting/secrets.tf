@@ -93,6 +93,7 @@ resource "aws_secretsmanager_secret" "oasys" {
     {
       Name          = "external/${local.project}-oasys-source-secret"
       Resource_Type = "Secrets"
+      Jira          = "DPR2-XXX"
     }
   )
 }
