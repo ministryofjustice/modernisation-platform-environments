@@ -1079,7 +1079,7 @@ module "generate_test_postgres_data" {
     {
       Name          = "${local.project}-load-generator-job-${local.env}"
       Resource_Type = "Glue Job"
-      Jira          = "DPR2-1876"
+      Jira          = "DPR2-1884"
     }
   )
 
@@ -1090,9 +1090,9 @@ module "generate_test_postgres_data" {
     "--dpr.aws.region"                           = local.account_region
     "--dpr.log.level"                            = local.glue_job_common_log_level
     "--dpr.test.database.secret.id"              = "external/dpr-dps-testing2-source-secrets"
-    "--dpr.test.data.batch.size"                 = 10
-    "--dpr.test.data.parallelism"                = 5
-    "--dpr.test.data.inter.batch.delay.millis"   = 100
+    "--dpr.test.data.batch.size"                 = 1000
+    "--dpr.test.data.parallelism"                = 100
+    "--dpr.test.data.inter.batch.delay.millis"   = 20
   }
 }
 
@@ -1103,8 +1103,18 @@ resource "aws_glue_trigger" "glue_postgres_data_generator_job_trigger" {
   name     = "${module.generate_test_postgres_data[0].name}-trigger"
   schedule = "cron(0 0/2 ? * * *)" # runs every 2 hours
   type     = "SCHEDULED"
+  enabled  = false
 
   actions {
     job_name = module.generate_test_postgres_data[0].name
   }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-load-generator-trigger-${local.env}"
+      Resource_Type = "Glue Trigger"
+      Jira          = "DPR2-1884"
+    }
+  )
 }
