@@ -16,27 +16,34 @@ module "production_replication_cica_dms_iam_role" {
   custom_role_policy_arns = [module.production_replication_cica_dms_iam_policy.arn]
 }
 
-resource "aws_iam_role" "eventbridge_dms_full_load_task_role" {
-  name = "tariff_dms_eventbridge_full_load_task_role"
-  assume_role_policy = jsonencode({
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "Service": [
-            "scheduler.amazonaws.com",
-            "apidestinations.events.amazonaws.com"
-          ]
-        },
-        "Action": "sts:AssumeRole",
-        "Condition": {
-          "StringEquals": {
-            "aws:SourceAccount": data.aws_caller_identity.current.account_id,
-            "aws:SourceArn": aws_scheduler_schedule_group.dms_nightly_full_load.arn
-          }
-        }
-      }
-    ]
-  })
+module "eventbridge_dms_full_load_task_role" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.52.2"
+
+  create_role = true
+
+  role_name         = "tariff-dms-eventbridge-full-load-task-role"
+  role_requires_mfa = false
+
+  trusted_role_services = [
+    "scheduler.amazonaws.com",
+    "apidestinations.events.amazonaws.com"
+  ]
+
+  custom_role_policy_arns = [module.production_replication_cica_dms_iam_policy.arn]
+  trust_policy_conditions = [
+    {
+      test = "StringEquals"
+      variable = "aws:SourceAccount"
+      values = [data.aws_caller_identity.current.account_id]
+    },
+    {
+      test = "StringEquals"
+      variable = "aws:SourceArn"
+      values = [aws_scheduler_schedule_group.dms_nightly_full_load.arn]
+    }
+  ]
 }
