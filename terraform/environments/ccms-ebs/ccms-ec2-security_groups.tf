@@ -36,7 +36,10 @@ resource "aws_security_group_rule" "all_internal_egress_traffic" {
   ]
 }
 
-resource "aws_security_group_rule" "ingress_oracledb" {
+#--Disabled until the ingress/egress rules in aws_security_group.lambda_security_group are removed
+#--Should be applied immediatley after they are removed
+
+/* resource "aws_security_group_rule" "ingress_oracledb" {
   type              = "ingress"
   from_port         = 1521
   to_port           = 1522
@@ -56,4 +59,4 @@ resource "aws_security_group_rule" "egress_oracledb" {
   protocol          = "-1" #--Any
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.lambda_security_group.id
-}
+} */
