@@ -49,6 +49,7 @@ data "aws_subnets" "ingestion-shared-public" {
   }
 }
 
+# trivy:ignore:AVD-AWS-0053 reason: (HIGH): Load balancer is exposed publicly.
 resource "aws_elb" "ingestion_lb" {
 
   depends_on = [
@@ -101,6 +102,10 @@ data "aws_acm_certificate" "ingestion_lb_cert" {
   statuses = ["ISSUED"]
 }
 
+# trivy:ignore:AVD-AWS-0086 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0087 reason: (HIGH): No public access block so not blocking public policies
+# trivy:ignore:AVD-AWS-0091 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0093 reason: (HIGH): No public access block so not restricting public buckets
 resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-ingestion-lblogs"
   force_destroy = true

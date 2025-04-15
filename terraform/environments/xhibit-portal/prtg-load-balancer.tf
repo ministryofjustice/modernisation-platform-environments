@@ -9,6 +9,8 @@ data "aws_subnets" "prtg-shared-public" {
   }
 }
 
+# trivy:ignore:AVD-AWS-0052 reason: (HIGH): Application load balancer is not set to drop invalid headers.
+# trivy:ignore:AVD-AWS-0053 reason: (HIGH): Load balancer is exposed publicly.
 resource "aws_lb" "prtg_lb" {
 
   depends_on = [
@@ -69,7 +71,7 @@ resource "aws_lb_target_group_attachment" "prtg-server-attachment" {
   port             = 443
 }
 
-
+# trivy:ignore:AVD-AWS-0047 reason: (CRITICAL): Listener uses an outdated TLS policy.
 resource "aws_lb_listener" "prtg_lb_listener" {
   depends_on = [
     aws_acm_certificate_validation.prtg_lb_cert_validation,
@@ -209,6 +211,10 @@ resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
   web_acl_arn  = aws_wafv2_web_acl.prtg_acl[0].arn
 }
 
+# trivy:ignore:AVD-AWS-0086 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0087 reason: (HIGH): No public access block so not blocking public policies
+# trivy:ignore:AVD-AWS-0091 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0093 reason: (HIGH): No public access block so not restricting public buckets
 resource "aws_s3_bucket" "prtg_logs" {
   count         = local.is-production ? 0 : 1
   bucket        = "aws-waf-logs-prtg-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"

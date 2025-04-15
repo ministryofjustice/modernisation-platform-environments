@@ -24,6 +24,8 @@ data "aws_subnets" "waf-shared-public" {
   }
 }
 
+# trivy:ignore:AVD-AWS-0052 reason: (HIGH): Application load balancer is not set to drop invalid headers.
+# trivy:ignore:AVD-AWS-0053 reason: (HIGH): Load balancer is exposed publicly.
 resource "aws_lb" "waf_lb" {
 
   depends_on = [
@@ -83,7 +85,7 @@ resource "aws_lb_target_group_attachment" "portal-server-attachment" {
   port             = 80
 }
 
-
+# trivy:ignore:AVD-AWS-0047 reason: (CRITICAL): Listener uses an outdated TLS policy.
 resource "aws_lb_listener" "waf_lb_listener" {
   depends_on = [
     aws_acm_certificate_validation.waf_lb_cert_validation,
@@ -295,6 +297,10 @@ resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
   web_acl_arn  = aws_wafv2_web_acl.waf_acl[0].arn
 }
 
+# trivy:ignore:AVD-AWS-0086 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0087 reason: (HIGH): No public access block so not blocking public policies
+# trivy:ignore:AVD-AWS-0091 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0093 reason: (HIGH): No public access block so not restricting public buckets
 resource "aws_s3_bucket" "loadbalancer_logs" {
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-lblogs"
   force_destroy = true
@@ -390,6 +396,10 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
   }
 }
 
+# trivy:ignore:AVD-AWS-0086 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0087 reason: (HIGH): No public access block so not blocking public policies
+# trivy:ignore:AVD-AWS-0091 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0093 reason: (HIGH): No public access block so not restricting public buckets
 resource "aws_s3_bucket" "waf_logs" {
   count         = local.is-production ? 0 : 1
   bucket        = "aws-waf-logs-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"

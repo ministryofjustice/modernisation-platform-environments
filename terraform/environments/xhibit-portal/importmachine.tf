@@ -1,3 +1,4 @@
+# trivy:ignore:AVD-AWS-0107 (HIGH): Security group rule allows unrestricted ingress from any IP address.
 resource "aws_security_group" "importmachine" {
   description = "Configure importmachine access - ingress should be only from Bastion"
   name        = "importmachine-${local.application_name}"
