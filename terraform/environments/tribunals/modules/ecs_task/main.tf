@@ -98,7 +98,7 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam
         "logs:PutLogEvents",
         "logs:DescribeLogGroups",
         "logs:DescribeLogStreams",
-        "logs:CreateLogGroup",
+        "logs:CreateLogGroup"
       ],
       "Resource": ["*"]
     }
