@@ -143,7 +143,7 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
 }
 
 resource "aws_iam_role" "app_task" {
-  name = "task-${var.networking[0].application}"
+  name = "task-${var.app_name}"
 
   assume_role_policy = <<EOF
 {
@@ -164,13 +164,13 @@ EOF
   tags = merge(
     var.tags_common,
     {
-      Name = "task-${var.networking[0].application}"
+      Name = "task-${var.app_name}"
     }
   )
 }
 
 resource "aws_iam_role_policy" "app_task" {
-  name = "task-${var.networking[0].application}"
+  name = "task-${var.app_name}"
   role = aws_iam_role.app_task.id
 
   policy = <<-EOF
