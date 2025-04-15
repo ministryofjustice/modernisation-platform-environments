@@ -431,7 +431,6 @@ resource "aws_secretsmanager_secret" "operational_db_secret" {
 
   tags = {
     Name = "${local.project}-rds-operational-db-secret"
-    Jira = "DPR2-438"
   }
 }
 
