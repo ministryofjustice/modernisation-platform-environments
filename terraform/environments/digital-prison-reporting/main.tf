@@ -591,6 +591,63 @@ module "s3_violation_bucket" {
   )
 }
 
+# S3 Landing Zone Bucket. Used by File Transfer In/Push
+module "s3_landing_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-landing-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-landing-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
+# S3 Landing Processing Zone Bucket. Used by File Transfer In/Push
+module "s3_landing_processing_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-landing-processing-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-landing-processing-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
+# S3 Quarantine Zone Bucket. Used by File Transfer In/Push
+module "s3_quarantine_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-quarantine-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-quarantine-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
 # S3 Bucket (Application Artifacts Store)
 module "s3_artifacts_store" {
   source              = "./modules/s3_bucket"
