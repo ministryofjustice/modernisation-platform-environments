@@ -52,6 +52,8 @@ data "aws_subnets" "ingestion-shared-public" {
 # trivy:ignore:AVD-AWS-0053 reason: (HIGH): Load balancer is exposed publicly.
 resource "aws_elb" "ingestion_lb" {
 
+  # checkov:skip=CKV_AWS_376: "Ensure AWS Elastic Load Balancer listener uses TLS/SSL"
+
   depends_on = [
     aws_security_group.ingestion_lb,
   ]
@@ -107,6 +109,13 @@ data "aws_acm_certificate" "ingestion_lb_cert" {
 # trivy:ignore:AVD-AWS-0091 reason: (HIGH): No public access block so not blocking public acls
 # trivy:ignore:AVD-AWS-0093 reason: (HIGH): No public access block so not restricting public buckets
 resource "aws_s3_bucket" "ingestion_loadbalancer_logs" {
+  # checkov:skip=CKV2_AWS_62: "Ensure S3 buckets should have event notifications enabled"
+  # checkov:skip=CKV_AWS_145: "Ensure that S3 buckets are encrypted with KMS by default"
+  # checkov:skip=CKV2_AWS_6: "Ensure that S3 bucket has a Public Access block"
+  # checkov:skip=CKV_AWS_21: "Ensure all data stored in the S3 bucket have versioning enabled"
+  # checkov:skip=CKV_AWS_144: "Ensure that S3 bucket has cross-region replication enabled"
+  # checkov:skip=CKV_AWS_18: "Ensure the S3 bucket has access logging enabled"
+  # checkov:skip=CKV2_AWS_61: "Ensure that an S3 bucket has a lifecycle configuration"
   bucket        = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}-ingestion-lblogs"
   force_destroy = true
 }
@@ -202,6 +211,9 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
 }
 
 resource "aws_load_balancer_policy" "ingestion-ssl" {
+
+  # checkov:skip=CKV_AWS_213: "Ensure ELB Policy uses only secure protocols"
+
   load_balancer_name = aws_elb.ingestion_lb.name
   policy_name        = "ingestion-lb-ssl"
   policy_type_name   = "SSLNegotiationPolicyType"

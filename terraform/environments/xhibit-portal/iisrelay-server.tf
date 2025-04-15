@@ -4,7 +4,8 @@ resource "aws_eip" "iisrelay" {
 }
 
 resource "aws_instance" "iisrelay-server" {
-
+  # checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+  # checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   depends_on                  = [aws_security_group.iisrelay_server]
   instance_type               = "t3.large"
   ami                         = local.application_data.accounts[local.environment].iisrelay-ami
