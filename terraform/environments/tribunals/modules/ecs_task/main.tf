@@ -142,6 +142,56 @@ resource "aws_cloudwatch_log_group" "cloudwatch_group" {
   )
 }
 
+resource "aws_iam_role" "app_task" {
+  name = "task-${var.networking[0].application}"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+
+  tags = merge(
+    var.tags_common,
+    {
+      Name = "task-${var.networking[0].application}"
+    }
+  )
+}
+
+resource "aws_iam_role_policy" "app_task" {
+  name = "task-${var.networking[0].application}"
+  role = aws_iam_role.app_task.id
+
+  policy = <<-EOF
+  {
+   "Version": "2012-10-17",
+   "Statement": [
+     {
+       "Effect": "Allow",
+        "Action": [
+          "logs:*",
+          "ecr:*",
+          "iam:*",
+          "ec2:*"
+        ],
+       "Resource": "*"
+     }
+   ]
+  }
+  EOF
+}
+
 resource "aws_ecs_service" "ecs_service" {
   count           = var.is_ftp_app ? 0 : 1
   name            = var.app_name
