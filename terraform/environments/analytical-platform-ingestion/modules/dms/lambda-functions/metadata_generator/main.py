@@ -234,6 +234,7 @@ class MetadataExtractor:
         table_meta = self._add_reference_columns(table_meta)
         table_meta = self._process_exclusions(table_meta, schema, table)
         # table_meta = self._convert_metadata(table_meta)
+        table_meta.database_name = schema
         table_meta.file_format = "parquet"
         return table_meta
 
@@ -290,6 +291,8 @@ def handler(event, context):  # pylint: disable=unused-argument
     host = db_secret["host"]
     db_name = db_secret.get("dbname", os.getenv("DATABASE_NAME"))
     raw_history_bucket = os.getenv("RAW_HISTORY_BUCKET")
+    destination_bucket = os.getenv("GLUE_DESTINATION_BUCKET", raw_history_bucket)
+    destination_prefix = os.getenv("GLUE_DESTINATION_PREFIX", "")
 
     # TODO: Works for oracle databases. Need to add support for other databases
     port = "1521"
@@ -338,14 +341,21 @@ def handler(event, context):  # pylint: disable=unused-argument
 
     # Used to create glue tables based on Metadata objects
     gc = GlueConverter()
-    glue_table_definitions = [
-        gc.generate_from_meta(
+    glue_table_definitions = []
+    for table in db_metadata:
+        if destination_prefix != "":
+            table_location = f"s3://{destination_bucket}/{destination_prefix}/{table.databse_name}/{table.name}"
+        else:
+            table_location = f"s3://{destination_bucket}/{table.databse_name}/{table.name}"
+
+        logger.info("Generating glue metadata for %s.%s located at %s", table.databse_name, table.name, table_location)
+        glue_table_definition = gc.generate_from_meta(
             table,
             db_identifier.replace("_", "-"),
-            f"s3://{raw_history_bucket}/{schema_name}/{table.name}",
+            table_location,
         )
-        for table in db_metadata
-    ]
+
+        glue_table_definitions.append(glue_table_definition)
 
     if use_glue_catalog:
         for table in glue_table_definitions:
