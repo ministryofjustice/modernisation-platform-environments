@@ -36,10 +36,7 @@ resource "aws_security_group_rule" "all_internal_egress_traffic" {
   ]
 }
 
-#--Disabled until the ingress/egress rules in aws_security_group.lambda_security_group are removed
-#--Should be applied immediatley after they are removed
-
-/* resource "aws_security_group_rule" "ingress_oracledb" {
+resource "aws_security_group_rule" "ingress_oracledb" {
   type              = "ingress"
   from_port         = 1521
   to_port           = 1522
@@ -51,7 +48,7 @@ resource "aws_security_group_rule" "all_internal_egress_traffic" {
 #--https://dsdmoj.atlassian.net/browse/CC-3348?atlOrigin=eyJpIjoiYzAzODExNjc3NWIxNDEyNGI4NjM5NDk1NmVkMzI2ZTAiLCJwIjoiaiJ9
 #--This should not be left in place, for the purposes of fixing a terraform bug only
 #--the existence of this rule is undermining the purpose of all other rules in
-#--aws_security_group_rule.all_internal_egress_traffic) -- AW 08/04/25
+#--aws_security_group_rule.all_internal_egress_traffic) -- AW 16/04/25
 resource "aws_security_group_rule" "egress_oracledb" {
   type              = "egress"
   from_port         = 0
@@ -59,4 +56,4 @@ resource "aws_security_group_rule" "egress_oracledb" {
   protocol          = "-1" #--Any
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.lambda_security_group.id
-} */
+}

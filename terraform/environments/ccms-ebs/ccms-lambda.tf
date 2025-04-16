@@ -23,7 +23,9 @@ resource "aws_security_group" "lambda_security_group" {
   name        = "${local.application_name}-${local.environment}-lambda-sg"
   description = "SG traffic control for Payment Load Lambda"
   vpc_id      = data.aws_vpc.shared.id
-
+  #--Empty lists pass to allow migration to aws_security_group_rule. Don't add to them! - AW 16/04/25
+  ingress     = []
+  egress      = []
   tags = merge(local.tags,
     { Name = "${local.application_name}-${local.environment}-lambda-sg" }
   )
