@@ -591,6 +591,63 @@ module "s3_violation_bucket" {
   )
 }
 
+# S3 Landing Zone Bucket. Used by File Transfer In/Push
+module "s3_landing_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-landing-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-landing-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
+# S3 Landing Processing Zone Bucket. Used by File Transfer In/Push
+module "s3_landing_processing_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-landing-processing-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-landing-processing-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
+# S3 Quarantine Zone Bucket. Used by File Transfer In/Push
+module "s3_quarantine_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-quarantine-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-quarantine-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
 # S3 Bucket (Application Artifacts Store)
 module "s3_artifacts_store" {
   source              = "./modules/s3_bucket"
@@ -1022,7 +1079,7 @@ module "generate_test_postgres_data" {
     {
       Name          = "${local.project}-load-generator-job-${local.env}"
       Resource_Type = "Glue Job"
-      Jira          = "DPR2-1876"
+      Jira          = "DPR2-1884"
     }
   )
 
@@ -1033,9 +1090,9 @@ module "generate_test_postgres_data" {
     "--dpr.aws.region"                           = local.account_region
     "--dpr.log.level"                            = local.glue_job_common_log_level
     "--dpr.test.database.secret.id"              = "external/dpr-dps-testing2-source-secrets"
-    "--dpr.test.data.batch.size"                 = 10
-    "--dpr.test.data.parallelism"                = 5
-    "--dpr.test.data.inter.batch.delay.millis"   = 100
+    "--dpr.test.data.batch.size"                 = 1000
+    "--dpr.test.data.parallelism"                = 100
+    "--dpr.test.data.inter.batch.delay.millis"   = 20
   }
 }
 
@@ -1046,8 +1103,18 @@ resource "aws_glue_trigger" "glue_postgres_data_generator_job_trigger" {
   name     = "${module.generate_test_postgres_data[0].name}-trigger"
   schedule = "cron(0 0/2 ? * * *)" # runs every 2 hours
   type     = "SCHEDULED"
+  enabled  = false
 
   actions {
     job_name = module.generate_test_postgres_data[0].name
   }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-load-generator-trigger-${local.env}"
+      Resource_Type = "Glue Trigger"
+      Jira          = "DPR2-1884"
+    }
+  )
 }
