@@ -12,10 +12,16 @@ locals {
     "allied_mdss",
     "staged_fms",
     "preprocessed_fms",
-    "staging",
-    "intermediate",
-    "mart",
-    "testing"
+    "staging_fms",
+    "staging_mdss",
+    "intermediate_fms",
+    "intermediate_mdss",
+    "staging",      # to be destroyed
+    "intermediate", # to be destroyed
+    "mart",         # to be destroyed
+    "datamart",
+    "derived",
+    "testing",
   ]
   prod_dbs_to_grant = local.is-production ? ["am_stg",
     "cap_dw_stg",
