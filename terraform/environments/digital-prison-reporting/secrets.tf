@@ -93,6 +93,7 @@ resource "aws_secretsmanager_secret" "oasys" {
     {
       Name          = "external/${local.project}-oasys-source-secret"
       Resource_Type = "Secrets"
+      Jira          = "DPR2-XXX"
     }
   )
 }
@@ -122,6 +123,7 @@ resource "aws_secretsmanager_secret" "onr" {
     {
       Name          = "external/${local.project}-onr-source-secret"
       Resource_Type = "Secrets"
+      Jira          = "DPR2-XXX"
     }
   )
 }
@@ -485,9 +487,14 @@ resource "aws_secretsmanager_secret" "ods_dps_inc_reporting_access" {
       Jira          = "DPR-1751"
     }
   )
+
 }
 
 resource "aws_secretsmanager_secret_version" "ods_dps_inc_reporting_access" {
   secret_id     = aws_secretsmanager_secret.ods_dps_inc_reporting_access.id
   secret_string = jsonencode(local.ods_access_secret_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
 }
