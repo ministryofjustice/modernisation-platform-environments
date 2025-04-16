@@ -20,20 +20,16 @@ module "esb" {
     null # Default to null, allowing AWS to auto-assign an IP
   )
 
-  # Choose the AMI, defaulting to the default AMI if not found
-  ami = coalesce(
-    lookup(
-      {
-        development   = "ami-0cc0dad47bc769c08"
-        preproduction = "ami-04a6fa2443473cfd5"
-      },
-      local.environment,
-      null
-    ),
-    "ami-01426769db5cd0a43"  # Default AMI
+  # Choose the AMI, defaulting to the default AMI if not found(doesnt work try and fix)
+   ami = lookup(
+    {
+      development   = "ami-0cc0dad47bc769c08"
+      preproduction = "ami-04a6fa2443473cfd5"
+      # Add more environments when AMIs are known
+    },
+    local.environment,
+    "ami-01426769db5cd0a43" # Default AMI
   )
-
-  
 
   project_name = local.project_name
   environment  = local.environment

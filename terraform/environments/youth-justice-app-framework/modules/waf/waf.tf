@@ -44,12 +44,23 @@ resource "aws_wafv2_web_acl" "waf" {
       }
 
 
-      statement {
-        managed_rule_group_statement {
-          name        = rule.value.managed_rule_group_statement.name
-          vendor_name = "AWS"
+    statement {
+      managed_rule_group_statement {
+        name        = rule.value.managed_rule_group_statement.name
+        vendor_name = lookup(rule.value.managed_rule_group_statement, "vendor_name", "AWS")
+
+        dynamic "rule_action_override" {
+          for_each = lookup(rule.value.managed_rule_group_statement, "rule_action_override", [])
+          content {
+            name = rule_action_override.value.name
+
+            action_to_use {
+              count = lookup(rule_action_override.value.action_to_use, "count", null)
+            }
+          }
         }
       }
+    }
       visibility_config {
         cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
@@ -140,11 +151,22 @@ resource "aws_wafv2_web_acl" "cf" {
 
 
       statement {
-        managed_rule_group_statement {
-          name        = rule.value.managed_rule_group_statement.name
-          vendor_name = "AWS"
+      managed_rule_group_statement {
+        name        = rule.value.managed_rule_group_statement.name
+        vendor_name = lookup(rule.value.managed_rule_group_statement, "vendor_name", "AWS")
+
+        dynamic "rule_action_override" {
+          for_each = lookup(rule.value.managed_rule_group_statement, "rule_action_override", [])
+          content {
+            name = rule_action_override.value.name
+
+            action_to_use {
+              count = lookup(rule_action_override.value.action_to_use, "count", null)
+            }
+          }
         }
       }
+    }
       visibility_config {
         cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
