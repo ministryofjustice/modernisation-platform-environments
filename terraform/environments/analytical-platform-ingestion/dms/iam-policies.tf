@@ -58,7 +58,7 @@ module "production_replication_cica_dms_iam_policy" {
   count = local.environment == "production" ? 1 : 0
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.2"
+  version = "5.55.0"
 
   name_prefix = "cica-dms-ingress-replication"
 
