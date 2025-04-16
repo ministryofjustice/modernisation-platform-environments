@@ -60,15 +60,15 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
   }
 }
 
-resource "aws_iam_policy" "ecs_task_execution_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
   #checkov:skip=CKV_AWS_290:"Required broad permissions for S3 and ECS/ELB operations"
   #checkov:skip=CKV_AWS_355:"Some AWS services require * resource access"
   #checkov:skip=CKV_AWS_288:"S3 operations require broader access"
-  name = "${var.app_name}-ecs-task-execution-policy"
+  name = "${var.app_name}-ecs-task-execution-s3-policy-2"
   tags = merge(
     var.tags_common,
     {
-      Name = "${var.app_name}-ecs-task-execution-policy"
+      Name = "${var.app_name}-ecs-task-execution-s3-policy-2"
     }
   )
   policy = <<EOF
@@ -131,7 +131,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_secrets_manager" {
 }
 resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
   role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.ecs_task_execution_policy.arn
+  policy_arn = aws_iam_policy.ecs_task_execution_s3_policy.arn
 }
 
 # Set up CloudWatch group and log stream and retain logs for 30 days
