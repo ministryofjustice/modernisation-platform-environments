@@ -99,7 +99,7 @@ resource "aws_acm_certificate" "prtg_lb_cert" {
 
   subject_alternative_names = [
     "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    "${local.application_data.accounts[local.environment].public_dns_name_prtg}"
+    local.application_data.accounts[local.environment].public_dns_name_prtg
   ]
 
   tags = {
@@ -250,7 +250,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 
 resource "aws_wafv2_web_acl_logging_configuration" "prtg_logs" {
   count                   = local.is-production ? 0 : 1
-  log_destination_configs = ["${aws_s3_bucket.prtg_logs[0].arn}"]
+  log_destination_configs = [aws_s3_bucket.prtg_logs[0].arn]
   resource_arn            = aws_wafv2_web_acl.prtg_acl[0].arn
 }
 
@@ -308,9 +308,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values = [
-        "${data.aws_caller_identity.current.account_id}"
-      ]
+      values = [data.aws_caller_identity.current.account_id]
     }
 
     condition {
@@ -333,16 +331,12 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
       "s3:GetBucketAcl"
     ]
     effect = "Allow"
-    resources = [
-      "${aws_s3_bucket.prtg_logs[0].arn}"
-    ]
+    resources = [aws_s3_bucket.prtg_logs[0].arn]
 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values = [
-        "${data.aws_caller_identity.current.account_id}"
-      ]
+      values = [data.aws_caller_identity.current.account_id]
     }
 
     condition {

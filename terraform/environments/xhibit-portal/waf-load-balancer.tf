@@ -185,7 +185,7 @@ resource "aws_acm_certificate" "waf_lb_cert" {
 
   subject_alternative_names = [
     "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    "${local.application_data.accounts[local.environment].public_dns_name_web}",
+    local.application_data.accounts[local.environment].public_dns_name_web,
   ]
 
   tags = {
@@ -347,7 +347,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
     effect = "Deny"
     resources = [
       "${aws_s3_bucket.loadbalancer_logs.arn}/*",
-      "${aws_s3_bucket.loadbalancer_logs.arn}"
+      aws_s3_bucket.loadbalancer_logs.arn
     ]
 
     condition {
@@ -397,7 +397,7 @@ data "aws_iam_policy_document" "s3_bucket_lb_write" {
       "s3:GetBucketAcl"
     ]
     effect    = "Allow"
-    resources = ["${aws_s3_bucket.loadbalancer_logs.arn}"]
+    resources = [aws_s3_bucket.loadbalancer_logs.arn]
 
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]
@@ -442,7 +442,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logs" {
   count                   = local.is-production ? 0 : 1
-  log_destination_configs = ["${aws_s3_bucket.waf_logs[0].arn}"]
+  log_destination_configs = [aws_s3_bucket.waf_logs[0].arn]
   resource_arn            = aws_wafv2_web_acl.waf_acl[0].arn
 }
 
@@ -462,7 +462,7 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
     effect = "Deny"
     resources = [
       "${aws_s3_bucket.waf_logs[0].arn}/*",
-      "${aws_s3_bucket.waf_logs[0].arn}"
+      aws_s3_bucket.waf_logs[0].arn
     ]
 
     condition {
@@ -500,9 +500,7 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values = [
-        "${data.aws_caller_identity.current.account_id}"
-      ]
+      values = [data.aws_caller_identity.current.account_id]
     }
 
     condition {
@@ -525,16 +523,12 @@ data "aws_iam_policy_document" "s3_bucket_waf_logs_policy" {
       "s3:GetBucketAcl"
     ]
     effect = "Allow"
-    resources = [
-      "${aws_s3_bucket.waf_logs[0].arn}"
-    ]
+    resources = [aws_s3_bucket.waf_logs[0].arn]
 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values = [
-        "${data.aws_caller_identity.current.account_id}"
-      ]
+      values = [data.aws_caller_identity.current.account_id]
     }
 
     condition {

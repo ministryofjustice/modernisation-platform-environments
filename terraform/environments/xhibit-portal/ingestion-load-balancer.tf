@@ -151,7 +151,7 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
     effect = "Deny"
     resources = [
       "${aws_s3_bucket.ingestion_loadbalancer_logs.arn}/*",
-      "${aws_s3_bucket.ingestion_loadbalancer_logs.arn}"
+      aws_s3_bucket.ingestion_loadbalancer_logs.arn
     ]
 
     condition {
@@ -201,7 +201,7 @@ data "aws_iam_policy_document" "s3_bucket_ingestion_lb_write" {
       "s3:GetBucketAcl"
     ]
     effect    = "Allow"
-    resources = ["${aws_s3_bucket.ingestion_loadbalancer_logs.arn}"]
+    resources = [aws_s3_bucket.ingestion_loadbalancer_logs.arn]
 
     principals {
       identifiers = ["delivery.logs.amazonaws.com"]

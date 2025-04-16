@@ -1,3 +1,4 @@
+# tflint:ignore:terraform_module_pinned_source # ITHC
 module "vm-import" {
 
   # checkov:skip=CKV_TF_1: "Ensure Terraform module sources use a commit hash"
