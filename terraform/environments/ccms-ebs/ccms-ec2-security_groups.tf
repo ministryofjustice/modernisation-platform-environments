@@ -36,3 +36,17 @@ resource "aws_security_group_rule" "all_internal_egress_traffic" {
   ]
 }
 
+#--Payment Load Lambda
+resource "aws_vpc_security_group_ingress_rule" "payment_lambda_oracledb" {
+  from_port         = 1521
+  to_port           = 1522
+  ip_protocol       = "tcp"
+  cidr_ipv4         = data.aws_vpc.shared.cidr_block
+  security_group_id = aws_security_group.lambda_security_group.id
+}
+
+resource "aws_vpc_security_group_egress_rule" "payment_lambda_oracledb" {
+  ip_protocol       = "-1" #--All protos, all ports
+  cidr_ipv4         = "0.0.0.0/0"
+  security_group_id = aws_security_group.lambda_security_group.id
+}
