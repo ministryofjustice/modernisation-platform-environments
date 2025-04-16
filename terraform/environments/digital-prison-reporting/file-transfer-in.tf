@@ -1,9 +1,10 @@
 module "landing_zone_antivirus_check" {
   source = "./modules/lambdas/container-image"
 
-  image_uri = aws_ecr_repository.file_transfer_in_clamav_scanner.repository_url
-  name      = "${local.project}-landing-zone-check-${local.env}"
-  tracing   = "Active"
+  enable_lambda = true
+  image_uri     = aws_ecr_repository.file_transfer_in_clamav_scanner.repository_url
+  name          = "${local.project}-landing-zone-check-${local.env}"
+  tracing       = "Active"
 
   memory_size            = 4096
   timeout                = 900
