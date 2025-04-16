@@ -281,7 +281,7 @@ def handler(event, context):  # pylint: disable=unused-argument
     db_secret_arn = os.getenv("DB_SECRET_ARN")
     db_secret_response = secretsmanager.get_secret_value(SecretId=db_secret_arn)
     db_secret = json.loads(db_secret_response["SecretString"])
-    db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog
+    db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog, underscores will get replaced by hyphens
     use_glue_catalog = os.getenv("USE_GLUE_CATALOG", "true").lower() == "true"
     glue_catalog_account_id = os.getenv("GLUE_CATALOG_ACCOUNT_ID", "")
     retry_failed_after_recreate_metadata = os.getenv("RETRY_FAILED_AFTER_RECREATE_METADATA", "true").lower() == "true"
@@ -344,11 +344,11 @@ def handler(event, context):  # pylint: disable=unused-argument
     glue_table_definitions = []
     for table in db_metadata:
         if destination_prefix != "":
-            table_location = f"s3://{destination_bucket}/{destination_prefix}/{table.databse_name}/{table.name}"
+            table_location = f"s3://{destination_bucket}/{destination_prefix}/{table.database_name}/{table.name}"
         else:
-            table_location = f"s3://{destination_bucket}/{table.databse_name}/{table.name}"
+            table_location = f"s3://{destination_bucket}/{table.database_name}/{table.name}"
 
-        logger.info("Generating glue metadata for %s.%s located at %s", table.databse_name, table.name, table_location)
+        logger.info("Generating glue metadata for %s.%s located at %s", table.database_name, table.name, table_location)
         glue_table_definition = gc.generate_from_meta(
             table,
             db_identifier.replace("_", "-"),
