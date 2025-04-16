@@ -1,8 +1,0 @@
-#AVD-AWS-0047  #(CRITICAL): Listener uses an outdated TLS policy.
-#AVD-AWS-0052  #(HIGH): Application load balancer is not set to drop invalid headers.
-#AVD-AWS-0053  #(HIGH): Load balancer is exposed publicly.
-#AVD-AWS-0086  #(HIGH): No public access block so not blocking public acls
-#AVD-AWS-0087  #(HIGH): No public access block so not blocking public policies
-#AVD-AWS-0091  #(HIGH): No public access block so not blocking public acls
-#AVD-AWS-0093  #(HIGH): No public access block so not restricting public buckets
-#AVD-AWS-0107  #(HIGH): Security group rule allows unrestricted ingress from any IP address.
