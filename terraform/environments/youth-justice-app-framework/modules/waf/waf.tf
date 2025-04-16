@@ -56,21 +56,21 @@ resource "aws_wafv2_web_acl" "waf" {
               name = rule_action_override.value.name
 
               dynamic "action_to_use" {
-                for_each = rule_action_override.value.action_to_use.count != null ? [1] : []
+                for_each = contains(keys(rule_action_override.value.action_to_use), "count") ? [1] : []
                 content {
                   count {}
                 }
               }
 
               dynamic "action_to_use" {
-                for_each = rule_action_override.value.action_to_use.block != null ? [1] : []
+                for_each = contains(keys(rule_action_override.value.action_to_use), "block") ? [1] : []
                 content {
                   block {}
                 }
               }
 
               dynamic "action_to_use" {
-                for_each = rule_action_override.value.action_to_use.allow != null ? [1] : []
+                for_each = contains(keys(rule_action_override.value.action_to_use), "allow") ? [1] : []
                 content {
                   allow {}
                 }
@@ -184,21 +184,21 @@ resource "aws_wafv2_web_acl" "cf" {
               name = rule_action_override.value.name
 
               dynamic "action_to_use" {
-                for_each = rule_action_override.value.action_to_use.count != null ? [1] : []
+                for_each = contains(keys(rule_action_override.value.action_to_use), "count") ? [1] : []
                 content {
                   count {}
                 }
               }
 
               dynamic "action_to_use" {
-                for_each = rule_action_override.value.action_to_use.block != null ? [1] : []
+                for_each = contains(keys(rule_action_override.value.action_to_use), "block") ? [1] : []
                 content {
                   block {}
                 }
               }
 
               dynamic "action_to_use" {
-                for_each = rule_action_override.value.action_to_use.allow != null ? [1] : []
+                for_each = contains(keys(rule_action_override.value.action_to_use), "allow") ? [1] : []
                 content {
                   allow {}
                 }
