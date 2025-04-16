@@ -24,6 +24,7 @@ resource "aws_dms_s3_endpoint" "s3_target" {
   endpoint_id                      = "${var.db}-target-${data.aws_region.current.name}-${var.environment}"
   endpoint_type                    = "target"
   bucket_name                      = aws_s3_bucket.landing.bucket
+  bucket_folder                    = var.dms_target_prefix
   service_access_role_arn          = aws_iam_role.dms.arn
   add_column_name                  = var.s3_target_config.add_column_name
   canned_acl_for_objects           = "bucket-owner-full-control"

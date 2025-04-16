@@ -8,7 +8,7 @@ data "aws_iam_policy_document" "validation_lambda_function" {
     ]
 
     resources = [
-      "${aws_s3_bucket.raw_history.arn}/*",
+      "${data.aws_s3_bucket.raw_history.arn}/*",
       "${aws_s3_bucket.invalid.arn}/*",
     ]
   }
@@ -48,8 +48,7 @@ module "validation_lambda_function" {
   runtime                 = "python3.12"
   timeout                 = 60
   architectures           = ["x86_64"]
-  build_in_docker         = true
-  docker_image            = "test-dms"
+  build_in_docker         = false
   store_on_s3             = true
   s3_bucket               = aws_s3_bucket.lambda.bucket
   s3_object_storage_class = "STANDARD"
@@ -59,17 +58,17 @@ module "validation_lambda_function" {
   policy_json        = data.aws_iam_policy_document.validation_lambda_function.json
 
   environment_variables = {
-    ENVIRONMENT      = "sandbox"
-    PASS_BUCKET      = aws_s3_bucket.raw_history.bucket
-    FAIL_BUCKET      = aws_s3_bucket.invalid.bucket
-    METADATA_BUCKET  = aws_s3_bucket.validation_metadata.bucket
-    METADATA_PATH    = ""
-    SLACK_SECRET_KEY = "" # TODO: Handle properly
+    ENVIRONMENT         = var.environment
+    PASS_BUCKET         = data.aws_s3_bucket.raw_history.bucket
+    FAIL_BUCKET         = aws_s3_bucket.invalid.bucket
+    METADATA_BUCKET     = aws_s3_bucket.validation_metadata.bucket
+    METADATA_PATH       = ""
+    SLACK_SECRET_KEY    = "" # TODO: Handle properly
+    VALID_FILES_MUTABLE = var.valid_files_mutable
   }
 
   source_path = [{
     path             = "${path.module}/lambda-functions/validation/main.py"
-    pip_tmp_dir      = "${path.module}/lambda-functions/validation/fixtures"
     pip_requirements = "${path.module}/lambda-functions/validation/requirements.txt"
     # Exclude tests and dist-info directories from the deployment package
     patterns = [
