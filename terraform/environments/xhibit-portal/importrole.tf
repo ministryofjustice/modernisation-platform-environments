@@ -1,9 +1,7 @@
-# tflint:ignore:terraform_module_pinned_source
 module "vm-import" {
-  # tflint:ignore:terraform_module_pinned_source
   # checkov:skip=CKV_TF_1: "Ensure Terraform module sources use a commit hash"
   # checkov:skip=CKV_TF_2: "Ensure Terraform module sources use a tag with a version number"
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-vm-import"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-vm-import?ref=v2.0.0"
 
   bucket_prefix    = local.application_data.accounts[local.environment].bucket_prefix
   tags             = local.tags
