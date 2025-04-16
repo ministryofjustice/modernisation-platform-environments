@@ -1,0 +1,44 @@
+resource "aws_cloudwatch_log_group" "this" {
+  #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+
+  count = var.enable_lambda ? 1 : 0
+  name  = "/aws/lambda/${var.name}-function"
+
+  retention_in_days = var.log_retention_in_days
+
+  tags = var.tags
+}
+
+resource "aws_lambda_function" "this" {
+  count = var.enable_lambda ? 1 : 0
+
+  function_name = "${var.name}-function"
+  role          = aws_iam_role.lambda_execution_role[0].arn
+  package_type  = "Image"
+  image_uri     = var.image_uri
+  memory_size   = var.memory_size
+  timeout       = var.timeout
+
+  tracing_config {
+    mode = var.tracing
+  }
+
+  dynamic "vpc_config" {
+    for_each = var.vpc_settings != null ? [true] : []
+    content {
+      subnet_ids         = lookup(var.vpc_settings, "subnet_ids", null)
+      security_group_ids = lookup(var.vpc_settings, "security_group_ids", null)
+    }
+  }
+
+  environment {
+    variables = var.env_vars
+  }
+
+  ephemeral_storage {
+    size = var.ephemeral_storage_size
+  }
+
+  tags = var.tags
+
+}
