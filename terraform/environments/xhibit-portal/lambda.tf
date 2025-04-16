@@ -141,6 +141,7 @@ resource "aws_iam_role" "delete_snapshot_lambda" {
 }
 
 #Create ZIP archive and lambda
+# tflint:ignore:terraform_required_providers # ITHC
 data "archive_file" "delete_lambda_zip" {
 
   type             = "zip"
