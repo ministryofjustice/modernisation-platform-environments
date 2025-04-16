@@ -20,7 +20,7 @@ locals {
     { "is-production"     = local.is-production },
     { "environment-name"  = terraform.workspace },
     { "source-code"       = "https://github.com/ministryofjustice/modernisation-platform-environments" },
-    { "env"               = workspace}
+    { "env"               = local.environment}
   )
 
   environment     = trimprefix(terraform.workspace, "${var.networking[0].application}-")
