@@ -3,7 +3,7 @@ module "landing_zone_antivirus_check" {
 
   enable_lambda = true
   image_uri     = "${aws_ecr_repository.file_transfer_in_clamav_scanner.repository_url}:latest"
-  name          = "${local.project}-landing-zone-check-${local.env}"
+  name          = "${local.project}-landing-zone-check"
   tracing       = "Active"
 
   memory_size            = 4096
@@ -23,7 +23,7 @@ module "landing_zone_antivirus_check" {
   tags = merge(
     local.all_tags,
     {
-      Name          = "${local.project}-landing-zone-check-${local.env}"
+      Name          = "${local.project}-landing-zone-check"
       Resource_Type = "Lambda"
       Jira          = "DPR2-1499"
     }
