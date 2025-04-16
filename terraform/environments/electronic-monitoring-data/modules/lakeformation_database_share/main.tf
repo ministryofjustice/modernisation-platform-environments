@@ -7,7 +7,6 @@ resource "aws_lakeformation_permissions" "s3_bucket_permissions" {
   principal = var.role_arn
 
   permissions = ["DATA_LOCATION_ACCESS"]
-  permissions_with_grant_option = ["ALL"]
   data_location {
     arn = var.data_bucket_lf_resource
   }
