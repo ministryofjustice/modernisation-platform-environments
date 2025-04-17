@@ -92,6 +92,23 @@ module "auth0_tfstate_bucket" {
   }
 }
 
+# Test bucket replication - source bucket
+module "test_cur_s3_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["s3/test-cur"]
+  description           = "test S3 CUR KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+}
+
 module "cur_v2_hourly_replication_test" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
@@ -103,6 +120,8 @@ module "cur_v2_hourly_replication_test" {
   replication_bucket_arn = "arn:aws:s3:::coat-development-test-replication-cur-v2-hourly"
   replication_role_arn   = module.cur_v2_hourly_replication_test.replication_role_arn
   destination_kms_arn    = "arn:aws:kms:eu-west-2:082282578003:key/ac596f22-3fed-4312-a022-0c56f833a1f5"
+  source_kms_arn = module.test_cur_s3_kms.key_arn
+
   replication_rules = [
     {
       id                 = "test-replicate-curv2-reports"
@@ -113,4 +132,13 @@ module "cur_v2_hourly_replication_test" {
       metrics            = "Enabled"
     }
   ]
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.test_cur_s3_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
 }
