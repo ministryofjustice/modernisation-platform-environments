@@ -8,3 +8,8 @@ output "ecs_service_internal_sg_id" {
   description = "The ID of the securiy group that controlls access to Internal ECS microservices (i.e the Gateway)."
   value       = aws_security_group.common_ecs_service_internal.id
 }
+
+output "ecs_cluster_arn" {
+  description = "The ARN of the ECS cluster"
+  value       = module.ecs_cluster.cluster_arn
+}
