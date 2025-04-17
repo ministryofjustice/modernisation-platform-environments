@@ -361,6 +361,23 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
   }
 }
 
+data "aws_iam_policy_document" "ram_shares" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ram:AssociateResourceShare",
+      "ram:CreateResourceShare",
+      "ram:DeleteResourceShare",
+      "ram:DisassociateResourceShare",
+      "ram:GetResourceShares",
+      "ram:UpdateResourceShare"
+    ]
+    resources = [
+      "arn:aws:ram:${data.aws_region.current.name}:${local.env_account_id}:resource-share/*"
+    ]
+  }
+}
+
 
 
 # Lake Formation Data Access Attachement
@@ -381,6 +398,11 @@ resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
   policy_arn = aws_iam_policy.unlimited_athena_query.arn
 }
 
+resource "aws_iam_role_policy_attachment" "ram_shares" {
+  role = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.ram_shares.arn
+}
+
 resource "aws_iam_policy" "unlimited_athena_query" {
   name        = "${local.environment_shorthand}-unlimited-athena-query"
   description = "Athena Access Policy"
@@ -398,6 +420,12 @@ resource "aws_iam_policy" "lake_formation_lftag_access" {
   name        = "${local.environment_shorthand}-lake-formation-lftag-access"
   description = "LakeFormation LFTag Access Policy"
   policy      = data.aws_iam_policy_document.lake_formation_lftag_access.json
+}
+
+resource "aws_iam_policy" "ram_shares" {
+  name        = "${local.environment_shorthand}-ram-shares"
+  description = "RAM Shares Access Policy"
+  policy      = data.aws_iam_policy_document.ram_shares.json
 }
 
 # Analytical Platform Share Policy & Role
