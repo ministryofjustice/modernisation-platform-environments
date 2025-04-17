@@ -217,3 +217,9 @@ resource "aws_iam_role_policy_attachment" "standard_athena_access" {
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.cmt_front_end_assumable_role.iam_role_name
 }
+
+
+resource "aws_iam_role_policy_attachment" "specials_role_standard_athena_access" {
+  policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.specials_cmt_front_end_assumable_role.iam_role_name
+}

@@ -1,6 +1,6 @@
 terraform {
   required_version = ">= 1.0.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -101,10 +101,10 @@ resource "aws_security_group" "allow_ssm" {
   vpc_id      = var.vpc_shared_id
 
   ingress {
-    description     = "Allow traffic from load balancer"
-    from_port       = 0
-    to_port         = 0
-    protocol        = "-1"
+    description = "Allow traffic from load balancer"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     security_groups = [
       var.nginx_lb_sg_id
     ]

@@ -124,7 +124,7 @@ module "probation_search_sagemaker_execution_iam_role" {
   for_each = tomap(local.probation_search_environment)
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
+  version = "5.55.0"
 
   create_role = true
 
@@ -179,7 +179,7 @@ module "probation_search_sagemaker_invocation_iam_role" {
   for_each = tomap(local.probation_search_environment)
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
+  version = "5.55.0"
 
   create_role = true
 

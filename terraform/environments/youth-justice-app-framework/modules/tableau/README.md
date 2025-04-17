@@ -57,25 +57,37 @@ The process for recovery of Tableau from backups is outlined in Confluance at <h
 The process will be followed but with changes, particurally to the process for restoring Tableau settings, to account for difference between the old and ned environments. In outline:
 
 1. A new server is provisioned by Terraform.
-2. Make Backup Files available.
+2. Make Install and Backup Files available.
 3. Create a new installation of Tableau as outlined in the Recovery instructions.
-4. Restore settings as described below. This is a variation of the the Setting Restore process in the Recovery instructions to account for differences between the environments.
-5. Enable External HTTPS with a servicicate signed by the new Subordinate CA.
+4. Enable External HTTPS with a certficicate signed by the new Subordinate CA.
+5. Restore settings as described below. This is a variation of the the Setting Restore process in the Recovery instructions to account for differences between the environments.
 6. Restore the Respostory as described in the Recovery instructions using file `repository_for_restore.tsbak` copied below.
 
-### Make Backup Files Available
+### Make Install and Backup Files Available
+Upload the following files to S3 bucket `yjaf-<envoronment>-tableau-backups-archive`, folder `Install_Files`:
+    - `AmazonRedshiftODBC-64-bit-1.5.9.1011-1.x86_64.rpm`
+    - `identity-store-template.json`
+    - `odbc.ini`
+    - `odbcinst.ini`
+    - `openssl-tableau.conf`
+    - `postgresql-42.7.3.jar`
+    - `registration.json`
+    - `tableau_redshift_odbc.sh`
+    - `tableau-backup.sh`
+    - `tableau-server-2024-2-2.x86_64.rpm`
+
 The latest Tableau backup files should have been replicated to S3 bucket `yjaf-<envoronment>-tableau-backups-archive`. The latest settings and repository files need to be copied to s3 location  `yjaf-<envoronment>-tableau-backups/Install_Files` and renamed to `settings_for_restore.json` and `repository_for_restore.tsbak`.
 
 ### Tableau Settings Restore
-The process is as documented in the Recovey instructions but file `settings_for_restore.json` must first be eddited to reflect the new environment. Make the changes after Tableaus instalation and setup when the new values are known. Change values of config keys as described below:
+The process is as documented in the Recovey instructions but file `settings_for_restore.json` must first be eddited to reflect the new environment. Make the changes after Tableau instalation and setup when the new values are known. Change values of config keys as described below:
 
-**wgserver.domain.password**: To be set to the valuse assigned to the tableau domain user. The value can be copied from file `identify-store.json`.
+**wgserver.domain.password**: To be set to the value assigned to the tableau domain user. The value can be copied from file `identify-store.json`.
 **wgserver.domain.port**: If present this config key must be removed.
 **wgserver.domain.ldap.hostname**: Copy from `identify-store.json`.
 **wgserver.domain.ssl_port**: Add if not already present and set the value to `636`.
 **vizportal.rest_api.cors.allow_origin**: Need to be populated with a comma seperated list of external URL for the YJAF and Tableau websites. It will probable not need to be changes in `preproduction` and `production`.
 
-After restoring the setting thaey shoudl not be applied to Tableau until External HTTPs has been enabled as described in the next section.
+After restoring the setting they should not be applied to Tableau until External HTTPs has been enabled as described in the next section.
 
 ### Enable External HTTPS
 The process for this is described in Confluance document <https://yjb.atlassian.net/wiki/spaces/YAM/pages/4729470989/DOE+Tableau+Enable+External+HTTPS?atlOrigin=eyJpIjoiNWQyNjA4YTQxYjRlNGRiNDk3NjU0ZWJhNWM4Mzg3NGUiLCJwIjoiYyJ9>.
@@ -90,7 +102,7 @@ See the restore instuctions referenced above.
 # Cutover
 
 ## Final Backup
-1. On the old Tableaus server, manually run the Tableau backup job.
+1. On the old Tableau server, manually run the Tableau backup job.
 2. In the new environment wait for the backup files to appear in S3 bucket `yjaf-<envoronment>-tableau-backups-archive`.
 
 ## Restore the Repository

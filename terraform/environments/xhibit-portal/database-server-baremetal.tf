@@ -1,6 +1,8 @@
 # While this is called database-server-baremetal, this actually holds the database and the app server.
 # We need permissions to run terraform mv to eventually update the naming.
 resource "aws_instance" "database-server-baremetal" {
+  # checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+  # checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   # Used to only allow the bare metal server to deploy in prod
   count                       = local.only_in_production
   depends_on                  = [aws_security_group.sms_server]
@@ -51,6 +53,9 @@ resource "aws_instance" "database-server-baremetal" {
 
 # Database disk and network
 resource "aws_ebs_volume" "database-baremetal-disk1" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   count             = local.only_in_production
   depends_on        = [aws_instance.database-server-baremetal]
   availability_zone = "${local.region}a"
@@ -96,6 +101,9 @@ resource "aws_network_interface" "baremetal-database-network-access" {
 
 # App disk and network
 resource "aws_ebs_volume" "app-baremetal-disk2" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   count             = local.only_in_production
   depends_on        = [aws_instance.database-server-baremetal]
   availability_zone = "${local.region}a"

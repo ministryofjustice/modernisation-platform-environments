@@ -1,6 +1,6 @@
 terraform {
   required_version = ">= 1.0.0"
-  
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -93,7 +93,12 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam
         "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
         "elasticloadbalancing:RegisterTargets",
         "ec2:Describe*",
-        "ec2:AuthorizeSecurityGroupIngress"
+        "ec2:AuthorizeSecurityGroupIngress",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:CreateLogGroup"
       ],
       "Resource": ["*"]
     }
