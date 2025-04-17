@@ -475,11 +475,14 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
     effect = "Allow"
     actions = [
       "ram:AssociateResourceShare",
+      "ram:AssociateResourceSharePermission",
       "ram:CreateResourceShare",
       "ram:DeleteResourceShare",
       "ram:DisassociateResourceShare",
+      "ram:DisassociateResourceSharePermission",
       "ram:GetResourceShares",
-      "ram:UpdateResourceShare"
+      "ram:ListResourceSharePermissions",
+      "ram:UpdateResourceShare",
     ]
     resources = [
       "arn:aws:ram:${data.aws_region.current.name}:${local.env_account_id}:resource-share/*"
