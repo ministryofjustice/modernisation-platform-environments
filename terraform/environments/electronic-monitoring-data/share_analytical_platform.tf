@@ -229,6 +229,7 @@ data "aws_iam_policy_document" "lake_formation_lftag_access" {
       "lakeformation:CreateDataCellsFilter",
       "lakeformation:GetDataCellsFilter",
       "lakeformation:UpdateDataCellsFilter",
+      "lakeformation:DeleteDataCellsFilter",
       "lakeformation:GrantPermissions",
       "lakeformation:RevokePermissions",
       "lakeformation:BatchGrantPermissions",
@@ -413,7 +414,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:RegisterResource",
       "lakeformation:DeregisterResource",
       "lakeformation:ListPermissions",
-      "lakeformation:DescribeResource",
+      "lakeformation:DescribeResource"
     ]
     resources = [
       #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
