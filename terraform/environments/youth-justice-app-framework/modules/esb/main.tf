@@ -16,8 +16,6 @@ resource "aws_ssm_parameter" "esb_private_key" {
   description = "EC2 Private Key for esb-keypair"
   type        = "SecureString"
   value       = module.key_pair.private_key_pem
-
-  tags = local.all_tags
 }
 
 
