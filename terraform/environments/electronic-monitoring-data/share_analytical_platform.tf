@@ -224,7 +224,20 @@ data "aws_iam_policy_document" "lake_formation_lftag_access" {
       "lakeformation:ListLFTags",
       "lakeformation:GetLFTag",
       "lakeformation:SearchTablesByLFTags",
-      "lakeformation:SearchDatabasesByLFTags"
+      "lakeformation:SearchDatabasesByLFTags",
+      "lakeformation:ListDataCellsFilter",
+      "lakeformation:CreateDataCellsFilter",
+      "lakeformation:GetDataCellsFilter",
+      "lakeformation:UpdateDataCellsFilter",
+      "lakeformation:DeleteDataCellsFilter",
+      "lakeformation:GrantPermissions",
+      "lakeformation:RevokePermissions",
+      "lakeformation:BatchGrantPermissions",
+      "lakeformation:BatchRevokePermissions",
+      "lakeformation:RegisterResource",
+      "lakeformation:DeregisterResource",
+      "lakeformation:ListPermissions",
+      "lakeformation:DescribeResource",
     ]
     resources = [
       "*"
@@ -348,6 +361,26 @@ data "aws_iam_policy_document" "unlimited_athena_query" {
   }
 }
 
+data "aws_iam_policy_document" "ram_shares" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ram:AssociateResourceShare",
+      "ram:CreateResourceShare",
+      "ram:DeleteResourceShare",
+      "ram:DisassociateResourceShare",
+      "ram:GetResourceShares",
+      "ram:UpdateResourceShare",
+      "ram:AssociateResourceSharePermission",
+      "ram:DisassociateResourceSharePermission",
+      "ram:ListResourceSharePermissions"
+    ]
+    resources = [
+      "arn:aws:ram:${data.aws_region.current.name}:${local.env_account_id}:resource-share/*"
+    ]
+  }
+}
+
 
 
 # Lake Formation Data Access Attachement
@@ -366,6 +399,11 @@ resource "aws_iam_role_policy_attachment" "lake_formation_lftag_access" {
 resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.unlimited_athena_query.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ram_shares" {
+  role = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.ram_shares.arn
 }
 
 resource "aws_iam_policy" "unlimited_athena_query" {
@@ -387,6 +425,12 @@ resource "aws_iam_policy" "lake_formation_lftag_access" {
   policy      = data.aws_iam_policy_document.lake_formation_lftag_access.json
 }
 
+resource "aws_iam_policy" "ram_shares" {
+  name        = "${local.environment_shorthand}-ram-shares"
+  description = "RAM Shares Access Policy"
+  policy      = data.aws_iam_policy_document.ram_shares.json
+}
+
 # Analytical Platform Share Policy & Role
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
   for_each = local.analytical_platform_share
@@ -401,8 +445,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:RegisterResource",
       "lakeformation:DeregisterResource",
       "lakeformation:ListPermissions",
-      "lakeformation:DescribeResource",
-
+      "lakeformation:DescribeResource"
     ]
     resources = [
       #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
@@ -434,8 +477,15 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   statement {
     effect = "Allow"
     actions = [
+      "ram:AssociateResourceShare",
+      "ram:AssociateResourceSharePermission",
       "ram:CreateResourceShare",
-      "ram:DeleteResourceShare"
+      "ram:DeleteResourceShare",
+      "ram:DisassociateResourceShare",
+      "ram:DisassociateResourceSharePermission",
+      "ram:GetResourceShares",
+      "ram:ListResourceSharePermissions",
+      "ram:UpdateResourceShare",
     ]
     resources = [
       "arn:aws:ram:${data.aws_region.current.name}:${local.env_account_id}:resource-share/*"
@@ -516,6 +566,13 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
 }
 
+
+resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_attachment_lf_perms" {
+  for_each = local.analytical_platform_share
+
+  role       = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy_arn=   "arn:aws:iam::aws:policy/AWSLakeFormationDataAdmin"
+}
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([
     [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
