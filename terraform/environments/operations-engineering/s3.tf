@@ -102,14 +102,14 @@ module "cur_v2_hourly_replication_test" {
   enable_replication     = true
   replication_bucket_arn = "arn:aws:s3:::coat-development-test-replication-cur-v2-hourly"
   replication_role_arn   = module.cur_v2_hourly_replication_test.replication_role_arn
-  destination_kms_arn    = "arn:aws:kms:eu-west-2:279191903737:key/ef7e1dc9-dc2b-4733-9278-46885b7040c7"
+  destination_kms_arn    = "arn:aws:kms:eu-west-2:082282578003:key/ac596f22-3fed-4312-a022-0c56f833a1f5"
   replication_rules = [
     {
       id                 = "test-replicate-curv2-reports"
       prefix             = "moj-cost-and-usage-reports/"
       status             = "Enabled"
       deletemarker       = "Enabled"
-      replica_kms_key_id = "arn:aws:kms:eu-west-2:279191903737:key/ef7e1dc9-dc2b-4733-9278-46885b7040c7"
+      replica_kms_key_id = "arn:aws:kms:eu-west-2:082282578003:key/ac596f22-3fed-4312-a022-0c56f833a1f5"
       metrics            = "Enabled"
     }
   ]
