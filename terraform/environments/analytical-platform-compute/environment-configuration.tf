@@ -151,29 +151,31 @@ locals {
       cadet_lf_tags = {
         domain = [
           "bold",
+          "cica",
+          "cjs_cross_dataset",
           "civil",
+          "corporate",
           "courts",
-          "general",
           "criminal_history",
+          "data_first",
           "development_sandpit",
           "electronic_monitoring",
+          "family",
           "finance",
+          "general",
           "interventions",
+          "laa",
           "opg",
-          "performance",
-          "risk",
           "people",
+          "performance",
           "prison",
           "probation",
+          "property",
+          "risk",
+          "sentence_offence",
           "staging",
           "victims",
-          "victims_case_management",
-          "cica",
-          "data_first",
-          "laa",
-          "corporate",
-          "property",
-          "family"
+          "victims_case_management"
         ]
       }
     }
