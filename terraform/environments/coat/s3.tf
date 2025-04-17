@@ -9,6 +9,26 @@ module "cur_s3_kms" {
   aliases               = ["s3/cur"]
   description           = "S3 CUR KMS key"
   enable_default_policy = true
+  # key_statements = [
+  #     {
+  #       sid = "AllowReplicationRole"
+  #       actions = [
+  #         "kms:Encrypt*",
+  #         "kms:Decrypt*",
+  #         "kms:ReEncrypt*",
+  #         "kms:GenerateDataKey*",
+  #         "kms:Describe*"
+  #       ]
+  #       resources = ["*"]
+  #       effect    = "Allow"
+  #       principals = [
+  #         {
+  #           type        = "AWS"
+  #           identifiers = ["arn:aws:iam::295814833350:role/cur-v2-hourly-replication-test-replication-role"]
+  #         }
+  #       ]
+  #     }
+  # ]
 
   deletion_window_in_days = 7
 
@@ -30,6 +50,20 @@ data "aws_iam_policy_document" "data_exports_write_policy" {
       identifiers = ["bcm-data-exports.amazonaws.com"]
     }
   }
+
+  # statement {
+  #   sid     = "focus_bucket_replication_policy"
+  #   effect  = "Allow"
+  #   actions = ["s3:ReplicateObject", "s3:ReplicateDelete", "s3:GetBucketVersioning", "s3:PutBucketVersioning"]
+  #   resources = [
+  #     "arn:aws:s3:::coat-${local.environment}-focus-reports/*",
+  #     "arn:aws:s3:::coat-${local.environment}-focus-reports"
+  #   ]
+  #   principals {
+  #     type        = "AWS"
+  #     identifiers = ["arn:aws:iam::295814833350:role/cur-v2-hourly-replication-test-replication-role"]
+  #   }
+  # }
 }
 
 module "cur_v2_hourly" {
@@ -67,48 +101,48 @@ module "focus_s3_kms" {
   aliases               = ["s3/focus"]
   description           = "S3 FOCUS KMS key"
   enable_default_policy = true
-    key_statements = [
-      {
-        sid = "AllowReplicationRole"
-        actions = [
-          "kms:Encrypt*",
-          "kms:Decrypt*",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:Describe*"
-        ]
-        resources = ["*"]
-        effect    = "Allow"
-        principals = [
-          {
-            type        = "AWS"
-            identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
-          }
-        ]
-      }
-    ]
+  # key_statements = [
+  #     {
+  #       sid = "AllowReplicationRole"
+  #       actions = [
+  #         "kms:Encrypt*",
+  #         "kms:Decrypt*",
+  #         "kms:ReEncrypt*",
+  #         "kms:GenerateDataKey*",
+  #         "kms:Describe*"
+  #       ]
+  #       resources = ["*"]
+  #       effect    = "Allow"
+  #       principals = [
+  #         {
+  #           type        = "AWS"
+  #           identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
+  #         }
+  #       ]
+  #     }
+  # ]
 
   deletion_window_in_days = 7
 
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "focus_bucket_replication_policy" {
-  #checkov:skip=CKV_AWS_356:resource "*" limited by condition
-  statement {
-    sid     = "focus_bucket_replication_policy"
-    effect  = "Allow"
-    actions = ["s3:ReplicateObject", "s3:ReplicateDelete", "s3:GetBucketVersioning", "s3:PutBucketVersioning"]
-    resources = [
-      "arn:aws:s3:::coat-${local.environment}-focus-reports/*",
-      "arn:aws:s3:::coat-${local.environment}-focus-reports"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
-    }
-  }
-}
+# data "aws_iam_policy_document" "focus_bucket_replication_policy" {
+#   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
+#   statement {
+#     sid     = "focus_bucket_replication_policy"
+#     effect  = "Allow"
+#     actions = ["s3:ReplicateObject", "s3:ReplicateDelete", "s3:GetBucketVersioning", "s3:PutBucketVersioning"]
+#     resources = [
+#       "arn:aws:s3:::coat-${local.environment}-focus-reports/*",
+#       "arn:aws:s3:::coat-${local.environment}-focus-reports"
+#     ]
+#     principals {
+#       type        = "AWS"
+#       identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
+#     }
+#   }
+# }
 
 module "focus_reports" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
@@ -121,8 +155,8 @@ module "focus_reports" {
   force_destroy = true
 
   attach_deny_insecure_transport_policy = true
-  attach_policy                         = true
-  policy                                = data.aws_iam_policy_document.focus_bucket_replication_policy.json
+  # attach_policy                         = true
+  # policy                                = data.aws_iam_policy_document.focus_bucket_replication_policy.json
 
   server_side_encryption_configuration = {
     rule = {

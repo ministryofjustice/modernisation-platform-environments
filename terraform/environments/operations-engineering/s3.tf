@@ -22,6 +22,29 @@ module "cur_v2_hourly" {
   }
 }
 
+module "cur_v2_hourly_replication_test" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "github.com/ministryofjustice/aws-root-account/modules/s3?ref=main"
+
+  bucket_name= "cur-v2-hourly-replication-test"
+  enable_versioning = true
+  enable_replication     = true
+  replication_bucket_arn = "arn:aws:s3:::coat-production-cur-v2-hourly"
+  replication_role_arn   = module.cur_v2_hourly_replication_test.replication_role_arn
+  destination_kms_arn    = "arn:aws:kms:eu-west-2:279191903737:key/ef7e1dc9-dc2b-4733-9278-46885b7040c7"
+  replication_rules = [
+    {
+      id                 = "test-replicate-curv2-reports"
+      prefix             = "moj-cost-and-usage-reports/"
+      status             = "Enabled"
+      deletemarker       = "Enabled"
+      replica_kms_key_id = "arn:aws:kms:eu-west-2:279191903737:key/ef7e1dc9-dc2b-4733-9278-46885b7040c7"
+      metrics            = "Enabled"
+    }
+  ]
+}
+
 module "gpx_output_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
