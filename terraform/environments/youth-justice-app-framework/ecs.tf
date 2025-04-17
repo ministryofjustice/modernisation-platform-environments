@@ -59,7 +59,6 @@ module "ecs" {
     aws_secretsmanager_secret.Auth_Email_Account.arn,
     aws_secretsmanager_secret.auto_admit_secret.arn,
     aws_secretsmanager_secret.Unit_test.arn,
-    module.ses.ses_secret_arn,
     aws_secretsmanager_secret.s3_user_secret.arn,
     aws_secretsmanager_secret.yjaf_credentials.arn
   ])

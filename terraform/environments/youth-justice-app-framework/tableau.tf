@@ -43,7 +43,7 @@ module "tableau" {
   directory_service_sg_id = module.ds.directory_service_sg_id
   management_server_sg_id = module.ds.management_server_sg_id
   yjsm_sg_id              = module.yjsm.yjsm_security_group_id
-
+  esb_sg_id               = module.esb.esb_security_group_id
 
   datadog_api_key_arn   = module.datadog.datadog_api_key_arn
   availability_schedule = ""
