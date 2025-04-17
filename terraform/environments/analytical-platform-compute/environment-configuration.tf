@@ -24,15 +24,15 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
       eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce9"
+      eks_node_version    = "1.36.0-00ef7af1"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
         kube_proxy             = "v1.32.0-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
-        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.5"
+        aws_ebs_csi_driver     = "v1.41.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.7-eksbuild.1"
+        aws_guardduty_agent    = "v1.9.0-eksbuild.2"
+        eks_pod_identity_agent = "v1.3.5-eksbuild.2"
+        vpc_cni                = "v1.19.3-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -73,15 +73,15 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce9"
+      eks_node_version    = "1.36.0-00ef7af1"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
         kube_proxy             = "v1.32.0-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
-        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.5"
+        aws_ebs_csi_driver     = "v1.41.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.7-eksbuild.1"
+        aws_guardduty_agent    = "v1.9.0-eksbuild.2"
+        eks_pod_identity_agent = "v1.3.5-eksbuild.2"
+        vpc_cni                = "v1.19.3-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -122,15 +122,15 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce9"
+      eks_node_version    = "1.36.0-00ef7af1"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
         kube_proxy             = "v1.32.0-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
-        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.5"
+        aws_ebs_csi_driver     = "v1.41.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.7-eksbuild.1"
+        aws_guardduty_agent    = "v1.9.0-eksbuild.2"
+        eks_pod_identity_agent = "v1.3.5-eksbuild.2"
+        vpc_cni                = "v1.19.3-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -151,29 +151,31 @@ locals {
       cadet_lf_tags = {
         domain = [
           "bold",
+          "cica",
+          "cjs_cross_dataset",
           "civil",
+          "corporate",
           "courts",
-          "general",
           "criminal_history",
+          "data_first",
           "development_sandpit",
           "electronic_monitoring",
+          "family",
           "finance",
+          "general",
           "interventions",
+          "laa",
           "opg",
-          "performance",
-          "risk",
           "people",
+          "performance",
           "prison",
           "probation",
+          "property",
+          "risk",
+          "sentence_offence",
           "staging",
           "victims",
-          "victims_case_management",
-          "cica",
-          "data_first",
-          "laa",
-          "corporate",
-          "property",
-          "family"
+          "victims_case_management"
         ]
       }
     }

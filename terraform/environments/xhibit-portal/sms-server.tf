@@ -1,4 +1,5 @@
 resource "aws_instance" "sms-server" {
+  # checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
   depends_on                  = [aws_security_group.sms_server]
   instance_type               = "t3.large"
   ami                         = local.application_data.accounts[local.environment].XHBPRESMS01-ami
