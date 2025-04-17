@@ -370,7 +370,10 @@ data "aws_iam_policy_document" "ram_shares" {
       "ram:DeleteResourceShare",
       "ram:DisassociateResourceShare",
       "ram:GetResourceShares",
-      "ram:UpdateResourceShare"
+      "ram:UpdateResourceShare",
+      "ram:AssociateResourceSharePermission",
+      "ram:DisassociateResourceSharePermission",
+      "ram:ListResourceSharePermissions"
     ]
     resources = [
       "arn:aws:ram:${data.aws_region.current.name}:${local.env_account_id}:resource-share/*"
