@@ -64,62 +64,114 @@ module "ecs_service" {
   volume = concat(each.value.volumes, local.default_volumes)
   #container_definitions = local.consolidated_container_definitions
   container_definitions = merge(each.value.additional_container_definitions, {
-    (each.value.name) = {
-      image = each.value.image
-      port_mappings = concat(each.value.additional_port_mappings, [{
-        name          = each.value.name
-        containerPort = each.value.container_port
-        hostPort      = each.value.container_port
-        protocol      = "tcp"
-      }])
+  (each.value.name) = {
+    image = each.value.image
+    port_mappings = concat(each.value.additional_port_mappings, [ {
+      name          = each.value.name
+      containerPort = each.value.container_port
+      hostPort      = each.value.container_port
+      protocol      = "tcp"
+    }])
 
-      cpu                      = try(each.value.container_cpu, each.value.task_cpu - 20)
-      memory                   = try(each.value.container_memory, each.value.task_memory - 40)
-      essential                = try(each.value.essential, true)
-      mount_points             = concat(each.value.additional_mount_points, local.default_mountpoints)
-      readonly_root_filesystem = each.value.readonly_root_filesystem
+    cpu                      = try(each.value.container_cpu, each.value.task_cpu - 20)
+    memory                   = try(each.value.container_memory, each.value.task_memory - 40)
+    essential                = try(each.value.essential, true)
+    mount_points             = concat(each.value.additional_mount_points, local.default_mountpoints)
+    readonly_root_filesystem = each.value.readonly_root_filesystem
 
-      enable_cloudwatch_logging              = true
-      create_cloudwatch_log_group            = true
-      cloudwatch_log_group_name              = "/ecs/${each.value.name}"
-      cloudwatch_log_group_retention_in_days = each.value.cloudwatch_log_group_retention_in_days
+    enable_cloudwatch_logging              = true
+    create_cloudwatch_log_group            = true
+    cloudwatch_log_group_name              = "/ecs/${each.value.name}"
+    cloudwatch_log_group_retention_in_days = each.value.cloudwatch_log_group_retention_in_days
 
-      log_configuration = {
-        logDriver = "awslogs"
-      }
-
-      environment = concat(each.value.additional_environment_variables, local.default_environment_variables,
-        [
-          {
-            "name" : "SPRING_PROFILES_ACTIVE",
-            "value" : "moj-${var.environment}"
-          },
-          {
-            "name" : "DD_SERVICE",
-            "value" : each.value.name
-          },
-          {
-            "name" : "DD_ENV",
-            "value" : var.environment
-        }]
-      )
-      secrets = each.value.enable_postgres_secret ? concat(each.value.secrets, [
-        {
-          name      = "postgres_password"
-          valueFrom = try(data.aws_secretsmanager_secret_version.postgres_secret[0].secret_string, null)
-        }
-      ]) : each.value.secrets
-      docker_labels = merge(try(each.value.dockerLabels, null), {
-        "com.datadoghq.tags.service" : each.value.name,
-        "com.datadoghq.tags.env" : var.environment,
-      })
-      health_check = each.value.enable_healthcheck ? {
-        command = each.value.health_check.command
-      } : {}
-      command     = each.value.command
-      entry_point = each.value.entry_point
+    log_configuration = {
+      logDriver = "awslogs"
     }
-  })
+
+    environment = concat(each.value.additional_environment_variables, local.default_environment_variables,
+      [
+        {
+          "name" : "SPRING_PROFILES_ACTIVE",
+          "value" : "moj-${var.environment}"
+        },
+        {
+          "name" : "DD_SERVICE",
+          "value" : each.value.name
+        },
+        {
+          "name" : "DD_ENV",
+          "value" : var.environment
+        },
+        {
+          "name" : "DD_API_KEY",
+          "value" : var.datadog_api_key  # This is your Datadog API key
+        },
+        {
+          "name" : "DD_SITE",
+          "value" : "datadoghq.com"  # or "datadoghq.eu" for EU region
+        }
+      ]
+    )
+
+    secrets = each.value.enable_postgres_secret ? concat(each.value.secrets, [
+      {
+        name      = "postgres_password"
+        valueFrom = try(data.aws_secretsmanager_secret_version.postgres_secret[0].secret_string, null)
+      }
+    ]) : each.value.secrets
+
+    docker_labels = merge(try(each.value.dockerLabels, null), {
+      "com.datadoghq.tags.service" : each.value.name,
+      "com.datadoghq.tags.env" : var.environment,
+    })
+
+    health_check = each.value.enable_healthcheck ? {
+      command = each.value.health_check.command
+    } : {}
+
+    command     = each.value.command
+    entry_point = each.value.entry_point
+  },
+
+  # Datadog Agent container definition
+  "datadog-agent" = {
+    image = "datadog/agent:latest"  # Datadog agent image
+    cpu    = 10  # Assign CPU resources
+    memory = 256  # Assign memory resources
+
+    essential                = false  # Datadog agent is not critical to your app
+    mount_points             = [{
+      sourceVolume  = "docker-socket"
+      containerPath = "/var/run/docker.sock"
+    }]
+    environment = [
+      {
+        name  = "DD_API_KEY"
+        value = var.datadog_api_key  # Set your Datadog API key
+      },
+      {
+        name  = "DD_SITE"
+        value = "datadoghq.com"  # or "datadoghq.eu" for EU region
+      },
+      {
+        name  = "DD_LOGS_ENABLED"
+        value = "true"  # Enable logs collection
+      },
+      {
+        name  = "DD_APM_ENABLED"
+        value = "true"  # Enable APM collection (optional)
+      },
+      {
+        name  = "DD_COLLECT_KUBERNETES_EVENTS"
+        value = "false"  # Disable Kubernetes event collection, as you are using ECS
+      }
+    ]
+    docker_labels = {
+      "com.datadoghq.tags.service" : "datadog-agent",
+      "com.datadoghq.tags.env" : var.environment
+    }
+  }
+})
   ignore_task_definition_changes = true
   load_balancer = each.value.internal_only ? {
     service = {
@@ -165,3 +217,48 @@ module "ecs_service" {
   tags = merge(each.value.tags, local.all_tags)
 }
 
+module "ecs_service_datadog_agent" {
+  source = "terraform-aws-modules/ecs/aws//modules/service"
+  
+  name        = "datadog-agent"
+  cluster_arn = module.ecs_cluster.arn
+
+  launch_type                        = "EC2"
+  desired_count                      = length(var.ec2_instance_ids)  # One per EC2 instance
+  deployment_maximum_percent         = 100
+  deployment_minimum_healthy_percent = 100
+  health_check_grace_period_seconds  = 60
+
+  # Add the Datadog Agent as a container to the ECS service
+  container_definitions = jsonencode([
+    {
+      name      = "datadog-agent"
+      image     = "datadog/agent:latest"
+      cpu       = 10
+      memory    = 256
+      essential = false
+
+      environment = [
+        {
+          name  = "DD_API_KEY"
+          value = var.datadog_api_key
+        },
+        {
+          name  = "DD_SITE"
+          value = "datadoghq.com"
+        }
+      ]
+
+      mount_points = [{
+        sourceVolume  = "docker-socket"
+        containerPath = "/var/run/docker.sock"
+      }]
+    }
+  ])
+
+  # Mount volume for Docker socket
+  volume = [{
+    name      = "docker-socket"
+    host_path = "/var/run/docker.sock"
+  }]
+}
