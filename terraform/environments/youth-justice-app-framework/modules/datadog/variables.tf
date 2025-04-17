@@ -25,3 +25,15 @@ variable "kms_key_arn" {
   type        = string
   description = "ARN of the AWS KMS key to be used to encrypt secret values."
 }
+
+variable "enable_datadog_agent_apm" {
+  description = "Enable the Datadog agent"
+  type        = bool
+  default     = false
+}
+
+variable "ecs_cluster_arn" {
+  description = "The ARN of the ECS cluster"
+  type        = string
+  default     = ""
+}

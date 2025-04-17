@@ -15,6 +15,7 @@ module "datadog" {
   datadog_integration_external_id = local.datadog_integration_external_id[local.environment]
   tags                            = local.tags
 
-  kms_key_arn = module.kms.key_arn
-
+  kms_key_arn              = module.kms.key_arn
+  enable_datadog_agent_apm = local.application_data.accounts[local.environment].enable_datadog_agent_apm
+  ecs_cluster_arn          = module.ecs.cluster_arn
 }

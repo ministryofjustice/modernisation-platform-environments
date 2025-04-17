@@ -1,0 +1,149 @@
+{
+    "taskDefinitionArn": "arn:aws:ecs:eu-west-2:066012302209:task-definition/datadog-agent-task:9",
+    "containerDefinitions": [
+        {
+            "name": "datadog-agent",
+            "image": "datadog/agent:latest-jmx",
+            "cpu": 100,
+            "memory": 512,
+            "portMappings": [
+                {
+                    "containerPort": 8126,
+                    "hostPort": 8126,
+                    "protocol": "tcp"
+                },
+                {
+                    "containerPort": 8125,
+                    "hostPort": 8125,
+                    "protocol": "udp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "DD_APM_NON_LOCAL_TRAFFIC",
+                    "value": "true"
+                },
+                {
+                    "name": "DD_API_KEY",
+                    "value": "18a268502a95f20bcc2a8d082e591f04"
+                },
+                {
+                    "name": "DD_SITE",
+                    "value": "datadoghq.eu"
+                },
+                {
+                    "name": "DD_APM_ENABLED",
+                    "value": "true"
+                },
+                {
+                    "name": "DD_SYSTEM_PROBE_ENABLED",
+                    "value": "true"
+                },
+                {
+                    "name": "DD_TAGS",
+                    "value": "project:yjaf env:prod"
+                },
+                {
+                    "name": "DD_DOGSTATSD_TAGS",
+                    "value": "prod"
+                },
+                {
+                    "name": "DD_DOGSTATSD_NON_LOCAL_TRAFFIC",
+                    "value": "true"
+                }
+            ],
+            "mountPoints": [
+                {
+                    "sourceVolume": "docker_sock",
+                    "containerPath": "/var/run/docker.sock",
+                    "readOnly": true
+                },
+                {
+                    "sourceVolume": "proc",
+                    "containerPath": "/host/proc/",
+                    "readOnly": true
+                },
+                {
+                    "sourceVolume": "cgroup",
+                    "containerPath": "/host/sys/fs/cgroup",
+                    "readOnly": null
+                }
+            ],
+            "volumesFrom": [],
+            "readonlyRootFilesystem": false,
+            "systemControls": []
+        }
+    ],
+    "family": "datadog-agent-task",
+    "revision": 9,
+    "volumes": [
+        {
+            "name": "docker_sock",
+            "host": {
+                "sourcePath": "/var/run/docker.sock"
+            }
+        },
+        {
+            "name": "proc",
+            "host": {
+                "sourcePath": "/proc/"
+            }
+        },
+        {
+            "name": "cgroup",
+            "host": {
+                "sourcePath": "/sys/fs/cgroup/"
+            }
+        }
+    ],
+    "status": "ACTIVE",
+    "placementConstraints": [],
+    "compatibilities": [
+        "EXTERNAL",
+        "EC2"
+    ],
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "registeredAt": "2024-07-16T14:39:03.545Z",
+    "registeredBy": "arn:aws:sts::066012302209:assumed-role/admin/ThomasTipler",
+    "tags": [
+        {
+            "key": "owner",
+            "value": "nps"
+        },
+        {
+            "key": "capability",
+            "value": "ci/cd"
+        },
+        {
+            "key": "components",
+            "value": "ec2"
+        },
+        {
+            "key": "environment",
+            "value": "prod"
+        },
+        {
+            "key": "tag-editor-review",
+            "value": "yes"
+        },
+        {
+            "key": "application",
+            "value": "ecs"
+        },
+        {
+            "key": "project",
+            "value": "yjaf"
+        },
+        {
+            "key": "tag-manual-review",
+            "value": "not-applicable"
+        },
+        {
+            "key": "infrastructure-support",
+            "value": "nps-devops"
+        }
+    ]
+}
