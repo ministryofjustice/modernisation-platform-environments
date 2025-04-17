@@ -449,6 +449,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "ram:AssociateResourceShare",
       "ram:CreateResourceShare",
       "ram:DeleteResourceShare",
+      "ram:DisassociateResourceShare",
+      "ram:GetResourceShares",
       "ram:UpdateResourceShare"
     ]
     resources = [
@@ -530,6 +532,13 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
 }
 
+
+resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_attachment_lf_perms" {
+  for_each = local.analytical_platform_share
+
+  role       = aws_iam_role.analytical_platform_share_role[each.key].name
+  policy_arn=   "arn:aws:iam::aws:policy/AWSLakeFormationDataAdmin"
+}
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([
     [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
