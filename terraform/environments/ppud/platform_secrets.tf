@@ -35,3 +35,10 @@ data "aws_ssm_parameter" "elb-account-eu-west-2" {
   name            = "elb-account-eu-west-2"
   with_decryption = true
 }
+
+# Home Office Account ID - used by endpoint service
+data "aws_ssm_parameter" "homeoffice_account_prod" {
+  count           = local.is-production == true ? 1 : 0
+  name            = "homeoffice-account"
+  with_decryption = true
+}

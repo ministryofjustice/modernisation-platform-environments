@@ -307,17 +307,17 @@ resource "aws_instance" "s609693lo6vw110" {
   }
 }
 
-# PDF Conversion Test Server
+# File Server
 
 resource "aws_instance" "s609693lo6vw111" {
   # checkov:skip=CKV_AWS_135: "EBS volumes are enabled by default for all PPUD EC2 instance types"
   # checkov:skip=CKV_AWS_8: "EBS volumes are encrypted by default and do not require the launch configuration encryption"
   count                  = local.is-development == true ? 1 : 0
-  ami                    = "ami-005cac270289ea0de"
+  ami                    = "ami-0cbeb839e55dbb65e"
   instance_type          = "m5.large"
   source_dest_check      = false
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.Dev-Servers-Standard[0].id]
+  vpc_security_group_ids = [aws_security_group.Archive-DOC-Server[0].id]
   subnet_id              = data.aws_subnet.private_subnets_b.id
 
   metadata_options {

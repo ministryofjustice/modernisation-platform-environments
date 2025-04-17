@@ -1,4 +1,6 @@
 resource "aws_instance" "app-server" {
+  # checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+  # checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   depends_on                  = [aws_security_group.app_servers]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig02-ami
