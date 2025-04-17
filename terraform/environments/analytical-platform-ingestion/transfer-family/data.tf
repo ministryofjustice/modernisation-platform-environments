@@ -1,3 +1,7 @@
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.eu-west-2.s3"
+}
+
 # Shared VPC and Subnets
 data "aws_vpc" "isolated" {
   tags = {
