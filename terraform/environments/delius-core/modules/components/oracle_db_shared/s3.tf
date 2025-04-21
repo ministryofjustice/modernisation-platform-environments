@@ -165,8 +165,8 @@ data "aws_iam_policy_document" "oracledb_remote_backup_bucket_access" {
       "s3:*"
     ]
     resources = [
-      "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix,var.env_name,local.oracle_duplicate_map[var.env_name]["source_environment"])}",
-      "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix,var.env_name,local.oracle_duplicate_map[var.env_name]["source_environment"])}/*"
+      "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, local.oracle_duplicate_map[var.env_name]["source_environment"])}",
+      "arn:aws:s3:::${replace(local.oracle_backup_bucket_prefix, var.env_name, local.oracle_duplicate_map[var.env_name]["source_environment"])}/*"
     ]
   }
 }
