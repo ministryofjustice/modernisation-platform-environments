@@ -328,12 +328,13 @@ locals {
 
     fsx_windows = {
       t2-bods-win-share = {
-        aliases             = ["t2-onr-fs.azure.noms.root"]
-        deployment_type     = "SINGLE_AZ_1"
-        security_groups     = ["bods"]
-        skip_final_backup   = true
-        storage_capacity    = 128
-        throughput_capacity = 8
+        aliases                         = ["t2-onr-fs.azure.noms.root"]
+        automatic_backup_retention_days = 0
+        deployment_type                 = "SINGLE_AZ_1"
+        security_groups                 = ["bods"]
+        skip_final_backup               = true
+        storage_capacity                = 128
+        throughput_capacity             = 8
 
         subnets = [
           {
@@ -352,7 +353,8 @@ locals {
           password_secret_name = "/sap/bods/t2/passwords"
         }
         tags = {
-          backup = true
+          backup      = false
+          backup-plan = "daily-and-weekly"
         }
       }
     }
