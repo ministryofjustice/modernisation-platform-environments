@@ -13,6 +13,17 @@ module "ecs_service_datadog_agent" {
   health_check_grace_period_seconds  = 60
   scheduling_strategy                = "DAEMON" # Run one task per EC2 instance
 
+  ignore_task_definition_changes = true
+  create_security_group          = false
+  create_tasks_iam_role          = false
+  create_task_exec_iam_role      = false
+
+  subnet_ids             = var.ecs_subnet_ids
+  security_group_ids     = [var.ecs_security_group_id]
+  tasks_iam_role_name    = var.ecs_task_iam_role_name
+  tasks_iam_role_arn     = var.ecs_task_iam_role_arn
+  task_exec_iam_role_arn = var.ecs_task_exec_iam_role_arn
+  tags                   = var.tags
 
   # Add the Datadog Agent as a container to the ECS service
   container_definitions = {
@@ -122,17 +133,4 @@ module "ecs_service_datadog_agent" {
       }
     }
   ]
-
-  ignore_task_definition_changes = true
-  create_security_group          = false
-  create_tasks_iam_role          = false
-  create_task_exec_iam_role      = false
-
-  subnet_ids             = var.ecs_subnet_ids
-  security_group_ids     = [var.ecs_security_group_id]
-  tasks_iam_role_name    = var.ecs_task_iam_role_name
-  tasks_iam_role_arn     = var.ecs_task_iam_role_arn
-  task_exec_iam_role_arn = var.ecs_task_exec_iam_role_arn
-
-  tags = var.tags
 }
