@@ -210,22 +210,34 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   destination = "http_endpoint"
 
   http_endpoint_configuration {
-    url                = "https://http-intake.logs.datadoghq.eu/v1/input/PLACEHOLDER" 
+    url                = "https://http-intake.logs.datadoghq.eu/v1/input/PLACEHOLDER"
     name               = "Datadog"
-    access_key         = ""  # Leave empty, add api key in aws 
+    access_key         = ""
     buffering_interval = 60
     buffering_size     = 1
+    role_arn           = aws_iam_role.firehose_to_datadog.arn  # <--- MUST go here
 
     request_configuration {
       content_encoding = "GZIP"
+    }
+
+    s3_backup_mode = "AllData"  # or "FailedDataOnly"
+    s3_configuration {
+      role_arn           = aws_iam_role.firehose_to_datadog.arn
+      bucket_arn         = aws_s3_bucket.firehose_backup.arn
+      buffering_interval = 60
+      buffering_size     = 5
+      compression_format = "GZIP"
     }
   }
 
   lifecycle {
     ignore_changes = [http_endpoint_configuration[0].url]
   }
+}
 
-  role_arn = aws_iam_role.firehose_to_datadog.arn
+resource "aws_s3_bucket" "firehose_backup" {
+  bucket = "my-firehose-datadog-backup"
 }
 
 
