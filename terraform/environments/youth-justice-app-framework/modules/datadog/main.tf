@@ -243,7 +243,7 @@ resource "aws_s3_bucket" "firehose_backup" {
 
 resource "aws_cloudwatch_log_subscription_filter" "user_journey" {
   name            = "firehose-subscription"
-  log_group_name  = "yjaf-preproduction/user-journey"
+  log_group_name  = "yjaf-${var.environment}/user-journey"
   filter_pattern  = ""
   destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
   role_arn        = aws_iam_role.firehose_to_datadog.arn

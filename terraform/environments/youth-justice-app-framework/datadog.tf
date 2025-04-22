@@ -14,7 +14,7 @@ module "datadog" {
   project_name                    = local.project_name
   datadog_integration_external_id = local.datadog_integration_external_id[local.environment]
   tags                            = local.tags
-
-  kms_key_arn = module.kms.key_arn
+  kms_key_arn                     = module.kms.key_arn
+  environment                     = local.environment
 
 }

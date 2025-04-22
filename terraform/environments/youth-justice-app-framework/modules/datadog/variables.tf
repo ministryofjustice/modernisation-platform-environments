@@ -25,3 +25,8 @@ variable "kms_key_arn" {
   type        = string
   description = "ARN of the AWS KMS key to be used to encrypt secret values."
 }
+
+variable "environment" {
+  description = "The environment for the log-groups"
+  type        = string
+}
