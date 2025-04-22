@@ -21,7 +21,7 @@ module "ecs_service_datadog_agent" {
       image     = "datadog/agent:latest-jmx"
       cpu       = 100
       memory    = 512
-      essential = false
+      essential = true
 
       readonly_root_filesystem = false
 
