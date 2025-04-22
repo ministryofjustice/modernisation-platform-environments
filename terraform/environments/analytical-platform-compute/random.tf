@@ -27,3 +27,8 @@ resource "random_password" "ui_app_secrets" {
   length  = 32
   special = false
 }
+
+resource "random_password" "dashboard_service_secret_key" {
+  length  = 32
+  special = false
+}
