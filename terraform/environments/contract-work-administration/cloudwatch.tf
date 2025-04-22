@@ -1114,7 +1114,7 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
 ################################
 
 data "template_file" "dashboard_ha" {
-  count    = contains(["development", "testing"], local.environment) ? 0 : 1
+  count    = contains(["development", "test"], local.environment) ? 0 : 1
   template = file("${path.module}/dashboard_ha.tpl")
 
   # TODO Update the local variables to reference the correct alarms once they are created
@@ -1124,7 +1124,7 @@ data "template_file" "dashboard_ha" {
 }
 
 data "template_file" "dashboard_no_ha" {
-  count    = contains(["development", "testing"], local.environment) ? 1 : 0
+  count    = contains(["development", "test"], local.environment) ? 1 : 0
   template = file("${path.module}/dashboard_no_ha.tpl")
 
   # TODO Update the local variables to reference the correct alarms once they are created
