@@ -14,3 +14,18 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     principal   = "IAM_ALLOWED_PRINCIPALS"
   }
 }
+
+  resource "aws_lakeformation_lf_tag" "domain_tag" {
+    key    = "domain"
+    values = ["prisons", "probation", "electonic-monitoring"]
+  }
+
+  resource "aws_lakeformation_lf_tag" "sensitive_tag" {
+    key    = "sensitive"
+    values = ["true", "false"]
+  }
+
+  resource "aws_lakeformation_lf_tag" "sensitive_data_linking_tag" {
+    key    = "sensitive_data_linking"
+    values = ["true", "false"]
+  }
