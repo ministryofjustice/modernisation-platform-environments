@@ -213,7 +213,7 @@ resource "aws_instance" "app1" {
 }
 
 resource "aws_instance" "app2" {
-  count                       = contains(["development2", "testing"], local.environment) ? 0 : 1
+  count                       = contains(["development2", "test"], local.environment) ? 0 : 1
   ami                         = local.application_data.accounts[local.environment].app_ami_id
   availability_zone           = "eu-west-2a"
   instance_type               = local.application_data.accounts[local.environment].app_instance_type
