@@ -211,13 +211,12 @@ module "dashboard_service_app_secrets" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+  count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.3.1"
 
-  name        = "actions-runners/app/apc-self-hosted-runners"
-  description = "https://github.com/organizations/moj-analytical-services/settings/apps/analytical-platform-runners"
+  name        = "dashboard-service/app-secrets"
   kms_key_id  = module.common_secrets_manager_kms.key_arn
 
   secret_string = jsonencode({
