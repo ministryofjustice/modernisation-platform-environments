@@ -281,7 +281,7 @@ def handler(event, context):  # pylint: disable=unused-argument
     db_secret_arn = os.getenv("DB_SECRET_ARN")
     db_secret_response = secretsmanager.get_secret_value(SecretId=db_secret_arn)
     db_secret = json.loads(db_secret_response["SecretString"])
-    db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog, underscores will get replaced by hyphens
+    db_identifier = db_secret.get("dbInstanceIdentifier", os.getenv("GLUE_CATALOG_DATABASE_NAME")) # identifies database in glue catalog
     use_glue_catalog = os.getenv("USE_GLUE_CATALOG", "true").lower() == "true"
     glue_catalog_account_id = os.getenv("GLUE_CATALOG_ACCOUNT_ID", "")
     retry_failed_after_recreate_metadata = os.getenv("RETRY_FAILED_AFTER_RECREATE_METADATA", "true").lower() == "true"
@@ -351,7 +351,7 @@ def handler(event, context):  # pylint: disable=unused-argument
         logger.info("Generating glue metadata for %s.%s located at %s", table.database_name, table.name, table_location)
         glue_table_definition = gc.generate_from_meta(
             table,
-            db_identifier.replace("_", "-"),
+            db_identifier,
             table_location,
         )
 
