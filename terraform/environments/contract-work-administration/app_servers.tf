@@ -420,7 +420,7 @@ resource "aws_volume_attachment" "app1" {
 }
 
 resource "aws_ebs_volume" "app2" {
-  count             = contains(["development2", "testing"], local.environment) ? 0 : 1
+  count             = contains(["development2", "test"], local.environment) ? 0 : 1
   availability_zone = "eu-west-2a"
   size              = local.application_data.accounts[local.environment].ebs_app_size
   type              = "gp2"
@@ -439,7 +439,7 @@ resource "aws_ebs_volume" "app2" {
 }
 
 resource "aws_volume_attachment" "app2" {
-  count       = contains(["development2", "testing"], local.environment) ? 0 : 1
+  count       = contains(["development2", "test"], local.environment) ? 0 : 1
   device_name = "/dev/sdf"
   volume_id   = aws_ebs_volume.app2[0].id
   instance_id = aws_instance.app2[0].id
