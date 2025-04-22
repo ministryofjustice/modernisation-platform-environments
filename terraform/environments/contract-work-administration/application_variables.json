@@ -94,9 +94,9 @@
       "database_diskspace_threshold": "95",
       "database_read_write_ops_threshold": "1100000",
       "database_oradata_queue_length_threshold": "3",
-      "old_mail_server_url": "mail.aws.stg.legalservices.gov.uk",
+      "old_mail_server_url": "mail.aws.dev.legalservices.gov.uk",
       "laa_mail_relay_url": "laa-mail.laa-test.modernisation-platform.service.justice.gov.uk",
-      "old_domain_name": "stg.legalservices.gov.uk",
+      "old_domain_name": "dev.legalservices.gov.uk",
       "app_disk_space_alert_threshold": "92",
       "lz_account_id": "484221692666"
     },
