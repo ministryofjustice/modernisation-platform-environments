@@ -2,7 +2,7 @@ resource "helm_release" "mlflow" {
   /* https://github.com/ministryofjustice/analytical-platform-mlflow */
   name       = "mlflow"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.16.2-rc2"
+  version    = "2.21.3-rc6"
   chart      = "mlflow"
   namespace  = kubernetes_namespace.mlflow.metadata[0].name
   values = [

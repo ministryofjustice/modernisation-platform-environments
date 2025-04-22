@@ -24,15 +24,15 @@ resource "aws_security_group" "aws_dns_resolver" {
 
 locals {
   dns_endpoint_rules = {
-    "TCP_53": {
-      "from_port": 53,
-      "to_port": 53,
-      "protocol": "TCP"
+    "TCP_53" : {
+      "from_port" : 53,
+      "to_port" : 53,
+      "protocol" : "TCP"
     },
-    "UDP_53": {
-      "from_port": 53,
-      "to_port": 53,
-      "protocol": "UDP"
+    "UDP_53" : {
+      "from_port" : 53,
+      "to_port" : 53,
+      "protocol" : "UDP"
     }
   }
 }
@@ -68,10 +68,10 @@ resource "aws_route53_resolver_endpoint" "vpc" {
   direction              = "OUTBOUND"
   resolver_endpoint_type = "IPV4"
 
-  security_group_ids = [ aws_security_group.aws_dns_resolver.id ]
+  security_group_ids = [aws_security_group.aws_dns_resolver.id]
 
   ip_address { subnet_id = data.aws_subnet.private_subnets_a.id }
-  ip_address { subnet_id = data.aws_subnet.private_subnets_b.id}
+  ip_address { subnet_id = data.aws_subnet.private_subnets_b.id }
   ip_address { subnet_id = data.aws_subnet.private_subnets_c.id }
 
   protocols = ["Do53"]
@@ -83,7 +83,7 @@ locals {
   dns_ip_addresses = tolist(module.ds.dns_ip_addresses)
   ip_address_count = length(module.ds.dns_ip_addresses)
 }
-  
+
 
 resource "aws_route53_resolver_rule" "i2n" {
   provider = aws.core-vpc
@@ -98,11 +98,11 @@ resource "aws_route53_resolver_rule" "i2n" {
     content {
       ip = target_ip.value
     }
-    
+
   }
-#  target_ip { ip = local.dns_ip_addresses[0] }
-#  target_ip { ip = local.dns_ip_addresses[1] }
-#  target_ip { ip = local.ip_address_count > 2 ? local.dns_ip_addresses[2] : null}
+  #  target_ip { ip = local.dns_ip_addresses[0] }
+  #  target_ip { ip = local.dns_ip_addresses[1] }
+  #  target_ip { ip = local.ip_address_count > 2 ? local.dns_ip_addresses[2] : null}
 
   tags = local.tags
 }

@@ -25,8 +25,8 @@ variable "database_subnets" {
 }
 
 ## 
-variable "rds_secret_rotation_arn" {
-  description = "The ARN of the rotated postgres secret."
+variable "rds_redshift_secret_arn" {
+  description = "The ARN of the secret created to provide read only access to Redshift.."
   type        = string
 }
 
@@ -40,8 +40,13 @@ variable "postgres_security_group_id" {
   description = "The ID of the Security group that represents the PostgreSQL instance which required access to Redshift."
 }
 
-variable "data_science_role" {
+variable "vpc_cidr" {
   type = string
+  description = "The VPCs main subnet."
+}
+
+variable "data_science_role" {
+  type        = string
   description = "The arn of a role that is adpopted by YJB Data Scientests."
-  default = null #"arn:aws:iam::066012302209:role/data_science"
+  default     = null #"arn:aws:iam::066012302209:role/data_science"
 }

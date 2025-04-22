@@ -66,7 +66,7 @@ resource "aws_iam_policy_attachment" "codedeploy_service_role_policy" {
 
 #create EC2 codedeploy service iam role
 resource "aws_iam_role" "codedeploy_ec2_service_role" {
-  name  = "codedeploy-ec2-service-role"
+  name = "codedeploy-ec2-service-role"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [

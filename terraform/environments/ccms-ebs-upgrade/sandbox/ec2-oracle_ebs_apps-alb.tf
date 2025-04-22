@@ -1,10 +1,11 @@
 resource "aws_lb" "ebsapps_lb" {
-  name               = lower(format("lb-%s-ebsapp", local.component_name ))
+  name               = lower(format("lb-%s-ebsapp", local.component_name))
   internal           = true
   load_balancer_type = "application"
   security_groups    = [aws_security_group.sg_ebsapps_lb.id]
   subnets            = data.aws_subnets.shared-private.ids
 
+  drop_invalid_header_fields = true
   enable_deletion_protection = true
 
   access_logs {
@@ -14,7 +15,7 @@ resource "aws_lb" "ebsapps_lb" {
   }
 
   tags = merge(local.tags,
-    { Name = lower(format("lb-%s-ebsapp", local.component_name )) }
+    { Name = lower(format("lb-%s-ebsapp", local.component_name)) }
   )
 }
 
@@ -36,7 +37,7 @@ resource "aws_lb_listener" "ebsapps_listener" {
 }
 
 resource "aws_lb_target_group" "ebsapp_tg" {
-  name     = lower(format("tg-%s-ebsapp", local.component_name ))
+  name     = lower(format("tg-%s-ebsapp", local.component_name))
   port     = local.application_data.accounts[local.environment].tg_apps_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.shared.id

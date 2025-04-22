@@ -168,9 +168,11 @@ E'g.
 
 # [Certificate Authority SetUp](#ca-setup)
 
-The additional configuration described in Confluence page https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642508592/DOE+LDAPS+and+Certificate+chaining#Domain-Controllers-Server-Certificates-AutoEnrol has not been completed as the AD servers have auto-enroled for LDAPS certificates and LDAPS appears to be working successfully. This may need to be reconsidered following testing in Preproduction (or Test).
+The additional configuration described in Confluence page <https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642508592/DOE+LDAPS+and+Certificate+chaining#Domain-Controllers-Server-Certificates-AutoEnrol> has not been completed as the AD servers have auto-enroled for LDAPS certificates and LDAPS appears to be working successfully. This may need to be reconsidered following testing in Preproduction (or Test).
 
 In addition the RootCA and SubordinateCA cetificates have been left with their default exiptiy periods of 10 and 5 years respectively, rather than changeing them to 20 and 10 years as mentioned in the above document.
+
+## Create Tableau Server SSL Template
 
 A template needs to be created on the SubordinateCA server for Tableau web site HTTPS access as follows:
 1. Launch the Certificate Templates snapin.
@@ -182,6 +184,10 @@ A template needs to be created on the SubordinateCA server for Tableau web site 
 # [User and Group Migration](#user-group-copy)
 
 The following describes the process of copying data from one environment to another. For example copying from Sandpit to Test.
+
+## Create SubCA Certificate Chain
+1. Export the `RootCA` and `SubordinateCA` certificates (without private keys) in `Base-64 encoded X.509` format.
+2. Create file `SubordinateCA-Chain-<enviroment>.cer` by appending the contents of the RootCA file to the SubordinateCA file using a text editor (e.g. `Notepad`).
 
 ## Export All
 1. RDP onto a management server in the source environment.
@@ -203,8 +209,7 @@ The following describes the process of copying data from one environment to anot
 1. RDP onto a management server in the destination environment as the initial docmin user `admin` whose password is in Secret `i2n.com_admin_secret_2`.
 2. Create folder `C:\i2N\AD_Files`.
 3. Copy all the exported AD files to the above folder, e.g.: `Copy-S3Object -BucketName yjaf-development-transfer -KeyPrefix AD_Files -LocalFolder c:\i2N\AD_Files`
-3. Copy the following files to the folder just created: `create-ou-tree.ps1`, `OUTree-DEfault.csv`, `import-admin-users.ps1` and `import-yjaf-users.ps1`.
-4. Open a Powershell wondow at `C:\i2N\AD_Files`
+3. Open a Powershell wondow at `C:\i2N\AD_Files`
 4. Run powerShell script `.\create-ou-tree.ps1`
 5. Create group `Admin-password-policy` in UO `i2N` and configure the password policy <TODO>.
 6. Run powerShell script `.\import-yjaf-users.ps1`

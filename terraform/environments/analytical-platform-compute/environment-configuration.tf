@@ -13,10 +13,7 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = [
-        "10.0.0.0/8",
-        "172.20.0.0/16"
-      ]
+      transit_gateway_routes = [] # development is not connected to the Transit Gateway
 
       /* Route53 */
       route53_zone = "compute.development.analytical-platform.service.justice.gov.uk"
@@ -24,15 +21,15 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-sandbox"
       eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce9"
+      eks_node_version    = "1.36.0-00ef7af1"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
         kube_proxy             = "v1.32.0-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
-        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.5"
+        aws_ebs_csi_driver     = "v1.41.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.7-eksbuild.1"
+        aws_guardduty_agent    = "v1.9.0-eksbuild.2"
+        eks_pod_identity_agent = "v1.3.5-eksbuild.2"
+        vpc_cni                = "v1.19.3-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -40,9 +37,6 @@ locals {
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-development"
-
-      /* QuickSight */
-      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
 
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
@@ -66,8 +60,10 @@ locals {
 
       /* Transit Gateway */
       transit_gateway_routes = [
-        "10.0.0.0/8",
-        "172.20.0.0/16"
+        "10.0.0.0/8",      # Internal 10.x.x.x
+        "172.20.0.0/16",   # Cloud Platform
+        "194.33.254.0/24", # SOP
+        "194.33.255.0/24", # SOP
       ]
 
       /* Route53 */
@@ -76,15 +72,15 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce9"
+      eks_node_version    = "1.36.0-00ef7af1"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
         kube_proxy             = "v1.32.0-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
-        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.5"
+        aws_ebs_csi_driver     = "v1.41.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.7-eksbuild.1"
+        aws_guardduty_agent    = "v1.9.0-eksbuild.2"
+        eks_pod_identity_agent = "v1.3.5-eksbuild.2"
+        vpc_cni                = "v1.19.3-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -92,9 +88,6 @@ locals {
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-test"
-
-      /* QuickSight */
-      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
 
       /* UI */
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
@@ -118,8 +111,10 @@ locals {
 
       /* Transit Gateway */
       transit_gateway_routes = [
-        "10.0.0.0/8",
-        "172.20.0.0/16"
+        "10.0.0.0/8",      # Internal 10.x.x.x
+        "172.20.0.0/16",   # Cloud Platform
+        "194.33.254.0/24", # SOP
+        "194.33.255.0/24", # SOP
       ]
 
       /* Route53 */
@@ -128,15 +123,15 @@ locals {
       /* EKS */
       eks_sso_access_role = "modernisation-platform-developer"
       eks_cluster_version = "1.32"
-      eks_node_version    = "1.32.0-cacc4ce9"
+      eks_node_version    = "1.36.0-00ef7af1"
       eks_cluster_addon_versions = {
         coredns                = "v1.11.4-eksbuild.2"
         kube_proxy             = "v1.32.0-eksbuild.2"
-        aws_ebs_csi_driver     = "v1.39.0-eksbuild.1"
-        aws_efs_csi_driver     = "v2.1.4-eksbuild.1"
-        aws_guardduty_agent    = "v1.8.1-eksbuild.2"
-        eks_pod_identity_agent = "v1.3.4-eksbuild.1"
-        vpc_cni                = "v1.19.2-eksbuild.5"
+        aws_ebs_csi_driver     = "v1.41.0-eksbuild.1"
+        aws_efs_csi_driver     = "v2.1.7-eksbuild.1"
+        aws_guardduty_agent    = "v1.9.0-eksbuild.2"
+        eks_pod_identity_agent = "v1.3.5-eksbuild.2"
+        vpc_cni                = "v1.19.3-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -144,9 +139,6 @@ locals {
 
       /* MLFlow */
       mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"
-
-      /* QuickSight */
-      quicksight_notification_email = "analytical-platform@digital.justice.gov.uk"
 
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
@@ -158,7 +150,34 @@ locals {
 
       /* LF Domain Tags */
       cadet_lf_tags = {
-        domain = ["bold", "civil", "courts", "general", "criminal_history", "development_sandpit", "electronic_monitoring", "finance", "interventions", "opg", "performance", "risk", "people", "prison", "probation", "staging", "victims", "victims_case_management", "cica", "data_first", "laa"] # extracted from bucket paths
+        domain = [
+          "bold",
+          "cica",
+          "cjs_cross_dataset",
+          "civil",
+          "corporate",
+          "courts",
+          "criminal_history",
+          "data_first",
+          "development_sandpit",
+          "electronic_monitoring",
+          "family",
+          "finance",
+          "general",
+          "interventions",
+          "laa",
+          "opg",
+          "people",
+          "performance",
+          "prison",
+          "probation",
+          "property",
+          "risk",
+          "sentence_offence",
+          "staging",
+          "victims",
+          "victims_case_management"
+        ]
       }
     }
   }
