@@ -45,7 +45,7 @@ module "cica_dms_tariff_dms_implementation" {
     retry_failed_after_recreate_metadata      = false
     valid_files_mutable                       = true
     glue_catalog_account_id                   = local.environment_management.account_ids["analytical-platform-data-production"]
-    glue_catalog_database_name                = "cica_tariff_${local.environment}"
+    glue_catalog_database_name                = "cica-tariff-${local.environment}"
     glue_catalog_role_arn                     = local.environment_configuration.ap_data_glue_catalog_role
     glue_destination_bucket                   = local.environment == "production" ? "mojap-data-production-cica-dms-ingress-production" : ""
 }
