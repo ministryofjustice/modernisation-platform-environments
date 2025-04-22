@@ -161,3 +161,78 @@ resource "aws_iam_role_policy_attachment" "datadog_aws_integration_security_audi
   role       = aws_iam_role.datadog_aws_integration.name
   policy_arn = "arn:aws:iam::aws:policy/SecurityAudit"
 }
+
+resource "aws_iam_role" "firehose_to_datadog" {
+  name = "firehose_to_datadog"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "firehose.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "firehose_policy" {
+  name        = "FirehoseToDatadogPolicy"
+  description = "Allows Firehose to send data to Datadog"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams",
+          "logs:GetLogEvents"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "firehose_policy_attach" {
+  role       = aws_iam_role.firehose_to_datadog.name
+  policy_arn = aws_iam_policy.firehose_policy.arn
+}
+
+
+resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
+  name        = "cloudwatch-to-datadog"
+  destination = "http_endpoint"
+
+  http_endpoint_configuration {
+    url                = "https://http-intake.logs.datadoghq.eu/v1/input/PLACEHOLDER" 
+    name               = "Datadog"
+    access_key         = ""  # Leave empty, add api key in aws 
+    buffering_interval = 60
+    buffering_size     = 1
+
+    request_configuration {
+      content_encoding = "GZIP"
+    }
+  }
+
+  lifecycle {
+    ignore_changes = [http_endpoint_configuration[0].url]
+  }
+
+  role_arn = aws_iam_role.firehose_to_datadog.arn
+}
+
+
+resource "aws_cloudwatch_log_subscription_filter" "user_journey" {
+  name            = "firehose-subscription"
+  log_group_name  = "yjaf-preproduction/user-journey"
+  filter_pattern  = ""
+  destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
+  role_arn        = aws_iam_role.firehose_to_datadog.arn
+}
