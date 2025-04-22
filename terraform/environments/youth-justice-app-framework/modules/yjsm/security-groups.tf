@@ -124,6 +124,50 @@ resource "aws_security_group_rule" "yjsm_to_ecsint_rule" {
   description              = "YJSM to ECSint communication"
 }
 
+#TEMP RULE FOR FIXING AMI KEEP UNTIL DONE IN PROD
+resource "aws_security_group_rule" "tableau_to_yjsm_ssh" {
+  type                     = "ingress"
+  from_port                = 22
+  to_port                  = 22
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.tableau_sg_id
+  description              = "tableau to yjsm ssh temp"
+}
+
+# (Subnet A to ASSETS)
+resource "aws_security_group_rule" "ecs_to_assets_a" {
+  type              = "ingress"
+  from_port         = 8089
+  to_port           = 8089
+  protocol          = "tcp"
+  security_group_id = aws_security_group.yjsm_service.id
+  cidr_blocks       = ["10.27.144.0/24"]
+  description       = "ECS internal to ASSETS (Subnet A)"
+}
+
+# (Subnet B to ASSETS)
+resource "aws_security_group_rule" "ecs_to_assets_b" {
+  type              = "ingress"
+  from_port         = 8089
+  to_port           = 8089
+  protocol          = "tcp"
+  security_group_id = aws_security_group.yjsm_service.id
+  cidr_blocks       = ["10.27.145.0/24"]
+  description       = "ECS internal to ASSETS (Subnet B)"
+}
+
+# (Subnet C to ASSETS)
+resource "aws_security_group_rule" "ecs_to_assets_c" {
+  type              = "ingress"
+  from_port         = 8089
+  to_port           = 8089
+  protocol          = "tcp"
+  security_group_id = aws_security_group.yjsm_service.id
+  cidr_blocks       = ["10.27.146.0/24"]
+  description       = "ECS internal to ASSETS (Subnet C)"
+}
+
 
 ### TO DO LIST 
 ### CUG SUBNETS

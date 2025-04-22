@@ -200,12 +200,13 @@ locals {
     fsx_windows = {
 
       pd-bods-win-share = {
-        preferred_availability_zone = "eu-west-2a"
-        deployment_type             = "MULTI_AZ_1"
-        security_groups             = ["bods"]
-        skip_final_backup           = true
-        storage_capacity            = 600
-        throughput_capacity         = 8
+        automatic_backup_retention_days = 0
+        deployment_type                 = "MULTI_AZ_1"
+        preferred_availability_zone     = "eu-west-2a"
+        security_groups                 = ["bods"]
+        skip_final_backup               = true
+        storage_capacity                = 600
+        throughput_capacity             = 8
 
         subnets = [
           {

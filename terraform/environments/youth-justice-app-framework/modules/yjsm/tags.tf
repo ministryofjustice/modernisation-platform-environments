@@ -8,8 +8,8 @@ locals {
     "module"          = "yjsm",
     "module_version"  = local.module_version,
     "module_git_hash" = local.module_git_hash,
-    "project_name"    = var.project_name
-    "environment"     = var.environment
+    "project"    = var.project_name
+    "environment"     = "moj-${var.environment}"
     "Name"            = "YJSM"
   }
 

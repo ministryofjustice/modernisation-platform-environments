@@ -99,6 +99,11 @@ resource "aws_lambda_function" "certificate_monitor" {
       SNS_TOPIC_ARN       = aws_sns_topic.certificate_expiration_alerts.arn
     }
   }
+
+  tracing_config {
+    mode = "Active"
+  }
+
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-certificate-monitor"
   })

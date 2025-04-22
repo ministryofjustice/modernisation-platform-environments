@@ -10,21 +10,29 @@ module "key_pair" {
   tags = local.all_tags
 }
 
+resource "aws_ssm_parameter" "private_key" {
+  #checkov:skip=CKV_AWS_337 TODO
+  name        = "/ec2/keypairs/yjsm-private-key"
+  description = "EC2 Private Key for yjsm-keypair"
+  type        = "SecureString"
+  value       = module.key_pair.private_key_pem
+
+  tags = local.all_tags
+}
 
 data "template_file" "userdata" {
   template = file("${path.module}/ec2-userdata.tftpl")
   vars = {
-    env          = var.environment
-    tags         = jsonencode(local.all_tags)
-    project      = var.project_name
+    env     = var.environment
+    tags    = jsonencode(local.all_tags)
+    project = var.project_name
   }
 }
 
-
 resource "aws_instance" "yjsm" {
   ami                    = var.ami
-  instance_type          = "t3a.xlarge"  
-  key_name               = module.key_pair.key_pair_name     
+  instance_type          = "t3a.xlarge"
+  key_name               = module.key_pair.key_pair_name
   monitoring             = true
   ebs_optimized          = true
   iam_instance_profile   = aws_iam_instance_profile.yjsm_ec2_profile.id
@@ -37,9 +45,9 @@ resource "aws_instance" "yjsm" {
   metadata_options {
     http_endpoint = "enabled"
     http_tokens   = "required"
-  }   
-  
-  
+  }
+
+
   root_block_device {
     encrypted             = true
     delete_on_termination = false

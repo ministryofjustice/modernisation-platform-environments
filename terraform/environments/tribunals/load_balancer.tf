@@ -33,16 +33,23 @@ locals {
   }
 }
 
+# tfsec:ignore:aws-elb-alb-not-public
 resource "aws_lb" "tribunals_lb" {
+  #checkov:skip=CKV_AWS_91:"Access logging not required for this load balancer"
+  #checkov:skip=CKV2_AWS_28:"WAF protection is handled at CloudFront level"
+  #tfsec:ignore:AVD-AWS-0053
   name                       = "tribunals-lb"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.tribunals_lb_sc.id]
   subnets                    = data.aws_subnets.shared-public.ids
-  enable_deletion_protection = false
+  enable_deletion_protection = true
   internal                   = false
+  drop_invalid_header_fields = true
 }
 
 resource "aws_security_group" "tribunals_lb_sc" {
+  #checkov:skip=CKV_AWS_260:"Public access required for web application"
+  #checkov:skip=CKV_AWS_382:"Full egress access required for dynamic port mapping"
   name        = "tribunals-load-balancer-sg"
   description = "control access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
@@ -73,8 +80,10 @@ resource "aws_security_group" "tribunals_lb_sc" {
 }
 
 resource "aws_lb_target_group" "tribunals_target_group" {
-  for_each             = var.services
-  name                 = "${each.value.module_key}-tg"
+  #checkov:skip=CKV_AWS_261:"Health check is properly configured with path and matcher"
+  for_each = var.services
+  name     = "${each.value.module_key}-tg"
+  #checkov:skip=CKV_AWS_378: Allow HTTP protocol for transport
   port                 = each.value.port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
@@ -86,12 +95,14 @@ resource "aws_lb_target_group" "tribunals_target_group" {
   }
 
   health_check {
-    healthy_threshold   = "3"
-    interval            = "15"
+    healthy_threshold = "3"
+    interval          = "15"
+    #checkov:skip=CKV_AWS_378: Allow HTTP protocol for transport
     protocol            = "HTTP"
     unhealthy_threshold = "3"
     matcher             = "200-499"
     timeout             = "10"
+    path                = "/"
   }
 }
 
