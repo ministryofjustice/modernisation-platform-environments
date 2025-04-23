@@ -226,4 +226,6 @@ module "metadata_generator" {
   }]
 
   tags = var.tags
+
+  allowed_triggers = var.metadata_generator_allowed_triggers
 }

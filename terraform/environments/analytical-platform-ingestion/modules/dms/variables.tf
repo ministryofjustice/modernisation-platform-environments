@@ -153,3 +153,9 @@ variable "glue_destination_bucket" {
     This is useful if this parameter must be different to the output bucket, e.g. because of bucket replication
   EOF
 }
+
+variable "metadata_generator_allowed_triggers" {
+  type = map(any)
+  default = {}
+  description = "Which services can invoke metadata generator lambda (see https://github.com/terraform-aws-modules/terraform-aws-lambda?tab=readme-ov-file#lambda-permissions-for-allowed-triggers)"
+}
