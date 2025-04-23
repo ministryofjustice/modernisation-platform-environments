@@ -27,7 +27,7 @@ $roleMembersFilePath        = "${Export_Folder}\${yjaf_role_members_File}"
 
 # Export Account Users
 Get-ADUser -Filter * -SearchBase "OU=Users,OU=Accounts,OU=i2N,DC=i2n,DC=com" -Properties * |  # retrieves users in OU i2N\Accounts\Users.
-Select-Object Name, SamAccountName, UserPrincipalName, GivenName, Initials, sn, displayName, mail, Enabled |  # selects required user properties.
+Select-Object Name, SamAccountName, UserPrincipalName, GivenName, Initials, sn, displayName, mail, @{Name='uid';Expression={$_.uid -join ';'}}, Enabled |  # selects required user properties.
 Export-Csv -Path "${usersFilePath}" -NoTypeInformation # exports the users to a CSV file.
 
 # Export Account Groups

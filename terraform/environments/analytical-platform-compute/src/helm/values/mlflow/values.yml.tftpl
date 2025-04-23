@@ -37,6 +37,11 @@ mlflow:
           key:  postgres_connection_string
     - name: "MLFLOW_SERVER_DEFAULT_ARTIFACT_ROOT"
       value: "s3://${s3_bucket_name}/tracking"
+    - name: "MLFLOW_FLASK_SERVER_SECRET_KEY"
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-flask-server-secret-key
+          key:  secret-key
 
 securityContext:
   allowPrivilegeEscalation: false

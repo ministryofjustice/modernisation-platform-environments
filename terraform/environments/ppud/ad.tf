@@ -62,11 +62,11 @@ resource "aws_ssm_association" "ad_join_domain_association_dev" {
 # Associate Policy to UAT Instance
 resource "aws_ssm_association" "ad_join_domain_association_preprod" {
   count      = local.is-preproduction == true ? 1 : 0
-  depends_on = [aws_instance.s618358rgvw201, aws_instance.S618358RGVW202, aws_instance.s618358rgsw025, aws_instance.s618358rgvw024, aws_instance.s618358rgvw023]
+  depends_on = [aws_instance.s618358rgvw201, aws_instance.S618358RGVW202, aws_instance.s618358rgsw025, aws_instance.s618358rgvw024, aws_instance.s618358rgvw023, aws_instance.s618358rgvw028]
   name       = aws_ssm_document.api_ad_join_domain.name
   targets {
     key    = "InstanceIds"
-    values = [aws_instance.s618358rgvw201[0].id, aws_instance.S618358RGVW202[0].id, aws_instance.s618358rgsw025[0].id, aws_instance.s618358rgvw024[0].id, aws_instance.s618358rgvw023[0].id]
+    values = [aws_instance.s618358rgvw201[0].id, aws_instance.S618358RGVW202[0].id, aws_instance.s618358rgsw025[0].id, aws_instance.s618358rgvw024[0].id, aws_instance.s618358rgvw023[0].id, aws_instance.s618358rgvw028[0].id]
   }
 }
 
