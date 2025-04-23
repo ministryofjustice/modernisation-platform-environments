@@ -16,7 +16,7 @@ module "observability_platform_tenant" {
 }
 
 module "analytical_platform_observability" {
-  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=bd09ac68fb3050ddd9992fe4326148aa5d2b1c9b" # 1.1.0
+  source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref= ccefcbdcecd3c5dfd25474b66ac06a58bd810928" # 2.0.0
 
   enable_amazon_prometheus_query_access = true
 
