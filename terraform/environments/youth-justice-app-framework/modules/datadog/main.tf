@@ -253,6 +253,12 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
     buffering_size     = 1
     role_arn           = aws_iam_role.firehose_to_datadog.arn 
 
+    cloudwatch_logging_options {
+    enabled            = true
+    log_group_name     = aws_cloudwatch_log_group.firehose_log_group.name
+    log_stream_name    = "firehose-datadog-http"
+    }
+
     request_configuration {
       content_encoding = "GZIP"
     }
