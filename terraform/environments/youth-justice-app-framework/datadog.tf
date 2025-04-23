@@ -17,4 +17,11 @@ module "datadog" {
   kms_key_arn                     = module.kms.key_arn
   environment                     = local.environment
 
+  #ECS
+  ecs_cluster_arn            = module.ecs.ecs_cluster_arn
+  ecs_subnet_ids             = local.private_subnet_list[*].id
+  ecs_security_group_id      = module.ecs.ecs_service_internal_sg_id
+  ecs_task_iam_role_name     = module.ecs.ecs_task_role_name
+  ecs_task_iam_role_arn      = module.ecs.ecs_task_role_arn
+  ecs_task_exec_iam_role_arn = module.ecs.ecs_task_execution_role_arn
 }
