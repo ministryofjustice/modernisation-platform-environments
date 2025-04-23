@@ -251,7 +251,7 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
     access_key         = ""
     buffering_interval = 60
     buffering_size     = 1
-    role_arn           = aws_iam_role.firehose_to_datadog.arn  # <--- MUST go here
+    role_arn           = aws_iam_role.firehose_to_datadog.arn 
 
     request_configuration {
       content_encoding = "GZIP"
@@ -273,7 +273,7 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
 }
 
 resource "aws_s3_bucket" "firehose_backup" {
-  bucket = "my-firehose-datadog-backup"
+  bucket = "firehose-datadog-backup"
 }
 
 
