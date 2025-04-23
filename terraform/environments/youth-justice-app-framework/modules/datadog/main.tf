@@ -286,9 +286,9 @@ resource "aws_cloudwatch_log_group" "firehose_log_group" {
   retention_in_days = 400
 }
 
-resource "aws_cloudwatch_log_subscription_filter" "user_journey" {
+resource "aws_cloudwatch_log_subscription_filter" "cloudtrail" {
   name            = "firehose-subscription"
-  log_group_name  = "yjaf-${var.environment}/user-journey"
+  log_group_name  = "cloudtrail"
   filter_pattern  = ""
   destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
   role_arn        = aws_iam_role.cw_logs_to_firehose.arn
