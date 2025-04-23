@@ -32,5 +32,5 @@ module "bastion_linux" {
   region                  = var.environment.region
   extra_user_data_content = var.bastion_linux.extra_user_data_content
   tags_common             = merge(local.tags, var.bastion_linux.tags)
-  tags_prefix             = terraform.workspacegit
+  tags_prefix             = terraform.workspace
 }
