@@ -220,7 +220,7 @@ module "dashboard_service_app_secrets" {
   kms_key_id  = module.common_secrets_manager_kms.key_arn
 
   secret_string = jsonencode({
-    secret_key          = random_password.dashboard_service_secret_key.result,
+    secret_key          = random_password.dashboard_service_secret_key[0].result,
     sentry_dsn          = "CHANGEME",
     auth0_client_id     = "CHANGEME",
     auth0_client_secret = "CHANGEME",
