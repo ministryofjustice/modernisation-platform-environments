@@ -48,4 +48,10 @@ module "cica_dms_tariff_dms_implementation" {
     glue_catalog_database_name                = "cica-tariff-${local.environment}"
     glue_catalog_role_arn                     = local.environment_configuration.ap_data_glue_catalog_role
     glue_destination_bucket                   = local.environment == "production" ? "mojap-data-production-cica-dms-ingress-production" : ""
+    metadata_generator_allowed_triggers = {
+      EventBridge = {
+        principal  = "events.amazonaws.com"
+        source_arn = aws_cloudwatch_event_rule.metadata_generator.arn
+      }
+    }
 }
