@@ -240,7 +240,6 @@ resource "aws_iam_role_policy_attachment" "firehose_policy_attach" {
   policy_arn = aws_iam_policy.firehose_policy.arn
 }
 
-
 resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   name        = "cloudwatch-to-datadog"
   destination = "http_endpoint"
@@ -282,6 +281,10 @@ resource "aws_s3_bucket" "firehose_backup" {
   bucket = "yjaf-${var.environment}-firehose-datadog-backup"
 }
 
+resource "aws_cloudwatch_log_group" "firehose_log_group" {
+  name              = "yjaf-${var.environment}-firehose-error-logs"
+  retention_in_days = 400
+}
 
 resource "aws_cloudwatch_log_subscription_filter" "user_journey" {
   name            = "firehose-subscription"
