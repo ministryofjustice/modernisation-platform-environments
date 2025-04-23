@@ -208,5 +208,8 @@ locals {
         ]
       }
     }
+    secretsmanager_secrets = {
+      "/microsoft/AD/azure.hmpp.root" = local.secretsmanager_secrets.domain
+    }
   }
 }
