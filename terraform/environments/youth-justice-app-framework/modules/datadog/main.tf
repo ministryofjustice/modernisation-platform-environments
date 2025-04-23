@@ -273,7 +273,7 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
 }
 
 resource "aws_s3_bucket" "firehose_backup" {
-  bucket = "firehose-datadog-backup"
+  bucket = "yjaf-${var.environment}-firehose-datadog-backup"
 }
 
 
