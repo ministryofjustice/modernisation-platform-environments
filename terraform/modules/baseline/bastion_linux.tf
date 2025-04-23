@@ -3,7 +3,7 @@ module "bastion_linux" {
 
   count = var.bastion_linux.public_key_data != null ? 1 : 0
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.4.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.4.2"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -32,5 +32,5 @@ module "bastion_linux" {
   region                  = var.environment.region
   extra_user_data_content = var.bastion_linux.extra_user_data_content
   tags_common             = merge(local.tags, var.bastion_linux.tags)
-  tags_prefix             = terraform.workspace
+  tags_prefix             = terraform.workspacegit
 }
