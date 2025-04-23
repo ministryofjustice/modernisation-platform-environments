@@ -54,6 +54,20 @@ module "cur_v2_hourly" {
       }
     }
   }
+
+  versioning = {
+    status = "Enabled"
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "DeleteOldVersions"
+      enabled = true
+      noncurrent_version_expiration = {
+        days = 1
+      }
+    }
+  ]
 }
 
 # FOCUS Reports
