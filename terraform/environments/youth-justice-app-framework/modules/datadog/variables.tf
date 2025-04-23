@@ -40,35 +40,29 @@ variable "enable_datadog_agent_apm" {
 variable "ecs_cluster_arn" {
   description = "The ARN of the ECS cluster"
   type        = string
-  default     = ""
 }
 
 variable "ecs_subnet_ids" {
   description = "The subnet IDs for the ECS cluster"
   type        = list(string)
-  default     = []
 }
 
 variable "ecs_security_group_id" {
   description = "The security group ID for the ECS cluster"
   type        = string
-  default     = ""
 }
 
 variable "ecs_task_iam_role_name" {
   description = "The name of the IAM role for the ECS task"
   type        = string
-  default     = ""
 }
 
 variable "ecs_task_iam_role_arn" {
   description = "The ARN of the IAM role for the ECS task"
   type        = string
-  default     = ""
 }
 
 variable "ecs_task_exec_iam_role_arn" {
   description = "The ARN of the IAM role for the ECS task execution"
   type        = string
-  default     = ""
 }
