@@ -106,6 +106,7 @@ resource "kubernetes_namespace" "mwaa" {
 
 resource "kubernetes_namespace" "dashboard_service" {
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
+
   metadata {
     name = "dashboard-service"
     labels = {
