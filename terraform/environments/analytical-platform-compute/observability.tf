@@ -19,6 +19,7 @@ module "analytical_platform_observability" {
   source = "github.com/ministryofjustice/terraform-aws-analytical-platform-observability?ref=ccefcbdcecd3c5dfd25474b66ac06a58bd810928" # 2.0.0
 
   enable_amazon_prometheus_query_access = true
+  enable_aws_xray_read_only_access      = true
 
   additional_policies = {
     managed_prometheus_kms_access = module.managed_prometheus_kms_access_iam_policy.arn
