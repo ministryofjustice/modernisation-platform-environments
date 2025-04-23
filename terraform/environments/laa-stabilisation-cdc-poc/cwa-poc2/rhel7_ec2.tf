@@ -34,14 +34,50 @@ resource "aws_vpc_security_group_ingress_rule" "rhel7_workspace_ssh" {
   to_port           = 22
 }
 
-# resource "aws_vpc_security_group_ingress_rule" "rhel7_workspace_ssh" {
-#   security_group_id = aws_security_group.rhel7_instance.id
-#   description       = "SSH access from LZ Workspace"
-#   cidr_ipv4         = local.management_cidr
-#   from_port         = 22
-#   ip_protocol       = "tcp"
-#   to_port           = 22
-# }
+resource "aws_vpc_security_group_ingress_rule" "rhel7_portal_poc_1" {
+  security_group_id            = aws_security_group.rhel7_instance.id
+  description                  = "SSH access from Portal POC App1"
+  referenced_security_group_id = aws_security_group.cwa_poc2_app.id
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rhel7_bastion_ssh" {
+  security_group_id            = aws_security_group.rhel7_instance.id
+  description                  = "SSH from the Bastion"
+  referenced_security_group_id = var.bastion_security_group
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rhel7_workspace_ohs_http" {
+  security_group_id = aws_security_group.rhel7_instance.id
+  description       = "Allow (OHS HTTP) from WorkSpace access"
+  cidr_ipv4         = local.management_cidr
+  from_port         = 7777
+  ip_protocol       = "tcp"
+  to_port           = 7777
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rhel7_workspace_ohs_https" {
+  security_group_id = aws_security_group.rhel7_instance.id
+  description       = "Allow (OHS HTTPS) from WorkSpace access"
+  cidr_ipv4         = local.management_cidr
+  from_port         = 4443
+  ip_protocol       = "tcp"
+  to_port           = 4443
+}
+
+resource "aws_vpc_security_group_ingress_rule" "rhel7_workspace_weblogic" {
+  security_group_id = aws_security_group.rhel7_instance.id
+  description       = "Allow (Weblogic) from WorkSpace access"
+  cidr_ipv4         = local.management_cidr
+  from_port         = 7001
+  ip_protocol       = "tcp"
+  to_port           = 7001
+}
 
 resource "aws_vpc_security_group_egress_rule" "rhel7_outbound" {
   security_group_id = aws_security_group.rhel7_instance.id
