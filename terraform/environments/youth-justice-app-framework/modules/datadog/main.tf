@@ -162,6 +162,42 @@ resource "aws_iam_role_policy_attachment" "datadog_aws_integration_security_audi
   policy_arn = "arn:aws:iam::aws:policy/SecurityAudit"
 }
 
+resource "aws_iam_role" "cw_logs_to_firehose" {
+  name = "cw-logs-to-firehose"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.amazonaws.com"
+        }
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "cw_logs_to_firehose_policy" {
+  name = "AllowCWLogsToWriteToFirehose"
+  role = aws_iam_role.cw_logs_to_firehose.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "firehose:PutRecord",
+          "firehose:PutRecordBatch"
+        ]
+        Resource = aws_kinesis_firehose_delivery_stream.to_datadog.arn
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "firehose_to_datadog" {
   name = "firehose_to_datadog"
 
@@ -246,5 +282,5 @@ resource "aws_cloudwatch_log_subscription_filter" "user_journey" {
   log_group_name  = "yjaf-${var.environment}/user-journey"
   filter_pattern  = ""
   destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
-  role_arn        = aws_iam_role.firehose_to_datadog.arn
+  role_arn        = aws_iam_role.cw_logs_to_firehose.arn
 }
