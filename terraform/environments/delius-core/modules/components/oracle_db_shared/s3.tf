@@ -54,7 +54,7 @@ module "s3_bucket_oracledb_backups" {
       ]
 
       expiration = {
-        days = 365
+        days = local.oracle_backup_bucket_expiration
       }
     }
   ]
@@ -218,7 +218,7 @@ module "s3_bucket_oracledb_backups_inventory" {
       ]
 
       expiration = {
-        days = 365
+        days = local.oracle_backup_bucket_expiration
       }
     }
   ]
@@ -353,7 +353,7 @@ module "s3_bucket_oracle_statistics" {
       ]
 
       expiration = {
-        days = 365
+        days = local.oracle_backup_bucket_expiration
       }
     }
   ]

@@ -72,7 +72,8 @@
         "dps-mj-and-ma",
         "dps-testing",
         "dps-testing2",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-manage-contac"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -226,7 +227,8 @@
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-manage-contac"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -382,7 +384,8 @@
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-manage-contac"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -554,7 +557,8 @@
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-manage-contac"
       ],
       "alarms": {
         "setup_cw_alarms": true,
