@@ -25,6 +25,24 @@ resource "aws_security_group" "rhel7_instance" {
 
 }
 
+resource "aws_vpc_security_group_ingress_rule" "rhel7_workspace_ssh" {
+  security_group_id = aws_security_group.rhel7_instance.id
+  description       = "SSH access from LZ Workspace"
+  cidr_ipv4         = local.management_cidr
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
+
+# resource "aws_vpc_security_group_ingress_rule" "rhel7_workspace_ssh" {
+#   security_group_id = aws_security_group.rhel7_instance.id
+#   description       = "SSH access from LZ Workspace"
+#   cidr_ipv4         = local.management_cidr
+#   from_port         = 22
+#   ip_protocol       = "tcp"
+#   to_port           = 22
+# }
+
 resource "aws_vpc_security_group_egress_rule" "rhel7_outbound" {
   security_group_id = aws_security_group.rhel7_instance.id
   cidr_ipv4         = "0.0.0.0/0"
