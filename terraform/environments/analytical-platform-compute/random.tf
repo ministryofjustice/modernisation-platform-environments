@@ -31,4 +31,5 @@ resource "random_password" "ui_app_secrets" {
 resource "random_password" "dashboard_service_secret_key" {
   length  = 32
   special = false
+  count   = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 }
