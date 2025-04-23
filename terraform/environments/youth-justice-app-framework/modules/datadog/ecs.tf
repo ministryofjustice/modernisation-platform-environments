@@ -116,15 +116,11 @@ module "ecs_service_datadog_agent" {
   volume = [
     {
       "name" : "docker_sock",
-      "host" : {
-        "sourcePath" : "/var/run/docker.sock"
-      }
+      "host_path" : "/var/run/docker.sock"
     },
     {
       "name" : "proc",
-      "host" : {
-        "sourcePath" : "/proc/"
-      }
+      "host_path " : "/proc/"
     },
     {
       "name" : "cgroup",
