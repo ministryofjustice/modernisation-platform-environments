@@ -8,7 +8,7 @@ locals {
     "module"         = "lambda",
     "module_version" = local.module_version,
     #"module_git_hash" = local.module_git_hash,# cant use this with the way moj have their terraform repo set up
-    "project_name" = var.project_name
+    "project" = var.project_name
   }
 
 

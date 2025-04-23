@@ -132,3 +132,8 @@ variable "kms_key_arn" {
   type        = string
   description = "ARN of the AWS KMS key to be used to encrypt secret values."
 }
+
+variable "esb_sg_id" {
+  type        = string
+  description = "The ID of the ESB Server Security Group. Used to add a rule to enable Tableau ssh to esb."
+}
