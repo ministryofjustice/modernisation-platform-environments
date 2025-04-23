@@ -227,5 +227,6 @@ module "metadata_generator" {
 
   tags = var.tags
 
+  publish          = true # Needed by allowed_triggers https://github.com/terraform-aws-modules/terraform-aws-lambda/issues/36#issuecomment-650217274
   allowed_triggers = var.metadata_generator_allowed_triggers
 }
