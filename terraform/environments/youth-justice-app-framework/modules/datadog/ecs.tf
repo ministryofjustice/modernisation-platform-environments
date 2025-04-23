@@ -120,13 +120,11 @@ module "ecs_service_datadog_agent" {
     },
     {
       "name" : "proc",
-      "host_path " : "/proc/"
+      "host_path" : "/proc/"
     },
     {
       "name" : "cgroup",
-      "host" : {
-        "sourcePath" : "/sys/fs/cgroup/"
-      }
+      "host_path" : "/sys/fs/cgroup/"
     }
   ]
 }
