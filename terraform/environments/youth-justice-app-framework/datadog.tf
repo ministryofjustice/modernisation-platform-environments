@@ -18,6 +18,7 @@ module "datadog" {
   environment                     = local.environment
 
   #ECS
+  enable_datadog_agent_apm   = local.application_data.accounts[local.environment].enable_datadog_agent_apm
   ecs_cluster_arn            = module.ecs.ecs_cluster_arn
   ecs_subnet_ids             = local.private_subnet_list[*].id
   ecs_security_group_id      = module.ecs.ecs_service_internal_sg_id
