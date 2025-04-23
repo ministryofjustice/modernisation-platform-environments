@@ -33,7 +33,7 @@ module "eventbridge_dms_full_load_task_role" {
     "apidestinations.events.amazonaws.com"
   ]
 
-  custom_role_policy_arns = [module.production_replication_cica_dms_iam_policy.arn]
+  custom_role_policy_arns = [module.eventbridge_dms_full_load_task_policy.arn]
   trust_policy_conditions = [
     {
       test = "StringEquals"
