@@ -141,7 +141,7 @@ resource "aws_iam_role_policy" "metadata_generator_lambda_function_assume_role" 
       {
         Action = ["sts:AssumeRole"]
         Effect = "Allow"
-        Resource = "${var.glue_catalog_role_arn}"
+        Resource = var.glue_catalog_role_arn
       },
     ]
   })
