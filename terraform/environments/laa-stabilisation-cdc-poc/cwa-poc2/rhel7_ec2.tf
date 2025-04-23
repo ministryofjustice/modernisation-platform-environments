@@ -116,6 +116,13 @@ resource "aws_instance" "rhel7_instance_1" {
     var.tags,
     { "Name" = "${local.application_name_short} rhel7 Instance 1" }
   )
+
+  lifecycle {
+    ignore_changes = [
+      root_block_device.kms_key_id
+    ]
+  }
+
 }
 
 ###############################
