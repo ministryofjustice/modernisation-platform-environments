@@ -1,7 +1,7 @@
 # Elastic IPs for WebGate NLB
 resource "aws_eip" "webgate_eip" {
-  count = local.is-production ? 6 : 3
-  vpc   = true
+  count  = local.is-production ? 6 : 3
+  domain = "vpc"
 
   lifecycle {
     prevent_destroy = true

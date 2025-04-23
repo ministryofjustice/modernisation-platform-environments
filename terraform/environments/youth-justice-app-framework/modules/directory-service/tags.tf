@@ -9,9 +9,8 @@ locals {
     "module"         = "directory-service",
     "module_version" = local.module_version,
     #"module_git_hash" = local.module_git_hash, #todo revisit this if we start using remote modules with tagging in github
-    "project_name" = var.project_name
+    "project" = var.project_name
   }
 
-
-  all_tags = merge(var.tags, local.tags, local.tags)
+  all_tags = merge(var.tags, local.tags)
 }

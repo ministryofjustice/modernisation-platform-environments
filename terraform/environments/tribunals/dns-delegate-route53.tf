@@ -58,6 +58,7 @@ locals {
 
 # 'A' records for sftp services currently routed to the existing EC2 Tribunals instance in DSD account via static ip address
 resource "aws_route53_record" "ec2_instances" {
+  #checkov:skip=CKV2_AWS_23:"A record points to existing EC2 instance IP in DSD account"
   count    = local.is-production ? length(local.ec2_records) : 0
   provider = aws.core-network-services
   zone_id  = local.production_zone_id
@@ -121,6 +122,7 @@ resource "aws_route53_record" "nginx_instances" {
 }
 
 resource "aws_route53_record" "nginx_instances_pre_migration" {
+  #checkov:skip=CKV2_AWS_23:"A record points to existing NGINX ALB in pre-migration environment"
   count    = local.is-production ? length(local.nginx_records_pre_migration) : 0
   provider = aws.core-network-services
   zone_id  = local.production_zone_id
@@ -136,6 +138,7 @@ resource "aws_route53_record" "nginx_instances_pre_migration" {
 
 # 'A' records for tribunals www. URLs redirects to existing entries - subtract the "www."
 resource "aws_route53_record" "www_instances" {
+  #checkov:skip=CKV2_AWS_23:"A record for www subdomain redirects to main domain"
   count    = local.is-production ? length(local.www_records) : 0
   provider = aws.core-network-services
   zone_id  = local.production_zone_id
@@ -151,6 +154,7 @@ resource "aws_route53_record" "www_instances" {
 
 #  The root www resource record needs its own resource to avoid breaking the logic of using the substring in www_instances
 resource "aws_route53_record" "www_root" {
+  #checkov:skip=CKV2_AWS_23:"Root www record points to apex domain"
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
   zone_id  = local.production_zone_id
