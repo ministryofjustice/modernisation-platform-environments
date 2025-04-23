@@ -119,7 +119,7 @@ resource "aws_instance" "rhel7_instance_1" {
 
   lifecycle {
     ignore_changes = [
-      root_block_device.kms_key_id
+      root_block_device[0].kms_key_id
     ]
   }
 
