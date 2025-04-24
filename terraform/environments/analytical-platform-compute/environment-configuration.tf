@@ -41,6 +41,10 @@ locals {
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
+      /* Dashboard Service */
+      dashboard_service_hostname = "dashboards.development.analytical-platform.service.justice.gov.uk"
+      dashboard_service_django_settings_module = "dashboard_service.settings.development"
+
       /* MWAA */
       airflow_version                 = "2.10.3"
       airflow_environment_class       = "mw1.small"
@@ -142,6 +146,10 @@ locals {
 
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
+
+      /* Dashboard Service */
+      dashboard_service_hostname = "dashboards.analytical-platform.service.justice.gov.uk"
+      dashboard_service_django_settings_module = "dashboard_service.settings.production"
 
       /* MWAA */
       airflow_version                 = "2.10.3"
