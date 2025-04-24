@@ -111,6 +111,21 @@ locals {
         })
       })
 
+      test-rdgw-2-a = merge(local.ec2_instances.rdgw, {
+        config = merge(local.ec2_instances.rdgw.config, {
+          availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.rdgw.instance, {
+          tags = {
+            patch-manager = "group1"
+          }
+        })
+        tags = merge(local.ec2_instances.rdgw.tags, {
+          description = "Remote Desktop Gateway for azure.noms.root domain"
+          domain-name = "azure.noms.root"
+        })
+      })
+
       t1-jump2022-1 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
@@ -214,6 +229,11 @@ locals {
               { ec2_instance_name = "test-rdgw-1-a" },
             ]
           })
+          test-rdgw-2-http = merge(local.lbs.public.instance_target_groups.http, {
+            attachments = [
+              { ec2_instance_name = "test-rdgw-2-a" },
+            ]
+          })
           test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "test-rds-2-b" },
@@ -239,6 +259,20 @@ locals {
                     values = [
                       "rdgateway1.test.hmpps-domain.service.justice.gov.uk",
                       "hmppgw1.justice.gov.uk",
+                    ]
+                  }
+                }]
+              }
+              test-rdgw-2-http = {
+                priority = 150
+                actions = [{
+                  type              = "forward"
+                  target_group_name = "test-rdgw-2-http"
+                }]
+                conditions = [{
+                  host_header = {
+                    values = [
+                      "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
                     ]
                   }
                 }]
