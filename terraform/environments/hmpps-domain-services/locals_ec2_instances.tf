@@ -80,6 +80,12 @@ locals {
       ebs_volumes = {
         "/dev/sda1" = { type = "gp3", size = 100 }
       }
+      secretsmanager_secrets = {
+        web-cert = {
+          description             = "Certificate secrets used for IIS Web Binding and RDGateway"
+          recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
+        }
+      }
       tags = {
         backup           = "false"
         os-type          = "Windows"
