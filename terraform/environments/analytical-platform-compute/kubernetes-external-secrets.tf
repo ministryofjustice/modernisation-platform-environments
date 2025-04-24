@@ -171,7 +171,7 @@ resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runne
             "key"      = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
             "property" = "installation_id"
           }
-          "secretKey" = "installation-id"
+          "secretKey" = "installation-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
         {
           "remoteRef" = {
@@ -179,7 +179,7 @@ resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runne
             "property"         = "private_key"
             "decodingStrategy" = "Base64"
           }
-          "secretKey" = "private-key"
+          "secretKey" = "private-key" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
       ]
     }
@@ -227,7 +227,7 @@ resource "kubernetes_manifest" "dashboard_service_app_secrets_secret" {
             "key"      = module.dashboard_service_app_secrets[0].secret_id
             "property" = "auth0_client_id"
           }
-          "secretKey" = "auth0-client-id"
+          "secretKey" = "auth0-client-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
         {
           "remoteRef" = {
@@ -235,7 +235,7 @@ resource "kubernetes_manifest" "dashboard_service_app_secrets_secret" {
             "property"         = "auth0_client_secret"
             "decodingStrategy" = "Base64"
           }
-          "secretKey" = "auth0-client-secret"
+          "secretKey" = "auth0-client-secret" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
       ]
     }
