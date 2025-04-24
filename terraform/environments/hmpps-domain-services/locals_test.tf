@@ -111,22 +111,22 @@ locals {
         })
       })
 
-      test-rdgw-2-a = merge(local.ec2_instances.rdgw, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.rdgw.config, {
-          availability_zone = "eu-west-2a"
-          subnet_name       = "public"
-        })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            patch-manager = "group1"
-          }
-        })
-        tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.noms.root domain"
-          domain-name = "azure.noms.root"
-        })
-      })
+      #test-rdgw-2-a = merge(local.ec2_instances.rdgw, {
+      #  cloudwatch_metric_alarms = {}
+      #  config = merge(local.ec2_instances.rdgw.config, {
+      #    availability_zone = "eu-west-2a"
+      #    subnet_name       = "public"
+      #  })
+      #  instance = merge(local.ec2_instances.rdgw.instance, {
+      #    tags = {
+      #      patch-manager = "group1"
+      #    }
+      #  })
+      #  tags = merge(local.ec2_instances.rdgw.tags, {
+      #    description = "Remote Desktop Gateway for azure.noms.root domain"
+      #    domain-name = "azure.noms.root"
+      #  })
+      #})
 
       t1-jump2022-1 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
@@ -229,7 +229,7 @@ locals {
         instance_target_groups = {
           test-rdgw-2-https = merge(local.lbs.network.instance_target_groups.https, {
             attachments = [
-              { ec2_instance_name = "test-rdgw-2-a" },
+              #{ ec2_instance_name = "test-rdgw-2-a" },
             ]
           })
         }
