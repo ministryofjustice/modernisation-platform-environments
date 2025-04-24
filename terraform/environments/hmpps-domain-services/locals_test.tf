@@ -224,23 +224,23 @@ locals {
 
     lbs = {
 
-      #network = merge(local.lbs.network, {
-      #  instance_target_groups = {
-      #    test-rdgw-2-http = merge(local.lbs.network.instance_target_groups.http, {
-      #      attachments = [
-      #        { ec2_instance_name = "test-rdgw-2-a" },
-      #      ]
-      #    })
-      #  }
-      #  listeners = merge(local.lbs.network.listeners, {
-      #    https = merge(local.lbs.netowrk.listeners.https, {
-      #      default_action = {
-      #        type              = "forward"
-      #        target_group_name = "test-rdgw-2-http"
-      #      }
-      #    })
-      #  })
-      #})
+      network = merge(local.lbs.network, {
+        instance_target_groups = {
+          test-rdgw-2-http = merge(local.lbs.network.instance_target_groups.http, {
+            attachments = [
+              { ec2_instance_name = "test-rdgw-2-a" },
+            ]
+          })
+        }
+        listeners = merge(local.lbs.network.listeners, {
+          https = merge(local.lbs.netowrk.listeners.https, {
+            default_action = {
+              type              = "forward"
+              target_group_name = "test-rdgw-2-http"
+            }
+          })
+        })
+      })
 
       public = merge(local.lbs.public, {
         instance_target_groups = {
@@ -341,7 +341,7 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
-          { name = "rdgateway2", type = "A", lbs_map_key = "public" },
+          { name = "rdgateway2", type = "A", lbs_map_key = "network" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
       }
