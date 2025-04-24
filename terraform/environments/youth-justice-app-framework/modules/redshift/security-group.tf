@@ -14,7 +14,7 @@ module "redshift_sg" {
 
   egress_with_cidr_blocks = [
     {
-      rule = "https-443-tcp"
+      rule        = "https-443-tcp"
       cidr_blocks = var.vpc_cidr
       description = "Redshift to Secrets Manager"
     }
