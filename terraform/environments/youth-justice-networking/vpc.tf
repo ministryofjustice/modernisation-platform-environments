@@ -26,6 +26,28 @@ resource "aws_internet_gateway" "main" {
   }
 }
 
+# Create an EIP for a NAT Gateway
+resource "aws_eip" "nat_eip" {
+  domain = "vpc"
+  tags = merge(
+    local.tags, {
+      Name = "${local.application_name}-${local.environment}-nat-eip"
+    }
+  )
+}
+
+#  Create a NAT Gateway 
+resource "aws_nat_gateway" "juniper_nat_gateway" {
+  allocation_id = aws_eip.nat_eip.id
+  subnet_id     = aws_subnet.vsrx_subnets["vSRX01 Management Range"].id
+
+  tags = merge(
+    local.tags, {
+      Name = "${local.application_name}-${local.environment}-nat-gateway"
+    }
+  )
+}
+
 locals {
   vsrx_subnet_config = {
     "vSRX01 Management Range"    = { cidr = "10.100.105.0/24", az = "eu-west-2a", eni_ip = ["10.100.105.100"] }
@@ -97,7 +119,7 @@ resource "aws_route_table" "juniper_route_table" {
   vpc_id = module.vpc.vpc_id
 
   tags = merge(local.tags, {
-    Name = "Juniper Route Table"
+    Name = "Juniper firewalls route table"
   })
 }
 
@@ -117,6 +139,25 @@ resource "aws_route_table_association" "juniper_route_table_association" {
 
   subnet_id      = each.value
   route_table_id = aws_route_table.juniper_route_table.id
+}
+
+# Create route table for Juniper Management & KMS subnet
+resource "aws_route_table" "juniper_management_route_table" {
+  vpc_id = module.vpc.vpc_id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.juniper_nat_gateway.id
+  }
+  tags = merge(local.tags, {
+    Name = "Juniper Management Route Table"
+  })
+}
+
+# Create a route table association for the "Juniper Management & KMS" subnet
+resource "aws_route_table_association" "juniper_management_route_table_association" {
+  subnet_id      = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
+  route_table_id = aws_route_table.juniper_management_route_table.id
 }
 
 # Create Elastic IPs

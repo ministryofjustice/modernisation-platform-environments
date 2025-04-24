@@ -231,11 +231,43 @@ resource "aws_security_group" "internal_sg" {
   })
 }
 
+# Create IAM role for SSM access
+resource "aws_iam_role" "ssm_role" {
+  name        = "YJBJuniperSSMRole"
+  description = "IAM role for SSM access"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# Attach the AmazonSSMManagedInstanceCore policy to the role
+resource "aws_iam_role_policy_attachment" "ssm_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.ssm_role.name
+}
+
+# Create instance profile for EC2 instances 
+resource "aws_iam_instance_profile" "ssm_instance_profile" {
+  name = "YJBJuniperSSMInstanceProfile"
+  role = aws_iam_role.ssm_role.name
+}
+
 # EC2 Instance (vSRX01)
 resource "aws_instance" "vsrx01" {
-  ami           = "ami-0ad7c5b240d3318e2" # Replace with correct AMI ID
-  instance_type = "c5.xlarge"
-  key_name      = "Juniper_KeyPair" # Replace with your SSH key name
+  ami                  = "ami-0ad7c5b240d3318e2" # Replace with correct AMI ID
+  instance_type        = "c5.xlarge"
+  key_name             = "Juniper_KeyPair" # Replace with your SSH key name
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
 
   # Attach the Management Interface
   network_interface {
@@ -268,9 +300,10 @@ resource "aws_instance" "vsrx01" {
 
 # EC2 Instance (vSRX02)
 resource "aws_instance" "vsrx02" {
-  ami           = "ami-0ad7c5b240d3318e2" # Replace with correct AMI ID
-  instance_type = "c5.xlarge"
-  key_name      = "Juniper_KeyPair" # Replace with your SSH key name
+  ami                  = "ami-0ad7c5b240d3318e2" # Replace with correct AMI ID
+  instance_type        = "c5.xlarge"
+  key_name             = "Juniper_KeyPair" # Replace with your SSH key name
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
 
   # Attach the Management Interface
   network_interface {
