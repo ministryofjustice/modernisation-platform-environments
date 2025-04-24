@@ -2,7 +2,6 @@
 
 #tfsec:ignore:AVD-AWS-0130
 module "ecs" {
-  #checkov:skip=CKV_TF_1: todo
   source = "./modules/ecs"
 
   #Network details
