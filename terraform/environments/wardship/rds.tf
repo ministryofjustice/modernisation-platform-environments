@@ -51,6 +51,10 @@ resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_1" {
   ip_protocol                  = "tcp"
   description                  = "Allows ECS service to access RDS"
   referenced_security_group_id = aws_security_group.ecs_service.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_2" {
@@ -61,6 +65,10 @@ resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_2" {
   ip_protocol                  = "tcp"
   description                  = "Allow PSQL traffic from bastion"
   referenced_security_group_id = module.bastion_linux.bastion_security_group
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1" {
@@ -70,6 +78,10 @@ resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1" {
   ip_protocol       = "-1"
   description       = "allow all outbound traffic"
   cidr_ipv4         = "0.0.0.0/0"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 // DB setup for the development environment (set to publicly accessible to allow GitHub Actions access):
@@ -118,6 +130,10 @@ resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_1_dev" {
   ip_protocol                  = "tcp"
   description                  = "Allows ECS service to access RDS"
   referenced_security_group_id = aws_security_group.ecs_service.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_2_dev" {
@@ -128,6 +144,10 @@ resource "aws_vpc_security_group_ingress_rule" "rds_ingress_rule_2_dev" {
   ip_protocol                  = "tcp"
   description                  = "Allow PSQL traffic from bastion"
   referenced_security_group_id = module.bastion_linux.bastion_security_group
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1_dev" {
@@ -137,4 +157,8 @@ resource "aws_vpc_security_group_egress_rule" "rds_egress_rule_1_dev" {
   ip_protocol       = "-1"
   description       = "allow all outbound traffic"
   cidr_ipv4         = "0.0.0.0/0"
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
