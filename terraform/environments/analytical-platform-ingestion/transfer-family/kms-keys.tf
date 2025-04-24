@@ -68,7 +68,7 @@ module "s3_transfer_quarantine_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["s3/transfer-quarantine"]
   description           = "Transfer, Quarantine S3 KMS Key"
@@ -81,7 +81,7 @@ module "transfer_govuk_notify_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["secretsmanager/transfer/govuk-notify"]
   description           = "Key for GOV.UK Notify data"

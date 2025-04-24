@@ -3,7 +3,7 @@ locals {
   environment_configurations = {
     development = {
       /* Image Versions */
-      transfer_service_image_version = "0.1.0-rc5"
+      transfer_service_image_version = "0.1.0-rc14"
 
       /* Target Buckets */
       target_buckets              = ["mojap-land-dev"]

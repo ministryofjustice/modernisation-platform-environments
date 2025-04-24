@@ -22,8 +22,8 @@ module "transfer_service_lambda" {
   environment_variables = {
     LANDING_BUCKET_NAME           = module.transfer_landing_bucket.s3_bucket_id
     QUARANTINE_BUCKET_NAME        = module.transfer_quarantine_bucket.s3_bucket_id
-    GOVUK_NOTIFY_API_KEY_SECRET   = "make a call to secets manager to get the api key"
-    GOVUK_NOTIFY_TEMPLATES_SECRET = "make a call to secrets manager to get the templates"
+    GOVUK_NOTIFY_API_KEY_SECRET   = "transfer/govuk-notify/api-key"   #TODO: un-hardcode
+    GOVUK_NOTIFY_TEMPLATES_SECRET = "transfer/govuk-notify/templates" #TODO: un-hardcode
   }
 
   attach_policy_statements = true
@@ -40,15 +40,17 @@ module "transfer_service_lambda" {
       ]
       resources = [
         module.s3_transfer_landing_kms.key_arn,
+        module.s3_transfer_quarantine_kms.key_arn,
         local.environment_configuration.mojap_land_kms_key,
-        module.supplier_data_kms.key_arn
+        module.supplier_data_kms.key_arn,
+        module.transfer_govuk_notify_kms.key_arn
       ]
     },
     secretsmanager_access = {
       sid       = "AllowSecretsManager"
       effect    = "Allow"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:ingestion/*"]
+      resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret:transfer/*"]
     },
     s3_source_object = {
       sid    = "AllowSourceObject"
