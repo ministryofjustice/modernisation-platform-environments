@@ -38,7 +38,6 @@ module "cur_s3_kms" {
 data "aws_iam_policy_document" "cur_v2_bucket_policy" {
   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
   statement {
-    sid     = "data_exports_write_policy"
     effect  = "Allow"
     actions = ["s3:PutObject", "s3:ListBucket", "s3:GetBucketLocation"]
     resources = [
@@ -52,7 +51,6 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
   }
 
   statement {
-    sid     = "focus_bucket_replication_policy"
     effect  = "Allow"
     actions = ["s3:ReplicateObject", "s3:ReplicateDelete", "s3:GetBucketVersioning", "s3:PutBucketVersioning"]
     resources = [
