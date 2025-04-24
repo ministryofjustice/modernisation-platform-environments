@@ -1,4 +1,6 @@
 resource "kubernetes_manifest" "ui_sentry_dsn_external_secret" {
+  #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+
   manifest = {
     "apiVersion" = "external-secrets.io/v1beta1"
     "kind"       = "ExternalSecret"
@@ -27,6 +29,8 @@ resource "kubernetes_manifest" "ui_sentry_dsn_external_secret" {
 }
 
 resource "kubernetes_manifest" "ui_azure_external_secret" {
+  #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+
   manifest = {
     "apiVersion" = "external-secrets.io/v1beta1"
     "kind"       = "ExternalSecret"
@@ -61,6 +65,8 @@ resource "kubernetes_manifest" "ui_azure_external_secret" {
 }
 
 resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_secret" {
+  #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   manifest = {
@@ -92,6 +98,8 @@ resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_se
 }
 
 resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runners_secret" {
+  #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   manifest = {
@@ -123,6 +131,8 @@ resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runner
 }
 
 resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runners_secret" {
+  #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
   manifest = {
@@ -177,6 +187,8 @@ resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runne
 }
 
 resource "kubernetes_manifest" "dashboard_service_app_secrets_secret" {
+  #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
+
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   manifest = {
