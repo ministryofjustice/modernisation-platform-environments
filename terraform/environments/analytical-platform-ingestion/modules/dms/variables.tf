@@ -54,13 +54,13 @@ variable "dms_source" {
   })
 
   validation {
-    condition     = contains(["oracle"], var.dms_source.engine_name)
-    error_message = "Valid values for var: test_variable are ('oracle')."
+    condition     = contains(["oracle", "sqlserver"], var.dms_source.engine_name)
+    error_message = "Valid values for var: test_variable are ('oracle', 'sqlserver')."
   }
 
   description = <<EOF
     extra_connection_attributes: Extra connection attributes to be used in the connection string</br>
-    cdc_start_time: The start time for the CDC task, this will need to be set to a date after the Oracle database setup has been complete (this is to ensure the logs are available)
+    cdc_start_time: The start time for the CDC task, this will need to be set to a date after the database setup has been complete (this is to ensure the logs are available)
   EOF
 }
 
