@@ -189,7 +189,7 @@ module "autoscaling_sg" {
     }
   ]
 
-  computed_ingress_with_source_security_group_id = concat(var.ec2_ingress_with_source_security_group_id_rules, local.common_datadog_rule)
+  computed_ingress_with_source_security_group_id = concat(var.ec2_ingress_with_source_security_group_id_rules, local.common_datadog_rules)
 
   number_of_computed_ingress_with_source_security_group_id = length(var.ec2_ingress_with_source_security_group_id_rules)
 

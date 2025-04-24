@@ -41,7 +41,7 @@ resource "aws_dms_replication_subnet_group" "replication_subnet_group" {
   replication_subnet_group_description = "Subnet group for DMS replication instances"
   replication_subnet_group_id          = var.dms_replication_instance.subnet_group_name == null ? "${data.aws_region.current.name}-${var.environment}" : var.dms_replication_instance.subnet_group_name
   # these would come from the core stack once created
-  subnet_ids = var.dms_replication_instance.subnet_ids
+  subnet_ids = data.aws_subnets.subnet_ids_vpc_subnets.ids
 
   tags = merge(var.tags,
     {
@@ -49,16 +49,21 @@ resource "aws_dms_replication_subnet_group" "replication_subnet_group" {
       application = "Data Engineering"
     }
   )
+
+  depends_on = [
+    aws_iam_role_policy_attachment.dms-vpc-role-AmazonDMSVPCManagementRole
+  ]
 }
 
 resource "aws_dms_replication_instance" "instance" {
   allocated_storage            = var.dms_replication_instance.allocated_storage
+  apply_immediately            = var.dms_replication_instance.apply_immediately
   auto_minor_version_upgrade   = true
   availability_zone            = var.dms_replication_instance.availability_zone
   engine_version               = var.dms_replication_instance.engine_version
   kms_key_arn                  = var.dms_replication_instance.kms_key_arn
   multi_az                     = var.dms_replication_instance.multi_az
-  preferred_maintenance_window = "sun:10:30-sun:14:30"
+  preferred_maintenance_window = var.dms_replication_instance.preferred_maintenance_window
   publicly_accessible          = false
   replication_instance_class   = var.dms_replication_instance.replication_instance_class
   replication_instance_id      = var.dms_replication_instance.replication_instance_id

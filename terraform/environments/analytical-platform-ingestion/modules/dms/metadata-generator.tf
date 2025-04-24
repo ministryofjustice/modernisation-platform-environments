@@ -1,6 +1,10 @@
 #S3 bucket to store source metadata
 #trivy:ignore:AVD-AWS-0089: No logging required
 resource "aws_s3_bucket" "validation_metadata" {
+  #checkov:skip=CKV_AWS_18:Logging not needed
+  #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
+  #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
+  #checkov:skip=CKV_AWS_144:Cross-region replication not required
   bucket_prefix = "${var.db}-metadata-"
 
   tags = var.tags
@@ -36,7 +40,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "validation_metada
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      kms_master_key_id = module.bucket_kms.key_arn
+      sse_algorithm     = "aws:kms"
     }
   }
 }
@@ -70,6 +75,19 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
     ]
   }
 
+  # Lambda can access configuration files placed in its own bucket
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:GetObject",
+    ]
+
+    resources = [
+      aws_s3_bucket.lambda.arn,
+      "${aws_s3_bucket.lambda.arn}/*"
+    ]
+  }
+
   # Lambda can reprocess data in the invalid bucket
   statement {
     actions = [
@@ -89,29 +107,50 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
     ]
 
     resources = [
-      aws_secretsmanager_secret.dms_source.arn
+      var.dms_source.secrets_manager_arn
     ]
   }
 
-  # Lambda can create glue database/table
-  # checkov:skip=CKV_AWS_111: The resource is not publicly accessible
-  # checkov:skip=CKV_AWS_356: Required glue permissions for the lambda
+  # Lambda needs permissions on the KMS key to access the above secret
   statement {
     actions = [
-      "glue:GetDatabase",
-      "glue:CreateDatabase",
-      "glue:GetTable",
-      "glue:CreateTable",
-      "glue:UpdateTable",
+      "kms:DescribeKey",
+      "kms:Decrypt"
     ]
-
-    resources = ["*"]
+    resources = [
+      var.dms_source.secrets_manager_kms_arn
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values = [
+        "secretsmanager.${data.aws_region.current.name}.amazonaws.com",
+      ]
+    }
   }
+}
+
+# Role policy to conditionally allow lambda to assume role
+resource "aws_iam_role_policy" "metadata_generator_lambda_function_assume_role" {
+  count = (var.glue_catalog_role_arn != "") ? 1 : 0
+  role = module.metadata_generator.lambda_role_name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = ["sts:AssumeRole"]
+        Effect = "Allow"
+        Resource = var.glue_catalog_role_arn
+      },
+    ]
+  })
 }
 
 # Create security group for Lambda function
 #trivy:ignore:AVD-AWS-0104: Allow all egress traffic
 resource "aws_security_group" "metadata_generator_lambda_function" {
+  #checkov:skip=CKV2_AWS_5: False positive, see https://github.com/bridgecrewio/checkov/issues/3010
   #checkov:skip=CKV_AWS_382: Allow all egress traffic
   name        = "${var.db}-metadata-generator-lambda-function"
   vpc_id      = var.vpc_id
@@ -126,6 +165,13 @@ resource "aws_security_group" "metadata_generator_lambda_function" {
   }
 }
 
+resource "aws_s3_object" "dms_mapping_rules" {
+  bucket = aws_s3_bucket.lambda.bucket
+  key    = "metadata-generator/config/dms_mapping_rules.json"
+  source = var.dms_mapping_rules
+  etag = filemd5(var.dms_mapping_rules)
+}
+
 module "metadata_generator" {
   # Commit hash for v7.20.1
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-lambda?ref=84dfbfddf9483bc56afa0aff516177c03652f0c7"
@@ -137,8 +183,7 @@ module "metadata_generator" {
   memory_size             = 512
   timeout                 = 60
   architectures           = ["x86_64"]
-  build_in_docker         = true
-  docker_image            = "test-dms"
+  build_in_docker         = false
   store_on_s3             = true
   s3_bucket               = aws_s3_bucket.lambda.bucket
   s3_object_storage_class = "STANDARD"
@@ -146,29 +191,42 @@ module "metadata_generator" {
 
   # Lambda function will be attached to the VPC to access the source database
   vpc_security_group_ids = [aws_security_group.metadata_generator_lambda_function.id]
-  vpc_subnet_ids         = var.dms_replication_instance.subnet_ids
+  vpc_subnet_ids         = data.aws_subnets.subnet_ids_vpc_subnets.ids
   attach_network_policy  = true
 
-
+  # Lambda function role will have the attached policies
   attach_policy_json = true
   policy_json        = data.aws_iam_policy_document.metadata_generator_lambda_function.json
 
   environment_variables = {
-    ENVIRONMENT        = "sandbox"
-    DB_SECRET_ARN      = aws_secretsmanager_secret.dms_source.arn
-    METADATA_BUCKET    = aws_s3_bucket.validation_metadata.bucket
-    LANDING_BUCKET     = aws_s3_bucket.landing.bucket
-    INVALID_BUCKET     = aws_s3_bucket.invalid.bucket
-    RAW_HISTORY_BUCKET = aws_s3_bucket.raw_history.bucket
-    DB_OBJECTS         = jsonencode(["TEST_DATA"])
-    DB_SCHEMA_NAME     = "ADMIN"
+    ENVIRONMENT                          = var.environment
+    DB_SECRET_ARN                        = var.dms_source.secrets_manager_arn
+    METADATA_BUCKET                      = aws_s3_bucket.validation_metadata.bucket
+    LANDING_BUCKET                       = aws_s3_bucket.landing.bucket
+    INVALID_BUCKET                       = aws_s3_bucket.invalid.bucket
+    RAW_HISTORY_BUCKET                   = data.aws_s3_bucket.raw_history.bucket
+    LAMBDA_BUCKET                        = aws_s3_bucket.lambda.bucket
+    DB_OBJECTS                           = jsonencode(jsondecode(file(var.dms_mapping_rules))["objects"])
+    DB_SCHEMA_NAME                       = lookup(jsondecode(file(var.dms_mapping_rules)), "schema", "")
+    ENGINE                               = var.dms_source.engine_name
+    DATABASE_NAME                        = var.dms_source.sid
+    GLUE_CATALOG_ACCOUNT_ID              = var.glue_catalog_account_id
+    GLUE_CATALOG_ROLE_ARN                = var.glue_catalog_role_arn
+    GLUE_CATALOG_DATABASE_NAME           = var.glue_catalog_database_name
+    GLUE_DESTINATION_BUCKET              = var.glue_destination_bucket != "" ? var.glue_destination_bucket : data.aws_s3_bucket.raw_history.bucket
+    GLUE_DESTINATION_PREFIX              = var.dms_target_prefix
+    USE_GLUE_CATALOG                     = var.write_metadata_to_glue_catalog
+    PATH_TO_DMS_MAPPING_RULES            = aws_s3_object.dms_mapping_rules.key
+    RETRY_FAILED_AFTER_RECREATE_METADATA = var.retry_failed_after_recreate_metadata
   }
 
   source_path = [{
     path             = "${path.module}/lambda-functions/metadata_generator/main.py"
-    pip_tmp_dir      = "${path.module}/lambda-functions/metadata_generator/fixtures"
     pip_requirements = "${path.module}/lambda-functions/metadata_generator/requirements.txt"
   }]
 
   tags = var.tags
+
+  publish          = true # Needed by allowed_triggers https://github.com/terraform-aws-modules/terraform-aws-lambda/issues/36#issuecomment-650217274
+  allowed_triggers = var.metadata_generator_allowed_triggers
 }
