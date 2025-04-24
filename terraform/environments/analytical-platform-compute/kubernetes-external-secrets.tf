@@ -175,3 +175,57 @@ resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runne
     }
   }
 }
+
+resource "kubernetes_manifest" "dashboard_service_app_secrets_secret" {
+  count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
+
+  manifest = {
+    "apiVersion" = "external-secrets.io/v1beta1"
+    "kind"       = "ExternalSecret"
+    "metadata" = {
+      "name"      = "dashboard-service-app-secrets"
+      "namespace" = kubernetes_namespace.dashboard_service[0].metadata[0].name
+    }
+    "spec" = {
+      "refreshInterval" = "1m"
+      "secretStoreRef" = {
+        "kind" = "ClusterSecretStore"
+        "name" = "aws-secretsmanager"
+      }
+      "target" = {
+        "name" = "dashboard-service-app-secrets"
+      }
+      "data" = [
+        {
+          "remoteRef" = {
+            "key"      = module.dashboard_service_app_secrets[0].secret_id
+            "property" = "secret_key"
+          }
+          "secretKey" = "secret-key"
+        },
+        {
+          "remoteRef" = {
+            "key"      = module.dashboard_service_app_secrets[0].secret_id
+            "property" = "sentry_dsn"
+          }
+          "secretKey" = "sentry-dsn"
+        },
+        {
+          "remoteRef" = {
+            "key"      = module.dashboard_service_app_secrets[0].secret_id
+            "property" = "auth0_client_id"
+          }
+          "secretKey" = "auth0-client-id"
+        },
+        {
+          "remoteRef" = {
+            "key"              = module.dashboard_service_app_secrets[0].secret_id
+            "property"         = "auth0_client_secret"
+            "decodingStrategy" = "Base64"
+          }
+          "secretKey" = "auth0-client-secret"
+        },
+      ]
+    }
+  }
+}
