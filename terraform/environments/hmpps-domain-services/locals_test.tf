@@ -223,6 +223,25 @@ locals {
     }
 
     lbs = {
+
+      #network = merge(local.lbs.network, {
+      #  instance_target_groups = {
+      #    test-rdgw-2-http = merge(local.lbs.network.instance_target_groups.http, {
+      #      attachments = [
+      #        { ec2_instance_name = "test-rdgw-2-a" },
+      #      ]
+      #    })
+      #  }
+      #  listeners = merge(local.lbs.network.listeners, {
+      #    https = merge(local.lbs.netowrk.listeners.https, {
+      #      default_action = {
+      #        type              = "forward"
+      #        target_group_name = "test-rdgw-2-http"
+      #      }
+      #    })
+      #  })
+      #})
+
       public = merge(local.lbs.public, {
         instance_target_groups = {
           test-rdgw-1-http = merge(local.lbs.public.instance_target_groups.http, {
@@ -230,11 +249,11 @@ locals {
               { ec2_instance_name = "test-rdgw-1-a" },
             ]
           })
-          test-rdgw-2-http = merge(local.lbs.public.instance_target_groups.http, {
-            attachments = [
-              { ec2_instance_name = "test-rdgw-2-a" },
-            ]
-          })
+          #test-rdgw-2-http = merge(local.lbs.public.instance_target_groups.http, {
+          #  attachments = [
+          #    { ec2_instance_name = "test-rdgw-2-a" },
+          #  ]
+          #})
           test-rds-1-https = merge(local.lbs.public.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "test-rds-2-b" },
@@ -264,20 +283,20 @@ locals {
                   }
                 }]
               }
-              test-rdgw-2-http = {
-                priority = 150
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "test-rdgw-2-http"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
+              #test-rdgw-2-http = {
+              #  priority = 150
+              #  actions = [{
+              #    type              = "forward"
+              #    target_group_name = "test-rdgw-2-http"
+              #  }]
+              #  conditions = [{
+              #    host_header = {
+              #      values = [
+              #        "rdgateway2.test.hmpps-domain.service.justice.gov.uk",
+              #      ]
+              #    }
+              #  }]
+              #}
               test-rds-1-https = {
                 priority = 200
                 actions = [{
