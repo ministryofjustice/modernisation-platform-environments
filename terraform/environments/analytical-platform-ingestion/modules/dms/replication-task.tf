@@ -1,8 +1,9 @@
 # Local to parse the JSON
 locals {
-  input_data = jsondecode(var.dms_mapping_rules)
-  objects    = [for object in local.input_data.objects : replace(object, "-", "_")]
-  blobs      = local.input_data.blobs
+  input_data         = jsondecode(file(var.dms_mapping_rules))
+  objects            = [for object in local.input_data.objects : replace(object, "-", "_")]
+  blobs              = local.input_data.blobs
+  columns_to_exclude = local.input_data.columns_to_exclude
   rules = flatten(concat(
     [
       for idx, obj in local.objects : {
@@ -11,8 +12,8 @@ locals {
         rule-name   = "include-${lower(obj)}"
         rule-action = "explicit"
         object-locator = {
-          schema-name = local.input_data.schema
-          table-name  = obj
+          schema-name = length(split(".", obj)) > 1 ? split(".", obj)[0] : local.input_data.schema
+          table-name  = length(split(".", obj)) > 1 ? split(".", obj)[1] : obj
         }
       }
     ],
@@ -30,8 +31,8 @@ locals {
           length = 50
         }
         object-locator = {
-          schema-name = local.input_data.schema
-          table-name  = obj
+          schema-name = length(split(".", obj)) > 1 ? split(".", obj)[0] : local.input_data.schema
+          table-name  = length(split(".", obj)) > 1 ? split(".", obj)[1] : obj
         }
       }
     ],
@@ -44,9 +45,24 @@ locals {
         rule-action = "remove-column"
         rule-target = "column"
         object-locator = {
-          schema-name = local.input_data.schema
-          table-name  = blob.object_name
+          schema-name = length(split(".", blob.object_name)) > 1 ? split(".", blob.object_name)[0] : local.input_data.schema
+          table-name  = length(split(".", blob.object_name)) > 1 ? split(".", blob.object_name)[1] : blob.object_name
           column-name = blob.column_name
+        }
+      }
+    ],
+    [
+      # Generate transformation rules for removing columns
+      for idx, column_to_exclude in local.columns_to_exclude : {
+        rule-type   = "transformation"
+        rule-id     = (length(local.objects) * 2) + idx + 1
+        rule-name   = "remove-${lower(column_to_exclude.column_name)}-from-${lower(column_to_exclude.object_name)}"
+        rule-action = "remove-column"
+        rule-target = "column"
+        object-locator = {
+          schema-name = length(split(".", column_to_exclude.object_name)) > 1 ? split(".", column_to_exclude.object_name)[0] : local.input_data.schema
+          table-name  = length(split(".", column_to_exclude.object_name)) > 1 ? split(".", column_to_exclude.object_name)[1] : column_to_exclude.object_name
+          column-name = column_to_exclude.column_name
         }
       }
     ],
@@ -89,6 +105,7 @@ resource "aws_dms_replication_task" "full_load_replication_task" {
 }
 
 resource "aws_dms_replication_task" "cdc_replication_task" {
+  count                     = lookup(var.replication_task_id, "cdc", null) == null ? 0 : 1
   migration_type            = "cdc"
   cdc_start_time            = var.dms_source.cdc_start_time
   replication_instance_arn  = aws_dms_replication_instance.instance.replication_instance_arn
