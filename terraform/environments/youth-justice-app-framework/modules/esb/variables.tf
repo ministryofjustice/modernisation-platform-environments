@@ -21,7 +21,7 @@ variable "subnet_id" {
 }
 
 variable "environment" {
-  description = "The environment for the ECS cluster"
+  description = "The environment for the ESB server"
   type        = string
 }
 

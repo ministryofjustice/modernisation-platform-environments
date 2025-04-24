@@ -67,7 +67,8 @@ locals {
     }
   }
 
-  oracle_backup_bucket_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
+  oracle_backup_bucket_prefix     = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
+  oracle_backup_bucket_expiration = var.env_name == "prod" ? 373 : 365
 
   db_port      = 1521
   db_tcps_port = 1522
