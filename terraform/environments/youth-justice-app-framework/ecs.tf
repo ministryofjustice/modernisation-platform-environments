@@ -1,8 +1,8 @@
 
 
 #tfsec:ignore:AVD-AWS-0130
+# checkov:skip=CKV_AWS_241: todo
 module "ecs" {
-  # checkov:skip=CKV_AWS_241 to do Ensure Terraform module sources use a commit hash
   source = "./modules/ecs"
 
   #Network details
