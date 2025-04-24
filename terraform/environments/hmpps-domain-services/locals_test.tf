@@ -115,6 +115,7 @@ locals {
         cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
+          subnet_name       = "public"
         })
         instance = merge(local.ec2_instances.rdgw.instance, {
           tags = {
