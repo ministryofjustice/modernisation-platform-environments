@@ -57,6 +57,8 @@ resource-types:
     - KMSAlias
     - KMSKey
     - OSPackage
+    - QuickSightSubscription
+    - QuickSightUser
     - S3AccessPoint
     - S3Bucket
     - S3MultipartUpload

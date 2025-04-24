@@ -41,7 +41,7 @@ variable "postgres_security_group_id" {
 }
 
 variable "vpc_cidr" {
-  type = string
+  type        = string
   description = "The VPCs main subnet."
 }
 

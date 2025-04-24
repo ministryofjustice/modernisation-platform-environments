@@ -20,9 +20,10 @@ module "esb" {
     null # Default to null, allowing AWS to auto-assign an IP
   )
 
-  ami = lookup(
+  # Choose the AMI, defaulting to the default AMI if not found(doesnt work try and fix)
+   ami = lookup(
     {
-      development   = "ami-0fc27ddcf3e4e76af"
+      development   = "ami-0cc0dad47bc769c08"
       preproduction = "ami-04a6fa2443473cfd5"
       # Add more environments when AMIs are known
     },

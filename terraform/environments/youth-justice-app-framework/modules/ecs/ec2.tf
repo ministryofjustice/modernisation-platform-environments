@@ -75,6 +75,7 @@ module "autoscaling" {
     AmazonEC2ContainerServiceforEC2Role = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
     ecs-fetch-secrets-policy            = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
     AmazonS3FullAccess                  = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+    AmazonSESFullAccess                 = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
     ecs-eni-policy                      = aws_iam_policy.ecs-eni-policy.arn
     ecs-secrets-policy                  = aws_iam_policy.ecs-secrets-policy.arn
   }
@@ -188,7 +189,7 @@ module "autoscaling_sg" {
     }
   ]
 
-  computed_ingress_with_source_security_group_id = concat(var.ec2_ingress_with_source_security_group_id_rules, local.common_datadog_rule)
+  computed_ingress_with_source_security_group_id = concat(var.ec2_ingress_with_source_security_group_id_rules, local.common_datadog_rules)
 
   number_of_computed_ingress_with_source_security_group_id = length(var.ec2_ingress_with_source_security_group_id_rules)
 
