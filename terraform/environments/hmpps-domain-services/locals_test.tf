@@ -226,7 +226,7 @@ locals {
 
       network = merge(local.lbs.network, {
         instance_target_groups = {
-          test-rdgw-2-http = merge(local.lbs.network.instance_target_groups.http, {
+          test-rdgw-2-https = merge(local.lbs.network.instance_target_groups.https, {
             attachments = [
               { ec2_instance_name = "test-rdgw-2-a" },
             ]
@@ -236,7 +236,7 @@ locals {
           https = merge(local.lbs.network.listeners.https, {
             default_action = {
               type              = "forward"
-              target_group_name = "test-rdgw-2-http"
+              target_group_name = "test-rdgw-2-https"
             }
           })
         })
