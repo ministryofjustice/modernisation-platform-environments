@@ -13,12 +13,35 @@ resource "aws_wafv2_ip_set" "allowed_ip_set" {
 }
 
 resource "aws_wafv2_web_acl" "tribunals_web_acl" {
+  #checkov:skip=CKV2_AWS_31:"WAF logging is not required for this implementation as we use CloudWatch metrics for monitoring"
   provider = aws.us-east-1
   name     = "tribunals-web-acl"
   scope    = "CLOUDFRONT"
 
   default_action {
     allow {}
+  }
+
+  rule {
+    name     = "log4j-mitigation"
+    priority = 1
+
+    override_action {
+      none {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "Log4jMitigationMetrics"
+      sampled_requests_enabled   = true
+    }
   }
 
   rule {
@@ -53,12 +76,6 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
       metric_name                = "AWSManagedRulesCommonRuleSetMetrics"
       sampled_requests_enabled   = true
     }
-  }
-
-  visibility_config {
-    cloudwatch_metrics_enabled = true
-    metric_name                = "tribunals-web-acl"
-    sampled_requests_enabled   = true
   }
 
   rule {
@@ -166,6 +183,12 @@ resource "aws_wafv2_web_acl" "tribunals_web_acl" {
       metric_name                = "BlockNonAllowedIPsMetrics"
       sampled_requests_enabled   = true
     }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "tribunals-web-acl"
+    sampled_requests_enabled   = true
   }
 }
 

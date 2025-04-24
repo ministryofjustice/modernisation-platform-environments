@@ -19,13 +19,11 @@ locals {
   baseline_development = {
 
     acm_certificates = {
-      nomis_wildcard_cert = {
+      nomis_wildcard_cert_v2 = {
         cloudwatch_metric_alarms = module.baseline_presets.cloudwatch_metric_alarms.acm
-        domain_name              = "modernisation-platform.service.justice.gov.uk"
+        domain_name              = "*.development.nomis.service.justice.gov.uk"
         subject_alternate_names = [
           "*.nomis.hmpps-development.modernisation-platform.service.justice.gov.uk",
-          "*.development.nomis.service.justice.gov.uk",
-          "*.development.nomis.az.justice.gov.uk",
         ]
         tags = {
           description = "wildcard cert for nomis development domains"
@@ -122,7 +120,6 @@ locals {
       })
 
       dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
-        autoscaling_schedules = {} # disable overnight scale down
       })
 
       dev-nomis-web19c-b = merge(local.ec2_autoscaling_groups.web19c, {
@@ -287,6 +284,23 @@ locals {
         })
       })
 
+      qa11g-nomis-web12-b = merge(local.ec2_instances.web12, {
+        config = merge(local.ec2_instances.web12.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.web12.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web12.user_data_cloud_init.args, {
+            branch = "TM-1185/nomis-web12-manual-build"
+          })
+        })
+        tags = merge(local.ec2_instances.web12.tags, {
+          nomis-environment = "qa11g"
+        })
+      })
+
       qa11r-nomis-web-a = merge(local.ec2_instances.web, {
         config = merge(local.ec2_instances.web.config, {
           availability_zone = "eu-west-2a"
@@ -408,7 +422,7 @@ locals {
 
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_wildcard_cert"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
 
             # /home/oracle/admin/scripts/lb_maintenance_mode.sh script on
             # weblogic servers can alter priorities to enable maintenance message
@@ -528,7 +542,6 @@ locals {
     }
 
     route53_zones = {
-      "development.nomis.az.justice.gov.uk" = {} # remove from cert before deleting
       "development.nomis.service.justice.gov.uk" = {
         records = [
           # SYSCON

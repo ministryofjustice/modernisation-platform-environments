@@ -1,8 +1,13 @@
 #### This file can be used to store locals specific to the member account ####
 #### DPR Specific ####
 locals {
+
+  is_dev_or_test       = local.is-development || local.is-test
   project              = local.application_data.accounts[local.environment].project_short_id
   analytics_project_id = "analytics"
+
+  # custom event bus
+  event_bus_dpr = "dpr-event_bus"
 
   other_log_retention_in_days = local.application_data.accounts[local.environment].other_log_retention_in_days
 
@@ -207,6 +212,28 @@ locals {
   lambda_scheduled_dataset_timeout_seconds     = 900
   lambda_scheduled_dataset_memory_size         = 1024
 
+  # Generate Dataset Lambda
+  lambda_generate_dataset_enabled        = true
+  lambda_generate_dataset_name           = "${local.project}-generate-dataset"
+  lambda_generate_dataset_runtime        = "java21"
+  lambda_generate_dataset_tracing        = "Active"
+  lambda_generate_dataset_handler        = "uk.gov.justice.digital.hmpps.scheduled.lambda.DatasetGenerateLambda::handleRequest"
+  lambda_generate_dataset_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_generate_dataset_jar_version    = local.application_data.accounts[local.environment].scheduled_dataset_lambda_version
+  lambda_generate_dataset_code_s3_key    = "build-artifacts/hmpps-dpr-scheduled-dataset-lambda/jars/hmpps-dpr-scheduled-dataset-lambda-${local.lambda_generate_dataset_jar_version}-all.jar"
+  lambda_generate_dataset_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    aws_iam_policy.redshift_dataapi_cross_policy.arn,
+    aws_iam_policy.dpd_table_read_policy.arn
+  ]
+  lambda_generate_dataset_secret_arn        = module.datamart.credential_secret_arn
+  lambda_generate_dataset_cluster_id        = module.datamart.cluster_id
+  lambda_generate_dataset_database_name     = module.datamart.cluster_database_name
+  lambda_generate_dataset_dpd_ddb_table_arn = module.dynamo_table_dpd.dynamodb_table_arn
+  lambda_generate_dataset_timeout_seconds   = 900
+  lambda_generate_dataset_memory_size       = 1024
+
   s3_redshift_table_expiry_days = local.application_data.accounts[local.environment].redshift_table_expiry_days + 1
 
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
@@ -297,14 +324,35 @@ locals {
     port     = "1522"
   }
 
+  # OASys Secrets PlaceHolder
+  oasys_secrets_placeholder = {
+    db_name  = "oasys"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
+  # ONR Secrets PlaceHolder
+  onr_secrets_placeholder = {
+    db_name  = "onr"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
   # DPS Secrets PlaceHolder
   dps_domains_list = local.application_data.accounts[local.environment].dps_domains
   dps_secrets_placeholder = {
-    db_name  = "dps"
-    password = "placeholder"
-    user     = "placeholder"
-    endpoint = "0.0.0.0"
-    port     = "5432"
+    db_name            = "dps"
+    password           = "placeholder"
+    user               = "placeholder"
+    endpoint           = "0.0.0.0"
+    port               = "5432"
+    heartbeat_endpoint = "0.0.0.0"
   }
 
   # Operational DataStore Secrets PlaceHolder
@@ -362,6 +410,15 @@ locals {
     username            = module.datamart.redshift_master_user
   }
 
+  # Placeholder for unpopulated Operational DataStore access secrets
+  ods_access_secret_placeholder = {
+    host     = module.aurora_operational_db.cluster_endpoint
+    port     = tostring(local.operational_db_port)
+    database = local.operational_db_default_database
+    username = "placeholder"
+    password = "placeholder"
+  }
+
   analytical_platform_share = can(local.application_data.accounts[local.environment].analytical_platform_share) ? { for share in local.application_data.accounts[local.environment].analytical_platform_share : share.target_account_name => share } : {}
 
   # Observability Platform & Analytical Platform
@@ -403,4 +460,6 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"
   ]
+
+  create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 }

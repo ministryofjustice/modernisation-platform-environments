@@ -59,7 +59,6 @@ locals {
     production = {
       # az-noms-production-1
       hmpps-az-gw1-rdgateway = ["hmpps-az-gw1.justice.gov.uk", true, "azure-fixngo-pagerduty"]
-      hpa                    = ["hpa.service.hmpps.dsd.io", true, "azure-fixngo-pagerduty"]
       offloc                 = ["www.offloc.service.justice.gov.uk", true, "azure-fixngo-pagerduty"]
 
       # corporate-staff-rostering

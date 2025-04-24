@@ -168,7 +168,7 @@ locals {
         }
       }
       autoscaling_schedules = {
-        "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
+        "scale_up"   = { recurrence = "0 6 * * Mon-Fri" }
         "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
       }
       config = {
@@ -250,7 +250,7 @@ locals {
         }
       }
       autoscaling_schedules = {
-        "scale_up"   = { recurrence = "0 7 * * Mon-Fri" }
+        "scale_up"   = { recurrence = "0 6 * * Mon-Fri" }
         "scale_down" = { desired_capacity = 0, recurrence = "0 19 * * Mon-Fri" }
       }
       config = {

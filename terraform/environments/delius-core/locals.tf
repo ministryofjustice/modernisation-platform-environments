@@ -16,7 +16,7 @@ locals {
     prod     = ["prod"]
     pre_prod = ["stage", "preprod"]
     test     = ["test"]
-    dev      = ["dev"]
+    dev      = ["dev", "poc"]
   }
 
   ordered_subnet_ids = [data.aws_subnets.shared-private-a.ids[0], data.aws_subnets.shared-private-b.ids[0], data.aws_subnets.shared-private-c.ids[0]]

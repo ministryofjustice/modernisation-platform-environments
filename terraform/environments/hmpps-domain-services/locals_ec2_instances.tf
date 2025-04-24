@@ -39,10 +39,10 @@ locals {
       tags = {
         ami_name               = "hmpps_windows_server_2022"
         backup                 = "false"
-        description            = "Windows Server 2022 jumpserver for Nart"
+        description            = "Windows Server 2022 jumpserver for Hmpps"
         instance-access-policy = "full"
         os-type                = "Windows"
-        server-type            = "NartClient"
+        server-type            = "HmppsJump2022"
         update-ssm-agent       = "patchgroup1"
       }
     }
@@ -84,7 +84,7 @@ locals {
         backup           = "false"
         os-type          = "Windows"
         server-type      = "RDGateway"
-        update-ssm-agent = "patchgroup1"
+        update-ssm-agent = "patchgroup2"
       }
     }
 
@@ -125,7 +125,7 @@ locals {
         backup           = "false"
         os-type          = "Windows"
         server-type      = "RDServices"
-        update-ssm-agent = "patchgroup1"
+        update-ssm-agent = "patchgroup2"
       }
     }
   }

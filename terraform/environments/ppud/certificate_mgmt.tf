@@ -21,7 +21,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   function_name                  = "certificate_expiry_dev"
   role                           = aws_iam_role.lambda_role_certificate_expiry_dev[0].arn
   handler                        = "certificate_expiry_dev.lambda_handler"
-  runtime                        = "python3.8"
+  runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
   code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
@@ -99,7 +99,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   function_name                  = "certificate_expiry_uat"
   role                           = aws_iam_role.lambda_role_certificate_expiry_uat[0].arn
   handler                        = "certificate_expiry_uat.lambda_handler"
-  runtime                        = "python3.8"
+  runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
   code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
@@ -177,7 +177,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   function_name                  = "certificate_expiry_prod"
   role                           = aws_iam_role.lambda_role_certificate_expiry_prod[0].arn
   handler                        = "certificate_expiry_prod.lambda_handler"
-  runtime                        = "python3.8"
+  runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
   code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"

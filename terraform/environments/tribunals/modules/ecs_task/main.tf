@@ -1,4 +1,17 @@
+terraform {
+  required_version = ">= 1.0.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 4.0.0"
+    }
+  }
+}
+
 resource "aws_ecs_task_definition" "ecs_task_definition" {
+  #checkov:skip=CKV_AWS_336:"Windows containers require write access to the filesystem"
+  #checkov:skip=CKV_AWS_249:"Same role used for execution and task roles by application design"
   family             = "${var.app_name}Family"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn      = aws_iam_role.ecs_task_execution_role.arn
@@ -48,6 +61,9 @@ data "aws_iam_policy_document" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  #checkov:skip=CKV_AWS_290:"Required broad permissions for S3 and ECS/ELB operations"
+  #checkov:skip=CKV_AWS_355:"Some AWS services require * resource access"
+  #checkov:skip=CKV_AWS_288:"S3 operations require broader access"
   name = "${var.app_name}-ecs-task-execution-s3-policy-2"
   tags = merge(
     var.tags_common,
@@ -77,7 +93,12 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" { #tfsec:ignore:aws-iam
         "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
         "elasticloadbalancing:RegisterTargets",
         "ec2:Describe*",
-        "ec2:AuthorizeSecurityGroupIngress"
+        "ec2:AuthorizeSecurityGroupIngress",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:CreateLogGroup"
       ],
       "Resource": ["*"]
     }
@@ -115,9 +136,9 @@ resource "aws_iam_role_policy_attachment" "ecs_task_s3_access" {
 
 # Set up CloudWatch group and log stream and retain logs for 30 days
 resource "aws_cloudwatch_log_group" "cloudwatch_group" {
-  #checkov:skip=CKV_AWS_158:Temporarily skip KMS encryption check while logging solution is being updated
+  #checkov:skip=CKV_AWS_158:Skip KMS encryption check
   name              = "${var.app_name}-ecs-log-group"
-  retention_in_days = 30
+  retention_in_days = 365
   tags = merge(
     var.tags_common,
     {

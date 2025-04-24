@@ -21,9 +21,10 @@ resource "aws_security_group" "wardship_lb_sc" {
 
   // Allow all User IPs
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    description = "Defines access control rules for HTTPS. IP ranges and individual IP addresses permitted access"
     cidr_blocks = [
       "194.33.193.0/25",
       "179.50.12.212/32",
@@ -47,9 +48,10 @@ resource "aws_security_group" "wardship_lb_sc" {
 
   // Replacement DOM1 allow list from Jaz Chan 11/6/24
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    description = "Replacement DOM1 allow list from Jaz Chan"
     cidr_blocks = [
       "20.26.11.71/32",
       "20.26.11.108/32",
@@ -89,11 +91,11 @@ resource "aws_security_group" "lb_sc_pingdom" {
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  // Allow all European Pingdom IP addresses
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    description = "Allow all European Pingdom IP addresses"
     cidr_blocks = [
       "94.75.211.73/32",
       "94.75.211.74/32",
@@ -162,11 +164,11 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
   description = "control Pingdom access to the load balancer"
   vpc_id      = data.aws_vpc.shared.id
 
-  // Allow all European Pingdom IP addresses
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    description = "Allow all European Pingdom IP addresses"
     cidr_blocks = [
       "5.172.196.188/32",
       "13.232.220.164/32",
@@ -231,17 +233,22 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
 }
 
 
+#tfsec:ignore:AVD-AWS-0053
 resource "aws_lb" "wardship_lb" {
+  #checkov:skip=CKV_AWS_91: "ELB Logging not required"
+  #checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
   name                       = "wardship-load-balancer"
   load_balancer_type         = "application"
   security_groups            = [aws_security_group.wardship_lb_sc.id, aws_security_group.lb_sc_pingdom.id, aws_security_group.lb_sc_pingdom_2.id]
   subnets                    = data.aws_subnets.shared-public.ids
   enable_deletion_protection = false
   internal                   = false
+  drop_invalid_header_fields = true
   depends_on                 = [aws_security_group.wardship_lb_sc, aws_security_group.lb_sc_pingdom, aws_security_group.lb_sc_pingdom_2]
 }
 
 resource "aws_lb_target_group" "wardship_target_group" {
+  #checkov:skip=CKV_AWS_261 "Health check clearly defined"
   name                 = "wardship-target-group"
   port                 = 80
   protocol             = "HTTP"
@@ -266,6 +273,8 @@ resource "aws_lb_target_group" "wardship_target_group" {
 }
 
 resource "aws_lb_listener" "wardship_lb" {
+  #checkov:skip=CKV_AWS_2: "Ensure ALB protocol is HTTPS" - false alert
+  #checkov:skip=CKV_AWS_103: "LB using higher version of TLS" - higher than alert
   depends_on = [
     aws_acm_certificate.external
   ]

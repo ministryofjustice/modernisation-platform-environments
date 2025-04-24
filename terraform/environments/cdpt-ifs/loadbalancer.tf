@@ -108,15 +108,17 @@ resource "aws_lb_target_group" "ifs_target_group" {
   deregistration_delay = 30
 
   stickiness {
-    type = "lb_cookie"
+    type            = "lb_cookie"
+    enabled         = true
+    cookie_duration = 86400
   }
 
   health_check {
-    healthy_threshold   = "5"
-    interval            = "60"
+    healthy_threshold   = "2"
+    interval            = "30"
     protocol            = "HTTP"
-    unhealthy_threshold = "2"
-    matcher             = "200-499"
+    unhealthy_threshold = "7"
+    matcher             = "200"
     timeout             = "15"
     path                = "/health"
   }

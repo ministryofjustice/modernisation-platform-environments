@@ -1,36 +1,3 @@
-locals {
-  oidc_provider = "token.actions.githubusercontent.com"
-  account_id    = local.environment_management.account_ids[terraform.workspace]
-}
-
-data "aws_iam_policy_document" "github_actions_assume_role_policy_document" {
-  version = "2012-10-17"
-
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRoleWithWebIdentity"]
-
-    principals {
-      type        = "Federated"
-      identifiers = ["arn:aws:iam::${local.account_id}:oidc-provider/token.actions.githubusercontent.com"]
-    }
-
-    condition {
-      test     = "StringLike"
-      variable = "${local.oidc_provider}:sub"
-      values = [
-        "repo:ministryofjustice/operations-engineering:*"
-      ]
-    }
-
-    condition {
-      test     = "StringEquals"
-      variable = "${local.oidc_provider}:aud"
-      values   = ["sts.amazonaws.com"]
-    }
-  }
-}
-
 resource "aws_iam_role" "cloudtrail_query_role" {
   name               = "cloudtrail_query_role"
   assume_role_policy = data.aws_iam_policy_document.github_actions_assume_role_policy_document.json

@@ -1,6 +1,6 @@
 # Python script to retrieve cloudwatch metic data (cpu processes), graph it and email it to end users via the internal mail relay.
 # Nick Buckingham
-# 6 December 2024
+# 4 April 2025
 
 import boto3
 import os
@@ -21,12 +21,13 @@ cloudwatch = boto3.client('cloudwatch')
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 INSTANCE_ID = "i-029d2b17679dab982"
 SERVER = "022"
-#START_TIME = datetime(2024, 12, 4, 8, 0, 0)
-#END_TIME = datetime(2024, 12, 4, 14, 0, 0)
-END_TIME = datetime.utcnow()
+#START_TIME = datetime(2025, 3, 31, 8, 0, 0)
+#END_TIME = datetime(2025, 3, 31, 17, 0, 0)
+END_TIME = datetime.utcnow() 
 START_TIME = END_TIME - timedelta(hours=9)
 SENDER = "donotreply@cjsm.secure-email.ppud.justice.gov.uk"
 RECIPIENTS = ["nick.buckingham@colt.net", "pankaj.pant@colt.net", "david.savage@colt.net", "kofi.owusu-nimoh@colt.net", "helen.stimpson@colt.net"]
+#RECIPIENTS = ["nick.buckingham@colt.net"]
 SUBJECT = f'AWS EC2 CPU Utilization Report - {SERVER} - {CURRENT_DATE}'
 REGION = "eu-west-2"
 IMAGE_ID = "ami-02f8251c8cdf2464f"
@@ -66,7 +67,7 @@ def create_graph(cpu_data, converttopdf_data, pdfcrawler2app_data, winword_data,
     plt.plot(winword_data['Timestamps'], winword_data['Values'], label='Microsoft Word CPU Utilization',  marker="o", linestyle="--", color="orange")
     plt.plot(wmiprvse_data['Timestamps'], wmiprvse_data['Values'], label='WmiPrvSE CPU Utilization',  marker="o", linestyle="--", color="red")
     plt.plot(createthumbnails_data['Timestamps'], createthumbnails_data['Values'], label='Create Thumbnails CPU Utilization',  marker="o", linestyle="--", color="darkviolet")
-    plt.xlabel('Time')
+    plt.xlabel('Time (UTC)')
     plt.ylabel('CPU Utilization (%)')
     plt.title(f'EC2 CPU Utilization - {SERVER} - {CURRENT_DATE}')
     plt.legend()
@@ -142,6 +143,13 @@ def lambda_handler(event, context):
     winword_data = get_metric_data('CWAgent', 'procstat cpu_usage', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}, {'Name': 'process_name', 'Value': 'WINWORD.exe'}, {'Name': 'exe', 'Value': 'WINWORD'}, {'Name': 'ImageId', 'Value': IMAGE_ID}, {'Name': 'InstanceType', 'Value': INSTANCE_TYPE}])
     wmiprvse_data = get_metric_data('CWAgent', 'procstat cpu_usage', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}, {'Name': 'process_name', 'Value': 'WmiPrvSE.exe'}, {'Name': 'exe', 'Value': 'WmiPrvSE'}, {'Name': 'ImageId', 'Value': IMAGE_ID}, {'Name': 'InstanceType', 'Value': INSTANCE_TYPE}])
     createthumbnails_data = get_metric_data('CWAgent', 'procstat cpu_usage', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}, {'Name': 'process_name', 'Value': 'CreateThumbnails.exe'}, {'Name': 'exe', 'Value': 'CreateThumbnails'}, {'Name': 'ImageId', 'Value': IMAGE_ID}, {'Name': 'InstanceType', 'Value': INSTANCE_TYPE}])
+
+    # Adjust CPU utilization values for multi-core distribution (divide by 4)
+    converttopdf_data['Values'] = [v / 4 for v in converttopdf_data['Values']]
+    pdfcrawler2app_data['Values'] = [v / 4 for v in pdfcrawler2app_data['Values']]
+    winword_data['Values'] = [v / 4 for v in winword_data['Values']]
+    wmiprvse_data['Values'] = [v / 4 for v in wmiprvse_data['Values']]
+    createthumbnails_data['Values'] = [v / 4 for v in createthumbnails_data['Values']]
 
     # Create a graph and encode it as base64
     print("Creating graph...")

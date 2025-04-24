@@ -1,6 +1,7 @@
 # S3 Bucket - Artefacts
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name = local.artefact_bucket_name
   #  bucket_prefix      = "s3-bucket-example"
@@ -96,7 +97,8 @@ data "aws_iam_policy_document" "artefacts_s3_policy" {
 
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = true
@@ -202,7 +204,8 @@ data "aws_iam_policy_document" "logging_s3_policy" {
 
 # S3 Bucket - R-sync
 module "s3-bucket-dbbackup" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = true
@@ -301,9 +304,104 @@ resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
 }
 
+resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
+  bucket                  = aws_s3_bucket.ccms_ebs_shared.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 
 ### S3 Bucket for Payment Load
 
 resource "aws_s3_bucket" "lambda_payment_load" {
   bucket = "${local.application_name}-${local.environment}-payment-load"
+}
+
+resource "aws_s3_bucket_public_access_block" "lambda_payment_load" {
+  bucket                  = aws_s3_bucket.lambda_payment_load.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "lambda_payment_load" {
+  bucket = aws_s3_bucket.lambda_payment_load.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Development
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-development-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-development-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-development-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-development-logging"]
+}
+
+moved {
+  from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-development-logging"]
+  to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-development-logging"]
+}
+
+# Test
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-test-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-test-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-test-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-test-logging"]
+}
+
+moved {
+  from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-test-logging"]
+  to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-test-logging"]
+}
+
+# Preproduction
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-preproduction-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-preproduction-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-preproduction-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-preproduction-logging"]
+}
+
+moved {
+  from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-preproduction-logging"]
+  to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-preproduction-logging"]
+}
+
+# Production
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-production-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-production-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-production-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-production-logging"]
+}
+
+moved {
+  from = module.s3-bucket-logging.aws_s3_bucket_logging.default["ccms-ebs-production-logging"]
+  to   = module.s3-bucket-logging.aws_s3_bucket_logging.default_single_name["ccms-ebs-production-logging"]
 }

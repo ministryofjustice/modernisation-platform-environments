@@ -132,3 +132,8 @@ variable "layers" {
   default     = null
 }
 
+variable "secret_arns" {
+  description = "ARNs of the secrets this Lambda will require Get access to"
+  type        = list(string)
+  default     = []
+}

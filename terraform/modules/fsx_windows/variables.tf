@@ -4,6 +4,12 @@ variable "active_directory_id" {
   default     = null
 }
 
+variable "aliases" {
+  description = "An array DNS alias names that you want to associate with the Amazon FSx file system"
+  type        = list(string)
+  default     = null
+}
+
 variable "automatic_backup_retention_days" {
   description = "The number of days to retain automatic backups. Minimum of 0 and maximum of 90. Defaults to 7. Set to 0 to disable"
   type        = number

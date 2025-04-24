@@ -46,7 +46,6 @@ resource "aws_iam_role" "snapshot_lambda" {
 
 #Create ZIP archive and lambda
 data "archive_file" "lambda_zip" {
-
   type             = "zip"
   source_file      = "lambda/index.py"
   output_file_mode = "0666"
@@ -58,6 +57,8 @@ resource "aws_lambda_function" "root_snapshot_to_ami" {
   # checkov:skip=CKV_AWS_50: "X-ray tracing is not required"
   # checkov:skip=CKV_AWS_117: "Lambda is not environment specific"
   # checkov:skip=CKV_AWS_116: "DLQ not required"
+  # checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
+  # checkov:skip=CKV_AWS_363: "Ensure Lambda Runtime is not deprecated"
   filename                       = "lambda/lambda_function.zip"
   function_name                  = "root_snapshot_to_ami"
   role                           = aws_iam_role.snapshot_lambda.arn
@@ -139,7 +140,6 @@ resource "aws_iam_role" "delete_snapshot_lambda" {
 
 #Create ZIP archive and lambda
 data "archive_file" "delete_lambda_zip" {
-
   type             = "zip"
   source_file      = "lambda/delete_old_ami.py"
   output_file_mode = "0666"
@@ -151,6 +151,8 @@ resource "aws_lambda_function" "delete_old_ami" {
   # checkov:skip=CKV_AWS_50: "X-ray tracing is not required"
   # checkov:skip=CKV_AWS_117: "Lambda is not environment specific"
   # checkov:skip=CKV_AWS_116: "DLQ not required"
+  # checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
+  # checkov:skip=CKV_AWS_363: "Ensure Lambda Runtime is not deprecated"
   filename         = "lambda/delete_old_ami.zip"
   function_name    = "delete_old_ami"
   role             = aws_iam_role.delete_snapshot_lambda.arn

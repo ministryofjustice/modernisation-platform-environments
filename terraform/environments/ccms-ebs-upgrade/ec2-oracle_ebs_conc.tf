@@ -10,8 +10,10 @@ resource "aws_instance" "ec2_oracle_conc" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
-  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsconc
-  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsconc
+  cpu_options {
+    core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsconc
+    threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsconc
+  }
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below.
   #lifecycle {
@@ -19,7 +21,7 @@ resource "aws_instance" "ec2_oracle_conc" {
   #}
   lifecycle {
     ignore_changes = [
-      cpu_core_count,
+      cpu_options["core_count"],
       ebs_block_device,
       ebs_optimized,
       user_data,
@@ -45,6 +47,30 @@ resource "aws_instance" "ec2_oracle_conc" {
     { OracleDbLTS-ManagedInstance = "true" }
   )
   depends_on = [aws_security_group.ec2_sg_ebsconc]
+}
+
+resource "aws_ebs_volume" "conc_swap" {
+  count = local.application_data.accounts[local.environment].conc_no_instances > 0 && local.application_data.accounts[local.environment].ebs_size_ebsconc_swap > 0 ? local.application_data.accounts[local.environment].conc_no_instances : 0
+  lifecycle {
+    ignore_changes = [kms_key_id]
+  }
+  availability_zone = "eu-west-2a"
+  size              = local.application_data.accounts[local.environment].ebs_size_ebsconc_swap
+  type              = "io2"
+  iops              = 3000
+  encrypted         = true
+  kms_key_id        = data.aws_kms_key.ebs_shared.key_id
+  tags = merge(local.tags,
+    { Name = lower(format("%s-%s", local.application_data.accounts[local.environment].instance_role_ebsconc, "swap")) },
+    { device-name = "/dev/sdm" }
+  )
+}
+
+resource "aws_volume_attachment" "conc_swap_att" {
+  count       = local.application_data.accounts[local.environment].conc_no_instances > 0 && local.application_data.accounts[local.environment].ebs_size_ebsconc_swap > 0 ? 1 : 0
+  device_name = "/dev/sds" # sdb was taken on the upgrade-dev conc by the AMI swap volume
+  volume_id   = aws_ebs_volume.conc_swap[count.index].id
+  instance_id = aws_instance.ec2_oracle_conc[count.index].id
 }
 
 resource "aws_ebs_volume" "conc_export_home" {
@@ -128,6 +154,7 @@ resource "aws_ebs_volume" "conc_home" {
   size              = local.application_data.accounts[local.environment].ebs_size_ebsconc_home
   type              = "io2"
   iops              = 3000
+  snapshot_id       = length(local.application_data.accounts[local.environment].ebs_home_conc_snapshot_id) > 0 ? local.application_data.accounts[local.environment].ebs_home_conc_snapshot_id : null
   encrypted         = true
   kms_key_id        = data.aws_kms_key.ebs_shared.key_id
   tags = merge(local.tags,

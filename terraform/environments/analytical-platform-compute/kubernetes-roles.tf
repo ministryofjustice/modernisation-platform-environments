@@ -112,6 +112,18 @@ resource "kubernetes_role" "mwaa_external_secrets" {
 
   }
   rule {
+    api_groups = [""]
+    resources  = ["secrets"]
+    verbs = [
+      "create",
+      "delete",
+      "get",
+      "list",
+      "patch",
+      "update"
+    ]
+  }
+  rule {
     api_groups = ["external-secrets.io"]
     resources  = ["externalsecrets"]
     verbs = [

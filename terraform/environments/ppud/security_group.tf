@@ -779,6 +779,83 @@ resource "aws_security_group_rule" "UAT-Document-Service-Egress-2" {
   security_group_id = aws_security_group.UAT-Document-Service[0].id
 }
 
+resource "aws_security_group" "UAT-Document-Servers" {
+  count       = local.is-preproduction == true ? 1 : 0
+  vpc_id      = data.aws_vpc.shared.id
+  name        = "UAT-Document-Servers"
+  description = "Document-Servers for UAT"
+
+  tags = {
+    Name = "${var.networking[0].business-unit}-${local.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "UAT-Document-Servers-Ingress" {
+  description       = "Rule to allow port 80 traffic inbound"
+  count             = local.is-preproduction == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.UAT-Document-Servers[0].id
+}
+
+resource "aws_security_group_rule" "UAT-Document-Servers-Ingress-1" {
+  description       = "Rule to allow port 445 traffic inbound"
+  count             = local.is-preproduction == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 445
+  to_port           = 445
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.UAT-Document-Servers[0].id
+}
+
+resource "aws_security_group_rule" "UAT-Document-Servers-Ingress-2" {
+  description       = "Rule to allow port 3389 traffic inbound"
+  count             = local.is-preproduction == true ? 1 : 0
+  type              = "ingress"
+  from_port         = 3389
+  to_port           = 3389
+  protocol          = "tcp"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.UAT-Document-Servers[0].id
+}
+
+resource "aws_security_group_rule" "UAT-Document-Servers-Egress" {
+  description       = "Rule to allow all traffic outbound"
+  count             = local.is-preproduction == true ? 1 : 0
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "all"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+  security_group_id = aws_security_group.UAT-Document-Servers[0].id
+}
+
+resource "aws_security_group_rule" "UAT-Document-Servers-Egress-1" {
+  description       = "Rule to allow port 443 traffic outbound"
+  count             = local.is-preproduction == true ? 1 : 0
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.UAT-Document-Servers[0].id
+}
+
+resource "aws_security_group_rule" "UAT-Document-Servers-Egress-2" {
+  description       = "Rule to allow port 80 traffic outbound"
+  count             = local.is-preproduction == true ? 1 : 0
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.UAT-Document-Servers[0].id
+}
+
 resource "aws_security_group" "PPUD-PROD-Database" {
   count       = local.is-production == true ? 1 : 0
   vpc_id      = data.aws_vpc.shared.id

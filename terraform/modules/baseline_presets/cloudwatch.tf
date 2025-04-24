@@ -1,4 +1,17 @@
 locals {
+  cloudwatch_event_rules = merge(
+    can(var.options.sns_topics.pagerduty_integrations["pagerduty"]) ? {
+      aws-health = {
+        event_pattern = jsonencode({
+          source = [
+            "aws.health"
+          ]
+        })
+        sns_topic_name_or_arn = "pagerduty"
+      }
+    } : {}
+  )
+
   cloudwatch_log_groups_retention_default = contains(["preproduction", "production"], var.environment.environment) ? 400 : 30 # 13 month retention on prod as per MOJ guidance
   cloudwatch_log_groups_filter = flatten([
     var.options.enable_ec2_session_manager_cloudwatch_logs ? ["session-manager-logs"] : [],
@@ -30,3 +43,4 @@ locals {
     }
   }
 }
+

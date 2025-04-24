@@ -71,7 +71,18 @@ module "ldap_ecs" {
     aws.core-network-services = aws.core-network-services
   }
 
-  log_error_pattern       = "%${join("|", local.ldap_formatted_error_codes)}%"
+  log_error_pattern = "%${join("|", local.ldap_formatted_error_codes)}%"
+  log_error_threshold_config = {
+    warning = {
+      threshold = 25
+      period    = 300
+    }
+    critical = {
+      threshold = 50
+      period    = 300
+    }
+  }
+
   sns_topic_arn           = aws_sns_topic.delius_core_alarms.arn
   enable_platform_backups = var.enable_platform_backups
 

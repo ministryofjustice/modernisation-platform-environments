@@ -50,5 +50,10 @@ locals {
     }
 
     security_groups = local.security_groups
+
+    schedule_alarms_lambda = {
+      start_time = "20:00"
+      end_time   = "05:15"
+    }
   }
 }

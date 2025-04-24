@@ -21,7 +21,7 @@ locals {
           conditions = [{
             http_header = {
               http_header_name = "X-Custom-Header"
-              values           = ["yjaf-cloudfront-custom-2022"]
+              values           = ["yjaf-cloudfront-custom-2024"]
             }
           }]
         }

@@ -886,8 +886,8 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
 }
 
-# IAM Policy and roles for executing a step-function
-data "aws_iam_policy_document" "step_function_execution_assume_policy_document" {
+# IAM Policy and roles for executing a step-function or lambda
+data "aws_iam_policy_document" "eventbridge_execution_assume_policy_document" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -897,7 +897,8 @@ data "aws_iam_policy_document" "step_function_execution_assume_policy_document" 
 
       identifiers = [
         "scheduler.amazonaws.com",
-        "states.amazonaws.com"
+        "states.amazonaws.com",
+        "lambda.amazonaws.com"
       ]
     }
   }
@@ -955,7 +956,7 @@ resource "aws_iam_policy" "step_function_execution_policy" {
 
 resource "aws_iam_role" "step_function_execution_role" {
   name               = "${local.project}-step-function-execution-role"
-  assume_role_policy = data.aws_iam_policy_document.step_function_execution_assume_policy_document.json
+  assume_role_policy = data.aws_iam_policy_document.eventbridge_execution_assume_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "step_function_role_policy_attachment" {
@@ -981,4 +982,14 @@ resource "aws_iam_role_policy_attachment" "step_function_role_lambda_policy_atta
 resource "aws_iam_role_policy_attachment" "step_function_role_all_state_machine_policy_attachment" {
   role       = aws_iam_role.step_function_execution_role.id
   policy_arn = aws_iam_policy.all_state_machine_policy.arn
+}
+
+resource "aws_iam_role" "lambda_function_invocation_role" {
+  name               = "${local.project}-lambda-function-invocation-role"
+  assume_role_policy = data.aws_iam_policy_document.eventbridge_execution_assume_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_function_invocation_role_policy_attachment" {
+  role       = aws_iam_role.lambda_function_invocation_role.id
+  policy_arn = aws_iam_policy.invoke_lambda_policy.arn
 }

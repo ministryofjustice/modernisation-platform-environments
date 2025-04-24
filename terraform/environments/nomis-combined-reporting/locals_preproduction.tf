@@ -108,7 +108,7 @@ locals {
         tags = merge(local.ec2_instances.db.tags, {
           description                          = "PREPROD NCR DATABASE"
           nomis-combined-reporting-environment = "pp"
-          oracle-sids                          = "PPBIPSYS PPBIPAUD"
+          oracle-sids                          = "PPBIPSYS PPBIPAUD PPBISYS PPBIAUD"
           instance-scheduling                  = "skip-scheduling"
         })
       })
@@ -141,7 +141,39 @@ locals {
     }
 
     efs = {
-      pp-ncr-sap-share = local.efs.sap_share
+      pp-ncr-sap-share = {
+        access_points = {
+          root = {
+            posix_user = {
+              gid = 1201 # binstall
+              uid = 1201 # bobj
+            }
+            root_directory = {
+              path = "/"
+              creation_info = {
+                owner_gid   = 1201 # binstall
+                owner_uid   = 1201 # bobj
+                permissions = "0777"
+              }
+            }
+          }
+        }
+        file_system = {
+          availability_zone_name = "eu-west-2a"
+          lifecycle_policy = {
+            transition_to_ia = "AFTER_30_DAYS"
+          }
+        }
+        mount_targets = [{
+          subnet_name        = "private"
+          availability_zones = ["eu-west-2a"]
+          security_groups    = ["bip"]
+        }]
+        tags = {
+          backup      = "false"
+          backup-plan = "daily-and-weekly"
+        }
+      }
     }
 
     iam_policies = {

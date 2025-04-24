@@ -3,6 +3,7 @@
 module "glue_s3_data_reconciliation_job" {
   source                        = "../../glue_job"
   create_job                    = var.create_job
+  create_role                   = var.create_role
   name                          = var.job_name
   short_name                    = var.short_name
   command_type                  = "glueetl"

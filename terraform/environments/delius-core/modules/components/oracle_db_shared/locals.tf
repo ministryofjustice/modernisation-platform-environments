@@ -14,9 +14,13 @@ locals {
   has_mis_environment = lookup(var.environment_config, "has_mis_environment", false)
 
   oracle_statistics_map = {
-    "dev" = {
+    "poc" = {
       #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
       #       "target_environment" = "test"
+    },
+    "dev" = {
+      "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+      "target_environment" = "test"
     },
     "test" = {
       "source_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-development"]
@@ -37,6 +41,10 @@ locals {
   }
 
   oracle_duplicate_map = {
+    "poc" = {
+      #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
+      #       "target_environment" = "test"
+    },
     "dev" = {
       #       "target_account_id"  = var.platform_vars.environment_management.account_ids["delius-core-test"]
       #       "target_environment" = "test"
@@ -59,7 +67,8 @@ locals {
     }
   }
 
-  oracle_backup_bucket_prefix = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
+  oracle_backup_bucket_prefix     = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-backups"
+  oracle_backup_bucket_expiration = var.env_name == "prod" ? 373 : 365
 
   db_port      = 1521
   db_tcps_port = 1522

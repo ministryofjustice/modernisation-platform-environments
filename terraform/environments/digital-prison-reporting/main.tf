@@ -591,6 +591,63 @@ module "s3_violation_bucket" {
   )
 }
 
+# S3 Landing Zone Bucket. Used by File Transfer In/Push
+module "s3_landing_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-landing-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-landing-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
+# S3 Landing Processing Zone Bucket. Used by File Transfer In/Push
+module "s3_landing_processing_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-landing-processing-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-landing-processing-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
+# S3 Quarantine Zone Bucket. Used by File Transfer In/Push
+module "s3_quarantine_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-quarantine-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-quarantine-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
 # S3 Bucket (Application Artifacts Store)
 module "s3_artifacts_store" {
   source              = "./modules/s3_bucket"
@@ -842,57 +899,6 @@ module "datamart" {
   )
 }
 
-# DMS Nomis Data Collector
-module "dms_nomis_to_s3_ingestor" {
-  source                       = "./modules/dms"
-  setup_dms_instance           = true
-  enable_replication_task      = true
-  name                         = "${local.project}-dms-nomis-ingestor-s3-target-${local.env}"
-  vpc_cidr                     = [data.aws_vpc.shared.cidr_block]
-  source_engine_name           = "oracle"
-  source_db_name               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
-  source_app_username          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["user"]
-  source_app_password          = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["password"]
-  source_address               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  source_db_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
-  vpc                          = data.aws_vpc.shared.id
-  project_id                   = local.project
-  dms_source_name              = "oracle"
-  dms_target_name              = "s3"
-  short_name                   = "nomis"
-  migration_type               = "full-load-and-cdc"
-  replication_instance_version = "3.5.1" # Upgrade
-  allow_major_version_upgrade  = true
-  replication_instance_class   = "dms.t3.medium"
-  subnet_ids = [
-    data.aws_subnet.data_subnets_a.id, data.aws_subnet.data_subnets_b.id, data.aws_subnet.data_subnets_c.id
-  ]
-
-  rename_rule_source_schema = "OMS_OWNER"
-  rename_rule_output_space  = "nomis"
-
-  vpc_role_dependency        = [aws_iam_role.dmsvpcrole]
-  cloudwatch_role_dependency = [aws_iam_role.dms_cloudwatch_logs_role]
-
-  extra_attributes = "supportResetlog=TRUE"
-
-  bucket_name = module.s3_raw_bucket.bucket_id
-
-  depends_on = [
-    module.s3_raw_bucket.bucket_id
-  ]
-
-  tags = merge(
-    local.all_tags,
-    {
-      Name          = "${local.project}-dms-t3nomis-ingestor-s3-target-${local.env}"
-      Resource_Type = "DMS Replication"
-      Nomis_Source  = "T3"
-      Jira          = "DPR2-165"
-    }
-  )
-}
-
 # Dynamo DB Tables
 # Dynamo DB for DomainRegistry, DPR-306/DPR-218
 module "dynamo_tab_domain_registry" {
@@ -1035,6 +1041,80 @@ module "dynamo_tab_application_tf_state" {
     {
       Name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "Dynamo Table"
+    }
+  )
+}
+
+# Glue Job, Temporary Job to Generate Test Data to the DPR Read-Replica Testing Postgres
+module "generate_test_postgres_data" {
+  count = local.create_postgres_load_generator_job ? 1 : 0
+
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-load-generator-job-${local.env}"
+  short_name                    = "${local.project}-load-generator-job"
+  command_type                  = "glueetl"
+  description                   = "Inserts a given number of records to postgres database.\nArguments:\n--dpr.test.database.secret.id: (Required) The Id of the secret to connect to the Postgres database\n--dpr.test.data.batch.size: (Optional) Total number of records to insert per batch\n--dpr.test.data.parallelism: (Optional) Total number of parallel batches\n--dpr.test.data.inter.batch.delay.millis: (Optional) Amount of milliseconds to wait between batches\n--dpr.test.data.run.duration.millis: (Optional) Total run duration of data generation in milliseconds"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-load-generator-job-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-load-generator-job-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  connections                  = ["dpr-dps-testing2-connection"]
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 1
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-load-generator-job-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-1884"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                             = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--extra-files"                            = local.shared_log4j_properties_path
+    "--class"                                  = "uk.gov.justice.digital.job.generator.PostgresLoadGeneratorJob"
+    "--dpr.aws.region"                         = local.account_region
+    "--dpr.log.level"                          = local.glue_job_common_log_level
+    "--dpr.test.database.secret.id"            = "external/dpr-dps-testing2-source-secrets"
+    "--dpr.test.data.batch.size"               = 1000
+    "--dpr.test.data.parallelism"              = 100
+    "--dpr.test.data.inter.batch.delay.millis" = 20
+  }
+}
+
+# Glue Trigger, Temporary Glue Trigger for the Postgres Test Data Generation Job
+resource "aws_glue_trigger" "glue_postgres_data_generator_job_trigger" {
+  count = local.create_postgres_load_generator_job ? 1 : 0
+
+  name     = "${module.generate_test_postgres_data[0].name}-trigger"
+  schedule = "cron(0 0/2 ? * * *)" # runs every 2 hours
+  type     = "SCHEDULED"
+  enabled  = false
+
+  actions {
+    job_name = module.generate_test_postgres_data[0].name
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-load-generator-trigger-${local.env}"
+      Resource_Type = "Glue Trigger"
+      Jira          = "DPR2-1884"
     }
   )
 }

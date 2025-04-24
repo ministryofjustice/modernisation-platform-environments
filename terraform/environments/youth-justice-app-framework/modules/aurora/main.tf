@@ -52,6 +52,8 @@ module "aurora" {
   backup_retention_period      = var.backup_retention_period
 
   # Monitoring
+  create_monitoring_role            = true
+  monitoring_interval               = 60
   enabled_cloudwatch_logs_exports   = ["postgresql"]
   create_cloudwatch_log_group       = true
   performance_insights_enabled      = var.performance_insights_enabled
@@ -67,27 +69,39 @@ module "aurora" {
 #todo match yjaf production security group
 resource "aws_security_group" "rds" {
   # checkov:skip=CKV2_AWS_5: Configured in Redshift cluster, Checkov not detecting reference.
-  name        = "RDS Postgres Security Group"
+  name_prefix = "RDS Postgres Security Group"
   description = "Controls access to the PostgreSQL RDS"
   vpc_id      = var.vpc_id
-
-  dynamic "ingress" {
-    for_each = var.rds_security_group_ingress
-    content {
-      from_port       = ingress.value.from_port
-      to_port         = ingress.value.to_port
-      protocol        = ingress.value.protocol
-      cidr_blocks     = ingress.value.cidr_blocks
-      security_groups = ingress.value.source_security_groups
-      description     = ingress.value.description
-    }
-  }
 
   tags = merge(local.all_tags,
     {
       Name = "RDS Postgres Security Group"
     }
   )
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
+
+
+# Retrieve the predefined Prefix List for S3 access
+# TODO Consider replacing the hard coded regon in the prefix name with a variable.
+data "aws_prefix_list" "s3" {
+  name = "com.amazonaws.eu-west-2.s3"
+}
+resource "aws_security_group_rule" "s3-access" {
+
+  security_group_id = aws_security_group.rds.id
+  type              = "egress"
+
+  from_port       = 443
+  to_port         = 443
+  protocol        = "TCP"
+  prefix_list_ids = [data.aws_prefix_list.s3.id]
+  description     = "Enable exports to S3"
+
+}
+
 
 #todo additional users and their password rotation? can it be done?

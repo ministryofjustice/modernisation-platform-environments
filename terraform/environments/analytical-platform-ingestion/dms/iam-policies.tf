@@ -18,7 +18,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "s3:GetReplicationConfiguration",
       "s3:ListBucket"
     ]
-    resources = length(module.cica_dms_ingress_bucket) > 0 ? [module.cica_dms_ingress_bucket[0].s3_bucket_arn] : []
+    resources = [module.cica_dms_ingress_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "SourceBucketObjectPermissions"
@@ -29,7 +29,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner"
     ]
-    resources = length(module.cica_dms_ingress_bucket) > 0 ? ["${module.cica_dms_ingress_bucket[0].s3_bucket_arn}/*"] : []
+    resources = ["${module.cica_dms_ingress_bucket.s3_bucket_arn}/*"]
   }
   statement {
     sid    = "SourceBucketKMSKey"
@@ -38,7 +38,7 @@ data "aws_iam_policy_document" "production_cica_dms_replication" {
       "kms:Decrypt",
       "kms:GenerateDataKey"
     ]
-    resources = length(module.s3_cica_dms_ingress_kms) > 0 ? [module.s3_cica_dms_ingress_kms[0].key_arn] : []
+    resources = [module.s3_cica_dms_ingress_kms.key_arn]
   }
   statement {
     sid    = "DestinationBucketKMSKey"
@@ -55,12 +55,31 @@ module "production_replication_cica_dms_iam_policy" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  count = local.environment == "production" ? 1 : 0
-
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.2"
+  version = "5.54.1"
 
   name_prefix = "cica-dms-ingress-replication"
 
   policy = data.aws_iam_policy_document.production_cica_dms_replication.json
+}
+
+data "aws_iam_policy_document" "eventbridge_dms_full_load_task_policy" {
+  statement {
+    sid = "AllowDmsTaskAccess"
+    effect = "Allow"
+    actions = ["dms:StartReplicationTask"]
+    resources = [module.cica_dms_tariff_dms_implementation.dms_full_load_task_arn]
+  }
+}
+
+module "eventbridge_dms_full_load_task_policy" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.54.1"
+
+  name_prefix = "cica-dms-eventbridge-full-load-task"
+
+  policy = data.aws_iam_policy_document.eventbridge_dms_full_load_task_policy.json
 }

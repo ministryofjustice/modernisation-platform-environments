@@ -132,7 +132,15 @@ resource "aws_security_group_rule" "ingress_traffic_ebsconc_5575" {
   local.application_data.accounts[local.environment].lz_aws_appstream_subnet_a_b]
 }
 
-### Oracle LDAP SSL
+resource "aws_security_group_rule" "ingress_traffic_ebsconc_1626" {
+  security_group_id        = aws_security_group.ec2_sg_ebsconc.id
+  type                     = "ingress"
+  description              = "Application Listener (FNDFS)"
+  protocol                 = "tcp"
+  from_port                = 1626
+  to_port                  = 1626
+  source_security_group_id = aws_security_group.ec2_sg_ebsapps.id
+}
 
 resource "aws_security_group_rule" "ingress_traffic_ebsconc_1636" {
   security_group_id = aws_security_group.ec2_sg_ebsconc.id
@@ -362,4 +370,3 @@ resource "aws_security_group_rule" "egress_traffic_ebsconc_4443" {
   to_port           = 4444
   cidr_blocks       = ["0.0.0.0/0"]
 }
-

@@ -20,3 +20,35 @@ resource "aws_lakeformation_data_lake_settings" "emds_development" {
     data.aws_iam_role.github_actions_role.arn
   ]
 }
+
+resource "aws_lakeformation_lf_tag" "domain_tag" {
+  key    = "domain"
+  values = ["prisons", "probation", "electronic-monitoring"]
+}
+
+resource "aws_lakeformation_lf_tag" "sensitive_tag" {
+  key    = "sensitive"
+  values = ["true", "false"]
+}
+
+resource "aws_lakeformation_permissions" "domain_grant" {
+  principal   = aws_iam_role.dataapi_cross_role.arn
+  permissions = ["DESCRIBE", "ASSOCIATE", "GRANT_WITH_LF_TAG_EXPRESSION"]
+
+  lf_tag {
+    key    = aws_lakeformation_lf_tag.domain_tag.key
+    values = aws_lakeformation_lf_tag.domain_tag.values
+  }
+
+}
+
+resource "aws_lakeformation_permissions" "sensitive_grant" {
+  principal   = aws_iam_role.dataapi_cross_role.arn
+  permissions = ["DESCRIBE", "ASSOCIATE", "GRANT_WITH_LF_TAG_EXPRESSION"]
+
+  lf_tag {
+    key    = aws_lakeformation_lf_tag.sensitive_tag.key
+    values = aws_lakeformation_lf_tag.sensitive_tag.values
+  }
+
+}

@@ -14,6 +14,7 @@ locals {
     ])
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
@@ -46,6 +47,7 @@ locals {
     ])
     http7xxx = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,

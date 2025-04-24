@@ -32,8 +32,8 @@
       "london_workspace_cidr": "10.200.16.0/20",
       "deletion_protection": "true",
       "pagerduty_integration_key_name": "laa_mojfin_prod_alarms",
-      "allocated_storage_size": "4000",
-      "max_allocated_storage_size": "4500"
+      "allocated_storage_size": "5000",
+      "max_allocated_storage_size": "6000"
     }
   }
 }

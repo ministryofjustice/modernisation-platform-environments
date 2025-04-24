@@ -11,7 +11,7 @@ resource "aws_vpc_endpoint_service" "HomeOffice" {
 resource "aws_vpc_endpoint_service_allowed_principal" "HomeOffice" {
   count                   = local.is-production == true ? 1 : 0
   vpc_endpoint_service_id = aws_vpc_endpoint_service.HomeOffice[0].id
-  principal_arn           = "arn:aws:iam::518406511151:root"
+  principal_arn           = "arn:aws:iam::${data.aws_ssm_parameter.homeoffice_account_prod[0].value}:root"
 }
 
 resource "aws_lb" "ppud_internal_nlb" {

@@ -11,8 +11,10 @@ resource "aws_instance" "ec2_ebsapps" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
-  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsapps
-  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsapps
+  cpu_options {
+    core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_ebsapps
+    threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_ebsapps
+  }
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below.
   lifecycle {
@@ -26,6 +28,11 @@ resource "aws_instance" "ec2_ebsapps" {
   user_data = base64encode(templatefile("./templates/ec2_user_data_ebs_apps.sh", {
     hostname = "ebs-apps"
   }))
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 
   # AMI ebs mappings from /dev/sd[a-d]
   # root

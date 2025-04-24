@@ -1,16 +1,17 @@
 ---
 # This file is consumed by the awsnuke.yml workflow
-feature-flags:
+settings:
   disable-deletion-protection:
     RDSInstance: true
     EC2Instance: true
     CloudformationStack: true
-  force-delete-lightsail-addons: true
+    force-delete-lightsail-addons:
+    enabled: true
 
 regions:
   - "eu-west-2"
 
-account-blocklist:
+blocklist:
 $account_blocklist_str
 
 resource-types:
@@ -55,6 +56,9 @@ resource-types:
     - IAMVirtualMFADevice
     - KMSAlias
     - KMSKey
+    - OSPackage
+    - QuickSightSubscription
+    - QuickSightUser
     - S3AccessPoint
     - S3Bucket
     - S3MultipartUpload
@@ -63,6 +67,7 @@ resource-types:
     - SecurityHub
     - Transfer
     - WAFv2WebACL
+    - WAFv2IPSet
 
 accounts:
 $accounts_str
@@ -105,16 +110,11 @@ presets:
       KMSKey:
         - property: tag:component
           value: "secure-baselines"
-      OSPackage:
-        - property: PackageName
-          type: regex
-          value: "^(opensearch-)?analysis-.+$"
-        - property: PackageName
-          type: glob
-          value: "titaniam-lockbox*"
-        - property: PackageName
-          type: glob
-          value: "rni*"
+      RDSClusterSnapshot:
+        - property: SnapshotType
+          value: "shared"
+        - property: SnapshotType
+          value: "automated"
       S3Bucket:
         - property: tag:component
           value: "secure-baselines"
