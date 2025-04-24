@@ -112,6 +112,7 @@ locals {
       })
 
       test-rdgw-2-a = merge(local.ec2_instances.rdgw, {
+        cloudwatch_metric_alarms = {}
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
         })
@@ -321,6 +322,7 @@ locals {
       "test.hmpps-domain.service.justice.gov.uk" = {
         lb_alias_records = [
           { name = "rdgateway1", type = "A", lbs_map_key = "public" },
+          { name = "rdgateway2", type = "A", lbs_map_key = "public" },
           { name = "rdweb1", type = "A", lbs_map_key = "public" },
         ]
       }
