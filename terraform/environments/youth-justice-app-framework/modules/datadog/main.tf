@@ -312,6 +312,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "firehose_backup_lifecycle" {
     expiration {
       days = 90
     }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
   }
 }
 
@@ -326,6 +330,36 @@ resource "aws_kms_key" "firehose_backup" {
   description             = "KMS key for encrypting Firehose S3 backup bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid: "AllowRootAccess",
+        Effect: "Allow",
+        Principal: {
+          AWS: "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action: "kms:*",
+        Resource: "*"
+      },
+      {
+        Sid: "AllowFirehoseToUseKey",
+        Effect: "Allow",
+        Principal: {
+          Service: "firehose.amazonaws.com"
+        },
+        Action: [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        Resource: "*"
+      }
+    ]
+  })
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "firehose_backup_encryption" {
