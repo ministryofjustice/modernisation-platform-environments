@@ -334,7 +334,6 @@ resource "aws_kms_key" "firehose_backup" {
   enable_key_rotation     = true
 }
 
-# KMS Key Policy (Ensure Firehose can use this key)
 resource "aws_kms_key_policy" "firehose_backup_policy" {
   key_id = aws_kms_key.firehose_backup.id
 
@@ -353,7 +352,21 @@ resource "aws_kms_key_policy" "firehose_backup_policy" {
           "kms:DescribeKey",
           "kms:GenerateDataKey"
         ],
-        Resource = aws_kms_key.firehose_backup.arn
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowFirehoseRoleAccess",
+        Effect = "Allow",
+        Principal = {
+          AWS = aws_iam_role.firehose_to_datadog.arn
+        },
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey"
+        ],
+        Resource = "*"
       },
       {
         Sid    = "AllowAccountRootUserFullAccess",
@@ -362,7 +375,7 @@ resource "aws_kms_key_policy" "firehose_backup_policy" {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
         Action   = "kms:*",
-        Resource = aws_kms_key.firehose_backup.arn
+        Resource = "*"
       }
     ]
   })
@@ -391,6 +404,32 @@ resource "aws_cloudwatch_log_subscription_filter" "cloudtrail" {
   filter_pattern  = ""
   destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
   role_arn        = aws_iam_role.cw_logs_to_firehose.arn
+}
+
+
+resource "aws_iam_policy" "firehose_kms_access" {
+  name = "AllowFirehoseToUseCMK"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
+        ],
+        Resource = aws_kms_key.firehose_backup.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_kms_access" {
+  role       = aws_iam_role.firehose_to_datadog.name
+  policy_arn = aws_iam_policy.firehose_kms_access.arn
 }
 
 # Data source to get current account ID
