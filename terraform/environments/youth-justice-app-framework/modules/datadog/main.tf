@@ -279,29 +279,32 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
 
 resource "aws_s3_bucket" "firehose_backup" {
   bucket = "yjaf-${var.environment}-firehose-datadog-backup"
+}
 
-  # Enable default encryption using a customer-managed KMS key
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        kms_master_key_id = aws_kms_key.firehose_backup.arn
-        sse_algorithm     = "aws:kms"
-      }
-    }
-  }
+resource "aws_s3_bucket_public_access_block" "firehose_backup_block" {
+  bucket = aws_s3_bucket.firehose_backup.id
 
-  public_access_block {
-    block_public_acls       = true
-    ignore_public_acls      = true
-    block_public_policy     = true
-    restrict_public_buckets = true
-  }
+  block_public_acls       = true
+  ignore_public_acls      = true
+  block_public_policy     = true
+  restrict_public_buckets = true
 }
 
 resource "aws_kms_key" "firehose_backup" {
   description             = "KMS key for encrypting Firehose S3 backup bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "firehose_backup_encryption" {
+  bucket = aws_s3_bucket.firehose_backup.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.firehose_backup.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
 }
 
 resource "aws_cloudwatch_log_group" "firehose_log_group" {
