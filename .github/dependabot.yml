@@ -9,10 +9,12 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 15
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 15
     reviewers:
       - "ministryofjustice/devcontainer-community"
   - package-ecosystem: "terraform"
@@ -20,10 +22,10 @@ updates:
       - "terraform/**/*"
     schedule:
       interval: "daily"
-    ignore:
-      - dependency-name: "integrations/github"
+    open-pull-requests-limit: 15
   - package-ecosystem: "gomod"
     directories:
       - "scripts/**/*"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 15
