@@ -264,7 +264,7 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
 
 # EC2 Instance (vSRX01)
 resource "aws_instance" "vsrx01" {
-  ami                  = "ami-0ad7c5b240d3318e2" # Replace with correct AMI ID
+  ami                  = "ami-0ad7c5b240d3318e2" # Juniper VSRX marketplace AMI
   instance_type        = "c5.xlarge"
   key_name             = "Juniper_KeyPair" # Replace with your SSH key name
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
@@ -300,7 +300,7 @@ resource "aws_instance" "vsrx01" {
 
 # EC2 Instance (vSRX02)
 resource "aws_instance" "vsrx02" {
-  ami                  = "ami-0ad7c5b240d3318e2" # Replace with correct AMI ID
+  ami                  = "ami-0ad7c5b240d3318e2" # Juniper VSRX marketplace AMI
   instance_type        = "c5.xlarge"
   key_name             = "Juniper_KeyPair" # Replace with your SSH key name
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
@@ -329,9 +329,90 @@ resource "aws_instance" "vsrx02" {
     device_index         = 3 # Tertiary interface (eth3)
   }
 
-
-
   tags = merge(local.tags, {
     Name = "Juniper vSRX02"
   })
+}
+
+#  EC2 Instance (Juniper Key Management Server)
+resource "aws_instance" "juniper_kms" {
+  ami                    = "ami-079423e9cb7067f4b" # AMI snapshot migrated from the old account
+  instance_type          = "t3.medium"
+  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
+  subnet_id              = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
+  private_ip             = "10.100.50.100"
+  vpc_security_group_ids = [aws_security_group.internal_sg.id]
+
+  tags = merge(local.tags, {
+    Name = "Juniper Key Management Server"
+  })
+}
+
+#  EC2 Instance (Juniper Syslog Server)
+resource "aws_instance" "juniper_syslog" {
+  ami                    = data.aws_ami.amazon_linux_2.id # Use data source instead of hardcoded AMI
+  instance_type          = "t3.medium"
+  key_name               = "Juniper_KeyPair" # Replace with your SSH key name
+  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
+  subnet_id              = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
+  private_ip             = "10.100.50.50"
+  vpc_security_group_ids = [aws_security_group.internal_sg.id]
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
+
+  tags = merge(local.tags, {
+    Name = "Juniper Syslog Server"
+  })
+}
+
+# EC2 Instance (Juniper Management Server)
+resource "aws_instance" "juniper_management" {
+  ami                    = data.aws_ami.windows_server.id # Use data source instead of hardcoded AMI
+  instance_type          = "t3.medium"
+  key_name               = "Juniper_KeyPair"
+  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
+  subnet_id              = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
+  private_ip             = "10.100.50.150"
+  vpc_security_group_ids = [aws_security_group.internal_sg.id]
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
+
+  tags = merge(local.tags, {
+    Name = "Juniper Management Server"
+  })
+}
+
+# Add data sources for AMIs
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+  owners      = ["aws-marketplace"]
+
+  filter {
+    name   = "name"
+    values = ["CIS Amazon Linux 2 Kernel 5.10 Benchmark*Level 1*"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+}
+
+data "aws_ami" "windows_server" {
+  most_recent = true
+  owners      = ["aws-marketplace"]
+
+  filter {
+    name   = "name"
+    values = ["CIS Microsoft Windows Server 2025*Level 1*"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
 }
