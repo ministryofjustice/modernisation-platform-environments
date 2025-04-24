@@ -326,7 +326,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "firehose_backup_lifecycle" {
 resource "aws_s3_bucket_logging" "firehose_backup_logging" {
   bucket = aws_s3_bucket.firehose_backup.id
 
-  target_bucket = "your-logging-bucket-name"
+  target_bucket = "yjaf-${var.environment}-firehose-datadog-backup"
   target_prefix = "firehose-backup-logs/"
 }
 
@@ -361,6 +361,20 @@ resource "aws_kms_key_policy" "firehose_backup_policy" {
         Effect = "Allow",
         Principal = {
           AWS = aws_iam_role.firehose_to_datadog.arn
+        },
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey"
+        ],
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogsAccess",
+        Effect = "Allow",
+        Principal = {
+          Service = "logs.eu-west-2.amazonaws.com"
         },
         Action = [
           "kms:Encrypt",
