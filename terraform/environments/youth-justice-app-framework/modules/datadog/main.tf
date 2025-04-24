@@ -240,9 +240,9 @@ resource "aws_iam_role_policy_attachment" "firehose_policy_attach" {
   policy_arn = aws_iam_policy.firehose_policy.arn
 }
 
-# checkov:skip=CKV_AWS_241: todo 
+
 resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
-  # checkov:skip=CKV_AWS_241: todo 
+  #checkov:skip=CKV_AWS_241: todo 
   name        = "cloudwatch-to-datadog"
   destination = "http_endpoint"
 
