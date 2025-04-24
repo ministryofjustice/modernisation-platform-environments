@@ -95,6 +95,15 @@ locals {
           to_port     = 443
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient_internal
+          security_groups = [
+            "public-lb", "public-lb-2"
+          ]
+        }
+        https-from-lb = {
+          description = "Allow http ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "TCP"
         }
         rpc-session-host = {
           description = "Allow connection to RD Session Host"
