@@ -9,8 +9,9 @@ resource "helm_release" "dashboard_service" {
     templatefile(
       "${path.module}/src/helm/values/dashboard-service/values.yml.tftpl",
       {
+        dashboard_service_app_env = local.environment,
+        dashboard_service_django_settings_module = "dashboard_service.settings.${local.environment}"
         dashboard_service_hostname = local.environment_configuration.dashboard_service_hostname,
-        dashboard_service_app_env = local.environment
       }
     )
   ]
