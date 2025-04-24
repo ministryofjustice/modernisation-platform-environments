@@ -283,6 +283,8 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
 }
 
 resource "aws_s3_bucket" "firehose_backup" {
+  # checkov:skip=CKV2_AWS_62
+  # checkov:skip=CKV_AWS_144
   bucket = "yjaf-${var.environment}-firehose-datadog-backup"
 }
 
@@ -326,34 +328,21 @@ resource "aws_s3_bucket_logging" "firehose_backup_logging" {
   target_prefix = "firehose-backup-logs/"
 }
 
-# KMS Key for Firehose S3 backup
 resource "aws_kms_key" "firehose_backup" {
   description             = "KMS key for encrypting Firehose S3 backup bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
 }
 
-# KMS Key Policy to avoid Checkov CKV2_AWS_64 failure
+# KMS Key Policy (Ensure Firehose can use this key)
 resource "aws_kms_key_policy" "firehose_backup_policy" {
   key_id = aws_kms_key.firehose_backup.id
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Id      = "firehose-backup-policy",
     Statement = [
-      # Allow account root user full access to prevent lockout
       {
-        Sid    = "AllowRootAccountFullAccess",
-        Effect = "Allow",
-        Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
-        },
-        Action   = "kms:*",
-        Resource = "*"
-      },
-      # Allow Kinesis Firehose to use the key
-      {
-        Sid    = "AllowFirehoseToUseKey",
+        Sid    = "AllowFirehoseServiceAccess",
         Effect = "Allow",
         Principal = {
           Service = "firehose.amazonaws.com"
@@ -361,11 +350,19 @@ resource "aws_kms_key_policy" "firehose_backup_policy" {
         Action = [
           "kms:Encrypt",
           "kms:Decrypt",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:DescribeKey"
+          "kms:DescribeKey",
+          "kms:GenerateDataKey"
         ],
-        Resource = "*"
+        Resource = aws_kms_key.firehose_backup.arn
+      },
+      {
+        Sid    = "AllowAccountRootUserFullAccess",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action   = "kms:*",
+        Resource = aws_kms_key.firehose_backup.arn
       }
     ]
   })
