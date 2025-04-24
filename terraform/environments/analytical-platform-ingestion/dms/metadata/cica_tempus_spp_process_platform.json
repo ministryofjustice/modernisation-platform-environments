@@ -10,7 +10,8 @@
         "dbo.LIVE_ACTIVITY_RESOURCE",
         "dbo.VARIABLE"
     ],
-    "blobs": [
+    "blobs": [],
+    "columns_to_exclude": [
         {
             "object_name": "dbo.AW_RESOURCE",
             "column_name": "CATEGORY_ID"

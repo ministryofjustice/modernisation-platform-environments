@@ -4,7 +4,8 @@
     "objects": [
         "dbo.CaseTrimDocuments"
     ],
-    "blobs": [
+    "blobs": [],
+    "columns_to_exclude": [
         {
             "object_name": "dbo.CaseTrimDocuments",
             "column_name": "BankSeqNo"

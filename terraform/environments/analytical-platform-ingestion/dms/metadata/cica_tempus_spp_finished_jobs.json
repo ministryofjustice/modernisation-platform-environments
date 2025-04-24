@@ -5,7 +5,8 @@
         "dbo.FINISHED_JOB_HISTORY",
         "dbo.FINISHED_JOB_VARIABLE"
     ],
-    "blobs": [
+    "blobs": [],
+    "columns_to_exclude": [
         {
             "object_name": "dbo.FINISHED_JOB_HISTORY",
             "column_name": "AUTOMATIC"
