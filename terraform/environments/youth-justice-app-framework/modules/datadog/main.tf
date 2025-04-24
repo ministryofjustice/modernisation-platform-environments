@@ -326,37 +326,46 @@ resource "aws_s3_bucket_logging" "firehose_backup_logging" {
   target_prefix = "firehose-backup-logs/"
 }
 
+# KMS Key for Firehose S3 backup
 resource "aws_kms_key" "firehose_backup" {
   description             = "KMS key for encrypting Firehose S3 backup bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+}
+
+# KMS Key Policy to avoid Checkov CKV2_AWS_64 failure
+resource "aws_kms_key_policy" "firehose_backup_policy" {
+  key_id = aws_kms_key.firehose_backup.id
 
   policy = jsonencode({
     Version = "2012-10-17",
+    Id      = "firehose-backup-policy",
     Statement = [
+      # Allow account root user full access to prevent lockout
       {
-        Sid: "AllowRootAccess",
-        Effect: "Allow",
-        Principal: {
-          AWS: "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        Sid    = "AllowRootAccountFullAccess",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
-        Action: "kms:*",
-        Resource: "*"
+        Action   = "kms:*",
+        Resource = "*"
       },
+      # Allow Kinesis Firehose to use the key
       {
-        Sid: "AllowFirehoseToUseKey",
-        Effect: "Allow",
-        Principal: {
-          Service: "firehose.amazonaws.com"
+        Sid    = "AllowFirehoseToUseKey",
+        Effect = "Allow",
+        Principal = {
+          Service = "firehose.amazonaws.com"
         },
-        Action: [
+        Action = [
           "kms:Encrypt",
           "kms:Decrypt",
           "kms:ReEncrypt*",
           "kms:GenerateDataKey*",
           "kms:DescribeKey"
         ],
-        Resource: "*"
+        Resource = "*"
       }
     ]
   })
@@ -386,3 +395,7 @@ resource "aws_cloudwatch_log_subscription_filter" "cloudtrail" {
   destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
   role_arn        = aws_iam_role.cw_logs_to_firehose.arn
 }
+
+# Data source to get current account ID
+data "aws_caller_identity" "current" {}
+
