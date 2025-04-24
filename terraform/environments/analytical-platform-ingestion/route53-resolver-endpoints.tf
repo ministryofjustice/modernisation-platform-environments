@@ -2,7 +2,7 @@ module "connected_vpc_outbound_route53_resolver_endpoint" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/route53/aws//modules/resolver-endpoints"
-  version = "4.1.0"
+  version = "5.0.0"
 
   name      = "connected-vpc-outbound"
   vpc_id    = module.connected_vpc.vpc_id
