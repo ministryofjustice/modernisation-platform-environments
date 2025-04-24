@@ -11,14 +11,16 @@ resource "aws_instance" "ec2_accessgate" {
   associate_public_ip_address = false
   iam_instance_profile        = aws_iam_instance_profile.iam_instace_profile_ccms_base.name
 
-  cpu_core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_accessgate
-  cpu_threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_accessgate
+  cpu_options {
+    core_count       = local.application_data.accounts[local.environment].ec2_oracle_instance_cores_accessgate
+    threads_per_core = local.application_data.accounts[local.environment].ec2_oracle_instance_threads_accessgate
+  }
 
   # Due to a bug in terraform wanting to rebuild the ec2 if more than 1 ebs block is attached, we need the lifecycle clause below.
   # Also includes ebs_optimized and cpu_core_count due to changing instance family from c5d.2xlarge to m5d.large
   lifecycle {
     ignore_changes = [
-      cpu_core_count,
+      cpu_options["core_count"],
       ebs_block_device,
       ebs_optimized,
       user_data,
@@ -29,6 +31,11 @@ resource "aws_instance" "ec2_accessgate" {
   user_data = base64encode(templatefile("./templates/ec2_user_data_accessgate.sh", {
     hostname = "accessgate"
   }))
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 
   # AMI ebs mappings from /dev/sd[a-d]
   # root

@@ -73,6 +73,12 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "cloudwatch_dashboards", {}),
   )
 
+  cloudwatch_event_rules = merge(
+    module.baseline_presets.cloudwatch_event_rules,
+    lookup(local.baseline_all_environments, "cloudwatch_event_rules", {}),
+    lookup(local.baseline_environment_specific, "cloudwatch_event_rules", {}),
+  )
+
   cloudwatch_metric_alarms = merge(
     module.baseline_presets.cloudwatch_metric_alarms_baseline,
     lookup(local.baseline_all_environments, "cloudwatch_metric_alarms", {}),
