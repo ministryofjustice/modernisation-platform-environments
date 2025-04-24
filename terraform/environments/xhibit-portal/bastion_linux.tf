@@ -8,7 +8,7 @@ module "bastion_linux" {
 
   # checkov:skip=CKV_TF_1: "Ensure Terraform module sources use a commit hash"
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.4.2"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
