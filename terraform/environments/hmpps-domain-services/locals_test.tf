@@ -233,7 +233,7 @@ locals {
           })
         }
         listeners = merge(local.lbs.network.listeners, {
-          https = merge(local.lbs.netowrk.listeners.https, {
+          https = merge(local.lbs.network.listeners.https, {
             default_action = {
               type              = "forward"
               target_group_name = "test-rdgw-2-http"
