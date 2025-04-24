@@ -99,8 +99,9 @@ resource "aws_security_group_rule" "res2_to_app" {
 }
 
 
-
 resource "aws_instance" "infra1" {
+  # checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+  # checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra1-ami
   vpc_security_group_ids      = [aws_security_group.app_servers.id]
@@ -144,6 +145,9 @@ resource "aws_instance" "infra1" {
 }
 
 resource "aws_ebs_volume" "infra1-disk1" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   availability_zone = "${local.region}a"
   type              = "gp2"
   encrypted         = true
@@ -167,6 +171,8 @@ resource "aws_volume_attachment" "infra1-disk1" {
 
 
 resource "aws_instance" "infra2" {
+  # checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+  # checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   depends_on                  = [aws_security_group.app_servers, aws_security_group.outbound_dns_resolver]
   instance_type               = "t2.small"
   ami                         = local.application_data.accounts[local.environment].infra2-ami

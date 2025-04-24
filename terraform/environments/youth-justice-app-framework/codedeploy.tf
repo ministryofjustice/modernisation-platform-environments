@@ -1,17 +1,3 @@
-data "aws_instance" "target_ec2" {
-  filter {
-    name   = "tag:Name"
-    values = ["YJSM"]
-  }
-  filter {
-    name   = "instance-state-name"
-    values = ["running"]
-  }
-  depends_on = [
-    module.yjsm
-  ]
-}
-
 module "codedeploy" {
   source           = "./modules/codedeploy"
   project_name     = local.project_name

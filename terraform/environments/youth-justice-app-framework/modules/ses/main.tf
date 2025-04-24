@@ -17,45 +17,6 @@ resource "aws_ses_domain_dkim" "main" {
 }
 
 
-#####################
-# SES SMTP User
-#####################
-
-
-resource "aws_iam_user" "ses_smtp_user" {
-  #checkov:skip=CKV_AWS_273: ses user
-  name = "${var.environment}-${var.project_name}-smtp-user"
-}
-
-resource "aws_iam_access_key" "ses_smtp_user" {
-  user = aws_iam_user.ses_smtp_user.name
-}
-
-resource "aws_iam_user_policy" "ses_smtp_user" {
-  name = "${var.environment}-${var.project_name}-ses-smtp-user-policy"
-  user = aws_iam_user.ses_smtp_user.name
-
-  policy = templatefile("${path.module}/ses_user_policy.json", {
-    private_subnets = jsonencode(var.private_subnets)
-  })
-}
-
-resource "aws_secretsmanager_secret" "ses_user_secret" {
-  #checkov:skip=CKV2_AWS_57:todo add rotation if needed
-  name        = "${var.project_name}-ses-user"
-  description = "key credentials for ses user"
-  kms_key_id  = var.key_id
-  tags        = var.tags
-}
-
-resource "aws_secretsmanager_secret_version" "ses_user_secret" {
-  secret_id = aws_secretsmanager_secret.ses_user_secret.id
-  secret_string = jsonencode({
-    username = aws_iam_access_key.ses_smtp_user.id,
-    password = data.external.smtp_password.result.smtp_password
-  })
-}
-
 resource "aws_sesv2_configuration_set" "ses_configuration_set" {
   configuration_set_name = format("%s-configuration-set", var.project_name)
 
@@ -64,12 +25,4 @@ resource "aws_sesv2_configuration_set" "ses_configuration_set" {
   }
 
   tags = var.tags
-}
-
-data "external" "smtp_password" {
-  program = ["python3", "${path.module}/smtp_password.py"]
-  query = {
-    secret_access_key = aws_iam_access_key.ses_smtp_user.secret
-    region            = "eu-west-2"
-  }
 }

@@ -7,6 +7,7 @@
       "desired_number_of_domain_controllers": 3,
       "test_mode": true,
       "tableau_website_name": "tableau",
+      "enable_datadog_agent_apm": true,
       "ses_domain_identities": {
         "development.justice.gov.uk": {
           "identity": "development.justice.gov.uk",
@@ -29,6 +30,7 @@
       "desired_number_of_domain_controllers": 2,
       "test_mode": true,
       "tableau_website_name": "tableau",
+      "enable_datadog_agent_apm": false,
       "ses_domain_identities": {
         "test.justice.gov.uk": {
           "identity": "test.justice.gov.uk",
@@ -51,6 +53,7 @@
       "desired_number_of_domain_controllers": 2,
       "test_mode": true,
       "tableau_website_name": "tableau",
+      "enable_datadog_agent_apm": true,
       "ses_domain_identities": {
         "preproduction.justice.gov.uk": {
           "identity": "preproduction.justice.gov.uk",
@@ -73,6 +76,7 @@
       "desired_number_of_domain_controllers": 3,
       "test_mode": true,
       "tableau_website_name": "tableau",
+      "enable_datadog_agent_apm": true,
       "ses_domain_identities": {
         "justice.gov.uk": {
           "identity": "justice.gov.uk",
