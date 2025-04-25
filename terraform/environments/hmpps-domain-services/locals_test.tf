@@ -128,7 +128,7 @@ locals {
         })
       })
 
-      test-rhel85 = {
+      test-rhel85-a = {
         config = {
           ami_name                  = "base_rhel_8_5*"
           availability_zone         = "eu-west-2a"
