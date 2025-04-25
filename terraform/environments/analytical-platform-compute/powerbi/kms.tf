@@ -7,15 +7,6 @@ module "auth0_secrets_kms" {
   description = "KMS key for Auth0 provider secrets"
   key_usage   = "ENCRYPT_DECRYPT"
 
-  # Key policy
-  key_administrators = [
-    data.aws_iam_session_context.current.issuer_arn
-  ]
-
-  key_users = [
-    data.aws_iam_session_context.current.issuer_arn
-  ]
-
   aliases = ["auth0-${local.environment}"]
   tags    = local.tags
 }
