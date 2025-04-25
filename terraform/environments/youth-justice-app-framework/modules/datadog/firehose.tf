@@ -4,7 +4,7 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   destination = "http_endpoint"
 
   http_endpoint_configuration {
-    url                = "https://http-intake.logs.datadoghq.eu/v1/input/PLACEHOLDER"
+    url                = "https://http-intake.logs.datadoghq.eu/v1/input"
     name               = "Datadog"
     access_key         = ""
     buffering_interval = 60
