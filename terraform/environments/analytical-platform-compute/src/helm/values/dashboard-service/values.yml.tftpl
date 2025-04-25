@@ -40,6 +40,8 @@ app:
         secretKeyRef:
           name: dashboard-service-app-secrets
           key: auth0-client-secret
+    - name: AUTH0_DOMAIN
+      value: ${dashboard_service_auth0_domain}
     - name: DB_USER
       valueFrom:
         secretKeyRef:
