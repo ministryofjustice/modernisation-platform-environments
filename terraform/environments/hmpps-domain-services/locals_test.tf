@@ -111,59 +111,22 @@ locals {
         })
       })
 
-      test-rdgw-2-a = merge(local.ec2_instances.rdgw, {
-        cloudwatch_metric_alarms = {}
-        config = merge(local.ec2_instances.rdgw.config, {
-          availability_zone = "eu-west-2a"
-          subnet_name       = "public"
-        })
-        instance = merge(local.ec2_instances.rdgw.instance, {
-          tags = {
-            patch-manager = "group1"
-          }
-        })
-        tags = merge(local.ec2_instances.rdgw.tags, {
-          description = "Remote Desktop Gateway for azure.noms.root domain"
-          domain-name = "azure.noms.root"
-        })
-      })
-
-      test-rhel85-a = {
-        config = {
-          ami_name                  = "base_rhel_8_5*"
-          availability_zone         = "eu-west-2a"
-          iam_resource_names_prefix = "ec2-instance"
-          instance_profile_policies = [
-            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-            "EC2Default",
-            "EC2S3BucketWriteAndDeleteAccessPolicy",
-            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-          ]
-          subnet_name = "public"
-        }
-        instance = {
-          disable_api_termination      = false
-          instance_type                = "t3.medium"
-          key_name                     = "ec2-user"
-          metadata_options_http_tokens = "required"
-          vpc_security_group_ids       = ["rds-ec2s"]
-        }
-        user_data_cloud_init = {
-          args = {
-            branch       = "main"
-            ansible_args = "--tags ec2provision"
-          }
-          scripts = [ # paths are relative to templates/ dir
-            "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
-          ]
-        }
-        tags = {
-          backup      = "false"
-          description = "test linux EC2"
-          os-type     = "Linux"
-          server-type = "hmpps-domain-services"
-        }
-      }
+      #test-rdgw-2-a = merge(local.ec2_instances.rdgw, {
+      #  cloudwatch_metric_alarms = {}
+      #  config = merge(local.ec2_instances.rdgw.config, {
+      #    availability_zone = "eu-west-2a"
+      #    subnet_name       = "public"
+      #  })
+      #  instance = merge(local.ec2_instances.rdgw.instance, {
+      #    tags = {
+      #      patch-manager = "group1"
+      #    }
+      #  })
+      #  tags = merge(local.ec2_instances.rdgw.tags, {
+      #    description = "Remote Desktop Gateway for azure.noms.root domain"
+      #    domain-name = "azure.noms.root"
+      #  })
+      #})
 
       t1-jump2022-1 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
@@ -266,7 +229,7 @@ locals {
         instance_target_groups = {
           test-rdgw-2-https = merge(local.lbs.network.instance_target_groups.https, {
             attachments = [
-              { ec2_instance_name = "test-rdgw-2-a" },
+              # { ec2_instance_name = "test-rdgw-2-a" },
             ]
           })
         }
