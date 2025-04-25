@@ -19,6 +19,15 @@ locals {
     var.cloud-platform-iam-prod
   ] : null
 
+  am_tables_to_share = [
+    "am_contact_history",
+    "am_equipment_details",
+    "am_incident",
+    "am_order_details",
+    "am_services",
+    "am_violations",
+    "am_visit_details",
+  ]
   tables_to_share = [
     "contact_history",
     "equipment_details",
@@ -30,11 +39,14 @@ locals {
     "violations",
     "visit_details"
   ]
-  table_filters = {
+  table_filters = merge({
     for table in local.tables_to_share : table => "specials_flag=0"
-  }
-  specials_table_filters = {
+  }, local.am_table_filters)
+  specials_table_filters = merge({
     for table in local.tables_to_share : table => ""
+  }, local.am_table_filters)
+  am_table_filters = {
+     for table in local.am_tables_to_share : table => ""
   }
 
   resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
