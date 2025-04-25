@@ -19,6 +19,7 @@ module "transfer_comp_lambda_layer" {
 }
 
 module "transfer_comp_Lambda" {
+  #checkov:skip=CKV_SECRET_6 Refers to a placeholder secret that is replaced with the real thing
   source = "./modules/lambdas/generic"
 
   enable_lambda  = local.enable_transfercomp_lambda
