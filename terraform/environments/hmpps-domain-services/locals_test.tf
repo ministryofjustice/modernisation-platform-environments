@@ -121,6 +121,13 @@ locals {
           tags = {
             patch-manager = "group1"
           }
+          vpc_security_group_ids = [
+            "rds-ec2s",
+            "public-lb",
+            "public-lb-2",
+            "network-lb",
+            "network-lb-2"
+          ]
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description = "Remote Desktop Gateway for azure.noms.root domain"
@@ -232,12 +239,23 @@ locals {
               { ec2_instance_name = "test-rdgw-2-a" },
             ]
           })
+          test-rdgw-2-https8443 = merge(local.lbs.network.instance_target_groups.https8443, {
+            attachments = [
+              { ec2_instance_name = "test-rdgw-2-a" },
+            ]
+          })
         }
         listeners = merge(local.lbs.network.listeners, {
           https = merge(local.lbs.network.listeners.https, {
             default_action = {
               type              = "forward"
               target_group_name = "test-rdgw-2-https"
+            }
+          })
+          https8443 = merge(local.lbs.network.listeners.https8443, {
+            default_action = {
+              type              = "forward"
+              target_group_name = "test-rdgw-2-https8443"
             }
           })
         })

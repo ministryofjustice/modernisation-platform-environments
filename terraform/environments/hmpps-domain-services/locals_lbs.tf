@@ -32,10 +32,31 @@ locals {
             type    = "source_ip"
           }
         }
+        https8443 = {
+          port     = 8443
+          protocol = "TCP"
+          health_check = {
+            enabled             = true
+            interval            = 5
+            healthy_threshold   = 3
+            port                = 8443
+            protocol            = "TCP"
+            timeout             = 4
+            unhealthy_threshold = 2
+          }
+          stickiness = {
+            enabled = true
+            type    = "source_ip"
+          }
+        }
       }
       listeners = {
         https = {
           port     = 443
+          protocol = "TCP"
+        }
+        https8443 = {
+          port     = 8443
           protocol = "TCP"
         }
       }

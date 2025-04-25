@@ -134,6 +134,16 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
+        https8443-from-euc = {
+          description = "Allow direct https8443 access for testing"
+          from_port   = 8443
+          to_port     = 8443
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
+          security_groups = [
+            "network-lb", "network-lb-2"
+          ]
+        }
         rpc_dynamic_tcp_rd_sessionhost = {
           description = "49152-65535: TCP Dynamic Port ingress from remote desktop session hosts"
           from_port   = 49152
@@ -303,6 +313,62 @@ locals {
           description = "Allow enduserclient https ingress"
           from_port   = 443
           to_port     = 443
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public2
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+    network-lb = {
+      description = "Security group for public load-balancer"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        https8443_lb = {
+          description = "Allow enduserclient https 8443 ingress"
+          from_port   = 8443
+          to_port     = 8443
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.enduserclient_public1
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all traffic outbound"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+    network-lb-2 = {
+      description = "Security group for public load-balancer"
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        https8443_lb = {
+          description = "Allow enduserclient https 8443 ingress"
+          from_port   = 8443
+          to_port     = 8443
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient_public2
         }
