@@ -213,7 +213,7 @@ locals {
   lambda_scheduled_dataset_memory_size         = 1024
 
   # Generate Dataset Lambda
-  lambda_generate_dataset_enabled        = true
+  lambda_generate_dataset_enabled        = local.application_data.accounts[local.environment].enable_generate_dataset_lambda
   lambda_generate_dataset_name           = "${local.project}-generate-dataset"
   lambda_generate_dataset_runtime        = "java21"
   lambda_generate_dataset_tracing        = "Active"
