@@ -190,7 +190,7 @@ locals {
   lambda_redshift_table_expiry_memory_size         = 1024
 
   # Scheduled Dataset Lambda
-  lambda_scheduled_dataset_enabled        = true
+  lambda_scheduled_dataset_enabled        = local.application_data.accounts[local.environment].enable_scheduled_dataset_lambda
   lambda_scheduled_dataset_name           = "${local.project}-scheduled-dataset"
   lambda_scheduled_dataset_runtime        = "java21"
   lambda_scheduled_dataset_tracing        = "Active"
