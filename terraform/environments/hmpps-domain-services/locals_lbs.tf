@@ -9,7 +9,7 @@ locals {
       force_destroy_bucket             = true
       internal_lb                      = false
       load_balancer_type               = "network"
-      security_groups                  = ["public-lb", "public-lb-2"]
+      security_groups                  = ["network-lb", "network-lb-2", "public-lb", "public-lb-2"]
       subnets = [
         module.environment.subnet["public"]["eu-west-2a"].id,
       ]
