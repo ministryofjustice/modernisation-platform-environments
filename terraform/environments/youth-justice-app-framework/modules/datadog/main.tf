@@ -451,4 +451,3 @@ resource "aws_iam_role_policy_attachment" "attach_kms_access" {
 
 # Data source to get current account ID
 data "aws_caller_identity" "current" {}
-
