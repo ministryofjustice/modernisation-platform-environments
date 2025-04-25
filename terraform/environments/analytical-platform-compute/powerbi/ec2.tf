@@ -14,7 +14,7 @@ module "powerbi_gateway_ec2" {
   monitoring                  = local.environment_configuration.powerbi_gateway.enable_monitoring
   create_iam_instance_profile = true
   iam_role_description        = "IAM role for PowerBI Gateway Instance"
-  ignore_ami_changes          = timecmp(local.environment_configuration.powerbi_gateway.ami_maintenance_date, timestamp()) > 0 ? true : false
+  ignore_ami_changes          = true
   enable_volume_tags          = false
   associate_public_ip_address = false
   iam_role_name               = local.powerbi_gateway_role
