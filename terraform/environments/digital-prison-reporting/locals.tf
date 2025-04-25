@@ -304,8 +304,8 @@ locals {
   setup_sonatype_secrets = local.application_data.accounts[local.environment].setup_sonatype_secrets
 
   # Nomis Secrets PlaceHolder
-  #checkov:skip=CKV_SECRET_6 This is a placeholder secret that is replaced with the real thing
   nomis_secrets_placeholder = {
+    #checkov:skip=CKV_SECRET_6 This is a placeholder secret that is replaced with the real thing
     db_name  = "nomis"
     password = "placeholder"
     # We need to duplicate the username with 'user' and 'username' keys
