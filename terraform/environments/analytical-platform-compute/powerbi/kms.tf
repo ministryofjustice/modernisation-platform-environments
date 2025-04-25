@@ -4,8 +4,10 @@ module "auth0_secrets_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "2.1.0"
 
-  description = "KMS key for Auth0 provider secrets"
-  key_usage   = "ENCRYPT_DECRYPT"
+  description             = "KMS key for Auth0 provider secrets"
+  key_usage               = "ENCRYPT_DECRYPT"
+  enable_key_rotation     = true
+  deletion_window_in_days = 7
 
   aliases = ["auth0-${local.environment}"]
   tags    = local.tags
