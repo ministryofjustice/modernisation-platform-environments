@@ -128,6 +128,43 @@ locals {
         })
       })
 
+      test-rhel85 = {
+        config = {
+          ami_name                  = "base_rhel_8_5*"
+          availability_zone         = "eu-west-2a"
+          iam_resource_names_prefix = "ec2-instance"
+          instance_profile_policies = [
+            "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+            "EC2Default",
+            "EC2S3BucketWriteAndDeleteAccessPolicy",
+            "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+          ]
+          subnet_name = "public"
+        }
+        instance = {
+          disable_api_termination      = false
+          instance_type                = "t3.medium"
+          key_name                     = "ec2-user"
+          metadata_options_http_tokens = "required"
+          vpc_security_group_ids       = ["rds-ec2s"]
+        }
+        user_data_cloud_init = {
+          args = {
+            branch       = "main"
+            ansible_args = "--tags ec2provision"
+          }
+          scripts = [ # paths are relative to templates/ dir
+            "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
+          ]
+        }
+        tags = {
+          backup      = "false"
+          description = "test linux EC2"
+          os-type     = "Linux"
+          server-type = "hmpps-domain-services"
+        }
+      }
+
       t1-jump2022-1 = merge(local.ec2_instances.jumpserver, {
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
