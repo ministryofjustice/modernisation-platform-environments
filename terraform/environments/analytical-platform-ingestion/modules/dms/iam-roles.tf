@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 # IAM Role for DMS VPC Access
-resource "aws_iam_role" "dms" {
+resource "aws_iam_role" "dms_vpc" {
   count = var.create_ancillary_static_roles ? 1 : 0
   # This has to be a specific name for some reason see https://repost.aws/questions/QU61eADUU7SnO-t7MmhxgfPA/dms-service-roles
   name = "dms-vpc-role"
@@ -20,6 +20,27 @@ resource "aws_iam_role" "dms" {
 
   tags = merge(
     { Name = "dms-vpc-role" },
+    var.tags
+  )
+}
+
+resource "aws_iam_role" "dms" {
+  name = "${var.db}-dms-role-${var.environment}"
+
+  assume_role_policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Principal" : {
+          "Service" : "dms.amazonaws.com"
+        },
+        "Action" : "sts:AssumeRole"
+      }
+    ]
+  })
+  tags = merge(
+    { Name = "${var.db}-dms-role-${var.environment}" },
     var.tags
   )
 }
@@ -103,8 +124,9 @@ resource "aws_iam_role_policy" "dms_source" {
 }
 
 resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
+  count = var.create_ancillary_static_roles ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
-  role       = aws_iam_role.dms.name
+  role       = aws_iam_role.dms_vpc[0].name
 
   # It takes some time for these attachments to work, and creating the aws_dms_replication_subnet_group fails if this attachment hasn't completed.
   provisioner "local-exec" {
