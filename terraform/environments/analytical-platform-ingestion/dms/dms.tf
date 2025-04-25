@@ -112,6 +112,7 @@ module "cica_dms_tempus_dms_implementation" {
 
     tags = local.tags
 
+    create_ancillary_static_roles            = false
     create_premigration_assessement_resources = local.environment == "development" ? true : false
     write_metadata_to_glue_catalog            = true
     retry_failed_after_recreate_metadata      = false
