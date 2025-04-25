@@ -19,7 +19,6 @@ module "transfer_comp_lambda_layer" {
 }
 
 module "transfer_comp_Lambda" {
-  #checkov:skip=CKV_SECRET_6 Refers to a placeholder secret that is replaced with the real thing
   source = "./modules/lambdas/generic"
 
   enable_lambda  = local.enable_transfercomp_lambda
@@ -39,6 +38,7 @@ module "transfer_comp_Lambda" {
   env_vars = {
     "DB_CONNECTION_STRING" = "placeholder"
     "DB_USERNAME"          = "placeholder"
+    #checkov:skip=CKV_SECRET_6 Refers to a placeholder secret that is replaced with the real thing
     "DB_PASSWORD"          = "placeholder"
     "FLYWAY_METHOD"        = "check"
     "GIT_FOLDERS"          = "placeholder" # Comma Seperated List
