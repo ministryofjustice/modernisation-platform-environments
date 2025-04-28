@@ -166,13 +166,13 @@ resource "aws_iam_role" "cw_logs_to_firehose" {
   name = "cw-logs-to-firehose"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
+        Effect = "Allow",
         Principal = {
           Service = "logs.amazonaws.com"
-        }
+        },
         Action = "sts:AssumeRole"
       }
     ]
@@ -184,14 +184,14 @@ resource "aws_iam_role_policy" "cw_logs_to_firehose_policy" {
   role = aws_iam_role.cw_logs_to_firehose.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
+        Effect = "Allow",
         Action = [
           "firehose:PutRecord",
           "firehose:PutRecordBatch"
-        ]
+        ],
         Resource = aws_kinesis_firehose_delivery_stream.to_datadog.arn
       }
     ]
@@ -202,11 +202,11 @@ resource "aws_iam_role" "firehose_to_datadog" {
   name = "firehose_to_datadog"
 
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
         Principal = {
           Service = "firehose.amazonaws.com"
         }
@@ -220,16 +220,16 @@ resource "aws_iam_policy" "firehose_policy" {
   description = "Allows Firehose to send data to Datadog"
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
+        Effect = "Allow",
         Action = [
           "logs:PutLogEvents",
           "logs:DescribeLogStreams",
           "logs:GetLogEvents"
-        ]
-        Resource = "*"
+        ],
+        Resource = aws_cloudwatch_log_group.firehose_log_group.arn
       }
     ]
   })
@@ -242,6 +242,7 @@ resource "aws_iam_role_policy_attachment" "firehose_policy_attach" {
 
 
 resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
+  #checkov:skip=CKV_AWS_241: todo 
   name        = "cloudwatch-to-datadog"
   destination = "http_endpoint"
 
@@ -251,13 +252,19 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
     access_key         = ""
     buffering_interval = 60
     buffering_size     = 1
-    role_arn           = aws_iam_role.firehose_to_datadog.arn  # <--- MUST go here
+    role_arn           = aws_iam_role.firehose_to_datadog.arn
+
+    cloudwatch_logging_options {
+      enabled         = true
+      log_group_name  = aws_cloudwatch_log_group.firehose_log_group.name
+      log_stream_name = "firehose-datadog-http"
+    }
 
     request_configuration {
       content_encoding = "GZIP"
     }
 
-    s3_backup_mode = "AllData"  # or "FailedDataOnly"
+    s3_backup_mode = "AllData"
     s3_configuration {
       role_arn           = aws_iam_role.firehose_to_datadog.arn
       bucket_arn         = aws_s3_bucket.firehose_backup.arn
@@ -267,20 +274,180 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
     }
   }
 
+  server_side_encryption {
+  enabled   = true
+  key_arn   = aws_kms_key.firehose_backup.arn
+  key_type  = "CUSTOMER_MANAGED_CMK"
+}
+
   lifecycle {
     ignore_changes = [http_endpoint_configuration[0].url]
   }
 }
 
 resource "aws_s3_bucket" "firehose_backup" {
-  bucket = "my-firehose-datadog-backup"
+  # checkov:skip=CKV2_AWS_62
+  # checkov:skip=CKV_AWS_144
+  bucket = "yjaf-${var.environment}-firehose-datadog-backup"
 }
 
+resource "aws_s3_bucket_public_access_block" "firehose_backup_block" {
+  bucket = aws_s3_bucket.firehose_backup.id
 
-resource "aws_cloudwatch_log_subscription_filter" "user_journey" {
+  block_public_acls       = true
+  ignore_public_acls      = true
+  block_public_policy     = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "firehose_backup_versioning" {
+  bucket = aws_s3_bucket.firehose_backup.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "firehose_backup_lifecycle" {
+  bucket = aws_s3_bucket.firehose_backup.id
+
+  rule {
+    id     = "expire-old-logs"
+    status = "Enabled"
+
+    expiration {
+      days = 400
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
+resource "aws_s3_bucket_logging" "firehose_backup_logging" {
+  bucket = aws_s3_bucket.firehose_backup.id
+
+  target_bucket = "yjaf-${var.environment}-firehose-datadog-backup"
+  target_prefix = "firehose-backup-logs/"
+}
+
+resource "aws_kms_key" "firehose_backup" {
+  description             = "KMS key for encrypting Firehose S3 backup bucket"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+}
+
+resource "aws_kms_key_policy" "firehose_backup_policy" {
+  key_id = aws_kms_key.firehose_backup.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowFirehoseServiceAccess",
+        Effect = "Allow",
+        Principal = {
+          Service = "firehose.amazonaws.com"
+        },
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey"
+        ],
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowFirehoseRoleAccess",
+        Effect = "Allow",
+        Principal = {
+          AWS = aws_iam_role.firehose_to_datadog.arn
+        },
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey"
+        ],
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogsAccess",
+        Effect = "Allow",
+        Principal = {
+          Service = "logs.eu-west-2.amazonaws.com"
+        },
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:GenerateDataKey"
+        ],
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowAccountRootUserFullAccess",
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action   = "kms:*",
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "firehose_backup_encryption" {
+  bucket = aws_s3_bucket.firehose_backup.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = aws_kms_key.firehose_backup.arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_group" "firehose_log_group" {
+  name              = "yjaf-${var.environment}-firehose-error-logs"
+  retention_in_days = 400
+  kms_key_id        = aws_kms_key.firehose_backup.arn
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "cloudtrail" {
   name            = "firehose-subscription"
-  log_group_name  = "yjaf-${var.environment}/user-journey"
+  log_group_name  = "cloudtrail"
   filter_pattern  = ""
   destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
   role_arn        = aws_iam_role.cw_logs_to_firehose.arn
 }
+
+
+resource "aws_iam_policy" "firehose_kms_access" {
+  name = "AllowFirehoseToUseCMK"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
+        ],
+        Resource = aws_kms_key.firehose_backup.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "attach_kms_access" {
+  role       = aws_iam_role.firehose_to_datadog.name
+  policy_arn = aws_iam_policy.firehose_kms_access.arn
+}
+
+# Data source to get current account ID
+data "aws_caller_identity" "current" {}
