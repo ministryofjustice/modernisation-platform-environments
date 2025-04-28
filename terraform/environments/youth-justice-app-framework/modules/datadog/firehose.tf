@@ -240,7 +240,7 @@ resource "aws_iam_policy" "firehose_kms_access" {
         ],
         Resource = [
           aws_kms_key.firehose_backup.arn,  
-          module.kms.key_arn
+          var.kms_key_arn
         ]
       }
     ]
