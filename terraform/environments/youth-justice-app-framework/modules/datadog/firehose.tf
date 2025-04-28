@@ -238,7 +238,10 @@ resource "aws_iam_policy" "firehose_kms_access" {
           "kms:GenerateDataKey",
           "kms:DescribeKey"
         ],
-        Resource = aws_kms_key.firehose_backup.arn
+        Resource = [
+          aws_kms_key.firehose_backup.arn,  
+          module.kms.key_arn
+        ]
       }
     ]
   })
