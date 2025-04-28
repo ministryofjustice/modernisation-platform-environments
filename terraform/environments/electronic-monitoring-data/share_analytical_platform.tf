@@ -12,6 +12,7 @@ locals {
     "allied_mdss",
     "staged_fms",
     "preprocessed_fms",
+    "curated_fms",
     "staging_fms",
     "staging_mdss",
     "intermediate_fms",
