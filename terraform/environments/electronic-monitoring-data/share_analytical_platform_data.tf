@@ -33,7 +33,7 @@ resource "aws_lakeformation_permissions" "share_table_with_ap" {
     database_name = "electronic_monitoring_${each.key}${local.dbt_suffix}"
     name          = each.value.table_name
   }
-  depends_on [aws_glue_catalog_database.db_resource_link]
+  depends_on = [aws_glue_catalog_database.db_resource_link]
 }
 
 resource "aws_lakeformation_permissions" "share_database_with_ap" {
@@ -52,7 +52,7 @@ resource "aws_lakeformation_permissions" "share_database_with_ap" {
   database {
     name = "electronic_monitoring_${each.key}${local.dbt_suffix}"
   }
-  depends_on [aws_glue_catalog_database.db_resource_link]
+  depends_on = [aws_glue_catalog_database.db_resource_link]
 }
 
 resource "aws_glue_catalog_database" "db_resource_link" {
