@@ -118,6 +118,7 @@ locals {
           subnet_name       = "private"
         })
         instance = merge(local.ec2_instances.rdgw.instance, {
+          instance_type = "t3.large"
           tags = {
             patch-manager = "group1"
           }
