@@ -4,7 +4,7 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   destination = "http_endpoint"
 
   http_endpoint_configuration {
-    url                = "https://http-intake.logs.datadoghq.eu/v1/input"
+    url                = "https://aws-kinesis-http-intake.logs.datadoghq.eu/v1/input"
     name               = "Datadog"
     access_key         = ""
     buffering_interval = 60
@@ -41,11 +41,7 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   enabled   = true
   key_arn   = aws_kms_key.firehose_backup.arn
   key_type  = "CUSTOMER_MANAGED_CMK"
-}
-
-  lifecycle {
-    ignore_changes = [http_endpoint_configuration[0].url]
-  }
+ }
 }
 
 
