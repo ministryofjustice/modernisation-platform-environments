@@ -209,26 +209,4 @@ module "calculate_checksum" {
 }
 
 
-#-----------------------------------------------------------------------------------
-# API Gateway authorizer
-#-----------------------------------------------------------------------------------
-
-module "api_gateway_authorizer" {
-  source                  = "./modules/lambdas"
-  is_image                = true
-  function_name           = "api_gateway_authorizer"
-  role_name               = aws_iam_role.api_gateway_authorizer.name
-  role_arn                = aws_iam_role.api_gateway_authorizer.arn
-  handler                 = "api_gateway_authorizer.handler"
-  memory_size             = 4096
-  timeout                 = 900
-  security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.shared-public.ids
-  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
-  production_dev          = local.is-production ? "prod" : "dev"
-  environment_variables = {
-    ENVIRONMENT_NAME = local.is-production ? "prod" : local.is-preproduction ? "preprod" : local.is-test ? "test" : "dev"
-  }
-}
-
 
