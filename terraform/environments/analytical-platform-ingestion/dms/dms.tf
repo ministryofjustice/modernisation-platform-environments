@@ -31,24 +31,25 @@ module "cica_dms_tariff_dms_implementation" {
   db          = local.tariff.short_resource_name
 
   dms_replication_instance = {
-      replication_instance_id    = local.tariff.resource_name
-      subnet_cidrs               = local.environment_configuration.connected_vpc_private_subnets
-      subnet_group_name          = local.tariff.resource_name
-      allocated_storage          = 20
-      availability_zone          = data.aws_availability_zones.available.names[0]
-      engine_version             = "3.5.4"
-      kms_key_arn                = module.cica_dms_credentials_kms.key_arn
-      multi_az                   = false
-      replication_instance_class = "dms.t3.large"
-      inbound_cidr               = local.environment_configuration.tariff_cidr
-      apply_immediately          = true
+    replication_instance_id    = local.tariff.resource_name
+    subnet_cidrs               = local.environment_configuration.connected_vpc_private_subnets
+    subnet_group_name          = local.tariff.resource_name
+    allocated_storage          = 20
+    availability_zone          = data.aws_availability_zones.available.names[0]
+    engine_version             = "3.5.4"
+    kms_key_arn                = module.cica_dms_credentials_kms.key_arn
+    multi_az                   = false
+    replication_instance_class = "dms.t3.large"
+    inbound_cidr               = local.environment_configuration.tariff_cidr
+    apply_immediately          = true
   }
   dms_source = {
-      engine_name                 = "oracle"
-      secrets_manager_arn         = module.cica_dms_tariff_database_credentials.secret_arn
-      secrets_manager_kms_arn     = module.cica_dms_credentials_kms.key_arn
-      sid                         = local.environment_configuration.source_database_sid
-      cdc_start_time              = "2025-03-10T12:00:00Z"
+    engine_name                 = "oracle"
+    protocol                    = "oracle"
+    secrets_manager_arn         = module.cica_dms_tariff_database_credentials.secret_arn
+    secrets_manager_kms_arn     = module.cica_dms_credentials_kms.key_arn
+    sid                         = local.environment_configuration.source_database_sid
+    cdc_start_time              = "2025-03-10T12:00:00Z"
   }
   dms_target_prefix = "cica_tariff"
   replication_task_id = {
@@ -80,7 +81,6 @@ module "cica_dms_tempus_dms_implementation" {
     source      = "../modules/dms"
     vpc_id      = data.aws_vpc.connected_vpc.id
     environment = local.environment
-
     db          = each.value.short_resource_name
 
     dms_replication_instance = {
@@ -98,6 +98,7 @@ module "cica_dms_tempus_dms_implementation" {
     }
     dms_source = {
         engine_name                 = "sqlserver"
+        protocol                    = "mssql+pymssql"
         secrets_manager_arn         = module.cica_dms_tempus_database_credentials.secret_arn
         secrets_manager_kms_arn     = module.cica_dms_credentials_kms.key_arn
         sid                         = each.value.database_name
