@@ -26,7 +26,8 @@ def _get_glue_client():
         "region_name": "eu-west-1"
     }
     glue_role_arn = os.getenv("GLUE_CATALOG_ROLE_ARN")
-    if glue_role_arn:
+    use_glue_catalog = os.getenv("USE_GLUE_CATALOG", "true").lower() == "true"
+    if use_glue_catalog and glue_role_arn:
         sts_connection = boto3.client('sts')
         acct_b = sts_connection.assume_role(
             RoleArn=glue_role_arn,
