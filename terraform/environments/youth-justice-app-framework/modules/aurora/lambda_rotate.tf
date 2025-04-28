@@ -107,7 +107,7 @@ resource "aws_lambda_permission" "allow_secrets_manager" {
   for_each      = toset(var.user_passwords_to_reset)
 
   # Add the secret arn suffix to the statemernt_id to ensure that it is unique.
-  statement_id  = format("AllowSecretsManagerInvoke-%s-%s" , each.value, reverse(split("-", aws_secretsmanager_secret.user_admin_secret[each.value].arn)[0]))
+  statement_id  = format("AllowSecretsManagerInvoke-%s-%s" , each.value, reverse(split("-", aws_secretsmanager_secret.user_admin_secret[each.value].arn))[0])
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.rds_secret_rotation.function_name
   principal     = "secretsmanager.amazonaws.com"
