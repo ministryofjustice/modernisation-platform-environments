@@ -338,8 +338,8 @@ resource "aws_s3_bucket_versioning" "moj-database-source-prod" {
 }
 
 resource "aws_s3_bucket_logging" "moj-database-source-prod" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-database-source-prod[0].id
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-database-source-prod[0].id
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/moj-database-source-prod-logs/"
 }
@@ -464,8 +464,8 @@ resource "aws_s3_bucket_versioning" "moj-report-source-prod" {
 }
 
 resource "aws_s3_bucket_logging" "moj-report-source-prod" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-report-source-prod[0].id
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-report-source-prod[0].id
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/moj-report-source-prod-logs/"
 }
@@ -956,14 +956,14 @@ resource "aws_s3_bucket_versioning" "moj-report-source-uat" {
 }
 
 resource "aws_s3_bucket_logging" "moj-report-source-uat" {
-  count  = local.is-preproduction == true ? 1 : 0
+  count         = local.is-preproduction == true ? 1 : 0
   bucket        = aws_s3_bucket.moj-report-source-uat[0].id
   target_bucket = aws_s3_bucket.moj-log-files-uat[0].id
   target_prefix = "s3-logs/moj-report-source-uat-logs/"
 }
 
 resource "aws_s3_bucket_public_access_block" "moj-report-source-uat" {
-  count  = local.is-preproduction == true ? 1 : 0
+  count                   = local.is-preproduction == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-report-source-uat[0].id
   block_public_acls       = true
   block_public_policy     = true
@@ -989,7 +989,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-uat" {
 
 
 resource "aws_s3_bucket_replication_configuration" "moj-report-source-uat-replication" {
-  count  = local.is-preproduction == true ? 1 : 0
+  count = local.is-preproduction == true ? 1 : 0
   # Must have bucket versioning enabled first
   depends_on = [aws_s3_bucket_versioning.moj-report-source-uat]
   role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_uat[0].arn

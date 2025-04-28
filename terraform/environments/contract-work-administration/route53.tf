@@ -28,7 +28,7 @@ resource "aws_route53_record" "app1" {
 
 # Note that this app2 referes to Application Server 2, not CM
 resource "aws_route53_record" "app2" {
-  count    = contains(["development", "testing"], local.environment) ? 0 : 1
+  count    = contains(["development", "test"], local.environment) ? 0 : 1
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.external.zone_id
   name     = "${local.appserver2_hostname}.${data.aws_route53_zone.external.name}"

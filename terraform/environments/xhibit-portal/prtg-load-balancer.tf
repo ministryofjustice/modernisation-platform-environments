@@ -308,7 +308,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values = [data.aws_caller_identity.current.account_id]
+      values   = [data.aws_caller_identity.current.account_id]
     }
 
     condition {
@@ -330,13 +330,13 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     actions = [
       "s3:GetBucketAcl"
     ]
-    effect = "Allow"
+    effect    = "Allow"
     resources = [aws_s3_bucket.prtg_logs[0].arn]
 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values = [data.aws_caller_identity.current.account_id]
+      values   = [data.aws_caller_identity.current.account_id]
     }
 
     condition {

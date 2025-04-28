@@ -21,9 +21,9 @@ resource "aws_security_group" "wardship_lb_sc" {
 
   // Allow all User IPs
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     description = "Defines access control rules for HTTPS. IP ranges and individual IP addresses permitted access"
     cidr_blocks = [
       "194.33.193.0/25",
@@ -48,9 +48,9 @@ resource "aws_security_group" "wardship_lb_sc" {
 
   // Replacement DOM1 allow list from Jaz Chan 11/6/24
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     description = "Replacement DOM1 allow list from Jaz Chan"
     cidr_blocks = [
       "20.26.11.71/32",
@@ -92,9 +92,9 @@ resource "aws_security_group" "lb_sc_pingdom" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     description = "Allow all European Pingdom IP addresses"
     cidr_blocks = [
       "94.75.211.73/32",
@@ -165,9 +165,9 @@ resource "aws_security_group" "lb_sc_pingdom_2" {
   vpc_id      = data.aws_vpc.shared.id
 
   ingress {
-    from_port = 443
-    to_port   = 443
-    protocol  = "tcp"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
     description = "Allow all European Pingdom IP addresses"
     cidr_blocks = [
       "5.172.196.188/32",

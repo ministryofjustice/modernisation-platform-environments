@@ -13,10 +13,7 @@ locals {
       vpc_single_nat_gateway     = false
 
       /* Transit Gateway */
-      transit_gateway_routes = [
-        "10.0.0.0/8",
-        "172.20.0.0/16"
-      ]
+      transit_gateway_routes = [] # development is not connected to the Transit Gateway
 
       /* Route53 */
       route53_zone = "compute.development.analytical-platform.service.justice.gov.uk"
@@ -44,6 +41,10 @@ locals {
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
+      /* Dashboard Service */
+      dashboard_service_auth0_domain = "dev-analytics-moj.eu.auth0.com"
+      dashboard_service_hostname = "dashboards.development.analytical-platform.service.justice.gov.uk"
+
       /* MWAA */
       airflow_version                 = "2.10.3"
       airflow_environment_class       = "mw1.small"
@@ -63,8 +64,10 @@ locals {
 
       /* Transit Gateway */
       transit_gateway_routes = [
-        "10.0.0.0/8",
-        "172.20.0.0/16"
+        "10.0.0.0/8",      # Internal 10.x.x.x
+        "172.20.0.0/16",   # Cloud Platform
+        "194.33.254.0/24", # SOP
+        "194.33.255.0/24", # SOP
       ]
 
       /* Route53 */
@@ -112,8 +115,10 @@ locals {
 
       /* Transit Gateway */
       transit_gateway_routes = [
-        "10.0.0.0/8",
-        "172.20.0.0/16"
+        "10.0.0.0/8",      # Internal 10.x.x.x
+        "172.20.0.0/16",   # Cloud Platform
+        "194.33.254.0/24", # SOP
+        "194.33.255.0/24", # SOP
       ]
 
       /* Route53 */
@@ -141,6 +146,10 @@ locals {
 
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
+
+      /* Dashboard Service */
+      dashboard_service_auth0_domain = "alpha-analytics-moj.eu.auth0.com"
+      dashboard_service_hostname = "dashboards.analytical-platform.service.justice.gov.uk"
 
       /* MWAA */
       airflow_version                 = "2.10.3"

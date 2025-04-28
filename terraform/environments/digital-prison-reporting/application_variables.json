@@ -38,6 +38,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -73,7 +75,8 @@
         "dps-testing",
         "dps-testing2",
         "dps-prison-reg",
-        "dps-manage-contac"
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -195,6 +198,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -228,7 +233,8 @@
         "dps-locations",
         "dps-calc-rel-date",
         "dps-prison-reg",
-        "dps-manage-contac"
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -350,6 +356,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -385,7 +393,8 @@
         "dps-locations",
         "dps-calc-rel-date",
         "dps-prison-reg",
-        "dps-manage-contac"
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -525,6 +534,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": false,
+      "enable_generate_dataset_lambda": false,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -558,7 +569,8 @@
         "dps-locations",
         "dps-calc-rel-date",
         "dps-prison-reg",
-        "dps-manage-contac"
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,

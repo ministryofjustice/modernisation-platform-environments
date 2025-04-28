@@ -402,7 +402,7 @@ resource "aws_iam_role_policy_attachment" "unlimited_athena_query" {
 }
 
 resource "aws_iam_role_policy_attachment" "ram_shares" {
-  role = aws_iam_role.dataapi_cross_role.name
+  role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.ram_shares.arn
 }
 
@@ -571,7 +571,7 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   for_each = local.analytical_platform_share
 
   role       = aws_iam_role.analytical_platform_share_role[each.key].name
-  policy_arn=   "arn:aws:iam::aws:policy/AWSLakeFormationDataAdmin"
+  policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationDataAdmin"
 }
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([

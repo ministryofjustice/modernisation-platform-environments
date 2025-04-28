@@ -47,9 +47,9 @@ resource "aws_instance" "cjip-server" {
 }
 
 resource "aws_ebs_volume" "cjip-disk1" {
-  
+
   # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
-  
+
   depends_on        = [aws_instance.cjip-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
