@@ -16,7 +16,7 @@ resource "aws_route53_record" "dbdns-ro" {
   name    = "db-yjafrds01-reader"
   type    = "CNAME"
   ttl     = 300
-  records = [module.aurora.rds_cluster_readonly_endpoint]
+  records = [module.aurora.rds_cluster_reader_endpoint]
 }
 
 resource "aws_route53_record" "redshift" {
