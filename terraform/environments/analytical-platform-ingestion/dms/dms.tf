@@ -5,17 +5,17 @@ locals {
     }
     tempus = {
         SPPFinishedJobs  = {
-            database_name = "spp_finished_jobs"
+            database_name = "SPPFinishedJobs"
             short_resource_name = "tempus-sppfj-${local.environment}"
             resource_name = "cica-ap-tempus-spp-finished-jobs-${local.environment}"
         }
         SPPProcessPlatform  = {
-            database_name = "spp_process_platform"
+            database_name = "SPPProcessPlatform"
             short_resource_name = "tempus-spppp-${local.environment}"
             resource_name = "cica-ap-tempus-spp-process-platform-${local.environment}"
         }
         CaseWork  = {
-            database_name = "case_work"
+            database_name = "CaseWork"
             short_resource_name = "tempus-cw-${local.environment}"
             resource_name = "cica-ap-tempus-case-work-${local.environment}"
         }
