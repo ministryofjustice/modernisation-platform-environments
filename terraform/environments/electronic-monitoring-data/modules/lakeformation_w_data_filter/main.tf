@@ -49,7 +49,7 @@ resource "aws_lakeformation_data_cells_filter" "data_filter" {
   for_each = tomap(var.table_filters)
   table_data {
     database_name    = var.database_name
-    name             = "filter-${each.key}"
+    name             = "filter-${each.key}-${each.value != "" ? each.value : "all-rows"}"
     table_catalog_id = data.aws_caller_identity.current.account_id
     table_name       = each.key
     column_wildcard {
