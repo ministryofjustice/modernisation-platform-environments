@@ -275,10 +275,10 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   }
 
   server_side_encryption {
-  enabled   = true
-  key_arn   = aws_kms_key.firehose_backup.arn
-  key_type  = "CUSTOMER_MANAGED_CMK"
-}
+    enabled  = true
+    key_arn  = aws_kms_key.firehose_backup.arn
+    key_type = "CUSTOMER_MANAGED_CMK"
+  }
 
   lifecycle {
     ignore_changes = [http_endpoint_configuration[0].url]

@@ -46,7 +46,7 @@ locals {
     for table in local.tables_to_share : table => ""
   }, local.am_table_filters)
   am_table_filters = {
-     for table in local.am_tables_to_share : table => ""
+    for table in local.am_tables_to_share : table => ""
   }
 
   resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)

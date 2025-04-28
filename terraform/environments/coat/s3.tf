@@ -6,30 +6,30 @@ module "cur_s3_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.1"
 
-  aliases               = ["s3/cur"]
-  description           = "S3 CUR KMS key"
-  enable_default_policy = true
+  aliases                 = ["s3/cur"]
+  description             = "S3 CUR KMS key"
+  enable_default_policy   = true
   deletion_window_in_days = 7
 
   key_statements = [
-      {
-        sid = "AllowReplicationRole"
-        actions = [
-          "kms:Encrypt*",
-          "kms:Decrypt*",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:Describe*"
-        ]
-        resources = ["*"]
-        effect    = "Allow"
-        principals = [
-          {
-            type        = "AWS"
-            identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
-          }
-        ]
-      }
+    {
+      sid = "AllowReplicationRole"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
+        }
+      ]
+    }
   ]
 
   tags = local.tags
@@ -114,24 +114,24 @@ module "focus_s3_kms" {
   description           = "S3 FOCUS KMS key"
   enable_default_policy = true
   key_statements = [
-      {
-        sid = "AllowReplicationRole"
-        actions = [
-          "kms:Encrypt*",
-          "kms:Decrypt*",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:Describe*"
-        ]
-        resources = ["*"]
-        effect    = "Allow"
-        principals = [
-          {
-            type        = "AWS"
-            identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
-          }
-        ]
-      }
+    {
+      sid = "AllowReplicationRole"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
+        }
+      ]
+    }
   ]
 
   deletion_window_in_days = 7
@@ -162,9 +162,9 @@ module "focus_reports" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "coat-${local.environment}-focus-reports"
+  bucket           = "coat-${local.environment}-focus-reports"
   object_ownership = "BucketOwnerEnforced"
-  force_destroy = true
+  force_destroy    = true
 
   attach_deny_insecure_transport_policy = true
   attach_policy                         = true

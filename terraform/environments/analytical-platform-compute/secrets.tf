@@ -216,8 +216,8 @@ module "dashboard_service_app_secrets" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.3.1"
 
-  name        = "dashboard-service/app-secrets"
-  kms_key_id  = module.common_secrets_manager_kms.key_arn
+  name       = "dashboard-service/app-secrets"
+  kms_key_id = module.common_secrets_manager_kms.key_arn
 
   secret_string = jsonencode({
     secret_key          = random_password.dashboard_service_secret_key[0].result,
