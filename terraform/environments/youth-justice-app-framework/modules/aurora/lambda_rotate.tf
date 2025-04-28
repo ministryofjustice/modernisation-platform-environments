@@ -102,15 +102,12 @@ resource "aws_iam_role_policy_attachment" "rds_secret_rotation_policy_attach_cus
   policy_arn = aws_iam_policy.rds_secret_rotation_policy.arn
 }
 
-locals {
-  arn_suffix = one(reverse(split("-", )))
-}
 
 resource "aws_lambda_permission" "allow_secrets_manager" {
   for_each      = toset(var.user_passwords_to_reset)
 
   # Add the secret arn suffix to the statemernt_id to ensure that it is unique.
-  statement_id  = "AllowSecretsManagerInvoke-${each.value}-${one(reverse(split("-", aws_secretsmanager_secret.user_admin_secret[each.value].arn)))}"
+  statement_id  = "AllowSecretsManagerInvoke-${each.value}-${one(reverse(split("-", "${aws_secretsmanager_secret.user_admin_secret[each.value].arn)))}"}
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.rds_secret_rotation.function_name
   principal     = "secretsmanager.amazonaws.com"
