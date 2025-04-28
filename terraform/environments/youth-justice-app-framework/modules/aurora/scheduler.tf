@@ -35,8 +35,6 @@ resource "aws_iam_policy" "scheduler_aurora_lambda_policy" {
             "Effect": "Allow",
             "Action": [
                 "rds:DescribeDBClusterParameters",
-                "rds:StartDBCluster",
-                "rds:StopDBCluster",
                 "rds:DescribeDBEngineVersions",
                 "rds:DescribeGlobalClusters",
                 "rds:DescribePendingMaintenanceActions",
@@ -55,6 +53,16 @@ resource "aws_iam_policy" "scheduler_aurora_lambda_policy" {
                 "rds:DescribeOptionGroups"
               ],
            "Resource": [
+              "arn:aws:rds:eu-west-2:${var.aws_account_id}:db:*"
+             ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "rds:StartDBCluster",
+                "rds:StopDBCluster"
+              ],
+            "Resource": [
               "${module.aurora.cluster_arn}"
              ]
         },
