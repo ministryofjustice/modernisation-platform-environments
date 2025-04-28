@@ -22,7 +22,9 @@ def _get_glue_client():
     """
     Return a glue client with an appropriate role
     """
-    glue_client_kwargs = {}
+    glue_client_kwargs = {
+        "region_name": "eu-west-1"
+    }
     glue_role_arn = os.getenv("GLUE_CATALOG_ROLE_ARN")
     if glue_role_arn:
         sts_connection = boto3.client('sts')
