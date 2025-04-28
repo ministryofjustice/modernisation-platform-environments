@@ -297,9 +297,13 @@ def handler(event, context):  # pylint: disable=unused-argument
     destination_bucket = os.getenv("GLUE_DESTINATION_BUCKET", raw_history_bucket)
     destination_prefix = os.getenv("GLUE_DESTINATION_PREFIX", "")
 
-    # TODO: Works for oracle databases. Need to add support for other databases
-    port = "1521"
-    dsn = f"{host}:{port}/?service_name={db_name}"
+    port = db_secret["port"]
+    if engine == "oracle":
+        dsn = f"{host}:{port}/?service_name={db_name}"
+    elif engine == "mssql+pymssql":
+        dsn = f"{host}:{port}/{db_name}?charset=utf8"
+    else:
+        raise ValueError(f"Supported engines: oracle, mssql+pymssql Got: {engine}")
 
     db_string = f"{engine}://{username}:{password}@{dsn}"
     engine = create_engine(db_string)

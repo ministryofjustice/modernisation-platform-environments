@@ -45,6 +45,7 @@ variable "replication_task_id" {
 
 variable "dms_source" {
   type = object({
+    protocol                    = string,
     engine_name                 = string,
     secrets_manager_arn         = string,
     secrets_manager_kms_arn     = string,
