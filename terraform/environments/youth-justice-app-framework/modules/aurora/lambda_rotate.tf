@@ -111,4 +111,6 @@ resource "aws_lambda_permission" "allow_secrets_manager" {
 
   # Restrict invocation to a specific AWS account
   source_arn = aws_secretsmanager_secret.user_admin_secret[each.value].arn
+
+  lifecycle { create_before_destroy = false }
 }
