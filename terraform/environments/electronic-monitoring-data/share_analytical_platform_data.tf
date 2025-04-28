@@ -64,3 +64,24 @@ resource "aws_glue_catalog_database" "db_resource_link" {
     database_name = "${each.key}${local.dbt_suffix}"
   }
 }
+
+resource "aws_glue_catalog_table" "tb_resource_link" {
+  provider = aws.eu_west_1
+  for_each                      = {for item in flatten([
+    for database_name, tables in local.tables_to_share_ap : [
+      for table_name in tables : {
+        database_name = database_name
+        table_name    = table_name
+      }
+    ]
+  ]): "${item.database_name}.${item.table_name}" => item}
+  name          = each.value.table_name
+  database_name = "electronic_monitoring_${each.value.database_name}${local.dbt_suffix}"
+
+  target_table {
+    catalog_id    = local.env_account_id
+    database_name = "${each.key}${local.dbt_suffix}"
+    name          = each.value.table_name
+    region        = "eu-west-2"
+  }
+}
