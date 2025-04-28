@@ -40,13 +40,19 @@ locals {
     "visit_details"
   ]
 
-  table_filters = merge({
-    for table in local.tables_to_share : table => "specials_flag=0"
-  }, local.am_table_filters)
+  table_filters = merge(
+    {
+      for table in local.tables_to_share : table => "specials_flag=0"
+    },
+    local.am_table_filters
+  )
 
-  specials_table_filters = merge({
-    for table in local.tables_to_share : table => ""
-  }, local.am_table_filters)
+  specials_table_filters = merge(
+    {
+      for table in local.tables_to_share : table => ""
+    },
+    local.am_table_filters
+  )
 
   am_table_filters = {
      for table in local.am_tables_to_share : table => ""
