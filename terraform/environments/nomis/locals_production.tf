@@ -220,11 +220,11 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      # NOT-ACTIVE (blue deployment)
+      # NOT-ACTIVE (blue deployment) - for testing Combined Reporting
       prod-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 0
+          desired_capacity = 1
+          max_size         = 1
         })
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -242,10 +242,11 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment    = "prod"
-          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
-          oracle-db-name       = "PCNOM"
+          nomis-environment     = "prod"
+          oracle-db-hostname-a  = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b  = "pnomis-b.production.nomis.service.justice.gov.uk"
+          oracle-db-name        = "PCNOM"
+          reporting-environment = "aws"
         })
       })
 
