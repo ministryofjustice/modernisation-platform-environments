@@ -649,6 +649,7 @@ variable "lbs" {
     s3_versioning                    = optional(bool, true)
     instance_target_groups = optional(map(object({
       port                 = optional(number)
+      preserve_client_ip   = optional(bool)
       protocol             = optional(string)
       deregistration_delay = optional(number)
       health_check = optional(object({

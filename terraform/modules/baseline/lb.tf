@@ -62,6 +62,7 @@ resource "aws_lb_target_group" "instance" {
 
   name                 = each.key
   port                 = each.value.port
+  preserve_client_ip   = each.value.preserve_client_ip
   protocol             = each.value.protocol
   target_type          = "instance"
   deregistration_delay = each.value.deregistration_delay

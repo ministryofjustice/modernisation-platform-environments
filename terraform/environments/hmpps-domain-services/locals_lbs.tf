@@ -16,8 +16,9 @@ locals {
 
       instance_target_groups = {
         https = {
-          port     = 443
-          protocol = "TCP"
+          port               = 443
+          preserve_client_ip = false
+          protocol           = "TCP"
           health_check = {
             enabled             = true
             interval            = 5
