@@ -30,9 +30,11 @@ locals {
     "violations",
     "visit_details"
   ]
+
   table_filters = {
     for table in local.tables_to_share : table => "specials_flag=0"
   }
+
   specials_table_filters = {
     for table in local.tables_to_share : table => ""
   }
