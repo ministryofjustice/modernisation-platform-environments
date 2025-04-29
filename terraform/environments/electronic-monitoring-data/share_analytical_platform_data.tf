@@ -11,7 +11,7 @@ locals {
 resource "aws_lakeformation_permissions" "share_cadt_bucket" {
   for_each = nonsensitive(toset(local.principals_to_share_with))
 
-  principal = each.value.principal
+  principal = each.value
   permissions = ["DATA_LOCATION_ACCESS"]
   permissions_with_grant_option = ["DATA_LOCATION_ACCESS"]
 
