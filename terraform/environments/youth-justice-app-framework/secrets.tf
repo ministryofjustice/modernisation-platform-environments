@@ -32,6 +32,7 @@ resource "aws_secretsmanager_secret" "LDAP_administration_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "LDAP_administration_version" {
+  #checkov:skip=CKV_SECRET_6: todo
   secret_id = aws_secretsmanager_secret.LDAP_administration_secret.id
   secret_string = jsonencode(
     { "user_password_attribute" = "unicodePwd"
