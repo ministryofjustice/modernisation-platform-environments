@@ -23,7 +23,7 @@ resource "aws_lakeformation_permissions" "share_cadt_bucket" {
 resource "aws_lakeformation_permissions" "share_table_with_ap" {
   for_each = {
     for pair in flatten([
-      for principal in local.principals_to_share_with : [
+      for principal in toset(local.principals_to_share_with) : [
         for database_name, tables in local.tables_to_share_ap : [
           for table_name in tables : {
             key = "${principal}:${database_name}.${table_name}"
@@ -50,7 +50,7 @@ resource "aws_lakeformation_permissions" "share_table_with_ap" {
 resource "aws_lakeformation_permissions" "share_database_with_ap" {
   for_each = {
     for pair in flatten([
-      for principal in local.principals_to_share_with : [
+      for principal in toset(local.principals_to_share_with) : [
         for database_name, tables in local.tables_to_share_ap : [
           for table_name in tables : {
             key = "${principal}:${database_name}.${table_name}"
