@@ -68,7 +68,7 @@ resource "aws_lakeformation_permissions" "share_data_cell_filter_with_ap" {
   data_cells_filter {
     database_name    = "${each.key}${local.dbt_suffix}"
     name             =  "${each.value.table_name}_general_filter"
-    table_catalog_id = data.aws_caller_identity.current.saccount_id
+    table_catalog_id = data.aws_caller_identity.current.account_id
     table_name       = each.value.table_name
   }
 }
