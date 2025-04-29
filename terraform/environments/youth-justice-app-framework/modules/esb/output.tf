@@ -17,5 +17,5 @@ output "esb_instance_private_ip" {
 }
 
 output "debug_ami" {
-  value = var.ami  # Referencing the variable directly
+  value = var.ami # Referencing the variable directly
 }
