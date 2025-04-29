@@ -33,7 +33,7 @@ module "ecs_service_datadog_agent" {
       essential = true
 
       readonly_root_filesystem = false
-
+      privileged               = true
       secrets = [
         {
           name      = "DD_API_KEY"
@@ -70,7 +70,7 @@ module "ecs_service_datadog_agent" {
         },
         {
           "name" : "DD_SYSTEM_PROBE_ENABLED",
-          "value" : "true"
+          "value" : "false" #todo fix this
         },
         {
           "name" : "DD_TAGS",

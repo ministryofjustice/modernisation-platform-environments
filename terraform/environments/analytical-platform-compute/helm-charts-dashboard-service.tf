@@ -1,7 +1,6 @@
 resource "helm_release" "dashboard_service" {
-  # count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
-  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
-
+  count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
+  
   /* https://github.com/ministryofjustice/analytical-platform-dashboard-service */
   name       = "dashboard-service"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
