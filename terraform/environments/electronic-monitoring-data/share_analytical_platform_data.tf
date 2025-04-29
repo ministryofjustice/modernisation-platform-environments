@@ -29,7 +29,7 @@ resource "aws_lakeformation_permissions" "share_table_with_ap" {
   permissions                   = ["DESCRIBE"]
   permissions_with_grant_option = ["DESCRIBE"]
   table {
-    database_name = "${each.key}${local.dbt_suffix}"
+    database_name = "${each.value.database_name}${local.dbt_suffix}"
     name          = each.value.table_name
   }
 }
@@ -48,6 +48,6 @@ resource "aws_lakeformation_permissions" "share_database_with_ap" {
   permissions                   = ["DESCRIBE"]
   permissions_with_grant_option = ["DESCRIBE"]
   database {
-    name = "${each.key}${local.dbt_suffix}"
+    name = "${each.value.database_name}${local.dbt_suffix}"
   }
 }
