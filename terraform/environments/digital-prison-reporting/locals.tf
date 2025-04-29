@@ -305,7 +305,7 @@ locals {
 
   # Nomis Secrets PlaceHolder
   nomis_secrets_placeholder = {
-    db_name  = "nomis"
+    db_name = "nomis"
     #checkov:skip=CKV_SECRET_6 This is a placeholder secret that is replaced with the real thing
     password = "placeholder"
     # We need to duplicate the username with 'user' and 'username' keys

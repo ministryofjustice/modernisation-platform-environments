@@ -89,7 +89,7 @@ resource "aws_lakeformation_permissions" "share_table_with_role" {
   permissions                   = ["DESCRIBE"]
   permissions_with_grant_option = ["DESCRIBE"]
   table {
-    database_name    = var.database_name
-    name       = each.key
+    database_name = var.database_name
+    name          = each.key
   }
 }
