@@ -202,7 +202,7 @@ resource "aws_iam_policy" "firehose_policy" {
           "logs:DescribeLogStreams",
           "logs:GetLogEvents"
         ],
-        Resource = "arn:aws:logs:eu-west-2:711387140977:log-group:yjaf-development-firehose-error-logs"
+        Resource = aws_cloudwatch_log_group.firehose_log_group.arn
       },
       {
         Sid = "cloudWatchLog",
