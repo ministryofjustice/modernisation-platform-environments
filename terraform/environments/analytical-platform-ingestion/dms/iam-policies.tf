@@ -65,9 +65,9 @@ module "production_replication_cica_dms_iam_policy" {
 
 data "aws_iam_policy_document" "eventbridge_dms_full_load_task_policy" {
   statement {
-    sid = "AllowDmsTaskAccess"
-    effect = "Allow"
-    actions = ["dms:StartReplicationTask"]
+    sid       = "AllowDmsTaskAccess"
+    effect    = "Allow"
+    actions   = ["dms:StartReplicationTask"]
     resources = [module.cica_dms_tariff_dms_implementation.dms_full_load_task_arn]
   }
 }

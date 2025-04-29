@@ -15,15 +15,15 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
-  resource "aws_lakeformation_lf_tag" "domain_tag" {
-    key    = "domain"
-    values = ["prisons", "probation", "electonic-monitoring"]
-  }
+resource "aws_lakeformation_lf_tag" "domain_tag" {
+  key    = "domain"
+  values = ["prisons", "probation", "electonic-monitoring"]
+}
 
-  resource "aws_lakeformation_lf_tag" "sensitive_tag" {
-    key    = "sensitive"
-    values = ["true", "false", "data_linking"]
-  }
+resource "aws_lakeformation_lf_tag" "sensitive_tag" {
+  key    = "sensitive"
+  values = ["true", "false", "data_linking"]
+}
 
 resource "aws_lakeformation_permissions" "domain_grant" {
   principal   = aws_iam_role.dataapi_cross_role.arn
