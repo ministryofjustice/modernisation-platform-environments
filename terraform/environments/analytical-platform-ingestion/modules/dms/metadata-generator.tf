@@ -133,14 +133,14 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
 # Role policy to conditionally allow lambda to assume role
 resource "aws_iam_role_policy" "metadata_generator_lambda_function_assume_role" {
   count = (var.glue_catalog_role_arn != "") ? 1 : 0
-  role = module.metadata_generator.lambda_role_name
+  role  = module.metadata_generator.lambda_role_name
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action = ["sts:AssumeRole"]
-        Effect = "Allow"
+        Action   = ["sts:AssumeRole"]
+        Effect   = "Allow"
         Resource = var.glue_catalog_role_arn
       },
     ]
@@ -169,7 +169,7 @@ resource "aws_s3_object" "dms_mapping_rules" {
   bucket = aws_s3_bucket.lambda.bucket
   key    = "metadata-generator/config/dms_mapping_rules.json"
   source = var.dms_mapping_rules
-  etag = filemd5(var.dms_mapping_rules)
+  etag   = filemd5(var.dms_mapping_rules)
 }
 
 module "metadata_generator" {

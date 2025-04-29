@@ -4,8 +4,8 @@ locals {
   mdss_supplier_account_mapping = {
     "production"    = null
     "preproduction" = null
-    "test" = null
-    "development" = null
+    "test"          = null
+    "development"   = null
   }
 
   p1_export_bucket_destination_mapping = {
