@@ -169,6 +169,42 @@ locals {
           nomis-combined-reporting-environment = "pd"
         })
       })
+
+      pd-ncr-web-2 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-web-3 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-web-4 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
     }
 
     efs = {
