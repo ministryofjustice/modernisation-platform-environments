@@ -345,6 +345,16 @@ locals {
     port     = "0"
   }
 
+  # nDelius Secrets PlaceHolder
+  ndelius_secrets_placeholder = {
+    db_name  = "ndelius"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
   # DPS Secrets PlaceHolder
   dps_domains_list = local.application_data.accounts[local.environment].dps_domains
   dps_secrets_placeholder = {
