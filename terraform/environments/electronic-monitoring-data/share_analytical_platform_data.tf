@@ -24,22 +24,16 @@ resource "aws_lakeformation_permissions" "share_table_with_ap" {
   for_each = {
     for pair in flatten([
       for principal in local.principals_to_share_with : [
-        for item in flatten([
-          for database_name, tables in local.tables_to_share_ap : [
-            for table_name in tables : {
+        for database_name, tables in local.tables_to_share_ap : [
+          for table_name in tables : {
+            key = "${principal}:${database_name}.${table_name}"
+            value = {
               database_name = database_name
               table_name    = table_name
               principal     = principal
             }
-          ]
-        ]) : {
-          key = "${principal}:${item.database_name}.${item.table_name}"
-          value = {
-            database_name = item.database_name
-            table_name    = item.table_name
-            principal     = principal
           }
-        }
+        ]
       ]
     ]) : pair.key => pair.value
   }
@@ -57,22 +51,16 @@ resource "aws_lakeformation_permissions" "share_database_with_ap" {
   for_each = {
     for pair in flatten([
       for principal in local.principals_to_share_with : [
-        for item in flatten([
-          for database_name, tables in local.tables_to_share_ap : [
-            for table_name in tables : {
+        for database_name, tables in local.tables_to_share_ap : [
+          for table_name in tables : {
+            key = "${principal}:${database_name}.${table_name}"
+            value = {
               database_name = database_name
               table_name    = table_name
               principal     = principal
             }
-          ]
-        ]) : {
-          key = "${principal}:${item.database_name}.${item.table_name}"
-          value = {
-            database_name = item.database_name
-            table_name    = item.table_name
-            principal     = principal
           }
-        }
+        ]
       ]
     ]) : pair.key => pair.value
   }
