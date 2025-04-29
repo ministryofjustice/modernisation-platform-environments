@@ -8,7 +8,7 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
     name               = "Datadog"
     access_key         = ""
     buffering_interval = 60
-    buffering_size     = 1
+    buffering_size     = 4
     role_arn           = aws_iam_role.firehose_to_datadog.arn
 
     cloudwatch_logging_options {
@@ -178,7 +178,9 @@ resource "aws_iam_role_policy" "cw_logs_to_firehose_policy" {
         Effect = "Allow",
         Action = [
           "firehose:PutRecord",
-          "firehose:PutRecordBatch"
+          "firehose:PutRecordBatch",
+          "kinesis:PutRecord",
+          "kinesis:PutRecords"
         ],
         Resource = aws_kinesis_firehose_delivery_stream.to_datadog.arn
       }
@@ -188,7 +190,7 @@ resource "aws_iam_role_policy" "cw_logs_to_firehose_policy" {
 
 resource "aws_iam_policy" "firehose_policy" {
   name        = "FirehoseToDatadogPolicy"
-  description = "Allows Firehose to send data to Datadog"
+  description = "Allows Firehose to send data to Datadog, write logs, and access S3 for backups"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -200,7 +202,30 @@ resource "aws_iam_policy" "firehose_policy" {
           "logs:DescribeLogStreams",
           "logs:GetLogEvents"
         ],
-        Resource = aws_cloudwatch_log_group.firehose_log_group.arn
+        Resource = "arn:aws:logs:eu-west-2:711387140977:log-group:yjaf-development-firehose-error-logs"
+      },
+      {
+        Sid = "cloudWatchLog",
+        Effect = "Allow",
+        Action = [
+          "logs:PutLogEvents"
+        ],
+        Resource = [
+          "arn:aws:logs:eu-west-2:711387140977:log-group:*"
+        ]
+      },
+      {
+        Sid = "s3Permissions",
+        Effect = "Allow",
+        Action = [
+          "s3:AbortMultipartUpload",
+          "s3:GetBucketLocation",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:ListBucketMultipartUploads",
+          "s3:PutObject"
+        ],
+        Resource = "*"
       }
     ]
   })
