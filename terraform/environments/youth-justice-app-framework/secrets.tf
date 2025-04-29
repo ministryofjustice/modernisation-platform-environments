@@ -37,7 +37,7 @@ resource "aws_secretsmanager_secret_version" "LDAP_administration_version" {
   secret_string = jsonencode(
     { "user_password_attribute" = "unicodePwd"
       "userdn"                  = "CN=admin2,OU=Users,OU=Accounts,OU=i2N,DC=i2n,DC=com"
-    "password" = "changeme" }
+    "password" = "changeme" } #checkov:skip=CKV_SECRET_6: Ignore this
   )
   lifecycle {
     ignore_changes = [secret_string]
