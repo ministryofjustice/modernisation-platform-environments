@@ -51,24 +51,3 @@ resource "aws_lakeformation_permissions" "share_database_with_ap" {
     name = "${each.key}${local.dbt_suffix}"
   }
 }
-
-resource "aws_lakeformation_permissions" "share_data_cell_filter_with_ap" {
-  # provider = aws.eu_west_1
-  for_each                      = {for item in flatten([
-    for database_name, tables in local.tables_to_share_ap : [
-      for table_name in tables : {
-        database_name = database_name
-        table_name    = table_name
-      }
-    ]
-  ]): "${item.database_name}.${item.table_name}" => item}
-  principal                     = local.environment_management.account_ids["analytical-platform-data-production"]
-  permissions                   = ["SELECT"]
-  permissions_with_grant_option = ["SELECT"]
-  data_cells_filter {
-    database_name    = "${each.key}${local.dbt_suffix}"
-    name             =  "${each.value.table_name}_general_filter"
-    table_catalog_id = data.aws_caller_identity.current.account_id
-    table_name       = each.value.table_name
-  }
-}
