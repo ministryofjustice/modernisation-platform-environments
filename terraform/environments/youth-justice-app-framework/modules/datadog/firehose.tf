@@ -210,9 +210,7 @@ resource "aws_iam_policy" "firehose_policy" {
         Action = [
           "logs:PutLogEvents"
         ],
-        Resource = [
-          "arn:aws:logs:eu-west-2:711387140977:log-group:*"
-        ]
+        Resource = aws_cloudwatch_log_group.firehose_log_group.arn
       },
       {
         Sid = "s3Permissions",
@@ -225,7 +223,10 @@ resource "aws_iam_policy" "firehose_policy" {
           "s3:ListBucketMultipartUploads",
           "s3:PutObject"
         ],
-        Resource = "*"
+        Resource = [
+          aws_s3_bucket.firehose_backup.arn,       
+          "${aws_s3_bucket.firehose_backup.arn}/*"  
+        ]
       }
     ]
   })
