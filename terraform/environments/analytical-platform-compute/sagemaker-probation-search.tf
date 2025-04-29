@@ -7,13 +7,15 @@ locals {
   probation_search_environments = {
     analytical-platform-compute-development = {
       hmpps-probation-search-dev = {
-        namespace       = "hmpps-probation-search-dev"                            # MOJ Cloud Platform namespace where OpenSearch is hosted
-        instance_type   = "ml.t2.large"                                           # SageMaker AI Real-time Inference instance type to use
-        repository_name = "tei-cpu"                                               # "tei" for GPU-accelerated instances, "tei-cpu" for CPU-only instances
-        image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"                  # Version of the Hugging Face Text Embeddings Inference image to use. See https://huggingface.co/docs/text-embeddings-inference.
-        s3_model_key    = "ext/fine_tune_testing/fine_tune_test_senttrans_mixedbread-ai_mxbai-embed-large-v1/" # To use a local model from S3
-        environment = {                                                           # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
-          HF_MODEL_ID           = "/opt/ml/model"                                 # Specifies the model to load from Hugging Face Hub, if you are specifying s3_model_key, this should be set to "/opt/ml/model"
+        namespace       = "hmpps-probation-search-dev"           # MOJ Cloud Platform namespace where OpenSearch is hosted
+        instance_type   = "ml.m5.xlarge"                         # SageMaker AI Real-time Inference instance type to use
+        repository_name = "tei-cpu"                              # "tei" for GPU-accelerated instances, "tei-cpu" for CPU-only instances
+        image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04" # Version of the Hugging Face Text Embeddings Inference image to use. See:
+        #  * https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/image_uri_config/huggingface-tei.json for latest versions for GPU-accelerated instances
+        #  * https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/image_uri_config/huggingface-tei-cpu.json for latest versions for CPU-only instances
+        s3_model_key = "ext/mixedbread-ai/mixedbread-ai_mxbai-embed-large-v1/" # To use a local model from S3
+        environment = {                                                        # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
+          HF_MODEL_ID           = "/opt/ml/model"                              # Specifies the model to load from Hugging Face Hub. If you are specifying s3_model_key, this should be set to "/opt/ml/model"
           MAX_CLIENT_BATCH_SIZE = 512
         }
       }
@@ -21,9 +23,9 @@ locals {
     analytical-platform-compute-production = {
       hmpps-probation-search-preprod = {
         namespace       = "hmpps-probation-search-preprod"
-        instance_type   = "ml.t2.large"
-        repository_name = "tei-cpu"
-        image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04"
+        instance_type   = "ml.g6.xlarge"
+        repository_name = "tei"
+        image_tag       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
         environment = {
           HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
           MAX_CLIENT_BATCH_SIZE = 512
@@ -124,7 +126,7 @@ module "probation_search_sagemaker_execution_iam_role" {
   for_each = tomap(local.probation_search_environment)
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
+  version = "5.55.0"
 
   create_role = true
 
@@ -179,7 +181,7 @@ module "probation_search_sagemaker_invocation_iam_role" {
   for_each = tomap(local.probation_search_environment)
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
+  version = "5.55.0"
 
   create_role = true
 

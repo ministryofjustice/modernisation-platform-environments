@@ -8,7 +8,7 @@ Version using version.txt file for now, we will move to remote modules and git r
 
 Cutover involves creating a manual snapshot in the source account, making the snapshot available to the destination account, restoring the snapshot on the destination account, generating a new admin password and saving it in the redshift secret.
 
-### Crete a Manual Snapshot ###
+### Create a Manual Snapshot ###
 1. In the AWS Management Console for the source account, on the `Servless dashboard`, click on the `Total snapshots` link to view the `Snapshots`.
 2. Select `Create snapshot`.
 3. Enter details for the snapshot:
