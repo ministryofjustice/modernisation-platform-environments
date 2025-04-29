@@ -7,7 +7,6 @@ import sys
 from datetime import datetime
 
 import boto3
-import oracledb
 from aws_xray_sdk.core import patch_all, xray_recorder
 from dotenv import load_dotenv
 from mojap_metadata import Metadata
@@ -51,8 +50,6 @@ logger.setLevel(log_level)
 secretsmanager = boto3.client("secretsmanager")
 s3 = boto3.client("s3")
 glue = _get_glue_client()
-oracledb.version = "8.3.0"
-sys.modules["cx_Oracle"] = oracledb
 load_dotenv()
 
 extraction_columns = [
