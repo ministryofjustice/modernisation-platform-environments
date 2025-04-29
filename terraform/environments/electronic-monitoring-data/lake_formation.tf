@@ -28,6 +28,12 @@ resource "aws_lakeformation_data_lake_settings" "admin_definition" {
   )
 }
 
+resource "aws_lakeformation_data_lake_settings" "cross_account_version" {
+  parameters = {
+    "CROSS_ACCOUNT_VERSION" = "4"
+  }
+}
+
 resource "aws_lakeformation_data_lake_settings" "admin_definition_ireland" {
   provider = aws.eu_west_1
   admins   = flatten(
