@@ -18,7 +18,7 @@ module "ecs" {
 
   #ECS details
   cluster_name         = "yjaf-cluster"
-  ec2_instance_type    = "m5.large"
+  ec2_instance_type    = "m5.xlarge"
   ec2_min_size         = 16
   ec2_max_size         = 16
   ec2_desired_capacity = 16
