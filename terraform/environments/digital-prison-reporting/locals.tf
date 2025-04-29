@@ -1,6 +1,8 @@
 #### This file can be used to store locals specific to the member account ####
 #### DPR Specific ####
 locals {
+
+  is_dev_or_test       = local.is-development || local.is-test
   project              = local.application_data.accounts[local.environment].project_short_id
   analytics_project_id = "analytics"
 
@@ -188,7 +190,7 @@ locals {
   lambda_redshift_table_expiry_memory_size         = 1024
 
   # Scheduled Dataset Lambda
-  lambda_scheduled_dataset_enabled        = true
+  lambda_scheduled_dataset_enabled        = local.application_data.accounts[local.environment].enable_scheduled_dataset_lambda
   lambda_scheduled_dataset_name           = "${local.project}-scheduled-dataset"
   lambda_scheduled_dataset_runtime        = "java21"
   lambda_scheduled_dataset_tracing        = "Active"
@@ -211,7 +213,7 @@ locals {
   lambda_scheduled_dataset_memory_size         = 1024
 
   # Generate Dataset Lambda
-  lambda_generate_dataset_enabled        = true
+  lambda_generate_dataset_enabled        = local.application_data.accounts[local.environment].enable_generate_dataset_lambda
   lambda_generate_dataset_name           = "${local.project}-generate-dataset"
   lambda_generate_dataset_runtime        = "java21"
   lambda_generate_dataset_tracing        = "Active"
@@ -303,7 +305,8 @@ locals {
 
   # Nomis Secrets PlaceHolder
   nomis_secrets_placeholder = {
-    db_name  = "nomis"
+    db_name = "nomis"
+    #checkov:skip=CKV_SECRET_6 This is a placeholder secret that is replaced with the real thing
     password = "placeholder"
     # We need to duplicate the username with 'user' and 'username' keys
     user     = "placeholder"
@@ -320,6 +323,26 @@ locals {
     username = "placeholder"
     endpoint = "0.0.0.0" # In dev this is always manually set to the static_private_ip of the ec2_kinesis_agent acting as a tunnel to NOMIS
     port     = "1522"
+  }
+
+  # OASys Secrets PlaceHolder
+  oasys_secrets_placeholder = {
+    db_name  = "oasys"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
+  # ONR Secrets PlaceHolder
+  onr_secrets_placeholder = {
+    db_name  = "onr"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
   }
 
   # DPS Secrets PlaceHolder
@@ -438,4 +461,6 @@ locals {
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"
   ]
+
+  create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 }

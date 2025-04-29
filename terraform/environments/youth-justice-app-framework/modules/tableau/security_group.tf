@@ -56,10 +56,14 @@ module "tableau_sg" {
       rule                     = "redshift-tcp"
       source_security_group_id = var.redshift_sg_id
     },
-   {
+    {
       rule                     = "ssh-tcp"
       source_security_group_id = var.yjsm_sg_id
     },
+    {
+      rule                     = "ssh-tcp"
+      source_security_group_id = var.esb_sg_id
+    }
   ]
 }
 
@@ -103,11 +107,11 @@ module "management_service_sg" {
       source_security_group_id = module.tableau_sg.security_group_id
     },
     {
-      rule = "ssh-tcp"
+      rule                     = "ssh-tcp"
       source_security_group_id = module.tableau_sg.security_group_id
     },
     {
-      rule = "ssh-tcp"
+      rule                     = "ssh-tcp"
       source_security_group_id = var.yjsm_sg_id
     }
   ]

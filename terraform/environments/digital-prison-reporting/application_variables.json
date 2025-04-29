@@ -38,6 +38,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -72,7 +74,9 @@
         "dps-mj-and-ma",
         "dps-testing",
         "dps-testing2",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -153,7 +157,8 @@
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
-      "enable_s3_data_migrate_lambda": true
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -193,6 +198,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -225,7 +232,9 @@
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -306,7 +315,8 @@
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
-      "enable_s3_data_migrate_lambda": true
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -346,6 +356,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -380,7 +392,9 @@
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -479,7 +493,8 @@
         }
       ],
       "redshift_table_expiry_days": 7,
-      "enable_s3_data_migrate_lambda": true
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -519,6 +534,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": false,
+      "enable_generate_dataset_lambda": false,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -551,7 +568,9 @@
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -647,7 +666,8 @@
         }
       ],
       "redshift_table_expiry_days": 1,
-      "enable_s3_data_migrate_lambda": false
+      "enable_s3_data_migrate_lambda": false,
+      "create_postgres_load_generator_job": false
     }
   }
 }

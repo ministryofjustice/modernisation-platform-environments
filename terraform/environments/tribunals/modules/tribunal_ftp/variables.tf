@@ -9,7 +9,7 @@ variable "module_name" {
 }
 
 variable "environment" {
-  type        = string
+  type = string
 }
 
 variable "task_definition_volume" {
@@ -53,7 +53,7 @@ variable "cluster_id" {
 }
 
 variable "cluster_name" {
-  type = string
+  type        = string
   description = "Name of the cluster"
 }
 

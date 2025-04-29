@@ -158,7 +158,7 @@ locals {
         metric_name         = "cpu_usage_iowait"
         namespace           = "CWAgent"
         period              = "60"
-        statistic           = "Maximum"
+        statistic           = "Average"
         threshold           = "40"
         alarm_description   = "Triggers if the amount of CPU time spent waiting for I/O to complete is continually high for 3 hours. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4325900634"
         alarm_actions       = var.options.cloudwatch_metric_alarms_default_actions

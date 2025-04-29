@@ -11,18 +11,19 @@ module "esb" {
   # Assigning private IP based on environment
   private_ip = lookup(
     {
-      development     = "10.26.144.217"
-      test            = "10.26.152.88"
-      preproduction   = "10.27.144.238"
+      development   = "10.26.144.217"
+      test          = "10.26.152.88"
+      preproduction = "10.27.144.238"
       # Add more environments when IP is known
     },
     local.environment,
     null # Default to null, allowing AWS to auto-assign an IP
   )
 
+  # Choose the AMI, defaulting to the default AMI if not found(doesnt work try and fix)
   ami = lookup(
     {
-      development   = "ami-0fc27ddcf3e4e76af"
+      development   = "ami-0cc0dad47bc769c08"
       preproduction = "ami-04a6fa2443473cfd5"
       # Add more environments when AMIs are known
     },
@@ -35,8 +36,8 @@ module "esb" {
   tags         = local.tags
 
   yjsm_service_sg_id = module.yjsm.yjsm_security_group_id
-  
+
   #Keep until prod images are done
-  tableau_sg_id                 = module.tableau.tableau_sg_id
+  tableau_sg_id = module.tableau.tableau_sg_id
 
 }

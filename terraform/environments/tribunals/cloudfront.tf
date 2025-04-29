@@ -10,8 +10,8 @@ resource "aws_cloudfront_distribution" "tribunals_distribution" {
 
   logging_config {
     include_cookies = false
-    bucket         = aws_s3_bucket.cloudfront_logs.bucket_domain_name
-    prefix         = "cloudfront-logs/"
+    bucket          = aws_s3_bucket.cloudfront_logs.bucket_domain_name
+    prefix          = "cloudfront-logs/"
   }
 
   aliases = local.is-production ? [
@@ -230,7 +230,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "cloudfront_logs" {
     status = "Enabled"
 
     filter {
-      prefix = ""  //Empty prefix means apply to all objects
+      prefix = "" //Empty prefix means apply to all objects
     }
 
     abort_incomplete_multipart_upload {
@@ -246,7 +246,7 @@ resource "aws_cloudfront_response_headers_policy" "security_headers_policy" {
   security_headers_config {
     content_security_policy {
       content_security_policy = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-      override = true
+      override                = true
     }
     strict_transport_security {
       access_control_max_age_sec = 31536000

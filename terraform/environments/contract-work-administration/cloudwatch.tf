@@ -175,7 +175,7 @@ resource "aws_cloudwatch_metric_alarm" "app1_ec2_status_check" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "app2_ec2_status_check" {
-  count               = contains(["development", "testing"], local.environment) ? 0 : 1
+  count               = contains(["development", "test"], local.environment) ? 0 : 1
   alarm_name          = "${local.application_name_short}-${local.environment}-app2-ec2-status-check"
   alarm_description   = "App2 EC2 Instance Status Check Failed"
   comparison_operator = "GreaterThanOrEqualToThreshold"
@@ -1010,7 +1010,7 @@ resource "aws_cloudwatch_metric_alarm" "app1_apache_process" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "app2_f60srvm_process" {
-  count               = contains(["development", "testing"], local.environment) ? 0 : 1
+  count               = contains(["development", "test"], local.environment) ? 0 : 1
   alarm_name          = "${local.application_name_short}-${local.environment}-app2-f60srvm-process"
   alarm_description   = ""
   comparison_operator = "GreaterThanThreshold"
@@ -1035,7 +1035,7 @@ resource "aws_cloudwatch_metric_alarm" "app2_f60srvm_process" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "app2_cwa_process" {
-  count               = contains(["development", "testing"], local.environment) ? 0 : 1
+  count               = contains(["development", "test"], local.environment) ? 0 : 1
   alarm_name          = "${local.application_name_short}-${local.environment}-app2-cwa-process"
   alarm_description   = "APPS_CWA Process has stopped"
   comparison_operator = "GreaterThanThreshold"
@@ -1060,7 +1060,7 @@ resource "aws_cloudwatch_metric_alarm" "app2_cwa_process" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "app2_apache_process" {
-  count               = contains(["development", "testing"], local.environment) ? 0 : 1
+  count               = contains(["development", "test"], local.environment) ? 0 : 1
   alarm_name          = "${local.application_name_short}-${local.environment}-app2-apache-process"
   alarm_description   = "Apache Process has stopped"
   comparison_operator = "GreaterThanThreshold"
@@ -1114,7 +1114,7 @@ resource "aws_cloudwatch_metric_alarm" "database_ec2_swap" {
 ################################
 
 data "template_file" "dashboard_ha" {
-  count    = contains(["development", "testing"], local.environment) ? 0 : 1
+  count    = contains(["development", "test"], local.environment) ? 0 : 1
   template = file("${path.module}/dashboard_ha.tpl")
 
   # TODO Update the local variables to reference the correct alarms once they are created
@@ -1124,7 +1124,7 @@ data "template_file" "dashboard_ha" {
 }
 
 data "template_file" "dashboard_no_ha" {
-  count    = contains(["development", "testing"], local.environment) ? 1 : 0
+  count    = contains(["development", "test"], local.environment) ? 1 : 0
   template = file("${path.module}/dashboard_no_ha.tpl")
 
   # TODO Update the local variables to reference the correct alarms once they are created
@@ -1169,5 +1169,5 @@ data "template_file" "dashboard_no_ha" {
 
 resource "aws_cloudwatch_dashboard" "dashboard" {
   dashboard_name = "${upper(local.application_name_short)}-Monitoring-Dashboard"
-  dashboard_body = contains(["development", "testing"], local.environment) ? data.template_file.dashboard_no_ha[0].rendered : data.template_file.dashboard_ha[0].rendered
+  dashboard_body = contains(["development", "test"], local.environment) ? data.template_file.dashboard_no_ha[0].rendered : data.template_file.dashboard_ha[0].rendered
 }
