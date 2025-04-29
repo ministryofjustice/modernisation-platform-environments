@@ -495,6 +495,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-prod" {
   }
 }
 
+resource "aws_s3_bucket_replication_configuration" "moj-report-source-prod-replication" {
+  count = local.is-production == true ? 1 : 0
+  # Must have bucket versioning enabled first
+  depends_on = [aws_s3_bucket_versioning.moj-report-source-prod]
+  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_prod[0].arn
+  bucket     = aws_s3_bucket.moj-report-source-prod[0].id
+
+  rule {
+    id     = "ppud-report-replication-rule-prod"
+    status = "Enabled"
+    destination {
+      bucket        = "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671"
+      storage_class = "STANDARD"
+    }
+  }
+}
+
 resource "aws_s3_bucket_policy" "moj-report-source-prod" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.moj-report-source-prod[0].id
