@@ -273,7 +273,6 @@ resource "aws_iam_policy" "firehose_kms_access" {
   })
 }
 
-
 resource "aws_iam_policy" "firehose_kms_secret_access" {
   name = "FirehoseKMSSecretsDecrypt"
 
