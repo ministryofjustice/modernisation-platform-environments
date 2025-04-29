@@ -72,7 +72,7 @@ resource "aws_lakeformation_permissions" "share_cadt_bucket_apde" {
   }
 }
 
-resource "aws_lakeformation_permissions" "share_table_with_ap" {
+resource "aws_lakeformation_permissions" "share_table_with_apde" {
   for_each = {
     for pair in flatten([
         for database_name, tables in local.tables_to_share_ap : [
@@ -95,7 +95,7 @@ resource "aws_lakeformation_permissions" "share_table_with_ap" {
   }
 }
 
-resource "aws_lakeformation_permissions" "share_database_with_ap" {
+resource "aws_lakeformation_permissions" "share_database_with_apde" {
   for_each = {
     for pair in flatten([
         for database_name, tables in local.tables_to_share_ap : [
