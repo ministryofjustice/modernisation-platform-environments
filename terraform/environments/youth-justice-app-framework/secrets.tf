@@ -31,12 +31,13 @@ resource "aws_secretsmanager_secret" "LDAP_administration_secret" {
   tags        = local.tags
 }
 
-#checkov:skip=CKV_SECRET_6: placeholder secret, not a real one
+
 resource "aws_secretsmanager_secret_version" "LDAP_administration_version" {
   secret_id = aws_secretsmanager_secret.LDAP_administration_secret.id
   secret_string = jsonencode(
     { "user_password_attribute" = "unicodePwd"
       "userdn"                  = "CN=admin2,OU=Users,OU=Accounts,OU=i2N,DC=i2n,DC=com"
+    #checkov:skip=CKV_SECRET_6: Ignore this
     "password" = "changeme" } #checkov:skip=CKV_SECRET_6: Ignore this
   )
   lifecycle {
