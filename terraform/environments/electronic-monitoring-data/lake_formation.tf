@@ -22,6 +22,7 @@ resource "aws_lakeformation_data_lake_settings" "admin_definition" {
     [
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.mod_plat_roles.names)}",
       data.aws_iam_role.github_actions_role.arn,
+      data.aws_iam_session_context.current.issuer_arn,
       [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn]
     ]
   )
@@ -33,6 +34,7 @@ resource "aws_lakeformation_data_lake_settings" "admin_definition_ireland" {
     [
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.mod_plat_roles.names)}",
       data.aws_iam_role.github_actions_role.arn,
+      data.aws_iam_session_context.current.issuer_arn,
       [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn]
     ]
   )
