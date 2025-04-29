@@ -222,7 +222,11 @@ module "metadata_generator" {
 
   source_path = [{
     path             = "${path.module}/lambda-functions/metadata_generator/main.py"
-    pip_requirements = "${path.module}/lambda-functions/metadata_generator/requirements.txt"
+    commands = [
+      "pip3.12 install --platform=manylinux2014_x86_64 --only-binary=:all: --no-compile --target=. -r requirements.txt",
+      "rm -rf pyarrow/tests numpy/tests *.dist-info", # Exclude tests and dist-info directories from the deployment package
+      ":zip",
+    ]
   }]
 
   tags = var.tags
