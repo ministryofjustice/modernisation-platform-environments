@@ -4,7 +4,7 @@
 # ------------------------------------------------------------------------
 
 locals {
-  admin_roles = local.is-development ? "sandbox_" : "data-eng"
+  admin_roles = local.is-development ? "sandbox" : "data-eng"
 }
 
 data "aws_iam_role" "github_actions_role" {
