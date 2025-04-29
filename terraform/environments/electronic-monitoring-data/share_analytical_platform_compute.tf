@@ -577,7 +577,7 @@ module "share_dbs_with_roles" {
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
 resource "aws_lakeformation_resource" "rds_bucket" {
@@ -590,7 +590,7 @@ module "share_non_cadt_dbs_with_roles" {
   dbs_to_grant            = ["dms_dbo_g4s_emsys_mvp"]
   data_bucket_lf_resource = aws_lakeformation_resource.rds_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
 

@@ -105,7 +105,7 @@ module "cmt_front_end_assumable_role" {
 
   trusted_role_arns = flatten([
     local.resolved-cloud-platform-iam-roles,
-    data.aws_iam_roles.data_engineering_roles.arns
+    data.aws_iam_roles.mod_plat_roles.arns
   ])
 
   create_role       = true
@@ -124,7 +124,7 @@ module "specials_cmt_front_end_assumable_role" {
 
   trusted_role_arns = flatten([
     local.resolved-cloud-platform-iam-roles,
-    data.aws_iam_roles.data_engineering_roles.arns
+    data.aws_iam_roles.mod_plat_roles.arns
   ])
 
   create_role       = true
@@ -141,7 +141,7 @@ module "share_data_marts" {
   count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
   table_filters           = local.table_filters
   database_name           = "historic_api_mart"
-  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  data_engineer_role_arn  = try(one(data.aws_iam_roles.mod_plat_roles.arns))
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
 }
@@ -152,7 +152,7 @@ module "share_specials_data_marts" {
   count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
   table_filters           = local.specials_table_filters
   database_name           = "historic_api_mart"
-  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  data_engineer_role_arn  = try(one(data.aws_iam_roles.mod_plat_roles.arns))
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
 }
