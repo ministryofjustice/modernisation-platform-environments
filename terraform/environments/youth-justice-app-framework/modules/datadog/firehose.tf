@@ -36,7 +36,7 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
       secret_arn = aws_secretsmanager_secret.datadog_api.arn
     }
   }
-      
+
   server_side_encryption {
   enabled   = true
   key_arn   = aws_kms_key.firehose_backup.arn

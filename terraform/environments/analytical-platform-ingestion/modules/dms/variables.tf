@@ -104,44 +104,44 @@ variable "tags" {
 }
 
 variable "create_premigration_assessement_resources" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "whether to create pre-requisites for DMS PreMigration Assessment to be run manually"
 }
 
 variable "retry_failed_after_recreate_metadata" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Whether to retry validation of failures after regenerating metadata"
 }
 
 variable "write_metadata_to_glue_catalog" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Whether to write metdata to glue catalog"
 }
 
 variable "valid_files_mutable" {
-  type = bool
-  default = false
+  type        = bool
+  default     = false
   description = "If false, copy valid files to their destination bucket with a datetime infix"
 }
 
 variable "glue_catalog_account_id" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "Which glue catalog to grant metadata generator permissions to (optional)"
 }
 
 variable "glue_catalog_role_arn" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "Which role to use to access glue catalog (optional)"
 }
 
 variable "glue_catalog_database_name" {
-  type = string
-  default = ""
+  type        = string
+  default     = ""
   description = "Which database to write to in glue catalog (optional)"
 }
 
@@ -155,7 +155,7 @@ variable "glue_destination_bucket" {
 }
 
 variable "metadata_generator_allowed_triggers" {
-  type = map(any)
-  default = {}
+  type        = map(any)
+  default     = {}
   description = "Which services can invoke metadata generator lambda (see https://github.com/terraform-aws-modules/terraform-aws-lambda?tab=readme-ov-file#lambda-permissions-for-allowed-triggers)"
 }

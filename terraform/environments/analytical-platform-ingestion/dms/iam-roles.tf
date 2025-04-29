@@ -36,14 +36,14 @@ module "eventbridge_dms_full_load_task_role" {
   custom_role_policy_arns = [module.eventbridge_dms_full_load_task_policy.arn]
   trust_policy_conditions = [
     {
-      test = "StringEquals"
+      test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values = [data.aws_caller_identity.current.account_id]
+      values   = [data.aws_caller_identity.current.account_id]
     },
     {
-      test = "StringEquals"
+      test     = "StringEquals"
       variable = "aws:SourceArn"
-      values = [aws_scheduler_schedule_group.dms_nightly_full_load.arn]
+      values   = [aws_scheduler_schedule_group.dms_nightly_full_load.arn]
     }
   ]
 }
