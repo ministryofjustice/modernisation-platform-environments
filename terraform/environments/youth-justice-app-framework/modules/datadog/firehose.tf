@@ -38,14 +38,10 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   }
 
   server_side_encryption {
-    enabled  = true
-    key_arn  = aws_kms_key.firehose_backup.arn
-    key_type = "CUSTOMER_MANAGED_CMK"
-  }
-
-  lifecycle {
-    ignore_changes = [http_endpoint_configuration[0].url]
-  }
+  enabled   = true
+  key_arn   = aws_kms_key.firehose_backup.arn
+  key_type  = "CUSTOMER_MANAGED_CMK"
+ }
 }
 
 
@@ -242,7 +238,32 @@ resource "aws_iam_policy" "firehose_kms_access" {
           "kms:GenerateDataKey",
           "kms:DescribeKey"
         ],
-        Resource = aws_kms_key.firehose_backup.arn
+        Resource = [
+          aws_kms_key.firehose_backup.arn,  
+          var.kms_key_arn
+        ]
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_policy" "firehose_kms_secret_access" {
+  name = "FirehoseKMSSecretsDecrypt"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid: "DecryptSecretWithKMSKey",
+        Effect = "Allow",
+        Action = "kms:Decrypt",
+        Resource = var.kms_key_arn, # this must match the KMS key that encrypts the secret
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "secretsmanager.eu-west-2.amazonaws.com"
+          }
+        }
       }
     ]
   })
@@ -262,4 +283,9 @@ resource "aws_iam_role_policy_attachment" "firehose_policy_attach" {
 resource "aws_iam_role_policy_attachment" "attach_secrets_access" {
   role       = aws_iam_role.firehose_to_datadog.name
   policy_arn = aws_iam_policy.firehose_secrets_access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "attach_kms_secret_access" {
+  role       = aws_iam_role.firehose_to_datadog.name
+  policy_arn = aws_iam_policy.firehose_kms_secret_access.arn
 }

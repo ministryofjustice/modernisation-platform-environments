@@ -19,10 +19,7 @@ module "ecs_service_datadog_agent" {
   create_tasks_iam_role          = false
   create_task_exec_iam_role      = false
 
-  subnet_ids             = var.ecs_subnet_ids
-  security_group_ids     = [var.ecs_security_group_id]
-  tasks_iam_role_name    = var.ecs_task_iam_role_name
-  tasks_iam_role_arn     = var.ecs_task_iam_role_arn
+  network_mode           = "bridge"
   task_exec_iam_role_arn = var.ecs_task_exec_iam_role_arn
   tags                   = var.tags
 
@@ -36,7 +33,7 @@ module "ecs_service_datadog_agent" {
       essential = true
 
       readonly_root_filesystem = false
-
+      privileged               = true
       secrets = [
         {
           name      = "DD_API_KEY"
@@ -73,7 +70,7 @@ module "ecs_service_datadog_agent" {
         },
         {
           "name" : "DD_SYSTEM_PROBE_ENABLED",
-          "value" : "true"
+          "value" : "false" #todo fix this
         },
         {
           "name" : "DD_TAGS",
