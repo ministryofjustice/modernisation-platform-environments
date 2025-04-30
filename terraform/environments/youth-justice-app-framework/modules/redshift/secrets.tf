@@ -36,6 +36,6 @@ resource "aws_secretsmanager_secret_version" "returns" {
     hostname = aws_redshiftserverless_workgroup.default.endpoint[0].address
     port     = aws_redshiftserverless_workgroup.default.endpoint[0].port
     database = "yjb_returns"
-    url      = aws_redshiftserverless_workgroup.default.endpoint[0].url
+    url      = "jdbc:redshift://${aws_redshiftserverless_workgroup.default.endpoint[0].address}:${aws_redshiftserverless_workgroup.default.endpoint[0].port}/yjb_returns;TCPKeepAlice=FALSE"
   })
 }
