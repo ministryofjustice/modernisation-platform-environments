@@ -733,7 +733,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
           "s3:ListBucket",
           "s3:PutObject"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::moj-log-files-prod",
           "arn:aws:s3:::moj-log-files-prod/*"
@@ -752,7 +752,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
           "s3:PutObject",
           "s3:ListBucket"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::moj-log-files-prod",
           "arn:aws:s3:::moj-log-files-prod/*"
@@ -914,7 +914,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
           "s3:ListBucket",
           "s3:PutObject"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::moj-log-files-uat",
           "arn:aws:s3:::moj-log-files-uat/*"
@@ -933,7 +933,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
           "s3:PutObject",
           "s3:ListBucket"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::moj-log-files-uat",
           "arn:aws:s3:::moj-log-files-uat/*"
@@ -1267,7 +1267,9 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "arn:aws:s3:::moj-log-files-dev/*"
         ]
         "Principal" : {
-          "AWS" : "arn:aws:iam:${data.aws_ssm_parameter.elb-account-eu-west-2-dev[0].value}:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
+          "AWS" : [
+            "arn:aws:iam::${data.aws_ssm_parameter.elb-account-eu-west-2-dev[0].value}:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
+          ]
         }
       }
     ]
