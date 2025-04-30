@@ -33,9 +33,9 @@ resource "aws_secretsmanager_secret_version" "returns" {
   secret_string = jsonencode({
     username = "microservice_returns"
     password = "changeme"
-    hostname = aws_redshiftserverless_workgroup.default.endpoint.address
-    port     = aws_redshiftserverless_workgroup.default.endpoint.port
+    hostname = aws_redshiftserverless_workgroup.default.endpoint[0].address
+    port     = aws_redshiftserverless_workgroup.default.endpoint[0].port
     database = "yjb_returns"
-    url      = aws_redshiftserverless_workgroup.default.endpoint.url
+    url      = aws_redshiftserverless_workgroup.default.endpoint[0].url
   })
 }
