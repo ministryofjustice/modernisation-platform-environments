@@ -454,6 +454,7 @@ locals {
     local.tags,
     {
       Name = local.application_name
+      Jira = "DPR-108"
     }
   )
 
