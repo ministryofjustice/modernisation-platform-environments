@@ -401,7 +401,6 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
 
 resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
-  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-production == true ? 1 : 0
   filename                       = "${path.module}/lambda_scripts/send_cpu_notification_prod.zip"
   function_name                  = "send_cpu_notification"
@@ -411,7 +410,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_prod
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_prod]
   reserved_concurrent_executions = 5
-#  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
   }
