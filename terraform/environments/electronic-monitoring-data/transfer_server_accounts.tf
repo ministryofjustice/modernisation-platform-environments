@@ -140,6 +140,7 @@ module "g4s" {
     # local.sftp_account_g4s_emsys_mvp,
     # local.sftp_account_g4s_emsys_tpims,
     # local.sftp_account_g4s_x_drive,
+    local.sftp_account_g4s_lcm_archive,
   ]
 
   data_store_bucket = module.s3-data-bucket.bucket
