@@ -65,7 +65,6 @@ resource "aws_lakeformation_permissions" "share_database_with_ap" {
 resource "aws_lakeformation_permissions" "share_cadt_bucket_apde" {
   principal = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
   permissions = ["DATA_LOCATION_ACCESS"]
-  permissions_with_grant_option = ["DATA_LOCATION_ACCESS"]
 
   data_location {
     arn = aws_lakeformation_resource.data_bucket.arn
