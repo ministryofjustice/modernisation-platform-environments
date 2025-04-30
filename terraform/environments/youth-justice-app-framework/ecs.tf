@@ -18,10 +18,10 @@ module "ecs" {
 
   #ECS details
   cluster_name         = "yjaf-cluster"
-  ec2_instance_type    = "m5.large"
-  ec2_min_size         = 16
-  ec2_max_size         = 16
-  ec2_desired_capacity = 16
+  ec2_instance_type    = "m5.xlarge"
+  ec2_min_size         = 11
+  ec2_max_size         = 11
+  ec2_desired_capacity = 11
   nameserver           = join(".", [split(".", data.aws_vpc.shared.cidr_block)[0], split(".", data.aws_vpc.shared.cidr_block)[1], "0", "2"]) #eg "10.23.0.2"
 
   spot_overrides = [
@@ -59,7 +59,6 @@ module "ecs" {
     aws_secretsmanager_secret.Auth_Email_Account.arn,
     aws_secretsmanager_secret.auto_admit_secret.arn,
     aws_secretsmanager_secret.Unit_test.arn,
-    module.ses.ses_secret_arn,
     aws_secretsmanager_secret.s3_user_secret.arn,
     aws_secretsmanager_secret.yjaf_credentials.arn
   ])

@@ -120,6 +120,7 @@ resource "aws_security_group_rule" "exchange-inbound-importmachine" {
 }
 
 resource "aws_security_group_rule" "exchange-outbound-all" {
+  # checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   description       = "allow all traffic to any IP address"
   type              = "egress"
   from_port         = 0
@@ -197,6 +198,7 @@ resource "aws_security_group_rule" "sms-outbound-importmachine" {
 }
 
 resource "aws_security_group_rule" "sms-outbound-all" {
+  # checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   description       = "allow all traffic to any IP address"
   type              = "egress"
   from_port         = 0
@@ -673,6 +675,7 @@ resource "aws_security_group_rule" "iisrelay-inbound-importmachine" {
 }
 
 resource "aws_security_group_rule" "iisrelay-outbound-all" {
+  # checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   description       = "allow all traffic to any IP address"
   type              = "egress"
   from_port         = 0

@@ -4,14 +4,8 @@ locals {
   mdss_supplier_account_mapping = {
     "production"    = null
     "preproduction" = null
-    "test" = {
-      "account_number" = 173142358744
-      "role_name"      = "dev-datatransfer-lambda-role"
-    }
-    "development" = {
-      "account_number" = 173142358744
-      "role_name"      = "dev-datatransfer-lambda-role"
-    }
+    "test"          = null
+    "development"   = null
   }
 
   p1_export_bucket_destination_mapping = {

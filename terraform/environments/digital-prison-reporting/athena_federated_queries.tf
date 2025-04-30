@@ -1,26 +1,35 @@
 locals {
-  nomis_host               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
-  nomis_port               = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
-  nomis_service_name       = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
-  connection_string_nomis  = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis.name}}@//${local.nomis_host}:${local.nomis_port}/${local.nomis_service_name}"
+  nomis_host              = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["endpoint"]
+  nomis_port              = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["port"]
+  nomis_service_name      = jsondecode(data.aws_secretsmanager_secret_version.nomis.secret_string)["db_name"]
+  connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis.name}}@//${local.nomis_host}:${local.nomis_port}/${local.nomis_service_name}"
+
   bodmis_host              = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["endpoint"]
   bodmis_service_name      = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["db_name"]
   connection_string_bodmis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.bodmis.name}}@//${local.bodmis_host}:1522/${local.bodmis_service_name}"
-  oasys_host               = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["endpoint"] : ""
-  oasys_port               = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["port"]: ""
-  oasys_service_name       = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["db_name"]: ""
-  connection_string_oasys  = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.oasys[0].name}}@//${local.oasys_host}:${local.oasys_port}/${local.oasys_service_name}": ""
-  onr_host                 = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["endpoint"] : ""
-  onr_port                 = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["port"]: ""
-  onr_service_name         = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["db_name"]: ""
-  connection_string_onr    = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.onr[0].name}}@//${local.onr_host}:${local.onr_port}/${local.onr_service_name}": ""
 
-  # OASys and ONR are currently only included in Dev and Test
+  oasys_host              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["endpoint"] : ""
+  oasys_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["port"] : ""
+  oasys_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["db_name"] : ""
+  connection_string_oasys = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.oasys[0].name}}@//${local.oasys_host}:${local.oasys_port}/${local.oasys_service_name}" : ""
+
+  onr_host              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["endpoint"] : ""
+  onr_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["port"] : ""
+  onr_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["db_name"] : ""
+  connection_string_onr = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.onr[0].name}}@//${local.onr_host}:${local.onr_port}/${local.onr_service_name}" : ""
+
+  ndelius_host              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["endpoint"] : ""
+  ndelius_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["port"]: ""
+  ndelius_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["db_name"]: ""
+  connection_string_ndelius = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndelius[0].name}}@//${local.ndelius_host}:${local.ndelius_port}/${local.ndelius_service_name}": ""
+
+  # OASys, ONR and nDelius are currently only included in Dev and Test
   federated_query_connection_strings_map = local.is_dev_or_test ? {
-    nomis  = local.connection_string_nomis
-    bodmis = local.connection_string_bodmis
-    oasys  = local.connection_string_oasys
-    onr    = local.connection_string_onr
+    nomis   = local.connection_string_nomis
+    bodmis  = local.connection_string_bodmis
+    oasys   = local.connection_string_oasys
+    onr     = local.connection_string_onr
+    ndelius = local.connection_string_ndelius
   } : {
     nomis  = local.connection_string_nomis
     bodmis = local.connection_string_bodmis
@@ -30,8 +39,9 @@ locals {
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
     aws_secretsmanager_secret.oasys[0].arn,
-    aws_secretsmanager_secret.onr[0].arn
-  ] : [
+    aws_secretsmanager_secret.onr[0].arn,
+    aws_secretsmanager_secret.ndelius[0].arn
+    ] : [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn
   ]
@@ -112,6 +122,19 @@ resource "aws_athena_data_catalog" "onr_catalog" {
 
   name        = "onr"
   description = "ONR Athena data catalog"
+  type        = "LAMBDA"
+
+  parameters = {
+    "function" = module.athena_federated_query_connector_oracle.lambda_function_arn
+  }
+}
+
+# Adds an Athena data source / catalog for nDelius
+resource "aws_athena_data_catalog" "ndelius_catalog" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  name        = "ndelius"
+  description = "nDelius Athena data catalog"
   type        = "LAMBDA"
 
   parameters = {

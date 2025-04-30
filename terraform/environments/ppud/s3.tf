@@ -338,8 +338,8 @@ resource "aws_s3_bucket_versioning" "moj-database-source-prod" {
 }
 
 resource "aws_s3_bucket_logging" "moj-database-source-prod" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-database-source-prod[0].id
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-database-source-prod[0].id
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/moj-database-source-prod-logs/"
 }
@@ -464,8 +464,8 @@ resource "aws_s3_bucket_versioning" "moj-report-source-prod" {
 }
 
 resource "aws_s3_bucket_logging" "moj-report-source-prod" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-report-source-prod[0].id
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-report-source-prod[0].id
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/moj-report-source-prod-logs/"
 }
@@ -491,6 +491,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-prod" {
     }
     expiration {
       days = 6
+    }
+  }
+}
+
+resource "aws_s3_bucket_replication_configuration" "moj-report-source-prod-replication" {
+  count = local.is-production == true ? 1 : 0
+  # Must have bucket versioning enabled first
+  depends_on = [aws_s3_bucket_versioning.moj-report-source-prod]
+  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_prod[0].arn
+  bucket     = aws_s3_bucket.moj-report-source-prod[0].id
+
+  rule {
+    id     = "ppud-report-replication-rule-prod"
+    status = "Enabled"
+    destination {
+      bucket        = "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671"
+      storage_class = "STANDARD"
     }
   }
 }
@@ -956,14 +973,14 @@ resource "aws_s3_bucket_versioning" "moj-report-source-uat" {
 }
 
 resource "aws_s3_bucket_logging" "moj-report-source-uat" {
-  count  = local.is-preproduction == true ? 1 : 0
+  count         = local.is-preproduction == true ? 1 : 0
   bucket        = aws_s3_bucket.moj-report-source-uat[0].id
   target_bucket = aws_s3_bucket.moj-log-files-uat[0].id
   target_prefix = "s3-logs/moj-report-source-uat-logs/"
 }
 
 resource "aws_s3_bucket_public_access_block" "moj-report-source-uat" {
-  count  = local.is-preproduction == true ? 1 : 0
+  count                   = local.is-preproduction == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-report-source-uat[0].id
   block_public_acls       = true
   block_public_policy     = true
@@ -989,7 +1006,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-uat" {
 
 
 resource "aws_s3_bucket_replication_configuration" "moj-report-source-uat-replication" {
-  count  = local.is-preproduction == true ? 1 : 0
+  count = local.is-preproduction == true ? 1 : 0
   # Must have bucket versioning enabled first
   depends_on = [aws_s3_bucket_versioning.moj-report-source-uat]
   role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_uat[0].arn
@@ -1225,7 +1242,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "s3:ListBucket",
           "s3:PutObject"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::moj-log-files-dev",
           "arn:aws:s3:::moj-log-files-dev/*"
@@ -1244,13 +1261,13 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "s3:PutObject",
           "s3:ListBucket"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::moj-log-files-dev",
           "arn:aws:s3:::moj-log-files-dev/*"
         ]
         "Principal" : {
-          "AWS" : "arn:aws:iam::652711504416:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
+          "AWS" : "arn:aws:iam:${data.aws_ssm_parameter.elb-account-eu-west-2-dev[0].value}:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
         }
       }
     ]

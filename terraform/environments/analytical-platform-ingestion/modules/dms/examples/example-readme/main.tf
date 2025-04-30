@@ -55,7 +55,7 @@ module "dms" {
     cdc       = "${aws_db_instance.dms_test.identifier}-cdc"
   }
 
-  dms_mapping_rules     = file("${path.module}/mappings.json")
+  dms_mapping_rules     = "${path.module}/mappings.json"
   landing_bucket        = aws_s3_bucket.landing.bucket
   landing_bucket_folder = "${local.tags.team-name}/${aws_db_instance.dms_test.identifier}"
 
