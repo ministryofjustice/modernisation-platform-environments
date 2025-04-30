@@ -294,3 +294,45 @@ sudo systemctl start bodmispf.service
 # AMAZON SSM SGENT
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
+
+## ODATA DEMO
+# ------------------------------
+# Setup and run Java OData Demo JAR as a systemd service
+# ------------------------------
+
+# Install Java (Amazon Linux 2 default: OpenJDK 11)
+sudo amazon-linux-extras enable corretto11
+sudo yum install -y java-11-amazon-corretto
+
+# Create app directory
+mkdir -p /opt/odata-demo
+cd /opt/odata-demo
+
+# Download the JAR from S3
+aws s3 cp s3://dpr-artifact-store-test/third-party/odata-demo/OData-demo-0.0.1-SNAPSHOT.jar ./OData-demo.jar
+
+# Make sure ec2-user can manage this directory (optional)
+chown -R ec2-user:ec2-user /opt/odata-demo
+
+# Create systemd service for the JAR
+cat <<EOF > /etc/systemd/system/odata-demo.service
+[Unit]
+Description=OData Demo Java Service
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/odata-demo
+ExecStart=/usr/bin/java -jar /opt/odata-demo/OData-demo.jar
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Reload systemd and start service
+systemctl daemon-reload
+systemctl enable odata-demo.service
+systemctl start odata-demo.service
+## ODATA DEMO
