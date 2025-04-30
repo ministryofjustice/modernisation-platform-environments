@@ -6,9 +6,8 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   http_endpoint_configuration {
     url                = "https://aws-kinesis-http-intake.logs.datadoghq.eu/v1/input"
     name               = "Datadog"
-    access_key         = ""
     buffering_interval = 60
-    buffering_size     = 1
+    buffering_size     = 4
     role_arn           = aws_iam_role.firehose_to_datadog.arn
 
     cloudwatch_logging_options {
@@ -178,7 +177,9 @@ resource "aws_iam_role_policy" "cw_logs_to_firehose_policy" {
         Effect = "Allow",
         Action = [
           "firehose:PutRecord",
-          "firehose:PutRecordBatch"
+          "firehose:PutRecordBatch",
+          "kinesis:PutRecord",
+          "kinesis:PutRecords"
         ],
         Resource = aws_kinesis_firehose_delivery_stream.to_datadog.arn
       }
@@ -188,7 +189,7 @@ resource "aws_iam_role_policy" "cw_logs_to_firehose_policy" {
 
 resource "aws_iam_policy" "firehose_policy" {
   name        = "FirehoseToDatadogPolicy"
-  description = "Allows Firehose to send data to Datadog"
+  description = "Allows Firehose to send data to Datadog, write logs, and access S3 for backups"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -201,6 +202,39 @@ resource "aws_iam_policy" "firehose_policy" {
           "logs:GetLogEvents"
         ],
         Resource = aws_cloudwatch_log_group.firehose_log_group.arn
+      },
+      {
+        Sid = "cloudWatchLog",
+        Effect = "Allow",
+        Action = [
+          "logs:PutLogEvents"
+        ],
+        Resource = aws_cloudwatch_log_group.firehose_log_group.arn
+      },
+      {
+        Sid = "CreateLogResources",
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream"
+        ],
+        Resource = "*"
+      },
+      {
+        Sid = "s3Permissions",
+        Effect = "Allow",
+        Action = [
+          "s3:AbortMultipartUpload",
+          "s3:GetBucketLocation",
+          "s3:GetObject",
+          "s3:ListBucket",
+          "s3:ListBucketMultipartUploads",
+          "s3:PutObject"
+        ],
+        Resource = [
+          aws_s3_bucket.firehose_backup.arn,       
+          "${aws_s3_bucket.firehose_backup.arn}/*"  
+        ]
       }
     ]
   })
@@ -246,7 +280,6 @@ resource "aws_iam_policy" "firehose_kms_access" {
     ]
   })
 }
-
 
 resource "aws_iam_policy" "firehose_kms_secret_access" {
   name = "FirehoseKMSSecretsDecrypt"
