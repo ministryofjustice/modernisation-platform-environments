@@ -302,6 +302,9 @@ locals {
           private-pd-http-7777 = merge(local.lbs.private.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "pd-ncr-web-1" },
+              { ec2_instance_name = "pd-ncr-web-2" },
+              { ec2_instance_name = "pd-ncr-web-3" },
+              { ec2_instance_name = "pd-ncr-web-4" },
             ]
           })
         }
@@ -357,6 +360,9 @@ locals {
           pd-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "pd-ncr-web-1" },
+              { ec2_instance_name = "pd-ncr-web-2" },
+              { ec2_instance_name = "pd-ncr-web-3" },
+              { ec2_instance_name = "pd-ncr-web-4" },
             ]
           })
         }
