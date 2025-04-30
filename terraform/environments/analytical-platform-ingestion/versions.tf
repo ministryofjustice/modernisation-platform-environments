@@ -16,6 +16,10 @@ terraform {
       version = "~> 3.0"
       source  = "hashicorp/http"
     }
+    local = {
+      version = "2.5.2"
+      source  = "hashicorp/local"
+    }
   }
   required_version = "~> 1.10"
 }
