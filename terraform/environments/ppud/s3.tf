@@ -1242,7 +1242,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "s3:ListBucket",
           "s3:PutObject"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::moj-log-files-dev",
           "arn:aws:s3:::moj-log-files-dev/*"
@@ -1261,7 +1261,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "s3:PutObject",
           "s3:ListBucket"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::moj-log-files-dev",
           "arn:aws:s3:::moj-log-files-dev/*"
