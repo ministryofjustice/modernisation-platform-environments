@@ -6,7 +6,6 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   http_endpoint_configuration {
     url                = "https://aws-kinesis-http-intake.logs.datadoghq.eu/v1/input"
     name               = "Datadog"
-    access_key         = ""
     buffering_interval = 60
     buffering_size     = 4
     role_arn           = aws_iam_role.firehose_to_datadog.arn
@@ -211,6 +210,15 @@ resource "aws_iam_policy" "firehose_policy" {
           "logs:PutLogEvents"
         ],
         Resource = aws_cloudwatch_log_group.firehose_log_group.arn
+      },
+      {
+        Sid = "CreateLogResources",
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream"
+        ],
+        Resource = "*"
       },
       {
         Sid = "s3Permissions",
