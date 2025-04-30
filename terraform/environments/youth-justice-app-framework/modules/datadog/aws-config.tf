@@ -14,3 +14,4 @@ resource "aws_config_delivery_channel" "main" {
   s3_bucket_name = "aws-config-snapshot-bucket"
   sns_topic_arn  = module.config_changes_datadog.sns_topic_arn
 }
+
