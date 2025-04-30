@@ -1,7 +1,7 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_lakeformation_permissions" "data_engineering_permissions" {
-  for_each    = var.extra_arns
+  for_each    = toset(var.extra_arns)
 
   permissions = ["ALL"]
   principal   = each.value
@@ -40,7 +40,7 @@ resource "aws_lakeformation_permissions" "data_engineering_table_permissions" {
 }
 
 resource "aws_lakeformation_permissions" "de_s3_bucket_permissions" {
-  for_each = var.extra_arns
+  for_each = toset(var.extra_arns)
 
   permissions = ["DATA_LOCATION_ACCESS"]
   principal = each.value
