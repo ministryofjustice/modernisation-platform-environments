@@ -18,7 +18,7 @@ terraform {
     }
     local = {
       version = "2.5.2"
-      source  = "hashicorp/local"
+      source  = "registry.opentofu.org/hashicorp/local"
     }
   }
   required_version = "~> 1.10"
