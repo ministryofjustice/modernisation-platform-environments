@@ -11,3 +11,21 @@ resource "aws_secretsmanager_secret_version" "datadog_api" {
   secret_string = "changeme"
 }
 
+resource "aws_secretsmanager_secret_policy" "allow_firehose_access" {
+  secret_arn = aws_secretsmanager_secret.datadog_api.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid: "AllowFirehoseAccess",
+        Effect: "Allow",
+        Principal = {
+          AWS = aws_iam_role.firehose_to_datadog.arn
+        },
+        Action = "secretsmanager:GetSecretValue",
+        Resource = aws_secretsmanager_secret.datadog_api.arn
+      }
+    ]
+  })
+}
