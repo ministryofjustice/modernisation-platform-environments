@@ -237,7 +237,7 @@ resource "aws_iam_role" "fis_role" {
 
 resource "aws_iam_role_policy_attachment" "fis_managed_policy" {
   role       = aws_iam_role.fis_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSFaultInjectionSimulatorFullAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AmazonFISServiceRolePolicy"
 }
 
 resource "aws_cloudwatch_log_group" "fis_logs" {
