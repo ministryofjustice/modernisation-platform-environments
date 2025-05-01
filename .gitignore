@@ -25,3 +25,5 @@ out/
 **/*.swp
 
 terraform/modules/**/*.zip
+
+plugins.zip
