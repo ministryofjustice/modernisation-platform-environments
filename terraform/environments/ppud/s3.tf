@@ -183,9 +183,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
 }
 
 resource "aws_s3_bucket_logging" "MoJ-Health-Check-Reports" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.MoJ-Health-Check-Reports[0].id
-  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
+  target_bucket = aws_s3_bucket.moj-log-files-prod.id
   target_prefix = "s3-logs/moj-health-check-reports-logs/"
 }
 
@@ -877,7 +876,7 @@ resource "aws_s3_bucket_versioning" "moj-log-files-uat" {
 resource "aws_s3_bucket_logging" "moj-log-files-uat" {
   count  = local.is-preproduction == true ? 1 : 0
   bucket = aws_s3_bucket.moj-log-files-uat[0].id
-  target_bucket = aws_s3_bucket.moj-log-files-uat.id
+  target_bucket = aws_s3_bucket.moj-log-files-uat[0].id
   target_prefix = "s3-logs/moj-log-files-uat-logs/"
 }
 
