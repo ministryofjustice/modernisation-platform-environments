@@ -296,25 +296,26 @@ sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
 
 ## ODATA DEMO
-# ------------------------------
-# Setup and run Java OData Demo JAR as a systemd service
-# ------------------------------
+set -euxo pipefail
 
-# Install Java (Amazon Linux 2 default: OpenJDK 11)
-sudo amazon-linux-extras enable corretto11
-sudo yum install -y java-11-amazon-corretto
+# Clean and update
+yum clean metadata
+yum update -y
 
-# Create app directory
+# Try installing Corretto11
+if amazon-linux-extras | grep -q corretto11; then
+  amazon-linux-extras enable corretto11
+  yum install -y java-11-amazon-corretto
+else
+  yum install -y java-11-openjdk
+fi
+
+# Set up service
 mkdir -p /opt/odata-demo
 cd /opt/odata-demo
-
-# Download the JAR from S3
 aws s3 cp s3://dpr-artifact-store-test/third-party/odata-demo/OData-demo-0.0.1-SNAPSHOT.jar ./OData-demo.jar
-
-# Make sure ec2-user can manage this directory (optional)
 chown -R ec2-user:ec2-user /opt/odata-demo
 
-# Create systemd service for the JAR
 cat <<EOF > /etc/systemd/system/odata-demo.service
 [Unit]
 Description=OData Demo Java Service
@@ -331,7 +332,6 @@ RestartSec=10
 WantedBy=multi-user.target
 EOF
 
-# Reload systemd and start service
 systemctl daemon-reload
 systemctl enable odata-demo.service
 systemctl start odata-demo.service
