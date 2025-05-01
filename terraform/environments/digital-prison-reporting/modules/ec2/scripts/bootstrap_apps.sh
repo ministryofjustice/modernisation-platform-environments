@@ -306,18 +306,26 @@ set -euxo pipefail
 yum clean metadata
 yum update -y
 
-# Try installing Corretto11
-# Install Java 11 safely
-if amazon-linux-extras | grep -q corretto11; then
-  amazon-linux-extras enable corretto11
-  yum clean metadata
-  yum install -y java-21-amazon-corretto
-else
-  # Fall back to direct repo if extras is missing
-  rpm --import https://yum.corretto.aws/corretto.key
-  curl -Lo /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
-  yum install -y java-21-amazon-corretto
-fi
+# Install Java 21 safely
+# Optional: remove older versions
+yum remove -y java-11-amazon-corretto java-17-amazon-corretto || true
+
+# Download Amazon Corretto 21 RPM
+cd /tmp
+wget https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.rpm
+
+# Install the RPM
+yum localinstall -y amazon-corretto-21-x64-linux-jdk.rpm
+
+# Register with alternatives and set as default
+alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-amazon-corretto/bin/java 2100
+alternatives --set java /usr/lib/jvm/java-21-amazon-corretto/bin/java
+
+# Confirm version
+java -version
+
+# Cleanup
+rm -f /tmp/amazon-corretto-21-x64-linux-jdk.rpm
 
 # Set up service
 mkdir -p /opt/odata-demo
