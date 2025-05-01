@@ -113,9 +113,9 @@ module "cica_dms_tempus_dms_implementation" {
 
     tags = local.tags
 
-    create_ancillary_static_roles            = false
+    create_ancillary_static_roles             = false
     create_premigration_assessement_resources = local.environment == "development" ? true : false
-    write_metadata_to_glue_catalog            = true
+    write_metadata_to_glue_catalog            = false
     retry_failed_after_recreate_metadata      = false
     valid_files_mutable                       = true
     glue_catalog_account_id                   = local.environment_management.account_ids["analytical-platform-data-production"]
