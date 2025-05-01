@@ -1302,6 +1302,13 @@ resource "aws_s3_bucket_versioning" "moj-lambda-layers-dev" {
   }
 }
 
+resource "aws_s3_bucket_logging" "moj-lambda-layers-dev" {
+  count         = local.is-development == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-lambda-layers-dev[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  target_prefix = "s3-logs/moj-lambda-layers-dev-logs/"
+}
+
 resource "aws_s3_bucket_public_access_block" "moj-lambda-layers-dev" {
   count                   = local.is-development == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-lambda-layers-dev[0].id
@@ -1329,9 +1336,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-lambda-layers-dev" {
       days          = 30
       storage_class = "STANDARD_IA"
     }
-    expiration {
-      days = 60
-    }
   }
 }
 
@@ -1344,6 +1348,21 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
+      "Sid": "RequireSSLRequests",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
+          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
+      ],
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+       }
+      },
+      {
         "Action" : [
           "s3:PutBucketNotification",
           "s3:GetBucketNotification",
@@ -1355,8 +1374,8 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-lambda-layers-dev",
-          "arn:aws:s3:::moj-lambda-layers-dev/*"
+          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
+          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
         ],
         "Principal" : {
           Service = "logging.s3.amazonaws.com"
@@ -1374,8 +1393,8 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-lambda-layers-dev",
-          "arn:aws:s3:::moj-lambda-layers-dev/*"
+          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
+          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
         ],
         "Principal" : {
           Service = "sns.amazonaws.com"
@@ -1391,8 +1410,8 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-lambda-layers-dev",
-          "arn:aws:s3:::moj-lambda-layers-dev/*"
+          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
+          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
         ],
         "Principal" : {
           "AWS" : [
