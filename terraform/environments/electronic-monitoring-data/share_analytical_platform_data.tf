@@ -1,5 +1,5 @@
 locals {
-  tables_to_share_ap = local.is-development ? {} : {
+  tables_to_share_ap = local.is-development || local.is-production ? {} : {
     "derived": ["visits"],
   }
 }
