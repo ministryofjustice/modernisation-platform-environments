@@ -15,3 +15,7 @@ output "esb_instance_profile" {
 output "esb_instance_private_ip" {
   value = aws_instance.esb.private_ip
 }
+
+output "debug_ami" {
+  value = var.ami # Referencing the variable directly
+}

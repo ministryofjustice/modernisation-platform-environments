@@ -1,0 +1,1662 @@
+{
+  "objects_from": "cica_tariff",
+  "extraction_date": "2025-04-09T17:34:25.447138",
+  "objects": [
+    "CLAIMS.APPLICANT_INJURIES",
+    "CLAIMS.APPLICATION_INCIDENT",
+    "CLAIMS.CASES",
+    "CLAIMS.CASE_DECISIONS",
+    "CLAIMS.CASE_DECISION_OFFERS",
+    "CLAIMS.CASE_IN_CASE_TYPES",
+    "CLAIMS.CASE_REASONS",
+    "CLAIMS.CASE_TYPES",
+    "CLAIMS.DECISION_STATUSES",
+    "CLAIMS.INJURY_IN_TARIFF_CATEGORIES",
+    "CLAIMS.INVOLVED_BODIES",
+    "CLAIMS.INVOLVEMENTS",
+    "CLAIMS.INVOLVEMENT_TYPE_CODES",
+    "CLAIMS.PI_TYPE_CAUSES",
+    "CLAIMS.POST_HOLDERS",
+    "CLAIMS.POST_HOLDER_GRADES",
+    "DRAFT_OL.SAVE_APPLICANT_INJURIES",
+    "DRAFT_OL.SAVE_AWARD_COMPONENTS",
+    "CLAIMS.STAGES",
+    "CLAIMS.TARIFF_AWARD_COMPONENTS",
+    "CLAIMS.TARIFF_AWA_COMP_TYPES",
+    "CLAIMS.TARIFF_DECISION_TYPES",
+    "CLAIMS.TARIFF_INJURIES",
+    "CLAIMS.TARIFF_REASON_TYPES",
+    "CLAIMS.TARIFF_STATUS_TYPES"
+  ],
+  "blobs": [],
+  "columns_to_exclude": [
+    {
+      "object_name": "CLAIMS.APPLICANT_INJURIES",
+      "column_name": "APPLY_EX_PER"
+    },
+    {
+      "object_name": "CLAIMS.APPLICANT_INJURIES",
+      "column_name": "DATE_INJURY_ADDED"
+    },
+    {
+      "object_name": "CLAIMS.APPLICANT_INJURIES",
+      "column_name": "EX_PERCENTAGE"
+    },
+    {
+      "object_name": "CLAIMS.APPLICANT_INJURIES",
+      "column_name": "STAFF_MEMBER"
+    },
+    {
+      "object_name": "CLAIMS.APPLICATION_INCIDENT",
+      "column_name": "OTHER_INCIDENT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ABLE_TO_OBTAIN"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ABLE_TO_PAY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ACCESSIBILITY_FLAG"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ACCESSIBILITY_REASON"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ADDITIONAL_INFO"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "AE_ADMISSION_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "AE_VISITED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "AFFECT_DAILY_CAPACITY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "AFFECT_FUTURE_GT_28_WEEKS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "AFFECT_GT_28_WEEKS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "AGE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ALLEDGED_OFFENDER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "APPLICANT_EXPENSES"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "APPLICATION_LAST_UPDATED_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "APPLICATION_TYPE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "APPLY_INTERIM_REDUCTION"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "APPL_DEFER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ARCH_LEVEL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ASSAILANT_IDENTIFIED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ASSAILANT_NAME"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ASSIGNED_GENDER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "AUTO_PROCESSED_IN_CICAP"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CARE_ORDER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CARE_ORDER_DETAILS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CASE_GOING_TO_COURT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CASE_GONE_TO_COURT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CASE_IN_HEARING"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CAUSED_COST_FOR_TREATMENT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CAUSED_INABILITY_TO_WORK"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CAUSED_LOSS_OF_EARNINGS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CICA_ACCOUNT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CICA_ONLINE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CICA_TO_SEND_SUMMARY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CJCANCELLED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CJCANCELLED_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CJCANCELLED_REASON"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CJCONSENT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CLAIMED_OTHER_COMPENSATION"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CLAIMED_OTHER_COMP_AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CLAIMED_OTHER_NAME"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CLAIM_PREF_CONTACT_TIME"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CLAIM_PREF_NUMBER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CLAIM_REASON_FOR_NO_PHONE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CLAIM_REASON_FOR_NO_PHONE_OTH"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CLAIM_WORK_NUMBER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CONTACT_BY_EMAIL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CONTACT_BY_PHONE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CONVICTIONS_ABROAD"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CONVICTION_COUNTRY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "COURT_CASE_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "COV_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "COV_DESCRIPTION"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CRIMINAL_PROCEEDINGS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "CURR_POST_HOLDER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DATE_CRIMINAL_PROCS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DATE_CRIM_PROCS_QUAL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DATE_OF_BIRTH_CONFIMED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DATE_OF_SIGNATURE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DEC_CONVICTIONS_ABROAD"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DEPENDENCY_ON_DECEASED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DESCRIPTION_OF_INCIDENT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DESC_MENTAL_INJURY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DESTROYED_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DESTRUCTION_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DESTRUCT_DT_NEW"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DETAILS_AWARE_FATAL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DMI"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DMI_GT_6_WEEKS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "DUPLICATE_APPLICATION"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ENQUIRY_ID"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ESTRANGED_FROM_DECEASED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ETHNICITY_OTHER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FATALITY_FLAG"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FOUND_INJURIES"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FULLY_RECOVERED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FUNERAL_CLAIM"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FUNERAL_CONTRIBUTORS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FUNERAL_ONLY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FUNERAL_PAID_AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FUNERAL_REMAINING_AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FUNERAL_TOTAL_COST"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FUTURE_TREATMENT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "FUTURE_WORK"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "GENDER_IDENTITY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "HAS_MADE_OTHER_CLAIM"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "HAVE_PAID_COSTS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCAPABLE_ADULT_RELAT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCAPACITY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCAPACITY_EFFECT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_AFTERMATH_DETAILS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_COUNTRY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_COUNTRY_OTHER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_DELAY_REASON_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_DELAY_REASON_OTHER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_PLACE_TEXT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_PRESENT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_REALISE_FATAL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_REPORTED_DELAY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_REPORTED_TO"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INCIDENT_REP_OTHER_DEL_REASON"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_ADD_1"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_ADD_2"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_ADD_3"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_ADD_4"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_ADD_5"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_FROM_QUAL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_POSTCODE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_REP"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_REP_DATE_QUAL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_REP_DATE_QUAL1"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_TIME_QUAL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INC_TO_QUAL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INFECTIONS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INJURED_WITH_REP"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INJURY_DETAILS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INJURY_DETAILS_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "INVOLVEMENT_DETAILS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "IN_FLIGHT_IMPORTED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "IS_ELIGIBLE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "IS_INJURED_PERSON"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "JUDICIAL_REVIEW"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "LABELS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "LAST_MOV_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "LEGAL_RESPONSIBILITY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "LENGTH_OF_INCAPACITY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "LOSS_OF_FOETUS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "LOST_EARNINGS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "MENTAL_CAPACITY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "MINC_NO"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "MIT_INSTANCE_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "MULT_APPL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "NAMED_CASE_OFFICER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "NIL_CASE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OAS_APPLICANT_RESPONSE_P1"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OAS_APPLICANT_RESPONSE_P2"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OAS_POST_SUBMISSION_EDIT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OAS_USERID"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OFFENCES_AND_SENTENCES"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OFFICER_REP_NO"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OFFICER_REP_RANK"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OFFICER_REP_SNAME"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "ON_NOTICE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OPT_IN_DIVERSITY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OPT_IN_SA"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OPT_IN_SCARRING"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OTHER_AUTHORITY_REPORTED_TO"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OTHER_CLAIMANTS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OTHER_CLAIMANT_NAME"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OTHER_CLAIMANT_RELATIONSHIP"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OTHER_CLAIM_DETAILS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OTHER_COMP_AWARDED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OTHER_COMP_DETAILS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OTHER_NAMES"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OTHER_RELATIONSHIP_TO_DECEASED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "OUT_OF_POCKET_EXPENSES"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PARENT_GUARD_REL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PARENT_PHONE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PAY_FUNERAL_DIRECTOR"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PERSONAL_INJURY_CLAIM"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PHYSICAL_INJURIES"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PI_TYPE_CAUSE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "POLICE_AWARE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "POLICE_CRIME_REF_NUM"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "POLICE_FORCE_AREA"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "POLICE_STATION"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PREFERRED_COMMS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PREGNANCY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PRESENTING_OFFICER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PRESENT_AT_INCIDENT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PREVIOUS_APPLICATION_SUBMITTED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PREVIOUS_CASE_REF_NUMBER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PREV_APPL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PREV_APPL_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PREV_APPL_NO"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "PSYCH_TREATMENT_DETAILS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "READY_FOR_ARCHIVE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "READY_FOR_SUBMISSION"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "READY_FOR_SUB_REVIEW"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RECOVERY_OF_MONIES"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REDUCTION_PCT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REGISTERED_GP_ATTENDED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REGISTERED_WITH_GP"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RELATIONSHIP_DATE_OK"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RELATIONSHIP_TO_DECEASED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RELAT_TO_DECEASED_COHAB"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REPORTED_BY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REPORTED_TO_POLICE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REP_AUTH_NAME"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REP_CLAIMS_COMPANY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REP_CLAIMS_COMPANY_REG"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_01"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_02"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_03"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_04"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_05"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_06"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_07"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_08"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_09"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESIDENCY_10"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RESTRICTED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "RETURN_TO_WORK_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REVIEW_DEC_DIFF_BASIS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "REV_ENQ_NECESSARY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SAME_FAMILY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SAME_HOUSEHOLD"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SAME_ROOF_REASON_APPEAL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SAME_ROOF_REASON_FDC"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SAME_ROOF_REASON_REV"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SAME_ROOF_RULE_DECISION_APPEAL"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SAME_ROOF_RULE_DECISION_FDC"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SAME_ROOF_RULE_DECISION_REV"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SCARRING"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SEEN_PSYCH"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SEND_CORR_TO_REP"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SHARED_PARENTAL_RESPON"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SHARED_PARENTAL_RESPON_NAME"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SHOCK_INJ_ONLY"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SPC"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SPP_ID"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SPP_TRIM_URI"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "STATEMENT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "SUSP_REA_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "TELL_US_INJURIES"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "TEL_APPL_REC_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "TREATMENT_CURRENT_SYMPTOMS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "TREATMENT_OTHER_PROV"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "TREATMENT_OTHER_PROV_DETAILS"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "TREATMENT_RECEIVED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "TREATMENT_STILL_RECEIVED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "TS_REFERENCE"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "UNABLE_OBTAIN_REASON"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "UNABLE_PAY_REASON"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "UNABLE_TO_WORK"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "UPLOADED_DOCUMENT"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "WHERE_REPORTED"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "WHY_NO_OTHER_COMPENSATION"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "WORK_SITUATION"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "WORK_SITUATION_OTHER"
+    },
+    {
+      "object_name": "CLAIMS.CASES",
+      "column_name": "WRITTEN_STATEMENT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "CHQ_SENT_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "DATE_CONFIRMED"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "DATE_PAID"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "DEC_MKR_GRADE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "MITIGATION_AMT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "MITIGATION_PCNT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "REASON_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "REDUCTION_AMT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "RETURN_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "REVOKED"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISIONS",
+      "column_name": "SUBMITTED_DEC_MKR"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "COURT_COMPENSATION"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "CREATED_BY"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "CREATED_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "DECISION_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "INJURY_1_AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "INJURY_1_DESCR"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "INJURY_2_AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "INJURY_2_DESCR"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "INJURY_3_AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "INJURY_3_DESCR"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "MITIGATION_AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "MITIGATION_PERCENT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "REDUCTION_AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "REDUCTION_PERCENT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "SAME_ROOF"
+    },
+    {
+      "object_name": "CLAIMS.CASE_DECISION_OFFERS",
+      "column_name": "TOTAL_OFFER"
+    },
+    {
+      "object_name": "CLAIMS.CASE_REASONS",
+      "column_name": "ADDITIONAL_TEXT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_REASONS",
+      "column_name": "AMENDED_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_REASONS",
+      "column_name": "CREATION_DATE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_REASONS",
+      "column_name": "DECISION_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_REASONS",
+      "column_name": "REASON_TEXT"
+    },
+    {
+      "object_name": "CLAIMS.CASE_REASONS",
+      "column_name": "STAFF_MEMBER"
+    },
+    {
+      "object_name": "CLAIMS.CASE_REASONS",
+      "column_name": "STAGE_CODE"
+    },
+    {
+      "object_name": "CLAIMS.CASE_TYPES",
+      "column_name": "CURR"
+    },
+    {
+      "object_name": "CLAIMS.CASE_TYPES",
+      "column_name": "SPP_ALERT"
+    },
+    {
+      "object_name": "CLAIMS.DECISION_STATUSES",
+      "column_name": "REASON_CODE"
+    },
+    {
+      "object_name": "CLAIMS.DECISION_STATUSES",
+      "column_name": "RETURN_CODE"
+    },
+    {
+      "object_name": "CLAIMS.DECISION_STATUSES",
+      "column_name": "STAFF_MEMBER"
+    },
+    {
+      "object_name": "CLAIMS.DECISION_STATUSES",
+      "column_name": "SUBMITTED_DEC_MKR"
+    },
+    {
+      "object_name": "CLAIMS.INJURY_IN_TARIFF_CATEGORIES",
+      "column_name": "AMENDMENT_DATE"
+    },
+    {
+      "object_name": "CLAIMS.INJURY_IN_TARIFF_CATEGORIES",
+      "column_name": "CREATION_DATE"
+    },
+    {
+      "object_name": "CLAIMS.INJURY_IN_TARIFF_CATEGORIES",
+      "column_name": "END_DATE"
+    },
+    {
+      "object_name": "CLAIMS.INJURY_IN_TARIFF_CATEGORIES",
+      "column_name": "STAFF_MEMBER"
+    },
+    {
+      "object_name": "CLAIMS.INJURY_IN_TARIFF_CATEGORIES",
+      "column_name": "START_DATE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "ADD_1"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "ADD_2"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "ADD_3"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "ADD_4"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "ADD_5"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "CLOCK_NO"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "COMPENSATION_FROM"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "COMPENSATION_VALUE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "CURR"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "DATE_OF_BIRTH_QUAL"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "DATE_OF_DEATH_QUAL"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "DATE_OF_DEATH_QUAL1"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "DISABILITY"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "EMAIL_ADDRESS"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "EQAL_OP_AGE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "EQAL_OP_GENDER"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "ETHNIC_ORIGIN"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "FORENAMES"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "FOR_SOUND"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "FUTURE_TREATMENT_DATE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "HERITIGE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "HERITIGE_OTHER"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "HOME_TEL"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "INITIALS"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "INS_ID"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "LAST_CHANGED"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "LAST_CHANGED_BY"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "LAST_PAID"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "MARITAL_STATUS"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "MOBILE_NUMBER"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "NI_NO"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "OAS_DTE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "POSTCODE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "PREV_CONVS"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "RELATIONSHIP_TO_DEC"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "RELIGION_OTHER"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "RELIGION_TYPE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "RESTRICTED"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "SO_TYPE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "SPECIAL_INDICATOR"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "SUR_SOUND"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "TELEPHONE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "TITLE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "TRANS_TRANS_INT"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVED_BODIES",
+      "column_name": "WEBSITE_ADDRESS"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVEMENTS",
+      "column_name": "CONTACT_CODE"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVEMENTS",
+      "column_name": "CORR_DIRECTLY"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVEMENTS",
+      "column_name": "DATE_OF_FIRST_MED_TREATMENT"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVEMENTS",
+      "column_name": "DATE_OF_FIRST_TREATMENT"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVEMENTS",
+      "column_name": "EXT_REF_NO"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVEMENTS",
+      "column_name": "INS_ID"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVEMENTS",
+      "column_name": "START_DATE_QUAL"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVEMENTS",
+      "column_name": "VISIT_HOSPITAL"
+    },
+    {
+      "object_name": "CLAIMS.INVOLVEMENT_TYPE_CODES",
+      "column_name": "CURR"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "AVAILABLE_FOR_CASES"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "CLAIMS_PRINTER"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "COMMENTS"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "DEST_ID"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "EMAIL_ADDRESS"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "FIRST_SUBS_CURR"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "FIRST_SUBS_YTD"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "GENERIC_LOGIN"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "HONOURS"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "INSTITUTION_UPDATES"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "INTERIM_SUBS_CURR"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "INTERIM_SUBS_YTD"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "LOGON_ALLOWED"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "MOBILE_PHONE_NUMBER"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "NO_OF_BAGS"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "PASSWORD_CHANGE"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "PHONE_NO"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "PRINTER_ID"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "REP_MAX_PRIORITY"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "REP_REPORT_LIMIT"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "REP_SPACE_LIMIT_MB"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "RESUBS_CURR"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "RESUBS_YTD"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "SEC_LOCATION"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "SUB_TYPE"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "TARIFF_PRINTER"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "TEMP"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "TITLE"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDERS",
+      "column_name": "USERID"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDER_GRADES",
+      "column_name": "AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDER_GRADES",
+      "column_name": "CURR"
+    },
+    {
+      "object_name": "CLAIMS.POST_HOLDER_GRADES",
+      "column_name": "GRADE_LEVEL"
+    },
+    {
+      "object_name": "CLAIMS.STAGES",
+      "column_name": "CURR"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWARD_COMPONENTS",
+      "column_name": "REA_TYPE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWARD_COMPONENTS",
+      "column_name": "START_DATE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+      "column_name": "ADDITIONAL_COMP"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+      "column_name": "APPLY_REDUC"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+      "column_name": "DEFAULT_AMOUNT"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+      "column_name": "END_DATE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+      "column_name": "PAST_FUTURE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+      "column_name": "PI_FATAL"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+      "column_name": "POST_HOLDER"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+      "column_name": "SIGNE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_AWA_COMP_TYPES",
+      "column_name": "START_DATE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_DECISION_TYPES",
+      "column_name": "CURR"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "AMENDED_DATE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "COMMENTS"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "CREATION_DATE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "DECISION_MAKER"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "END_DATE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "FULL_DESCRIPTION"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "GUIDELINES"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "INJ_TYPE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "INTERIM_FLAG"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "MEDICAL_NAME"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "SCHEME_BAND_2012"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "SERIOUS_HEAD_SPINAL_INJ"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "STAFF_MEMBER"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_INJURIES",
+      "column_name": "START_DATE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_REASON_TYPES",
+      "column_name": "CURR"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_REASON_TYPES",
+      "column_name": "REMOVED_DATE"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_REASON_TYPES",
+      "column_name": "SCHEME"
+    },
+    {
+      "object_name": "CLAIMS.TARIFF_STATUS_TYPES",
+      "column_name": "CURR"
+    }
+  ]
+}

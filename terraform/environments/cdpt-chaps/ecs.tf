@@ -373,7 +373,7 @@ resource "aws_launch_template" "ec2-launch-template" {
     ebs {
       delete_on_termination = true
       encrypted             = true
-      volume_size           = 30
+      volume_size           = 60
       volume_type           = "gp2"
       iops                  = 0
     }

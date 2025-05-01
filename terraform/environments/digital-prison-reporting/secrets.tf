@@ -93,6 +93,7 @@ resource "aws_secretsmanager_secret" "oasys" {
     {
       Name          = "external/${local.project}-oasys-source-secret"
       Resource_Type = "Secrets"
+      Jira          = "DPR2-XXX"
     }
   )
 }
@@ -122,6 +123,7 @@ resource "aws_secretsmanager_secret" "onr" {
     {
       Name          = "external/${local.project}-onr-source-secret"
       Resource_Type = "Secrets"
+      Jira          = "DPR2-XXX"
     }
   )
 }
@@ -137,6 +139,36 @@ resource "aws_secretsmanager_secret_version" "onr" {
     ignore_changes = [secret_string, ]
   }
 }
+
+# nDelius Source Secrets
+resource "aws_secretsmanager_secret" "ndelius" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+  count = local.is_dev_or_test ? 1 : 0
+
+  name = "external/${local.project}-ndelius-source-secret"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-ndelius-source-secret"
+      Resource_Type = "Secrets"
+    }
+  )
+}
+
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "ndelius" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.ndelius[0].id
+  secret_string = jsonencode(local.ndelius_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
 
 
 # DPS Source Secrets
@@ -485,9 +517,14 @@ resource "aws_secretsmanager_secret" "ods_dps_inc_reporting_access" {
       Jira          = "DPR-1751"
     }
   )
+
 }
 
 resource "aws_secretsmanager_secret_version" "ods_dps_inc_reporting_access" {
   secret_id     = aws_secretsmanager_secret.ods_dps_inc_reporting_access.id
   secret_string = jsonencode(local.ods_access_secret_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
 }

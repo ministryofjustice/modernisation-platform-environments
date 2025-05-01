@@ -27,10 +27,12 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 50
   - package-ecosystem: "devcontainers"
     directory: "/"
     schedule:
       interval: "daily"
+    open-pull-requests-limit: 50
     reviewers:
       - "ministryofjustice/devcontainer-community"
 EOL
@@ -48,8 +50,7 @@ if [[ -n "$tf_dirs" ]]; then
   
   echo "    schedule:" >> "$dependabot_file"
   echo "      interval: \"daily\"" >> "$dependabot_file"
-  echo "    ignore:" >> "$dependabot_file"
-  echo "      - dependency-name: \"integrations/github\"" >> "$dependabot_file"
+  echo "    open-pull-requests-limit: 50" >> "$dependabot_file"
 fi
 
 # Add Go module ecosystem entries (dynamically only for top-level directories containing go.mod)
@@ -65,6 +66,7 @@ if [[ -n "$gomod_dirs" ]]; then
 
   echo "    schedule:" >> "$dependabot_file"
   echo "      interval: \"daily\"" >> "$dependabot_file"
+  echo "    open-pull-requests-limit: 50" >> "$dependabot_file"
 fi
 
 echo "dependabot.yml has been successfully generated."

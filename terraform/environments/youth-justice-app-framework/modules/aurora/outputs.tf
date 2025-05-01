@@ -3,9 +3,19 @@ output "rds_cluster_endpoint" {
   value       = module.aurora.cluster_endpoint
 }
 
+output "rds_cluster_reader_endpoint" {
+  description = "The read only endpoint of the Aurora cluster"
+  value       = module.aurora.cluster_reader_endpoint
+}
+
 output "app_rotated_postgres_secret_arn" {
   description = "The ARN of the rotated postgres secret"
   value       = aws_secretsmanager_secret.user_admin_secret["postgres_rotated"].arn
+}
+
+output "rds_redshift_secret_arn" {
+  description = "The ARN of the rotated postgres secret"
+  value       = aws_secretsmanager_secret.user_admin_secret["redshift_readonly"].arn
 }
 
 output "rds_cluster_security_group_id" {

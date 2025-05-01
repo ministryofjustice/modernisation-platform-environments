@@ -9,9 +9,9 @@ variable "database_name" {
 
 }
 
-variable "data_engineer_role_arn" {
-  description = "ARN of the DE role"
-  type        = string
+variable "extra_arns" {
+  description = "ARNs of admin roles"
+  type        = list(string)
 }
 
 variable "data_bucket_lf_resource" {

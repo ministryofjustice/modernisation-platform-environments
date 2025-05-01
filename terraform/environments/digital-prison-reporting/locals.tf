@@ -190,7 +190,7 @@ locals {
   lambda_redshift_table_expiry_memory_size         = 1024
 
   # Scheduled Dataset Lambda
-  lambda_scheduled_dataset_enabled        = true
+  lambda_scheduled_dataset_enabled        = local.application_data.accounts[local.environment].enable_scheduled_dataset_lambda
   lambda_scheduled_dataset_name           = "${local.project}-scheduled-dataset"
   lambda_scheduled_dataset_runtime        = "java21"
   lambda_scheduled_dataset_tracing        = "Active"
@@ -213,7 +213,7 @@ locals {
   lambda_scheduled_dataset_memory_size         = 1024
 
   # Generate Dataset Lambda
-  lambda_generate_dataset_enabled        = true
+  lambda_generate_dataset_enabled        = local.application_data.accounts[local.environment].enable_generate_dataset_lambda
   lambda_generate_dataset_name           = "${local.project}-generate-dataset"
   lambda_generate_dataset_runtime        = "java21"
   lambda_generate_dataset_tracing        = "Active"
@@ -305,7 +305,8 @@ locals {
 
   # Nomis Secrets PlaceHolder
   nomis_secrets_placeholder = {
-    db_name  = "nomis"
+    db_name = "nomis"
+    #checkov:skip=CKV_SECRET_6 This is a placeholder secret that is replaced with the real thing
     password = "placeholder"
     # We need to duplicate the username with 'user' and 'username' keys
     user     = "placeholder"
@@ -337,6 +338,16 @@ locals {
   # ONR Secrets PlaceHolder
   onr_secrets_placeholder = {
     db_name  = "onr"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
+  # nDelius Secrets PlaceHolder
+  ndelius_secrets_placeholder = {
+    db_name  = "ndelius"
     password = "placeholder"
     user     = "placeholder"
     username = "placeholder"

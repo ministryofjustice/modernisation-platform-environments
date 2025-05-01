@@ -1,4 +1,12 @@
+# trivy:ignore:AVD-AWS-0107 (HIGH): Security group rule allows unrestricted ingress from any IP address.
 resource "aws_security_group" "importmachine" {
+
+  # checkov:skip=CKV_AWS_24: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 22"
+  # checkov:skip=CKV_AWS_260: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 80"
+  # checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+  # checkov:skip=CKV_AWS_25: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 3389"
+  # checkov:skip=CKV_AWS_277: "Ensure no security groups allow ingress from 0.0.0.0:0 to port -1"
+
   description = "Configure importmachine access - ingress should be only from Bastion"
   name        = "importmachine-${local.application_name}"
   vpc_id      = local.vpc_id
@@ -47,7 +55,7 @@ resource "aws_key_pair" "ben" {
 }
 
 resource "aws_instance" "importmachine" {
-
+  # checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   depends_on             = [aws_security_group.importmachine]
   instance_type          = "t3a.large"
   ami                    = local.application_data.accounts[local.environment].importmachine-ami
@@ -87,6 +95,9 @@ resource "aws_instance" "importmachine" {
 }
 
 resource "aws_ebs_volume" "disk_xvdf" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.importmachine]
   snapshot_id       = local.application_data.accounts[local.environment].importmachine-data-snapshot
   availability_zone = "${local.region}a"

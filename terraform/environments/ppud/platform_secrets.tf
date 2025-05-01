@@ -31,7 +31,15 @@ data "aws_ssm_parameter" "klayers_account_prod" {
 }
 
 # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
-data "aws_ssm_parameter" "elb-account-eu-west-2" {
-  name            = "elb-account-eu-west-2"
+data "aws_ssm_parameter" "elb-account-eu-west-2-dev" {
+  count           = local.is-development == true ? 1 : 0
+  name            = "elb-account-eu-west-2-dev"
+  with_decryption = true
+}
+
+# Home Office Account ID - used by endpoint service
+data "aws_ssm_parameter" "homeoffice_account_prod" {
+  count           = local.is-production == true ? 1 : 0
+  name            = "homeoffice-account"
   with_decryption = true
 }

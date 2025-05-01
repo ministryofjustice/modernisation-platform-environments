@@ -402,9 +402,9 @@ resource "aws_vpc_security_group_ingress_rule" "ecs_ingress" {
 resource "aws_vpc_security_group_egress_rule" "ecs_egress" {
   #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
   security_group_id = aws_security_group.ecs_service.id
-  ip_protocol      = "-1"
-  description      = "Allow all outbound traffic"
-  cidr_ipv4        = "0.0.0.0/0"
+  ip_protocol       = "-1"
+  description       = "Allow all outbound traffic"
+  cidr_ipv4         = "0.0.0.0/0"
 }
 
 resource "aws_ecr_repository" "wardship_ecr_repo" {

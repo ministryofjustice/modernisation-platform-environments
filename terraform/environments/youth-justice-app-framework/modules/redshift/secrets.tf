@@ -11,6 +11,8 @@ resource "aws_secretsmanager_secret_version" "user_admin" {
   secret_string = jsonencode({
     username = "admin"
     password = random_password.user_admin_password.result
+
+
   })
 }
 
@@ -18,4 +20,24 @@ resource "random_password" "user_admin_password" {
   length           = 16
   special          = true
   override_special = "!#$%&*()-_=+[]{}<>:?"
+}
+
+resource "aws_secretsmanager_secret" "returns" {
+  #checkov:skip=CKV2_AWS_57: [TODO] Consider adding rotation for the Redshift admin user password.
+
+  name        = "${var.project_name}/${var.environment}/returns-microservice/redshift-serverless/"
+  description = "Access to Redshift Serverless for the Returns Microservice"
+  kms_key_id  = var.kms_key_arn
+}
+
+resource "aws_secretsmanager_secret_version" "returns" {
+  secret_id = aws_secretsmanager_secret.returns.id
+  secret_string = jsonencode({
+    username = "microservice_returns"
+    password = "changeme"
+    hostname = aws_redshiftserverless_workgroup.default.endpoint[0].address
+    port     = aws_redshiftserverless_workgroup.default.endpoint[0].port
+    database = "yjb_returns"
+    url      = "jdbc:redshift://${aws_redshiftserverless_workgroup.default.endpoint[0].address}:${aws_redshiftserverless_workgroup.default.endpoint[0].port}/yjb_returns;TCPKeepAlice=FALSE"
+  })
 }
