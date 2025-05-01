@@ -143,16 +143,18 @@ locals {
   # G4S
   #----------------------------------------------------------------------------
   g4s_ssh_keys = [
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBK85G9UwgU1KKgsYXfTWDsT4MqGSmjku1XGpH1EqmSuXLk5lmwFsgoLqqsROq2oEw2Yrr3uLyNVY2Dl6Pfm+dkdljfbPtqku+AkRSkhDo4K7bIwhWPh7HImcalxhde6BUA== ecdsa-key-20240208",
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBEXJdSFcodesKVvDRdJYySLZ7RSmkHDadklPTi1M4GId09+9hD9VoCbLWJsDbbDtXEkts63oNOIBcF8w1KfkC1O0N7VPumJ6VkklXNBrhDPJu3JvENZW/bX2JDPC+/gYdg== ecdsa-key-20241125",
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBJ11LVR2KRfiTbziv7Xkr7RfDCI502InqqBlAKxDiQQgEeGkRJQNI11e/uSQTZCgaj/F4AXadBvaJ0buH478q1+FBZ8pl7EkZlxeRky3vBu0hPFNN6+9D8Q//uGpEKSu+w== ecdsa-key-20241125",
-    "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBGa8I/XEQt/HkWvjEXip9Ob0xgsUb47dyAoJ3htuc/pp0oxf2xpYk1YkdzQt8jo8b6effc2e5mf6MdEdMo6t/ck9TnER5IOs/BeurNTnlzq2JW6RDLBmhrB5yyfcYf9nyA== ecdsa-key-20241125",
+    # "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBK85G9UwgU1KKgsYXfTWDsT4MqGSmjku1XGpH1EqmSuXLk5lmwFsgoLqqsROq2oEw2Yrr3uLyNVY2Dl6Pfm+dkdljfbPtqku+AkRSkhDo4K7bIwhWPh7HImcalxhde6BUA== ecdsa-key-20240208",
+    # "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBEXJdSFcodesKVvDRdJYySLZ7RSmkHDadklPTi1M4GId09+9hD9VoCbLWJsDbbDtXEkts63oNOIBcF8w1KfkC1O0N7VPumJ6VkklXNBrhDPJu3JvENZW/bX2JDPC+/gYdg== ecdsa-key-20241125",
+    # "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBJ11LVR2KRfiTbziv7Xkr7RfDCI502InqqBlAKxDiQQgEeGkRJQNI11e/uSQTZCgaj/F4AXadBvaJ0buH478q1+FBZ8pl7EkZlxeRky3vBu0hPFNN6+9D8Q//uGpEKSu+w== ecdsa-key-20241125",
+    # "ecdsa-sha2-nistp384 AAAAE2VjZHNhLXNoYTItbmlzdHAzODQAAAAIbmlzdHAzODQAAABhBGa8I/XEQt/HkWvjEXip9Ob0xgsUb47dyAoJ3htuc/pp0oxf2xpYk1YkdzQt8jo8b6effc2e5mf6MdEdMo6t/ck9TnER5IOs/BeurNTnlzq2JW6RDLBmhrB5yyfcYf9nyA== ecdsa-key-20241125",
+    "rsa-key-20250430 AAAAB3NzaC1yc2EAAAADAQABAAACAQCgnqTO2creQg+f4cS39KICfGw2q65MxkJroL1jTvvxxz9GtU8JGY2SXRFtiiacrM29Akd9IkXeo3QImFU7h6R6NPrIr7rd75w5NJewHfmDYdzx7pZIjIyV3HS8md/xr4wxr6OllxGujdOKoXPA22GfLkWP94UaOh+Z9AtJawxMDcHvQf+yYq6Yz2IMooEfw1ijVoPfDxpFtrzq0ilX0A8ja4iWyUwojy0P7PPygviTbOMSzG5w3+B0lFKuiBtm+EOcGAy1h0rg8Izqyu8TgHJbfCKzVnnFbxdl/j2A98LHZ22d48NxaKn/Im432UQkbWThKSkwZi+T+5GbTI1qP+2XxxNH1q90t0x4Y+em2wtg5RymN96Fbuh0Dsrp8An3ZcFLn+SmZkky/Hypv86dhS24XRwMe/AlrCmGjb7EpYWUq2wvhe2L3pHMxwK9Nl3L+qJLgaV7P54tlq+BgQE2pieuxj+Bod+Ks5kOZdpyal/3AIoA5BEIFyY80qGtHJnbDZXD5qgNLaozxW5EoyHn93dUGAmncZHfmurhPImjqukdWnnwPC6XqghQhJgfL5Ed+xv+qipp0vzcm+T6UAppS3W6KEAJzb/ce4u1ReQzxMX+VPvdv94REE6EMBh5rkgH2+C8RtNM8Tfys8nogt/Pi96Wh/fYqWMELTfaZSDlbiyxgQ=="
   ]
   g4s_cidr_ipv4s = [
-    "18.135.195.129/32",
-    "18.130.124.178/32",
-    "18.171.111.175/32",
-    "35.178.248.3/32",
+    # "18.135.195.129/32",
+    # "18.130.124.178/32",
+    # "18.171.111.175/32",
+    # "35.178.248.3/32",
+    "34.89.82.32/32",
   ]
   g4s_cidr_ipv6s = []
 
@@ -249,6 +251,27 @@ locals {
   
   sftp_account_g4s_lcm_archive = {
     name       = "lcm_archive"
+    ssh_keys   = local.g4s_ssh_keys
+    cidr_ipv4s = local.g4s_cidr_ipv4s
+    cidr_ipv6s = local.g4s_cidr_ipv6s
+  }
+
+  sftp_account_g4s_lcm = {
+    name       = "lcm"
+    ssh_keys   = local.g4s_ssh_keys
+    cidr_ipv4s = local.g4s_cidr_ipv4s
+    cidr_ipv6s = local.g4s_cidr_ipv6s
+  }
+
+  sftp_account_g4s_gps = {
+    name       = "gps"
+    ssh_keys   = local.g4s_ssh_keys
+    cidr_ipv4s = local.g4s_cidr_ipv4s
+    cidr_ipv6s = local.g4s_cidr_ipv6s
+  }
+
+  sftp_account_g4s_centurion = {
+    name       = "centurion"
     ssh_keys   = local.g4s_ssh_keys
     cidr_ipv4s = local.g4s_cidr_ipv4s
     cidr_ipv6s = local.g4s_cidr_ipv6s
