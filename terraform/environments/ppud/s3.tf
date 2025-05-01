@@ -184,7 +184,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
 
 resource "aws_s3_bucket_logging" "MoJ-Health-Check-Reports" {
   bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
-  target_bucket = aws_s3_bucket.moj-log-files-prod.id
+  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/moj-health-check-reports-logs/"
 }
 
