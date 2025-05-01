@@ -318,7 +318,7 @@ fi
 # Set up service
 mkdir -p /opt/odata-demo
 cd /opt/odata-demo
-aws s3 cp s3://dpr-artifact-store-test/third-party/odata-demo/OData-demo-0.0.1-SNAPSHOT.jar ./OData-demo.jar
+aws s3 cp s3://dpr-artifact-store-development/third-party/odata-demo/OData-demo-0.0.1-SNAPSHOT.jar ./OData-demo.jar
 chown -R ec2-user:ec2-user /opt/odata-demo
 
 cat <<EOF > /etc/systemd/system/odata-demo.service
