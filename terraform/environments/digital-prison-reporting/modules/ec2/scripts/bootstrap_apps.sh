@@ -37,6 +37,10 @@ else
   echo "ssm-user created"
 fi
 
+# Add ssm-user to sudoers temporarily (optional)
+echo 'ssm-user ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ssm-user
+chmod 440 /etc/sudoers.d/ssm-user
+
 echo "assumeyes=1" >> /etc/yum.conf
 
 # Update all packages
