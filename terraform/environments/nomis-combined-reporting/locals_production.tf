@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_production = {
+    maintenance_title   = "Prison-NOMIS Reporting Maintenance Window"
+    maintenance_message = "Prison-NOMIS Reporting is currently unavailable due to planned maintenance. Please try again later."
+  }
+
   baseline_presets_production = {
     options = {
       sns_topics = {
@@ -332,7 +337,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
                     status_code  = "200"
                   }
                 }]
@@ -404,7 +409,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
                     status_code  = "200"
                   }
                 }]
