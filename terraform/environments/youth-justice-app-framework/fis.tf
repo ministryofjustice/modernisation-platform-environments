@@ -1,6 +1,6 @@
 resource "aws_fis_experiment_template" "az_power_interrupt" {
   description = "Simulate AZ power outage in eu-west-2b"
-  role_arn    = "arn:aws:iam::053556912568:role/service-role/AWSFISIAMRole-Preprod"
+  role_arn    = aws_iam_role.fis_role.arn
 
   stop_condition {
     source = "none"
@@ -8,11 +8,12 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
 
   log_configuration {
     cloudwatch_logs_configuration {
-      log_group_arn = "arn:aws:logs:eu-west-2:053556912568:log-group:AWS-FIS-Logs"
+      log_group_arn = aws_cloudwatch_log_group.fis_logs.arn
     }
     log_schema_version = 1
   }
 
+  # Targets
   target {
     name           = "ASG"
     resource_type  = "aws:ec2:autoscaling-group"
@@ -22,6 +23,82 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
       value = "IceAsg"
     }
   }
+
+  target {
+    name           = "ASGInstances"
+    resource_type  = "aws:ec2:instance"
+    selection_mode = "ALL"
+    resource_tag {
+      key   = "AzImpairmentPower"
+      value = "IceAsg"
+    }
+    filter {
+      path   = "State.Name"
+      values = ["running"]
+    }
+    filter {
+      path   = "Placement.AvailabilityZone"
+      values = ["eu-west-2b"]
+    }
+  }
+
+  target {
+    name           = "EC2Instances"
+    resource_type  = "aws:ec2:instance"
+    selection_mode = "ALL"
+    resource_tag {
+      key   = "AzImpairmentPower"
+      value = "StopInstances"
+    }
+    filter {
+      path   = "State.Name"
+      values = ["running"]
+    }
+    filter {
+      path   = "Placement.AvailabilityZone"
+      values = ["eu-west-2b"]
+    }
+  }
+
+  target {
+    name           = "Volumes"
+    resource_type  = "aws:ec2:ebs-volume"
+    selection_mode = "COUNT(1)"
+    resource_tag {
+      key   = "AzImpairmentPower"
+      value = "ApiPauseVolume"
+    }
+    filter {
+      path   = "Attachments.DeleteOnTermination"
+      values = ["false"]
+    }
+  }
+
+  target {
+    name           = "RDSCluster"
+    resource_type  = "aws:rds:cluster"
+    selection_mode = "ALL"
+    resource_tag {
+      key   = "AzImpairmentPower"
+      value = "DisruptRds"
+    }
+  }
+
+  target {
+    name           = "Subnets"
+    resource_type  = "aws:ec2:subnet"
+    selection_mode = "ALL"
+    resource_tag {
+      key   = "AzImpairmentPower"
+      value = "DisruptSubnet"
+    }
+    filter {
+      path   = "AvailabilityZone"
+      values = ["eu-west-2b"]
+    }
+  }
+
+  # Actions
 
   action {
     name      = "Pause-ASG-Scaling"
@@ -48,7 +125,122 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     }
   }
 
+  action {
+    name      = "Stop-ASG-Instances"
+    action_id = "aws:ec2:stop-instances"
+
+    target {
+      key   = "Instances"
+      value = "ASGInstances"
+    }
+
+    parameter {
+      key   = "completeIfInstancesTerminated"
+      value = "true"
+    }
+
+    parameter {
+      key   = "startInstancesAfterDuration"
+      value = "PT1H"
+    }
+  }
+
+  action {
+    name      = "Stop-EC2-Instances"
+    action_id = "aws:ec2:stop-instances"
+
+    target {
+      key   = "Instances"
+      value = "EC2Instances"
+    }
+
+    parameter {
+      key   = "completeIfInstancesTerminated"
+      value = "true"
+    }
+
+    parameter {
+      key   = "startInstancesAfterDuration"
+      value = "PT1H"
+    }
+  }
+
+  action {
+    name      = "Pause-Volume-IO"
+    action_id = "aws:ebs:pause-volume-io"
+
+    target {
+      key   = "Volumes"
+      value = "Volumes"
+    }
+
+    parameter {
+      key   = "duration"
+      value = "PT1H"
+    }
+  }
+
+  action {
+    name      = "Failover-RDS"
+    action_id = "aws:rds:failover-db-cluster"
+
+    target {
+      key   = "Clusters"
+      value = "RDSCluster"
+    }
+
+    parameter {
+      key   = "writerAvailabilityZoneIdentifiers"
+      value = "eu-west-2b"
+    }
+  }
+
+  action {
+    name      = "Disrupt-Network"
+    action_id = "aws:network:disrupt-connectivity"
+
+    target {
+      key   = "Subnets"
+      value = "Subnets"
+    }
+
+    parameter {
+      key   = "duration"
+      value = "PT2M"
+    }
+
+    parameter {
+      key   = "scope"
+      value = "all"
+    }
+  }
+
   tags = {
     Name = "FIS AZ Power Outage Simulation"
   }
+}
+
+resource "aws_iam_role" "fis_role" {
+  name = "AWSFISIAMRole-Preprod"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "fis.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "fis_managed_policy" {
+  role       = aws_iam_role.fis_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSFaultInjectionSimulatorFullAccess"
+}
+
+resource "aws_cloudwatch_log_group" "fis_logs" {
+  name              = "AWS-FIS-Logs"
+  retention_in_days = 400
 }
