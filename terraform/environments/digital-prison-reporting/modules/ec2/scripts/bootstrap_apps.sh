@@ -307,12 +307,12 @@ yum update -y
 if amazon-linux-extras | grep -q corretto11; then
   amazon-linux-extras enable corretto11
   yum clean metadata
-  yum install -y java-11-amazon-corretto
+  yum install -y java-21-amazon-corretto
 else
   # Fall back to direct repo if extras is missing
   rpm --import https://yum.corretto.aws/corretto.key
   curl -Lo /etc/yum.repos.d/corretto.repo https://yum.corretto.aws/corretto.repo
-  yum install -y java-11-amazon-corretto
+  yum install -y java-21-amazon-corretto
 fi
 
 # Set up service
