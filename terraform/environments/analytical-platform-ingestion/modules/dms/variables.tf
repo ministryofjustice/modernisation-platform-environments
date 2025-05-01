@@ -128,7 +128,7 @@ variable "valid_files_mutable" {
   description = "If false, copy valid files to their destination bucket with a datetime infix"
 }
 
-variable create_ancillary_static_roles {
+variable "create_ancillary_static_roles" {
   type = bool
   default = true
   description = <<EOF
