@@ -189,10 +189,9 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
       value = "RDSCluster"
     }
 
-    parameter {
-      key   = "writerAvailabilityZoneIdentifiers"
-      value = "eu-west-2b"
-    }
+    parameters = {
+    dbClusterIdentifier = module.aurora.cluster_id
+}
   }
 
   action {
