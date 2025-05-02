@@ -43,7 +43,10 @@ module "eventbridge_dms_full_load_task_role" {
     {
       test     = "StringEquals"
       variable = "aws:SourceArn"
-      values   = [aws_scheduler_schedule_group.dms_nightly_full_load.arn]
+      values   = [
+        aws_scheduler_schedule_group.tariff_dms_nightly_full_load.arn,
+        aws_scheduler_schedule_group.tempus_dms_nightly_full_load.arn
+      ]
     }
   ]
 }
