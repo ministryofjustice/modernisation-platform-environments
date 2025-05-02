@@ -1,5 +1,5 @@
 #!/bin/bash -xe
-# send script output to /tmp so we can debug boot failures
+# send script output to /tmp so we can debug boot failures 
 exec > /tmp/userdata.log 2>&1
 
 # ENV Variables, 
