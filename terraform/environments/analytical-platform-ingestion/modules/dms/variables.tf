@@ -171,3 +171,9 @@ variable "metadata_generator_allowed_triggers" {
   default     = {}
   description = "Which services can invoke metadata generator lambda (see https://github.com/terraform-aws-modules/terraform-aws-lambda?tab=readme-ov-file#lambda-permissions-for-allowed-triggers)"
 }
+
+variable "create_replication_instance" {
+  type        = bool
+  default     = true
+  description = "Whether to create new replication instance in module"
+}

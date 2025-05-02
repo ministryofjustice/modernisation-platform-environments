@@ -34,7 +34,7 @@ module "cica_dms_tariff_dms_implementation" {
   db = local.tariff.short_resource_name
 
   dms_replication_instance = {
-    replication_instance_id    = local.tariff.resource_name
+    replication_instance_id    = "cica-ap-${local.environment}"
     subnet_cidrs               = local.environment_configuration.connected_vpc_private_subnets
     subnet_group_name          = local.tariff.resource_name
     allocated_storage          = 20
@@ -84,10 +84,12 @@ module "cica_dms_tempus_dms_implementation" {
   source      = "../modules/dms"
   vpc_id      = data.aws_vpc.connected_vpc.id
   environment = local.environment
-  db          = each.value.short_resource_name
+
+  db                          = each.value.short_resource_name
+  create_replication_instance = false
 
   dms_replication_instance = {
-    replication_instance_id    = each.value.resource_name
+    replication_instance_id    = "cica-ap-${local.environment}"
     subnet_cidrs               = local.environment_configuration.connected_vpc_private_subnets
     subnet_group_name          = each.value.resource_name
     allocated_storage          = 20
