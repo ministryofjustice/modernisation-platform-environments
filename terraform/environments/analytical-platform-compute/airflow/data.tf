@@ -114,7 +114,7 @@ data "aws_subnets" "apc_public_subnets" {
 }
 
 # ACM
-data "aws_acm_certificate" "issued" {
+data "aws_acm_certificate" "certificate" {
   domain   = local.route53_zone
   statuses = ["ISSUED"]
 }
