@@ -8,6 +8,8 @@ resource "aws_s3_bucket" "lambda" {
   bucket_prefix = "${var.db}-lambda-fns-"
 
   tags = var.tags
+  # Force destroy is safe here, as the bucket is repopulated on terraform run
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "lambda" {
