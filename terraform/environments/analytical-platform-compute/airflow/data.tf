@@ -91,3 +91,8 @@ data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_
 
   secret_id = data.aws_secretsmanager_secret.actions_runners_token_apc_self_hosted_runners_secret.id
 }
+
+# EKS
+data "aws_eks_cluster" "apc_cluster" {
+  name = local.eks_cluster_name
+}

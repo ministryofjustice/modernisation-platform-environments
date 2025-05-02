@@ -8,7 +8,7 @@ resource "helm_release" "actions_runner_mojas_airflow" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-2"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runner.metadata.name
+  namespace  = data.kubernetes_namespace.actions_runner.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow/values.yml.tftpl",
@@ -34,7 +34,7 @@ resource "helm_release" "actions_runner_mojas_airflow_create_a_pipeline" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-2"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runner.metadata.name
+  namespace  = data.kubernetes_namespace.actions_runner.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow-create-a-pipeline/values.yml.tftpl",
