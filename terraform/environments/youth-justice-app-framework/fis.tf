@@ -99,7 +99,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
   }
 
   # Actions
-
   action {
     name      = "Pause-ASG-Scaling"
     action_id = "aws:ec2:asg-insufficient-instance-capacity-error"
@@ -189,9 +188,10 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
       value = "RDSCluster"
     }
 
-    parameters = {
-    dbClusterIdentifier = module.aurora.cluster_id
-}
+    parameter {
+      key   = "dbClusterIdentifier"
+      value = module.aurora.cluster_id
+    }
   }
 
   action {
@@ -218,6 +218,7 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     Name = "FIS AZ Power Outage Simulation"
   }
 }
+
 
 resource "aws_iam_role" "fis_role" {
   name = "AWSFISIAMRole"
