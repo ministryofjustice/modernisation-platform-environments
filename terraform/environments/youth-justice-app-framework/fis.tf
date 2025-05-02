@@ -8,7 +8,7 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
 
   log_configuration {
     cloudwatch_logs_configuration {
-      log_group_arn = aws_cloudwatch_log_group.fis_logs.arn
+      log_group_arn = "${aws_cloudwatch_log_group.fis_logs.arn}:*"
     }
     log_schema_version = 1
   }
