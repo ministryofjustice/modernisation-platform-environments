@@ -7,12 +7,12 @@ module "mwaa_security_group" {
 
   name = "mwaa"
 
-  vpc_id = module.vpc.vpc_id
+  vpc_id = data.aws_vpc.apc_vpc.id
 
   egress_cidr_blocks = ["0.0.0.0/0"]
   egress_rules       = ["all-all"]
 
-  ingress_cidr_blocks = [module.vpc.vpc_cidr_block]
+  ingress_cidr_blocks = [data.aws_vpc.apc_vpc.cidr_block]
   ingress_rules       = ["all-all"]
 
   ingress_with_self = [

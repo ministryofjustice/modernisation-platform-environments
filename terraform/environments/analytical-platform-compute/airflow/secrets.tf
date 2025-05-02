@@ -53,7 +53,7 @@ module "airflow_connections_slack_api_default_secret" {
 
   name        = "airflow/connections/slack_api_default"
   description = "https://api.slack.com/apps/A06NU3WMDSS/"
-  kms_key_id  = module.common_secrets_manager_kms.key_arn
+  kms_key_id  = data.aws_kms_key.common_secrets_manager_kms.arn
 
   secret_string         = "CHANGEME"
   ignore_secret_changes = true

@@ -1,0 +1,10 @@
+---
+acme:
+  email:
+
+dnsIssuer:
+  aws:
+    region:
+
+httpIssuer:
+  ingressClassName:

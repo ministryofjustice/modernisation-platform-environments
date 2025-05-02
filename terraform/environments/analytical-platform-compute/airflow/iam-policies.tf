@@ -110,7 +110,7 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
     sid       = "AllowSecretsManagerKMS"
     effect    = "Allow"
     actions   = ["kms:Decrypt"]
-    resources = [module.common_secrets_manager_kms.key_arn]
+    resources = [data.aws_kms_key.common_secrets_manager_kms.arn]
   }
   statement {
     sid       = "AllowSecretsManagerList"
@@ -210,7 +210,7 @@ data "aws_iam_policy_document" "mwaa_ses" {
     condition {
       test     = "StringEquals"
       variable = "ses:FromAddress"
-      values   = ["noreply@${local.environment_configuration.route53_zone}"]
+      values   = ["noreply@${local.route53_zone}"]
     }
   }
 }
