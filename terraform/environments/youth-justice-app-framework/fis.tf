@@ -179,18 +179,13 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     }
   }
 
-  action {
+   action {
     name      = "Failover-RDS"
     action_id = "aws:rds:failover-db-cluster"
 
     target {
       key   = "Clusters"
       value = "RDSCluster"
-    }
-
-    parameter {
-      key   = "dbClusterIdentifier"
-      value = module.aurora.cluster_id
     }
   }
 
