@@ -5,6 +5,8 @@ resource "aws_cloudwatch_event_rule" "event_rule" {
   schedule_expression = var.trigger_schedule_expression
   event_pattern       = var.trigger_event_pattern
   event_bus_name      = var.event_bus_name
+
+  tags = var.tags
 }
 
 resource "aws_cloudwatch_event_target" "event_target" {
