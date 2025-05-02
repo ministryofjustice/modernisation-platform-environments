@@ -401,6 +401,7 @@ module "glue_registry_avro" {
     {
       Name          = "${local.project}-glue-registry-avro-${local.env}"
       Resource_Type = "Glue Registry"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -422,6 +423,7 @@ module "s3_glue_job_bucket" {
     {
       name          = "${local.project}-glue-jobs-${local.environment}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -440,6 +442,7 @@ module "s3_raw_archive_bucket" {
     {
       name          = "${local.project}-raw-archive-${local.env}-s3"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-209"
     }
   )
 }
@@ -457,6 +460,7 @@ module "s3_raw_bucket" {
     {
       name          = "${local.project}-raw-zone-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -475,6 +479,7 @@ module "s3_structured_bucket" {
     {
       name          = "${local.project}-structured-zone-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -494,6 +499,7 @@ module "s3_curated_bucket" {
     {
       name          = "${local.project}-curated-zone-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -531,6 +537,7 @@ module "s3_domain_bucket" {
     {
       name          = "${local.project}-domain-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -551,6 +558,7 @@ module "s3_schema_registry_bucket" {
     {
       name          = "${local.project}-schema-registry-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-245"
     }
   )
 }
@@ -569,6 +577,7 @@ module "s3_domain_config_bucket" {
     {
       name          = "${local.project}-domain-config-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -587,6 +596,7 @@ module "s3_violation_bucket" {
     {
       name          = "${local.project}-violation-${local.environment}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -671,6 +681,7 @@ module "s3_artifacts_store" {
     {
       name          = "${local.project}-artifact-store-${local.environment}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -703,6 +714,7 @@ module "s3_working_bucket" {
     {
       name          = "${local.project}-working-${local.environment}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -821,6 +833,7 @@ module "ec2_kinesis_agent" {
     {
       Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
       Resource_Type = "EC2 Instance"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -895,6 +908,7 @@ module "datamart" {
     {
       Name          = local.redshift_cluster_name
       Resource_Type = "Redshift Cluster"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -951,6 +965,7 @@ module "dynamo_tab_domain_registry" {
     {
       Name          = "${local.project}-domain-registry-${local.environment}"
       Resource_Type = "Dynamo Table"
+      Jira          = "DPR-306"
     }
   )
 }
@@ -994,6 +1009,7 @@ module "dynamo_table_step_functions_token" {
     {
       Name          = "${local.project}-step-functions-${local.environment}"
       Resource_Type = "Dynamo Table"
+      Jira          = "DPR2-209"
     }
   )
 }
