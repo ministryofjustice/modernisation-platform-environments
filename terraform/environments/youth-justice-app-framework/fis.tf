@@ -221,7 +221,7 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
 }
 
 resource "aws_iam_role" "fis_role" {
-  name = "AWSFISIAMRole-Preprod"
+  name = "AWSFISIAMRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -235,9 +235,24 @@ resource "aws_iam_role" "fis_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "fis_managed_policy" {
+resource "aws_iam_role_policy_attachment" "fis_ec2_policy" {
   role       = aws_iam_role.fis_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonFISServiceRolePolicy"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSFaultInjectionSimulatorEC2Access"
+}
+
+resource "aws_iam_role_policy_attachment" "fis_networkaccess_policy" {
+  role       = aws_iam_role.fis_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSFaultInjectionSimulatorNetworkAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "fis_rds_policy" {
+  role       = aws_iam_role.fis_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSFaultInjectionSimulatorRDSAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "fis_cloudwatch_policy" {
+  role       = aws_iam_role.fis_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
 }
 
 resource "aws_cloudwatch_log_group" "fis_logs" {
