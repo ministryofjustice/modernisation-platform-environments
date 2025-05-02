@@ -6,8 +6,8 @@ module "mwaa_alb" {
   version = "9.15.0"
 
   name    = "mwaa"
-  vpc_id  = module.vpc.vpc_id
-  subnets = module.vpc.public_subnets
+  vpc_id  = data.aws_vpc.apc_vpc.id
+  subnets = data.aws_subnets.apc_public_subnets
 
   security_group_ingress_rules = {
     all_http = {

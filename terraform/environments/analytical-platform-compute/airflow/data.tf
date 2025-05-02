@@ -95,3 +95,20 @@ data "aws_vpc_endpoint" "mwaa_webserver" {
 data "dns_a_record_set" "mwaa_webserver_vpc_endpoint" {
   host = data.aws_vpc_endpoint.mwaa_webserver.dns_entry[0].dns_name
 }
+
+# APC VPC
+data "aws_vpc" "apc_vpc" {
+  tags = {
+    "Name" = "${var.networking[0].application}-${local.environment}"
+  }
+}
+
+data "aws_subnets" "apc_public_subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.apc_vpc.id]
+  }
+  tags = {
+    Name = "${var.networking[0].application}-${local.environment}-public*"
+  }
+}
