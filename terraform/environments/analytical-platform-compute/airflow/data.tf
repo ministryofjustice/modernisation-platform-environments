@@ -112,3 +112,9 @@ data "aws_subnets" "apc_public_subnets" {
     Name = "${var.networking[0].application}-${local.environment}-public*"
   }
 }
+
+# ACM
+data "aws_acm_certificate" "issued" {
+  domain   = local.route53_zone
+  statuses = ["ISSUED"]
+}

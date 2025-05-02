@@ -28,7 +28,7 @@ module "mwaa_alb" {
   security_group_egress_rules = {
     all = {
       ip_protocol = "-1"
-      cidr_ipv4   = module.vpc.vpc_cidr_block
+      cidr_ipv4   = data.aws_vpc.apc_vpc.cidr_block
     }
   }
   listeners = {
@@ -44,7 +44,7 @@ module "mwaa_alb" {
     https = {
       port            = 443
       protocol        = "HTTPS"
-      certificate_arn = module.acm_certificate.acm_certificate_arn
+      certificate_arn = data.aws_acm_certificate.certificate.arn
 
       forward = {
         target_group_key = "mwaa"
