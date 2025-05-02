@@ -63,8 +63,12 @@ module "cica_dms_eventscheduler_kms" {
 
   # Grants
   grants = {
-    dms_source = {
-      grantee_principal = module.eventbridge_dms_full_load_task_role.iam_role_arn
+    tariff_dms_source = {
+      grantee_principal = module.tariff_eventbridge_dms_full_load_task_role.iam_role_arn
+      operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
+    }
+    tempus_dms_source = {
+      grantee_principal = module.tempus_eventbridge_dms_full_load_task_role.iam_role_arn
       operations        = ["Encrypt", "Decrypt", "GenerateDataKey"]
     }
   }
