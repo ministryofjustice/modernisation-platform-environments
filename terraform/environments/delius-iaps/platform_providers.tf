@@ -56,3 +56,12 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
 }
+
+provider "aws" {
+  alias  = "hmpps-oem"
+  region = "eu-west-2"
+  assume_role {
+    role_arn     = "arn:aws:iam::${local.oem_account_id}:role/OEMSharedSecretsAccessRole"
+    session_name = "tf-oem-secret-access"
+  }
+}

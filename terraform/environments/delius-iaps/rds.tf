@@ -3,6 +3,7 @@ resource "aws_db_instance" "iaps" {
   engine         = "oracle-ee"
   engine_version = local.application_data.accounts[local.environment].db_engine_version
   license_model  = "bring-your-own-license"
+  storage_type   = "gp3"
   instance_class = local.application_data.accounts[local.environment].db_instance_class
   db_name        = "IAPS"
   identifier     = "iaps"
@@ -12,10 +13,11 @@ resource "aws_db_instance" "iaps" {
   master_user_secret_kms_key_id = data.aws_kms_key.general_shared.arn
   snapshot_identifier           = length(local.iaps_snapshot_data_refresh_id) > 0 && local.iaps_snapshot_data_refresh_id != "null" ? local.iaps_snapshot_data_refresh_id : null
   db_subnet_group_name          = aws_db_subnet_group.iaps.id
-  vpc_security_group_ids        = [aws_security_group.iaps_db.id]
+  vpc_security_group_ids        = [aws_security_group.iaps_db.id, aws_security_group.iaps_oem.id]
 
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name  = "default.oracle-ee-19"
+  option_group_name      = aws_db_option_group.oracle_oem_agent.name
   ca_cert_identifier    = "rds-ca-rsa2048-g1"
   skip_final_snapshot   = local.application_data.accounts[local.environment].db_skip_final_snapshot
   allocated_storage     = local.application_data.accounts[local.environment].db_allocated_storage
@@ -98,6 +100,36 @@ resource "aws_vpc_security_group_ingress_rule" "allow_db_in" {
   to_port                      = 1521
 }
 
+#checkov:skip=CKV2_AWS_5: "Ensure that Security Groups are attached to another resource"
+resource "aws_security_group" "iaps_oem" {
+  name        = "allow_hmpps_oem"
+  description = "Allow DB and OEM Agent traffic to/from HMPPS OEM"
+  vpc_id      = data.aws_vpc.shared.id
+  tags        = local.tags
+}
+
+resource "aws_security_group_rule" "oem_ingress_traffic_vpc" {
+  for_each          = local.application_data.oem_sg_ingress_rules_vpc
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.iaps_oem.id
+  to_port           = each.value.to_port
+  type              = "ingress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
+resource "aws_security_group_rule" "oem_egress_traffic_vpc" {
+  for_each          = local.application_data.oem_sg_egress_rules_vpc
+  description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
+  from_port         = each.value.from_port
+  protocol          = each.value.protocol
+  security_group_id = aws_security_group.iaps_oem.id
+  to_port           = each.value.to_port
+  type              = "egress"
+  cidr_blocks       = [data.aws_vpc.shared.cidr_block]
+}
+
 resource "aws_iam_role" "rds_enhanced_monitoring" {
   assume_role_policy = data.aws_iam_policy_document.rds_enhanced_monitoring[0].json
   count              = local.application_data.accounts[local.environment].db_monitoring_interval == 0 ? 0 : 1
@@ -125,4 +157,41 @@ data "aws_iam_policy_document" "rds_enhanced_monitoring" {
       identifiers = ["monitoring.rds.amazonaws.com"]
     }
   }
+}
+
+resource "aws_db_option_group" "oracle_oem_agent" {
+  name                     = "oracle-oem-option-group"
+  option_group_description = "Option group with OEM_AGENT for Oracle RDS"
+  engine_name              = "oracle-ee"
+  major_engine_version     = local.application_data.accounts[local.environment].major_engine_version
+
+  option {
+    option_name = "OEM_AGENT"
+
+    option_settings {
+      name  = "AGENT_VERSION"
+      value = local.application_data.accounts[local.environment].oem_agent_version
+    }
+    option_settings {
+      name  = "AGENT_PORT"
+      value = local.application_data.accounts[local.environment].oem_agent_port
+    }
+    option_settings {
+      name  = "OEM_HOST"
+      value = local.application_data.accounts[local.environment].oem_host
+    }
+    option_settings {
+      name  = "OEM_PORT"
+      value = local.application_data.accounts[local.environment].oem_port
+    }
+    option_settings {
+      name  = "AGENT_REGISTRATION_PASSWORD"
+      value = local.oem_agent_password
+    }
+    vpc_security_group_memberships = [
+      aws_security_group.iaps_oem.id
+    ]
+  }
+
+  tags = local.tags
 }
