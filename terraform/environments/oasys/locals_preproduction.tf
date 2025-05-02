@@ -94,7 +94,7 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 }  # /u01
+          "/dev/sdb" = { label = "app", size = 200 }  # /u01
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
           "/dev/sde" = { label = "data", size = 2000 }
           "/dev/sdf" = { label = "data", size = 2000 }
