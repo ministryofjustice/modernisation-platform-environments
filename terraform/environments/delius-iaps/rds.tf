@@ -168,29 +168,20 @@ resource "aws_db_option_group" "oracle_oem_agent" {
   option {
     option_name = "OEM_AGENT"
 
-    option_settings {
-      name  = "AGENT_VERSION"
-      value = local.application_data.accounts[local.environment].oem_agent_version
+    dynamic "option_settings" {
+      for_each = {
+      "AGENT_VERSION"              = local.application_data.accounts[local.environment].oem_agent_version
+      "AGENT_PORT"                 = local.application_data.accounts[local.environment].oem_agent_port
+      "OEM_HOST"                   = local.application_data.accounts[local.environment].oem_host
+      "OEM_PORT"                   = local.application_data.accounts[local.environment].oem_port
+      "AGENT_REGISTRATION_PASSWORD" = local.oem_agent_password
+      }
+      content {
+      name  = option_settings.key
+      value = option_settings.value
+      }
     }
-    option_settings {
-      name  = "AGENT_PORT"
-      value = local.application_data.accounts[local.environment].oem_agent_port
-    }
-    option_settings {
-      name  = "OEM_HOST"
-      value = local.application_data.accounts[local.environment].oem_host
-    }
-    option_settings {
-      name  = "OEM_PORT"
-      value = local.application_data.accounts[local.environment].oem_port
-    }
-    option_settings {
-      name  = "AGENT_REGISTRATION_PASSWORD"
-      value = local.oem_agent_password
-    }
-    vpc_security_group_memberships = [
-      aws_security_group.iaps_oem.id
-    ]
+    vpc_security_group_memberships = [aws_security_group.iaps_oem.id]
   }
 
   tags = local.tags

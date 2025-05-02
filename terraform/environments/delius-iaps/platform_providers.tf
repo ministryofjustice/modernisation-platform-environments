@@ -61,7 +61,7 @@ provider "aws" {
   alias  = "hmpps-oem"
   region = "eu-west-2"
   assume_role {
-    role_arn     = "arn:aws:iam::${local.oem_account_id}:role/OEMSharedSecretsAccessRole"
+    role_arn     = "arn:aws:iam::${local.oem_account_id}:role/EC2OracleEnterpriseManagementSecretsRole"
     session_name = "tf-oem-secret-access"
   }
 }
