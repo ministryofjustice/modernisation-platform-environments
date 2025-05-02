@@ -67,6 +67,16 @@ data "aws_subnets" "apc_public_subnets" {
   }
 }
 
+data "aws_subnets" "apc_private_subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.apc_vpc.id]
+  }
+  tags = {
+    Name = "${var.networking[0].application}-${local.environment}-private*"
+  }
+}
+
 # ACM
 data "aws_acm_certificate" "certificate" {
   domain   = local.route53_zone

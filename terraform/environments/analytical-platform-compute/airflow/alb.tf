@@ -7,7 +7,7 @@ module "mwaa_alb" {
 
   name    = "mwaa"
   vpc_id  = data.aws_vpc.apc_vpc.id
-  subnets = data.aws_subnets.apc_public_subnets
+  subnets = data.aws_subnets.apc_public_subnets.ids
 
   security_group_ingress_rules = {
     all_http = {
