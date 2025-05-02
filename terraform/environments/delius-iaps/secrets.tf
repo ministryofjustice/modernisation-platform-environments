@@ -39,14 +39,14 @@ resource "random_password" "dbsnmp_password" {
 }
 
 resource "aws_secretsmanager_secret" "database_dba_passwords" {
-  name                    = locals.dba_secret_name
+  name                    = local.dba_secret_name
   description             = "DBA Users Credentials"
   recovery_window_in_days = 0
 
   tags = merge(
     local.tags,
     {
-      Name = locals.dba_secret_name
+      Name = local.dba_secret_name
     },
   )
 }
