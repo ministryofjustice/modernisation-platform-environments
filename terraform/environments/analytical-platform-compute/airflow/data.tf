@@ -50,6 +50,12 @@ data "dns_a_record_set" "mwaa_webserver_vpc_endpoint" {
   host = data.aws_vpc_endpoint.mwaa_webserver.dns_entry[0].dns_name
 }
 
+data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_runners_github_app" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
+  secret_id = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
+}
+
 # APC VPC
 data "aws_vpc" "apc_vpc" {
   tags = {
@@ -71,4 +77,11 @@ data "aws_subnets" "apc_public_subnets" {
 data "aws_acm_certificate" "certificate" {
   domain   = local.route53_zone
   statuses = ["ISSUED"]
+}
+
+# Kubernetes
+data "kubernetes_namespace" "actions_runner" {
+  metadata {
+    name = "actions-runner"
+  }
 }
