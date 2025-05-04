@@ -15,6 +15,7 @@ data "aws_iam_policy_document" "landing_bucket_policy" {
     ]
   }
 }
+
 module "landing_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
