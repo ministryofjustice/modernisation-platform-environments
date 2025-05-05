@@ -89,7 +89,7 @@ data "aws_iam_policy_document" "tempus_eventbridge_dms_full_load_task_policy" {
     sid       = "AllowDmsTaskAccess"
     effect    = "Allow"
     actions   = ["dms:StartReplicationTask"]
-    resources = [for tempus_module in module.cica_dms_tempus_dms_implementation: tempus_module.dms_full_load_task_arn]
+    resources = [for tempus_module in module.cica_dms_tempus_dms_implementation : tempus_module.dms_full_load_task_arn]
   }
 }
 
