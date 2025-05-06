@@ -62,11 +62,12 @@ resource "aws_route53_record" "external_prod" {
 
 # Non-prod Route53 DNS record 
 resource "aws_route53_record" "external_nonprod" {
-  count    = local.is-production ? 0 : 1
-  provider = aws.core-vpc
-  zone_id = data.aws_route53_zone.external.zone_id
-  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
-  type    = "A"
+  count           = local.is-production ? 0 : 1
+  provider        = aws.core-vpc
+  zone_id         = data.aws_route53_zone.external.zone_id
+  name            = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  type            = "A"
+  allow_overwrite = true
 
   alias {
     name                   = module.lb_access_logs_enabled.load_balancer.dns_name
