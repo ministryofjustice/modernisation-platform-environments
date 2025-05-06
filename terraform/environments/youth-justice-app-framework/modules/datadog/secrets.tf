@@ -18,12 +18,12 @@ resource "aws_secretsmanager_secret_policy" "allow_firehose_access" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid: "AllowFirehoseAccess",
-        Effect: "Allow",
+        Sid : "AllowFirehoseAccess",
+        Effect : "Allow",
         Principal = {
           AWS = aws_iam_role.firehose_to_datadog.arn
         },
-        Action = "secretsmanager:GetSecretValue",
+        Action   = "secretsmanager:GetSecretValue",
         Resource = aws_secretsmanager_secret.datadog_api.arn
       }
     ]
