@@ -3,9 +3,9 @@ locals {
 
   mdss_supplier_account_mapping = {
     "production"    = null
-    "preproduction" = null
-    "test"          = null
-    "development"   = null
+    "preproduction" = "arn:aws:iam::${data.aws_secretsmanager_secret_version.allied_account_id.secret_string}:role/juniper-datatransfer-lambda-role"
+    "test"          = "arn:aws:iam::${data.aws_secretsmanager_secret_version.allied_account_id.secret_string}:role/dev-datatransfer-lambda-role"
+    "development"   = "arn:aws:iam::${data.aws_secretsmanager_secret_version.allied_account_id.secret_string}:role/dev-datatransfer-lambda-role"
   }
 
   p1_export_bucket_destination_mapping = {
@@ -14,6 +14,23 @@ locals {
     "test"          = null
     "development"   = null
   }
+
+
+data "aws_secretsmanager_secret" "allied_account_id" {
+  count = local.is-development ? 0 : 1
+
+  name = aws_secretsmanager_secret.allied_account_id[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.allied_account_id]
+}
+
+data "aws_secretsmanager_secret_version" "allied_account_id" {
+  count = local.is-development ? 0 : 1
+
+  secret_id = data.aws_secretsmanager_secret.allied_account_id.id
+
+  depends_on = [aws_secretsmanager_secret.allied_account_id]
+}
 
   # Adding new buckets for logging needs to happen after buckets have been created
   # as an error occurs otherwise because local.buckets_to_log contains keys that 
