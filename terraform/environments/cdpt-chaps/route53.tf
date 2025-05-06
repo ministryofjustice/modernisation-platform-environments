@@ -29,7 +29,7 @@ resource "aws_route53_record" "external_validation" {
   records         = [tolist(aws_acm_certificate.external.domain_validation_options)[0].resource_record_value]
   ttl             = 60
   type            = tolist(aws_acm_certificate.external.domain_validation_options)[0].resource_record_type
-  zone_id         = data.aws_route53_zone.application_zone[0].zone_id
+  zone_id         = data.aws_route53_zone.application_zone.zone_id
 }
 
 
@@ -43,7 +43,7 @@ resource "aws_route53_record" "external_validation_subdomain" {
   records         = local.domain_record_sub
   ttl             = 60
   type            = local.domain_type_sub[0]
-  zone_id         = data.aws_route53_zone.network_services_zone[0].zone_id
+  zone_id         = data.aws_route53_zone.external.zone_id
 }
 
 # Production Route53 DNS record 
