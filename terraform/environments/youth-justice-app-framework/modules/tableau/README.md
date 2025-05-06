@@ -114,7 +114,7 @@ The move between AWS accounts involves the creation of a new Directory service a
 - **Tableau_Viewer**
 - **Tableau_Site_Admin**
 
-3. Ensure that each of the above groups has the same 
+3. Ensure that each of the above groups has the same
 
 # Cutover
 
