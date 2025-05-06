@@ -63,7 +63,7 @@ data "aws_secretsmanager_secret" "allied_account_id" {
 data "aws_secretsmanager_secret_version" "allied_account_id" {
   count = local.is-development ? 0 : 1
 
-  secret_id = data.aws_secretsmanager_secret.allied_account_id.id
+  secret_id = data.aws_secretsmanager_secret.allied_account_id[0].id
 
   depends_on = [aws_secretsmanager_secret.allied_account_id]
 }
