@@ -14,6 +14,9 @@ module "ecs_service_datadog_agent" {
   health_check_grace_period_seconds  = 60
   scheduling_strategy                = "DAEMON" # Run one task per EC2 instance
 
+
+  cpu                            = 120
+  memory                         = 600
   ignore_task_definition_changes = true
   create_security_group          = false
   create_tasks_iam_role          = false
@@ -37,7 +40,7 @@ module "ecs_service_datadog_agent" {
       secrets = [
         {
           name      = "DD_API_KEY"
-          valueFrom = aws_secretsmanager_secret_version.datadog_api.arn
+          valueFrom = aws_secretsmanager_secret_version.plain_datadog_api.arn
         }
       ]
       port_mappings = [
@@ -70,7 +73,7 @@ module "ecs_service_datadog_agent" {
         },
         {
           "name" : "DD_SYSTEM_PROBE_ENABLED",
-          "value" : "false" #todo fix this
+          "value" : "true"
         },
         {
           "name" : "DD_TAGS",
