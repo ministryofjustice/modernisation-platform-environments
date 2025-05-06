@@ -44,12 +44,27 @@ resource "aws_route53_record" "external_validation_subdomain" {
   zone_id         = data.aws_route53_zone.external.zone_id
 }
 
-# Route53 DNS record for directing traffic to the service
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
+# Production Route53 DNS record for directing traffic to the service: 
+resource "aws_route53_record" "external_prod" {
+  count     = local.is-production ? 1 : 0
+  provider  = aws.core-network-services
+  zone_id   = data.aws_route53_zone.application_zone.zone_id
+  name      = "correspondence-handling-and-processing.service.justice.gov.uk"
+  type      = "A"
 
-  zone_id = local.is-production ? data.aws_route53_zone.external.zone_id : data.aws_route53_zone.network-services.zone_id
-  name    = local.is-production ? "correspondence-handling-and-processing.service.justice.gov.uk" : "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
+  alias {
+    name    = module.lb_access_logs_enabled.load_balancer.dns_name
+    zone_id = module.lb_access_logs_enabled.load_balancer.zone_id
+    evaluate_target_health = true
+  }
+}
+
+# Non-prod Route53 DNS record for directing traffic to the service
+resource "aws_route53_record" "external_nonprod" {
+  count    = local.is-production ? 0 : 1
+  provider = aws.core-vpc
+  zone_id = data.aws_route53_zone.network-services.zone_id
+  name    = "${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"
   type    = "A"
 
   alias {
