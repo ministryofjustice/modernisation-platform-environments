@@ -265,11 +265,14 @@ resource "aws_iam_role" "awsconfig_sns_to_datadog" {
     Version = "2012-10-17",
     Statement = [
       {
-        Action = "sts:AssumeRole",
         Effect = "Allow",
         Principal = {
-          Service = "sns.amazonaws.com"
-        }
+          Service = [
+            "sns.amazonaws.com",
+            "firehose.amazonaws.com"
+          ]
+        },
+        Action = "sts:AssumeRole"
       }
     ]
   })
@@ -299,10 +302,7 @@ resource "aws_iam_policy" "awsconfig_sns_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "awsconfig_attach_kms_access" {
-  role       = aws_iam_role.awsconfig_firehose_to_datadog.name
-  policy_arn = aws_iam_policy.awsconfig_firehose_kms_access.arn
-}
+
 
 resource "aws_iam_role_policy_attachment" "awsconfig_firehose_policy_attach" {
   role       = aws_iam_role.awsconfig_firehose_to_datadog.name
@@ -317,6 +317,11 @@ resource "aws_iam_role_policy_attachment" "awsconfig_attach_secrets_access" {
 resource "aws_iam_role_policy_attachment" "awsconfig_attach_kms_secret_access" {
   role       = aws_iam_role.awsconfig_firehose_to_datadog.name
   policy_arn = aws_iam_policy.awsconfig_firehose_kms_secret_access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "awsconfig_attach_kms_access" {
+  role       = aws_iam_role.awsconfig_firehose_to_datadog.name
+  policy_arn = aws_iam_policy.awsconfig_firehose_kms_access.arn
 }
 
 resource "aws_iam_role_policy_attachment" "awsconfig_sns_policy_attach" {
