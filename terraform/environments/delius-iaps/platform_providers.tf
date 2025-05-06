@@ -57,12 +57,3 @@ provider "aws" {
   }
 }
 
-# Provider for reading resources from OEM account to get the OEM agent password during terraform apply process
-provider "aws" {
-  alias  = "hmpps-oem"
-  region = "eu-west-2"
-  assume_role {
-    role_arn     = "arn:aws:iam::${local.oem_account_id}:role/github-actions"
-    session_name = "tf-oem-secret-access"
-  }
-}
