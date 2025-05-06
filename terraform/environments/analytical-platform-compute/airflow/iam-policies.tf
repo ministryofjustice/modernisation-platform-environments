@@ -210,7 +210,7 @@ data "aws_iam_policy_document" "mwaa_ses" {
     condition {
       test     = "StringEquals"
       variable = "ses:FromAddress"
-      values   = ["noreply@${local.route53_zone}"]
+      values   = ["noreply@${local.environment_configuration.route53_zone}"]
     }
   }
 }

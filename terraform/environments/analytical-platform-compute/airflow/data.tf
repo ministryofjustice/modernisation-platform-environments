@@ -79,7 +79,7 @@ data "aws_subnets" "apc_private_subnets" {
 
 # ACM
 data "aws_acm_certificate" "certificate" {
-  domain   = local.route53_zone
+  domain   = local.environment_configuration.route53_zone
   statuses = ["ISSUED"]
 }
 
