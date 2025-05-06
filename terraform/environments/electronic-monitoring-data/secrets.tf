@@ -14,7 +14,7 @@ resource "aws_secretsmanager_secret" "allied_account_id" {
 }
 
 resource "aws_secretsmanager_secret_version" "allied_account_id" {
-  secret_id     = aws_secretsmanager_secret.allied_account_id[0].id
+  secret_id     = aws_secretsmanager_secret.allied_account_id.id
   secret_string = jsonencode(local.allied_account_id_placeholder)
 
   lifecycle {
