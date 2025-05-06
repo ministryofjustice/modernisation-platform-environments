@@ -5,7 +5,7 @@ data "aws_region" "this" {}
 data "aws_availability_zones" "available" {
   filter {
     name   = "region-name"
-    values = [ data.aws_region.this.name ]
+    values = [data.aws_region.this.name]
   }
 }
 
