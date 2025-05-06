@@ -182,5 +182,3 @@ resource "aws_security_group_rule" "monitoring_to_yjsm" {
   source_security_group_id = aws_security_group.yjsm_service.id
   description              = "Service monitoring access (YJSM 8400)"
 }
-
-
