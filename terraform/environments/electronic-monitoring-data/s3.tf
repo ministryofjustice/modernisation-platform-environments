@@ -53,13 +53,13 @@ locals {
 # ------------------------------------------------------------------------
 
 data "aws_secretsmanager_secret" "allied_account_id" {
-  name = aws_secretsmanager_secret.allied_account_id[0].id
+  name = aws_secretsmanager_secret.allied_account_id.id
 
   depends_on = [aws_secretsmanager_secret_version.allied_account_id]
 }
 
 data "aws_secretsmanager_secret_version" "allied_account_id" {
-  secret_id = data.aws_secretsmanager_secret.allied_account_id[0].id
+  secret_id = data.aws_secretsmanager_secret.allied_account_id.id
 
   depends_on = [aws_secretsmanager_secret.allied_account_id]
 }
