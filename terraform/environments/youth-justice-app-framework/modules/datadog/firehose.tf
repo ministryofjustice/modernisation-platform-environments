@@ -49,7 +49,6 @@ resource "aws_kms_key" "firehose_backup" {
   description             = "KMS key for encrypting Firehose S3 backup bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
-  aliases                 = firehose
 }
 
 resource "aws_kms_key_policy" "firehose_backup_policy" {

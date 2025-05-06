@@ -63,7 +63,6 @@ resource "aws_kms_key" "awsconfig_firehose_backup" {
   description             = "KMS key for encrypting Firehose S3 backup bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
-  aliases                 = awsconfig-firehose
 }
 
 resource "aws_kms_key_policy" "awsconfig_firehose_backup_policy" {
@@ -130,7 +129,6 @@ resource "aws_kms_key_policy" "awsconfig_firehose_backup_policy" {
 resource "aws_cloudwatch_log_group" "awsconfig_firehose_log_group" {
   name              = "yjaf-${var.environment}-awsconfig-firehose-error-logs"
   retention_in_days = 400
-  kms_key_id        = aws_kms_key.awsconfig_firehose_backup.arn
 }
 
 resource "aws_sns_topic_subscription" "datadog_config" {
