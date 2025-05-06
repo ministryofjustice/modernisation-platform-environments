@@ -4,15 +4,15 @@ locals {
   mdss_supplier_account_mapping = {
     "production"    = null
     "preproduction" = {
-      "account_number" = data.aws_secretsmanager_secret_version.allied_account_id.secret_string
+      "account_number" = "173142358744"
       "role_name"      = "juniper-datatransfer-lambda-role"
     }
     "test"          = {
-      "account_number" = data.aws_secretsmanager_secret_version.allied_account_id.secret_string
+      "account_number" = "173142358744"
       "role_name"      = "dev-datatransfer-lambda-role"
     }
     "development"   = {
-      "account_number" = data.aws_secretsmanager_secret_version.allied_account_id.secret_string
+      "account_number" = "173142358744"
       "role_name"      = "dev-datatransfer-lambda-role"
     }
   }
