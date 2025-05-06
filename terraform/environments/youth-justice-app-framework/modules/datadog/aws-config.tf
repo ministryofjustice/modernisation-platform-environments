@@ -258,13 +258,46 @@ resource "aws_iam_policy" "awsconfig_firehose_kms_secret_access" {
   })
 }
 
+resource "aws_iam_role" "awsconfig_sns_to_datadog" {
+  name = "awsconfig_sns_datadog"
 
-resource "aws_cloudwatch_log_group" "awsconfig_firehose_log_group" {
-  name              = "yjaf-${var.environment}-awsconfig-firehose-error-logs"
-  retention_in_days = 400
-  kms_key_id        = aws_kms_key.awsconfig_firehose_backup.arn
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Action = "sts:AssumeRole",
+        Effect = "Allow",
+        Principal = {
+          Service = "sns.amazonaws.com"
+        }
+      }
+    ]
+  })
 }
 
+resource "aws_iam_policy" "awsconfig_sns_policy" {
+  name        = "awsconfig_sns_policy"
+  description = "Allows SNS to publish to Firehose delivery stream"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "firehose:DescribeDeliveryStream",
+          "firehose:ListDeliveryStreams",
+          "firehose:ListTagsForDeliveryStream",
+          "firehose:PutRecord",
+          "firehose:PutRecordBatch"
+        ],
+        Resource = [
+          "arn:aws:firehose:eu-west-2:${var.aws_account_id}:deliverystream/awsconfig-to-datadog"
+        ]
+      }
+    ]
+  })
+}
 
 resource "aws_iam_role_policy_attachment" "awsconfig_attach_kms_access" {
   role       = aws_iam_role.awsconfig_firehose_to_datadog.name
@@ -286,9 +319,20 @@ resource "aws_iam_role_policy_attachment" "awsconfig_attach_kms_secret_access" {
   policy_arn = aws_iam_policy.awsconfig_firehose_kms_secret_access.arn
 }
 
+resource "aws_iam_role_policy_attachment" "awsconfig_sns_policy_attach" {
+  role       = aws_iam_role.awsconfig_sns_to_datadog.name
+  policy_arn = aws_iam_policy.awsconfig_sns_policy.arn
+}
+
+resource "aws_cloudwatch_log_group" "awsconfig_firehose_log_group" {
+  name              = "yjaf-${var.environment}-awsconfig-firehose-error-logs"
+  retention_in_days = 400
+  kms_key_id        = aws_kms_key.awsconfig_firehose_backup.arn
+}
 
 resource "aws_sns_topic_subscription" "datadog_config" {
-  topic_arn = "arn:aws:sns:eu-west-2:${var.aws_account_id}:config"
-  protocol  = "https"
-  endpoint  = "https://datadoghq.eu/api/v1/integration/aws/config"
+  topic_arn              = "arn:aws:sns:eu-west-2:${var.aws_account_id}:config"
+  protocol               = "firehose"
+  endpoint               = aws_kinesis_firehose_delivery_stream.awsconfig_to_datadog.arn
+  subscription_role_arn  = aws_iam_role.awsconfig_sns_to_datadog.arn
 }
