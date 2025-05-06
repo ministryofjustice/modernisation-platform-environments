@@ -145,7 +145,7 @@ resource "aws_iam_role" "awsconfig_firehose_to_datadog" {
 
 
 resource "aws_iam_policy" "awsconfig_firehose_policy" {
-  name        = "FirehoseToDatadogPolicy"
+  name        = "awsconfig_FirehoseToDatadogPolicy"
   description = "Allows Firehose to send data to Datadog, write logs, and access S3 for backups"
 
   policy = jsonencode({
