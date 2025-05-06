@@ -5,8 +5,6 @@ locals {
 resource "aws_secretsmanager_secret" "allied_account_id" {
   #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
   #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
-  count = local.is-development ? 0 : 1
-
   name                    = "account_ids/allied"
   recovery_window_in_days = 0
 
@@ -16,7 +14,6 @@ resource "aws_secretsmanager_secret" "allied_account_id" {
 }
 
 resource "aws_secretsmanager_secret_version" "allied_account_id" {
-  count = local.is-development ? 0 : 1
   secret_id     = aws_secretsmanager_secret.allied_account_id[0].id
   secret_string = jsonencode(local.allied_account_id_placeholder)
 
