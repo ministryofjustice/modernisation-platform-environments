@@ -102,7 +102,7 @@ data "aws_secretsmanager_secret" "actions_runners_token_apc_self_hosted_runners_
 data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_runners_github_app" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
-  secret_id = data.aws_secretsmanager_secret.actions_runners_token_apc_self_hosted_runners_secret.id
+  secret_id = data.aws_secretsmanager_secret.actions_runners_token_apc_self_hosted_runners_secret[0].id
 }
 
 # EKS
