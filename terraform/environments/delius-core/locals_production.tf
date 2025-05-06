@@ -113,8 +113,8 @@ locals {
     }
 
     sfs = {
-      container_cpu    = 16384
-      container_memory = 32768
+      container_cpu    = 2048
+      container_memory = 4096
     }
   }
 
