@@ -45,6 +45,7 @@ variable "replication_task_id" {
 
 variable "dms_source" {
   type = object({
+    protocol                    = string,
     engine_name                 = string,
     secrets_manager_arn         = string,
     secrets_manager_kms_arn     = string,
@@ -54,13 +55,13 @@ variable "dms_source" {
   })
 
   validation {
-    condition     = contains(["oracle"], var.dms_source.engine_name)
-    error_message = "Valid values for var: test_variable are ('oracle')."
+    condition     = contains(["oracle", "sqlserver"], var.dms_source.engine_name)
+    error_message = "Valid values for var: test_variable are ('oracle', 'sqlserver')."
   }
 
   description = <<EOF
     extra_connection_attributes: Extra connection attributes to be used in the connection string</br>
-    cdc_start_time: The start time for the CDC task, this will need to be set to a date after the Oracle database setup has been complete (this is to ensure the logs are available)
+    cdc_start_time: The start time for the CDC task, this will need to be set to a date after the database setup has been complete (this is to ensure the logs are available)
   EOF
 }
 
@@ -118,7 +119,7 @@ variable "retry_failed_after_recreate_metadata" {
 variable "write_metadata_to_glue_catalog" {
   type        = bool
   default     = true
-  description = "Whether to write metdata to glue catalog"
+  description = "Whether to write metadata to glue catalog"
 }
 
 variable "valid_files_mutable" {
@@ -126,6 +127,17 @@ variable "valid_files_mutable" {
   default     = false
   description = "If false, copy valid files to their destination bucket with a datetime infix"
 }
+
+variable "create_ancillary_static_roles" {
+  type        = bool
+  default     = true
+  description = <<EOF
+    AWS DMS requires roles of a specific name to be created for vpc/cloudwatch, which can cause
+    issues if two or more invocations of this module live in the same environment.
+    If false, assume these roles have been created by another invocation
+  EOF
+}
+
 
 variable "glue_catalog_account_id" {
   type        = string
