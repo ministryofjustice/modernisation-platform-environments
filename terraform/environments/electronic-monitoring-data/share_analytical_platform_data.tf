@@ -39,7 +39,7 @@ resource "aws_lakeformation_permissions" "share_table_with_ap" {
   }
 }
 
-resource "aws_lakeformation_permissions" "share_table_with_ap" {
+resource "aws_lakeformation_permissions" "share_grantable_filter_with_ap" {
   for_each = {
     for pair in flatten([
       for database_name, tables in local.tables_to_share_ap : [
