@@ -24,8 +24,8 @@ module "alfresco_sfs_ecs" {
   name     = "alfresco-sfs"
   env_name = var.env_name
 
-  container_cpu    = 2048
-  container_memory = 4096
+  container_cpu    = var.delius_microservice_configs.sfs.container_cpu
+  container_memory = var.delius_microservice_configs.sfs.container_memory
 
   container_vars_default = {
     "scheduler.content.age.millis" = 518400000 # 6 days
