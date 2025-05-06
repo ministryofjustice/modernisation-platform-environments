@@ -329,6 +329,10 @@ resource "aws_iam_role_policy_attachment" "awsconfig_sns_policy_attach" {
   policy_arn = aws_iam_policy.awsconfig_sns_policy.arn
 }
 
+
+
+
+
 resource "aws_cloudwatch_log_group" "awsconfig_firehose_log_group" {
   name              = "yjaf-${var.environment}-awsconfig-firehose-error-logs"
   retention_in_days = 400
