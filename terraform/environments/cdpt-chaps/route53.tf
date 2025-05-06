@@ -1,13 +1,9 @@
 # ACM Public Certificate
 resource "aws_acm_certificate" "external" {
-  domain_name       = local.is-production 
-    ? "correspondence-handling-and-processing.service.justice.gov.uk" 
-    : "modernisation-platform.service.justice.gov.uk"
+  domain_name       = local.is-production ? "correspondence-handling-and-processing.service.justice.gov.uk" : "modernisation-platform.service.justice.gov.uk"
   validation_method = "DNS"
 
-  subject_alternative_names = local.is-production 
-    ? ["correspondence-handling-and-processing.service.justice.gov.uk"] 
-    : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
+  subject_alternative_names = local.is-production ? ["correspondence-handling-and-processing.service.justice.gov.uk"] : ["${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk"]
   
   tags = {
     Environment = local.environment
@@ -20,9 +16,7 @@ resource "aws_acm_certificate" "external" {
 
 resource "aws_acm_certificate_validation" "external" {
   certificate_arn         = aws_acm_certificate.external.arn
-  validation_record_fqdns = local.is-production 
-    ? [aws_route53_record.external_validation.fqdn] 
-    : [local.domain_name_main[0], local.domain_name_sub[0]]
+  validation_record_fqdns = local.is-production ? [aws_route53_record.external_validation.fqdn] : [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
 # Route53 DNS records for certificate validation (prod)
