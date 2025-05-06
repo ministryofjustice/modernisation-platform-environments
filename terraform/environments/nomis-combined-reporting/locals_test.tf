@@ -64,7 +64,7 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { type = "gp3", label = "app", size = 100 }  # /u01
+          "/dev/sdb" = { type = "gp3", label = "app", size = 200 }  # /u01
           "/dev/sdc" = { type = "gp3", label = "app", size = 100 }  # /u02
           "/dev/sde" = { type = "gp3", label = "data", size = 100 } # DATA01
           "/dev/sdf" = { type = "gp3", label = "data", size = 100 } # DATA02
