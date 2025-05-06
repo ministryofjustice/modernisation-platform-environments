@@ -19,7 +19,7 @@ resource "aws_acm_certificate_validation" "external" {
 }
 
 # Route53 DNS records for certificate validation (prod)
-resource "aws_route53_record" "external_validation" {
+resource "aws_route53_record" "external_validation_prod" {
   count    = local.is-production ? 1 : 0
   provider = aws.core-network-services
 
@@ -74,6 +74,13 @@ resource "aws_route53_record" "external_nonprod" {
     zone_id                = module.lb_access_logs_enabled.load_balancer.zone_id
     evaluate_target_health = true
   }
+}
+
+resource "aws_acm_certificate_validation" "external" {
+  certificate_arn         = aws_acm_certificate.external.arn
+  validation_record_fqdns = local.is-production
+    ? [aws_route53_record.external_validation_prod[0].fqdn]
+    : [local.domain_name_main[0], local.domain_name_sub[0]]
 }
 
 
