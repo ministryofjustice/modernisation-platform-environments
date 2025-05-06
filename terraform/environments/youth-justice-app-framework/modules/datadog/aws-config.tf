@@ -129,6 +129,7 @@ resource "aws_kms_key_policy" "awsconfig_firehose_backup_policy" {
 resource "aws_cloudwatch_log_group" "awsconfig_firehose_log_group" {
   name              = "yjaf-${var.environment}-awsconfig-firehose-error-logs"
   retention_in_days = 400
+  kms_key_id        = aws_kms_key.firehose_backup.arn
 }
 
 resource "aws_sns_topic_subscription" "datadog_config" {
@@ -137,6 +138,9 @@ resource "aws_sns_topic_subscription" "datadog_config" {
   endpoint               = aws_kinesis_firehose_delivery_stream.awsconfig_to_datadog.arn
   subscription_role_arn  = aws_iam_role.awsconfig_sns_to_datadog.arn
 }
+
+# Data source to get current account ID
+data "aws_caller_identity" "current" {}
 
 resource "aws_iam_role" "awsconfig_firehose_to_datadog" {
   name = "awsconfig_firehose_to_datadog"
