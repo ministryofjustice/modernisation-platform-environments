@@ -15,23 +15,6 @@ locals {
     "development"   = null
   }
 
-
-data "aws_secretsmanager_secret" "allied_account_id" {
-  count = local.is-development ? 0 : 1
-
-  name = aws_secretsmanager_secret.allied_account_id[0].id
-
-  depends_on = [aws_secretsmanager_secret_version.allied_account_id]
-}
-
-data "aws_secretsmanager_secret_version" "allied_account_id" {
-  count = local.is-development ? 0 : 1
-
-  secret_id = data.aws_secretsmanager_secret.allied_account_id.id
-
-  depends_on = [aws_secretsmanager_secret.allied_account_id]
-}
-
   # Adding new buckets for logging needs to happen after buckets have been created
   # as an error occurs otherwise because local.buckets_to_log contains keys that 
   # are derived  from resource attributes, which are not known until the apply phase.
@@ -62,6 +45,27 @@ data "aws_secretsmanager_secret_version" "allied_account_id" {
     { id = module.s3-create-a-derived-table-bucket.bucket.id, arn = module.s3-create-a-derived-table-bucket.bucket.arn },
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn }
   ]
+}
+
+
+# ------------------------------------------------------------------------
+# Get secrets for bucket policy for allied
+# ------------------------------------------------------------------------
+
+data "aws_secretsmanager_secret" "allied_account_id" {
+  count = local.is-development ? 0 : 1
+
+  name = aws_secretsmanager_secret.allied_account_id[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.allied_account_id]
+}
+
+data "aws_secretsmanager_secret_version" "allied_account_id" {
+  count = local.is-development ? 0 : 1
+
+  secret_id = data.aws_secretsmanager_secret.allied_account_id.id
+
+  depends_on = [aws_secretsmanager_secret.allied_account_id]
 }
 
 # ------------------------------------------------------------------------
