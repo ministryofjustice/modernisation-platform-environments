@@ -37,10 +37,10 @@ resource "aws_kinesis_firehose_delivery_stream" "to_datadog" {
   }
 
   server_side_encryption {
-    enabled  = true
-    key_arn  = aws_kms_key.firehose_backup.arn
-    key_type = "CUSTOMER_MANAGED_CMK"
-  }
+  enabled   = true
+  key_arn   = aws_kms_key.firehose_backup.arn
+  key_type  = "CUSTOMER_MANAGED_CMK"
+ }
 }
 
 
@@ -49,6 +49,7 @@ resource "aws_kms_key" "firehose_backup" {
   description             = "KMS key for encrypting Firehose S3 backup bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+  aliases                 = firehose
 }
 
 resource "aws_kms_key_policy" "firehose_backup_policy" {
@@ -204,7 +205,7 @@ resource "aws_iam_policy" "firehose_policy" {
         Resource = aws_cloudwatch_log_group.firehose_log_group.arn
       },
       {
-        Sid    = "cloudWatchLog",
+        Sid = "cloudWatchLog",
         Effect = "Allow",
         Action = [
           "logs:PutLogEvents"
@@ -212,7 +213,7 @@ resource "aws_iam_policy" "firehose_policy" {
         Resource = aws_cloudwatch_log_group.firehose_log_group.arn
       },
       {
-        Sid    = "CreateLogResources",
+        Sid = "CreateLogResources",
         Effect = "Allow",
         Action = [
           "logs:CreateLogGroup",
@@ -221,7 +222,7 @@ resource "aws_iam_policy" "firehose_policy" {
         Resource = "*"
       },
       {
-        Sid    = "s3Permissions",
+        Sid = "s3Permissions",
         Effect = "Allow",
         Action = [
           "s3:AbortMultipartUpload",
@@ -232,8 +233,8 @@ resource "aws_iam_policy" "firehose_policy" {
           "s3:PutObject"
         ],
         Resource = [
-          aws_s3_bucket.firehose_backup.arn,
-          "${aws_s3_bucket.firehose_backup.arn}/*"
+          aws_s3_bucket.firehose_backup.arn,       
+          "${aws_s3_bucket.firehose_backup.arn}/*"  
         ]
       }
     ]
@@ -273,7 +274,7 @@ resource "aws_iam_policy" "firehose_kms_access" {
           "kms:DescribeKey"
         ],
         Resource = [
-          aws_kms_key.firehose_backup.arn,
+          aws_kms_key.firehose_backup.arn,  
           var.kms_key_arn
         ]
       }
@@ -288,9 +289,9 @@ resource "aws_iam_policy" "firehose_kms_secret_access" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid : "DecryptSecretWithKMSKey",
-        Effect   = "Allow",
-        Action   = "kms:Decrypt",
+        Sid: "DecryptSecretWithKMSKey",
+        Effect = "Allow",
+        Action = "kms:Decrypt",
         Resource = var.kms_key_arn, # this must match the KMS key that encrypts the secret
         Condition = {
           StringEquals = {
