@@ -36,3 +36,13 @@ variable "aws_accounts" {
     }
   }
 }
+
+variable "nonmp_account_ids" {
+  description = "Map of account IDs not present in the environment_management secret (excluding Modernisation Platform)"
+  type        = map(string)
+  default     = {}
+}
+
+variable "all_account_ids" {
+  type = map(string)
+}
