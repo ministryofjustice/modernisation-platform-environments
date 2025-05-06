@@ -341,3 +341,4 @@ resource "aws_sns_topic_subscription" "datadog_config" {
   endpoint               = aws_kinesis_firehose_delivery_stream.awsconfig_to_datadog.arn
   subscription_role_arn  = aws_iam_role.awsconfig_sns_to_datadog.arn
 }
+
