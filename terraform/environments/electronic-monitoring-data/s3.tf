@@ -3,9 +3,18 @@ locals {
 
   mdss_supplier_account_mapping = {
     "production"    = null
-    "preproduction" = "arn:aws:iam::${data.aws_secretsmanager_secret_version.allied_account_id.secret_string}:role/juniper-datatransfer-lambda-role"
-    "test"          = "arn:aws:iam::${data.aws_secretsmanager_secret_version.allied_account_id.secret_string}:role/dev-datatransfer-lambda-role"
-    "development"   = "arn:aws:iam::${data.aws_secretsmanager_secret_version.allied_account_id.secret_string}:role/dev-datatransfer-lambda-role"
+    "preproduction" = {
+      "account_number" = data.aws_secretsmanager_secret_version.allied_account_id.secret_string
+      "role_name"      = "juniper-datatransfer-lambda-role"
+    }
+    "test"          = {
+      "account_number" = data.aws_secretsmanager_secret_version.allied_account_id.secret_string
+      "role_name"      = "dev-datatransfer-lambda-role"
+    }
+    "development"   = {
+      "account_number" = data.aws_secretsmanager_secret_version.allied_account_id.secret_string
+      "role_name"      = "dev-datatransfer-lambda-role"
+    }
   }
 
   p1_export_bucket_destination_mapping = {
