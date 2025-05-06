@@ -143,6 +143,28 @@ locals {
         cloudwatch_metric_alarms = null
       })
 
+      t3-jump2022-3 = merge(local.ec2_instances.jumpserver, {
+        config = merge(local.ec2_instances.jumpserver.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
+          availability_zone = "eu-west-2c"
+          user_data_raw = base64encode(templatefile(
+            "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
+            branch = "TM/TM-1198/test-rdp-allow-group"
+            }
+          ))
+        })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          tags = {
+            patch-manager = "group1"
+          }
+        })
+        tags = merge(local.ec2_instances.jumpserver.tags, {
+          domain-name = "azure.noms.root"
+          server-type = "RDPTest"
+        })
+        cloudwatch_metric_alarms = null
+      })
+
       test-rds-2-b = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
