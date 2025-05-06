@@ -6,6 +6,9 @@
       "harish": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC3UnvV36Pws9K1aHa+keChxLp+icYf9zABIuyv9qozdzRpsnq74vRV3iNShFURfjtg4vNyMns0BMTmqXGNohSHrgbKKZAujJHvH/c53BGgTVayp4IS3WDdTEQjSRVaT6fR35DxzgPw3SFl5njIDQZ+3WveTe4a9zmnOgC4Z7nxWz9s57DzyNRbwqrkf9/bSTXO4gNqsuTVJo3A4H7eEVXAFIef7CaukKq6x3xi8jjeEZynsCubSxevJozPXD051BqmLXK2yk5Cynof9Eqlm7cSfItwRdpEG5GMHb1NPFGPNuS9vnjZH5yjd54b3ZBnSzJjXXDkhpXb11EKE/X316Jr rsa-key-20250131-hk-mdpdev",
       "louise": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCljbApPJIjHDlSAwds6PtSdSwP0J94vh2BFGyLx4GDzLnuvBX53WrPUcQGLtc+j95yJdqxeLA6WS3sFgfYLG0Gzr+maNpMDXdQujXpXCM9LB48l+fY7VN5kMK+5cFmuEu/thwUi1S4SHpxzeq62Sb9Wgb7Kc4Nk9uW18CcLDqlI/axLGqOZC2tzq3vd2tEdjVSSfAbevwLWlJQOskhe3muqetglzL+XnhGth4qehAsRSf+R9NQ7WQ/e5PDJwtjE2eLQwdXd6eY9eCNeRLw+rt/fxi6oV5zqf7AZshZiGeiydYAtwjazWtYI6RVoqK6I2E+XdMb/+S6vB6EW2M8r4Yn rsa-key-20250227-lc-mdpdev"
     },
+    "test": {
+      "ed": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJa3flPvFH6LHw9VLhoAFFZl+ETpm5VO+X7qRkYyw1pU"
+    },
     "preproduction": {},
     "production": {}
   }
