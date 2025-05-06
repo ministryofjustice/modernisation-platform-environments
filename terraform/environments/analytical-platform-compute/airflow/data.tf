@@ -85,6 +85,8 @@ data "aws_acm_certificate" "certificate" {
 
 # Kubernetes
 data "kubernetes_namespace" "actions_runner" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
   metadata {
     name = "actions-runner"
   }
@@ -92,9 +94,10 @@ data "kubernetes_namespace" "actions_runner" {
 
 # Secrets manager
 data "aws_secretsmanager_secret" "actions_runners_token_apc_self_hosted_runners_secret" {
+  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
+
   name = "actions-runners/token/apc-self-hosted-runners"
 }
-
 
 data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_runners_github_app" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
