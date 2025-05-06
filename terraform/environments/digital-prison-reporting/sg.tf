@@ -22,6 +22,7 @@ resource "aws_security_group" "lambda_generic" {
       Resource_Type = "sg_group"
       Name          = "${local.generic_lambda}-sg"
       Used_By       = "service_bundle"
+      Jira          = "DPR2-XXXX"
     }
   )
 }

@@ -4,8 +4,8 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  dbt_suffix  = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
-  suffix      = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
+  dbt_suffix = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
+  suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
   live_feed_dbs = [
     "serco_fms",
     "allied_mdss",
