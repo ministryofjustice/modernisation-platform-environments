@@ -1644,10 +1644,6 @@
     },
     {
       "object_name": "CLAIMS.TARIFF_REASON_TYPES",
-      "column_name": "CORR_RECIPIENT"
-    },
-    {
-      "object_name": "CLAIMS.TARIFF_REASON_TYPES",
       "column_name": "CURR"
     },
     {

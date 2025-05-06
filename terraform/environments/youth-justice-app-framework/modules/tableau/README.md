@@ -20,6 +20,7 @@ This module manages the Tableau instance and Application load balancer and assoc
 **test_mode**: (string) (Optional) When test mode is true the destroy command can be used to remove all items. Default false.
 **tags** (map(string)) User defined extra tags to be added to all resources created in the module. Default is an empty map.**
 **vpc_id**: (string) VPC ID.
+
 ### Tableasu Instance Inputs
 **tableau_subnet_id**: (string) ID of the Subnet where the tableau instance is to be created.
 **instance_type**: (string) Type of EC2 instance to provision for Tableau. Default "t3.nano".
@@ -48,9 +49,12 @@ This module manages the Tableau instance and Application load balancer and assoc
 **instance_arn**: The ARN of the Tableau ec2 instance.{
 **tableau_sg_id**: The ID of the Security Group hat controlls access to the Tableau ec3 instnce.
 
+
 # Tableau Install and Setup
+
 ## Introduction
-The process for restoring Tableaus from backup is followed with some variations descripbed below to deal with differences between the old and new environments.
+The process for restoring Tableau from backup is followed with some variations described below to deal with differences between the old and new environments.
+
 ## Install and Restore
 The process for recovery of Tableau from backups is outlined in Confluance at <https://yjb.atlassian.net/wiki/spaces/YAM/pages/5191794714/DOE+Tableau+Backup+and+Recovery#Recovery.1> which refers to detailed instructions in <https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642507957/DOE+Tableau+Server+Install+Guide?atlOrigin=eyJpIjoiODA0MTExZDI0YjRhNGU0N2EwMGE1ZmQxOTBmYWEzNmMiLCJwIjoiYyJ9> and its subordinate documents.
 
@@ -81,23 +85,36 @@ The latest Tableau backup files should have been replicated to S3 bucket `yjaf-<
 ### Tableau Settings Restore
 The process is as documented in the Recovey instructions but file `settings_for_restore.json` must first be eddited to reflect the new environment. Make the changes after Tableau instalation and setup when the new values are known. Change values of config keys as described below:
 
-**wgserver.domain.password**: To be set to the value assigned to the tableau domain user. The value can be copied from file `identify-store.json`.
-**wgserver.domain.port**: If present this config key must be removed.
-**wgserver.domain.ldap.hostname**: Copy from `identify-store.json`.
-**wgserver.domain.ssl_port**: Add if not already present and set the value to `636`.
-**vizportal.rest_api.cors.allow_origin**: Need to be populated with a comma seperated list of external URL for the YJAF and Tableau websites. It will probable not need to be changes in `preproduction` and `production`.
+- **wgserver.domain.password**: To be set to the value assigned to the tableau domain user. The value can be copied from file `identify-store.json`.
+- **wgserver.domain.port**: If present this config key must be removed.
+- **wgserver.domain.ldap.hostname**: Copy from `identify-store.json`.
+- **wgserver.domain.ssl_port**: Add if not already present and set the value to `636`.
+- **vizportal.rest_api.cors.allow_origin**: Need to be populated with a comma seperated list of external URL for the YJAF and Tableau websites. It will probable not need to be changes in `preproduction` and `production`.
 
-After restoring the setting they should not be applied to Tableau until External HTTPs has been enabled as described in the next section.
+After restoring the settings they should not be applied to Tableau until External HTTPs has been enabled as described in the next section.
 
 ### Enable External HTTPS
 The process for this is described in Confluance document <https://yjb.atlassian.net/wiki/spaces/YAM/pages/4729470989/DOE+Tableau+Enable+External+HTTPS?atlOrigin=eyJpIjoiNWQyNjA4YTQxYjRlNGRiNDk3NjU0ZWJhNWM4Mzg3NGUiLCJwIjoiYyJ9>.
 
 A copy of openssl-tableau.conf will already be available. The Siging Request and Certificate files can be copied beteen the Tableau and SubordinateCA servers via s3 location `yjaf-<envoronment>-tableau-backups/Install_Files`.
 
-Review the proposed Tableau settings change and if they look OK apply them.
+Review the proposed Tableau settings changes and, if they look OK, apply them.
 
 ### Restore the Repositiory
 See the restore instuctions referenced above.
+
+### Recreate All Users
+The move between AWS accounts involves the creation of a new Directory service and transfer of all users and groups. As a consequecnce it is not possibel to authenticate to Tableau using an existing account. The solution is to remove a recreate Tableau users. The can be done as follows:
+
+1. Capture information on all users in Tableau. This is best done as a services of screen prints of the Site Users page. First sort by Site role to make it easier to identify user in each role. Save the screnprints to a word document with an appropriate name (e.g. `Tableau Users Preprod 30042025.docx`).
+
+2. Create the following groups in AD if they do not already exist.
+- **Tableau_Creator**
+- **Tableau_Publisher**
+- **Tableau_Viewer**
+- **Tableau_Site_Admin**
+
+3. Ensure that each of the above groups has the same
 
 # Cutover
 

@@ -26,7 +26,8 @@ def _get_glue_client():
         "region_name": "eu-west-1"
     }
     glue_role_arn = os.getenv("GLUE_CATALOG_ROLE_ARN")
-    if glue_role_arn:
+    use_glue_catalog = os.getenv("USE_GLUE_CATALOG", "true").lower() == "true"
+    if use_glue_catalog and glue_role_arn:
         sts_connection = boto3.client('sts')
         acct_b = sts_connection.assume_role(
             RoleArn=glue_role_arn,
@@ -143,7 +144,7 @@ class MetadataExtractor:
         self.upper_case_dialects = ["oracle"]
 
     def _manage_blob_columns(self, metadata: Metadata) -> Metadata:
-        logger.info("Managing blob columns for metadata: %s", metadata)
+        logger.info("Managing blob columns for metadata: %s", metadata.to_dict())
         for column_name in metadata.column_names:
             if metadata.get_column(column_name)["type"] in ["binary"]:
                 metadata.remove_column(column_name)
@@ -164,7 +165,7 @@ class MetadataExtractor:
         return metadata
 
     def _convert_int_columns(self, metadata: Metadata) -> Metadata:
-        logger.info("Converting int columns for metadata: %s", metadata)
+        logger.info("Converting int columns for metadata: %s", metadata.to_dict())
         for column_name in metadata.column_names:
             if metadata.get_column(column_name)["type"].startswith("int"):
                 column_int = metadata.get_column(column_name)
@@ -173,13 +174,13 @@ class MetadataExtractor:
         return metadata
 
     def _rename_materialised_view(self, metadata: Metadata) -> Metadata:
-        logger.info("Renaming materialised view for metadata: %s", metadata)
+        logger.info("Renaming materialised view for metadata: %s", metadata.to_dict())
         if metadata.name.lower().endswith("_mv"):
             metadata.name = metadata.name[:-3]
         return metadata
 
     def _add_reference_columns(self, metadata: Metadata) -> Metadata:
-        logger.info("Adding reference columns to metadata: %s", metadata)
+        logger.info("Adding reference columns to metadata: %s", metadata.to_dict())
         for column in extraction_columns:
             metadata.update_column(column, append=False)
         for column in curation_columns:
@@ -230,7 +231,8 @@ class MetadataExtractor:
         logger.info("Getting table metadata for table %s in schema %s", table, schema)
         table_meta = self.sqlc.generate_to_meta(table.lower(), schema)
         logger.info("Primary key of %s.%s is %s", schema, table, table_meta.primary_key)
-        table_meta = self._manage_blob_columns(table_meta)
+        if self.dialect == "oracle":
+            table_meta = self._manage_blob_columns(table_meta)
         table_meta = self._convert_int_columns(table_meta)
         table_meta = self._rename_materialised_view(table_meta)
         table_meta = self._add_reference_columns(table_meta)
@@ -296,9 +298,13 @@ def handler(event, context):  # pylint: disable=unused-argument
     destination_bucket = os.getenv("GLUE_DESTINATION_BUCKET", raw_history_bucket)
     destination_prefix = os.getenv("GLUE_DESTINATION_PREFIX", "")
 
-    # TODO: Works for oracle databases. Need to add support for other databases
-    port = "1521"
-    dsn = f"{host}:{port}/?service_name={db_name}"
+    port = db_secret["port"]
+    if engine == "oracle":
+        dsn = f"{host}:{port}/?service_name={db_name}"
+    elif engine == "mssql+pymssql":
+        dsn = f"{host}:{port}/{db_name}?charset=utf8"
+    else:
+        raise ValueError(f"Supported engines: oracle, mssql+pymssql Got: {engine}")
 
     db_string = f"{engine}://{username}:{password}@{dsn}"
     engine = create_engine(db_string)
