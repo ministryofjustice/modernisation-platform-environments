@@ -138,10 +138,10 @@ module "specials_cmt_front_end_assumable_role" {
 module "share_data_marts" {
   source = "./modules/lakeformation_w_data_filter"
 
-  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters           = local.table_filters
-  database_name           = "historic_api_mart"
-  extra_arns              = [
+  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters = local.table_filters
+  database_name = "historic_api_mart"
+  extra_arns = [
     try(one(data.aws_iam_roles.mod_plat_roles.arns)),
     data.aws_iam_role.github_actions_role.arn,
     data.aws_iam_session_context.current.issuer_arn
@@ -153,10 +153,10 @@ module "share_data_marts" {
 module "share_specials_data_marts" {
   source = "./modules/lakeformation_w_data_filter"
 
-  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters           = local.specials_table_filters
-  database_name           = "historic_api_mart"
-  extra_arns              = [
+  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters = local.specials_table_filters
+  database_name = "historic_api_mart"
+  extra_arns = [
     try(one(data.aws_iam_roles.mod_plat_roles.arns)),
     data.aws_iam_role.github_actions_role.arn,
     data.aws_iam_session_context.current.issuer_arn

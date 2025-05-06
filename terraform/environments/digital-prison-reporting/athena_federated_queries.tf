@@ -19,9 +19,9 @@ locals {
   connection_string_onr = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.onr[0].name}}@//${local.onr_host}:${local.onr_port}/${local.onr_service_name}" : ""
 
   ndelius_host              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["endpoint"] : ""
-  ndelius_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["port"]: ""
-  ndelius_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["db_name"]: ""
-  connection_string_ndelius = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndelius[0].name}}@//${local.ndelius_host}:${local.ndelius_port}/${local.ndelius_service_name}": ""
+  ndelius_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["port"] : ""
+  ndelius_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["db_name"] : ""
+  connection_string_ndelius = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndelius[0].name}}@//${local.ndelius_host}:${local.ndelius_port}/${local.ndelius_service_name}" : ""
 
   # OASys, ONR and nDelius are currently only included in Dev and Test
   federated_query_connection_strings_map = local.is_dev_or_test ? {
@@ -30,7 +30,7 @@ locals {
     oasys   = local.connection_string_oasys
     onr     = local.connection_string_onr
     ndelius = local.connection_string_ndelius
-  } : {
+    } : {
     nomis  = local.connection_string_nomis
     bodmis = local.connection_string_bodmis
   }

@@ -124,7 +124,7 @@ resource "aws_iam_role_policy" "dms_source" {
 }
 
 resource "aws_iam_role_policy_attachment" "dms-vpc-role-AmazonDMSVPCManagementRole" {
-  count = var.create_ancillary_static_roles ? 1 : 0
+  count      = var.create_ancillary_static_roles ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
   role       = aws_iam_role.dms_vpc[0].name
 
@@ -159,7 +159,7 @@ resource "aws_iam_role" "dms_cloudwatch" {
 }
 
 resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSCloudWatchLogsRole" {
-  count = var.create_ancillary_static_roles ? 1 : 0
+  count      = var.create_ancillary_static_roles ? 1 : 0
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
   role       = aws_iam_role.dms_cloudwatch[0].name
 }
@@ -167,7 +167,7 @@ resource "aws_iam_role_policy_attachment" "dms-cloudwatch-logs-role-AmazonDMSClo
 # IAM Role for DMS Premigration Assessmeent
 resource "aws_iam_role" "dms_premigration" {
   count = var.create_premigration_assessement_resources ? 1 : 0
-  name = "dms-premigration-assessment-role-${var.db}"
+  name  = "dms-premigration-assessment-role-${var.db}"
   assume_role_policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
