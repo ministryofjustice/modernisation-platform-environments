@@ -127,7 +127,7 @@ resource "aws_kms_key_policy" "awsconfig_firehose_backup_policy" {
 }
 
 resource "aws_iam_role" "awsconfig_firehose_to_datadog" {
-  name = "firehose_to_datadog"
+  name = "awsconfig_firehose_to_datadog"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -198,7 +198,7 @@ resource "aws_iam_policy" "awsconfig_firehose_policy" {
 }
 
 resource "aws_iam_policy" "awsconfig_firehose_secrets_access" {
-  name = "FirehoseSecretsAccess"
+  name = "awsconfig_FirehoseSecretsAccess"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -215,7 +215,7 @@ resource "aws_iam_policy" "awsconfig_firehose_secrets_access" {
 }
 
 resource "aws_iam_policy" "awsconfig_firehose_kms_access" {
-  name = "AllowFirehoseToUseCMK"
+  name = "awsconfig_FirehoseToUseCMK"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -238,7 +238,7 @@ resource "aws_iam_policy" "awsconfig_firehose_kms_access" {
 }
 
 resource "aws_iam_policy" "awsconfig_firehose_kms_secret_access" {
-  name = "FirehoseKMSSecretsDecrypt"
+  name = "awsconfig_FirehoseKMSSecretsDecrypt"
 
   policy = jsonencode({
     Version = "2012-10-17",
