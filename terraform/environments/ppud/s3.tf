@@ -66,8 +66,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "PPUD" {
 }
 
 resource "aws_s3_bucket_logging" "PPUD" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.PPUD[0].id
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.PPUD[0].id
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/ppud-ppud-files-production-logs/"
 }
@@ -93,19 +93,19 @@ resource "aws_s3_bucket_policy" "PPUD" {
     Version = "2012-10-17"
     Statement = [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.PPUD[0].arn,
-        "${aws_s3_bucket.PPUD[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.PPUD[0].arn,
+          "${aws_s3_bucket.PPUD[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         Effect = "Allow"
@@ -225,8 +225,8 @@ resource "aws_s3_bucket_versioning" "moj-infrastructure" {
 }
 
 resource "aws_s3_bucket_logging" "moj-infrastructure" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-infrastructure[0].id
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-infrastructure[0].id
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/moj-infrastructure-logs/"
 }
@@ -270,19 +270,19 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-infrastructure[0].arn,
-        "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure[0].arn,
+          "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
@@ -318,7 +318,7 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         "Effect" : "Allow",
         "Resource" : [
           aws_s3_bucket.moj-infrastructure[0].arn,
-           "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
+          "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
         ],
         "Principal" : {
           Service = "logging.s3.amazonaws.com"
@@ -414,19 +414,19 @@ resource "aws_s3_bucket_policy" "moj-database-source-prod" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-database-source-prod[0].arn,
-        "${aws_s3_bucket.moj-database-source-prod[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-database-source-prod[0].arn,
+          "${aws_s3_bucket.moj-database-source-prod[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
@@ -572,19 +572,19 @@ resource "aws_s3_bucket_policy" "moj-report-source-prod" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-report-source-prod[0].arn,
-        "${aws_s3_bucket.moj-report-source-prod[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-report-source-prod[0].arn,
+          "${aws_s3_bucket.moj-report-source-prod[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
@@ -735,19 +735,19 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-log-files-prod[0].arn,
-        "${aws_s3_bucket.moj-log-files-prod[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-log-files-prod[0].arn,
+          "${aws_s3_bucket.moj-log-files-prod[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
@@ -876,8 +876,8 @@ resource "aws_s3_bucket_versioning" "moj-log-files-uat" {
 }
 
 resource "aws_s3_bucket_logging" "moj-log-files-uat" {
-  count  = local.is-preproduction == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-log-files-uat[0].id
+  count         = local.is-preproduction == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-log-files-uat[0].id
   target_bucket = aws_s3_bucket.moj-log-files-uat[0].id
   target_prefix = "s3-logs/moj-log-files-uat-logs/"
 }
@@ -938,19 +938,19 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-log-files-uat[0].arn,
-        "${aws_s3_bucket.moj-log-files-uat[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-log-files-uat[0].arn,
+          "${aws_s3_bucket.moj-log-files-uat[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
@@ -1134,19 +1134,19 @@ resource "aws_s3_bucket_policy" "moj-report-source-uat" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-report-source-uat[0].arn,
-        "${aws_s3_bucket.moj-report-source-uat[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-report-source-uat[0].arn,
+          "${aws_s3_bucket.moj-report-source-uat[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
@@ -1241,8 +1241,8 @@ resource "aws_s3_bucket_versioning" "moj-log-files-dev" {
 }
 
 resource "aws_s3_bucket_logging" "moj-log-files-dev" {
-  count  = local.is-development == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  count         = local.is-development == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-log-files-dev[0].id
   target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
   target_prefix = "s3-logs/moj-log-files-dev-logs/"
 }
@@ -1303,19 +1303,19 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-log-files-dev[0].arn,
-        "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-log-files-dev[0].arn,
+          "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
@@ -1488,19 +1488,19 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-lambda-layers-dev[0].arn,
-        "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
+          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
@@ -1646,19 +1646,19 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-database-source-dev[0].arn,
-        "${aws_s3_bucket.moj-database-source-dev[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-database-source-dev[0].arn,
+          "${aws_s3_bucket.moj-database-source-dev[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
@@ -1806,19 +1806,19 @@ resource "aws_s3_bucket_policy" "moj-report-source-dev" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-      "Sid": "RequireSSLRequests",
-      "Effect": "Deny",
-      "Principal": "*",
-      "Action": "s3:*",
-      "Resource": [
-        aws_s3_bucket.moj-report-source-dev[0].arn,
-        "${aws_s3_bucket.moj-report-source-dev[0].arn}/*"
-      ],
-      "Condition": {
-        "Bool": {
-          "aws:SecureTransport": "false"
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-report-source-dev[0].arn,
+          "${aws_s3_bucket.moj-report-source-dev[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
         }
-       }
       },
       {
         "Action" : [
