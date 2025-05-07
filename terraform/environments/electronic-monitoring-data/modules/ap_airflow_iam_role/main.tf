@@ -2,7 +2,7 @@ locals {
   account_map = {
     "production"    = "prod"
     "preproduction" = "prod"
-    "test"          = "test"
+    "test"          = var.new_airflow ? "test" : "dev"
     "development"   = "dev"
   }
   env_suffixes = {

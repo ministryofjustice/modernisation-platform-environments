@@ -12,7 +12,7 @@ data "aws_iam_role" "github_actions_role" {
 }
 
 data "aws_iam_roles" "mod_plat_roles" {
-  name_regex = "AWSReservedSSO_modernisation-platform-${local.admin_roles}_.*"
+  name_regex  = "AWSReservedSSO_modernisation-platform-${local.admin_roles}_.*"
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 

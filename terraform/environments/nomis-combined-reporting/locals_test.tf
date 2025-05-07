@@ -2,7 +2,7 @@ locals {
 
   lb_maintenance_message_test = {
     maintenance_title   = "Prison-NOMIS Reporting T1 Maintenance Window"
-    maintenance_message = "Prison-NOMIS Reporting T1 is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpecedly down."
+    maintenance_message = "Prison-NOMIS Reporting T1 is currently unavailable due to planned maintenance or out-of-hours shutdown (7pm-7am). Please contact <a href=\"https://moj.enterprise.slack.com/archives/C6D94J81E\">#ask-digital-studio-ops</a> slack channel if environment is unexpectedly down."
   }
 
   baseline_presets_test = {
@@ -64,7 +64,7 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { type = "gp3", label = "app", size = 100 }  # /u01
+          "/dev/sdb" = { type = "gp3", label = "app", size = 200 }  # /u01
           "/dev/sdc" = { type = "gp3", label = "app", size = 100 }  # /u02
           "/dev/sde" = { type = "gp3", label = "data", size = 100 } # DATA01
           "/dev/sdf" = { type = "gp3", label = "data", size = 100 } # DATA02
