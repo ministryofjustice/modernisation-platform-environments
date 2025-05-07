@@ -227,6 +227,10 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
     weight            = 1
   }
 
+  placement_constraints {
+    type = "distinctInstance"
+  }
+
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
     security_groups = [aws_security_group.chaps_combined_ecs_service.id]
