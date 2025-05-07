@@ -709,6 +709,7 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
     effect = "Allow"
     actions = [
       "glue:GetTable",
+      "glue:GetTables",
       "glue:GetDatabase",
       "glue:GetPartition",
       "glue:List*",
