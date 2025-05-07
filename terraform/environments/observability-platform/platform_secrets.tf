@@ -18,14 +18,10 @@ data "aws_secretsmanager_secret_version" "environment_management" {
 
 data "aws_secretsmanager_secret" "nonmp_account_ids" {
   provider = aws.modernisation-platform
-  name     = "nonmp_account_ids"
+  name     = "nonmp-account-ids"
 }
 
 data "aws_secretsmanager_secret_version" "nonmp_account_ids" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.nonmp_account_ids.id
-}
-
-data "aws_ssm_parameter" "modernisation_platform_account_id" {
-  name = "modernisation_platform_account_id"
 }
