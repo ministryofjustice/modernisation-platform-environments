@@ -133,4 +133,8 @@ module "cica_dms_tempus_dms_implementation" {
       source_arn = aws_cloudwatch_event_rule.metadata_generator.arn
     }
   }
+
+  depends_on = [
+    module.cica_dms_tariff_dms_implementation.aws_dms_replication_instance
+  ]
 }
