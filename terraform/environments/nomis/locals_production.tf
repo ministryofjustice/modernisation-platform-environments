@@ -533,6 +533,7 @@ locals {
                   host_header = {
                     values = [
                       "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                      "c.production.nomis.az.justice.gov.uk"
                     ]
                   }
                 }]
@@ -598,6 +599,13 @@ locals {
           { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1200.awsdns-22.org", "ns-1958.awsdns-52.co.uk", "ns-44.awsdns-05.com", "ns-759.awsdns-30.net"] },
           { name = "reporting", type = "NS", ttl = "86400", records = ["ns-1122.awsdns-12.org", "ns-1844.awsdns-38.co.uk", "ns-388.awsdns-48.com", "ns-887.awsdns-46.net"] },
           { name = "ndh", type = "NS", ttl = "86400", records = ["ns-1106.awsdns-10.org", "ns-1904.awsdns-46.co.uk", "ns-44.awsdns-05.com", "ns-799.awsdns-35.net"] },
+        ]
+      }
+
+      # use this zone for testing as it's in the IE compatibility enterprise site list
+      "production.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
 
