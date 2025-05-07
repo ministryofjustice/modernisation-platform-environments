@@ -2,6 +2,10 @@
 # Data Sources and CloudWatch Alarms for EC2 Instances Windows
 ###############################################################
 
+#########################
+# Data Sources Production
+#########################
+
 # Create a data source to fetch the tags of each instance
 
 data "aws_instances" "windows_tagged_instances" {
@@ -17,6 +21,10 @@ data "aws_instance" "windows_instance_details" {
   for_each    = toset(data.aws_instances.windows_tagged_instances.ids)
   instance_id = each.value
 }
+
+##############################
+# CloudWatch Alarms Production
+##############################
 
 # Low Disk Alarm for all Windows instances with C Volumes
 
@@ -395,11 +403,7 @@ resource "aws_cloudwatch_metric_alarm" "system_health_check" {
   }
 }
 
-# ====================
-# IIS and Event Logs
-# ====================
-
-# Status Check Alarm
+# IIS Status Check Alarm
 
 resource "aws_cloudwatch_metric_alarm" "Windows_IIS_check" {
   for_each            = toset(data.aws_instances.windows_tagged_instances.ids)
@@ -1023,4 +1027,44 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw027" {
     Instance = "i-00cbccc46d25e77c6"
     Port     = "Port-25"
   }
+}
+
+############################
+# Data Sources PreProduction
+############################
+
+# Create a data source to fetch the tags of each instance
+
+data "aws_instances" "windows_tagged_instances_uat" {
+  filter {
+    name   = "tag:patch_group"
+    values = ["uat_win_patch"]
+  }
+}
+
+# Data source for ImageId and InstanceType for each instance
+
+data "aws_instance" "windows_instance_details_uat" {
+  for_each    = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  instance_id = each.value
+}
+
+##########################
+# Data Sources Development
+##########################
+
+# Create a data source to fetch the tags of each instance
+
+data "aws_instances" "windows_tagged_instances_dev" {
+  filter {
+    name   = "tag:patch_group"
+    values = ["dev_win_patch"]
+  }
+}
+
+# Data source for ImageId and InstanceType for each instance
+
+data "aws_instance" "windows_instance_details_dev" {
+  for_each    = toset(data.aws_instances.windows_tagged_instances_dev.ids)
+  instance_id = each.value
 }
