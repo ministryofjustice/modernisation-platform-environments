@@ -2,7 +2,7 @@
 # SNS Topics and Topic Subscriptions
 ####################################
 
-# Production - Cloud Watch
+# Production CloudWatch SNS Topic and Subscription
 
 resource "aws_sns_topic" "cw_alerts" {
   # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
@@ -18,7 +18,7 @@ resource "aws_sns_topic_subscription" "cw_subscription" {
   #  endpoint  = aws_secretsmanager_secret_version.support_email_account[0].secret_string
 }
 
-# SMS topic subscriptions to be implemented temporarily over the Christmas period or during other periods of low staffing.
+# SNS topic subscriptions to be implemented temporarily over the Christmas period or during other periods of low staffing.
 
 /*
 resource "aws_sns_topic_subscription" "cw_sms_subscription" {
@@ -57,7 +57,7 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription4" {
 }
 */
 
-# PreProduction - Cloud Watch
+# Preproduction CloudWatch SNS Topic and Subscription
 
 resource "aws_sns_topic" "cw_uat_alerts" {
   # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
@@ -107,7 +107,57 @@ resource "aws_sns_topic_policy" "sns_uat_policy" {
   })
 }
 
-# Production - S3 Bucket Notification
+# Development CloudWatch SNS Topic and Subscription
+
+resource "aws_sns_topic" "cw_dev_alerts" {
+  # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
+  count = local.is-development == true ? 1 : 0
+  name  = "ppud-dev-cw-alerts"
+}
+
+resource "aws_sns_topic_subscription" "cw_dev_subscription" {
+  count     = local.is-development == true ? 1 : 0
+  topic_arn = aws_sns_topic.cw_dev_alerts[0].arn
+  protocol  = "email"
+  endpoint  = "PPUDAlerts@colt.net"
+}
+
+resource "aws_sns_topic_policy" "sns_dev_policy" {
+  count = local.is-development == true ? 1 : 0
+  arn   = aws_sns_topic.cw_dev_alerts[0].arn
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        "Sid" : "__default_statement_ID",
+        "Effect" : "Allow",
+        "Principal" : {
+          "AWS" : "*"
+        },
+        "Action" : [
+          "SNS:Publish",
+          "SNS:RemovePermission",
+          "SNS:SetTopicAttributes",
+          "SNS:DeleteTopic",
+          "SNS:ListSubscriptionsByTopic",
+          "SNS:GetTopicAttributes",
+          "SNS:Receive",
+          "SNS:AddPermission",
+          "SNS:Subscribe"
+        ],
+        "Resource" : "aws_sns_topic.cw_dev_alerts[0].arn",
+        "Condition" : {
+          "StringEquals" : {
+            "AWS:SourceOwner" : "data.aws_caller_identity.current.account_id"
+          }
+        }
+      }
+    ]
+  })
+}
+
+# Production S3 Bucket Notification Topic and Subscription
 
 resource "aws_sns_topic" "s3_bucket_notifications_prod" {
   # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
@@ -154,7 +204,7 @@ data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_prod" {
   }
 }
 
-# Pre-production - S3 Bucket Notification
+# Preproduction S3 Bucket Notification Topic and Subscription
 
 resource "aws_sns_topic" "s3_bucket_notifications_uat" {
   # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
@@ -201,7 +251,7 @@ data "aws_iam_policy_document" "sns_topic_policy_s3_notifications_uat" {
   }
 }
 
-# Development - S3 Bucket Notification
+# Development S3 Bucket Notification Topic and Subscription
 
 resource "aws_sns_topic" "s3_bucket_notifications_dev" {
   # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
