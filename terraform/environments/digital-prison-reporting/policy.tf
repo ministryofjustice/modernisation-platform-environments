@@ -710,6 +710,7 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
     actions = [
       "glue:GetTable",
       "glue:GetTables",
+      "glue:GetTableVersions",
       "glue:GetDatabase",
       "glue:GetDatabases",
       "glue:GetPartition",
