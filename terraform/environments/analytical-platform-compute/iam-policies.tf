@@ -187,6 +187,7 @@ module "gha_mojas_airflow_iam_policy" {
   tags = local.tags
 }
 
+#trivy:ignore:AVD-AWS-0345: test policy for development
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
   #checkov:skip=CKV_AWS_110: test policy for development
   #checkov:skip=CKV_AWS_107: test policy for development
