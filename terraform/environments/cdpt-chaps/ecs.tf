@@ -227,7 +227,7 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
     weight            = 1
   }
 
-  placement_strategies {
+  placement_strategy {
     type  = "spread"
     field = "instanceId"
   }
