@@ -1056,7 +1056,6 @@ data "aws_instance" "windows_instance_details_uat" {
 # Create a data source to fetch the tags of each instance
 
 data "aws_instances" "windows_tagged_instances_dev" {
-  count    = local.is-development == true ? 1 : 0
   filter {
     name   = "tag:patch_group"
     values = ["dev_win_patch"]
@@ -1066,12 +1065,9 @@ data "aws_instances" "windows_tagged_instances_dev" {
 # Data source for ImageId and InstanceType for each instance
 
 data "aws_instance" "windows_instance_details_dev" {
-  count       = local.is-development == true ? 1 : 0
   for_each    = toset(data.aws_instances.windows_tagged_instances_dev.ids)
   instance_id = each.value
 }
-
-/*
 
 ###############################
 # CloudWatch Alarms Development
@@ -1080,7 +1076,6 @@ data "aws_instance" "windows_instance_details_dev" {
 # Malware Event Signature Update Failed
 
 resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed_dev" {
-  count               = local.is-development == true ? 1 : 0
   for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
   alarm_name          = "Malware-Event-Signature-Update-Failed-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -1103,7 +1098,6 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed_de
 # Malware Event State Detected
 
 resource "aws_cloudwatch_metric_alarm" "malware_event_state_detected_dev" {
-  count               = local.is-development == true ? 1 : 0
   for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
   alarm_name          = "Malware-Event-State-Detected-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -1126,7 +1120,6 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_state_detected_dev" {
 # Malware Event Scan Failed
 
 resource "aws_cloudwatch_metric_alarm" "malware_event_scan_failed_dev" {
-  count               = local.is-development == true ? 1 : 0
   for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
   alarm_name          = "Malware-Event-Scan-Failed-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -1149,7 +1142,6 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_scan_failed_dev" {
 # Malware Event Engine Update Failed
 
 resource "aws_cloudwatch_metric_alarm" "malware_event_engine_update_failed_dev" {
-  count               = local.is-development == true ? 1 : 0
   for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
   alarm_name          = "Malware-Event-Engine-Update-Failed-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -1172,7 +1164,6 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_engine_update_failed_dev" 
 # Malware Event Engine Out of Date
 
 resource "aws_cloudwatch_metric_alarm" "malware_event_engine_out_of_date_dev" {
-  count               = local.is-development == true ? 1 : 0
   for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
   alarm_name          = "Malware-Event-Engine-Out-Of-Date-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -1195,7 +1186,6 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_engine_out_of_date_dev" {
 # Malware Event Behavior Detected
 
 resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected_dev" {
-  count               = local.is-development == true ? 1 : 0
   for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
   alarm_name          = "Malware-Event-Engine-Behavior-Detected-${each.key}"
   comparison_operator = "GreaterThanThreshold"
@@ -1214,5 +1204,3 @@ resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected_dev" {
     MalwareBehaviorDetected = "MalwareBehaviorDetected"
   }
 }
-
-*/
