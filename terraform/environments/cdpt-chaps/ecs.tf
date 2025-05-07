@@ -222,6 +222,8 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
   deployment_minimum_healthy_percent = 50
   deployment_maximum_percent         = 200
 
+  launch_type = "EC2"
+
   capacity_provider_strategy {
     capacity_provider = aws_ecs_capacity_provider.chaps.name
     weight            = 1
