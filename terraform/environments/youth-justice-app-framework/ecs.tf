@@ -49,8 +49,9 @@ module "ecs" {
   environment  = local.environment
   tags         = local.tags
 
-  #RDS Details
+  #RDS and Redshift Details
   rds_postgresql_sg_id = module.aurora.rds_cluster_security_group_id
+  redshift_sg_id       = module.redshift.security_group_id
 
   secret_kms_key_arn = module.kms.key_arn
   ecs_secrets_access_policy_secret_arns = jsonencode([
@@ -67,7 +68,7 @@ module "ecs" {
     aws_iam_policy.s3-access.arn
   ]
 
-  depends_on = [module.internal_alb, module.external_alb, module.aurora]
+  depends_on = [module.internal_alb, module.external_alb, module.aurora, module.redshift]
 }
 
 
