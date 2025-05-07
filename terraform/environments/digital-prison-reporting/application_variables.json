@@ -484,10 +484,7 @@
           "resource_shares": [
             {
               "glue_database": "curated_prisons_history_preprod_dbt",
-              "glue_tables": [
-                "nomis_offender_course_attendances",
-                "nomis_offender_program_profiles"
-              ]
+              "glue_tables": ["*"]
             }
           ]
         }
