@@ -224,11 +224,6 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
 
   launch_type = "EC2"
 
-  capacity_provider_strategy {
-    capacity_provider = aws_ecs_capacity_provider.chaps.name
-    weight            = 1
-  }
-
   placement_strategy {
     type  = "spread"
     field = "instanceId"
