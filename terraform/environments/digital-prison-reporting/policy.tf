@@ -711,6 +711,7 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
       "glue:GetTable",
       "glue:GetTables",
       "glue:GetDatabase",
+      "glue:GetDatabases",
       "glue:GetPartition",
       "glue:List*",
       "glue:DeleteTable",
