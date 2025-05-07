@@ -19,9 +19,10 @@ resource "aws_instance" "tariff_app" {
   subnet_id                   = data.aws_subnet.private_subnets_a.id
   user_data                   = <<EOF
             #!/bin/bash
-            yum update -y
-            yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-            systemctl status amazon-ssm-agent
+            cd /tmp
+            sudo dnf install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+            sudo systemctl enable amazon-ssm-agent
+            sudo systemctl start amazon-ssm-agent
             EOF
   vpc_security_group_ids      = [aws_security_group.tariff_app_security_group.id]
 

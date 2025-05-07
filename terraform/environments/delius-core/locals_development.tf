@@ -107,6 +107,11 @@ locals {
       container_memory = 1024
     }
 
+    sfs = {
+      container_cpu    = 2048
+      container_memory = 4096
+    }
+
     oracle_observer = {
       image_tag        = "latest"
       container_cpu    = 512

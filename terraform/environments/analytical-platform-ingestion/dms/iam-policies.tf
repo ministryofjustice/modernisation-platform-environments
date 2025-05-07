@@ -63,7 +63,7 @@ module "production_replication_cica_dms_iam_policy" {
   policy = data.aws_iam_policy_document.production_cica_dms_replication.json
 }
 
-data "aws_iam_policy_document" "eventbridge_dms_full_load_task_policy" {
+data "aws_iam_policy_document" "tariff_eventbridge_dms_full_load_task_policy" {
   statement {
     sid       = "AllowDmsTaskAccess"
     effect    = "Allow"
@@ -72,14 +72,35 @@ data "aws_iam_policy_document" "eventbridge_dms_full_load_task_policy" {
   }
 }
 
-module "eventbridge_dms_full_load_task_policy" {
+module "tariff_eventbridge_dms_full_load_task_policy" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.54.1"
 
-  name_prefix = "cica-dms-eventbridge-full-load-task"
+  name_prefix = "tariff-cica-dms-eventbridge-full-load-task"
 
-  policy = data.aws_iam_policy_document.eventbridge_dms_full_load_task_policy.json
+  policy = data.aws_iam_policy_document.tariff_eventbridge_dms_full_load_task_policy.json
+}
+
+data "aws_iam_policy_document" "tempus_eventbridge_dms_full_load_task_policy" {
+  statement {
+    sid       = "AllowDmsTaskAccess"
+    effect    = "Allow"
+    actions   = ["dms:StartReplicationTask"]
+    resources = [for tempus_module in module.cica_dms_tempus_dms_implementation : tempus_module.dms_full_load_task_arn]
+  }
+}
+
+module "tempus_eventbridge_dms_full_load_task_policy" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.54.1"
+
+  name_prefix = "tempus-cica-dms-eventbridge-full-load-task"
+
+  policy = data.aws_iam_policy_document.tempus_eventbridge_dms_full_load_task_policy.json
 }

@@ -21,9 +21,14 @@ data "aws_iam_policy_document" "datahub_read_cadet_bucket" {
     sid    = "datahubReadCaDeTBucket"
     effect = "Allow"
     actions = [
-      "s3:Get*",
-      "s3:List*",
-      "s3:Describe*"
+      "s3:GetObject",
+      "s3:GetObjectAttributes",
+      "s3:GetObjectTagging",
+      "s3:GetObjectVersion",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:DescribeJob",
+      "s3:DescribeMultiRegionAccessPointOperation"
     ]
     resources = [
       "${module.s3-create-a-derived-table-bucket.bucket.arn}/em_data_artefacts/*",
