@@ -900,7 +900,7 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2_cw_dev" {
   count     = local.is-development == true ? 1 : 0
   policy_id = "SnsTopicId"
   statement {
-    sid = "statement1"
+    sid = "snstopicpolicy"
     principals {
       type        = "AWS"
       identifiers = ["*"]
