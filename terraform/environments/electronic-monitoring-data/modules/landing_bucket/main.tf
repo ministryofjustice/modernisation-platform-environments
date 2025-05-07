@@ -106,7 +106,7 @@ module "kms_key" {
   # aws kms list-grants --region=eu-west-2 --key-id <key id>
   grants = var.cross_account_access_role != null ? {
     cross_account_access_role = {
-      grantee_principal = "arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}"
+      grantee_principal = nonsensitive("arn:aws:iam::${var.cross_account_access_role.account_number}:role/${var.cross_account_access_role.role_name}")
       operations = [
         "Encrypt",
         "GenerateDataKey",
