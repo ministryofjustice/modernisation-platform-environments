@@ -62,6 +62,27 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
       identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
     }
   }
+
+  statement {
+    effect  = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["athena.amazonaws.com"]
+    }
+  }
 }
 
 module "cur_v2_hourly" {
