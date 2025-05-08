@@ -26,8 +26,7 @@ resource "aws_iam_role_policy" "dmskinesispolicy" {
   #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   #checkov:skip=CKV_AWS_289: "Ensure IAM policies does not allow permissions management / resource exposure without constraints"
   #checkov:skip=CKV_AWS_288: "Ensure IAM policies does not allow data exfiltration"
-  
-
+  #trivy:ignore:AVD-AWS-0345: test policy for development
   name = "dms-${var.short_name}-kinesis-policy"
   role = aws_iam_role.dms-kinesis-role.id
 
