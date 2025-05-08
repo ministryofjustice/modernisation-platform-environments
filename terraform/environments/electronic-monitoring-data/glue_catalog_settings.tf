@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "glue-policy" {
       effect = "Allow"
       principals {
         type = "AWS"
-        identifiers = ["arn:aws:iam::${local.environment_management["analytical-platform-data-production"]}:root"]
+        identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:root"]
       }
       actions = ["glue:*"]
       resources = [
