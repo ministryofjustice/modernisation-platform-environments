@@ -925,7 +925,7 @@ resource "aws_iam_policy" "sns_topic_policy_ec2_cw_uat" {
       "SNS:ListTopics",
       "SNS:Publish"
         ],
-      "Resource": "${aws_sns_topic.cw_dev_alerts[0].arn}",
+      "Resource": "${aws_sns_topic.cw_uat_alerts[0].arn}"
       "Condition": {
         "StringEquals": {
           "AWS:SourceOwner": "${data.aws_caller_identity.current.account_id}"
