@@ -20,6 +20,7 @@ EOF
 }
 
 # Attach an admin policy to the role
+# trivy:ignore:AVD-AWS-0345 Reason: This role needs full S3 access for legacy operations
 resource "aws_iam_role_policy" "dmskinesispolicy" {
   #checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
   #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
