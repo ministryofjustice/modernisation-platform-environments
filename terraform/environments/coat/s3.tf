@@ -74,8 +74,8 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
     ]
 
     resources = [
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly",
-      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*"
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results"
     ]
 
     principals {
