@@ -1,18 +1,28 @@
+# Modernisation platform - adding Admin Data Lake permissions
+# https://user-guide.modernisation-platform.service.justice.gov.uk/runbooks/adding-admin-data-lake-formation-permissions.html#configuration-overview
+
+data "aws_iam_role" "github_actions_role" {
+  name = "github-actions"
+}
+
+data "aws_iam_roles" "modernisation_platform_sandbox_role" {
+  name_regex  = "AWSReservedSSO_modernisation-platform-sandbox_.*"
+  path_prefix = "/aws-reserved/sso.amazonaws.com/"
+}
+
+locals {
+  sandbox_role_arn = (
+    length(data.aws_iam_roles.modernisation_platform_sandbox_role.names) > 0 ?
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform_sandbox_role.names)}" :
+    null
+  )
+}
+
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = flatten([[for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn], data.aws_iam_session_context.current.issuer_arn, try(one(data.aws_iam_roles.data_engineering_roles.arns), [])])
-
-  # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
-  create_database_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
-
-  create_table_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
+  admins = compact([
+    local.sandbox_role_arn,
+    data.aws_iam_role.github_actions_role.arn,
+  ])
 }
 
 resource "aws_lakeformation_lf_tag" "domain_tag" {
