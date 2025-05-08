@@ -21,8 +21,7 @@ module "ecs" {
   ec2_instance_type    = "m5.xlarge"
   ec2_min_size         = 11
   ec2_max_size         = 11
-  ec2_desired_capacity = 11
-  ec2_ami_id           = "ami-0f7072b9f80de802d"                                                                                             #todo shared from old yjaf, replace with output of ami builder
+  ec2_desired_capacity = 11                                                                                                                  #todo shared from old yjaf, replace with output of ami builder
   nameserver           = join(".", [split(".", data.aws_vpc.shared.cidr_block)[0], split(".", data.aws_vpc.shared.cidr_block)[1], "0", "2"]) #eg "10.23.0.2"
 
   spot_overrides = [

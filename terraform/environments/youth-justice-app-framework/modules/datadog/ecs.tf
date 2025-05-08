@@ -101,7 +101,7 @@ module "ecs_service_datadog_agent" {
         },
         {
           "name" : "DD_SYSTEM_PROBE_ENABLED",
-          "value" : "true"
+          "value" : "false"
         },
         {
           "name" : "DD_TAGS",
