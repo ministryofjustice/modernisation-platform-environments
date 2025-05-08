@@ -55,10 +55,10 @@ resource "aws_cloudwatch_log_group" "Windows-Defender-Logs" {
   retention_in_days = 365
 }
 
-resource "aws_cloudwatch_log_group" "Application-Event-Logs" {
+resource "aws_cloudwatch_log_group" "Custom-Event-Logs" {
   # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
   count             = local.is-production == true ? 1 : 0
-  name              = "Application-Event-Logs"
+  name              = "Custom-Event-Logs"
   retention_in_days = 365
 }
 
@@ -639,7 +639,7 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineOutofDate-Development"
 resource "aws_cloudwatch_log_metric_filter" "EmailSender-True" {
   count          = local.is-production == true ? 1 : 0
   name           = "EmailSender-True"
-  log_group_name = aws_cloudwatch_log_group.Application-Event-Logs[count.index].name
+  log_group_name = aws_cloudwatch_log_group.Custom-Event-Logs[count.index].name
   pattern        = "[date, time, Instance, EmailSender, status=True]"
   metric_transformation {
     name      = "True"
@@ -655,7 +655,7 @@ resource "aws_cloudwatch_log_metric_filter" "EmailSender-True" {
 resource "aws_cloudwatch_log_metric_filter" "EmailSender-False" {
   count          = local.is-production == true ? 1 : 0
   name           = "EmailSender-False"
-  log_group_name = aws_cloudwatch_log_group.Application-Event-Logs[count.index].name
+  log_group_name = aws_cloudwatch_log_group.Custom-Event-Logs[count.index].name
   pattern        = "[date, time, Instance, EmailSender, status=False]"
   metric_transformation {
     name      = "False"
