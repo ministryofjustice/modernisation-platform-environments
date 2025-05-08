@@ -1,3 +1,4 @@
+#checkov:skip=CKV_AWS_355:Glue Crawlers do not support security_configuration
 resource "aws_glue_catalog_database" "cur_v2_database" {
   name = "cur_v2_database"
 }
