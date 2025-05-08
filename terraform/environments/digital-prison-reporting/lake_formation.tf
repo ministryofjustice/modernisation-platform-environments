@@ -5,24 +5,16 @@ data "aws_iam_role" "github_actions_role" {
   name = "github-actions"
 }
 
-data "aws_iam_roles" "modernisation_platform_sandbox_role" {
-  name_regex  = "AWSReservedSSO_modernisation-platform-sandbox_.*"
-  path_prefix = "/aws-reserved/sso.amazonaws.com/"
-}
-
-locals {
-  sandbox_role_arn = (
-    length(data.aws_iam_roles.modernisation_platform_sandbox_role.names) > 0 ?
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform_sandbox_role.names)}" :
-    null
-  )
+data "aws_iam_role" "dataapi_cross_account_role" {
+  name = "${local.project}-data-api-cross-account-role"
+  
 }
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = compact([
-    local.sandbox_role_arn,
-    data.aws_iam_role.github_actions_role.arn,
-  ])
+  admins = [
+    data.aws_iam_role.dataapi_cross_account_role.arn,
+    data.aws_iam_role.github_actions_role.arn
+  ]
 }
 
 resource "aws_lakeformation_lf_tag" "domain_tag" {
@@ -54,5 +46,4 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
     key    = aws_lakeformation_lf_tag.sensitive_tag.key
     values = aws_lakeformation_lf_tag.sensitive_tag.values
   }
-
 }
