@@ -29,6 +29,24 @@ module "cur_s3_kms" {
           identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
         }
       ]
+    },
+    {
+      sid = "AllowGlueService"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["glue.amazonaws.com"]
+        }
+      ]
     }
   ]
 
