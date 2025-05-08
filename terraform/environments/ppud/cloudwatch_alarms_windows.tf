@@ -1029,6 +1029,28 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw027" {
   }
 }
 
+# Email Sender Stale Log File
+
+resource "aws_cloudwatch_metric_alarm" "emailsender_check_rgvw022" {
+  count               = local.is-production == true ? 1 : 0
+  alarm_name          = "Email-Sender-Check-i-029d2b17679dab982"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "True"
+  namespace           = "EmailSenderStatus"
+  period              = "60"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "Monitors for stale email sender log files "
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance        = "i-029d2b17679dab982"
+    EmailSender     = "EmailSender"
+  }
+}
+
 ############################
 # Data Sources PreProduction
 ############################

@@ -55,6 +55,13 @@ resource "aws_cloudwatch_log_group" "Windows-Defender-Logs" {
   retention_in_days = 365
 }
 
+resource "aws_cloudwatch_log_group" "Custom-Event-Logs" {
+  # checkov:skip=CKV_AWS_158: "CloudWatch log group is not public facing, does not contain any sensitive information and does not need encryption"
+  count             = local.is-production == true ? 1 : 0
+  name              = "Custom-Event-Logs"
+  retention_in_days = 365
+}
+
 ##################################
 # Windows Log Groups Preproduction
 ##################################
@@ -623,6 +630,40 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineOutofDate-Development"
     dimensions = {
       Instance               = "$Instance"
       MalwareEngineOutofDate = "$MalwareEngineOutofDate"
+    }
+  }
+}
+
+# EmailSender Log Application Metric Filters
+
+resource "aws_cloudwatch_log_metric_filter" "EmailSender-True" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "EmailSender-True"
+  log_group_name = aws_cloudwatch_log_group.Custom-Event-Logs[count.index].name
+  pattern        = "[date, time, Instance, EmailSender, status=True]"
+  metric_transformation {
+    name      = "True"
+    namespace = "EmailSenderStatus"
+    value     = "1"
+    dimensions = {
+      Instance = "$Instance"
+      EmailSender  = "$EmailSender"
+    }
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "EmailSender-False" {
+  count          = local.is-production == true ? 1 : 0
+  name           = "EmailSender-False"
+  log_group_name = aws_cloudwatch_log_group.Custom-Event-Logs[count.index].name
+  pattern        = "[date, time, Instance, EmailSender, status=False]"
+  metric_transformation {
+    name      = "False"
+    namespace = "EmailSenderStatus"
+    value     = "0"
+    dimensions = {
+      Instance = "$Instance"
+      EmailSender  = "$EmailSender"
     }
   }
 }

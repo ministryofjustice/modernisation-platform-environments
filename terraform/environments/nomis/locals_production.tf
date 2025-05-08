@@ -527,7 +527,7 @@ locals {
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v3"]
 
             alarm_target_group_names = [
               # "prod-nomis-web-a-http-7777",
