@@ -11,4 +11,5 @@ module "tenant_configuration" {
   name                   = each.key
   identity_centre_team   = each.value.identity_centre_team
   aws_accounts           = each.value.aws_accounts
+  all_account_ids        = local.all_account_ids
 }
