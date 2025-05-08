@@ -2,14 +2,14 @@ locals {
   env_ = "${local.environment_shorthand}_"
   iam-dev = local.environment_shorthand == "dev" ? [
     var.cloud-platform-iam-dev,
-    var.cloud-platform-iam-crime-matching-dev
+    var.cloud-platform-crime-matching-iam-dev
   ] : null
 
   iam-test = local.environment_shorthand == "test" ? [
     var.cloud-platform-iam-dev,
     var.cloud-platform-iam-preprod,
     var.cloud-platform-iam-prod,
-    var.cloud-platform-iam-crime-matching-dev
+    var.cloud-platform-crime-matching-iam-dev
   ] : null
 
   iam-preprod = local.environment_shorthand == "preprod" ? [
@@ -94,7 +94,7 @@ variable "cloud-platform-iam-prod" {
   default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-7a81f92a48491ef0-live"
 }
 
-variable "cloud-platform-iam-crime-matching-dev" {
+variable "cloud-platform-crime-matching-iam-dev" {
   type        = string
   description = "IAM role that the crime matching API in Cloud Platform will use to connect to this role."
   default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-6e3937460af175fd-live"
