@@ -92,3 +92,12 @@ data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_
 data "aws_lb" "mwaa_alb" {
   name = "mwaa"
 }
+
+# KMS
+data "aws_kms_key" "mwaa_kms" {
+  key_id = "alias/mwaa/default"
+}
+
+data "aws_s3_bucket" "mwaa_bucket" {
+  bucket = "mojap-compute-${local.environment}-mwaa"
+}
