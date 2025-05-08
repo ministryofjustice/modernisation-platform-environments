@@ -10,22 +10,19 @@ data "aws_iam_roles" "modernisation_platform_sandbox_role" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
+locals {
+  sandbox_role_arn = (
+    length(data.aws_iam_roles.modernisation_platform_sandbox_role.names) > 0 ?
+    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform_sandbox_role.names)}" :
+    null
+  )
+}
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = [
+  admins = compact([
+    local.sandbox_role_arn,
     data.aws_iam_role.github_actions_role.arn,
-    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/${data.aws_region.current.name}/${one(data.aws_iam_roles.modernisation_platform_sandbox_role.names)}"
-  ]
-
-  create_database_default_permissions {
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
-
-  create_table_default_permissions {
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
+  ])
 }
 
 resource "aws_lakeformation_lf_tag" "domain_tag" {
