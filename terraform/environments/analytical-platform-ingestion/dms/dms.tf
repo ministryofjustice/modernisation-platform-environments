@@ -1,26 +1,39 @@
 locals {
   tariff = {
-    short_resource_name = "tariff-${local.environment}"
-    resource_name       = "cica-ap-tariff-${local.environment}"
+    short_resource_name         = "tariff-${local.environment}"
+    resource_name               = "cica-ap-tariff-${local.environment}"
+
+    create_replication_instance = true
+    instance_size               = "dms.t3.large"
+    replication_instance_id     = "cica-ap-${local.environment}"
   }
   tempus = {
     SPPFinishedJobs = {
-      database_name       = "SPPFinishedJobs"
-      short_resource_name = "tempus-sppfj-${local.environment}"
-      resource_name       = "cica-ap-tempus-spp-finished-jobs-${local.environment}"
-      instance_size       = "dms.t3.large"
+      database_name               = "SPPFinishedJobs"
+      short_resource_name         = "tempus-sppfj-${local.environment}"
+      resource_name               = "cica-ap-tempus-spp-finished-jobs-${local.environment}"
+
+      create_replication_instance = false
+      instance_size               = "n/a"
+      replication_instance_id     = local.tariff.replication_instance_id
     }
     SPPProcessPlatform = {
-      database_name       = "SPPProcessPlatform"
-      short_resource_name = "tempus-spppp-${local.environment}"
-      resource_name       = "cica-ap-tempus-spp-process-platform-${local.environment}"
-      instance_size       = "dms.r5.large"
+      database_name               = "SPPProcessPlatform"
+      short_resource_name         = "tempus-spppp-${local.environment}"
+      resource_name               = "cica-ap-tempus-spp-process-platform-${local.environment}"
+
+      create_replication_instance = true
+      instance_size               = "dms.r5.large"
+      replication_instance_id     = "cica-ap-tempus-SPPPPP-${local.environment}"
     }
     CaseWork = {
-      database_name       = "CaseWork"
-      short_resource_name = "tempus-cw-${local.environment}"
-      resource_name       = "cica-ap-tempus-case-work-${local.environment}"
-      instance_size       = "dms.t3.large"
+      database_name               = "CaseWork"
+      short_resource_name         = "tempus-cw-${local.environment}"
+      resource_name               = "cica-ap-tempus-case-work-${local.environment}"
+
+      create_replication_instance = false
+      instance_size               = "n/a"
+      replication_instance_id     = local.tariff.replication_instance_id
     }
   }
 }
@@ -31,7 +44,8 @@ module "cica_dms_tariff_dms_implementation" {
   vpc_id      = data.aws_vpc.connected_vpc.id
   environment = local.environment
 
-  db = local.tariff.short_resource_name
+  db                          = local.tariff.short_resource_name
+  create_replication_instance = local.tariff.create_replication_instance
 
   dms_replication_instance = {
     replication_instance_id    = "cica-ap-${local.environment}"
@@ -42,7 +56,7 @@ module "cica_dms_tariff_dms_implementation" {
     engine_version             = "3.5.4"
     kms_key_arn                = module.cica_dms_credentials_kms.key_arn
     multi_az                   = false
-    replication_instance_class = "dms.t3.large"
+    replication_instance_class = local.tariff.instance_size
     inbound_cidr               = local.environment_configuration.tariff_cidr
     apply_immediately          = true
   }
@@ -86,7 +100,7 @@ module "cica_dms_tempus_dms_implementation" {
   environment = local.environment
 
   db                          = each.value.short_resource_name
-  create_replication_instance = false
+  create_replication_instance = each.value.create_replication_instance
 
   dms_replication_instance = {
     replication_instance_id    = "cica-ap-${local.environment}"
@@ -133,8 +147,4 @@ module "cica_dms_tempus_dms_implementation" {
       source_arn = aws_cloudwatch_event_rule.metadata_generator.arn
     }
   }
-
-  depends_on = [
-    module.cica_dms_tariff_dms_implementation.aws_dms_replication_instance
-  ]
 }

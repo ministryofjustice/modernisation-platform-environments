@@ -9,7 +9,7 @@ locals {
         replication_task_arn = module.cica_dms_tempus_dms_implementation["SPPFinishedJobs"].dms_full_load_task_arn
       }
       SPPProcessPlatform = {
-        cron_string = "cron(0 2 * * ? *)" # 2am every day
+        cron_string = "cron(10 0 * * ? *)" # 12:10 every day, runs in own replication instance
         replication_task_arn = module.cica_dms_tempus_dms_implementation["SPPProcessPlatform"].dms_full_load_task_arn
       }
       CaseWork = {
