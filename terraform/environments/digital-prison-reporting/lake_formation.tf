@@ -10,10 +10,6 @@ data "aws_iam_roles" "modernisation_platform_sandbox_role" {
   path_prefix = "/aws-reserved/sso.amazonaws.com/"
 }
 
-data "aws_caller_identity" "current" {}
-
-data "aws_region" "current" {}
-
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([
     [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
