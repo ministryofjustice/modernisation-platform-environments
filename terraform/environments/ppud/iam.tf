@@ -894,6 +894,45 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
   }
 }
 
+# Production IAM SNS Policy
+
+data "aws_iam_policy_document" "sns_topic_policy_ec2_cw_uat" {
+  count     = local.is-preproduction == true ? 1 : 0
+  policy_id = "SnsTopicId"
+  statement {
+    sid = "statement1"
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    effect = "Allow"
+    actions = [
+      "SNS:GetTopicAttributes",
+      "SNS:SetTopicAttributes",
+      "SNS:GetSubscriptionAttributes",
+      "SNS:SetSubscriptionAttributes",
+      "SNS:AddPermission",
+      "SNS:DeleteTopic",
+      "SNS:Subscribe",
+      "SNS:Unsubscribe",
+      "SNS:ListSubscriptions",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:ListTopics",
+      "SNS:Publish"
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceOwner"
+      values   = [data.aws_caller_identity.current.account_id]
+    }
+
+    resources = [
+      aws_sns_topic.cw_uat_alerts[0].arn
+    ]
+  }
+}
+
 # Development IAM SNS Policy
 
 data "aws_iam_policy_document" "sns_topic_policy_ec2_cw_dev" {
