@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "glue-policy" {
         type = "AWS"
         identifiers = ["arn:aws:iam::${local.environment_management["analytical-platform-data-production"]}:root"]
       }
-      actions = "glue:*"
+      actions = ["glue:*"]
       resources = [
         "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/*/*",
         "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
