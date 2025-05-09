@@ -93,7 +93,7 @@ resource "aws_instance" "ohs_instance_1" {
   instance_type               = local.application_data.accounts[local.environment].ohs_instance_type
   monitoring                  = true
   vpc_security_group_ids      = [aws_security_group.ohs_instance.id]
-  subnet_id                   = module.vpc.private_subnets.0
+  # subnet_id                   = module.vpc.private_subnets.0
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.ohs_1_userdata)
   user_data_replace_on_change = true

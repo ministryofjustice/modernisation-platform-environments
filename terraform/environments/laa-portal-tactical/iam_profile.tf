@@ -52,6 +52,7 @@ resource "aws_iam_policy" "portal" { #tfsec:ignore:aws-iam-no-policy-wildcards
   )
   policy = <<EOF
 {
+    "Version": "2012-10-17",
     "Statement": [
         {
             "Action": [
