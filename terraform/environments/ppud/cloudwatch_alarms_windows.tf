@@ -965,7 +965,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw019" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-0dba6054c0f5f7a11"
-    Port     = "Port-25"
+    Port     = "Port25"
   }
 }
 
@@ -985,7 +985,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw020" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-0f393d9ed4e53da68"
-    Port     = "Port-25"
+    Port     = "Port25"
   }
 }
 
@@ -1005,7 +1005,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw022" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-029d2b17679dab982"
-    Port     = "Port-25"
+    Port     = "Port25"
   }
 }
 
@@ -1025,7 +1025,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw027" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-00cbccc46d25e77c6"
-    Port     = "Port-25"
+    Port     = "Port25"
   }
 }
 
