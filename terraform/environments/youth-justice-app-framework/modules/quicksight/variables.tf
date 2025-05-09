@@ -20,11 +20,6 @@ variable "notification_email" {
   default     = "YJAFoperationsAWS@necsws.com"
 }
 
-variable "vpc_connection_id" {
-  type        = string
-  description = "The ID of the VPC connection to be created in Quicksight."
-}
-
 variable "quicksight_role_name" {
   type        = string
   description = "The name of the role to be assined tot he Quicksight VPN Connection."
@@ -35,7 +30,6 @@ variable "vpc_id" {
   type        = string
   description = "VPC ID."
 }
-
 
 variable "database_subnet_ids" {
   description = "List of database subnets"
