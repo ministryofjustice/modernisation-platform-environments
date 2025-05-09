@@ -8,16 +8,19 @@ locals {
       database_name       = "SPPFinishedJobs"
       short_resource_name = "tempus-sppfj-${local.environment}"
       resource_name       = "cica-ap-tempus-spp-finished-jobs-${local.environment}"
+      instance_size       = "dms.t3.large"
     }
     SPPProcessPlatform = {
       database_name       = "SPPProcessPlatform"
       short_resource_name = "tempus-spppp-${local.environment}"
       resource_name       = "cica-ap-tempus-spp-process-platform-${local.environment}"
+      instance_size       = "dms.r5.large"
     }
     CaseWork = {
       database_name       = "CaseWork"
       short_resource_name = "tempus-cw-${local.environment}"
       resource_name       = "cica-ap-tempus-case-work-${local.environment}"
+      instance_size       = "dms.t3.large"
     }
   }
 }
@@ -92,7 +95,7 @@ module "cica_dms_tempus_dms_implementation" {
     engine_version             = "3.5.4"
     kms_key_arn                = module.cica_dms_credentials_kms.key_arn
     multi_az                   = false
-    replication_instance_class = "dms.t3.large"
+    replication_instance_class = each.value.instance_size
     inbound_cidr               = local.environment_configuration.tempus_cidr
     apply_immediately          = true
   }

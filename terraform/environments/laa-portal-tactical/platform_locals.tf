@@ -1,9 +1,8 @@
 locals {
 
-  application_name = "observability-platform"
+  application_name = "laa-portal-tactical"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
-  nonmp_account_ids      = jsondecode(data.aws_secretsmanager_secret_version.nonmp_account_ids.secret_string).nonmp_account_ids
 
   # Stores modernisation platform account id for setting up the modernisation-platform provider
   modernisation_platform_account_id = data.aws_ssm_parameter.modernisation_platform_account_id.value
