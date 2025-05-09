@@ -894,8 +894,8 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
   }
 }
 
-# Production IAM SNS Policy
-
+# Preproduction IAM SNS Policy
+/*
 data "aws_iam_policy_document" "sns_topic_policy_ec2_cw_uat" {
   count     = local.is-preproduction == true ? 1 : 0
   policy_id = "SnsTopicId"
@@ -931,6 +931,48 @@ data "aws_iam_policy_document" "sns_topic_policy_ec2_cw_uat" {
       aws_sns_topic.cw_uat_alerts[0].arn
     ]
   }
+}
+*/
+
+# Preproduction IAM SNS Policy
+
+resource "aws_iam_policy" "sns_topic_policy_ec2_cw_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name        = "CloudWatchSNSPublishPolicy"
+  description = "Allows CloudWatch to publish messages to SNS topic"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "AllowCloudWatchPublish",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cloudwatch.amazonaws.com"
+      },
+      "Action": [
+      "SNS:GetTopicAttributes",
+      "SNS:SetTopicAttributes",
+      "SNS:GetSubscriptionAttributes",
+      "SNS:SetSubscriptionAttributes",
+      "SNS:Subscribe",
+      "SNS:Unsubscribe",
+      "SNS:ListSubscriptions",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:ListTopics",
+      "SNS:Publish"
+        ],
+      "Resource": "${aws_sns_topic.cw_uat_alerts[0].arn}"
+      "Condition": {
+        "StringEquals": {
+          "AWS:SourceOwner": "${data.aws_caller_identity.current.account_id}"
+        }
+      }
+    }
+  ]
+}
+EOF
 }
 
 # Development IAM SNS Policy
