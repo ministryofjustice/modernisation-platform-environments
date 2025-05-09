@@ -156,33 +156,33 @@ resource "aws_vpc_security_group_ingress_rule" "oam_coherence_icmp" {
 #   to_port     = 2049
 # }
 
-resource "aws_vpc_security_group_ingress_rule" "nonprod_workspaces" {
-  count             = contains(["development", "testing"], local.environment) ? 1 : 0
-  security_group_id = aws_security_group.oam_instance.id
-  description       = "OAM Admin Server from Shared Svs"
-  cidr_ipv4         = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
-  from_port         = 7001
-  ip_protocol       = "tcp"
-  to_port           = 7001
-}
+# resource "aws_vpc_security_group_ingress_rule" "nonprod_workspaces" {
+#   count             = contains(["development", "testing"], local.environment) ? 1 : 0
+#   security_group_id = aws_security_group.oam_instance.id
+#   description       = "OAM Admin Server from Shared Svs"
+#   cidr_ipv4         = local.nonprod_workspaces_cidr # env-BastionSSHCIDR
+#   from_port         = 7001
+#   ip_protocol       = "tcp"
+#   to_port           = 7001
+# }
 
-resource "aws_vpc_security_group_ingress_rule" "redc" {
-  count             = contains(["development", "testing"], local.environment) ? 1 : 0
-  security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4         = local.redc_cidr
-  from_port         = 5575
-  ip_protocol       = "tcp"
-  to_port           = 5575
-}
+# resource "aws_vpc_security_group_ingress_rule" "redc" {
+#   count             = contains(["development", "testing"], local.environment) ? 1 : 0
+#   security_group_id = aws_security_group.oam_instance.id
+#   cidr_ipv4         = local.redc_cidr
+#   from_port         = 5575
+#   ip_protocol       = "tcp"
+#   to_port           = 5575
+# }
 
-resource "aws_vpc_security_group_ingress_rule" "atos" {
-  count             = contains(["preproduction", "production"], local.environment) ? 1 : 0
-  security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4         = local.atos_cidr
-  from_port         = 5575
-  ip_protocol       = "tcp"
-  to_port           = 5575
-}
+# resource "aws_vpc_security_group_ingress_rule" "atos" {
+#   count             = contains(["preproduction", "production"], local.environment) ? 1 : 0
+#   security_group_id = aws_security_group.oam_instance.id
+#   cidr_ipv4         = local.atos_cidr
+#   from_port         = 5575
+#   ip_protocol       = "tcp"
+#   to_port           = 5575
+# }
 
 ######################################
 # OAM Instance
