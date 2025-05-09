@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "alfresco_read_only" {
 }
 
 resource "aws_iam_role" "alfresco_read_only" {
-  name               = "${var.env_name}-alresco-read-only"
+  name               = "${var.env_name}-alfresco-read-only"
   assume_role_policy = data.aws_iam_policy_document.alfresco_read_only.json
   tags               = var.tags
 }
