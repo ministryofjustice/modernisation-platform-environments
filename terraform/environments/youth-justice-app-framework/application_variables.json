@@ -21,7 +21,8 @@
           "identity": "development.yjbservices.yjb.gov.uk",
           "create_records": true
         }
-      }
+      },
+      "create_quicksight_subscription": false
     },
     "test": {
       "allow_s3_replication": true,
@@ -44,7 +45,8 @@
           "identity": "test.yjbservices.yjb.gov.uk",
           "create_records": false
         }
-      }
+      },
+      "create_quicksight_subscription": true
     },
     "preproduction": {
       "allow_s3_replication": true,
@@ -67,7 +69,8 @@
           "identity": "preproduction.yjbservices.yjb.gov.uk",
           "create_records": true
         }
-      }
+      },
+      "create_quicksight_subscription": true
     },
     "production": {
       "allow_s3_replication": true,
@@ -94,7 +97,8 @@
           "identity": "production.yjbservices.yjb.gov.uk",
           "create_records": true
         }
-      }
+      },
+      "create_quicksight_subscription": true
     }
   }
 }

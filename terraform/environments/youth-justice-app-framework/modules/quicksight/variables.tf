@@ -14,6 +14,11 @@ variable "tags" {
   default     = {}
 }
 
+variable "create_quicksight_subscription" {
+  type        = bool
+  description = "Only create a quicksight subscription if this is set to true."
+}
+
 variable "notification_email" {
   type        = string
   description = "Mail address that you want Amazon QuickSight to send notifications to regarding your Amazon QuickSight account or Amazon QuickSight subscription"

@@ -7,6 +7,8 @@ module "quicksight" {
   environment  = local.environment
   tags         = local.tags
 
+  create_quicksight_subscription = local.application_data.accounts[local.environment].create_quicksight_subscription
+
   notification_email = "david.seekins@necsws.com" # For testing change later.
 
   vpc_id              = data.aws_vpc.shared.id

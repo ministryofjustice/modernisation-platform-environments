@@ -1,4 +1,6 @@
 resource "aws_quicksight_account_subscription" "subscription" {
+  count = var.create_quicksight_subscription ? 1 : 0
+
   account_name                     = "${var.project_name}-${var.environment}-moj"
   edition                          = "ENTERPRISE"
   authentication_method            = "IAM_AND_QUICKSIGHT"
