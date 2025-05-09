@@ -69,6 +69,7 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
         Action = [
           "glue:BatchGetPartition",
           "glue:CreateTable",
+          "glue:GetCatalogs",
           "glue:GetDatabase",
           "glue:GetDatabases",
           "glue:GetTable",
