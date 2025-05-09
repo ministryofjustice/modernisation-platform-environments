@@ -7,6 +7,8 @@ module "vpc" {
   azs             = local.availability_zones
   cidr            = local.application_data.accounts[local.environment].vpc_cidr
   private_subnets = local.private_subnets
+  public_subnets = local.public_subnets
+  database_subnets = local.database_subnets
 
   # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
   enable_flow_log                      = true
