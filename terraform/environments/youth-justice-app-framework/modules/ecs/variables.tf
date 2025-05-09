@@ -23,6 +23,12 @@ variable "nameserver" {
   type        = string
 }
 
+variable "ec2_ami_id" {
+  description = "The AMI ID for the ECS cluster"
+  type        = string
+  default     = ""
+}
+
 variable "ecs_services" {
   description = "A list of ECS services to create. Will create the main container definition for the app itself"
   type = map(object({
