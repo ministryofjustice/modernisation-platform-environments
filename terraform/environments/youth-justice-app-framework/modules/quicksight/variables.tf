@@ -23,7 +23,7 @@ variable "notification_email" {
 variable "quicksight_role_name" {
   type        = string
   description = "The name of the role to be assined tot he Quicksight VPN Connection."
-  default     = "aws-qiicksight-service-role-v0"
+  default     = "aws-quicksight-service-role-v0"
 }
 
 variable "vpc_id" {
