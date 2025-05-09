@@ -29,6 +29,24 @@ module "cur_s3_kms" {
           identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
         }
       ]
+    },
+    {
+      sid = "AllowGlueService"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["glue.amazonaws.com"]
+        }
+      ]
     }
   ]
 
@@ -60,6 +78,27 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
+    }
+  }
+
+  statement {
+    effect  = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:PutObject"
+    ]
+
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*",
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results"
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["athena.amazonaws.com"]
     }
   }
 }
