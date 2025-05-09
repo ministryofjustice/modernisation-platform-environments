@@ -111,7 +111,7 @@ resource "aws_instance" "ohs_instance_1" {
   user_data_base64            = base64encode(local.ohs_1_userdata)
   user_data_replace_on_change = true
   
-  # key_name                    = aws_key_pair.portal15_ssh.key_name
+  key_name                    = aws_key_pair.portal15_ssh.key_name
 
   # vpc_security_group_ids      = [aws_security_group.ohs_instance.id]
   # subnet_id                   = module.vpc.private_subnets.0
@@ -141,10 +141,10 @@ resource "aws_network_interface" "ohs_1" {
 #############################################
 # TEMP SSH Key to installing Portal
 #############################################
-# resource "aws_key_pair" "portal15_ssh" {
-#   key_name   = "portal1.5-ssh-key"
-#   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDpAb+2L7URPwzVqFjmRq3daVTsjX2uT2UKWq8CL9dMdSRHMclgBvanEHp7QyogC9nlMjnTnoPTY2jDuQL3vjTB7i7ToRw+Hmq5QHPbNQ/+aoaNYQOIFQv6svAr1vqzD7F0N7vj19rQ+cb5tSjCobjmDE0aGScPCDEhfhoHgFVtaELtnDvxTKacS8rZbrGwISi9LYJHM1ldNFTPU3ib74cDYHO03tL1S3ric70SrN4yR3ly7caKPEL+C9ZNDjVGUs7sCgIg1+MI7mOuK1IcO9rOkItc21Qohn0MaOPbi5NoI+rkG49ueDSRrEA1gMXjBWjp5IfOy3EluqJZQNmmD0T3AVRx6fwrp9GeeHcQKdcU1ONgaUvnukgO76H/jZWgWYRUlhVIs1QhgmIenFdyKOrXXjrtDJqQutZzjO+NQTOe12AFT2Jv8fu1m/iDyQIx/NXFpiBko6tgw5NOk6l3H9j0HgVbPHP+st6ogC/dPmWDPkeUyt8Bj6fphCWmGhvm7/c= vincent.cheung@MJ004609"
-# }
+resource "aws_key_pair" "portal15_ssh" {
+  key_name   = "portal1.5-ssh-key"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDpAb+2L7URPwzVqFjmRq3daVTsjX2uT2UKWq8CL9dMdSRHMclgBvanEHp7QyogC9nlMjnTnoPTY2jDuQL3vjTB7i7ToRw+Hmq5QHPbNQ/+aoaNYQOIFQv6svAr1vqzD7F0N7vj19rQ+cb5tSjCobjmDE0aGScPCDEhfhoHgFVtaELtnDvxTKacS8rZbrGwISi9LYJHM1ldNFTPU3ib74cDYHO03tL1S3ric70SrN4yR3ly7caKPEL+C9ZNDjVGUs7sCgIg1+MI7mOuK1IcO9rOkItc21Qohn0MaOPbi5NoI+rkG49ueDSRrEA1gMXjBWjp5IfOy3EluqJZQNmmD0T3AVRx6fwrp9GeeHcQKdcU1ONgaUvnukgO76H/jZWgWYRUlhVIs1QhgmIenFdyKOrXXjrtDJqQutZzjO+NQTOe12AFT2Jv8fu1m/iDyQIx/NXFpiBko6tgw5NOk6l3H9j0HgVbPHP+st6ogC/dPmWDPkeUyt8Bj6fphCWmGhvm7/c= vincent.cheung@MJ004609"
+}
 
 # resource "aws_vpc_security_group_ingress_rule" "ohs_ssh" {
 #   security_group_id            = aws_security_group.ohs_instance.id
