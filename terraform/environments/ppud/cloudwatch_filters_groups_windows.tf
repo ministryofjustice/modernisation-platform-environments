@@ -128,14 +128,14 @@ resource "aws_cloudwatch_log_metric_filter" "PortStatus-True" {
   count          = local.is-production == true ? 1 : 0
   name           = "PortStatus-True"
   log_group_name = aws_cloudwatch_log_group.Network-Connectivity-Logs[count.index].name
-  pattern        = "[date, time, Instance, Port, status!=False]"
+  pattern        = "[date, time, Instance, Port-25, status!=False]"
   metric_transformation {
     name      = "True"
     namespace = "PortStatus"
     value     = "1"
     dimensions = {
       Instance = "$Instance"
-      Port     = "$Port"
+      Port     = "$Port-25"
     }
   }
 }
@@ -144,14 +144,14 @@ resource "aws_cloudwatch_log_metric_filter" "PortStatus-False" {
   count          = local.is-production == true ? 1 : 0
   name           = "PortStatus-False"
   log_group_name = aws_cloudwatch_log_group.Network-Connectivity-Logs[count.index].name
-  pattern        = "[date, time, Instance, Port, status=False]"
+  pattern        = "[date, time, Instance, Port-25, status=False]"
   metric_transformation {
     name      = "False"
     namespace = "PortStatus"
     value     = "0"
     dimensions = {
       Instance = "$Instance"
-      Port     = "$Port"
+      Port     = "$Port-25"
     }
   }
 }
