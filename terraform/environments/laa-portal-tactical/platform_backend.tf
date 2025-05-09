@@ -9,6 +9,6 @@ terraform {
     key                  = "terraform.tfstate"
     region               = "eu-west-2"
     use_lockfile         = true
-    workspace_key_prefix = "environments/members/dummy-account" # This will store the object as environments/members/dummy-account/${workspace}/terraform.tfstate
+    workspace_key_prefix = "environments/members/laa-portal-tactical" # This will store the object as environments/members/laa-portal-tactical/${workspace}/terraform.tfstate
   }
 }

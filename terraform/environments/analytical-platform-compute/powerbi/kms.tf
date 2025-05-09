@@ -1,6 +1,8 @@
 # KMS key for encrypting Auth0 secrets
 module "auth0_secrets_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
   source  = "terraform-aws-modules/kms/aws"
   version = "2.1.0"
 
