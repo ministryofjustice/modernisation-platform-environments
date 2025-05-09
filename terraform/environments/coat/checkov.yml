@@ -1,2 +1,0 @@
-skip-check:
-  -  CKV_AWS_355 # Glue Crawler do not support security_configuration
