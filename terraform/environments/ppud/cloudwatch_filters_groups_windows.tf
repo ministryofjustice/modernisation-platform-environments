@@ -635,23 +635,22 @@ resource "aws_cloudwatch_log_metric_filter" "MalwareEngineOutofDate-Development"
 }
 
 # EmailSender Log Application Metric Filters
-/*
+
 resource "aws_cloudwatch_log_metric_filter" "EmailSender-True" {
   count          = local.is-production == true ? 1 : 0
   name           = "EmailSender-True"
   log_group_name = aws_cloudwatch_log_group.Custom-Event-Logs[count.index].name
-  pattern        = "[date, time, Instance, EmailSender, status=True]"
+  pattern        = "[date, time, Instance, EmailSender, status!=False]"
   metric_transformation {
-    name      = "True"
-    namespace = "EmailSenderStatus"
+    name      = "EmailSenderStatus"
+    namespace = "EmailSender"
     value     = "1"
     dimensions = {
-      Instance = "$Instance"
+      Instance     = "$Instance"
       EmailSender  = "$EmailSender"
     }
   }
 }
-*/
 
 resource "aws_cloudwatch_log_metric_filter" "EmailSender-False" {
   count          = local.is-production == true ? 1 : 0
@@ -661,9 +660,9 @@ resource "aws_cloudwatch_log_metric_filter" "EmailSender-False" {
   metric_transformation {
     name      = "EmailSenderStatus"
     namespace = "EmailSender"
-    value     = "1"
+    value     = "0"
     dimensions = {
-      Instance = "$Instance"
+      Instance     = "$Instance"
       EmailSender  = "$EmailSender"
     }
   }
