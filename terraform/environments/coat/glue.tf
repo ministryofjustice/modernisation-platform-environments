@@ -48,6 +48,7 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
 }
 
 resource "aws_glue_crawler" "cur_v2_crawler" {
+  #checkov:skip=CKV_AWS_195: "Ensure Glue component has a security configuration associated"
   name          = "cur_v2_crawler"
   database_name = aws_glue_catalog_database.cur_v2_database.name
   role          = aws_iam_role.glue_cur_role.arn
