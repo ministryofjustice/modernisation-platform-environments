@@ -72,6 +72,7 @@ resource "aws_sns_topic_subscription" "cw_uat_subscription" {
   endpoint  = "PPUDAlerts@colt.net"
 }
 
+/*
 resource "aws_sns_topic_policy" "sns_uat_policy" {
   count = local.is-preproduction == true ? 1 : 0
   arn   = aws_sns_topic.cw_uat_alerts[0].arn
@@ -106,6 +107,7 @@ resource "aws_sns_topic_policy" "sns_uat_policy" {
     ]
   })
 }
+*/
 
 # Development CloudWatch SNS Topic and Subscription
 
