@@ -1,6 +1,6 @@
 locals {
 
-  application_name = "dummy-account"
+  application_name = "laa-portal-tactical"
 
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
 

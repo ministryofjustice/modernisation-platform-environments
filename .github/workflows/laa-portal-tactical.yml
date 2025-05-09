@@ -1,19 +1,19 @@
 ---
-name: dummy-account
+name: laa-portal-tactical
 on:
   push:
     branches:
       - main
     paths:
-      - 'terraform/environments/dummy-account/**'
-      - '.github/workflows/dummy-account.yml'
+      - 'terraform/environments/laa-portal-tactical/**'
+      - '.github/workflows/laa-portal-tactical.yml'
 
   pull_request:
     branches:
       - main
     paths:
-      - 'terraform/environments/dummy-account/**'
-      - '.github/workflows/dummy-account.yml'
+      - 'terraform/environments/laa-portal-tactical/**'
+      - '.github/workflows/laa-portal-tactical.yml'
 
   workflow_dispatch:
     inputs:
