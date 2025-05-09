@@ -117,3 +117,29 @@ resource "aws_lakeformation_permissions" "share_database_with_apde" {
     name = "${each.value.database_name}${local.dbt_suffix}"
   }
 }
+
+resource "aws_lakeformation_permissions" "share_table_filter_with_ap" {
+  for_each = {
+    for pair in flatten([
+      for database_name, tables in local.tables_to_share_ap : [
+        for table_name in tables : {
+          key = "${database_name}.${table_name}"
+          value = {
+            database_name = database_name
+            table_name    = table_name
+          }
+        }
+      ]
+    ]) : pair.key => pair.value
+  }
+
+  principal                     = local.environment_management.account_ids["analytical-platform-data-production"]
+  permissions                   = ["SELECT"]
+  permissions_with_grant_option = ["SELECT"]
+  data_cells_filter {
+    database_name   = "${each.value.database_name}${local.dbt_suffix}"
+    table_name      = each.value.table_name
+    table_catalog_id = data.aws_caller_identity.current.account_id
+    name            = "${each.value.table_name}_general_filter"
+  }
+}
