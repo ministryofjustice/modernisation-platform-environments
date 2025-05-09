@@ -56,6 +56,7 @@ resource "aws_dms_replication_subnet_group" "replication_subnet_group" {
 }
 
 resource "aws_dms_replication_instance" "instance" {
+  count                        = var.create_replication_instance ? 1 : 0
   allocated_storage            = var.dms_replication_instance.allocated_storage
   apply_immediately            = var.dms_replication_instance.apply_immediately
   auto_minor_version_upgrade   = true
@@ -73,4 +74,8 @@ resource "aws_dms_replication_instance" "instance" {
   tags = merge({ Name = var.dms_replication_instance.replication_instance_id },
     var.tags
   )
+}
+
+data "aws_dms_replication_instance" "instance" {
+  replication_instance_id = var.create_replication_instance ? aws_dms_replication_instance.instance[0].replication_instance_id: var.dms_replication_instance.replication_instance_id
 }
