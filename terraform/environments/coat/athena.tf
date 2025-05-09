@@ -21,7 +21,7 @@ resource "aws_glue_catalog_database" "cur_v2_database" {
 }
 
 resource "aws_iam_role" "glue_cur_role" {
-  name = "glue-cur-role"
+  name = "glue_cur_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -35,15 +35,10 @@ resource "aws_iam_role" "glue_cur_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "glue_service_role_policy" {
-  role       = aws_iam_role.glue_cur_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
-}
-
 resource "aws_iam_role_policy" "glue_s3_policy" {
   #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   #checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
-  role = aws_iam_role.glue_cur_role.id
+  role = aws_iam_role.glue_cur_role.name
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -78,7 +73,8 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
           "glue:GetPartitions",
           "glue:ImportCatalogToGlue",
           "glue:UpdateDatabase",
-          "glue:UpdateTable"
+          "glue:UpdateTable",
+          "glue:StartCrawler"
         ],
         Resource = ["*"]
       },
