@@ -8,7 +8,7 @@
       "pagerduty_integration_key_name": "laa_portal_nonprod_alarms",
       "management_cidr": "",
       "oim_ami_id": "",
-      "oam_ami_id": "",
+      "oam_ami_id": "ami-013e6c65f9221ce14",
       "oam_instance_type": "m5.xlarge",
       "oam_fmw_snapshot": "",
       "oam_aserver_snapshot": "",
