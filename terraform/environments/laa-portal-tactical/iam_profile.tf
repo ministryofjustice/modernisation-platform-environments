@@ -63,8 +63,7 @@ resource "aws_iam_policy" "portal" { #tfsec:ignore:aws-iam-no-policy-wildcards
                 "logs:DescribeLogGroups",
                 "cloudwatch:PutMetricData",
                 "cloudwatch:GetMetricStatistics",
-                "cloudwatch:ListMetrics",
-                "ec2messages:*"
+                "cloudwatch:ListMetrics"
             ],
             "Resource": "*",
             "Effect": "Allow"
@@ -96,16 +95,38 @@ resource "aws_iam_policy" "portal" { #tfsec:ignore:aws-iam-no-policy-wildcards
                 "*"
             ],
             "Effect": "Allow"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "ec2messages:AcknowledgeMessage",
+                "ec2messages:DeleteMessage",
+                "ec2messages:FailMessage",
+                "ec2messages:GetEndpoint",
+                "ec2messages:GetMessages",
+                "ec2messages:SendReply"
+            ],
+            "Resource": "*"
         }
     ]
 }
 EOF
 }
 
-resource "aws_iam_role_policy_attachment" "ssm" {
-  role       = aws_iam_role.portal.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-}
+# resource "aws_iam_role_policy_attachment" "ssm" {
+#   role       = aws_iam_role.portal.name
+#   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+# }
 
 resource "aws_iam_role_policy_attachment" "portal" {
   role       = aws_iam_role.portal.name

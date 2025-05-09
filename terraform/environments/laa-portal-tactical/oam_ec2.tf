@@ -6,8 +6,8 @@ locals {
 #!/bin/bash
 
 # Setting up SSM Agent
-sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
-sudo systemctl start amazon-ssm-agent
+# sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+# sudo systemctl start amazon-ssm-agent
 
 
 EOF
@@ -26,11 +26,25 @@ resource "aws_security_group" "oam_instance" {
   vpc_id      = module.vpc.vpc_id
 }
 
+# resource "aws_vpc_security_group_egress_rule" "oam_outbound" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   cidr_ipv4         = "0.0.0.0/0"
+#   ip_protocol       = "-1"
+# }
+
 resource "aws_vpc_security_group_egress_rule" "oam_outbound" {
   security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4         = "0.0.0.0/0"
+  cidr_ipv4         = module.vpc.vpc_cidr_block
   ip_protocol       = "-1"
 }
+
+# resource "aws_vpc_security_group_egress_rule" "oam_outbound_https" {
+#   security_group_id = aws_security_group.oam_instance.id
+#   cidr_ipv4         = "0.0.0.0/0"
+#   from_port         = 443
+#   to_port           = 443
+#   ip_protocol       = "tcp"
+# }
 
 # TODO some rules will need adding referencing Landing Zone environments (e.g. VPC) for other dependent applications not migrated to MP yet but needs talking to Portal.
 # At the moment we are unsure what rules form LZ is required so leaving out those rules for now, to be added when dependencies identified in future tickets or testing.
