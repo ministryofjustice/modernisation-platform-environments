@@ -5,9 +5,10 @@ locals {
   ohs_1_userdata = <<EOF
 #!/bin/bash
 
-# Setting up SSM Agent
+# Setting up SSM Agent here
 sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 
+g
 EOF
 
   #   ohs_2_userdata = <<EOF
@@ -31,10 +32,18 @@ resource "aws_security_group" "ohs_instance" {
 
 }
 
-resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
+# resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
+#   security_group_id = aws_security_group.ohs_instance.id
+#   cidr_ipv4         = module.vpc.vpc_cidr_block
+#   ip_protocol       = "-1"
+# }
+
+resource "aws_vpc_security_group_egress_rule" "ohs_outbound_https" {
   security_group_id = aws_security_group.ohs_instance.id
-  cidr_ipv4         = module.vpc.vpc_cidr_block
-  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
 }
 
 resource "aws_vpc_security_group_ingress_rule" "ohs_local_vpc" {
