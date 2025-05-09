@@ -16,9 +16,11 @@ resource "aws_iam_role" "vpc_connection_role" {
       }
     ]
   })
-  inline_policy {
-    name = "QuickSightVPCConnectionRolePolicy"
-    policy = jsonencode({
+}
+
+resource "aws_iam_policy" "qs_vpc" {
+  name        = "QuickSightVPCConnectionRolePolicy"
+  policy = jsonencode({
       Version = "2012-10-17"
       Statement = [
         {
@@ -33,6 +35,10 @@ resource "aws_iam_role" "vpc_connection_role" {
           Resource = ["*"]
         }
       ]
-    })
-  }
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "qs_vpc" {
+  role       = aws_iam_role.vpc_connection_role.name
+  policy_arn = aws_iam_policy.qs_vpc.arn
 }
