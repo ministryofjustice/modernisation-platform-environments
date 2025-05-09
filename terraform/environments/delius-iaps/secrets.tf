@@ -26,3 +26,33 @@ resource "aws_secretsmanager_secret" "ad_password" {
 data "aws_secretsmanager_secret_version" "ad_password" {
   secret_id = aws_secretsmanager_secret.ad_password.id
 }
+
+##
+# Oracle Database DBA Secret
+##
+resource "random_password" "dbsnmp_password" {
+  length  = 30
+  lower   = true
+  upper   = true
+  numeric = true
+  special = true
+}
+
+resource "aws_secretsmanager_secret" "database_dba_passwords" {
+  name                    = local.dba_secret_name
+  description             = "DBA Users Credentials"
+  recovery_window_in_days = 0
+
+  tags = merge(
+    local.tags,
+    {
+      Name = local.dba_secret_name
+    },
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "database_dba_passwords" {
+  secret_id     = aws_secretsmanager_secret.database_dba_passwords.id
+  secret_string = random_password.dbsnmp_password.result
+}
+
