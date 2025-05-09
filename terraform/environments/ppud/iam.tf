@@ -941,8 +941,7 @@ resource "aws_iam_policy" "sns_topic_policy_ec2_cw_uat" {
   name        = "CloudWatchSNSPublishPolicy"
   description = "Allows CloudWatch to publish messages to SNS topic"
 
-  policy = <<EOF
-{
+  policy = jsonencode({
   "Version": "2012-10-17",
   "Statement": [
     {
@@ -952,29 +951,26 @@ resource "aws_iam_policy" "sns_topic_policy_ec2_cw_uat" {
         "Service": "cloudwatch.amazonaws.com"
       },
       "Action": [
-      "SNS:GetTopicAttributes",
-      "SNS:SetTopicAttributes",
-      "SNS:GetSubscriptionAttributes",
-      "SNS:SetSubscriptionAttributes",
-      "SNS:Subscribe",
-      "SNS:Unsubscribe",
-      "SNS:ListSubscriptions",
-      "SNS:ListSubscriptionsByTopic",
-      "SNS:ListTopics",
-      "SNS:Publish"
-        ],
-      "Resource": [
-          "${aws_sns_topic.cw_uat_alerts[0].arn}"
-        ],
+        "SNS:GetTopicAttributes",
+        "SNS:SetTopicAttributes",
+        "SNS:GetSubscriptionAttributes",
+        "SNS:SetSubscriptionAttributes",
+        "SNS:Subscribe",
+        "SNS:Unsubscribe",
+        "SNS:ListSubscriptions",
+        "SNS:ListSubscriptionsByTopic",
+        "SNS:ListTopics",
+        "SNS:Publish"
+      ],
+      "Resource": "${aws_sns_topic.cw_uat_alerts[0].arn}",
       "Condition": {
         "StringEquals": {
-          "AWS:SourceOwner": "${data.aws_caller_identity.current.account_id}"
+          "AWS:SourceOwner": data.aws_caller_identity.current.account_id
         }
       }
     }
   ]
-}
-EOF
+})
 }
 
 # Development IAM SNS Policy
