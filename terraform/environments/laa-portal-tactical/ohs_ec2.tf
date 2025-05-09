@@ -7,6 +7,7 @@ locals {
 
 # # Setting up SSM Agent
 # sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+sudo systemctl start amazon-ssm-agent
 
 EOF
 
@@ -112,12 +113,12 @@ resource "aws_instance" "ohs_instance_1" {
   
   # key_name                    = aws_key_pair.portal15_ssh.key_name
 
-  vpc_security_group_ids      = [aws_security_group.ohs_instance.id]
-  subnet_id                   = module.vpc.private_subnets.0
-  # network_interface {
-  #   network_interface_id = aws_network_interface.ohs_1.id
-  #   device_index         = 0
-  # }
+  # vpc_security_group_ids      = [aws_security_group.ohs_instance.id]
+  # subnet_id                   = module.vpc.private_subnets.0
+  network_interface {
+    network_interface_id = aws_network_interface.ohs_1.id
+    device_index         = 0
+  }
 
   tags = merge(
     { "instance-scheduling" = "skip-scheduling" },
@@ -127,15 +128,15 @@ resource "aws_instance" "ohs_instance_1" {
   )
 }
 
-# resource "aws_network_interface" "ohs_1" {
-#   subnet_id   = module.vpc.private_subnets.0
-#   private_ips = ["10.206.4.100"]
-#   security_groups = [aws_security_group.ohs_instance.id]
+resource "aws_network_interface" "ohs_1" {
+  subnet_id   = module.vpc.private_subnets.0
+  private_ips = ["10.206.4.100"]
+  security_groups = [aws_security_group.ohs_instance.id]
 
-#   tags = {
-#     Name = "ohs1_ec2_networking_interface"
-#   }
-# }
+  tags = {
+    Name = "ohs1_ec2_networking_interface"
+  }
+}
 
 #############################################
 # TEMP SSH Key to installing Portal
