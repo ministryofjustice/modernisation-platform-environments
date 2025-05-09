@@ -1,5 +1,38 @@
 
-data "aws_iam_role" "quicksight" {
-  name = var.quicksight_role_name
-}
+# Create a role to allow quicksight to create a VPC connection
+resource "aws_iam_role" "vpc_connection_role" {
+  name               = "create-quicksight-vpc-connection"
+  description        = "Rule to allow the Quicksite service to create a VPC connection."
 
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "quicksight.amazonaws.com"
+        }
+      }
+    ]
+  })
+  inline_policy {
+    name = "QuickSightVPCConnectionRolePolicy"
+    policy = jsonencode({
+      Version = "2012-10-17"
+      Statement = [
+        {
+          Effect = "Allow"
+          Action = [
+            "ec2:CreateNetworkInterface",
+            "ec2:ModifyNetworkInterfaceAttribute",
+            "ec2:DeleteNetworkInterface",
+            "ec2:DescribeSubnets",
+            "ec2:DescribeSecurityGroups"
+          ]
+          Resource = ["*"]
+        }
+      ]
+    })
+  }
+}
