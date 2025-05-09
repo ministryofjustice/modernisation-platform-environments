@@ -14,18 +14,18 @@ variable "tags" {
   default     = {}
 }
 
-variable "notification_email {
+variable "notification_email" {
   type        = string
   description = "Mail address that you want Amazon QuickSight to send notifications to regarding your Amazon QuickSight account or Amazon QuickSight subscription"
   default     = "YJAFoperationsAWS@necsws.com"
 }
 
-variable "vpc_connection_id {
+variable "vpc_connection_id" {
   type        = string
   description = "The ID of the VPC connection to be created in Quicksight."
 }
 
-variable "quicksight_role_name {
+variable "quicksight_role_name" {
   type        = string
   description = "The name of the role to be assined tot he Quicksight VPN Connection."
   default     = "aws-qiicksight-service-role-v0"

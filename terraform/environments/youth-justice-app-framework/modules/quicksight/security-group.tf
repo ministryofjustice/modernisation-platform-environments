@@ -33,7 +33,7 @@ module "quicksight_sg" {
 }
 
 module "postgresql_sg" {
-  source = "./tableau/add_rules_to_sg"
+  source = "../tableau/add_rules_to_sg"
 
   vpc_id       = var.vpc_id
   source_sg_id = module.aws_quicksight_sg.security_group_id
@@ -43,7 +43,7 @@ module "postgresql_sg" {
 }
 
 module "redshift_sg" {
-  source = "./tableau/add_rules_to_sg"
+  source = "../tableau/add_rules_to_sg"
 
   vpc_id       = var.vpc_id
   source_sg_id = module.quicksight_sg.security_group_id
