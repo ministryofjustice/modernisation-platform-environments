@@ -24,9 +24,9 @@ module "airflow_kube_config_object" {
   bucket = module.mwaa_bucket.s3_bucket_id
   key    = "dags/.kube/config"
   content = templatefile("${path.module}/src/airflow/kube_config", {
-    cluster_name                       = module.eks.cluster_name
-    cluster_server                     = module.eks.cluster_endpoint
-    cluster_certificate_authority_data = module.eks.cluster_certificate_authority_data
+    cluster_name                       = data.aws_eks_cluster.apc_cluster.name
+    cluster_server                     = data.aws_eks_cluster.apc_cluster.endpoint
+    cluster_certificate_authority_data = data.aws_eks_cluster.apc_cluster.certificate_authority[0].data
   })
   force_destroy = true
 

@@ -12,7 +12,7 @@ module "route53_records" {
       name    = "airflow"
       type    = "CNAME"
       ttl     = 300
-      records = [module.mwaa_alb.dns_name]
+      records = [data.aws_lb.mwaa_alb.dns_name]
     },
     {
       name    = "_amazonses"
