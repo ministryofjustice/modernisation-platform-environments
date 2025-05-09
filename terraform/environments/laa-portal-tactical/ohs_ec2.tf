@@ -5,10 +5,9 @@ locals {
   ohs_1_userdata = <<EOF
 #!/bin/bash
 
-# Setting up SSM Agent for SSM
-sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+# # Setting up SSM Agent for SSM
+# sudo yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 
-g
 EOF
 
   #   ohs_2_userdata = <<EOF
