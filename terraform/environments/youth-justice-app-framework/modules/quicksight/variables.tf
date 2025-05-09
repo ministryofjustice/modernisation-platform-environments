@@ -37,7 +37,7 @@ variable "vpc_id" {
 }
 
 
-variable "database_subnets" {
+variable "database_subnet_ids" {
   description = "List of database subnets"
   type        = list(string)
 }
