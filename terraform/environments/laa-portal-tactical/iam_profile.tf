@@ -102,10 +102,10 @@ resource "aws_iam_policy" "portal" { #tfsec:ignore:aws-iam-no-policy-wildcards
 EOF
 }
 
-# resource "aws_iam_role_policy_attachment" "ssm" {
-#   role       = aws_iam_role.portal.name
-#   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-# }
+resource "aws_iam_role_policy_attachment" "ssm" {
+  role       = aws_iam_role.portal.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
 
 resource "aws_iam_role_policy_attachment" "portal" {
   role       = aws_iam_role.portal.name
