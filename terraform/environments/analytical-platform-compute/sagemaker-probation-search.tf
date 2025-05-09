@@ -18,6 +18,7 @@ locals {
         environment = {                                                        # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
           HF_MODEL_ID           = "/opt/ml/model"                              # Specifies the model to load from Hugging Face Hub. If you are specifying s3_model_key, this should be set to "/opt/ml/model"
           MAX_CLIENT_BATCH_SIZE = 512
+          AUTO_TRUNCATE         = true
         }
       }
     }
@@ -31,6 +32,7 @@ locals {
         environment = {
           HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
           MAX_CLIENT_BATCH_SIZE = 512
+          AUTO_TRUNCATE         = true
         }
       }
       hmpps-probation-search-prod = {
@@ -42,6 +44,7 @@ locals {
         environment = {
           HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
           MAX_CLIENT_BATCH_SIZE = 512
+          AUTO_TRUNCATE         = true
         }
       }
     }
