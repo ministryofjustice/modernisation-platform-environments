@@ -128,7 +128,7 @@ resource "aws_cloudwatch_log_metric_filter" "PortStatus-True" {
   count          = local.is-production == true ? 1 : 0
   name           = "PortStatus-True"
   log_group_name = aws_cloudwatch_log_group.Network-Connectivity-Logs[count.index].name
-  pattern        = "[date, time, Instance, Port, status=True]"
+  pattern        = "[date, time, Instance, Port, status!=False]"
   metric_transformation {
     name      = "True"
     namespace = "PortStatus"

@@ -1039,7 +1039,7 @@ resource "aws_cloudwatch_metric_alarm" "emailsender_check_rgvw022" {
   datapoints_to_alarm = "1"
   metric_name         = "EmailSenderStatus"
   namespace           = "EmailSender"
-  period              = "60"
+  period              = "3600"
   statistic           = "Average"
   threshold           = "1"
   treat_missing_data  = "notBreaching"
