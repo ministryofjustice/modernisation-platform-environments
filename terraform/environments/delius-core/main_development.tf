@@ -40,6 +40,7 @@ module "environment_dev" {
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
 
+  alfresco_account_ids = local.alfresco_account_ids
 }
 
 module "environment_poc" {
@@ -80,4 +81,5 @@ module "environment_poc" {
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
 
+  alfresco_account_ids = local.alfresco_account_ids
 }

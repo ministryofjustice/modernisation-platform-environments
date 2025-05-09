@@ -40,4 +40,6 @@ module "environment_prod" {
   dms_config = local.dms_config_prod
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
+
+  alfresco_account_ids = local.alfresco_account_ids
 }

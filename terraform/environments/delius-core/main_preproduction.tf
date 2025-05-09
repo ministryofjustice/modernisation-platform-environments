@@ -40,6 +40,8 @@ module "environment_stage" {
   dms_config = local.dms_config_stage
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
+
+  alfresco_account_ids = local.alfresco_account_ids
 }
 
 module "environment_preprod" {
@@ -79,4 +81,6 @@ module "environment_preprod" {
   dms_config = local.dms_config_preprod
 
   env_name_to_dms_config_map = local.env_name_to_dms_config_map
+
+  alfresco_account_ids = local.alfresco_account_ids
 }
