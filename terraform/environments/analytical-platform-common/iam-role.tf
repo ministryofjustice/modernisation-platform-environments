@@ -24,7 +24,7 @@ module "analytical_platform_github_actions_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.52.2"
+  version = "5.55.0"
 
   name = "analytical-platform-github-actions"
 
@@ -42,7 +42,7 @@ module "analytical_platform_terraform_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.52.2"
+  version = "5.55.0"
 
   create_role = true
 
