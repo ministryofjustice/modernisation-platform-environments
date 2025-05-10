@@ -7,17 +7,12 @@ resource "aws_instance" "windows_bastion" {
   subnet_id                   = module.vpc.public_subnets.0
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   associate_public_ip_address = true
-  key_name                    = aws_key_pair.portal15_ssh.key_name
+  key_name                    = "portal_windows_bastion" # This is created manually on the AWS Console
 
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name} Windows Bastion" }
   )
-}
-
-resource "aws_key_pair" "portal15_ssh" {
-  key_name   = "portal1.5-ssh-key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDpAb+2L7URPwzVqFjmRq3daVTsjX2uT2UKWq8CL9dMdSRHMclgBvanEHp7QyogC9nlMjnTnoPTY2jDuQL3vjTB7i7ToRw+Hmq5QHPbNQ/+aoaNYQOIFQv6svAr1vqzD7F0N7vj19rQ+cb5tSjCobjmDE0aGScPCDEhfhoHgFVtaELtnDvxTKacS8rZbrGwISi9LYJHM1ldNFTPU3ib74cDYHO03tL1S3ric70SrN4yR3ly7caKPEL+C9ZNDjVGUs7sCgIg1+MI7mOuK1IcO9rOkItc21Qohn0MaOPbi5NoI+rkG49ueDSRrEA1gMXjBWjp5IfOy3EluqJZQNmmD0T3AVRx6fwrp9GeeHcQKdcU1ONgaUvnukgO76H/jZWgWYRUlhVIs1QhgmIenFdyKOrXXjrtDJqQutZzjO+NQTOe12AFT2Jv8fu1m/iDyQIx/NXFpiBko6tgw5NOk6l3H9j0HgVbPHP+st6ogC/dPmWDPkeUyt8Bj6fphCWmGhvm7/c= vincent.cheung@MJ004609"
 }
 
 resource "aws_security_group" "bastion" {
