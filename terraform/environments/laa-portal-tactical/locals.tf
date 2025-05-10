@@ -7,9 +7,9 @@ locals {
   nonprod_workspaces_cidr = "10.200.0.0/20"
   prod_workspaces_cidr    = "10.200.16.0/20"
 
+  lb_logs_bucket = local.application_data.accounts[local.environment].lb_logs_bucket
+  
   # Temp local variable for environments where we wish to build out the EBS to be transfered to EFS
   ebs_conditional = ["testing", "preproduction", "production"]
 
-  lb_enable_deletion_protection  = local.application_data.accounts[local.environment].lb_enable_deletion_protection
-  efs_enable_deletion_protection = local.application_data.accounts[local.environment].efs_enable_deletion_protection
 }

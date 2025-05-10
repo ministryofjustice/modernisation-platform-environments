@@ -32,13 +32,13 @@
       "idm_config_snapshot": "",
       "idm_mserver_snapshot": "",
       "idm_instances_snapshot": "",
+      "lb_enable_deletion_protection": "false",
+      "lb_logs_bucket": "",
       "lb_access_logs_existing_bucket_name": "",
       "url": "s3://laa-portal-development-archive-mp",
       "maintenance_window_name": "diagnostics-log-archive-poc",
       "landing_zone_vpc_cidr": "10.202.0.0/20",
-      "mp_domain_name": "modernisation-platform.service.justice.gov.uk",
-      "lb_enable_deletion_protection": "false",
-      "efs_enable_deletion_protection": "false"
+      "mp_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
     "test": {
       "example_var": "test-data",
