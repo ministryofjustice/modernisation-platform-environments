@@ -21,7 +21,7 @@ resource "aws_security_group" "bastion" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "windows_bastion_local_vpc" {
-  security_group_id = aws_security_group.windows_bastion.id
+  security_group_id = aws_security_group.bastion.id
   cidr_ipv4         = module.vpc.vpc_cidr_block
   ip_protocol       = "-1"
 }
