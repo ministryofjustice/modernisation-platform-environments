@@ -137,7 +137,7 @@ resource "aws_instance" "oim_instance_1" {
 
 resource "aws_network_interface" "oim_1" {
   subnet_id   = module.vpc.private_subnets.0
-  private_ips = ["10.205.4.246"]
+  private_ips = ["10.206.4.80"]
   security_groups = [aws_security_group.oim_instance.id]
 
   tags = {

@@ -231,7 +231,7 @@ resource "aws_instance" "idm_instance_1" {
 
 resource "aws_network_interface" "idm_1" {
   subnet_id   = module.vpc.private_subnets.0
-  private_ips = ["10.205.4.131"]
+  private_ips = ["10.206.4.121"]
   security_groups = [aws_security_group.idm_instance.id]
 
   tags = {
