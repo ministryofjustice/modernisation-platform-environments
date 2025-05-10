@@ -22,7 +22,7 @@ EOF
 resource "aws_security_group" "idm_instance" {
   name        = "${local.application_name}-${local.environment}-idm-security-group"
   description = "Portal App IDM Security Group"
-  vpc_id      = data.aws_vpc.shared.id
+  vpc_id      = module.vpc.vpc_id
 }
 
 resource "aws_vpc_security_group_egress_rule" "idm_outbound_local_vpc" {
