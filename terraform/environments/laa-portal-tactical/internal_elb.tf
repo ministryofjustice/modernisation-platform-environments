@@ -204,13 +204,10 @@ resource "aws_vpc_security_group_ingress_rule" "internal_lb_http_prd_workspaces"
 
 resource "aws_vpc_security_group_egress_rule" "internal_lb_outbound" {
   for_each = toset(local.outbound_security_group_ids)
-  security_group_id        = aws_security_group.bastion.id
+  security_group_id        = aws_security_group.internal_lb.id
   ip_protocol       = "-1"
   referenced_security_group_id = each.value
 }
-
-
-
 
 ###########################################
 # Internal Portal Classic ELB to IDM
