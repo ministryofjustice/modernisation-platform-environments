@@ -21,9 +21,27 @@ resource "aws_security_group" "bastion" {
   vpc_id      = module.vpc.vpc_id
 }
 
-resource "aws_vpc_security_group_egress_rule" "windows_bastion_local_vpc" {
+resource "aws_vpc_security_group_egress_rule" "windows_bastion_idm" {
   security_group_id = aws_security_group.bastion.id
-  cidr_ipv4         = module.vpc.vpc_cidr_block
+  referenced_security_group_id = aws_security_group.idm_instance.id
+  ip_protocol       = "-1"
+}
+
+resource "aws_vpc_security_group_egress_rule" "windows_bastion_oam" {
+  security_group_id = aws_security_group.bastion.id
+  referenced_security_group_id = aws_security_group.oam_instance.id
+  ip_protocol       = "-1"
+}
+
+resource "aws_vpc_security_group_egress_rule" "windows_bastion_oim" {
+  security_group_id = aws_security_group.bastion.id
+  referenced_security_group_id = aws_security_group.oim_instance.id
+  ip_protocol       = "-1"
+}
+
+resource "aws_vpc_security_group_egress_rule" "windows_bastion_ohs" {
+  security_group_id = aws_security_group.bastion.id
+  referenced_security_group_id = aws_security_group.ohs_instance.id
   ip_protocol       = "-1"
 }
 
