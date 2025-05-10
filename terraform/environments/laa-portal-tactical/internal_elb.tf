@@ -112,7 +112,7 @@ resource "aws_lb_listener" "http_internal" {
 # }
 
 resource "aws_lb_target_group" "internal" {
-  name                 = "${local.application_name}-internal-ohs-target-group"
+  name                 = "portal15-internal-ohs-tg"
   port                 = 7777
   protocol             = "HTTP"
   vpc_id               = module.vpc.vpc_id
@@ -136,7 +136,7 @@ resource "aws_lb_target_group" "internal" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-internal-ohs-target-group"
+      Name = "portal15-internal-ohs-tg"
     },
   )
 
@@ -216,7 +216,7 @@ resource "aws_vpc_security_group_egress_rule" "internal_lb_outbound_local_vpc" {
 ###########################################
 
 resource "aws_elb" "idm_lb" {
-  name            = "${local.application_name}-internal-lb-idm"
+  name            = "portal15-internal-lb-idm"
   internal        = true
   idle_timeout    = 3600
   security_groups = [aws_security_group.internal_idm_sg.id]
@@ -224,7 +224,7 @@ resource "aws_elb" "idm_lb" {
 
   access_logs {
     bucket        = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
-    bucket_prefix = "${local.application_name}-internal-lb-idm"
+    bucket_prefix = "portal15-internal-lb-idm"
     enabled       = true
   }
 
@@ -254,7 +254,7 @@ resource "aws_elb" "idm_lb" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-internal-lb-idm"
+      Name = "portal15-internal-lb-idm"
     }
   )
 }
