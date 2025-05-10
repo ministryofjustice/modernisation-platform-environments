@@ -7,7 +7,7 @@ locals {
   nonprod_workspaces_cidr = "10.200.0.0/20"
   prod_workspaces_cidr    = "10.200.16.0/20"
 
-  outbound_security_group_ids = [aws_security_group.idm_instance.id, aws_security_group.oam_instance.id, aws_security_group.oim_instance.id, aws_security_group.ohs_instance.id, aws_security_group.idm_lb.id, aws_security_group.internal.id]
+  outbound_security_group_ids = [aws_security_group.idm_instance.id, aws_security_group.oam_instance.id, aws_security_group.oim_instance.id, aws_security_group.ohs_instance.id, aws_security_group.internal_lb.id, aws_security_group.internal_idm_sg.id]
 
   lb_logs_bucket = local.application_data.accounts[local.environment].lb_logs_bucket
 
