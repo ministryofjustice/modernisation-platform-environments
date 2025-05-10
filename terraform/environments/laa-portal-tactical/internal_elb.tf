@@ -20,7 +20,7 @@ resource "aws_lb" "internal" {
   idle_timeout               = local.internal_lb_idle_timeout
 
   access_logs {
-    bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
+    bucket  = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3.bucket.id
     prefix  = "${local.application_name}-internal-lb"
     enabled = true
   }
@@ -223,7 +223,7 @@ resource "aws_elb" "idm_lb" {
   subnets         = [module.vpc.private_subnets.0, module.vpc.private_subnets.1, module.vpc.private_subnets.2]
 
   access_logs {
-    bucket        = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3[0].bucket.id
+    bucket        = local.lb_logs_bucket != "" ? local.lb_logs_bucket : module.elb-logs-s3.bucket.id
     bucket_prefix = "portal15-internal-lb-idm"
     enabled       = true
   }

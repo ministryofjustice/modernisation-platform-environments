@@ -63,7 +63,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     actions = [
       "s3:PutObject"
     ]
-    resources = [local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}/*" : "${module.elb-logs-s3[0].bucket.arn}/*"]
+    resources = [local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}/*" : "${module.elb-logs-s3.bucket.arn}/*"]
     principals {
       type        = "AWS"
       identifiers = [data.aws_elb_service_account.default.arn]
@@ -81,7 +81,7 @@ data "aws_iam_policy_document" "bucket_policy" {
       "s3:PutObject"
     ]
 
-    resources = [local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}/*" : "${module.elb-logs-s3[0].bucket.arn}/*"]
+    resources = [local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}/*" : "${module.elb-logs-s3.bucket.arn}/*"]
 
     condition {
       test     = "StringEquals"
@@ -106,7 +106,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     ]
 
     resources = [
-      local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}" : module.elb-logs-s3[0].bucket.arn
+      local.lb_logs_bucket != "" ? "arn:aws:s3:::${local.lb_logs_bucket}" : module.elb-logs-s3.bucket.arn
     ]
   }
 }
