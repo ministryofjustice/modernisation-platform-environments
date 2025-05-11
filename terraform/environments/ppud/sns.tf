@@ -124,6 +124,7 @@ resource "aws_sns_topic_subscription" "cw_dev_subscription" {
   endpoint  = "PPUDAlerts@colt.net"
 }
 
+/*
 resource "aws_sns_topic_policy" "sns_dev_policy" {
   count = local.is-development == true ? 1 : 0
   arn   = aws_sns_topic.cw_dev_alerts[0].arn
@@ -158,6 +159,7 @@ resource "aws_sns_topic_policy" "sns_dev_policy" {
     ]
   })
 }
+*/
 
 # Production S3 Bucket Notification Topic and Subscription
 
