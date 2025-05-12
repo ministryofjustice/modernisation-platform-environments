@@ -6,7 +6,7 @@ resource "aws_quicksight_data_set" "rowleveldata" {
    physical_table_map {
     physical_table_map_id = "rowleveldata"
     custom_sql {
-      data_source_arn = aws_quicksight_data_source.postgres.arn
+      data_source_arn = aws_quicksight_data_source.postgresql.arn
       name = ""
 
       sql_query = <<EOT

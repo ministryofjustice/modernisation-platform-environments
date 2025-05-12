@@ -8,9 +8,14 @@ resource "aws_quicksight_data_source" "redshift" {
         port = var.redshift_port
         database   = "yjb_returns"
     }
-    disable_ssl = false
 
-    vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
+    ssl_properties {
+      disable_ssl = false
+    }
+    
+    vpc_connection_properties {
+      vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
+    }
   }
 
   type = "redshift"
@@ -42,7 +47,7 @@ resource "aws_quicksight_data_source" "postgresql" {
   parameters {
     aurora_postgresql {
         host = var.postgres_host
-        port = var.postgreport_port
+        port = var.postgres_port
         database   = "yjaf"
     }
     disable_ssl = false
