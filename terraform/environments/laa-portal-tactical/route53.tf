@@ -15,18 +15,18 @@ resource "aws_route53_zone" "private_uat" {
 # #   vpc_id  = module.vpc.vpc_id
 # # }
 
-# resource "aws_route53_record" "iadb" {
-#   zone_id  = aws_route53_zone.private_uat.zone_id
-#   name     = "db-portal-iadb.${aws_route53_zone.private_uat.name}" # db-portal-iadb.aws.[env].legalservices.gov.uk
-#   type     = "CNAME"
-#   ttl      = 60
-#   records  = [aws_db_instance.iadb.address]
-# }
+resource "aws_route53_record" "iadb" {
+  zone_id  = aws_route53_zone.private_uat.zone_id
+  name     = "db-portal-iadb.${aws_route53_zone.private_uat.name}" # db-portal-iadb.aws.[env].legalservices.gov.uk
+  type     = "CNAME"
+  ttl      = 60
+  records  = [aws_db_instance.iadb.address]
+}
 
-# resource "aws_route53_record" "igdb" {
-#   zone_id  = aws_route53_zone.private_uat.zone_id
-#   name     = "db-portal-igdb.${aws_route53_zone.private_uat.name}" # db-portal-igdb.aws.dev.legalservices.gov.uk
-#   type     = "CNAME"
-#   ttl      = 60
-#   records  = [aws_db_instance.igdb.address]
-# }
+resource "aws_route53_record" "igdb" {
+  zone_id  = aws_route53_zone.private_uat.zone_id
+  name     = "db-portal-igdb.${aws_route53_zone.private_uat.name}" # db-portal-igdb.aws.dev.legalservices.gov.uk
+  type     = "CNAME"
+  ttl      = 60
+  records  = [aws_db_instance.igdb.address]
+}
