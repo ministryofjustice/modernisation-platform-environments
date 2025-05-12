@@ -60,7 +60,7 @@ module "ecs_service_datadog_agent" {
 
       environment = [
         {
-          name  = "ECS_FARGATE"
+          name  = "DD_ECS_FARGATE"
           value = "false"
         },
         {
