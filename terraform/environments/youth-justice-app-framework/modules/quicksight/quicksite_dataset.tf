@@ -30,7 +30,7 @@ resource "aws_quicksight_data_set" "rowleveldata" {
 
       dynamic "columns" {
         for_each = local.rowleveldata_columns
-        content = {
+        content {
           name = columns.name
           type = columns.type
         }
@@ -258,7 +258,7 @@ resource "aws_quicksight_data_set" "personal_data" {
 
       dynamic "columns" {
         for_each = local.person_columns
-        content = {
+        content {
           name = columns.name
           type = columns.type
         }
