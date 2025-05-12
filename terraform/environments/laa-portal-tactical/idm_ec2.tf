@@ -32,6 +32,14 @@ resource "aws_vpc_security_group_egress_rule" "idm_outbound_local_vpc" {
   referenced_security_group_id = each.value
 }
 
+resource "aws_vpc_security_group_egress_rule" "idm_outbound_vpc_endpoints" {
+  security_group_id = aws_security_group.idm_instance.id
+  referenced_security_group_id = "sg-00a0a775d5675afdc"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
 # TODO some rules will need adding referencing Landing Zone environments (e.g. VPC) for other dependent applications not migrated to MP yet but needs talking to Portal.
 # At the moment we are unsure what rules form LZ is required so leaving out those rules for now, to be added when dependencies identified in future tickets or testing.
 # Some rules may need updating or removing as we migrate more applications across to MP.

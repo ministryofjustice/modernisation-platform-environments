@@ -39,6 +39,14 @@ resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
   referenced_security_group_id = each.value
 }
 
+resource "aws_vpc_security_group_egress_rule" "ohs_outbound_vpc_endpoints" {
+  security_group_id = aws_security_group.ohs_instance.id
+  referenced_security_group_id = "sg-00a0a775d5675afdc"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+
 # resource "aws_vpc_security_group_egress_rule" "ohs_outbound" {
 #   security_group_id = aws_security_group.ohs_instance.id
 #   cidr_ipv4         = "0.0.0.0/0"
