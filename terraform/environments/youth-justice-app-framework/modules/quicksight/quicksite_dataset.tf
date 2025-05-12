@@ -257,7 +257,7 @@ resource "aws_quicksight_data_set" "personal_data" {
       EOT
 
       dynamic "columns" {
-        for_each = local.person_columns
+        for_each = local.personal_columns
         content {
           name = columns.value["name"]
           type = columns.value["type"]
