@@ -16,16 +16,14 @@ resource "aws_quicksight_data_set" "rowleveldata" {
       norder by "GroupName"
       EOT
 
-      columns = [
-        {
+      columns {
           name = "GroupName"
           type = "STRING"
-        },
-        {
+      }      
+      columns  {
           name = "yotoucode"
           type = "STRING"
-        }
-      ]
+       }
     }
   }
 }
