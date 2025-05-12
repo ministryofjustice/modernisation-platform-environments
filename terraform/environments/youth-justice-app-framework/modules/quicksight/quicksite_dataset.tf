@@ -179,7 +179,8 @@ resource "aws_quicksight_data_set" "personal_data" {
                        WHEN o.outcome_date::date BETWEEN '2034-04-01' AND '2035-03-31' THEN '2034/35' WHEN o.outcome_date::date BETWEEN '2035-04-01' AND '2036-03-31' THEN '2035/36' 
                        ELSE '' END"
       EOT
-      columns [
+
+      columns = [
         {
             "Name": "ypid",
             "Type": "STRING"
