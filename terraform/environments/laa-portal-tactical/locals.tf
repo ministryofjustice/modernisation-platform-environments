@@ -10,6 +10,8 @@ locals {
   outbound_security_group_ids = [aws_security_group.idm_instance.id, aws_security_group.oam_instance.id, aws_security_group.oim_instance.id, aws_security_group.ohs_instance.id, aws_security_group.internal_lb.id, aws_security_group.internal_idm_sg.id, aws_security_group.igdb.id, aws_security_group.iadb.id]
   portal_ec2_security_group_ids = [aws_security_group.idm_instance.id, aws_security_group.oam_instance.id, aws_security_group.oim_instance.id, aws_security_group.ohs_instance.id, aws_security_group.internal_lb.id, aws_security_group.internal_idm_sg.id]
 
+  lb_logs_bucket = local.application_data.accounts[local.environment].lb_logs_bucket
+
   # RDS - IAGB and IDGB
   igdb_username = "admin"
   iadb_username = "admin"
