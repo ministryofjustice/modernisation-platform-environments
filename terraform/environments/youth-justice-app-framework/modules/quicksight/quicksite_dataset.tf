@@ -1,3 +1,15 @@
+locals {
+  rowleveldata_columns = [{
+          name = "GroupName"
+          type = "STRING"
+      },      
+      columns  {
+          name = "yotoucode"
+          type = "STRING"
+       }
+  ]
+}
+
 resource "aws_quicksight_data_set" "rowleveldata" {
   data_set_id = "rowleveldata"
   name        = "RowLevelkData"
@@ -16,16 +28,81 @@ resource "aws_quicksight_data_set" "rowleveldata" {
       norder by "GroupName"
       EOT
 
-      columns {
-          name = "GroupName"
-          type = "STRING"
-      }      
-      columns  {
-          name = "yotoucode"
-          type = "STRING"
-       }
+      dynalic "columns" {
+        for_each = local.rowleveldata_columns
+        content = {
+          name = columns.name
+          type = columns.type
+        }
+
+      }
     }
   }
+}
+
+locals {
+     person_columns = [
+        {
+            "Name": "ypid",
+            "Type": "STRING"
+        },
+        {
+            "Name": "yotoucode",
+            "Type": "STRING"
+        },
+        {
+            "Name": "yot_name",
+            "Type": "STRING"
+        },
+        {
+            "Name": "currentyotid",
+            "Type": "STRING"
+        },
+        {
+            "Name": "pncnumber",
+            "Type": "STRING"
+        },
+        {
+            "Name": "gender_name",
+            "Type": "STRING"
+        },
+        {
+            "Name": "gender_sex",
+            "Type": "INTEGER"
+        },
+        {
+            "Name": "ethnicity",
+            "Type": "STRING"
+        },
+        {
+            "Name": "ethnicitygroup",
+            "Type": "STRING"
+        },
+        {
+            "Name": "sortorder",
+            "Type": "INTEGER"
+        },
+        {
+            "Name": "date_of_birth",
+            "Type": "DATETIME"
+        },
+        {
+            "Name": "age_at_arrest_or_offence",
+            "Type": "INTEGER"
+        },
+        {
+            "Name": "age_at_first_hearing",
+            "Type": "INTEGER"
+        },
+        {
+            "Name": "finyear",
+            "Type": "STRING"
+        },
+        {
+            "Name": "number",
+            "Type": "INTEGER"
+        }
+      ]
 }
 
 resource "aws_quicksight_data_set" "personal_data" {
@@ -33,7 +110,7 @@ resource "aws_quicksight_data_set" "personal_data" {
   name        = "Personal Data"
   import_mode = "SPICE"
 
-  row_level_permissions_data_set {
+  row_level_permission_data_set {
     arn                = aws_quicksight_data_set.rowleveldata
     permissions_policy = "GRANT_ACCESS"
     format_version     = "VERSIOM_1"
@@ -41,7 +118,7 @@ resource "aws_quicksight_data_set" "personal_data" {
     status             = "ENABLED"
   }
 
-  data_set_usage_configuratio {
+  data_set_usage_configuration {
     disable_use_as_direct_query_source  = false
     disable_use_as_imported_source = false
   }
@@ -179,71 +256,16 @@ resource "aws_quicksight_data_set" "personal_data" {
                        ELSE '' END"
       EOT
 
-      columns = [
-        {
-            "Name": "ypid",
-            "Type": "STRING"
-        },
-        {
-            "Name": "yotoucode",
-            "Type": "STRING"
-        },
-        {
-            "Name": "yot_name",
-            "Type": "STRING"
-        },
-        {
-            "Name": "currentyotid",
-            "Type": "STRING"
-        },
-        {
-            "Name": "pncnumber",
-            "Type": "STRING"
-        },
-        {
-            "Name": "gender_name",
-            "Type": "STRING"
-        },
-        {
-            "Name": "gender_sex",
-            "Type": "INTEGER"
-        },
-        {
-            "Name": "ethnicity",
-            "Type": "STRING"
-        },
-        {
-            "Name": "ethnicitygroup",
-            "Type": "STRING"
-        },
-        {
-            "Name": "sortorder",
-            "Type": "INTEGER"
-        },
-        {
-            "Name": "date_of_birth",
-            "Type": "DATETIME"
-        },
-        {
-            "Name": "age_at_arrest_or_offence",
-            "Type": "INTEGER"
-        },
-        {
-            "Name": "age_at_first_hearing",
-            "Type": "INTEGER"
-        },
-        {
-            "Name": "finyear",
-            "Type": "STRING"
-        },
-        {
-            "Name": "number",
-            "Type": "INTEGER"
+      dynamic "columns" {
+        for_each = local.person_columns
+        content = {
+          name = columns.name
+          type = columns.type
         }
-      ]
+      }
     }
   }
-}
+}  
 
 /*
    *     "ImportMode": "SPICE",
