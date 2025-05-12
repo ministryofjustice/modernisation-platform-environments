@@ -111,7 +111,7 @@ resource "aws_quicksight_data_set" "personal_data" {
   import_mode = "SPICE"
 
   row_level_permission_data_set {
-    arn                = aws_quicksight_data_set.rowleveldata
+    arn                = aws_quicksight_data_set.rowleveldata.arn
     permission_policy = "GRANT_ACCESS"
     format_version     = "VERSIOM_1"
     namespace          = "default"
