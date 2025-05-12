@@ -3,7 +3,7 @@ locals {
           name = "GroupName"
           type = "STRING"
       },      
-      columns  {
+      {
           name = "yotoucode"
           type = "STRING"
        }
