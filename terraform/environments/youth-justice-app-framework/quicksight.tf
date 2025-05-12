@@ -18,5 +18,10 @@ module "quicksight" {
   postgresql_sg_id    = module.aurora.rds_cluster_security_group_id
   redshift_sg_id      = module.redshift.security_group_id
 
+  redshift_host = module.redshift.address
+  redshift_port = module.redshift.port
+
+  postgres_host = module.aurora.cluster_endpoint.address
+  postgres_port = module.aurora.cluster_endpoint.port
 }
 

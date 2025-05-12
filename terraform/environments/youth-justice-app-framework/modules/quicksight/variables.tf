@@ -50,3 +50,24 @@ variable "redshift_sg_id" {
   type        = string
   description = "The ID of the Redshift Serverless Security Group. Used to add a rule to enable Quicksight access to Redshift."
 }
+
+
+variable "redshift_host" {
+  type        = string
+  description = "The Redshift host name."
+}
+
+variable "redshift_port" {
+  type        = string
+  description = "The Redshift Port."
+}
+
+variable "postgres_host" {
+  type        = string
+  description = "The Postgres database host name."
+}
+
+variable "postgres_port" {
+  type        = string
+  description = "The Postgres databases Port."
+}
