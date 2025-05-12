@@ -164,6 +164,7 @@ locals {
           "cjs_cross_dataset",
           "civil",
           "corporate",
+          "counter_terrorism",
           "courts",
           "criminal_history",
           "data_first",
