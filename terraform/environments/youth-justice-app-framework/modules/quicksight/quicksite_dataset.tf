@@ -41,66 +41,66 @@ resource "aws_quicksight_data_set" "rowleveldata" {
 }
 
 locals {
-     person_columns = [
+     personal_columns = [
         {
-            "Name": "ypid",
-            "Type": "STRING"
+            name: "ypid",
+            type: "STRING"
         },
         {
-            "Name": "yotoucode",
-            "Type": "STRING"
+            name: "yotoucode",
+            type: "STRING"
         },
         {
-            "Name": "yot_name",
-            "Type": "STRING"
+            name: "yot_name",
+            type: "STRING"
         },
         {
-            "Name": "currentyotid",
-            "Type": "STRING"
+            name: "currentyotid",
+            type: "STRING"
         },
         {
-            "Name": "pncnumber",
-            "Type": "STRING"
+            name: "pncnumber",
+            type: "STRING"
         },
         {
-            "Name": "gender_name",
-            "Type": "STRING"
+            name: "gender_name",
+            type: "STRING"
         },
         {
-            "Name": "gender_sex",
-            "Type": "INTEGER"
+            name: "gender_sex",
+            type: "INTEGER"
         },
         {
-            "Name": "ethnicity",
-            "Type": "STRING"
+            name: "ethnicity",
+            type: "STRING"
         },
         {
-            "Name": "ethnicitygroup",
-            "Type": "STRING"
+            name: "ethnicitygroup",
+            type: "STRING"
         },
         {
-            "Name": "sortorder",
-            "Type": "INTEGER"
+            name: "sortorder",
+            type: "INTEGER"
         },
         {
-            "Name": "date_of_birth",
-            "Type": "DATETIME"
+            name: "date_of_birth",
+            type: "DATETIME"
         },
         {
-            "Name": "age_at_arrest_or_offence",
-            "Type": "INTEGER"
+            name: "age_at_arrest_or_offence",
+            type: "INTEGER"
         },
         {
-            "Name": "age_at_first_hearing",
-            "Type": "INTEGER"
+            name: "age_at_first_hearing",
+            type: "INTEGER"
         },
         {
-            "Name": "finyear",
-            "Type": "STRING"
+            name: "finyear",
+            type: "STRING"
         },
         {
-            "Name": "number",
-            "Type": "INTEGER"
+            name: "number",
+            type: "INTEGER"
         }
       ]
 }
@@ -112,7 +112,7 @@ resource "aws_quicksight_data_set" "personal_data" {
 
   row_level_permission_data_set {
     arn                = aws_quicksight_data_set.rowleveldata
-    permissions_policy = "GRANT_ACCESS"
+    permission_policy = "GRANT_ACCESS"
     format_version     = "VERSIOM_1"
     namespace          = "default"
     status             = "ENABLED"
@@ -125,9 +125,9 @@ resource "aws_quicksight_data_set" "personal_data" {
 
   physical_table_map {
     physical_table_map_id = "personal_data"
-    name                  = "Persaon Data"
     custom_sql {
       data_source_arn = aws_quicksight_data_source.redshift.arn
+      name            = "Persaonal Data"
       sql_query = <<EOT
         -- Personal Data
         
