@@ -9,6 +9,7 @@ locals {
       hmpps-probation-search-dev = {
         namespace       = "hmpps-probation-search-dev"           # MOJ Cloud Platform namespace where OpenSearch is hosted
         instance_type   = "ml.m5.xlarge"                         # SageMaker AI Real-time Inference instance type to use
+        instance_count  = 1                                      # The number of instances to use
         repository_name = "tei-cpu"                              # "tei" for GPU-accelerated instances, "tei-cpu" for CPU-only instances
         image_tag       = "2.0.1-tei1.2.3-cpu-py310-ubuntu22.04" # Version of the Hugging Face Text Embeddings Inference image to use. See:
         #  * https://github.com/aws/sagemaker-python-sdk/blob/master/src/sagemaker/image_uri_config/huggingface-tei.json for latest versions for GPU-accelerated instances
@@ -17,6 +18,7 @@ locals {
         environment = {                                                        # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
           HF_MODEL_ID           = "/opt/ml/model"                              # Specifies the model to load from Hugging Face Hub. If you are specifying s3_model_key, this should be set to "/opt/ml/model"
           MAX_CLIENT_BATCH_SIZE = 512
+          AUTO_TRUNCATE         = true
         }
       }
     }
@@ -24,21 +26,25 @@ locals {
       hmpps-probation-search-preprod = {
         namespace       = "hmpps-probation-search-preprod"
         instance_type   = "ml.g6.xlarge"
+        instance_count  = 1
         repository_name = "tei"
         image_tag       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
         environment = {
           HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
           MAX_CLIENT_BATCH_SIZE = 512
+          AUTO_TRUNCATE         = true
         }
       }
       hmpps-probation-search-prod = {
         namespace       = "hmpps-probation-search-prod"
         instance_type   = "ml.g6.xlarge"
+        instance_count  = 1
         repository_name = "tei"
         image_tag       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
         environment = {
           HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
           MAX_CLIENT_BATCH_SIZE = 512
+          AUTO_TRUNCATE         = true
         }
       }
     }
@@ -94,7 +100,7 @@ resource "aws_sagemaker_endpoint_configuration" "probation_search" {
   production_variants {
     variant_name           = "AllTraffic"
     model_name             = aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key].name
-    initial_instance_count = 1
+    initial_instance_count = each.value.instance_count
     instance_type          = each.value.instance_type
   }
 

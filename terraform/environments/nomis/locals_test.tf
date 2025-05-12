@@ -265,7 +265,7 @@ locals {
           "/dev/sdc" = { label = "app", size = 100 }
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 500 }
+          data  = { total_size = 700 }
           flash = { total_size = 50 }
         })
         instance = merge(local.ec2_instances.db.instance, {
