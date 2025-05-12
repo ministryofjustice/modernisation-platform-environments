@@ -8,19 +8,16 @@ resource "aws_quicksight_data_source" "redshift" {
         port = var.redshift_port
         database   = "yjb_returns"
     }
-
-    ssl_properties {
-      disable_ssl = false
-    }
+  }
+  ssl_properties {
+    disable_ssl = false
+  }
     
-    vpc_connection_properties {
-      vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
-    }
+  vpc_connection_properties {
+    vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
   }
 
-  type = "redshift"
-
-  
+  type = "REDSHIFT"
 }
 
 /*
@@ -50,14 +47,17 @@ resource "aws_quicksight_data_source" "postgresql" {
         port = var.postgres_port
         database   = "yjaf"
     }
-    disable_ssl = false
+  }
 
+  ssl_properties {
+    disable_ssl = false
+  }
+    
+  vpc_connection_properties {
     vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
   }
 
-  type = "POSTGRESQL"
-
-  
+  type = "AURORA_POSTGRESQL"
 }
 
 /*
