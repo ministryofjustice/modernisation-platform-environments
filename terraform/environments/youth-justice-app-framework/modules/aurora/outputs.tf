@@ -5,7 +5,7 @@ output "rds_cluster_endpoint" {
 
 output "rds_cluster_port" {
   description = "The endpoint of the Aurora cluster"
-  value       = module.aurora.port
+  value       = module.aurora.cluster_port
 }
 
 output "rds_cluster_reader_endpoint" {
