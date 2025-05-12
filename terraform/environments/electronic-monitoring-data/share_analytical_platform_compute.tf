@@ -9,8 +9,8 @@ locals {
   live_feed_dbs = [
     "serco_fms",
     "allied_mdss",
-    "allied_mdss_test",
     "staged_fms",
+    "staged_mdss",
     "preprocessed_fms",
     "curated_fms",
     "staging_fms",
