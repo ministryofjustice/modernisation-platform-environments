@@ -162,13 +162,13 @@ resource "aws_ec2_managed_prefix_list_entry" "custom_internal_entry" {
 }
 
 resource "aws_security_group_rule" "prefix_list" {
-  type                    = "ingress"
-  from_port               = 80
-  to_port                 = 80
-  protocol                = "tcp"
-  security_group_id       = aws_security_group.yjsm_service.id
-  prefix_list_ids         = [aws_ec2_managed_prefix_list.custom_internal.id]
-  description             = "Allow HTTP from internal prefix list"
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  security_group_id = aws_security_group.yjsm_service.id
+  prefix_list_ids   = [aws_ec2_managed_prefix_list.custom_internal.id]
+  description       = "Allow HTTP from internal prefix list"
 }
 
 
@@ -178,7 +178,7 @@ resource "aws_security_group_rule" "monitoring_to_yjsm" {
   from_port                = 8400
   to_port                  = 8400
   protocol                 = "tcp"
-  security_group_id        = var.management_server_sg_id 
+  security_group_id        = var.management_server_sg_id
   source_security_group_id = aws_security_group.yjsm_service.id
   description              = "Service monitoring access (YJSM 8400)"
 }
