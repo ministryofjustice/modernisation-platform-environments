@@ -38,6 +38,7 @@ variable "dms_replication_instance" {
   description = "DMS Rep Instance ARN"
 }
 
+
 variable "dms_source_endpoint" {
   type    = string
   default = ""
