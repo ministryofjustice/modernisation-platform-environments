@@ -28,7 +28,7 @@ resource "aws_quicksight_data_set" "rowleveldata" {
       norder by "GroupName"
       EOT
 
-      dynalic "columns" {
+      dynamic "columns" {
         for_each = local.rowleveldata_columns
         content = {
           name = columns.name
