@@ -29,7 +29,7 @@ resource "aws_iam_role" "glue_cur_role" {
       Action    = "sts:AssumeRole",
       Effect    = "Allow",
       Principal = {
-        AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        Service = "glue.amazonaws.com"
       }
     }]
   })
@@ -78,7 +78,7 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
         ],
         Resource = ["*"]
       },
-        {
+      {
         Sid    = "AthenaAccess",
         Effect = "Allow",
         Action = [
@@ -96,7 +96,17 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
           "athena:StopQueryExecution"
         ],
         Resource = ["*"]
-      }
+      },
+      { 
+        Sid    = "LoggingAccess",
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+          ],
+          Resource = ["*"]
+        },
     ]
   })
 }
