@@ -57,7 +57,7 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription4" {
 }
 */
 
-# Preproduction CloudWatch SNS Topic and Subscription
+# Preproduction CloudWatch SNS Topic, Subscription, Topic Policy and Topic Policy Document
 
 resource "aws_sns_topic" "cw_uat_alerts" {
   # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
@@ -72,42 +72,46 @@ resource "aws_sns_topic_subscription" "cw_uat_subscription" {
   endpoint  = "PPUDAlerts@colt.net"
 }
 
-/*
-resource "aws_sns_topic_policy" "sns_uat_policy" {
-  count = local.is-preproduction == true ? 1 : 0
-  arn   = aws_sns_topic.cw_uat_alerts[0].arn
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        "Sid" : "__default_statement_ID",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : "*"
-        },
-        "Action" : [
-          "SNS:Publish",
-          "SNS:RemovePermission",
-          "SNS:SetTopicAttributes",
-          "SNS:DeleteTopic",
-          "SNS:ListSubscriptionsByTopic",
-          "SNS:GetTopicAttributes",
-          "SNS:Receive",
-          "SNS:AddPermission",
-          "SNS:Subscribe"
-        ],
-        "Resource" : "aws_sns_topic.cw_uat_alerts[0].arn",
-        "Condition" : {
-          "StringEquals" : {
-            "AWS:SourceOwner" : "data.aws_caller_identity.current.account_id"
-          }
-        }
-      }
-    ]
-  })
+resource "aws_sns_topic_policy" "cw_uat_topic_policy" {
+  count  = local.is-preproduction == true ? 1 : 0
+  arn    = aws_sns_topic.cw_uat_alerts[0].arn
+  policy = data.aws_iam_policy_document.cw_uat_topic_policy_document[0].json
 }
-*/
+
+data "aws_iam_policy_document" "cw_uat_topic_policy_document" {
+  count     = local.is-preproduction == true ? 1 : 0
+  policy_id = "cw_uat_sns_topic_policy_document"
+
+ statement {
+    sid    = "cw_uat_statement_id"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudwatch.amazonaws.com"]
+    }
+    actions = [
+      "SNS:Subscribe",
+      "SNS:SetTopicAttributes",
+      "SNS:RemovePermission",
+      "SNS:Receive",
+      "SNS:Publish",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:GetTopicAttributes",
+      "SNS:DeleteTopic",
+      "SNS:AddPermission"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceOwner"
+      values   = [
+        data.aws_caller_identity.current.account_id
+      ]
+    }
+    resources = [
+      aws_sns_topic.cw_uat_alerts[0].arn
+    ]
+  }
+}
 
 # Development CloudWatch SNS Topic and Subscription
 
