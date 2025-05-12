@@ -40,7 +40,7 @@ resource "aws_quicksight_data_source" "postgresql" {
   name           = "YJB_CASE_REPORTING_PROD"
 
   parameters {
-    postgresql {
+    aurora_postgresql {
         host = var.postgres_host
         port = var.postgreport_port
         database   = "yjaf"
