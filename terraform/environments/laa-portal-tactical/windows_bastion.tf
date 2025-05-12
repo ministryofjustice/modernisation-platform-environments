@@ -34,11 +34,11 @@ resource "aws_vpc_security_group_egress_rule" "windows_bastion" {
   referenced_security_group_id = each.value
 }
 
-resource "aws_vpc_security_group_ingress_rule" "bastion_rdp_workspace" {
-  security_group_id = aws_security_group.bastion.id
-  description       = "Bastion RDP Inbound from WorkSpaces"
-  cidr_ipv4         = "35.176.93.186/32"
-  from_port         = 3389
-  ip_protocol       = "tcp"
-  to_port           = 3389
-}
+# resource "aws_vpc_security_group_ingress_rule" "bastion_rdp_workspace" {
+#   security_group_id = aws_security_group.bastion.id
+#   description       = "Bastion RDP Inbound from Global Protect VPN"
+#   cidr_ipv4         = "35.176.93.186/32"
+#   from_port         = 3389
+#   ip_protocol       = "tcp"
+#   to_port           = 3389
+# }

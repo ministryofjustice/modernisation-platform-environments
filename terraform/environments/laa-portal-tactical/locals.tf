@@ -7,11 +7,11 @@ locals {
   nonprod_workspaces_cidr = "10.200.0.0/20"
   prod_workspaces_cidr    = "10.200.16.0/20"
 
-  outbound_security_group_ids = [aws_security_group.idm_instance.id, aws_security_group.oam_instance.id, aws_security_group.oim_instance.id, aws_security_group.ohs_instance.id, aws_security_group.internal_lb.id, aws_security_group.internal_idm_sg.id]
+  outbound_security_group_ids = [aws_security_group.idm_instance.id, aws_security_group.oam_instance.id, aws_security_group.oim_instance.id, aws_security_group.ohs_instance.id, aws_security_group.internal_lb.id, aws_security_group.internal_idm_sg.id, aws_security_group.igdb.id, aws_security_group.iadb.id]
+  portal_ec2_security_group_ids = [aws_security_group.idm_instance.id, aws_security_group.oam_instance.id, aws_security_group.oim_instance.id, aws_security_group.ohs_instance.id, aws_security_group.internal_lb.id, aws_security_group.internal_idm_sg.id]
 
-  lb_logs_bucket = local.application_data.accounts[local.environment].lb_logs_bucket
-
-  # Temp local variable for environments where we wish to build out the EBS to be transfered to EFS
-  ebs_conditional = ["testing", "preproduction", "production"]
+  # RDS - IAGB and IDGB
+  igdb_username = "admin"
+  iadb_username = "admin"
 
 }
