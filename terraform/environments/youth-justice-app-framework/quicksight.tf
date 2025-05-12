@@ -21,8 +21,8 @@ module "quicksight" {
   redshift_host = module.redshift.address
   redshift_port = module.redshift.port
 
-  postgres_host = module.aurora.rds_cluster_endpoint.address
-  postgres_port = module.aurora.rds_cluster_endpoint.port
+  postgres_host = module.aurora.rds_cluster_endpoint
+  postgres_port = module.aurora.rds_cluster_port
 
   depends_on = [module.aurora, module.redshift]
  }
