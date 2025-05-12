@@ -2,7 +2,7 @@
 # SNS Topics and Topic Subscriptions
 ####################################
 
-# Production CloudWatch SNS Topic and Subscription
+# Production CloudWatch SNS Topic, Subscription, Topic Policy and Topic Policy Document
 
 resource "aws_sns_topic" "cw_alerts" {
   # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
@@ -56,6 +56,47 @@ resource "aws_sns_topic_subscription" "cw_sms_subscription4" {
   endpoint  = "+447887576466" # Kofi Owusu-nimoh
 }
 */
+
+resource "aws_sns_topic_policy" "cw_prod_topic_policy" {
+  count  = local.is-production == true ? 1 : 0
+  arn    = aws_sns_topic.cw_alerts[0].arn
+  policy = data.aws_iam_policy_document.cw_prod_topic_policy_document[0].json
+}
+
+data "aws_iam_policy_document" "cw_prod_topic_policy_document" {
+  count     = local.is-production == true ? 1 : 0
+  policy_id = "cw_prod_sns_topic_policy_document"
+
+ statement {
+    sid    = "cw_prod_statement_id"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudwatch.amazonaws.com"]
+    }
+    actions = [
+      "SNS:Subscribe",
+      "SNS:SetTopicAttributes",
+      "SNS:RemovePermission",
+      "SNS:Receive",
+      "SNS:Publish",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:GetTopicAttributes",
+      "SNS:DeleteTopic",
+      "SNS:AddPermission"
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceOwner"
+      values   = [
+        data.aws_caller_identity.current.account_id
+      ]
+    }
+    resources = [
+      aws_sns_topic.cw_alerts[0].arn
+    ]
+  }
+}
 
 # Preproduction CloudWatch SNS Topic, Subscription, Topic Policy and Topic Policy Document
 
@@ -113,7 +154,7 @@ data "aws_iam_policy_document" "cw_uat_topic_policy_document" {
   }
 }
 
-# Development CloudWatch SNS Topic and Subscription
+# Development CloudWatch SNS Topic, Subscription, Topic Policy and Topic Policy Document
 
 resource "aws_sns_topic" "cw_dev_alerts" {
   # checkov:skip=CKV_AWS_26: "SNS topic encryption is not required as no sensitive data is processed through it"
@@ -128,39 +169,45 @@ resource "aws_sns_topic_subscription" "cw_dev_subscription" {
   endpoint  = "PPUDAlerts@colt.net"
 }
 
-resource "aws_sns_topic_policy" "sns_dev_policy" {
-  count = local.is-development == true ? 1 : 0
-  arn   = aws_sns_topic.cw_dev_alerts[0].arn
+resource "aws_sns_topic_policy" "cw_dev_topic_policy" {
+  count  = local.is-development == true ? 1 : 0
+  arn    = aws_sns_topic.cw_dev_alerts[0].arn
+  policy = data.aws_iam_policy_document.cw_dev_topic_policy_document[0].json
+}
 
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        "Sid" : "__default_statement_ID",
-        "Effect" : "Allow",
-        "Principal" : {
-          "AWS" : "*"
-        },
-        "Action" : [
-          "SNS:Publish",
-          "SNS:RemovePermission",
-          "SNS:SetTopicAttributes",
-          "SNS:DeleteTopic",
-          "SNS:ListSubscriptionsByTopic",
-          "SNS:GetTopicAttributes",
-          "SNS:Receive",
-          "SNS:AddPermission",
-          "SNS:Subscribe"
-        ],
-        "Resource" : "aws_sns_topic.cw_dev_alerts[0].arn",
-        "Condition" : {
-          "StringEquals" : {
-            "AWS:SourceOwner" : "data.aws_caller_identity.current.account_id"
-          }
-        }
-      }
+data "aws_iam_policy_document" "cw_dev_topic_policy_document" {
+  count     = local.is-development == true ? 1 : 0
+  policy_id = "cw_dev_sns_topic_policy_document"
+
+ statement {
+    sid    = "cw_dev_statement_id"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["cloudwatch.amazonaws.com"]
+    }
+    actions = [
+      "SNS:Subscribe",
+      "SNS:SetTopicAttributes",
+      "SNS:RemovePermission",
+      "SNS:Receive",
+      "SNS:Publish",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:GetTopicAttributes",
+      "SNS:DeleteTopic",
+      "SNS:AddPermission"
     ]
-  })
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceOwner"
+      values   = [
+        data.aws_caller_identity.current.account_id
+      ]
+    }
+    resources = [
+      aws_sns_topic.cw_dev_alerts[0].arn
+    ]
+  }
 }
 
 # Production S3 Bucket Notification Topic and Subscription
