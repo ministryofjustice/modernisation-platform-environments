@@ -21,7 +21,7 @@ resource "aws_glue_catalog_database" "cur_v2_database" {
 }
 
 resource "aws_iam_role" "glue_cur_role" {
-  name = "glue-cur-role"
+  name = "glue_cur_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -35,15 +35,10 @@ resource "aws_iam_role" "glue_cur_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "glue_service_role_policy" {
-  role       = aws_iam_role.glue_cur_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
-}
-
 resource "aws_iam_role_policy" "glue_s3_policy" {
   #checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   #checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
-  role = aws_iam_role.glue_cur_role.id
+  role = aws_iam_role.glue_cur_role.name
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -69,6 +64,7 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
         Action = [
           "glue:BatchGetPartition",
           "glue:CreateTable",
+          "glue:GetCatalogs",
           "glue:GetDatabase",
           "glue:GetDatabases",
           "glue:GetTable",
@@ -77,11 +73,12 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
           "glue:GetPartitions",
           "glue:ImportCatalogToGlue",
           "glue:UpdateDatabase",
-          "glue:UpdateTable"
+          "glue:UpdateTable",
+          "glue:StartCrawler"
         ],
         Resource = ["*"]
       },
-        {
+      {
         Sid    = "AthenaAccess",
         Effect = "Allow",
         Action = [
@@ -99,7 +96,17 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
           "athena:StopQueryExecution"
         ],
         Resource = ["*"]
-      }
+      },
+      { 
+        Sid    = "LoggingAccess",
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+          ],
+          Resource = ["*"]
+        },
     ]
   })
 }
@@ -111,7 +118,7 @@ resource "aws_glue_crawler" "cur_v2_crawler" {
   role          = aws_iam_role.glue_cur_role.arn
 
   s3_target {
-    path = "s3://coat-${local.environment}-cur-v2-hourly/"
+    path = "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/"
   }
 
   configuration = jsonencode({
