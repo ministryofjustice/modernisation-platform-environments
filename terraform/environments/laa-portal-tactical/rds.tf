@@ -295,6 +295,8 @@ resource "aws_db_instance" "igdb" {
   allow_major_version_upgrade = true
   multi_az                    = true
   option_group_name           = aws_db_option_group.igdb19.name
+  ca_cert_identifier          = "rds-ca-rsa4096-g1"
+  # availability_zone           = "eu-west-2b"
 
   timeouts {
     create = "60m"
@@ -351,6 +353,8 @@ resource "aws_db_instance" "iadb" {
   allow_major_version_upgrade = true
   multi_az                    = true
   option_group_name           = aws_db_option_group.iadb19.name
+  ca_cert_identifier          = "rds-ca-rsa4096-g1"
+  # availability_zone           = "eu-west-2b"
 
   timeouts {
     create = "60m"
