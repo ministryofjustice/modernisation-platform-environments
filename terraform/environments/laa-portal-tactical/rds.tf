@@ -168,7 +168,7 @@ resource "aws_security_group" "igdb" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "igdb_portal_ec2" {
-  for_each = toset(local.portal_ec2_security_group_ids)
+  for_each = local.portal_ec2_security_group_ids
   security_group_id = aws_security_group.igdb.id
   description       = "IGDB Inbound from Portal EC2"
   from_port         = 1521
@@ -178,7 +178,7 @@ resource "aws_vpc_security_group_ingress_rule" "igdb_portal_ec2" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "igdb_portal_ec2" {
-  for_each = toset(local.portal_ec2_security_group_ids)
+  for_each = local.portal_ec2_security_group_ids
   security_group_id        = aws_security_group.igdb.id
   ip_protocol       = "-1"
   referenced_security_group_id = each.value
@@ -196,7 +196,7 @@ resource "aws_security_group" "iadb" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "iadb_portal_ec2" {
-  for_each = toset(local.portal_ec2_security_group_ids)
+  for_each = local.portal_ec2_security_group_ids
   security_group_id = aws_security_group.iadb.id
   description       = "IADB Inbound from Portal EC2"
   from_port         = 1521
@@ -206,7 +206,7 @@ resource "aws_vpc_security_group_ingress_rule" "iadb_portal_ec2" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "iadb_portal_ec2" {
-  for_each = toset(local.portal_ec2_security_group_ids)
+  for_each = local.portal_ec2_security_group_ids
   security_group_id        = aws_security_group.iadb.id
   ip_protocol       = "-1"
   referenced_security_group_id = each.value

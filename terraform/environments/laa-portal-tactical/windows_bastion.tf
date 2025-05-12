@@ -28,7 +28,7 @@ resource "aws_security_group" "bastion" {
 # }
 
 resource "aws_vpc_security_group_egress_rule" "windows_bastion" {
-  for_each = toset(local.outbound_security_group_ids)
+  for_each = local.outbound_security_group_ids
   security_group_id        = aws_security_group.bastion.id
   ip_protocol       = "-1"
   referenced_security_group_id = each.value

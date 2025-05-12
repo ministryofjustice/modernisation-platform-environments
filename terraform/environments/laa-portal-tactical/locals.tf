@@ -7,9 +7,23 @@ locals {
   nonprod_workspaces_cidr = "10.200.0.0/20"
   prod_workspaces_cidr    = "10.200.16.0/20"
 
-  outbound_security_group_ids = [aws_security_group.idm_instance.id, aws_security_group.oam_instance.id, aws_security_group.oim_instance.id, aws_security_group.ohs_instance.id, aws_security_group.internal_lb.id, aws_security_group.internal_idm_sg.id, aws_security_group.igdb.id, aws_security_group.iadb.id]
-  portal_ec2_security_group_ids = [aws_security_group.idm_instance.id, aws_security_group.oam_instance.id, aws_security_group.oim_instance.id, aws_security_group.ohs_instance.id, aws_security_group.internal_lb.id, aws_security_group.internal_idm_sg.id]
-
+  outbound_security_group_ids = {
+    idm = aws_security_group.idm_instance.id, 
+    oam = aws_security_group.oam_instance.id,
+    oim = aws_security_group.oim_instance.id,
+    ohs = aws_security_group.ohs_instance.id,
+    internal_ohs_alb = aws_security_group.internal_lb.id
+    internal_idm_alb = aws_security_group.internal_idm_sg.id
+    igdb = aws_security_group.igdb.id
+    iadb = aws_security_group.iadb.id
+  }
+  portal_ec2_security_group_ids = {
+    idm = aws_security_group.idm_instance.id, 
+    oam = aws_security_group.oam_instance.id,
+    oim = aws_security_group.oim_instance.id,
+    ohs = aws_security_group.ohs_instance.id
+  }
+  
   lb_logs_bucket = local.application_data.accounts[local.environment].lb_logs_bucket
 
   # RDS - IAGB and IDGB
