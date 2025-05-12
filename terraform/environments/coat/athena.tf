@@ -108,7 +108,7 @@ resource "aws_glue_crawler" "cur_v2_crawler" {
   role          = aws_iam_role.glue_cur_role.arn
 
   s3_target {
-    path = "s3://coat-${local.environment}-cur-v2-hourly/"
+    path = "s3://coat-${local.environment}-cur-v2-hourly/moj-cost-and-usage-reports/MOJ-CUR-V2-HOURLY/data/"
   }
 
   configuration = jsonencode({
