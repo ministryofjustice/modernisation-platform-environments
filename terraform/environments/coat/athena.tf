@@ -29,7 +29,7 @@ resource "aws_iam_role" "glue_cur_role" {
       Action    = "sts:AssumeRole",
       Effect    = "Allow",
       Principal = {
-        Service = "glue.amazonaws.com"
+        AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
       }
     }]
   })
