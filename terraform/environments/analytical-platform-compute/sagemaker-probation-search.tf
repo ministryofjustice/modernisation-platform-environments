@@ -26,7 +26,7 @@ locals {
       hmpps-probation-search-preprod = {
         namespace       = "hmpps-probation-search-preprod"
         instance_type   = "ml.g6.xlarge"
-        instance_count  = 4
+        instance_count  = 1
         repository_name = "tei"
         image_tag       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
         environment = {
