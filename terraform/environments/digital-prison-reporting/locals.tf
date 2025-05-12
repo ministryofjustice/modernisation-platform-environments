@@ -293,6 +293,10 @@ locals {
   thrld_dms_cdc_inc_events_check    = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
   period_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
 
+  enable_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.enable
+  thrld_postgres_tickle_function_failure_alarm  = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.threshold
+  period_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.period
+
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 
