@@ -33,9 +33,10 @@ resource "aws_security_group" "oam_instance" {
 # }
 
 resource "aws_vpc_security_group_egress_rule" "oam_outbound" {
+  for_each = local.outbound_security_group_ids
   security_group_id = aws_security_group.oam_instance.id
-  cidr_ipv4         = module.vpc.vpc_cidr_block
   ip_protocol       = "-1"
+  referenced_security_group_id = each.value
 }
 
 # resource "aws_vpc_security_group_egress_rule" "oam_outbound_https" {

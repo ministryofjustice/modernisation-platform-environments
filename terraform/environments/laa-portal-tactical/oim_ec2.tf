@@ -95,9 +95,10 @@ resource "aws_vpc_security_group_ingress_rule" "oim_bi" {
 # }
 
 resource "aws_vpc_security_group_egress_rule" "oim_outbound_local_vpc" {
+  for_each = local.outbound_security_group_ids
   security_group_id = aws_security_group.oim_instance.id
-  cidr_ipv4         = module.vpc.vpc_cidr_block
   ip_protocol       = "-1"
+  referenced_security_group_id = each.value
 }
 
 # TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1

@@ -26,9 +26,10 @@ resource "aws_security_group" "idm_instance" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "idm_outbound_local_vpc" {
+  for_each = local.outbound_security_group_ids
   security_group_id = aws_security_group.idm_instance.id
-  cidr_ipv4         = module.vpc.vpc_cidr_block
   ip_protocol       = "-1"
+  referenced_security_group_id = each.value
 }
 
 # TODO some rules will need adding referencing Landing Zone environments (e.g. VPC) for other dependent applications not migrated to MP yet but needs talking to Portal.
