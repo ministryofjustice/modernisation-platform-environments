@@ -16,7 +16,7 @@ resource "aws_quicksight_data_set" "rowleveldata" {
       norder by "GroupName"
       EOT
 
-      columns = [
+      columns {[
         {
           name = "GroupName"
           type = "STRING"
@@ -25,7 +25,7 @@ resource "aws_quicksight_data_set" "rowleveldata" {
           name = "yotoucode"
           type = "STRING"
         }
-      ]
+      ]}
     }
   }
 }
@@ -49,7 +49,8 @@ resource "aws_quicksight_data_set" "personal_data" {
   }
 
   physical_table_map {
-    physical_table_map_id = var.physical_table_map_id
+    physical_table_map_id = "personal_data"
+    name                  = "Persaon Data"
     custom_sql {
       data_source_arn = aws_quicksight_data_source.redshift.arn
       sql_query = <<EOT
@@ -180,7 +181,7 @@ resource "aws_quicksight_data_set" "personal_data" {
                        ELSE '' END"
       EOT
 
-      columns = [
+      columns = {[
         {
             "Name": "ypid",
             "Type": "STRING"
@@ -241,11 +242,7 @@ resource "aws_quicksight_data_set" "personal_data" {
             "Name": "number",
             "Type": "INTEGER"
         }
-    ]
-
-      upload_settings {
-        format = "JSON"
-      }
+      ]}
     }
   }
 }
