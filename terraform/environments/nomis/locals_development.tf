@@ -31,6 +31,25 @@ locals {
       }
     }
 
+    backup_plans = {
+      # delete once qa11g-nomis-web12-a removed
+      qa11g-nomis-web12-a-workaround = {
+        rule = {
+          schedule          = "cron(30 23 ? * MON-FRI *)"
+          start_window      = 60
+          completion_window = 3600
+          delete_after      = 10
+        }
+        selection = {
+          selection_tags = [{
+            type  = "STRINGEQUALS"
+            key   = "server-name"
+            value = "qa11g-nomis-web12-a"
+          }]
+        }
+      }
+    }
+
     cloudwatch_dashboards = {
       "CloudWatch-Default" = {
         periodOverride = "auto"
@@ -130,6 +149,7 @@ locals {
         })
       })
 
+      # remember to delete associated backup plan
       qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
         autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.web12.config, {
