@@ -82,7 +82,7 @@ locals {
             },
             {
               "name" : "DD_ENV",
-              "value" : "${local.environment}"
+              "value" : local.environment
             },
             {
               "name" : "DD_PROFILING_ENABLED",
