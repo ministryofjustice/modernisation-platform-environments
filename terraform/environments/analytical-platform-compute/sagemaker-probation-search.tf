@@ -106,7 +106,7 @@ resource "aws_sagemaker_endpoint_configuration" "probation_search" {
   production_variants {
     variant_name           = "AllTraffic"
     model_name             = aws_sagemaker_model.probation_search_huggingface_embedding_model[each.key].name
-    initial_instance_count = each.value.instance_count
+    initial_instance_count = each.value.min_instance_count
     instance_type          = each.value.instance_type
   }
 
