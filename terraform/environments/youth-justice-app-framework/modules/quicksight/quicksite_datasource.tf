@@ -63,7 +63,7 @@ resource "aws_quicksight_data_source" "postgresql" {
 
   type = "AURORA_POSTGRESQL"
 
-  redentials {
+  credentials {
     secret_arn = "arn:aws:secretsmanager:eu-west-2:711387140977:secret:yjafrds01-cluster-db-postgres_rotated-password-TBoGFg"
   }
 }
