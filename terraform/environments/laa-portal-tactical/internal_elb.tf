@@ -94,7 +94,7 @@ resource "aws_lb_listener_rule" "https_internal" {
 
 resource "aws_lb_listener_rule" "host_based_internal" {
   listener_arn = aws_lb_listener.http_internal.arn
-  priority     = 100
+  priority     = 200
 
   action {
     type             = "forward"
