@@ -131,10 +131,16 @@ locals {
       })
 
       qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
+        autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.web12.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
           ])
+        })
+        instance = merge(local.ec2_autoscaling_groups.web12.instance, {
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
