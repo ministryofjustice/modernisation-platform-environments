@@ -56,25 +56,39 @@ resource "aws_lb_listener" "http_internal" {
 
 }
 
-# TODO This needs uncommenting once Cert has been set up
-# resource "aws_lb_listener" "https_internal" {
+resource "aws_lb_listener" "https_internal" {
 
-#   load_balancer_arn = aws_lb.internal.arn
-#   port              = local.internal_lb_https_port
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
-#   certificate_arn   = aws_acm_certificate_validation.load_balancer.certificate_arn
+  load_balancer_arn = aws_lb.internal.arn
+  port              = local.internal_lb_https_port
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  certificate_arn   = data.aws_secretsmanager_secret_version.cert_arn.secret_string
 
-#   default_action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.internal.arn
-#   }
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.internal.arn
+  }
 
-#   tags = local.tags
+  tags = local.tags
 
-# }
+}
 
+resource "aws_lb_listener_rule" "https_internal" {
+  listener_arn = aws_lb_listener.https_internal.arn
+  priority     = 100
 
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.internal.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/"]
+    }
+  }
+
+}
 
 # resource "aws_lb_listener_rule" "host_based_internal" {
 #   listener_arn = aws_lb_listener.http_internal.arn
@@ -93,23 +107,6 @@ resource "aws_lb_listener" "http_internal" {
 
 # }
 
-# TODO This needs uncommenting once Cert has been set up
-# resource "aws_lb_listener_rule" "https_internal" {
-#   listener_arn = aws_lb_listener.https_internal.arn
-#   priority     = 100
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.internal.arn
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = ["/"]
-#     }
-#   }
-
-# }
 
 resource "aws_lb_target_group" "internal" {
   name                 = "portal15-internal-ohs-tg"
