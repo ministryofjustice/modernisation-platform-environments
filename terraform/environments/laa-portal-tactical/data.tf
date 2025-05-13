@@ -10,5 +10,5 @@ data "aws_secretsmanager_secret" "cert_arn" {
 }
 
 data "aws_secretsmanager_secret_version" "cert_arn" {
-  secret_id = data.aws_secretsmanager_secret.secrets.id
+  secret_id = data.aws_secretsmanager_secret.cert_arn.id
 }
