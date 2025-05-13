@@ -10,6 +10,7 @@ locals {
     "serco_fms",
     "allied_mdss",
     "staged_fms",
+    "staged_mdss",
     "preprocessed_fms",
     "curated_fms",
     "staging_fms",

@@ -955,8 +955,8 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw019" {
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   datapoints_to_alarm = "1"
-  metric_name         = "True"
-  namespace           = "PortStatus"
+  metric_name         = "PortStatus"
+  namespace           = "Port"
   period              = "60"
   statistic           = "Average"
   threshold           = "1"
@@ -965,7 +965,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw019" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-0dba6054c0f5f7a11"
-    Port     = "Port-25"
+    Port     = "Port25"
   }
 }
 
@@ -975,8 +975,8 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw020" {
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   datapoints_to_alarm = "1"
-  metric_name         = "True"
-  namespace           = "PortStatus"
+  metric_name         = "PortStatus"
+  namespace           = "Port"
   period              = "60"
   statistic           = "Average"
   threshold           = "1"
@@ -985,7 +985,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw020" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-0f393d9ed4e53da68"
-    Port     = "Port-25"
+    Port     = "Port25"
   }
 }
 
@@ -995,8 +995,8 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw022" {
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   datapoints_to_alarm = "1"
-  metric_name         = "True"
-  namespace           = "PortStatus"
+  metric_name         = "PortStatus"
+  namespace           = "Port"
   period              = "60"
   statistic           = "Average"
   threshold           = "1"
@@ -1005,7 +1005,7 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw022" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-029d2b17679dab982"
-    Port     = "Port-25"
+    Port     = "Port25"
   }
 }
 
@@ -1015,8 +1015,8 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw027" {
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   datapoints_to_alarm = "1"
-  metric_name         = "True"
-  namespace           = "PortStatus"
+  metric_name         = "PortStatus"
+  namespace           = "Port"
   period              = "60"
   statistic           = "Average"
   threshold           = "1"
@@ -1025,7 +1025,29 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_rgvw027" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-00cbccc46d25e77c6"
-    Port     = "Port-25"
+    Port     = "Port25"
+  }
+}
+
+# Email Sender Stale Log File
+
+resource "aws_cloudwatch_metric_alarm" "emailsender_check_rgvw022" {
+  count               = local.is-production == true ? 1 : 0
+  alarm_name          = "Email-Sender-Check-i-029d2b17679dab982"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "EmailSenderStatus"
+  namespace           = "EmailSender"
+  period              = "3600"
+  statistic           = "Average"
+  threshold           = "1"
+  treat_missing_data  = "notBreaching"
+  alarm_description   = "Monitors for stale email sender log files "
+  alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
+  dimensions = {
+    Instance        = "i-029d2b17679dab982"
+    EmailSender     = "EmailSender"
   }
 }
 
@@ -1049,6 +1071,143 @@ data "aws_instance" "windows_instance_details_uat" {
   instance_id = each.value
 }
 
+
+#################################
+# CloudWatch Alarms Preproduction
+#################################
+
+# Malware Event Signature Update Failed
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed_uat" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  alarm_name          = "Malware-Event-Signature-Update-Failed-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareSignatureFailed"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware signature update failed events"
+  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
+  dimensions = {
+    Instance               = each.key
+    MalwareSignatureFailed = "MalwareSignatureFailed"
+  }
+}
+
+# Malware Event State Detected
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_state_detected_uat" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  alarm_name          = "Malware-Event-State-Detected-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareStateDetected"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware state detected events"
+  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
+  dimensions = {
+    Instance             = each.key
+    MalwareStateDetected = "MalwareStateDetected"
+  }
+}
+
+# Malware Event Scan Failed
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_scan_failed_uat" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  alarm_name          = "Malware-Event-Scan-Failed-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareScanFailed"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware scan failed events"
+  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
+  dimensions = {
+    Instance          = each.key
+    MalwareScanFailed = "MalwareScanFailed"
+  }
+}
+
+# Malware Event Engine Update Failed
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_engine_update_failed_uat" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  alarm_name          = "Malware-Event-Engine-Update-Failed-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareEngineFailed"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware engine update events"
+  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
+  dimensions = {
+    Instance            = each.key
+    MalwareEngineFailed = "MalwareEngineFailed"
+  }
+}
+
+# Malware Event Engine Out of Date
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_engine_out_of_date_uat" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  alarm_name          = "Malware-Event-Engine-Out-Of-Date-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareEngineOutofDate"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware engine out of date events"
+  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
+  dimensions = {
+    Instance               = each.key
+    MalwareEngineOutofDate = "MalwareEngineOutofDate"
+  }
+}
+
+# Malware Event Behavior Detected
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected_uat" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_uat.ids)
+  alarm_name          = "Malware-Event-Engine-Behavior-Detected-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareBehaviorDetected"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware behavior detected events"
+  alarm_actions       = [aws_sns_topic.cw_uat_alerts[0].arn]
+  dimensions = {
+    Instance                = each.key
+    MalwareBehaviorDetected = "MalwareBehaviorDetected"
+  }
+}
+
 ##########################
 # Data Sources Development
 ##########################
@@ -1067,4 +1226,140 @@ data "aws_instances" "windows_tagged_instances_dev" {
 data "aws_instance" "windows_instance_details_dev" {
   for_each    = toset(data.aws_instances.windows_tagged_instances_dev.ids)
   instance_id = each.value
+}
+
+###############################
+# CloudWatch Alarms Development
+###############################
+
+# Malware Event Signature Update Failed
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_signature_update_failed_dev" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
+  alarm_name          = "Malware-Event-Signature-Update-Failed-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareSignatureFailed"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware signature update failed events"
+  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+  dimensions = {
+    Instance               = each.key
+    MalwareSignatureFailed = "MalwareSignatureFailed"
+  }
+}
+
+# Malware Event State Detected
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_state_detected_dev" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
+  alarm_name          = "Malware-Event-State-Detected-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareStateDetected"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware state detected events"
+  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+  dimensions = {
+    Instance             = each.key
+    MalwareStateDetected = "MalwareStateDetected"
+  }
+}
+
+# Malware Event Scan Failed
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_scan_failed_dev" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
+  alarm_name          = "Malware-Event-Scan-Failed-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareScanFailed"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware scan failed events"
+  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+  dimensions = {
+    Instance          = each.key
+    MalwareScanFailed = "MalwareScanFailed"
+  }
+}
+
+# Malware Event Engine Update Failed
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_engine_update_failed_dev" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
+  alarm_name          = "Malware-Event-Engine-Update-Failed-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareEngineFailed"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware engine update events"
+  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+  dimensions = {
+    Instance            = each.key
+    MalwareEngineFailed = "MalwareEngineFailed"
+  }
+}
+
+# Malware Event Engine Out of Date
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_engine_out_of_date_dev" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
+  alarm_name          = "Malware-Event-Engine-Out-Of-Date-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareEngineOutofDate"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware engine out of date events"
+  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+  dimensions = {
+    Instance               = each.key
+    MalwareEngineOutofDate = "MalwareEngineOutofDate"
+  }
+}
+
+# Malware Event Behavior Detected
+
+resource "aws_cloudwatch_metric_alarm" "malware_event_behavior_detected_dev" {
+  for_each            = toset(data.aws_instances.windows_tagged_instances_dev.ids)
+  alarm_name          = "Malware-Event-Engine-Behavior-Detected-${each.key}"
+  comparison_operator = "GreaterThanThreshold"
+  period              = "60"
+  threshold           = "0"
+  evaluation_periods  = "1"
+  datapoints_to_alarm = "1"
+  metric_name         = "MalwareBehaviorDetected"
+  treat_missing_data  = "notBreaching"
+  namespace           = "WindowsDefender"
+  statistic           = "Sum"
+  alarm_description   = "Monitors for windows defender malware behavior detected events"
+  alarm_actions       = [aws_sns_topic.cw_dev_alerts[0].arn]
+  dimensions = {
+    Instance                = each.key
+    MalwareBehaviorDetected = "MalwareBehaviorDetected"
+  }
 }

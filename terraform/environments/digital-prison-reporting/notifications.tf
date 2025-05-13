@@ -80,6 +80,35 @@ PATTERN
   depends_on = [module.notifications_sns]
 }
 
+# DMS failure state rule
+module "dms_failure_state_rule" {
+  source        = "./modules/notifications/eventbridge"
+  sns_topic_arn = module.notifications_sns.sns_topic_arn
+
+  rule_name         = "${local.project}-dms-task-failure-state-rule-${local.environment}"
+  event_target_name = "${local.project}-dms-task-rule-target-${local.environment}"
+
+  event_pattern = <<PATTERN
+{
+  "source": ["aws.dms"],
+  "detail": {
+    "category": ["Failure"]
+  }
+}
+PATTERN
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name = "${local.project}-dms-task-failure-state-rule-${local.environment}",
+      Jira = "DPR2-849",
+      Dept = "Digital-Prison-Reporting"
+    }
+  )
+
+  depends_on = [module.notifications_sns]
+}
+
 # Pager duty integration
 
 # Notification SNS

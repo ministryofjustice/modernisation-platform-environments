@@ -249,8 +249,8 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_401_cjsm" {
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   datapoints_to_alarm = "1"
-  metric_name         = "True"
-  namespace           = "PortStatus"
+  metric_name         = "PortStatus"
+  namespace           = "Port"
   period              = "60"
   statistic           = "Average"
   threshold           = "1"
@@ -259,6 +259,6 @@ resource "aws_cloudwatch_metric_alarm" "port_25_status_check_401_cjsm" {
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
     Instance = "i-0e8e2a182917bcf26"
-    Port     = "port-25"
+    Port     = "Port25"
   }
 }
