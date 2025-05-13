@@ -32,6 +32,7 @@
       "idm_config_snapshot": "",
       "idm_mserver_snapshot": "",
       "idm_instances_snapshot": "",
+      "lb_cert_arn": "arn:aws:acm:eu-west-2:464827657497:certificate/5c913e7e-8dfe-41fd-ab03-fba7cf9ef538",
       "lb_enable_deletion_protection": "false",
       "lb_logs_bucket": "",
       "lb_access_logs_existing_bucket_name": "",
