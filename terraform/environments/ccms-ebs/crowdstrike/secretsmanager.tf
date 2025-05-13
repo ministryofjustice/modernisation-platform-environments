@@ -6,6 +6,10 @@ resource "aws_secretsmanager_secret" "crowdstrike" {
 }
 
 resource "aws_secretsmanager_secret_version" "crowdstrike" {
-  lifecycle { ignore_changes = [secret_string]}
+  lifecycle { ignore_changes = [secret_string] }
   secret_id = aws_secretsmanager_secret.crowdstrike.id
+  secret_string = jsonencode({
+    client_id     = ""
+    client_secret = ""
+  })
 }
