@@ -18,6 +18,10 @@ resource "aws_quicksight_data_source" "redshift" {
   }
 
   type = "REDSHIFT"
+
+  credentials {
+    secret_arn = "arn:aws:secretsmanager:eu-west-2:711387140977:secret:yjaf/development/returns-microservice/redshift-serverless/-cpSCa8"
+  }
 }
 
 /*
@@ -58,6 +62,10 @@ resource "aws_quicksight_data_source" "postgresql" {
   }
 
   type = "AURORA_POSTGRESQL"
+
+  redentials {
+    secret_arn = "arn:aws:secretsmanager:eu-west-2:711387140977:secret:yjafrds01-cluster-db-postgres_rotated-password-TBoGFg"
+  }
 }
 
 /*
