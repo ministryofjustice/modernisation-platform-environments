@@ -91,7 +91,7 @@ output "terraform_rules" {
 
 resource "aws_dms_replication_task" "full_load_replication_task" {
   migration_type            = "full-load"
-  replication_instance_arn  = aws_dms_replication_instance.instance.replication_instance_arn
+  replication_instance_arn  = data.aws_dms_replication_instance.instance.replication_instance_arn
   replication_task_id       = var.replication_task_id.full_load
   replication_task_settings = file("${path.module}/default_task_settings.json")
   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
@@ -108,7 +108,7 @@ resource "aws_dms_replication_task" "cdc_replication_task" {
   count                     = lookup(var.replication_task_id, "cdc", null) == null ? 0 : 1
   migration_type            = "cdc"
   cdc_start_time            = var.dms_source.cdc_start_time
-  replication_instance_arn  = aws_dms_replication_instance.instance.replication_instance_arn
+  replication_instance_arn  = data.aws_dms_replication_instance.instance.replication_instance_arn
   replication_task_id       = var.replication_task_id.cdc
   replication_task_settings = file("${path.module}/default_task_settings.json")
   source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
