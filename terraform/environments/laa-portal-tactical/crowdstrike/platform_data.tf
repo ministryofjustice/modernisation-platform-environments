@@ -44,3 +44,8 @@ data "aws_iam_session_context" "whoami" {
 data "http" "environments_file" {
   url = "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${local.application_name}.json"
 }
+
+# Reference the shared KMS key
+data "aws_kms_key" "general_shared" {
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-laa"
+}
