@@ -27,3 +27,13 @@ output "rds_cluster_security_group_id" {
   description = "The ID of the Security Groups that is used to controll access to the RDS cluster."
   value       = aws_security_group.rds.id
 }
+
+output "cluster_arn" {
+  description = "The ARN of the RDS Aurora cluster"
+  value       = module.aurora.cluster_arn
+}
+
+output "cluster_id" {
+  description = "The ID of the RDS Aurora cluster"
+  value       = module.aurora.cluster_id
+}
