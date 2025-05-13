@@ -59,26 +59,6 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
         Resource = module.cur_s3_kms.key_arn
       },
       {
-        Sid    = "GluePermission",
-        Effect = "Allow",
-        Action = [
-          "glue:BatchGetPartition",
-          "glue:CreateTable",
-          "glue:GetCatalogs",
-          "glue:GetDatabase",
-          "glue:GetDatabases",
-          "glue:GetTable",
-          "glue:GetTables",
-          "glue:GetPartition",
-          "glue:GetPartitions",
-          "glue:ImportCatalogToGlue",
-          "glue:UpdateDatabase",
-          "glue:UpdateTable",
-          "glue:StartCrawler"
-        ],
-        Resource = ["*"]
-      },
-      {
         Sid    = "AthenaAccess",
         Effect = "Allow",
         Action = [
@@ -97,18 +77,13 @@ resource "aws_iam_role_policy" "glue_s3_policy" {
         ],
         Resource = ["*"]
       },
-      { 
-        Sid    = "LoggingAccess",
-        Effect = "Allow",
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-          ],
-          Resource = ["*"]
-        },
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "glue_service_role_attachment" {
+  role       = aws_iam_role.glue_cur_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
 }
 
 resource "aws_glue_crawler" "cur_v2_crawler" {
