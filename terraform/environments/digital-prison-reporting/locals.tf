@@ -3,6 +3,7 @@
 locals {
 
   is_dev_or_test       = local.is-development || local.is-test
+  is_non_prod          = !local.is-production
   project              = local.application_data.accounts[local.environment].project_short_id
   analytics_project_id = "analytics"
 
@@ -352,6 +353,16 @@ locals {
   # nDelius Secrets PlaceHolder
   ndelius_secrets_placeholder = {
     db_name  = "ndelius"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
+  # ndmis Secrets PlaceHolder
+  ndmis_secrets_placeholder = {
+    db_name  = "ndmis"
     password = "placeholder"
     user     = "placeholder"
     username = "placeholder"
