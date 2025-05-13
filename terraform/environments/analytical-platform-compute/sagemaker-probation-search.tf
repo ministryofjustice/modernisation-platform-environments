@@ -133,8 +133,8 @@ resource "aws_sagemaker_endpoint" "probation_search" {
 
 resource "aws_appautoscaling_target" "probation_search" {
   for_each           = tomap(local.probation_search_environment)
-  max_capacity       = each.value.min_instance_count
-  min_capacity       = each.value.max_instance_count
+  min_capacity       = each.value.min_instance_count
+  max_capacity       = each.value.max_instance_count
   resource_id        = "endpoint/${aws_sagemaker_endpoint.probation_search[each.key].name}/variant/AllTraffic"
   scalable_dimension = "sagemaker:variant:DesiredInstanceCount"
   service_namespace  = "sagemaker"
