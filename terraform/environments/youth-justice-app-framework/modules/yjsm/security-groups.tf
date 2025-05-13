@@ -157,7 +157,7 @@ resource "aws_ec2_managed_prefix_list" "custom_internal" {
 
 resource "aws_ec2_managed_prefix_list_entry" "custom_internal_entry" {
   prefix_list_id = aws_ec2_managed_prefix_list.custom_internal.id
-  cidr           = "10.0.224.0/21"
+  cidr           = "10.20.224.0/21"
   description    = "YJB CUG RANGE 1"
 }
 
@@ -178,7 +178,7 @@ resource "aws_security_group_rule" "monitoring_to_yjsm" {
   from_port                = 8400
   to_port                  = 8400
   protocol                 = "tcp"
-  security_group_id        = var.management_server_sg_id 
-  source_security_group_id = aws_security_group.yjsm_service.id
-  description              = "Service monitoring access (YJSM 8400)"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.management_server_sg_id 
+  description              = "Service access (YJSM 8400)"
 }

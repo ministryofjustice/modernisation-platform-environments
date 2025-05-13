@@ -175,7 +175,8 @@ data "aws_iam_policy_document" "combined" {
   source_policy_documents = compact([
     try(data.aws_iam_policy_document.oracledb_backup_bucket_access.json, null),
     try(data.aws_iam_policy_document.oracle_remote_statistics_bucket_access[0].json, null),
-    try(data.aws_iam_policy_document.oracledb_remote_backup_bucket_access[0].json, null)
+    try(data.aws_iam_policy_document.oracledb_remote_backup_bucket_access[0].json, null),
+    try(data.aws_iam_policy_document.db_uplift_bucket_access.json, null)
   ])
 }
 
@@ -359,4 +360,31 @@ module "s3_bucket_oracle_statistics" {
   ]
 
   tags = var.tags
+}
+
+module "s3_bucket_db_uplift" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
+
+  providers = {
+    aws.bucket-replication = aws.bucket-replication
+  }
+
+  bucket_name = "${var.app_name}-${var.env_name}-db-uplift"
+
+  tags = var.tags
+}
+
+data "aws_iam_policy_document" "db_uplift_bucket_access" {
+  statement {
+    sid    = "allowAccessToUpliftBucket"
+    effect = "Allow"
+    actions = [
+      "s3:Get*",
+      "s3:List*"
+    ]
+    resources = [
+      "${module.s3_bucket_db_uplift.bucket.arn}",
+      "${module.s3_bucket_db_uplift.bucket.arn}/*"
+    ]
+  }
 }

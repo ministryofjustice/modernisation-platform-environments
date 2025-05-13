@@ -12,14 +12,14 @@ ses = boto3.client('ses')
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 SENDER = 'noreply@uat.ppud.justice.gov.uk'
 RECIPIENTS = ['nick.buckingham@colt.net']
-SUBJECT = f'AWS Security Hub - PPUD Preproduction Vulnerabilities Report - {CURRENT_DATE}'
+SUBJECT = f'AWS Security Hub - Critical Vulnerabilities Report - {CURRENT_DATE}'
 
 # Function to obfuscate patterns in text
 def obfuscate_text(text):
     patterns = [
         (r'(8\d{10}4)', '**********'), # Obfuscate Production
-        (r'(1\d{10}0)', '**********'), # Obfuscate Dev
-        (r'(0\d{10}6)', '**********')  # Obfuscate UAT
+        (r'(0\d{10}6)', '**********'), # Obfuscate Dev
+        (r'(1\d{10}0)', '**********')  # Obfuscate UAT
     ]
     
     for pattern, replacement in patterns:
@@ -30,7 +30,7 @@ def obfuscate_text(text):
 # Functions to replace sensitive information with the obfuscated text
 
 def obfuscate_account_number(resource_id):
-    return re.sub(r'(0)(\w{10})(6)', r'\1**********\3', resource_id)
+    return re.sub(r'(1)(\w{10})(0)', r'\1**********\3', resource_id)
 
 def obfuscate_instance_id(resource_id):
     return re.sub(r'(instance/i-0)(\w{13})', r'\1**************', resource_id)
