@@ -5,7 +5,7 @@ terraform {
       source  = "hashicorp/aws"
     }
     crowdstrike = {
-      source = "crowdstrike/crowdstrike"
+      source  = "crowdstrike/crowdstrike"
       version = ">= 0.0.18"
     }
     dns = {
