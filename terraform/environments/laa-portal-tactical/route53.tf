@@ -94,8 +94,8 @@ resource "aws_route53_record" "oid" {
   name     = "portal-oid.${aws_route53_zone.private_uat.name}"
   type     = "A"
   alias {
-    name                   = aws_lb.idm_lb.dns_name
-    zone_id                = aws_lb.idm_lb.zone_id
+    name                   = aws_elb.idm_lb.dns_name
+    zone_id                = aws_elb.idm_lb.zone_id
     evaluate_target_health = true
   }
 }
