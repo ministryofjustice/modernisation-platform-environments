@@ -3,7 +3,7 @@ locals {
   internal_lb_http_port    = 80
   internal_lb_https_port   = 443
   lb_enable_deletion_protection  = local.application_data.accounts[local.environment].lb_enable_deletion_protection
-#   internal_lb_http_hosts   = [aws_route53_record.oim_internal.name, aws_route53_record.oam_internal.name, aws_route53_record.idm_console.name, aws_route53_record.ohs_internal.name]
+  internal_lb_http_hosts   = [aws_route53_record.oim_internal.name, aws_route53_record.oam_internal.name, aws_route53_record.idm_console.name, aws_route53_record.ohs_internal.name]
 }
 
 ####################################
@@ -38,6 +38,7 @@ resource "aws_lb_listener" "http_internal" {
   load_balancer_arn = aws_lb.internal.arn
   port              = local.internal_lb_http_port
   protocol          = "HTTP"
+  routing_http_response_server_enabled = true
 
   # TODO This needs using once Cert and CloudFront has been set up
   default_action {
@@ -62,6 +63,7 @@ resource "aws_lb_listener" "https_internal" {
   port              = local.internal_lb_https_port
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  routing_http_response_server_enabled = true
   certificate_arn   = local.application_data.accounts[local.environment].lb_cert_arn
 
   default_action {
@@ -90,22 +92,22 @@ resource "aws_lb_listener_rule" "https_internal" {
 
 }
 
-# resource "aws_lb_listener_rule" "host_based_internal" {
-#   listener_arn = aws_lb_listener.http_internal.arn
-#   priority     = 100
+resource "aws_lb_listener_rule" "host_based_internal" {
+  listener_arn = aws_lb_listener.http_internal.arn
+  priority     = 100
 
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.internal.arn
-#   }
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.internal.arn
+  }
 
-#   condition {
-#     host_header {
-#       values = local.internal_lb_http_hosts # These are the URLs that accessed the LAA-Porta-AppOhsIn CLB in Landing Zone via Port 80, but we have merged this CLB with the Internal ALB instead, so this additional rule is required
-#     }
-#   }
+  condition {
+    host_header {
+      values = local.internal_lb_http_hosts # These are the URLs that accessed the LAA-Porta-AppOhsIn CLB in Landing Zone via Port 80, but we have merged this CLB with the Internal ALB instead, so this additional rule is required
+    }
+  }
 
-# }
+}
 
 
 resource "aws_lb_target_group" "internal" {
