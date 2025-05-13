@@ -52,8 +52,8 @@ locals {
 
 
   federated_query_connection_strings_map = local.is_dev_or_test ? local.dev_and_test_federated_query_connections :
-    ((local.is-preproduction ? local.preproduction_federated_query_connections :
-      local.production_federated_query_connections))
+    (local.is-preproduction ? local.preproduction_federated_query_connections :
+      local.production_federated_query_connections)
 
   federated_query_credentials_secret_arns = local.is_dev_or_test ? [
     aws_secretsmanager_secret.nomis.arn,
