@@ -4,6 +4,10 @@ terraform {
       version = "~> 5.0"
       source  = "hashicorp/aws"
     }
+    crowdstrike = {
+      source = "crowdstrike/crowdstrike"
+      version = ">= 0.0.18"
+    }
     dns = {
       version = "~> 3.0"
       source  = "hashicorp/dns"
