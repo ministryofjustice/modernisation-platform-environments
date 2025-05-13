@@ -22,8 +22,8 @@ resource "aws_quicksight_data_source" "redshift" {
   credentials {
 #    secret_arn = "arn:aws:secretsmanager:eu-west-2:711387140977:secret:yjaf/development/returns-microservice/redshift-serverless/-cpSCa8"
     credential_pair {
-      username = "aaaaaaaa"
-      password = "bbbbbbbb"
+      username = "yjb_publish"
+      password = "D%0uK6US6dIM"
     }
   }
 }
@@ -68,11 +68,11 @@ resource "aws_quicksight_data_source" "postgresql" {
   type = "AURORA_POSTGRESQL"
 
   credentials {
- #   secret_arn = "arn:aws:secretsmanager:eu-west-2:711387140977:secret:yjafrds01-cluster-db-postgres_rotated-password-TBoGFg"
-    credential_pair {
-      username = "aaaaaaaa"
-      password = "bbbbbbbb"
-    }
+    secret_arn = "arn:aws:secretsmanager:eu-west-2:711387140977:secret:yjafrds01-cluster-db-postgres_rotated-password-TBoGFg"
+ #   credential_pair {
+ #     username = "aaaaaaaa"
+ #     password = "bbbbbbbb"
+ #   }
   }
 }
 
