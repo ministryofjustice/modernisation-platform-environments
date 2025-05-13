@@ -253,4 +253,5 @@ resource "aws_iam_role_policy_attachment" "fis_cloudwatch_policy" {
 resource "aws_cloudwatch_log_group" "fis_logs" {
   name              = "AWS-FIS-Logs"
   retention_in_days = 400
+  kms_key_id        = module.kms.key_arn
 }
