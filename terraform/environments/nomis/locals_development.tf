@@ -157,11 +157,6 @@ locals {
             "Ec2Qa11GWeblogicPolicy",
           ])
         })
-        instance = merge(local.ec2_autoscaling_groups.web12.instance, {
-          tags = {
-            backup-plan = "daily-and-weekly"
-          }
-        })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web12.user_data_cloud_init.args, {
             branch = "main"
