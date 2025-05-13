@@ -135,7 +135,7 @@ resource "aws_appautoscaling_target" "probation_search" {
   for_each           = tomap(local.probation_search_environment)
   max_capacity       = each.value.min_instance_count
   min_capacity       = each.value.max_instance_count
-  resource_id        = "endpoint/${aws_sagemaker_endpoint.probation_search.name}/variant/AllTraffic"
+  resource_id        = "endpoint/${aws_sagemaker_endpoint.probation_search[each.key].name}/variant/AllTraffic"
   scalable_dimension = "sagemaker:variant:DesiredInstanceCount"
   service_namespace  = "sagemaker"
 }
@@ -144,9 +144,9 @@ resource "aws_appautoscaling_policy" "probation_search" {
   for_each           = tomap(local.probation_search_environment)
   name               = each.value.namespace
   policy_type        = "TargetTrackingScaling"
-  resource_id        = aws_appautoscaling_target.probation_search[0].resource_id
-  scalable_dimension = aws_appautoscaling_target.probation_search[0].scalable_dimension
-  service_namespace  = aws_appautoscaling_target.probation_search[0].service_namespace
+  resource_id        = aws_appautoscaling_target.probation_search[each.key].resource_id
+  scalable_dimension = aws_appautoscaling_target.probation_search[each.key].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.probation_search[each.key].service_namespace
 
   target_tracking_scaling_policy_configuration {
     target_value = each.value.target_invocations_per_instance
