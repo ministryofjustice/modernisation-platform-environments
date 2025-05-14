@@ -162,7 +162,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "kms:GenerateDataKey*",
       "kms:Describe*"
     ]
-    resources = [data.aws_kms_key.mwaa_kms.arn]
+    resources = [module.mwaa_kms.key_arn]
   }
   statement {
     sid    = "MWAABucketAccess"
@@ -171,7 +171,7 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "s3:ListBucket",
       "s3:GetBucketLocation"
     ]
-    resources = [data.aws_s3_bucket.mwaa_bucket.arn]
+    resources = [module.mwaa_bucket.s3_bucket_arn]
   }
   statement {
     sid    = "MWAAS3WriteAccess"
@@ -181,13 +181,13 @@ data "aws_iam_policy_document" "gha_moj_ap_airflow" {
       "s3:GetObject",
       "s3:DeleteObject"
     ]
-    resources = ["${data.aws_s3_bucket.mwaa_bucket.arn}/*"]
+    resources = ["${module.mwaa_bucket.s3_bucket_arn}/*"]
   }
   statement {
     sid       = "EKSAccess"
     effect    = "Allow"
     actions   = ["eks:DescribeCluster"]
-    resources = [module.eks.cluster_arn]
+    resources = [data.aws_eks_cluster.apc_cluster.arn]
   }
 }
 
@@ -210,7 +210,7 @@ data "aws_iam_policy_document" "gha_mojas_airflow" {
     sid       = "EKSAccess"
     effect    = "Allow"
     actions   = ["eks:DescribeCluster"]
-    resources = [module.eks.cluster_arn]
+    resources = [data.aws_eks_cluster.apc_cluster.arn]
   }
 }
 
