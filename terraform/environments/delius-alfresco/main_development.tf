@@ -14,7 +14,6 @@ module "environment_poc" {
     aws.core-vpc               = aws.core-vpc
     aws.core-network-services  = aws.core-network-services
     aws.modernisation-platform = aws.modernisation-platform
-    aws.delius-core = aws.delius-core
   }
 
   env_name      = "poc"
@@ -27,7 +26,7 @@ module "environment_poc" {
   environment_config      = local.environment_config_poc
   environments_in_account = local.delius_environments_per_account.dev
 
-  ldap_config = local.ldap_config_poc
+  ldap_config                = local.ldap_config_poc
   ldap_formatted_error_codes = local.ldap_formatted_error_codes
 
   delius_microservice_configs = local.delius_microservices_configs_poc

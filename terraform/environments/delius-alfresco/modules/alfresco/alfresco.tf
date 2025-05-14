@@ -92,8 +92,7 @@ module "alfresco_sfs_ecs" {
   }
 
   log_error_pattern       = "%${join("|", var.ldap_formatted_error_codes)}%"
-  # sns_topic_arn           = data.aws_sns_topic.delius_core_alarms.arn
-  sns_topic_arn = "arn:aws:sns:eu-west-2:326912278139:delius-core-poc-alarms-topic"
+  sns_topic_arn           = aws_sns_topic.alfresco_alerting.arn
   enable_platform_backups = false
   frontend_lb_arn_suffix  = aws_lb.alfresco_sfs.arn_suffix
 
@@ -154,10 +153,10 @@ module "alfresco_sfs_ecs" {
       description = "Allow inbound LDAP traffic from CP"
     },
     {
-      port                         = 2049
-      ip_protocol                  = "tcp"
+      port        = 2049
+      ip_protocol = "tcp"
       cidr_ipv4   = var.account_config.shared_vpc_cidr
-      description                  = "EFS ingress"
+      description = "EFS ingress"
     }
   ]
 
@@ -187,10 +186,10 @@ module "alfresco_sfs_ecs" {
       description = "Allow inbound web traffic from CP"
     },
     {
-      port                         = 2049
-      ip_protocol                  = "tcp"
+      port        = 2049
+      ip_protocol = "tcp"
       cidr_ipv4   = var.account_config.shared_vpc_cidr
-      description                  = "EFS ingress"
+      description = "EFS ingress"
     }
   ]
 }

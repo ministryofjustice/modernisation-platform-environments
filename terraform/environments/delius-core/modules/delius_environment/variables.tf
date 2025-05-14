@@ -108,8 +108,3 @@ variable "env_name_to_dms_config_map" {
   description = "Map of delius-core environments to DMS configurations"
   type        = any
 }
- 
-variable "alfresco_account_ids" {
-  description = "Map of Alfresco account IDs"
-  type        = any
-}
