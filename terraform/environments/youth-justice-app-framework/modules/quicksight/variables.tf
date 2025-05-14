@@ -60,6 +60,7 @@ variable "redshift_port" {
 variable "redshift_quicksight_user_secret_arn" {
   type        = string
   description = "The ARN of the secret crated for the Quicksight user in Redshift."
+}
 
 variable "postgres_host" {
   type        = string
