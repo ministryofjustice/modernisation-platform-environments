@@ -164,29 +164,6 @@ module "mlflow_iam_policy" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "gha_mojas_airflow" {
-  statement {
-    sid       = "EKSAccess"
-    effect    = "Allow"
-    actions   = ["eks:DescribeCluster"]
-    resources = [module.eks.cluster_arn]
-  }
-}
-
-module "gha_mojas_airflow_iam_policy" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.55.0"
-
-  name_prefix = "github-actions-mojas-airflow"
-
-  policy = data.aws_iam_policy_document.gha_mojas_airflow.json
-
-  tags = local.tags
-}
-
 #trivy:ignore:AVD-AWS-0345: test policy for development
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
   #checkov:skip=CKV_AWS_110: test policy for development
@@ -426,60 +403,6 @@ module "copy_apdp_cadet_metadata_to_compute_policy" {
   name_prefix = "copy-apdp-cadet-metadata-to-compute-"
 
   policy = data.aws_iam_policy_document.copy_apdp_cadet_metadata_to_compute_policy.json
-
-  tags = local.tags
-}
-
-data "aws_iam_policy_document" "gha_moj_ap_airflow" {
-  statement {
-    sid    = "MWAAKMSAccess"
-    effect = "Allow"
-    actions = [
-      "kms:Encrypt*",
-      "kms:Decrypt*",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:Describe*"
-    ]
-    resources = [data.aws_kms_key.mwaa_kms.arn]
-  }
-  statement {
-    sid    = "MWAABucketAccess"
-    effect = "Allow"
-    actions = [
-      "s3:ListBucket",
-      "s3:GetBucketLocation"
-    ]
-    resources = [data.aws_s3_bucket.mwaa_bucket.arn]
-  }
-  statement {
-    sid    = "MWAAS3WriteAccess"
-    effect = "Allow"
-    actions = [
-      "s3:PutObject",
-      "s3:GetObject",
-      "s3:DeleteObject"
-    ]
-    resources = ["${data.aws_s3_bucket.mwaa_bucket.arn}/*"]
-  }
-  statement {
-    sid       = "EKSAccess"
-    effect    = "Allow"
-    actions   = ["eks:DescribeCluster"]
-    resources = [module.eks.cluster_arn]
-  }
-}
-
-module "gha_moj_ap_airflow_iam_policy" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.55.0"
-
-  name = "github-actions-ministryofjustice-analytical-platform-airflow"
-
-  policy = data.aws_iam_policy_document.gha_moj_ap_airflow.json
 
   tags = local.tags
 }
