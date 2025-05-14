@@ -113,7 +113,7 @@ resource "aws_quicksight_data_set" "personal_data" {
   row_level_permission_data_set {
     arn                = aws_quicksight_data_set.rowleveldata.arn
     permission_policy = "GRANT_ACCESS"
-    format_version     = "VERSIOM_1"
+    format_version     = "VERSION_1"
     namespace          = "default"
     status             = "ENABLED"
   }
