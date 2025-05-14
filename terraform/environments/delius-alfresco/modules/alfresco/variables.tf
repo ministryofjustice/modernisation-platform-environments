@@ -48,15 +48,11 @@ variable "ldap_config" {
   }
 }
 
+variable "ldap_formatted_error_codes" {
+  type = any
+}
+
 variable "delius_microservice_configs" {
-  type = any
-}
-
-variable "db_config" {
-  type = any
-}
-
-variable "dms_config" {
   type = any
 }
 
@@ -68,11 +64,6 @@ variable "platform_vars" {
   type = object({
     environment_management = any
   })
-}
-
-
-variable "bastion_config" {
-  type = any
 }
 
 variable "environments_in_account" {
@@ -102,9 +93,4 @@ variable "db_suffix" {
   description = "identifier to append to name e.g. dsd, boe"
   type        = string
   default     = "db"
-}
-
-variable "env_name_to_dms_config_map" {
-  description = "Map of delius-core environments to DMS configurations"
-  type        = any
 }
