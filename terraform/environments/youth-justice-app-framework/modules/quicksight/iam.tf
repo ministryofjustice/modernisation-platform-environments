@@ -67,6 +67,6 @@ data "aws_iam_role" "secrets" {
 resource "aws_iam_role_policy_attachment" "kms" {
   count = var.quicksight_secrets_role_exists ? 1 : 0
 
-  role       = data.aws_iam_role.secrets.name
+  role       = data.aws_iam_role.secrets[count.index].name
   policy_arn = aws_iam_policy.qs_kms.arn
 }
