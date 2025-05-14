@@ -20,7 +20,7 @@ module "ldap_ecs" {
     "BIND_PASSWORD"         = aws_ssm_parameter.ldap_bind_password.arn,
     "MIGRATION_S3_LOCATION" = aws_ssm_parameter.ldap_seed_uri.arn,
     "RBAC_TAG"              = aws_ssm_parameter.ldap_rbac_version.arn,
-    "EXPORT_USERS_SCRIPT"   = var.data_refresh_user_export
+    "EXPORT_USERS_SCRIPT"   = file("${path.module}/scripts/data_refresh_user_export.sh")
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
@@ -369,8 +369,4 @@ resource "aws_cloudwatch_log_group" "ldap_automation" {
   name              = "/ecs/ldap-automation-${var.env_name}"
   retention_in_days = 7
   tags              = var.tags
-}
-
-variable "data_refresh_user_export" {
-  default = file("${path.module}/scripts/data_refresh_user_export.sh")
 }
