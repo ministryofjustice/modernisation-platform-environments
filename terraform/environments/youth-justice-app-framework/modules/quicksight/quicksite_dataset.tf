@@ -19,7 +19,7 @@ resource "aws_quicksight_data_set" "rowleveldata" {
     physical_table_map_id = "rowleveldata"
     custom_sql {
       data_source_arn = aws_quicksight_data_source.postgresql.arn
-      name = ""
+      name = "RowLevelData"
 
       sql_query = <<EOT
       select distinct "GroupName", CASE WHEN "GroupName" = 'yot_f00' then  '' ELSE ltrim(rtrim(yotoucode)) END AS "yotoucode"
