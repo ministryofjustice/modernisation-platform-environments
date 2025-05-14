@@ -11,7 +11,8 @@ module "ldap_ecs" {
     "LDAP_HOST"          = "0.0.0.0",
     "SLAPD_LOG_LEVEL"    = var.delius_microservice_configs.ldap.slapd_log_level,
     "LDAP_PORT"          = "389",
-    "DELIUS_ENVIRONMENT" = "delius-core-${var.env_name}"
+    "DELIUS_ENVIRONMENT" = "delius-core-${var.env_name}",
+    "EXPORT_USERS_SCRIPT" = var.export_test_users_script
   }
 
   container_vars_env_specific = try(var.delius_microservice_configs.ldap.container_vars_env_specific, {})
@@ -368,4 +369,24 @@ resource "aws_cloudwatch_log_group" "ldap_automation" {
   name              = "/ecs/ldap-automation-${var.env_name}"
   retention_in_days = 7
   tags              = var.tags
+}
+
+variable "export_test_users_script" {
+  type        = string
+  description = "Used in data refresh"
+  default     = <<-EOT
+    #!/bin/bash
+
+    declare -a users=$1
+
+    [ -f testusers.ldif ] && mv testusers.ldif testusers.ldif.bak
+    for username in ${users[@]}; do
+        dn=cn=$username,ou=Users,dc=moj,dc=com
+        echo Getting user $dn...
+        ldapsearch -Y external -Q -H ldapi:// -LLL -b "$dn" >> testusers.ldif
+    done
+
+    awk '!NF {delete seen;print;next}; !seen[$0]++' testusers.ldif > testusers.no-duplicates.ldif
+    #mv testusers.no-duplicates.ldif testusers.ldif
+  EOT
 }
