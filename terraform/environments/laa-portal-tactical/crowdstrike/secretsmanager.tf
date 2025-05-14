@@ -13,3 +13,8 @@ resource "aws_secretsmanager_secret_version" "crowdstrike" {
     client_secret = ""
   })
 }
+
+# Data call needs to be created to pass credentials into provider block
+data "aws_secretsmanager_secret_version" "crowdstrike" {
+  secret_id = aws_secretsmanager_secret.crowdstrike.id
+}
