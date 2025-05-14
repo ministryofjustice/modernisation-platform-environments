@@ -38,6 +38,8 @@ resource "aws_iam_role_policy_attachment" "ecs_task_ses_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
 }
 
+
+
 resource "aws_iam_role" "ecs_task_role" {
   name = "${var.cluster_name}-ecs-task-role"
   assume_role_policy = jsonencode({
@@ -61,9 +63,6 @@ resource "aws_iam_policy" "ecs-secrets-access" {
     secret_arns    = var.ecs_secrets_access_policy_secret_arns
     secret_kms_key = var.secret_kms_key_arn
   })
-  lifecycle {
-    create_before_destroy = true
-  }
   tags = local.all_tags
 }
 
