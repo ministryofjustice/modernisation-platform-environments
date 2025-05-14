@@ -3,12 +3,12 @@ locals {
 }
 
 resource "aws_quicksight_account_subscription" "subscription" {
-  count = var.quicksight_setup ? 0 : 1
+  count = local.quicksight_setup ? 0 : 1
 
-  account_name                     = "${var.project_name}-${var.environment}-moj"
+  account_name                     = "${local.project_name}-${local.environment}-moj"
   edition                          = "ENTERPRISE"
   authentication_method            = "IAM_AND_QUICKSIGHT"
-  notification_email               = var.notification_email
+  notification_email               = "david.seekins@necsws.com" # For testing change later, e.g. use YJAFoperationsAWS@necsws.com
   
 }
 
@@ -16,13 +16,11 @@ resource "aws_quicksight_account_subscription" "subscription" {
 module "quicksight" {
   source = "./modules/quicksight"
 
-  count = var.quicksight_setup ? 1 : 0
+  count = local.quicksight_setup ? 1 : 0
 
   project_name = local.project_name
   environment  = local.environment
   tags         = local.tags
-
-  notification_email = "david.seekins@necsws.com" # For testing change later.
 
   vpc_id              = data.aws_vpc.shared.id
 
