@@ -56,7 +56,7 @@ resource "aws_iam_role" "ecs_task_role" {
 
 resource "aws_iam_policy" "ecs-secrets-access" {
   name        = "${var.cluster_name}-ecs-secrets-access"
-  description = "Allows ECS tasks to access secrets in Secrets Manager"
+  description = "Allows ECS tasks to access secrets in Secrets Manager also allows cw logs access"
   policy = templatefile("${path.module}/ecs_secrets_access.json", {
     secret_arns    = var.ecs_secrets_access_policy_secret_arns
     secret_kms_key = var.secret_kms_key_arn
