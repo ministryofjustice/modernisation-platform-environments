@@ -20,7 +20,7 @@ module "ldap_ecs" {
     "BIND_PASSWORD"         = aws_ssm_parameter.ldap_bind_password.arn,
     "MIGRATION_S3_LOCATION" = aws_ssm_parameter.ldap_seed_uri.arn,
     "RBAC_TAG"              = aws_ssm_parameter.ldap_rbac_version.arn,
-    "EXPORT_USERS_SCRIPT"   = var.export_test_users_script
+    "EXPORT_USERS_SCRIPT"   = var.data_refresh_user_export
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
@@ -371,22 +371,6 @@ resource "aws_cloudwatch_log_group" "ldap_automation" {
   tags              = var.tags
 }
 
-variable "export_test_users_script" {
-  type        = string
-  description = "Used in data refresh"
-  default     = <<-EOT
-    #!/bin/bash
-
-    declare -a users=$1
-
-    [ -f testusers.ldif ] && mv testusers.ldif testusers.ldif.bak
-    for username in ${users[@]}; do
-        dn=cn=$username,ou=Users,dc=moj,dc=com
-        echo Getting user $dn...
-        ldapsearch -Y external -Q -H ldapi:// -LLL -b "$dn" >> testusers.ldif
-    done
-
-    awk '!NF {delete seen;print;next}; !seen[$0]++' testusers.ldif > testusers.no-duplicates.ldif
-    #mv testusers.no-duplicates.ldif testusers.ldif
-  EOT
+variable "data_refresh_user_export" {
+  default = file("${path.module}/scripts/data_refresh_user_export.sh")
 }
