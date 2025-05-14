@@ -22,6 +22,10 @@ resource "aws_quicksight_data_source" "redshift" {
   credentials {
     secret_arn = var.redshift_quicksight_user_secret_arn
   }
+
+  depends_on {
+    aws_iam_role_policy_attachment.kms
+  }
 }
 
 /*
@@ -66,6 +70,11 @@ resource "aws_quicksight_data_source" "postgresql" {
   credentials {
     secret_arn = var.postgres_quicksight_user_secret_arn
   }
+
+  depends_on {
+    aws_iam_role_policy_attachment.kms
+  }
+
 }
 
 /*
