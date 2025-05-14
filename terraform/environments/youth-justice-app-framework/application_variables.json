@@ -23,7 +23,7 @@
         }
       },
       "create_quicksight_subscription": false,
-      "quicksight_secrets_role_exists": true
+      "quicksight_secrets_role_exists": false
     },
     "test": {
       "allow_s3_replication": true,
