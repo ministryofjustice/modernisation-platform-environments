@@ -61,7 +61,6 @@ variable "redshift_quicksight_user_secret_arn" {
   type        = string
   description = "The ARN of the secret crated for the Quicksight user in Redshift."
 
-redshift_quicksight_user_secret_arn
 variable "postgres_host" {
   type        = string
   description = "The Postgres database host name."
