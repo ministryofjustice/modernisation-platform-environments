@@ -15,7 +15,7 @@ resource "aws_lb_listener" "alfresco_sfs_listener_https" {
   load_balancer_arn = aws_lb.alfresco_sfs.id
   port              = 443
   protocol          = "HTTPS"
-  certificate_arn   = aws_acm_certificate.external.arn
+  certificate_arn   = aws_acm_certificate.alf_external.arn
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
 
   default_action {
