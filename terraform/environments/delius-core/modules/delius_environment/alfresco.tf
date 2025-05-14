@@ -1,3 +1,5 @@
+# "moved" resources are necessary as we don't have the permissions to edit the state file
+# All resources in alfresco.tf can be removed once they've been relocated to delius-alfresco for all envs
 moved {
   from = module.alfresco_efs
   to   = module.alfresco_efs[0]
