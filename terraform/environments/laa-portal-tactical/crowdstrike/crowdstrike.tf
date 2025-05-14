@@ -34,6 +34,7 @@ resource "crowdstrike_cloud_aws_account" "this" {
 }
 
 module "fcs_account_primary" {
+  #checkov:skip=CKV_TF_1: Module registry does not support commit hashes
   depends_on                 = [crowdstrike_cloud_aws_account.this]
   source                     = "CrowdStrike/cloud-registration/aws"
   version                    = "0.1.3"
@@ -66,6 +67,7 @@ module "fcs_account_primary" {
 }
 
 module "fcs_account_eu_west_2" {
+  #checkov:skip=CKV_TF_1: Module registry does not support commit hashes
   depends_on = [crowdstrike_cloud_aws_account.this, module.fcs_account_primary]
   providers = {
     aws         = aws
