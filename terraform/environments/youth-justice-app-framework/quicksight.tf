@@ -31,7 +31,7 @@ module "quicksight" {
 
   redshift_host = module.redshift.address
   redshift_port = module.redshift.port
-  redshift_quicksight_user_secret_arn = module.redshift.rds_quicksight_secret_arn
+  redshift_quicksight_user_secret_arn = module.redshift.quicksight_secret_arn
 
   postgres_host                       = module.aurora.rds_cluster_endpoint
   postgres_port                       = module.aurora.rds_cluster_port
