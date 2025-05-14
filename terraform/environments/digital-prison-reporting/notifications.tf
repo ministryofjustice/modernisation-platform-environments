@@ -109,6 +109,41 @@ PATTERN
   depends_on = [module.notifications_sns]
 }
 
+# DMS failure state rule
+module "postgres_tickle_function_failure_rule" {
+  count         = local.enable_cw_alarm && local.enable_postgres_tickle_function_failure_alarm ? 1 : 0
+  source        = "./modules/notifications/eventbridge"
+  sns_topic_arn = module.notifications_sns.sns_topic_arn
+
+  rule_name         = "${local.project}-postgres-tickle-function-failure-rule-${local.environment}"
+  event_target_name = "${local.project}-postgres-tickle-function-failure-rule-target-${local.environment}"
+
+  event_pattern = <<PATTERN
+{
+  "source": [
+    "aws.cloudwatch"
+  ],
+  "detail-type": [
+    "CloudWatch Alarm State Change"
+  ],
+  "resources": [
+    "arn:aws:cloudwatch:${local.account_region}:${local.account_id}:alarm:${local.project}-postgres-tickle-function-failure"
+  ]
+}
+PATTERN
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name = "${local.project}-postgres-tickle-function-failure-rule-${local.environment}",
+      Jira = "DPR2-1966",
+      Dept = "Digital-Prison-Reporting"
+    }
+  )
+
+  depends_on = [module.notifications_sns]
+}
+
 # Pager duty integration
 
 # Notification SNS
