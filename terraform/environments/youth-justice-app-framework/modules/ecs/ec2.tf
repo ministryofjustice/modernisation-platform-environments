@@ -43,6 +43,12 @@ locals {
   ecs_optimized_ami = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)
 }
 
+resource "aws_iam_policy" "ecs-logs-access" {
+  name        = "${var.cluster_name}-ecs-logs-access"
+  description = "Allows ECS tasks to create log groups and set retention policies"
+  policy      = file("${path.module}/ecs_logs_access.json")
+}
+
 resource "aws_iam_policy" "ecs-fetch-secrets-policy" {
   name        = "ecs-fetch-secrets-policy"
   description = "Allows ecs services to fetch secrets from secrets manager"
@@ -86,6 +92,7 @@ module "autoscaling" {
     AmazonSESFullAccess                 = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
     ecs-eni-policy                      = aws_iam_policy.ecs-eni-policy.arn
     ecs-secrets-policy                  = aws_iam_policy.ecs-secrets-policy.arn
+    ecs-logs-access-policy              = aws_iam_policy.ecs-logs-access.arn
   }
   security_groups = [module.autoscaling_sg.security_group_id]
 

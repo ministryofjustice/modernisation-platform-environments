@@ -38,6 +38,8 @@ resource "aws_iam_role_policy_attachment" "ecs_task_ses_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
 }
 
+
+
 resource "aws_iam_role" "ecs_task_role" {
   name = "${var.cluster_name}-ecs-task-role"
   assume_role_policy = jsonencode({
@@ -56,12 +58,14 @@ resource "aws_iam_role" "ecs_task_role" {
 
 resource "aws_iam_policy" "ecs-secrets-access" {
   name        = "${var.cluster_name}-ecs-secrets-access"
-  description = "Allows ECS tasks to access secrets in Secrets Manager"
+  description = "Allows ECS tasks to access secrets in Secrets Manager also allows cw logs access"
   policy = templatefile("${path.module}/ecs_secrets_access.json", {
     secret_arns    = var.ecs_secrets_access_policy_secret_arns
     secret_kms_key = var.secret_kms_key_arn
   })
+  tags = local.all_tags
 }
+
 
 resource "aws_iam_role_policy_attachment" "ecs_task_role_policy" {
   role       = aws_iam_role.ecs_task_role.name
@@ -71,6 +75,11 @@ resource "aws_iam_role_policy_attachment" "ecs_task_role_policy" {
 resource "aws_iam_role_policy_attachment" "ecs_exec_task_role_policy" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.ecs-secrets-access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_exec_logs_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs-logs-access.arn
 }
 
 #for each for any other policies
