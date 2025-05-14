@@ -11,8 +11,7 @@ module "ldap_ecs" {
     "LDAP_HOST"          = "0.0.0.0",
     "SLAPD_LOG_LEVEL"    = var.delius_microservice_configs.ldap.slapd_log_level,
     "LDAP_PORT"          = "389",
-    "DELIUS_ENVIRONMENT" = "delius-core-${var.env_name}",
-    "EXPORT_USERS_SCRIPT" = var.export_test_users_script
+    "DELIUS_ENVIRONMENT" = "delius-core-${var.env_name}"
   }
 
   container_vars_env_specific = try(var.delius_microservice_configs.ldap.container_vars_env_specific, {})
@@ -20,7 +19,8 @@ module "ldap_ecs" {
   container_secrets_default = {
     "BIND_PASSWORD"         = aws_ssm_parameter.ldap_bind_password.arn,
     "MIGRATION_S3_LOCATION" = aws_ssm_parameter.ldap_seed_uri.arn,
-    "RBAC_TAG"              = aws_ssm_parameter.ldap_rbac_version.arn
+    "RBAC_TAG"              = aws_ssm_parameter.ldap_rbac_version.arn,
+    "EXPORT_USERS_SCRIPT"   = var.export_test_users_script
   }
   container_secrets_env_specific = try(var.delius_microservice_configs.ldap.container_secrets_env_specific, {})
 
