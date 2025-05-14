@@ -14,11 +14,6 @@ variable "tags" {
   default     = {}
 }
 
-variable "create_quicksight_subscription" {
-  type        = bool
-  description = "Only create a quicksight subscription if this is set to true."
-}
-
 variable "notification_email" {
   type        = string
   description = "Mail address that you want Amazon QuickSight to send notifications to regarding your Amazon QuickSight account or Amazon QuickSight subscription"
@@ -62,6 +57,11 @@ variable "redshift_port" {
   description = "The Redshift Port."
 }
 
+variable "redshift_quicksight_user_secret_arn" {
+  type        = string
+  description = "The ARN of the secret crated for the Quicksight user in Redshift."
+
+redshift_quicksight_user_secret_arn
 variable "postgres_host" {
   type        = string
   description = "The Postgres database host name."
@@ -74,12 +74,7 @@ variable "postgres_port" {
 
 variable "postgres_quicksight_user_secret_arn" {
   type        = string
-  description = "The ARN of the secret crated for the Quicksight user."
-}
-
-variable "quicksight_secrets_role_exists" {
-  type        = string
-  description = "Set to true after manually enabling Quicksight access to secrets manager."
+  description = "The ARN of the secret created for the Quicksight user in Postgres."
 }
 
 

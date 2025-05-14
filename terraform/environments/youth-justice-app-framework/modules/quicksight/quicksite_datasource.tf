@@ -20,11 +20,7 @@ resource "aws_quicksight_data_source" "redshift" {
   type = "REDSHIFT"
 
   credentials {
-#    secret_arn = "arn:aws:secretsmanager:eu-west-2:711387140977:secret:yjaf/development/returns-microservice/redshift-serverless/-cpSCa8"
-    credential_pair {
-      username = "david_seekins"
-      password = "D%0uK6US6dIM"
-    }
+    secret_arn = var.redshift_quicksight_user_secret_arn
   }
 }
 

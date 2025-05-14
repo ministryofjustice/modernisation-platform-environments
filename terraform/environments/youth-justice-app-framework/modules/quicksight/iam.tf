@@ -59,14 +59,11 @@ resource "aws_iam_policy" "qs_kms" {
 }
 
 data "aws_iam_role" "secrets" {
-  count = var.quicksight_secrets_role_exists ? 1 : 0
-
   name = "aws-quicksight-secretsmanager-role-v0"
 }
 
 resource "aws_iam_role_policy_attachment" "kms" {
-  count = var.quicksight_secrets_role_exists ? 1 : 0
 
-  role       = data.aws_iam_role.secrets[count.index].name
+  role       = data.aws_iam_role.secrets.name
   policy_arn = aws_iam_policy.qs_kms.arn
 }
