@@ -105,22 +105,24 @@ locals {
       ]
 }
 
+/*
+# This commended out as it is not currently working. To be fixed after merging with main.
 resource "aws_quicksight_data_set" "personal_data" {
   data_set_id = "personal_data"
   name        = "Personal Data"
   import_mode = "SPICE"
 
   row_level_permission_data_set {
-    arn                = aws_quicksight_data_set.rowleveldata.arn
+    arn               = aws_quicksight_data_set.rowleveldata.arn
     permission_policy = "GRANT_ACCESS"
-    format_version     = "VERSION_1"
-    namespace          = "default"
-    status             = "ENABLED"
+    format_version    = "VERSION_1"
+    namespace         = "default"
+    status            = "ENABLED"
   }
 
   data_set_usage_configuration {
     disable_use_as_direct_query_source  = false
-    disable_use_as_imported_source = false
+    disable_use_as_imported_source      = false
   }
 
   physical_table_map {
@@ -266,6 +268,7 @@ resource "aws_quicksight_data_set" "personal_data" {
     }
   }
 }  
+*/
 
 /*
    *     "ImportMode": "SPICE",

@@ -71,3 +71,15 @@ variable "postgres_port" {
   type        = string
   description = "The Postgres databases Port."
 }
+
+variable "postgres_quicksight_user_secret_arn" {
+  type        = string
+  description = "The ARN of the secret crated for the Quicksight user."
+}
+
+variable "quicksight_secrets_role_exists" {
+  type        = string
+  description = "Set to true after manually enabling Quicksight access to secrets manager."
+}
+
+

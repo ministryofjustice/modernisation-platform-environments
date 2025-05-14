@@ -22,7 +22,8 @@
           "create_records": true
         }
       },
-      "create_quicksight_subscription": false
+      "create_quicksight_subscription": false,
+      "quicksight_secrets_role_exists": true
     },
     "test": {
       "allow_s3_replication": true,
@@ -46,7 +47,8 @@
           "create_records": false
         }
       },
-      "create_quicksight_subscription": true
+      "create_quicksight_subscription": true,
+      "quicksight_secrets_role_exists": false
     },
     "preproduction": {
       "allow_s3_replication": true,
@@ -70,7 +72,8 @@
           "create_records": true
         }
       },
-      "create_quicksight_subscription": true
+      "create_quicksight_subscription": true,
+      "quicksight_secrets_role_exists": false
     },
     "production": {
       "allow_s3_replication": true,
@@ -98,7 +101,8 @@
           "create_records": true
         }
       },
-      "create_quicksight_subscription": true
+      "create_quicksight_subscription": true,
+      "quicksight_secrets_role_exists": false
     }
   }
 }

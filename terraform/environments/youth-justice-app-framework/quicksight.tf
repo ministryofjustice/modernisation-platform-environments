@@ -8,6 +8,7 @@ module "quicksight" {
   tags         = local.tags
 
   create_quicksight_subscription = local.application_data.accounts[local.environment].create_quicksight_subscription
+  quicksight_secrets_role_exists = local.application_data.accounts[local.environment].quicksight_secrets_role_exists
 
   notification_email = "david.seekins@necsws.com" # For testing change later.
 
@@ -21,8 +22,9 @@ module "quicksight" {
   redshift_host = module.redshift.address
   redshift_port = module.redshift.port
 
-  postgres_host = module.aurora.rds_cluster_endpoint
-  postgres_port = module.aurora.rds_cluster_port
+  postgres_host                       = module.aurora.rds_cluster_endpoint
+  postgres_port                       = module.aurora.rds_cluster_port
+  postgres_quicksight_user_secret_arn = module.aurora.rds_quicksight_secret_arn
 
   depends_on = [module.aurora, module.redshift]
  }
