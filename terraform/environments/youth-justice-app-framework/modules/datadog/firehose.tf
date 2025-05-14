@@ -325,10 +325,10 @@ resource "aws_iam_role_policy_attachment" "attach_kms_secret_access" {
 
 ###### log groups to stream
 
-resource "aws_cloudwatch_log_subscription_filter" "userjourney" {
-  name            = "firehose-subscription"
-  log_group_name  = "yjaf-${var.environment}/user-journey"
-  filter_pattern  = ""
-  destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
-  role_arn        = aws_iam_role.cw_logs_to_firehose.arn
-}
+#resource "aws_cloudwatch_log_subscription_filter" "userjourney" {
+#  name            = "firehose-subscription"
+#  log_group_name  = "yjaf-${var.environment}/user-journey"
+#  filter_pattern  = ""
+#  destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
+#  role_arn        = aws_iam_role.cw_logs_to_firehose.arn
+#}
