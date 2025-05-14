@@ -51,7 +51,7 @@ resource "aws_secretsmanager_secret" "quicksight" {
 }
 
 resource "aws_secretsmanager_secret_version" "quicksight" {
-  secret_id = aws_secretsmanager_secret.returns.id
+  secret_id = aws_secretsmanager_secret.quicksight.id
   secret_string = jsonencode({
     username = "quicksight"
     password = "changeme"
