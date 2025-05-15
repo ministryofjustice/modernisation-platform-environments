@@ -24,13 +24,13 @@ module "yjsm" {
   ami = lookup(
     {
       development   = "ami-007acc01ecffc3c6c"
-      preproduction = "ami-04ee6bb49367c4dd9"
+      preproduction = "ami-03a3abb779b0de835"
       # Add more environments when AMIs are known
     },
     local.environment,
     "ami-01426769db5cd0a43" # Default AMI
   )
-
+  
   project_name = local.project_name
   environment  = local.environment
   tags         = local.tags
