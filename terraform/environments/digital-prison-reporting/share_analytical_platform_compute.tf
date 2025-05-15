@@ -4,17 +4,20 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  dbt_suffix = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
   suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
-  live_feed_dbs = [
-    "curated_prisons_history"
-  ]
-  prod_dbs_to_grant = local.is-production ? ["am_stg",
-    "curated_prison_history_stg"
-  ] : []
-  dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
-  live_feed_dbs_to_grant = [for db in local.live_feed_dbs : "${db}${local.dbt_suffix}"]
-  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.live_feed_dbs_to_grant]))
+prod_dbs_to_grant = local.is-production ? [
+  "curated_prison_history",
+  "staged_prisons_history"
+] : []
+
+preprod_dbs_to_grant = local.is-production ? [
+  for db in local.prod_dbs_to_grant : "${db}_preprod_dbt"
+] : []
+
+dbs_to_grant = toset(flatten([
+  local.prod_dbs_to_grant,
+  local.preprod_dbs_to_grant
+]))
 }
 
 # Source Analytics DBT Secrets
@@ -121,7 +124,7 @@ data "aws_iam_policy_document" "dataapi_cross_assume" {
     }
     condition {
       test     = "StringEquals"
-      values   = ["system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-emds${local.suffix}"]
+      values   = ["system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-dpr${local.suffix}"]
 
 # values   = ["system:serviceaccount:actions-runners:actions-runner-mojas-create-a-derived-table-dpr${local.environment_configuration.analytical_platform_runner_suffix}"]
 

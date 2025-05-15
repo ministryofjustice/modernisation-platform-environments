@@ -1,6 +1,7 @@
 locals {
   tables_to_share_ap = local.is-development || local.is-production ? {} : {
     "derived" : ["visits"],
+    apde_principal_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
   }
 }
 
@@ -34,7 +35,7 @@ resource "aws_lakeformation_permissions" "share_table_with_ap" {
   permissions                   = ["DESCRIBE"]
   permissions_with_grant_option = ["DESCRIBE"]
   table {
-    database_name = "${each.value.database_name}${local.dbt_suffix}"
+    database_name = "${each.value.database_name}"
     name          = each.value.table_name
   }
 }
@@ -58,14 +59,14 @@ resource "aws_lakeformation_permissions" "share_database_with_ap" {
   permissions                   = ["DESCRIBE"]
   permissions_with_grant_option = ["DESCRIBE"]
   database {
-    name = "${each.value.database_name}${local.dbt_suffix}"
+    name = "${each.value.database_name}"
   }
 }
 
 
 resource "aws_lakeformation_permissions" "share_cadt_bucket_apde" {
   count       = local.is-development || local.is-production ? 0 : 1
-  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+ principal = local.apde_principal_arn
   permissions = ["DATA_LOCATION_ACCESS"]
 
   data_location {
@@ -88,7 +89,7 @@ resource "aws_lakeformation_permissions" "share_table_with_apde" {
     ]) : pair.key => pair.value
   }
 
-  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  principal = local.apde_principal_arn
   permissions = ["DESCRIBE"]
   table {
     database_name = "${each.value.database_name}${local.dbt_suffix}"
@@ -111,7 +112,7 @@ resource "aws_lakeformation_permissions" "share_database_with_apde" {
     ]) : pair.key => pair.value
   }
 
-  principal   = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  principal = local.apde_principal_arn
   permissions = ["DESCRIBE"]
   database {
     name = "${each.value.database_name}${local.dbt_suffix}"
