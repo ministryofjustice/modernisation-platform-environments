@@ -322,6 +322,23 @@ locals {
         })
       })
 
+      qa11g-nomis-web12-c = merge(local.ec2_instances.web12, {
+        config = merge(local.ec2_instances.web12.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.web12.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web12.user_data_cloud_init.args, {
+            branch = "TM-1259/nomis/web12c-reporting-fixes"
+          })
+        })
+        tags = merge(local.ec2_instances.web12.tags, {
+          nomis-environment = "qa11g"
+        })
+      })
+
       qa11r-nomis-web-a = merge(local.ec2_instances.web, {
         config = merge(local.ec2_instances.web.config, {
           availability_zone = "eu-west-2a"
