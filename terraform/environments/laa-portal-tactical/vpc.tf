@@ -107,7 +107,7 @@ resource "aws_security_group_rule" "allow_all_vpc" {
 # VPC peering
 resource "aws_ssm_parameter" "mp_shared_vpc_id" {
   #checkov:skip=CKV_AWS_337: Standard key is fine here
-  name = "laa_tactical_portal_peering_id"
+  name = "mp_shared_vpc_id"
   type = "SecureString"
   value = "DEFAULT"
   tags = local.tags
