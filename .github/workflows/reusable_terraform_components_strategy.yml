@@ -95,7 +95,7 @@ jobs:
               module_name=$(dirname "${f#$modules_dir/}" | cut -d'/' -f1)
               if [[ ! " ${changed_modules[@]} " =~ " ${module_name} " ]]; then
                 changed_modules+=("$module_name")
-              end
+              fi
             done
           fi
 
