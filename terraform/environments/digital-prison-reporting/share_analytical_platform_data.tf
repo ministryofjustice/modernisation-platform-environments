@@ -1,6 +1,6 @@
 locals {
   tables_to_share_ap = local.is-development || local.is-production ? {} : {
-    "derived" : ["visits"],
+    "curated_prisons_history" : ["*"],
     apde_principal_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
   }
 }
