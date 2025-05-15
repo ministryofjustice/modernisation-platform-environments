@@ -7,7 +7,6 @@ module "quicksight" {
   tags         = local.tags
   
   notification_email = "david.seekins@necsws.com" # For testing change later.
-invalid = fdd
 
   vpc_id              = data.aws_vpc.shared.id
 
@@ -28,6 +27,8 @@ module "quicksight-artifacts" {
   project_name = local.project_name
   environment  = local.environment
   tags         = local.tags
+
+  vpc_connection_arn = module.quicksight.vpc_connection_arn
 
   redshift_host = module.redshift.address
   redshift_port = module.redshift.port

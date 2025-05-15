@@ -14,7 +14,7 @@ resource "aws_quicksight_data_source" "redshift" {
   }
     
   vpc_connection_properties {
-    vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
+    vpc_connection_arn = var.vpc_connection_arn
   }
 
   type = "REDSHIFT"
@@ -60,7 +60,7 @@ resource "aws_quicksight_data_source" "postgresql" {
   }
     
   vpc_connection_properties {
-    vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
+    vpc_connection_arn = var.vpc_connection_arn
   }
 
   type = "AURORA_POSTGRESQL"

@@ -14,6 +14,11 @@ variable "tags" {
   default     = {}
 }
 
+variable "vpc_connection_arn" {
+  type        = string
+  description = "The arn of the Quicksight VPC Connection."
+}
+
 variable "quicksight_role_name" {
   type        = string
   description = "The name of the role to be assined tot he Quicksight VPN Connection."

@@ -1,4 +1,0 @@
-output "vpc_connection_arn" {
-  description = "The ARN for the Quicksight VPC Connection."
-  value       = aws_quicksight_vpc_connection.local.vpc_connection_arn
-}
