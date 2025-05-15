@@ -1,3 +1,4 @@
+#trivy:ignore:AVD-AWS-0345: required as per documentation
 data "aws_iam_policy_document" "mwaa_execution_policy" {
   statement {
     effect  = "Deny"
