@@ -29,13 +29,23 @@ data "aws_subnets" "apc_public_subnets" {
   }
 }
 
-data "aws_subnets" "apc_private_subnets" {
+data "aws_subnet" "apc_private_subnet_a" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.apc_vpc.id]
   }
   tags = {
-    Name = "${var.networking[0].application}-${local.environment}-private*"
+    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.name}a"
+  }
+}
+
+data "aws_subnet" "apc_private_subnet_b" {
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.apc_vpc.id]
+  }
+  tags = {
+    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.name}b"
   }
 }
 
