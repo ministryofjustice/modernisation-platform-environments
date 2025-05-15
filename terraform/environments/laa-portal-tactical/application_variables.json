@@ -41,23 +41,21 @@
       "landing_zone_vpc_cidr": "10.202.0.0/20",
       "mp_domain_name": "modernisation-platform.service.justice.gov.uk"
     },
-    "test": {
-      "example_var": "test-data",
-      "landing_zone_vpc_cidr": "10.203.0.0/20"
-    },
-    "preproduction": {
-      "example_var": "preproduction-data",
-      "url": "s3://laa-portal-preproduction-archive-mp",
-      "maintenance_window_name": "diagnostics-log-archive-preproduction",
-      "landing_zone_vpc_cidr": "tbc"
-    },
     "production": {
-      "example_var": "production-data",
-      "existing_archive_bucket_name": "",
+      "vpc_cidr": "10.206.0.0/20",
+      "oim_ami_id": "ami-025e80df269cdef6e",
+      "oam_ami_id": "ami-013e6c65f9221ce14",
+      "ohs_ami_id": "ami-066a4fbb6e24ebde1",
+      "idm_ami_id": "ami-0afe3c7368a8bcfb3",
+      "oim_instance_type": "m5.xlarge",
+      "oam_instance_type": "m5.xlarge",
       "ohs_instance_type": "m5.xlarge",
-      "url": "s3://laa-portal-production-archive-mp",
-      "maintenance_window_name": "diagnostics-log-archive-production",
-      "landing_zone_vpc_cidr": "10.205.0.0/20"
+      "idm_instance_type": "m5.xlarge",
+      "igdb_snapshot_name": "portal-igdb-202505092306",
+      "iadb_snapshot_name": "portal-iadb-202505092309",
+      "lb_cert_arn": "",
+      "lb_enable_deletion_protection": "false",
+      "lb_logs_bucket": ""
     }
   }
 }

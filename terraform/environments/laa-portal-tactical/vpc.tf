@@ -101,3 +101,27 @@ resource "aws_security_group_rule" "allow_all_vpc" {
   to_port           = 65535
   type              = "ingress"
 }
+
+# VPC peering
+resource "aws_ssm_parameter" "mp_shared_vpc_id" {
+  #checkov:skip=CKV_AWS_337: Standard key is fine here
+  name = "laa_tactical_portal_peering_id"
+  type = "SecureString"
+  value = "DEFAULT"
+  tags = local.tags
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+}
+
+# resource "aws_vpc_peering_connection" "laa_mp_vpc" {
+#   vpc_id        = module.vpc.vpc_id
+#   peer_vpc_id   = aws_ssm_parameter.mp_shared_vpc_id.value
+#   peer_owner_id = local.environment_management.account_ids[local.provider_name]
+#   tags = merge(
+#     local.tags,
+#     {Side = "Requester"}
+#   )
+# }
