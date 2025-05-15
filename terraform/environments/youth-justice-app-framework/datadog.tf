@@ -8,6 +8,12 @@ locals {
   }
 }
 
+#create a log group for the user journey logs
+resource "aws_cloudwatch_log_group" "userjourney_log_group" {
+  name              = "yjaf-${local.environment}/user-journey"
+  retention_in_days = 400
+  kms_key_id        = module.kms.key_id
+}
 
 module "datadog" {
   source                          = "./modules/datadog"
@@ -17,7 +23,7 @@ module "datadog" {
   kms_key_arn                     = module.kms.key_arn
   kms_key_id                      = module.kms.key_id
   environment                     = local.environment
-  aws_account_id          = data.aws_caller_identity.current.account_id
+  aws_account_id                  = data.aws_caller_identity.current.account_id
 
   #ECS
   enable_datadog_agent_apm   = local.application_data.accounts[local.environment].enable_datadog_agent_apm
