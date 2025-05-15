@@ -24,7 +24,7 @@ module "yjsm" {
   ami = lookup(
     {
       development   = "ami-007acc01ecffc3c6c"
-      preproduction = "ami-03a3abb779b0de835"
+      preproduction = "ami-0d79a6afc87dfa388"
       # Add more environments when AMIs are known
     },
     local.environment,
