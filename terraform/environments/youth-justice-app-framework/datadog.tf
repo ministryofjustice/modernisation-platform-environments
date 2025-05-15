@@ -34,4 +34,6 @@ module "datadog" {
   ecs_task_iam_role_name     = module.ecs.ecs_task_role_name
   ecs_task_iam_role_arn      = module.ecs.ecs_task_role_arn
   ecs_task_exec_iam_role_arn = module.ecs.ecs_task_execution_role_arn
+
+  depends_on = [aws_cloudwatch_log_group.userjourney_log_group]
 }
