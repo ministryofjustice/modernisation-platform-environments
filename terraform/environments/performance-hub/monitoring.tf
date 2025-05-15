@@ -11,15 +11,40 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
   threshold           = "0"
   alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
   treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.ddos_alarm.arn]
+  alarm_actions       = [aws_sns_topic.alerts_topic.arn]
   dimensions = {
     ResourceArn = aws_lb.external.arn
   }
 }
 
-# SNS topic for monitoring to send DDOS alarms to
-resource "aws_sns_topic" "ddos_alarm" {
-  name = "ddos_alarm"
+# SNS topic for monitoring to send alarms to
+resource "aws_sns_topic" "alerts_topic" {
+  name = "alerts_topic"
+}
+
+# load balancer alarm (5xx)
+resource "aws_cloudwatch_metric_alarm" "lb_5xx_errors" {
+  alarm_name         = "${local.application_name}-lb-5xx-error-alarm"
+  alarm_description  = "This alarm will trigger if we receive 4 5XX elb alerts in a 5-minute period."
+  namespace          = "AWS/ApplicationELB"
+  metric_name        = "HTTPCode_ELB_5XX_Count"
+  statistic          = "Sum"
+  period             = 300
+  evaluation_periods = 5
+  threshold          = 1
+  treat_missing_data = "notBreaching"
+  alarm_actions      = [aws_sns_topic.alerts_topic.arn]
+  ok_actions         = [aws_sns_topic.alerts_topic.arn]
+  dimensions = {
+    LoadBalancer = aws_lb.external.name
+  }
+  comparison_operator = "GreaterThanThreshold"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-lb-5xx-error-alarm"
+    },
+  )
 }
 
 ## Pager duty integration
@@ -45,6 +70,6 @@ module "pagerduty_ddos_alarm" {
     aws_sns_topic.ddos_alarm
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.ddos_alarm.name]
+  sns_topics                = [aws_sns_topic.aws_sns_topic.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ddos_cloudwatch"]
 }
