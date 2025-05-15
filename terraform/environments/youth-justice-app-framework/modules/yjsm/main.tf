@@ -36,7 +36,6 @@ resource "aws_instance" "yjsm" {
   monitoring             = true
   ebs_optimized          = true
   iam_instance_profile   = aws_iam_instance_profile.yjsm_ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.yjsm_service.id]
   tags                   = local.all_tags
 
   network_interface {
@@ -75,4 +74,5 @@ resource "aws_network_interface" "main" {
   subnet_id                            = var.subnet_id
   private_ips                          = [var.private_ip]
   private_ips_count                    = 2
+  vpc_security_group_ids               = [aws_security_group.yjsm_service.id]
 }
