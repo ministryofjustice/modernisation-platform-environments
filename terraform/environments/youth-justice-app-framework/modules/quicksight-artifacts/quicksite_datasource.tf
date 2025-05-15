@@ -44,7 +44,7 @@ resource "aws_quicksight_data_source" "redshift" {
 */
 
 resource "aws_quicksight_data_source" "postgresql" {
-  data_source_id = "prosgresql"
+  data_source_id = "postgresql"
   name           = "YJB_CASE_REPORTING_PROD"
 
   parameters {

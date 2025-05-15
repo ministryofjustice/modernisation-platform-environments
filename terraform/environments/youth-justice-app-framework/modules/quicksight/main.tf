@@ -1,3 +1,13 @@
+resource "aws_quicksight_account_subscription" "subscription" {
+  count var.environment == "development" ? 0 : 1 # subscription was created manually in develiopment
+
+  account_name                     = "${var.project_name}-${var.environment}-moj"
+  edition                          = "ENTERPRISE"
+  authentication_method            = "IAM_AND_QUICKSIGHT"
+  notification_email               = var.notification_email
+  
+}
+
 resource "aws_quicksight_vpc_connection" "local" {
   name               = "${var.project_name}-${var.environment}"
   vpc_connection_id  = "${var.project_name}-${var.environment}-4"
