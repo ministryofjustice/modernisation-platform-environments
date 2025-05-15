@@ -79,6 +79,51 @@ jobs:
           echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
 
           # --------------------------------------------------------------------
+          # 3.1. Detect changes in the "modules" folder.
+          # --------------------------------------------------------------------
+          modules_dir="terraform/environments/${{ inputs.application }}/modules"
+          changed_modules=()
+          if [ -d "$modules_dir" ]; then
+            if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+              merge_base=$(git merge-base origin/main "$head_commit")
+              changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$modules_dir")
+            else
+              changed_files=$(git diff --name-only HEAD~1 HEAD -- "$modules_dir")
+            fi
+
+            for f in $changed_files; do
+              module_name=$(dirname "${f#$modules_dir/}" | cut -d'/' -f1)
+              if [[ ! " ${changed_modules[@]} " =~ " ${module_name} " ]]; then
+                changed_modules+=("$module_name")
+              end
+            done
+          fi
+
+          echo "Changed modules: ${changed_modules[@]}"
+
+          # --------------------------------------------------------------------
+          # 3.2. Identify components referencing the changed modules.
+          # --------------------------------------------------------------------
+          referencing_components=()
+          for module in "${changed_modules[@]}"; do
+            for comp in $COMPONENTS; do
+              folder="$app_dir/$comp"
+              if grep -q "source.*=.*\"../modules/$module\"" "$folder"/*.tf 2>/dev/null; then
+                if [[ ! " ${referencing_components[@]} " =~ " ${comp} " ]]; then
+                  referencing_components+=("$comp")
+                fi
+              fi
+            done
+          done
+
+          echo "Components referencing changed modules: ${referencing_components[@]}"
+
+          # Merge referencing components into the COMPONENTS list.
+          COMPONENTS=$(echo "$COMPONENTS ${referencing_components[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+
+          echo "Final components list: $COMPONENTS"
+
+          # --------------------------------------------------------------------
           # 4. Build the final matrix by checking each component independently.
           # --------------------------------------------------------------------
           echo "[" > final-list.json
