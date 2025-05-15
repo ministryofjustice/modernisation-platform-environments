@@ -14,6 +14,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "notification_email" {
+  type        = string
+  description = "Mail address that you want Amazon QuickSight to send notifications to regarding your Amazon QuickSight account or Amazon QuickSight subscription"
+  default     = "YJAFoperationsAWS@necsws.com"
+}
+
 variable "vpc_id" {
   type        = string
   description = "VPC ID."
