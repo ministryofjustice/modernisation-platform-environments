@@ -1,5 +1,5 @@
 resource "aws_quicksight_account_subscription" "subscription" {
-  count var.environment == "development" ? 0 : 1 # subscription was created manually in develiopment
+  count = var.environment == "development" ? 0 : 1 # subscription was created manually in develiopment
 
   account_name                     = "${var.project_name}-${var.environment}-moj"
   edition                          = "ENTERPRISE"
