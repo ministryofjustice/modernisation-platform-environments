@@ -7,6 +7,8 @@ module "powerbi_gateway_ec2" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
+  count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
+
   source  = "terraform-aws-modules/ec2-instance/aws"
   version = "5.8.0"
 
