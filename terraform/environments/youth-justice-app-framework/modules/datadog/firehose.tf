@@ -325,6 +325,9 @@ resource "aws_iam_role_policy_attachment" "attach_kms_secret_access" {
 
 ###### log groups to stream
 
+
+
+
 resource "aws_cloudwatch_log_subscription_filter" "userjourney" {
   count           = contains(["preproduction", "production"], var.environment) ? 1 : 0
   name            = "firehose-subscription"
