@@ -7,6 +7,7 @@ module "quicksight" {
   tags         = local.tags
   
   notification_email = "david.seekins@necsws.com" # For testing change later.
+invalid = fdd
 
   vpc_id              = data.aws_vpc.shared.id
 
