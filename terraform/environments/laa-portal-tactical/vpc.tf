@@ -10,6 +10,8 @@ module "vpc" {
   public_subnets = local.public_subnets
   database_subnets = local.database_subnets
 
+  # enable_nat_gateway = true # Disable for now
+
   # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
   enable_flow_log                      = true
   create_flow_log_cloudwatch_log_group = true
