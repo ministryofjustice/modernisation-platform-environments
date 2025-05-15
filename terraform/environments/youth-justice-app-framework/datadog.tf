@@ -12,7 +12,8 @@ locals {
 resource "aws_cloudwatch_log_group" "userjourney_log_group" {
   name              = "yjaf-${local.environment}/user-journey"
   retention_in_days = 400
-  kms_key_id        = module.kms.key_id
+  kms_key_id        = module.kms.key_arn
+  tags              = local.tags
 }
 
 module "datadog" {
