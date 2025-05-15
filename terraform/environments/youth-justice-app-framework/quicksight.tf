@@ -5,6 +5,8 @@ module "quicksight" {
   project_name = local.project_name
   environment  = local.environment
   tags         = local.tags
+  
+  notification_email = "david.seekins@necsws.com" # For testing change later.
 
   vpc_id              = data.aws_vpc.shared.id
 
@@ -20,7 +22,7 @@ module "quicksight" {
 module "quicksight-artifacts" {
   source = "./modules/quicksight-artifacts"
 
-  count = local.quicksight_setup ? 1 : 0
+  count = local.application_data.accounts[local.environment].quicksight_setup ? 1 : 0
 
   project_name = local.project_name
   environment  = local.environment
