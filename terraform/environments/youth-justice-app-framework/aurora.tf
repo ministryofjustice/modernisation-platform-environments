@@ -10,7 +10,7 @@ module "aurora" {
 
   name                       = "yjafrds01-cluster"
   azs                        = ["eu-west-2a", "eu-west-2b"]
-  db_cluster_instance_class  = "db.t4g.medium"
+  db_cluster_instance_class  = local.application_data.accounts[local.environment].database_instance_class
   database_subnet_group_name = "yjaf-db-subnet-group"
   alb_route53_record_name    = "db-yjafrds01"
 
