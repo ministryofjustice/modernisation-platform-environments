@@ -143,9 +143,9 @@ jobs:
                   # For "root", count changes to any files directly in the app folder.
                   if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
                     merge_base=$(git merge-base origin/main "$head_commit")
-                    changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder"/*)
+                    changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
                   else
-                    changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder"/*)
+                    changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
                   fi
 
                   if [ -n "$changed_files" ]; then
