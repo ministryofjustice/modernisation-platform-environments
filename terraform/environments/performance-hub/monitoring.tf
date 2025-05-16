@@ -1,5 +1,14 @@
-# DDoS Alarm
+# SNS topic for monitoring to send alarms to
+resource "aws_sns_topic" "alerts_topic" {
+  name = "alerts_topic"
+}
 
+resource "aws_sns_topic" "ddos_topic" {
+  name = "ddos_topic"
+}
+
+
+# DDoS Alarm
 resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
   alarm_name          = "DDoSDetected"
   comparison_operator = "GreaterThanThreshold"
@@ -11,15 +20,10 @@ resource "aws_cloudwatch_metric_alarm" "ddos_attack_external" {
   threshold           = "0"
   alarm_description   = "Triggers when AWS Shield Advanced detects a DDoS attack"
   treat_missing_data  = "notBreaching"
-  alarm_actions       = [aws_sns_topic.alerts_topic.arn]
+  alarm_actions       = [aws_sns_topic.ddos_topic.arn]
   dimensions = {
     ResourceArn = aws_lb.external.arn
   }
-}
-
-# SNS topic for monitoring to send alarms to
-resource "aws_sns_topic" "alerts_topic" {
-  name = "alerts_topic"
 }
 
 # load balancer alarm (5xx)
@@ -65,13 +69,23 @@ locals {
   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
 }
 
-# link the sns topic to the service
+# link the SNS topics to the PagerDuty service
+# https://github.com/ministryofjustice/modernisation-platform/blob/main/terraform/pagerduty/member-services-integrations.tf
+# https://github.com/ministryofjustice/modernisation-platform/blob/main/terraform/pagerduty/aws.tf#L17
 module "pagerduty_alerts" {
   depends_on = [
     aws_sns_topic.alerts_topic
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
   sns_topics                = [aws_sns_topic.alerts_topic.name]
-  #TODO: update key ID once pagerduty PR is merged in MP:
+  pagerduty_integration_key = local.pagerduty_integration_keys["performance_hub_prod_alarms"]
+}
+
+module "pagerduty_alerts" {
+  depends_on = [
+    aws_sns_topic.ddos_topic
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.ddos_topic.name]
   pagerduty_integration_key = local.pagerduty_integration_keys["ddos_cloudwatch"]
 }
