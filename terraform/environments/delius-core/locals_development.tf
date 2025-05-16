@@ -144,9 +144,10 @@ locals {
       write_database = local.db_config_dev.database_name
     }
     is-production = false
+    # Times must be specified in UTC
     disable_latency_alarms = {
-      start_time      = "14:00"
-      end_time        = "07:00"
+      start_time      = "13:00"
+      end_time        = "06:00"
       disable_weekend = true
     }
   }
