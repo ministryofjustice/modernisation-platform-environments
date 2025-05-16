@@ -329,7 +329,7 @@ resource "aws_iam_role_policy_attachment" "attach_kms_secret_access" {
 
 
 resource "aws_cloudwatch_log_subscription_filter" "userjourney" {
-  count           = contains(["preproduction", "production"], var.environment) ? 1 : 0
+  count           = contains(["test", "preproduction", "production"], var.environment) ? 1 : 0
   name            = "firehose-subscription"
   log_group_name  = "yjaf-${var.environment}/user-journey"
   filter_pattern  = ""
