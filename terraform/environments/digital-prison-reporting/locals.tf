@@ -243,13 +243,13 @@ locals {
 
   # Multiphase Query Manager Lambda
   lambda_multiphase_query_enabled         = local.application_data.accounts[local.environment].enable_multiphase_query_lambda
-  lambda_multiphase_query_name            = "${local.project}-multiphase-query-manager"
+  lambda_multiphase_query_name            = "${local.project}-multiphase-query"
   lambda_multiphase_query_runtime         = "java21"
   lambda_multiphase_query_tracing         = "Active"
   lambda_multiphase_query_handler         = "uk.gov.justice.digital.hmpps.multiphasequery.ManageAthenaAsyncQueries::handleRequest"
   lambda_multiphase_query_code_s3_bucket  = module.s3_artifacts_store.bucket_id
   lambda_multiphase_query_jar_version     = local.application_data.accounts[local.environment].multiphase_query_lambda_version
-  lambda_multiphase_query_code_s3_key     = "build-artifacts/hmpps-dpr-multiphase-query-manager-lambda/jars/hmpps-dpr-multiphase-query-manager-lambda-${local.lambda_multiphase_query_jar_version}-all.jar"
+  lambda_multiphase_query_code_s3_key     = "build-artifacts/hmpps-dpr-multiphase-query-lambda/jars/hmpps-dpr-multiphase-query-manager-lambda-${local.lambda_multiphase_query_jar_version}-all.jar"
   lambda_multiphase_query_policies        = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
