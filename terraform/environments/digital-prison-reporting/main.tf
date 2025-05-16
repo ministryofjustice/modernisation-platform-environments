@@ -1100,7 +1100,7 @@ module "generate_test_postgres_data" {
   )
 
   arguments = {
-    "--extra-jars"                             = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--extra-jars"                             = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-v1.0.113-dev.1+DPR2-1884.a01c91ce-all.jar"
     "--extra-files"                            = local.shared_log4j_properties_path
     "--class"                                  = "uk.gov.justice.digital.job.generator.PostgresLoadGeneratorJob"
     "--dpr.aws.region"                         = local.account_region
