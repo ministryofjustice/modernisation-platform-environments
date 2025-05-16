@@ -118,8 +118,11 @@ jobs:
 
           echo "Components referencing changed modules: ${referencing_components[@]}"
 
-          # Merge referencing components into the COMPONENTS list.
-          COMPONENTS=$(echo "$COMPONENTS ${referencing_components[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+          # Merge referencing components into the COMPONENTS list, excluding "root" unless explicitly required.
+          COMPONENTS=$(echo "$COMPONENTS ${referencing_components[@]}" | tr ' ' '\n' | grep -v '^root$' | sort -u | tr '\n' ' ')
+          if [[ " ${referencing_components[@]} " =~ " root " ]]; then
+            COMPONENTS="root $COMPONENTS"
+          fi
 
           echo "Final components list: $COMPONENTS"
 
@@ -131,48 +134,53 @@ jobs:
 
           while IFS= read -r envobj; do
             for comp in $COMPONENTS; do
-              if [ "$comp" = "root" ]; then
-                folder="$app_dir"
-                # For "root", only count changes to files directly in the app folder.
-                if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
-                  merge_base=$(git merge-base origin/main "$head_commit")
-                  changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
-                else
-                  changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
-                fi
-                top_level_changed=false
-                prefix="$folder/"
-                for f in $changed_files; do
-                  # Remove the folder prefix.
-                  rel="${f#$prefix}"
-                  # If the relative path has no "/" and is not empty, it's a top-level change.
-                  if [[ "$rel" != */* ]] && [ -n "$rel" ]; then
-                    top_level_changed=true
-                    break
-                  fi
-                done
-                if ! $top_level_changed; then
-                  echo "No top-level changes in '$folder'; skipping 'root'"
-                  continue
-                fi
+              # Skip change detection for components referencing changed modules.
+              if [[ " ${referencing_components[@]} " =~ " ${comp} " ]]; then
+                echo "Including '${comp}' because it references a changed module."
               else
-                # For non-root components, use the standard diff check.
-                folder="$app_dir/$comp"
-                if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
-                  merge_base=$(git merge-base origin/main "$head_commit")
-                  if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
-                    echo "No changes in '$folder' (branch compared to merge base); skipping '$comp'"
+                if [ "$comp" = "root" ]; then
+                  folder="$app_dir"
+                  # For "root", only count changes to files directly in the app folder.
+                  if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+                    merge_base=$(git merge-base origin/main "$head_commit")
+                    changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
+                  else
+                    changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
+                  fi
+                  top_level_changed=false
+                  prefix="$folder/"
+                  for f in $changed_files; do
+                    # Remove the folder prefix.
+                    rel="${f#$prefix}"
+                    # If the relative path has no "/" and is not empty, it's a top-level change.
+                    if [[ "$rel" != */* ]] && [ -n "$rel" ]; then
+                      top_level_changed=true
+                      break
+                    fi
+                  done
+                  if ! $top_level_changed; then
+                    echo "No top-level changes in '$folder'; skipping 'root'"
                     continue
                   fi
                 else
-                  if git diff --quiet HEAD~1 HEAD -- "$folder"; then
-                    echo "No changes in '$folder' (main branch); skipping '$comp'"
-                    continue
+                  # For non-root components, use the standard diff check.
+                  folder="$app_dir/$comp"
+                  if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+                    merge_base=$(git merge-base origin/main "$head_commit")
+                    if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
+                      echo "No changes in '$folder' (branch compared to merge base); skipping '$comp'"
+                      continue
+                    fi
+                  else
+                    if git diff --quiet HEAD~1 HEAD -- "$folder"; then
+                      echo "No changes in '$folder' (main branch); skipping '$comp'"
+                      continue
+                    fi
                   fi
                 fi
               fi
 
-              # Add an entry for this component if changes are detected.
+              # Add an entry for this component if changes are detected or it references a changed module.
               if [ "$firstEntry" = true ]; then
                 firstEntry=false
               else
