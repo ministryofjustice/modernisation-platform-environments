@@ -145,6 +145,13 @@
             "threshold": 100,
             "period": 60
           }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
         }
       },
       "biprws": {
@@ -303,6 +310,13 @@
           "cdc_inc_events_check": {
             "enable": true,
             "threshold": 100,
+            "period": 60
+          }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
             "period": 60
           }
         }
@@ -465,6 +479,13 @@
           "cdc_inc_events_check": {
             "enable": true,
             "threshold": 100,
+            "period": 60
+          }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
             "period": 60
           }
         }
@@ -640,6 +661,13 @@
           "cdc_inc_events_check": {
             "enable": true,
             "threshold": 100,
+            "period": 60
+          }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
             "period": 60
           }
         }
