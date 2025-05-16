@@ -136,5 +136,11 @@ locals {
     }
     user_target_endpoint = {}
     is-production        = false
+    # Times must be specified in UTC
+    disable_latency_alarms = {
+      start_time      = "19:59"
+      end_time        = "06:00"
+      disable_weekend = true
+    }
   }
 }

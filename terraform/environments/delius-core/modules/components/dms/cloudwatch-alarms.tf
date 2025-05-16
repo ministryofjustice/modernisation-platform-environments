@@ -165,6 +165,37 @@ module "pagerduty_core_alerts" {
   pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
 }
 
+# We do not want to receive Pager Duty Notifications for the development->test replication out of hours.   This is because
+# the development environment is shutdown each evening and at weekends.  Immediately after a shutdown occurs, the
+# the CDC latency can spike, triggering the alarm.   
+# It is not practical to block these alarms in PagerDuty since it does not support recurring maintenance windows.
+# Therefore we want to stop the alarm being raised in the first place.   We can do this by disabling the alarm actions out
+# of hours.   Cloud Watch alarms do not have this functionality natively so we use a scheduled Lambda function to implement it.
+locals {
+    disable_latency_alarm_defaults = { 
+       start_time      = null
+       end_time        = null
+       disable_weekend = false
+    }
+   # Create normalized version of map which includes above defaults if not specified for the environment
+   disable_latency_alarms = merge(local.disable_latency_alarm_defaults,lookup(var.dms_config,"disable_latency_alarms",{}))
+}
+
+module "disable_out_of_hours_alarms" {
+   count  = local.disable_latency_alarms.start_time == null ? 0 : 1
+   source = "../../../../../modules/schedule_alarms_lambda"
+
+   lambda_function_name = "toggle-dms-cdc-latency-alarms"
+
+   start_time      = local.disable_latency_alarms.start_time
+   end_time        = local.disable_latency_alarms.end_time
+   disable_weekend = local.disable_latency_alarms.disable_weekend
+
+   alarm_patterns  = ["dms-cdc-latency-*"]
+
+   tags = var.tags
+}
+
 
 # Raising a Cloudwatch Alarm on a DMS Replication Task Event is not directly possible using the 
 # Cloudwatch Alarm Integration in PagerDuty as the JSON payload is different.   Therefore, as
