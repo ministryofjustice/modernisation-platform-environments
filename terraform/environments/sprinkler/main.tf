@@ -825,6 +825,7 @@ resource "aws_cloudwatch_log_group" "app" {
     local.tags,
     {
       Name = var.networking[0].application
+      Test = "test"
     },
   )
 }
