@@ -79,7 +79,59 @@ jobs:
           echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
 
           # --------------------------------------------------------------------
-          # 3.1. Detect changes in the "modules" folder.
+          # 4. Build the final matrix by checking each component independently.
+          # --------------------------------------------------------------------
+          echo "[" > final-list.json
+          firstEntry=true
+
+          while IFS= read -r envobj; do
+            for comp in $COMPONENTS; do
+              if [ "$comp" = "root" ]; then
+                folder="$app_dir"
+                # For "root", count changes to any files directly in the app folder.
+                if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+                  merge_base=$(git merge-base origin/main "$head_commit")
+                  changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
+                else
+                  changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
+                fi
+
+                if [ -n "$changed_files" ]; then
+                  echo "Changes detected in 'root'; including 'root' in the matrix."
+                else
+                  echo "No changes detected in 'root'; skipping 'root'."
+                  continue
+                fi
+              else
+                # For non-root components, use the standard diff check.
+                folder="$app_dir/$comp"
+                if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+                  merge_base=$(git merge-base origin/main "$head_commit")
+                  if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
+                    echo "No changes in '$folder' (branch compared to merge base); skipping '$comp'"
+                    continue
+                  fi
+                else
+                  if git diff --quiet HEAD~1 HEAD -- "$folder"; then
+                    echo "No changes in '$folder' (main branch); skipping '$comp'"
+                    continue
+                  fi
+                fi
+              fi
+
+              # Add an entry for this component if changes are detected.
+              if [ "$firstEntry" = true ]; then
+                firstEntry=false
+              else
+                echo "," >> final-list.json
+              fi
+              echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
+            done
+          done < envlist.json
+          echo "]" >> final-list.json
+
+          # --------------------------------------------------------------------
+          # 5. Detect changes in the "modules" folder and update the matrix.
           # --------------------------------------------------------------------
           modules_dir="terraform/environments/${{ inputs.application }}/modules"
           changed_modules=()
@@ -101,9 +153,7 @@ jobs:
 
           echo "Changed modules: ${changed_modules[@]}"
 
-          # --------------------------------------------------------------------
-          # 3.2. Identify components referencing the changed modules.
-          # --------------------------------------------------------------------
+          # Identify components referencing the changed modules.
           referencing_components=()
           for module in "${changed_modules[@]}"; do
             for comp in $COMPONENTS; do
@@ -118,73 +168,13 @@ jobs:
 
           echo "Components referencing changed modules: ${referencing_components[@]}"
 
-          # Merge referencing components into the COMPONENTS list, excluding "root" unless explicitly required.
-          COMPONENTS=$(echo "$COMPONENTS ${referencing_components[@]}" | tr ' ' '\n' | grep -v '^root$' | sort -u | tr '\n' ' ')
-          if [[ " ${referencing_components[@]} " =~ " root " ]]; then
-            COMPONENTS="root $COMPONENTS"
-          fi
+          # Merge referencing components into the COMPONENTS list.
+          COMPONENTS=$(echo "$COMPONENTS ${referencing_components[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
 
-          echo "Final components list: $COMPONENTS"
+          echo "Final components list after module checks: $COMPONENTS"
 
           # --------------------------------------------------------------------
-          # 4. Build the final matrix by checking each component independently.
-          # --------------------------------------------------------------------
-          echo "[" > final-list.json
-          firstEntry=true
-
-          while IFS= read -r envobj; do
-            for comp in $COMPONENTS; do
-              # Skip change detection for components referencing changed modules.
-              if [[ " ${referencing_components[@]} " =~ " ${comp} " ]]; then
-                echo "Including '${comp}' because it references a changed module."
-              else
-                if [ "$comp" = "root" ]; then
-                  folder="$app_dir"
-                  # For "root", count changes to any files directly in the app folder.
-                  if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
-                    merge_base=$(git merge-base origin/main "$head_commit")
-                    changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
-                  else
-                    changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
-                  fi
-
-                  if [ -n "$changed_files" ]; then
-                    echo "Changes detected in 'root'; including 'root' in the matrix."
-                  else
-                    echo "No changes detected in 'root'; skipping 'root'."
-                    continue
-                  fi
-                else
-                  # For non-root components, use the standard diff check.
-                  folder="$app_dir/$comp"
-                  if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
-                    merge_base=$(git merge-base origin/main "$head_commit")
-                    if git diff --quiet "$merge_base" "$head_commit" -- "$folder"; then
-                      echo "No changes in '$folder' (branch compared to merge base); skipping '$comp'"
-                      continue
-                    fi
-                  else
-                    if git diff --quiet HEAD~1 HEAD -- "$folder"; then
-                      echo "No changes in '$folder' (main branch); skipping '$comp'"
-                      continue
-                    fi
-                  fi
-                fi
-              fi
-
-              # Add an entry for this component if changes are detected or it references a changed module.
-              if [ "$firstEntry" = true ]; then
-                firstEntry=false
-              else
-                echo "," >> final-list.json
-              fi
-              echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
-            done
-          done < envlist.json
-          echo "]" >> final-list.json
-
-          # --------------------------------------------------------------------
-          # 5. Wrap the JSON array in a matrix object.
+          # 6. Wrap the JSON array in a matrix object.
           # --------------------------------------------------------------------
           echo -n '{"include":' > matrix.out
           cat final-list.json >> matrix.out
@@ -195,7 +185,7 @@ jobs:
           echo "$matrix"
 
           # --------------------------------------------------------------------
-          # 6. Output the matrix for subsequent jobs.
+          # 7. Output the matrix for subsequent jobs.
           # --------------------------------------------------------------------
           echo 'matrix<<EOF' >> $GITHUB_OUTPUT
           echo "${matrix}" >> $GITHUB_OUTPUT
