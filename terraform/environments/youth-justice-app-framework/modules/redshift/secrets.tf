@@ -45,7 +45,7 @@ resource "aws_secretsmanager_secret_version" "returns" {
 resource "aws_secretsmanager_secret" "quicksight" {
   #checkov:skip=CKV2_AWS_57: [TODO] Consider adding rotation for the Redshift admin user password.
 
-  name        = "${var.project_name}/${var.environment}/quicksight/redshift-serverless/"
+  name        = "${var.project_name}/${var.environment}/quicksight/redshift-serverless/2"
   description = "Access to Redshift Serverless for Quicksite data sources"
   kms_key_id  = var.kms_key_arn
 }
