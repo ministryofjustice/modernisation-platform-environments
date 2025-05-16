@@ -150,7 +150,11 @@ jobs:
             done
           fi
 
-          echo "Changed modules: ${changed_modules[@]}"
+          if [ ${#changed_modules[@]} -eq 0 ]; then
+            echo "No changes detected in modules."
+          else
+            echo "Changed modules: ${changed_modules[@]}"
+          fi
 
           # Identify components referencing the changed modules.
           referencing_components=()
@@ -165,7 +169,11 @@ jobs:
             done
           done
 
-          echo "Components referencing changed modules: ${referencing_components[@]}"
+          if [ ${#referencing_components[@]} -eq 0 ]; then
+            echo "No components referencing changed modules."
+          else
+            echo "Components referencing changed modules: ${referencing_components[@]}"
+          fi
 
           # Append referencing components to the matrix.
           while IFS= read -r envobj; do
