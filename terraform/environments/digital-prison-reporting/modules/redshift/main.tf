@@ -318,6 +318,7 @@ resource "aws_security_group" "redshift" {
     var.tags,
     {
       Name = "${var.name}-sg"
+      Jira = "DPR-108"
     },
   )
 }

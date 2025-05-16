@@ -14,15 +14,15 @@ module "ecs_service_datadog_agent" {
   health_check_grace_period_seconds  = 60
   scheduling_strategy                = "DAEMON" # Run one task per EC2 instance
 
+
+  cpu                            = 128
+  memory                         = 512
   ignore_task_definition_changes = true
   create_security_group          = false
   create_tasks_iam_role          = false
   create_task_exec_iam_role      = false
 
-  subnet_ids             = var.ecs_subnet_ids
-  security_group_ids     = [var.ecs_security_group_id]
-  tasks_iam_role_name    = var.ecs_task_iam_role_name
-  tasks_iam_role_arn     = var.ecs_task_iam_role_arn
+  network_mode           = "bridge"
   task_exec_iam_role_arn = var.ecs_task_exec_iam_role_arn
   tags                   = var.tags
 
@@ -36,11 +36,11 @@ module "ecs_service_datadog_agent" {
       essential = true
 
       readonly_root_filesystem = false
-
+      privileged               = true
       secrets = [
         {
           name      = "DD_API_KEY"
-          valueFrom = aws_secretsmanager_secret_version.datadog_api.arn
+          valueFrom = aws_secretsmanager_secret_version.plain_datadog_api.arn
         }
       ]
       port_mappings = [
@@ -60,7 +60,7 @@ module "ecs_service_datadog_agent" {
 
       environment = [
         {
-          name  = "ECS_FARGATE"
+          name  = "DD_ECS_FARGATE"
           value = "false"
         },
         {
@@ -72,8 +72,36 @@ module "ecs_service_datadog_agent" {
           "value" : var.enable_datadog_agent_apm ? "true" : "false"
         },
         {
-          "name" : "DD_SYSTEM_PROBE_ENABLED",
+          "name" : "DD_LOGS_ENABLED",
           "value" : "true"
+        },
+        {
+          "name" : "DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL",
+          "value" : "true"
+        },
+        {
+          "name" : "DD_DOGSTATSD_PORT",
+          "value" : "8125"
+        },
+        {
+          "name" : "DD_DOGSTATSD_NON_LOCAL_TRAFFIC",
+          "value" : "true"
+        },
+        {
+          "name" : "DD_JMX_ENABLED",
+          "value" : "true"
+        },
+        {
+          "name" : "DD_JMXFETCH_CONTAINER_COLLECT_ALL",
+          "value" : "true"
+        },
+        {
+          "name" : "DD_JMXFETCH_PORT",
+          "value" : "5555"
+        },
+        {
+          "name" : "DD_SYSTEM_PROBE_ENABLED",
+          "value" : "false"
         },
         {
           "name" : "DD_TAGS",

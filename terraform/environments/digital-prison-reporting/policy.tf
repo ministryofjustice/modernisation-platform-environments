@@ -298,6 +298,7 @@ resource "aws_iam_role" "redshift-role" {
     {
       name    = "redshift-service-role"
       project = "dpr"
+      Jira    = "DPR2-XXXX"
     }
   )
 }
@@ -312,7 +313,7 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
 
   statement {
     actions = [
-      "glue:*"
+      "glue:*",
     ]
     resources = [
       "*"
@@ -391,6 +392,7 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
     {
       name    = "dms-service-cw-role"
       project = "dpr"
+      Jira    = "DPR2-XXXX"
     }
   )
 }
@@ -409,6 +411,7 @@ resource "aws_iam_role" "dmsvpcrole" {
     {
       name    = "dms-service-vpc-role"
       project = "dpr"
+      Jira    = "DPR2-XXXX"
     }
   )
 }
@@ -467,6 +470,7 @@ resource "aws_iam_role" "redshift-spectrum-role" {
     {
       name    = "redshift-spectrum-role"
       project = "dpr"
+      Jira    = "DPR2-XXXX"
     }
   )
 }
@@ -704,7 +708,12 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
   statement {
     effect = "Allow"
     actions = [
-      "glue:Get*",
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetTableVersions",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetPartition",
       "glue:List*",
       "glue:DeleteTable",
       "glue:DeleteSchema",

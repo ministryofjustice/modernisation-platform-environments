@@ -851,50 +851,6 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expi
   policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_prod[0].arn
 }
 
-###################
-# SNS IAM Policies
-###################
-
-## Production
-
-
-data "aws_iam_policy_document" "sns_topic_policy_ec2cw" {
-  count     = local.is-production == true ? 1 : 0
-  policy_id = "SnsTopicId"
-  statement {
-    sid = "statement1"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"]
-    }
-    effect = "Allow"
-    actions = [
-      "SNS:GetTopicAttributes",
-      "SNS:SetTopicAttributes",
-      "SNS:GetSubscriptionAttributes",
-      "SNS:SetSubscriptionAttributes",
-      "SNS:AddPermission",
-      "SNS:DeleteTopic",
-      "SNS:Subscribe",
-      "SNS:Unsubscribe",
-      "SNS:ListSubscriptions",
-      "SNS:ListSubscriptionsByTopic",
-      "SNS:ListTopics",
-      "SNS:Publish"
-    ]
-
-    condition {
-      test     = "StringEquals"
-      variable = "AWS:SourceOwner"
-      values   = [data.aws_caller_identity.current.account_id]
-    }
-
-    resources = [
-      aws_sns_topic.cw_alerts[0].arn
-    ]
-  }
-}
-
 ####################################################
 # IAM User, Policy for MGN
 ####################################################

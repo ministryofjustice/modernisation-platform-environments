@@ -21,7 +21,7 @@ module "esb" {
   )
 
   # Choose the AMI, defaulting to the default AMI if not found(doesnt work try and fix)
-   ami = lookup(
+  ami = lookup(
     {
       development   = "ami-0cc0dad47bc769c08"
       preproduction = "ami-04a6fa2443473cfd5"

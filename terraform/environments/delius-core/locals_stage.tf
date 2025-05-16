@@ -12,7 +12,7 @@ locals {
     migration_environment_short_name       = "stage"
     legacy_engineering_vpc_cidr            = "10.160.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/stage/ec2-user.pub")
-    homepage_path                          = "/"
+    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
     has_mis_environment                    = true
   }
 
@@ -110,6 +110,11 @@ locals {
       slapd_log_level  = "conns,config,stats,stats2"
       container_cpu    = 8192
       container_memory = 16384
+    }
+
+    sfs = {
+      container_cpu    = 2048
+      container_memory = 4096
     }
   }
 

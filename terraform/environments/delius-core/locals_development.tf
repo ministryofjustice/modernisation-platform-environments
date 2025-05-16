@@ -13,7 +13,7 @@ locals {
     migration_environment_short_name       = "mis-dev"
     legacy_engineering_vpc_cidr            = "10.161.98.0/25"
     ec2_user_ssh_key                       = file("${path.module}/files/.ssh/dev/ec2-user.pub")
-    homepage_path                          = "/"
+    homepage_path                          = "/NDelius-war/delius/JSP/auth/login.xhtml"
     has_mis_environment                    = true
   }
 
@@ -105,6 +105,11 @@ locals {
       slapd_log_level  = "stats"
       container_cpu    = 512
       container_memory = 1024
+    }
+
+    sfs = {
+      container_cpu    = 2048
+      container_memory = 4096
     }
 
     oracle_observer = {

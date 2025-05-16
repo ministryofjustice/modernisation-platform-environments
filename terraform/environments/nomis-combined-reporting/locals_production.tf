@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_production = {
+    maintenance_title   = "Prison-NOMIS Reporting Maintenance Window"
+    maintenance_message = "Prison-NOMIS Reporting is currently unavailable due to planned maintenance. Please try again later."
+  }
+
   baseline_presets_production = {
     options = {
       sns_topics = {
@@ -91,7 +96,7 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { type = "gp3", label = "app", size = 100 }   # /u01
+          "/dev/sdb" = { type = "gp3", label = "app", size = 200 }   # /u01
           "/dev/sdc" = { type = "gp3", label = "app", size = 500 }   # /u02
           "/dev/sde" = { type = "gp3", label = "data", size = 500 }  # DATA01
           "/dev/sdj" = { type = "gp3", label = "flash", size = 250 } # FLASH01
@@ -161,6 +166,42 @@ locals {
       pd-ncr-web-1 = merge(local.ec2_instances.bip_web, {
         config = merge(local.ec2_instances.bip_web.config, {
           availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-web-2 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-web-3 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-web-4 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
           instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
             "Ec2PDReportingPolicy",
           ])
@@ -266,6 +307,9 @@ locals {
           private-pd-http-7777 = merge(local.lbs.private.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "pd-ncr-web-1" },
+              { ec2_instance_name = "pd-ncr-web-2" },
+              { ec2_instance_name = "pd-ncr-web-3" },
+              { ec2_instance_name = "pd-ncr-web-4" },
             ]
           })
         }
@@ -293,7 +337,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
                     status_code  = "200"
                   }
                 }]
@@ -321,6 +365,9 @@ locals {
           pd-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "pd-ncr-web-1" },
+              { ec2_instance_name = "pd-ncr-web-2" },
+              { ec2_instance_name = "pd-ncr-web-3" },
+              { ec2_instance_name = "pd-ncr-web-4" },
             ]
           })
         }
@@ -362,7 +409,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
                     status_code  = "200"
                   }
                 }]

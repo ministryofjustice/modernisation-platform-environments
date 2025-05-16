@@ -9,6 +9,26 @@ resource "aws_route53_record" "dbdns" {
   records = [module.aurora.rds_cluster_endpoint]
 }
 
+resource "aws_route53_record" "dbdns-ro" {
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = "db-yjafrds01-reader"
+  type    = "CNAME"
+  ttl     = 300
+  records = [module.aurora.rds_cluster_reader_endpoint]
+}
+
+resource "aws_route53_record" "redshift" {
+  provider = aws.core-network-services
+
+  zone_id = data.aws_route53_zone.yjaf-inner.id
+  name    = "redshift"
+  type    = "CNAME"
+  ttl     = 300
+  records = [module.redshift.address]
+}
+
 resource "aws_route53_record" "private_alb" {
   provider = aws.core-network-services
 

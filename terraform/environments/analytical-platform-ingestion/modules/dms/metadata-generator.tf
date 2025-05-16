@@ -133,14 +133,14 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
 # Role policy to conditionally allow lambda to assume role
 resource "aws_iam_role_policy" "metadata_generator_lambda_function_assume_role" {
   count = (var.glue_catalog_role_arn != "") ? 1 : 0
-  role = module.metadata_generator.lambda_role_name
+  role  = module.metadata_generator.lambda_role_name
 
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Action = ["sts:AssumeRole"]
-        Effect = "Allow"
+        Action   = ["sts:AssumeRole"]
+        Effect   = "Allow"
         Resource = var.glue_catalog_role_arn
       },
     ]
@@ -169,7 +169,7 @@ resource "aws_s3_object" "dms_mapping_rules" {
   bucket = aws_s3_bucket.lambda.bucket
   key    = "metadata-generator/config/dms_mapping_rules.json"
   source = var.dms_mapping_rules
-  etag = filemd5(var.dms_mapping_rules)
+  etag   = filemd5(var.dms_mapping_rules)
 }
 
 module "metadata_generator" {
@@ -208,7 +208,7 @@ module "metadata_generator" {
     LAMBDA_BUCKET                        = aws_s3_bucket.lambda.bucket
     DB_OBJECTS                           = jsonencode(jsondecode(file(var.dms_mapping_rules))["objects"])
     DB_SCHEMA_NAME                       = lookup(jsondecode(file(var.dms_mapping_rules)), "schema", "")
-    ENGINE                               = var.dms_source.engine_name
+    ENGINE                               = var.dms_source.protocol
     DATABASE_NAME                        = var.dms_source.sid
     GLUE_CATALOG_ACCOUNT_ID              = var.glue_catalog_account_id
     GLUE_CATALOG_ROLE_ARN                = var.glue_catalog_role_arn
@@ -221,8 +221,12 @@ module "metadata_generator" {
   }
 
   source_path = [{
-    path             = "${path.module}/lambda-functions/metadata_generator/main.py"
-    pip_requirements = "${path.module}/lambda-functions/metadata_generator/requirements.txt"
+    path = "${path.module}/lambda-functions/metadata_generator/"
+    commands = [
+      "pip3.12 install --platform=manylinux2014_x86_64 --only-binary=:all: --no-compile --target=. -r requirements.txt",
+      "rm -rf pyarrow/tests numpy/tests *.dist-info", # Exclude tests and dist-info directories from the deployment package
+      ":zip",
+    ]
   }]
 
   tags = var.tags

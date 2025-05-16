@@ -6,30 +6,48 @@ module "cur_s3_kms" {
   source  = "terraform-aws-modules/kms/aws"
   version = "3.1.1"
 
-  aliases               = ["s3/cur"]
-  description           = "S3 CUR KMS key"
-  enable_default_policy = true
+  aliases                 = ["s3/cur"]
+  description             = "S3 CUR KMS key"
+  enable_default_policy   = true
   deletion_window_in_days = 7
 
   key_statements = [
-      {
-        sid = "AllowReplicationRole"
-        actions = [
-          "kms:Encrypt*",
-          "kms:Decrypt*",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:Describe*"
-        ]
-        resources = ["*"]
-        effect    = "Allow"
-        principals = [
-          {
-            type        = "AWS"
-            identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
-          }
-        ]
-      }
+    {
+      sid = "AllowReplicationRole"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
+        }
+      ]
+    },
+    {
+      sid = "AllowGlueService"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "Service"
+          identifiers = ["glue.amazonaws.com"]
+        }
+      ]
+    }
   ]
 
   tags = local.tags
@@ -39,12 +57,24 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
   statement {
     effect  = "Allow"
-    actions = ["s3:PutObject", "s3:ListBucket", "s3:GetBucketLocation"]
+    actions = ["s3:PutObject"]
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
     ]
     principals {
+      type        = "Service"
+      identifiers = ["bcm-data-exports.amazonaws.com"]
+    }
+  }
+
+  statement { 
+    effect  = "Allow"
+    actions =  ["s3:ListBucket", "s3:GetBucketLocation"]
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
+    ]
+     principals {
       type        = "Service"
       identifiers = ["bcm-data-exports.amazonaws.com"]
     }
@@ -60,6 +90,24 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
     principals {
       type        = "AWS"
       identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
+    }
+  }
+
+  statement {
+    effect  = "Allow"
+
+    actions = [
+    "s3:GetObject",
+    "s3:PutObject"
+  ]
+
+    resources = [
+      "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*"
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["athena.amazonaws.com"]
     }
   }
 }
@@ -114,24 +162,24 @@ module "focus_s3_kms" {
   description           = "S3 FOCUS KMS key"
   enable_default_policy = true
   key_statements = [
-      {
-        sid = "AllowReplicationRole"
-        actions = [
-          "kms:Encrypt*",
-          "kms:Decrypt*",
-          "kms:ReEncrypt*",
-          "kms:GenerateDataKey*",
-          "kms:Describe*"
-        ]
-        resources = ["*"]
-        effect    = "Allow"
-        principals = [
-          {
-            type        = "AWS"
-            identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
-          }
-        ]
-      }
+    {
+      sid = "AllowReplicationRole"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
+        }
+      ]
+    }
   ]
 
   deletion_window_in_days = 7
@@ -162,9 +210,9 @@ module "focus_reports" {
   source  = "terraform-aws-modules/s3-bucket/aws"
   version = "4.3.0"
 
-  bucket = "coat-${local.environment}-focus-reports"
+  bucket           = "coat-${local.environment}-focus-reports"
   object_ownership = "BucketOwnerEnforced"
-  force_destroy = true
+  force_destroy    = true
 
   attach_deny_insecure_transport_policy = true
   attach_policy                         = true

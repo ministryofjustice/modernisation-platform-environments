@@ -26,6 +26,12 @@ variable "kms_key_arn" {
   description = "ARN of the AWS KMS key to be used to encrypt secret values."
 }
 
+variable "kms_key_id" {
+  description = "The ARN of the KMS key to use for encryption"
+  type        = string
+  default     = null
+}
+
 variable "environment" {
   description = "The environment for the log-groups"
   type        = string
@@ -64,5 +70,10 @@ variable "ecs_task_iam_role_arn" {
 
 variable "ecs_task_exec_iam_role_arn" {
   description = "The ARN of the IAM role for the ECS task execution"
+  type        = string
+}
+
+variable "aws_account_id" {
+  description = "The AWS account ID"
   type        = string
 }

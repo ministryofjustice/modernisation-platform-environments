@@ -3,6 +3,7 @@
 locals {
 
   is_dev_or_test       = local.is-development || local.is-test
+  is_non_prod          = !local.is-production
   project              = local.application_data.accounts[local.environment].project_short_id
   analytics_project_id = "analytics"
 
@@ -190,7 +191,7 @@ locals {
   lambda_redshift_table_expiry_memory_size         = 1024
 
   # Scheduled Dataset Lambda
-  lambda_scheduled_dataset_enabled        = true
+  lambda_scheduled_dataset_enabled        = local.application_data.accounts[local.environment].enable_scheduled_dataset_lambda
   lambda_scheduled_dataset_name           = "${local.project}-scheduled-dataset"
   lambda_scheduled_dataset_runtime        = "java21"
   lambda_scheduled_dataset_tracing        = "Active"
@@ -213,7 +214,7 @@ locals {
   lambda_scheduled_dataset_memory_size         = 1024
 
   # Generate Dataset Lambda
-  lambda_generate_dataset_enabled        = true
+  lambda_generate_dataset_enabled        = local.application_data.accounts[local.environment].enable_generate_dataset_lambda
   lambda_generate_dataset_name           = "${local.project}-generate-dataset"
   lambda_generate_dataset_runtime        = "java21"
   lambda_generate_dataset_tracing        = "Active"
@@ -293,6 +294,10 @@ locals {
   thrld_dms_cdc_inc_events_check    = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
   period_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
 
+  enable_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.enable
+  thrld_postgres_tickle_function_failure_alarm  = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.threshold
+  period_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.period
+
   # CW Insights
   enable_cw_insights = local.application_data.accounts[local.environment].setup_cw_insights
 
@@ -305,7 +310,8 @@ locals {
 
   # Nomis Secrets PlaceHolder
   nomis_secrets_placeholder = {
-    db_name  = "nomis"
+    db_name = "nomis"
+    #checkov:skip=CKV_SECRET_6 This is a placeholder secret that is replaced with the real thing
     password = "placeholder"
     # We need to duplicate the username with 'user' and 'username' keys
     user     = "placeholder"
@@ -337,6 +343,26 @@ locals {
   # ONR Secrets PlaceHolder
   onr_secrets_placeholder = {
     db_name  = "onr"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
+  # nDelius Secrets PlaceHolder
+  ndelius_secrets_placeholder = {
+    db_name  = "ndelius"
+    password = "placeholder"
+    user     = "placeholder"
+    username = "placeholder"
+    endpoint = "0.0.0.0"
+    port     = "0"
+  }
+
+  # ndmis Secrets PlaceHolder
+  ndmis_secrets_placeholder = {
+    db_name  = "ndmis"
     password = "placeholder"
     user     = "placeholder"
     username = "placeholder"
@@ -443,6 +469,7 @@ locals {
     local.tags,
     {
       Name = local.application_name
+      Jira = "DPR-108"
     }
   )
 

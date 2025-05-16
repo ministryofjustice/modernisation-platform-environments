@@ -15,6 +15,7 @@ resource "aws_kms_key" "s3" {
     local.tags,
     {
       Name = "${local.application_name}-s3-kms"
+      Jira = "DPR2-XXXX"
     }
   )
 }
@@ -65,6 +66,7 @@ resource "aws_kms_key" "kinesis-kms-key" {
     local.tags,
     {
       Name = "${local.application_name}-kinesis-kms"
+      Jira = "DPR2-XXXX"
     }
   )
 }
@@ -72,8 +74,8 @@ resource "aws_kms_key" "kinesis-kms-key" {
 data "aws_iam_policy_document" "kinesis-kms" {
   statement {
     #checkov:skip=CKV_AWS_111
-    #checkov:skip=CKV_AWS_109 
-    #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"      
+    #checkov:skip=CKV_AWS_109
+    #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
     effect    = "Allow"
     actions   = ["kms:*"]
     resources = ["*"]
@@ -105,6 +107,7 @@ resource "aws_kms_key" "redshift-kms-key" {
     local.tags,
     {
       Name = "${local.application_name}-redshift-kms"
+      Jira = "DPR2-XXXX"
     }
   )
 }
@@ -152,6 +155,7 @@ resource "aws_kms_key" "rds" {
     local.tags,
     {
       Name = "${local.application_name}-rds-kms"
+      Jira = "DPR2-XXXX"
     }
   )
 }
@@ -201,6 +205,7 @@ resource "aws_kms_key" "operational_db" {
     local.tags,
     {
       Name = "${local.project}-operational-db-key"
+      Jira = "DPR2-XXXX"
     }
   )
 }
@@ -222,6 +227,7 @@ resource "aws_kms_key" "cloudtrail" {
     local.tags,
     {
       Name = "${local.application_name}-cloudtrail-kms"
+      Jira = "DPR2-XXXX"
     }
   )
 }

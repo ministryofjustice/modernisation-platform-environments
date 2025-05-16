@@ -66,9 +66,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "PPUD" {
 }
 
 resource "aws_s3_bucket_logging" "PPUD" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.PPUD[0].id
-
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.PPUD[0].id
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/ppud-ppud-files-production-logs/"
 }
@@ -93,6 +92,21 @@ resource "aws_s3_bucket_policy" "PPUD" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.PPUD[0].arn,
+          "${aws_s3_bucket.PPUD[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
       {
         Effect = "Allow"
         Principal = {
@@ -168,6 +182,14 @@ resource "aws_s3_bucket_lifecycle_configuration" "MoJ-Health-Check-Reports" {
   }
 }
 
+/*
+resource "aws_s3_bucket_logging" "MoJ-Health-Check-Reports" {
+  bucket = aws_s3_bucket.MoJ-Health-Check-Reports.id
+  target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
+  target_prefix = "s3-logs/moj-health-check-reports-logs/"
+}
+*/
+
 resource "aws_s3_bucket_public_access_block" "MoJ-Health-Check-Reports" {
   bucket                  = aws_s3_bucket.MoJ-Health-Check-Reports.id
   block_public_acls       = true
@@ -203,9 +225,8 @@ resource "aws_s3_bucket_versioning" "moj-infrastructure" {
 }
 
 resource "aws_s3_bucket_logging" "moj-infrastructure" {
-  count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-infrastructure[0].id
-
+  count         = local.is-production == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-infrastructure[0].id
   target_bucket = aws_s3_bucket.moj-log-files-prod[0].id
   target_prefix = "s3-logs/moj-infrastructure-logs/"
 }
@@ -249,6 +270,21 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-infrastructure[0].arn,
+          "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
         "Action" : [
           "s3:GetBucketAcl",
           "s3:DeleteObject",
@@ -258,8 +294,8 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-infrastructure",
-          "arn:aws:s3:::moj-infrastructure/*"
+          aws_s3_bucket.moj-infrastructure[0].arn,
+          "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
         ],
         "Principal" : {
           "AWS" : [
@@ -281,8 +317,8 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-infrastructure",
-          "arn:aws:s3:::moj-infrastructure/*"
+          aws_s3_bucket.moj-infrastructure[0].arn,
+          "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
         ],
         "Principal" : {
           Service = "logging.s3.amazonaws.com"
@@ -300,8 +336,8 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-infrastructure",
-          "arn:aws:s3:::moj-infrastructure/*"
+          aws_s3_bucket.moj-infrastructure[0].arn,
+          "${aws_s3_bucket.moj-infrastructure[0].arn}/*"
         ],
         "Principal" : {
           Service = "sns.amazonaws.com"
@@ -377,6 +413,21 @@ resource "aws_s3_bucket_policy" "moj-database-source-prod" {
 
     "Version" : "2012-10-17",
     "Statement" : [
+      {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-database-source-prod[0].arn,
+          "${aws_s3_bucket.moj-database-source-prod[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
       {
         "Action" : [
           "s3:DeleteObject",
@@ -495,6 +546,23 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-report-source-prod" {
   }
 }
 
+resource "aws_s3_bucket_replication_configuration" "moj-report-source-prod-replication" {
+  count = local.is-production == true ? 1 : 0
+  # Must have bucket versioning enabled first
+  depends_on = [aws_s3_bucket_versioning.moj-report-source-prod]
+  role       = aws_iam_role.iam_role_s3_bucket_moj_report_source_prod[0].arn
+  bucket     = aws_s3_bucket.moj-report-source-prod[0].id
+
+  rule {
+    id     = "ppud-report-replication-rule-prod"
+    status = "Enabled"
+    destination {
+      bucket        = "arn:aws:s3:::cloud-platform-9c7fd5fc774969b089e942111a7d5671"
+      storage_class = "STANDARD"
+    }
+  }
+}
+
 resource "aws_s3_bucket_policy" "moj-report-source-prod" {
   count  = local.is-production == true ? 1 : 0
   bucket = aws_s3_bucket.moj-report-source-prod[0].id
@@ -503,6 +571,21 @@ resource "aws_s3_bucket_policy" "moj-report-source-prod" {
 
     "Version" : "2012-10-17",
     "Statement" : [
+      {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-report-source-prod[0].arn,
+          "${aws_s3_bucket.moj-report-source-prod[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
       {
         "Action" : [
           "s3:DeleteObject",
@@ -652,6 +735,21 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-log-files-prod[0].arn,
+          "${aws_s3_bucket.moj-log-files-prod[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
         "Action" : [
           "s3:PutBucketNotification",
           "s3:GetBucketNotification",
@@ -663,8 +761,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-prod",
-          "arn:aws:s3:::moj-log-files-prod/*"
+          aws_s3_bucket.moj-log-files-prod[0].arn,
+          "${aws_s3_bucket.moj-log-files-prod[0].arn}/*"
         ],
         "Principal" : {
           Service = "logging.s3.amazonaws.com"
@@ -682,8 +780,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-prod",
-          "arn:aws:s3:::moj-log-files-prod/*"
+          aws_s3_bucket.moj-log-files-prod[0].arn,
+          "${aws_s3_bucket.moj-log-files-prod[0].arn}/*"
         ],
         "Principal" : {
           Service = "sns.amazonaws.com"
@@ -699,8 +797,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-prod",
-          "arn:aws:s3:::moj-log-files-prod/*"
+          aws_s3_bucket.moj-log-files-prod[0].arn,
+          "${aws_s3_bucket.moj-log-files-prod[0].arn}/*"
         ],
         "Principal" : {
           "AWS" : [
@@ -716,7 +814,7 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
           "s3:ListBucket",
           "s3:PutObject"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
           "arn:aws:s3:::moj-log-files-prod",
           "arn:aws:s3:::moj-log-files-prod/*"
@@ -735,10 +833,10 @@ resource "aws_s3_bucket_policy" "moj-log-files-prod" {
           "s3:PutObject",
           "s3:ListBucket"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-prod",
-          "arn:aws:s3:::moj-log-files-prod/*"
+          aws_s3_bucket.moj-log-files-prod[0].arn,
+          "${aws_s3_bucket.moj-log-files-prod[0].arn}/*"
         ]
         "Principal" : {
           Service = "elasticloadbalancing.amazonaws.com"
@@ -775,6 +873,13 @@ resource "aws_s3_bucket_versioning" "moj-log-files-uat" {
   versioning_configuration {
     status = "Enabled"
   }
+}
+
+resource "aws_s3_bucket_logging" "moj-log-files-uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-log-files-uat[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-uat[0].id
+  target_prefix = "s3-logs/moj-log-files-uat-logs/"
 }
 
 resource "aws_s3_bucket_public_access_block" "moj-log-files-uat" {
@@ -833,6 +938,21 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-log-files-uat[0].arn,
+          "${aws_s3_bucket.moj-log-files-uat[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
         "Action" : [
           "s3:PutBucketNotification",
           "s3:GetBucketNotification",
@@ -844,8 +964,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-uat",
-          "arn:aws:s3:::moj-log-files-uat/*"
+          aws_s3_bucket.moj-log-files-uat[0].arn,
+          "${aws_s3_bucket.moj-log-files-uat[0].arn}/*"
         ],
         "Principal" : {
           Service = "logging.s3.amazonaws.com"
@@ -863,8 +983,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-uat",
-          "arn:aws:s3:::moj-log-files-uat/*"
+          aws_s3_bucket.moj-log-files-uat[0].arn,
+          "${aws_s3_bucket.moj-log-files-uat[0].arn}/*"
         ],
         "Principal" : {
           Service = "sns.amazonaws.com"
@@ -880,8 +1000,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-uat",
-          "arn:aws:s3:::moj-log-files-uat/*"
+          aws_s3_bucket.moj-log-files-uat[0].arn,
+          "${aws_s3_bucket.moj-log-files-uat[0].arn}/*"
         ],
         "Principal" : {
           "AWS" : [
@@ -897,10 +1017,10 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
           "s3:ListBucket",
           "s3:PutObject"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-uat",
-          "arn:aws:s3:::moj-log-files-uat/*"
+          aws_s3_bucket.moj-log-files-uat[0].arn,
+          "${aws_s3_bucket.moj-log-files-uat[0].arn}/*"
         ]
         "Principal" : {
           Service = "delivery.logs.amazonaws.com"
@@ -916,10 +1036,10 @@ resource "aws_s3_bucket_policy" "moj-log-files-uat" {
           "s3:PutObject",
           "s3:ListBucket"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-uat",
-          "arn:aws:s3:::moj-log-files-uat/*"
+          aws_s3_bucket.moj-log-files-uat[0].arn,
+          "${aws_s3_bucket.moj-log-files-uat[0].arn}/*"
         ]
         "Principal" : {
           Service = "elasticloadbalancing.amazonaws.com"
@@ -1014,6 +1134,21 @@ resource "aws_s3_bucket_policy" "moj-report-source-uat" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-report-source-uat[0].arn,
+          "${aws_s3_bucket.moj-report-source-uat[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
         "Action" : [
           "s3:PutBucketNotification",
           "s3:GetBucketNotification",
@@ -1105,6 +1240,13 @@ resource "aws_s3_bucket_versioning" "moj-log-files-dev" {
   }
 }
 
+resource "aws_s3_bucket_logging" "moj-log-files-dev" {
+  count         = local.is-development == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-log-files-dev[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  target_prefix = "s3-logs/moj-log-files-dev-logs/"
+}
+
 resource "aws_s3_bucket_public_access_block" "moj-log-files-dev" {
   count                   = local.is-development == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-log-files-dev[0].id
@@ -1161,6 +1303,21 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-log-files-dev[0].arn,
+          "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
         "Action" : [
           "s3:PutBucketNotification",
           "s3:GetBucketNotification",
@@ -1172,8 +1329,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-dev",
-          "arn:aws:s3:::moj-log-files-dev/*"
+          aws_s3_bucket.moj-log-files-dev[0].arn,
+          "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
         ],
         "Principal" : {
           Service = "logging.s3.amazonaws.com"
@@ -1191,8 +1348,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-dev",
-          "arn:aws:s3:::moj-log-files-dev/*"
+          aws_s3_bucket.moj-log-files-dev[0].arn,
+          "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
         ],
         "Principal" : {
           Service = "sns.amazonaws.com"
@@ -1208,8 +1365,8 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-dev",
-          "arn:aws:s3:::moj-log-files-dev/*"
+          aws_s3_bucket.moj-log-files-dev[0].arn,
+          "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
         ],
         "Principal" : {
           "AWS" : [
@@ -1225,10 +1382,10 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "s3:ListBucket",
           "s3:PutObject"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-dev",
-          "arn:aws:s3:::moj-log-files-dev/*"
+          aws_s3_bucket.moj-log-files-dev[0].arn,
+          "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
         ]
         "Principal" : {
           Service = "delivery.logs.amazonaws.com"
@@ -1244,13 +1401,15 @@ resource "aws_s3_bucket_policy" "moj-log-files-dev" {
           "s3:PutObject",
           "s3:ListBucket"
         ],
-        "Effect" = "Allow",
+        "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-log-files-dev",
-          "arn:aws:s3:::moj-log-files-dev/*"
+          aws_s3_bucket.moj-log-files-dev[0].arn,
+          "${aws_s3_bucket.moj-log-files-dev[0].arn}/*"
         ]
         "Principal" : {
-          "AWS" : "arn:aws:iam::652711504416:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
+          "AWS" : [
+            "arn:aws:iam::${data.aws_ssm_parameter.elb-account-eu-west-2-dev[0].value}:root" # This ID is the elb-account-id for eu-west-2 obtained from https://docs.aws.amazon.com/elasticloadbalancing/latest/application/enable-access-logging.html
+          ]
         }
       }
     ]
@@ -1283,6 +1442,13 @@ resource "aws_s3_bucket_versioning" "moj-lambda-layers-dev" {
   }
 }
 
+resource "aws_s3_bucket_logging" "moj-lambda-layers-dev" {
+  count         = local.is-development == true ? 1 : 0
+  bucket        = aws_s3_bucket.moj-lambda-layers-dev[0].id
+  target_bucket = aws_s3_bucket.moj-log-files-dev[0].id
+  target_prefix = "s3-logs/moj-lambda-layers-dev-logs/"
+}
+
 resource "aws_s3_bucket_public_access_block" "moj-lambda-layers-dev" {
   count                   = local.is-development == true ? 1 : 0
   bucket                  = aws_s3_bucket.moj-lambda-layers-dev[0].id
@@ -1310,9 +1476,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-lambda-layers-dev" {
       days          = 30
       storage_class = "STANDARD_IA"
     }
-    expiration {
-      days = 60
-    }
   }
 }
 
@@ -1325,6 +1488,21 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
+          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
         "Action" : [
           "s3:PutBucketNotification",
           "s3:GetBucketNotification",
@@ -1336,8 +1514,8 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-lambda-layers-dev",
-          "arn:aws:s3:::moj-lambda-layers-dev/*"
+          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
+          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
         ],
         "Principal" : {
           Service = "logging.s3.amazonaws.com"
@@ -1355,8 +1533,8 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-lambda-layers-dev",
-          "arn:aws:s3:::moj-lambda-layers-dev/*"
+          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
+          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
         ],
         "Principal" : {
           Service = "sns.amazonaws.com"
@@ -1372,8 +1550,8 @@ resource "aws_s3_bucket_policy" "moj-lambda-layers-dev" {
         ],
         "Effect" : "Allow",
         "Resource" : [
-          "arn:aws:s3:::moj-lambda-layers-dev",
-          "arn:aws:s3:::moj-lambda-layers-dev/*"
+          aws_s3_bucket.moj-lambda-layers-dev[0].arn,
+          "${aws_s3_bucket.moj-lambda-layers-dev[0].arn}/*"
         ],
         "Principal" : {
           "AWS" : [
@@ -1467,6 +1645,21 @@ resource "aws_s3_bucket_policy" "moj-database-source-dev" {
 
     "Version" : "2012-10-17",
     "Statement" : [
+      {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-database-source-dev[0].arn,
+          "${aws_s3_bucket.moj-database-source-dev[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
       {
         "Action" : [
           "s3:PutBucketNotification",
@@ -1613,6 +1806,21 @@ resource "aws_s3_bucket_policy" "moj-report-source-dev" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.moj-report-source-dev[0].arn,
+          "${aws_s3_bucket.moj-report-source-dev[0].arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
         "Action" : [
           "s3:PutBucketNotification",
           "s3:GetBucketNotification",
@@ -1650,7 +1858,6 @@ resource "aws_s3_bucket_policy" "moj-report-source-dev" {
           Service = "sns.amazonaws.com"
         }
       },
-
       {
         "Action" : [
           "s3:GetBucketAcl",

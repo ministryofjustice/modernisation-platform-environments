@@ -9,8 +9,8 @@ locals {
     "module"         = "redshift",
     "module_version" = local.module_version,
     #"module_git_hash" = local.module_git_hash, #todo revisit this if we start using remote modules with tagging in github
-    "project" = var.project_name,
-    "environment"  = var.environment
+    "project"     = var.project_name,
+    "environment" = var.environment
   }
 
   all_tags = merge(var.tags, local.tags)

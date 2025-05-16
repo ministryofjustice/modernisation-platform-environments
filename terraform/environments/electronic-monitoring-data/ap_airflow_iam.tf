@@ -109,7 +109,7 @@ module "load_alcohol_monitoring_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "alcohol-monitoring"
   environment        = local.environment
@@ -127,7 +127,7 @@ module "load_orca_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "orca"
   environment        = local.environment
@@ -145,7 +145,7 @@ module "load_atrium_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "atrium"
   environment        = local.environment
@@ -163,7 +163,7 @@ module "load_atv_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "atv"
   environment        = local.environment
@@ -181,7 +181,7 @@ module "load_cap_dw_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name                 = "cap-dw"
   environment          = local.environment
@@ -200,7 +200,7 @@ module "load_emsys_mvp_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name                 = "emsys-mvp"
   environment          = local.environment
@@ -219,7 +219,7 @@ module "load_emsys_tpims_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name                 = "emsys-tpims"
   environment          = local.environment
@@ -238,7 +238,7 @@ module "load_fep_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "fep"
   environment        = local.environment
@@ -256,7 +256,7 @@ module "load_rf_hours_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "rf-hours"
   environment        = local.environment
@@ -274,7 +274,7 @@ module "load_subject_history_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "subject-history"
   environment        = local.environment
@@ -292,7 +292,7 @@ module "load_tasking_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "tasking"
   environment        = local.environment
@@ -310,7 +310,7 @@ module "load_telephony_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "telephony"
   environment        = local.environment
@@ -328,7 +328,7 @@ module "load_unstructured_atrium_database" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "unstructured-atrium"
   environment        = local.environment
@@ -347,7 +347,7 @@ module "load_fms" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "fms"
   environment        = local.environment
@@ -367,7 +367,7 @@ module "load_mdss" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "mdss"
   environment        = local.environment
@@ -486,7 +486,7 @@ module "full_reload_fms" {
   source = "./modules/ap_airflow_load_data_iam_role"
 
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 
   name               = "fms"
   environment        = local.environment
