@@ -172,12 +172,17 @@ jobs:
           # Append referencing components to the matrix.
           for comp in "${referencing_components[@]}"; do
             echo "Including '${comp}' because it references a changed module."
+            target=$(jq -r --arg comp "$comp" '.[] | select(.component == $comp) | .target' envlist.json)
+            if [ -z "$target" ]; then
+              echo "Error: Unable to determine target for component '${comp}'."
+              exit 1
+            fi
             if [ "$firstEntry" = true ]; then
               firstEntry=false
             else
               echo "," >> final-list.json
             fi
-            echo -n '{"target":"'"$env.name"'","action":"plan_apply","component":"'"$comp"'"}' >> final-list.json
+            echo -n '{"target":"'"$target"'","action":"plan_apply","component":"'"$comp"'"}' >> final-list.json
           done
 
           echo "]" >> final-list.json
