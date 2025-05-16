@@ -51,12 +51,7 @@ jobs:
           if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
             # On a branch: production gets "plan", others get "plan_apply".
             curl -s -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
-              | jq -c '.environments[] as $env |
-                  if $env.name | contains("production") then
-                    {"target": $env.name, "action": "plan"}
-                  else
-                    {"target": $env.name, "action": "plan_apply"}
-                  end' > envlist.json
+              | jq -c '[.environments[] | if .name | contains("production") then {"target": .name, "action": "plan"} else {"target": .name, "action": "plan_apply"} end]' > envlist.json
           else
             # On main: all accounts get "plan_apply".
             curl -s -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
