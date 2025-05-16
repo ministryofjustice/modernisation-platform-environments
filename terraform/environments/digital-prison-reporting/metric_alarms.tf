@@ -114,3 +114,26 @@ module "dpr_dms_network_receive_throughput" {
 
   alarm_actions = [module.notifications_sns.sns_topic_arn]
 }
+
+module "dpr_postgres_tickle_function_failure_alarm" {
+  source              = "./modules/cw_alarm"
+  create_metric_alarm = local.enable_cw_alarm && local.enable_postgres_tickle_function_failure_alarm
+
+  alarm_name          = "dpr-postgres-tickle-function-failure"
+  alarm_description   = "ATTENTION: DPR Postgres Tickle Function Failure, Please investigate!"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1 # Boolean
+  threshold           = local.thrld_postgres_tickle_function_failure_alarm
+  period              = local.period_postgres_tickle_function_failure_alarm
+  unit                = "Count"
+
+  namespace   = "AWS/Lambda"
+  metric_name = "Errors"
+  statistic   = "Maximum"
+
+  dimensions = {
+    FunctionName = "dpr-postgres-tickle-function"
+  }
+
+  alarm_actions = [module.notifications_sns.sns_topic_arn]
+}

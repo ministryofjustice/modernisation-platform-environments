@@ -12,7 +12,8 @@
       "riyaz": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPUmCzNuvxAS3UhzAdb9/eRX/KJPqSligm+5xVmSi6Ru riyaz.patel@L1127",
       "mark": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINFbOGuIaNRB/jAF80J3cdYUCuhb32CCDfzBLx5uEIjQ mark.doughty@justice.gov.uk",
       "michael": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKbCt0IICgRaIqNNCZCZm9YUZ3IZ1bM44c1pPAqY3s7Q michael.keane@justice.gov.uk",
-      "jack": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMlhOo4jy4gwgoxgfcGjruK1h9NUkmLBXbTKbNGvzWge jack.liggett@justice.gov.uk"
+      "jack": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMlhOo4jy4gwgoxgfcGjruK1h9NUkmLBXbTKbNGvzWge jack.liggett@justice.gov.uk",
+      "prem": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN7rHtllJZImHvjEwJVdWUw8mtoN8nC7DDpVEua+L0A0 prem.kankipati@justice.gov.uk"
     },
     "preproduction": {},
     "production": {}

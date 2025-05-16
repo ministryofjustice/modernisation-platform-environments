@@ -190,23 +190,6 @@ module "actions_runners_token_apc_self_hosted_runners_github_app" {
   tags = local.tags
 }
 
-module "airflow_connections_slack_api_default_secret" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/secrets-manager/aws"
-  version = "1.3.1"
-
-  name        = "airflow/connections/slack_api_default"
-  description = "https://api.slack.com/apps/A06NU3WMDSS/"
-  kms_key_id  = module.common_secrets_manager_kms.key_arn
-
-  secret_string         = "CHANGEME"
-  ignore_secret_changes = true
-
-  tags = local.tags
-}
-
 module "dashboard_service_app_secrets" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -216,8 +199,8 @@ module "dashboard_service_app_secrets" {
   source  = "terraform-aws-modules/secrets-manager/aws"
   version = "1.3.1"
 
-  name        = "dashboard-service/app-secrets"
-  kms_key_id  = module.common_secrets_manager_kms.key_arn
+  name       = "dashboard-service/app-secrets"
+  kms_key_id = module.common_secrets_manager_kms.key_arn
 
   secret_string = jsonencode({
     secret_key          = random_password.dashboard_service_secret_key[0].result,

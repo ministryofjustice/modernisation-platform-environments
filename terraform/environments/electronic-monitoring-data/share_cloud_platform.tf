@@ -1,14 +1,15 @@
 locals {
-  # Setting the IAM name that our Cloud Platform API will use to connect to this role
-
+  env_ = "${local.environment_shorthand}_"
   iam-dev = local.environment_shorthand == "dev" ? [
-    var.cloud-platform-iam-dev
+    var.cloud-platform-iam-dev,
+    var.cloud-platform-crime-matching-iam-dev
   ] : null
 
   iam-test = local.environment_shorthand == "test" ? [
     var.cloud-platform-iam-dev,
     var.cloud-platform-iam-preprod,
-    var.cloud-platform-iam-prod
+    var.cloud-platform-iam-prod,
+    var.cloud-platform-crime-matching-iam-dev
   ] : null
 
   iam-preprod = local.environment_shorthand == "preprod" ? [
@@ -28,6 +29,7 @@ locals {
     "am_violations",
     "am_visit_details",
   ]
+
   tables_to_share = [
     "contact_history",
     "equipment_details",
@@ -39,14 +41,23 @@ locals {
     "violations",
     "visit_details"
   ]
-  table_filters = merge({
-    for table in local.tables_to_share : table => "specials_flag=0"
-  }, local.am_table_filters)
-  specials_table_filters = merge({
-    for table in local.tables_to_share : table => ""
-  }, local.am_table_filters)
+
+  table_filters = merge(
+    {
+      for table in local.tables_to_share : table => "specials_flag=0"
+    },
+    local.am_table_filters
+  )
+
+  specials_table_filters = merge(
+    {
+      for table in local.tables_to_share : table => ""
+    },
+    local.am_table_filters
+  )
+
   am_table_filters = {
-     for table in local.am_tables_to_share : table => ""
+    for table in local.am_tables_to_share : table => ""
   }
 
   resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
@@ -83,6 +94,17 @@ variable "cloud-platform-iam-prod" {
   default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-7a81f92a48491ef0-live"
 }
 
+variable "cloud-platform-crime-matching-iam-dev" {
+  type        = string
+  description = "IAM role that the crime matching API in Cloud Platform will use to connect to this role."
+  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-6e3937460af175fd-live"
+}
+
+resource "aws_lakeformation_resource" "data_bucket" {
+  arn = module.s3-create-a-derived-table-bucket.bucket.arn
+}
+
+
 module "cmt_front_end_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -91,7 +113,7 @@ module "cmt_front_end_assumable_role" {
 
   trusted_role_arns = flatten([
     local.resolved-cloud-platform-iam-roles,
-    data.aws_iam_roles.data_engineering_roles.arns
+    data.aws_iam_roles.mod_plat_roles.arns
   ])
 
   create_role       = true
@@ -110,7 +132,7 @@ module "specials_cmt_front_end_assumable_role" {
 
   trusted_role_arns = flatten([
     local.resolved-cloud-platform-iam-roles,
-    data.aws_iam_roles.data_engineering_roles.arns
+    data.aws_iam_roles.mod_plat_roles.arns
   ])
 
   create_role       = true
@@ -124,10 +146,14 @@ module "specials_cmt_front_end_assumable_role" {
 module "share_data_marts" {
   source = "./modules/lakeformation_w_data_filter"
 
-  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters           = local.table_filters
-  database_name           = "historic_api_mart"
-  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters = local.table_filters
+  database_name = "historic_api_mart"
+  extra_arns = [
+    try(one(data.aws_iam_roles.mod_plat_roles.arns)),
+    data.aws_iam_role.github_actions_role.arn,
+    data.aws_iam_session_context.current.issuer_arn
+  ]
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
 }
@@ -135,10 +161,14 @@ module "share_data_marts" {
 module "share_specials_data_marts" {
   source = "./modules/lakeformation_w_data_filter"
 
-  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters           = local.specials_table_filters
-  database_name           = "historic_api_mart"
-  data_engineer_role_arn  = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters = local.specials_table_filters
+  database_name = "historic_api_mart"
+  extra_arns = [
+    try(one(data.aws_iam_roles.mod_plat_roles.arns)),
+    data.aws_iam_role.github_actions_role.arn,
+    data.aws_iam_session_context.current.issuer_arn
+  ]
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
 }

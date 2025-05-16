@@ -88,10 +88,16 @@ data "aws_secretsmanager_secret_version" "actions_runners_token_apc_self_hosted_
   secret_id = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
 }
 
-data "aws_vpc_endpoint" "mwaa_webserver" {
-  service_name = aws_mwaa_environment.main.webserver_vpc_endpoint_service
+# Application Load Balancer
+data "aws_lb" "mwaa_alb" {
+  name = "mwaa"
 }
 
-data "dns_a_record_set" "mwaa_webserver_vpc_endpoint" {
-  host = data.aws_vpc_endpoint.mwaa_webserver.dns_entry[0].dns_name
+# KMS
+data "aws_kms_key" "mwaa_kms" {
+  key_id = "alias/mwaa/default"
+}
+
+data "aws_s3_bucket" "mwaa_bucket" {
+  bucket = "mojap-compute-${local.environment}-mwaa"
 }

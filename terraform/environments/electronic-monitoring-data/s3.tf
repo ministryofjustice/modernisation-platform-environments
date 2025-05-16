@@ -3,9 +3,18 @@ locals {
 
   mdss_supplier_account_mapping = {
     "production"    = null
-    "preproduction" = null
-    "test" = null
-    "development" = null
+    "preproduction" = {
+      "account_number" = "173142358744"
+      "role_name"      = "juniper-datatransfer-lambda-role"
+    }
+    "test"          = {
+      "account_number" = "173142358744"
+      "role_name"      = "dev-datatransfer-lambda-role"
+    }
+    "development"   = {
+      "account_number" = "173142358744"
+      "role_name"      = "dev-datatransfer-lambda-role"
+    }
   }
 
   p1_export_bucket_destination_mapping = {
@@ -45,6 +54,23 @@ locals {
     { id = module.s3-create-a-derived-table-bucket.bucket.id, arn = module.s3-create-a-derived-table-bucket.bucket.arn },
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn }
   ]
+}
+
+
+# ------------------------------------------------------------------------
+# Get secrets for bucket policy for allied
+# ------------------------------------------------------------------------
+
+data "aws_secretsmanager_secret" "allied_account_id" {
+  name = aws_secretsmanager_secret.allied_account_id.id
+
+  depends_on = [aws_secretsmanager_secret_version.allied_account_id]
+}
+
+data "aws_secretsmanager_secret_version" "allied_account_id" {
+  secret_id = data.aws_secretsmanager_secret.allied_account_id.id
+
+  depends_on = [aws_secretsmanager_secret.allied_account_id]
 }
 
 # ------------------------------------------------------------------------

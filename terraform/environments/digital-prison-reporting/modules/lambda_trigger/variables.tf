@@ -41,3 +41,9 @@ variable "event_bus_name" {
   type        = string
   default     = "default"
 }
+
+variable "tags" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Key-value map of resource tags."
+}

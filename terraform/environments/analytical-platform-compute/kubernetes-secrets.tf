@@ -88,7 +88,7 @@ resource "kubernetes_secret" "dashboard_service_rds" {
 
   metadata {
     name      = "dashboard-service-rds"
-    namespace = kubernetes_namespace.ui.metadata[0].name
+    namespace = kubernetes_namespace.dashboard_service[0].metadata[0].name
   }
 
   type = "Opaque"

@@ -135,41 +135,50 @@ resource "aws_security_group_rule" "tableau_to_yjsm_ssh" {
   description              = "tableau to yjsm ssh temp"
 }
 
-# (Subnet A to ASSETS)
-resource "aws_security_group_rule" "ecs_to_assets_a" {
+# ECS to ASSETS SUBNETS
+resource "aws_security_group_rule" "ecs_subnets_assets" {
+  for_each          = { for s in var.private_subnet_list : s.availability_zone => s }
   type              = "ingress"
   from_port         = 8089
   to_port           = 8089
   protocol          = "tcp"
   security_group_id = aws_security_group.yjsm_service.id
-  cidr_blocks       = ["10.27.144.0/24"]
-  description       = "ECS internal to ASSETS (Subnet A)"
-}
-
-# (Subnet B to ASSETS)
-resource "aws_security_group_rule" "ecs_to_assets_b" {
-  type              = "ingress"
-  from_port         = 8089
-  to_port           = 8089
-  protocol          = "tcp"
-  security_group_id = aws_security_group.yjsm_service.id
-  cidr_blocks       = ["10.27.145.0/24"]
-  description       = "ECS internal to ASSETS (Subnet B)"
-}
-
-# (Subnet C to ASSETS)
-resource "aws_security_group_rule" "ecs_to_assets_c" {
-  type              = "ingress"
-  from_port         = 8089
-  to_port           = 8089
-  protocol          = "tcp"
-  security_group_id = aws_security_group.yjsm_service.id
-  cidr_blocks       = ["10.27.146.0/24"]
-  description       = "ECS internal to ASSETS (Subnet C)"
+  cidr_blocks       = [each.value.cidr_block]
+  description       = "ECS internal to ASSETS (${each.key})"
 }
 
 
-### TO DO LIST 
-### CUG SUBNETS
+### CUG RANGES
+resource "aws_ec2_managed_prefix_list" "custom_internal" {
+  name           = "custom-internal-access"
+  address_family = "IPv4"
+  max_entries    = 1
+}
+
+resource "aws_ec2_managed_prefix_list_entry" "custom_internal_entry" {
+  prefix_list_id = aws_ec2_managed_prefix_list.custom_internal.id
+  cidr           = "10.20.224.0/21"
+  description    = "YJB CUG RANGE 1"
+}
+
+resource "aws_security_group_rule" "prefix_list" {
+  type                    = "ingress"
+  from_port               = 80
+  to_port                 = 80
+  protocol                = "tcp"
+  security_group_id       = aws_security_group.yjsm_service.id
+  prefix_list_ids         = [aws_ec2_managed_prefix_list.custom_internal.id]
+  description             = "Allow HTTP from internal prefix list"
+}
+
+
 ### SERVICE MONITORING/ENG
-### 
+resource "aws_security_group_rule" "monitoring_to_yjsm" {
+  type                     = "ingress"
+  from_port                = 8400
+  to_port                  = 8400
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.yjsm_service.id
+  source_security_group_id = var.management_server_sg_id 
+  description              = "Service access (YJSM 8400)"
+}

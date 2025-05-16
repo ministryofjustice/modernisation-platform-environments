@@ -7,6 +7,7 @@ locals {
   airflow_secret_placeholder = {
     oidc_cluster_identifier = "placeholder"
   }
+  #checkov:skip=CKV_SECRET_6: Ignore this
   airflow_cadt_secret_placeholder = "placeholder"
 }
 data "aws_secretsmanager_secret" "airflow_secret" {

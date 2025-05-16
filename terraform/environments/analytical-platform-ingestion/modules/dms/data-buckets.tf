@@ -5,9 +5,11 @@ resource "aws_s3_bucket" "lambda" {
   #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
   #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
   #checkov:skip=CKV_AWS_144:Cross-region replication not required
-  bucket_prefix = "${var.db}-lambda-functions-"
+  bucket_prefix = "${var.db}-lambda-fns-"
 
   tags = var.tags
+  # Force destroy is safe here, as the bucket is repopulated on terraform run
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "lambda" {
@@ -114,7 +116,7 @@ resource "aws_s3_bucket" "raw_history" {
   #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
   #checkov:skip=CKV_AWS_144:Cross-region replication not required
   #checkov:skip=CKV_AWS_145:False positive, KMS envryption attached via data.raw_history instead of resource
-  count = length(var.output_bucket) > 0 ? 0 : 1
+  count         = length(var.output_bucket) > 0 ? 0 : 1
   bucket_prefix = "${var.db}-raw-history-"
 }
 
@@ -123,7 +125,7 @@ data "aws_s3_bucket" "raw_history" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "raw_history" {
-  count = length(var.output_bucket) > 0 ? 0 : 1
+  count  = length(var.output_bucket) > 0 ? 0 : 1
   bucket = data.aws_s3_bucket.raw_history.id
   rule {
     object_ownership = "BucketOwnerEnforced"
@@ -131,7 +133,7 @@ resource "aws_s3_bucket_ownership_controls" "raw_history" {
 }
 
 resource "aws_s3_bucket_public_access_block" "raw_history" {
-  count = length(var.output_bucket) > 0 ? 0 : 1
+  count  = length(var.output_bucket) > 0 ? 0 : 1
   bucket = data.aws_s3_bucket.raw_history.id
 
   block_public_acls       = true
@@ -142,7 +144,7 @@ resource "aws_s3_bucket_public_access_block" "raw_history" {
 
 #trivy:ignore:AVD-AWS-0090: Versioning not needed
 resource "aws_s3_bucket_versioning" "raw_history" {
-  count = length(var.output_bucket) > 0 ? 0 : 1
+  count  = length(var.output_bucket) > 0 ? 0 : 1
   bucket = data.aws_s3_bucket.raw_history.id
   versioning_configuration {
     status = "Disabled"
@@ -150,7 +152,7 @@ resource "aws_s3_bucket_versioning" "raw_history" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "raw_history" {
-  count = length(var.output_bucket) > 0 ? 0 : 1
+  count  = length(var.output_bucket) > 0 ? 0 : 1
   bucket = data.aws_s3_bucket.raw_history.id
 
   rule {
@@ -215,12 +217,12 @@ resource "aws_s3_bucket" "premigration_assessment" {
   #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
   #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
   #checkov:skip=CKV_AWS_144:Cross-region replication not required
-  count = var.create_premigration_assessement_resources ? 1 : 0
+  count         = var.create_premigration_assessement_resources ? 1 : 0
   bucket_prefix = "${var.db}-pma-"
 }
 
 resource "aws_s3_bucket_ownership_controls" "premigration_assessment" {
-  count = var.create_premigration_assessement_resources ? 1 : 0
+  count  = var.create_premigration_assessement_resources ? 1 : 0
   bucket = aws_s3_bucket.premigration_assessment[0].id
   rule {
     object_ownership = "BucketOwnerEnforced"
@@ -228,7 +230,7 @@ resource "aws_s3_bucket_ownership_controls" "premigration_assessment" {
 }
 
 resource "aws_s3_bucket_public_access_block" "premigration_assessment" {
-  count = var.create_premigration_assessement_resources ? 1 : 0
+  count  = var.create_premigration_assessement_resources ? 1 : 0
   bucket = aws_s3_bucket.premigration_assessment[0].id
 
   block_public_acls       = true
@@ -239,7 +241,7 @@ resource "aws_s3_bucket_public_access_block" "premigration_assessment" {
 
 #trivy:ignore:AVD-AWS-0090: Versioning not needed
 resource "aws_s3_bucket_versioning" "premigration_assessment" {
-  count = var.create_premigration_assessement_resources ? 1 : 0
+  count  = var.create_premigration_assessement_resources ? 1 : 0
   bucket = aws_s3_bucket.premigration_assessment[0].id
   versioning_configuration {
     status = "Disabled"
@@ -247,7 +249,7 @@ resource "aws_s3_bucket_versioning" "premigration_assessment" {
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "premigration_assessment" {
-  count = var.create_premigration_assessement_resources ? 1 : 0
+  count  = var.create_premigration_assessement_resources ? 1 : 0
   bucket = aws_s3_bucket.premigration_assessment[0].id
 
   rule {

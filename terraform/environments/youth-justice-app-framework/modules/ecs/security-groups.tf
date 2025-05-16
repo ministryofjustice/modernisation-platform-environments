@@ -128,6 +128,17 @@ resource "aws_security_group_rule" "ecsint_to_rds_rule" {
   description              = "PostgreSQL from ECS Internal"
 }
 
+# Enable ECS Services access to Redshift
+resource "aws_security_group_rule" "ecsint_to_redshift_rule" {
+  type                     = "ingress"
+  from_port                = 5439
+  to_port                  = 5439
+  protocol                 = "tcp"
+  security_group_id        = var.redshift_sg_id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "Pedshift from ECS Internal"
+}
+
 ###DATADOG RULES
 
 resource "aws_security_group_rule" "ecsext_toecs_ecsint_datadog_rule" {

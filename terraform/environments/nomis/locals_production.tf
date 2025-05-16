@@ -23,14 +23,15 @@ locals {
   baseline_production = {
 
     acm_certificates = {
-      nomis_wildcard_cert_v2 = {
+      nomis_wildcard_cert_v3 = {
         cloudwatch_metric_alarms            = module.baseline_presets.cloudwatch_metric_alarms.acm
         domain_name                         = "*.nomis.service.justice.gov.uk"
         external_validation_records_created = true
         subject_alternate_names = [
-          "*.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk",
-          "*.production.nomis.service.justice.gov.uk",
           "*.nomis.az.justice.gov.uk",
+          "*.nomis.hmpps-production.modernisation-platform.service.justice.gov.uk",
+          "*.production.nomis.az.justice.gov.uk",
+          "*.production.nomis.service.justice.gov.uk",
         ]
         tags = {
           description = "wildcard cert for nomis production domains"
@@ -220,11 +221,11 @@ locals {
     }
 
     ec2_autoscaling_groups = {
-      # NOT-ACTIVE (blue deployment)
+      # NOT-ACTIVE (blue deployment) - for testing Combined Reporting
       prod-nomis-web-a = merge(local.ec2_autoscaling_groups.web, {
         autoscaling_group = merge(local.ec2_autoscaling_groups.web.autoscaling_group, {
-          desired_capacity = 0
-          max_size         = 0
+          desired_capacity = 1
+          max_size         = 1
         })
         # cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.web
         config = merge(local.ec2_autoscaling_groups.web.config, {
@@ -242,10 +243,11 @@ locals {
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
-          nomis-environment    = "prod"
-          oracle-db-hostname-a = "pnomis-a.production.nomis.service.justice.gov.uk"
-          oracle-db-hostname-b = "pnomis-b.production.nomis.service.justice.gov.uk"
-          oracle-db-name       = "PCNOM"
+          nomis-environment     = "prod"
+          oracle-db-hostname-a  = "pnomis-a.production.nomis.service.justice.gov.uk"
+          oracle-db-hostname-b  = "pnomis-b.production.nomis.service.justice.gov.uk"
+          oracle-db-name        = "PCNOM"
+          reporting-environment = "aws"
         })
       })
 
@@ -512,7 +514,7 @@ locals {
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
-            certificate_names_or_arns = ["nomis_wildcard_cert_v2"]
+            certificate_names_or_arns = ["nomis_wildcard_cert_v3"]
 
             alarm_target_group_names = [
               # "prod-nomis-web-a-http-7777",
@@ -532,6 +534,7 @@ locals {
                   host_header = {
                     values = [
                       "prod-nomis-web-a.production.nomis.service.justice.gov.uk",
+                      "c.production.nomis.az.justice.gov.uk"
                     ]
                   }
                 }]
@@ -597,6 +600,13 @@ locals {
           { name = "preproduction", type = "NS", ttl = "86400", records = ["ns-1200.awsdns-22.org", "ns-1958.awsdns-52.co.uk", "ns-44.awsdns-05.com", "ns-759.awsdns-30.net"] },
           { name = "reporting", type = "NS", ttl = "86400", records = ["ns-1122.awsdns-12.org", "ns-1844.awsdns-38.co.uk", "ns-388.awsdns-48.com", "ns-887.awsdns-46.net"] },
           { name = "ndh", type = "NS", ttl = "86400", records = ["ns-1106.awsdns-10.org", "ns-1904.awsdns-46.co.uk", "ns-44.awsdns-05.com", "ns-799.awsdns-35.net"] },
+        ]
+      }
+
+      # use this zone for testing as it's in the IE compatibility enterprise site list
+      "production.nomis.az.justice.gov.uk" = {
+        lb_alias_records = [
+          { name = "c", type = "A", lbs_map_key = "private" },
         ]
       }
 

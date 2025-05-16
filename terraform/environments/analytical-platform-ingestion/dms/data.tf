@@ -1,9 +1,11 @@
 #### This file can be used to store data specific to the member account ####
 
+data "aws_region" "this" {}
+
 data "aws_availability_zones" "available" {
   filter {
     name   = "region-name"
-    values = ["eu-west-2"]
+    values = [data.aws_region.this.name]
   }
 }
 

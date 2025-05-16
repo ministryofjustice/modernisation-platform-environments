@@ -45,7 +45,24 @@
     "preproduction": {
       "example_var": "preproduction-data",
       "enable_dbt_k8s_secrets": true,
-      "enable_airflow_secret": true
+      "enable_airflow_secret": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": [
+            "emds-dev-dms-data-validation-20240917144028498200000007"
+          ],
+          "resource_shares": [
+            {
+              "glue_database": "dms_data_validation",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ]
     },
     "production": {
       "example_var": "production-data",

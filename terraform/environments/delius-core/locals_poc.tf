@@ -106,6 +106,10 @@ locals {
       container_memory = 1024
     }
 
+    sfs = {
+      container_cpu    = 2048
+      container_memory = 4096
+    }
   }
 
   bastion_config_poc = {

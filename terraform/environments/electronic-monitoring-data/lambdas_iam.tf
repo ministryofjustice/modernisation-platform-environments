@@ -488,11 +488,3 @@ resource "aws_iam_role_policy" "calculate_checksum" {
   policy = data.aws_iam_policy_document.calculate_checksum.json
 }
 
-# -----------------------------------------------------------------------------------
-# API Gateway authorizer
-# -----------------------------------------------------------------------------------
-
-resource "aws_iam_role" "api_gateway_authorizer" {
-  name               = "api_gateway_authorizer"
-  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
-}

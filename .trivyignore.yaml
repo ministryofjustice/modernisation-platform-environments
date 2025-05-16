@@ -51,7 +51,6 @@ misconfigurations:
   - id: AVD-AWS-0104
   - id: AVD-AWS-0095
 
-
 secrets:
 
 licenses:

@@ -18,10 +18,10 @@ module "ecs" {
 
   #ECS details
   cluster_name         = "yjaf-cluster"
-  ec2_instance_type    = "m5.large"
-  ec2_min_size         = 16
-  ec2_max_size         = 16
-  ec2_desired_capacity = 16
+  ec2_instance_type    = "m5.xlarge"
+  ec2_min_size         = 11
+  ec2_max_size         = 11
+  ec2_desired_capacity = 11                                                                                                                  #todo shared from old yjaf, replace with output of ami builder
   nameserver           = join(".", [split(".", data.aws_vpc.shared.cidr_block)[0], split(".", data.aws_vpc.shared.cidr_block)[1], "0", "2"]) #eg "10.23.0.2"
 
   spot_overrides = [
@@ -48,8 +48,9 @@ module "ecs" {
   environment  = local.environment
   tags         = local.tags
 
-  #RDS Details
+  #RDS and Redshift Details
   rds_postgresql_sg_id = module.aurora.rds_cluster_security_group_id
+  redshift_sg_id       = module.redshift.security_group_id
 
   secret_kms_key_arn = module.kms.key_arn
   ecs_secrets_access_policy_secret_arns = jsonencode([
@@ -66,7 +67,7 @@ module "ecs" {
     aws_iam_policy.s3-access.arn
   ]
 
-  depends_on = [module.internal_alb, module.external_alb, module.aurora]
+  depends_on = [module.internal_alb, module.external_alb, module.aurora, module.redshift]
 }
 
 

@@ -38,6 +38,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -141,6 +143,13 @@
             "threshold": 100,
             "period": 60
           }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
         }
       },
       "biprws": {
@@ -196,6 +205,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -297,6 +308,13 @@
             "threshold": 100,
             "period": 60
           }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
         }
       },
       "biprws": {
@@ -352,6 +370,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -455,6 +475,13 @@
             "threshold": 100,
             "period": 60
           }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
         }
       },
       "biprws": {
@@ -478,10 +505,7 @@
           "resource_shares": [
             {
               "glue_database": "curated_prisons_history_preprod_dbt",
-              "glue_tables": [
-                "nomis_offender_course_attendances",
-                "nomis_offender_program_profiles"
-              ]
+              "glue_tables": ["*"]
             }
           ]
         }
@@ -528,6 +552,8 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": false,
+      "enable_generate_dataset_lambda": false,
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -627,6 +653,13 @@
           "cdc_inc_events_check": {
             "enable": true,
             "threshold": 100,
+            "period": 60
+          }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
             "period": 60
           }
         }
