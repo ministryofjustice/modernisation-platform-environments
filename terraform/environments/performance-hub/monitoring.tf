@@ -72,7 +72,7 @@ locals {
 # link the SNS topics to the PagerDuty service
 # https://github.com/ministryofjustice/modernisation-platform/blob/main/terraform/pagerduty/member-services-integrations.tf
 # https://github.com/ministryofjustice/modernisation-platform/blob/main/terraform/pagerduty/aws.tf#L17
-module "pagerduty_alerts" {
+module "pagerduty_alerts_app" {
   depends_on = [
     aws_sns_topic.alerts_topic
   ]
@@ -81,7 +81,7 @@ module "pagerduty_alerts" {
   pagerduty_integration_key = local.pagerduty_integration_keys["performance_hub_prod_alarms"]
 }
 
-module "pagerduty_alerts" {
+module "pagerduty_alerts_ddos" {
   depends_on = [
     aws_sns_topic.ddos_topic
   ]
