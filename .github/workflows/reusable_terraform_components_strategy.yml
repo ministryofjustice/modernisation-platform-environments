@@ -74,7 +74,7 @@ jobs:
               subfolder=$(basename "$d")
               if [ -f "$d/platform_backend.tf" ] && [ "$subfolder" != ".terraform" ]; then
                 COMPONENTS="$COMPONENTS $subfolder"
-              end
+              fi
             done
           fi
 
