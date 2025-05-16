@@ -54,6 +54,7 @@ data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
   provider = aws.modernisation-platform
   name     = "pagerduty_integration_keys"
 }
+
 data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
@@ -65,11 +66,12 @@ locals {
 }
 
 # link the sns topic to the service
-module "pagerduty_ddos_alarm" {
+module "pagerduty_alerts" {
   depends_on = [
-    aws_sns_topic.ddos_alarm
+    aws_sns_topic.alerts_topic
   ]
   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.aws_sns_topic.name]
+  sns_topics                = [aws_sns_topic.alerts_topic.name]
+  #TODO: update key ID once pagerduty PR is merged in MP:
   pagerduty_integration_key = local.pagerduty_integration_keys["ddos_cloudwatch"]
 }
