@@ -31,6 +31,25 @@ locals {
       }
     }
 
+    backup_plans = {
+      # delete once qa11g-nomis-web12-a removed
+      qa11g-nomis-web12-a-workaround = {
+        rule = {
+          schedule          = "cron(30 23 ? * MON-FRI *)"
+          start_window      = 60
+          completion_window = 3600
+          delete_after      = 10
+        }
+        selection = {
+          selection_tags = [{
+            type  = "STRINGEQUALS"
+            key   = "server-name"
+            value = "qa11g-nomis-web12-a"
+          }]
+        }
+      }
+    }
+
     cloudwatch_dashboards = {
       "CloudWatch-Default" = {
         periodOverride = "auto"
@@ -119,18 +138,9 @@ locals {
         })
       })
 
-      dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
-      })
-
-      dev-nomis-web19c-b = merge(local.ec2_autoscaling_groups.web19c, {
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-      })
-
+      # remember to delete associated backup plan
       qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
+        autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.web12.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
@@ -284,6 +294,7 @@ locals {
         })
       })
 
+      # built by code and then handed over to Syscon for remaining manual configuration
       qa11g-nomis-web12-b = merge(local.ec2_instances.web12, {
         config = merge(local.ec2_instances.web12.config, {
           availability_zone = "eu-west-2b"
@@ -293,7 +304,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_instances.web12.user_data_cloud_init, {
           args = merge(local.ec2_instances.web12.user_data_cloud_init.args, {
-            branch = "TM-1185/nomis-web12-manual-build"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_instances.web12.tags, {
@@ -472,34 +483,6 @@ locals {
                   }
                 }]
               }
-              dev-nomis-web19c-a-http-7777 = {
-                priority = 400
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "dev-nomis-web19c-a-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "dev-nomis-web19c-a.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              dev-nomis-web19c-b-http-7777 = {
-                priority = 410
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "dev-nomis-web19c-b-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "dev-nomis-web19c-b.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
               qa11g-nomis-web12-a-http-7777 = {
                 priority = 500
                 actions = [{
@@ -564,8 +547,6 @@ locals {
           { name = "qa11r-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-qa11r", type = "A", lbs_map_key = "private" },
           # weblogic 12
-          { name = "dev-nomis-web19c-a", type = "A", lbs_map_key = "private" },
-          { name = "dev-nomis-web19c-b", type = "A", lbs_map_key = "private" },
           { name = "qa11g-nomis-web12-a", type = "A", lbs_map_key = "private" },
         ]
       }
