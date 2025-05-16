@@ -138,17 +138,6 @@ locals {
         })
       })
 
-      dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
-      })
-
-      dev-nomis-web19c-b = merge(local.ec2_autoscaling_groups.web19c, {
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-      })
-
       # remember to delete associated backup plan
       qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
         autoscaling_schedules = {}
@@ -494,34 +483,6 @@ locals {
                   }
                 }]
               }
-              dev-nomis-web19c-a-http-7777 = {
-                priority = 400
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "dev-nomis-web19c-a-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "dev-nomis-web19c-a.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              dev-nomis-web19c-b-http-7777 = {
-                priority = 410
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "dev-nomis-web19c-b-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "dev-nomis-web19c-b.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
               qa11g-nomis-web12-a-http-7777 = {
                 priority = 500
                 actions = [{
@@ -586,8 +547,6 @@ locals {
           { name = "qa11r-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-qa11r", type = "A", lbs_map_key = "private" },
           # weblogic 12
-          { name = "dev-nomis-web19c-a", type = "A", lbs_map_key = "private" },
-          { name = "dev-nomis-web19c-b", type = "A", lbs_map_key = "private" },
           { name = "qa11g-nomis-web12-a", type = "A", lbs_map_key = "private" },
         ]
       }
