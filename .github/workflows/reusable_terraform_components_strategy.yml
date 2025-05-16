@@ -60,7 +60,7 @@ jobs:
           else
             # On main: all accounts get "plan_apply".
             curl -s -X GET "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform/main/environments/${{ inputs.application }}.json" \
-              | jq -c '.environments[] | {"target": .name, "action": "plan_apply"}' > envlist.json
+              | jq -c '[.environments[] | {"target": .name, "action": "plan_apply"}]' > envlist.json
           fi
 
           # --------------------------------------------------------------------
@@ -172,7 +172,7 @@ jobs:
           # Append referencing components to the matrix.
           for comp in "${referencing_components[@]}"; do
             echo "Including '${comp}' because it references a changed module."
-            target=$(jq -r --arg comp "$comp" '.[] | select(.component == $comp) | .target' envlist.json)
+            target=$(jq -r --arg comp "$comp" '.[] | select(.target == $comp) | .target' envlist.json)
             if [ -z "$target" ]; then
               echo "Error: Unable to determine target for component '${comp}'."
               exit 1
