@@ -144,5 +144,10 @@ locals {
       write_database = local.db_config_dev.database_name
     }
     is-production = false
+    disable_latency_alarms = {
+      start_time      = "14:00"
+      end_time        = "07:00"
+      disable_weekend = true
+    }
   }
 }
