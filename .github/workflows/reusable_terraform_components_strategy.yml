@@ -140,26 +140,18 @@ jobs:
               else
                 if [ "$comp" = "root" ]; then
                   folder="$app_dir"
-                  # For "root", only count changes to files directly in the app folder.
+                  # For "root", count changes to any files directly in the app folder.
                   if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
                     merge_base=$(git merge-base origin/main "$head_commit")
-                    changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
+                    changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder"/*)
                   else
-                    changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
+                    changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder"/*)
                   fi
-                  top_level_changed=false
-                  prefix="$folder/"
-                  for f in $changed_files; do
-                    # Remove the folder prefix.
-                    rel="${f#$prefix}"
-                    # If the relative path has no "/" and is not empty, it's a top-level change.
-                    if [[ "$rel" != */* ]] && [ -n "$rel" ]; then
-                      top_level_changed=true
-                      break
-                    fi
-                  done
-                  if ! $top_level_changed; then
-                    echo "No top-level changes in '$folder'; skipping 'root'"
+
+                  if [ -n "$changed_files" ]; then
+                    echo "Changes detected in 'root'; including 'root' in the matrix."
+                  else
+                    echo "No changes detected in 'root'; skipping 'root'."
                     continue
                   fi
                 else
