@@ -1,3 +1,4 @@
+#trivy:ignore:AVD-AWS-0053: this needs to be public
 module "mwaa_alb" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
@@ -6,8 +7,8 @@ module "mwaa_alb" {
   version = "9.15.0"
 
   name    = "mwaa"
-  vpc_id  = module.vpc.vpc_id
-  subnets = module.vpc.public_subnets
+  vpc_id  = data.aws_vpc.apc_vpc.id
+  subnets = data.aws_subnets.apc_public_subnets.ids
 
   security_group_ingress_rules = {
     all_http = {
@@ -28,7 +29,7 @@ module "mwaa_alb" {
   security_group_egress_rules = {
     all = {
       ip_protocol = "-1"
-      cidr_ipv4   = module.vpc.vpc_cidr_block
+      cidr_ipv4   = data.aws_vpc.apc_vpc.cidr_block
     }
   }
   listeners = {
@@ -44,7 +45,7 @@ module "mwaa_alb" {
     https = {
       port            = 443
       protocol        = "HTTPS"
-      certificate_arn = module.acm_certificate.acm_certificate_arn
+      certificate_arn = data.aws_acm_certificate.certificate.arn
 
       forward = {
         target_group_key = "mwaa"

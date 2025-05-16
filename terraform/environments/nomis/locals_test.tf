@@ -252,33 +252,6 @@ locals {
         })
       })
 
-      t1-nomis-db-1-b = merge(local.ec2_instances.db, {
-        config = merge(local.ec2_instances.db.config, {
-          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
-            "Ec2T1DatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.ec2_instances.db.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 700 }
-          flash = { total_size = 50 }
-        })
-        instance = merge(local.ec2_instances.db.instance, {
-          disable_api_termination = true
-        })
-        tags = merge(local.ec2_instances.db.tags, {
-          description         = "for testing oracle19c upgrade"
-          instance-scheduling = "skip-scheduling"
-          nomis-environment   = "t1"
-          oracle-sids         = ""
-        })
-      })
-
       t1-nomis-db-2-a = merge(local.ec2_instances.db, {
         cloudwatch_metric_alarms = merge(
           local.cloudwatch_metric_alarms.db,
