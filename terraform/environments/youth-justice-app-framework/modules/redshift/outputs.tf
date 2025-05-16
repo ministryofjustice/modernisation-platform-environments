@@ -12,3 +12,8 @@ output "port" {
   description = "The port that this Redshift servless instance listens on."
   value       = aws_redshiftserverless_workgroup.default.endpoint[0].port
 }
+
+output "quicksight_secret_arn" {
+  description = "The secret created to hold the quicksight credentials."
+  value       = aws_secretsmanager_secret.quicksight.arn
+}
