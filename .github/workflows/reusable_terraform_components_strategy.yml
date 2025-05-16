@@ -17,6 +17,8 @@ jobs:
   strategy:
     name: "strategy"
     runs-on: ubuntu-latest
+    env:
+      TARGET_ENV: "development" # Replace with the desired default environment
     outputs:
       matrix: "${{ steps.strategy.outputs.matrix }}"
     steps:
@@ -72,7 +74,7 @@ jobs:
               subfolder=$(basename "$d")
               if [ -f "$d/platform_backend.tf" ] && [ "$subfolder" != ".terraform" ]; then
                 COMPONENTS="$COMPONENTS $subfolder"
-              fi
+              end
             done
           fi
 
@@ -128,7 +130,6 @@ jobs:
               echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
             done
           done < envlist.json
-          echo "]" >> final-list.json
 
           # --------------------------------------------------------------------
           # 5. Detect changes in the "modules" folder and update the matrix.
@@ -168,10 +169,18 @@ jobs:
 
           echo "Components referencing changed modules: ${referencing_components[@]}"
 
-          # Merge referencing components into the COMPONENTS list.
-          COMPONENTS=$(echo "$COMPONENTS ${referencing_components[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' ')
+          # Append referencing components to the matrix.
+          for comp in "${referencing_components[@]}"; do
+            echo "Including '${comp}' because it references a changed module."
+            if [ "$firstEntry" = true ]; then
+              firstEntry=false
+            else
+              echo "," >> final-list.json
+            fi
+            echo -n '{"target":"'"$env.name"'","action":"plan_apply","component":"'"$comp"'"}' >> final-list.json
+          done
 
-          echo "Final components list after module checks: $COMPONENTS"
+          echo "]" >> final-list.json
 
           # --------------------------------------------------------------------
           # 6. Wrap the JSON array in a matrix object.
