@@ -37,30 +37,6 @@ module "multiphase_query_lambda" {
   )
 }
 
-data "aws_iam_policy_document" "glue_read_update_table_policy_document" {
-  statement {
-    sid    = "ReadUpdateGlueTable"
-    effect = "Allow"
-    actions = [
-      "glue:GetDatabase",
-      "glue:GetTables",
-      "glue:UpdateTable"
-    ]
-    resources = [
-      "arn:aws:glue:*:771283872747:database/*",
-      "arn:aws:glue:*:771283872747:table/*/*",
-      "arn:aws:glue:*:771283872747:catalog/*",
-      "arn:aws:glue:*:771283872747:catalog"
-    ]
-  }
-}
-
-resource "aws_iam_policy" "glue_read_update_table_policy" {
-  name        = "${local.project}-dpd-glue-read-update-table-policy"
-  description = "Allows reading and updating Glue tables"
-  policy      = data.aws_iam_policy_document.glue_read_update_table_policy_document.json
-}
-
 module "multiphase_query_lambda_trigger" {
   source = "./modules/lambda_trigger"
 
