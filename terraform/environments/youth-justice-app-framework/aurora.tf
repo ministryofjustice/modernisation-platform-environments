@@ -10,12 +10,12 @@ module "aurora" {
 
   name                       = "yjafrds01-cluster"
   azs                        = ["eu-west-2a", "eu-west-2b"]
-  db_cluster_instance_class  = "db.t4g.medium"
+  db_cluster_instance_class  = local.application_data.accounts[local.environment].database_instance_class
   database_subnet_group_name = "yjaf-db-subnet-group"
   alb_route53_record_name    = "db-yjafrds01"
 
   #one time restore from a shared snapshot on preprod
-  snapshot_identifier = "arn:aws:rds:eu-west-2:053556912568:cluster-snapshot:mojpreprodsnapshot-22-04-encrypted"
+  snapshot_identifier = local.application_data.accounts[local.environment].snapshot_identifier
 
   user_passwords_to_reset = ["postgres_rotated", "redshift_readonly", "quicksight"]
   db_name                 = "yjafrds01"
