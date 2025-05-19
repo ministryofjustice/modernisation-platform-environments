@@ -128,14 +128,14 @@ resource "aws_cloudwatch_log_metric_filter" "PortStatus-True" {
   count          = local.is-production == true ? 1 : 0
   name           = "PortStatus-True"
   log_group_name = aws_cloudwatch_log_group.Network-Connectivity-Logs[count.index].name
-  pattern        = "[date, time, Instance, Port, status=True]"
+  pattern        = "[date, time, Instance, Port25, status!=False]"
   metric_transformation {
-    name      = "True"
-    namespace = "PortStatus"
+    name      = "PortStatus"
+    namespace = "Port"
     value     = "1"
     dimensions = {
       Instance = "$Instance"
-      Port     = "$Port"
+      Port     = "$Port25"
     }
   }
 }
@@ -144,14 +144,14 @@ resource "aws_cloudwatch_log_metric_filter" "PortStatus-False" {
   count          = local.is-production == true ? 1 : 0
   name           = "PortStatus-False"
   log_group_name = aws_cloudwatch_log_group.Network-Connectivity-Logs[count.index].name
-  pattern        = "[date, time, Instance, Port, status=False]"
+  pattern        = "[date, time, Instance, Port25, status=False]"
   metric_transformation {
-    name      = "False"
-    namespace = "PortStatus"
+    name      = "PortStatus"
+    namespace = "Port"
     value     = "0"
     dimensions = {
       Instance = "$Instance"
-      Port     = "$Port"
+      Port     = "$Port25"
     }
   }
 }
@@ -646,8 +646,8 @@ resource "aws_cloudwatch_log_metric_filter" "EmailSender-True" {
     namespace = "EmailSender"
     value     = "1"
     dimensions = {
-      Instance     = "$Instance"
-      EmailSender  = "$EmailSender"
+      Instance    = "$Instance"
+      EmailSender = "$EmailSender"
     }
   }
 }
@@ -662,8 +662,8 @@ resource "aws_cloudwatch_log_metric_filter" "EmailSender-False" {
     namespace = "EmailSender"
     value     = "0"
     dimensions = {
-      Instance     = "$Instance"
-      EmailSender  = "$EmailSender"
+      Instance    = "$Instance"
+      EmailSender = "$EmailSender"
     }
   }
 }
