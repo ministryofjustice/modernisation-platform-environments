@@ -7,7 +7,7 @@ resource "aws_backup_vault" "portal" {
 }
 
 resource "aws_backup_plan" "portal" {
-  name  = "${local.application_name}-backup-daily-retain-35-days"
+  name = "${local.application_name}-backup-daily-retain-35-days"
 
   rule {
     rule_name         = "${local.application_name}-backup-daily-retain-35-days"

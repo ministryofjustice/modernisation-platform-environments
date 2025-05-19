@@ -3,11 +3,11 @@ module "vpc" {
 
   source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
 
-  name            = "${local.application_name}-${local.environment}"
-  azs             = local.availability_zones
-  cidr            = local.application_data.accounts[local.environment].vpc_cidr
-  private_subnets = local.private_subnets
-  public_subnets = local.public_subnets
+  name             = "${local.application_name}-${local.environment}"
+  azs              = local.availability_zones
+  cidr             = local.application_data.accounts[local.environment].vpc_cidr
+  private_subnets  = local.private_subnets
+  public_subnets   = local.public_subnets
   database_subnets = local.database_subnets
 
   # enable_nat_gateway = true # Disable for now
@@ -57,8 +57,8 @@ module "vpc_endpoints" {
       )
     },
     ssm = {
-      service         = "ssm"
-      service_type    = "Interface"
+      service             = "ssm"
+      service_type        = "Interface"
       private_dns_enabled = true
       tags = merge(
         local.tags,
@@ -66,8 +66,8 @@ module "vpc_endpoints" {
       )
     },
     ssmmessages = {
-      service         = "ssmmessages"
-      service_type    = "Interface"
+      service             = "ssmmessages"
+      service_type        = "Interface"
       private_dns_enabled = true
       tags = merge(
         local.tags,
@@ -75,8 +75,8 @@ module "vpc_endpoints" {
       )
     },
     ec2messages = {
-      service         = "ec2messages"
-      service_type    = "Interface"
+      service             = "ec2messages"
+      service_type        = "Interface"
       private_dns_enabled = true
       tags = merge(
         local.tags,
@@ -107,10 +107,10 @@ resource "aws_security_group_rule" "allow_all_vpc" {
 # VPC peering
 resource "aws_ssm_parameter" "mp_shared_vpc_id" {
   #checkov:skip=CKV_AWS_337: Standard key is fine here
-  name = "mp_shared_vpc_id"
-  type = "SecureString"
+  name  = "mp_shared_vpc_id"
+  type  = "SecureString"
   value = "DEFAULT"
-  tags = local.tags
+  tags  = local.tags
   lifecycle {
     ignore_changes = [
       value

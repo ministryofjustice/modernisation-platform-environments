@@ -95,18 +95,18 @@ resource "aws_vpc_security_group_ingress_rule" "oim_bi" {
 # }
 
 resource "aws_vpc_security_group_egress_rule" "oim_outbound_local_vpc" {
-  for_each = local.outbound_security_group_ids
-  security_group_id = aws_security_group.oim_instance.id
-  ip_protocol       = "-1"
+  for_each                     = local.outbound_security_group_ids
+  security_group_id            = aws_security_group.oim_instance.id
+  ip_protocol                  = "-1"
   referenced_security_group_id = each.value
 }
 
 resource "aws_vpc_security_group_egress_rule" "oim_outbound_vpc_endpoints" {
-  security_group_id = aws_security_group.oim_instance.id
+  security_group_id            = aws_security_group.oim_instance.id
   referenced_security_group_id = aws_security_group.vpc_endpoints.id
-  from_port         = 443
-  ip_protocol       = "tcp"
-  to_port           = 443
+  from_port                    = 443
+  ip_protocol                  = "tcp"
+  to_port                      = 443
 }
 
 # TODO Depending on outcome of how EBS/EFS is used, this resource may depend on aws_instance.oam_instance_1
@@ -118,7 +118,7 @@ resource "aws_instance" "oim_instance_1" {
   iam_instance_profile        = aws_iam_instance_profile.portal.id
   user_data_base64            = base64encode(local.oim_1_userdata)
   user_data_replace_on_change = true
-#   key_name                    = aws_key_pair.portal_ssh_ohs.key_name
+  #   key_name                    = aws_key_pair.portal_ssh_ohs.key_name
 
   network_interface {
     network_interface_id = aws_network_interface.oim_1.id
@@ -145,8 +145,8 @@ resource "aws_instance" "oim_instance_1" {
 }
 
 resource "aws_network_interface" "oim_1" {
-  subnet_id   = module.vpc.private_subnets.0
-  private_ips = ["10.206.4.80"]
+  subnet_id       = module.vpc.private_subnets.0
+  private_ips     = ["10.206.4.80"]
   security_groups = [aws_security_group.oim_instance.id]
 
   tags = {
