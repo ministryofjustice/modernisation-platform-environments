@@ -1,7 +1,9 @@
 {
   "keys": {
     "poc": {},
-    "dev": {},
+    "dev": {
+      "bathinas" : "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMOM5xl0Ygn1o9/Dc5z29TQdaYPvCgFqjZCdN2aR0tmJ siva.bathina@MJ004028"
+    },
     "test": {},
     "stage": {},
     "preprod": {},
