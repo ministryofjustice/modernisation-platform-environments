@@ -15,6 +15,7 @@ module "yjsm" {
       development   = "10.26.144.61"
       test          = "10.26.152.172"
       preproduction = "10.27.144.83"
+      production    = "10.27.152.21"
       # Add more environments when IP is known
     },
     local.environment,

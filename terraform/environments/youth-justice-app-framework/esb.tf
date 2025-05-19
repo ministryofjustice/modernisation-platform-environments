@@ -14,6 +14,7 @@ module "esb" {
       development   = "10.26.144.217"
       test          = "10.26.152.88"
       preproduction = "10.27.144.238"
+      production    = "10.27.152.38"
       # Add more environments when IP is known
     },
     local.environment,

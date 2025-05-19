@@ -74,5 +74,5 @@ resource "aws_network_interface" "main" {
   subnet_id                            = var.subnet_id
   private_ips                          = [var.private_ip]
   private_ips_count                    = 2
-  vpc_security_group_ids               = [aws_security_group.yjsm_service.id]
+  security_groups                      = [aws_security_group.yjsm_service.id]
 }
