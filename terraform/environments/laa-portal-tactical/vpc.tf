@@ -10,7 +10,7 @@ module "vpc" {
   public_subnets   = local.public_subnets
   database_subnets = local.database_subnets
 
-  # enable_nat_gateway = true # Disable for now
+  enable_nat_gateway = true # Disable for now
 
   # VPC Flow Logs (Cloudwatch log group and IAM role will be created)
   enable_flow_log                      = true
@@ -118,12 +118,12 @@ resource "aws_ssm_parameter" "mp_shared_vpc_id" {
   }
 }
 
-# resource "aws_vpc_peering_connection" "laa_mp_vpc" {
-#   vpc_id        = module.vpc.vpc_id
-#   peer_vpc_id   = aws_ssm_parameter.mp_shared_vpc_id.value
-#   peer_owner_id = local.environment_management.account_ids[local.provider_name]
-#   tags = merge(
-#     local.tags,
-#     {Side = "Requester"}
-#   )
-# }
+resource "aws_vpc_peering_connection" "laa_mp_vpc" {
+  vpc_id        = module.vpc.vpc_id
+  peer_vpc_id   = aws_ssm_parameter.mp_shared_vpc_id.value
+  peer_owner_id = local.environment_management.account_ids[local.provider_name]
+  tags = merge(
+    local.tags,
+    {Side = "Requester"}
+  )
+}

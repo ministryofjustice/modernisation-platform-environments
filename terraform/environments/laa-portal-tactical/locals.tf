@@ -25,6 +25,7 @@ locals {
   }
 
   lb_logs_bucket = local.application_data.accounts[local.environment].lb_logs_bucket
+  lb_cert_arn = "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["laa-portal-tactical-development"]}:certificate/${local.application_data.accounts[local.environment].lb_cert_id}"
 
   # RDS - IAGB and IDGB
   igdb_username = "admin"
