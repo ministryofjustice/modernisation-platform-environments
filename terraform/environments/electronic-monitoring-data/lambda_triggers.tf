@@ -31,7 +31,7 @@ resource "aws_s3_bucket_notification" "historic_data_store" {
     events = [
       "s3:ObjectCreated:*",
     ]
-    filter_suffix = ".7z*"
+    filter_suffix = ".7z"
   }
   lambda_function {
     lambda_function_arn = module.format_json_fms_data.lambda_function_arn
