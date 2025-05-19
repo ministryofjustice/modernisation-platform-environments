@@ -36,10 +36,12 @@ resource "aws_instance" "yjsm" {
   monitoring             = true
   ebs_optimized          = true
   iam_instance_profile   = aws_iam_instance_profile.yjsm_ec2_profile.id
-  vpc_security_group_ids = [aws_security_group.yjsm_service.id]
-  subnet_id              = var.subnet_id
-  private_ip             = var.private_ip
   tags                   = local.all_tags
+
+  network_interface {
+    network_interface_id = aws_network_interface.main.id
+    device_index         = 0
+  }
 
 
   metadata_options {
@@ -68,3 +70,9 @@ data "aws_ami" "amazon_linux" {
   owners = ["amazon"]
 }
 
+resource "aws_network_interface" "main" {
+  subnet_id                            = var.subnet_id
+  private_ips                          = [var.private_ip]
+  private_ips_count                    = 2
+  security_groups                      = [aws_security_group.yjsm_service.id]
+}

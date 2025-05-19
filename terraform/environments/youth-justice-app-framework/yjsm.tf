@@ -15,6 +15,7 @@ module "yjsm" {
       development   = "10.26.144.61"
       test          = "10.26.152.172"
       preproduction = "10.27.144.83"
+      production    = "10.27.152.21"
       # Add more environments when IP is known
     },
     local.environment,
@@ -24,13 +25,14 @@ module "yjsm" {
   ami = lookup(
     {
       development   = "ami-007acc01ecffc3c6c"
-      preproduction = "ami-04ee6bb49367c4dd9"
+      preproduction = "ami-0d79a6afc87dfa388"
+      production    = "ami-08e24cb718917177b"
       # Add more environments when AMIs are known
     },
     local.environment,
     "ami-01426769db5cd0a43" # Default AMI
   )
-
+  
   project_name = local.project_name
   environment  = local.environment
   tags         = local.tags
