@@ -64,7 +64,7 @@ resource "aws_lb_listener" "https_internal" {
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   routing_http_response_server_enabled = true
-  certificate_arn   = local.application_data.accounts[local.environment].lb_cert_arn
+  certificate_arn   = local.lb_cert_arn
 
   default_action {
     type             = "forward"
