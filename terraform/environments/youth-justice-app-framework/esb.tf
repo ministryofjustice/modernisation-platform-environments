@@ -26,6 +26,7 @@ module "esb" {
     {
       development   = "ami-0cc0dad47bc769c08"
       preproduction = "ami-04a6fa2443473cfd5"
+      production    = "ami-0b14bd01e84f3e0a5"
       # Add more environments when AMIs are known
     },
     local.environment,
