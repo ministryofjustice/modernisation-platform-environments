@@ -36,6 +36,12 @@ locals {
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["private-jumpserver"]
       }
+      secretsmanager_secrets = {
+        dso-modernisation-platform-automation = {
+          description             = "Use the dso-modernisation-platform-automation azure app registration"
+          recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
+        }
+      }
       tags = {
         ami_name               = "hmpps_windows_server_2022"
         backup                 = "false"

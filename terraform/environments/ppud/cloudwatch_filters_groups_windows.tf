@@ -646,8 +646,8 @@ resource "aws_cloudwatch_log_metric_filter" "EmailSender-True" {
     namespace = "EmailSender"
     value     = "1"
     dimensions = {
-      Instance     = "$Instance"
-      EmailSender  = "$EmailSender"
+      Instance    = "$Instance"
+      EmailSender = "$EmailSender"
     }
   }
 }
@@ -662,8 +662,8 @@ resource "aws_cloudwatch_log_metric_filter" "EmailSender-False" {
     namespace = "EmailSender"
     value     = "0"
     dimensions = {
-      Instance     = "$Instance"
-      EmailSender  = "$EmailSender"
+      Instance    = "$Instance"
+      EmailSender = "$EmailSender"
     }
   }
 }
