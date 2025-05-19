@@ -32,7 +32,7 @@
       "idm_config_snapshot": "",
       "idm_mserver_snapshot": "",
       "idm_instances_snapshot": "",
-      "lb_cert_arn": "5c913e7e-8dfe-41fd-ab03-fba7cf9ef538",
+      "lb_cert_id": "5c913e7e-8dfe-41fd-ab03-fba7cf9ef538",
       "lb_enable_deletion_protection": "false",
       "lb_logs_bucket": "",
       "lb_access_logs_existing_bucket_name": "",
@@ -53,7 +53,7 @@
       "idm_instance_type": "m5.xlarge",
       "igdb_snapshot_name": "portal-igdb-202505092306",
       "iadb_snapshot_name": "portal-iadb-202505092309",
-      "lb_cert_arn": "ef6914c9-2ff0-42e7-8bcd-5dfe3e79dd36",
+      "lb_cert_id": "ef6914c9-2ff0-42e7-8bcd-5dfe3e79dd36",
       "lb_enable_deletion_protection": "false",
       "lb_logs_bucket": ""
     }
