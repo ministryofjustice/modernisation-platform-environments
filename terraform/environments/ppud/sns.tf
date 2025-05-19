@@ -67,7 +67,7 @@ data "aws_iam_policy_document" "cw_prod_topic_policy_document" {
   count     = local.is-production == true ? 1 : 0
   policy_id = "cw_prod_sns_topic_policy_document"
 
- statement {
+  statement {
     sid    = "cw_prod_statement_id"
     effect = "Allow"
     principals {
@@ -88,7 +88,7 @@ data "aws_iam_policy_document" "cw_prod_topic_policy_document" {
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceOwner"
-      values   = [
+      values = [
         data.aws_caller_identity.current.account_id
       ]
     }
@@ -123,7 +123,7 @@ data "aws_iam_policy_document" "cw_uat_topic_policy_document" {
   count     = local.is-preproduction == true ? 1 : 0
   policy_id = "cw_uat_sns_topic_policy_document"
 
- statement {
+  statement {
     sid    = "cw_uat_statement_id"
     effect = "Allow"
     principals {
@@ -144,7 +144,7 @@ data "aws_iam_policy_document" "cw_uat_topic_policy_document" {
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceOwner"
-      values   = [
+      values = [
         data.aws_caller_identity.current.account_id
       ]
     }
@@ -179,7 +179,7 @@ data "aws_iam_policy_document" "cw_dev_topic_policy_document" {
   count     = local.is-development == true ? 1 : 0
   policy_id = "cw_dev_sns_topic_policy_document"
 
- statement {
+  statement {
     sid    = "cw_dev_statement_id"
     effect = "Allow"
     principals {
@@ -200,7 +200,7 @@ data "aws_iam_policy_document" "cw_dev_topic_policy_document" {
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceOwner"
-      values   = [
+      values = [
         data.aws_caller_identity.current.account_id
       ]
     }

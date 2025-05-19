@@ -1046,8 +1046,8 @@ resource "aws_cloudwatch_metric_alarm" "emailsender_check_rgvw022" {
   alarm_description   = "Monitors for stale email sender log files "
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    Instance        = "i-029d2b17679dab982"
-    EmailSender     = "EmailSender"
+    Instance    = "i-029d2b17679dab982"
+    EmailSender = "EmailSender"
   }
 }
 
