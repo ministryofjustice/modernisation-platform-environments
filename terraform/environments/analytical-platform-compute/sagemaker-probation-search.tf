@@ -19,7 +19,8 @@ locals {
         s3_model_key = "ext/mixedbread-ai/mixedbread-ai_mxbai-embed-large-v1/" # To use a local model from S3
         environment = {                                                        # Environment variables to be passed to the Hugging Face Text Embeddings Inference image. See https://huggingface.co/docs/text-embeddings-inference/cli_arguments.
           HF_MODEL_ID           = "/opt/ml/model"                              # Specifies the model to load from Hugging Face Hub. If you are specifying s3_model_key, this should be set to "/opt/ml/model"
-          MAX_CLIENT_BATCH_SIZE = 512
+          MAX_CLIENT_BATCH_SIZE = 2048
+          MAX_BATCH_TOKENS      = 65536
           AUTO_TRUNCATE         = true
         }
       }
@@ -35,7 +36,8 @@ locals {
         image_tag                       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
         environment = {
           HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
-          MAX_CLIENT_BATCH_SIZE = 512
+          MAX_CLIENT_BATCH_SIZE = 2048
+          MAX_BATCH_TOKENS      = 65536
           AUTO_TRUNCATE         = true
         }
       }
@@ -49,7 +51,8 @@ locals {
         image_tag                       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
         environment = {
           HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
-          MAX_CLIENT_BATCH_SIZE = 512
+          MAX_CLIENT_BATCH_SIZE = 2048
+          MAX_BATCH_TOKENS      = 65536
           AUTO_TRUNCATE         = true
         }
       }
