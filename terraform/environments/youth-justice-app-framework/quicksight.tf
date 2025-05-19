@@ -2,6 +2,8 @@
 module "quicksight" {
   source = "./modules/quicksight"
 
+  count = local.application_data.accounts[local.environment].quicksight_setup ? 1 : 0
+
   project_name = local.project_name
   environment  = local.environment
   tags         = local.tags
@@ -14,21 +16,6 @@ module "quicksight" {
 
   postgresql_sg_id    = module.aurora.rds_cluster_security_group_id
   redshift_sg_id      = module.redshift.security_group_id
-
-  depends_on = [module.aurora, module.redshift]
- }
-
- 
-module "quicksight-artifacts" {
-  source = "./modules/quicksight-artifacts"
-
-  count = local.application_data.accounts[local.environment].quicksight_setup ? 1 : 0
-
-  project_name = local.project_name
-  environment  = local.environment
-  tags         = local.tags
-
-  vpc_connection_arn = module.quicksight.vpc_connection_arn
 
   redshift_host = module.redshift.address
   redshift_port = module.redshift.port

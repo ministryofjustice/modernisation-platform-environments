@@ -1,3 +1,5 @@
+/*
+# Subecription created manaulall as Git Actioos do not have sufficient permissions.
 resource "aws_quicksight_account_subscription" "subscription" {
   count = var.environment == "development" ? 0 : 1 # subscription was created manually in develiopment
 
@@ -7,6 +9,7 @@ resource "aws_quicksight_account_subscription" "subscription" {
   notification_email               = var.notification_email
   
 }
+*/
 
 resource "aws_quicksight_vpc_connection" "local" {
   name               = "${var.project_name}-${var.environment}"

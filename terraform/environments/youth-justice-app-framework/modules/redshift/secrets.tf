@@ -42,7 +42,7 @@ resource "aws_secretsmanager_secret_version" "returns" {
   })
 }
 
-resource "aws_secretsmanager_secret" "quicksight" {
+resource "aws_secretsmanager_secret" "yjb_publish" {
   #checkov:skip=CKV2_AWS_57: [TODO] Consider adding rotation for the Redshift admin user password.
 
   name        = "${var.project_name}/${var.environment}/quicksight/redshift-serverless/2"
@@ -50,14 +50,14 @@ resource "aws_secretsmanager_secret" "quicksight" {
   kms_key_id  = var.kms_key_arn
 }
 
-resource "aws_secretsmanager_secret_version" "quicksight" {
-  secret_id = aws_secretsmanager_secret.quicksight.id
+resource "aws_secretsmanager_secret_version" "yjb_publish" {
+  secret_id = aws_secretsmanager_secret.yjb_publish.id
   secret_string = jsonencode({
-    username = "quicksight"
+    username = "yjb_publish"
     password = "changeme"
     hostname = aws_redshiftserverless_workgroup.default.endpoint[0].address
     port     = aws_redshiftserverless_workgroup.default.endpoint[0].port
     database = "yjb_returns"
-    url      = "jdbc:redshift://${aws_redshiftserverless_workgroup.default.endpoint[0].address}:${aws_redshiftserverless_workgroup.default.endpoint[0].port}/yjb_returns;TCPKeepAlice=FALSE"
+    url      = "jdbc:redshift://${aws_redshiftserverless_workgroup.default.endpoint[0].address}:${aws_redshiftserverless_workgroup.default.endpoint[0].port}/yjb_returns;TCPKeepAlive=FALSE"
   })
 }

@@ -15,5 +15,5 @@ output "port" {
 
 output "quicksight_secret_arn" {
   description = "The secret created to hold the quicksight credentials."
-  value       = aws_secretsmanager_secret.quicksight.arn
+  value       = aws_secretsmanager_secret.yjb_publish.arn
 }
