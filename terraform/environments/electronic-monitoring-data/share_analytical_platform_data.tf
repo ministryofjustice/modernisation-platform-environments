@@ -137,9 +137,9 @@ resource "aws_lakeformation_permissions" "share_table_filter_with_ap" {
   permissions                   = ["SELECT"]
   permissions_with_grant_option = ["SELECT"]
   data_cells_filter {
-    database_name   = "${each.value.database_name}${local.dbt_suffix}"
-    table_name      = each.value.table_name
+    database_name    = "${each.value.database_name}${local.dbt_suffix}"
+    table_name       = each.value.table_name
     table_catalog_id = data.aws_caller_identity.current.account_id
-    name            = "${each.value.table_name}_general_filter"
+    name             = "${each.value.table_name}_general_filter"
   }
 }

@@ -68,13 +68,13 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
     }
   }
 
-  statement { 
+  statement {
     effect  = "Allow"
-    actions =  ["s3:ListBucket", "s3:GetBucketLocation"]
+    actions = ["s3:ListBucket", "s3:GetBucketLocation"]
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
     ]
-     principals {
+    principals {
       type        = "Service"
       identifiers = ["bcm-data-exports.amazonaws.com"]
     }
@@ -94,12 +94,12 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
   }
 
   statement {
-    effect  = "Allow"
+    effect = "Allow"
 
     actions = [
-    "s3:GetObject",
-    "s3:PutObject"
-  ]
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
 
     resources = [
       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*"
