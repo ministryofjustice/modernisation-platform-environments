@@ -44,6 +44,12 @@ locals {
           tags = {
             patch-manager = "group1"
           }
+          secretsmanager_secrets = {
+            dso-modernisation-platform-automation = {
+              description             = "Use the dso-modernisation-platform-automation azure app registration"
+              recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
+            }
+          }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.hmpp.root"
