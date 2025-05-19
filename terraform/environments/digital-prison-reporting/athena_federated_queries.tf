@@ -53,16 +53,16 @@ locals {
   dev_and_test_federated_query_credentials_secret_arns = [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
-    aws_secretsmanager_secret.oasys[0].arn,
-    aws_secretsmanager_secret.onr[0].arn,
-    aws_secretsmanager_secret.ndelius[0].arn,
-    aws_secretsmanager_secret.ndmis[0].arn
+    local.is_dev_or_test ? aws_secretsmanager_secret.oasys[0].arn : "",
+    local.is_dev_or_test ? aws_secretsmanager_secret.onr[0].arn : "",
+    local.is_dev_or_test ? aws_secretsmanager_secret.ndelius[0].arn : "",
+    local.is_dev_or_test ? aws_secretsmanager_secret.ndmis[0].arn : ""
   ]
 
   preproduction_federated_query_credentials_secret_arns = [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
-    aws_secretsmanager_secret.ndmis[0].arn,
+    local.is-preproduction? aws_secretsmanager_secret.ndmis[0].arn : "",
   ]
 
   production_federated_query_credentials_secret_arns = [
