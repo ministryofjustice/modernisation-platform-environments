@@ -46,7 +46,7 @@ resource "aws_db_parameter_group" "parameter_group_19" {
 #TODO - These settings are for MAATDB only so we need to consider whether they should be in the module or not.
 
 resource "aws_db_option_group" "option_group_19" {
-  name                     = "option-group-19"
+  name                     = "appdboptiongroup19"
   option_group_description = "${var.application_name}-${var.environment}-option-group"
   engine_name              = var.engine
   major_engine_version     = "19"
