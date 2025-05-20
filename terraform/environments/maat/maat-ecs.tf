@@ -221,15 +221,6 @@ resource "aws_security_group_rule" "alb_ingress" {
   source_security_group_id = aws_security_group.external_lb.id
 }
 
-resource "aws_security_group_rule" "outbound" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  security_group_id = aws_security_group.maat_ecs_security_group.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
 resource "aws_security_group_rule" "maat_sg_rule_int_lb_to_ecs" {
   security_group_id        = aws_security_group.maat_ecs_security_group.id
   type                     = "ingress"

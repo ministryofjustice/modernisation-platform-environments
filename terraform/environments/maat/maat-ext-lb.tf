@@ -160,24 +160,6 @@ resource "aws_security_group" "external_lb" {
   )
 }
 
-resource "aws_security_group_rule" "external_lb_ingress" {
-  type              = "ingress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.external_lb.id
-}
-
-resource "aws_security_group_rule" "external_lb_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  security_group_id = aws_security_group.external_lb.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
 resource "aws_lb_listener" "external" {
 
   load_balancer_arn = aws_lb.external.arn
