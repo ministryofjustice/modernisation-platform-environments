@@ -50,7 +50,7 @@ if [[ -n "$tf_dirs" ]]; then
   
   echo "    schedule:" >> "$dependabot_file"
   echo "      interval: \"daily\"" >> "$dependabot_file"
-  echo "    open-pull-requests-limit: 50" >> "$dependabot_file"
+  echo "    open-pull-requests-limit: 75" >> "$dependabot_file"
 fi
 
 # Add Go module ecosystem entries (dynamically only for top-level directories containing go.mod)
