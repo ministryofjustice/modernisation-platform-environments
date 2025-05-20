@@ -327,6 +327,25 @@ locals {
             }
           }
         }
+      },
+      "coat = {
+          "identity_centre_team" = "cloud-optimisation-and-accountability",
+          "aws_accounts" = {
+            "coat-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                primary = {
+                  database  = "cur_v2_database"
+                  workgroup = "coat_cur_report"
+                }
+              }
+            }
+          }
+        }
       }
       grafana_version                 = "10.4"
       grafana_api_key_rotator_version = "1.0.10"
