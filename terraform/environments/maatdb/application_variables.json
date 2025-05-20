@@ -4,10 +4,11 @@
       "application_name": "MAATDB",
       "identifier_name": "maatdb",
       "region": "eu-west-2",
+      "port": "1521",
       "allocated_storage": 300,
       "engine": "oracle-se2",
       "engine_version": "19.0.0.0.ru-2021-10.rur-2021-10.r1",
-      "instance_class": "db.t3.small",
+      "instance_class": "db.t3.medium",
       "allow_major_version_upgrade": true,
       "auto_minor_version_upgrade": true,
       "storage_type": "gp2",
@@ -24,7 +25,9 @@
       "performance_insights_retention_period": 7,
       "lz_vpc_cidr": "10.202.0.0/20",
       "snapshot_arn": "rds-maatdb-copy",
-      "deletion_protection": false
+      "deletion_protection": false,
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "manual_added_cidr": "10.221.0.0/16"
     },
     "test": {
       "example_var": "test-data"
