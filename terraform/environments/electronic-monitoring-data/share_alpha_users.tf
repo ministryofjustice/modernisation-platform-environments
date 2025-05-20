@@ -12,7 +12,9 @@ locals {
 }
 
 resource "aws_lakeformation_permissions" "share_data_bucket_alpha_users" {
-  for_each = flatten([for details in local.alpha_user_permissions : [details.username]])
+  for_each = local.is-production ? toset(flatten([
+    for details in local.alpha_user_permissions : [details.username]
+  ])) : []
 
   principal                     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/alpha_user_${each.value}"
   permissions                   = ["DATA_LOCATION_ACCESS"]
