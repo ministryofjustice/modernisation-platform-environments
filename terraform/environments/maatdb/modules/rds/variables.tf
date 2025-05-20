@@ -114,11 +114,6 @@ variable "performance_insights_retention_period" {
   description = "Retention period for PI. Typically longer for prod dbs"
 }
 
-variable "lz_vpc_cidr" {
-  type        = string
-  description = "The CIDR range of the LAA LZ"
-}
-
 variable "snapshot_arn" {
   type        = string
   description = "The ARN of the source snapshot"
