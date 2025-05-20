@@ -40,7 +40,7 @@ resource "aws_instance" "db_access_instance" {
   instance_type     = "t3.small"
   vpc_security_group_ids      = [aws_security_group.ec2.id]
   monitoring                  = true
-  subnet_id                   = data.aws_subnet.shared-data.id
+  subnet_id                   = data.aws_subnet.data_subnets_a.id
   root_block_device {
     volume_size = 10
     volume_type = "gp3"
