@@ -34,13 +34,24 @@ module "bastion_linux" {
 
 # ec2 to access the RDS
 
-resource "aws_instance" "oas_app_instance" {
+resource "aws_instance" "db_access_instance" {
   ami = "ami-0fc32db49bc3bfbb1"
   availability_zone = "eu-west-2a"
   instance_type     = "t3.small"
   vpc_security_group_ids      = [aws_security_group.ec2.id]
-  monitoring = true
-  subnet_id                   = data.aws_subnet.private_subnets_a.id
+  monitoring                  = true
+  subnet_id                   = data.aws_subnet.shared-data.id
+  root_block_device {
+    volume_size = 10
+    volume_type = "gp3"
+    delete_on_termination = true
+  }
+  ebs_block_device {
+    device_name           = "/dev/sdf" 
+    volume_size           = 30
+    volume_type           = "gp3"
+    delete_on_termination = true
+  }
   tags = merge(
     local.tags,
     { "Name" = "${local.application_name}-db-access" },
@@ -48,6 +59,8 @@ resource "aws_instance" "oas_app_instance" {
     { "snapshot-with-daily-7-day-retention" = "yes" }
   )
 }
+
+
 
 resource "aws_security_group" "ec2" {
   name        = local.application_name
