@@ -73,6 +73,7 @@ locals {
           description         = "Test instance from pp-cafm-a-11-a"
           instance-scheduling = "skip-scheduling"
         })
+        cloudwatch_metric_alarms = null
       })
 
       # database servers
