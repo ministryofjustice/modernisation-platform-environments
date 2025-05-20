@@ -1149,36 +1149,6 @@ module "s3-dms-target-store-bucket" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "cadt_runner" {
-  statement {
-    sid    = "AllowS3BucketAccess"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject",
-      "s3:ListBucket",
-      "s3:ListBucketMultipartUploads",
-      "s3:ListMultipartUploadParts",
-      "s3:ListBucket",
-      "s3:ListBucketMultipartUploads",
-      "s3:ListMultipartUploadParts"
-    ]
-    resources = [
-      aws_s3_bucket.data_store.arn,
-      "${aws_s3_bucket.data_store.arn}/*"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow_prod_cadet_emds_deploy_historic_transforms"]
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "cadt_runner" {
-  bucket = aws_s3_bucket.data_store.id
-  policy = data.aws_iam_policy_document.cadt_runner.json
-}
 
 module "s3-create-a-derived-table-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"
