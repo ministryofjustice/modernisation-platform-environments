@@ -73,6 +73,6 @@ data "aws_ami" "amazon_linux" {
 resource "aws_network_interface" "main" {
   subnet_id                            = var.subnet_id
   private_ip                           = var.private_ip
-  private_ips_count                    = 2
+  private_ips_count                    = 1
   security_groups                      = [aws_security_group.yjsm_service.id]
 }
