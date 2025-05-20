@@ -2,6 +2,15 @@ locals {
   public_key_data = jsondecode(file("./files/bastion_linux.json"))
 }
 
+# get core_vpc account protected subnets security group
+data "aws_security_group" "core_vpc_protected" {
+  provider = aws.share-host
+
+  tags = {
+    Name = "${var.business_unit}-${var.environment}-int-endpoint"
+  }
+}
+
 module "bastion_linux" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.4.2"
 
