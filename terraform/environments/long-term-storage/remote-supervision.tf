@@ -2,7 +2,7 @@
 # owner : Remote Supervision: remote.supervision+hosting@digital.justice.gov.uk
 
 module "remote_supervision_s3" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
 
   bucket_prefix      = "remote-supervision"
   versioning_enabled = true
