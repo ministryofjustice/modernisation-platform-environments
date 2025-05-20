@@ -1,6 +1,6 @@
 # Python script to retrieve cloudwatch metic data (cpu processes), graph it and email it to end users via the internal mail relay.
 # Nick Buckingham
-# 4 April 2025
+# 20 May 2025
 
 import boto3
 import os
@@ -21,12 +21,12 @@ cloudwatch = boto3.client('cloudwatch')
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 INSTANCE_ID = "i-029d2b17679dab982"
 SERVER = "022"
-#START_TIME = datetime(2025, 3, 31, 8, 0, 0)
-#END_TIME = datetime(2025, 3, 31, 17, 0, 0)
+#START_TIME = datetime(2025, 5, 13, 8, 0, 0)
+#END_TIME = datetime(2025, 5, 13, 17, 0, 0)
 END_TIME = datetime.utcnow() 
 START_TIME = END_TIME - timedelta(hours=9)
 SENDER = "donotreply@cjsm.secure-email.ppud.justice.gov.uk"
-RECIPIENTS = ["nick.buckingham@colt.net", "pankaj.pant@colt.net", "david.savage@colt.net", "kofi.owusu-nimoh@colt.net", "helen.stimpson@colt.net"]
+RECIPIENTS = ["nick.buckingham@colt.net", "pankaj.pant@colt.net", "david.savage@colt.net", "kofi.owusu-nimoh@colt.net", "helen.stimpson@colt.net", "prasad.cherukuri@colt.net"]
 #RECIPIENTS = ["nick.buckingham@colt.net"]
 SUBJECT = f'AWS EC2 CPU Utilization Report - {SERVER} - {CURRENT_DATE}'
 REGION = "eu-west-2"
@@ -49,7 +49,7 @@ def get_metric_data(namespace, metric_name, dimensions):
                         'Dimensions': dimensions
                     },
                     'Period': 300,
-                    'Stat': 'Maximum'
+                    'Stat': 'Average'
                 },
                 'ReturnData': True
             },
@@ -100,6 +100,10 @@ def email_image_to_users(graph_base64):
         <p>Hi Team,</p>
         <p>Please find below the CPU utilization metrics for EC2 instance {SERVER} for today from 08:00 to 17:00.</p>
         <img src="data:image/png;base64,{graph_base64}" alt="CPU Utilization Graph" />
+        <p>Note the times above are in UTC time, for BST time please add one hour to the above times.
+        <p></p>
+        <p>For multiple processes with the same name, the graph will display the aggregated average of all the processes and not the total CPU usage.</p>
+        <p></p>
         <p>This is an automated email.</p>
     </body>
     </html>
@@ -140,7 +144,7 @@ def lambda_handler(event, context):
     cpu_data = get_metric_data('AWS/EC2', 'CPUUtilization', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}])
     converttopdf_data = get_metric_data('CWAgent', 'procstat cpu_usage', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}, {'Name': 'process_name', 'Value': 'ConvertToPDF.exe'}, {'Name': 'exe', 'Value': 'ConvertToPDF'}, {'Name': 'ImageId', 'Value': IMAGE_ID}, {'Name': 'InstanceType', 'Value': INSTANCE_TYPE}])
     pdfcrawler2app_data = get_metric_data('CWAgent', 'procstat cpu_usage', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}, {'Name': 'process_name', 'Value': 'PDFCrawler2App.exe'}, {'Name': 'exe', 'Value': 'PDFCrawler2App'}, {'Name': 'ImageId', 'Value': IMAGE_ID}, {'Name': 'InstanceType', 'Value': INSTANCE_TYPE}])
-    winword_data = get_metric_data('CWAgent', 'procstat cpu_usage', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}, {'Name': 'process_name', 'Value': 'WINWORD.exe'}, {'Name': 'exe', 'Value': 'WINWORD'}, {'Name': 'ImageId', 'Value': IMAGE_ID}, {'Name': 'InstanceType', 'Value': INSTANCE_TYPE}])
+    winword_data = get_metric_data('CWAgent', 'procstat cpu_usage', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}, {'Name': 'process_name', 'Value': 'WINWORD.exe'.upper()}, {'Name': 'exe', 'Value': 'WINWORD'.upper()}, {'Name': 'ImageId', 'Value': IMAGE_ID}, {'Name': 'InstanceType', 'Value': INSTANCE_TYPE}])
     wmiprvse_data = get_metric_data('CWAgent', 'procstat cpu_usage', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}, {'Name': 'process_name', 'Value': 'WmiPrvSE.exe'}, {'Name': 'exe', 'Value': 'WmiPrvSE'}, {'Name': 'ImageId', 'Value': IMAGE_ID}, {'Name': 'InstanceType', 'Value': INSTANCE_TYPE}])
     createthumbnails_data = get_metric_data('CWAgent', 'procstat cpu_usage', [{'Name': 'InstanceId', 'Value': INSTANCE_ID}, {'Name': 'process_name', 'Value': 'CreateThumbnails.exe'}, {'Name': 'exe', 'Value': 'CreateThumbnails'}, {'Name': 'ImageId', 'Value': IMAGE_ID}, {'Name': 'InstanceType', 'Value': INSTANCE_TYPE}])
 
