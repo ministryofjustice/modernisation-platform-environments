@@ -119,6 +119,16 @@ resource "aws_security_group" "ec2" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+}
 
+resource "aws_security_group_rule" "bastion_linux_egress_2" {
+  security_group_id = aws_security_group.ec2.id
+
+  description              = "egress_to_interface_endpoints"
+  type                     = "egress"
+  from_port                = "443"
+  to_port                  = "443"
+  protocol                 = "TCP"
+  source_security_group_id = data.aws_security_group.core_vpc_protected.id
 }
 
