@@ -57,7 +57,7 @@ locals {
       })
 
       # test instance, not for use
-      pp-test-a-21-a = merge(local.ec2_instances.app, {
+      pp-test-a-11-a = merge(local.ec2_instances.app, {
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-cafm-a-11-upgrade-test"
           availability_zone = "eu-west-2a"
@@ -70,7 +70,7 @@ locals {
           instance_type           = "t3.large"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          description         = "Test instance"
+          description         = "Test instance from pp-cafm-a-11-a"
           instance-scheduling = "skip-scheduling"
         })
       })
