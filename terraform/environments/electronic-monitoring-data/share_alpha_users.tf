@@ -41,7 +41,7 @@ resource "aws_lakeformation_permissions" "share_database_describe_alpha_users" {
   principal                     = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/alpha_user_${each.value.username}"
   permissions                   = ["DESCRIBE"]
   database {
-    name = "${each.value.database_name}${local.dbt_suffix}"
+    name = "${each.value.database_key}${local.dbt_suffix}"
   }
 }
 
