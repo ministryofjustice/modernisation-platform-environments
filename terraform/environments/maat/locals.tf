@@ -26,11 +26,11 @@ locals {
     type   = dvo.resource_record_type
     }
   }
-  cloudfront_domain_name_main   = [for k, v in local.cloudfront_domain_types : v.name if k == "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_name_main   = [for k, v in local.cloudfront_domain_types : v.name if k == local.cloudfront_domain]
   cloudfront_domain_name_sub    = [for k, v in local.cloudfront_domain_types : v.name if k != "modernisation-platform.service.justice.gov.uk"]
-  cloudfront_domain_record_main = [for k, v in local.cloudfront_domain_types : v.record if k == "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_record_main = [for k, v in local.cloudfront_domain_types : v.record if k == local.cloudfront_domain]
   cloudfront_domain_record_sub  = [for k, v in local.cloudfront_domain_types : v.record if k != "modernisation-platform.service.justice.gov.uk"]
-  cloudfront_domain_type_main   = [for k, v in local.cloudfront_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
+  cloudfront_domain_type_main   = [for k, v in local.cloudfront_domain_types : v.type if k == local.cloudfront_domain]
   cloudfront_domain_type_sub    = [for k, v in local.cloudfront_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
   # For LBs validation for MAAT

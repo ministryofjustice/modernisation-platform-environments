@@ -4,7 +4,9 @@ locals {
   custom_header            = "X-Custom-Header-LAA-${upper(local.application_name)}"
 
   # TODO Note that the application variable's domain_name will be the actual CloudFront alias for production
-  cloudfront_alias = local.environment == "production" ? local.application_data.accounts[local.environment].cloudfront_domain_name : local.lower_env_cloudfront_url
+  prod_fqdn         = data.aws_route53_zone.production_network_services.name
+  cloudfront_alias  = local.environment == "production" ? local.prod_fqdn : local.lower_env_cloudfront_url
+  cloudfront_domain = local.environment == "production" ? local.prod_fqdn : local.application_data.accounts[local.environment].cloudfront_domain_name
 
 
   cloudfront_default_cache_behavior = {
@@ -316,5 +318,5 @@ resource "aws_route53_record" "cloudfront_external_validation_subdomain" {
 resource "aws_acm_certificate_validation" "cloudfront" {
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.cloudfront.arn
-  validation_record_fqdns = [local.cloudfront_domain_name_main[0], local.cloudfront_domain_name_sub[0]]
+  validation_record_fqdns = local.environment == "production" ? [local.cloudfront_domain_name_main[0]] : [local.cloudfront_domain_name_main[0], local.cloudfront_domain_name_sub[0]]
 }
