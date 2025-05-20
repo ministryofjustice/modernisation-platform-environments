@@ -4,10 +4,8 @@ locals {
 
 # get core_vpc account protected subnets security group
 data "aws_security_group" "core_vpc_protected" {
-  provider = aws.share-host
-
   tags = {
-    Name = "${var.business_unit}-${var.environment}-int-endpoint"
+    Name = "${local.application_name}-${local.environment}-int-endpoint"
   }
 }
 
