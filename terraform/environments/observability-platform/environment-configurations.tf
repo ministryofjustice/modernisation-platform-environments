@@ -328,7 +328,7 @@ locals {
           }
         }
       },
-      "coat = {
+      "coat" = {
           "identity_centre_team" = "cloud-optimisation-and-accountability",
           "aws_accounts" = {
             "coat-production" = {
