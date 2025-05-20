@@ -26,7 +26,6 @@ module "rds" {
   license_model                         = local.application_data.accounts[local.environment].license_model
   performance_insights_enabled          = local.application_data.accounts[local.environment].performance_insights_enabled
   performance_insights_retention_period = local.application_data.accounts[local.environment].performance_insights_retention_period
-  lz_vpc_cidr                           = local.application_data.accounts[local.environment].lz_vpc_cidr
   snapshot_arn                          = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.application_data.accounts[local.environment].snapshot_arn)
   deletion_protection                   = local.application_data.accounts[local.environment].deletion_protection
   cloud_platform_cidr                   = local.application_data.accounts[local.environment].cloud_platform_cidr 
