@@ -4,7 +4,7 @@ locals {
   custom_header            = "X-Custom-Header-LAA-${upper(local.application_name)}"
 
   # TODO Note that the application variable's domain_name will be the actual CloudFront alias for production
-  prod_fqdn         = data.aws_route53_zone.production_network_services.name
+  prod_fqdn         = data.aws_route53_zone.production-network-services.name
   cloudfront_alias  = local.environment == "production" ? local.prod_fqdn : local.lower_env_cloudfront_url
   cloudfront_domain = local.environment == "production" ? local.prod_fqdn : local.application_data.accounts[local.environment].cloudfront_domain_name
 
