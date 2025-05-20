@@ -126,23 +126,6 @@ locals {
         })
       })
 
-      # NOTE: will likely be rebuilt again, needs deploying BEFORE associated rds instance!
-      t2-jump2022-2 = merge(local.ec2_instances.jumpserver, {
-        config = merge(local.ec2_instances.jumpserver.config, {
-          ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
-          availability_zone = "eu-west-2b"
-        })
-        instance = merge(local.ec2_instances.jumpserver.instance, {
-          tags = {
-            patch-manager = "group1"
-          }
-        })
-        tags = merge(local.ec2_instances.jumpserver.tags, {
-          domain-name = "azure.noms.root"
-        })
-        cloudwatch_metric_alarms = null
-      })
-
       test-rds-2-b = merge(local.ec2_instances.rds, {
         config = merge(local.ec2_instances.rds.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-04-02T00-00-40.543Z"
