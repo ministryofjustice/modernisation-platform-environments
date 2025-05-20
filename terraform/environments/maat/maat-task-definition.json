@@ -143,10 +143,6 @@
         "value": ""
       },
       {
-        "name": "APP_CCP_BASE_URL",
-        "value": "${maat_ccp_base_url}"
-      },
-      {
         "name": "APP_DB_POOL_MAX_CONNECTION",
         "value": "200"
       },
@@ -159,28 +155,12 @@
         "value": "${maat_orch_oauth_url}"
       },
       {
-        "name": "APP_CCC_OAUTH_URL",
-        "value": "${maat_ccc_oauth_url}"
-      },
-      {
         "name": "APP_LOG_LEVEL",
         "value": "debug"
       },
       {
-        "name": "APP_CMA_ENDPOINT_AUTH",
-        "value": "${maat_cma_endpoint_auth_url}"
-      },
-      {
-        "name": "APP_CCP_ENDPOINT_AUTH",
-        "value": "${maat_ccp_endpoint_auth_url}"
-      },
-      {
         "name": "APP_DB_URL",
         "value": "${maat_db_url}"
-      },
-      {
-        "name": "APP_CCC_BASE_URL",
-        "value": "${maat_ccc_base_url}"
       },
       {
         "name": "APP_CAA_OAUTH_URL",
@@ -209,10 +189,6 @@
       {
         "name": "APP_CAA_BASE_URL",
         "value": "${maat_caa_base_url}"
-      },
-      {
-        "name": "APP_CMA_BASE_URL",
-        "value": "${maat_cma_base_url}"
       }
     ],
     "logConfiguration": {

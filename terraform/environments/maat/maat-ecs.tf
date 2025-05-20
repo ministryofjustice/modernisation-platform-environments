@@ -105,11 +105,22 @@ resource "aws_ecs_cluster" "maat_ecs_cluster" {
   )
 }
 
+# always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
+}
+
+# if the AMI is used elsewhere it can be obtained here
+output "ami_id" {
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  sensitive = true
+}
+
 ##### EC2 launch config/template -----
 
 resource "aws_launch_template" "maat_ec2_launch_template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = local.application_data.accounts[local.environment].ami_id
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type = local.application_data.accounts[local.environment].instance_type
 
   monitoring {
@@ -493,18 +504,12 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
       region                     = local.application_data.accounts[local.environment].region
       sentry_env                 = local.environment
       maat_orch_base_url         = local.application_data.accounts[local.environment].maat_orch_base_url
-      maat_ccp_base_url          = local.application_data.accounts[local.environment].maat_ccp_base_url
       maat_orch_oauth_url        = local.application_data.accounts[local.environment].maat_orch_oauth_url
-      maat_ccc_oauth_url         = local.application_data.accounts[local.environment].maat_ccc_oauth_url
-      maat_cma_endpoint_auth_url = local.application_data.accounts[local.environment].maat_cma_endpoint_auth_url
-      maat_ccp_endpoint_auth_url = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
       maat_db_url                = local.application_data.accounts[local.environment].maat_db_url
-      maat_ccc_base_url          = local.application_data.accounts[local.environment].maat_ccc_base_url
       maat_caa_oauth_url         = local.application_data.accounts[local.environment].maat_caa_oauth_url
       maat_bc_endpoint_url       = local.application_data.accounts[local.environment].maat_bc_endpoint_url
       maat_mlra_url              = local.application_data.accounts[local.environment].maat_mlra_url
       maat_caa_base_url          = local.application_data.accounts[local.environment].maat_caa_base_url
-      maat_cma_base_url          = local.application_data.accounts[local.environment].maat_cma_base_url
       ecr_url                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
       maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
       maat_aws_stream_prefix     = local.application_data.accounts[local.environment].maat_aws_stream_prefix
