@@ -12,7 +12,7 @@ data "aws_ssm_parameter" "ecs_optimized_ami" { #todo what should this be?
 module "key_pair" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/key-pair/aws"
-  version = "2.0.3"
+  version = "2.1.0"
 
   key_name           = "${var.cluster_name}-ecs-ec2-keypair"
   create_private_key = true
