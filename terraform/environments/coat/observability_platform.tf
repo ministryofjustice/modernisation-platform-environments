@@ -23,7 +23,18 @@ data "aws_iam_policy_document" "grafana_athena_full_access_policy" {
     effect = "Allow"
 
     actions = [
-      "athena:*"
+      "athena:GetDatabase",
+      "athena:GetDataCatalog",
+      "athena:GetQueryExecution",
+      "athena:GetQueryResults",
+      "athena:GetTableMetadata",
+      "athena:GetWorkGroup",
+      "athena:ListDatabases",
+      "athena:ListDataCatalogs",
+      "athena:ListWorkGroups",
+      "athena:ListTableMetadata",
+      "athena:StartQueryExecution",
+      "athena:StopQueryExecution"
     ]
 
     resources = ["*"]
