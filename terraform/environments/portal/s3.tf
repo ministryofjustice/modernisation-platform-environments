@@ -1,6 +1,6 @@
 module "s3_bucket_archive" {
   count  = local.application_data.accounts[local.environment].existing_archive_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
 
   providers = {
     aws.bucket-replication = aws
