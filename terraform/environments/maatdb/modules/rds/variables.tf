@@ -149,6 +149,16 @@ variable "vpc_subnet_c_id" {
   description = "vpc_subnet_c_id"
 }
 
+variable "cloud_platform_cidr" {
+  type        = string
+  description = "transit_gateway_cidr"
+}
+
+variable "tags" {
+  type        = map(string)
+  description = "Common tags to be used by all resources"
+}
+
 
 
 

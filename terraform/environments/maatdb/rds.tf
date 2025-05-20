@@ -28,9 +28,11 @@ module "rds" {
   lz_vpc_cidr                           = local.application_data.accounts[local.environment].lz_vpc_cidr
   snapshot_arn                          = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.application_data.accounts[local.environment].snapshot_arn)
   deletion_protection                   = local.application_data.accounts[local.environment].deletion_protection
+  cloud_platform_cidr                   = local.application_data.accounts[local.environment].cloud_platform_cidr 
   vpc_shared_id                         = data.aws_vpc.shared.id
   vpc_shared_cidr                       = data.aws_vpc.shared.cidr_block
   vpc_subnet_a_id                       = data.aws_subnet.data_subnets_a.id
   vpc_subnet_b_id                       = data.aws_subnet.data_subnets_b.id
   vpc_subnet_c_id                       = data.aws_subnet.data_subnets_c.id
+  tags                                  = local.tags
 }
