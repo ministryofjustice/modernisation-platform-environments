@@ -17,7 +17,9 @@ resource "aws_iam_policy" "grafana_athena_full_access_policy" {
   policy = data.aws_iam_policy_document.grafana_athena_full_access_policy.json
 }
 
-data "aws_iam_policy_document" "grafana_athena_full_access_policy" {  statement {
+data "aws_iam_policy_document" "grafana_athena_full_access_policy" {
+
+  statement {
     effect = "Allow"
 
     actions = [
