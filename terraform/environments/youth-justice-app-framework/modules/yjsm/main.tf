@@ -76,10 +76,3 @@ resource "aws_network_interface" "main" {
   private_ips_count                    = 2
   security_groups                      = [aws_security_group.yjsm_service.id]
 }
-
-
-resource "aws_network_interface_attachment" "eni_attachment" {
-  instance_id           = aws_instance.yjsm.id
-  network_interface_id  = aws_network_interface.main.id
-  device_index          = 1
-}
