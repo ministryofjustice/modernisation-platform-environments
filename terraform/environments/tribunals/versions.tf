@@ -18,7 +18,7 @@ terraform {
     }
     github = {
       source  = "hashicorp/github"
-      version = "~> 5.0"
+      version = "~> 6.6"
     }
   }
   required_version = "~> 1.10"
