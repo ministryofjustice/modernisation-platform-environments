@@ -6,7 +6,7 @@ module "aurora" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source = "terraform-aws-modules/rds-aurora/aws"
   # Do not use latest, pick a version so we don't unintentionally break things
-  version = "9.4.0"
+  version = "9.13.0"
 
   # General
   name                = var.name #yjafrds01
