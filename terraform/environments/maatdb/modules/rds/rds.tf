@@ -6,22 +6,22 @@
 # RDS Subnet Group
 
 
-resource "aws_db_subnet_group" "appdbsubnetgroup" {
-  name       = "appdbsubnetgroup"
+resource "aws_db_subnet_group" "subnet_group" {
+  name       = "subnet-group"
   subnet_ids = [var.vpc_subnet_a_id, var.vpc_subnet_b_id, var.vpc_subnet_c_id]
 
   tags = {
-    Name = "${var.application_name}-${var.environment}-subnetgroup"
+    Name = "${var.application_name}-${var.environment}-subnet-group"
   }
 }
 
 
 # RDS Parameter group
 
-resource "aws_db_parameter_group" "appdbparametergroup19" {
-  name        = "appdbparametergroup19"
+resource "aws_db_parameter_group" "parameter_group_19" {
+  name        = "parameter-group-19"
   family      = "oracle-se2-19"
-  description = "${var.application_name}-${var.environment}-parametergroup"
+  description = "${var.application_name}-${var.environment}-parameter-group"
 
   parameter {
     name  = "remote_dependencies_mode"
@@ -34,7 +34,7 @@ resource "aws_db_parameter_group" "appdbparametergroup19" {
   }
 
   tags = {
-    Name = "${var.application_name}-${var.environment}-parametergroup"
+    Name = "${var.application_name}-${var.environment}-parameter-group"
   }
 
 }
@@ -103,7 +103,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 }
 
 # From Vincent's PR
-# TODO Rotation of secret which requires Lambda fucntion created and permissions granted to Lambda to rotate. 
+# TODO Rotation of secret which requires Lambda function created and permissions granted to Lambda to rotate. 
 #
 # resource "aws_secretsmanager_secret_rotation" "rds_password-rotation" {
 #   secret_id           = aws_secretsmanager_secret.rds_password_secret.id
@@ -118,6 +118,7 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 # RDS database
 
 resource "aws_db_instance" "appdb1" {
+  port                                  = var.port
   allocated_storage                     = var.allocated_storage
   db_name                               = var.application_name
   identifier                            = "${var.identifier_name}-${var.environment}-database"
@@ -135,12 +136,12 @@ resource "aws_db_instance" "appdb1" {
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_password.result
-  vpc_security_group_ids                = [aws_security_group.laalz-secgroup.id, aws_security_group.vpc-secgroup.id]
+  vpc_security_group_ids                = [aws_security_group.cloud_platform_sec_group.id, aws_security_group.vpc_sec_group.id]
   skip_final_snapshot                   = false
   final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
-  parameter_group_name                  = aws_db_parameter_group.appdbparametergroup19.name
+  parameter_group_name                  = aws_db_parameter_group.parameter_group_19.name
   option_group_name                     = aws_db_option_group.appdboptiongroup19.name
-  db_subnet_group_name                  = aws_db_subnet_group.appdbsubnetgroup.name
+  db_subnet_group_name                  = aws_db_subnet_group.subnet_group.name
   license_model                         = var.license_model
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_retention_period = var.performance_insights_retention_period
@@ -149,9 +150,7 @@ resource "aws_db_instance" "appdb1" {
   storage_encrypted                     = true
   apply_immediately                     = true
   snapshot_identifier                   = var.snapshot_arn
-  tags = {
-    Name = "${var.application_name}-${var.environment}-database"
-  }
+  tags = var.tags
 
   timeouts {
     create = "60m"
@@ -160,13 +159,11 @@ resource "aws_db_instance" "appdb1" {
 
 }
 
-# enabled_cloudwatch_logs_exports       = ["general", "error", "slowquery"]
-
 # Security Group
 
-resource "aws_security_group" "laalz-secgroup" {
-  name        = "laalz-secgroup"
-  description = "RDS access with the LAA Landing Zone"
+resource "aws_security_group" "cloud_platform_sec_group" {
+  name        = "cloud-platform-sec-group"
+  description = "RDS access from Cloud Platform via Transit gateway"
   vpc_id      = var.vpc_shared_id
 
   ingress {
@@ -174,7 +171,7 @@ resource "aws_security_group" "laalz-secgroup" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [var.lz_vpc_cidr]
+    cidr_blocks = [var.cloud_platform_cidr]
   }
 
   egress {
@@ -182,16 +179,16 @@ resource "aws_security_group" "laalz-secgroup" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [var.lz_vpc_cidr]
+    cidr_blocks = [var.cloud_platform_cidr]
   }
 
   tags = {
-    Name = "${var.application_name}-${var.environment}-laalz-secgroup"
+    Name = "${var.application_name}-${var.environment}-transit-gateway-sec-group"
   }
 }
 
-resource "aws_security_group" "vpc-secgroup" {
-  name        = "ecs-secgroup"
+resource "aws_security_group" "vpc_sec_group" {
+  name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
@@ -212,6 +209,6 @@ resource "aws_security_group" "vpc-secgroup" {
   }
 
   tags = {
-    Name = "${var.application_name}-${var.environment}-vpc-secgroup"
+    Name = "${var.application_name}-${var.environment}-vpc-sec-group"
   }
 }
