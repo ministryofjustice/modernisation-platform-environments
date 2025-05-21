@@ -104,7 +104,7 @@ resource "aws_lb_listener" "listener_http" {
 
 resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 2 # must be before ndelius_allowed_paths_rule
+  priority     = 12 # must be before ndelius_allowed_paths_rule
   condition {
     path_pattern {
       values = [
@@ -123,7 +123,7 @@ resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 3
+  priority     = 13
   condition {
     path_pattern {
       values = [
@@ -142,7 +142,7 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
 
 resource "aws_lb_listener_rule" "homepage_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 5
+  priority     = 15
   condition {
     path_pattern {
       values = ["/"]
