@@ -1,9 +1,3 @@
-# Necessary as it is automatically created in some accounts
-import {
-  to = aws_iam_role.aws_backup_default_service_role
-  id = "AWSBackupDefaultServiceRole"
-}
-
 resource "aws_iam_role" "aws_backup_default_service_role" {
   name = "AWSBackupDefaultServiceRole"
 
