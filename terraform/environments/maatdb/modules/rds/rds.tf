@@ -136,7 +136,7 @@ resource "aws_db_instance" "appdb1" {
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_password.result
-  vpc_security_group_ids                = [aws_security_group.cloud_platform_sec_group.id, aws_security_group.vpc_sec_group.id]
+  vpc_security_group_ids = var.environment != "production" ? [aws_security_group.cloud_platform_sec_group.id, aws_security_group.vpc_sec_group.id] : [aws_security_group.ec2_access_sec_group.id]
   skip_final_snapshot                   = false
   final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name                  = aws_db_parameter_group.parameter_group_19.name
@@ -159,7 +159,7 @@ resource "aws_db_instance" "appdb1" {
 
 }
 
-# Security Group
+# Non-Prod / Normal Security Group
 
 resource "aws_security_group" "cloud_platform_sec_group" {
   name        = "cloud-platform-sec-group"
@@ -212,3 +212,34 @@ resource "aws_security_group" "vpc_sec_group" {
     Name = "${var.application_name}-${var.environment}-vpc-sec-group"
   }
 }
+
+
+# Production SecGroup
+
+resource "aws_security_group" "ec2_access_sec_group" {
+  name        = "temp-access-sec-group"
+  description = "Temp Access"
+  vpc_id      = var.vpc_shared_id
+
+  ingress {
+    description = "Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    security_groups = [var.ec2_security_group_id, var.bastion_security_group_id]
+  }
+
+  egress {
+    description = "Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    security_groups = [var.ec2_security_group_id, var.bastion_security_group_id]
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-ec2-sec-group"
+  }
+}
+
+
