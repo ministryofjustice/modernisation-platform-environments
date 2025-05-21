@@ -1,16 +1,63 @@
 {
   "accounts": {
     "development": {
-      "example_var": "dev-data"
+      "app_name": "ccms-soa",
+      "aws_region": "eu-west-2",
+      "environment_dns_admin": "",
+      "ami_image_id": "ami-0fc32db49bc3bfbb1",
+      "admin_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-admin",
+      "admin_server_port": "7001",
+      "admin_container_version": "latest",
+      "admin_ami_image_id": "ami-0fc32db49bc3bfbb1",
+      "admin_ec2_instance_type": "t3.large",
+      "admin_ec2_desired_capacity": "1",
+      "admin_ec2_key_name": "",
+      "admin_container_cpu": "2048",
+      "admin_container_memory": "7680",
+      "admin_app_count": "1",
+      "admin_wl_mem_args": " -Xms4096m -Xmx6144m ",
+      "admin_loadbalancer_certificate_arn": "arn:aws:acm:eu-west-2:345283705478:certificate/24c8443f-f1c8-4fe8-bcc0-e4179698ddc4",
+      "admin_xxsoa_ds_username": "XXSOA",
+      "admin_ebs_ds_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-development.modernisation-platform.service.justice.gov.uk:1521:EBSDB",
+      "admin_ebs_ds_username": "apps",
+      "admin_ebssms_ds_url": "jdbc:oracle:thin:@cwa-db.aws.dev.legalservices.gov.uk:1571:CWA",
+      "app_count_admin": "1",
+      "admin_ebssms_ds_username": "apps",
+      "admin_ebs_user_username": "ebs_soa_super_user",
+      "managed_ami_image_id": "ami-0fc32db49bc3bfbb1",
+      "managed_ec2_instance_type": "m5.xlarge",
+      "managed_ec2_desired_capacity": "1",
+      "managed_ec2_key_name": "",
+      "managed_container_cpu": "2048",
+      "managed_container_memory": "7680",
+      "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-maanaged",
+      "managed_server_port": "8001",
+      "app_count_managed": "2",
+      "managed_container_version": "latest",
+      "managed_wl_mem_args": " -Xms2048m -Xmx2048m ",
+      "managed_loadbalancer_certificate_arn": "",
+      "soa_db_user": "soapdb",
+      "soa_db_role": "system",
+      "soa_db_deploy_to_multi_azs": "false",
+      "soa_db_instance_type": "db.t3.large",
+      "soa_db_storage_gb": "100",
+      "soa_db_deletion_protection": "false",
+      "tds_db_user": "admin",
+      "tds_db_deploy_to_multi_azs": "false",
+      "tds_db_instance_type": "db.t3.small",
+      "tds_db_storage_gb": "50",
+      "tds_db_deletion_protection": "false",
+      "inbound_s3_bucket_name": "",
+      "outbound_s3_bucket_name": ""
     },
     "test": {
-      "example_var": "test-data"
+      "app_name": "ccms-soa"
     },
     "preproduction": {
-      "example_var": "preproduction-data"
+      "app_name": "ccms-soa"
     },
     "production": {
-      "example_var": "production-data"
+      "app_name": "ccms-soa"
     }
   }
 }

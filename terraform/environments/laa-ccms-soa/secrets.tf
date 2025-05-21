@@ -1,1 +1,43 @@
-#### This file can be used to store secrets specific to the member account ####
+resource "aws_secretsmanager_secret" "soa_password" {
+  name        = "ccms/soa/password"
+  description = "SOA Weblogic EM Console and Database Password" #--Is the same password shared between two services? Don't like that. Revisit. AW
+}
+
+data "aws_secretsmanager_secret_version" "soa_password" {
+  secret_id = aws_secretsmanager_secret.soa_password.id
+}
+
+resource "aws_secretsmanager_secret" "tds_db_password" {
+  name        = "ccms/soa/tds/db/password"
+  description = "TDS Database Password"
+}
+
+data "aws_secretsmanager_secret_version" "tds_db_password" {
+  secret_id = aws_secretsmanager_secret.tds_db_password.id
+}
+
+resource "aws_secretsmanager_secret" "xxsoa_ds_password" {
+  name        = "ccms/soa/xxsoa/ds/password"
+  description = "TDS XXSOA Data Source Password"
+}
+
+resource "aws_secretsmanager_secret" "ebs_ds_password" {
+  name        = "ccms/soa/ebs/ds/password"
+  description = "EBS Data Source Password"
+}
+
+
+resource "aws_secretsmanager_secret" "ebssms_ds_password" {
+  name        = "ccms/soa/ebs/sms/ds/password"
+  description = "EBS SMS Data Source Password"
+}
+
+resource "aws_secretsmanager_secret" "pui_user_password" {
+  name        = "ccms/soa/pui/user/password"
+  description = "PUI User Password"
+}
+
+resource "aws_secretsmanager_secret" "ebs_user_password" {
+  name        = "ccms/soa/ebs/user/password"
+  description = "EBS User Password"
+}

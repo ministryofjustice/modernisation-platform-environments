@@ -1,0 +1,90 @@
+resource "aws_db_subnet_group" "soa" {
+  name_prefix = "main"
+  subnet_ids  = data.aws_subnets.shared-data.ids
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+#--NEEDS A REFACTOR
+resource "aws_security_group" "soa_db" {
+  name_prefix = "soa_allow_db"
+  description = "Allow DB inbound traffic"
+  vpc_id      = data.aws_vpc.shared.id
+
+  ingress {
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    cidr_blocks = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+resource "aws_db_option_group" "soa_oracle_19" {
+  name_prefix          = "soa-db-option-group"
+  engine_name          = "oracle-ee"
+  major_engine_version = "19"
+
+  option {
+    option_name = "JVM"
+  }
+
+  option {
+    option_name = "S3_INTEGRATION"
+    port        = 0
+    version     = "1.0"
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+resource "aws_db_instance" "soa_db" {
+  identifier                          = "soa-db"
+  allocated_storage                   = local.application_data.accounts[local.environment].soa_db_storage_gb
+  auto_minor_version_upgrade          = true
+  storage_type                        = "gp2"
+  engine                              = "oracle-ee"
+  engine_version                      = "19.0.0.0.ru-2025-01.rur-2025-01.r1"
+  instance_class                      = local.application_data.accounts[local.environment].soa_db_instance_type
+  multi_az                            = local.application_data.accounts[local.environment].soa_db_deploy_to_multi_azs
+  name                                = "SOADB"
+  username                            = local.application_data.accounts[local.environment].soa_db_user
+  password                            = data.aws_secretsmanager_secret_version.soa_password.secret_string
+  port                                = "1521"
+  kms_key_id                          = data.aws_kms_key.rds_shared.id
+  storage_encrypted                   = true
+  license_model                       = "bring-your-own-license"
+  iam_database_authentication_enabled = false
+  vpc_security_group_ids = [
+    aws_security_group.soa-db.id
+  ]
+  backup_retention_period   = 30
+  maintenance_window        = "Mon:00:00-Mon:03:00"
+  backup_window             = "03:00-06:00"
+  final_snapshot_identifier = "soadb"
+  character_set_name        = "AL32UTF8"
+  deletion_protection       = local.application_data.accounts[local.environment].soa_db_deletion_protection
+  db_subnet_group_name      = aws_db_subnet_group.soa.id
+  option_group_name         = aws_db_option_group.soa_oracle_19.id
+
+  timeouts {
+    create = "40m"
+    delete = "40m"
+    update = "80m"
+  }
+}
