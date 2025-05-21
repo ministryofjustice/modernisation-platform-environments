@@ -57,7 +57,7 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "logs:DescribeLogStreams",
-          "ecr:*",
+          # "ecr:*",
           "xray:PutTraceSegments",
           "xray:PutTelemetryRecords",
           "xray:GetSamplingRules",
@@ -456,7 +456,7 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "cloudwatch:PutMetricData",
-          "sqs:*"
+          # "sqs:*"
         ]
         Resource = "*"
       },
