@@ -68,7 +68,7 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
     ebs {
       delete_on_termination = true
       encrypted             = true
-      kms_key_id            = data.aws_kms_key.ebs_shared.id
+      kms_key_id            = data.aws_kms_key.ebs_shared.arn
       volume_size           = 30
       volume_type           = "gp2"
       iops                  = 0
@@ -126,7 +126,7 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
     ebs {
       delete_on_termination = true
       encrypted             = true
-      kms_key_id            = data.aws_kms_key.ebs_shared.id
+      kms_key_id            = data.aws_kms_key.ebs_shared.arn
       volume_size           = 30
       volume_type           = "gp2"
       iops                  = 0
