@@ -136,7 +136,7 @@ resource "aws_db_instance" "appdb1" {
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_password.result
-  vpc_security_group_ids = var.environment != "production" ? [aws_security_group.cloud_platform_sec_group_nonprod.id, aws_security_group.vpc_sec_group_nonprod.id] : [aws_security_group.ec2_access_sec_group.id]
+  vpc_security_group_ids = var.environment != "production" ? [aws_security_group.cloud_platform_sec_group.id, aws_security_group.vpc_sec_group.id] : [aws_security_group.ec2_access_sec_group.id]
   skip_final_snapshot                   = false
   final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name                  = aws_db_parameter_group.parameter_group_19.name
@@ -161,7 +161,7 @@ resource "aws_db_instance" "appdb1" {
 
 # Non-Prod / Normal Security Group
 
-resource "aws_security_group" "cloud_platform_sec_group_nonprod" {
+resource "aws_security_group" "cloud_platform_sec_group" {
   name        = "cloud-platform-sec-group"
   description = "RDS access from Cloud Platform via Transit gateway"
   vpc_id      = var.vpc_shared_id
@@ -187,7 +187,7 @@ resource "aws_security_group" "cloud_platform_sec_group_nonprod" {
   }
 }
 
-resource "aws_security_group" "vpc_sec_group_nonprod" {
+resource "aws_security_group" "vpc_sec_group" {
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
