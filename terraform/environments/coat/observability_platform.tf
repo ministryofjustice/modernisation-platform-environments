@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "grafana_athena_full_access_policy" {
       "kms:Decrypt",
       "kms:GenerateDataKey"
     ]
-    Resource = module.cur_s3_kms.key_arn
+    resources = ["*"]
   }
 
   statement {
