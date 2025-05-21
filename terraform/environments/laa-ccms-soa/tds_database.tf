@@ -49,7 +49,7 @@ resource "aws_db_instance" "tds_db" {
   username                            = local.application_data.accounts[local.environment].tds_db_user
   password                            = data.aws_secretsmanager_secret_version.tds_db_password.secret_string
   port                                = "1521"
-  kms_key_id                          = data.aws_kms_key.rds_shared.id
+  kms_key_id                          = data.aws_kms_key.rds_shared.arn
   storage_encrypted                   = true
   iam_database_authentication_enabled = false
   vpc_security_group_ids = [

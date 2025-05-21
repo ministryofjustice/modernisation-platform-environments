@@ -65,7 +65,7 @@ resource "aws_ecs_task_definition" "admin" {
       db_user              = local.application_data.accounts[local.environment].soa_db_user
       db_role              = local.application_data.accounts[local.environment].soa_db_role
       db_instance_endpoint = aws_db_instance.soa_db.endpoint
-      as_hostname          = local.application_data.accounts[local.environment].environment_dns_admin
+      as_hostname          = "ccms-soa-admin-${data.aws_route53_zone.external.name}"
       wl_admin_mem_args    = local.application_data.accounts[local.environment].admin_wl_mem_args
       xxsoa_ds_host        = aws_db_instance.tds_db.endpoint
       xxsoa_ds_username    = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
@@ -167,9 +167,9 @@ resource "aws_ecs_task_definition" "managed" {
       admin_server_port   = local.application_data.accounts[local.environment].admin_server_port
       aws_region          = local.application_data.accounts[local.environment].aws_region
       container_version   = local.application_data.accounts[local.environment].managed_container_version
-      admin_host          = local.application_data.accounts[local.environment].environment_dns_admin
+      admin_host          = "ccms-soa-admin-${data.aws_route53_zone.external.name}"
       soa_password        = aws_secretsmanager_secret.soa_password.arn
-      ms_hostname         = local.application_data.accounts[local.environment].environment_dns_managed
+      ms_hostname         = "ccms-soa-managed-${data.aws_route53_zone.external.name}"
       wl_mem_args         = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
   )
