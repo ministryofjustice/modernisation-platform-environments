@@ -34,7 +34,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group-admin" {
 
   depends_on = [
     aws_efs_file_system.storage,
-    aws_db_instance.soa-db
+    aws_db_instance.soa_db
   ]
 }
 
