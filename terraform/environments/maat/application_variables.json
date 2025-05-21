@@ -108,7 +108,7 @@
     "production": {
       "env_short_name": "prod",
       "ext_lb_enable_deletion_protection": "true",
-      "cloudfront_domain_name": "meansassessment.service.justice.gov.uk",
+      "cloudfront_domain_name": "means-assessment-administration.service.justice.gov.uk",
       "instance_type": "m5.large",
       "maat_ec2_asg_desired_capacity": "1",
       "maat_ec2_asg_min_size": "1",
