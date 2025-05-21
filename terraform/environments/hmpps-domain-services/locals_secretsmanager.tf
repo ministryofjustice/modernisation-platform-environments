@@ -60,5 +60,12 @@ locals {
         }
       }
     }
+    gfsl = {
+      secrets = {
+        planetfm-data-extract = {
+          description = "configuration for GFSL planetFM data-extract script"
+        }
+      }
+    }
   }
 }
