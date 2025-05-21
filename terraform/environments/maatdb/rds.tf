@@ -35,5 +35,6 @@ module "rds" {
   vpc_subnet_b_id                       = data.aws_subnet.data_subnets_b.id
   vpc_subnet_c_id                       = data.aws_subnet.data_subnets_c.id
   ec2_security_group_id                 = aws_security_group.ec2.id
+  bastion_security_group_id             = module.bastion_linux.bastion_security_group
   tags                                  = local.tags
 }

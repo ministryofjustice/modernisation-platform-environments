@@ -159,6 +159,11 @@ variable "ec2_security_group_id" {
   description = "ID of the EC2 security group allowed to access RDS"
 }
 
+variable "bastion_security_group_id" {
+  type = string
+  description = "bastion security group id"
+}
+
 variable "tags" {
   type        = map(string)
   description = "Common tags to be used by all resources"
