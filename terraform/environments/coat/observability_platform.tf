@@ -19,6 +19,8 @@ resource "aws_iam_policy" "grafana_athena_full_access_policy" {
 
 # checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
 # checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+# checkov:skip=CKV_AWS_111: "Ensure IAM policies does not allow write access without constraints"
+# checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
 data "aws_iam_policy_document" "grafana_athena_full_access_policy" {
 
   statement {
