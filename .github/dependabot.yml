@@ -22,7 +22,7 @@ updates:
       - "terraform/**/*"
     schedule:
       interval: "daily"
-    open-pull-requests-limit: 75
+    open-pull-requests-limit: 150
   - package-ecosystem: "gomod"
     directories:
       - "scripts/**/*"
