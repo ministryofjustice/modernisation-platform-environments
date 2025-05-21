@@ -46,7 +46,8 @@ resource "aws_iam_policy" "rds-aurora-postgres-secret" {
 
         ],
         "Resource" : [
-          var.rds_redshift_secret_arns
+          var.rds_redshift_secret_arns[0],
+          var.rds_redshift_secret_arns[1]
         ]
       },
       {
