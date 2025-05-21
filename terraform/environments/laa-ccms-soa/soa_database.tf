@@ -71,7 +71,7 @@ resource "aws_db_instance" "soa_db" {
   license_model                       = "bring-your-own-license"
   iam_database_authentication_enabled = false
   vpc_security_group_ids = [
-    aws_security_group.soa-db.id
+    aws_security_group.soa_db.id
   ]
   backup_retention_period   = 30
   maintenance_window        = "Mon:00:00-Mon:03:00"

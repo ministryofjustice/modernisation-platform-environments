@@ -32,7 +32,7 @@ resource "aws_lb_target_group" "admin" {
 
 resource "aws_lb_listener" "admin80" {
   load_balancer_arn = aws_lb.admin.id
-  Port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
+  port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
   protocol          = "TCP"
 
   default_action {

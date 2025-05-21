@@ -43,7 +43,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group-admin" {
 # so that the autoscaling group creates new ones using the new launch template
 
 resource "aws_launch_template" "ec2-launch-template-managed" {
-  name          = "${var.app_name}-launch-template-managed"
+  name          = "${local.application_data.accounts[local.environment].app_name}-launch-template-managed"
   image_id      = local.application_data.accounts[local.environment].managed_ami_image_id
   instance_type = local.application_data.accounts[local.environment].managed_ec2_instance_type
   #key_name      = local.application_data.accounts[local.environment].managed_ec2_key_name
@@ -126,7 +126,7 @@ resource "aws_launch_template" "ec2-launch-template-admin" {
     ebs {
       delete_on_termination = true
       encrypted             = true
-      kms_key_id            = data.aws_kms_alias.ebs.target_key_arn
+      kms_key_id            = data.aws_kms_key.ebs_shared.id
       volume_size           = 30
       volume_type           = "gp2"
       iops                  = 0
