@@ -65,7 +65,7 @@ resource "aws_ecs_task_definition" "admin" {
       db_user              = local.application_data.accounts[local.environment].soa_db_user
       db_role              = local.application_data.accounts[local.environment].soa_db_role
       db_instance_endpoint = aws_db_instance.soa_db.endpoint
-      as_hostname          = "ccms-soa-admin-${data.aws_route53_zone.external.name}"
+      as_hostname          = aws_route53_record.admin.name
       wl_admin_mem_args    = local.application_data.accounts[local.environment].admin_wl_mem_args
       xxsoa_ds_host        = aws_db_instance.tds_db.endpoint
       xxsoa_ds_username    = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
@@ -73,8 +73,8 @@ resource "aws_ecs_task_definition" "admin" {
       ebs_ds_url           = local.application_data.accounts[local.environment].admin_ebs_ds_url
       ebs_ds_username      = local.application_data.accounts[local.environment].admin_ebs_ds_username
       ebs_ds_password      = aws_secretsmanager_secret.ebs_ds_password.arn
-      ebssms_ds_url        = local.application_data.accounts[local.environment].ebssms_ds_url
-      ebssms_ds_username   = local.application_data.accounts[local.environment].ebssms_ds_username
+      ebssms_ds_url        = local.application_data.accounts[local.environment].admin_ebssms_ds_url
+      ebssms_ds_username   = local.application_data.accounts[local.environment].admin_ebs_ds_username
       ebssms_ds_password   = aws_secretsmanager_secret.ebssms_ds_password.arn
       pui_user_password    = aws_secretsmanager_secret.pui_user_password.arn
       ebs_user_username    = local.application_data.accounts[local.environment].admin_ebs_user_username
@@ -167,9 +167,9 @@ resource "aws_ecs_task_definition" "managed" {
       admin_server_port   = local.application_data.accounts[local.environment].admin_server_port
       aws_region          = local.application_data.accounts[local.environment].aws_region
       container_version   = local.application_data.accounts[local.environment].managed_container_version
-      admin_host          = "ccms-soa-admin-${data.aws_route53_zone.external.name}"
+      admin_host          = aws_route53_record.admin.name
       soa_password        = aws_secretsmanager_secret.soa_password.arn
-      ms_hostname         = "ccms-soa-managed-${data.aws_route53_zone.external.name}"
+      ms_hostname         = aws_route53_record.managed.name
       wl_mem_args         = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
   )
