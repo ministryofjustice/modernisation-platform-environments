@@ -75,10 +75,10 @@ resource "aws_iam_role_policy_attachment" "maat_ec2_instance_role_policy_attachm
   policy_arn = aws_iam_policy.maat_ec2_instance_role_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "SSM_ec2_role_policy_attachment" {
-  role       = aws_iam_role.maat_ec2_instance_role.name
-  policy_arn = local.application_data.accounts[local.environment].SSM_managed_core_policy_arn
-}
+# resource "aws_iam_role_policy_attachment" "SSM_ec2_role_policy_attachment" {
+#   role       = aws_iam_role.maat_ec2_instance_role.name
+#   policy_arn = local.application_data.accounts[local.environment].SSM_managed_core_policy_arn
+# }
 
 ##### EC2 Instance Profile ------
 
@@ -369,8 +369,8 @@ resource "aws_iam_policy" "maat_ecs_service_role_policy" {
           "elasticloadbalancing:Describe*",
           "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
           "elasticloadbalancing:RegisterTargets",
-          "ec2:Describe*",
-          "ec2:AuthorizeSecurityGroupIngress"
+          "ec2:Describe*"
+          # "ec2:AuthorizeSecurityGroupIngress"
         ]
         Resource = "*"
       },
@@ -442,13 +442,13 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
-        Effect = "Allow"
-        Action = "ssm:GetParameters"
-        Resource = [
-          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
-        ]
-      },
+      # {
+      #   Effect = "Allow"
+      #   Action = "ssm:GetParameters"
+      #   Resource = [
+      #     "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
+      #   ]
+      # },
       {
         Effect = "Allow"
         Action = [
