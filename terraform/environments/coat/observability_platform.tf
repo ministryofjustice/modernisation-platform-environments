@@ -45,6 +45,16 @@ data "aws_iam_policy_document" "grafana_athena_full_access_policy" {
   }
 
   statement {
+    Effect = "Allow"
+
+    Action = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    Resource = module.cur_s3_kms.key_arn
+  }
+
+  statement {
     effect = "Allow"
 
     actions = [
