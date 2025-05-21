@@ -45,9 +45,9 @@ data "aws_iam_policy_document" "grafana_athena_full_access_policy" {
   }
 
   statement {
-    Effect = "Allow"
+    effect = "Allow"
 
-    Action = [
+    actions = [
       "kms:Decrypt",
       "kms:GenerateDataKey"
     ]
