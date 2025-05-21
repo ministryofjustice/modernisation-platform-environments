@@ -1,12 +1,46 @@
 resource "aws_s3_bucket" "error_page" {
   bucket        = "yjaf-${var.environment}-custom-error-pages"
   force_destroy = true
-  
+
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
         kms_master_key_id = var.kms_key_arn
         sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+
+  versioning {
+    enabled = true
+  }
+
+  logging {
+    target_bucket = var.logging_bucket_name
+    target_prefix = "s3/${var.environment}/error-page-logs/"
+  }
+
+  lifecycle_rule {
+    id      = "expire-old-objects"
+    enabled = true
+
+    expiration {
+      days = 365
+    }
+  }
+
+  replication_configuration {
+    role = var.replication_role_arn
+
+    rules {
+      id     = "replicate-everything"
+      status = "Enabled"
+
+      filter {}
+
+      destination {
+        bucket        = var.replica_bucket_arn
+        storage_class = "STANDARD"
       }
     }
   }
