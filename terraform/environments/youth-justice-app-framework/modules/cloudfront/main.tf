@@ -58,6 +58,25 @@ resource "aws_cloudfront_distribution" "external" {
     }
   }
 
+  # Custom error pages
+  origin {
+    domain_name = aws_s3_bucket.error_page.bucket_regional_domain_name
+    origin_id   = "s3-private-origin"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
+    }
+  }
+
+  default_root_object = "index.html"
+
+  custom_error_response {
+    error_code            = 503
+    response_code         = 200
+    response_page_path    = "/custom-503.html"
+    error_caching_min_ttl = 300
+  }
+
   #   is_ipv6_enabled = true
 
   tags = var.tags
@@ -142,3 +161,5 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
     }
   }
 }
+
+
