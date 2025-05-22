@@ -57,13 +57,14 @@ locals {
       })
 
       # upgrade test instance - do not use
+      # rename and join the domain FIRST
       # Mount drive
       # Upgrade OS - Server DataCenter 2019
       # Join domain as pp-cafm-a-19-a
       # Remove drive
       # Check E: drive also gone
       # Reboot
-      pp-cafm-a-19-a = merge(local.ec2_instances.app, {
+      pp-cafm-a-20-a = merge(local.ec2_instances.app, {
         config = merge(local.ec2_instances.app.config, {
           ami_name          = "pp-cafm-a-11-a-unjoined"
           availability_zone = "eu-west-2a"

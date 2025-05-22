@@ -63,7 +63,7 @@
       "deletion_protection": false,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
-      "ecs_cluster_sec_group_id": "sg-050fb73f9c212d1bb"
+      "ecs_cluster_sec_group_id": "sg-056a1a203c91700ea"
     }
   }
 }
