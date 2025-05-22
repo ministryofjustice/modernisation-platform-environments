@@ -7,25 +7,19 @@ data "aws_secretsmanager_secret_version" "soa_password" {
   secret_id = aws_secretsmanager_secret.soa_password.id
 }
 
-resource "aws_secretsmanager_secret" "tds_db_password" {
-  name        = "ccms/soa/tds/db/password"
-  description = "TDS Database Password"
-}
-
-data "aws_secretsmanager_secret_version" "tds_db_password" {
-  secret_id = aws_secretsmanager_secret.tds_db_password.id
-}
-
 resource "aws_secretsmanager_secret" "xxsoa_ds_password" {
   name        = "ccms/soa/xxsoa/ds/password"
   description = "TDS XXSOA Data Source Password"
+}
+
+data "aws_secretsmanager_secret_version" "xxsoa_ds_password" {
+  secret_id = aws_secretsmanager_secret.xxsoa_ds_password.id
 }
 
 resource "aws_secretsmanager_secret" "ebs_ds_password" {
   name        = "ccms/soa/ebs/ds/password"
   description = "EBS Data Source Password"
 }
-
 
 resource "aws_secretsmanager_secret" "ebssms_ds_password" {
   name        = "ccms/soa/ebs/sms/ds/password"

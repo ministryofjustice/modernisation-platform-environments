@@ -47,7 +47,7 @@ resource "aws_db_instance" "tds_db" {
   multi_az                            = local.application_data.accounts[local.environment].tds_db_deploy_to_multi_azs
   db_name                             = "SOATDSDB"
   username                            = local.application_data.accounts[local.environment].tds_db_user
-  password                            = data.aws_secretsmanager_secret_version.tds_db_password.secret_string
+  password                            = data.aws_secretsmanager_secret_version.xxsoa_ds_password.secret_string
   port                                = "1521"
   kms_key_id                          = data.aws_kms_key.rds_shared.arn
   storage_encrypted                   = true

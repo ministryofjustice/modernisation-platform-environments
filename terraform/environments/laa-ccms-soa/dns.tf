@@ -1,6 +1,6 @@
 #--Admin
 resource "aws_route53_record" "admin" {
-  zone_id = data.aws_route53_zone.external.zone_id
+  zone_id = data.aws_route53_zone.network-services.zone_id
   name    = local.application_data.accounts[local.environment].admin_hostname
   type    = "A"
   alias {
@@ -12,7 +12,7 @@ resource "aws_route53_record" "admin" {
 
 #--Managed
 resource "aws_route53_record" "managed" {
-  zone_id = data.aws_route53_zone.external.zone_id
+  zone_id = data.aws_route53_zone.network-services.zone_id
   name    = local.application_data.accounts[local.environment].managed_hostname
   type    = "A"
   alias {

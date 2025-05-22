@@ -173,6 +173,11 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ssmmessages:OpenDataChannel"
             ],
             "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": ["secretsmanager:GetSecretValue"],
+          "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/*"]
         }
     ]
 }
