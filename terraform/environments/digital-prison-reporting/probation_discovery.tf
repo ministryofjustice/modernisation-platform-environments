@@ -21,15 +21,15 @@ module "probation_discovery_windows_node" {
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}"
   ]
-  region  = local.account_region
-  account = local.account_id
-  env     = local.env
+  #region  = local.account_region
+  #account = local.account_id
+  #env     = local.env
   app_key = "probation-discovery"  # points to scripts/probation-discovery.ps1
 
-  env_vars = {
-    ENV = local.env
+  #env_vars = {
+   # ENV = local.env
     # add any app-specific env vars here
-  }
+  #}
 
   tags = merge(
     local.all_tags,
