@@ -68,7 +68,7 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
     ebs {
       delete_on_termination = true
       encrypted             = true
-      kms_key_id            = data.aws_kms_key.ebs_shared.arn
+      kms_key_id            = data.aws_kms_alias.ebs.target_key_arn #--TEMPORARY. SHOULD USE A CMK. AW
       volume_size           = 30
       volume_type           = "gp2"
       iops                  = 0

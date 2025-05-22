@@ -59,7 +59,6 @@ resource "aws_db_instance" "tds_db" {
   maintenance_window      = "Mon:00:00-Mon:03:00"
   backup_window           = "03:00-06:00"
   character_set_name      = "AL32UTF8"
-  snapshot_identifier     = "ccms-soa-tds-post-import-xxsoa-encrypted"
   deletion_protection     = local.application_data.accounts[local.environment].tds_db_deletion_protection
   db_subnet_group_name    = aws_db_subnet_group.tds.id
   option_group_name       = aws_db_option_group.tds_oracle_19.id
