@@ -71,6 +71,6 @@ resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "xhibit_waf_logging" {
-  log_destination_configs = [aws_cloudwatch_log_group.xhibiy_waf_logs.arn]
+  log_destination_configs = [aws_cloudwatch_log_group.xbhibit_waf_logs.arn]
   resource_arn            = aws_wafv2_web_acl.xhibit_web_acl.arn
 }
