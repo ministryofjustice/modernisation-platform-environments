@@ -9,6 +9,7 @@ resource "aws_wafv2_ip_set" "wafmanualallowset" {
   # removed redundant ip addresses such as RedCentric access and AWS Holborn offices Wifi
   
   scope              = "CLOUDFRONT"
+  provider    = aws.us-east-1
   ip_address_version = "IPV4"
   description        = "Manual Allow Set for ${local.application_name} WAF"
   addresses          = local.ip_set_list
@@ -17,6 +18,7 @@ resource "aws_wafv2_ip_set" "wafmanualallowset" {
 resource "aws_wafv2_ip_set" "wafmanualblockset" {
   name               = "${upper(local.application_name)}-manual-block-set"
   scope              = "CLOUDFRONT"
+  provider    = aws.us-east-1
   description        = "Manual Block Set for ${local.application_name} WAF"
   ip_address_version = "IPV4"
   addresses          = [] 
@@ -24,6 +26,7 @@ resource "aws_wafv2_ip_set" "wafmanualblockset" {
 
 resource "aws_wafv2_rule_group" "manual-rules" {
   name        = "${upper(local.application_name)}-manual-rules"
+  provider    = aws.us-east-1
   scope       = "CLOUDFRONT" # Use "CLOUDFRONT" for CloudFront
   capacity    = 10 # Adjust based on complexity
   description = "Manual Allow/Block Rules for ${local.application_name}"
