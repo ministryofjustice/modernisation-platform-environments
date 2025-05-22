@@ -516,5 +516,5 @@ locals {
   create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
 
   # Probation Discovery
-  probation_discovery_windows_ami_id  = 
+  probation_discovery_windows_ami_id  = "ami-0ba9276d1fb25ed77"
 }
