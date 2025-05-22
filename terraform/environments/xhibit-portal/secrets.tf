@@ -1,4 +1,5 @@
 resource "aws_secretsmanager_secret" "ip_block_list" {
+# checkov:skip=CKV2_AWS_57:Auto rotation not possible
   name        = "ip_block_list"
   description = "Secret for storing IP block list"
   tags = merge(
