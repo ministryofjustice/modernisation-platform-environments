@@ -81,8 +81,7 @@
       "maat_ALB5xxAlarmThreshold": "10",
       "maat_ALBTarget4xxAlarmThreshold": "10",
       "maat_ALB4xxAlarmThreshold": "10",
-      "maat_pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
-      "ami_id": "ami-0842fd82be043dc8e"
+      "maat_pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
     },
     "test": {
       "example_var": "test-data",
