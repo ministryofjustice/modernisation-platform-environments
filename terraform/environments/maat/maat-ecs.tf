@@ -120,7 +120,7 @@ output "ami_id" {
 
 resource "aws_launch_template" "maat_ec2_launch_template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  image_id      = local.application_data.accounts[local.environment].ami_id
   instance_type = local.application_data.accounts[local.environment].instance_type
 
   monitoring {
