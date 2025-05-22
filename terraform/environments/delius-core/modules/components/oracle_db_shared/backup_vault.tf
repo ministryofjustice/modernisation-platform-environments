@@ -29,5 +29,13 @@ data "aws_iam_policy_document" "oracle_ec2_snapshot_backup_role_policy_document"
     "ec2:DescribeSnapshots"]
     resources = ["*"]
   }
+  statement {
+    actions = [
+
+      "kms:Encrypt",
+      "kms:Decrypt",
+    ]
+    resources = [var.account_config.kms_keys.general_shared]
+  }
 }
 

@@ -38,6 +38,13 @@ data "aws_iam_policy_document" "backup_action_policy_document" {
       "ec2:DescribeSnapshots"]
     resources = ["*"]
   }
+  statement {
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+    ]
+    resources = [var.account_config.kms_keys.general_shared]
+  }
 }
 
 resource "aws_iam_policy" "backup_action_policy" {
