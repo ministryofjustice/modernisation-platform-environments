@@ -11,23 +11,6 @@ resource "aws_s3_bucket" "error_page" {
       }
     }
   }
-  }
-
-  replication_configuration {
-    role = var.replication_role_arn
-
-    rules {
-      id     = "replicate-everything"
-      status = "Enabled"
-
-      filter {}
-
-      destination {
-        bucket        = var.replica_bucket_arn
-        storage_class = "STANDARD"
-      }
-    }
-  }
 }
 
 resource "aws_s3_bucket_public_access_block" "error_page_public" {
