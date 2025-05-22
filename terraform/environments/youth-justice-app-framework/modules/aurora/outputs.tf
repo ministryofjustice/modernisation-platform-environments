@@ -18,6 +18,11 @@ output "app_rotated_postgres_secret_arn" {
   value       = aws_secretsmanager_secret.user_admin_secret["postgres_rotated"].arn
 }
 
+output "rds_postgres_secret_arn" {
+  description = "The ARN of the rotated postgres secret"
+  value       = aws_secretsmanager_secret.user_admin_secret["postgres"].arn
+}
+
 output "rds_redshift_secret_arn" {
   description = "The ARN of the redshift_readonly secret"
   value       = aws_secretsmanager_secret.user_admin_secret["redshift_readonly"].arn
