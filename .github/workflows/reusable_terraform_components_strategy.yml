@@ -154,27 +154,32 @@ jobs:
           done < envlist.json
 
           # --------------------------------------------------------------------
-          # 5. Detect changes in the "modules" folder and update the matrix.
+          # 5. Detect changes in all module locations and update the matrix.
           # --------------------------------------------------------------------
+          # Define all module locations to check
+          module_locations=(
+            "terraform/environments/${{ inputs.application }}/modules"
+            "terraform/environments/modules"
+            # Add more locations here as needed
+          )
 
-          # Check for changes in the modules directory.
-          modules_dir="terraform/environments/${{ inputs.application }}/modules"
           changed_modules=()
-          if [ -d "$modules_dir" ]; then
-            if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
-              merge_base=$(git merge-base origin/main "$head_commit")
-              changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$modules_dir")
-            else
-              changed_files=$(git diff --name-only HEAD~1 HEAD -- "$modules_dir")
-            fi
-
-            for f in $changed_files; do
-              module_name=$(dirname "${f#$modules_dir/}" | cut -d'/' -f1)
-              if [[ ! " ${changed_modules[@]} " =~ " ${module_name} " ]]; then
-                changed_modules+=("$module_name")
+          for modules_dir in "${module_locations[@]}"; do
+            if [ -d "$modules_dir" ]; then
+              if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+                merge_base=$(git merge-base origin/main "$head_commit")
+                changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$modules_dir")
+              else
+                changed_files=$(git diff --name-only HEAD~1 HEAD -- "$modules_dir")
               fi
-            done
-          fi
+              for f in $changed_files; do
+                module_name=$(dirname "${f#$modules_dir/}" | cut -d'/' -f1)
+                if [[ ! " ${changed_modules[@]} " =~ " ${module_name}@${modules_dir} " ]]; then
+                  changed_modules+=("${module_name}@${modules_dir}")
+                fi
+              done
+            fi
+          done
 
           if [ ${#changed_modules[@]} -eq 0 ]; then
             echo "No changes detected in modules."
@@ -184,27 +189,27 @@ jobs:
 
           # Identify components referencing the changed modules.
           referencing_components=()
-          for module in "${changed_modules[@]}"; do
+          for module_ref in "${changed_modules[@]}"; do
+            module_name="${module_ref%@*}"
+            modules_dir="${module_ref#*@}"
             for comp in $COMPONENTS; do
               if [ "$comp" = "root" ]; then
                 folder="$app_dir"
-                echo "Checking for module '$module' references in component '$comp'"
-                
-                if grep -qE "source.*=.*(\"modules/$module\"|\"./modules/$module\")" "$folder"/*.tf 2>/dev/null; then
-                  echo "Found module '$module' reference in root"
+                if grep -qE "source.*=.*(\"modules/$module_name\"|\"./modules/$module_name\")" "$folder"/*.tf 2>/dev/null; then
                   referencing_components+=("$comp")
                 fi
               else
                 folder="$app_dir/$comp"
-                echo "Checking for module '$module' references in component '$comp'"
-
-                if grep -qE "source.*=.*\"../modules/$module\"" "$folder"/*.tf 2>/dev/null; then
-                  echo "Found module '$module' reference in component '$comp'"
+                # Compute the relative path from the component to the module location
+                rel_path=$(python3 -c "import os; print(os.path.relpath('$modules_dir', '$folder'))" 2>/dev/null || true)
+                if [ -n "$rel_path" ] && grep -qE "source.*=.*\"$rel_path/$module_name\"" "$folder"/*.tf 2>/dev/null; then
                   referencing_components+=("$comp")
                 fi
               fi
             done
           done
+
+          referencing_components=($(echo "${referencing_components[@]}" | tr ' ' '\n' | sort -u | tr '\n' ' '))
 
           if [ ${#referencing_components[@]} -eq 0 ]; then
             echo "No components referencing changed modules."
