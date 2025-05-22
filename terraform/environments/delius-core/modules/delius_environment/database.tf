@@ -1,6 +1,13 @@
+data "aws_iam_policy" "backup_operator" {
+  arn = "arn:aws:iam::aws:policy/AWSBackupOperatorAccess"
+}
+
 locals {
   db_public_key_data = jsondecode(file("./db_users.json"))
-  instance_policies  = [for v in values(merge(module.oracle_db_shared.instance_policies, var.db_config.instance_policies)) : v.arn]
+  backup_operator_policy = {
+     operator     = data.aws_iam_policy.backup_operator
+  }
+  instance_policies  = [for v in values(merge(module.oracle_db_shared.instance_policies, var.db_config.instance_policies, local.backup_operator_policy)) : v.arn]
   availability_zone_map = {
     0 = "a"
     1 = "b"
