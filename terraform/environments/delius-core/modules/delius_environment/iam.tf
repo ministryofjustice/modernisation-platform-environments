@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "backup_actions_policy_document" {
 
 resource "aws_iam_policy" "backup_actions_policy" {
   name   = "${var.env_name}-backup_actions_policy"
-  policy = data.aws_iam_policy_document.backup_actions_policy_document[0].json
+  policy = data.aws_iam_policy_document.backup_actions_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "backup_actions_policy_attachment" {
