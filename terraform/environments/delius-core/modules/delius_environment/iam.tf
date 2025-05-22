@@ -46,6 +46,6 @@ resource "aws_iam_policy" "backup_actions_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "backup_actions_policy_attachment" {
-  role       = aws_iam_role.aws_backup_default_service_role[0].name
+  role       = "AWSBackupDefaultServiceRole"
   policy_arn = aws_iam_policy.backup_actions_policy.arn
 }
