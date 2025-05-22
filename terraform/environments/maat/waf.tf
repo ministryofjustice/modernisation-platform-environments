@@ -80,7 +80,7 @@ resource "aws_wafv2_rule_group" "manual-rules" {
 resource "aws_wafv2_web_acl" "waf_acl" {
   name        = "${upper(local.application_name)}-Whitelisting-Requesters"
   provider    = aws.us-east-1
-  scope       = "CLOUDFRONT" # Use "CLOUDFRONT" for CloudFront
+  scope       = "REGIONAL" # Use "CLOUDFRONT" for CloudFront
   description = "Web ACL for ${local.application_name}"
 
   default_action {
