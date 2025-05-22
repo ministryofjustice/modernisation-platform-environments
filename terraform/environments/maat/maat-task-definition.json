@@ -45,7 +45,7 @@
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_OAUTH_SCOPE"
       },
       {
-        "name": "APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID",
+        "name": "APP_MAAT_GOOGLE_TAG_MANAGER_ID",
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
       },
       {
