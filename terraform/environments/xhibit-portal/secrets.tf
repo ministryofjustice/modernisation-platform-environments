@@ -10,6 +10,6 @@ resource "aws_secretsmanager_secret" "ip_block_list" {
 
 resource "aws_secretsmanager_secret_version" "ip_block_list_version" {
   secret_id     = aws_secretsmanager_secret.ip_block_list.id
-  secret_string = "{}"  # Initialize as empty, populate later
+  secret_string = jsonencode([])  # Initialize as empty, populate later
   
 }
