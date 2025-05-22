@@ -10,12 +10,6 @@ data "aws_kms_key" "common_secrets_manager_kms" {
 }
 
 # Kubernetes
-# data "kubernetes_namespace" "actions_runners" {
-#   metadata {
-#     name = "actions-runners"
-#   }
-# }
-
 data "kubernetes_namespace" "actions_runners" {
   count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
 
