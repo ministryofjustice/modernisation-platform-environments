@@ -40,3 +40,10 @@ resource "aws_secretsmanager_secret" "ebs_user_password" {
   description = "EBS user password"
 
 }
+
+resource "aws_secretsmanager_secret" "tds_db_password" {
+  name        = "ccms/soa/tds/db/password"
+  description = "TDS database password"
+
+  tags = local.tags
+}
