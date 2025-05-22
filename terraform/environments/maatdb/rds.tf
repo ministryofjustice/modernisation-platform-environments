@@ -1,11 +1,9 @@
 # This calls a custom RDS module to create a single RDS instance with option & parameter groups & multi-az and perf insights engabled.
 # Also includes secrets manager storage for the randomised password that is (TO BE DONE) cycled periodically.
 
-
 locals {
   rds_kms_key_arn = data.aws_kms_key.rds_shared.arn
 }
-
 
 module "rds" {
   source                                = "./modules/rds"
