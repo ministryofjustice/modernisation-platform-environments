@@ -107,6 +107,11 @@ locals {
       container_memory = 1024
     }
 
+    sfs = {
+      container_cpu    = 2048
+      container_memory = 4096
+    }
+
     oracle_observer = {
       image_tag        = "latest"
       container_cpu    = 512
@@ -139,5 +144,11 @@ locals {
       write_database = local.db_config_dev.database_name
     }
     is-production = false
+    # Times must be specified in UTC
+    disable_latency_alarms = {
+      start_time      = "19:59"
+      end_time        = "06:00"
+      disable_weekend = true
+    }
   }
 }

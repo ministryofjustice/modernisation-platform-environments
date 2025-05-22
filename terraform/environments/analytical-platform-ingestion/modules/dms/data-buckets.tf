@@ -5,9 +5,11 @@ resource "aws_s3_bucket" "lambda" {
   #checkov:skip=CKV2_AWS_61:Lifecycle configuration not needed
   #checkov:skip=CKV2_AWS_62:Versioning,event notifications,logging not needed
   #checkov:skip=CKV_AWS_144:Cross-region replication not required
-  bucket_prefix = "${var.db}-lambda-functions-"
+  bucket_prefix = "${var.db}-lambda-fns-"
 
   tags = var.tags
+  # Force destroy is safe here, as the bucket is repopulated on terraform run
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "lambda" {

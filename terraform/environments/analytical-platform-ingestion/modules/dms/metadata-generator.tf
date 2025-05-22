@@ -208,7 +208,7 @@ module "metadata_generator" {
     LAMBDA_BUCKET                        = aws_s3_bucket.lambda.bucket
     DB_OBJECTS                           = jsonencode(jsondecode(file(var.dms_mapping_rules))["objects"])
     DB_SCHEMA_NAME                       = lookup(jsondecode(file(var.dms_mapping_rules)), "schema", "")
-    ENGINE                               = var.dms_source.engine_name
+    ENGINE                               = var.dms_source.protocol
     DATABASE_NAME                        = var.dms_source.sid
     GLUE_CATALOG_ACCOUNT_ID              = var.glue_catalog_account_id
     GLUE_CATALOG_ROLE_ARN                = var.glue_catalog_role_arn

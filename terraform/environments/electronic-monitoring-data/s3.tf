@@ -2,10 +2,19 @@ locals {
   bucket_prefix = "emds-${local.environment_shorthand}"
 
   mdss_supplier_account_mapping = {
-    "production"    = null
-    "preproduction" = null
-    "test"          = null
-    "development"   = null
+    "production" = null
+    "preproduction" = {
+      "account_number" = "173142358744"
+      "role_name"      = "juniper-datatransfer-lambda-role"
+    }
+    "test" = {
+      "account_number" = "173142358744"
+      "role_name"      = "dev-datatransfer-lambda-role"
+    }
+    "development" = {
+      "account_number" = "173142358744"
+      "role_name"      = "dev-datatransfer-lambda-role"
+    }
   }
 
   p1_export_bucket_destination_mapping = {
@@ -45,6 +54,23 @@ locals {
     { id = module.s3-create-a-derived-table-bucket.bucket.id, arn = module.s3-create-a-derived-table-bucket.bucket.arn },
     { id = module.s3-raw-formatted-data-bucket.bucket.id, arn = module.s3-raw-formatted-data-bucket.bucket.arn }
   ]
+}
+
+
+# ------------------------------------------------------------------------
+# Get secrets for bucket policy for allied
+# ------------------------------------------------------------------------
+
+data "aws_secretsmanager_secret" "allied_account_id" {
+  name = aws_secretsmanager_secret.allied_account_id.id
+
+  depends_on = [aws_secretsmanager_secret_version.allied_account_id]
+}
+
+data "aws_secretsmanager_secret_version" "allied_account_id" {
+  secret_id = data.aws_secretsmanager_secret.allied_account_id.id
+
+  depends_on = [aws_secretsmanager_secret.allied_account_id]
 }
 
 # ------------------------------------------------------------------------
@@ -231,18 +257,6 @@ module "s3-metadata-bucket" {
 
   tags = merge(local.tags, { Resource_Type = "metadata_store" })
 }
-
-# resource "aws_s3_bucket_notification" "send_metadata_to_ap_lambda" {
-#   bucket = module.s3-metadata-bucket.bucket.id
-
-#   lambda_function {
-#     id                  = "metadata_bucket_notification"
-#     lambda_function_arn = module.send_metadata_to_ap.lambda_function_arn
-#     events              = ["s3:ObjectCreated:*"]
-#   }
-
-#   depends_on = [aws_lambda_permission.send_metadata_to_ap]
-# }
 
 # ----------------------------------
 # Athena Query result storage bucket
@@ -1135,108 +1149,6 @@ module "s3-dms-target-store-bucket" {
   tags = local.tags
 }
 
-## temp set up for old s3 bucket
-#trivy:ignore:AVD-AWS-0088
-#trivy:ignore:AVD-AWS-0090
-#trivy:ignore:AVD-AWS-0132
-#trivy:ignore:s3-bucket-logging
-#tfsec:ignore:aws-s3-enable-bucket-logging
-#tfsec:ignore:aws-s3-enable-versioning
-resource "aws_s3_bucket" "data_store" {
-  #checkov:skip=CKV_AWS_145
-  #checkov:skip=CKV_AWS_144
-  #checkov:skip=CKV2_AWS_65
-  #checkov:skip=CKV2_AWS_62
-  #checkov:skip=CKV_AWS_18
-  #checkov:skip=CKV2_AWS_61
-  bucket_prefix = "em-data-store-"
-  #checkov:skip=CKV_AWS_21:Legacy bucket to be deleted
-  force_destroy = false
-  tags = {
-    "application"            = "electronic-monitoring-data"
-    "business-unit"          = "HMPPS"
-    "environment-name"       = "electronic-monitoring-data-production"
-    "infrastructure-support" = "dataengineering@digital.justice.gov.uk"
-    "is-production"          = "true"
-    "owner"                  = "Data engineering: dataengineering@digital.justice.gov.uk"
-    "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "data_store" {
-  bucket                  = aws_s3_bucket.data_store.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
-resource "aws_s3_bucket_ownership_controls" "bucket" {
-  #checkov:skip=CKV2_AWS_65
-  bucket = aws_s3_bucket.data_store.id
-  rule {
-    object_ownership = "ObjectWriter"
-  }
-}
-
-data "aws_iam_policy_document" "data_store_deny_all" {
-  statement {
-    sid     = "EnforceTLSv12orHigher"
-    effect  = "Deny"
-    actions = ["s3:*"]
-    resources = [
-      aws_s3_bucket.data_store.arn,
-      "${aws_s3_bucket.data_store.arn}/*"
-
-    ]
-    principals {
-      identifiers = ["*"]
-      type        = "AWS"
-    }
-    condition {
-      test     = "NumericLessThan"
-      variable = "s3:TlsVersion"
-      values   = [1.2]
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "data_store" {
-  bucket = aws_s3_bucket.data_store.id
-  policy = data.aws_iam_policy_document.data_store_deny_all.json
-}
-
-
-data "aws_iam_policy_document" "cadt_runner" {
-  statement {
-    sid    = "AllowS3BucketAccess"
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject",
-      "s3:ListBucket",
-      "s3:ListBucketMultipartUploads",
-      "s3:ListMultipartUploadParts",
-      "s3:ListBucket",
-      "s3:ListBucketMultipartUploads",
-      "s3:ListMultipartUploadParts"
-    ]
-    resources = [
-      aws_s3_bucket.data_store.arn,
-      "${aws_s3_bucket.data_store.arn}/*"
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow_prod_cadet_emds_deploy_historic_transforms"]
-    }
-  }
-}
-
-resource "aws_s3_bucket_policy" "cadt_runner" {
-  bucket = aws_s3_bucket.data_store.id
-  policy = data.aws_iam_policy_document.cadt_runner.json
-}
 
 module "s3-create-a-derived-table-bucket" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=f759060"

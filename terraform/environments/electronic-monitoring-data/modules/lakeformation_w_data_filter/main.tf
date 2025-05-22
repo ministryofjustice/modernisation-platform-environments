@@ -1,8 +1,10 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_lakeformation_permissions" "data_engineering_permissions" {
+  for_each = toset(var.extra_arns)
+
   permissions = ["ALL"]
-  principal   = var.data_engineer_role_arn
+  principal   = each.value
 
   database {
     name = var.database_name
@@ -14,21 +16,34 @@ resource "random_id" "suffix" {
 }
 
 resource "aws_lakeformation_permissions" "data_engineering_table_permissions" {
-  for_each    = var.table_filters
+  for_each = tomap({
+    for pair in flatten([
+      for arn in var.extra_arns : [
+        for table, filter in var.table_filters : {
+          key = "${arn}:${table}"
+          value = {
+            arn    = arn
+            table  = table
+            filter = filter
+          }
+        }
+      ]
+    ]) : pair.key => pair.value
+  })
   permissions = ["ALL"]
-  principal   = var.data_engineer_role_arn
+  principal   = each.value.arn
 
   table {
     database_name = var.database_name
-    name          = each.key
+    name          = each.value.table
   }
 }
 
 resource "aws_lakeformation_permissions" "de_s3_bucket_permissions" {
-  principal = var.data_engineer_role_arn
+  for_each = toset(var.extra_arns)
 
   permissions = ["DATA_LOCATION_ACCESS"]
-
+  principal   = each.value
   data_location {
     arn = var.data_bucket_lf_resource
   }

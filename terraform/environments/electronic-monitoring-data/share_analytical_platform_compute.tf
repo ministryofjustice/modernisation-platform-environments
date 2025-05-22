@@ -4,13 +4,13 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  dbt_suffix  = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
-  admin_roles = local.is-development ? "sandbox_" : "data-eng"
-  suffix      = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
+  dbt_suffix = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
+  suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
   live_feed_dbs = [
     "serco_fms",
     "allied_mdss",
     "staged_fms",
+    "staged_mdss",
     "preprocessed_fms",
     "curated_fms",
     "staging_fms",
@@ -57,9 +57,6 @@ data "aws_iam_session_context" "current" {
   arn = data.aws_caller_identity.current.arn
 }
 
-data "aws_iam_roles" "data_engineering_roles" {
-  name_regex = "AWSReservedSSO_modernisation-platform-${local.admin_roles}s*"
-}
 
 ## DBT Analytics EKS Cluster Identifier
 # PlaceHolder Secrets
@@ -574,15 +571,6 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   role       = aws_iam_role.analytical_platform_share_role[each.key].name
   policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationDataAdmin"
 }
-resource "aws_lakeformation_data_lake_settings" "lake_formation" {
-  admins = flatten([
-    [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
-    data.aws_iam_session_context.current.issuer_arn,
-    try(one(data.aws_iam_roles.data_engineering_roles.arns),
-    [])]
-  )
-
-}
 
 module "share_dbs_with_roles" {
   count                   = local.is-development ? 0 : 1
@@ -590,7 +578,7 @@ module "share_dbs_with_roles" {
   dbs_to_grant            = local.dbs_to_grant
   data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
 resource "aws_lakeformation_resource" "rds_bucket" {
@@ -603,7 +591,7 @@ module "share_non_cadt_dbs_with_roles" {
   dbs_to_grant            = ["dms_dbo_g4s_emsys_mvp"]
   data_bucket_lf_resource = aws_lakeformation_resource.rds_bucket.arn
   role_arn                = aws_iam_role.dataapi_cross_role.arn
-  de_role_arn             = try(one(data.aws_iam_roles.data_engineering_roles.arns))
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
 

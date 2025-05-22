@@ -20,4 +20,8 @@ locals {
       for account_name, _ in lookup(tenant_config, "aws_accounts", {}) : account_name
     ]
   ]))
+  all_account_ids = merge(
+    local.environment_management.account_ids,
+    local.nonmp_account_ids
+  )
 }

@@ -151,6 +151,7 @@ module "glue_archive_job" {
     var.tags,
     {
       Resource_Type = "Glue Job"
+      Jira          = "DPR2-713"
     }
   )
 }
@@ -202,6 +203,12 @@ resource "aws_glue_trigger" "glue_file_archive_job_trigger" {
 
   actions {
     job_name = module.glue_archive_job.name
+  }
+
+  tags = {
+    Name          = "${module.glue_archive_job.name}-trigger"
+    Resource_Type = "Glue Trigger"
+    Jira          = "DPR2-713"
   }
 }
 

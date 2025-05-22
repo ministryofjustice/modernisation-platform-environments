@@ -53,7 +53,19 @@ module "cica_dms_tempus_database_credentials" {
     host     = "CHANGEME"
   })
 
-  # TODO add policy to let tempus DMS endpoint source role to read this secret (see above)
+  create_policy       = true
+  block_public_policy = true
+  policy_statements = {
+    read = {
+      sid = "AllowDMSSourceRoleRead"
+      principals = [{
+        type        = "AWS"
+        identifiers = [for database in module.cica_dms_tempus_dms_implementation : database.dms_source_role_arn]
+      }]
+      actions   = ["secretsmanager:GetSecretValue"]
+      resources = ["*"]
+    }
+  }
 
   tags = local.tags
 }

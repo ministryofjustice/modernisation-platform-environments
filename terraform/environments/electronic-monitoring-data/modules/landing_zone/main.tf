@@ -155,7 +155,7 @@ resource "aws_transfer_server" "this" {
 
   domain = "S3"
 
-  security_policy_name = "TransferSecurityPolicy-2023-05"
+  security_policy_name = "TransferSecurityPolicy-2024-01"
 
   pre_authentication_login_banner = "\nHello there\n"
 

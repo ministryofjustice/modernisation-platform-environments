@@ -1,10 +1,10 @@
 resource "helm_release" "dashboard_service" {
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
-  
+
   /* https://github.com/ministryofjustice/analytical-platform-dashboard-service */
   name       = "dashboard-service"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "0.1.4"
+  version    = "0.1.7"
   chart      = "dashboard-service"
   namespace  = kubernetes_namespace.dashboard_service[0].metadata[0].name
   values = [

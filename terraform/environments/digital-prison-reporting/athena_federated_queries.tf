@@ -19,32 +19,63 @@ locals {
   connection_string_onr = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.onr[0].name}}@//${local.onr_host}:${local.onr_port}/${local.onr_service_name}" : ""
 
   ndelius_host              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["endpoint"] : ""
-  ndelius_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["port"]: ""
-  ndelius_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["db_name"]: ""
-  connection_string_ndelius = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndelius[0].name}}@//${local.ndelius_host}:${local.ndelius_port}/${local.ndelius_service_name}": ""
+  ndelius_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["port"] : ""
+  ndelius_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["db_name"] : ""
+  connection_string_ndelius = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndelius[0].name}}@//${local.ndelius_host}:${local.ndelius_port}/${local.ndelius_service_name}" : ""
+
+  ndmis_host              = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["endpoint"] : ""
+  ndmis_port              = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["port"] : ""
+  ndmis_service_name      = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["db_name"] : ""
+  connection_string_ndmis = local.is_non_prod ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndmis[0].name}}@//${local.ndmis_host}:${local.ndmis_port}/${local.ndmis_service_name}" : ""
 
   # OASys, ONR and nDelius are currently only included in Dev and Test
-  federated_query_connection_strings_map = local.is_dev_or_test ? {
+  # ndmis is only included in Dev, Test and PreProduction
+  dev_and_test_federated_query_connections = {
     nomis   = local.connection_string_nomis
     bodmis  = local.connection_string_bodmis
     oasys   = local.connection_string_oasys
     onr     = local.connection_string_onr
     ndelius = local.connection_string_ndelius
-  } : {
+    ndmis   = local.connection_string_ndmis
+  }
+
+  preproduction_federated_query_connections = {
+    nomis  = local.connection_string_nomis
+    bodmis = local.connection_string_bodmis
+    ndmis  = local.connection_string_ndmis
+  }
+
+  production_federated_query_connections = {
     nomis  = local.connection_string_nomis
     bodmis = local.connection_string_bodmis
   }
 
-  federated_query_credentials_secret_arns = local.is_dev_or_test ? [
+  dev_and_test_federated_query_credentials_secret_arns = local.is_dev_or_test ? [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
     aws_secretsmanager_secret.oasys[0].arn,
     aws_secretsmanager_secret.onr[0].arn,
-    aws_secretsmanager_secret.ndelius[0].arn
-    ] : [
+    aws_secretsmanager_secret.ndelius[0].arn,
+    aws_secretsmanager_secret.ndmis[0].arn
+  ]: []
+
+  preproduction_federated_query_credentials_secret_arns = local.is-preproduction?  [
+    aws_secretsmanager_secret.nomis.arn,
+    aws_secretsmanager_secret.bodmis.arn,
+    aws_secretsmanager_secret.ndmis[0].arn
+  ] : []
+
+  production_federated_query_credentials_secret_arns = [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn
   ]
+
+
+  federated_query_connection_strings_map = (local.is_dev_or_test ? local.dev_and_test_federated_query_connections :
+  (local.is-preproduction ? local.preproduction_federated_query_connections : local.production_federated_query_connections))
+
+  federated_query_credentials_secret_arns =  (local.is_dev_or_test ? local.dev_and_test_federated_query_credentials_secret_arns :
+    (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns : local.production_federated_query_credentials_secret_arns))
 }
 
 module "athena_federated_query_connector_oracle" {
@@ -135,6 +166,19 @@ resource "aws_athena_data_catalog" "ndelius_catalog" {
 
   name        = "ndelius"
   description = "nDelius Athena data catalog"
+  type        = "LAMBDA"
+
+  parameters = {
+    "function" = module.athena_federated_query_connector_oracle.lambda_function_arn
+  }
+}
+
+# Adds an Athena data source / catalog for ndmis
+resource "aws_athena_data_catalog" "ndmis_catalog" {
+  count = local.is_non_prod ? 1 : 0
+
+  name        = "ndmis"
+  description = "ndmis Athena data catalog"
   type        = "LAMBDA"
 
   parameters = {
