@@ -242,3 +242,47 @@ resource "aws_ssm_parameter" "maat_app_caa_endpoint" {
     ]
   }
 }
+
+resource "aws_ssm_parameter" "maat_app_bc_service_name" {
+  name  = "/maat/APP_BC_SERVICE_NAME"
+  type  = "SecureString"
+  value = "replace in console"
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "maat_app_ats_client_secret" {
+  name  = "/maat/APP_ATS_CLIENT_SECRET"
+  type  = "SecureString"
+  value = "replace in console"
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "maat_app_ats_client_id" {
+  name  = "/maat/APP_ATS_CLIENT_ID"
+  type  = "SecureString"
+  value = "replace in console"
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "maat_app_ats_oauth_scope" {
+  name  = "/maat/APP_ATS_OAUTH_SCOPE"
+  type  = "SecureString"
+  value = "replace in console"
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
