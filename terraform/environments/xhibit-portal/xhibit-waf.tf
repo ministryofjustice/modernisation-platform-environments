@@ -13,7 +13,7 @@ resource "aws_wafv2_ip_set" "xbhibit_waf_ip_set" {
   ip_address_version = "IPV4"
   description        = "List IP Addresses to be blockefd via WAF"
 
-  addresses = jsondecode(data.aws_secretsmanager_secret_version.ip_block_list.secret_string)
+  addresses = local.blocked_ips
 
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-ip-set", local.application_name, local.environment)) }
