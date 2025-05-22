@@ -11,23 +11,6 @@ resource "aws_s3_bucket" "error_page" {
       }
     }
   }
-
-  versioning {
-    enabled = true
-  }
-
-  logging {
-    target_bucket = var.logging_bucket_name
-    target_prefix = "s3/${var.environment}/error-page-logs/"
-  }
-
-  lifecycle_rule {
-    id      = "expire-old-objects"
-    enabled = true
-
-    expiration {
-      days = 365
-    }
   }
 
   replication_configuration {
