@@ -31,7 +31,7 @@ resource "aws_s3_bucket_public_access_block" "error_page_public" {
 resource "aws_s3_object" "custom_503" {
   bucket       = aws_s3_bucket.error_page.id
   key          = "custom-503.html"
-  source       = "custom-503.html" # Local file
+  source       = "${path.module}/custom-503.html" # Local file
   content_type = "text/html"
   acl          = "private"
 }
