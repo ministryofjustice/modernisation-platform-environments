@@ -327,20 +327,42 @@ java -version
 # Cleanup
 rm -f /tmp/amazon-corretto-21-x64-linux-jdk.rpm
 
-# Set up service
-mkdir -p /opt/odata-demo
-cd /opt/odata-demo
-aws s3 cp s3://dpr-artifact-store-development/third-party/odata-demo/OData-demo-0.0.1-SNAPSHOT.jar ./OData-demo.jar
-chown -R ec2-user:ec2-user /opt/odata-demo
+# Set up service (ODATA)
+#mkdir -p /opt/odata-demo
+#cd /opt/odata-demo
+#aws s3 cp s3://dpr-artifact-store-development/third-party/odata-demo/OData-demo-0.0.1-SNAPSHOT.jar ./OData-demo.jar
+#chown -R ec2-user:ec2-user /opt/odata-demo
 
-cat <<EOF > /etc/systemd/system/odata-demo.service
+#cat <<EOF > /etc/systemd/system/odata-demo.service
+#[Unit]
+#Description=OData Demo Java Service
+#After=network.target
+
+#[Service]
+#WorkingDirectory=/opt/odata-demo
+#ExecStart=/usr/bin/java -jar /opt/odata-demo/OData-demo.jar
+#SuccessExitStatus=143
+#Restart=on-failure
+#RestartSec=10
+
+#[Install]
+#WantedBy=multi-user.target
+#EOF
+
+# Set up service (headless BI)
+mkdir -p /opt/headless-bi
+cd /opt/headless-bi
+aws s3 cp s3://dpr-artifact-store-development/third-party/headless-bi/hmpps-probation-headless-bi-poc.jar ./headless-bi.jar
+chown -R ec2-user:ec2-user /opt/headless-bi
+
+cat <<EOF > /etc/systemd/system/headless-bi.service
 [Unit]
-Description=OData Demo Java Service
+Description=headless-bi Java Service
 After=network.target
 
 [Service]
-WorkingDirectory=/opt/odata-demo
-ExecStart=/usr/bin/java -jar /opt/odata-demo/OData-demo.jar
+WorkingDirectory=/opt/headless-bi
+ExecStart=/usr/bin/java -jar /opt/headless-bi/headless-bi.jar
 SuccessExitStatus=143
 Restart=on-failure
 RestartSec=10
@@ -350,6 +372,6 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable odata-demo.service
-systemctl start odata-demo.service
+systemctl enable headless-bi.service
+systemctl start headless-bi.service
 ## ODATA DEMO 
