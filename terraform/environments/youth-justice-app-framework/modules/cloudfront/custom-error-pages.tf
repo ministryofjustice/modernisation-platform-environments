@@ -1,4 +1,5 @@
 resource "aws_s3_bucket" "error_page" {
+  #checkov:skip=CKV2_AWS_62:"Event notifications not required for CloudFront error pages
   bucket        = "yjaf-${var.environment}-custom-error-pages"
   force_destroy = true
 
