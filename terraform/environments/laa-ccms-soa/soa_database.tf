@@ -73,13 +73,13 @@ resource "aws_db_instance" "soa_db" {
   vpc_security_group_ids = [
     aws_security_group.soa_db.id
   ]
-  backup_retention_period   = 30
-  maintenance_window        = "Mon:00:00-Mon:03:00"
-  backup_window             = "03:00-06:00"
-  character_set_name        = "AL32UTF8"
-  deletion_protection       = local.application_data.accounts[local.environment].soa_db_deletion_protection
-  db_subnet_group_name      = aws_db_subnet_group.soa.id
-  option_group_name         = aws_db_option_group.soa_oracle_19.id
+  backup_retention_period = 30
+  maintenance_window      = "Mon:00:00-Mon:03:00"
+  backup_window           = "03:00-06:00"
+  character_set_name      = "AL32UTF8"
+  deletion_protection     = local.application_data.accounts[local.environment].soa_db_deletion_protection
+  db_subnet_group_name    = aws_db_subnet_group.soa.id
+  option_group_name       = aws_db_option_group.soa_oracle_19.id
 
   timeouts {
     create = "40m"
