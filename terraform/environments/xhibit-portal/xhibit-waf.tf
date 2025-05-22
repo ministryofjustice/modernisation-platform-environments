@@ -21,6 +21,7 @@ resource "aws_wafv2_ip_set" "xbhibit_waf_ip_set" {
 }
 
 resource "aws_wafv2_web_acl" "xhibit_web_acl" {
+
   name        = "xbhibit_waf"
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL"
@@ -28,7 +29,31 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
   default_action {
     block {}
   }
-
+  rule {
+    name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 10 # Higher priority than your IP block rule
+    override_action {
+      none {}
+    }
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+        rule_action_override {
+          action_to_use {
+            count {}
+          }
+          name = "Log4JRCE"
+        }
+      }
+    }
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AWSManagedRulesKnownBadInputsRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+  
   rule {
     name = "xbhibit-waf-blocked-rule"
 
@@ -62,8 +87,9 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
 }
 
 resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
+# checkov:skip=CKV_AWS_158: Default encryption is fine
   name              = "aws-waf-logs/xhibit-waf-logs"
-  retention_in_days = 30
+  retention_in_days = 365
 
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-xhibit-waf-logs", local.application_name, local.environment)) }
