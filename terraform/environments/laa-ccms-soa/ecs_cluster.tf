@@ -123,7 +123,7 @@ resource "aws_ecs_service" "admin" {
   }
 
   depends_on = [
-    aws_lb_listener.admin443,
+    aws_lb_listener.admin80,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_db_instance.soa_db,
     aws_efs_file_system.storage,
@@ -215,7 +215,7 @@ resource "aws_ecs_service" "managed" {
   }
 
   depends_on = [
-    aws_lb_listener.managed443,
+    aws_lb_listener.managed80,
     aws_iam_role_policy_attachment.ecs_task_execution_role,
     aws_ecs_service.admin,
   ]
