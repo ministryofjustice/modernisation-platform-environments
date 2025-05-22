@@ -1,30 +1,8 @@
 ######################################
 # PARAMETER STORE SECRETS
 ######################################
-resource "aws_ssm_parameter" "maat_app_cma_oauth_scope" {
-  name  = "/maat/APP_CMA_OAUTH_SCOPE"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
 resource "aws_ssm_parameter" "maat_app_bc_client_user_id" {
   name  = "/maat/APP_BC_CLIENT_USER_ID"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
-resource "aws_ssm_parameter" "maat_app_ccc_endpoint" {
-  name  = "/maat/APP_CCC_ENDPOINT"
   type  = "SecureString"
   value = "replace in console"
   lifecycle {
@@ -45,41 +23,8 @@ resource "aws_ssm_parameter" "maat_app_orch_oauth_scope" {
   }
 }
 
-resource "aws_ssm_parameter" "maat_app_ccp_client_secret" {
-  name  = "/maat/APP_CCP_CLIENT_SECRET"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
 resource "aws_ssm_parameter" "maat_app_google_analytics_tag_id" {
   name  = "/maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
-resource "aws_ssm_parameter" "maat_app_cma_client_id" {
-  name  = "/maat/APP_CMA_CLIENT_ID"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
-resource "aws_ssm_parameter" "maat_app_cma_client_secret" {
-  name  = "/maat/APP_CMA_CLIENT_SECRET"
   type  = "SecureString"
   value = "replace in console"
   lifecycle {
@@ -155,17 +100,6 @@ resource "aws_ssm_parameter" "maat_app_orch_client_id" {
   }
 }
 
-resource "aws_ssm_parameter" "maat_app_ccc_client_id" {
-  name  = "/maat/APP_CCC_CLIENT_ID"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
 resource "aws_ssm_parameter" "maat_app_db_user_id" {
   name  = "/maat/APP_DB_USERID"
   type  = "SecureString"
@@ -177,52 +111,8 @@ resource "aws_ssm_parameter" "maat_app_db_user_id" {
   }
 }
 
-resource "aws_ssm_parameter" "maat_app_ccc_client_secret" {
-  name  = "/maat/APP_CCC_CLIENT_SECRET"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
 resource "aws_ssm_parameter" "maat_app_orch_endpoint" {
   name  = "/maat/APP_ORCH_ENDPOINT"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
-resource "aws_ssm_parameter" "maat_app_ccc_oauth_scope" {
-  name  = "/maat/APP_CCC_OAUTH_SCOPE"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
-resource "aws_ssm_parameter" "maat_app_ccp_client_id" {
-  name  = "/maat/APP_CCP_CLIENT_ID"
-  type  = "SecureString"
-  value = "replace in console"
-  lifecycle {
-    ignore_changes = [
-      value,
-    ]
-  }
-}
-
-resource "aws_ssm_parameter" "maat_app_ccp_endpoint_proc" {
-  name  = "/maat/APP_CCP_ENDPOINT_PROCEEDINGS"
   type  = "SecureString"
   value = "replace in console"
   lifecycle {
