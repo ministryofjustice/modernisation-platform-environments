@@ -159,7 +159,7 @@ jobs:
           # Define all module locations to check
           module_locations=(
             "terraform/environments/${{ inputs.application }}/modules"
-            "terraform/environments/modules"
+            "terraform/modules"
             # Add more locations here as needed
           )
 
@@ -195,7 +195,8 @@ jobs:
             for comp in $COMPONENTS; do
               if [ "$comp" = "root" ]; then
                 folder="$app_dir"
-                if grep -qE "source.*=.*(\"modules/$module_name\"|\"./modules/$module_name\")" "$folder"/*.tf 2>/dev/null; then
+                # Try to match any possible source path for shared modules
+                if grep -qE "source.*=.*(\"modules/$module_name\"|\"./modules/$module_name\"|\"../../modules/$module_name\")" "$folder"/*.tf 2>/dev/null; then
                   referencing_components+=("$comp")
                 fi
               else
