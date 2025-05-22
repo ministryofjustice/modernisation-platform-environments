@@ -1,4 +1,4 @@
-#--Admin
+/* #--Admin
 resource "aws_route53_record" "admin" {
   zone_id = data.aws_route53_zone.network-services.zone_id
   name    = local.application_data.accounts[local.environment].admin_hostname
@@ -21,3 +21,4 @@ resource "aws_route53_record" "managed" {
     evaluate_target_health = false
   }
 }
+ */
