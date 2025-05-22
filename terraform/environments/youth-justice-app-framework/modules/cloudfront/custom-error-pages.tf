@@ -1,5 +1,8 @@
 resource "aws_s3_bucket" "error_page" {
   #checkov:skip=CKV2_AWS_62:"Event notifications not required for CloudFront error pages
+  #checkov:skip=CKV2_AWS_61:"Dont want to delete any files in this bucket"
+  #checkov:skip=CKV_AWS_144:"Do not need to replicate error pages as stored in terraform anyway"
+  #checkov:skip=CKV_AWS_18:"Logging not required for error pages"
   bucket        = "yjaf-${var.environment}-custom-error-pages"
   force_destroy = true
 
@@ -10,6 +13,9 @@ resource "aws_s3_bucket" "error_page" {
         sse_algorithm     = "aws:kms"
       }
     }
+  }
+  versioning {
+    enabled = true
   }
 }
 
