@@ -47,6 +47,7 @@ resource "aws_iam_policy" "backup_actions_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "backup_actions_policy_attachment" {
+  count      = contains(["poc", "stage"], var.env_name) ? 0 : 1
   role       = aws_iam_role.aws_backup_default_service_role[0].name
   policy_arn = aws_iam_policy.backup_actions_policy[0].arn
 }
