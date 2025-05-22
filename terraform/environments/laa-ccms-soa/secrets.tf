@@ -45,5 +45,4 @@ resource "aws_secretsmanager_secret" "tds_db_password" {
   name        = "ccms/soa/tds/db/password"
   description = "TDS database password"
 
-  tags = local.tags
 }
