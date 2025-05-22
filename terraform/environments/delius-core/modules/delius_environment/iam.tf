@@ -41,11 +41,12 @@ data "aws_iam_policy_document" "backup_actions_policy_document" {
 }
 
 resource "aws_iam_policy" "backup_actions_policy" {
-  name   = "${var.env_name}-backup_actions_policy"
+  count  = contains(["poc", "stage"], var.env_name) ? 0 : 1
+  name   = "backup_actions_policy"
   policy = data.aws_iam_policy_document.backup_actions_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "backup_actions_policy_attachment" {
-  role       = "AWSBackupDefaultServiceRole"
-  policy_arn = aws_iam_policy.backup_actions_policy.arn
+  role       = aws_iam_role.aws_backup_default_service_role[0].name
+  policy_arn = aws_iam_policy.backup_actions_policy[0].arn
 }
