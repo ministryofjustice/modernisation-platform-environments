@@ -442,13 +442,13 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      # {
-      #   Effect = "Allow"
-      #   Action = "ssm:GetParameters"
-      #   Resource = [
-      #     "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
-      #   ]
-      # },
+      {
+        Effect = "Allow"
+        Action = "ssm:GetParameters"
+        Resource = [
+          "arn:aws:ssm:${local.env_account_region}:${local.env_account_id}:parameter/maat/*"
+        ]
+      },
       {
         Effect = "Allow"
         Action = [
