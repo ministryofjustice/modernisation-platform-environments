@@ -5,6 +5,11 @@ vulnerabilities:
     statement: Accept the risk of jsonwebtoken to pass the checks
   - id: CVE-2022-25883
     statement: Accept the risk of semver to pass the checks
+  ignore:
+    - id: CVE-2025-27152
+      reason: "Legacy system requires axios 0.21.4"
+    - id: CVE-2022-25883
+      reason: "Semver usage does not expose ReDoS risk in our application"
 
 misconfigurations:
   - id: AVD-AWS-0047
