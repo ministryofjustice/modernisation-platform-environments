@@ -41,6 +41,10 @@ locals {
           description             = "Use the dso-modernisation-platform-automation azure app registration"
           recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
         }
+        dso-ad-computer-cleanup = {
+          description             = "Use the AD service account"
+          recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
+        }
       }
       tags = {
         ami_name               = "hmpps_windows_server_2022"
