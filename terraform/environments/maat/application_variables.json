@@ -81,7 +81,8 @@
       "maat_ALB5xxAlarmThreshold": "10",
       "maat_ALBTarget4xxAlarmThreshold": "10",
       "maat_ALB4xxAlarmThreshold": "10",
-      "maat_pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
+      "maat_pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
+      "app_log_level": "debug"
     },
     "test": {
       "example_var": "test-data",
@@ -143,7 +144,8 @@
       "maat_ALB5xxAlarmThreshold": "10",
       "maat_ALBTarget4xxAlarmThreshold": "10",
       "maat_ALB4xxAlarmThreshold": "10",
-      "maat_pagerduty_integration_key_name": "laa_maat_prod_alarm"
+      "maat_pagerduty_integration_key_name": "laa_maat_prod_alarm",
+      "app_log_level": "info"
     }
   }
 }

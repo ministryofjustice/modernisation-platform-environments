@@ -1,7 +1,7 @@
 #####################################
 #
 # EC2 RESOURCES (from infra stack)
-# 
+#
 #####################################
 
 ##### EC2 IAM Role ---------
@@ -184,7 +184,7 @@ resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
   }
 }
 
-#### EC2 Scaling Policies 
+#### EC2 Scaling Policies
 
 resource "aws_autoscaling_policy" "maat_ec2_scaling_up_policy" {
   name                   = "${local.application_name}-ec2-scaling-up"
@@ -324,9 +324,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_low_cpu_alarm" {
 }
 
 #####################################
-# 
+#
 # ECS RESOURCES (from app stack)
-# 
+#
 #####################################
 
 ##### ECS Service Role -----
@@ -506,6 +506,7 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
       maat_aws_stream_prefix     = local.application_data.accounts[local.environment].maat_aws_stream_prefix
       env_account_region         = local.env_account_region
       env_account_id             = local.env_account_id
+      app_log_level              = local.application_data.accounts[local.environment].app_log_level
     }
   )
 
