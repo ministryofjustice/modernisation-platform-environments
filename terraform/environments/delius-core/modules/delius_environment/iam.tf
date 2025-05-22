@@ -30,6 +30,7 @@ resource "aws_iam_role_policy_attachment" "restore_policy" {
 }
 
 data "aws_iam_policy_document" "backup_actions_policy_document" {
+  count      = contains(["poc", "stage"], var.env_name) ? 0 : 1
   statement {
     effect = "Allow"
     actions = ["backup:ListBackupVaults",
@@ -41,12 +42,13 @@ data "aws_iam_policy_document" "backup_actions_policy_document" {
 }
 
 resource "aws_iam_policy" "backup_actions_policy" {
+  count  = contains(["poc", "stage"], var.env_name) ? 0 : 1
   name   = "backup_actions_policy"
-  policy = data.aws_iam_policy_document.backup_actions_policy_document.json
+  policy = data.aws_iam_policy_document.backup_actions_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "backup_actions_policy_attachment" {
   count      = contains(["poc", "stage"], var.env_name) ? 0 : 1
   role       = aws_iam_role.aws_backup_default_service_role[0].name
-  policy_arn = aws_iam_policy.backup_actions_policy.arn
+  policy_arn = aws_iam_policy.backup_actions_policy[0].arn
 }
