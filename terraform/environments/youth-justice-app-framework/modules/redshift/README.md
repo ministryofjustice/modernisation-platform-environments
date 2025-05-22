@@ -34,7 +34,14 @@ As, currently, the default AWS key is used for encryption, permissions are not n
 4. Wait to the snapshort restore to complete.
 
 ### Copy account passwords from old to new secrets ###
-1. Whenever the Postgress database is restored from the old account the redshift_readonly user password needs to be reset. Copy the password from Secret `<env>/yjaf/rds` (e.g. `preprod/yjaf/rds`) on the old account to secret `yjafrds01-cluster-db-redshift_readonly-password` on the new account.
+1. Whenever the Postgress database is restored from the old account the postgres and redshift_readonly user passwords need to be reset. Copy the password from the corresponding old to new secret specified below.
+
+| Account | Old Secret | New Secret |
+| ------- | ---------- | ---------- |
+| postgres | `AuroraPostgres `| `yjafrds01-cluster-db-postgres-password` |
+| read-only |`<env>/yjaf/rds` (e.g. `preprod/yjaf/rds`) |`yjafrds01-cluster-db-redshift_readonly-password` |
+
+
 2. Afrer copying the password as descripbed in step *1* use the `Rotation` function to reset it. While in the Secret select the `Rotation` tab and `Rotate secret immediatly`. Ti will be scheduled to later on the same day.
 
 

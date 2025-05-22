@@ -17,7 +17,7 @@ module "aurora" {
   #one time restore from a shared snapshot on preprod
   snapshot_identifier = local.application_data.accounts[local.environment].snapshot_identifier
 
-  user_passwords_to_reset = ["postgres_rotated", "redshift_readonly"]
+  user_passwords_to_reset = ["postgres_rotated", "redshift_readonly", "ycs_team", "postgres"]
   db_name                 = "yjafrds01"
   aws_account_id          = data.aws_caller_identity.current.account_id
 

@@ -26,7 +26,7 @@ module "cur_s3_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
+          identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
         }
       ]
     },
@@ -89,7 +89,7 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
     ]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
+      identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
     }
   }
 
@@ -176,7 +176,7 @@ module "focus_s3_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
+          identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-focus-1-reports-replication-role"]
         }
       ]
     }
@@ -199,7 +199,7 @@ data "aws_iam_policy_document" "focus_bucket_replication_policy" {
     ]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
+      identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-focus-1-reports-replication-role"]
     }
   }
 }
