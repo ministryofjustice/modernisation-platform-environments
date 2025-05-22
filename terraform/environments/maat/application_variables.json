@@ -82,7 +82,10 @@
       "maat_ALBTarget4xxAlarmThreshold": "10",
       "maat_ALB4xxAlarmThreshold": "10",
       "maat_pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
-      "app_log_level": "debug"
+      "app_log_level": "debug",
+      "maat_ats_oauth_url": "https://laa-crime-auth-ats.auth.eu-west-2.amazoncognito.com/oauth2/token",
+      "maat_ats_endpoint": "/api/internal/v1/application-tracking-output-result",
+      "maat_ats_base_url": "https://laa-crime-application-tracking-service-dev.apps.live.cloud-platform.service.justice.gov.uk"
     },
     "test": {
       "example_var": "test-data",
@@ -145,7 +148,10 @@
       "maat_ALBTarget4xxAlarmThreshold": "10",
       "maat_ALB4xxAlarmThreshold": "10",
       "maat_pagerduty_integration_key_name": "laa_maat_prod_alarm",
-      "app_log_level": "info"
+      "app_log_level": "info",
+      "maat_ats_oauth_url": "https://laa-crime-auth-ats.auth.eu-west-2.amazoncognito.com/oauth2/token",
+      "maat_ats_endpoint": "/api/internal/v1/application-tracking-output-result",
+      "maat_ats_base_url": "https://laa-crime-application-tracking-service-prod.apps.live.cloud-platform.service.justice.gov.uk"
     }
   }
 }

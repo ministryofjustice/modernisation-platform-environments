@@ -507,6 +507,10 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
       env_account_region         = local.env_account_region
       env_account_id             = local.env_account_id
       app_log_level              = local.application_data.accounts[local.environment].app_log_level
+      maat_ats_oauth_url         = local.application_data.accounts[local.environment].maat_ats_oauth_url
+      maat_ats_endpoint          = local.application_data.accounts[local.environment].maat_ats_endpoint
+      maat_ats_base_url          = local.application_data.accounts[local.environment].maat_ats_base_url
+
     }
   )
 

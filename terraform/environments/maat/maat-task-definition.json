@@ -83,16 +83,28 @@
       {
         "name": "APP_CAA_ENDPOINT",
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CAA_ENDPOINT"
+      },
+      {
+        "name": "APP_BC_SERVICE_NAME",
+        "value": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_BC_SERVICE_NAME"
+      },
+      {
+        "name": "APP_ATS_CLIENT_SECRET",
+        "value": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_CLIENT_SECRET"
+      },
+      {
+        "name": "APP_ATS_CLIENT_ID",
+        "value": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_CLIENT_ID"
+      },
+      {
+        "name": "APP_ATS_OAUTH_SCOPE",
+        "value": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_OAUTH_SCOPE"
       }
     ],
     "environment": [
       {
         "name": "APP_ORCH_BASE_URL",
         "value": "${maat_orch_base_url}"
-      },
-      {
-        "name": "APP_BC_SERVICE_NAME",
-        "value": ""
       },
       {
         "name": "APP_DB_POOL_MAX_CONNECTION",
@@ -141,6 +153,18 @@
       {
         "name": "APP_CAA_BASE_URL",
         "value": "${maat_caa_base_url}"
+      },
+      {
+        "name": "APP_ATS_OAUTH_URL",
+        "value": "${maat_ats_oauth_url}"
+      },
+      {
+        "name": "APP_ATS_ENDPOINT",
+        "value": "${maat_ats_endpoint}"
+      },
+      {
+        "name": "APP_ATS_BASE_URL",
+        "value": "${maat_ats_base_url}"
       }
     ],
     "logConfiguration": {
