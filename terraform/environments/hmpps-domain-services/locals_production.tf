@@ -39,6 +39,9 @@ locals {
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.jumpserver.config.instance_profile_policies, [
+            #  "Ec2GFSLSecretPolicy" # add after secret created
+          ])
         })
         instance = merge(local.ec2_instances.jumpserver.instance, {
           tags = {
@@ -97,6 +100,23 @@ locals {
           domain-name = "azure.hmpp.root"
         })
       })
+    }
+
+    iam_policies = {
+      Ec2GFSLSecretPolicy = {
+        description = "Permissions required to access GFSL secrets"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/GFSL/*",
+            ]
+          }
+        ]
+      }
     }
 
     lbs = {
@@ -193,6 +213,7 @@ locals {
 
     secretsmanager_secrets = {
       "/microsoft/AD/azure.hmpp.root" = local.secretsmanager_secrets.domain
+      "/GFSL"                         = local.secretsmanager_secrets.gfsl
     }
   }
 }
