@@ -239,6 +239,8 @@ resource "aws_cloudfront_distribution" "external" {
 
   web_acl_id = aws_wafv2_web_acl.waf_acl.arn
 
+  depends_on = [aws_wafv2_web_acl.waf_acl]
+
   # This is a required block in Terraform. Here we are having no geo restrictions.
   restrictions {
     geo_restriction {
