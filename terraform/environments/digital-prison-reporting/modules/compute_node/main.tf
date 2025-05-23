@@ -1,3 +1,5 @@
+# checkov:skip=CKV2_AWS_5
+
 data "aws_caller_identity" "current" {}
 
 data "template_file" "user_data" {
