@@ -204,12 +204,12 @@ resource "aws_security_group" "vpc_sec_group" {
     security_groups = [var.ecs_cluster_sec_group_id]
   }
 
-  ingress {
-    description = "MLRA Sql Net on 1521"
+  egress {
+    description = "MAAT Sql Net on 1521"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    security_groups = [var.mlra_ecs_cluster_sec_group_id]
+    security_groups = [var.ecs_cluster_sec_group_id]
   }
 
   tags = {
