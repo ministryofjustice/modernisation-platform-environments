@@ -28,4 +28,3 @@ resource "aws_iam_role_policy_attachment" "restore_policy" {
   role       = aws_iam_role.aws_backup_default_service_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
 }
-
