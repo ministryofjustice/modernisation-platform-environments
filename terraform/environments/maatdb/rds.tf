@@ -39,7 +39,7 @@ module "rds" {
   vpc_subnet_b_id                       = data.aws_subnet.data_subnets_b.id
   vpc_subnet_c_id                       = data.aws_subnet.data_subnets_c.id
   bastion_security_group_id             = module.bastion_linux.bastion_security_group
-  ecs_cluster_sec_group_id              = local.application_data.accounts[local.environment].ecs_cluster_sec_group_id
+  ecs_cluster_sec_group_id              = "${local.environment_management.account_ids["maat-${local.environment}"]}/${local.application_data.accounts[local.environment].ecs_cluster_sec_group_id}"
   kms_key_arn                           = local.rds_kms_key_arn
 
   tags                                  = local.tags
