@@ -63,5 +63,5 @@ variable "tags" {
 }
 variable "key_name" {
   type    = string
-  default = "default-windows-key"
+  default = ""
 }
