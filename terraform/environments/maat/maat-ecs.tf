@@ -230,6 +230,26 @@ resource "aws_security_group_rule" "maat_sg_rule_int_lb_to_ecs" {
   source_security_group_id = aws_security_group.maat_int_lb_sg.id
 }
 
+resource "aws_security_group_rule" "maat_sg_rule_outbound" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints" 
+  security_group_id = aws_security_group.maat_ecs_security_group.id
+}
+
+resource "aws_security_group_rule" "maat_sg_rule_outbound" {
+  type              = "egress"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints" 
+  security_group_id = aws_security_group.maat_ecs_security_group.id
+  source_security_group_id = "sg-0727aa271de73eb1d"
+}
+
 #### EC2 CLOUDWATCH LOG GROUP & Key ------
 
 resource "aws_kms_key" "maat_ec2_cloudwatch_log_key" {
