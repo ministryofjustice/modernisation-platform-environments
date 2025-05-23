@@ -151,7 +151,10 @@ resource "aws_db_instance" "appdb1" {
   kms_key_id                            = var.kms_key_arn
   apply_immediately                     = true
   snapshot_identifier                   = var.snapshot_arn
-  tags = var.tags
+  tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
+    var.tags
+  )
 
   timeouts {
     create = "60m"
