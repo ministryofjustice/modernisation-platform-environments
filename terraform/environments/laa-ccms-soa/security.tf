@@ -117,7 +117,7 @@ resource "aws_security_group" "ecs_tasks_managed" {
 }
 
 resource "aws_security_group_rule" "ecs_tasks_managed_server" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
+  security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
   description       = "SOA Managed Server"
   protocol          = "TCP"
@@ -127,7 +127,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_server" {
 }
 
 resource "aws_security_group_rule" "ecs_tasks_managed_7" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
+  security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
   description       = "SOA Managed Application" #--Why?
   protocol          = "TCP"
@@ -137,7 +137,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_7" {
 }
 
 resource "aws_security_group_rule" "ecs_tasks_managed_7574_tcp" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
+  security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
   description       = "SOA Managed Application" #--Why?
   protocol          = "TCP"
@@ -147,7 +147,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_7574_tcp" {
 }
 
 resource "aws_security_group_rule" "ecs_tasks_managed_8088_8089" {
-  security_group_id = aws_security_group.ecs_tasks_admin.id
+  security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
   description       = "SOA Managed Application" #--Why?
   protocol          = "TCP"

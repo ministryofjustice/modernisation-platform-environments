@@ -31,7 +31,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 resource "aws_ecs_task_definition" "admin" {
   family             = "${local.application_data.accounts[local.environment].app_name}-admin-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "bridge"
+  network_mode       = "host"
   requires_compatibilities = [
     "EC2",
   ]
@@ -109,12 +109,10 @@ resource "aws_ecs_service" "admin" {
     expression = "attribute:server == admin"
   }
 
-  network_configuration {
-    security_groups = [
-      aws_security_group.ecs_tasks_admin.id,
-    ]
+/*   network_configuration {
+    security_groups = [aws_security_group.ecs_tasks_admin.id]
     subnets = data.aws_subnets.shared-private.ids
-  }
+  } */
 
   load_balancer {
     target_group_arn = aws_lb_target_group.admin.id
@@ -137,7 +135,7 @@ resource "aws_ecs_service" "admin" {
 resource "aws_ecs_task_definition" "managed" {
   family             = "${local.application_data.accounts[local.environment].app_name}-managed-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "bridge"
+  network_mode       = "host"
   requires_compatibilities = [
     "EC2",
   ]
@@ -201,12 +199,10 @@ resource "aws_ecs_service" "managed" {
     expression = "attribute:server == managed"
   }
 
-  network_configuration {
-    security_groups = [
-      aws_security_group.ecs_tasks_managed.id,
-    ]
+/*   network_configuration {
+    security_groups = [aws_security_group.ecs_tasks_managed.id]
     subnets = data.aws_subnets.shared-private.ids
-  }
+  } */
 
   load_balancer {
     target_group_arn = aws_lb_target_group.managed.id
