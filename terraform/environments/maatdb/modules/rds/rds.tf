@@ -240,7 +240,7 @@ resource "aws_security_group_rule" "allow_mlra_ecs_to_rds" {
   to_port                  = 1521
   protocol                 = "tcp"
   description              = "Allow ECS cluster from Account A to connect to RDS"
-  security_group_id        = aws_security_group.ecs_sec_group.id
+  security_group_id        = aws_security_group.vpc_sec_group.id
   source_security_group_id = aws_security_group.vpc_sec_group.id
 }
 
