@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "athena_bucket_policy" {
       "s3:PutObject",
       "s3:GetObject"
     ]
-    resources = ["${module.s3-bucket-athena-queries.bucket.arn}/*"]
+    resources = ["${module.s3-bucket-athena-queries-output.bucket.arn}/*"]
     principals {
       type        = "Service"
       identifiers = ["athena.amazonaws.com"]
