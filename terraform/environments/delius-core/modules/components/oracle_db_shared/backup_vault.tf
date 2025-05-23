@@ -22,19 +22,16 @@ data "aws_iam_policy_document" "oracle_ec2_snapshot_backup_role_policy_document"
     resources = ["arn:aws:iam::${var.account_info.id}:role/service-role/AWSBackupDefaultServiceRole"]
   }
   statement {
-    effect = "Allow"
-    actions = ["backup:ListBackupVaults",
-      "backup:StartBackupJob",
-      "backup:DescribeBackupJob",
-    "ec2:DescribeSnapshots"]
-    resources = ["*"]
-  }
-  statement {
-    actions = [
-      "kms:GenerateDataKey",
-      "kms:Encrypt",
-      "kms:Decrypt",
-    ]
-    resources = [var.account_config.kms_keys.general_shared]
-  }
+      sid     = "BackupOperations"
+      effect  = "Allow"
+      actions = [
+        "backup:StartBackupJob",
+        "ec2:DescribeInstances",
+        "ec2:DescribeVolumes",
+        "ec2:CreateSnapshot",
+        "ec2:DescribeSnapshots",
+        "ec2:CreateTags"
+      ]
+      resources = ["*"]
+    }
 }
