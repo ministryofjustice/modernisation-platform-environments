@@ -11,6 +11,8 @@ variable "aws_region" {}
 variable "description" {
   default = "Security group for Windows compute node"
 }
+variable "ec2_terminate_behavior" {}
+
 variable "associate_public_ip_address" {
   type    = bool
   default = false
@@ -21,6 +23,16 @@ variable "enable_compute_node" {
 }
 variable "ebs_size" {
   default = 50
+}
+variable "ebs_optimized" {
+  description = "If true, the launched EC2 instance will be EBS-optimized"
+  type        = bool
+  default     = null
+}
+variable "monitoring" {
+  description = "If true, the launched EC2 instance will have detailed monitoring enabled"
+  type        = bool
+  default     = false
 }
 variable "ebs_encrypted" {
   type    = bool
