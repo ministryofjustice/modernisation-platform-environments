@@ -31,7 +31,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 resource "aws_ecs_task_definition" "admin" {
   family             = "${local.application_data.accounts[local.environment].app_name}-admin-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "host"
+  network_mode       = "bridge"
   requires_compatibilities = [
     "EC2",
   ]
@@ -135,7 +135,7 @@ resource "aws_ecs_service" "admin" {
 resource "aws_ecs_task_definition" "managed" {
   family             = "${local.application_data.accounts[local.environment].app_name}-managed-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "host"
+  network_mode       = "bridge"
   requires_compatibilities = [
     "EC2",
   ]
