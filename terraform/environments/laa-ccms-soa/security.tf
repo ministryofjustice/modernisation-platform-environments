@@ -222,13 +222,14 @@ resource "aws_security_group" "soa_db" {
 
 
 resource "aws_security_group_rule" "soa_db_ingress" {
+  count             = length(local.private_subnets_cidr_blocks)
   security_group_id = aws_security_group.soa_db.id
   type              = "ingress"
   description       = "Database Ingress"
   protocol          = "TCP"
   from_port         = 1521
   to_port           = 1521
-  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
 }
 
 resource "aws_security_group_rule" "soa_db_egress_all" {
@@ -249,13 +250,14 @@ resource "aws_security_group" "tds_db" {
 }
 
 resource "aws_security_group_rule" "tds_db_ingress" {
+  count             = length(local.private_subnets_cidr_blocks)
   security_group_id = aws_security_group.tds_db.id
   type              = "ingress"
   description       = "Database Ingress"
   protocol          = "TCP"
   from_port         = 1521
   to_port           = 1521
-  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
 }
 
 resource "aws_security_group_rule" "tds_db_egress_all" {
