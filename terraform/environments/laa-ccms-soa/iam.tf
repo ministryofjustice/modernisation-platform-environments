@@ -28,6 +28,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+#--Read the two keys used to clone and read gpg encrypted values from the repo
 resource "aws_iam_policy" "ecs_secrets_policy" {
   name = "${local.application_data.accounts[local.environment].app_name}-ecs_secrets_policy"
 
@@ -38,7 +39,7 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
     {
       "Effect": "Allow",
       "Action": ["secretsmanager:GetSecretValue"],
-      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/*"]
+      "Resource": ["arn:aws:secretsmanager:eu-west-2:*:secret:ccms/soa/deploy-*"]
     }
   ]
 }

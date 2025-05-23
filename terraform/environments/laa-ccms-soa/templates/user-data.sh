@@ -55,7 +55,7 @@ rm awscliv2.zip
 
 # install git and pull repo
 sudo yum install git -y
-aws ssm get-parameter --name "APP_CCMS_SOA_DEPLOY_KEY" --with-decryption --output text --query Parameter.Value > /home/ec2-user/.ssh/laa-ccms-app-soa.pem
+aws secretsmanager get-secret-value --secret-id ccms/soa/deploy-github-ssh-key --query SecretString --output text | base64 -d > /home/ec2-user/.ssh/laa-ccms-app-soa.pem
 chown ec2-user /home/ec2-user/.ssh/laa-ccms-app-soa.pem
 chgrp ec2-user /home/ec2-user/.ssh/laa-ccms-app-soa.pem
 chmod 400 /home/ec2-user/.ssh/laa-ccms-app-soa.pem
@@ -80,7 +80,7 @@ make install PREFIX=/usr/local
 rm -r "/var/tmp/git-crypt-0.6.0"
 yum remove gcc-c++ openssl-devel -y
 yum clean packages
-aws ssm get-parameter --name "APP_CCMS_SOA_GPG_PRIVATE_KEY" --with-decryption --output text --query Parameter.Value > /home/ec2-user/.ssh/laa-ccms-gpg-private.key
+aws secretsmanager get-secret-value --secret-id ccms/soa/deploy-gitcrypt-gpg-key --query SecretString --output text | base64 -d > /home/ec2-user/.ssh/laa-ccms-gpg-private.key
 chown ec2-user /home/ec2-user/.ssh/laa-ccms-gpg-private.key
 chgrp ec2-user /home/ec2-user/.ssh/laa-ccms-gpg-private.key
 chmod 400 /home/ec2-user/.ssh/laa-ccms-gpg-private.key
