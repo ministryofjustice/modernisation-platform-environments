@@ -102,7 +102,7 @@ resource "aws_security_group" "ecs_tasks_admin" {
 resource "aws_security_group_rule" "ecs_tasks_admin_server" {
   security_group_id = aws_security_group.ecs_tasks_admin.id
   type              = "ingress"
-  description       = "SOA Admin Server" #--Why?
+  description       = "SOA Admin Server"
   protocol          = "TCP"
   from_port         = local.application_data.accounts[local.environment].admin_server_port
   to_port           = local.application_data.accounts[local.environment].admin_server_port
@@ -129,7 +129,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_server" {
 resource "aws_security_group_rule" "ecs_tasks_managed_7" {
   security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
-  description       = "SOA Managed Application" #--Why?
+  description       = "SOA Managed Application" #--What?
   protocol          = "TCP"
   from_port         = 7
   to_port           = 7
@@ -139,7 +139,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_7" {
 resource "aws_security_group_rule" "ecs_tasks_managed_7574_tcp" {
   security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
-  description       = "SOA Managed Application" #--Why?
+  description       = "SOA Managed Application" #--What?
   protocol          = "TCP"
   from_port         = 7574
   to_port           = 7574
@@ -149,7 +149,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_7574_tcp" {
 resource "aws_security_group_rule" "ecs_tasks_managed_8088_8089" {
   security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
-  description       = "SOA Managed Application" #--Why?
+  description       = "SOA Managed Application" #--What?
   protocol          = "TCP"
   from_port         = 8088
   to_port           = 8089
@@ -176,8 +176,8 @@ resource "aws_security_group" "cluster_ec2" {
 resource "aws_security_group_rule" "cluster_ec2_ingress_1521" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "ingress"
-  description       = "Application Traffic"
-  protocol          = "TCP" #--What?
+  description       = "Application Traffic" #--What?
+  protocol          = "TCP"
   from_port         = 1521
   to_port           = 1521
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
@@ -186,8 +186,8 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_1521" {
 resource "aws_security_group_rule" "cluster_ec2_ingress_3872" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "ingress"
-  description       = "Application Traffic"
-  protocol          = "TCP" #--What?
+  description       = "Application Traffic" #--What?
+  protocol          = "TCP"
   from_port         = 3872
   to_port           = 3872
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
@@ -196,8 +196,8 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_3872" {
 resource "aws_security_group_rule" "cluster_ec2_ingress_4903" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "ingress"
-  description       = "Application Traffic"
-  protocol          = "TCP" #--What?
+  description       = "Application Traffic" #--What?
+  protocol          = "TCP"
   from_port         = 4903
   to_port           = 4903
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
@@ -205,6 +205,61 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_4903" {
 
 resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   security_group_id = aws_security_group.cluster_ec2.id
+  type              = "egress"
+  description       = "All Egress"
+  protocol          = "TCP"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
+}
+
+#--Database SOA
+resource "aws_security_group" "soa_db" {
+  name_prefix = "soa_db_access"
+  description = "Controls Access to SOA Database"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+
+resource "aws_security_group_rule" "soa_db_ingress" {
+  security_group_id = aws_security_group.soa_db.id
+  type              = "ingress"
+  description       = "Database Ingress"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+}
+
+resource "aws_security_group_rule" "soa_db_egress_all" {
+  security_group_id = aws_security_group.soa_db.id
+  type              = "egress"
+  description       = "All Egress"
+  protocol          = "TCP"
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
+}
+
+#--Database TDS
+resource "aws_security_group" "tds_db" {
+  name        = "ccms-soa-tds-allow-db"
+  description = "Allow DB inbound traffic"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_security_group_rule" "tds_db_ingress" {
+  security_group_id = aws_security_group.tds_db.id
+  type              = "ingress"
+  description       = "Database Ingress"
+  protocol          = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
+}
+
+resource "aws_security_group_rule" "tds_db_egress_all" {
+  security_group_id = aws_security_group.tds_db.id
   type              = "egress"
   description       = "All Egress"
   protocol          = "TCP"

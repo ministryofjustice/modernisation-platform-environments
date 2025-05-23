@@ -7,31 +7,6 @@ resource "aws_db_subnet_group" "soa" {
   }
 }
 
-#--NEEDS A REFACTOR
-resource "aws_security_group" "soa_db" {
-  name_prefix = "soa_allow_db"
-  description = "Allow DB inbound traffic"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
 resource "aws_db_option_group" "soa_oracle_19" {
   name_prefix          = "soa-db-option-group"
   engine_name          = "oracle-ee"
@@ -51,7 +26,6 @@ resource "aws_db_option_group" "soa_oracle_19" {
     create_before_destroy = true
   }
 }
-
 
 resource "aws_db_instance" "soa_db" {
   identifier                          = "soa-db"

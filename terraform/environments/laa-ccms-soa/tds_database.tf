@@ -3,27 +3,6 @@ resource "aws_db_subnet_group" "tds" {
   subnet_ids = data.aws_subnets.shared-data.ids
 }
 
-#--NEEDS A REFACTOR
-resource "aws_security_group" "tds_db" {
-  name        = "ccms-soa-tds-allow-db"
-  description = "Allow DB inbound traffic"
-  vpc_id      = data.aws_vpc.shared.id
-
-  ingress {
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    cidr_blocks = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
 resource "aws_db_option_group" "tds_oracle_19" {
   name_prefix          = "ccms-soa-tds-db-option-group"
   engine_name          = "oracle-se2"
