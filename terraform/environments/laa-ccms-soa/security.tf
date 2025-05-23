@@ -215,8 +215,8 @@ resource "aws_security_group_rule" "cluster_ec2_egress_all" {
 
 #--Database SOA
 resource "aws_security_group" "soa_db" {
-  name_prefix = "soa_db_access"
-  description = "Controls Access to SOA Database"
+  name_prefix = "soa_allow_db"
+  description = "Allow DB inbound traffic"
   vpc_id      = data.aws_vpc.shared.id
 }
 
