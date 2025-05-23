@@ -78,7 +78,7 @@ resource "aws_launch_template" "windows_template" {
     ebs {
       volume_size           = var.ebs_size
       volume_type           = "gp3"
-      delete_on_termination = true
+      delete_on_termination = var.ebs_delete_on_termination
       encrypted             = var.ebs_encrypted
     }
   }

@@ -26,6 +26,11 @@ variable "ebs_encrypted" {
   type    = bool
   default = true
 }
+variable "ebs_delete_on_termination" {
+  description = "If true, the launched EBS Block to be Terminated with EC2"
+  type        = bool
+  default     = true
+}
 variable "ec2_sec_rules" {
   type = any
   default = {
