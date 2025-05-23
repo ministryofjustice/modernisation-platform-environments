@@ -227,15 +227,6 @@ resource "aws_security_group_rule" "allow_mlra_ecs_to_rds" {
   source_security_group_id = var.mlra_ecs_cluster_sec_group_id
 }
 
-resource "aws_security_group_rule" "allow_mlra_ecs_to_rds" {
-  type                     = "egress"
-  from_port                = 1521
-  to_port                  = 1521
-  protocol                 = "tcp"
-  description              = "Allow ECS cluster from Account A to connect to RDS"
-  security_group_id        = aws_security_group.vpc_sec_group.id
-  source_security_group_id = var.mlra_ecs_cluster_sec_group_id
-}
 
 resource "aws_security_group" "bastion_sec_group" {
   name        = "bastion-sec-group"
