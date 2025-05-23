@@ -88,7 +88,7 @@ resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_se
       "data" = [
         {
           "remoteRef" = {
-            "key" = module.actions_runners_token_apc_self_hosted_runners_secret[0].secret_id
+            "key" = data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].id
           }
           "secretKey" = "token"
         }
@@ -121,7 +121,7 @@ resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runner
       "data" = [
         {
           "remoteRef" = {
-            "key" = module.actions_runners_token_moj_apc_self_hosted_runners_secret[0].secret_id
+            "key" = data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].id
           }
           "secretKey" = "token"
         }
@@ -154,28 +154,28 @@ resource "kubernetes_manifest" "actions_runners_github_app_apc_self_hosted_runne
       "data" = [
         {
           "remoteRef" = {
-            "key"      = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
+            "key"      = data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].id
             "property" = "app_id"
           }
           "secretKey" = "app-id"
         },
         {
           "remoteRef" = {
-            "key"      = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
+            "key"      = data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].id
             "property" = "client_id"
           }
           "secretKey" = "client-id"
         },
         {
           "remoteRef" = {
-            "key"      = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
+            "key"      = data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].id
             "property" = "installation_id"
           }
           "secretKey" = "installation-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
         {
           "remoteRef" = {
-            "key"              = module.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_id
+            "key"              = data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].id
             "property"         = "private_key"
             "decodingStrategy" = "Base64"
           }
