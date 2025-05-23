@@ -127,6 +127,12 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
     enabled = true
   }
 
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "optional"
+    http_put_response_hop_limit = "2"
+  }
+
   iam_instance_profile {
     name = aws_iam_instance_profile.maat_ec2_instance_profile.name
   }
@@ -236,7 +242,7 @@ resource "aws_security_group_rule" "maat_sg_rule_outbound" {
   to_port           = 443
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
-  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints" 
+  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
   security_group_id = aws_security_group.maat_ecs_security_group.id
 }
 
@@ -245,7 +251,7 @@ resource "aws_security_group_rule" "maat_to_maatdb_sg_rule_outbound" {
   from_port         = 1521
   to_port           = 1521
   protocol          = "tcp"
-  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints" 
+  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
   security_group_id = aws_security_group.maat_ecs_security_group.id
   source_security_group_id = "sg-0727aa271de73eb1d"
 }
