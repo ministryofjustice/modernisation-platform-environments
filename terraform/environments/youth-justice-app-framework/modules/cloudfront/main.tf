@@ -34,6 +34,28 @@ resource "aws_cloudfront_distribution" "external" {
     response_headers_policy_id = aws_cloudfront_response_headers_policy.strict_transport_security.id
   }
 
+  ordered_cache_behavior {
+  path_pattern     = "custom-503.html"
+  target_origin_id = "s3-private-origin"
+
+  viewer_protocol_policy = "redirect-to-https"
+  allowed_methods        = ["GET", "HEAD"]
+  cached_methods         = ["GET", "HEAD"]
+
+  compress = true
+
+  forwarded_values {
+    query_string = false
+    cookies {
+      forward = "none"
+    }
+  }
+
+  min_ttl     = 0
+  default_ttl = 0
+  max_ttl     = 0
+}
+
   price_class = "PriceClass_100"
 
   viewer_certificate {
@@ -56,6 +78,25 @@ resource "aws_cloudfront_distribution" "external" {
       restriction_type = "whitelist"
       locations        = ["GB", "IE", "FR"]
     }
+  }
+
+  # Custom error pages
+  origin {
+    domain_name = aws_s3_bucket.error_page.bucket_regional_domain_name
+    origin_id   = "s3-private-origin"
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
+    }
+  }
+
+  default_root_object = "index.html"
+
+  custom_error_response {
+    error_code            = 503
+    response_code         = 200
+    response_page_path    = "/custom-503.html"
+    error_caching_min_ttl = 300
   }
 
   #   is_ipv6_enabled = true
@@ -142,3 +183,5 @@ resource "aws_cloudfront_response_headers_policy" "strict_transport_security" {
     }
   }
 }
+
+

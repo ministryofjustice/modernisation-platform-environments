@@ -12,36 +12,51 @@ module "kms" {
   aliases = [local.project_name]
 
   key_statements = [
-    {
-      sid = "CloudWatchLogs"
-      actions = [
-        "kms:Encrypt*",
-        "kms:Decrypt*",
-        "kms:ReEncrypt*",
-        "kms:GenerateDataKey*",
-        "kms:Describe*"
-      ]
-      resources = ["*"]
+  {
+    sid = "CloudWatchLogs"
+    actions = [
+      "kms:Encrypt*",
+      "kms:Decrypt*",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Describe*"
+    ]
+    resources = ["*"]
 
-      principals = [
-        {
-          type        = "Service"
-          identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
-        }
-      ]
+    principals = [
+      {
+        type        = "Service"
+        identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+      }
+    ]
 
-      conditions = [
-        {
-          test     = "ArnLike"
-          variable = "kms:EncryptionContext:aws:logs:arn"
-          values = [
-            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*",
-          ]
-        }
-      ]
-    }
+    conditions = [
+      {
+        test     = "ArnLike"
+        variable = "kms:EncryptionContext:aws:logs:arn"
+        values = [
+          "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"
+        ]
+      }
+    ]
+  },
+
+  {
+    sid = "AllowCloudFrontToUseKMSKey"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+
+    principals = [
+      {
+        type        = "Service"
+        identifiers = ["cloudfront.amazonaws.com"]
+      }
+    ]
+  }
   ]
-
   tags = local.tags
 }
 #todo add to all secrets
