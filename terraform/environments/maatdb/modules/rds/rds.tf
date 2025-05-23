@@ -214,7 +214,7 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 
   ingress {
-    description = "MAAT Sql Net on 1521"
+    description = "MLRA Sql Net on 1521"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
@@ -222,7 +222,7 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 
   egress {
-    description = "MAAT Sql Net on 1521"
+    description = "MLRA Sql Net on 1521"
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
@@ -234,15 +234,15 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 }
 
-# resource "aws_security_group_rule" "allow_mlra_ecs_to_rds" {
-#   type                     = "ingress"
-#   from_port                = 1521
-#   to_port                  = 1521
-#   protocol                 = "tcp"
-#   description              = "Allow ECS cluster from Account A to connect to RDS"
-#   security_group_id        = aws_security_group.ecs_sec_group.id
-#   source_security_group_id = aws_security_group.vpc_sec_group.id
-# }
+resource "aws_security_group_rule" "allow_mlra_ecs_to_rds" {
+  type                     = "ingress"
+  from_port                = 1521
+  to_port                  = 1521
+  protocol                 = "tcp"
+  description              = "Allow ECS cluster from Account A to connect to RDS"
+  security_group_id        = aws_security_group.ecs_sec_group.id
+  source_security_group_id = aws_security_group.vpc_sec_group.id
+}
 
 
 resource "aws_security_group" "bastion_sec_group" {
