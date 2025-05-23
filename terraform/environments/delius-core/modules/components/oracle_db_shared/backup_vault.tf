@@ -42,7 +42,7 @@ data "aws_iam_policy_document" "oracle_ec2_snapshot_backup_role_policy_document"
 ### DEBUG ONLY
 # S3 bucket to store CloudTrail logs
 resource "aws_s3_bucket" "cloudtrail_logs" {
-  bucket = "cloudtrail-debug-logs-bucket"
+  bucket = "${var.env_name}-cloudtrail-debug-logs-bucket"
   force_destroy = true
 }
 
@@ -85,7 +85,7 @@ data "aws_caller_identity" "current" {}
 
 # CloudTrail trail
 resource "aws_cloudtrail" "my_trail" {
-  name                          = "debug-cloudtrail"
+  name                          = "${var.env_name}-debug-cloudtrail"
   s3_bucket_name                = aws_s3_bucket.cloudtrail_logs.bucket
   include_global_service_events = true
   is_multi_region_trail         = true
