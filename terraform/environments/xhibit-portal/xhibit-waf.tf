@@ -87,34 +87,28 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
   }
 }
 
-# WAF Association with lifecycle management
 resource "aws_wafv2_web_acl_association" "xhibit_portal_prtg" {
   resource_arn = aws_lb.prtg_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.xhibit_web_acl.arn
 
+  depends_on = [aws_lb.prtg_lb]  # Ensures ALB is ready before association
+
   lifecycle {
-    create_before_destroy = true
-    ignore_changes = [
-      resource_arn,  # Ignore changes if ALB gets recreated
-      web_acl_arn    # Ignore changes if WAF gets recreated
-    ]
+    ignore_changes = [web_acl_arn]  # Prevents replacement if ARN changes externally
   }
 }
 
-
-# WAF Association with lifecycle management
 resource "aws_wafv2_web_acl_association" "xhibit_portal_waf" {
   resource_arn = aws_lb.waf_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.xhibit_web_acl.arn
 
+  depends_on = [aws_lb.waf_lb]  # Ensures ALB is ready before association
+
   lifecycle {
-    create_before_destroy = true
-    ignore_changes = [
-      resource_arn,  # Ignore changes if ALB gets recreated
-      web_acl_arn    # Ignore changes if WAF gets recreated
-    ]
+    ignore_changes = [web_acl_arn]  # Prevents replacement if ARN changes externally
   }
 }
+
 resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
 # checkov:skip=CKV_AWS_158: Default encryption is fine
   name              = "aws-waf-logs/xhibit-waf-logs"
