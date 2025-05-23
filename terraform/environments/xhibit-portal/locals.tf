@@ -33,7 +33,11 @@ locals {
   prtg_domain_type_main   = [for k, v in local.prtg_domain_types : v.type if k == "modernisation-platform.service.justice.gov.uk"]
   prtg_domain_type_sub    = [for k, v in local.prtg_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
-
+  # Used for the WAF
+  blocked_ips = try(
+    toset(jsondecode(data.aws_secretsmanager_secret_version.ip_block_list.secret_string)),
+    toset([]) # Fallback if secret is invalid
+  )
 
   # This is used to prevent our bare metal server from deploying in environments other than production
   only_in_production_mapping = {
