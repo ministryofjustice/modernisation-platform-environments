@@ -1,5 +1,5 @@
 #!/bin/bash -xe
-# send script output to /tmp so we can debug boot failures
+# send script output to /tmp so we can debug boot failures 
 exec > /tmp/userdata.log 2>&1
 
 # ENV Variables, 
@@ -36,6 +36,10 @@ else
   sudo useradd ssm-user --create-home
   echo "ssm-user created"
 fi
+
+# Add ssm-user to sudoers temporarily (optional)
+echo 'ssm-user ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ssm-user
+chmod 440 /etc/sudoers.d/ssm-user
 
 echo "assumeyes=1" >> /etc/yum.conf
 
@@ -294,3 +298,80 @@ sudo systemctl start bodmispf.service
 # AMAZON SSM SGENT
 sudo systemctl start amazon-ssm-agent
 sudo systemctl enable amazon-ssm-agent
+
+## ODATA DEMO
+set -euxo pipefail
+
+# Clean and update
+yum clean metadata
+yum update -y
+
+# Install Java 21 safely
+# Optional: remove older versions
+yum remove -y java-11-amazon-corretto java-17-amazon-corretto || true
+
+# Download Amazon Corretto 21 RPM
+cd /tmp
+wget https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.rpm
+
+# Install the RPM
+yum localinstall -y amazon-corretto-21-x64-linux-jdk.rpm
+
+# Register with alternatives and set as default
+alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-amazon-corretto/bin/java 2100
+alternatives --set java /usr/lib/jvm/java-21-amazon-corretto/bin/java
+
+# Confirm version
+java -version
+
+# Cleanup
+rm -f /tmp/amazon-corretto-21-x64-linux-jdk.rpm
+
+# Set up service (ODATA)
+#mkdir -p /opt/odata-demo
+#cd /opt/odata-demo
+#aws s3 cp s3://dpr-artifact-store-development/third-party/odata-demo/OData-demo-0.0.1-SNAPSHOT.jar ./OData-demo.jar
+#chown -R ec2-user:ec2-user /opt/odata-demo
+
+#cat <<EOF > /etc/systemd/system/odata-demo.service
+#[Unit]
+#Description=OData Demo Java Service
+#After=network.target
+
+#[Service]
+#WorkingDirectory=/opt/odata-demo
+#ExecStart=/usr/bin/java -jar /opt/odata-demo/OData-demo.jar
+#SuccessExitStatus=143
+#Restart=on-failure
+#RestartSec=10
+
+#[Install]
+#WantedBy=multi-user.target
+#EOF
+
+# Set up service (headless BI)
+mkdir -p /opt/headless-bi
+cd /opt/headless-bi
+aws s3 cp s3://dpr-artifact-store-development/third-party/headless-bi/hmpps-probation-headless-bi-poc.jar ./headless-bi.jar
+chown -R ec2-user:ec2-user /opt/headless-bi
+
+cat <<EOF > /etc/systemd/system/headless-bi.service
+[Unit]
+Description=headless-bi Java Service
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/headless-bi
+ExecStart=/usr/bin/java -jar /opt/headless-bi/headless-bi.jar
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable headless-bi.service
+systemctl start headless-bi.service
+## ODATA DEMO 
