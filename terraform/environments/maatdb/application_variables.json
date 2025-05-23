@@ -27,8 +27,8 @@
       "deletion_protection": false,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
-      "ecs_cluster_sec_group_id": "sg-050fb73f9c212d1bb"
-
+      "ecs_cluster_sec_group_id": "sg-050fb73f9c212d1bb",
+      "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907"
     },
     "test": {
       "example_var": "test-data"
@@ -63,7 +63,8 @@
       "deletion_protection": false,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
-      "ecs_cluster_sec_group_id": "sg-056a1a203c91700ea"
+      "ecs_cluster_sec_group_id": "sg-056a1a203c91700ea",
+      "mlra_ecs_cluster_sec_group_id": "sg-0faa8fe022ea7e3aa"
     }
   }
 }
