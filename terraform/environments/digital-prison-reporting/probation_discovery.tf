@@ -1,7 +1,7 @@
 module "probation_discovery_windows_node" {
   source = "./modules/compute_node_windows"
 
-  enable_compute_node         = true
+  enable_compute_node         = local.enable_probation_discovery_node
   name                        = "${local.project}-probation-discovery-${local.env}"
   description                 = "Probation Discovery Windows Agent"
   vpc                         = data.aws_vpc.shared.id
