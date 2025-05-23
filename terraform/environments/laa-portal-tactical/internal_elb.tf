@@ -1,9 +1,9 @@
 locals {
-  internal_lb_idle_timeout = 180
-  internal_lb_http_port    = 80
-  internal_lb_https_port   = 443
-  lb_enable_deletion_protection  = local.application_data.accounts[local.environment].lb_enable_deletion_protection
-  internal_lb_http_hosts   = [aws_route53_record.oim_internal.name, aws_route53_record.oam_internal.name, aws_route53_record.idm_console.name, aws_route53_record.ohs_internal.name]
+  internal_lb_idle_timeout      = 180
+  internal_lb_http_port         = 80
+  internal_lb_https_port        = 443
+  lb_enable_deletion_protection = local.application_data.accounts[local.environment].lb_enable_deletion_protection
+  internal_lb_http_hosts        = [aws_route53_record.oim_internal.name, aws_route53_record.oam_internal.name, aws_route53_record.idm_console.name, aws_route53_record.ohs_internal.name]
 }
 
 ####################################
@@ -35,9 +35,9 @@ resource "aws_lb" "internal" {
 
 resource "aws_lb_listener" "http_internal" {
 
-  load_balancer_arn = aws_lb.internal.arn
-  port              = local.internal_lb_http_port
-  protocol          = "HTTP"
+  load_balancer_arn                    = aws_lb.internal.arn
+  port                                 = local.internal_lb_http_port
+  protocol                             = "HTTP"
   routing_http_response_server_enabled = true
 
   # TODO This needs using once Cert and CloudFront has been set up
@@ -59,12 +59,12 @@ resource "aws_lb_listener" "http_internal" {
 
 resource "aws_lb_listener" "https_internal" {
 
-  load_balancer_arn = aws_lb.internal.arn
-  port              = local.internal_lb_https_port
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"
+  load_balancer_arn                    = aws_lb.internal.arn
+  port                                 = local.internal_lb_https_port
+  protocol                             = "HTTPS"
+  ssl_policy                           = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   routing_http_response_server_enabled = true
-  certificate_arn   = local.application_data.accounts[local.environment].lb_cert_arn
+  certificate_arn   = local.lb_cert_arn
 
   default_action {
     type             = "forward"
@@ -202,9 +202,9 @@ resource "aws_vpc_security_group_ingress_rule" "internal_lb_http_prd_workspaces"
 }
 
 resource "aws_vpc_security_group_egress_rule" "internal_lb_outbound" {
-  for_each = local.outbound_security_group_ids
-  security_group_id        = aws_security_group.internal_lb.id
-  ip_protocol       = "-1"
+  for_each                     = local.outbound_security_group_ids
+  security_group_id            = aws_security_group.internal_lb.id
+  ip_protocol                  = "-1"
   referenced_security_group_id = each.value
 }
 
@@ -293,9 +293,9 @@ resource "aws_vpc_security_group_ingress_rule" "internal_inbound1" {
 
 
 resource "aws_vpc_security_group_egress_rule" "internal_idm_lb_outbound" {
-  security_group_id = aws_security_group.internal_idm_sg.id
+  security_group_id            = aws_security_group.internal_idm_sg.id
   referenced_security_group_id = aws_security_group.idm_instance.id
-  ip_protocol       = "-1"
+  ip_protocol                  = "-1"
 }
 
 ################################################
