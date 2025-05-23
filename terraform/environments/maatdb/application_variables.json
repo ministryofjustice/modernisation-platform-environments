@@ -23,10 +23,12 @@
       "license_model": "license-included",
       "performance_insights_enabled": true,
       "performance_insights_retention_period": 7,
-      "snapshot_arn": "rds-maatdb-copy",
+      "snapshot_arn": "maatdb-dev-rds-kms",
       "deletion_protection": false,
       "cloud_platform_cidr": "172.20.0.0/16",
-      "manual_added_cidr": "10.221.0.0/16"
+      "manual_added_cidr": "10.221.0.0/16",
+      "ecs_cluster_sec_group_id": "sg-050fb73f9c212d1bb"
+
     },
     "test": {
       "example_var": "test-data"
@@ -60,7 +62,8 @@
       "snapshot_arn": "la1jkamurh6jd9a-shutdown",
       "deletion_protection": false,
       "cloud_platform_cidr": "172.20.0.0/16",
-      "manual_added_cidr": "10.221.0.0/16"
+      "manual_added_cidr": "10.221.0.0/16",
+      "ecs_cluster_sec_group_id": "sg-056a1a203c91700ea"
     }
   }
 }

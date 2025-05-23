@@ -136,7 +136,7 @@ resource "aws_db_instance" "appdb1" {
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_password.result
-  vpc_security_group_ids = var.environment != "production" ? [aws_security_group.cloud_platform_sec_group.id, aws_security_group.vpc_sec_group.id] : [aws_security_group.ec2_access_sec_group.id]
+  vpc_security_group_ids                = [aws_security_group.cloud_platform_sec_group.id, aws_security_group.bastion_sec_group.id, aws_security_group.vpc_sec_group.id]
   skip_final_snapshot                   = false
   final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name                  = aws_db_parameter_group.parameter_group_19.name
@@ -148,9 +148,13 @@ resource "aws_db_instance" "appdb1" {
   deletion_protection                   = var.deletion_protection
   copy_tags_to_snapshot                 = true
   storage_encrypted                     = true
+  kms_key_id                            = var.kms_key_arn
   apply_immediately                     = true
   snapshot_identifier                   = var.snapshot_arn
-  tags = var.tags
+  tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
+    var.tags
+  )
 
   timeouts {
     create = "60m"
@@ -159,7 +163,7 @@ resource "aws_db_instance" "appdb1" {
 
 }
 
-# Non-Prod / Normal Security Group
+# Normal Security Group
 
 resource "aws_security_group" "cloud_platform_sec_group" {
   name        = "cloud-platform-sec-group"
@@ -197,7 +201,7 @@ resource "aws_security_group" "vpc_sec_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_shared_cidr]
+    security_groups = [var.ecs_cluster_sec_group_id]
   }
 
   egress {
@@ -205,7 +209,7 @@ resource "aws_security_group" "vpc_sec_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    cidr_blocks = [var.vpc_shared_cidr]
+    security_groups = [var.ecs_cluster_sec_group_id]
   }
 
   tags = {
@@ -213,12 +217,9 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 }
 
-
-# Production SecGroup
-
-resource "aws_security_group" "ec2_access_sec_group" {
-  name        = "temp-access-sec-group"
-  description = "Temp Access"
+resource "aws_security_group" "bastion_sec_group" {
+  name        = "bastion-sec-group"
+  description = "Bastion Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
   ingress {
@@ -226,7 +227,7 @@ resource "aws_security_group" "ec2_access_sec_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    security_groups = [var.ec2_security_group_id, var.bastion_security_group_id]
+    security_groups = [var.bastion_security_group_id]
   }
 
   egress {
@@ -234,12 +235,15 @@ resource "aws_security_group" "ec2_access_sec_group" {
     from_port   = 1521
     to_port     = 1521
     protocol    = "tcp"
-    security_groups = [var.ec2_security_group_id, var.bastion_security_group_id]
+    security_groups = [var.bastion_security_group_id]
   }
 
   tags = {
-    Name = "${var.application_name}-${var.environment}-ec2-sec-group"
+    Name = "${var.application_name}-${var.environment}-bastion-sec-group"
   }
 }
+
+
+
 
 
