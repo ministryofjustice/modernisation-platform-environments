@@ -221,7 +221,7 @@ resource "aws_security_group" "soa_db" {
 }
 
 
-resource "aws_security_group_rule" "soa_db_ingress" {
+resource "aws_vpc_security_group_ingress_rule" "soa_db_ingress" {
   count             = length(local.private_subnets_cidr_blocks)
   security_group_id = aws_security_group.soa_db.id
   type              = "ingress"
@@ -249,7 +249,7 @@ resource "aws_security_group" "tds_db" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "tds_db_ingress" {
+resource "aws_vpc_security_group_ingress_rule" "tds_db_ingress" {
   count             = length(local.private_subnets_cidr_blocks)
   security_group_id = aws_security_group.tds_db.id
   type              = "ingress"
@@ -268,4 +268,31 @@ resource "aws_security_group_rule" "tds_db_egress_all" {
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
+}
+
+#--EFS
+resource "aws_security_group" "efs-security-group" {
+  name_prefix = "${local.application_name}-efs-security-group"
+  description = "allow inbound access from container instances"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+
+resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
+  description       = "Allow outgoing traffic"
+  security_group_id = aws_security_group.efs-security-group.id
+  ip_protocol       = "-1"
+  # from_port         = 0
+  # to_port           = 0
+  cidr_ipv4 = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "efs-security-group-ingress" {
+  count             = length(local.private_subnets_cidr_blocks)
+  description       = "Allow inbound access from container instances"
+  security_group_id = aws_security_group.efs-security-group.id
+  ip_protocol       = "tcp"
+  from_port         = 2049
+  to_port           = 2049
+  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
 }
