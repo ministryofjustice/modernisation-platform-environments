@@ -35,3 +35,13 @@ resource "aws_secretsmanager_secret" "ebs_user_password" {
   name        = "ccms/soa/ebs/user/password"
   description = "EBS User Password"
 }
+
+resource "aws_secretsmanager_secret" "soa_deploy_ssh_key" {
+  name        = "ccms/soa/deploy-github-ssh-key"
+  description = "Github SSH Deploy Key"
+}
+
+resource "aws_secretsmanager_secret" "soa_deploy_gpg_key" {
+  name        = "ccms/soa/deploy-github-ssh-key"
+  description = "git-crypt GPG Key"
+}
