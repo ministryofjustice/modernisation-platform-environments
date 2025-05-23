@@ -56,13 +56,13 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "efs-security-group-ingress" {
-  count             = length(local.data_subnets_cidr_blocks)
+  count             = length(local.private_subnets_cidr_blocks)
   description       = "Allow inbound access from container instances"
   security_group_id = aws_security_group.efs-security-group.id
   ip_protocol       = "tcp"
   from_port         = 2049
   to_port           = 2049
-  cidr_ipv4         = local.data_subnets_cidr_blocks[count.index]
+  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
 
   tags = merge(local.tags,
     { Name = lower(format("sg-%s-%s-efs", local.application_name, local.environment)) }
