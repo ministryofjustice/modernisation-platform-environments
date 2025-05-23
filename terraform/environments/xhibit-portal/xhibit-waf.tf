@@ -1,6 +1,3 @@
-
-# WAF FOR EBS APP
-
 # The secret containing IP addresses
 data "aws_secretsmanager_secret_version" "ip_block_list" {
   secret_id = aws_secretsmanager_secret.ip_block_list.id
@@ -14,6 +11,10 @@ resource "aws_wafv2_ip_set" "xbhibit_waf_ip_set" {
   description        = "List IP Addresses to be blockefd via WAF"
 
   addresses = local.blocked_ips
+  
+  lifecycle {
+    ignore_changes = [addresses]  # Prevents perpetual diff
+  }
 
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-ip-set", local.application_name, local.environment)) }
@@ -53,7 +54,7 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
       sampled_requests_enabled   = true
     }
   }
-  
+
   rule {
     name = "xbhibit-waf-blocked-rule"
 
@@ -86,6 +87,34 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
   }
 }
 
+# WAF Association with lifecycle management
+resource "aws_wafv2_web_acl_association" "xhibit_portal_prtg" {
+  resource_arn = aws_lb.prtg_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.xhibit_web_acl.arn
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes = [
+      resource_arn,  # Ignore changes if ALB gets recreated
+      web_acl_arn    # Ignore changes if WAF gets recreated
+    ]
+  }
+}
+
+
+# WAF Association with lifecycle management
+resource "aws_wafv2_web_acl_association" "xhibit_portal_waf" {
+  resource_arn = aws_lb.waf_lb.arn
+  web_acl_arn  = aws_wafv2_web_acl.xhibit_web_acl.arn
+
+  lifecycle {
+    create_before_destroy = true
+    ignore_changes = [
+      resource_arn,  # Ignore changes if ALB gets recreated
+      web_acl_arn    # Ignore changes if WAF gets recreated
+    ]
+  }
+}
 resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
 # checkov:skip=CKV_AWS_158: Default encryption is fine
   name              = "aws-waf-logs/xhibit-waf-logs"
@@ -96,7 +125,7 @@ resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
   )
 }
 
-resource "aws_wafv2_web_acl_logging_configuration" "xhibit_waf_logging" {
-  log_destination_configs = [aws_cloudwatch_log_group.xbhibit_waf_logs.arn]
-  resource_arn            = aws_wafv2_web_acl.xhibit_web_acl.arn
-}
+# resource "aws_wafv2_web_acl_logging_configuration" "xhibit_waf_logging" {
+#   log_destination_configs = [aws_cloudwatch_log_group.xbhibit_waf_logs.arn]
+#   resource_arn            = aws_wafv2_web_acl.xhibit_web_acl.arn
+# }
