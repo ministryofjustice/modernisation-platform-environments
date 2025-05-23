@@ -8,7 +8,7 @@ module "probation_discovery_windows_node" {
   cidr                        = [data.aws_vpc.shared.cidr_block]
   subnet_ids                  = data.aws_subnet.private_subnets_a.id
   ec2_instance_type           = "t3.large"
-  ami_image_id                = local.windows_ami_id
+  ami_image_id                = local.probation_discovery_windows_ami_id
   aws_region                  = local.account_region
   ec2_terminate_behavior      = "terminate"
   associate_public_ip_address = false
