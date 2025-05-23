@@ -19,7 +19,7 @@ data "aws_iam_policy_document" "oracle_ec2_snapshot_backup_role_policy_document"
   statement {
     effect    = "Allow"
     actions   = ["iam:PassRole"]
-    resources = ["arn:aws:iam::${var.account_info.id}:role/service-role/AWSBackupDefaultServiceRole"]
+    resources = ["arn:aws:iam::${var.account_info.id}:role/AWSBackupDefaultServiceRole"]
   }
   statement {
       sid     = "BackupOperations"
