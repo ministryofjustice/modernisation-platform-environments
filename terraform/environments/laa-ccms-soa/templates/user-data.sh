@@ -69,7 +69,8 @@ EOF
 chown ec2-user /home/ec2-user/.ssh/config
 chgrp ec2-user /home/ec2-user/.ssh/config
 chmod 600 /home/ec2-user/.ssh/config
-su ec2-user bash -c "git clone git@github.com:ministryofjustice/laa-ccms-app-soa.git /home/ec2-user/efs/laa-ccms-app-soa || git -C /home/ec2-user/efs/laa-ccms-app-soa pull"
+#--TEMP CLONE A SINGLE BRANCH WHERE SECRETS HAVE BEEN CHANGED! - AW
+su ec2-user bash -c "git clone --single-branch --branch feat-laa-ccms-soa-mp git@github.com:ministryofjustice/laa-ccms-app-soa.git /home/ec2-user/efs/laa-ccms-app-soa || git -C /home/ec2-user/efs/laa-ccms-app-soa pull"
 
 # install git-crypt and decrypt repo
 yum -y install gcc-c++ openssl-devel
