@@ -191,13 +191,8 @@ resource "aws_security_group" "cloud_platform_sec_group" {
   }
 }
 
-resource "aws_security_group" "vpc_sec_group" {
-  name        = "ecs-sec-group"
-  description = "RDS Access with the shared vpc"
-  vpc_id      = var.vpc_shared_id
-}
 
-resource "aws_security_group" "ecs_sec_group" {
+resource "aws_security_group" "vpc_sec_group" {
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
@@ -218,20 +213,36 @@ resource "aws_security_group" "ecs_sec_group" {
     security_groups = [var.ecs_cluster_sec_group_id]
   }
 
+  ingress {
+    description = "MAAT Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  }
+
+  egress {
+    description = "MAAT Sql Net on 1521"
+    from_port   = 1521
+    to_port     = 1521
+    protocol    = "tcp"
+    security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  }
+
   tags = {
     Name = "${var.application_name}-${var.environment}-vpc-sec-group"
   }
 }
 
-resource "aws_security_group_rule" "allow_mlra_ecs_to_rds" {
-  type                     = "ingress"
-  from_port                = 1521
-  to_port                  = 1521
-  protocol                 = "tcp"
-  description              = "Allow ECS cluster from Account A to connect to RDS"
-  security_group_id        = aws_security_group.ecs_sec_group.id
-  source_security_group_id = aws_security_group.vpc_sec_group.id
-}
+# resource "aws_security_group_rule" "allow_mlra_ecs_to_rds" {
+#   type                     = "ingress"
+#   from_port                = 1521
+#   to_port                  = 1521
+#   protocol                 = "tcp"
+#   description              = "Allow ECS cluster from Account A to connect to RDS"
+#   security_group_id        = aws_security_group.ecs_sec_group.id
+#   source_security_group_id = aws_security_group.vpc_sec_group.id
+# }
 
 
 resource "aws_security_group" "bastion_sec_group" {
