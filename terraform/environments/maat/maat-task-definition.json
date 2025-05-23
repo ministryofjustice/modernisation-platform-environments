@@ -37,36 +37,16 @@
     "essential": true,
     "secrets": [
       {
-        "name": "APP_CMA_OAUTH_SCOPE",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CMA_OAUTH_SCOPE"
-      },
-      {
         "name": "APP_BC_CLIENT_USER_ID",
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_BC_CLIENT_USER_ID"
-      },
-      {
-        "name": "APP_CCC_ENDPOINT",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CCC_ENDPOINT"
       },
       {
         "name": "APP_ORCH_OAUTH_SCOPE",
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_OAUTH_SCOPE"
       },
       {
-        "name": "APP_CCP_CLIENT_SECRET",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CCP_CLIENT_SECRET"
-      },
-      {
-        "name": "APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID",
+        "name": "APP_MAAT_GOOGLE_TAG_MANAGER_ID",
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_MAAT_GOOGLE_ANALYTICS_4_TAG_ID"
-      },
-      {
-        "name": "APP_CMA_CLIENT_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CMA_CLIENT_ID"
-      },
-      {
-        "name": "APP_CMA_CLIENT_SECRET",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CMA_CLIENT_SECRET"
       },
       {
         "name": "APP_BC_CLIENT_ORIG_ID",
@@ -93,58 +73,38 @@
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_CLIENT_ID"
       },
       {
-        "name": "APP_CCC_CLIENT_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CCC_CLIENT_ID"
-      },
-      {
         "name": "APP_DB_USERID",
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_DB_USERID"
-      },
-      {
-        "name": "APP_CCC_CLIENT_SECRET",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CCC_CLIENT_SECRET"
       },
       {
         "name": "APP_ORCH_ENDPOINT",
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ORCH_ENDPOINT"
       },
       {
-        "name": "APP_CCC_OAUTH_SCOPE",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CCC_OAUTH_SCOPE"
-      },
-      {
-        "name": "APP_CCP_CLIENT_ID",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CCP_CLIENT_ID"
-      },
-      {
-        "name": "APP_CCP_ENDPOINT_PROCEEDINGS",
-        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CCP_ENDPOINT_PROCEEDINGS"
-      },
-      {
         "name": "APP_CAA_ENDPOINT",
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_CAA_ENDPOINT"
+      },
+      {
+        "name": "APP_BC_SERVICE_NAME",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_BC_SERVICE_NAME"
+      },
+      {
+        "name": "APP_ATS_CLIENT_SECRET",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_CLIENT_SECRET"
+      },
+      {
+        "name": "APP_ATS_CLIENT_ID",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_CLIENT_ID"
+      },
+      {
+        "name": "APP_ATS_OAUTH_SCOPE",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_OAUTH_SCOPE"
       }
     ],
     "environment": [
       {
-        "name": "APP_CMA_ENDPOINT_CREATE_ASSESSMENT",
-        "value": "/api/internal/v1/assessment/means"
-      },
-      {
         "name": "APP_ORCH_BASE_URL",
         "value": "${maat_orch_base_url}"
-      },
-      {
-        "name": "APP_BC_SERVICE_NAME",
-        "value": ""
-      },
-      {
-        "name": "APP_CCP_OAUTH_SCOPE",
-        "value": ""
-      },
-      {
-        "name": "APP_CCP_BASE_URL",
-        "value": "${maat_ccp_base_url}"
       },
       {
         "name": "APP_DB_POOL_MAX_CONNECTION",
@@ -159,28 +119,12 @@
         "value": "${maat_orch_oauth_url}"
       },
       {
-        "name": "APP_CCC_OAUTH_URL",
-        "value": "${maat_ccc_oauth_url}"
-      },
-      {
         "name": "APP_LOG_LEVEL",
-        "value": "debug"
-      },
-      {
-        "name": "APP_CMA_ENDPOINT_AUTH",
-        "value": "${maat_cma_endpoint_auth_url}"
-      },
-      {
-        "name": "APP_CCP_ENDPOINT_AUTH",
-        "value": "${maat_ccp_endpoint_auth_url}"
+        "value": "${app_log_level}"
       },
       {
         "name": "APP_DB_URL",
         "value": "${maat_db_url}"
-      },
-      {
-        "name": "APP_CCC_BASE_URL",
-        "value": "${maat_ccc_base_url}"
       },
       {
         "name": "APP_CAA_OAUTH_URL",
@@ -211,8 +155,16 @@
         "value": "${maat_caa_base_url}"
       },
       {
-        "name": "APP_CMA_BASE_URL",
-        "value": "${maat_cma_base_url}"
+        "name": "APP_ATS_OAUTH_URL",
+        "value": "${maat_ats_oauth_url}"
+      },
+      {
+        "name": "APP_ATS_ENDPOINT",
+        "value": "${maat_ats_endpoint}"
+      },
+      {
+        "name": "APP_ATS_BASE_URL",
+        "value": "${maat_ats_base_url}"
       }
     ],
     "logConfiguration": {

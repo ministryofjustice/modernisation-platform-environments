@@ -21,7 +21,16 @@ resource "aws_security_group_rule" "maat_int_lb_sg_rule_transit_gw" {
   protocol          = "tcp"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = ["172.20.0.0/16"] #The transit gateway cidr would need to replaced without something equivalent when migrated to MP 
+  cidr_blocks       = ["172.20.0.0/16"] #The transit gateway cidr would need to replaced without something equivalent when migrated to MP
+}
+
+resource "aws_security_group_rule" "internal_lb_egress" {
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.maat_ecs_security_group.id
+  security_group_id        = aws_security_group.maat_int_lb_sg.id
 }
 
 
