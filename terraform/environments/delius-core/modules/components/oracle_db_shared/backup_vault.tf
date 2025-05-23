@@ -15,6 +15,11 @@ resource "aws_backup_vault" "oracle_backup_vault" {
 # backup vault allows them to timeout without being overwritten.
 # The AWSBackupDefaultServiceRole managed by AWS and is documented at: 
 # https://docs.aws.amazon.com/aws-backup/latest/devguide/iam-service-roles.html
+#
+# Note Separation of Roles:
+#    The instance role starts the backup so must have StartBackupJob privileges.
+#    It must also have privileges to pass the AWSBackupDefaultServiceRole to the Backup Service.
+#
 data "aws_iam_policy_document" "oracle_ec2_snapshot_backup_role_policy_document" {
   statement {
     effect    = "Allow"
