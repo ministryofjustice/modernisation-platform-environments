@@ -29,32 +29,3 @@ resource "aws_iam_role_policy_attachment" "restore_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
 }
 
-data "aws_iam_policy_document" "backup_action_policy_document" {
-  statement {
-    effect = "Allow"
-    actions = ["backup:ListBackupVaults",
-      "backup:StartBackupJob",
-      "backup:DescribeBackupJob",
-      "ec2:DescribeSnapshots"]
-    resources = ["*"]
-  }
-  statement {
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-    ]
-    resources = [var.account_config.kms_keys.general_shared]
-  }
-}
-
-resource "aws_iam_policy" "backup_action_policy" {
-  count  = contains(["poc", "stage"], var.env_name) ? 0 : 1
-  name   = "backup_action_policy"
-  policy = data.aws_iam_policy_document.backup_action_policy_document.json
-}
-
-resource "aws_iam_role_policy_attachment" "backup_action_policy_attachment" {
-  count      = contains(["poc", "stage"], var.env_name) ? 0 : 1
-  role       = aws_iam_role.aws_backup_default_service_role[0].name
-  policy_arn = aws_iam_policy.backup_action_policy[0].arn
-}
