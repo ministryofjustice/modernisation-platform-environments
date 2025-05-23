@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "oracle_ec2_snapshot_backup_role_policy_document"
   }
   statement {
     actions = [
-
+      "kms:GenerateDataKey",
       "kms:Encrypt",
       "kms:Decrypt",
     ]
