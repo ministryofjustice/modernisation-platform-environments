@@ -40,6 +40,8 @@
       "enable_dbuilder_flyway_lambda": true,
       "enable_scheduled_dataset_lambda": true,
       "enable_generate_dataset_lambda": true,
+      "enable_multiphase_query_lambda": true,
+      "multiphase_query_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -165,7 +167,8 @@
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": true
+      "create_postgres_load_generator_job": true,
+      "enable_probation_discovery_node": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -207,6 +210,8 @@
       "enable_dbuilder_flyway_lambda": true,
       "enable_scheduled_dataset_lambda": true,
       "enable_generate_dataset_lambda": true,
+      "enable_multiphase_query_lambda": true,
+      "multiphase_query_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -372,6 +377,8 @@
       "enable_dbuilder_flyway_lambda": true,
       "enable_scheduled_dataset_lambda": true,
       "enable_generate_dataset_lambda": true,
+      "enable_multiphase_query_lambda": true,
+      "multiphase_query_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -512,7 +519,8 @@
       ],
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": false
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -554,6 +562,8 @@
       "enable_dbuilder_flyway_lambda": true,
       "enable_scheduled_dataset_lambda": false,
       "enable_generate_dataset_lambda": false,
+      "enable_multiphase_query_lambda": false,
+      "multiphase_query_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -692,7 +702,8 @@
       ],
       "redshift_table_expiry_days": 1,
       "enable_s3_data_migrate_lambda": false,
-      "create_postgres_load_generator_job": false
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false
     }
   }
 }
