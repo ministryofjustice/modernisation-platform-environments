@@ -1,3 +1,7 @@
+data "secretsmanager_secret" "snapshot_identifier" {
+  name = "yjaf-snapshot-identifier"
+}
+
 module "aurora" {
   source       = "./modules/aurora"
   project_name = local.project_name
@@ -14,8 +18,8 @@ module "aurora" {
   database_subnet_group_name = "yjaf-db-subnet-group"
   alb_route53_record_name    = "db-yjafrds01"
 
-  #one time restore from a shared snapshot on preprod
-  snapshot_identifier = local.application_data.accounts[local.environment].snapshot_identifier
+  #one time restore from a shared snapshot #todo remove this post migration. Take from secrets manager 
+  snapshot_identifier = data.secretsmanager_secret_version.snapshot_identifier.secret_string != "" ? jsondecode(data.secretsmanager_secret_version.snapshot_identifier.secret_string).snapshot_identifier : local.application_data.accounts[local.environment].snapshot_identifier
 
   user_passwords_to_reset = ["postgres_rotated", "redshift_readonly", "ycs_team", "postgres"]
   db_name                 = "yjafrds01"

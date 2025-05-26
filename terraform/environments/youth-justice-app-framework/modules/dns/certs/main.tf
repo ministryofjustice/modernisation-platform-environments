@@ -9,24 +9,22 @@ resource "aws_acm_certificate" "domain_cert" {
 }
 
 resource "aws_route53_record" "cert_validation" {
-  for_each = {
-    for dvo in aws_acm_certificate.domain_cert.domain_validation_options : dvo.domain_name => {
-      name   = dvo.resource_record_name
-      record = dvo.resource_record_value
-      type   = dvo.resource_record_type
-    }
-  }
+  count = var.validate_certs ? length([
+    for dvo in aws_acm_certificate.domain_cert.domain_validation_options : dvo
+  ]) : 0
 
   allow_overwrite = true
-  name            = each.value.name
-  records         = [each.value.record]
+  name            = aws_acm_certificate.domain_cert.domain_validation_options[count.index].resource_record_name
+  records         = [aws_acm_certificate.domain_cert.domain_validation_options[count.index].resource_record_value]
   ttl             = 300
-  type            = each.value.type
+  type            = aws_acm_certificate.domain_cert.domain_validation_options[count.index].resource_record_type
   zone_id         = var.r53_zone_id
 }
 
+
 #Wait for the certificate to be issued
 resource "aws_acm_certificate_validation" "cert" {
+  count                   = var.validate_certs ? 1 : 0
   certificate_arn         = aws_acm_certificate.domain_cert.arn
-  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.name]
+  validation_record_fqdns = [for r in aws_route53_record.cert_validation : r.name]
 }

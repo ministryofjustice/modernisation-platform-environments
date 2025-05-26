@@ -2,6 +2,9 @@
   "accounts": {
     "development": {
       "allow_s3_replication": true,
+      "domain_name": "development.yjbservices.yjb.gov.uk",
+      "justice_domain_name": "development.justice.gov.uk",
+      "validate_certs": true,
       "source_account": "856879713508",
       "ad_management_instance_count": 1,
       "desired_number_of_domain_controllers": 3,
@@ -30,6 +33,9 @@
     },
     "test": {
       "allow_s3_replication": true,
+      "domain_name": "test.yjbservices.yjb.gov.uk",
+      "justice_domain_name": "test.justice.gov.uk",
+      "validate_certs": true,
       "source_account": "856879713508",
       "ad_management_instance_count": 2,
       "desired_number_of_domain_controllers": 2,
@@ -58,6 +64,9 @@
     },
     "preproduction": {
       "allow_s3_replication": true,
+      "domain_name": "preproduction.yjbservices.yjb.gov.uk",
+      "justice_domain_name": "preproduction.justice.gov.uk",
+      "validate_certs": true,
       "source_account": "053556912568",
       "ad_management_instance_count": 2,
       "desired_number_of_domain_controllers": 2,
@@ -86,6 +95,9 @@
     },
     "production": {
       "allow_s3_replication": true,
+      "domain_name": "yjbservices.yjb.gov.uk",
+      "justice_domain_name": "justice.gov.uk",
+      "validate_certs": false,
       "source_account": "066012302209",
       "ad_management_instance_count": 2,
       "desired_number_of_domain_controllers": 3,
