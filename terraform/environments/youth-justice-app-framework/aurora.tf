@@ -25,7 +25,7 @@ module "aurora" {
   engine_version  = "16.6"
   master_username = "root"
 
-  create_sheduler              = true
+  create_sheduler              = local.application_data.accounts[local.environment].create_rds_sheduler
   stop_aurora_cluster_schedule = "cron(00 00 ? * MON-FRI *)"
   performance_insights_enabled = true
 
