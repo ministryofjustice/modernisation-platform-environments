@@ -32,7 +32,7 @@ module "rds" {
   performance_insights_retention_period = local.application_data.accounts[local.environment].performance_insights_retention_period
   snapshot_arn                          = format("arn:aws:rds:eu-west-2:%s:snapshot:%s", data.aws_caller_identity.current.account_id, local.application_data.accounts[local.environment].snapshot_arn)
   deletion_protection                   = local.application_data.accounts[local.environment].deletion_protection
-  cloud_platform_cidr                   = local.application_data.accounts[local.environment].cloud_platform_cidr 
+  cloud_platform_cidr                   = local.application_data.accounts[local.environment].cloud_platform_cidr
   vpc_shared_id                         = data.aws_vpc.shared.id
   vpc_shared_cidr                       = data.aws_vpc.shared.cidr_block
   vpc_subnet_a_id                       = data.aws_subnet.data_subnets_a.id
@@ -42,5 +42,5 @@ module "rds" {
   ecs_cluster_sec_group_id              = "${local.environment_management.account_ids["maat-${local.environment}"]}/${local.application_data.accounts[local.environment].ecs_cluster_sec_group_id}"
   kms_key_arn                           = local.rds_kms_key_arn
 
-  tags                                  = local.tags
+  tags = local.tags
 }

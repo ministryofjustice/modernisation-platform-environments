@@ -4,15 +4,15 @@ resource "aws_quicksight_data_source" "redshift" {
 
   parameters {
     redshift {
-        host = var.redshift_host
-        port = var.redshift_port
-        database   = "yjb_returns"
+      host     = var.redshift_host
+      port     = var.redshift_port
+      database = "yjb_returns"
     }
   }
   ssl_properties {
     disable_ssl = false
   }
-    
+
   vpc_connection_properties {
     vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
   }
@@ -23,7 +23,7 @@ resource "aws_quicksight_data_source" "redshift" {
     secret_arn = var.redshift_quicksight_user_secret_arn
   }
 
-   depends_on = [ aws_iam_role_policy_attachment.kms ]
+  depends_on = [aws_iam_role_policy_attachment.kms]
 }
 
 /*
@@ -49,16 +49,16 @@ resource "aws_quicksight_data_source" "postgresql" {
 
   parameters {
     aurora_postgresql {
-        host = var.postgres_host
-        port = var.postgres_port
-        database   = "yjaf"
+      host     = var.postgres_host
+      port     = var.postgres_port
+      database = "yjaf"
     }
   }
 
   ssl_properties {
     disable_ssl = false
   }
-    
+
   vpc_connection_properties {
     vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
   }
@@ -69,7 +69,7 @@ resource "aws_quicksight_data_source" "postgresql" {
     secret_arn = var.postgres_quicksight_user_secret_arn
   }
 
-  depends_on = [ aws_iam_role_policy_attachment.kms ]
+  depends_on = [aws_iam_role_policy_attachment.kms]
 
 }
 

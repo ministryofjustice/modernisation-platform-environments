@@ -160,12 +160,12 @@ variable "ecs_cluster_sec_group_id" {
 }
 
 variable "bastion_security_group_id" {
-  type = string
+  type        = string
   description = "bastion security group id"
 }
 
 variable "kms_key_arn" {
-  type = string
+  type        = string
   description = "kms key arn"
 }
 

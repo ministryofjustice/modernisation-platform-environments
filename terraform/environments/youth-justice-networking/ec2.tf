@@ -210,7 +210,7 @@ resource "aws_security_group" "internal_sg" {
     description = "Internal Juniper vSRX02 access to KMS website on port 80"
   }
 
-ingress {
+  ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -379,12 +379,12 @@ resource "aws_instance" "juniper_syslog" {
 
 # EC2 Instance (Juniper Management Server)
 resource "aws_instance" "juniper_management" {
-  ami                    = data.aws_ami.windows_server.id # Use data source instead of hardcoded AMI
-  instance_type          = "t3.large"
-  key_name               = "Juniper_KeyPair"
-  iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
-  subnet_id              = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
-  private_ip             = "10.100.50.150"
+  ami                  = data.aws_ami.windows_server.id # Use data source instead of hardcoded AMI
+  instance_type        = "t3.large"
+  key_name             = "Juniper_KeyPair"
+  iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  subnet_id            = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
+  private_ip           = "10.100.50.150"
   root_block_device {
     volume_size = 50    # Define the root volume size in GB
     volume_type = "gp3" # Optional: Specify the volume type (e.g., gp3, gp2, io1)
