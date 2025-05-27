@@ -407,7 +407,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-lambda-metrics-prod" {
 
 resource "aws_s3_bucket_policy" "moj-lambda-metrics-prod" {
   count  = local.is-production == true ? 1 : 0
-  bucket = aws_s3_bucket.moj-moj-lambda-metrics-prod[0].id
+  bucket = aws_s3_bucket.moj-lambda-metrics-prod[0].id
 
   policy = jsonencode({
 
