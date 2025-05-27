@@ -32,6 +32,7 @@ locals {
 
   maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
   gtm_id_secret_name          = "APP_MLRA_GOOGLE_TAG_MANAGER_ID"
+  infox_client_secret_name    = "APP_INFOX_CLIENT_SECRET"
   task_definition = templatefile("task_definition.json", {
     app_name              = local.application_name
     ecr_url               = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
@@ -43,6 +44,7 @@ locals {
     sentry_env            = local.environment
     db_secret_arn         = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maatdb_password_secret_name}"
     google_tag_manager_id = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.gtm_id_secret_name}"
+    infox_client_secret   = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.infox_client_secret_name}"
   })
   ecs_target_capacity = 100
 
