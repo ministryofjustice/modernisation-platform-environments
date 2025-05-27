@@ -51,21 +51,31 @@ resource "aws_s3_bucket_policy" "error_page_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [
+    Statement: [
       {
-        Effect = "Allow",
-        Principal = {
-          AWS = aws_cloudfront_origin_access_identity.oai.iam_arn
+        Sid:    "AllowCloudFrontServiceAccessViaOAC",
+        Effect: "Allow",
+        Principal: {
+          Service: "cloudfront.amazonaws.com"
         },
-        Action = "s3:GetObject",
-        Resource = "${aws_s3_bucket.error_page.arn}/*"
+        Action: "s3:GetObject",
+        Resource: "${aws_s3_bucket.error_page.arn}/*",
+        Condition: {
+          StringEquals: {
+            "AWS:SourceArn": "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${var.cloudfront_distribution_id}"
+          }
+        }
       }
     ]
   })
 }
 
-resource "aws_cloudfront_origin_access_identity" "oai" {
-  comment = "OAI for private S3 access"
+resource "aws_cloudfront_origin_access_control" "s3_oac" {
+  name                              = "cloudfront-${var.environment}-s3-oac"
+  description                       = "OAC for CloudFront to access S3 bucket"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 resource "aws_kms_key" "cloudfront_s3" {

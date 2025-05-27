@@ -82,13 +82,15 @@ resource "aws_cloudfront_distribution" "external" {
 
   # Custom error pages
   origin {
-    domain_name = aws_s3_bucket.error_page.bucket_regional_domain_name
-    origin_id   = "s3-private-origin"
+  domain_name = aws_s3_bucket.error_page.bucket_regional_domain_name
+  origin_id   = "s3-error-page"
 
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
-    }
+  s3_origin_config {
+    origin_access_identity = null # Must be null when using OAC
   }
+
+  origin_access_control_id = aws_cloudfront_origin_access_control.s3_oac.id
+}
 
   default_root_object = "index.html"
 
