@@ -87,6 +87,10 @@
       {
         "name": "APP_MLRA_GOOGLE_TAG_MANAGER_ID",
         "valueFrom": "${google_tag_manager_id}"
+      },
+      {
+        "name": "APP_INFOX_CLIENT_SECRET",
+        "valueFrom": "${infox_client_secret}"
       }
     ]
   }
