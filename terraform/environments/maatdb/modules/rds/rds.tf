@@ -136,7 +136,7 @@ resource "aws_db_instance" "appdb1" {
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_password.result
-  vpc_security_group_ids                = [aws_security_group.cloud_platform_sec_group.id, aws_security_group.bastion_sec_group.id, aws_security_group.vpc_sec_group.id, aws_security_group.mlra_ecs_sec_group.id]
+  vpc_security_group_ids                = var.environment == "development" ? [aws_security_group.cloud_platform_sec_group.id, aws_security_group.bastion_sec_group.id, aws_security_group.vpc_sec_group[0].id, aws_security_group.mlra_ecs_sec_group.id] : [aws_security_group.cloud_platform_sec_group.id, aws_security_group.bastion_sec_group.id, aws_security_group.mlra_ecs_sec_group.id]
   skip_final_snapshot                   = false
   final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name                  = aws_db_parameter_group.parameter_group_19.name
@@ -192,6 +192,7 @@ resource "aws_security_group" "cloud_platform_sec_group" {
 
 # Access fromm MAAT Application
 resource "aws_security_group" "vpc_sec_group" {
+  count = var.environment == "development" ? 1:0
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
