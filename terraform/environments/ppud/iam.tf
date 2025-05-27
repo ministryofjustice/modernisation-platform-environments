@@ -1289,7 +1289,9 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_prod
         ],
         "Resource" : [
           "arn:aws:s3:::moj-infrastructure",
-          "arn:aws:s3:::moj-infrastructure/*"
+          "arn:aws:s3:::moj-infrastructure/*",
+          "arn:aws:s3:::moj-lambda-metrics-prod",
+          "arn:aws:s3:::moj-lambda-metrics-prod/*"
         ]
       },
       {
