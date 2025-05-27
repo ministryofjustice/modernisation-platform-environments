@@ -34,6 +34,21 @@ resource "aws_cloudfront_distribution" "external" {
     response_headers_policy_id = aws_cloudfront_response_headers_policy.strict_transport_security.id
   }
 
+  ordered_cache_behavior {
+  path_pattern           = "/custom-503.html"
+  target_origin_id       = "s3-error-page"
+  
+  viewer_protocol_policy = "redirect-to-https"
+
+  allowed_methods  = ["GET", "HEAD"]
+  cached_methods   = ["GET", "HEAD"]
+
+  cache_policy_id = "413fd5bd-5e24-4b2b-b517-3d5ffbbf0a3c" # Managed-CachingDisabled
+  origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
+
+  compress = true
+}
+
   
   price_class = "PriceClass_100"
 
