@@ -289,7 +289,5 @@ resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
   description       = "Allow connections to EFS"
   security_group_id = aws_security_group.efs-security-group.id
   ip_protocol       = "-1"
-  from_port         = 0
-  to_port           = 0
   cidr_ipv4 = "0.0.0.0/0"
 }
