@@ -13,7 +13,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "error_page" {
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = "aws:kms"
-      kms_master_key_id = var.kms_key_arn
+      kms_master_key_id = aws_kms_key.cloudfront_s3.arn
     }
   }
 }
@@ -65,20 +65,48 @@ resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "OAI for private S3 access"
 }
 
+resource "aws_kms_key" "cloudfront_s3" {
+  description             = "KMS key for CloudFront ${var.environment}"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
 
-resource "aws_kms_grant" "cloudfront_access" {
-  name              = "AllowCloudFrontAccess"
-  key_id            = var.kms_key_arn
-  grantee_principal = "cloudfront.amazonaws.com"
-
-  operations = [
-    "Decrypt",
-    "DescribeKey"
-  ]
-
-  constraints {
-    encryption_context_equals = {
-      "aws:cloudfront:distribution-id" = var.cloudfront_distribution_id
-    }
-  }
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Id      = "cloudfront-s3-kms-policy",
+    Statement: [
+      {
+        Sid: "AllowCloudFrontDecryptAccess",
+        Effect: "Allow",
+        Principal: {
+          Service: "cloudfront.amazonaws.com"
+        },
+        Action: [
+          "kms:Decrypt",
+          "kms:DescribeKey"
+        ],
+        Resource: "*",
+        Condition: {
+          StringEquals: {
+            "AWS:SourceArn": "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${var.cloudfront_distribution_id}"
+          }
+        }
+      },
+      {
+        Sid: "AllowRootAccountFullAccess",
+        Effect: "Allow",
+        Principal: {
+          AWS: "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        },
+        Action: "kms:*",
+        Resource: "*"
+      }
+    ]
+  })
 }
+
+resource "aws_kms_alias" "cloudfront_s3" {
+  name          = "alias/cloudfront-${var.environment}"
+  target_key_id = aws_kms_key.cloudfront_s3.id
+}
+
+data "aws_caller_identity" "current" {}
