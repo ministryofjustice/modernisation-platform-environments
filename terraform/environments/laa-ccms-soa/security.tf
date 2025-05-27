@@ -161,6 +161,8 @@ resource "aws_security_group_rule" "ecs_tasks_managed_egress_all" {
   type              = "egress"
   description       = "All"
   protocol          = -1
+  from_port         = 0
+  to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
 }
 
@@ -206,6 +208,8 @@ resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   type              = "egress"
   description       = "All Egress"
   protocol          = -1
+  from_port         = 0
+  to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
 }
 
@@ -232,6 +236,8 @@ resource "aws_security_group_rule" "soa_db_egress_all" {
   type              = "egress"
   description       = "All Egress"
   protocol          = -1
+  from_port         = 0
+  to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
 }
 
@@ -257,6 +263,8 @@ resource "aws_security_group_rule" "tds_db_egress_all" {
   type              = "egress"
   description       = "All Egress"
   protocol          = -1
+  from_port         = 0
+  to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
 }
 
