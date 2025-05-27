@@ -160,7 +160,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "egress"
   description       = "All"
-  protocol          = "TCP"
+  protocol          = -1
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
@@ -207,7 +207,7 @@ resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   security_group_id = aws_security_group.cluster_ec2.id
   type              = "egress"
   description       = "All Egress"
-  protocol          = "TCP"
+  protocol          = -1
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
@@ -235,7 +235,7 @@ resource "aws_security_group_rule" "soa_db_egress_all" {
   security_group_id = aws_security_group.soa_db.id
   type              = "egress"
   description       = "All Egress"
-  protocol          = "TCP"
+  protocol          = -1
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
@@ -262,7 +262,7 @@ resource "aws_security_group_rule" "tds_db_egress_all" {
   security_group_id = aws_security_group.tds_db.id
   type              = "egress"
   description       = "All Egress"
-  protocol          = "TCP"
+  protocol          = -1
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
@@ -286,10 +286,10 @@ resource "aws_vpc_security_group_ingress_rule" "efs-security-group-ingress" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "efs-security-group-egress" {
-  description       = "Allow outgoing traffic"
+  description       = "Allow connections to EFS"
   security_group_id = aws_security_group.efs-security-group.id
   ip_protocol       = "-1"
-  # from_port         = 0
-  # to_port           = 0
+  from_port         = 0
+  to_port           = 0
   cidr_ipv4 = "0.0.0.0/0"
 }
