@@ -34,28 +34,7 @@ resource "aws_cloudfront_distribution" "external" {
     response_headers_policy_id = aws_cloudfront_response_headers_policy.strict_transport_security.id
   }
 
-  ordered_cache_behavior {
-  path_pattern     = "custom-503.html"
-  target_origin_id = "s3-private-origin"
-
-  viewer_protocol_policy = "redirect-to-https"
-  allowed_methods        = ["GET", "HEAD"]
-  cached_methods         = ["GET", "HEAD"]
-
-  compress = true
-
-  forwarded_values {
-    query_string = false
-    cookies {
-      forward = "none"
-    }
-  }
-
-  min_ttl     = 0
-  default_ttl = 0
-  max_ttl     = 0
-}
-
+  
   price_class = "PriceClass_100"
 
   viewer_certificate {
