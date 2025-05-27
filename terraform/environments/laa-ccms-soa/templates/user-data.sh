@@ -43,7 +43,7 @@ if [[ -d /home/ec2-user/efs/domains/soainfra ]] && [[ "${server}" = "admin" ]]; 
   reset_admin
 fi
 
-service start ecs
+service ecs start
 
 # install aws cli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
