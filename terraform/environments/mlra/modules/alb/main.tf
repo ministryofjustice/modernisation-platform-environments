@@ -589,8 +589,9 @@ resource "aws_lb_listener_rule" "alb_listener_rule" {
     }
   }
 }
-#checkov:skip=CKV_AWS_378: Allow HTTP Target Group Protocol
+
 resource "aws_lb_target_group" "alb_target_group" {
+  #checkov:skip=CKV_AWS_378: Allow HTTP Target Group Protocol
   name                 = "${var.application_name}-alb-tg"
   port                 = var.target_group_port
   protocol             = var.target_group_protocol
