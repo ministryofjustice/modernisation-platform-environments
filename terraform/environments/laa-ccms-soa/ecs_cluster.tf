@@ -109,7 +109,7 @@ resource "aws_ecs_service" "admin" {
     expression = "attribute:server == admin"
   }
 
-/*   network_configuration {
+  /*   network_configuration {
     security_groups = [aws_security_group.ecs_tasks_admin.id]
     subnets = data.aws_subnets.shared-private.ids
   } */
@@ -199,7 +199,7 @@ resource "aws_ecs_service" "managed" {
     expression = "attribute:server == managed"
   }
 
-/*   network_configuration {
+  /*   network_configuration {
     security_groups = [aws_security_group.ecs_tasks_managed.id]
     subnets = data.aws_subnets.shared-private.ids
   } */

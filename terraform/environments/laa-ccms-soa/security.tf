@@ -224,9 +224,8 @@ resource "aws_security_group" "soa_db" {
 resource "aws_vpc_security_group_ingress_rule" "soa_db_ingress" {
   count             = length(local.private_subnets_cidr_blocks)
   security_group_id = aws_security_group.soa_db.id
-  type              = "ingress"
   description       = "Database Ingress"
-  protocol          = "TCP"
+  ip_protocol       = "TCP"
   from_port         = 1521
   to_port           = 1521
   cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
