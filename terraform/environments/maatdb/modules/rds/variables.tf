@@ -159,6 +159,11 @@ variable "ecs_cluster_sec_group_id" {
   description = "ID of the ecs cluster security group allowed to access RDS"
 }
 
+variable "mlra_ecs_cluster_sec_group_id" {
+  type        = string
+  description = "ID of the MLRA ecs cluster security group allowed to access RDS"
+}
+
 variable "bastion_security_group_id" {
   type        = string
   description = "bastion security group id"

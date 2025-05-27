@@ -163,8 +163,7 @@ resource "aws_db_instance" "appdb1" {
 
 }
 
-# Normal Security Group
-
+# Access from Cloud Platform
 resource "aws_security_group" "cloud_platform_sec_group" {
   name        = "cloud-platform-sec-group"
   description = "RDS access from Cloud Platform via Transit gateway"
@@ -191,6 +190,7 @@ resource "aws_security_group" "cloud_platform_sec_group" {
   }
 }
 
+# Access fromm MAAT Application
 resource "aws_security_group" "vpc_sec_group" {
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
@@ -217,6 +217,34 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 }
 
+# Access from MLRA Application
+resource "aws_security_group" "mlra_ecs_sec_group" {
+  name        = "mlra-ecs-sec-group"
+  description = "RDS Access from the MLRA application"
+  vpc_id      = var.vpc_shared_id
+
+  ingress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  }
+
+  egress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-mlra-ecs-sec-group"
+  }
+}
+
+# Access from Bastion
 resource "aws_security_group" "bastion_sec_group" {
   name        = "bastion-sec-group"
   description = "Bastion Access with the shared vpc"
