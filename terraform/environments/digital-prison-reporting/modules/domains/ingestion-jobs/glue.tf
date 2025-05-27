@@ -195,6 +195,45 @@ module "create_reload_diff_job" {
   arguments = var.glue_create_reload_diff_job_arguments
 }
 
+# Glue Job, Create Reload Diff Between the Raw Data And Archived Data
+module "set_cdc_dms_start_time_job" {
+  source                        = "../../glue_job"
+  create_job                    = var.setup_set_cdc_dms_start_time_job
+  create_role                   = var.glue_set_cdc_dms_start_time_job_role # Needs to Set to TRUE
+  name                          = var.glue_set_cdc_dms_start_time_job_name
+  short_name                    = var.glue_set_cdc_dms_start_time_job_short_name
+  command_type                  = "glueetl"
+  description                   = var.glue_set_cdc_dms_start_time_job_description
+  create_security_configuration = var.glue_set_cdc_dms_start_time_job_create_sec_conf
+  job_language                  = var.glue_set_cdc_dms_start_time_job_language
+  temp_dir                      = var.glue_set_cdc_dms_start_time_job_temp_dir
+  spark_event_logs              = var.glue_set_cdc_dms_start_time_job_spark_event_logs
+  # Placeholder Script Location
+  script_location              = "s3://${var.project_id}-artifact-store-${var.env}/build-artifacts/digital-prison-reporting-jobs/scripts/${var.script_version}"
+  enable_continuous_log_filter = var.glue_set_cdc_dms_start_time_job_enable_cont_log_filter
+  project_id                   = var.project_id
+  aws_kms_key                  = var.s3_kms_arn
+  execution_class              = var.glue_set_cdc_dms_start_time_job_execution_class
+  additional_policies          = var.glue_set_cdc_dms_start_time_job_additional_policies
+  worker_type                  = var.glue_set_cdc_dms_start_time_job_worker_type
+  number_of_workers            = var.glue_set_cdc_dms_start_time_job_num_workers
+  max_concurrent               = var.glue_set_cdc_dms_start_time_job_max_concurrent #64
+  region                       = var.account_region
+  account                      = var.account_id
+  log_group_retention_in_days  = var.glue_log_group_retention_in_days
+  enable_spark_ui              = var.enable_spark_ui
+
+  tags = merge(
+    var.tags,
+    {
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-1925"
+    }
+  )
+
+  arguments = var.glue_set_cdc_dms_start_time_job_arguments
+}
+
 resource "aws_glue_trigger" "glue_file_archive_job_trigger" {
   count    = var.setup_archive_job ? 1 : 0
   name     = "${module.glue_archive_job.name}-trigger"
