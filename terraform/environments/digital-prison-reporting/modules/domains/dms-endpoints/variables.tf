@@ -84,16 +84,22 @@ variable "bucket_name" {
   type = string
 }
 
+variable "max_file_size" {
+  description = "Maximum size (in KB) of any .csv file to be created while migrating to an S3 target during full load. Valid values are from 1 to 1048576"
+  type        = number
+  default     = 120000
+}
+
 variable "cdc_max_batch_interval" {
   description = "Maximum length of the interval defined in seconds, after which to output a file to Amazon S3 during CDC"
-  type = number
-  default = 10
+  type        = number
+  default     = 10
 }
 
 variable "cdc_min_file_size" {
   description = "Minimum file size condition as defined in kilobytes to output a file to Amazon S3 during CDC"
-  type = number
-  default = 32000
+  type        = number
+  default     = 32000
 }
 
 #--------------------------------------------------------------
