@@ -51,8 +51,8 @@ module "multiphase_query_lambda_trigger" {
     {
       "source" : ["aws.athena"],
       "detail-type" : ["Athena Query State Change"],
-      "detail": {
-        "workgroupName": ["dpr-generic-athena-workgroup"]
+      "detail" : {
+        "workgroupName" : ["dpr-generic-athena-workgroup"]
       }
     }
   )

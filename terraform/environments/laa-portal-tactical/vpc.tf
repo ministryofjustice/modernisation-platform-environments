@@ -124,6 +124,6 @@ resource "aws_vpc_peering_connection" "laa_mp_vpc" {
   peer_owner_id = local.environment_management.account_ids[local.provider_name]
   tags = merge(
     local.tags,
-    {Side = "Requester"}
+    { Side = "Requester" }
   )
 }

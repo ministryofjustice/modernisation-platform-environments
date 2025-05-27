@@ -104,7 +104,7 @@ Review the proposed Tableau settings changes and, if they look OK, apply them.
 # Tableau Site Export and Import #
 
 ## Introduction
-Use of the Site Export and Import functions allows for mapping of all users to the new Active Directory Services, but has other limitaitons as described in https://help.tableau.com/current/server-linux/en-us/sites_exportimport.htm.
+Use of the Site Export and Import functions allows for mapping of all users to the new Active Directory Services, but has other limitaitons as described in <https://help.tableau.com/current/server-linux/en-us/sites_exportimport.htm>.
 
 On the new Server all Tableau users must first be imported from Activey Directory and all must be enabled. Any disabled user will need to be removed from the old Tableasue service or enabled in Active Directory in the new environment.
 
@@ -142,8 +142,8 @@ All Users must be imported to Tableaus before the import is run.
 
 ## Prepare Tableau ##
 On each Tableaus Server administration site import the groups prepared above:
--   On the Default Site import GRoup `tableau_users` and set the defauls role to `Unlicensed`
--   On the Guest Site import GRoup `tableau_yjaf_guest` and set the default role to `Unlicensed`
+- On the Default Site import GRoup `tableau_users` and set the defauls role to `Unlicensed`
+- On the Guest Site import GRoup `tableau_yjaf_guest` and set the default role to `Unlicensed`
 
 ## Import Sites ##
 
@@ -152,7 +152,7 @@ On each Tableaus Server administration site import the groups prepared above:
    Copy `site-export-preprod-default.zip` and `site-export-preprod-default.zip` from the `Import_Files` folder in bucket `yjaf-preproduction-tableau-backups-archive` to the same folder in `yjaf-preproduction-tableau-backups`.
 
 **The remaining Steps are to be completed on the Tableaus servers as `root` or `tabadmin`.**
- 
+
 2. Run the following commands to copy the site export files to Tableau Server:
 
   `aws s3 cp s3://yjaf-preproduction-tableau-backups/Install_Files/site-export-preprod-default.zip /var/opt/tableau/tableau_server/data/tabsvc/files/siteimports/site-export-preprod-default.zip`

@@ -30,8 +30,8 @@ resource "aws_iam_role_policy_attachment" "ssm_core" {
 }
 
 resource "aws_iam_role_policy_attachment" "additional" {
-  for_each = var.enable_compute_node ? toset(var.policies) : toset([])
-  role     = aws_iam_role.instance_role[0].id
+  for_each   = var.enable_compute_node ? toset(var.policies) : toset([])
+  role       = aws_iam_role.instance_role[0].id
   policy_arn = each.value
 }
 
@@ -44,7 +44,7 @@ resource "aws_security_group" "windows_sg" {
 }
 
 resource "aws_security_group_rule" "windows_ingress" {
-  for_each = var.enable_compute_node ? var.ec2_sec_rules : {}
+  for_each          = var.enable_compute_node ? var.ec2_sec_rules : {}
   from_port         = each.value.from_port
   to_port           = each.value.to_port
   protocol          = each.value.protocol
