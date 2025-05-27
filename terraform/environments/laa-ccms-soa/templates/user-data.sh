@@ -43,15 +43,15 @@ if [ "${server}" = "admin" ]; then
   reset_admin
 fi
 
-start ecs
+service start ecs
 
-# install aws cli
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-sudo yum install unzip -y
-unzip awscliv2.zip
-sudo ./aws/install
-rm -rf aws
-rm awscliv2.zip
+# # install aws cli
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# sudo yum install unzip -y
+# unzip awscliv2.zip
+# sudo ./aws/install
+# rm -rf aws
+# rm awscliv2.zip
 
 # install git and pull repo
 sudo yum install git -y
