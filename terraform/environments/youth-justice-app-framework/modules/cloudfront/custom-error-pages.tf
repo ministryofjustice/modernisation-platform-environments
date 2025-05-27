@@ -1,3 +1,6 @@
+data "aws_region" "current" {}
+data "aws_caller_identity" "current" {}
+
 resource "aws_s3_bucket" "error_page" {
   #checkov:skip=CKV2_AWS_62:"Event notifications not required for CloudFront error pages
   #checkov:skip=CKV2_AWS_61:"Dont want to delete any files in this bucket"
@@ -75,7 +78,7 @@ resource "aws_kms_key" "cloudfront_s3" {
     Id      = "cloudfront-s3-kms-policy",
     Statement: [
       {
-        Sid: "AllowCloudFrontDecryptAccess",
+        Sid: "AllowCloudFrontServiceAccess",
         Effect: "Allow",
         Principal: {
           Service: "cloudfront.amazonaws.com"
@@ -87,7 +90,8 @@ resource "aws_kms_key" "cloudfront_s3" {
         Resource: "*",
         Condition: {
           StringEquals: {
-            "AWS:SourceArn": "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${var.cloudfront_distribution_id}"
+            "kms:ViaService": "s3.${data.aws_region.current.name}.amazonaws.com",
+            "kms:CallerAccount": data.aws_caller_identity.current.account_id
           }
         }
       },
@@ -108,5 +112,3 @@ resource "aws_kms_alias" "cloudfront_s3" {
   name          = "alias/cloudfront-${var.environment}"
   target_key_id = aws_kms_key.cloudfront_s3.id
 }
-
-data "aws_caller_identity" "current" {}
