@@ -267,5 +267,5 @@ variable "cdc_max_batch_interval" {
 variable "cdc_min_file_size" {
   description = "Minimum file size condition as defined in kilobytes to output a file to Amazon S3 during CDC"
   type        = number
-  default     = 32000
+  default     = 0
 }
