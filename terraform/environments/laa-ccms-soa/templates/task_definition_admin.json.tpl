@@ -13,7 +13,8 @@
     "portMappings": [
       {
         "containerPort": ${admin_server_port},
-        "hostPort": 0
+        "hostPort": 0,
+        "protocol": "tcp"
       }
     ],
     "mountPoints": [
