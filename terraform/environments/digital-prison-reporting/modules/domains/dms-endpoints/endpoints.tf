@@ -22,6 +22,8 @@ module "dms_endpoints" {
   bucket_name                         = var.bucket_name
   source_postgres_heartbeat_enable    = var.source_postgres_heartbeat_enable
   source_postgres_heartbeat_frequency = var.source_postgres_heartbeat_frequency
+  cdc_max_batch_interval              = var.cdc_max_batch_interval
+  cdc_min_file_size                   = var.cdc_min_file_size
 
   tags = var.tags
 }

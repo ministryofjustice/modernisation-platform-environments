@@ -257,3 +257,15 @@ variable "source_app_username" {
   type        = string
   default     = ""
 }
+
+variable "cdc_max_batch_interval" {
+  description = "Maximum length of the interval defined in seconds, after which to output a file to Amazon S3 during CDC"
+  type = number
+  default = 10
+}
+
+variable "cdc_min_file_size" {
+  description = "Minimum file size condition as defined in kilobytes to output a file to Amazon S3 during CDC"
+  type = number
+  default = 32000
+}
