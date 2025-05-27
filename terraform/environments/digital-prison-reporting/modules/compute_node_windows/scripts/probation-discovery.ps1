@@ -12,8 +12,6 @@ Start-Process "msiexec.exe" -ArgumentList "/i C:\Windows\Temp\AWSCLIV2.msi /qn" 
 # Download file from S3
 & "C:\Program Files\Amazon\AWSCLIV2\aws.exe" s3 cp s3://dpr-artifact-store-development/third-party/PowerBI/PBIDesktopSetup_x64.exe C:\Windows\Temp\PBIDesktopSetup_x64.exe
 
-# Set Administrator password directly
-net user Administrator "MySecurePassword123"
 </powershell>
 
 
