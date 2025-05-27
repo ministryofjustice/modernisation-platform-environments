@@ -61,8 +61,9 @@ chgrp ec2-user /home/ec2-user/.ssh/laa-ccms-app-soa.pem
 chmod 400 /home/ec2-user/.ssh/laa-ccms-app-soa.pem
 cat <<EOF > /home/ec2-user/.ssh/config
 host github.com
- HostName github.com
+ HostName ssh.github.com
  IdentityFile /home/ec2-user/.ssh/laa-ccms-app-soa.pem
+ Port 443
  User git
 StrictHostKeyChecking no
 EOF
@@ -70,7 +71,7 @@ chown ec2-user /home/ec2-user/.ssh/config
 chgrp ec2-user /home/ec2-user/.ssh/config
 chmod 600 /home/ec2-user/.ssh/config
 #--TEMP CLONE A SINGLE BRANCH WHERE SECRETS HAVE BEEN CHANGED! - AW
-su ec2-user bash -c "git clone --single-branch --branch feat-laa-ccms-soa-mp git@github.com:ministryofjustice/laa-ccms-app-soa.git /home/ec2-user/efs/laa-ccms-app-soa || git -C /home/ec2-user/efs/laa-ccms-app-soa pull"
+su ec2-user bash -c "git clone --single-branch --branch feat-laa-ccms-soa-mp ssh://git@ssh.github.com:443/ministryofjustice/laa-ccms-app-soa.git /home/ec2-user/efs/laa-ccms-app-soa || git -C /home/ec2-user/efs/laa-ccms-app-soa pull"
 
 # install git-crypt and decrypt repo
 yum -y install gcc-c++ openssl-devel
