@@ -72,7 +72,9 @@ locals {
     "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/historic_api_mart",
     "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/historic_api_mart/*",
     "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/staged_fms_${local.env_}dbt",
-    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*"
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/staged_fms_${local.env_}dbt/*",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/crime_matching_test_db",
+    "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/crime_matching_test_db/*"
   ]
 }
 
