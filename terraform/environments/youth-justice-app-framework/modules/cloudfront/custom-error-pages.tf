@@ -78,6 +78,10 @@ resource "aws_cloudfront_origin_access_control" "s3_oac" {
   signing_protocol                  = "sigv4"
 }
 
+resource "aws_cloudfront_origin_access_identity" "oai" {
+  comment = "OAI for private S3 access"
+}
+
 resource "aws_kms_key" "cloudfront_s3" {
   description             = "KMS key for CloudFront ${var.environment}"
   deletion_window_in_days = 7
