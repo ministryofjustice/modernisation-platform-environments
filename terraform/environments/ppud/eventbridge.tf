@@ -312,3 +312,29 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_start" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.start_instance[0].arn
 }
+
+# Eventbridge rule to invoke the PPUD load balancer target uptime data lambda function every day at 00:00
+# Set time to 00:00 UTC
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_ppud_elb_uptime_data_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_data_prod[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_schedule_elb_uptime_data_prod[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "daily_schedule_elb_uptime_data_prod" {
+  count               = local.is-production == true ? 1 : 0
+  name                = "ppud-elb-uptime-data-daily-schedule"
+  description         = "Trigger Lambda at 00:00 every day"
+  schedule_expression = "cron(0 0 ? * * *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_elb_uptime_data_prod" {
+  count     = local.is-production == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.daily_schedule_elb_uptime_data_prod[0].name
+  target_id = "ppud_elb_uptime_data_prod"
+  arn       = aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_data_prod[0].arn
+}
