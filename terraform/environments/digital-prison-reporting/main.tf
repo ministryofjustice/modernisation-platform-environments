@@ -824,12 +824,6 @@ module "ec2_kinesis_agent" {
       "to_port"                  = local.nomis_port,
       "protocol"                 = "TCP",
       "source_security_group_id" = aws_security_group.glue_job_connection_sg.id
-    },
-    "DELIUS_FROM_MP" = {
-      "from_port"                = 1521,
-      "to_port"                  = 1521,
-      "protocol"                 = "TCP",
-      "source_security_group_id" = "0.0.0.0/0"
     }
   }
 
