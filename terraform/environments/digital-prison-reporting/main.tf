@@ -347,6 +347,49 @@ module "stop_dms_task_job" {
   }
 }
 
+# Glue Job, Set the CDC DMS Start Time
+module "set_cdc_dms_start_time_job" {
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-set-cdc-dms-start-time-job-${local.env}"
+  short_name                    = "${local.project}-set-cdc-dms-start-time-job"
+  command_type                  = "glueetl"
+  description                   = "Sets the start time of a CDC DMS Task associated with a given Full-Load task.\nArguments:\n--dpr.dms.replication.task.id: (Required) Id of the Full-Load DMS task from which the start time of the CDC task will be obtained\n--dpr.cdc.dms.replication.task.id: (Required) Id of the CDC DMS task for which the start time is to be updated"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-set-cdc-dms-start-time-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-set-cdc-dms-start-time-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 64
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-set-cdc-dms-start-time-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-1925"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"    = local.glue_jobs_latest_jar_location
+    "--extra-files"   = local.shared_log4j_properties_path
+    "--class"         = "uk.gov.justice.digital.job.UpdateDmsCdcTaskStartTimeJob"
+    "--dpr.log.level" = local.glue_job_common_log_level
+  }
+}
+
 # Glue Job, Activate/Deactivate Glue Trigger Job
 module "activate_glue_trigger_job" {
   source                        = "./modules/glue_job"
