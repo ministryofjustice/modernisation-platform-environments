@@ -216,4 +216,3 @@ resource "aws_ecs_service" "managed" {
     aws_ecs_service.admin,
   ]
 }
-

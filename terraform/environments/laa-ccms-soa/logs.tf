@@ -9,6 +9,11 @@ resource "aws_cloudwatch_log_stream" "log_stream_admin" {
   log_group_name = aws_cloudwatch_log_group.log_group_admin.name
 }
 
+resource "aws_cloudwatch_log_stream" "log_stream_admin_ecs" {
+  name           = "${local.application_data.accounts[local.environment].app_name}-admin-ecs"
+  log_group_name = aws_cloudwatch_log_group.log_group_admin.name
+}
+
 resource "aws_cloudwatch_log_metric_filter" "soa_stuck_thread_admin" {
   name           = "SOAStuckThreadAdmin"
   pattern        = "\"STUCK\" -\"Self tuning\""
@@ -53,6 +58,11 @@ resource "aws_cloudwatch_log_group" "log_group_managed" {
 
 resource "aws_cloudwatch_log_stream" "log_stream_managed" {
   name           = "${local.application_data.accounts[local.environment].app_name}-managed-log-stream"
+  log_group_name = aws_cloudwatch_log_group.log_group_managed.name
+}
+
+resource "aws_cloudwatch_log_stream" "log_stream_managed_ecs" {
+  name           = "${local.application_data.accounts[local.environment].app_name}-managed-ecs"
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 }
 

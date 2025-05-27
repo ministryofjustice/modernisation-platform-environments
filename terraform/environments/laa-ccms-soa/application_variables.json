@@ -26,7 +26,7 @@
       "managed_ec2_desired_capacity": "1",
       "managed_container_cpu": "2048",
       "managed_container_memory": "7680",
-      "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-maanaged",
+      "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed",
       "managed_server_port": "8001",
       "app_count_managed": "2",
       "managed_container_version": "latest",
