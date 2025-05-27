@@ -39,7 +39,7 @@ reset_admin() {
   sudo rm -rf $domain_home/servers/AdminServer/tmp
 }
 
-if [ "${server}" = "admin" ]; then
+if [[ -d /home/ec2-user/efs/domains/soainfra ]] && [[ "${server}" = "admin" ]]; then
   reset_admin
 fi
 
