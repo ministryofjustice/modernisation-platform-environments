@@ -480,9 +480,9 @@ data "aws_iam_policy_document" "calculate_checksum" {
     resources = ["${module.s3-data-bucket.bucket.arn}/*"]
   }
   statement {
-    sid       = "S3BucketPermissions"
-    effect    = "Allow"
-    actions   = [
+    sid    = "S3BucketPermissions"
+    effect = "Allow"
+    actions = [
       "s3:ListBucket"
     ]
     resources = [module.s3-data-bucket.bucket.arn]

@@ -180,6 +180,6 @@ variable "environment" {
 }
 
 variable "maatdb_rds_sec_group_id" {
-  type = string
+  type        = string
   description = "MAATDB sec group ID"
 }
