@@ -39,22 +39,6 @@ module "kms" {
         ]
       }
     ]
-  },
-
-  {
-    sid = "AllowCloudFrontToUseKMSKey"
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey"
-    ]
-    resources = ["*"]
-
-    principals = [
-      {
-        type        = "Service"
-        identifiers = ["cloudfront.amazonaws.com"]
-      }
-    ]
   }
   ]
   tags = local.tags

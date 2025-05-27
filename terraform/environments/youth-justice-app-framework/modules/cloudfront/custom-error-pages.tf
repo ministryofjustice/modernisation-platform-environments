@@ -5,17 +5,24 @@ resource "aws_s3_bucket" "error_page" {
   #checkov:skip=CKV_AWS_18:"Logging not required for error pages"
   bucket        = "yjaf-${var.environment}-custom-error-pages"
   force_destroy = true
+}
 
-  server_side_encryption_configuration {
-    rule {
-      apply_server_side_encryption_by_default {
-        kms_master_key_id = var.kms_key_arn
-        sse_algorithm     = "aws:kms"
-      }
+resource "aws_s3_bucket_server_side_encryption_configuration" "error_page" {
+  bucket = aws_s3_bucket.error_page.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = var.kms_key_arn
     }
   }
-  versioning {
-    enabled = true
+}
+
+resource "aws_s3_bucket_versioning" "error_page" {
+  bucket = aws_s3_bucket.error_page.id
+
+  versioning_configuration {
+    status = "Enabled"
   }
 }
 
@@ -56,4 +63,22 @@ resource "aws_s3_bucket_policy" "error_page_policy" {
 
 resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "OAI for private S3 access"
+}
+
+
+resource "aws_kms_grant" "cloudfront_access" {
+  name              = "AllowCloudFrontAccess"
+  key_id            = var.kms_key_arn
+  grantee_principal = "cloudfront.amazonaws.com"
+
+  operations = [
+    "Decrypt",
+    "DescribeKey"
+  ]
+
+  constraints {
+    encryption_context_equals = {
+      "aws:cloudfront:distribution-id" = var.cloudfront_distribution_id
+    }
+  }
 }
