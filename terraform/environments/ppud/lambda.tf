@@ -1263,6 +1263,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_uptime_calculate_
   layers = [
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
     "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
+    aws_lambda_layer_version.lambda_layer_pandas_prod[0].arn,
     aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
   ]
   # VPC configuration
@@ -1289,4 +1290,15 @@ resource "aws_cloudwatch_log_group" "lambda_ppud_elb_uptime_calculate_prod_log_g
   count             = local.is-production == true ? 1 : 0
   name              = "/aws/lambda/ppud_elb_uptime_calculate_prod"
   retention_in_days = 30
+}
+
+# Lambda Layer for Pandas
+
+resource "aws_lambda_layer_version" "lambda_layer_pandas_prod" {
+  count               = local.is-production == true ? 1 : 0
+  layer_name          = "pandas-layer"
+  description         = "pandas-layer for python 3.12"
+  s3_bucket           = aws_s3_bucket.moj-infrastructure[0].id
+  s3_key              = "lambda/layers/pandas-layer.zip"
+  compatible_runtimes = ["python3.12"]
 }
