@@ -65,8 +65,8 @@ resource "aws_security_group_rule" "dms_to_s3_egress" {
   type              = "egress"
   cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
   protocol          = "tcp"
-  from_port         = each.value
-  to_port           = each.value
+  from_port         = 433
+  to_port           = 433
   description       = "Allow DMS to communicate with S3 over HTTPS"
 }
 
