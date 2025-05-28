@@ -349,9 +349,14 @@ rm -f /tmp/amazon-corretto-21-x64-linux-jdk.rpm
 #WantedBy=multi-user.target
 #EOF
 
+# Configure MP -> NOMIS Connectivity, for Development Env Workaround
+if [ ${environment} = "development" ]; then
 # Set up service (headless BI)
 mkdir -p /opt/headless-bi
 cd /opt/headless-bi
+
+# Check if UNZIP exists
+command -v unzip >/dev/null 2>&1 || yum install -y unzip
 
 # Download and unzip JAR
 #aws s3 cp s3://dpr-artifact-store-development/third-party/headless-bi/hmpps-probation-headless-bi-poc.jar ./headless-bi.jar
@@ -369,7 +374,7 @@ After=network.target
 
 [Service]
 WorkingDirectory=/opt/headless-bi
-ExecStart=/usr/bin/java -jar /opt/headless-bi/hmpps-probation-headless-bi-poc.jar
+ExecStart=/usr/bin/java -jar /opt/headless-bi/hmpps-probation-headless-bi-poc.jar --spring.profiles.active=dev
 User=ec2-user
 Group=ec2-user
 SuccessExitStatus=143
@@ -384,3 +389,8 @@ EOF
 systemctl daemon-reload
 systemctl enable headless-bi.service
 systemctl start headless-bi.service
+
+# Verify Service
+echo "_____ Check if Headless BI Service..."
+systemctl status headless-bi.service --no-pager
+fi
