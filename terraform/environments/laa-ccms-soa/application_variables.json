@@ -44,7 +44,9 @@
       "tds_db_storage_gb": "50",
       "tds_db_deletion_protection": "false",
       "inbound_s3_bucket_name": "",
-      "outbound_s3_bucket_name": ""
+      "outbound_s3_bucket_name": "",
+      "workspace_cidr_nonprod": "10.200.0.0/20",
+      "workspace_cidr_prod": "10.200.16.0/20"
     },
     "test": {
       "app_name": "ccms-soa"
