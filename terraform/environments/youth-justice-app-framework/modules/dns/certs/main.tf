@@ -14,12 +14,14 @@ resource "aws_route53_record" "cert_validation" {
   ]) : 0
 
   allow_overwrite = true
-  name            = aws_acm_certificate.domain_cert.domain_validation_options[count.index].resource_record_name
-  records         = [aws_acm_certificate.domain_cert.domain_validation_options[count.index].resource_record_value]
+  name            = aws_acm_certificate.domain_cert.domain_validation_options.resource_record_name
+  records         = [aws_acm_certificate.domain_cert.domain_validation_options.resource_record_value]
   ttl             = 300
-  type            = aws_acm_certificate.domain_cert.domain_validation_options[count.index].resource_record_type
+  type            = aws_acm_certificate.domain_cert.domain_validation_options.resource_record_type
   zone_id         = var.r53_zone_id
 }
+
+
 
 
 #Wait for the certificate to be issued
