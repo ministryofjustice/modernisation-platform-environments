@@ -43,7 +43,7 @@ resource "aws_cloudfront_distribution" "external" {
   allowed_methods  = ["GET", "HEAD"]
   cached_methods   = ["GET", "HEAD"]
 
-  cache_policy_id = "413fd5bd-5e24-4b2b-b517-3d5ffbbf0a3c" # Managed-CachingDisabled
+  cache_policy_id = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Managed-CachingDisabled
   origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
 
   compress = true
