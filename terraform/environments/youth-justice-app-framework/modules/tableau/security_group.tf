@@ -19,6 +19,10 @@ module "tableau_sg" {
       source_security_group_id = var.management_server_sg_id
     },
     {
+      rule                     = "http-80-tcp"
+      source_security_group_id = var.management_server_sg_id
+    },
+    {
       rule                     = "https-443-tcp"
       source_security_group_id = var.management_server_sg_id
     },
