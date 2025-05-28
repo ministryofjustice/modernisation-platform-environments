@@ -40,4 +40,6 @@ module "probation_discovery_windows_node" {
       Jira           = "DPR2-1980"
     }
   )
+
+  depends_on = [aws_secretsmanager_secret.dpr_windows_rdp_credentials]  
 }

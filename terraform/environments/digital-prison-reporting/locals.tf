@@ -519,4 +519,8 @@ locals {
   probation_discovery_windows_ami_id  = "ami-0ba9276d1fb25ed77"
   enable_probation_discovery_node = local.application_data.accounts[local.environment].enable_probation_discovery_node
 
+ dpr_windows_rdp_credentials = {
+    username = "placeholder"
+    password = "placeholder"
+  }
 }
