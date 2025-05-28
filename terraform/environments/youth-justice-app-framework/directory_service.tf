@@ -28,7 +28,7 @@ module "ds" {
 
 
   ds_managed_ad_directory_name = "i2n.com"
-  ds_managed_ad_short_name     = "i2n"
+  ds_managed_ad_short_name     = "i2N"
   management_keypair_name      = "ad_management_server"
   ds_managed_ad_secret_key     = module.kms.key_arn
 
