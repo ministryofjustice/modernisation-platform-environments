@@ -231,7 +231,7 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_ingress" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "soa_db_workspace_ingress_nonprod" {
-  count             =  local.is-production ? 0 : 1
+  count             = local.is-production ? 0 : 1
   security_group_id = aws_security_group.soa_db.id
   description       = "Workspace to Database Ingress"
   ip_protocol       = "TCP"
