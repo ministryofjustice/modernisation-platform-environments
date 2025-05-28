@@ -352,9 +352,16 @@ rm -f /tmp/amazon-corretto-21-x64-linux-jdk.rpm
 # Set up service (headless BI)
 mkdir -p /opt/headless-bi
 cd /opt/headless-bi
-aws s3 cp s3://dpr-artifact-store-development/third-party/headless-bi/hmpps-probation-headless-bi-poc.jar ./headless-bi.jar
+
+# Download and unzip JAR
+#aws s3 cp s3://dpr-artifact-store-development/third-party/headless-bi/hmpps-probation-headless-bi-poc.jar ./headless-bi.jar
+aws s3 cp s3://dpr-artifact-store-development/third-party/zip_files/hmpps-probation-headless-bi-poc/hmpps-probation-headless-bi-poc.jar.zip ./hmpps-probation-headless-bi-poc.jar.zip
+unzip ./hmpps-probation-headless-bi-poc.jar.zip
+
+# Set correct ownership
 chown -R ec2-user:ec2-user /opt/headless-bi
 
+# Create systemd service
 cat <<EOF > /etc/systemd/system/headless-bi.service
 [Unit]
 Description=headless-bi Java Service
@@ -362,7 +369,9 @@ After=network.target
 
 [Service]
 WorkingDirectory=/opt/headless-bi
-ExecStart=/usr/bin/java -jar /opt/headless-bi/headless-bi.jar
+ExecStart=/usr/bin/java -jar /opt/headless-bi/hmpps-probation-headless-bi-poc.jar
+User=ec2-user
+Group=ec2-user
 SuccessExitStatus=143
 Restart=on-failure
 RestartSec=10
@@ -371,7 +380,7 @@ RestartSec=10
 WantedBy=multi-user.target
 EOF
 
+# Enable and start service
 systemctl daemon-reload
 systemctl enable headless-bi.service
 systemctl start headless-bi.service
-## ODATA DEMO 
