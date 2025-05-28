@@ -136,7 +136,7 @@ resource "aws_db_instance" "appdb1" {
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_password.result
-  vpc_security_group_ids                = [aws_security_group.cloud_platform_sec_group.id, aws_security_group.bastion_sec_group.id, aws_security_group.vpc_sec_group.id]
+  vpc_security_group_ids                = var.environment == "development" ? [aws_security_group.cloud_platform_sec_group.id, aws_security_group.bastion_sec_group.id, aws_security_group.vpc_sec_group[0].id, aws_security_group.mlra_ecs_sec_group.id] : [aws_security_group.cloud_platform_sec_group.id, aws_security_group.bastion_sec_group.id, aws_security_group.mlra_ecs_sec_group.id]
   skip_final_snapshot                   = false
   final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name                  = aws_db_parameter_group.parameter_group_19.name
@@ -151,7 +151,10 @@ resource "aws_db_instance" "appdb1" {
   kms_key_id                            = var.kms_key_arn
   apply_immediately                     = true
   snapshot_identifier                   = var.snapshot_arn
-  tags = var.tags
+  tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
+    var.tags
+  )
 
   timeouts {
     create = "60m"
@@ -160,8 +163,7 @@ resource "aws_db_instance" "appdb1" {
 
 }
 
-# Normal Security Group
-
+# Access from Cloud Platform
 resource "aws_security_group" "cloud_platform_sec_group" {
   name        = "cloud-platform-sec-group"
   description = "RDS access from Cloud Platform via Transit gateway"
@@ -188,24 +190,26 @@ resource "aws_security_group" "cloud_platform_sec_group" {
   }
 }
 
+# Access fromm MAAT Application
 resource "aws_security_group" "vpc_sec_group" {
+  count = var.environment == "development" ? 1:0
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
   ingress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [var.ecs_cluster_sec_group_id]
   }
 
   egress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [var.ecs_cluster_sec_group_id]
   }
 
@@ -214,24 +218,52 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 }
 
+# Access from MLRA Application
+resource "aws_security_group" "mlra_ecs_sec_group" {
+  name        = "mlra-ecs-sec-group"
+  description = "RDS Access from the MLRA application"
+  vpc_id      = var.vpc_shared_id
+
+  ingress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  }
+
+  egress {
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-mlra-ecs-sec-group"
+  }
+}
+
+# Access from Bastion
 resource "aws_security_group" "bastion_sec_group" {
   name        = "bastion-sec-group"
   description = "Bastion Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
   ingress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [var.bastion_security_group_id]
   }
 
   egress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [var.bastion_security_group_id]
   }
 
