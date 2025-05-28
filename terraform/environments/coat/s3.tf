@@ -265,7 +265,12 @@ module "coat_s3_kms" {
       ]
       resources = ["*"]
       effect    = "Allow"
-      principals = ["*"]
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+      ]
     }
   ]
 
