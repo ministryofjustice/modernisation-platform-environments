@@ -14,7 +14,12 @@ module "dms_task" {
     "g4s_tasking",
     "g4s_fep",
     "g4s_emsys_tpims",
-    "capita_forms_and_subject_id"
+    "capita_forms_and_subject_id",
+    "LCM_ARCHIVE_2019",
+    "LCM_ARCHIVE_2020",
+    "LCM_ARCHIVE_2021",
+    "LCM_ARCHIVE_2022",
+    "LCM_ARCHIVE_2023"
   ] : ["test"])
 
   database_name = each.key

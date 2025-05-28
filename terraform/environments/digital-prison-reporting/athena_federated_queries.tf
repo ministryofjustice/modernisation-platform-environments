@@ -57,9 +57,9 @@ locals {
     aws_secretsmanager_secret.onr[0].arn,
     aws_secretsmanager_secret.ndelius[0].arn,
     aws_secretsmanager_secret.ndmis[0].arn
-  ]: []
+  ] : []
 
-  preproduction_federated_query_credentials_secret_arns = local.is-preproduction?  [
+  preproduction_federated_query_credentials_secret_arns = local.is-preproduction ? [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
     aws_secretsmanager_secret.ndmis[0].arn
@@ -74,8 +74,8 @@ locals {
   federated_query_connection_strings_map = (local.is_dev_or_test ? local.dev_and_test_federated_query_connections :
   (local.is-preproduction ? local.preproduction_federated_query_connections : local.production_federated_query_connections))
 
-  federated_query_credentials_secret_arns =  (local.is_dev_or_test ? local.dev_and_test_federated_query_credentials_secret_arns :
-    (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns : local.production_federated_query_credentials_secret_arns))
+  federated_query_credentials_secret_arns = (local.is_dev_or_test ? local.dev_and_test_federated_query_credentials_secret_arns :
+  (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns : local.production_federated_query_credentials_secret_arns))
 }
 
 module "athena_federated_query_connector_oracle" {

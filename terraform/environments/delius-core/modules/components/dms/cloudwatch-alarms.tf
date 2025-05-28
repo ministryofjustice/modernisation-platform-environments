@@ -172,28 +172,28 @@ module "pagerduty_core_alerts" {
 # Therefore we want to stop the alarm being raised in the first place.   We can do this by disabling the alarm actions out
 # of hours.   Cloud Watch alarms do not have this functionality natively so we use a scheduled Lambda function to implement it.
 locals {
-    disable_latency_alarm_defaults = { 
-       start_time      = null
-       end_time        = null
-       disable_weekend = false
-    }
-   # Create normalized version of map which includes above defaults if not specified for the environment
-   disable_latency_alarms = merge(local.disable_latency_alarm_defaults,lookup(var.dms_config,"disable_latency_alarms",{}))
+  disable_latency_alarm_defaults = {
+    start_time      = null
+    end_time        = null
+    disable_weekend = false
+  }
+  # Create normalized version of map which includes above defaults if not specified for the environment
+  disable_latency_alarms = merge(local.disable_latency_alarm_defaults, lookup(var.dms_config, "disable_latency_alarms", {}))
 }
 
 module "disable_out_of_hours_alarms" {
-   count  = local.disable_latency_alarms.start_time == null ? 0 : 1
-   source = "../../../../../modules/schedule_alarms_lambda"
+  count  = local.disable_latency_alarms.start_time == null ? 0 : 1
+  source = "../../../../../modules/schedule_alarms_lambda"
 
-   lambda_function_name = "toggle-dms-cdc-latency-alarms"
+  lambda_function_name = "toggle-dms-cdc-latency-alarms"
 
-   start_time      = local.disable_latency_alarms.start_time
-   end_time        = local.disable_latency_alarms.end_time
-   disable_weekend = local.disable_latency_alarms.disable_weekend
+  start_time      = local.disable_latency_alarms.start_time
+  end_time        = local.disable_latency_alarms.end_time
+  disable_weekend = local.disable_latency_alarms.disable_weekend
 
-   alarm_patterns  = ["dms-cdc-latency-*"]
+  alarm_patterns = ["dms-cdc-latency-*"]
 
-   tags = var.tags
+  tags = var.tags
 }
 
 
