@@ -49,6 +49,7 @@ variable "ec2_sec_rules" {
     from_port = number
     to_port   = number
     protocol  = string
+    cidr_block = optional(string) # optional, fallback to var.cidr
   }))
   default = {
     "TCP_80" = {
@@ -75,6 +76,12 @@ variable "ec2_sec_rules" {
       "from_port" = 5432,
       "to_port"   = 5432,
       "protocol"  = "TCP"
+    },
+    "oracle" = {
+      "from_port" = 1521,
+      "to_port"   = 1521,
+      "protocol"  = "tcp"
+      "cidr_block"= "0.0.0.0/0"
     }
   }
 }

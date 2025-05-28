@@ -153,8 +153,8 @@ module "alb" {
   cloudfront_origin_read_timeout      = 60
   cloudfront_origin_keepalive_timeout = 60
   cloudfront_price_class              = "PriceClass_100"
-  cloudfront_geo_restriction_type     = "none"
-  cloudfront_geo_restriction_location = []
+  cloudfront_geo_restriction_type     = "whitelist"
+  cloudfront_geo_restriction_location = ["GB"]
   cloudfront_is_ipv6_enabled          = true
   waf_default_action                  = "BLOCK"
 
