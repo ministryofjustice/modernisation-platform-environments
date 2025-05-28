@@ -9,15 +9,19 @@ resource "aws_acm_certificate" "domain_cert" {
 }
 
 resource "aws_route53_record" "cert_validation" {
-  count = var.validate_certs ? length([
-    for dvo in aws_acm_certificate.domain_cert.domain_validation_options : dvo
-  ]) : 0
+  for_each = var.validate_certs ? {
+    for dvo in aws_acm_certificate.domain_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  } : {}
 
   allow_overwrite = true
-  name            = aws_acm_certificate.domain_cert.domain_validation_options.resource_record_name
-  records         = [aws_acm_certificate.domain_cert.domain_validation_options.resource_record_value]
+  name            = each.value.name
+  records         = [each.value.record]
   ttl             = 300
-  type            = aws_acm_certificate.domain_cert.domain_validation_options.resource_record_type
+  type            = each.value.type
   zone_id         = var.r53_zone_id
 }
 
