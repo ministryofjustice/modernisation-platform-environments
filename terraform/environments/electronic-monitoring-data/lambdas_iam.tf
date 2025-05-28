@@ -465,7 +465,7 @@ resource "aws_iam_role" "calculate_checksum" {
 
 data "aws_iam_policy_document" "calculate_checksum" {
   statement {
-    sid    = "S3Permissions"
+    sid    = "S3ObjectPermissions"
     effect = "Allow"
     actions = [
       "s3:PutObject",
@@ -476,9 +476,16 @@ data "aws_iam_policy_document" "calculate_checksum" {
       "s3:GetObjectTagging",
       "s3:GetObjectAttributes",
       "s3:GetObjectVersionAttributes",
-      "s3:ListBucket"
     ]
     resources = ["${module.s3-data-bucket.bucket.arn}/*"]
+  }
+  statement {
+    sid    = "S3BucketPermissions"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = [module.s3-data-bucket.bucket.arn]
   }
 }
 

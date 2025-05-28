@@ -346,16 +346,16 @@ resource "aws_cloudwatch_log_subscription_filter" "userjourney" {
 #### iam role and permissions are made in aws-config.tf file
 
 resource "aws_sns_topic_subscription" "datadog_securityhub-alarms" {
-  topic_arn              = "arn:aws:sns:eu-west-2:${var.aws_account_id}:securityhub-alarms"
-  protocol               = "firehose"
-  endpoint               = aws_kinesis_firehose_delivery_stream.to_datadog.arn
-  subscription_role_arn  = aws_iam_role.awsconfig_sns_to_datadog.arn
+  topic_arn             = "arn:aws:sns:eu-west-2:${var.aws_account_id}:securityhub-alarms"
+  protocol              = "firehose"
+  endpoint              = aws_kinesis_firehose_delivery_stream.to_datadog.arn
+  subscription_role_arn = aws_iam_role.awsconfig_sns_to_datadog.arn
 }
 
 resource "aws_sns_topic_subscription" "datadog_sechub_findings" {
-  topic_arn              = "arn:aws:sns:eu-west-2:${var.aws_account_id}:sechub_findings_sns_topic"
-  protocol               = "firehose"
-  endpoint               = aws_kinesis_firehose_delivery_stream.to_datadog.arn
-  subscription_role_arn  = aws_iam_role.awsconfig_sns_to_datadog.arn
+  topic_arn             = "arn:aws:sns:eu-west-2:${var.aws_account_id}:sechub_findings_sns_topic"
+  protocol              = "firehose"
+  endpoint              = aws_kinesis_firehose_delivery_stream.to_datadog.arn
+  subscription_role_arn = aws_iam_role.awsconfig_sns_to_datadog.arn
 }
 

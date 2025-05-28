@@ -119,6 +119,20 @@ resource "aws_security_group" "cluster_ec2" {
   )
 }
 
+# Specific Security Group Rule for Access to MAATDB
+
+resource "aws_security_group_rule" "mlra_to_maatdb_sg_rule_outbound" {
+  count                    = var.environment == "production" || var.environment == "development" ? 1 : 0
+  type                     = "egress"
+  from_port                = 1521
+  to_port                  = 1521
+  protocol                 = "tcp"
+  description              = "This rule is needed for MAATDB to reference the MLRA ECS sec group ID"
+  security_group_id        = aws_security_group.cluster_ec2.id
+  source_security_group_id = var.maatdb_rds_sec_group_id
+}
+
+
 # always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
 data "aws_ssm_parameter" "ecs_optimized_ami_1" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
