@@ -16,31 +16,6 @@ data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
   }
 }
 
-data "aws_iam_policy_document" "business_unit_kms_key_access" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey",
-      "kms:CreateGrant",
-      "kms:ListGrants",
-      "kms:RevokeGrant"
-    ]
-    resources = [
-      var.account_config.kms_keys.general_shared,
-    ]
-  }
-}
-
-resource "aws_iam_policy" "business_unit_kms_key_access" {
-  name   = "${var.env_name}-${var.db_suffix}-business-unit-kms-key-access-policy"
-  path   = "/"
-  policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
-}
-
 data "aws_iam_policy_document" "core_shared_services_bucket_access" {
   statement {
     effect = "Allow"
@@ -188,14 +163,4 @@ data "aws_iam_policy_document" "combined_instance_policy" {
 resource "aws_iam_policy" "combined_instance_policy" {
   name   = "${var.account_info.application_name}-${var.env_name}-oracle-${var.db_suffix}-combined-instance-policy"
   policy = data.aws_iam_policy_document.combined_instance_policy.json
-}
-
-# Must attach KMS Policies for All Environments even through Role is Created Once per Account
-data "aws_iam_role" "aws_backup_default_service_role" {
-  name = "AWSBackupDefaultServiceRole"
-}
-
-resource "aws_iam_role_policy_attachment" "backup_service_kms_policy_attachment" {
-  role       = data.aws_iam_role.aws_backup_default_service_role.name
-  policy_arn = aws_iam_policy.business_unit_kms_key_access.arn
 }
