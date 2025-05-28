@@ -23,7 +23,7 @@ module "aurora" {
   alb_route53_record_name    = "db-yjafrds01"
 
   #one time restore from a shared snapshot #todo remove this post migration. Take from secrets manager
-  snapshot_identifier = data.aws_secretsmanager_secret_version.snapshot-identifier-secret-version.secret_string != "" ? data.aws_secretsmanager_secret_version.snapshot-identifier-secret-version.secret_string.snapshot_identifier : local.application_data.accounts[local.environment].snapshot_identifier
+  snapshot_identifier = data.aws_secretsmanager_secret_version.snapshot-identifier-secret-version.secret_string != "" ? data.aws_secretsmanager_secret_version.snapshot-identifier-secret-version.secret_string : local.application_data.accounts[local.environment].snapshot_identifier
 
   user_passwords_to_reset = ["postgres_rotated", "redshift_readonly", "ycs_team", "postgres"]
   db_name                 = "yjafrds01"
