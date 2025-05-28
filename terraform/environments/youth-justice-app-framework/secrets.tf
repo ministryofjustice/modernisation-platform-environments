@@ -13,7 +13,7 @@ resource "aws_secretsmanager_secret" "snapshot_identifier" {
 resource "aws_secretsmanager_secret_version" "snapshot_identifier" {
   #checkov:skip=CKV2_AWS_57:temporary secret, no rotation needed
   secret_id     = aws_secretsmanager_secret.snapshot_identifier.id
-  secret_string = ""
+  secret_string = "dummy"
   lifecycle {
     ignore_changes = [secret_string]
   }
