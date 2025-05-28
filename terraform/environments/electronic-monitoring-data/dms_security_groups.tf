@@ -1,5 +1,5 @@
 # -------------------------------------------------------
-# get glue, s3 ip ranges and define ports
+# get glue, s3 ip ranges
 # -------------------------------------------------------
 
 data "aws_ip_ranges" "london_s3" {
@@ -12,118 +12,117 @@ data "aws_ip_ranges" "london_glue" {
   services = ["glue"]
 }
 
-variable "sqlserver_https_ports" {
-  description = "List of ports required for Glue outbound connections"
-  type        = list(number)
-  default     = [1433, 443]
-}
-
 # -------------------------------------------------------
-# Define groups and rules
+# Security Groups
 # -------------------------------------------------------
 
-resource "aws_security_group" "dms_ri_security_group" {
-  name        = "dms_rep_instance_access_tf"
-  description = "Secuity Group having relevant acess for DMS"
+# Security group for DMS-to-S3 communication
+resource "aws_security_group" "dms_to_s3_security_group" {
+  name        = "dms-to-s3-security-group"
+  description = "Security Group for DMS communication with S3"
   vpc_id      = data.aws_vpc.shared.id
 
   tags = merge(
     local.tags,
     {
-      Resource_Type = "DMS Replication Instance Access",
+      Resource_Type = "DMS to S3 VPC Endpoint Security Group",
     }
   )
 }
 
-resource "aws_security_group_rule" "dms_tcp_outbound" {
-  for_each          = toset([for port in var.sqlserver_https_ports : tostring(port)])
-  security_group_id = aws_security_group.dms_ri_security_group.id
+resource "aws_security_group" "glue_security_group" {
+  name        = "glue-security-group"
+  description = "Security Group for Glue client"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "Glue Security Group",
+    }
+  )
+}
+
+resource "aws_security_group" "rds_security_group" {
+  name        = "rds-security-group"
+  description = "Security Group for RDS server"
+  vpc_id      = data.aws_vpc.shared.id
+
+  tags = merge(
+    local.tags,
+    {
+      Resource_Type = "RDS Security Group",
+    }
+  )
+}
+
+# -------------------------------------------------------
+# DMS to S3 Security Group Rules
+# -------------------------------------------------------
+
+resource "aws_security_group_rule" "dms_to_s3_egress" {
+  security_group_id = aws_security_group.dms_to_s3_security_group.id
   type              = "egress"
   cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
   protocol          = "tcp"
   from_port         = each.value
   to_port           = each.value
-  description       = "DMS Terraform"
+  description       = "Allow DMS to communicate with S3 over HTTPS"
 }
 
-resource "aws_vpc_security_group_egress_rule" "dms_db_ob_access" {
+# -------------------------------------------------------
+# Glue to RDS Security Group Rules - SQL Server communication
+# -------------------------------------------------------
 
-  security_group_id            = aws_security_group.dms_ri_security_group.id
-  description                  = "dms_rds_db_outbound"
+resource "aws_vpc_security_group_ingress_rule" "glue_to_rds_ingress" {
+  security_group_id            = aws_security_group.glue_security_group.id
+  referenced_security_group_id = aws_security_group.rds_security_group.id
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id = aws_security_group.db.id
+  description                  = "Allow incoming traffic *from* RDS *to* Glue on SQL Server port 1433"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "dms_to_rds_sg_rule" {
-  security_group_id = aws_security_group.db.id
-
-  referenced_security_group_id = aws_security_group.dms_ri_security_group.id
+resource "aws_vpc_security_group_egress_rule" "glue_to_rds_egress" {
+  security_group_id            = aws_security_group.glue_security_group.id
+  referenced_security_group_id = aws_security_group.rds_security_group.id
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  description                  = "DMS Terraform"
+  description                  = "Allow outgoing traffic *to* Glue *from* RDS on SQL Server port 1433"
 }
 
-resource "aws_security_group_rule" "allow_glue_athena" {
-  type                     = "ingress"
-  from_port                = 443
-  to_port                  = 443
-  protocol                 = "tcp"
-  security_group_id        = aws_security_group.dms_ri_security_group.id
-  source_security_group_id = aws_security_group.dms_ri_security_group.id
-  description              = "Allow inbound traffic from DMS replication instance to Glue and Athena endpoints"
-}
+# -------------------------------------------------------
+# RDS to Glue Security Group Rules - HTTPS traffic
+# -------------------------------------------------------
 
-# ---------------------------------------------------------------------------
-
-resource "aws_security_group" "glue_rds_conn_security_group" {
-  #checkov:skip=CKV2_AWS_5
-  name        = "glue-rds-sqlserver-connection-tf"
-  description = "Secuity Group for Glue-RDS-Connection"
-  vpc_id      = data.aws_vpc.shared.id
-
-  tags = merge(
-    local.tags,
-    {
-      Resource_Type = "Secuity Group for Glue-RDS-Connection",
-    }
-  )
-}
-
-resource "aws_security_group_rule" "glue_rds_conn_outbound" {
-  #checkov:skip=CKV_AWS_277
-  type                     = "egress"
-  security_group_id        = aws_security_group.glue_rds_conn_security_group.id
-  source_security_group_id = aws_security_group.glue_rds_conn_security_group.id
-  protocol                 = "tcp"
-  from_port                = 0
-  to_port                  = 65535
-  description              = "Required ports open for Glue-RDS-Connection"
-}
-
-resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_inbound" {
-  security_group_id = aws_security_group.glue_rds_conn_security_group.id
-
-  referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
+resource "aws_vpc_security_group_ingress_rule" "rds_to_glue_ingress" {
+  security_group_id            = aws_security_group.rds_security_group.id
+  referenced_security_group_id = aws_security_group.glue_security_group.id
   ip_protocol                  = "tcp"
-  from_port                    = 0
-  to_port                      = 65535
-  description                  = "Required ports open for Glue-RDS-Connection"
-  #checkov:skip=CKV_AWS_260
-  #checkov:skip=CKV_AWS_24
-  #checkov:skip=CKV_AWS_25
+  from_port                    = 443
+  to_port                      = 443
+  description                  = "Allow traffic *from* Glue *to* RDS on HTTPS port"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_db_inbound" {
-  security_group_id = aws_security_group.db.id
-
-  referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
+resource "aws_vpc_security_group_egress_rule" "rds_to_glue_egress" {
+  security_group_id            = aws_security_group.rds_security_group.id
+  referenced_security_group_id = aws_security_group.glue_security_group.id
   ip_protocol                  = "tcp"
-  from_port                    = 1433
-  to_port                      = 1433
-  description                  = "Required ports open for Glue-RDS-Connection"
+  from_port                    = 443
+  to_port                      = 443
+  description                  = "Allow traffic *to* Glue *from* RDS on HTTPS port"
 }
 
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------
+# Self-referencing Security Group Rules
+# -------------------------------------------------------
+
+resource "aws_vpc_security_group_egress_rule" "rds_self_reference" {
+  security_group_id = aws_security_group.rds_security_group.id
+  referenced_security_group_id = aws_security_group.glue_security_group.id
+  ip_protocol       = "tcp"
+  from_port         = 0
+  to_port           = 65535
+  description       = "Allow all outbound traffic within the RDS security group to itself"
+}
