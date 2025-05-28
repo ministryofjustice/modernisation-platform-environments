@@ -122,13 +122,13 @@ resource "aws_security_group" "cluster_ec2" {
 # Specific Security Group Rule for Access to MAATDB
 
 resource "aws_security_group_rule" "mlra_to_maatdb_sg_rule_outbound" {
-  count = var.environment == "production" || var.environment == "development" ? 1 : 0
-  type              = "egress"
-  from_port         = 1521
-  to_port           = 1521
-  protocol          = "tcp"
-  description       = "This rule is needed for MAATDB to reference the MLRA ECS sec group ID" 
-  security_group_id = aws_security_group.cluster_ec2.id
+  count                    = var.environment == "production" || var.environment == "development" ? 1 : 0
+  type                     = "egress"
+  from_port                = 1521
+  to_port                  = 1521
+  protocol                 = "tcp"
+  description              = "This rule is needed for MAATDB to reference the MLRA ECS sec group ID"
+  security_group_id        = aws_security_group.cluster_ec2.id
   source_security_group_id = var.maatdb_rds_sec_group_id
 }
 
@@ -512,6 +512,13 @@ resource "aws_iam_policy" "ecs_task_execution_ssm_policy" { #tfsec:ignore:aws-ia
         "ssm:GetParameters"
       ],
       "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.gtm_id_secret_name}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.infox_client_secret}"]
     }
   ]
 }

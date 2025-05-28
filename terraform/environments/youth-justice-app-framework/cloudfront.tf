@@ -15,4 +15,5 @@ module "cloudfront_yjaf" {
   environment                    = local.environment
   project_name                   = local.project_name
   tags                           = local.tags
+  cloudfront_distribution_id     = module.cloudfront_yjaf.cloudfront_distribution_id
 }

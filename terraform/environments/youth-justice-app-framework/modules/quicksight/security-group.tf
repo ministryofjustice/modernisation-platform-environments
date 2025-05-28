@@ -21,7 +21,7 @@ module "quicksight_sg" {
   ]
 
   egress_with_source_security_group_id = [
-     {
+    {
       rule                     = "postgresql-tcp"
       source_security_group_id = var.postgresql_sg_id
     },

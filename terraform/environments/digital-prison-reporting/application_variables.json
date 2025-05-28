@@ -335,7 +335,8 @@
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": false
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false
     },
     "preproduction": {
       "project_short_id": "dpr",
