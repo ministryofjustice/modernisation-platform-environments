@@ -35,12 +35,18 @@ Set-Service -Name TermService -StartupType Automatic
 Start-Service -Name TermService
 
 # Download Power BI installer
+$powerBIInstaller = "C:\Windows\Temp\PBIDesktopSetup_x64.exe"
 & "$awsCliPath\aws.exe" s3 cp `
   s3://dpr-artifact-store-development/third-party/PowerBI/PBIDesktopSetup_x64.exe `
-  C:\Windows\Temp\PBIDesktopSetup_x64.exe
+  $powerBIInstaller
 
-# Install Power BI silently
-Start-Process -FilePath "C:\Windows\Temp\PBIDesktopSetup_x64.exe" -ArgumentList "/quiet /norestart" -Wait
+# Install Power BI silently if downloaded
+if (Test-Path $powerBIInstaller) {
+  Write-Output "Installing Power BI Desktop..."
+  Start-Process -FilePath $powerBIInstaller -ArgumentList "/quiet /norestart" -Wait
+} else {
+  Write-Output "Power BI installer not found at $powerBIInstaller"
+}
 
-Write-Output "✅ Bootstrap complete."
+Write-Output "Bootstrap complete."
 </powershell>
