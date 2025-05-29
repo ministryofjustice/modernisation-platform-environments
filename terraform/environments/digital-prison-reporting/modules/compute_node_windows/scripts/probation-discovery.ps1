@@ -1,8 +1,9 @@
 <powershell>
+# --- Setup transcript and COM1 logging ---
 $logPath = "C:\Windows\Temp\bootstrap.log"
 Start-Transcript -Path $logPath -Force
 
-# Output to both transcript and EC2 system log
+# Output to both transcript and EC2 system log (COM1)
 function Write-Log {
   param ([string]$Message)
   $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
@@ -12,14 +13,17 @@ function Write-Log {
   $formatted | Out-File -Append -FilePath "COM1"
 }
 
+# Explicit early message for EC2 console
+"Bootstrap script started at $(Get-Date)" | Out-File -Append -FilePath "COM1"
+
 Write-Log "Bootstrapping Windows EC2 instance..."
 
-# Install AWS CLI
+# --- Install AWS CLI ---
 Write-Log "Installing AWS CLI..."
 Invoke-WebRequest -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "C:\Windows\Temp\AWSCLIV2.msi"
 Start-Process "msiexec.exe" -ArgumentList "/i C:\Windows\Temp\AWSCLIV2.msi /qn" -Wait
 
-# Add AWS CLI to system PATH
+# --- Add AWS CLI to system PATH ---
 $awsCliPath = "C:\Program Files\Amazon\AWSCLIV2"
 $currentPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
 if ($currentPath -notlike "*$awsCliPath*") {
@@ -29,18 +33,23 @@ if ($currentPath -notlike "*$awsCliPath*") {
   Write-Log "AWS CLI already in PATH"
 }
 
-# Fetch RDP credentials from AWS Secrets Manager
+# --- Fetch RDP credentials from AWS Secrets Manager ---
 Write-Log "Fetching RDP credentials from Secrets Manager..."
-$secretJson = & "$awsCliPath\aws.exe" secretsmanager get-secret-value `
-  --secret-id "compute/dpr-windows-rdp-credentials" `
-  --query SecretString `
-  --output text `
-  --region eu-west-2
+try {
+  $secretJson = & "$awsCliPath\aws.exe" secretsmanager get-secret-value `
+    --secret-id "compute/dpr-windows-rdp-credentials" `
+    --query SecretString `
+    --output text `
+    --region eu-west-2
+} catch {
+  Write-Log "Failed to retrieve secret from Secrets Manager: $_"
+}
 
 $secret = $secretJson | ConvertFrom-Json
 $username = $secret.username
 $password = $secret.password
 
+# --- Create user if not exists ---
 if (-not [string]::IsNullOrWhiteSpace($username) -and -not [string]::IsNullOrWhiteSpace($password)) {
   $existingUser = net user $username 2>$null
   if (-not $?) {
@@ -54,21 +63,19 @@ if (-not [string]::IsNullOrWhiteSpace($username) -and -not [string]::IsNullOrWhi
   Write-Log "Error: Username or password is empty. Skipping user creation."
 }
 
-
-# Enable Remote Desktop and firewall
+# --- Enable Remote Desktop ---
 Write-Log "Enabling Remote Desktop and configuring firewall..."
 Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
 Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
 Set-Service -Name TermService -StartupType Automatic
 Start-Service -Name TermService
 
-# Download Power BI installer from S3
+# --- Download and Install Power BI ---
 Write-Log "Downloading Power BI installer from S3..."
 & "$awsCliPath\aws.exe" s3 cp `
   s3://dpr-artifact-store-development/third-party/PowerBI/PBIDesktopSetup_x64.exe `
   C:\Windows\Temp\PBIDesktopSetup_x64.exe
 
-# Install Power BI silently
 $installer = "C:\Windows\Temp\PBIDesktopSetup_x64.exe"
 if (Test-Path $installer) {
   Write-Log "Installing Power BI Desktop..."
@@ -77,8 +84,8 @@ if (Test-Path $installer) {
   Write-Log "Power BI installer not found. Skipping installation."
 }
 
-# Create marker file
-Write-Log "Bootstrap script completed."
+# --- Final Marker and End ---
+Write-Log "Bootstrap script completed successfully."
 New-Item -Path "C:\Windows\Temp\bootstrap-success.txt" -ItemType File -Force
 
 Stop-Transcript
