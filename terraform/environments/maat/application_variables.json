@@ -42,7 +42,8 @@
       "app_log_level": "debug",
       "maat_ats_oauth_url": "https://laa-crime-auth-ats.auth.eu-west-2.amazoncognito.com/oauth2/token",
       "maat_ats_endpoint": "/api/internal/v1/application-tracking-output-result",
-      "maat_ats_base_url": "https://laa-crime-application-tracking-service-dev.apps.live.cloud-platform.service.justice.gov.uk"
+      "maat_ats_base_url": "https://laa-crime-application-tracking-service-dev.apps.live.cloud-platform.service.justice.gov.uk",
+      "maatdb_rds_sec_group_id": "sg-0727aa271de73eb1d"
     },
     "test": {
       "cloudfront_domain_name": "modernisation-platform.service.justice.gov.uk"
@@ -92,7 +93,8 @@
       "app_log_level": "info",
       "maat_ats_oauth_url": "https://laa-crime-auth-ats.auth.eu-west-2.amazoncognito.com/oauth2/token",
       "maat_ats_endpoint": "/api/internal/v1/application-tracking-output-result",
-      "maat_ats_base_url": "https://laa-crime-application-tracking-service-prod.apps.live.cloud-platform.service.justice.gov.uk"
+      "maat_ats_base_url": "https://laa-crime-application-tracking-service-prod.apps.live.cloud-platform.service.justice.gov.uk",
+      "maatdb_rds_sec_group_id": "sg-031a88ae1c02b46a4"
     }
   }
 }
