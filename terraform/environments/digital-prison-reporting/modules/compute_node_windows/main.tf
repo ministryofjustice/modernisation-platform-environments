@@ -132,6 +132,11 @@ resource "aws_autoscaling_group" "windows_asg" {
     propagate_at_launch = true
   }
 
+  instance_refresh {
+    strategy = "Rolling"
+    triggers = ["launch_template", "desired_capacity"] # You can add any argument from ASG here, if those has changes, ASG Instance Refresh will trigger
+  }
+
   dynamic "tag" {
     for_each = var.tags
     content {
