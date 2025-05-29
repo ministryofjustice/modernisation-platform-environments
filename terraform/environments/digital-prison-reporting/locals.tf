@@ -98,6 +98,8 @@ locals {
   s3_read_write_policy   = "${local.project}_s3_read_write_policy"
   apigateway_get_policy  = "${local.project}_apigateway_get_policy"
   invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
+  secretsmanager_read_policy = "${local.project}_secretsmanager_read_policy"
+
 
   trigger_glue_job_policy = "${local.project}_start_glue_job_policy"
   start_dms_task_policy   = "${local.project}_start_dms_task_policy"
