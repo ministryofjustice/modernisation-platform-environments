@@ -47,8 +47,8 @@
         "value": "${region}"
       },
       {
-        "name": "MAAT_API_END_POINT",
-        "value": "${maat_api_end_point}"
+        "name": "MAAT_API_ENDPOINT",
+        "value": "${maat_api_endpoint}"
       },
       {
         "name": "MAAT_API_OAUTH_SCOPE",

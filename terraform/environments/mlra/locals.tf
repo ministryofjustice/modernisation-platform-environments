@@ -38,7 +38,9 @@ locals {
     ecr_url               = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
     docker_image_tag      = local.application_data.accounts[local.environment].docker_image_tag
     region                = local.application_data.accounts[local.environment].region
-    maat_api_end_point    = local.application_data.accounts[local.environment].maat_api_end_point
+    maat_api_endpoint     = local.application_data.accounts[local.environment].maat_api_endpoint
+    maat_api_oauth_scope  = local.application_data.accounts[local.environment].maat_api_oauth_scope
+    maat_api_oauth_url    = local.application_data.accounts[local.environment].maat_api_oauth_url
     maat_db_url           = local.application_data.accounts[local.environment].maat_db_url
     maat_libra_wsdl_url   = local.application_data.accounts[local.environment].maat_libra_wsdl_url
     sentry_env            = local.environment
