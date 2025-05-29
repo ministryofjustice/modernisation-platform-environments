@@ -1,110 +1,98 @@
 <powershell>
-# IAM NEW SCRIPT NEW
-# --- Setup COM1 logging and transcript (separate files) ---
+# --- Logging setup ---
+#---New logs----
 $logPath = "C:\Windows\Temp\bootstrap-transcript.log"
-$consoleLog = "COM1"
 
-"Bootstrap script started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" | Out-File -Append -FilePath $consoleLog
+Start-Transcript -Path $logPath -Force
+Write-Host "Bootstrap started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
 
-function Write-Log {
-  param ([string]$Message)
-  $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  "$timestamp - $Message" | Out-File -Append -FilePath $consoleLog
-}
-
-Write-Log "Starting transcript...."
+# --- Install AWS CLI ---
 try {
-  Start-Transcript -Path $logPath -Force
+    Write-Host "Installing AWS CLI..."
+    Invoke-WebRequest -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "C:\Windows\Temp\AWSCLIV2.msi"
+    Start-Process "msiexec.exe" -ArgumentList "/i C:\Windows\Temp\AWSCLIV2.msi /qn" -Wait
+    Write-Host "AWS CLI installed."
 } catch {
-  Write-Log "Failed to start transcript: $_"
+    Write-Host "ERROR: AWS CLI installation failed: $_"
 }
 
-Write-Log "Installing AWS CLI..."
-try {
-  Invoke-WebRequest -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "C:\Windows\Temp\AWSCLIV2.msi"
-  Start-Process "msiexec.exe" -ArgumentList "/i C:\Windows\Temp\AWSCLIV2.msi /qn" -Wait
-} catch {
-  Write-Log "Failed to install AWS CLI: $_"
-}
-
+# --- Add to PATH ---
 $awsCliPath = "C:\Program Files\Amazon\AWSCLIV2"
 $currentPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
 if ($currentPath -notlike "*$awsCliPath*") {
-  Write-Log "Adding AWS CLI to system PATH..."
-  [Environment]::SetEnvironmentVariable("Path", "$currentPath;$awsCliPath", [EnvironmentVariableTarget]::Machine)
+    [Environment]::SetEnvironmentVariable("Path", "$currentPath;$awsCliPath", [EnvironmentVariableTarget]::Machine)
 }
 
-Write-Log "Fetching RDP credentials..."
+# --- Fetch RDP credentials ---
 try {
-  $secretJson = & "$awsCliPath\aws.exe" secretsmanager get-secret-value `
-    --secret-id "compute/dpr-windows-rdp-credentials" `
-    --query SecretString `
-    --output text `
-    --region eu-west-2
-  $secret = $secretJson | ConvertFrom-Json
-  $username = $secret.username
-  $password = $secret.password
-  Write-Log "Got username: $username"
-} catch {
-  Write-Log "Error retrieving secret: $_"
-}
+    Write-Host "Fetching RDP credentials..."
+    $secretJson = & "$awsCliPath\aws.exe" secretsmanager get-secret-value `
+      --secret-id "compute/dpr-windows-rdp-credentials" `
+      --query SecretString `
+      --output text `
+      --region eu-west-2
 
-# --- Reliable user creation using net user + LASTEXITCODE ---
-if ($username -and $password) {
-  try {
-    Write-Log "Checking if user $username exists..."
-    $null = cmd /c "net user $username"
-    if ($LASTEXITCODE -ne 0) {
-      Write-Log "User $username does not exist. Creating..."
-      net user $username $password /add
-      net localgroup administrators $username /add
-    } else {
-      Write-Log "User $username exists. Resetting password..."
-      net user $username $password
+    $secret = $secretJson | ConvertFrom-Json
+    $username = $secret.username
+    $password = $secret.password
+
+    if (-not $username -or -not $password) {
+        throw "Username or password is empty"
     }
-  } catch {
-    Write-Log "User creation/reset failed: $_"
-  }
-} else {
-  Write-Log "Username or password missing"
-}
 
-Write-Log "Enabling RDP and firewall..."
-try {
-  Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
-  Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-  Set-Service -Name TermService -StartupType Automatic
-  Start-Service -Name TermService
+    Write-Host "Retrieved username: $username"
 } catch {
-  Write-Log "RDP setup failed: $_"
+    Write-Host "ERROR: Failed to fetch credentials: $_"
 }
 
-Write-Log "Downloading Power BI..."
+# --- Create or reset Windows user ---
+if ($username -and $password) {
+    try {
+        Write-Host "Checking for existing user..."
+        net user $username > $null 2>&1
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "User $username does not exist. Creating..."
+            net user $username $password /add
+            net localgroup administrators $username /add
+        } else {
+            Write-Host "User $username exists. Resetting password..."
+            net user $username $password
+        }
+        net user $username
+    } catch {
+        Write-Host "ERROR: User creation/reset failed: $_"
+    }
+} else {
+    Write-Host "ERROR: Username/password not available"
+}
+
+
+# --- Download and install Power BI Desktop ---
 $powerBIPath = "C:\Windows\Temp\PBIDesktopSetup_x64.exe"
 $bucketPath = "s3://dpr-artifact-store-development/third-party/PowerBI/PBIDesktopSetup_x64.exe"
 
 try {
-  & "$awsCliPath\aws.exe" s3 cp $bucketPath $powerBIPath
+    Write-Host "Downloading Power BI..."
+    & "$awsCliPath\aws.exe" s3 cp $bucketPath $powerBIPath
 } catch {
-  Write-Log "Power BI download failed: $_"
+    Write-Host "ERROR: Power BI download failed: $_"
 }
 
 if (Test-Path $powerBIPath) {
-  try {
-    Start-Process -FilePath $powerBIPath -ArgumentList "/quiet /norestart" -Wait
-    Write-Log "Power BI installed successfully"
-  } catch {
-    Write-Log "Power BI install failed: $_"
-  }
+    try {
+        Write-Host "Installing Power BI..."
+        Start-Process -FilePath $powerBIPath -ArgumentList "/quiet /norestart" -Wait
+        Write-Host "Power BI installed."
+    } catch {
+        Write-Host "ERROR: Power BI install failed: $_"
+    }
 } else {
-  Write-Log "Power BI installer not found"
+    Write-Host "Power BI installer not found"
 }
 
-New-Item -Path "C:\Windows\Temp\bootstrap-success.txt" -ItemType File -Force
+# --- Mark success ---
+New-Item -Path "C:\Windows\Temp\bootstrap-success.txt" -ItemType File -Force | Out-Null
 
-try {
-  Stop-Transcript
-} catch {
-  Write-Log "Failed to stop transcript: $_"
-}
+# --- End Transcript ---
+Stop-Transcript
 </powershell>
