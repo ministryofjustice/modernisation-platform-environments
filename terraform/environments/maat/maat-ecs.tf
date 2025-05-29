@@ -66,6 +66,16 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
         ]
         Resource = "*"
       },
+      {
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject"
+        ],
+        Resource = [
+          "arn:aws:s3:::${module.xdr-agent-s3.bucket_name}",
+          "arn:aws:s3:::${module.xdr-agent-s3.bucket_name}/*"
+        ]
+      }
     ]
   })
 }
