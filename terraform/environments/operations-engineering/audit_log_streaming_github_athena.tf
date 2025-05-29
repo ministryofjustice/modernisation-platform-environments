@@ -77,7 +77,11 @@ resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
           "glue:GetTable",
           "glue:UpdateTable",
           "glue:GetDatabase",
-          "glue:UpdateDatabase"
+          "glue:UpdateDatabase",
+          "glue:BatchGetPartition",
+          "glue:GetPartition",
+          "glue:CreatePartition",
+          "glue:UpdatePartition"
         ],
         Resource = "*"
       },
