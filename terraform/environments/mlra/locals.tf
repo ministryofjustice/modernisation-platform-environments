@@ -16,7 +16,7 @@ locals {
     }
   }
   ec2_egress_rules = {
-    "maat_to_maatdb_sg_rule_outbound" = {
+    "mlra_to_maatdb_sg_rule_outbound" = {
       description     = "This rule is needed for the MLRA to connect to MAATDB"
       from_port       = 1521
       to_port         = 1521
@@ -24,7 +24,7 @@ locals {
       cidr_blocks     = []
       security_groups = [local.application_data.accounts[local.environment].maatdb_rds_sec_group_id]
     }
-    "maat_sg_rule_outbound" = {
+    "mlra_sg_rule_outbound" = {
       description     = "This rule is needed for the ECS agent to reach the ECS API endpoints"
       from_port       = 443
       to_port         = 443
