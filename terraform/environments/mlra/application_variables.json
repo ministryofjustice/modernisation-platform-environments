@@ -30,9 +30,7 @@
       "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
       "maatdb_rds_sec_group_id": "sg-0727aa271de73eb1d",
       "maat_api_oauth_scope": "maat-api-dev",
-      "maat_api_oauth_url": "https://maat-api-dev.auth.eu-west-2.amazoncognito.com/oauth2/token",
-      "maat_api_client_id": "",
-      "maat_api_client_secret": ""
+      "maat_api_oauth_url": "https://maat-api-dev.auth.eu-west-2.amazoncognito.com/oauth2/token"
     },
     "test": {
       "example_var": "test-data",
@@ -62,9 +60,7 @@
       "nlb_prevent_deletion": false,
       "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
       "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
-      "maatdb_rds_sec_group_id": "",
-      "maat_api_client_id": "",
-      "maat_api_client_secret": ""
+      "maatdb_rds_sec_group_id": ""
     },
     "preproduction": {
       "example_var": "preproduction-data",
@@ -94,9 +90,7 @@
       "nlb_prevent_deletion": true,
       "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
       "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
-      "maatdb_rds_sec_group_id": "",
-      "maat_api_client_id": "",
-      "maat_api_client_secret": ""
+      "maatdb_rds_sec_group_id": ""
     },
     "production": {
       "example_var": "production-data",
@@ -128,9 +122,7 @@
       "acm_cert_domain_name": "maat-libra-administration-tool.service.justice.gov.uk",
       "maatdb_rds_sec_group_id": "sg-031a88ae1c02b46a4",
       "maat_api_oauth_scope": "maat-api-prod",
-      "maat_api_oauth_url": "https://maat-api-prod.auth.eu-west-2.amazoncognito.com/oauth2/token",
-      "maat_api_client_id": "",
-      "maat_api_client_secret": ""
+      "maat_api_oauth_url": "https://maat-api-prod.auth.eu-west-2.amazoncognito.com/oauth2/token"
     }
   }
 }
