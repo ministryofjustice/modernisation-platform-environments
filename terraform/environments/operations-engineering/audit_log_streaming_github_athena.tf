@@ -114,8 +114,7 @@ resource "aws_glue_crawler" "github_auditlog" {
   database_name = aws_glue_catalog_database.github_auditlog.name
 
   s3_target {
-    # 👇 Narrow target for testing: modify this to a recent known date
-    path = "s3://${module.github-cloudtrail-auditlog.github_auditlog_s3bucket}/2025/05/20/"
+    path = "s3://${module.github-cloudtrail-auditlog.github_auditlog_s3bucket}/"
   }
 
   configuration = jsonencode({
@@ -127,7 +126,7 @@ resource "aws_glue_crawler" "github_auditlog" {
       Partitions = {
         AddOrUpdateBehavior = "InheritFromTable"
       }
-    }
+    },
   })
 
   recrawl_policy {
