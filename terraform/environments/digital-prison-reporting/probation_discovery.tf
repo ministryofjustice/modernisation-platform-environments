@@ -19,7 +19,8 @@ module "probation_discovery_windows_node" {
   ebs_delete_on_termination   = true
   policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
-    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}"
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.secretsmanager-read-policy}"  
   ]
   #region  = local.account_region
   #account = local.account_id
