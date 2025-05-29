@@ -102,7 +102,7 @@ resource "aws_cloudfront_distribution" "external" {
   response_code         = 200
   response_page_path    = "/custom-503.html"
   error_caching_min_ttl = 300
-
+  }
   #   is_ipv6_enabled = true
 
   tags = var.tags
