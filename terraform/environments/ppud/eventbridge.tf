@@ -359,7 +359,7 @@ resource "aws_cloudwatch_event_rule" "monthly_schedule_elb_uptime_calculate_prod
 
 resource "aws_cloudwatch_event_target" "trigger_lambda_target_elb_uptime_calculate_prod" {
   count     = local.is-production == true ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.monthy_schedule_elb_uptime_calculate_prod[0].name
+  rule      = aws_cloudwatch_event_rule.monthly_schedule_elb_uptime_calculate_prod[0].name
   target_id = "ppud_elb_uptime_calculate_prod"
   arn       = aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_calculate_prod[0].arn
 }
