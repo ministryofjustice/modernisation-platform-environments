@@ -1,10 +1,30 @@
 <powershell>
 # --- Logging setup ---
-#---New logs----
+# --- Disable UAC ---
 $logPath = "C:\Windows\Temp\bootstrap-transcript.log"
-
 Start-Transcript -Path $logPath -Force
 Write-Host "Bootstrap started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+
+# --- Flag to check if this is first or second run ---
+$flagFile = "C:\Windows\Temp\bootstrap-stage2-flag.txt"
+
+if (-Not (Test-Path $flagFile)) {
+    Write-Host "First boot detected. Disabling UAC..."
+
+    try {
+        Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System" `
+                         -Name "EnableLUA" -Value 0
+        Write-Host "UAC disabled successfully."
+    } catch {
+        Write-Host "ERROR: Failed to disable UAC: $_"
+    }
+
+    Write-Host "Marking first-run complete and rebooting..."
+    New-Item -Path $flagFile -ItemType File -Force | Out-Null
+
+    Restart-Computer -Force
+    exit
+}
 
 # --- Install AWS CLI ---
 try {
@@ -66,7 +86,6 @@ if ($username -and $password) {
     Write-Host "ERROR: Username/password not available"
 }
 
-
 # --- Download and install Power BI Desktop ---
 $powerBIPath = "C:\Windows\Temp\PBIDesktopSetup_x64.exe"
 $bucketPath = "s3://dpr-artifact-store-development/third-party/PowerBI/PBIDesktopSetup_x64.exe"
@@ -82,7 +101,13 @@ if (Test-Path $powerBIPath) {
     try {
         Write-Host "Installing Power BI..."
         Start-Process -FilePath $powerBIPath -ArgumentList "/quiet /norestart" -Wait
-        Write-Host "Power BI installed."
+
+        # Confirm install
+        if (Test-Path "C:\Program Files\Microsoft Power BI Desktop\bin\PBIDesktop.exe") {
+            Write-Host "✅ Power BI installed successfully"
+        } else {
+            Write-Host "❌ Power BI install command completed, but executable not found"
+        }
     } catch {
         Write-Host "ERROR: Power BI install failed: $_"
     }
