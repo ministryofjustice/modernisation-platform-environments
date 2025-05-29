@@ -41,10 +41,19 @@ $secret = $secretJson | ConvertFrom-Json
 $username = $secret.username
 $password = $secret.password
 
-# Create user and set password
-Write-Log "Creating user: $username"
-net user $username $password /add
-net localgroup administrators $username /add
+if (-not [string]::IsNullOrWhiteSpace($username) -and -not [string]::IsNullOrWhiteSpace($password)) {
+  $existingUser = net user $username 2>$null
+  if (-not $?) {
+    Write-Log "Creating user: $username"
+    net user $username $password /add
+    net localgroup administrators $username /add
+  } else {
+    Write-Log "User $username already exists. Skipping creation."
+  }
+} else {
+  Write-Log "Error: Username or password is empty. Skipping user creation."
+}
+
 
 # Enable Remote Desktop and firewall
 Write-Log "Enabling Remote Desktop and configuring firewall..."
