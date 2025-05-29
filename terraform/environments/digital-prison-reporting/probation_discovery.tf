@@ -20,7 +20,7 @@ module "probation_discovery_windows_node" {
   policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
-    "arn:aws:iam::${local.account_id}:policy/${local.secretsmanager-read-policy}"  
+    "arn:aws:iam::${local.account_id}:policy/${local.secretsmanager_read_policy}" 
   ]
   #region  = local.account_region
   #account = local.account_id
