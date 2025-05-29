@@ -1,27 +1,39 @@
 <powershell>
-# --- Setup transcript and COM1 logging ---
+# --- Setup COM1 logging (EC2 System Log) ---
 $logPath = "C:\Windows\Temp\bootstrap.log"
-Start-Transcript -Path $logPath -Force
+"Bootstrap script started at $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")" | Out-File -Append -FilePath "COM1"
 
-# Output to both transcript and EC2 system log (COM1)
+# Function to log to both file and system log
 function Write-Log {
   param ([string]$Message)
   $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
   $formatted = "$timestamp - $Message"
-  Write-Output $formatted
-  $formatted | Out-File -Append -FilePath $logPath
+  try {
+    Add-Content -Path $logPath -Value $formatted
+  } catch {
+    # fallback if file is locked
+    "$timestamp - (log file busy) $Message" | Out-File -Append -FilePath "COM1"
+  }
   $formatted | Out-File -Append -FilePath "COM1"
 }
 
-# Explicit early message for EC2 console
-"Bootstrap script started at $(Get-Date)" | Out-File -Append -FilePath "COM1"
+Write-Log "Starting transcript..."
+try {
+  Start-Transcript -Path $logPath -Force
+} catch {
+  Write-Log "Failed to start transcript: $_"
+}
 
 Write-Log "Bootstrapping Windows EC2 instance..."
 
 # --- Install AWS CLI ---
 Write-Log "Installing AWS CLI..."
-Invoke-WebRequest -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "C:\Windows\Temp\AWSCLIV2.msi"
-Start-Process "msiexec.exe" -ArgumentList "/i C:\Windows\Temp\AWSCLIV2.msi /qn" -Wait
+try {
+  Invoke-WebRequest -Uri "https://awscli.amazonaws.com/AWSCLIV2.msi" -OutFile "C:\Windows\Temp\AWSCLIV2.msi"
+  Start-Process "msiexec.exe" -ArgumentList "/i C:\Windows\Temp\AWSCLIV2.msi /qn" -Wait
+} catch {
+  Write-Log "Failed to install AWS CLI: $_"
+}
 
 # --- Add AWS CLI to system PATH ---
 $awsCliPath = "C:\Program Files\Amazon\AWSCLIV2"
@@ -41,16 +53,15 @@ try {
     --query SecretString `
     --output text `
     --region eu-west-2
+  $secret = $secretJson | ConvertFrom-Json
+  $username = $secret.username
+  $password = $secret.password
 } catch {
-  Write-Log "Failed to retrieve secret from Secrets Manager: $_"
+  Write-Log "Failed to retrieve secret: $_"
 }
 
-$secret = $secretJson | ConvertFrom-Json
-$username = $secret.username
-$password = $secret.password
-
 # --- Create user if not exists ---
-if (-not [string]::IsNullOrWhiteSpace($username) -and -not [string]::IsNullOrWhiteSpace($password)) {
+if ($username -and $password) {
   $existingUser = net user $username 2>$null
   if (-not $?) {
     Write-Log "Creating user: $username"
@@ -60,33 +71,49 @@ if (-not [string]::IsNullOrWhiteSpace($username) -and -not [string]::IsNullOrWhi
     Write-Log "User $username already exists. Skipping creation."
   }
 } else {
-  Write-Log "Error: Username or password is empty. Skipping user creation."
+  Write-Log "Username or password is missing. Skipping user creation."
 }
 
-# --- Enable Remote Desktop ---
+# --- Enable Remote Desktop and firewall ---
 Write-Log "Enabling Remote Desktop and configuring firewall..."
-Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
-Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
-Set-Service -Name TermService -StartupType Automatic
-Start-Service -Name TermService
+try {
+  Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+  Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+  Set-Service -Name TermService -StartupType Automatic
+  Start-Service -Name TermService
+} catch {
+  Write-Log "Failed to configure RDP: $_"
+}
 
 # --- Download and Install Power BI ---
 Write-Log "Downloading Power BI installer from S3..."
-& "$awsCliPath\aws.exe" s3 cp `
-  s3://dpr-artifact-store-development/third-party/PowerBI/PBIDesktopSetup_x64.exe `
-  C:\Windows\Temp\PBIDesktopSetup_x64.exe
+try {
+  & "$awsCliPath\aws.exe" s3 cp `
+    s3://dpr-artifact-store-development/third-party/PowerBI/PBIDesktopSetup_x64.exe `
+    C:\Windows\Temp\PBIDesktopSetup_x64.exe
+} catch {
+  Write-Log "Power BI download failed: $_"
+}
 
 $installer = "C:\Windows\Temp\PBIDesktopSetup_x64.exe"
 if (Test-Path $installer) {
   Write-Log "Installing Power BI Desktop..."
-  Start-Process -FilePath $installer -ArgumentList "/quiet /norestart" -Wait
+  try {
+    Start-Process -FilePath $installer -ArgumentList "/quiet /norestart" -Wait
+  } catch {
+    Write-Log "Power BI install failed: $_"
+  }
 } else {
-  Write-Log "Power BI installer not found. Skipping installation."
+  Write-Log "Power BI installer not found. Skipping install."
 }
 
-# --- Final Marker and End ---
+# --- Final Marker and Completion ---
 Write-Log "Bootstrap script completed successfully."
 New-Item -Path "C:\Windows\Temp\bootstrap-success.txt" -ItemType File -Force
 
-Stop-Transcript
+try {
+  Stop-Transcript
+} catch {
+  Write-Log "Failed to stop transcript: $_"
+}
 </powershell>
