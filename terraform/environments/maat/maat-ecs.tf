@@ -152,7 +152,10 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
   }
 
   user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
-  maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group, app_ecs_cluster = aws_ecs_cluster.maat_ecs_cluster.name }))
+    maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group,
+    app_ecs_cluster    = aws_ecs_cluster.maat_ecs_cluster.name,
+    xdr_bucket         = module.xdr-agent-s3.bucket.id
+  }))
 
   tag_specifications {
     resource_type = "instance"
