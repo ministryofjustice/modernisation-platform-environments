@@ -65,3 +65,9 @@ variable "key_name" {
   type    = string
   default = ""
 }
+
+variable "env_vars" {
+  type        = map(string)
+  default     = {}
+  description = "(Optional) Key-value map of resource env vars."
+}

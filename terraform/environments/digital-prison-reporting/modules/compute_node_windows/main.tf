@@ -1,3 +1,9 @@
+data "template_file" "user_data" {
+  template = file("${path.module}/scripts/${var.app_key}.ps1")
+
+  vars = var.env_vars
+}
+
 resource "aws_iam_role" "instance_role" {
   count = var.enable_compute_node ? 1 : 0
 
@@ -95,7 +101,8 @@ resource "aws_launch_template" "windows_template" {
     delete_on_termination       = true
   }
 
-  user_data = base64encode(file("${path.module}/scripts/${var.app_key}.ps1"))
+  # user_data = base64encode(file("${path.module}/scripts/${var.app_key}.ps1"))
+  user_data = base64encode(data.template_file.user_data.rendered)
 
   tag_specifications {
     resource_type = "instance"
