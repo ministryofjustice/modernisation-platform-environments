@@ -87,43 +87,43 @@ resource "aws_security_group" "glue_rds_conn_security_group" {
   tags = merge(
     local.tags,
     {
-      Resource_Type = "Secuity Group for Glue-RDS-Connection",
+      Resource_Type = "Security Group for Glue-RDS-Connection",
     }
   )
 }
 
-resource "aws_security_group_rule" "glue_rds_conn_outbound" {
-  #checkov:skip=CKV_AWS_277
-  type                     = "egress"
-  security_group_id        = aws_security_group.glue_rds_conn_security_group.id
-  source_security_group_id = aws_security_group.glue_rds_conn_security_group.id
-  protocol                 = "tcp"
-  from_port                = 0
-  to_port                  = 65535
-  description              = "Required ports open for Glue-RDS-Connection"
-}
+# -------------------------------------------------------
+# Glue-RDS & RDS-Glue Security Group Rules
+# -------------------------------------------------------
 
-resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_inbound" {
-  security_group_id = aws_security_group.glue_rds_conn_security_group.id
+resource "aws_vpc_security_group_egress_rule" "glue_rds_egress" {
 
-  referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
+  security_group_id            = aws_security_group.glue_rds_conn_security_group.id
+  referenced_security_group_id = aws_security_group.db.id
   ip_protocol                  = "tcp"
-  from_port                    = 0
-  to_port                      = 65535
-  description                  = "Required ports open for Glue-RDS-Connection"
-  #checkov:skip=CKV_AWS_260
-  #checkov:skip=CKV_AWS_24
-  #checkov:skip=CKV_AWS_25
+  from_port                    = 1433
+  to_port                      = 1433
+  description                  = "Glue          -----[mssql]-----+ RDS Database"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "glue_rds_conn_db_inbound" {
-  security_group_id = aws_security_group.db.id
-
+resource "aws_vpc_security_group_ingress_rule" "rds_glue_ingress" {
+  security_group_id            = aws_security_group.db.id
   referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  description                  = "Required ports open for Glue-RDS-Connection"
+  description                  = "RDS Database +-----[mssql]----- Glue"
 }
 
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------
+# Glue self-referencing rule
+# -------------------------------------------------------
+
+resource "aws_vpc_security_group_ingress_rule" "glue_glue_ingress" {
+  security_group_id            = aws_security_group.glue_rds_conn_security_group.id
+  referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
+  ip_protocol                  = "tcp"
+  from_port                    = 0
+  to_port                      = 65535
+  description                  = "Glue         +-----[mssql]----- Glue"
+}
