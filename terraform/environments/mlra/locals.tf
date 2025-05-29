@@ -16,11 +16,19 @@ locals {
     }
   }
   ec2_egress_rules = {
-    "cluster_ec2_lb_egress" = {
-      description     = "Cluster EC2 loadbalancer egress rule"
-      from_port       = 0
-      to_port         = 0
-      protocol        = "-1"
+    "maat_to_maatdb_sg_rule_outbound" = {
+      description     = "This rule is needed for the MLRA to connect to MAATDB"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      cidr_blocks     = []
+      security_groups = [[local.application_data.accounts][local.environment].maatdb_rds_sec_group_id]
+    }
+    "maat_sg_rule_outbound" = {
+      description     = "This rule is needed for the ECS agent to reach the ECS API endpoints"
+      from_port       = 443
+      to_port         = 443
+      protocol        = "tcp"
       cidr_blocks     = ["0.0.0.0/0"]
       security_groups = []
     }

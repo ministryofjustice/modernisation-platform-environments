@@ -98,6 +98,18 @@ resource "aws_security_group" "cluster_ec2" {
       security_groups = lookup(ingress.value, "security_groups", null)
     }
   }
+  dynamic "egress" {
+    for_each = var.ec2_egress_rules
+    content {
+      description = lookup(egress.value, "description", null)
+      from_port   = lookup(egress.value, "from_port", null)
+      to_port     = lookup(egress.value, "to_port", null)
+      protocol    = lookup(egress.value, "protocol", null)
+      #tfsec:ignore:AVD-AWS-0104:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
+      cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
+      security_groups = lookup(egress.value, "security_groups", null)
+    }
+  }
 
   tags = merge(
     var.tags_common,
@@ -105,28 +117,6 @@ resource "aws_security_group" "cluster_ec2" {
       Name = "${var.app_name}-cluster-ec2-security-group"
     }
   )
-}
-
-
-resource "aws_security_group_rule" "maat_sg_rule_outbound" {
-  type              = "egress"
-  from_port         = 443
-  to_port           = 443
-  protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
-  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
-  security_group_id = aws_security_group.cluster_ec2.id
-}
-
-# Specific Security Group Rule for Access to MAATDB
-resource "aws_security_group_rule" "maat_to_maatdb_sg_rule_outbound" {
-  type              = "egress"
-  from_port         = 1521
-  to_port           = 1521
-  protocol          = "tcp"
-  description       = "This rule is needed for the MLRA to connect to MAATDB"
-  security_group_id = aws_security_group.cluster_ec2.id
-  source_security_group_id = var.maatdb_rds_sec_group_id
 }
 
 # always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
