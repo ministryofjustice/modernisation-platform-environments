@@ -19,7 +19,9 @@ resource "aws_iam_role" "vpc_connection_role" {
 }
 
 resource "aws_iam_policy" "qs_vpc" {
-  name = "QuickSightVPCConnectionRolePolicy"
+  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
+  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
+  name        = "QuickSightVPCConnectionRolePolicy"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [

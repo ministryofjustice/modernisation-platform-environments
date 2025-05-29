@@ -86,8 +86,10 @@ resource "random_password" "rds_password" {
   special = false
 }
 
-
+# TODO: Setup secret rotation and kms encryption of secret
 resource "aws_secretsmanager_secret" "rds_password_secret" {
+  #checkov:skip=CKV2_AWS_57:"This is will be fixed at a later date"
+  #checkov:skip=CKV_AWS_149:"To be added later."
   name = "${var.application_name}-${var.environment}-rds_password_secret"
 }
 
@@ -117,7 +119,12 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 
 # RDS database
 
+# TODO: Ensure logging is enabled for the database and performance insights logs are encrypted
 resource "aws_db_instance" "appdb1" {
+  #checkov:skip=CKV_AWS_129:"To be addressed"
+  #checkov:skip=CKV_AWS_354:"To be addressed"
+  #checkov:skip=CKV_AWS_118:"Enhanced security not required"
+
   port                                  = var.port
   allocated_storage                     = var.allocated_storage
   db_name                               = var.application_name

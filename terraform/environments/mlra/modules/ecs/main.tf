@@ -282,7 +282,6 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
                 "ecr:BatchGetImage",
-                "ecr:*",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
                 "logs:CreateLogGroup",
@@ -299,8 +298,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "xray:PutTelemetryRecords",
                 "xray:GetSamplingRules",
                 "xray:GetSamplingTargets",
-                "xray:GetSamplingStatisticSummaries",
-                "xray:*"
+                "xray:GetSamplingStatisticSummaries"
             ],
             "Resource": "*"
         }
@@ -512,6 +510,13 @@ resource "aws_iam_policy" "ecs_task_execution_ssm_policy" { #tfsec:ignore:aws-ia
         "ssm:GetParameters"
       ],
       "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.gtm_id_secret_name}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.infox_client_secret}"]
     }
   ]
 }
