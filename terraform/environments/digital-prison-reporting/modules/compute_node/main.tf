@@ -82,7 +82,6 @@ resource "aws_launch_template" "ec2_template" {
   instance_initiated_shutdown_behavior = var.ec2_terminate_behavior
   instance_type                        = var.ec2_instance_type
   key_name                             = aws_key_pair.ec2-user[0].key_name
-
   metadata_options {
     http_endpoint               = "enabled" # defaults to enabled but is required if http_tokens is specified
     http_put_response_hop_limit = 1         # default is 1, value values are 1 through 64
