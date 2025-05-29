@@ -26,3 +26,13 @@ chmod 644 /etc/awslogs/awslogs.conf
 sed -i 's/^region = .*/region = eu-west-2/g' /etc/awslogs/awscli.conf
 chkconfig awslogs on
 service awslogs restart
+
+# Install XDC agent stored in S3 bucket
+aws s3 cp s3://${xdr_bucket}/cortex.rpm /tmp/cortex.rpm
+
+if [[ -f /tmp/cortex.rpm ]]; then
+    yum install -y /tmp/cortex.rpm
+else
+    echo "XDR agent download failed" >&2
+    exit 1
+fi
