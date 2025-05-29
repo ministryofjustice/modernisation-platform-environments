@@ -9,7 +9,7 @@
       "engine": "oracle-se2",
       "engine_version": "19.0.0.0.ru-2025-01.rur-2025-01.r1",
       "instance_class": "db.t3.medium",
-      "allow_major_version_upgrade": true,
+      "allow_major_version_upgrade": false,
       "auto_minor_version_upgrade": false,
       "storage_type": "gp2",
       "iops": 0,
@@ -63,7 +63,7 @@
       "deletion_protection": false,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
-      "ecs_cluster_sec_group_id": "",
+      "ecs_cluster_sec_group_id": "sg-065ac58b9f6a06bb1",
       "mlra_ecs_cluster_sec_group_id": "sg-0faa8fe022ea7e3aa"
     }
   }
