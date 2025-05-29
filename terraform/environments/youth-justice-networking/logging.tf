@@ -15,7 +15,7 @@ resource "aws_cloudwatch_log_group" "yjaf_logs" {
   retention_in_days = each.value
 }
 
-resource "aws_iam_role" "yjb_syslog_ec2_role" {
+resource "aws_iam_role" "yjb_juniper_ec2_role" {
   name = "YJBJuniperEC2Role"
 
   assume_role_policy = jsonencode({
@@ -33,16 +33,16 @@ resource "aws_iam_role" "yjb_syslog_ec2_role" {
 # CReate instance profile for syslog server
 
 resource "aws_iam_role_policy_attachment" "ssm_attach" {
-  role       = aws_iam_role.yjb_syslog_ec2_role.name
+  role       = aws_iam_role.yjb_juniper_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_role_policy_attachment" "cloudwatch_agent_attach" {
-  role       = aws_iam_role.yjb_syslog_ec2_role.name
+  role       = aws_iam_role.yjb_juniper_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-resource "aws_iam_instance_profile" "yjb_syslog_instance_profile" {
-  name = "YJBSyslogInstanceProfile"
-  role = aws_iam_role.yjb_syslog_ec2_role.name
+resource "aws_iam_instance_profile" "yjb_juniper_instance_profile" {
+  name = "YJBJuniperInstanceProfile"
+  role = aws_iam_role.yjb_juniper_ec2_role.name
 }
