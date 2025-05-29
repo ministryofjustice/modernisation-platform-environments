@@ -338,3 +338,28 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_elb_uptime_data_pr
   target_id = "ppud_elb_uptime_data_prod"
   arn       = aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_data_prod[0].arn
 }
+
+# Eventbridge rule to invoke the PPUD load balancer target uptime calculation lambda function on the 1st day of every month at 02:00
+
+resource "aws_lambda_permission" "allow_eventbridge_invoke_ppud_elb_uptime_calculation_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowEventBridgeInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_calculation_prod[0].function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.daily_schedule_elb_uptime_calculation_prod[0].arn
+}
+
+resource "aws_cloudwatch_event_rule" "daily_schedule_elb_uptime_calculation_prod" {
+  count               = local.is-production == true ? 1 : 0
+  name                = "ppud-elb-uptime-calculation-monthly-schedule"
+  description         = "Trigger Lambda at 02:00 on the 1st day of every month"
+  schedule_expression = "cron(0 2 ? 1 * *)"
+}
+
+resource "aws_cloudwatch_event_target" "trigger_lambda_target_elb_uptime_calculation_prod" {
+  count     = local.is-production == true ? 1 : 0
+  rule      = aws_cloudwatch_event_rule.daily_schedule_elb_uptime_data_calculation[0].name
+  target_id = "ppud_elb_uptime_calculation_prod"
+  arn       = aws_lambda_function.terraform_lambda_func_ppud_elb_uptime_calculation_prod[0].arn
+}
