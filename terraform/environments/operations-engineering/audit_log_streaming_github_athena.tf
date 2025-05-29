@@ -27,3 +27,11 @@ resource "aws_athena_workgroup" "github_auditlog" {
   tags = local.tags
 }
 
+resource "aws_glue_catalog_database" "github_auditlog" {
+  name = "github_auditlog"
+
+  description = "Stores metadata for querying GitHub audit log events via Athena"
+
+  tags = local.tags
+}
+
