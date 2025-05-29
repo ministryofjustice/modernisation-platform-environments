@@ -1,4 +1,5 @@
 <powershell>
+# IAM NEW SCRIPT
 # --- Setup COM1 logging and transcript (separate files) ---
 $logPath = "C:\Windows\Temp\bootstrap-transcript.log"
 $consoleLog = "COM1"
@@ -11,7 +12,7 @@ function Write-Log {
   "$timestamp - $Message" | Out-File -Append -FilePath $consoleLog
 }
 
-Write-Log "Starting transcript..."
+Write-Log "Starting transcript...."
 try {
   Start-Transcript -Path $logPath -Force
 } catch {
