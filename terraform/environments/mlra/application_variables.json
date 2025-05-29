@@ -28,7 +28,7 @@
       "nlb_prevent_deletion": false,
       "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
       "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
-      "maatdb_rds_sec_group_id": "sg-0727aa271de73eb1d"
+      "maatdb_rds_sec_group_id": "sg-01af07cdeb1fb46d0"
     },
     "test": {
       "example_var": "test-data",
@@ -118,7 +118,7 @@
       "nlb_prevent_deletion": true,
       "pagerduty_integration_key_name": "laa_mlra_prod_alarms",
       "acm_cert_domain_name": "maat-libra-administration-tool.service.justice.gov.uk",
-      "maatdb_rds_sec_group_id": "sg-031a88ae1c02b46a4"
+      "maatdb_rds_sec_group_id": "sg-0fae0ff1a577fb001"
     }
   }
 }
