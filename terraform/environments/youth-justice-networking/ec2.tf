@@ -242,7 +242,7 @@ resource "aws_security_group" "internal_sg" {
 # Attach the AmazonSSMManagedInstanceCore policy to the role
 resource "aws_iam_role_policy_attachment" "ssm_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
-  role       = aws_iam_role.ssm_role.name
+  role       = aws_iam_role.yjb_juniper_ec2_role.name
 }
 
 # Create instance profile for EC2 instances 
