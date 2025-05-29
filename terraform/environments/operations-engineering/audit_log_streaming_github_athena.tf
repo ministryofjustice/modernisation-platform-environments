@@ -47,6 +47,10 @@ resource "aws_iam_role" "glue_github_auditlog_crawler" {
   })
 }
 
+data "aws_kms_key" "github_auditlog" {
+  key_id = "alias/GitHubCloudTrailOpenEvent"
+}
+
 resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
   role = aws_iam_role.glue_github_auditlog_crawler.id
 
@@ -86,6 +90,15 @@ resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
           "logs:PutLogEvents"
         ],
         Resource = "*"
+      },
+      {
+        Sid    = "AllowKMSEncryptDecrypt",
+        Effect = "Allow",
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey"
+        ],
+        Resource = data.aws_kms_key.github_auditlog.arn
       }
     ]
   })
