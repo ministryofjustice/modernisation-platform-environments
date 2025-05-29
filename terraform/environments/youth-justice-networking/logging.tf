@@ -16,7 +16,7 @@ resource "aws_cloudwatch_log_group" "yjaf_logs" {
 }
 
 resource "aws_iam_role" "yjb_syslog_ec2_role" {
-  name = "YJBSyslogEC2Role"
+  name = "YJBJuniperEC2Role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
