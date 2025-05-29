@@ -8,7 +8,6 @@ Start-Process "msiexec.exe" -ArgumentList "/i C:\Windows\Temp\AWSCLIV2.msi /qn" 
 # Persist AWS CLI in system PATH
 $awsCliPath = "C:\Program Files\Amazon\AWSCLIV2"
 $currentPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
-
 if ($currentPath -notlike "*$awsCliPath*") {
   [Environment]::SetEnvironmentVariable("Path", "$currentPath;$awsCliPath", [EnvironmentVariableTarget]::Machine)
 }
@@ -25,8 +24,9 @@ $secret = $secretJson | ConvertFrom-Json
 $username = $secret.username
 $password = $secret.password
 
-# Set the Administrator password
-net user $username $password
+# Create the user if not exists and set password
+net user $username $password /add
+net localgroup administrators $username /add
 
 # Enable RDP and start required services
 Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
