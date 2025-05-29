@@ -48,14 +48,17 @@ try {
   Write-Log "Error retrieving secret: $_"
 }
 
+# --- Reliable user creation using net user + LASTEXITCODE ---
 if ($username -and $password) {
   try {
-    if (-Not (Get-LocalUser -Name $username -ErrorAction SilentlyContinue)) {
-      Write-Log "Creating new user $username"
+    Write-Log "Checking if user $username exists..."
+    $null = cmd /c "net user $username"
+    if ($LASTEXITCODE -ne 0) {
+      Write-Log "User $username does not exist. Creating..."
       net user $username $password /add
       net localgroup administrators $username /add
     } else {
-      Write-Log "User $username exists, resetting password"
+      Write-Log "User $username exists. Resetting password..."
       net user $username $password
     }
   } catch {
