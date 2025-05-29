@@ -367,7 +367,7 @@ resource "aws_instance" "juniper_management" {
   subnet_id            = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
   private_ip           = "10.100.50.150"
   root_block_device {
-    volume_size = 50    # Define the root volume size in GB
+    volume_size = 70    # Define the root volume size in GB
     volume_type = "gp3" # Optional: Specify the volume type (e.g., gp3, gp2, io1)
   }
   vpc_security_group_ids = [aws_security_group.internal_sg.id]
