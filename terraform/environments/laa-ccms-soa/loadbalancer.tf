@@ -132,14 +132,3 @@ resource "aws_lb_listener" "managed8001" {
     type             = "forward"
   }
 }
-
-resource "aws_lb_listener" "managed7777" {
-  load_balancer_arn = aws_lb.managed.id
-  port              = 7777
-  protocol          = "HTTP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.managed.id
-    type             = "forward"
-  }
-}
