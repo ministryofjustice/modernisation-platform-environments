@@ -1,0 +1,27 @@
+
+variable "lambda_name" {}
+variable "vpc_id" {}
+variable "subnet_ids" {
+  type = list(string)
+}
+variable "ftp_host" {}
+variable "ftp_port" {}
+variable "ftp_protocol" {}
+variable "ftp_transfer_type" {}
+variable "ftp_file_types" {}
+variable "ftp_local_path" {}
+variable "ftp_remote_path" {}
+variable "ftp_require_ssl" {}
+variable "ftp_insecure" {}
+variable "ftp_ca_cert" {}
+variable "ftp_cert" {}
+variable "ftp_key" {}
+variable "ftp_key_type" {}
+variable "ftp_user" {}
+variable "ftp_password_path" {}
+variable "ftp_file_remove" {}
+variable "ftp_cron" {}
+variable "ftp_bucket" {}
+variable "sns_topic_sev5" {}
+variable "sns_topic_ops" {}
+variable "ssh_key_path" {}
