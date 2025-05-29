@@ -32,7 +32,7 @@ module "yjsm" {
     local.environment,
     "ami-01426769db5cd0a43" # Default AMI
   )
-  
+
   project_name = local.project_name
   environment  = local.environment
   tags         = local.tags

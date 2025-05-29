@@ -56,10 +56,17 @@ locals {
         })
       })
 
-      # test instance, not for use 
-      pp-cafm-a-19-a = merge(local.ec2_instances.app, {
+      # upgrade test instance - do not use
+      # rename and join the domain FIRST
+      # Mount drive
+      # Upgrade OS - Server DataCenter 2019
+      # Join domain as pp-cafm-a-19-a
+      # Remove drive
+      # Check E: drive also gone
+      # Reboot
+      pp-cafm-a-20-a = merge(local.ec2_instances.app, {
         config = merge(local.ec2_instances.app.config, {
-          ami_name          = "pp-cafm-a-11-upgrade-test"
+          ami_name          = "pp-cafm-a-11-a-unjoined"
           availability_zone = "eu-west-2a"
         })
         ebs_volumes = {
@@ -70,7 +77,8 @@ locals {
           instance_type           = "t3.large"
         })
         tags = merge(local.ec2_instances.app.tags, {
-          description         = "Test instance ami from pp-cafm-a-11-a"
+          ami                 = "pp-cafm-a-11-a-unjoined"
+          description         = "RDS session host and app server upgrade test"
           instance-scheduling = "skip-scheduling"
         })
         cloudwatch_metric_alarms = null

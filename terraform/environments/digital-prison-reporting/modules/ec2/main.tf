@@ -40,11 +40,11 @@ resource "aws_security_group_rule" "ingress_traffic" {
   for_each          = var.ec2_sec_rules
   description       = format("Traffic for %s %d", each.value.protocol, each.value.from_port)
   from_port         = each.value.from_port
+  to_port           = each.value.to_port
   protocol          = each.value.protocol
   security_group_id = aws_security_group.ec2_sec_group.id
-  to_port           = each.value.to_port
   type              = "ingress"
-  cidr_blocks       = var.cidr
+  cidr_blocks       = each.value.cidr_block != null ? [each.value.cidr_block] : var.cidr
 }
 
 resource "aws_security_group_rule" "ingress_traffic_from_security_groups" {

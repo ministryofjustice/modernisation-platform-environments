@@ -25,9 +25,9 @@ variable "database_subnets" {
 }
 
 ## 
-variable "rds_redshift_secret_arn" {
-  description = "The ARN of the secret created to provide read only access to Redshift.."
-  type        = string
+variable "rds_redshift_secret_arns" {
+  description = "The ARNs of the secrets created to provide access to Redshift.."
+  type        = list(string)
 }
 
 variable "kms_key_arn" {
