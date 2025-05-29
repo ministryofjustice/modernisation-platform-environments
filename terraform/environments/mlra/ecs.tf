@@ -39,4 +39,6 @@ module "mlra-ecs" {
   ecs_target_capacity         = local.ecs_target_capacity
   environment                 = local.environment
   maatdb_rds_sec_group_id     = local.application_data.accounts[local.environment].maatdb_rds_sec_group_id
+  maat_api_client_id          = local.application_data.accounts[local.environment].maat_api_client_id
+  maat_api_client_secret      = local.application_data.accounts[local.environment].maat_api_client_secret
 }

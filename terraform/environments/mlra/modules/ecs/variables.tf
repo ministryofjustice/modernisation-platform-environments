@@ -188,3 +188,13 @@ variable "maatdb_rds_sec_group_id" {
   type        = string
   description = "MAATDB sec group ID"
 }
+
+variable "maat_api_client_id" {
+  type        = string
+  description = "MAAT API Client ID"
+}
+
+variable "maat_api_client_secret" {
+  type        = string
+  description = "MAAT API Client Secret"
+}
