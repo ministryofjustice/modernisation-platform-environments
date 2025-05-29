@@ -18,24 +18,20 @@ resource "aws_athena_workgroup" "github_auditlog" {
 
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
-    bytes_scanned_cutoff_per_query     = "1000000000" # 1GB, adjust as needed
+    bytes_scanned_cutoff_per_query     = 1000000000 # 1GB
     requester_pays_enabled             = false
   }
 
   state = "ENABLED"
-
-  tags = local.tags
+  tags  = local.tags
 }
 
 resource "aws_glue_catalog_database" "github_auditlog" {
-  name = "github_auditlog"
-
+  name        = "github_auditlog"
   description = "Stores metadata for querying GitHub audit log events via Athena"
-
-  tags = local.tags
+  tags        = local.tags
 }
 
-# IAM Role that allows Glue to read from S3 and write to the catalog
 resource "aws_iam_role" "glue_github_auditlog_crawler" {
   name = "glue-github-auditlog-crawler-role"
 
@@ -51,7 +47,6 @@ resource "aws_iam_role" "glue_github_auditlog_crawler" {
   })
 }
 
-# Minimal policy: S3 read + Glue write
 resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
   role = aws_iam_role.glue_github_auditlog_crawler.id
 
@@ -59,6 +54,7 @@ resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
     Version = "2012-10-17",
     Statement = [
       {
+        Sid    = "AllowS3ReadAccess",
         Effect = "Allow",
         Action = [
           "s3:GetObject",
@@ -70,6 +66,7 @@ resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
         ]
       },
       {
+        Sid    = "AllowGlueCatalogAccess",
         Effect = "Allow",
         Action = [
           "glue:CreateTable",
@@ -79,24 +76,31 @@ resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
           "glue:UpdateDatabase"
         ],
         Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogging",
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Resource = "*"
       }
     ]
   })
 }
 
-# Glue Crawler
 resource "aws_glue_crawler" "github_auditlog" {
-  name = "github-auditlog-crawler"
-
-  role = aws_iam_role.glue_github_auditlog_crawler.arn
-
+  name          = "github-auditlog-crawler"
+  role          = aws_iam_role.glue_github_auditlog_crawler.arn
   database_name = aws_glue_catalog_database.github_auditlog.name
 
   s3_target {
-    path = "s3://${module.github-cloudtrail-auditlog.github_auditlog_s3bucket}/"
+    # 👇 Narrow target for testing: modify this to a recent known date
+    path = "s3://${module.github-cloudtrail-auditlog.github_auditlog_s3bucket}/2025/05/20/"
   }
 
-  # Configuration to optimize schema inference and control partitions
   configuration = jsonencode({
     Version = 1.0,
     Grouping = {
@@ -108,6 +112,10 @@ resource "aws_glue_crawler" "github_auditlog" {
       }
     }
   })
+
+  recrawl_policy {
+    recrawl_behavior = "CRAWL_EVERYTHING"
+  }
 
   tags = local.tags
 }
