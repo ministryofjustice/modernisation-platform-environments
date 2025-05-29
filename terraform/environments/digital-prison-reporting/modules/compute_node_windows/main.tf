@@ -115,7 +115,7 @@ resource "aws_autoscaling_group" "windows_asg" {
 
   launch_template {
     id      = aws_launch_template.windows_template[0].id
-    version = aws_launch_template.ec2_template.latest_version
+    version = aws_launch_template.windows_template[0].latest_version
   }
 
   availability_zones        = ["${var.aws_region}a"]
