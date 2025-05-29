@@ -1,6 +1,6 @@
 <powershell>
 # --- Setup COM1 logging (EC2 System Log) ---
-$logPath = "C:\Windows\Temp\bootstrap.log"
+$logPath = "C:\Windows\Temp\bootstrap-new.log"
 "Bootstrap script started at $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")" | Out-File -Append -FilePath "COM1"
 
 # Function to log to both file and system log
