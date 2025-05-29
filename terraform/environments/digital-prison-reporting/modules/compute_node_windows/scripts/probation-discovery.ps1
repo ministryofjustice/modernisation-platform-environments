@@ -1,5 +1,5 @@
 <powershell>
-# IAM NEW SCRIPT
+# IAM NEW SCRIPT NEW
 # --- Setup COM1 logging and transcript (separate files) ---
 $logPath = "C:\Windows\Temp\bootstrap-transcript.log"
 $consoleLog = "COM1"
