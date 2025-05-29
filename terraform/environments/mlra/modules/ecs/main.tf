@@ -282,7 +282,6 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
                 "ecr:BatchGetImage",
-                "ecr:*",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
                 "logs:CreateLogGroup",
@@ -299,8 +298,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "xray:PutTelemetryRecords",
                 "xray:GetSamplingRules",
                 "xray:GetSamplingTargets",
-                "xray:GetSamplingStatisticSummaries",
-                "xray:*"
+                "xray:GetSamplingStatisticSummaries"
             ],
             "Resource": "*"
         }
