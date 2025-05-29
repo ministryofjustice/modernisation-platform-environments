@@ -1,22 +1,19 @@
 <powershell>
-# --- Setup COM1 logging (EC2 System Log) ---
-$logPath = "C:\Windows\Temp\bootstrap-new.log"
-"Bootstrap script started at $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")" | Out-File -Append -FilePath "COM1"
+# --- Setup COM1 logging and transcript (separate files) ---
+$logPath = "C:\Windows\Temp\bootstrap-transcript.log"
+$consoleLog = "COM1"
 
-# Function to log to both file and system log
+# Initial output for EC2 console log
+"Bootstrap script started at $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" | Out-File -Append -FilePath $consoleLog
+
+# Logging function for EC2 system log only
 function Write-Log {
   param ([string]$Message)
   $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-  $formatted = "$timestamp - $Message"
-  try {
-    Add-Content -Path $logPath -Value $formatted
-  } catch {
-    # fallback if file is locked
-    "$timestamp - (log file busy) $Message" | Out-File -Append -FilePath "COM1"
-  }
-  $formatted | Out-File -Append -FilePath "COM1"
+  "$timestamp - $Message" | Out-File -Append -FilePath $consoleLog
 }
 
+# Start transcript (separate from COM1 logging)
 Write-Log "Starting transcript..."
 try {
   Start-Transcript -Path $logPath -Force
@@ -86,25 +83,28 @@ try {
 }
 
 # --- Download and Install Power BI ---
-Write-Log "Downloading Power BI installer from S3..."
+Write-Log "Starting Power BI installation..."
+
+$powerBIPath = "C:\Windows\Temp\PBIDesktopSetup_x64.exe"
+$bucketPath = "s3://dpr-artifact-store-development/third-party/PowerBI/PBIDesktopSetup_x64.exe"
+
 try {
-  & "$awsCliPath\aws.exe" s3 cp `
-    s3://dpr-artifact-store-development/third-party/PowerBI/PBIDesktopSetup_x64.exe `
-    C:\Windows\Temp\PBIDesktopSetup_x64.exe
+  Write-Log "Downloading Power BI installer from $bucketPath"
+  & "$awsCliPath\aws.exe" s3 cp $bucketPath $powerBIPath
 } catch {
   Write-Log "Power BI download failed: $_"
 }
 
-$installer = "C:\Windows\Temp\PBIDesktopSetup_x64.exe"
-if (Test-Path $installer) {
-  Write-Log "Installing Power BI Desktop..."
+if (Test-Path $powerBIPath) {
+  Write-Log "Power BI installer found. Installing..."
   try {
-    Start-Process -FilePath $installer -ArgumentList "/quiet /norestart" -Wait
+    Start-Process -FilePath $powerBIPath -ArgumentList "/quiet /norestart" -Wait
+    Write-Log "Power BI installation completed successfully."
   } catch {
-    Write-Log "Power BI install failed: $_"
+    Write-Log "Power BI installation failed: $_"
   }
 } else {
-  Write-Log "Power BI installer not found. Skipping install."
+  Write-Log "Power BI installer not found after download attempt."
 }
 
 # --- Final Marker and Completion ---
