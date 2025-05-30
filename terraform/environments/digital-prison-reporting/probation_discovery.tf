@@ -14,7 +14,7 @@ module "probation_discovery_windows_node" {
   associate_public_ip_address = false
   ebs_optimized               = true
   monitoring                  = true
-  ebs_size                    = 100
+  ebs_size                    = 500
   ebs_encrypted               = true
   ebs_delete_on_termination   = true
   policies = [
