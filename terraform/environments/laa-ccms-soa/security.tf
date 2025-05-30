@@ -62,7 +62,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_80" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "alb_managed_ingress_7001" {
+resource "aws_security_group_rule" "alb_managed_ingress_8001" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
   description       = "Managed Weblogic" #--Maybe?

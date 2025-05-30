@@ -18,6 +18,7 @@
       "admin_ebs_ds_username": "apps",
       "admin_ebssms_ds_url": "jdbc:oracle:thin:@cwa-db.aws.dev.legalservices.gov.uk:1571:CWA",
       "admin_hostname": "ccms-soa-admin",
+      "admin_run_rcu_bootstrap": "false",
       "app_count_admin": "1",
       "admin_ebssms_ds_username": "apps",
       "admin_ebs_user_username": "ebs_soa_super_user",

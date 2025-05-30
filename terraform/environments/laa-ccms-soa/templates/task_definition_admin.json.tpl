@@ -29,6 +29,10 @@
         "value": "${db_instance_endpoint}/SOADB"
       },
       {
+        "name": "RUN_RCU",
+        "value": "${admin_run_rcu_bootstrap}"
+      },
+      {
         "name": "RCUPREFIX",
         "value": "CCMSSOA"
       },
