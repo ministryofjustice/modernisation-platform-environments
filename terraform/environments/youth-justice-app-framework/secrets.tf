@@ -99,6 +99,22 @@ resource "aws_secretsmanager_secret_version" "Unit_test" {
   }
 }
 
+resource "aws_secretsmanager_secret" "google_api" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}_google_api"
+  description = "Used within UI for google maps"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "google_api" {
+  secret_id     = aws_secretsmanager_secret.google_api.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
 
 ### Tableau Secrets ###
 ## Secret to hold Tableau administration details
