@@ -40,29 +40,11 @@ resource "aws_iam_role_policy" "lambda_policy" {
         Resource = "*"
       },
       {
+        Effect = "Allow",
         Action = [
-          "sns:Publish"
+          "cloudwatch:PutMetricData"
         ],
-        Effect   = "Allow",
-        Resource = aws_sns_topic.dms_alerts_topic.arn
-      },
-      {
-        Action = [
-          "logs:CreateLogGroup",
-          "logs:CreateLogStream",
-          "logs:PutLogEvents"
-        ],
-        Effect   = "Allow",
         Resource = "*"
-      },
-      {
-        Action = [
-          "kms:GenerateDataKey",
-          "kms:Decrypt",
-          "kms:Encrypt"
-        ],
-        Effect   = "Allow",
-        Resource = var.account_config.kms_keys.general_shared
       }
     ]
   })
@@ -115,4 +97,56 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   function_name = aws_lambda_function.dms_checker.function_name
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.check_dms_every_5_min.arn
+}
+
+# Raising a Cloudwatch Alarm on a DMS Replication Task Event is not directly possible using the 
+# Cloudwatch Alarm Integration in PagerDuty as the JSON payload is different.   Therefore, as
+# workaround for this we create a custom Cloudwatch Metric which is populated by the
+# DMS Health Checker Lambda Function.
+
+resource "aws_cloudwatch_metric_alarm" "dms_alarm" {
+  alarm_name          = "DMS-Task-Not-Running"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
+  evaluation_periods  = 1
+  metric_name         = "DMSTaskNotRunning"
+  namespace           = "Custom/DMS"
+  period              = 300
+  statistic           = "Maximum"
+  threshold           = 1
+
+  alarm_description   = "Triggered when any DMS replication task is not running"
+  actions_enabled     = true
+  alarm_actions       = [aws_sns_topic.alerts.arn]
+}
+
+# Pager duty integration
+
+# Get the map of pagerduty integration keys from the modernisation platform account
+data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+  provider = aws.modernisation-platform
+  name     = "pagerduty_integration_keys"
+}
+
+data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+  provider  = aws.modernisation-platform
+  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+}
+
+# Add a local to get the keys
+locals {
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  integration_key_lookup     = var.dms_config.is-production ? "delius_oracle_prod_alarms" : "delius_oracle_nonprod_alarms"
+}
+
+# link the sns topic to the service
+# Non-Prod alerts channel: #delius-aws-oracle-dev-alerts
+# Prod alerts channel:     #delius-aws-oracle-prod-alerts
+module "pagerduty_core_alerts" {
+  #checkov:skip=CKV_TF_1
+  depends_on = [
+    aws_sns_topic.dms_alerts_topic
+  ]
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  sns_topics                = [aws_sns_topic.dms_alerts_topic.name]
+  pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
 }

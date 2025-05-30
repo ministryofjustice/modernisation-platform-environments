@@ -133,37 +133,37 @@ resource "aws_cloudwatch_metric_alarm" "dms_cdc_latency_target" {
   tags = var.tags
 }
 
-# Pager duty integration
+# # Pager duty integration
 
-# Get the map of pagerduty integration keys from the modernisation platform account
-data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
-  provider = aws.modernisation-platform
-  name     = "pagerduty_integration_keys"
-}
+# # Get the map of pagerduty integration keys from the modernisation platform account
+# data "aws_secretsmanager_secret" "pagerduty_integration_keys" {
+#   provider = aws.modernisation-platform
+#   name     = "pagerduty_integration_keys"
+# }
 
-data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
-  provider  = aws.modernisation-platform
-  secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
-}
+# data "aws_secretsmanager_secret_version" "pagerduty_integration_keys" {
+#   provider  = aws.modernisation-platform
+#   secret_id = data.aws_secretsmanager_secret.pagerduty_integration_keys.id
+# }
 
-# Add a local to get the keys
-locals {
-  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
-  integration_key_lookup     = var.dms_config.is-production ? "delius_oracle_prod_alarms" : "delius_oracle_nonprod_alarms"
-}
+# # Add a local to get the keys
+# locals {
+#   pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+#   integration_key_lookup     = var.dms_config.is-production ? "delius_oracle_prod_alarms" : "delius_oracle_nonprod_alarms"
+# }
 
-# link the sns topic to the service
-# Non-Prod alerts channel: #delius-aws-oracle-dev-alerts
-# Prod alerts channel:     #delius-aws-oracle-prod-alerts
-module "pagerduty_core_alerts" {
-  #checkov:skip=CKV_TF_1
-  depends_on = [
-    aws_sns_topic.dms_alerts_topic
-  ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
-  sns_topics                = [aws_sns_topic.dms_alerts_topic.name]
-  pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
-}
+# # link the sns topic to the service
+# # Non-Prod alerts channel: #delius-aws-oracle-dev-alerts
+# # Prod alerts channel:     #delius-aws-oracle-prod-alerts
+# module "pagerduty_core_alerts" {
+#   #checkov:skip=CKV_TF_1
+#   depends_on = [
+#     aws_sns_topic.dms_alerts_topic
+#   ]
+#   source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+#   sns_topics                = [aws_sns_topic.dms_alerts_topic.name]
+#   pagerduty_integration_key = local.pagerduty_integration_keys[local.integration_key_lookup]
+# }
 
 # We do not want to receive Pager Duty Notifications for the development->test replication out of hours.   This is because
 # the development environment is shutdown each evening and at weekends.  Immediately after a shutdown occurs, the
