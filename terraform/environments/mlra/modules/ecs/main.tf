@@ -87,36 +87,53 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-  dynamic "ingress" {
-    for_each = var.ec2_ingress_rules
-    content {
-      description     = lookup(ingress.value, "description", null)
-      from_port       = lookup(ingress.value, "from_port", null)
-      to_port         = lookup(ingress.value, "to_port", null)
-      protocol        = lookup(ingress.value, "protocol", null)
-      cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
-      security_groups = lookup(ingress.value, "security_groups", null)
-    }
-  }
-    dynamic "egress" {
-    for_each = var.ec2_egress_rules
-    content {
-      description = lookup(egress.value, "description", null)
-      from_port   = lookup(egress.value, "from_port", null)
-      to_port     = lookup(egress.value, "to_port", null)
-      protocol    = lookup(egress.value, "protocol", null)
-      #tfsec:ignore:AVD-AWS-0104:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-      cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
-      security_groups = lookup(egress.value, "security_groups", null)
-    }
-  }
-
   tags = merge(
     var.tags_common,
     {
       Name = "${var.app_name}-cluster-ec2-security-group"
     }
   )
+}
+
+resource "aws_security_group_rule" "cluster_ec2_lb_ingress" {
+  type                     = "ingress"
+  from_port                = 32768
+  to_port                  = 61000
+  protocol                 = "tcp"
+  description              = "Cluster EC2 ingress"
+  security_group_id        = aws_security_group.cluster_ec2.id
+  source_security_group_id = module.alb.security_group.id
+}
+
+resource "aws_security_group_rule" "cluster_ec2_lb_egress" {
+  type                     = "egress"
+  from_port                = 32768
+  to_port                  = 61000
+  protocol                 = "tcp"
+  description              = "Cluster EC2 loadbalancer egress rule"
+  security_group_id        = aws_security_group.cluster_ec2.id
+  source_security_group_id = module.alb.security_group.id
+}
+
+resource "aws_security_group_rule" "mlra_sg_rule_outbound" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
+  security_group_id = aws_security_group.cluster_ec2.id
+}
+
+# Specific Security Group Rule for Access to MAATDB
+resource "aws_security_group_rule" "mlra_to_maatdb_sg_rule_outbound" {
+  type              = "egress"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  description       = "This rule is needed for the MLRA to connect to MAATDB"
+  security_group_id = aws_security_group.cluster_ec2.id
+  source_security_group_id = var.maatdb_rds_sec_group_id
 }
 
 # always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
