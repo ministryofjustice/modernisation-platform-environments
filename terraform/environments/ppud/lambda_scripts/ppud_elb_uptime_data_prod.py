@@ -26,9 +26,9 @@ def lambda_handler(event, context):
     end_time = datetime.now(timezone.utc)
     start_time = end_time - timedelta(days=1)
 
-    # Format for S3 file path: elb-target-uptime/elb_uptime_report_YYYY-MM-DD.csv
-    current_date_str = end_time.strftime('%Y-%m-%d')
-    s3_key = f"elb-target-uptime/elb_uptime_report_{current_date_str}.csv"
+    # Format for S3 file path: elb-target-uptime/elb_uptime_report_START_DATE.csv
+    start_date_str = start_time.strftime('%Y-%m-%d')
+    s3_key = f"elb-target-uptime/elb_uptime_report_{start_date_str}.csv"
 
     # Get CloudWatch metrics
     response = cloudwatch.get_metric_statistics(

@@ -43,8 +43,9 @@ resource "aws_cloudfront_distribution" "external" {
   allowed_methods  = ["GET", "HEAD"]
   cached_methods   = ["GET", "HEAD"]
 
-  cache_policy_id = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Managed-CachingDisabled
-  origin_request_policy_id = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
+  cache_policy_id            = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Managed-CachingDisabled
+  origin_request_policy_id   = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
+  response_headers_policy_id = aws_cloudfront_response_headers_policy.strict_transport_security.id
 
   compress = true
 }
@@ -96,6 +97,12 @@ resource "aws_cloudfront_distribution" "external" {
     error_caching_min_ttl = 300
   }
 
+  custom_error_response {
+  error_code            = 504
+  response_code         = 200
+  response_page_path    = "/custom-503.html"
+  error_caching_min_ttl = 300
+  }
   #   is_ipv6_enabled = true
 
   tags = var.tags

@@ -1109,22 +1109,22 @@ resource "aws_cloudwatch_log_group" "lambda_security_hub_report_uat_log_group" {
 # Lambda Function to graph PPUD Target Response Time - PROD
 ###########################################################
 
-resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_ppud_elb_trt_prod" {
+resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_ppud_elb_trt_data_prod" {
   count         = local.is-production == true ? 1 : 0
   statement_id  = "AllowAccesstoCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_ppud_elb_trt_prod[0].function_name
+  function_name = aws_lambda_function.terraform_lambda_func_ppud_elb_trt_data_prod[0].function_name
   principal     = "cloudwatch.amazonaws.com"
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
 }
 
-resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_prod" {
+resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_data_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/ppud_elb_report_trt.zip"
-  function_name                  = "ppud_elb_trt"
+  filename                       = "${path.module}/lambda_scripts/ppud_elb_trt_data_prod.zip"
+  function_name                  = "ppud_elb_trt_data_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
-  handler                        = "ppud_elb_trt_prod.lambda_handler"
+  handler                        = "ppud_elb_trt_data_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
@@ -1136,11 +1136,6 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_prod" {
   tracing_config {
     mode = "Active"
   }
-  layers = [
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
-  ]
   # VPC configuration
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_b.id]
@@ -1150,20 +1145,20 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_prod" {
 
 # Archive the zip file
 
-data "archive_file" "zip_the_ppud_elb_trt_prod" {
+data "archive_file" "zip_the_ppud_elb_trt_data_prod" {
   count       = local.is-production == true ? 1 : 0
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/ppud_elb_report_trt.zip"
+  output_path = "${path.module}/lambda_scripts/ppud_elb_trt_data_prod.zip"
 }
 
 # Cloudwatch log group for the lambda function
 
-resource "aws_cloudwatch_log_group" "lambda_ppud_elb_trt_prod_log_group" {
+resource "aws_cloudwatch_log_group" "lambda_ppud_elb_trt_data_prod_log_group" {
   # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
   # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
   count             = local.is-production == true ? 1 : 0
-  name              = "/aws/lambda/ppud_elb_trt"
+  name              = "/aws/lambda/ppud_elb_trt_data_prod"
   retention_in_days = 30
 }
 
@@ -1198,11 +1193,6 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_uptime_data_prod"
   tracing_config {
     mode = "Active"
   }
-  layers = [
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
-  ]
   # VPC configuration
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_b.id]
@@ -1260,11 +1250,6 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_uptime_calculate_
   tracing_config {
     mode = "Active"
   }
-  layers = [
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
-  ]
   # VPC configuration
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_b.id]
