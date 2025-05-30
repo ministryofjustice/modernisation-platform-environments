@@ -134,7 +134,8 @@ data "aws_iam_policy_document" "extra-policy-document" {
     actions = [
       "dms:DescribeTableStatistics",
       "dms:DescribeReplicationTasks",
-      "dms:StopReplicationTask"
+      "dms:StopReplicationTask",
+      "dms:ModifyReplicationTask"
     ]
     resources = [
       "arn:aws:dms:${var.region}:${var.account}:*:*"
