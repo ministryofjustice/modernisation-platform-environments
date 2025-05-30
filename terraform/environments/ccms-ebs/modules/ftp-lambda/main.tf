@@ -77,10 +77,10 @@ resource "aws_lambda_function" "ftp_lambda" {
   source_code_hash = filebase64sha256("${path.module}/lambda/ftp-client.zip")
   layers        = [aws_lambda_layer_version.ftp_layer.arn]
 
-  vpc_config {
-    subnet_ids         = var.subnet_ids
+  # vpc_config {
+  #   subnet_ids         = var.subnet_ids
     # security_group_ids = [aws_security_group.ftp_sg.id]
-  }
+  # }
 
   environment {
     variables = {
