@@ -8,7 +8,9 @@
       "instance_type": "m5.large",
       "key_name": "",
       "docker_image_tag": "development",
-      "maat_api_end_point": "https://laa-maat-data-api-dev.apps.live.cloud-platform.service.justice.gov.uk/maatApi/laaStatus",
+      "maat_api_endpoint": "https://laa-maat-data-api-dev.apps.live.cloud-platform.service.justice.gov.uk/maatApi/laaStatus",
+      "maat_api_oauth_scope": "maat-api-dev",
+      "maat_api_oauth_url": "https://maat-api-dev.auth.eu-west-2.amazoncognito.com/oauth2/token",
       "maat_db_url": "maatdb-development-database.cfxq8vgqqxpp.eu-west-2.rds.amazonaws.com:1521:MAATDB",
       "maat_libra_wsdl_url": "http://infox.aws.dev.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
@@ -28,7 +30,7 @@
       "nlb_prevent_deletion": false,
       "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
       "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
-      "maatdb_rds_sec_group_id": "sg-0727aa271de73eb1d"
+      "maatdb_rds_sec_group_id": "sg-01af07cdeb1fb46d0"
     },
     "test": {
       "example_var": "test-data",
@@ -38,7 +40,9 @@
       "instance_type": "m5.large",
       "key_name": "",
       "docker_image_tag": "test",
-      "maat_api_end_point": "http://maat-cd-api.aws.uat.legalservices.gov.uk/maatApi/laaStatus",
+      "maat_api_endpoint": "http://maat-cd-api.aws.uat.legalservices.gov.uk/maatApi/laaStatus",
+      "maat_api_oauth_scope": "maat-api-uat",
+      "maat_api_oauth_url": "https://maat-api-uat.auth.eu-west-2.amazoncognito.com/oauth2/token",
       "maat_db_url": "rds.maat.aws.uat.legalservices.gov.uk:1521:MAATDB",
       "maat_libra_wsdl_url": "http://infox.aws.uat.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
@@ -68,7 +72,9 @@
       "instance_type": "m5.large",
       "key_name": "",
       "docker_image_tag": "preproduction",
-      "maat_api_end_point": "http://maat-cd-api.aws.stg.legalservices.gov.uk/maatApi/laaStatus",
+      "maat_api_endpoint": "http://maat-cd-api.aws.stg.legalservices.gov.uk/maatApi/laaStatus",
+      "maat_api_oauth_scope": "maat-api-uat",
+      "maat_api_oauth_url": "https://maat-api-uat.auth.eu-west-2.amazoncognito.com/oauth2/token",
       "maat_db_url": "rds.maat.aws.stg.legalservices.gov.uk:1521:MAATDB",
       "maat_libra_wsdl_url": "http://infox.aws.stg.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
@@ -98,7 +104,9 @@
       "instance_type": "m5.large",
       "key_name": "",
       "docker_image_tag": "production",
-      "maat_api_end_point": "https://laa-maat-data-api-prod.apps.live.cloud-platform.service.justice.gov.uk/maatApi/laaStatus",
+      "maat_api_endpoint": "https://laa-maat-data-api-prod.apps.live.cloud-platform.service.justice.gov.uk/maatApi/laaStatus",
+      "maat_api_oauth_scope": "maat-api-prod",
+      "maat_api_oauth_url": "https://maat-api-prod.auth.eu-west-2.amazoncognito.com/oauth2/token",
       "maat_db_url": "maatdb-production-database.cpc2ec6s8389.eu-west-2.rds.amazonaws.com:1521:MAATDB",
       "maat_libra_wsdl_url": "http://infox.aws.prd.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 0,
@@ -118,7 +126,7 @@
       "nlb_prevent_deletion": true,
       "pagerduty_integration_key_name": "laa_mlra_prod_alarms",
       "acm_cert_domain_name": "maat-libra-administration-tool.service.justice.gov.uk",
-      "maatdb_rds_sec_group_id": "sg-04dc271480abca473"
+      "maatdb_rds_sec_group_id": "sg-0fae0ff1a577fb001"
     }
   }
 }

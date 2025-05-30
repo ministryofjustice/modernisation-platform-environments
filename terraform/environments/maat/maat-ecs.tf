@@ -253,7 +253,7 @@ resource "aws_security_group_rule" "maat_to_maatdb_sg_rule_outbound" {
   protocol          = "tcp"
   description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
   security_group_id = aws_security_group.maat_ecs_security_group.id
-  source_security_group_id = "sg-0727aa271de73eb1d"
+  source_security_group_id = local.application_data.accounts[local.environment].maatdb_rds_sec_group_id
 }
 
 #### EC2 CLOUDWATCH LOG GROUP & Key ------
