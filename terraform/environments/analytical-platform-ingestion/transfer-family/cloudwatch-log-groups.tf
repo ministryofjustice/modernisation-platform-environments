@@ -6,5 +6,6 @@ module "transfer_server_structured_logs" {
 
   name              = "/aws/transfer-server-structured-logs"
   kms_key_id        = module.transfer_server_logs_kms.key_arn
+
   retention_in_days = 400
 }
