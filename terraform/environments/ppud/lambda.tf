@@ -880,26 +880,26 @@ resource "aws_cloudwatch_log_group" "lambda_disk_info_report_prod_log_group" {
   retention_in_days = 30
 }
 
-#######################################################
-# Lambda Function to send Disk Read Write Report - PROD
-#######################################################
+########################################################################
+# Lambda Function for use in python script development and testing- PROD
+########################################################################
 
-resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_disk_read_write_report_prod" {
+resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_script_testing_prod" {
   count         = local.is-production == true ? 1 : 0
   statement_id  = "AllowAccesstoCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_disk_read_write_report_prod[0].function_name
+  function_name = aws_lambda_function.terraform_lambda_func_script_testing_prod[0].function_name
   principal     = "cloudwatch.amazonaws.com"
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
 }
 
-resource "aws_lambda_function" "terraform_lambda_func_disk_read_write_report_prod" {
+resource "aws_lambda_function" "terraform_lambda_func_script_testing_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/disk_read_write_report_prod.zip"
-  function_name                  = "disk_read_write_report"
+  filename                       = "${path.module}/lambda_scripts/script_testing_prod.zip"
+  function_name                  = "script_testing_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
-  handler                        = "disk_read_write_report_prod.lambda_handler"
+  handler                        = "script_testing_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
@@ -925,11 +925,11 @@ resource "aws_lambda_function" "terraform_lambda_func_disk_read_write_report_pro
 
 # Archive the zip file
 
-data "archive_file" "zip_the_disk_read_write_report_code_prod" {
+data "archive_file" "zip_the_script_testing_prod" {
   count       = local.is-production == true ? 1 : 0
   type        = "zip"
   source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/disk_read_write_report_prod.zip"
+  output_path = "${path.module}/lambda_scripts/script_testing_prod.zip"
 }
 
 # Cloudwatch log group for the lambda function
