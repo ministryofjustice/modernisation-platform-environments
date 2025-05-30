@@ -87,18 +87,6 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-  dynamic "ingress" {
-    for_each = var.ec2_ingress_rules
-    content {
-      description     = lookup(ingress.value, "description", null)
-      from_port       = lookup(ingress.value, "from_port", null)
-      to_port         = lookup(ingress.value, "to_port", null)
-      protocol        = lookup(ingress.value, "protocol", null)
-      cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
-      security_groups = lookup(ingress.value, "security_groups", null)
-    }
-  }
-
   tags = merge(
     var.tags_common,
     {
@@ -107,6 +95,26 @@ resource "aws_security_group" "cluster_ec2" {
   )
 }
 
+
+resource "aws_security_group_rule" "cluster_ec2_lb_ingress" {
+  type                     = "ingress"
+  from_port                = 32768
+  to_port                  = 61000
+  protocol                 = "tcp"
+  description              = "Cluster EC2 ingress"
+  security_group_id        = aws_security_group.cluster_ec2.id
+  source_security_group_id = var.alb_security_group_id
+}
+
+resource "aws_security_group_rule" "cluster_ec2_lb_egress" {
+  type                     = "egress"
+  from_port                = 32768
+  to_port                  = 61000
+  protocol                 = "tcp"
+  description              = "Cluster EC2 loadbalancer egress rule"
+  security_group_id        = aws_security_group.cluster_ec2.id
+  source_security_group_id = var.alb_security_group_id
+}
 
 resource "aws_security_group_rule" "mlra_sg_rule_outbound" {
   type              = "egress"
@@ -513,20 +521,6 @@ resource "aws_iam_policy" "ecs_task_execution_ssm_policy" { #tfsec:ignore:aws-ia
         "ssm:GetParameters"
       ],
       "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.infox_client_secret}"]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ssm:GetParameters"
-      ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maat_api_client_id}"]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ssm:GetParameters"
-      ],
-      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maat_api_client_secret}"]
     }
   ]
 }
