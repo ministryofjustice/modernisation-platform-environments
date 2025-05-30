@@ -31,21 +31,21 @@ sudo systemctl enable awslogsd.service
 XDR_DIR="/tmp/cortex-agent"
 XDR_TAR="/tmp/cortex-agent.tar.gz"
 
-aws s3 cp "s3://${xdr_bucket}/cortex-agent.tar.gz" "${XDR_TAR}"
+aws s3 cp "s3://${xdr_bucket}/cortex-agent.tar.gz" \${XDR_TAR}
 
-if [[ -f "${XDR_TAR}" ]]; then
-  mkdir -p "${XDR_DIR}"
-  tar -xzf "${XDR_TAR}" -C "${XDR_DIR}"
+if [[ -f \${XDR_TAR} ]]; then
+  mkdir -p \${XDR_DIR}
+  tar -xzf \${XDR_TAR} -C \${XDR_DIR}
 
-  if [[ -f "${XDR_DIR}/cortex.conf" ]]; then
+  if [[ -f \${XDR_DIR}/cortex.conf ]]; then
     sudo mkdir -p /etc/panw
-    sudo cp "${XDR_DIR}/cortex.conf" /etc/panw/
+    sudo cp \${XDR_DIR}/cortex.conf /etc/panw/
   else
     echo "Missing cortex.conf in extracted archive" >&2
     exit 1
   fi
 
-  sudo yum install -y "${XDR_DIR}"/*.rpm
+  sudo yum install -y \${XDR_DIR}/*.rpm
 else
   echo "XDR agent download failed" >&2
   exit 1
