@@ -16,6 +16,14 @@ locals {
     }
   }
   ec2_egress_rules = {
+    "cluster_ec2_lb_egress" = {
+      description     = "Cluster EC2 loadbalancer egress rule"
+      from_port       = 32768
+      to_port         = 61000
+      protocol        = "tcp"
+      cidr_blocks     = []
+      security_groups = [module.alb.security_group.id]
+    }
   }
 
   user_data = base64encode(templatefile("user_data.sh", {
