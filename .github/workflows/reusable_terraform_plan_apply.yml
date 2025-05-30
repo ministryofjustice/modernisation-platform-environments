@@ -68,7 +68,7 @@ env:
   WORKSPACE_NAME: "${{ inputs.application }}-${{ inputs.environment }}"
   ENVIRONMENT_MANAGEMENT: "${{ secrets.modernisation_platform_environments }}"
   GITHUB_TOKEN: "${{ secrets.pipeline_github_token }}"
-  TF_LOG: "DEBUG"
+  TF_LOG: "TRACE"
 
 concurrency:
   group: ${{ inputs.application }}-${{ inputs.environment }}
