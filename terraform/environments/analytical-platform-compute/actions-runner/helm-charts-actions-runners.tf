@@ -8,7 +8,7 @@ resource "helm_release" "actions_runner_mojas_airflow" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow/values.yml.tftpl",
@@ -34,7 +34,7 @@ resource "helm_release" "actions_runner_mojas_airflow_create_a_pipeline" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow-create-a-pipeline/values.yml.tftpl",
@@ -59,7 +59,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -83,7 +83,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_non_spot" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -111,7 +111,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_sandbox_a" 
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -135,7 +135,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_sandbox_a_n
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -163,7 +163,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -187,7 +187,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr_pp" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -211,7 +211,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr_test" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -235,7 +235,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr_dev" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -259,7 +259,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds_test" 
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -283,7 +283,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds_pp" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -307,7 +307,7 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
@@ -333,7 +333,7 @@ resource "helm_release" "actions_runner_moj_data_catalogue" {
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
   version    = "2.323.0-6"
   chart      = "actions-runner"
-  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/data-catalogue/values.yml.tftpl",

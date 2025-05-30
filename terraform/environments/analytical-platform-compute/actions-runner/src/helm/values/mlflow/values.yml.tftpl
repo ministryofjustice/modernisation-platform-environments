@@ -1,0 +1,70 @@
+---
+ingress:
+  enabled: true
+  className: "default"
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: ${mlflow_hostname}
+  hosts:
+    - host: ${mlflow_hostname}
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+          backend:
+            service:
+              name: mlflow
+              port:
+                number: 5000
+  tls:
+    - hosts:
+      - ${mlflow_hostname}
+
+mlflow:
+  environment:
+    - name: "MLFLOW_AUTH_ADMIN_PASSWORD"
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-admin
+          key:  password
+    - name: "MLFLOW_AUTH_DATABASE_URI"
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-auth-rds
+          key:  postgres_connection_string
+    - name: "MLFLOW_SERVER_BACKEND_STORE_URI"
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-rds
+          key:  postgres_connection_string
+    - name: "MLFLOW_SERVER_DEFAULT_ARTIFACT_ROOT"
+      value: "s3://${s3_bucket_name}/tracking"
+    - name: "MLFLOW_FLASK_SERVER_SECRET_KEY"
+      valueFrom:
+        secretKeyRef:
+          name: mlflow-flask-server-secret-key
+          key:  secret-key
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: ${eks_role_arn}
+
+serviceMonitor:
+  enabled: true
+
+resources:
+  limits:
+    cpu: 1
+    memory: 1Gi
+  requests:
+    cpu: 0.1
+    memory: 128Mi
