@@ -79,7 +79,7 @@ resource "aws_lambda_function" "ftp_lambda" {
 
   vpc_config {
     subnet_ids         = var.subnet_ids
-    security_group_ids = [aws_security_group.ftp_sg.id]
+    # security_group_ids = [aws_security_group.ftp_sg.id]
   }
 
   environment {
