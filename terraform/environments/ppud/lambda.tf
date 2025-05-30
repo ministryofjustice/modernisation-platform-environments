@@ -1180,7 +1180,7 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_calculate_pro
   count                          = local.is-production == true ? 1 : 0
   filename                       = "${path.module}/lambda_scripts/ppud_elb_trt_calculate_prod.zip"
   function_name                  = "ppud_elb_trt_calculate_prod"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_calculate_prod[0].arn
+  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
   handler                        = "ppud_elb_trt_calculate_prod.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
