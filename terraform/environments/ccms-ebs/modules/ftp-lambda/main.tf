@@ -128,22 +128,22 @@ resource "aws_lambda_permission" "ftp_permission" {
 
 
 ### crating cw metric alarm
-resource "aws_cloudwatch_metric_alarm" "ftp_errors" {
-  alarm_name          = "${var.lambda_name}-Errors"
-  comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = 1
-  metric_name         = "Errors"
-  namespace           = "AWS/Lambda"
-  period              = 60
-  statistic           = "Sum"
-  threshold           = 0
-  treat_missing_data  = "ignore"
+# resource "aws_cloudwatch_metric_alarm" "ftp_errors" {
+#   alarm_name          = "${var.lambda_name}-Errors"
+#   comparison_operator = "GreaterThanThreshold"
+#   evaluation_periods  = 1
+#   metric_name         = "Errors"
+#   namespace           = "AWS/Lambda"
+#   period              = 60
+#   statistic           = "Sum"
+#   threshold           = 0
+#   treat_missing_data  = "ignore"
 
-  dimensions = {
-    FunctionName = aws_lambda_function.ftp_lambda.function_name
-  }
+#   dimensions = {
+#     FunctionName = aws_lambda_function.ftp_lambda.function_name
+#   }
 
-  alarm_description = "Errors occurred in Lambda"
-  alarm_actions     = [var.sns_topic_sev5, var.sns_topic_ops]
-  ok_actions        = [var.sns_topic_sev5, var.sns_topic_ops]
-}
+#   alarm_description = "Errors occurred in Lambda"
+#   alarm_actions     = [var.sns_topic_sev5, var.sns_topic_ops]
+#   ok_actions        = [var.sns_topic_sev5, var.sns_topic_ops]
+# }

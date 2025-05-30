@@ -54,7 +54,7 @@ module "ftp_lambda" {
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
   ftp_bucket          = aws_s3_bucket.inbound_bucket.id
-  sns_topic_sev5      = "arn:aws:sns:region:account:sev5"
-  sns_topic_ops       = "arn:aws:sns:region:account:ops"
+  sns_topic_sev5      = ""
+  sns_topic_ops       = ""
   ssh_key_path        = ""
 }
