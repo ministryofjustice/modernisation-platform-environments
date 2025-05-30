@@ -39,8 +39,24 @@ module "kms" {
         ]
       }
     ]
+  },
+  {
+    sid = "AllowLambdaFunctionAccess"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:GenerateDataKey"
+    ]
+    resources = ["*"]
+
+    principals = [
+      {
+        type        = "AWS"
+        identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/update-dc-names-lambda-role"]
+      }
+    ]
   }
-  ]
+]
   tags = local.tags
 }
 #todo add to all secrets
