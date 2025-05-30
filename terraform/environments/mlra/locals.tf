@@ -23,7 +23,7 @@ locals {
       protocol        = "tcp"
       cidr_blocks     = []
       security_groups = [module.alb.security_group.id]
-    }
+    },
     "maat_to_maatdb_sg_rule_outbound" = {
       description     = "This rule is needed for the MLRA to connect to MAATDB"
       from_port       = 1521
@@ -31,7 +31,7 @@ locals {
       protocol        = "tcp"
       cidr_blocks     = []
       security_groups = [local.application_data.accounts[local.environment].maatdb_rds_sec_group_id]
-    }
+    },
     "maat_sg_rule_outbound" = {
       description     = "This rule is needed for the ECS agent to reach the ECS API endpoints"
       from_port       = 443
