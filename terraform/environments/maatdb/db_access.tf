@@ -1,5 +1,10 @@
 locals {
   public_key_data = jsondecode(file("./files/bastion_linux.json"))
+
+  crontab = {
+    "down" = "15 23 25 12 *"
+    "up"   = "30 23 25 12 *"
+  }
 }
 
 module "bastion_linux" {
@@ -25,6 +30,8 @@ module "bastion_linux" {
   subnet_set         = local.subnet_set
   environment        = local.environment
   region             = "eu-west-2"
+  # Autoscaling
+  autoscaling_cron   = local.crontab
 
   # Tags
   tags_common = local.tags
