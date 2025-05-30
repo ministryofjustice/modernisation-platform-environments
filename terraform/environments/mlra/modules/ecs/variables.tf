@@ -198,3 +198,8 @@ variable "maat_api_client_secret" {
   type        = string
   description = "Parameter store secret name containing the MAAT API Client Secret"
 }
+
+variable "alb_security_group_id" {
+  type        = string
+  description = "ALB Security Group ID"
+}

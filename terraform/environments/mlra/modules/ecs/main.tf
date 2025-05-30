@@ -102,7 +102,7 @@ resource "aws_security_group_rule" "cluster_ec2_lb_ingress" {
   protocol                 = "tcp"
   description              = "Cluster EC2 ingress"
   security_group_id        = aws_security_group.cluster_ec2.id
-  source_security_group_id = module.alb.security_group.id
+  source_security_group_id = var.alb_security_group_id
 }
 
 resource "aws_security_group_rule" "cluster_ec2_lb_egress" {
@@ -112,7 +112,7 @@ resource "aws_security_group_rule" "cluster_ec2_lb_egress" {
   protocol                 = "tcp"
   description              = "Cluster EC2 loadbalancer egress rule"
   security_group_id        = aws_security_group.cluster_ec2.id
-  source_security_group_id = module.alb.security_group.id
+  source_security_group_id = var.alb_security_group_id
 }
 
 resource "aws_security_group_rule" "mlra_sg_rule_outbound" {
