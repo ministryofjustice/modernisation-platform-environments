@@ -61,7 +61,7 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "kms:Decrypt",
           "kms.Encrypt"
         ],
-        Effect   = "Allow"
+        Effect   = "Allow",
         Resource = var.account_config.kms_keys.general_shared
       }
     ]
