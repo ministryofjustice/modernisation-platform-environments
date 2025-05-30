@@ -18,6 +18,7 @@ def lambda_handler(event, context):
     tasks = response.get('ReplicationTasks', [])
     print(f"Found {len(tasks)} replication task(s)")
 
+    # Initialize list of non-running replication tasks
     non_running = []
 
     for task in tasks:
