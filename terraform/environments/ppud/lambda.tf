@@ -486,17 +486,6 @@ data "archive_file" "zip_the_send_cpu_graph_code_dev" {
   output_path = "${path.module}/lambda_scripts/send_cpu_graph_dev.zip"
 }
 
-# Lambda Layer for Matplotlib
-
-resource "aws_lambda_layer_version" "lambda_layer_matplotlib_dev" {
-  count               = local.is-development == true ? 1 : 0
-  layer_name          = "matplotlib-layer"
-  description         = "matplotlib-layer for python 3.12"
-  s3_bucket           = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  s3_key              = "matplotlib-layer.zip"
-  compatible_runtimes = ["python3.12"]
-}
-
 #################################################
 # Lambda Function to graph CPU Utilization - PROD
 #################################################
@@ -559,16 +548,6 @@ resource "aws_cloudwatch_log_group" "lambda_send_cpu_graph_prod_log_group" {
   retention_in_days = 30
 }
 
-# Lambda Layer for Matplotlib
-
-resource "aws_lambda_layer_version" "lambda_layer_matplotlib_prod_new" {
-  count               = local.is-production == true ? 1 : 0
-  layer_name          = "matplotlib-layer-prod"
-  description         = "matplotlib-layer for python 3.12"
-  s3_bucket           = aws_s3_bucket.moj-infrastructure[0].id
-  s3_key              = "lambda/layers/matplotlib-layer.zip"
-  compatible_runtimes = ["python3.12"]
-}
 
 ##################################################
 # Lambda Function to graph PPUD Email Usage - PROD
