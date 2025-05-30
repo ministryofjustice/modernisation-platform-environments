@@ -465,7 +465,7 @@ module "maat_pagerduty_core_alerts" {
   depends_on = [
     aws_sns_topic.maat_alerting_topic
   ]
-  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=v2.0.0"
+  source                    = "github.com/ministryofjustice/modernisation-platform-terraform-pagerduty-integration?ref=0179859e6fafc567843cd55c0b05d325d5012dc4"
   sns_topics                = [aws_sns_topic.maat_alerting_topic.name]
   pagerduty_integration_key = local.maat_pagerduty_integration_keys[local.maat_pagerduty_integration_key_name]
 }
