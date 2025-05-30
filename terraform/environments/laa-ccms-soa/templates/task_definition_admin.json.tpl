@@ -30,7 +30,7 @@
       },
       {
         "name": "RUN_RCU",
-        "value": "${admin_run_rcu_bootstrap}"
+        "value": "${run_rcu}"
       },
       {
         "name": "RCUPREFIX",

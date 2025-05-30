@@ -79,6 +79,7 @@ resource "aws_ecs_task_definition" "admin" {
       pui_user_password    = aws_secretsmanager_secret.pui_user_password.arn
       ebs_user_username    = local.application_data.accounts[local.environment].admin_ebs_user_username
       ebs_user_password    = aws_secretsmanager_secret.ebs_user_password.arn
+      run_rcu              = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
     }
   )
 }
