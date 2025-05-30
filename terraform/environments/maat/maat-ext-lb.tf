@@ -13,7 +13,7 @@ locals {
 
 module "lb-s3-access-logs" {
   count  = local.existing_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
 
   providers = {
     aws.bucket-replication = aws

@@ -256,18 +256,18 @@ resource "aws_security_group_rule" "maat_sg_rule_outbound" {
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  cidr_blocks = ["0.0.0.0/0"]
   description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
   security_group_id = aws_security_group.maat_ecs_security_group.id
 }
 
 resource "aws_security_group_rule" "maat_to_maatdb_sg_rule_outbound" {
-  type              = "egress"
-  from_port         = 1521
-  to_port           = 1521
-  protocol          = "tcp"
-  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
-  security_group_id = aws_security_group.maat_ecs_security_group.id
+  type                     = "egress"
+  from_port                = 1521
+  to_port                  = 1521
+  protocol                 = "tcp"
+  description              = "This rule is needed for the ECS agent to reach the ECS API endpoints"
+  security_group_id        = aws_security_group.maat_ecs_security_group.id
   source_security_group_id = local.application_data.accounts[local.environment].maatdb_rds_sec_group_id
 }
 
@@ -338,7 +338,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_high_cpu_alarm" {
   threshold           = local.application_data.accounts[local.environment].maat_ec2_cpu_scaling_up_threshold
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
-  alarm_actions       = [aws_autoscaling_policy.maat_ec2_scaling_up_policy.arn]
+  alarm_actions = [aws_autoscaling_policy.maat_ec2_scaling_up_policy.arn]
 
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
@@ -357,7 +357,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_low_cpu_alarm" {
   threshold           = local.application_data.accounts[local.environment].maat_ec2_cpu_scaling_down_threshold
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
-  alarm_actions       = [aws_autoscaling_policy.maat_ec2_scaling_down_policy.arn]
+  alarm_actions = [aws_autoscaling_policy.maat_ec2_scaling_down_policy.arn]
 
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
@@ -525,32 +525,32 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_tasks_role_policy_attachment
 #### ECS TASK DEFINITION -------
 
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
-  family             = "${local.application_name}-ecs-task-definition"
+  family = "${local.application_name}-ecs-task-definition"
   execution_role_arn = aws_iam_role.maat_ec2_instance_role.arn
   # task_role_arn            = aws_iam_role.maat_ec2_instance_role.arn
 
   container_definitions = templatefile("maat-task-definition.json",
     {
-      maat_docker_image_tag      = local.application_data.accounts[local.environment].maat_docker_image_tag
-      xray_docker_image_tag      = local.application_data.accounts[local.environment].xray_docker_image_tag
-      region                     = local.application_data.accounts[local.environment].region
-      sentry_env                 = local.environment
-      maat_orch_base_url         = local.application_data.accounts[local.environment].maat_orch_base_url
-      maat_orch_oauth_url        = local.application_data.accounts[local.environment].maat_orch_oauth_url
-      maat_db_url                = local.application_data.accounts[local.environment].maat_db_url
-      maat_caa_oauth_url         = local.application_data.accounts[local.environment].maat_caa_oauth_url
-      maat_bc_endpoint_url       = local.application_data.accounts[local.environment].maat_bc_endpoint_url
-      maat_mlra_url              = local.application_data.accounts[local.environment].maat_mlra_url
-      maat_caa_base_url          = local.application_data.accounts[local.environment].maat_caa_base_url
-      ecr_url                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
-      maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
-      maat_aws_stream_prefix     = local.application_data.accounts[local.environment].maat_aws_stream_prefix
-      env_account_region         = local.env_account_region
-      env_account_id             = local.env_account_id
-      app_log_level              = local.application_data.accounts[local.environment].app_log_level
-      maat_ats_oauth_url         = local.application_data.accounts[local.environment].maat_ats_oauth_url
-      maat_ats_endpoint          = local.application_data.accounts[local.environment].maat_ats_endpoint
-      maat_ats_base_url          = local.application_data.accounts[local.environment].maat_ats_base_url
+      maat_docker_image_tag  = local.application_data.accounts[local.environment].maat_docker_image_tag
+      xray_docker_image_tag  = local.application_data.accounts[local.environment].xray_docker_image_tag
+      region                 = local.application_data.accounts[local.environment].region
+      sentry_env             = local.environment
+      maat_orch_base_url     = local.application_data.accounts[local.environment].maat_orch_base_url
+      maat_orch_oauth_url    = local.application_data.accounts[local.environment].maat_orch_oauth_url
+      maat_db_url            = local.application_data.accounts[local.environment].maat_db_url
+      maat_caa_oauth_url     = local.application_data.accounts[local.environment].maat_caa_oauth_url
+      maat_bc_endpoint_url   = local.application_data.accounts[local.environment].maat_bc_endpoint_url
+      maat_mlra_url          = local.application_data.accounts[local.environment].maat_mlra_url
+      maat_caa_base_url      = local.application_data.accounts[local.environment].maat_caa_base_url
+      ecr_url                = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
+      maat_ecs_log_group     = local.application_data.accounts[local.environment].maat_ecs_log_group
+      maat_aws_stream_prefix = local.application_data.accounts[local.environment].maat_aws_stream_prefix
+      env_account_region     = local.env_account_region
+      env_account_id         = local.env_account_id
+      app_log_level          = local.application_data.accounts[local.environment].app_log_level
+      maat_ats_oauth_url     = local.application_data.accounts[local.environment].maat_ats_oauth_url
+      maat_ats_endpoint      = local.application_data.accounts[local.environment].maat_ats_endpoint
+      maat_ats_base_url      = local.application_data.accounts[local.environment].maat_ats_base_url
 
     }
   )
@@ -670,9 +670,9 @@ resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
 #### ECS Service ------
 
 resource "aws_ecs_service" "maat_ecs_service" {
-  name            = "${local.application_name}-ecs-service"
-  cluster         = aws_ecs_cluster.maat_ecs_cluster.id
-  desired_count   = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
+  name          = "${local.application_name}-ecs-service"
+  cluster       = aws_ecs_cluster.maat_ecs_cluster.id
+  desired_count = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
   task_definition = aws_ecs_task_definition.maat_ecs_task_definition.arn
   # iam_role                          = aws_iam_role.maat_ecs_service_role.arn
   depends_on = [aws_lb_listener.external, aws_lb_listener.maat_internal_lb_https_listener]
@@ -683,13 +683,13 @@ resource "aws_ecs_service" "maat_ecs_service" {
   }
 
   load_balancer {
-    container_name   = upper(local.application_name)
+    container_name = upper(local.application_name)
     container_port   = 8080
     target_group_arn = aws_lb_target_group.external.arn
   }
 
   load_balancer {
-    container_name   = upper(local.application_name)
+    container_name = upper(local.application_name)
     container_port   = 8080
     target_group_arn = aws_lb_target_group.maat_internal_lb_target_group.arn
   }
@@ -721,7 +721,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ecs_high_cpu_alarm" {
   threshold           = 70
   unit                = "Percent"
   comparison_operator = "GreaterThanThreshold"
-  alarm_actions       = [aws_appautoscaling_policy.maat_ecs_scaling_up_policy.arn]
+  alarm_actions = [aws_appautoscaling_policy.maat_ecs_scaling_up_policy.arn]
 
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
@@ -741,7 +741,7 @@ resource "aws_cloudwatch_metric_alarm" "maat_ecs_low_cpu_alarm" {
   threshold           = 20
   unit                = "Percent"
   comparison_operator = "LessThanThreshold"
-  alarm_actions       = [aws_appautoscaling_policy.maat_ecs_scaling_down_policy.arn]
+  alarm_actions = [aws_appautoscaling_policy.maat_ecs_scaling_down_policy.arn]
 
   dimensions = {
     ClusterName = aws_ecs_cluster.maat_ecs_cluster.name
