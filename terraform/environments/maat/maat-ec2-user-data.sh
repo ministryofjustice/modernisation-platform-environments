@@ -24,8 +24,8 @@ EOF
 chmod 644 /etc/awslogs/awslogs.conf
 # Change region
 sed -i 's/^region = .*/region = eu-west-2/g' /etc/awslogs/awscli.conf
-chkconfig awslogs on
-service awslogs restart
+sudo systemctl start awslogsd
+sudo systemctl enable awslogsd.service
 
 # Install XDC agent stored in S3 bucket
 aws s3 cp s3://${xdr_bucket}/cortex.rpm /tmp/cortex.rpm
