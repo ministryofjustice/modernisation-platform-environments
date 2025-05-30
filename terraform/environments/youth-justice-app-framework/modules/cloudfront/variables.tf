@@ -49,3 +49,8 @@ variable "cloudfront_route53_record_name" {
   type        = string
   default     = ""
 }
+
+variable "cloudfront_distribution_id" {
+  description = "ID of the CloudFront distribution"
+  type        = string
+}

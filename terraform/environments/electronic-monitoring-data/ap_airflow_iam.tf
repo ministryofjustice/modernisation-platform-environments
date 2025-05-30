@@ -513,7 +513,7 @@ module "load_gps" {
   environment        = local.environment
   database_name      = "g4s-gps"
   path_to_data       = "/g4s/gps"
-  source_data_bucket = module.s3-raw-formatted-data-bucket.bucket
+  source_data_bucket = module.s3-data-bucket.bucket
   secret_code        = jsondecode(data.aws_secretsmanager_secret_version.airflow_secret.secret_string)["oidc_cluster_identifier"]
   oidc_arn           = aws_iam_openid_connect_provider.analytical_platform_compute.arn
   athena_dump_bucket = module.s3-athena-bucket.bucket

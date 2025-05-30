@@ -89,6 +89,7 @@ resource "aws_lb_target_group_attachment" "portal-server-attachment" {
 # trivy:ignore:AVD-AWS-0047 reason: (CRITICAL): Listener uses an outdated TLS policy.
 resource "aws_lb_listener" "waf_lb_listener" {
   # checkov:skip=CKV_AWS_103: "Ensure that load balancer is using at least TLS 1.2"
+  # checkov:skip=CKV2_AWS_74:Legacy clients require older SSL policy for compatibility
   depends_on = [
     aws_acm_certificate_validation.waf_lb_cert_validation,
     aws_lb_target_group.waf_lb_web_tg

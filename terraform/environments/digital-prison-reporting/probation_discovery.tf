@@ -25,11 +25,11 @@ module "probation_discovery_windows_node" {
   #region  = local.account_region
   #account = local.account_id
   #env     = local.env
-  app_key = "probation-discovery"  # points to scripts/probation-discovery.ps1
+  app_key = "probation-discovery" # points to scripts/probation-discovery.ps1
 
   #env_vars = {
-   # ENV = local.env
-    # add any app-specific env vars here
+  # ENV = local.env
+  # add any app-specific env vars here
   #}
 
   tags = merge(
