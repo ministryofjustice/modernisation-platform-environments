@@ -22,11 +22,11 @@ module "xdr-agent-s3" {
       }
 
       expiration = {
-        days = 90
+        days = 120
       }
 
       noncurrent_version_expiration = {
-        days = 90
+        days = 120
       }
     }
   ]
