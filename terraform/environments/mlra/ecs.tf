@@ -40,4 +40,6 @@ module "mlra-ecs" {
   environment                 = local.environment
   maatdb_rds_sec_group_id     = local.application_data.accounts[local.environment].maatdb_rds_sec_group_id
   alb_security_group_id       = local.alb_security_group_id
+  maat_api_client_id          = local.maat_api_client_id_name
+  maat_api_client_secret      = local.maat_api_client_secret_name
 }
