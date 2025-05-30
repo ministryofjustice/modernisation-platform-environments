@@ -9,7 +9,7 @@ locals {
       databases = [{ derived = ["visits"] }]
     }
   ]
-  alpha_user_permissions_no_filter = local.is-development ? [] : [
+  alpha_user_permissions_no_filter = local.is-production ? [
     {
       username  = "arjunkhetia66"
       databases = [{ g4s_gps = ["read_g4s_gps_xlsx"] }]
@@ -22,7 +22,7 @@ locals {
       username  = "evincent-moj"
       databases = [{ g4s_gps = ["read_g4s_gps_xlsx"] }]
     }
-  ]
+  ] : []
 }
 
 resource "aws_lakeformation_permissions" "share_data_bucket_alpha_users" {
