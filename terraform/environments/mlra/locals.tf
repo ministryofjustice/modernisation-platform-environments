@@ -30,7 +30,7 @@ locals {
       to_port         = 1521
       protocol        = "tcp"
       cidr_blocks     = []
-      security_groups = [[local.application_data.accounts][local.environment].maatdb_rds_sec_group_id]
+      security_groups = [local.application_data.accounts[local.environment].maatdb_rds_sec_group_id]
     }
     "maat_sg_rule_outbound" = {
       description     = "This rule is needed for the ECS agent to reach the ECS API endpoints"
