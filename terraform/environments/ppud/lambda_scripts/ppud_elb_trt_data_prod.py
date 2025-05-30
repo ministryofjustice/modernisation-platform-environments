@@ -64,10 +64,10 @@ def lambda_handler(event, context):
     with tempfile.NamedTemporaryFile(mode='w+', delete=False) as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow([
-            'TimeStamp',
+            'Timestamp',
             'AvailabilityZone eu-west-2b', 'AverageTargetResponseTime eu-west-2b',
             'AvailabilityZone eu-west-2c', 'AverageTargetResponseTime eu-west-2c',
-            'Overall AverageTargetResponseTime'
+            'OverallAverageTargetResponseTime'
         ])
 
         for timestamp in sorted(data_points.keys()):
