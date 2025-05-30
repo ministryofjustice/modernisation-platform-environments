@@ -188,3 +188,8 @@ variable "maatdb_rds_sec_group_id" {
   type        = string
   description = "MAATDB sec group ID"
 }
+
+variable "alb_security_group_id" {
+  type        = string
+  description = "ALB Security Group ID"
+}
