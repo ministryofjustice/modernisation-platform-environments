@@ -1,16 +1,16 @@
 ## sg for ftp
-resource "aws_security_group" "ftp_sg" {
-  name        = "${var.lambda_name}-sg"
-  description = "Allow outbound connection"
-  vpc_id      = var.vpc_id
+# resource "aws_security_group" "ftp_sg" {
+#   name        = "${var.lambda_name}-sg"
+#   description = "Allow outbound connection"
+#   vpc_id      = var.vpc_id
 
-  egress {
-    from_port   = 0
-    to_port     = 65535
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
+#   egress {
+#     from_port   = 0
+#     to_port     = 65535
+#     protocol    = "tcp"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
+# }
 
 ## lambda role for ftp
 resource "aws_iam_role" "ftp_lambda_role" {
