@@ -15,9 +15,5 @@ data "kubernetes_namespace" "actions_runners" {
 
   metadata {
     name = "actions-runners"
-    labels = {
-      "pod-security.kubernetes.io/enforce"                          = "baseline"
-      "compute.analytical-platform.service.justice.gov.uk/workload" = "actions-runners"
-    }
   }
 }
