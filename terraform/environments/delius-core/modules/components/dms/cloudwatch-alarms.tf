@@ -86,6 +86,9 @@ resource "aws_lambda_function" "dms_checker" {
   timeout       = 30
   filename      = "${path.module}/lambda/detect_stopped_replication.zip"
 
+  # Automatically triggers redeploy when code changes
+  source_code_hash = data.archive_file.lambda_dms_replication_stopped_zip.output_base64sha256
+
   environment {
     variables = {
       SNS_TOPIC_ARN = aws_sns_topic.dms_alerts_topic.arn
