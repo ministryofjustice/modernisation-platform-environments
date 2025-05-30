@@ -79,6 +79,7 @@ resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
           "glue:GetDatabase",
           "glue:UpdateDatabase",
           "glue:BatchGetPartition",
+          "glue:BatchCreatePartition",
           "glue:GetPartition",
           "glue:CreatePartition",
           "glue:UpdatePartition"
@@ -132,6 +133,6 @@ resource "aws_glue_crawler" "github_auditlog" {
   recrawl_policy {
     recrawl_behavior = "CRAWL_EVERYTHING"
   }
-
-  tags = local.tags
+  schedule = "cron(0 7 * * ? *)"
+  tags     = local.tags
 }
