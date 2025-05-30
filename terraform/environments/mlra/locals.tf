@@ -10,6 +10,8 @@ locals {
   ec2_egress_rules = {
   }
 
+  alb_security_group_id = module.alb.security_group.id
+
   user_data = base64encode(templatefile("user_data.sh", {
     app_name = local.application_name
   }))
