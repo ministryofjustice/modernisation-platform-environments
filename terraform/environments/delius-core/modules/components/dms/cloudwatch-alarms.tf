@@ -181,7 +181,7 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-# IAM Policy for Lambda (permissions to describe DMS tasks and publish to SNS)
+# IAM Policy for Lambda (permissions to describe DMS tasks and write to the clodwatch logs)
 resource "aws_iam_role_policy" "lambda_policy" {
   name = "dms-checker-policy"
   role = aws_iam_role.lambda_exec.id
@@ -244,14 +244,14 @@ resource "aws_lambda_function" "dms_checker" {
   }
 }
 
-# EventBridge Rule to Trigger Lambda Every 5 Minutes
-resource "aws_cloudwatch_event_rule" "check_dms_every_5_min" {
-  name                = "check-dms-every-5-minutes"
-  schedule_expression = "rate(5 minutes)"
+# EventBridge Rule to Trigger Lambda Every 15 Minutes (We hardcode this for now for simplicity - can change it if it needs to be configurable)
+resource "aws_cloudwatch_event_rule" "check_dms_every_15_min" {
+  name                = "check-dms-every-15-minutes"
+  schedule_expression = "rate(15 minutes)"
 }
 
 resource "aws_cloudwatch_event_target" "lambda_trigger" {
-  rule      = aws_cloudwatch_event_rule.check_dms_every_5_min.name
+  rule      = aws_cloudwatch_event_rule.check_dms_every_15_min.name
   target_id = "dms-task-check"
   arn       = aws_lambda_function.dms_checker.arn
 }
@@ -262,7 +262,7 @@ resource "aws_lambda_permission" "allow_eventbridge" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.dms_checker.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.check_dms_every_5_min.arn
+  source_arn    = aws_cloudwatch_event_rule.check_dms_every_15_min.arn
 }
 
 # Raising a Cloudwatch Alarm on a DMS Replication Task Event is not directly possible using the 
