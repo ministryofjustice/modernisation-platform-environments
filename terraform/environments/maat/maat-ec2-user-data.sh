@@ -43,6 +43,8 @@ if [[ -f ${xdr_tar} ]]; then
   fi
 
   sudo yum install -y ${xdr_dir}/*.rpm
+  sudo /opt/traps/bin/cytool endpoint_tags add ${xdr_tags}
+
 else
   echo "XDR agent download failed" >&2
   exit 1

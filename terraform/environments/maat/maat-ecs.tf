@@ -155,8 +155,9 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
     maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group,
     app_ecs_cluster    = aws_ecs_cluster.maat_ecs_cluster.name,
     xdr_bucket         = module.xdr-agent-s3.bucket.id,
-    xdr_dir            ="/tmp/cortex-agent",
-    xdr_tar            ="/tmp/cortex-agent.tar.gz"
+    xdr_dir            = "/tmp/cortex-agent",
+    xdr_tar            = "/tmp/cortex-agent.tar.gz",
+    xdr_tags           = local.xdr_tags
   }))
 
   tag_specifications {
