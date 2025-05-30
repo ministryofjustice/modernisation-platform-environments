@@ -1,7 +1,7 @@
 #####################################
 #
 # EC2 RESOURCES (from infra stack)
-# 
+#
 #####################################
 
 ##### EC2 IAM Role ---------
@@ -57,7 +57,7 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "logs:DescribeLogStreams",
-          "ecr:*",
+          # "ecr:*",
           "xray:PutTraceSegments",
           "xray:PutTelemetryRecords",
           "xray:GetSamplingRules",
@@ -75,10 +75,10 @@ resource "aws_iam_role_policy_attachment" "maat_ec2_instance_role_policy_attachm
   policy_arn = aws_iam_policy.maat_ec2_instance_role_policy.arn
 }
 
-resource "aws_iam_role_policy_attachment" "SSM_ec2_role_policy_attachment" {
-  role       = aws_iam_role.maat_ec2_instance_role.name
-  policy_arn = local.application_data.accounts[local.environment].SSM_managed_core_policy_arn
-}
+# resource "aws_iam_role_policy_attachment" "SSM_ec2_role_policy_attachment" {
+#   role       = aws_iam_role.maat_ec2_instance_role.name
+#   policy_arn = local.application_data.accounts[local.environment].SSM_managed_core_policy_arn
+# }
 
 ##### EC2 Instance Profile ------
 
@@ -105,15 +105,32 @@ resource "aws_ecs_cluster" "maat_ecs_cluster" {
   )
 }
 
+# always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
+data "aws_ssm_parameter" "ecs_optimized_ami" {
+  name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
+}
+
+# if the AMI is used elsewhere it can be obtained here
+output "ami_id" {
+  value     = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
+  sensitive = true
+}
+
 ##### EC2 launch config/template -----
 
 resource "aws_launch_template" "maat_ec2_launch_template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = local.application_data.accounts[local.environment].ami_id
+  image_id      = jsondecode(data.aws_ssm_parameter.ecs_optimized_ami.value)["image_id"]
   instance_type = local.application_data.accounts[local.environment].instance_type
 
   monitoring {
     enabled = true
+  }
+
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "optional"
+    http_put_response_hop_limit = "2"
   }
 
   iam_instance_profile {
@@ -173,7 +190,7 @@ resource "aws_autoscaling_group" "maat_ec2_scaling_group" {
   }
 }
 
-#### EC2 Scaling Policies 
+#### EC2 Scaling Policies
 
 resource "aws_autoscaling_policy" "maat_ec2_scaling_up_policy" {
   name                   = "${local.application_name}-ec2-scaling-up"
@@ -210,15 +227,6 @@ resource "aws_security_group_rule" "alb_ingress" {
   source_security_group_id = aws_security_group.external_lb.id
 }
 
-resource "aws_security_group_rule" "outbound" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  security_group_id = aws_security_group.maat_ecs_security_group.id
-  cidr_blocks       = ["0.0.0.0/0"]
-}
-
 resource "aws_security_group_rule" "maat_sg_rule_int_lb_to_ecs" {
   security_group_id        = aws_security_group.maat_ecs_security_group.id
   type                     = "ingress"
@@ -226,6 +234,26 @@ resource "aws_security_group_rule" "maat_sg_rule_int_lb_to_ecs" {
   to_port                  = 0
   protocol                 = "-1"
   source_security_group_id = aws_security_group.maat_int_lb_sg.id
+}
+
+resource "aws_security_group_rule" "maat_sg_rule_outbound" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
+  security_group_id = aws_security_group.maat_ecs_security_group.id
+}
+
+resource "aws_security_group_rule" "maat_to_maatdb_sg_rule_outbound" {
+  type              = "egress"
+  from_port         = 1521
+  to_port           = 1521
+  protocol          = "tcp"
+  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
+  security_group_id = aws_security_group.maat_ecs_security_group.id
+  source_security_group_id = local.application_data.accounts[local.environment].maatdb_rds_sec_group_id
 }
 
 #### EC2 CLOUDWATCH LOG GROUP & Key ------
@@ -322,9 +350,9 @@ resource "aws_cloudwatch_metric_alarm" "maat_ec2_low_cpu_alarm" {
 }
 
 #####################################
-# 
+#
 # ECS RESOURCES (from app stack)
-# 
+#
 #####################################
 
 ##### ECS Service Role -----
@@ -367,8 +395,8 @@ resource "aws_iam_policy" "maat_ecs_service_role_policy" {
           "elasticloadbalancing:Describe*",
           "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
           "elasticloadbalancing:RegisterTargets",
-          "ec2:Describe*",
-          "ec2:AuthorizeSecurityGroupIngress"
+          "ec2:Describe*"
+          # "ec2:AuthorizeSecurityGroupIngress"
         ]
         Resource = "*"
       },
@@ -454,7 +482,7 @@ resource "aws_iam_policy" "maat_ecs_policy_access_params" {
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "cloudwatch:PutMetricData",
-          "sqs:*"
+          # "sqs:*"
         ]
         Resource = "*"
       },
@@ -493,23 +521,22 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
       region                     = local.application_data.accounts[local.environment].region
       sentry_env                 = local.environment
       maat_orch_base_url         = local.application_data.accounts[local.environment].maat_orch_base_url
-      maat_ccp_base_url          = local.application_data.accounts[local.environment].maat_ccp_base_url
       maat_orch_oauth_url        = local.application_data.accounts[local.environment].maat_orch_oauth_url
-      maat_ccc_oauth_url         = local.application_data.accounts[local.environment].maat_ccc_oauth_url
-      maat_cma_endpoint_auth_url = local.application_data.accounts[local.environment].maat_cma_endpoint_auth_url
-      maat_ccp_endpoint_auth_url = local.application_data.accounts[local.environment].maat_ccp_endpoint_auth_url
       maat_db_url                = local.application_data.accounts[local.environment].maat_db_url
-      maat_ccc_base_url          = local.application_data.accounts[local.environment].maat_ccc_base_url
       maat_caa_oauth_url         = local.application_data.accounts[local.environment].maat_caa_oauth_url
       maat_bc_endpoint_url       = local.application_data.accounts[local.environment].maat_bc_endpoint_url
       maat_mlra_url              = local.application_data.accounts[local.environment].maat_mlra_url
       maat_caa_base_url          = local.application_data.accounts[local.environment].maat_caa_base_url
-      maat_cma_base_url          = local.application_data.accounts[local.environment].maat_cma_base_url
       ecr_url                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
       maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
       maat_aws_stream_prefix     = local.application_data.accounts[local.environment].maat_aws_stream_prefix
       env_account_region         = local.env_account_region
       env_account_id             = local.env_account_id
+      app_log_level              = local.application_data.accounts[local.environment].app_log_level
+      maat_ats_oauth_url         = local.application_data.accounts[local.environment].maat_ats_oauth_url
+      maat_ats_endpoint          = local.application_data.accounts[local.environment].maat_ats_endpoint
+      maat_ats_base_url          = local.application_data.accounts[local.environment].maat_ats_base_url
+
     }
   )
 

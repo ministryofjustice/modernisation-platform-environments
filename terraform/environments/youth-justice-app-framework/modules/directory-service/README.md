@@ -209,7 +209,7 @@ The following describes the process of copying data from one environment to anot
 1. RDP onto a management server in the destination environment as the initial docmin user `admin` whose password is in Secret `i2n.com_admin_secret_2`.
 2. Create folder `C:\i2N\AD_Files`.
 3. Copy all the exported AD files to the above folder, e.g.: `Copy-S3Object -BucketName yjaf-development-transfer -KeyPrefix AD_Files -LocalFolder c:\i2N\AD_Files`
-3. Open a Powershell wondow at `C:\i2N\AD_Files`
+3. Open a Powershell window at `C:\i2N\AD_Files`
 4. Run powerShell script `.\create-ou-tree.ps1`
 5. Create group `Admin-password-policy` in UO `i2N` and configure the password policy <TODO>.
 6. Run powerShell script `.\import-yjaf-users.ps1`

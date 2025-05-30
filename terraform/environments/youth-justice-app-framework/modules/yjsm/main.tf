@@ -30,13 +30,13 @@ data "template_file" "userdata" {
 }
 
 resource "aws_instance" "yjsm" {
-  ami                    = var.ami
-  instance_type          = "t3a.xlarge"
-  key_name               = module.key_pair.key_pair_name
-  monitoring             = true
-  ebs_optimized          = true
-  iam_instance_profile   = aws_iam_instance_profile.yjsm_ec2_profile.id
-  tags                   = local.all_tags
+  ami                  = var.ami
+  instance_type        = "t3a.xlarge"
+  key_name             = module.key_pair.key_pair_name
+  monitoring           = true
+  ebs_optimized        = true
+  iam_instance_profile = aws_iam_instance_profile.yjsm_ec2_profile.id
+  tags                 = local.all_tags
 
   network_interface {
     network_interface_id = aws_network_interface.main.id
@@ -71,8 +71,8 @@ data "aws_ami" "amazon_linux" {
 }
 
 resource "aws_network_interface" "main" {
-  subnet_id                            = var.subnet_id
-  private_ips                          = [var.private_ip]
-  private_ips_count                    = 2
-  security_groups                      = [aws_security_group.yjsm_service.id]
+  subnet_id         = var.subnet_id
+  private_ip        = var.private_ip
+  private_ips_count = 1
+  security_groups   = [aws_security_group.yjsm_service.id]
 }

@@ -26,7 +26,7 @@ module "cur_s3_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
+          identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
         }
       ]
     },
@@ -89,7 +89,7 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
     ]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::295814833350:role/moj-cur-reports-v2-hourly-replication-role"]
+      identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
     }
   }
 
@@ -176,7 +176,7 @@ module "focus_s3_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
+          identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-focus-1-reports-replication-role"]
         }
       ]
     }
@@ -199,7 +199,7 @@ data "aws_iam_policy_document" "focus_bucket_replication_policy" {
     ]
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::295814833350:role/moj-focus-1-reports-replication-role"]
+      identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-focus-1-reports-replication-role"]
     }
   }
 }
@@ -222,6 +222,78 @@ module "focus_reports" {
     rule = {
       apply_server_side_encryption_by_default = {
         kms_master_key_id = module.focus_s3_kms.key_arn
+        sse_algorithm     = "aws:kms"
+      }
+    }
+  }
+
+  versioning = {
+    status = "Enabled"
+  }
+
+  lifecycle_rule = [
+    {
+      id      = "DeleteOldVersions"
+      enabled = true
+      noncurrent_version_expiration = {
+        days = 1
+      }
+    }
+  ]
+}
+
+# COAT Reports 
+module "coat_s3_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["s3/coat"]
+  description           = "S3 COAT KMS key"
+  enable_default_policy = true
+  key_statements = [
+    {
+      sid = "AllowAdministrationKey"
+      actions = [
+        "kms:Encrypt*",
+        "kms:Decrypt*",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+      ]
+    }
+  ]
+
+  tags = local.tags
+}
+
+module "coat_reports" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/s3-bucket/aws"
+  version = "4.3.0"
+
+  bucket           = "coat-reports-${local.environment}"
+  object_ownership = "BucketOwnerEnforced"
+  force_destroy    = true
+
+  attach_deny_insecure_transport_policy = true
+  attach_policy                         = false
+
+  server_side_encryption_configuration = {
+    rule = {
+      apply_server_side_encryption_by_default = {
+        kms_master_key_id = module.coat_s3_kms.key_arn
         sse_algorithm     = "aws:kms"
       }
     }
