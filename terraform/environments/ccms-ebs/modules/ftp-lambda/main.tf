@@ -81,8 +81,6 @@ resource "aws_lambda_layer_version" "ftp_layer" {
   s3_key              = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ccms ebs ftp lambda"
-
-  depends_on = [aws_s3_object.ftp_lambda_s3]
 }
 #### lambda function for ftp inbound
 resource "aws_lambda_function" "ftp_lambda" {
