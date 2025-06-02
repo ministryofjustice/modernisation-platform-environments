@@ -394,7 +394,7 @@
       "enable_scheduled_dataset_lambda": true,
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
-      "multiphase_query_lambda_version": "vLatest",
+      "multiphase_query_lambda_version": "v0.0.4.rel",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
