@@ -70,7 +70,7 @@ resource "aws_ecs_service" "edrms" {
   name            = local.application_name
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.edrms.arn
-  desired_count   = local.application_data.accounts[local.environment].app_count_edrms
+  desired_count   = local.application_data.accounts[local.environment].app_count
   launch_type     = "EC2"
 
   health_check_grace_period_seconds = 120
