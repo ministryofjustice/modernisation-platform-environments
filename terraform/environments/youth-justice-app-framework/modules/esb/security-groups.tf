@@ -55,8 +55,8 @@ resource "aws_security_group_rule" "tableau_to_esb_ssh" {
   description              = "tableau to esb ssh temp"
 }
 
-#YJSM to ECS
-resource "aws_security_group_rule" "yjsm_to_ecsint_rule" {
+#ESB to ECS
+resource "aws_security_group_rule" "esb_to_ecs_int_rule" {
   type                     = "ingress"
   from_port                = 8080
   to_port                  = 8080
