@@ -1,16 +1,9 @@
 
 ### secrets for ftp user and password
-resource "aws_secretsmanager_secret" "ftp_password" {
-  name        = lower(format("laa-ccms-ebs-ftp-password-%s",local.environment))
-  description = "A secret for storing ftp server password"
+resource "aws_secretsmanager_secret" "ftp_credentials" {
+  name        = lower(format("laa-ccms-ebs-ftp-credentials-%s",local.environment))
+  description = "A secret for storing ftp credentials"
 }
-
-resource "aws_secretsmanager_secret" "ftp_user" {
-  name        = lower(format("laa-ccms-ebs-ftp-user-%s",local.environment))
-  description = "A secret for storing ftp server user"
-}
-
-
 
 
 #### bucket for laa-ccms-inbound for storing files from lambda
@@ -30,7 +23,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_enc
   }
 }
 
-
+##### bucket for storing lambda layers and ftp client code
 resource "aws_s3_bucket" "ftp_bucket" {
   bucket = lower(format("laa-ccms-ftp-lambda-%s-mp",local.environment))  # ccms lambda bucket
 
