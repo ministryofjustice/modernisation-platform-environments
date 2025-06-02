@@ -31,7 +31,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 resource "aws_ecs_task_definition" "admin" {
   family             = "${local.application_data.accounts[local.environment].app_name}-admin-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "host"
+  network_mode       = "bridge"
   requires_compatibilities = [
     "EC2",
   ]
@@ -65,7 +65,7 @@ resource "aws_ecs_task_definition" "admin" {
       db_user              = local.application_data.accounts[local.environment].soa_db_user
       db_role              = local.application_data.accounts[local.environment].soa_db_role
       db_instance_endpoint = aws_db_instance.soa_db.endpoint
-      as_hostname          = aws_route53_record.admin.name
+      as_hostname          = aws_route53_record.admin.fqdn
       wl_admin_mem_args    = local.application_data.accounts[local.environment].admin_wl_mem_args
       xxsoa_ds_host        = aws_db_instance.tds_db.endpoint
       xxsoa_ds_username    = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
@@ -136,7 +136,7 @@ resource "aws_ecs_service" "admin" {
 resource "aws_ecs_task_definition" "managed" {
   family             = "${local.application_data.accounts[local.environment].app_name}-managed-task"
   execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
-  network_mode       = "host"
+  network_mode       = "bridge"
   requires_compatibilities = [
     "EC2",
   ]
@@ -166,9 +166,9 @@ resource "aws_ecs_task_definition" "managed" {
       admin_server_port   = local.application_data.accounts[local.environment].admin_server_port
       aws_region          = local.application_data.accounts[local.environment].aws_region
       container_version   = local.application_data.accounts[local.environment].managed_container_version
-      admin_host          = aws_route53_record.admin.name
+      admin_host          = aws_route53_record.admin.fqdn
       soa_password        = aws_secretsmanager_secret.soa_password.arn
-      ms_hostname         = aws_route53_record.managed.name
+      ms_hostname         = aws_route53_record.managed.fqdn
       wl_mem_args         = local.application_data.accounts[local.environment].managed_wl_mem_args
     }
   )

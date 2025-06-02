@@ -13,7 +13,7 @@
     "portMappings": [
       {
         "containerPort": ${admin_server_port},
-        "hostPort": ${admin_server_port},
+        "hostPort": 0,
         "protocol": "tcp"
       }
     ],
@@ -30,7 +30,7 @@
       },
       {
         "name": "RUN_RCU",
-        "value": "${run_rcu}"
+        "value": "${admin_run_rcu_bootstrap}"
       },
       {
         "name": "RCUPREFIX",
