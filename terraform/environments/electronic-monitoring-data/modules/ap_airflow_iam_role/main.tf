@@ -2,10 +2,18 @@ locals {
   account_map = {
     "production"    = "prod"
     "preproduction" = "prod"
-    "test"          = "dev"
+    "test"          = var.new_airflow ? "test" : "dev"
     "development"   = "dev"
   }
-  role_name = "airflow-${local.account_map[var.environment]}-${var.role_name_suffix}"
+  env_suffixes = {
+    "production"    = ""
+    "preproduction" = "-pp"
+    "test"          = ""
+    "development"   = ""
+  }
+  role_name_suffix = var.environment == "preproduction" ? trimsuffix(var.role_name_suffix, "-pp") : var.role_name_suffix
+  mwaa             = var.new_airflow ? "mwaa:electronic-monitoring-data-store${local.env_suffixes[var.environment]}-${local.role_name_suffix}" : "airflow:${local.role_name}"
+  role_name        = "airflow-${local.account_map[var.environment]}-${var.role_name_suffix}"
 }
 
 # --------------------------------------------
@@ -22,7 +30,7 @@ data "aws_iam_policy_document" "oidc_assume_role_policy" {
     }
     condition {
       test     = "StringEquals"
-      values   = ["system:serviceaccount:airflow:${local.role_name}"]
+      values   = ["system:serviceaccount:${local.mwaa}"]
       variable = "oidc.eks.eu-west-2.amazonaws.com/id/${var.secret_code}:sub"
     }
     condition {

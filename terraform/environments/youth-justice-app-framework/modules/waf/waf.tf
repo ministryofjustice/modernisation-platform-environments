@@ -1,4 +1,4 @@
-#duplicate resource to get around provider error
+# Duplicate resource to get around provider error
 
 resource "aws_wafv2_web_acl" "waf" {
   #checkov:skip=CKV2_AWS_31:add this later depends on datadog todo
@@ -16,6 +16,7 @@ resource "aws_wafv2_web_acl" "waf" {
     content {
       name     = rule.value.name
       priority = rule.value.priority
+
       action {
         allow {}
       }
@@ -25,6 +26,7 @@ resource "aws_wafv2_web_acl" "waf" {
           arn = aws_wafv2_ip_set.ipset[rule.value.name].arn
         }
       }
+
       visibility_config {
         cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
@@ -43,13 +45,41 @@ resource "aws_wafv2_web_acl" "waf" {
         none {}
       }
 
-
       statement {
         managed_rule_group_statement {
           name        = rule.value.managed_rule_group_statement.name
-          vendor_name = "AWS"
+          vendor_name = lookup(rule.value.managed_rule_group_statement, "vendor_name", "AWS")
+
+          dynamic "rule_action_override" {
+            for_each = lookup(rule.value.managed_rule_group_statement, "rule_action_override", [])
+            content {
+              name = rule_action_override.value.name
+
+              dynamic "action_to_use" {
+                for_each = contains(keys(rule_action_override.value.action_to_use), "count") ? [1] : []
+                content {
+                  count {}
+                }
+              }
+
+              dynamic "action_to_use" {
+                for_each = contains(keys(rule_action_override.value.action_to_use), "block") ? [1] : []
+                content {
+                  block {}
+                }
+              }
+
+              dynamic "action_to_use" {
+                for_each = contains(keys(rule_action_override.value.action_to_use), "allow") ? [1] : []
+                content {
+                  allow {}
+                }
+              }
+            }
+          }
         }
       }
+
       visibility_config {
         cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
@@ -58,15 +88,16 @@ resource "aws_wafv2_web_acl" "waf" {
     }
   }
 
-
   dynamic "rule" {
     for_each = var.waf_geoIP_rules
     content {
       name     = rule.value.name
       priority = rule.value.priority
+
       action {
         block {}
       }
+
       statement {
         not_statement {
           statement {
@@ -76,6 +107,7 @@ resource "aws_wafv2_web_acl" "waf" {
           }
         }
       }
+
       visibility_config {
         cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
@@ -91,6 +123,7 @@ resource "aws_wafv2_web_acl" "waf" {
     metric_name                = "WAF"
     sampled_requests_enabled   = true
   }
+
   depends_on = [aws_wafv2_ip_set.ipset]
 }
 
@@ -111,6 +144,7 @@ resource "aws_wafv2_web_acl" "cf" {
     content {
       name     = rule.value.name
       priority = rule.value.priority
+
       action {
         allow {}
       }
@@ -120,6 +154,7 @@ resource "aws_wafv2_web_acl" "cf" {
           arn = aws_wafv2_ip_set.ipset[rule.value.name].arn
         }
       }
+
       visibility_config {
         cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
@@ -138,13 +173,41 @@ resource "aws_wafv2_web_acl" "cf" {
         none {}
       }
 
-
       statement {
         managed_rule_group_statement {
           name        = rule.value.managed_rule_group_statement.name
-          vendor_name = "AWS"
+          vendor_name = lookup(rule.value.managed_rule_group_statement, "vendor_name", "AWS")
+
+          dynamic "rule_action_override" {
+            for_each = lookup(rule.value.managed_rule_group_statement, "rule_action_override", [])
+            content {
+              name = rule_action_override.value.name
+
+              dynamic "action_to_use" {
+                for_each = contains(keys(rule_action_override.value.action_to_use), "count") ? [1] : []
+                content {
+                  count {}
+                }
+              }
+
+              dynamic "action_to_use" {
+                for_each = contains(keys(rule_action_override.value.action_to_use), "block") ? [1] : []
+                content {
+                  block {}
+                }
+              }
+
+              dynamic "action_to_use" {
+                for_each = contains(keys(rule_action_override.value.action_to_use), "allow") ? [1] : []
+                content {
+                  allow {}
+                }
+              }
+            }
+          }
         }
       }
+
       visibility_config {
         cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
@@ -153,15 +216,16 @@ resource "aws_wafv2_web_acl" "cf" {
     }
   }
 
-
   dynamic "rule" {
     for_each = var.waf_geoIP_rules
     content {
       name     = rule.value.name
       priority = rule.value.priority
+
       action {
         block {}
       }
+
       statement {
         not_statement {
           statement {
@@ -171,6 +235,7 @@ resource "aws_wafv2_web_acl" "cf" {
           }
         }
       }
+
       visibility_config {
         cloudwatch_metrics_enabled = true
         metric_name                = rule.value.name
@@ -186,6 +251,7 @@ resource "aws_wafv2_web_acl" "cf" {
     metric_name                = "WAF"
     sampled_requests_enabled   = true
   }
+
   depends_on = [aws_wafv2_ip_set.ipset]
 }
 

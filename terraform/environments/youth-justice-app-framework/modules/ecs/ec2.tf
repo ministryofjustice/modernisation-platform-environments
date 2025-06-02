@@ -20,6 +20,14 @@ module "key_pair" {
   tags = local.all_tags
 }
 
+resource "aws_ssm_parameter" "ecs_private_key" {
+  #checkov:skip=CKV_AWS_337 TODO
+  name        = "/ec2/keypairs/ecs-private-key"
+  description = "EC2 Private Key for esb-keypair"
+  type        = "SecureString"
+  value       = module.key_pair.private_key_pem
+}
+
 data "template_file" "userdata" {
   template = file("${path.module}/ec2-userdata.tftpl")
   vars = {
@@ -74,6 +82,10 @@ module "autoscaling" {
     AmazonEC2RoleforSSM                 = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
     AmazonEC2ContainerServiceforEC2Role = "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role"
     ecs-fetch-secrets-policy            = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
+    AmazonS3FullAccess                  = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+    AmazonSESFullAccess                 = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+    ecs-eni-policy                      = aws_iam_policy.ecs-eni-policy.arn
+    ecs-secrets-policy                  = aws_iam_policy.ecs-secrets-policy.arn
   }
   security_groups = [module.autoscaling_sg.security_group_id]
 
@@ -91,7 +103,7 @@ module "autoscaling" {
   ebs_optimized          = false
   #launch_template_id     = aws_launch_template.this.id #todo try creating within the module instead
   launch_template_name = "${var.cluster_name}-ec2-launch-template"
-  image_id             = local.ecs_optimized_ami.image_id #todo change to output of image builder
+  image_id             = var.ec2_ami_id != "" ? var.ec2_ami_id : local.ecs_optimized_ami.image_id #todo change to output of image builder
   instance_type        = var.ec2_instance_type
   key_name             = module.key_pair.key_pair_name
   #instance_market_options = {
@@ -99,16 +111,16 @@ module "autoscaling" {
   #}
 
   # Mixed instances
-  use_mixed_instances_policy = true
-  mixed_instances_policy = {
-    instances_distribution = {
-      on_demand_base_capacity                  = 0
-      on_demand_percentage_above_base_capacity = 10
-      spot_allocation_strategy                 = "capacity-optimized"
-    }
+  use_mixed_instances_policy = false #no spot instances
+  #mixed_instances_policy = { #uncomment for spot instances
+  #  instances_distribution = {
+  #    on_demand_base_capacity                  = 0
+  #    on_demand_percentage_above_base_capacity = 10
+  #    spot_allocation_strategy                 = "capacity-optimized"
+  #  }
 
-    override = var.spot_overrides
-  }
+  #  override = var.spot_overrides
+  #}
 
   block_device_mappings = [
     {
@@ -125,6 +137,14 @@ module "autoscaling" {
   enable_monitoring      = true
   update_default_version = true
   user_data              = base64encode(data.template_file.userdata.rendered)
+
+  #Networking this adds more secondary ips but doesn't solve the max eni issues
+  #network_interfaces = [
+  #  {
+  #    ipv4_address_count = 10 # Assign 10 secondary IPs
+  #  }
+  #]
+
 
   # Scaling policies and tags
   schedules = local.schedules
@@ -177,11 +197,86 @@ module "autoscaling_sg" {
     }
   ]
 
-  computed_ingress_with_source_security_group_id = concat(var.ec2_ingress_with_source_security_group_id_rules, local.common_datadog_rule)
+  computed_ingress_with_source_security_group_id = concat(var.ec2_ingress_with_source_security_group_id_rules, local.common_datadog_rules)
 
   number_of_computed_ingress_with_source_security_group_id = length(var.ec2_ingress_with_source_security_group_id_rules)
 
   egress_rules = ["all-all"]
 
   tags = local.all_tags
+}
+
+resource "aws_iam_policy" "ecs-eni-policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
+
+  name   = "${var.cluster_name}-ecs-eni"
+  tags   = local.all_tags
+  policy = <<EOF
+{
+    "Version" : "2012-10-17",
+    "Statement": [
+      {
+        "Action": [
+          "ec2:CreateNetworkInterface",
+          "ec2:CreateNetworkInterfacePermission",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:DescribeInstances",
+          "ec2:AttachNetworkInterface",
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:UnassignPrivateIpAddresses",
+          "ec2:ModifyNetworkInterfaceAttribute"
+        ],
+        "Effect": "Allow",
+        "Resource": "*"
+      }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "ecs-secrets-policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
+  #checkov:skip=CKV_AWS_288: [TODO] Ensure IAM policies does not allow data exfiltration
+
+  name = "${var.cluster_name}-ecs-secrets"
+  tags = local.all_tags
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetRandomPassword",
+          "secretsmanager:GetResourcePolicy",
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecretVersionIds",
+          "secretsmanager:ListSecrets",
+          "secretsmanager:CancelRotateSecret"
+        ]
+        Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey"
+        ]
+        Resource = var.secret_kms_key_arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:AssignPrivateIpAddresses",
+          "ec2:UnassignPrivateIpAddresses",
+          "ec2:DescribeNetworkInterfaces"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }

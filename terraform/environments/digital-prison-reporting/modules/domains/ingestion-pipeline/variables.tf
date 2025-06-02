@@ -5,6 +5,12 @@ variable "setup_data_ingestion_pipeline" {
   default     = false
 }
 
+variable "batch_only" {
+  description = "Determines if the pipeline is batch only, True or False?"
+  type        = bool
+  default     = false
+}
+
 variable "data_ingestion_pipeline" {
   description = "Name for Data Ingestion Pipeline"
   type        = string
@@ -49,6 +55,33 @@ variable "glue_reporting_hub_batch_jobname" {
 variable "glue_reporting_hub_cdc_jobname" {
   description = "Glue Reporting Hub CDC JobName"
   type        = string
+}
+
+variable "glue_reconciliation_job" {
+  description = "Name of the reconciliation glue job"
+  type        = string
+}
+
+variable "glue_reconciliation_job_worker_type" {
+  description = "(Optional) Worker type to use for the reconciliation job"
+  type        = string
+  default     = "G.1X"
+
+  validation {
+    condition     = contains(["G.1X", "G.2X", "G.4X", "G.8X"], var.glue_reconciliation_job_worker_type)
+    error_message = "Worker type can only be one of G.1X, G.2X, G.4X, G.8X"
+  }
+}
+
+variable "glue_reconciliation_job_num_workers" {
+  description = "(Optional) Number of workers to use for the reconciliation job. Must be >= 2"
+  type        = number
+  default     = 2
+
+  validation {
+    condition     = var.glue_reconciliation_job_num_workers >= 2
+    error_message = "Number of workers must be >= 2"
+  }
 }
 
 variable "s3_glue_bucket_id" {

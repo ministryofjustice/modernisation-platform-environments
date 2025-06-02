@@ -1,5 +1,7 @@
 #another trigger
 resource "aws_instance" "database-server" {
+  # checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+  # checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   depends_on                  = [aws_security_group.app_servers]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].suprig01-ami
@@ -48,6 +50,9 @@ resource "aws_instance" "database-server" {
 
 
 resource "aws_ebs_volume" "database-disk1" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
@@ -71,10 +76,10 @@ resource "aws_volume_attachment" "database-disk1" {
   instance_id  = aws_instance.database-server.id
 }
 
-
-
-
 resource "aws_ebs_volume" "database-disk2" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
@@ -100,6 +105,9 @@ resource "aws_volume_attachment" "database-disk2" {
 
 
 resource "aws_ebs_volume" "database-disk3" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
@@ -124,6 +132,9 @@ resource "aws_volume_attachment" "database-disk3" {
 }
 
 resource "aws_ebs_volume" "database-disk4" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
@@ -148,6 +159,9 @@ resource "aws_volume_attachment" "database-disk4" {
 }
 
 resource "aws_ebs_volume" "database-disk5" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
@@ -173,6 +187,9 @@ resource "aws_volume_attachment" "database-disk5" {
 
 
 resource "aws_ebs_volume" "database-disk6" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
@@ -199,6 +216,9 @@ resource "aws_volume_attachment" "database-disk6" {
 }
 
 resource "aws_ebs_volume" "database-disk7" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.database-server]
   availability_zone = "${local.region}a"
   type              = "gp2"

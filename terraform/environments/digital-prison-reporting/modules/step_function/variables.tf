@@ -1,11 +1,13 @@
 variable "region" {
   description = "Current AWS Region."
   default     = "eu-west-2"
+  type        = string
 }
 
 variable "account" {
   description = "AWS Account ID."
   default     = ""
+  type        = string
 }
 
 variable "enable_step_function" {
@@ -33,6 +35,7 @@ variable "dms_task_time_out" {
 
 variable "definition" {
   description = "(Required) The definition of the step function"
+  type        = string
 }
 
 variable "tags" {

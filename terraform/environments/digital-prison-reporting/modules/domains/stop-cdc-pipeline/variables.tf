@@ -2,6 +2,17 @@ variable "setup_stop_cdc_pipeline" {
   description = "Enable Maintenance Pipeline, True or False"
   type        = bool
   default     = false
+
+  validation {
+    condition     = var.setup_stop_cdc_pipeline ? !var.batch_only : true
+    error_message = "Stop CDC pipeline can only be created when batch_only = false"
+  }
+}
+
+variable "batch_only" {
+  description = "Determines if the pipeline is batch only, True or False?"
+  type        = bool
+  default     = false
 }
 
 variable "stop_cdc_pipeline" {

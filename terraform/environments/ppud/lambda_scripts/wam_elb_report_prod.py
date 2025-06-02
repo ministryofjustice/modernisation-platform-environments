@@ -1,7 +1,7 @@
 # Python script to retrieve elastic load balancer data from cloudwatch, count the connections per 15 minutes
 # graph it and email it to end users via the internal mail relay.
 # Nick Buckingham
-# 9 December 2024
+# 3 April 2025
 
 import boto3
 import os
@@ -36,7 +36,8 @@ def get_elb_request_counts(ELB_NAME):
     # Calculate the start and end time for the day
     #start_time = datetime(2024, 12, 8, 6, 0, 0)  # 08:00 UTC, 28 Nov 2024
     #end_time = datetime(2024, 12, 8, 20, 10, 0)  # 17:00 UTC, 28 Nov 2024
-    current_time = datetime.utcnow()
+    # current_time = datetime.utcnow()
+    current_time = datetime.utcnow() + timedelta(hours=1)
     end_time = datetime.utcnow()
     start_time = end_time - timedelta(hours=14)
 

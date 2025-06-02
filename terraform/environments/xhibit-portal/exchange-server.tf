@@ -4,7 +4,8 @@ resource "aws_eip" "exchange" {
 }
 
 resource "aws_instance" "exchange-server" {
-
+  # checkov:skip=CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+  # checkov:skip=CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
   depends_on                  = [aws_security_group.exchange_server]
   instance_type               = "t2.medium"
   ami                         = local.application_data.accounts[local.environment].infra6-ami
@@ -51,6 +52,9 @@ resource "aws_instance" "exchange-server" {
 }
 
 resource "aws_ebs_volume" "exchange-disk1" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.exchange-server]
   availability_zone = "${local.region}a"
   type              = "gp2"
@@ -75,6 +79,9 @@ resource "aws_volume_attachment" "exchange-disk1" {
 }
 
 resource "aws_ebs_volume" "exchange-disk2" {
+
+  # checkov:skip=CKV_AWS_189: "Ensure EBS Volume is encrypted by KMS using a customer managed Key (CMK)"
+
   depends_on        = [aws_instance.exchange-server]
   availability_zone = "${local.region}a"
   type              = "gp2"

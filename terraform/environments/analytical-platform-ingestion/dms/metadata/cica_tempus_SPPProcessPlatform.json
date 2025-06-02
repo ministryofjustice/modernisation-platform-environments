@@ -1,0 +1,732 @@
+{
+  "objects_from": "tempus_spp_process_platform",
+  "extraction_date": "2025-03-26T14:26:33.595862",
+  "objects": [
+    "dbo.AW_RESOURCE",
+    "dbo.CASE_INSTANCE",
+    "dbo.JOB",
+    "dbo.JOB_HISTORY",
+    "dbo.LIVE_ACTIVITY",
+    "dbo.LIVE_ACTIVITY_RESOURCE",
+    "dbo.VARIABLE"
+  ],
+  "blobs": [],
+  "columns_to_exclude": [
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "CATEGORY_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "CHANGE_PASSWORD_ON_NEXT_LOGON"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "CHARGE_FIXED_RATE"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "EMAIL_ADDRESS"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "END_DATE"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "FAILED_LOGON_ATTEMPTS"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "IS_LOCKED_OUT"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "JOBLIST_QUERY_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "LAST_MODIFIED_DATE"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "LAST_MODIFIED_RESOURCE_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "LOCKED_OUT_DATETIME"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "MANAGERIAL_LEVEL"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "PASSCODE"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "PASSCODE_SENT_DATETIME"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "PASSCODE_VERIFIED_DATETIME"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "PASSWORD"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "PERSONA_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "PHONE_NUMBER"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "PROFILE_PICTURE"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "PROFILE_PICTURE_FILENAME"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "PROFILE_SETTINGS"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "RESOURCE_TYPE"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "SECURITY_KEY"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "SECURITY_LEVEL"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "SERVER_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "SETTINGS_XML"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "SKILL_LEVEL_MAX"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "SKILL_LEVEL_MIN"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "START_DATE"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "SUPERVISOR_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "TRANS_SERVER_INSTANCE_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "UNIT_CHARGE_RATE"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "UNIT_DURATION_IN_SECONDS"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "UNIT_TYPE"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "WORKALLOCATIONRULE_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "WORKING_CATEGORY_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "WORKING_GROUP_ID"
+    },
+    {
+      "object_name": "dbo.AW_RESOURCE",
+      "column_name": "WORKQUEUE_QUERY_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "ACTIVATION_TIME"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "ARCHIVE_FINISHED_JOB"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "ASSESSED_FOR_CHECKING"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "ASSESSED_FOR_SAMPLING"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "BUDGET"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "CAPTURE_ENABLED"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "CATEGORY_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "CHECKED_RESOURCE_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "COST_OVERRUN"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "CREATION_TIME"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "CREATOR"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "CUST_DATA"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "DOCUMENT_SET_RULES"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "DURATION_OVERRUN"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "EMBEDDED_PROCESS_COUNT"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "EXCEPTION_CODE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "EXPECTED_COST"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "EXPECTED_DURATION_IN_SECONDS"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "EXPECTED_FINISH_TIME"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "FINISH_TIME"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "HOLD_TIME"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "JOB_OWNER_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "JOB_SOURCE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "JOB_STATUS"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "LANGUAGE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "LAST_MODIFIED_DATE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "MACHINE_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "ORIGIN_SERVER_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "OWNER_PROCESS_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "PRIORITY"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "PROCESS_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "PROCESS_NAME"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "RAISED_BY"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "REASON_FOR_HOLD"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "ROOT_JOB_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SCORE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SELECTED_FOR_CHECKING"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SELECTED_FOR_SAMPLING"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SKIN_ID"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SLA_STATUS2_DATE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SLA_STATUS3_DATE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SLA_STATUS4_DATE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SLA_STATUS5_DATE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SPEND_SO_FAR"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "START_TIME"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "STATE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "SUSPEND_REASON"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "TEST_DEBUG_MODE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "TYPE"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "VERSION"
+    },
+    {
+      "object_name": "dbo.JOB",
+      "column_name": "WORK_QUEUE_DEFINITION_ID"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "AUTOMATIC"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "COST"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "DEPENDENCY_INCLUDE"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "DESIGN_TIME_TYPE"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "DOCUMENT_COUNT"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "DUE_DATE"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "EMBEDDED_PROCESS_COUNT"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "EXPECTED_COST"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "IS_ARCHIVED"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "MACHINE_ID"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "MONITORING_DUE_DATE"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "NODE_ID"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "NODE_ID_AFTER_DECISION"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "OUTCOME_NODE_INFO"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "OVERDUE"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "OVERRUN"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "OVERRUN_EXCEPTION"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "PAGE_COUNT"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "PERF_RES_INCLUDE"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "PROCESS_ID"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "PROCESS_NAME"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "SET_TIME_MILLISECS"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "STARTED_SUB_JOB_ID"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "SUB_JOB_ID"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "TARGET_TIME_IN_SECONDS"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "TIME_PENDING_IN_SECS"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "USE_ADV_WORKFLOW_RULES"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "VERSION"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "WORKING_TIME_PENDING_IN_SECS"
+    },
+    {
+      "object_name": "dbo.JOB_HISTORY",
+      "column_name": "WORKING_TIME_SPENT_IN_SECONDS"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "ACTIVITY_STATUS"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "ASSOCIATED_FILE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "AUTOMATIC"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "DATA_PROCESS_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "DELEGATED"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "DESIGN_TIME_TYPE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "DOCUMENT_COUNT"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "DUE_DATE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "EMBEDDED_PROCESS_COUNT"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "EXPECTED_COST"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "EXPECTED_DURATION_IN_SECONDS"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "FIXED_COST"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "HELP_TEXT"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "JOB_EXPECTED_FINISH_TIME"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "LIBRARY"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "MACHINE_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "MFP_READY"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "MONITORING_DUE_DATE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "NODE_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "OFFERED_RESOURCE_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "OFFERED_TIME"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "PAGE_COUNT"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "PERFORMING_RESOURCE_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "POOLID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "PREVIOUS_STATUS"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "PRIORITY"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "PROCESS_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "PROCESS_NAME"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "RESET_COUNT"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "RESET_LIMIT"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "SAVED_ACTIVITY"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "SECURITY"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "SKILL"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "SLA_STATUS2_DATE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "SLA_STATUS3_DATE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "SLA_STATUS4_DATE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "SLA_STATUS5_DATE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "SPP_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "SUB_NODE_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "TAKEN_TIME"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "TIME_OUT_ACTION_TYPE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "TYPE"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "UNIQUE_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "USE_ADV_WORKFLOW_RULES"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY",
+      "column_name": "VERSION"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY_RESOURCE",
+      "column_name": "ASSIGNED_RESOURCE_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY_RESOURCE",
+      "column_name": "EMBEDDED_PROCESS_COUNT"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY_RESOURCE",
+      "column_name": "NODE_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY_RESOURCE",
+      "column_name": "SERVER_ID"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY_RESOURCE",
+      "column_name": "STATUS"
+    },
+    {
+      "object_name": "dbo.LIVE_ACTIVITY_RESOURCE",
+      "column_name": "SUB_NODE_ID"
+    },
+    {
+      "object_name": "dbo.VARIABLE",
+      "column_name": "CATEGORY_ID"
+    },
+    {
+      "object_name": "dbo.VARIABLE",
+      "column_name": "DERIVED_EXPRESSION"
+    },
+    {
+      "object_name": "dbo.VARIABLE",
+      "column_name": "DISPLAY_NAME"
+    },
+    {
+      "object_name": "dbo.VARIABLE",
+      "column_name": "DYNAMIC"
+    },
+    {
+      "object_name": "dbo.VARIABLE",
+      "column_name": "ENTITY_ID"
+    },
+    {
+      "object_name": "dbo.VARIABLE",
+      "column_name": "IS_SECURE"
+    },
+    {
+      "object_name": "dbo.VARIABLE",
+      "column_name": "USE_AS_SKIN_VARIABLE"
+    },
+    {
+      "object_name": "dbo.VARIABLE",
+      "column_name": "VAR_TYPE"
+    },
+    {
+      "object_name": "dbo.VARIABLE",
+      "column_name": "VERSION"
+    }
+  ]
+}

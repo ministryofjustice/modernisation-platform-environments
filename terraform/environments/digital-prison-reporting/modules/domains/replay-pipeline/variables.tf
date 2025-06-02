@@ -2,6 +2,17 @@ variable "setup_replay_pipeline" {
   description = "Enable Replay Pipeline, True or False?"
   type        = bool
   default     = false
+
+  validation {
+    condition     = var.setup_replay_pipeline ? !var.batch_only : true
+    error_message = "Replay pipeline can only be created when batch_only = false"
+  }
+}
+
+variable "batch_only" {
+  description = "Determines if the pipeline is batch only, True or False?"
+  type        = bool
+  default     = false
 }
 
 variable "replay_pipeline" {

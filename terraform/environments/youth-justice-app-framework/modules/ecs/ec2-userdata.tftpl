@@ -37,8 +37,9 @@ systemctl enable amazon-cloudwatch-agent.service
 systemctl start amazon-cloudwatch-agent.service
 echo add config for metadata
 echo ECS_ENABLE_CONTAINER_METADATA=true >> /etc/ecs/ecs.config
+
 #todo only for spot
-echo ECS_ENABLE_SPOT_INSTANCE_DRAINING=true >> /etc/ecs/ecs.config 
+#echo ECS_ENABLE_SPOT_INSTANCE_DRAINING=true >> /etc/ecs/ecs.config 
 echo ECS_CLUSTER=${cluster_name} >> /etc/ecs/ecs.config
 
 #set ssh key Algorithms

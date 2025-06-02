@@ -67,6 +67,11 @@ resource "aws_lambda_function" "lambda_payment_load_monitor" {
       SNS_TOPIC_ARN = aws_sns_topic.payment_load_notifications.arn
     }
   }
+
+  tracing_config {
+    mode = "Active"
+  }
+
   tags = merge(local.tags, {
     Name = "${local.application_name}-${local.environment}-payment-load-monitor"
   })

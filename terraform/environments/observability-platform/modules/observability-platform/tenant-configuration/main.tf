@@ -6,7 +6,7 @@ module "xray_source" {
   source = "../../grafana/xray-source"
 
   name       = each.key
-  account_id = var.environment_management.account_ids[each.key]
+  account_id = var.all_account_ids[each.key]
 }
 
 module "cloudwatch_source" {
@@ -17,7 +17,7 @@ module "cloudwatch_source" {
   source = "../../grafana/cloudwatch-source"
 
   name                         = each.key
-  account_id                   = try(each.key == "modernisation-platform" ? var.environment_management.modernisation_platform_account_id : var.environment_management.account_ids[each.key], var.environment_management.account_ids[each.key])
+  account_id                   = var.all_account_ids[each.key]
   cloudwatch_custom_namespaces = try(each.value.cloudwatch_custom_namespaces, null)
   xray_enabled                 = try(each.value.xray_enabled, false)
 
@@ -32,7 +32,7 @@ module "amazon_prometheus_query_source" {
   source = "../../grafana/amazon-prometheus-query-source"
 
   name                               = each.key
-  account_id                         = try(each.key == "modernisation-platform" ? var.environment_management.modernisation_platform_account_id : var.environment_management.account_ids[each.key], var.environment_management.account_ids[each.key])
+  account_id                         = var.all_account_ids[each.key]
   amazon_prometheus_workspace_region = try(each.value.amazon_prometheus_workspace_region, "eu-west-2")
   amazon_prometheus_workspace_id     = each.value.amazon_prometheus_workspace_id
 }
@@ -42,7 +42,7 @@ locals {
     for env_name, env_data in var.aws_accounts : [
       for config_name, config_data in try(env_data.athena_config, {}) : {
         key        = "${env_name}-${config_name}"
-        account_id = nonsensitive(var.environment_management.account_ids[env_name])
+        account_id = nonsensitive(var.all_account_ids[env_name])
         database   = config_data.database
         workgroup  = config_data.workgroup
       }
@@ -71,7 +71,7 @@ module "prometheus_push" {
   source = "../../prometheus/iam-role"
 
   name       = each.key
-  account_id = try(each.key == "modernisation-platform" ? var.environment_management.modernisation_platform_account_id : var.environment_management.account_ids[each.key], var.environment_management.account_ids[each.key])
+  account_id = var.all_account_ids[each.key]
 }
 
 module "team" {

@@ -116,3 +116,65 @@ resource "aws_security_group_rule" "ecsint_to_ecsext_rule" {
   source_security_group_id = aws_security_group.common_ecs_service_internal.id
   description              = "ECSint to ECSext communication"
 }
+
+# Enable ECS Services access to RDS PostgreSQL
+resource "aws_security_group_rule" "ecsint_to_rds_rule" {
+  type                     = "ingress"
+  from_port                = 5432
+  to_port                  = 5432
+  protocol                 = "tcp"
+  security_group_id        = var.rds_postgresql_sg_id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "PostgreSQL from ECS Internal"
+}
+
+# Enable ECS Services access to Redshift
+resource "aws_security_group_rule" "ecsint_to_redshift_rule" {
+  type                     = "ingress"
+  from_port                = 5439
+  to_port                  = 5439
+  protocol                 = "tcp"
+  security_group_id        = var.redshift_sg_id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "Pedshift from ECS Internal"
+}
+
+###DATADOG RULES
+
+resource "aws_security_group_rule" "ecsext_toecs_ecsint_datadog_rule" {
+  type                     = "ingress"
+  from_port                = 8126
+  to_port                  = 8126
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.common_ecs_service_external.id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "Datadog from ECS External to ECS Internal"
+}
+resource "aws_security_group_rule" "ecsext_toecs_ecsint_datadog_rule_udp" {
+  type                     = "ingress"
+  from_port                = 8125
+  to_port                  = 8125
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.common_ecs_service_external.id
+  source_security_group_id = aws_security_group.common_ecs_service_internal.id
+  description              = "Datadog from ECS External to ECS Internal"
+}
+
+resource "aws_security_group_rule" "ecsint_toecs_ecsext_datadog_rule" {
+  type                     = "ingress"
+  from_port                = 8126
+  to_port                  = 8126
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.common_ecs_service_internal.id
+  source_security_group_id = aws_security_group.common_ecs_service_external.id
+  description              = "Datadog from ECS Internal to ECS External"
+}
+resource "aws_security_group_rule" "ecsint_toecs_ecsext_datadog_rule_udp" {
+  type                     = "ingress"
+  from_port                = 8125
+  to_port                  = 8125
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.common_ecs_service_internal.id
+  source_security_group_id = aws_security_group.common_ecs_service_external.id
+  description              = "Datadog from ECS Internal to ECS External"
+}

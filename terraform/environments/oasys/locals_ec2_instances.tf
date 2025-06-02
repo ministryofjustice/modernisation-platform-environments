@@ -96,15 +96,14 @@ locals {
         ]
       }
       tags = {
-        backup                      = "false" # opt out of mod platform default backup plan
-        description                 = "${local.environment} onr database"
-        licence-requirements        = "Oracle Database"
-        OracleDbLTS-ManagedInstance = true # oracle license tracking
-        os-type                     = "Linux"
-        os-major-version            = 8
-        os-version                  = "RHEL 8.5"
-        server-type                 = "onr-db"
-        update-ssm-agent            = "patchgroup1"
+        backup               = "false" # opt out of mod platform default backup plan
+        description          = "${local.environment} onr database"
+        licence-requirements = "Oracle Database"
+        os-type              = "Linux"
+        os-major-version     = 8
+        os-version           = "RHEL 8.5"
+        server-type          = "onr-db"
+        update-ssm-agent     = "patchgroup1"
       }
     }
 
@@ -158,16 +157,15 @@ locals {
         }
       }
       tags = {
-        backup                      = "false" # opt out of mod platform default backup plan
-        component                   = "data"
-        description                 = "${local.environment} oasys database"
-        licence-requirements        = "Oracle Database"
-        OracleDbLTS-ManagedInstance = true # oracle license tracking
-        os-type                     = "Linux"
-        os-major-version            = 8
-        os-version                  = "RHEL 8.5"
-        server-type                 = "oasys-db"
-        update-ssm-agent            = "patchgroup1"
+        backup               = "false" # opt out of mod platform default backup plan
+        component            = "data"
+        description          = "${local.environment} oasys database"
+        licence-requirements = "Oracle Database"
+        os-type              = "Linux"
+        os-major-version     = 8
+        os-version           = "RHEL 8.5"
+        server-type          = "oasys-db"
+        update-ssm-agent     = "patchgroup1"
       }
     }
   }

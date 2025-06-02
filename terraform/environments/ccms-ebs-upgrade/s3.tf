@@ -1,6 +1,7 @@
 # S3 Bucket - Artefacts
 module "s3-bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name = local.artefact_bucket_name
   #  bucket_prefix      = "s3-bucket-example"
@@ -184,7 +185,8 @@ data "aws_iam_policy_document" "logging_s3_policy" {
 
 # S3 Bucket - R-sync
 module "s3-bucket-dbbackup" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  # v8.2.0 = https://github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket/commit/52a40b0dd18aaef0d7c5565d93cc8997aad79636
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=52a40b0dd18aaef0d7c5565d93cc8997aad79636"
 
   bucket_name        = local.rsync_bucket_name
   versioning_enabled = false
@@ -279,4 +281,52 @@ data "aws_iam_policy_document" "dbbackup_s3_policy" {
 
 resource "aws_s3_bucket" "ccms_ebs_shared" {
   bucket = "${local.application_name}-${local.environment}-shared"
+}
+
+resource "aws_s3_bucket_public_access_block" "ccms_ebs_shared" {
+  bucket                  = aws_s3_bucket.ccms_ebs_shared.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "ccms_ebs_shared" {
+  bucket = aws_s3_bucket.ccms_ebs_shared.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# Development
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-development-logging"]
+}
+
+moved {
+  from = module.s3-bucket-artefacts.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]
+  to   = module.s3-bucket-artefacts.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-development-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-upgrade-development-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-development-logging"]
+}
+
+# Test
+moved {
+  from = module.s3-bucket.aws_s3_bucket_logging.default["ccms-ebs-upgrade-test-logging"]
+  to   = module.s3-bucket.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-test-logging"]
+}
+
+moved {
+  from = module.s3-bucket-artefacts.aws_s3_bucket_logging.default["ccms-ebs-upgrade-test-logging"]
+  to   = module.s3-bucket-artefacts.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-test-logging"]
+}
+
+moved {
+  from = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default["ccms-ebs-upgrade-test-logging"]
+  to   = module.s3-bucket-dbbackup.aws_s3_bucket_logging.default_single_name["ccms-ebs-upgrade-test-logging"]
 }

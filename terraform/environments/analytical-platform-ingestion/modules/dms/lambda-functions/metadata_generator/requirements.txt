@@ -1,0 +1,8 @@
+oracledb==2.5.1
+etl_manager==7.5.3
+mojap-metadata==1.15.3
+python-dotenv==1.0.1
+setuptools==75.8.0
+sqlalchemy==2.0.38
+aws-xray-sdk==2.14.0
+pymssql==2.3.4

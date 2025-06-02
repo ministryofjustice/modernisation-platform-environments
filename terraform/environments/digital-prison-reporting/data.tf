@@ -29,6 +29,75 @@ data "aws_secretsmanager_secret_version" "bodmis" {
   depends_on = [aws_secretsmanager_secret.bodmis]
 }
 
+# Source OASys Secrets
+data "aws_secretsmanager_secret" "oasys" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  name = aws_secretsmanager_secret.oasys[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.oasys[0]]
+}
+
+data "aws_secretsmanager_secret_version" "oasys" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id = data.aws_secretsmanager_secret.oasys[0].id
+
+  depends_on = [aws_secretsmanager_secret.oasys[0]]
+}
+
+# Source ONR Secrets
+data "aws_secretsmanager_secret" "onr" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  name = aws_secretsmanager_secret.onr[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.onr[0]]
+}
+
+data "aws_secretsmanager_secret_version" "onr" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id = data.aws_secretsmanager_secret.onr[0].id
+
+  depends_on = [aws_secretsmanager_secret.onr[0]]
+}
+
+# Source nDelius Secrets
+data "aws_secretsmanager_secret" "ndelius" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  name = aws_secretsmanager_secret.ndelius[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.ndelius[0]]
+}
+
+data "aws_secretsmanager_secret_version" "ndelius" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id = data.aws_secretsmanager_secret.ndelius[0].id
+
+  depends_on = [aws_secretsmanager_secret.ndelius[0]]
+}
+
+# Source nDelius Secrets
+data "aws_secretsmanager_secret" "ndmis" {
+  count = local.is_non_prod ? 1 : 0
+
+  name = aws_secretsmanager_secret.ndmis[0].id
+
+  depends_on = [aws_secretsmanager_secret_version.ndmis[0]]
+}
+
+data "aws_secretsmanager_secret_version" "ndmis" {
+  count = local.is_non_prod ? 1 : 0
+
+  secret_id = data.aws_secretsmanager_secret.ndmis[0].id
+
+  depends_on = [aws_secretsmanager_secret.ndmis[0]]
+}
+
+
 # Source DataMart Secrets
 data "aws_secretsmanager_secret" "datamart" {
   name = aws_secretsmanager_secret.redshift.id

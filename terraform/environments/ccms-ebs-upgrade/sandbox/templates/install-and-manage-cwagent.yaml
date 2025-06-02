@@ -1,0 +1,27 @@
+---
+schemaVersion: "2.2"
+description: A composite document for installing and configuring the CloudWatch Agent.
+parameters:
+  optionalConfigurationLocation:
+    description: name of ssm parameter that contains the CW Agent config
+    type: String
+mainSteps:
+  - name: installCWAgent
+    action: aws:runDocument
+    inputs:
+      documentType: SSMDocument
+      documentPath: AWS-ConfigureAWSPackage
+      documentParameters:
+        action: Install
+        name: AmazonCloudWatchAgent
+  - name: configureCWAgent
+    action: aws:runDocument
+    inputs:
+      documentType: SSMDocument
+      documentPath: AmazonCloudWatch-ManageAgent
+      documentParameters:
+        action: configure
+        mode: ec2
+        optionalConfigurationSource: ssm
+        optionalConfigurationLocation: "{{ optionalConfigurationLocation }}"
+        optionalRestart: "yes"

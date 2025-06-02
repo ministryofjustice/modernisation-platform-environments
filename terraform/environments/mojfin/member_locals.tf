@@ -32,7 +32,7 @@ locals {
   memory_threshold                  = "1000000000"
   memory_alert_period               = "60"
   memory_evaluation_period          = "10"
-  disk_free_space_threshold         = "50000000000"
+  disk_free_space_threshold         = "100000000000"
   disk_free_space_alert_period      = "60"
   disk_free_space_evaluation_period = "1"
   read_latency_threshold            = "0.5"

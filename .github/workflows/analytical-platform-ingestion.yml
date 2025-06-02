@@ -8,7 +8,6 @@
       paths:
         - 'terraform/environments/analytical-platform-ingestion/**'
         - '.github/workflows/analytical-platform-ingestion.yml'
-        - '.github/workflows/reusable_terraform_component_strategy.yml'
 
     pull_request:
       branches:
@@ -42,17 +41,9 @@
         # so the strategy can load environment info from it.
         application: "${{ github.workflow }}"  # Typically: "analytical-platform-ingestion"
 
-    skipping_terraform:
-      needs: strategy
-      if: ${{ inputs.action != 'destroy' && (needs.strategy.outputs.matrix == '' || toJson(fromJson(needs.strategy.outputs.matrix)) == '[]')}}  # conversion from and to Json standardises output
-      runs-on: ubuntu-latest
-      steps:
-        - name: Skip Terraform
-          run: echo "No terraform changes detected. Skipping Terraform plan/apply."
-
     terraform:
       needs: strategy
-      if: ${{ inputs.action != 'destroy' && needs.strategy.outputs.matrix != '' && toJson(fromJson(needs.strategy.outputs.matrix)) != '[]'}}  # conversion from and to Json standardises output
+      if: inputs.action != 'destroy'
       strategy:
         fail-fast: false
         matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
@@ -63,7 +54,7 @@
         application: "${{ github.workflow }}"
         environment: "${{ matrix.target }}"
         action: "${{ matrix.action }}"
-        component: "${{ matrix.component }}"
+        component: "${{ matrix.component }}"      # If your strategy workflow also outputs "matrix.component"
       secrets:
         modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
         pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"

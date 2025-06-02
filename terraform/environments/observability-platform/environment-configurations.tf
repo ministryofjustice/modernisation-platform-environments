@@ -3,6 +3,25 @@ locals {
   environment_configurations = {
     development = {
       tenant_configuration = {
+        "modernisation-platform" = {
+          identity_centre_team = "modernisation-platform"
+          slack_channels       = ["mod-plat-observ-test"]
+          aws_accounts = {
+            "cooker-development" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                primary = {
+                  database  = "grafana_db"
+                  workgroup = "grafana-dashboard"
+                }
+              }
+            }
+          }
+        },
         "observability-platform" = {
           identity_centre_team = "observability-platform"
           slack_channels       = ["observability-platform-development-alerts"]
@@ -287,19 +306,6 @@ locals {
               amazon_prometheus_query_enabled = false
               xray_enabled                    = false
               athena_enabled                  = false
-            },
-            "cooker-development" = {
-              cloudwatch_enabled              = true
-              prometheus_push_enabled         = false
-              amazon_prometheus_query_enabled = false
-              xray_enabled                    = false
-              athena_enabled                  = true
-              athena_config = {
-                primary = {
-                  database  = "grafana_db"
-                  workgroup = "grafana-dashboard"
-                }
-              }
             }
           }
         },
@@ -316,6 +322,24 @@ locals {
                 primary = {
                   database  = "greenops_cur_poc"
                   workgroup = "primary"
+                }
+              }
+            }
+          }
+        },
+        "coat" = {
+          "identity_centre_team" = "cloud-optimisation-and-accountability",
+          "aws_accounts" = {
+            "coat-production" = {
+              cloudwatch_enabled              = true
+              prometheus_push_enabled         = false
+              amazon_prometheus_query_enabled = false
+              xray_enabled                    = false
+              athena_enabled                  = true
+              athena_config = {
+                primary = {
+                  database  = "cur_v2_database"
+                  workgroup = "coat_cur_report"
                 }
               }
             }

@@ -82,8 +82,8 @@ module "glue_reporting_hub_batch_job" {
 # Glue Job, Check All Raw Files Have Been Processed Job
 module "unprocessed_raw_files_check_job" {
   source                        = "../../glue_job"
-  create_job                    = var.setup_unprocessed_raw_files_check_job
-  create_role                   = var.glue_unprocessed_raw_files_check_create_role # Needs to Set to TRUE
+  create_job                    = var.batch_only ? false : var.setup_unprocessed_raw_files_check_job
+  create_role                   = var.batch_only ? false : var.glue_unprocessed_raw_files_check_create_role # Needs to Set to TRUE
   name                          = var.glue_unprocessed_raw_files_check_job_name
   short_name                    = var.glue_unprocessed_raw_files_check_job_short_name
   command_type                  = "glueetl"
@@ -121,8 +121,8 @@ module "unprocessed_raw_files_check_job" {
 # Glue Job, Reporting Hub Archive
 module "glue_archive_job" {
   source                        = "../../glue_job"
-  create_job                    = var.setup_archive_job
-  create_role                   = var.glue_archive_create_role # Needs to Set to TRUE
+  create_job                    = var.batch_only ? false : var.setup_archive_job
+  create_role                   = var.batch_only ? false : var.glue_archive_create_role # Needs to Set to TRUE
   name                          = var.glue_archive_job_name
   short_name                    = var.glue_archive_job_short_name
   command_type                  = "glueetl"
@@ -151,6 +151,7 @@ module "glue_archive_job" {
     var.tags,
     {
       Resource_Type = "Glue Job"
+      Jira          = "DPR2-713"
     }
   )
 }
@@ -202,6 +203,12 @@ resource "aws_glue_trigger" "glue_file_archive_job_trigger" {
 
   actions {
     job_name = module.glue_archive_job.name
+  }
+
+  tags = {
+    Name          = "${module.glue_archive_job.name}-trigger"
+    Resource_Type = "Glue Trigger"
+    Jira          = "DPR2-713"
   }
 }
 

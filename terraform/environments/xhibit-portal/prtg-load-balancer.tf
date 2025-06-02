@@ -9,8 +9,11 @@ data "aws_subnets" "prtg-shared-public" {
   }
 }
 
+# trivy:ignore:AVD-AWS-0052 reason: (HIGH): Application load balancer is not set to drop invalid headers.
+# trivy:ignore:AVD-AWS-0053 reason: (HIGH): Load balancer is exposed publicly.
 resource "aws_lb" "prtg_lb" {
-
+  # checkov:skip=CKV_AWS_131: "Ensure that ALB drops HTTP headers"
+  # checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
   depends_on = [
     aws_security_group.prtg_lb,
   ]
@@ -69,8 +72,10 @@ resource "aws_lb_target_group_attachment" "prtg-server-attachment" {
   port             = 443
 }
 
-
+# trivy:ignore:AVD-AWS-0047 reason: (CRITICAL): Listener uses an outdated TLS policy.
 resource "aws_lb_listener" "prtg_lb_listener" {
+  # checkov:skip=CKV_AWS_103: "Ensure that load balancer is using at least TLS 1.2"
+  # checkov:skip=CKV2_AWS_74:Legacy clients require older SSL policy for compatibility
   depends_on = [
     aws_acm_certificate_validation.prtg_lb_cert_validation,
     aws_lb_target_group.prtg_lb_web_tg
@@ -95,7 +100,7 @@ resource "aws_acm_certificate" "prtg_lb_cert" {
 
   subject_alternative_names = [
     "${var.networking[0].business-unit}-${local.environment}.modernisation-platform.service.justice.gov.uk",
-    "${local.application_data.accounts[local.environment].public_dns_name_prtg}"
+    local.application_data.accounts[local.environment].public_dns_name_prtg
   ]
 
   tags = {
@@ -136,6 +141,7 @@ resource "aws_acm_certificate_validation" "prtg_lb_cert_validation" {
 }
 
 resource "aws_wafv2_web_acl" "prtg_acl" {
+  # checkov:skip=CKV_AWS_192: "Ensure WAF prevents message lookup in Log4j2. See CVE-2021-44228 aka log4jshell"
   count       = local.is-production ? 0 : 1
   name        = "WAFprtg-acl"
   description = "WAF ACL rules for prtg Looad Balancer."
@@ -209,7 +215,18 @@ resource "aws_wafv2_web_acl_association" "aws_prtg-lb_waf_association" {
   web_acl_arn  = aws_wafv2_web_acl.prtg_acl[0].arn
 }
 
+# trivy:ignore:AVD-AWS-0086 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0087 reason: (HIGH): No public access block so not blocking public policies
+# trivy:ignore:AVD-AWS-0091 reason: (HIGH): No public access block so not blocking public acls
+# trivy:ignore:AVD-AWS-0093 reason: (HIGH): No public access block so not restricting public buckets
 resource "aws_s3_bucket" "prtg_logs" {
+  # checkov:skip=CKV2_AWS_62: "Ensure S3 buckets should have event notifications enabled"
+  # checkov:skip=CKV_AWS_145: "Ensure that S3 buckets are encrypted with KMS by default"
+  # checkov:skip=CKV2_AWS_6: "Ensure that S3 bucket has a Public Access block"
+  # checkov:skip=CKV_AWS_21: "Ensure all data stored in the S3 bucket have versioning enabled"
+  # checkov:skip=CKV_AWS_144: "Ensure that S3 bucket has cross-region replication enabled"
+  # checkov:skip=CKV_AWS_18: "Ensure the S3 bucket has access logging enabled"
+  # checkov:skip=CKV2_AWS_61: "Ensure that an S3 bucket has a lifecycle configuration"
   count         = local.is-production ? 0 : 1
   bucket        = "aws-waf-logs-prtg-${var.networking[0].application}.${var.networking[0].business-unit}-${local.environment}"
   force_destroy = true
@@ -234,7 +251,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default_encryptio
 
 resource "aws_wafv2_web_acl_logging_configuration" "prtg_logs" {
   count                   = local.is-production ? 0 : 1
-  log_destination_configs = ["${aws_s3_bucket.prtg_logs[0].arn}"]
+  log_destination_configs = [aws_s3_bucket.prtg_logs[0].arn]
   resource_arn            = aws_wafv2_web_acl.prtg_acl[0].arn
 }
 
@@ -254,7 +271,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     effect = "Deny"
     resources = [
       "${aws_s3_bucket.prtg_logs[0].arn}/*",
-      "${aws_s3_bucket.prtg_logs[0].arn}"
+      aws_s3_bucket.prtg_logs[0].arn
     ]
 
     condition {
@@ -292,9 +309,7 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values = [
-        "${data.aws_caller_identity.current.account_id}"
-      ]
+      values   = [data.aws_caller_identity.current.account_id]
     }
 
     condition {
@@ -316,17 +331,13 @@ data "aws_iam_policy_document" "s3_bucket_prtg_logs_policy" {
     actions = [
       "s3:GetBucketAcl"
     ]
-    effect = "Allow"
-    resources = [
-      "${aws_s3_bucket.prtg_logs[0].arn}"
-    ]
+    effect    = "Allow"
+    resources = [aws_s3_bucket.prtg_logs[0].arn]
 
     condition {
       test     = "StringEquals"
       variable = "aws:SourceAccount"
-      values = [
-        "${data.aws_caller_identity.current.account_id}"
-      ]
+      values   = [data.aws_caller_identity.current.account_id]
     }
 
     condition {

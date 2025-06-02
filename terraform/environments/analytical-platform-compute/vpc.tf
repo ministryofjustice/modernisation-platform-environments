@@ -1,4 +1,3 @@
-
 #tfsec:ignore:avd-aws-0102 NACLs not restricted
 #tfsec:ignore:avd-aws-0105 NACLs not restricted
 module "vpc" {

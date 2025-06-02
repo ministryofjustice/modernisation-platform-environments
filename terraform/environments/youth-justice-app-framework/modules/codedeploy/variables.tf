@@ -44,3 +44,15 @@ variable "environment" {
   description = "The environment to deploy to"
   type        = string
 }
+
+variable "ec2_applications" {
+  description = "List of application names for EC2 CodeDeploy deployments"
+  type        = list(string)
+  default     = []
+}
+
+variable "ec2_enabled" {
+  description = "Enable EC2 deployments"
+  type        = bool
+  default     = false
+}

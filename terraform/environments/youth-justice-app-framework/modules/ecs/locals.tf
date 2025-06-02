@@ -44,7 +44,7 @@ locals {
     },
     {
       sourceVolume : "tmp",
-      containerPath : "/root/tmp",
+      containerPath : "/tmp",
       readOnly : false
     }
   ]
@@ -60,13 +60,20 @@ locals {
     }
   ]
 
-  common_datadog_rule = [
+  common_datadog_rules = [
     {
-      from_port                = 8125
-      to_port                  = 8126
-      protocol                 = "tcp"
-      source_security_group_id = aws_security_group.common_ecs_service_internal.id
-      description              = "Datadog from ecs services"
+      from_port   = 8126
+      to_port     = 8126
+      protocol    = "tcp"
+      self        = true
+      description = "Datadog from ecs services"
+    },
+    {
+      from_port   = 8125
+      to_port     = 8125
+      protocol    = "udp"
+      self        = true
+      description = "Datadog from ecs services"
     }
   ]
 
@@ -108,12 +115,14 @@ locals {
   combined_ingress_rules_external = concat(
     local.ecs_common_security_group_ingress,
     local.cloudfront_ingress,
+    local.common_datadog_rules,
     var.additional_ecs_common_security_group_ingress
   )
 
   # Concatenate the lists
   combined_ingress_rules_internal = concat(
     local.ecs_common_security_group_ingress,
+    local.common_datadog_rules,
     var.additional_ecs_common_security_group_ingress
   )
 

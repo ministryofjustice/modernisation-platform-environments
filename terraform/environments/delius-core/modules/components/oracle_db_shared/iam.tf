@@ -16,31 +16,6 @@ data "aws_iam_policy_document" "db_ec2_instance_iam_assume_policy" {
   }
 }
 
-data "aws_iam_policy_document" "business_unit_kms_key_access" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:DescribeKey",
-      "kms:CreateGrant",
-      "kms:ListGrants",
-      "kms:RevokeGrant"
-    ]
-    resources = [
-      var.account_config.kms_keys.general_shared,
-    ]
-  }
-}
-
-resource "aws_iam_policy" "business_unit_kms_key_access" {
-  name   = "${var.env_name}-${var.db_suffix}-business-unit-kms-key-access-policy"
-  path   = "/"
-  policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
-}
-
 data "aws_iam_policy_document" "core_shared_services_bucket_access" {
   statement {
     effect = "Allow"
@@ -176,7 +151,8 @@ data "aws_iam_policy_document" "combined_instance_policy" {
     data.aws_iam_policy_document.allow_access_to_ssm_parameter_store.json,
     data.aws_iam_policy_document.ec2_access_for_ansible.json,
     data.aws_iam_policy_document.db_access_to_secrets_manager.json,
-    data.aws_iam_policy_document.oracledb_backup_bucket_access.json,
+    # data.aws_iam_policy_document.oracledb_backup_bucket_access.json,
+    data.aws_iam_policy_document.combined.json,
     data.aws_iam_policy_document.db_ssh_keys_s3_policy_document.json,
     data.aws_iam_policy_document.instance_ssm.json,
     data.aws_iam_policy_document.oracle_ec2_snapshot_backup_role_policy_document.json,

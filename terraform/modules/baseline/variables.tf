@@ -104,6 +104,14 @@ variable "cloudwatch_dashboards" {
   default = {}
 }
 
+variable "cloudwatch_event_rules" {
+  type = map(object({
+    event_pattern         = optional(string)
+    sns_topic_name_or_arn = optional(string)
+  }))
+  default = {}
+}
+
 variable "cloudwatch_log_groups" {
   description = "set of cloudwatch log groups to create where the key is the name of the group"
   type = map(object({

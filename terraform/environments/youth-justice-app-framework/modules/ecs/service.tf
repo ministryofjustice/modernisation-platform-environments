@@ -53,8 +53,10 @@ module "ecs_service" {
   desired_count                      = each.value.desired_count
   deployment_maximum_percent         = each.value.deployment_maximum_percent
   deployment_minimum_healthy_percent = each.value.deployment_minimum_healthy_percent
+  health_check_grace_period_seconds  = each.value.health_check_grace_period_seconds
   autoscaling_max_capacity           = try(each.value.autoscaling_max_capacity, 4)
   autoscaling_policies               = local.autoscaling_policies
+  force_new_deployment               = false
   #ec2 capacity_provider_strategy  spread (attribute:ecs.availability-zone), spread (instanceId) todo
   # Container definition(s)
   cpu    = try(each.value.task_cpu, each.value.container_cpu)
@@ -73,13 +75,13 @@ module "ecs_service" {
 
       cpu                      = try(each.value.container_cpu, each.value.task_cpu - 20)
       memory                   = try(each.value.container_memory, each.value.task_memory - 40)
-      essential                = true
+      essential                = try(each.value.essential, true)
       mount_points             = concat(each.value.additional_mount_points, local.default_mountpoints)
       readonly_root_filesystem = each.value.readonly_root_filesystem
 
       enable_cloudwatch_logging              = true
       create_cloudwatch_log_group            = true
-      cloudwatch_log_group_name              = "/aws/ecs/${each.value.name}"
+      cloudwatch_log_group_name              = "/ecs/${each.value.name}"
       cloudwatch_log_group_retention_in_days = each.value.cloudwatch_log_group_retention_in_days
 
       log_configuration = {
@@ -111,11 +113,11 @@ module "ecs_service" {
         "com.datadoghq.tags.service" : each.value.name,
         "com.datadoghq.tags.env" : var.environment,
       })
-      health_check = {
+      health_check = each.value.enable_healthcheck ? {
         command = each.value.health_check.command
-      }
-      command    = each.value.command
-      entryPoint = each.value.entryPoint
+      } : {}
+      command     = each.value.command
+      entry_point = each.value.entry_point
     }
   })
   ignore_task_definition_changes = true
@@ -154,6 +156,7 @@ module "ecs_service" {
   create_security_group      = false
   security_group_ids         = each.value.internal_only ? [aws_security_group.common_ecs_service_internal.id] : [aws_security_group.common_ecs_service_external.id]
   tasks_iam_role_name        = each.value.ecs_task_iam_role_name
+  tasks_iam_role_arn         = aws_iam_role.ecs_task_role.arn
   create_tasks_iam_role      = false
   tasks_iam_role_description = "IAM role for ECS tasks"
   create_task_exec_iam_role  = false

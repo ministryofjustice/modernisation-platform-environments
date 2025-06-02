@@ -36,13 +36,23 @@ locals {
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["private-jumpserver"]
       }
+      secretsmanager_secrets = {
+        dso-modernisation-platform-automation = {
+          description             = "Use the dso-modernisation-platform-automation azure app registration"
+          recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
+        }
+        dso-ad-computer-cleanup = {
+          description             = "Use the AD service account"
+          recovery_window_in_days = 0 # so instances can be deleted and re-created without issue
+        }
+      }
       tags = {
         ami_name               = "hmpps_windows_server_2022"
         backup                 = "false"
-        description            = "Windows Server 2022 jumpserver for Nart"
+        description            = "Windows Server 2022 jumpserver for Hmpps"
         instance-access-policy = "full"
         os-type                = "Windows"
-        server-type            = "NartClient"
+        server-type            = "HmppsJump2022"
         update-ssm-agent       = "patchgroup1"
       }
     }

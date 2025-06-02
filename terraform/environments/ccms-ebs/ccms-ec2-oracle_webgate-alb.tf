@@ -6,6 +6,7 @@ resource "aws_lb" "webgate_lb" {
   security_groups    = [aws_security_group.sg_webgate_lb.id]
   subnets            = data.aws_subnets.shared-private.ids
 
+  drop_invalid_header_fields = true
   enable_deletion_protection = true
 
   access_logs {
@@ -66,6 +67,7 @@ resource "aws_lb" "webgate_public_lb" {
   security_groups    = [aws_security_group.sg_webgate_lb.id]
   subnets            = data.aws_subnets.shared-public.ids
 
+  drop_invalid_header_fields = true
   enable_deletion_protection = true
 
   access_logs {

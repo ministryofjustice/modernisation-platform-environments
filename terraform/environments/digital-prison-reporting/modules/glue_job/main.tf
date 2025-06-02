@@ -92,7 +92,13 @@ data "aws_iam_policy_document" "extra-policy-document" {
 
   statement {
     actions = [
-      "s3:*"
+      "s3:GetObject",
+      "s3:DeleteObject",
+      "s3:GetObjectAcl",
+      "s3:ListBucket",
+      "s3:PutObject",
+      "s3:GetBucketLocation",
+      "s3:GetBucketLocation"
     ]
     resources = [
       "arn:aws:s3:::${var.project_id}-*/*",
@@ -153,7 +159,8 @@ data "aws_iam_policy_document" "extra-policy-document" {
       "secretsmanager:DescribeSecret"
     ]
     resources = concat(var.additional_secret_arns, [
-      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*"
+      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:${var.project_id}-redshift-secret-*",
+      "arn:aws:secretsmanager:${var.region}:${var.account}:secret:external/${var.project_id}-dps-*"
     ])
   }
   statement {
@@ -194,6 +201,7 @@ resource "aws_iam_policy" "additional-policy" {
   name        = "${var.name}-policy"
   description = "Extra Policy for AWS Glue Job"
   policy      = data.aws_iam_policy_document.extra-policy-document.json
+  tags        = var.tags
 }
 
 resource "aws_iam_role_policy_attachment" "glue_policies" {

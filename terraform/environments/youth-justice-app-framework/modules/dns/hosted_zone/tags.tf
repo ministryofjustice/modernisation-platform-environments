@@ -6,7 +6,7 @@ locals {
   tags = {
     "module"         = "dns/hosted_zone",
     "module_version" = local.module_version,
-    "project_name"   = var.project_name
+    "project"        = var.project_name
   }
 
 

@@ -1,6 +1,11 @@
-variable "environment_name" {
+variable "project_name" {
   type        = string
-  description = "Environment name"
+  description = "project name within aws"
+}
+
+variable "environment" {
+  type        = string
+  description = "Environment"
 }
 
 variable "ds_managed_ad_directory_name" {
@@ -47,11 +52,6 @@ variable "management_keypair_name" {
 variable "vpc_cidr_block" {
   type        = string
   description = "The CIDR block for the VPC"
-}
-
-variable "project_name" {
-  type        = string
-  description = "project name within aws"
 }
 
 variable "tags" {

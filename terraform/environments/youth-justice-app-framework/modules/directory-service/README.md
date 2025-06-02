@@ -80,7 +80,7 @@ module "managed-ad" {
 
 
 # Issues and workarounds
-## CouudFormation Template for the KPI Infrastructure
+## CloudFormation Template for the KPI Infrastructure
 It is recommended that rollback on failure is never disable to ensure that the infrastructure is tidied up to a state where a sucessfull rerun is possible when ever a failure occures. This is particurly important in enviroments other than development where a manual rollback may not be possible due to permissions restrictions.
 
 If automatic rollbck is disabled for any reason the following manuall actions may be needed to tidy up entries in the Directory Sevice that would otherwise prevent a sucessfuly rerun:
@@ -100,9 +100,9 @@ If the instances hasn't koined the domain, this is probably becuase the domain j
 2. Select the above association and use the `Resources` tab to check the status.
 3. Reapply the association using button `Apply association now` and confirm that it is now successful.
 
-# Cutover and Setup Guidance
+# Management Server Setup
 ## Introduciton
-This section contains instructions for [initialising the AD Management instances](#managment-server-setup) and [copying active directory users and groups from the old to the new environment](#user-group-copy).
+This section contains instructions for [initialising the AD Management instances](#managment-server-setup), [copying active directory users and groups from the old to the new environment](#user-group-copy) and [Certificate Authority SetUp](#ca-setup).
 
 ## [Managment Server Setup](#managment-server-setup)
 
@@ -116,7 +116,7 @@ When each instance is created the User-Data script performs some language setup 
 ### Location for User-Data scripts and log files
 
 `C:\Windows\System32\config\systemprofile\AppData\Local\Temp\EC2Launch<nnnnnnnnn>\`
-This will contin and copy of the User-DAte script as well as err and output log files from running the script.
+This will contin and copy of the User-Data script as well as error and output log files from running the script.
 
 ## Enable File Copy via Clipboard
 While files can be uploaded and downloaded via a S3 bucket it may be  more converient to enable file copy via the clipboard by removing a setting in Group Policy. This only needs to be done once per environment to enable copy on all domain menbers (the management servers and the Suborginate CA server).
@@ -133,7 +133,7 @@ On each management instance:
 2. Move English (UK) to the top of the Preferred languages list.
 3. Select `Options` for `English (United Kingdom)`:
     - Download everything.
-    - Under `Regional format` select 'Settings' and change and necessary to ensure all are set to `United Kingdom`.
+    - Under `Regional format` select 'Settings' and change as necessary to ensure all are set to `United Kingdom`.
 4. Return to the Language page and wait a few minities while the language finishes installing.
 5. Change the `Windows display language` to `English (United Kingdom)`. (Need to signout and log back in for this to become effective.)
 6. Remove language `English (Unites States)`.
@@ -166,12 +166,30 @@ E.g.
 E'g.
 > 'C:\i2N\Scripts\management-server-app-install.ps1 yjaf-development'
 
+# [Certificate Authority SetUp](#ca-setup)
 
-## [Copy Users & Groups](#user-group-copy)
+The additional configuration described in Confluence page <https://yjb.atlassian.net/wiki/spaces/YAM/pages/4642508592/DOE+LDAPS+and+Certificate+chaining#Domain-Controllers-Server-Certificates-AutoEnrol> has not been completed as the AD servers have auto-enroled for LDAPS certificates and LDAPS appears to be working successfully. This may need to be reconsidered following testing in Preproduction (or Test).
+
+In addition the RootCA and SubordinateCA cetificates have been left with their default exiptiy periods of 10 and 5 years respectively, rather than changeing them to 20 and 10 years as mentioned in the above document.
+
+## Create Tableau Server SSL Template
+
+A template needs to be created on the SubordinateCA server for Tableau web site HTTPS access as follows:
+1. Launch the Certificate Templates snapin.
+2. Duplicate template `Web Server` to `Tableau Web Server` and make the following changes:
+    - On the `General` tab set the `Valitory period` to 1 year and 6 weeks.
+    - On the `Security` tab add Group `AWS Delegated Administrators`, remove `Allow` `Read` and add `Allow` `Write` and `Enroll`.
+3. Launch Server Tool `Certificate Authority`, right click on `Certificate Templates`, choose option `New` > `Certificate Template to Issue`, highlight `Tableau Web Server` and `OK`.
+
+# [User and Group Migration](#user-group-copy)
 
 The following describes the process of copying data from one environment to another. For example copying from Sandpit to Test.
 
-### Export All
+## Create SubCA Certificate Chain
+1. Export the `RootCA` and `SubordinateCA` certificates (without private keys) in `Base-64 encoded X.509` format.
+2. Create file `SubordinateCA-Chain-<enviroment>.cer` by appending the contents of the RootCA file to the SubordinateCA file using a text editor (e.g. `Notepad`).
+
+## Export All
 1. RDP onto a management server in the source environment.
 2. Create folder `C:\i2N\AD_Files`.
 3. Copy the following files to the folder just created: export-admin-users.ps1 and export-yjaf-users.ps1.
@@ -184,22 +202,40 @@ The following describes the process of copying data from one environment to anot
     - `groups.csv`
     - `roles.csv`
 
-### Import All
+7. Copy the files to the Transfer S3 bucket, e.g. run a Powershell command like:
+    `Write-S3Object -BucketName yjaf-sandpit-replication-source -KeyPrefix AD_Files -Folder C:\i2n\AD_Files\`
+
+## Import All
 1. RDP onto a management server in the destination environment as the initial docmin user `admin` whose password is in Secret `i2n.com_admin_secret_2`.
 2. Create folder `C:\i2N\AD_Files`.
-3. Copy all the exported AD files to the above folder.
-3. Copy the following files to the folder just created: `create-ou-tree.ps1`, `OUTree-DEfault.csv`, `import-admin-users.ps1` and `import-yjaf-users.ps1`.
-4. Open a Powershell wondow at `C:\i2N\AD_Files`
+3. Copy all the exported AD files to the above folder, e.g.: `Copy-S3Object -BucketName yjaf-development-transfer -KeyPrefix AD_Files -LocalFolder c:\i2N\AD_Files`
+3. Open a Powershell window at `C:\i2N\AD_Files`
 4. Run powerShell script `.\create-ou-tree.ps1`
-5. Run powerShell script `.\import-yjaf-users.ps1`
-6. Run powerShell script `.\import-admin-users.ps1`
+5. Create group `Admin-password-policy` in UO `i2N` and configure the password policy <TODO>.
+6. Run powerShell script `.\import-yjaf-users.ps1`
+7. Run powerShell script `.\import-admin-users.ps1`
 Note: Errors relating to admin user should be ignored as this user is created when the infrastructure is built.
 
-### Cutover
+## Correct YJAF users
+Passwords need to be rest for yjaf acconunts identified in the following secrets so that they match the value recorded in the secret and the accounts need to be configured to never expire the password:
+- `LDAP-administration-user`
+- `yjaf-auto-admit`
+- `yjaf_Auth_Email_Account`
+
+
+In addtion the user identified in `LDAP-administration-user` needs to be made a member of group `AWS Delegated Administrators`.
+
+**[TODO]** Consider writing a script to make these change automatically for efficiency and to ensure that the changes are always made correctly.
+
+# Cutover
 For cutover repeat the export and import steps for Yjaf Users only.
 On a source management server:
 1. Run powershell script `export-yjaf-users.ps1`
 2. Copy the files users.csv, groups.csv and roles.csv created by the above scripts to a management server in the destination environment.
 On a destination management server:
-1. Delete all Users from OU `i2N\Accounts\Users`.
+1. Delete all Users from OU `i2N\Accounts\Users` and all Groups from `i2N\Accounts\Groups` and `i2N\Accounts\Roles`.
 2. Run powerShell script import-yjaf-users.ps1
+
+
+
+

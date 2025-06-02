@@ -31,6 +31,11 @@ output "cloudwatch_dashboards" {
   }
 }
 
+output "cloudwatch_event_rules" {
+  description = "Map of common cloudwatch_event_rules to create"
+  value       = local.cloudwatch_event_rules
+}
+
 output "cloudwatch_log_groups" {
   description = "Map of log groups"
 

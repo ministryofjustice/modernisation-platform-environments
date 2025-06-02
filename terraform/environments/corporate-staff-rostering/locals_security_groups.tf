@@ -709,7 +709,7 @@ locals {
           from_port   = 5985
           to_port     = 5986
           protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
+          cidr_blocks = local.security_group_cidrs.enduserclient
         }
       }
       egress = {

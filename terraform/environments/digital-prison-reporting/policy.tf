@@ -298,6 +298,7 @@ resource "aws_iam_role" "redshift-role" {
     {
       name    = "redshift-service-role"
       project = "dpr"
+      Jira    = "DPR2-XXXX"
     }
   )
 }
@@ -312,7 +313,7 @@ data "aws_iam_policy_document" "redshift-additional-policy" {
 
   statement {
     actions = [
-      "glue:*"
+      "glue:*",
     ]
     resources = [
       "*"
@@ -391,6 +392,7 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
     {
       name    = "dms-service-cw-role"
       project = "dpr"
+      Jira    = "DPR2-XXXX"
     }
   )
 }
@@ -409,6 +411,7 @@ resource "aws_iam_role" "dmsvpcrole" {
     {
       name    = "dms-service-vpc-role"
       project = "dpr"
+      Jira    = "DPR2-XXXX"
     }
   )
 }
@@ -467,6 +470,7 @@ resource "aws_iam_role" "redshift-spectrum-role" {
     {
       name    = "redshift-spectrum-role"
       project = "dpr"
+      Jira    = "DPR2-XXXX"
     }
   )
 }
@@ -704,7 +708,12 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
   statement {
     effect = "Allow"
     actions = [
-      "glue:Get*",
+      "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetTableVersions",
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:GetPartition",
       "glue:List*",
       "glue:DeleteTable",
       "glue:DeleteSchema",
@@ -886,8 +895,8 @@ resource "aws_iam_role_policy_attachment" "analytical_platform_share_policy_atta
   policy_arn = "arn:aws:iam::aws:policy/AWSLakeFormationCrossAccountManager"
 }
 
-# IAM Policy and roles for executing a step-function
-data "aws_iam_policy_document" "step_function_execution_assume_policy_document" {
+# IAM Policy and roles for executing a step-function or lambda
+data "aws_iam_policy_document" "eventbridge_execution_assume_policy_document" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
@@ -897,7 +906,8 @@ data "aws_iam_policy_document" "step_function_execution_assume_policy_document" 
 
       identifiers = [
         "scheduler.amazonaws.com",
-        "states.amazonaws.com"
+        "states.amazonaws.com",
+        "lambda.amazonaws.com"
       ]
     }
   }
@@ -955,7 +965,7 @@ resource "aws_iam_policy" "step_function_execution_policy" {
 
 resource "aws_iam_role" "step_function_execution_role" {
   name               = "${local.project}-step-function-execution-role"
-  assume_role_policy = data.aws_iam_policy_document.step_function_execution_assume_policy_document.json
+  assume_role_policy = data.aws_iam_policy_document.eventbridge_execution_assume_policy_document.json
 }
 
 resource "aws_iam_role_policy_attachment" "step_function_role_policy_attachment" {
@@ -981,4 +991,37 @@ resource "aws_iam_role_policy_attachment" "step_function_role_lambda_policy_atta
 resource "aws_iam_role_policy_attachment" "step_function_role_all_state_machine_policy_attachment" {
   role       = aws_iam_role.step_function_execution_role.id
   policy_arn = aws_iam_policy.all_state_machine_policy.arn
+}
+
+resource "aws_iam_role" "lambda_function_invocation_role" {
+  name               = "${local.project}-lambda-function-invocation-role"
+  assume_role_policy = data.aws_iam_policy_document.eventbridge_execution_assume_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_function_invocation_role_policy_attachment" {
+  role       = aws_iam_role.lambda_function_invocation_role.id
+  policy_arn = aws_iam_policy.invoke_lambda_policy.arn
+}
+
+# Secrets Manager Read Access Policy
+resource "aws_iam_policy" "secretsmanager_read_policy" {
+  name        = local.secretsmanager_read_policy
+  description = "Read-only access to Secrets Manager"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowReadAccessToSecretsManager",
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecrets"
+        ],
+        Resource = [
+          "arn:aws:secretsmanager:${local.current_account_region}:${local.current_account_id}:secret:*"
+        ]
+      }
+    ]
+  })
 }

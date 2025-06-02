@@ -1,5 +1,10 @@
 locals {
 
+  lb_maintenance_message_production = {
+    maintenance_title   = "Prison-NOMIS Reporting Maintenance Window"
+    maintenance_message = "Prison-NOMIS Reporting is currently unavailable due to planned maintenance. Please try again later."
+  }
+
   baseline_presets_production = {
     options = {
       sns_topics = {
@@ -91,7 +96,7 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { type = "gp3", label = "app", size = 100 }   # /u01
+          "/dev/sdb" = { type = "gp3", label = "app", size = 200 }   # /u01
           "/dev/sdc" = { type = "gp3", label = "app", size = 500 }   # /u02
           "/dev/sde" = { type = "gp3", label = "data", size = 500 }  # DATA01
           "/dev/sdj" = { type = "gp3", label = "flash", size = 250 } # FLASH01
@@ -169,11 +174,77 @@ locals {
           nomis-combined-reporting-environment = "pd"
         })
       })
+
+      pd-ncr-web-2 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-web-3 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
+
+      pd-ncr-web-4 = merge(local.ec2_instances.bip_web, {
+        config = merge(local.ec2_instances.bip_web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.bip_web.config.instance_profile_policies, [
+            "Ec2PDReportingPolicy",
+          ])
+        })
+        tags = merge(local.ec2_instances.bip_web.tags, {
+          nomis-combined-reporting-environment = "pd"
+        })
+      })
     }
 
-    # Comment out till needed for deployment
     efs = {
-      pd-ncr-sap-share = local.efs.sap_share
+      pd-ncr-sap-share-multiaz = {
+        access_points = {
+          root = {
+            posix_user = {
+              gid = 1201 # binstall
+              uid = 1201 # bobj
+            }
+            root_directory = {
+              path = "/"
+              creation_info = {
+                owner_gid   = 1201 # binstall
+                owner_uid   = 1201 # bobj
+                permissions = "0777"
+              }
+            }
+          }
+        }
+        file_system = {
+          lifecycle_policy = {
+            transition_to_ia = "AFTER_30_DAYS"
+          }
+        }
+        mount_targets = [{
+          subnet_name        = "private"
+          availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
+          security_groups    = ["bip"]
+        }]
+        tags = {
+          backup      = "false"
+          backup-plan = "daily-and-weekly"
+        }
+      }
     }
 
     iam_policies = {
@@ -236,6 +307,9 @@ locals {
           private-pd-http-7777 = merge(local.lbs.private.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "pd-ncr-web-1" },
+              { ec2_instance_name = "pd-ncr-web-2" },
+              { ec2_instance_name = "pd-ncr-web-3" },
+              { ec2_instance_name = "pd-ncr-web-4" },
             ]
           })
         }
@@ -263,7 +337,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
                     status_code  = "200"
                   }
                 }]
@@ -291,6 +365,9 @@ locals {
           pd-http-7777 = merge(local.lbs.public.instance_target_groups.http-7777, {
             attachments = [
               { ec2_instance_name = "pd-ncr-web-1" },
+              { ec2_instance_name = "pd-ncr-web-2" },
+              { ec2_instance_name = "pd-ncr-web-3" },
+              { ec2_instance_name = "pd-ncr-web-4" },
             ]
           })
         }
@@ -332,7 +409,7 @@ locals {
                   type = "fixed-response"
                   fixed_response = {
                     content_type = "text/html"
-                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_preproduction)
+                    message_body = templatefile("templates/maintenance.html.tftpl", local.lb_maintenance_message_production)
                     status_code  = "200"
                   }
                 }]
@@ -382,8 +459,12 @@ locals {
     secretsmanager_secrets = {
       "/oracle/database/PDBIPSYS" = local.secretsmanager_secrets.db # Azure Live System DB
       "/oracle/database/PDBIPAUD" = local.secretsmanager_secrets.db # Azure Live Audit DB
-      "/oracle/database/PDBISYS"  = local.secretsmanager_secrets.db
-      "/oracle/database/PDBIAUD"  = local.secretsmanager_secrets.db
+      "/oracle/database/PDBISYS"  = local.secretsmanager_secrets.db # AWS System DB
+      "/oracle/database/PDBIAUD"  = local.secretsmanager_secrets.db # AWS Audit DB
+      "/oracle/database/DRBIPSYS" = local.secretsmanager_secrets.db
+      "/oracle/database/DRBIPAUD" = local.secretsmanager_secrets.db
+      "/oracle/database/DRBISYS"  = local.secretsmanager_secrets.db
+      "/oracle/database/DRBIAUD"  = local.secretsmanager_secrets.db
       "/sap/bip/pd"               = local.secretsmanager_secrets.bip
       "/sap/bods/pd"              = local.secretsmanager_secrets.bods
     }

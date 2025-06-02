@@ -8,9 +8,9 @@ locals {
     "module"          = "s3",
     "module_version"  = local.module_version,
     "module_git_hash" = local.module_git_hash,
-    "project_name"    = var.project_name
+    "project"         = var.project_name
   }
 
 
-  all_tags = merge(var.tags, local.tags, local.tags)
+  all_tags = merge(var.tags, local.tags)
 }

@@ -3,7 +3,7 @@ module "route53_records" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/route53/aws//modules/records"
-  version = "4.1.0"
+  version = "5.0.0"
 
   zone_id = module.route53_zones.route53_zone_zone_id[local.environment_configuration.route53_zone]
 
@@ -12,7 +12,7 @@ module "route53_records" {
       name    = "airflow"
       type    = "CNAME"
       ttl     = 300
-      records = [module.mwaa_alb.dns_name]
+      records = [data.aws_lb.mwaa_alb.dns_name]
     },
     {
       name    = "_amazonses"

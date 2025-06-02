@@ -39,6 +39,14 @@ locals {
         config = merge(local.ec2_instances.jumpserver.config, {
           ami_name          = "hmpps_windows_server_2022_release_2025-01-02T00-00-40.487Z"
           availability_zone = "eu-west-2a"
+          instance_profile_policies = concat(local.ec2_instances.jumpserver.config.instance_profile_policies, [
+            "Ec2GFSLSecretPolicy"
+          ])
+        })
+        instance = merge(local.ec2_instances.jumpserver.instance, {
+          tags = {
+            patch-manager = "group1"
+          }
         })
         tags = merge(local.ec2_instances.jumpserver.tags, {
           domain-name = "azure.hmpp.root"
@@ -48,6 +56,11 @@ locals {
       pd-rdgw-1-a = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2a"
+        })
+        instance = merge(local.ec2_instances.rdgw.instance, {
+          tags = {
+            patch-manager = "group1"
+          }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description      = "Remote Desktop Gateway for azure.hmpp.root domain"
@@ -59,6 +72,11 @@ locals {
       pd-rdgw-1-b = merge(local.ec2_instances.rdgw, {
         config = merge(local.ec2_instances.rdgw.config, {
           availability_zone = "eu-west-2b"
+        })
+        instance = merge(local.ec2_instances.rdgw.instance, {
+          tags = {
+            patch-manager = "group2"
+          }
         })
         tags = merge(local.ec2_instances.rdgw.tags, {
           description      = "Remote Desktop Gateway for azure.hmpp.root domain"
@@ -73,12 +91,32 @@ locals {
         })
         instance = merge(local.ec2_instances.rds.instance, {
           instance_type = "t3.large"
+          tags = {
+            patch-manager = "group2"
+          }
         })
         tags = merge(local.ec2_instances.rds.tags, {
           description = "Remote Desktop Services for azure.hmpp.root domain"
           domain-name = "azure.hmpp.root"
         })
       })
+    }
+
+    iam_policies = {
+      Ec2GFSLSecretPolicy = {
+        description = "Permissions required to access GFSL secrets"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/GFSL/*",
+            ]
+          }
+        ]
+      }
     }
 
     lbs = {
@@ -142,6 +180,21 @@ locals {
       })
     }
 
+
+    patch_manager = {
+      patch_schedules = {
+        group1 = "cron(00 03 ? * WED *)"
+        group2 = "cron(00 03 ? * THU *)"
+      }
+      maintenance_window_duration = 4
+      maintenance_window_cutoff   = 2
+      patch_classifications = {
+        # REDHAT_ENTERPRISE_LINUX = ["Security", "Bugfix"] # Linux Options=(Security,Bugfix,Enhancement,Recommended,Newpackage)
+        WINDOWS = ["SecurityUpdates", "CriticalUpdates"]
+      }
+    }
+
+
     route53_zones = {
       "hmpps-domain.service.justice.gov.uk" = {
         records = [
@@ -160,6 +213,7 @@ locals {
 
     secretsmanager_secrets = {
       "/microsoft/AD/azure.hmpp.root" = local.secretsmanager_secrets.domain
+      "/GFSL"                         = local.secretsmanager_secrets.gfsl
     }
   }
 }

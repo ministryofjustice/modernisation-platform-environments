@@ -3,7 +3,7 @@ module "vpc_cni_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix      = "vpc-cni"
   attach_vpc_cni_policy = true
@@ -24,7 +24,7 @@ module "ebs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix      = "ebs-csi-driver"
   attach_ebs_csi_policy = true
@@ -44,7 +44,7 @@ module "efs_csi_driver_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix      = "efs-csi-driver"
   attach_efs_csi_policy = true
@@ -64,7 +64,7 @@ module "aws_for_fluent_bit_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix = "aws-for-fluent-bit"
 
@@ -88,7 +88,7 @@ module "amazon_prometheus_proxy_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix = "amazon-prometheus-proxy"
 
@@ -111,7 +111,7 @@ module "cluster_autoscaler_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix = "cluster-autoscaler"
 
@@ -133,7 +133,7 @@ module "external_dns_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix              = "external-dns"
   attach_external_dns_policy    = true
@@ -154,7 +154,7 @@ module "cert_manager_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix              = "cert-manager"
   attach_cert_manager_policy    = true
@@ -175,7 +175,7 @@ module "external_secrets_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix               = "external-secrets"
   attach_external_secrets_policy = true
@@ -196,7 +196,7 @@ module "mlflow_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   role_name_prefix = "mlflow"
 
@@ -214,30 +214,12 @@ module "mlflow_iam_role" {
   tags = local.tags
 }
 
-module "gha_mojas_airflow_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.54.0"
-
-  name = "github-actions-mojas-airflow"
-
-  policies = {
-    GHAMoJASAirflow = module.gha_mojas_airflow_iam_policy.arn
-  }
-
-  subjects = ["moj-analytical-services/airflow:*"]
-
-  tags = local.tags
-}
-
 module "lake_formation_share_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
+  version = "5.55.0"
 
   create_role       = true
   role_requires_mfa = false
@@ -264,7 +246,7 @@ module "analytical_platform_ui_service_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-  version = "5.54.0"
+  version = "5.55.0"
 
   create_role = true
 
@@ -288,7 +270,7 @@ module "analytical_platform_control_panel_service_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
+  version = "5.55.0"
 
   allow_self_assume_role = true
   trusted_role_arns = [
@@ -313,7 +295,7 @@ module "analytical_platform_data_eng_dba_service_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
+  version = "5.55.0"
 
   allow_self_assume_role = false
   trusted_role_arns      = formatlist("arn:aws:iam::%s:root", [local.environment_management.account_ids[local.analytical_platform_environment], local.environment_management.account_ids["analytical-platform-management-production"]])
@@ -330,30 +312,12 @@ module "analytical_platform_data_eng_dba_service_role" {
   tags = local.tags
 }
 
-module "quicksight_vpc_connection_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
-
-  create_role       = true
-  role_name_prefix  = "quicksight-vpc-connection"
-  role_requires_mfa = false
-
-  trusted_role_services = ["quicksight.amazonaws.com"]
-
-  custom_role_policy_arns = [module.quicksight_vpc_connection_iam_policy.arn]
-
-  tags = local.tags
-}
-
 module "lake_formation_to_data_production_mojap_derived_tables_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
+  version = "5.55.0"
 
   create_role       = true
   role_requires_mfa = false
@@ -382,7 +346,7 @@ module "copy_apdp_cadet_metadata_to_compute_assumable_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
+  version = "5.55.0"
 
   allow_self_assume_role = false
   trusted_role_arns = [
@@ -395,69 +359,6 @@ module "copy_apdp_cadet_metadata_to_compute_assumable_role" {
   role_name         = "copy-apdp-cadet-metadata-to-compute"
 
   custom_role_policy_arns = [module.copy_apdp_cadet_metadata_to_compute_policy.arn]
-
-  tags = local.tags
-}
-
-module "find_moj_data_quicksight_sa_assumable_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
-
-  allow_self_assume_role = false
-  trusted_role_arns = [
-    "arn:aws:iam::754256621582:role/cloud-platform-irsa-e5ba8827240d2ff3-live",
-    "arn:aws:iam::754256621582:role/cloud-platform-irsa-1003dc6e42f4229f-live",
-    "arn:aws:iam::754256621582:role/cloud-platform-irsa-25d122a26f9264de-live"
-  ]
-
-  create_role       = true
-  role_requires_mfa = false
-  role_name         = "find-moj-data-quicksight"
-
-  custom_role_policy_arns = [module.find_moj_data_quicksight_policy.arn]
-
-  tags = local.tags
-}
-
-module "mwaa_execution_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.54.0"
-
-  create_role = true
-
-  role_name         = "mwaa-execution"
-  role_requires_mfa = false
-
-  trusted_role_services = [
-    "airflow.amazonaws.com",
-    "airflow-env.amazonaws.com"
-  ]
-
-  custom_role_policy_arns = [module.mwaa_execution_iam_policy.arn]
-
-  tags = local.tags
-}
-
-module "gha_moj_ap_airflow_iam_role" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.54.0"
-
-  name = "github-actions-ministryofjustice-analytical-platform-airflow"
-
-  policies = {
-    gha-moj-ap-airflow = module.gha_moj_ap_airflow_iam_policy.arn
-  }
-
-  subjects = ["ministryofjustice/analytical-platform-airflow:*"]
 
   tags = local.tags
 }

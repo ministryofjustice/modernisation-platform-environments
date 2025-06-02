@@ -203,7 +203,7 @@ resource "aws_instance" "database" {
   iam_instance_profile        = aws_iam_instance_profile.cwa.id
   key_name                    = aws_key_pair.cwa.key_name
   user_data_base64            = base64encode(local.db_userdata)
-  user_data_replace_on_change = true
+  user_data_replace_on_change = false
   metadata_options {
     http_tokens = "optional"
   }

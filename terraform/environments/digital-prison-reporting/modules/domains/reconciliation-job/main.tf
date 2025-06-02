@@ -48,4 +48,10 @@ resource "aws_glue_trigger" "glue_file_archive_job_trigger" {
   actions {
     job_name = module.glue_s3_data_reconciliation_job.name
   }
+
+  tags = {
+    Name          = "${module.glue_s3_data_reconciliation_job.name}-trigger"
+    Resource_Type = "Glue Trigger"
+    Jira          = "DPR2-1135"
+  }
 }

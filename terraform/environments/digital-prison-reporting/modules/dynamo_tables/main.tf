@@ -77,6 +77,7 @@ resource "aws_dynamodb_table" "this" {
     var.tags,
     {
       "Name" = format("%s", var.name)
+      "Jira" = "DPR-306"
     },
   )
 
@@ -170,6 +171,7 @@ resource "aws_dynamodb_table" "autoscaled" {
     var.tags,
     {
       "Name" = format("%s", var.name)
+      "Jira" = "DPR-306"
     },
   )
 

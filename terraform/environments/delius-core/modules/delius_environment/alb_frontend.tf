@@ -49,7 +49,6 @@ resource "aws_lb" "delius_core_frontend" {
   drop_invalid_header_fields = true
 }
 
-
 resource "aws_lb_listener" "listener_https" {
   load_balancer_arn = aws_lb.delius_core_frontend.id
   port              = 443
@@ -84,29 +83,47 @@ resource "aws_lb_listener" "listener_http" {
 }
 
 # Listener rules
-resource "aws_lb_listener_rule" "homepage_listener_rule" {
+resource "aws_lb_listener_rule" "deny_mobiles_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 3
+  priority     = 1
   condition {
-    path_pattern {
-      values = ["/"]
+    http_header {
+      http_header_name = "User-Agent"
+      values           = ["*Mobile*"]
     }
   }
   action {
-    type = "redirect"
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_302"
-      path        = var.environment_config.homepage_path
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Access is restricted to MoJ-issued laptops and PCs."
+      status_code  = "403"
     }
   }
-  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
+}
+
+resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
+  listener_arn = aws_lb_listener.listener_https.arn
+  priority     = 2 # must be before ndelius_allowed_paths_rule
+  condition {
+    path_pattern {
+      values = [
+        "/NDelius*/delius/a4j/g/3_3_3.Final*DATA*", # mitigates CVE-2018-12533
+      ]
+    }
+  }
+  action {
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      status_code  = "404"
+    }
+  }
 }
 
 resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 2
+  priority     = 3
   condition {
     path_pattern {
       values = [
@@ -122,21 +139,23 @@ resource "aws_lb_listener_rule" "allowed_paths_listener_rule" {
   depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }
 
-resource "aws_lb_listener_rule" "blocked_paths_listener_rule" {
+
+resource "aws_lb_listener_rule" "homepage_listener_rule" {
   listener_arn = aws_lb_listener.listener_https.arn
-  priority     = 1 # must be before ndelius_allowed_paths_rule
+  priority     = 5
   condition {
     path_pattern {
-      values = [
-        "/NDelius*/delius/a4j/g/3_3_3.Final*DATA*", # mitigates CVE-2018-12533
-      ]
+      values = ["/"]
     }
   }
   action {
-    type = "fixed-response"
-    fixed_response {
-      content_type = "text/plain"
-      status_code  = "404"
+    type = "redirect"
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_302"
+      path        = var.environment_config.homepage_path
     }
   }
+  depends_on = [aws_lb_listener_rule.blocked_paths_listener_rule]
 }

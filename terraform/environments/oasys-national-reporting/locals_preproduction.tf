@@ -181,12 +181,13 @@ locals {
     fsx_windows = {
 
       pp-bods-win-share = {
-        aliases             = ["pp-onr-fs.azure.hmpp.root"]
-        deployment_type     = "SINGLE_AZ_1"
-        security_groups     = ["bods"]
-        skip_final_backup   = true
-        storage_capacity    = 600
-        throughput_capacity = 8
+        aliases                         = ["pp-onr-fs.azure.hmpp.root"]
+        automatic_backup_retention_days = 0
+        deployment_type                 = "SINGLE_AZ_1"
+        security_groups                 = ["bods"]
+        skip_final_backup               = true
+        storage_capacity                = 600
+        throughput_capacity             = 8
 
         subnets = [
           {

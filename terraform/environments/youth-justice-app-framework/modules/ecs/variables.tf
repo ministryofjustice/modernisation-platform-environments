@@ -23,6 +23,12 @@ variable "nameserver" {
   type        = string
 }
 
+variable "ec2_ami_id" {
+  description = "The AMI ID for the ECS cluster"
+  type        = string
+  default     = ""
+}
+
 variable "ecs_services" {
   description = "A list of ECS services to create. Will create the main container definition for the app itself"
   type = map(object({
@@ -32,6 +38,7 @@ variable "ecs_services" {
     deployment_controller    = optional(string, "CODE_DEPLOY")
     internal_only            = optional(bool, true)
     additional_port_mappings = optional(any, [])
+    enable_healthcheck       = optional(bool, true)
     health_check = optional(object({
       command      = list(string)
       interval     = number
@@ -46,6 +53,7 @@ variable "ecs_services" {
       start_period = 60
     })
     desired_count                          = optional(number, 2)
+    autoscaling_max_capacity               = optional(number, 4)
     health_check_grace_period_seconds      = optional(number, 360)
     stop_timeout                           = optional(number, 30)
     deployment_minimum_healthy_percent     = optional(number, 100)
@@ -55,7 +63,7 @@ variable "ecs_services" {
     container_cpu                          = optional(number, null)
     container_memory                       = optional(number, null)
     command                                = optional(list(string), [])
-    entryPoint                             = optional(list(string), [])
+    entry_point                            = optional(list(string), [])
     readonly_root_filesystem               = optional(bool, true)
     cloudwatch_log_group_retention_in_days = optional(number, 400)
     additional_mount_points = optional(list(object({
@@ -167,13 +175,13 @@ variable "disable_overnight_scheduler" {
 variable "morning_cron_schedule" {
   description = "The cron schedule for the morning scheduler"
   type        = string
-  default     = "0 7 * * *"
+  default     = "0 7 * * 1-5"
 }
 
 variable "overnight_cron_schedule" {
   description = "The cron schedule for the overnight scheduler"
   type        = string
-  default     = "0 19 * * *"
+  default     = "0 19 * * 1-5"
 }
 
 variable "ec2_instance_type" {
@@ -274,4 +282,31 @@ variable "ecs_allowed_secret_arns" {
   description = "A list of allowed secret ARNs"
   type        = list(string)
   default     = []
+}
+
+
+variable "rds_postgresql_sg_id" {
+  description = "The ID of the security group that controlls ingress to the PostgreSQL database."
+  type        = string
+}
+
+variable "redshift_sg_id" {
+  description = "The ID of the security group that controlls ingress to the Redshift database."
+  type        = string
+}
+
+variable "ecs_secrets_access_policy_secret_arns" {
+  description = "A list of secret ARNs to allow access to"
+  type        = string
+}
+
+variable "ecs_role_additional_policies_arns" {
+  description = "A list of additional policies to attach to the ECS task role"
+  type        = list(string)
+  default     = []
+}
+
+variable "secret_kms_key_arn" {
+  description = "The ARN of the KMS key to use for secrets"
+  type        = string
 }

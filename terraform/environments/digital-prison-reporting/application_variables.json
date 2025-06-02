@@ -38,6 +38,10 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
+      "enable_multiphase_query_lambda": true,
+      "multiphase_query_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -71,7 +75,10 @@
         "dps-health-and-me",
         "dps-mj-and-ma",
         "dps-testing",
-        "dps-prison-reg"
+        "dps-testing2",
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -138,6 +145,13 @@
             "threshold": 100,
             "period": 60
           }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
         }
       },
       "biprws": {
@@ -151,8 +165,25 @@
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-development"],
+          "resource_shares": [
+            {
+              "glue_database": "*",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ],
       "redshift_table_expiry_days": 7,
-      "enable_s3_data_migrate_lambda": true
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": true,
+      "enable_probation_discovery_node": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -192,6 +223,10 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
+      "enable_multiphase_query_lambda": true,
+      "multiphase_query_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -224,7 +259,9 @@
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -291,6 +328,13 @@
             "threshold": 100,
             "period": 60
           }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
         }
       },
       "biprws": {
@@ -305,7 +349,9 @@
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
-      "enable_s3_data_migrate_lambda": true
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -345,6 +391,10 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": true,
+      "enable_generate_dataset_lambda": true,
+      "enable_multiphase_query_lambda": true,
+      "multiphase_query_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -379,7 +429,9 @@
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -446,6 +498,13 @@
             "threshold": 100,
             "period": 60
           }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
         }
       },
       "biprws": {
@@ -469,16 +528,15 @@
           "resource_shares": [
             {
               "glue_database": "curated_prisons_history_preprod_dbt",
-              "glue_tables": [
-                "nomis_offender_course_attendances",
-                "nomis_offender_program_profiles"
-              ]
+              "glue_tables": ["*"]
             }
           ]
         }
       ],
       "redshift_table_expiry_days": 7,
-      "enable_s3_data_migrate_lambda": true
+      "enable_s3_data_migrate_lambda": true,
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -518,6 +576,10 @@
       "enable_dms_replication_task": true,
       "enable_domain_builder_lambda": true,
       "enable_dbuilder_flyway_lambda": true,
+      "enable_scheduled_dataset_lambda": false,
+      "enable_generate_dataset_lambda": false,
+      "enable_multiphase_query_lambda": false,
+      "multiphase_query_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -550,7 +612,9 @@
         "dps-mj-and-ma",
         "dps-locations",
         "dps-calc-rel-date",
-        "dps-prison-reg"
+        "dps-prison-reg",
+        "dps-personal-rela",
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -617,6 +681,13 @@
             "threshold": 100,
             "period": 60
           }
+        },
+        "lambda": {
+          "postgres_tickle_function_failure": {
+            "enable": true,
+            "threshold": 1,
+            "period": 60
+          }
         }
       },
       "biprws": {
@@ -646,7 +717,9 @@
         }
       ],
       "redshift_table_expiry_days": 1,
-      "enable_s3_data_migrate_lambda": false
+      "enable_s3_data_migrate_lambda": false,
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false
     }
   }
 }

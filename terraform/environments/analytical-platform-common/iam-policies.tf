@@ -39,6 +39,7 @@ data "aws_iam_policy_document" "ecr_access" {
       "ecr:BatchGetImage",
       "ecr:BatchCheckLayerAvailability",
       "ecr:CompleteLayerUpload",
+      "ecr:DescribeImages",
       "ecr:GetDownloadUrlForLayer",
       "ecr:InitiateLayerUpload",
       "ecr:PutImage",
@@ -71,7 +72,7 @@ module "ecr_access_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.54.0"
+  version = "5.55.0"
 
   name_prefix = "ecr-access"
 

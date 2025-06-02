@@ -401,6 +401,7 @@ module "glue_registry_avro" {
     {
       Name          = "${local.project}-glue-registry-avro-${local.env}"
       Resource_Type = "Glue Registry"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -422,6 +423,7 @@ module "s3_glue_job_bucket" {
     {
       name          = "${local.project}-glue-jobs-${local.environment}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -440,6 +442,7 @@ module "s3_raw_archive_bucket" {
     {
       name          = "${local.project}-raw-archive-${local.env}-s3"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-209"
     }
   )
 }
@@ -457,6 +460,7 @@ module "s3_raw_bucket" {
     {
       name          = "${local.project}-raw-zone-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -475,6 +479,7 @@ module "s3_structured_bucket" {
     {
       name          = "${local.project}-structured-zone-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -494,6 +499,7 @@ module "s3_curated_bucket" {
     {
       name          = "${local.project}-curated-zone-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -531,6 +537,7 @@ module "s3_domain_bucket" {
     {
       name          = "${local.project}-domain-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -551,6 +558,7 @@ module "s3_schema_registry_bucket" {
     {
       name          = "${local.project}-schema-registry-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-245"
     }
   )
 }
@@ -569,6 +577,7 @@ module "s3_domain_config_bucket" {
     {
       name          = "${local.project}-domain-config-${local.env}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -587,6 +596,64 @@ module "s3_violation_bucket" {
     {
       name          = "${local.project}-violation-${local.environment}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
+    }
+  )
+}
+
+# S3 Landing Zone Bucket. Used by File Transfer In/Push
+module "s3_landing_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-landing-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-landing-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
+# S3 Landing Processing Zone Bucket. Used by File Transfer In/Push
+module "s3_landing_processing_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-landing-processing-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-landing-processing-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
+    }
+  )
+}
+
+# S3 Quarantine Zone Bucket. Used by File Transfer In/Push
+module "s3_quarantine_bucket" {
+  source                    = "./modules/s3_bucket"
+  create_s3                 = local.setup_buckets
+  name                      = "${local.project}-quarantine-zone-${local.environment}"
+  custom_kms_key            = local.s3_kms_arn
+  create_notification_queue = false # For SQS Queue
+  enable_lifecycle          = true
+
+  tags = merge(
+    local.all_tags,
+    {
+      name          = "${local.project}-quarantine-zone-${local.environment}"
+      Resource_Type = "S3 Bucket"
+      Jira          = "DPR2-1499"
     }
   )
 }
@@ -614,6 +681,7 @@ module "s3_artifacts_store" {
     {
       name          = "${local.project}-artifact-store-${local.environment}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -646,6 +714,7 @@ module "s3_working_bucket" {
     {
       name          = "${local.project}-working-${local.environment}"
       Resource_Type = "S3 Bucket"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -764,6 +833,7 @@ module "ec2_kinesis_agent" {
     {
       Name          = "${local.project}-ec2-kinesis-agent-${local.env}"
       Resource_Type = "EC2 Instance"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -838,6 +908,7 @@ module "datamart" {
     {
       Name          = local.redshift_cluster_name
       Resource_Type = "Redshift Cluster"
+      Jira          = "DPR-108"
     }
   )
 }
@@ -894,6 +965,7 @@ module "dynamo_tab_domain_registry" {
     {
       Name          = "${local.project}-domain-registry-${local.environment}"
       Resource_Type = "Dynamo Table"
+      Jira          = "DPR-306"
     }
   )
 }
@@ -937,6 +1009,7 @@ module "dynamo_table_step_functions_token" {
     {
       Name          = "${local.project}-step-functions-${local.environment}"
       Resource_Type = "Dynamo Table"
+      Jira          = "DPR2-209"
     }
   )
 }
@@ -984,6 +1057,80 @@ module "dynamo_tab_application_tf_state" {
     {
       Name          = "${local.project}-terraform-state-${local.environment}"
       Resource_Type = "Dynamo Table"
+    }
+  )
+}
+
+# Glue Job, Temporary Job to Generate Test Data to the DPR Read-Replica Testing Postgres
+module "generate_test_postgres_data" {
+  count = local.create_postgres_load_generator_job ? 1 : 0
+
+  source                        = "./modules/glue_job"
+  create_job                    = local.create_job
+  name                          = "${local.project}-load-generator-job-${local.env}"
+  short_name                    = "${local.project}-load-generator-job"
+  command_type                  = "glueetl"
+  description                   = "Inserts a given number of records to postgres database.\nArguments:\n--dpr.test.database.secret.id: (Required) The Id of the secret to connect to the Postgres database\n--dpr.test.data.batch.size: (Optional) Total number of records to insert per batch\n--dpr.test.data.parallelism: (Optional) Total number of parallel batches\n--dpr.test.data.inter.batch.delay.millis: (Optional) Amount of milliseconds to wait between batches\n--dpr.test.data.run.duration.millis: (Optional) Total run duration of data generation in milliseconds"
+  create_security_configuration = local.create_sec_conf
+  job_language                  = "scala"
+  temp_dir                      = "s3://${module.s3_glue_job_bucket.bucket_id}/tmp/${local.project}-load-generator-job-${local.env}/"
+  spark_event_logs              = "s3://${module.s3_glue_job_bucket.bucket_id}/spark-logs/${local.project}-load-generator-job-${local.env}/"
+  # Placeholder Script Location
+  script_location              = local.glue_placeholder_script_location
+  enable_continuous_log_filter = false
+  project_id                   = local.project
+  aws_kms_key                  = local.s3_kms_arn
+  connections                  = ["dpr-dps-testing2-connection"]
+
+  execution_class             = "STANDARD"
+  worker_type                 = "G.1X"
+  number_of_workers           = 2
+  max_concurrent              = 1
+  region                      = local.account_region
+  account                     = local.account_id
+  log_group_retention_in_days = local.glue_log_retention_in_days
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-load-generator-job-${local.env}"
+      Resource_Type = "Glue Job"
+      Jira          = "DPR2-1884"
+    }
+  )
+
+  arguments = {
+    "--extra-jars"                             = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--extra-files"                            = local.shared_log4j_properties_path
+    "--class"                                  = "uk.gov.justice.digital.job.generator.PostgresLoadGeneratorJob"
+    "--dpr.aws.region"                         = local.account_region
+    "--dpr.log.level"                          = local.glue_job_common_log_level
+    "--dpr.test.database.secret.id"            = "external/dpr-dps-testing2-source-secrets"
+    "--dpr.test.data.batch.size"               = 1000
+    "--dpr.test.data.parallelism"              = 100
+    "--dpr.test.data.inter.batch.delay.millis" = 20
+  }
+}
+
+# Glue Trigger, Temporary Glue Trigger for the Postgres Test Data Generation Job
+resource "aws_glue_trigger" "glue_postgres_data_generator_job_trigger" {
+  count = local.create_postgres_load_generator_job ? 1 : 0
+
+  name     = "${module.generate_test_postgres_data[0].name}-trigger"
+  schedule = "cron(0 0/2 ? * * *)" # runs every 2 hours
+  type     = "SCHEDULED"
+  enabled  = false
+
+  actions {
+    job_name = module.generate_test_postgres_data[0].name
+  }
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "${local.project}-load-generator-trigger-${local.env}"
+      Resource_Type = "Glue Trigger"
+      Jira          = "DPR2-1884"
     }
   )
 }

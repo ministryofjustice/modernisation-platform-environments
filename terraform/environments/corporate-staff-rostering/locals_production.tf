@@ -111,7 +111,7 @@ locals {
         })
         ebs_volumes = merge(local.ec2_instances.db.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
-          "/dev/sdb"  = { label = "app", size = 100 } # /u01
+          "/dev/sdb"  = { label = "app", size = 200 } # /u01
           "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
@@ -142,7 +142,7 @@ locals {
         })
         ebs_volumes = merge(local.ec2_instances.db.ebs_volumes, {
           "/dev/sda1" = { label = "root", size = 30 }
-          "/dev/sdb"  = { label = "app", size = 100 } # /u01
+          "/dev/sdb"  = { label = "app", size = 200 } # /u01
           "/dev/sdc"  = { label = "app", size = 500 } # /u02
         })
         ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
@@ -414,7 +414,7 @@ locals {
     fsx_windows = {
 
       pd-csr-win-share = {
-        aliases                     = ["prison-retail.azure.hmpp.root"]
+        aliases                     = ["prisoner-retail.azure.hmpp.root"]
         preferred_availability_zone = "eu-west-2a"
         deployment_type             = "MULTI_AZ_1"
         security_groups             = ["fsx_windows"]

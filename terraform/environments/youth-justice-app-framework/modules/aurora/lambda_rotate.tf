@@ -8,7 +8,7 @@ resource "aws_lambda_function" "rds_secret_rotation" {
   #checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   #checkov:skip=CKV_AWS_115: "Ensure that AWS Lambda function is configured for function-level concurrent execution limit"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
-  function_name = "rds-secret-rotation"
+  function_name = "rds-secrets-rotation"
   role          = aws_iam_role.rds_secret_rotation.arn
   runtime       = "python3.9"
   handler       = "lambda_function.lambda_handler"
@@ -81,6 +81,17 @@ resource "aws_iam_policy" "rds_secret_rotation_policy" {
         ],
         "Resource" : "*",
         "Effect" : "Allow"
+      },
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ],
+        "Resource" : var.kms_key_arn
       }
     ]
   })
@@ -91,13 +102,17 @@ resource "aws_iam_role_policy_attachment" "rds_secret_rotation_policy_attach_cus
   policy_arn = aws_iam_policy.rds_secret_rotation_policy.arn
 }
 
+
 resource "aws_lambda_permission" "allow_secrets_manager" {
-  for_each      = toset(var.user_passwords_to_reset)
-  statement_id  = "AllowSecretsManagerInvoke"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.rds_secret_rotation.function_name
-  principal     = "secretsmanager.amazonaws.com"
+  for_each = toset(var.user_passwords_to_reset)
+
+  statement_id_prefix = "AllowSecretsManagerInvoke-${each.value}"
+  action              = "lambda:InvokeFunction"
+  function_name       = aws_lambda_function.rds_secret_rotation.function_name
+  principal           = "secretsmanager.amazonaws.com"
 
   # Restrict invocation to a specific AWS account
   source_arn = aws_secretsmanager_secret.user_admin_secret[each.value].arn
+
+
 }

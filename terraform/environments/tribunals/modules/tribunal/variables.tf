@@ -1,69 +1,74 @@
 variable "app_name" {
+  type        = string
   description = "Name of the application"
 }
 
 variable "module_name" {
+  type        = string
   description = "Name of the module"
 }
 
-variable "app_url" {
-}
-
 variable "app_db_name" {
+  type = string
 }
 
 variable "app_db_login_name" {
-}
-
-variable "app_source_db_name" {
+  type = string
 }
 
 variable "app_rds_url" {
-}
-
-variable "app_rds_user" {
-}
-
-variable "app_rds_port" {
+  type = string
 }
 
 variable "app_rds_password" {
-}
-
-variable "app_source_db_url" {
-}
-
-variable "app_source_db_user" {
-}
-
-variable "app_source_db_password" {
+  type = string
 }
 
 variable "environment" {
+  type = string
 }
 
-variable "application_data" {
+variable "support_team" {
+  type = string
+}
+
+variable "support_email" {
+  type = string
+}
+
+variable "curserver" {
+  type = string
 }
 
 variable "tags" {
-}
-
-variable "dms_instance_arn" {
+  description = "tags to apply to resources"
+  type        = map(any)
+  default     = {}
 }
 
 variable "task_definition_volume" {
+  type        = string
+  description = "Name of the volume referenced in the sourceVolume parameter of container definition in the mountPoints section"
 }
 
 variable "appscaling_min_capacity" {
+  type        = number
+  description = "Minimum capacity of the application scaling target"
 }
 
 variable "appscaling_max_capacity" {
+  type        = number
+  description = "Maximum capacity of the application scaling target"
 }
 
 variable "ecs_scaling_cpu_threshold" {
+  type        = number
+  description = "The cpu threshold for ecs cluster scaling"
 }
 
 variable "ecs_scaling_mem_threshold" {
+  type        = number
+  description = "The utilised memory threshold for ec2 cluster scaling"
 }
 
 variable "app_count" {
@@ -77,29 +82,33 @@ variable "server_port" {
 }
 
 variable "cluster_id" {
+  type        = string
+  description = "The ID of the ECS cluster"
 }
 
 variable "cluster_name" {
+  type        = string
+  description = "Name of the cluster"
 }
 
 variable "subnets_shared_public_ids" {
-}
-
-variable "aws_acm_certificate_external" {
-}
-
-variable "vpc_shared_id" {
+  type        = list(string)
+  description = "Public subnets"
 }
 
 variable "documents_location" {
+  description = "location of the documents"
+  type        = string
 }
 
 variable "is_ftp_app" {
   description = "Determines if it is an ftp app or not"
+  type        = bool
 }
 
 variable "target_group_attachment_port" {
   description = "The port of the target group"
+  type        = number
 }
 
 variable "target_group_arns" {
@@ -114,4 +123,5 @@ variable "target_group_arns_sftp" {
 
 variable "new_db_password" {
   description = "Randomly generated password for each db"
+  type        = string
 }

@@ -202,13 +202,13 @@ locals {
       cpu-iowait-high = {
         type            = "metric"
         alarm_threshold = local.cloudwatch_metric_alarms.ec2_cwagent_linux.cpu-iowait-high.threshold
-        expression      = "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"cpu_usage_iowait\"','Maximum'),MAX,DESC)"
+        expression      = "SORT(SEARCH('{CWAgent,InstanceId} MetricName=\"cpu_usage_iowait\"','Maximum'),AVG,DESC)"
         properties = {
           view    = "timeSeries"
           stacked = false
           region  = "eu-west-2"
           title   = "EC2 Linux cpu-iowait-high"
-          stat    = "Maximum"
+          stat    = "Average"
           yAxis = {
             left = {
               showUnits = false,

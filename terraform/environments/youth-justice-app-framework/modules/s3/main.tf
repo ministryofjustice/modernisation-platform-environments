@@ -3,13 +3,13 @@ resource "aws_s3_bucket" "default" {
   #checkov:skip=CKV_AWS_144
   #checkov:skip=CKV2_AWS_61:  "lift and shift" todo fix later
   #checkov:skip=CKV2_AWS_62:  "lift and shift"
-  for_each = toset(local.bucket_name)
+  for_each = toset(local.bucket_name_all)
   bucket   = each.value
-  tags     = var.tags
+  tags     = local.all_tags
 }
 
 resource "aws_s3_bucket_ownership_controls" "default" {
-  for_each = toset(local.bucket_name)
+  for_each = toset(local.bucket_name_all)
   bucket   = aws_s3_bucket.default[each.value].id
   rule {
     object_ownership = var.ownership_controls
@@ -17,7 +17,7 @@ resource "aws_s3_bucket_ownership_controls" "default" {
 }
 
 resource "aws_s3_bucket_acl" "default" {
-  for_each = toset(local.bucket_name)
+  for_each = toset(local.bucket_name_all)
   bucket   = aws_s3_bucket.default[each.value].id
   acl      = var.acl
   depends_on = [
@@ -26,7 +26,7 @@ resource "aws_s3_bucket_acl" "default" {
 }
 
 resource "aws_s3_bucket_public_access_block" "default" {
-  for_each                = toset(local.bucket_name)
+  for_each                = toset(local.bucket_name_all)
   bucket                  = aws_s3_bucket.default[each.value].bucket
   block_public_acls       = true
   block_public_policy     = true
@@ -35,7 +35,7 @@ resource "aws_s3_bucket_public_access_block" "default" {
 }
 
 resource "aws_s3_bucket_versioning" "default" {
-  for_each = toset(local.bucket_name)
+  for_each = toset(local.bucket_name_all)
   bucket   = aws_s3_bucket.default[each.value].id
   versioning_configuration {
     status = "Enabled"
@@ -43,7 +43,7 @@ resource "aws_s3_bucket_versioning" "default" {
 }
 
 resource "aws_s3_bucket_logging" "default" {
-  for_each = var.log_bucket != null ? toset(local.bucket_name) : []
+  for_each = var.log_bucket != null ? toset(local.bucket_name_all) : []
   bucket   = aws_s3_bucket.default[each.value].id
 
   target_bucket = var.log_bucket
@@ -52,7 +52,7 @@ resource "aws_s3_bucket_logging" "default" {
 
 
 resource "aws_s3_bucket_policy" "default" {
-  for_each = var.allow_replication == true ? toset(local.bucket_name) : []
+  for_each = var.allow_replication == true ? toset(local.bucket_name_allow_replication) : []
   bucket   = aws_s3_bucket.default[each.value].id
 
 
@@ -104,10 +104,10 @@ resource "aws_s3_bucket_policy" "default" {
   POLICY
 
 }
-
+#trivy:ignore:AVD-AWS-0132 todo fix later
 resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
   #checkov:skip=CKV_AWS_145
-  for_each = toset(local.bucket_name)
+  for_each = toset(local.bucket_name_all)
   bucket   = aws_s3_bucket.default[each.value].id
   rule {
     apply_server_side_encryption_by_default {

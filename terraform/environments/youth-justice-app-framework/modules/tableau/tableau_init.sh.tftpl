@@ -1,0 +1,33 @@
+#!/bin/bash
+script_name="NewServerCustomInit"
+echo "$script_name : Set Timezone to Europe/London"
+timedatectl set-timezone Europe/London
+
+echo "$script_name : Installing ClaimAV"
+yum update -y
+yum -y install clamav clamav-update clamd
+
+echo "$script_name : Install amazon cloudwatch Agent"
+yum -y install amazon-cloudwatch-agent
+
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c default
+
+echo "$script_name : Install Datadog Agent"
+dd_api_key=$(aws secretsmanager get-secret-value --secret-id ${dd_api_key_secret_arn} --query SecretString --output text)
+
+DD_API_KEY=$dd_api_key DD_SITE="datadoghq.eu" bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent6.sh)"
+
+echo "$script_name : Role Specific Actions"
+if [ ${instance_role} = "tableau" ]
+then
+    echo "$script_name : Performance Tableau Role Actions"
+    echo "$script_name : Create Tableau Admin Account"
+    useradd -s /bin/bash -m tabadmin
+
+    usermod -aG wheel tabadmin
+fi
+
+echo "$script_name : Final yum update"
+yum update -y
+
+echo "$script_name : Initialisation script complete"

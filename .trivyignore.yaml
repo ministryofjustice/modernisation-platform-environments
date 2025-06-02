@@ -16,8 +16,14 @@ vulnerabilities:
   - id: CVE-2021-43816
   - id: CVE-2022-1996
   - id: CVE-2022-21698
+  - id: CVE-2022-23539
   - id: CVE-2022-23648
+    expired_at: 2025-04-25
+    statement: "XP - Pass ITHC in this week"
   - id: CVE-2022-24778
+  - id: CVE-2022-25883
+    expired_at: 2025-04-25
+    statement: "XP - Pass ITHC in this week"
   - id: CVE-2022-27191
   - id: CVE-2022-27664
   - id: CVE-2022-32149
@@ -33,6 +39,9 @@ vulnerabilities:
   - id: CVE-2024-21626
     expired_at: 2024-08-19
     statement: "Review in 6 months"
+  - id: CVE-2025-27152
+    expired_at: 2025-04-25
+    statement: "XP - Pass ITHC in this week"
 
 misconfigurations:
   - id: AVD-GIT-0001
@@ -41,7 +50,6 @@ misconfigurations:
   - id: AVD-AWS-0057
   - id: AVD-AWS-0104
   - id: AVD-AWS-0095
-
 
 secrets:
 

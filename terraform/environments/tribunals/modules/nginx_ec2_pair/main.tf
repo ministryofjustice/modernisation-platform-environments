@@ -1,3 +1,14 @@
+terraform {
+  required_version = ">= 1.0.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 4.0.0"
+    }
+  }
+}
+
 output "instance_ids" {
   value = tomap({
     for k, inst in aws_instance.nginx : k => inst.id
@@ -13,12 +24,19 @@ variable "vpc_shared_id" {
 }
 
 variable "public_subnets_a_id" {
+  type = string
 }
 
 variable "public_subnets_b_id" {
+  type = string
 }
 
 variable "environment" {
+  type = string
+}
+
+variable "s3_encryption_key_arn" {
+  type = string
 }
 
 data "aws_ami" "latest_linux" {
@@ -31,6 +49,7 @@ data "aws_ami" "latest_linux" {
 }
 
 resource "aws_instance" "nginx" {
+  #checkov:skip=CKV_AWS_88:"EC2 instances require public IPs as they are internet-facing nginx servers"
   for_each = toset(["eu-west-2a", "eu-west-2b"])
 
   ami                         = data.aws_ami.latest_linux.id
@@ -38,6 +57,14 @@ resource "aws_instance" "nginx" {
   subnet_id                   = each.key == "eu-west-2a" ? var.public_subnets_a_id : var.public_subnets_b_id
   instance_type               = "t2.micro"
   availability_zone           = each.value
+  ebs_optimized               = true
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+  root_block_device {
+    encrypted = true
+  }
   tags = {
     Name = "tribunals-nginx-${each.value}"
   }
@@ -68,20 +95,23 @@ resource "aws_instance" "nginx" {
 }
 
 resource "aws_security_group" "allow_ssm" {
+  #checkov:skip=CKV_AWS_382:"EC2 instances require unrestricted egress"
   name        = "allow_ssm"
   description = "Allow SSM connection"
   vpc_id      = var.vpc_shared_id
 
   ingress {
-    from_port = 0
-    to_port   = 0
-    protocol  = "-1"
+    description = "Allow traffic from load balancer"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     security_groups = [
       var.nginx_lb_sg_id
     ]
   }
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
@@ -90,7 +120,39 @@ resource "aws_security_group" "allow_ssm" {
 }
 
 resource "aws_s3_bucket" "nginx_config" {
+  #checkov:skip=CKV2_AWS_62:"Event notifications not required for this bucket"
+  #checkov:skip=CKV_AWS_144:"Cross-region replication not required"
+  #checkov:skip=CKV_AWS_18:"Access logging not required"
+  #checkov:skip=CKV2_AWS_61:"Lifecycle configuration not required for nginx config files that need to be retained"
   bucket = "tribunals-nginx-config-files-${var.environment}"
+}
+
+resource "aws_s3_bucket_versioning" "nginx_bucket_versioning" {
+  bucket = aws_s3_bucket.nginx_config.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "nginx_config_encryption" {
+  bucket = aws_s3_bucket.nginx_config.id
+
+  rule {
+
+    apply_server_side_encryption_by_default {
+      kms_master_key_id = var.s3_encryption_key_arn
+      sse_algorithm     = "aws:kms"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "nginx_config_access_block" {
+  bucket = aws_s3_bucket.nginx_config.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
 }
 
 resource "aws_s3_object" "sites_available" {

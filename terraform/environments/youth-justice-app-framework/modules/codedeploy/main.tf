@@ -4,6 +4,12 @@ resource "aws_codedeploy_app" "this" {
   compute_platform = "ECS"
 }
 
+resource "aws_codedeploy_app" "ec2" {
+  for_each         = var.ec2_enabled ? toset(var.ec2_applications) : []
+  name             = each.key
+  compute_platform = "Server"
+}
+
 data "aws_lb" "internal" {
   name = var.internal_alb_name
 }
@@ -58,6 +64,31 @@ resource "aws_iam_policy_attachment" "codedeploy_service_role_policy" {
   roles      = [aws_iam_role.codedeploy_service_role.name]
 }
 
+#create EC2 codedeploy service iam role
+resource "aws_iam_role" "codedeploy_ec2_service_role" {
+  name = "codedeploy-ec2-service-role"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "codedeploy.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+# Attach AWSCodeDeployRoleForEC2 policy
+resource "aws_iam_role_policy_attachment" "codedeploy_ec2_service_role_policy" {
+  role       = aws_iam_role.codedeploy_ec2_service_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
+}
+
+
+
 resource "aws_codedeploy_deployment_group" "this" {
   for_each               = { for pair in var.services : join("", keys(pair)) => pair }
   deployment_group_name  = var.environment
@@ -107,4 +138,32 @@ resource "aws_codedeploy_deployment_group" "this" {
     }
   }
   depends_on = [aws_iam_policy_attachment.codedeploy_service_role_policy]
+}
+
+resource "aws_codedeploy_deployment_group" "ec2" {
+  for_each               = var.ec2_enabled ? toset(var.ec2_applications) : []
+  deployment_group_name  = var.environment
+  app_name               = aws_codedeploy_app.ec2[each.key].name
+  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+  service_role_arn       = aws_iam_role.codedeploy_ec2_service_role.arn
+
+  deployment_style {
+    deployment_option = "WITHOUT_TRAFFIC_CONTROL"
+    deployment_type   = "IN_PLACE"
+  }
+
+  ec2_tag_set {
+    ec2_tag_filter {
+      key   = "Name"
+      type  = "KEY_AND_VALUE"
+      value = "YJSM"
+    }
+  }
+
+  auto_rollback_configuration {
+    enabled = true
+    events  = ["DEPLOYMENT_FAILURE"]
+  }
+
+  depends_on = [aws_iam_role_policy_attachment.codedeploy_ec2_service_role_policy]
 }
