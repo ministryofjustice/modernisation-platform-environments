@@ -22,7 +22,7 @@ resource "aws_lb_target_group" "edrms_target_group" {
   deregistration_delay = 30
 
   health_check {
-    path                = local.application_data.accounts[local.environment].health_check_path
+    path                = "/actuator/health"
     healthy_threshold   = "5"
     interval            = "120"
     protocol            = "HTTP"

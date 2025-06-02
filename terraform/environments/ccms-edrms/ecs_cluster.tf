@@ -47,7 +47,7 @@ resource "aws_ecs_task_definition" "edrms" {
       app_name                      = local.application_name
       app_image                     = local.application_data.accounts[local.environment].app_image
       edrms_server_port             = local.application_data.accounts[local.environment].edrms_server_port
-      aws_region                    = local.application_data.accounts[local.environment].region
+      aws_region                    = local.application_data.accounts[local.environment].aws_region
       container_version             = local.application_data.accounts[local.environment].container_version
       spring_profiles_active        = local.application_data.accounts[local.environment].spring_profiles_active
       spring_datasource_username    = local.application_data.accounts[local.environment].spring_datasource_username
