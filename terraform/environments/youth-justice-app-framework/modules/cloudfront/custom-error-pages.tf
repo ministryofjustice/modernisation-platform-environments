@@ -51,18 +51,18 @@ resource "aws_s3_bucket_policy" "error_page_policy" {
 
   policy = jsonencode({
     Version = "2012-10-17",
-    Statement: [
+    Statement : [
       {
-        Sid:    "AllowCloudFrontServiceAccessViaOAC",
-        Effect: "Allow",
-        Principal: {
-          Service: "cloudfront.amazonaws.com"
+        Sid : "AllowCloudFrontServiceAccessViaOAC",
+        Effect : "Allow",
+        Principal : {
+          Service : "cloudfront.amazonaws.com"
         },
-        Action: "s3:GetObject",
-        Resource: "${aws_s3_bucket.error_page.arn}/*",
-        Condition: {
-          StringEquals: {
-            "AWS:SourceArn": "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${var.cloudfront_distribution_id}"
+        Action : "s3:GetObject",
+        Resource : "${aws_s3_bucket.error_page.arn}/*",
+        Condition : {
+          StringEquals : {
+            "AWS:SourceArn" : "arn:aws:cloudfront::${data.aws_caller_identity.current.account_id}:distribution/${var.cloudfront_distribution_id}"
           }
         }
       }
@@ -90,33 +90,33 @@ resource "aws_kms_key" "cloudfront_s3" {
   policy = jsonencode({
     Version = "2012-10-17",
     Id      = "cloudfront-s3-kms-policy",
-    Statement: [
+    Statement : [
       {
-        Sid: "AllowCloudFrontServiceAccess",
-        Effect: "Allow",
-        Principal: {
-          Service: "cloudfront.amazonaws.com"
+        Sid : "AllowCloudFrontServiceAccess",
+        Effect : "Allow",
+        Principal : {
+          Service : "cloudfront.amazonaws.com"
         },
-        Action: [
+        Action : [
           "kms:Decrypt",
           "kms:DescribeKey"
         ],
-        Resource: "*",
-        Condition: {
-          StringEquals: {
-            "kms:ViaService": "s3.${data.aws_region.current.name}.amazonaws.com",
-            "kms:CallerAccount": data.aws_caller_identity.current.account_id
+        Resource : "*",
+        Condition : {
+          StringEquals : {
+            "kms:ViaService" : "s3.${data.aws_region.current.name}.amazonaws.com",
+            "kms:CallerAccount" : data.aws_caller_identity.current.account_id
           }
         }
       },
       {
-        Sid: "AllowRootAccountFullAccess",
-        Effect: "Allow",
-        Principal: {
-          AWS: "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        Sid : "AllowRootAccountFullAccess",
+        Effect : "Allow",
+        Principal : {
+          AWS : "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
-        Action: "kms:*",
-        Resource: "*"
+        Action : "kms:*",
+        Resource : "*"
       }
     ]
   })
