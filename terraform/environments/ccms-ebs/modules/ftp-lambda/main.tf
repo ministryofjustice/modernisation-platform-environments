@@ -80,8 +80,8 @@ resource "aws_s3_bucket" "ftp_layer_bucket" {
 
 resource "aws_s3_object" "ftp_lambda_layer_s3" {
   bucket = aws_s3_bucket.ftp_layer_bucket.bucket
-  key    = data.archive_file.ftpclientlibs_zip.output_path
-  source = data.archive_file.ftpclientlibs_zip.output_path
+  key    = "${path.module}/lambda/ftpclientlibs.zip"
+  source = "${path.module}/lambda/ftpclientlibs.zip"
 }
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
