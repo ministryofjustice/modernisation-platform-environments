@@ -87,9 +87,12 @@ resource "aws_s3_object" "ftp_lambda_layer_s3" {
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name          = "ftpclientlibs"
   compatible_runtimes = ["python3.7"]
-  filename            = "ftpclientlibs.zip"
   s3_bucket           = aws_s3_bucket.ftp_layer_bucket.bucket
   s3_key              = aws_s3_object.ftp_lambda_layer_s3.key
+  compatible_architectures = ["x86_64"]
+  description              = "Lambda Layer for ccms ebs ftp lambda"
+
+  depends_on = [aws_s3_object.ftp_lambda_layer_s3]
 }
 #### lambda function for ftp inbound
 resource "aws_lambda_function" "ftp_lambda" {
