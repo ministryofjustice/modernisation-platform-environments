@@ -128,7 +128,7 @@ resource "aws_db_instance" "appdb1" {
   #checkov:skip=CKV_AWS_133:"Nightly backup is enabled"
   #checkov:skip=CKV_AWS_353:"Performance Insights are enabled"
   #checkov:skip=CKV_AWS_226:"Minor upgrades disabled to ensure compatibility"
-  #
+  #checkov:skip=CKV_AWS_293:"Deletion protection is enabled but not being recognised"
 
   port                                  = var.port
   allocated_storage                     = var.allocated_storage

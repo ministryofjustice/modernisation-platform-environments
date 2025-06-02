@@ -60,7 +60,6 @@ resource "aws_iam_user" "ftp_user" {
 # IAM Policy for FTP User (access to all buckets)
 
 data "aws_iam_policy_document" "ftp_user_policy" {
-  #checkov:skip=CKV_AWS_40:"IAM user required for backwards compatibility with existing solution"
   statement {
     effect = "Allow"
     actions = [
@@ -83,6 +82,7 @@ data "aws_iam_policy_document" "ftp_user_policy" {
 }
 
 resource "aws_iam_user_policy" "ftp_user_policy" {
+  #checkov:skip=CKV_AWS_40:"IAM user required for backwards compatibility with existing solution"
   count  = local.build_s3 ? 1 : 0
   name   = "${local.application_name}-FTPUserPolicy"
   user   = aws_iam_user.ftp_user[0].name
