@@ -193,3 +193,8 @@ variable "alb_security_group_id" {
   type        = string
   description = "ALB Security Group ID"
 }
+
+variable "xdr_bucket_name" {
+  type        = string
+  description = "The name of the bucket used to store the XDR agent"
+}
