@@ -17,3 +17,9 @@ data "kubernetes_namespace" "actions_runners" {
     name = "actions-runners"
   }
 }
+
+# EKS
+data "aws_eks_cluster" "apc_cluster" {
+  name = local.eks_cluster_name
+}
+
