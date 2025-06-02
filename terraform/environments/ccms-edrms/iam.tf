@@ -153,7 +153,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ssmmessages:OpenDataChannel"
             ],
             "Resource": "*"
-        },
+        }
     ]
 }
 EOF
