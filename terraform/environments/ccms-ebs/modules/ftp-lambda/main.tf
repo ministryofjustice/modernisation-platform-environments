@@ -59,19 +59,6 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
 
-# data "archive_file" "ftp_zip" {
-#   type        = "zip"
-#   source_dir  = "${path.module}/lambda"
-#   output_path = "${path.module}/lambda/ftp-client.zip"
-# }
-
-# data "archive_file" "ftpclientlibs_zip" {
-#   type        = "zip"
-#   source_dir  = "${path.module}/lambda"
-#   output_path = "${path.module}/lambda/ftpclientlibs.zip"
-# }
-
-
 
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
