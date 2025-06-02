@@ -46,8 +46,8 @@ resource "aws_lb_listener" "edrms" {
   port              = 443
   protocol          = "HTTPS"
 
-  ssl_policy      = "ELBSecurityPolicy-TLS-1-2-2017-01" # Need to double check this policy
-  certificate_arn = local.application_data.accounts[local.environment].certificate_arn # Need to find a better way to reference the certificate
+  ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06" # Need to double check this policy
+  certificate_arn = aws_acm_certificate.external.arn
 
   default_action {
     target_group_arn = aws_lb_target_group.edrms_target_group.id
