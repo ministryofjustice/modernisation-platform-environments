@@ -58,12 +58,25 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   role       = aws_iam_role.ftp_lambda_role.name
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
+
+data "archive_file" "ftp_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda"
+  output_path = "${path.module}/lambda/ftp-client.zip"
+}
+
+data "archive_file" "ftpclientlibs_zip" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda"
+  output_path = "${path.module}/lambda/ftpclientlibs.zip"
+}
+
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name          = "ftpclientlibs"
   compatible_runtimes = ["python3.7"]
   filename            = "ftpclientlibs.zip"
-  source_code_hash = filebase64sha256("${path.module}/ftp-lambda/lambda/ftpclientlibs.zip")
+  source_code_hash = filebase64sha256(data.archive_file.ftpclientlibs_zip.output_path)
 }
 #### lambda function for ftp inbound
 resource "aws_lambda_function" "ftp_lambda" {
@@ -74,7 +87,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   timeout       = 300
   memory_size   = 256
   filename         = "ftp-client.zip"
-  source_code_hash = filebase64sha256("${path.module}/ftp-lambda/lambda/ftp-client.zip")
+  source_code_hash = filebase64sha256(data.archive_file.ftpclientlibs_zip.output_path)
   layers        = [aws_lambda_layer_version.ftp_layer.arn]
 
   vpc_config {
