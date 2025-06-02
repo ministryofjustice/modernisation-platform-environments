@@ -306,15 +306,6 @@ resource "aws_iam_policy" "ec2_instance_policy" {
           "xray:GetSamplingStatisticSummaries"
         ],
         "Resource" : "*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:GetObject"
-        ],
-        Resource = [
-          "arn:aws:s3:::${var.xdr_bucket_name}/*"
-        ]
       }
     ]
   })
