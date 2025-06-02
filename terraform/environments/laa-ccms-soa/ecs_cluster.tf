@@ -40,7 +40,7 @@ resource "aws_ecs_task_definition" "admin" {
   volume {
     name = "soa_volume"
     efs_volume_configuration {
-      file_system_id = aws_efs_file_system.storage.id #--OUTSTANDING RESOURCE
+      file_system_id = aws_efs_file_system.storage.id
     }
   }
   volume {

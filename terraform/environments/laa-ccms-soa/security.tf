@@ -157,44 +157,50 @@ resource "aws_security_group_rule" "ecs_tasks_managed_egress_all" {
 }
 
 #--Cluster EC2 Instances
-resource "aws_security_group" "cluster_ec2" {
-  name        = "${local.application_data.accounts[local.environment].app_name}-cluster-ec2-security-group"
-  description = "controls access to the cluster ec2 instance"
+resource "aws_security_group" "cluster_ec2_admin" {
+  name        = "${local.application_data.accounts[local.environment].app_name}-cluster-ec2-admin"
+  description = "Controls Traffic to Admin EC2 Instances"
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "cluster_ec2_ingress_1521" {
-  security_group_id = aws_security_group.cluster_ec2.id
-  type              = "ingress"
-  description       = "Application Traffic" #--What?
-  protocol          = "TCP"
-  from_port         = 1521
-  to_port           = 1521
+resource "aws_security_group_rule" "cluster_ec2_admin_ingress" {
+  type                     = "ingress"
+  from_port               = 0
+  to_port                 = 0
+  protocol                = -1
+  security_group_id       = aws_security_group.cluster_ec2_admin.id
+  source_security_group_id = aws_security_group.alb_admin.id
+  description             = "Allow ingress from ALB"
+}
+
+resource "aws_security_group_rule" "cluster_ec2_admin_egress_all" {
+  security_group_id = aws_security_group.cluster_ec2_admin.id
+  type              = "egress"
+  description       = "All Egress"
+  protocol          = -1
+  from_port         = 0
+  to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
 }
 
-resource "aws_security_group_rule" "cluster_ec2_ingress_3872" {
-  security_group_id = aws_security_group.cluster_ec2.id
-  type              = "ingress"
-  description       = "Application Traffic" #--What?
-  protocol          = "TCP"
-  from_port         = 3872
-  to_port           = 3872
-  cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
+resource "aws_security_group" "cluster_ec2_managed" {
+  name        = "${local.application_data.accounts[local.environment].app_name}-cluster-ec2-admin"
+  description = "Controls Traffic to Managed EC2 Instances"
+  vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "cluster_ec2_ingress_4903" {
-  security_group_id = aws_security_group.cluster_ec2.id
-  type              = "ingress"
-  description       = "Application Traffic" #--What?
-  protocol          = "TCP"
-  from_port         = 4903
-  to_port           = 4903
-  cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
+resource "aws_security_group_rule" "cluster_ec2_admin_managed" {
+  type                     = "ingress"
+  from_port               = 0
+  to_port                 = 0
+  protocol                = -1
+  security_group_id       = aws_security_group.cluster_ec2_managed.id
+  source_security_group_id = aws_security_group.alb_managed.id
+  description             = "Allow ingress from ALB"
 }
 
-resource "aws_security_group_rule" "cluster_ec2_egress_all" {
-  security_group_id = aws_security_group.cluster_ec2.id
+resource "aws_security_group_rule" "cluster_ec2_managed_egress_all" {
+  security_group_id = aws_security_group.cluster_ec2_managed.id
   type              = "egress"
   description       = "All Egress"
   protocol          = -1
