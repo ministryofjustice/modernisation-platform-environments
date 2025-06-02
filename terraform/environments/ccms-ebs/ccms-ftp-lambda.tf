@@ -42,6 +42,25 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_enc
   }
 }
 
+
+#### bucket for laa-ccms-inbound for storing files from lambda
+resource "aws_s3_bucket" "outbound_bucket" {
+  bucket = lower(format("laa-ccms-outbound-%s-mp",local.environment))  # ccms inbound bucket
+
+}
+
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption_outbound" {
+  bucket = aws_s3_bucket.outbound_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+
 ##### bucket for storing lambda layers and ftp client code
 resource "aws_s3_bucket" "ftp_bucket" {
   bucket = lower(format("laa-ccms-ftp-lambda-%s-mp",local.environment))  # ccms lambda bucket
