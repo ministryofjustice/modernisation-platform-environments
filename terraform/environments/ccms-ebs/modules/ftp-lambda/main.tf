@@ -63,7 +63,7 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name          = "ftpclientlibs"
-  compatible_runtimes = ["python3.7"]
+  compatible_runtimes = ["python3.13"]
   s3_bucket           = var.s3_bucket_ftp
   s3_key              = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
