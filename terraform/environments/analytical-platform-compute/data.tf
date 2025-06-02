@@ -107,3 +107,4 @@ data "aws_kms_key" "mwaa_kms" {
 data "aws_s3_bucket" "mwaa_bucket" {
   bucket = "mojap-compute-${local.environment}-mwaa"
 }
+

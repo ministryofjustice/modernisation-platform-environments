@@ -1,21 +1,16 @@
 locals {
-  public_key_data = jsondecode(file("./files/bastion_linux.json"))
-
-  crontab = {
-    "down" = "15 23 25 12 *"
-    "up"   = "45 23 25 12 *"
-  }
+  public_key_data = jsondecode(file("./bastion_linux.json"))
 }
 
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.4.2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.2.0"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
     aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
   }
   # s3 - used for logs and user ssh public keys
-  bucket_name = "bastion-${local.application_name}-${local.environment}"
+  bucket_name = "bastion-${local.application_name}"
   # public keys
   public_key_data = local.public_key_data.keys[local.environment]
   # logs
@@ -30,13 +25,8 @@ module "bastion_linux" {
   subnet_set         = local.subnet_set
   environment        = local.environment
   region             = "eu-west-2"
-  # Autoscaling
-  autoscaling_cron = local.crontab
 
   # Tags
   tags_common = local.tags
   tags_prefix = terraform.workspace
 }
-
-
-
