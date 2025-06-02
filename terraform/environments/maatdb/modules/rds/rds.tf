@@ -117,6 +117,17 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 # }
 
 
+# Consolidate security group IDs
+# RDS database
+locals {
+  rds_sg_group_ids = compact([
+    aws_security_group.cloud_platform_sec_group,
+    aws_security_group.bastion_sec_group.id,
+    length(aws_security_group.vpc_sec_group) > 0 ? aws_security_group.vpc_sec_group[0].id : "",
+    length(aws_security_group.mlra_ecs_sec_group) > 0 ? aws_security_group.mlra_ecs_sec_group[0].id : ""
+  ])
+}
+
 # RDS database
 
 # TODO: Ensure logging is enabled for the database and performance insights logs are encrypted
@@ -148,7 +159,7 @@ resource "aws_db_instance" "appdb1" {
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_password.result
-  vpc_security_group_ids                = [aws_security_group.cloud_platform_sec_group.id, aws_security_group.bastion_sec_group.id, aws_security_group.vpc_sec_group.id, aws_security_group.mlra_ecs_sec_group.id]
+  vpc_security_group_ids                = local.rds_sg_group_ids
   skip_final_snapshot                   = false
   final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name                  = aws_db_parameter_group.parameter_group_19.name
@@ -202,8 +213,8 @@ resource "aws_security_group" "cloud_platform_sec_group" {
   }
 }
 
-# Access fromm MAAT Application
 resource "aws_security_group" "vpc_sec_group" {
+  count = length(trimspace(var.ecs_cluster_sec_group_id)) > 0 ? 1 : 0
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
@@ -229,8 +240,8 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 }
 
-# Access from MLRA Application
 resource "aws_security_group" "mlra_ecs_sec_group" {
+  count = length(trimspace(var.mlra_ecs_cluster_sec_group_id)) > 0 ? 1 : 0
   name        = "mlra-ecs-sec-group"
   description = "RDS Access from the MLRA application"
   vpc_id      = var.vpc_shared_id
@@ -255,6 +266,7 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
     Name = "${var.application_name}-${var.environment}-mlra-ecs-sec-group"
   }
 }
+
 
 # Access from Bastion
 resource "aws_security_group" "bastion_sec_group" {
