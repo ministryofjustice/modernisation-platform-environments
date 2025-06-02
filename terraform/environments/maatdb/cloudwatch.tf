@@ -77,6 +77,7 @@ locals {
 
 # Create SNS topic
 resource "aws_sns_topic" "maatdb_alerting_topic" {
+  #checkov:skip=CKV_AWS_26:"Not required as only standard RDS metrics being alerted on."
   name = "${local.application_name}-${local.environment}-alerting-topic"
   tags = merge(
     local.tags,

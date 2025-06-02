@@ -124,6 +124,11 @@ resource "aws_db_instance" "appdb1" {
   #checkov:skip=CKV_AWS_129:"To be addressed"
   #checkov:skip=CKV_AWS_354:"To be addressed"
   #checkov:skip=CKV_AWS_118:"Enhanced security not required"
+  #checkov:skip=CKV_AWS_157:"Multi-az is enabled"
+  #checkov:skip=CKV_AWS_133:"Nightly backup is enabled"
+  #checkov:skip=CKV_AWS_353:"Performance Insights are enabled"
+  #checkov:skip=CKV_AWS_226:"Minor upgrades disabled to ensure compatibility"
+  #
 
   port                                  = var.port
   allocated_storage                     = var.allocated_storage
