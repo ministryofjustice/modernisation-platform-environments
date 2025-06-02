@@ -5,13 +5,21 @@
       "aws_region": "eu-west-2",
       "ami_image_id": "ami-0d6d764bbe794b8ca",
       "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/edrms",
+      "container_version": "latest",
       "ec2_instance_type": "m5.large",
       "app_count": "1",
       "container_cpu": "1024",
       "container_memory": "2048",
       "northgate_gateway_ip": "152.114.58.102",
       "northgate_destination_cidr": "10.120.0.0/24",
-      "aws_gateway_id": "vgw-697af559"
+      "aws_workspace": "10.200.0.0/20",
+      "spring_profiles_active": "WithoutNorthgate",
+      "spring_datasource_username": "XXSOA",
+      "target_northgate_hub_dime_url": "http://10.120.0.147/DocumentHub/dime",
+      "northgate_timeout": "300000",
+      "target_min_capacity": "1",
+      "target_max_capacity": "3",
+      "logging_level_root": "debug"
     },
     "test": {
       "app_name": "ccms-edrms"
