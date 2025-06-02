@@ -14,6 +14,7 @@ module "esb" {
       development   = "10.26.144.217"
       test          = "10.26.152.88"
       preproduction = "10.27.144.238"
+      production    = "10.27.152.38"
       # Add more environments when IP is known
     },
     local.environment,
@@ -25,6 +26,7 @@ module "esb" {
     {
       development   = "ami-0cc0dad47bc769c08"
       preproduction = "ami-04a6fa2443473cfd5"
+      production    = "ami-0b14bd01e84f3e0a5"
       # Add more environments when AMIs are known
     },
     local.environment,

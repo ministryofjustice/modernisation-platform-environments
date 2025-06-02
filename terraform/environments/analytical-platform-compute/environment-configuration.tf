@@ -166,6 +166,7 @@ locals {
           "prison",
           "probation",
           "property",
+          "public",
           "risk",
           "sentence_offence",
           "staging",

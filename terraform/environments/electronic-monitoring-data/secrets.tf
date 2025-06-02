@@ -1,5 +1,5 @@
 locals {
-    allied_account_id_placeholder = "placeholder"
+  allied_account_id_placeholder = "placeholder"
 }
 
 resource "aws_secretsmanager_secret" "allied_account_id" {

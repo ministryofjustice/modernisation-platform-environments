@@ -51,6 +51,12 @@ resource "aws_kms_key" "firehose_backup" {
   enable_key_rotation     = true
 }
 
+# Create an alias for easier identification
+resource "aws_kms_alias" "firehose_kms_alias" {
+  name          = "alias/firehose-s3-backup-key"
+  target_key_id = aws_kms_key.firehose_backup.key_id
+}
+
 resource "aws_kms_key_policy" "firehose_backup_policy" {
   key_id = aws_kms_key.firehose_backup.id
 
@@ -325,9 +331,6 @@ resource "aws_iam_role_policy_attachment" "attach_kms_secret_access" {
 
 ###### log groups to stream
 
-
-
-
 resource "aws_cloudwatch_log_subscription_filter" "userjourney" {
   count           = contains(["test", "preproduction", "production"], var.environment) ? 1 : 0
   name            = "firehose-subscription"
@@ -336,3 +339,23 @@ resource "aws_cloudwatch_log_subscription_filter" "userjourney" {
   destination_arn = aws_kinesis_firehose_delivery_stream.to_datadog.arn
   role_arn        = aws_iam_role.cw_logs_to_firehose.arn
 }
+
+
+###### sns topics to stream
+
+#### iam role and permissions are made in aws-config.tf file
+
+resource "aws_sns_topic_subscription" "datadog_securityhub-alarms" {
+  topic_arn             = "arn:aws:sns:eu-west-2:${var.aws_account_id}:securityhub-alarms"
+  protocol              = "firehose"
+  endpoint              = aws_kinesis_firehose_delivery_stream.to_datadog.arn
+  subscription_role_arn = aws_iam_role.awsconfig_sns_to_datadog.arn
+}
+
+resource "aws_sns_topic_subscription" "datadog_sechub_findings" {
+  topic_arn             = "arn:aws:sns:eu-west-2:${var.aws_account_id}:sechub_findings_sns_topic"
+  protocol              = "firehose"
+  endpoint              = aws_kinesis_firehose_delivery_stream.to_datadog.arn
+  subscription_role_arn = aws_iam_role.awsconfig_sns_to_datadog.arn
+}
+

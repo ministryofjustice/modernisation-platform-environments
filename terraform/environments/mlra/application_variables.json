@@ -8,8 +8,8 @@
       "instance_type": "m5.large",
       "key_name": "",
       "docker_image_tag": "development",
-      "maat_api_end_point": "http://maat-cd-api.aws.dev.legalservices.gov.uk/maatApi/laaStatus",
-      "maat_db_url": "rds.maat.aws.dev.legalservices.gov.uk:1521:MAATDB",
+      "maat_api_end_point": "https://laa-maat-data-api-dev.apps.live.cloud-platform.service.justice.gov.uk/maatApi/laaStatus",
+      "maat_db_url": "maatdb-development-database.cfxq8vgqqxpp.eu-west-2.rds.amazonaws.com:1521:MAATDB",
       "maat_libra_wsdl_url": "http://infox.aws.dev.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
       "ec2_max_size": 6,
@@ -27,7 +27,8 @@
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": false,
       "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
-      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk"
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
+      "maatdb_rds_sec_group_id": "sg-01af07cdeb1fb46d0"
     },
     "test": {
       "example_var": "test-data",
@@ -56,7 +57,8 @@
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": false,
       "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
-      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk"
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
+      "maatdb_rds_sec_group_id": ""
     },
     "preproduction": {
       "example_var": "preproduction-data",
@@ -85,7 +87,8 @@
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": true,
       "pagerduty_integration_key_name": "laa_mlra_nonprod_alarms",
-      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk"
+      "acm_cert_domain_name": "modernisation-platform.service.justice.gov.uk",
+      "maatdb_rds_sec_group_id": ""
     },
     "production": {
       "example_var": "production-data",
@@ -95,18 +98,18 @@
       "instance_type": "m5.large",
       "key_name": "",
       "docker_image_tag": "production",
-      "maat_api_end_point": "http://maat-cd-api.aws.prd.legalservices.gov.uk/maatApi/laaStatus",
-      "maat_db_url": "rds.maat.aws.prd.legalservices.gov.uk:1521:MAATDB",
+      "maat_api_end_point": "https://laa-maat-data-api-prod.apps.live.cloud-platform.service.justice.gov.uk/maatApi/laaStatus",
+      "maat_db_url": "maatdb-production-database.cpc2ec6s8389.eu-west-2.rds.amazonaws.com:1521:MAATDB",
       "maat_libra_wsdl_url": "http://infox.aws.prd.legalservices.gov.uk/infoX/gateway",
-      "ec2_desired_capacity": 2,
-      "ec2_max_size": 6,
-      "ec2_min_size": 2,
+      "ec2_desired_capacity": 0,
+      "ec2_max_size": 0,
+      "ec2_min_size": 0,
       "task_definition_volume": "upload_volume",
       "network_mode": "bridge",
       "server_port": 8080,
-      "app_count": 2,
-      "appscaling_min_capacity": 2,
-      "appscaling_max_capacity": 6,
+      "app_count": 0,
+      "appscaling_min_capacity": 0,
+      "appscaling_max_capacity": 0,
       "ec2_scaling_cpu_threshold": 75,
       "ec2_scaling_mem_threshold": 61,
       "ecs_scaling_cpu_threshold": 80,
@@ -114,7 +117,8 @@
       "moj_vpn_cidr": "81.134.202.29/32",
       "nlb_prevent_deletion": true,
       "pagerduty_integration_key_name": "laa_mlra_prod_alarms",
-      "acm_cert_domain_name": "maat-libra-administration-tool.service.justice.gov.uk"
+      "acm_cert_domain_name": "maat-libra-administration-tool.service.justice.gov.uk",
+      "maatdb_rds_sec_group_id": "sg-0fae0ff1a577fb001"
     }
   }
 }
