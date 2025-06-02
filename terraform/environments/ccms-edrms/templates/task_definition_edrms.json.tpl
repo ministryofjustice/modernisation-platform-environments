@@ -26,10 +26,6 @@
         "value": "${spring_datasource_username}"
       },
       {
-        "name": "SPRING_DATASOURCE_PASSWORD",
-        "value": "${spring_datasource_password}"
-      },
-      {
         "name": "TARGET_NORTHGATE_HUB_DIME_URL",
         "value": "${target_northgate_hub_dime_url}"
       },
@@ -45,6 +41,12 @@
         "name": "logging_level_root",
         "value": "${logging_level_root}"
       }
+    ],
+    "secrets": [
+        {
+          "name": "SPRING_DATASOURCE_PASSWORD",
+          "valueFrom": "${spring_datasource_password}"
+        }
     ]
   }
 ]
