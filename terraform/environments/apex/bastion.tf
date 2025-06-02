@@ -10,7 +10,7 @@ module "bastion_linux" {
     aws.share-tenant = aws          # The default provider (unaliased, `aws`) is the tenant
   }
   # s3 - used for logs and user ssh public keys
-  bucket_name = "bastion-${local.application_name_short}"
+  bucket_name = "bastion-${local.application_name}"
   # public keys
   public_key_data = local.public_key_data.keys[local.environment]
   # logs
