@@ -59,7 +59,7 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
 
   network_interfaces {
     associate_public_ip_address = false
-    security_groups             = [aws_security_group.cluster_ec2.id]
+    security_groups             = [aws_security_group.cluster_ec2_admin.id, aws_security_group.cluster_ec2_managed.id]
     delete_on_termination       = false
   }
 
