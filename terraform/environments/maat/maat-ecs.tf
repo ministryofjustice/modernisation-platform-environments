@@ -247,12 +247,12 @@ resource "aws_security_group_rule" "maat_sg_rule_outbound" {
 }
 
 resource "aws_security_group_rule" "maat_to_maatdb_sg_rule_outbound" {
-  type              = "egress"
-  from_port         = 1521
-  to_port           = 1521
-  protocol          = "tcp"
-  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
-  security_group_id = aws_security_group.maat_ecs_security_group.id
+  type                     = "egress"
+  from_port                = 1521
+  to_port                  = 1521
+  protocol                 = "tcp"
+  description              = "This rule is needed for the ECS agent to reach the ECS API endpoints"
+  security_group_id        = aws_security_group.maat_ecs_security_group.id
   source_security_group_id = local.application_data.accounts[local.environment].maatdb_rds_sec_group_id
 }
 
@@ -516,26 +516,26 @@ resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
 
   container_definitions = templatefile("maat-task-definition.json",
     {
-      maat_docker_image_tag      = local.application_data.accounts[local.environment].maat_docker_image_tag
-      xray_docker_image_tag      = local.application_data.accounts[local.environment].xray_docker_image_tag
-      region                     = local.application_data.accounts[local.environment].region
-      sentry_env                 = local.environment
-      maat_orch_base_url         = local.application_data.accounts[local.environment].maat_orch_base_url
-      maat_orch_oauth_url        = local.application_data.accounts[local.environment].maat_orch_oauth_url
-      maat_db_url                = local.application_data.accounts[local.environment].maat_db_url
-      maat_caa_oauth_url         = local.application_data.accounts[local.environment].maat_caa_oauth_url
-      maat_bc_endpoint_url       = local.application_data.accounts[local.environment].maat_bc_endpoint_url
-      maat_mlra_url              = local.application_data.accounts[local.environment].maat_mlra_url
-      maat_caa_base_url          = local.application_data.accounts[local.environment].maat_caa_base_url
-      ecr_url                    = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
-      maat_ecs_log_group         = local.application_data.accounts[local.environment].maat_ecs_log_group
-      maat_aws_stream_prefix     = local.application_data.accounts[local.environment].maat_aws_stream_prefix
-      env_account_region         = local.env_account_region
-      env_account_id             = local.env_account_id
-      app_log_level              = local.application_data.accounts[local.environment].app_log_level
-      maat_ats_oauth_url         = local.application_data.accounts[local.environment].maat_ats_oauth_url
-      maat_ats_endpoint          = local.application_data.accounts[local.environment].maat_ats_endpoint
-      maat_ats_base_url          = local.application_data.accounts[local.environment].maat_ats_base_url
+      maat_docker_image_tag  = local.application_data.accounts[local.environment].maat_docker_image_tag
+      xray_docker_image_tag  = local.application_data.accounts[local.environment].xray_docker_image_tag
+      region                 = local.application_data.accounts[local.environment].region
+      sentry_env             = local.environment
+      maat_orch_base_url     = local.application_data.accounts[local.environment].maat_orch_base_url
+      maat_orch_oauth_url    = local.application_data.accounts[local.environment].maat_orch_oauth_url
+      maat_db_url            = local.application_data.accounts[local.environment].maat_db_url
+      maat_caa_oauth_url     = local.application_data.accounts[local.environment].maat_caa_oauth_url
+      maat_bc_endpoint_url   = local.application_data.accounts[local.environment].maat_bc_endpoint_url
+      maat_mlra_url          = local.application_data.accounts[local.environment].maat_mlra_url
+      maat_caa_base_url      = local.application_data.accounts[local.environment].maat_caa_base_url
+      ecr_url                = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/maat-ecr-repo"
+      maat_ecs_log_group     = local.application_data.accounts[local.environment].maat_ecs_log_group
+      maat_aws_stream_prefix = local.application_data.accounts[local.environment].maat_aws_stream_prefix
+      env_account_region     = local.env_account_region
+      env_account_id         = local.env_account_id
+      app_log_level          = local.application_data.accounts[local.environment].app_log_level
+      maat_ats_oauth_url     = local.application_data.accounts[local.environment].maat_ats_oauth_url
+      maat_ats_endpoint      = local.application_data.accounts[local.environment].maat_ats_endpoint
+      maat_ats_base_url      = local.application_data.accounts[local.environment].maat_ats_base_url
 
     }
   )
