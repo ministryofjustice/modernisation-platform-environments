@@ -25,7 +25,7 @@ resource "aws_ecs_cluster" "main" {
 
 resource "aws_ecs_cluster_capacity_providers" "main" {
   cluster_name       = aws_ecs_cluster.main.name
-  capacity_providers = aws_ecs_capacity_provider.capacity-provider.name
+  capacity_providers = [aws_ecs_capacity_provider.capacity-provider.name]
 }
 
 # ECS Task Definition
