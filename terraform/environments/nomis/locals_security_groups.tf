@@ -51,6 +51,7 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
+      module.ip_addresses.moj_cidr.aws_xsiam_prod_vpc,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_agent = flatten([
