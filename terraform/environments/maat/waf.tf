@@ -3,11 +3,11 @@ locals {
 }
 
 resource "aws_wafv2_ip_set" "wafmanualallowset" {
-  name              = "${upper(local.application_name)}-manual-allow-set"
+  name = "${upper(local.application_name)}-manual-allow-set"
 
   # Ranges from https://github.com/ministryofjustice/laa-apex/blob/master/aws/application/application_stack.template
   # removed redundant ip addresses such as RedCentric access and AWS Holborn offices Wifi
-  
+
   scope              = "CLOUDFRONT"
   provider           = aws.us-east-1
   ip_address_version = "IPV4"
@@ -21,14 +21,14 @@ resource "aws_wafv2_ip_set" "wafmanualblockset" {
   provider           = aws.us-east-1
   description        = "Manual Block Set for ${local.application_name} WAF"
   ip_address_version = "IPV4"
-  addresses          = [] 
+  addresses          = []
 }
 
 resource "aws_wafv2_rule_group" "manual-rules" {
   name        = "${upper(local.application_name)}-manual-rules"
   provider    = aws.us-east-1
   scope       = "CLOUDFRONT" # Use "CLOUDFRONT" for CloudFront
-  capacity    = 10 # Adjust based on complexity
+  capacity    = 10           # Adjust based on complexity
   description = "Manual Allow/Block Rules for ${local.application_name}"
 
   rule {
