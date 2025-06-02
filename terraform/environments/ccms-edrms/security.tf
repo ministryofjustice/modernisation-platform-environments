@@ -50,9 +50,9 @@ resource "aws_security_group_rule" "ecs_tasks_edrms" {
   protocol          = "TCP"
   from_port         = local.application_data.accounts[local.environment].edrms_server_port
   to_port           = local.application_data.accounts[local.environment].edrms_server_port
-  cidr_blocks       = [
-      aws_security_group.load_balancer.id,
-    ]
+  source_security_group_id = [
+    aws_security_group.load_balancer.id,
+  ]
 }
 
 resource "aws_security_group_rule" "ecs_tasks_egress_all" {
@@ -109,13 +109,13 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_8001" {
 }
 
 resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
-  security_group_id = aws_security_group.cluster_ec2.id
-  type              = "ingress"
-  description       = "Application Traffic"
-  protocol          = "TCP"
-  from_port         = 0
-  to_port           = 65535
-  cidr_blocks       = [aws_security_group.load_balancer.id] # Allow the LB to access the EC2 instances
+  security_group_id        = aws_security_group.cluster_ec2.id
+  type                     = "ingress"
+  description              = "Application Traffic"
+  protocol                 = "TCP"
+  from_port                = 0
+  to_port                  = 65535
+  source_security_group_id = [aws_security_group.load_balancer.id] # Allow the LB to access the EC2 instances
 }
 
 resource "aws_security_group_rule" "cluster_ec2_egress_all" {
