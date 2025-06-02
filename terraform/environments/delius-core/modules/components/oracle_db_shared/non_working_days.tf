@@ -13,8 +13,5 @@ resource "aws_dynamodb_table" "non_working_days" {
     type = "S"
   }
 
-  tags = {
-    Name        = "NonWorkingDaysTable"
-    Environment = var.environment
-  }
+  tags = merge({Name = "NonWorkingDaysTable"},var.tags)
 }
