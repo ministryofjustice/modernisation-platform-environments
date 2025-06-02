@@ -1,15 +1,13 @@
 {
   "accounts": {
     "development": {
-      "application_name": "MAATDB",
-      "identifier_name": "maatdb",
       "region": "eu-west-2",
       "port": "1521",
       "allocated_storage": 300,
       "engine": "oracle-se2",
       "engine_version": "19.0.0.0.ru-2025-01.rur-2025-01.r1",
       "instance_class": "db.t3.medium",
-      "allow_major_version_upgrade": true,
+      "allow_major_version_upgrade": false,
       "auto_minor_version_upgrade": false,
       "storage_type": "gp2",
       "iops": 0,
@@ -28,7 +26,9 @@
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "sg-050fb73f9c212d1bb",
-      "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907"
+      "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907",
+      "build_s3": true,
+      "build_ftp": false
     },
     "test": {
       "example_var": "test-data"
@@ -37,8 +37,6 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "application_name": "MAATDB",
-      "identifier_name": "maatdb",
       "region": "eu-west-2",
       "port": "1521",
       "allocated_storage": 600,
@@ -57,14 +55,16 @@
       "username": "admin",
       "db_password_rotation_period": 30,
       "license_model": "license-included",
-      "performance_insights_enabled": true,
+      "performance_insights_enabled": false,
       "performance_insights_retention_period": 31,
-      "snapshot_arn": "maatdb-22may20250936-finalsnapshot",
+      "snapshot_arn": "maatdb-22may20250936-finalsnapshot-withkms",
       "deletion_protection": false,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "",
-      "mlra_ecs_cluster_sec_group_id": "sg-0faa8fe022ea7e3aa"
+      "mlra_ecs_cluster_sec_group_id": "sg-0faa8fe022ea7e3aa",
+      "build_s3": false,
+      "build_ftp": false
     }
   }
 }
