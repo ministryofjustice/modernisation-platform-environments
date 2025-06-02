@@ -90,8 +90,9 @@ resource "aws_s3_object" "ftp_client" {
 }
 
 
+
 #LAA-ftp-allpay-inbound-ccms
-module "ftp_lambda" {
+module "allpay_ftp_lambda_inbound" {
   source              = "./modules/ftp-lambda"
   lambda_name         = lower(format("LAA-ftp-allpay-inbound-ccms-%s",local.environment))
   vpc_id              = data.aws_vpc.shared.id
@@ -110,10 +111,45 @@ module "ftp_lambda" {
   ftp_key             = ""
   ftp_key_type        = ""
   ftp_user            = ""
-  ftp_password_path   = "/secure/path"
+  ftp_password_path   = ""
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
   ftp_bucket          = aws_s3_bucket.inbound_bucket.id
+  sns_topic_sev5      = ""
+  sns_topic_ops       = ""
+  ssh_key_path        = ""
+  env                 = local.environment
+  s3_bucket_ftp       = aws_s3_bucket.ftp_bucket.bucket
+  s3_object_ftp_client= aws_s3_object.ftp_client.key
+  s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
+
+}
+
+
+#LAA-ftp-allpay-outbound-ccms
+module "allpay_ftp_lambda_outbound" {
+  source              = "./modules/ftp-lambda"
+  lambda_name         = lower(format("LAA-ftp-allpay-outbound-ccms-%s",local.environment))
+  vpc_id              = data.aws_vpc.shared.id
+  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+  ftp_host            = "sftp.allpay.cloud"
+  ftp_port            = "22"
+  ftp_protocol        = "FTPS"
+  ftp_transfer_type   = "SFTP_UPLOAD"
+  ftp_file_types      = ""
+  ftp_local_path      = "CCMS_PRD_Allpay/Outbound/"
+  ftp_remote_path     = "/Inbound/"
+  ftp_require_ssl     = "NO"
+  ftp_insecure        = "NO"
+  ftp_ca_cert         = ""
+  ftp_cert            = ""
+  ftp_key             = ""
+  ftp_key_type        = ""
+  ftp_user            = ""
+  ftp_password_path   = ""
+  ftp_file_remove     = "YES"
+  ftp_cron            = "cron(0 10 * * ? *)"
+  ftp_bucket          = aws_s3_bucket.outbound_bucket.id
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
   ssh_key_path        = ""
