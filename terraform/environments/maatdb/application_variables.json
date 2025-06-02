@@ -1,8 +1,6 @@
 {
   "accounts": {
     "development": {
-      "application_name": "MAATDB",
-      "identifier_name": "maatdb",
       "region": "eu-west-2",
       "port": "1521",
       "allocated_storage": 300,
@@ -28,7 +26,11 @@
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "sg-050fb73f9c212d1bb",
-      "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907"
+      "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907",
+      "build_s3": false,
+      "build_ftp": false,
+      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
+
     },
     "test": {
       "example_var": "test-data"
@@ -37,8 +39,6 @@
       "example_var": "preproduction-data"
     },
     "production": {
-      "application_name": "MAATDB",
-      "identifier_name": "maatdb",
       "region": "eu-west-2",
       "port": "1521",
       "allocated_storage": 600,
@@ -64,7 +64,11 @@
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "sg-065ac58b9f6a06bb1",
-      "mlra_ecs_cluster_sec_group_id": "sg-0faa8fe022ea7e3aa"
+      "mlra_ecs_cluster_sec_group_id": "sg-0faa8fe022ea7e3aa",
+      "build_s3": false,
+      "build_ftp": false,
+      "pagerduty_integration_key_name": "laa_maat_prod_alarm"
+
     }
   }
 }
