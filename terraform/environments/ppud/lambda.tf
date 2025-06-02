@@ -486,17 +486,6 @@ data "archive_file" "zip_the_send_cpu_graph_code_dev" {
   output_path = "${path.module}/lambda_scripts/send_cpu_graph_dev.zip"
 }
 
-# Lambda Layer for Matplotlib
-
-resource "aws_lambda_layer_version" "lambda_layer_matplotlib_dev" {
-  count               = local.is-development == true ? 1 : 0
-  layer_name          = "matplotlib-layer"
-  description         = "matplotlib-layer for python 3.12"
-  s3_bucket           = aws_s3_bucket.moj-lambda-layers-dev[0].id
-  s3_key              = "matplotlib-layer.zip"
-  compatible_runtimes = ["python3.12"]
-}
-
 #################################################
 # Lambda Function to graph CPU Utilization - PROD
 #################################################
@@ -559,16 +548,6 @@ resource "aws_cloudwatch_log_group" "lambda_send_cpu_graph_prod_log_group" {
   retention_in_days = 30
 }
 
-# Lambda Layer for Matplotlib
-
-resource "aws_lambda_layer_version" "lambda_layer_matplotlib_prod_new" {
-  count               = local.is-production == true ? 1 : 0
-  layer_name          = "matplotlib-layer-prod"
-  description         = "matplotlib-layer for python 3.12"
-  s3_bucket           = aws_s3_bucket.moj-infrastructure[0].id
-  s3_key              = "lambda/layers/matplotlib-layer.zip"
-  compatible_runtimes = ["python3.12"]
-}
 
 ##################################################
 # Lambda Function to graph PPUD Email Usage - PROD
@@ -877,68 +856,6 @@ resource "aws_cloudwatch_log_group" "lambda_disk_info_report_prod_log_group" {
   # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
   count             = local.is-production == true ? 1 : 0
   name              = "/aws/lambda/disk_info_report"
-  retention_in_days = 30
-}
-
-#######################################################
-# Lambda Function to send Disk Read Write Report - PROD
-#######################################################
-
-resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_disk_read_write_report_prod" {
-  count         = local.is-production == true ? 1 : 0
-  statement_id  = "AllowAccesstoCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_disk_read_write_report_prod[0].function_name
-  principal     = "cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_disk_read_write_report_prod" {
-  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
-  count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/disk_read_write_report_prod.zip"
-  function_name                  = "disk_read_write_report"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
-  handler                        = "disk_read_write_report_prod.lambda_handler"
-  runtime                        = "python3.12"
-  timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_prod]
-  reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_prod[0].arn
-  }
-  tracing_config {
-    mode = "Active"
-  }
-  layers = [
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
-  ]
-  # VPC configuration
-  vpc_config {
-    subnet_ids         = [data.aws_subnet.private_subnets_b.id]
-    security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
-  }
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_disk_read_write_report_code_prod" {
-  count       = local.is-production == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/disk_read_write_report_prod.zip"
-}
-
-# Cloudwatch log group for the lambda function
-
-resource "aws_cloudwatch_log_group" "lambda_disk_read_write_report_prod_log_group" {
-  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
-  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
-  count             = local.is-production == true ? 1 : 0
-  name              = "/aws/lambda/disk_read_write_report"
   retention_in_days = 30
 }
 

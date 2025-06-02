@@ -31,7 +31,7 @@ module "bastion_linux" {
   environment        = local.environment
   region             = "eu-west-2"
   # Autoscaling
-  autoscaling_cron   = local.crontab
+  autoscaling_cron = local.crontab
 
   # Tags
   tags_common = local.tags
