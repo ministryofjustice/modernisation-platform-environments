@@ -40,12 +40,15 @@ sed -i 's/^region = .*/region = eu-west-2/g' /etc/awslogs/awscli.conf
 sudo systemctl start awslogsd
 sudo systemctl enable awslogsd.service
 systemctl enable docker
+
 # Cloudwatch Agent
 amazon-linux-extras install collectd
 yum install -y amazon-cloudwatch-agent
 aws s3 cp s3://modernisation-platform-software20230224000709766100000001/laa-platform/cloudwatch-agent-config/config.json /opt/aws/amazon-cloudwatch-agent/bin/.
-amazon-cloudwatch-agent-ctl -a stop
-amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
+if [[ -f /opt/aws/amazon-cloudwatch-agent/bin/config.json ]]; then
+  amazon-cloudwatch-agent-ctl -a stop
+  amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/bin/config.json -s
+fi
 
 # Install XDR agent stored in S3 bucket
 aws s3 cp "s3://${xdr_bucket}/cortex-agent.tar.gz" ${xdr_tar}
