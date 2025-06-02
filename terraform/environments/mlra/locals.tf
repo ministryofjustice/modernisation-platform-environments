@@ -1,7 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 
 locals {
-  env_account_id       = local.environment_management.account_ids[terraform.workspace]
+  env_account_id = local.environment_management.account_ids[terraform.workspace]
   application_test_url = "https://mlra.laa-development.modernisation-platform.service.justice.gov.uk/mlra/"
 
   # ECS local variables for ecs.tf
@@ -13,7 +13,11 @@ locals {
   alb_security_group_id = module.alb.security_group.id
 
   user_data = base64encode(templatefile("user_data.sh", {
-    app_name = local.application_name
+    app_name   = local.application_name,
+    xdr_bucket = module.xdr-agent-s3.bucket.id,
+    xdr_dir    = "/tmp/cortex-agent",
+    xdr_tar    = "/tmp/cortex-agent.tar.gz",
+    xdr_tags   = local.xdr_tags
   }))
 
   maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
@@ -35,6 +39,10 @@ locals {
   ecs_target_capacity = 100
 
   # SNS local variables for cloudwatch.tf
-  pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
+
+  xdr_tags = join(", ", [
+    upper(local.application_name), upper(local.environment), upper(var.networking[0].business-unit)
+  ])
 }
