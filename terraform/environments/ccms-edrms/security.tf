@@ -75,7 +75,7 @@ resource "aws_security_group" "cluster_ec2" {
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-ec2-sg", local.application_name, local.environment)) }
   )
-  
+
 }
 
 resource "aws_security_group_rule" "cluster_ec2_ingress_22" {
@@ -85,7 +85,7 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_22" {
   protocol          = "TCP"
   from_port         = 22
   to_port           = 22
-  cidr_blocks       = local.application_data.accounts[local.environment].aws_workspace
+  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace]
 }
 
 resource "aws_security_group_rule" "cluster_ec2_ingress_7001" {
@@ -115,7 +115,7 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_lb" {
   protocol          = "TCP"
   from_port         = 0
   to_port           = 65535
-  cidr_blocks       = aws_security_group.load_balancer.id # Allow the LB to access the EC2 instances
+  cidr_blocks       = [aws_security_group.load_balancer.id] # Allow the LB to access the EC2 instances
 }
 
 resource "aws_security_group_rule" "cluster_ec2_egress_all" {

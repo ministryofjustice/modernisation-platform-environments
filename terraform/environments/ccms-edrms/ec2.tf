@@ -62,7 +62,7 @@ resource "aws_launch_template" "ec2-launch-template" {
 resource "aws_autoscaling_group" "cluster-scaling-group" {
   name                = "${local.application_name}-auto-scaling-group"
   vpc_zone_identifier = data.aws_subnets.shared-private.ids
-  desired_capacity    = local.application_data.accounts[local.environment].ec2_desired_capacity
+  desired_capacity    = 2
   max_size            = 3
   min_size            = 2
 
