@@ -90,7 +90,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   runtime       = "python3.7"
   timeout       = 300
   memory_size   = 256
-  filename         = "ftp-client.zip"
+  # filename         = "ftp-client.zip"
   # source_code_hash = filebase64sha256(data.archive_file.ftp_zip.output_path)
   s3_bucket           = var.s3_bucket_ftp
   s3_key              = var.s3_object_ftp_client
