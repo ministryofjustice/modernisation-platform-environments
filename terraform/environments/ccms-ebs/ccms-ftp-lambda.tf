@@ -30,11 +30,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_enc
   }
 }
 
-resource "aws_s3_bucket" "ftp_layer_bucket" {
-  bucket = lower(format("laa-ccms-ftp-lambda-layer-%s-mp",local.environment))  # ccms inbound bucket
-
-}
-
 
 #LAA-ftp-allpay-inbound-ccms
 module "ftp_lambda" {
@@ -63,4 +58,5 @@ module "ftp_lambda" {
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
   ssh_key_path        = ""
+  env                 = local.environment
 }

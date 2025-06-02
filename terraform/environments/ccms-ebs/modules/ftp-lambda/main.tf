@@ -71,6 +71,13 @@ data "archive_file" "ftpclientlibs_zip" {
   output_path = "${path.module}/lambda/ftpclientlibs.zip"
 }
 
+
+resource "aws_s3_bucket" "ftp_layer_bucket" {
+  bucket = lower(format("laa-ccms-ftp-lambda-layer-%s-mp",var.env))  # ccms inbound bucket
+
+}
+
+
 resource "aws_s3_object" "ftp_lambda_layer_s3" {
   bucket = aws_s3_bucket.ftp_layer_bucket.bucket
   key    = data.archive_file.ftpclientlibs_zip.output_path

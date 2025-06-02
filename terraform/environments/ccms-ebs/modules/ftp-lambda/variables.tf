@@ -25,3 +25,4 @@ variable "ftp_bucket" {}
 variable "sns_topic_sev5" {}
 variable "sns_topic_ops" {}
 variable "ssh_key_path" {}
+variable "env" {}
