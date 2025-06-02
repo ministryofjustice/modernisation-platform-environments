@@ -4,7 +4,7 @@ module "cur_v2_hourly" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.3.0"
+  version = "4.10.0"
 
   bucket = "cur-v2-hourly"
 
@@ -26,7 +26,7 @@ module "gpx_output_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.3.0"
+  version = "4.10.0"
 
   bucket = "gpx-cur-output-bucket"
 
@@ -50,7 +50,7 @@ module "github_repos_tfstate_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.3.0"
+  version = "4.10.0"
 
   bucket = "github-repos-tfstate-bucket"
 
@@ -74,7 +74,7 @@ module "auth0_tfstate_bucket" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.3.0"
+  version = "4.10.0"
 
   bucket = "auth0-tfstate-bucket"
 
