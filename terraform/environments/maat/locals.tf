@@ -35,7 +35,5 @@ locals {
   lbs_domain_type_main   = [for k, v in local.lbs_domain_types : v.type if k == local.cloudfront_domain]
   lbs_domain_type_sub    = [for k, v in local.lbs_domain_types : v.type if k != "modernisation-platform.service.justice.gov.uk"]
 
-
-
-
+  xdr_tags = join(", ", [upper(local.application_name), upper(local.environment), upper(var.networking[0].business-unit)])
 }
