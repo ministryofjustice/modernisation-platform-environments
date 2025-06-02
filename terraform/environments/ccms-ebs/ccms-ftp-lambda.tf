@@ -31,6 +31,25 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_enc
 }
 
 
+resource "aws_s3_bucket" "ftp_bucket" {
+  bucket = lower(format("laa-ccms-ftp-lambda-%s-mp",local.environment))  # ccms lambda bucket
+
+}
+
+
+resource "aws_s3_object" "ftp_lambda_layer" {
+  bucket = aws_s3_bucket.ftp_bucket.bucket
+  key    = "lambda/ftpclientlibs.zip"
+  source = "lambda/ftpclientlibs.zip"
+}
+
+resource "aws_s3_object" "ftp_client" {
+  bucket = aws_s3_bucket.ftp_bucket.bucket
+  key    = "lambda/ftp-client.zip"
+  source = "lambda/ftp-client.zip"
+}
+
+
 #LAA-ftp-allpay-inbound-ccms
 module "ftp_lambda" {
   source              = "./modules/ftp-lambda"
@@ -59,4 +78,8 @@ module "ftp_lambda" {
   sns_topic_ops       = ""
   ssh_key_path        = ""
   env                 = local.environment
+  s3_bucket_ftp       = aws_s3_bucket.ftp_bucket.bucket
+  s3_object_ftp_client= aws_s3_object.ftp_client.key
+  s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
+
 }

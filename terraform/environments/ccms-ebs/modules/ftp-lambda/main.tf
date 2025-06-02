@@ -59,40 +59,30 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
 
-data "archive_file" "ftp_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda"
-  output_path = "${path.module}/lambda/ftp-client.zip"
-}
+# data "archive_file" "ftp_zip" {
+#   type        = "zip"
+#   source_dir  = "${path.module}/lambda"
+#   output_path = "${path.module}/lambda/ftp-client.zip"
+# }
 
-data "archive_file" "ftpclientlibs_zip" {
-  type        = "zip"
-  source_dir  = "${path.module}/lambda"
-  output_path = "${path.module}/lambda/ftpclientlibs.zip"
-}
-
-
-resource "aws_s3_bucket" "ftp_layer_bucket" {
-  bucket = lower(format("laa-ccms-ftp-lambda-layer-%s-mp",var.env))  # ccms inbound bucket
-
-}
+# data "archive_file" "ftpclientlibs_zip" {
+#   type        = "zip"
+#   source_dir  = "${path.module}/lambda"
+#   output_path = "${path.module}/lambda/ftpclientlibs.zip"
+# }
 
 
-resource "aws_s3_object" "ftp_lambda_layer_s3" {
-  bucket = aws_s3_bucket.ftp_layer_bucket.bucket
-  key    = "${path.module}/lambda/ftpclientlibs.zip"
-  source = "${path.module}/lambda/ftpclientlibs.zip"
-}
+
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name          = "ftpclientlibs"
   compatible_runtimes = ["python3.7"]
-  s3_bucket           = aws_s3_bucket.ftp_layer_bucket.bucket
-  s3_key              = aws_s3_object.ftp_lambda_layer_s3.key
+  s3_bucket           = var.s3_bucket_ftp
+  s3_key              = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ccms ebs ftp lambda"
 
-  depends_on = [aws_s3_object.ftp_lambda_layer_s3]
+  depends_on = [aws_s3_object.ftp_lambda_s3]
 }
 #### lambda function for ftp inbound
 resource "aws_lambda_function" "ftp_lambda" {
@@ -103,7 +93,9 @@ resource "aws_lambda_function" "ftp_lambda" {
   timeout       = 300
   memory_size   = 256
   filename         = "ftp-client.zip"
-  source_code_hash = filebase64sha256(data.archive_file.ftp_zip.output_path)
+  # source_code_hash = filebase64sha256(data.archive_file.ftp_zip.output_path)
+  s3_bucket           = var.s3_bucket_ftp
+  s3_key              = var.s3_object_ftp_client
   layers        = [aws_lambda_layer_version.ftp_layer.arn]
 
   vpc_config {

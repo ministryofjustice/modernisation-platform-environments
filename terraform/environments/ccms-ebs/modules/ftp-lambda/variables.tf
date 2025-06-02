@@ -26,3 +26,6 @@ variable "sns_topic_sev5" {}
 variable "sns_topic_ops" {}
 variable "ssh_key_path" {}
 variable "env" {}
+variable "s3_bucket_ftp" {}
+variable "s3_object_ftp_client" {}
+variable "s3_object_ftp_clientlibs" {}
