@@ -35,6 +35,15 @@ resource "aws_s3_bucket" "ftp_bucket" {
   bucket = lower(format("laa-ccms-ftp-lambda-%s-mp",local.environment))  # ccms lambda bucket
 
 }
+resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption_ftp_lambda" {
+  bucket = aws_s3_bucket.ftp_bucket.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
 
 
 resource "aws_s3_object" "ftp_lambda_layer" {
