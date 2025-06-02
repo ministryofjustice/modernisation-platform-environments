@@ -86,6 +86,15 @@ resource "aws_vpc_security_group_ingress_rule" "db_lambda" {
   to_port                      = 22
 }
 
+resource "aws_vpc_security_group_ingress_rule" "db_bastion" {
+  security_group_id            = aws_security_group.database.id
+  description                  = "Allow Bastion SSH access"
+  referenced_security_group_id = module.bastion_linux.bastion_security_group
+  from_port                    = 22
+  ip_protocol                  = "tcp"
+  to_port                      = 22
+}
+
 resource "aws_vpc_security_group_ingress_rule" "db_workspace" {
   security_group_id = aws_security_group.database.id
   description       = "Database listener port access to Workspaces"
