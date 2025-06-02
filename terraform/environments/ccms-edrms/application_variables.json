@@ -4,7 +4,7 @@
       "app_name": "ccms-edrms",
       "aws_region": "eu-west-2",
       "ami_image_id": "ami-0d6d764bbe794b8ca",
-      "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/edrms",
+      "app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/ccms-edrms",
       "container_version": "latest",
       "ec2_instance_type": "m5.large",
       "app_count": "1",
