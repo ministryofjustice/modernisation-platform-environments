@@ -27,9 +27,8 @@ resource "aws_cloudwatch_log_resource_policy" "ad-log-policy" {
   policy_name     = "${var.project_name}-ad-log-policy"
 }
 
-/*
+
 resource "aws_directory_service_log_subscription" "ad-log-policy" {
   directory_id   = aws_directory_service_directory.ds_managed_ad.id
   log_group_name = aws_cloudwatch_log_group.ds.name
 }
-*/
