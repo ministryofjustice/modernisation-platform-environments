@@ -40,6 +40,25 @@ resource "aws_ses_configuration_set" "default_configuration_set" {
   }
   reputation_metrics_enabled = true
   sending_enabled            = true
+
+  tags = merge(local.tags,
+    { "ses:region" = data.aws_region.current.id },
+    { "laa:environment" = "${local.environment}" }
+  )
+}
+
+resource "aws_ses_event_destination" "cloudwatch" {
+  name                   = "ses-default-${local.environment}"
+  configuration_set_name = aws_ses_configuration_set.default_configuration_set.name
+  enabled                = true
+  matching_types         = ["bounce", "click", "complaint", "delivery", "open", "reject", "renderingFailure", "send"]
+
+  cloudwatch_destination {
+    default_value  = aws_ses_configuration_set.default_configuration_set.name
+    dimension_name = "ses:configuration-set"
+    value_source   = "messageTag"
+  }
+
 }
 
 # TO DO: Kinesis configuration (including S3 bucket, IAM role and policy, ...).
