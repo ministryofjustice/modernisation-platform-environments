@@ -184,7 +184,7 @@ resource "aws_security_group_rule" "cluster_ec2_admin_egress_all" {
 }
 
 resource "aws_security_group" "cluster_ec2_managed" {
-  name        = "${local.application_data.accounts[local.environment].app_name}-cluster-ec2-admin"
+  name        = "${local.application_data.accounts[local.environment].app_name}-cluster-ec2-managed"
   description = "Controls Traffic to Managed EC2 Instances"
   vpc_id      = data.aws_vpc.shared.id
 }
