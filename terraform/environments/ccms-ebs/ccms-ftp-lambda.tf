@@ -19,6 +19,7 @@ resource "aws_s3_bucket" "inbound_bucket" {
 
 }
 
+
 resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption" {
   bucket = aws_s3_bucket.inbound_bucket.id
 
@@ -27,6 +28,11 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_enc
       sse_algorithm = "AES256"
     }
   }
+}
+
+resource "aws_s3_bucket" "ftp_layer_bucket" {
+  bucket = lower(format("laa-ccms-ftp-lambda-layer-%s-mp",local.environment))  # ccms inbound bucket
+
 }
 
 

@@ -71,12 +71,18 @@ data "archive_file" "ftpclientlibs_zip" {
   output_path = "${path.module}/lambda/ftpclientlibs.zip"
 }
 
+resource "aws_s3_object" "ftp_lambda_layer_s3" {
+  bucket = aws_s3_bucket.ftp_layer_bucket.bucket
+  key    = data.archive_file.ftpclientlibs_zip.output_path
+  source = data.archive_file.ftpclientlibs_zip.output_path
+}
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name          = "ftpclientlibs"
   compatible_runtimes = ["python3.7"]
   filename            = "ftpclientlibs.zip"
-  source_code_hash = filebase64sha256(data.archive_file.ftpclientlibs_zip.output_path)
+  s3_bucket           = aws_s3_bucket.ftp_layer_bucket.bucket
+  s3_key              = aws_s3_object.ftp_lambda_layer_s3.key
 }
 #### lambda function for ftp inbound
 resource "aws_lambda_function" "ftp_lambda" {
@@ -87,7 +93,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   timeout       = 300
   memory_size   = 256
   filename         = "ftp-client.zip"
-  source_code_hash = filebase64sha256(data.archive_file.ftpclientlibs_zip.output_path)
+  source_code_hash = filebase64sha256(data.archive_file.ftp_zip.output_path)
   layers        = [aws_lambda_layer_version.ftp_layer.arn]
 
   vpc_config {
