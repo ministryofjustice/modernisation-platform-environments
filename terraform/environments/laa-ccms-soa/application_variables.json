@@ -29,7 +29,7 @@
       "managed_container_memory": "7680",
       "managed_app_image": "374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed",
       "managed_server_port": "8001",
-      "app_count_managed": "2",
+      "app_count_managed": "1",
       "managed_container_version": "latest",
       "managed_wl_mem_args": " -Xms2048m -Xmx2048m ",
       "managed_hostname": "ccms-soa-managed",
