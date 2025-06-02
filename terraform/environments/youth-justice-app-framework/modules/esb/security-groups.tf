@@ -54,3 +54,14 @@ resource "aws_security_group_rule" "tableau_to_esb_ssh" {
   source_security_group_id = var.tableau_sg_id
   description              = "tableau to esb ssh temp"
 }
+
+#YJSM to ECS
+resource "aws_security_group_rule" "yjsm_to_ecsint_rule" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = var.ecs_service_internal_sg_id
+  source_security_group_id = aws_security_group.esb_service.id
+  description              = "ESB to ECS int communication"
+}
