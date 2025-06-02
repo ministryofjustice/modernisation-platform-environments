@@ -1,8 +1,42 @@
-
+locals {
+  secret_names = [
+    "LAA-ftp-cds-cis-pay-outbound",
+    "LAA-ftp-allpay-inbound-ccms",
+    "LAA-ftp-cds-ccms-outbound",
+    "LAA-ftp-tdx-inbound-ccms-agencyassigmen",
+    "LAA-ftp-rossendales-ccms-csv-inbound",
+    "LAA-ftp-rossendales-maat-inbound",
+    "LAA-ftp-tdx-inbound-ccms-activity",
+    "LAA-ftp-tdx-inbound-ccms-transaction",
+    "LAA-ftp-xerox-cis-outbound",
+    "LAA-ftp-tdx-inbound-ccms-livelist",
+    "LAA-ftp-tdx-inbound-ccms-multiplefiles",
+    "LAA-ftp-xerox-ccms-outbound-peterboroug",
+    "LAA-ftp-xerox-cis-pay-outbound",
+    "LAA-ftp-rossendales-ccms-inbound",
+    "LAA-ftp-1stlocate-ccms-outbound",
+    "LAA-ftp-tdx-inbound-ccms-agencyrecallre",
+    "LAA-ftp-cds-cis-outbound",
+    "LAA-ftp-rossendales-maat-outbound",
+    "LAA-ftp-tdx-inbound-ccms-nonfinancialup",
+    "LAA-ftp-xerox-ccms-outbound",
+    "LAA-ftp-xerox-maat-outbound",
+    "LAA-ftp-allpay-outbound-ccms",
+    "LAA-ftp-tdx-inbound-ccms-exceptionnotif",
+    "LAA-ftp-eckoh-inbound-ccms",
+    "LAA-ftp-1stlocate-ccms-inbound",
+    "LAA-ftp-rossendales-nct-inbound-product",
+    "LAA-ftp-eckoh-outbound-ccms",
+    "LAA-ftp-cds-maat-outbound",
+    "LAA-ftp-cds-ccms-outbound-peterborough",
+    "LAA-ftp-tdx-outbound-ccms"
+  ]
+}
 ### secrets for ftp user and password
-resource "aws_secretsmanager_secret" "ftp_credentials" {
-  name        = lower(format("laa-ccms-ebs-ftp-credentials-%s",local.environment))
-  description = "A secret for storing ftp credentials"
+resource "aws_secretsmanager_secret" "secrets" {
+  for_each = toset(local.secret_names)
+
+  name = "${each.value}-${local.environment}"
 }
 
 
