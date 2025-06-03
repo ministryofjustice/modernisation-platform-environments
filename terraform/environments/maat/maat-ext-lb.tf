@@ -13,7 +13,7 @@ locals {
 
 module "lb-s3-access-logs" {
   count  = local.existing_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
 
   providers = {
     aws.bucket-replication = aws
@@ -132,7 +132,7 @@ resource "aws_lb" "external" {
   subnets                    = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
   enable_deletion_protection = local.application_data.accounts[local.environment].ext_lb_enable_deletion_protection
   idle_timeout               = local.external_lb_idle_timeout
-  drop_invalid_header_fields = false
+  drop_invalid_header_fields = true
 
   access_logs {
     bucket  = local.existing_bucket_name != "" ? local.existing_bucket_name : module.lb-s3-access-logs[0].bucket.id
