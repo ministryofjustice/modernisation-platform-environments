@@ -16,12 +16,65 @@ locals {
     "LAA-ftp-1stlocate-ccms-inbound",
     "LAA-ftp-rossendales-nct-inbound-product"
   ]
+  base_buckets = ["laa-ccms-inbound", "laa-ccms-outbound", "laa-ccms-ftp-lambda"]
+
+  bucket_names = [
+    for name in local.base_buckets : "${name}-${local.environment}-mp"
+  ]
 }
+
 ### secrets for ftp user and password
 resource "aws_secretsmanager_secret" "secrets" {
   for_each = toset(local.secret_names)
 
   name = "${each.value}-${local.environment}"
+}
+
+data "aws_secretsmanager_secret_version" "secrets" {
+  for_each  = toset(local.secret_names)
+  secret_id = "${each.value}-${local.environment}"
+}
+
+resource "aws_s3_bucket" "buckets" {
+  for_each = toset(local.bucket_names)
+
+  bucket = each.value
+
+  tags = {
+    Name        = each.value
+    Environment = local.environment
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
+  for_each = aws_s3_bucket.buckets
+
+  bucket = each.value.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+
+
+
+locals {
+  secrets_map = {
+    for name in local.secret_names :
+    name => jsondecode(data.aws_secretsmanager_secret_version.secrets[name].secret_string)
+  }
+
+  # Optionally extract just user/password maps
+  credentials_map = {
+    for name, creds in local.secrets_map :
+    name => {
+      user     = creds.USER
+      password = creds.PASSWORD
+    }
+  }
 }
 
 
@@ -77,14 +130,15 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_enc
 }
 
 
+
 resource "aws_s3_object" "ftp_lambda_layer" {
-  bucket = aws_s3_bucket.ftp_bucket.bucket
+  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   key    = "lambda/ftpclientlibs.zip"
   source = "lambda/ftpclientlibs.zip"
 }
 
 resource "aws_s3_object" "ftp_client" {
-  bucket = aws_s3_bucket.ftp_bucket.bucket
+  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   key    = "lambda/ftp-client.zip"
   source = "lambda/ftp-client.zip"
 }
@@ -110,16 +164,16 @@ module "allpay_ftp_lambda_inbound" {
   ftp_cert            = ""
   ftp_key             = ""
   ftp_key_type        = ""
-  ftp_user            = ""
-  ftp_password_path   = ""
+  ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
+  ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
-  ftp_bucket          = aws_s3_bucket.inbound_bucket.id
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.id
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
   ssh_key_path        = ""
   env                 = local.environment
-  s3_bucket_ftp       = aws_s3_bucket.ftp_bucket.bucket
+  s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_client= aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
 
@@ -145,16 +199,16 @@ module "allpay_ftp_lambda_outbound" {
   ftp_cert            = ""
   ftp_key             = ""
   ftp_key_type        = ""
-  ftp_user            = ""
-  ftp_password_path   = ""
+  ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
+  ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
-  ftp_bucket          = aws_s3_bucket.outbound_bucket.id
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket.id
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
   ssh_key_path        = ""
   env                 = local.environment
-  s3_bucket_ftp       = aws_s3_bucket.ftp_bucket.bucket
+  s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_client= aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
 

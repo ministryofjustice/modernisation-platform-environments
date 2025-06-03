@@ -1,3 +1,4 @@
+
 ## sg for ftp
 resource "aws_security_group" "ftp_sg" {
   name        = "${var.lambda_name}-sg"
