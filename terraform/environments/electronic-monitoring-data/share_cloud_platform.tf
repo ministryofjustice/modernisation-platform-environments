@@ -1,13 +1,15 @@
 locals {
   env_ = "${local.environment_shorthand}_"
   iam-dev = local.environment_shorthand == "dev" ? [
-    var.cloud-platform-iam-dev
+    var.cloud-platform-iam-dev,
+    var.cloud-platform-crime-matching-iam-dev
   ] : null
 
   iam-test = local.environment_shorthand == "test" ? [
     var.cloud-platform-iam-dev,
     var.cloud-platform-iam-preprod,
-    var.cloud-platform-iam-prod
+    var.cloud-platform-iam-prod,
+    var.cloud-platform-crime-matching-iam-dev
   ] : null
 
   iam-preprod = local.environment_shorthand == "preprod" ? [
@@ -92,6 +94,12 @@ variable "cloud-platform-iam-prod" {
   default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-7a81f92a48491ef0-live"
 }
 
+variable "cloud-platform-crime-matching-iam-dev" {
+  type        = string
+  description = "IAM role that the crime matching API in Cloud Platform will use to connect to this role."
+  default     = "arn:aws:iam::754256621582:role/cloud-platform-irsa-6e3937460af175fd-live"
+}
+
 resource "aws_lakeformation_resource" "data_bucket" {
   arn = module.s3-create-a-derived-table-bucket.bucket.arn
 }
@@ -138,10 +146,10 @@ module "specials_cmt_front_end_assumable_role" {
 module "share_data_marts" {
   source = "./modules/lakeformation_w_data_filter"
 
-  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters           = local.table_filters
-  database_name           = "historic_api_mart"
-  extra_arns              = [
+  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters = local.table_filters
+  database_name = "historic_api_mart"
+  extra_arns = [
     try(one(data.aws_iam_roles.mod_plat_roles.arns)),
     data.aws_iam_role.github_actions_role.arn,
     data.aws_iam_session_context.current.issuer_arn
@@ -153,10 +161,10 @@ module "share_data_marts" {
 module "share_specials_data_marts" {
   source = "./modules/lakeformation_w_data_filter"
 
-  count                   = local.is-development ? 0 : local.is-preproduction ? 0 : 1
-  table_filters           = local.specials_table_filters
-  database_name           = "historic_api_mart"
-  extra_arns              = [
+  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters = local.specials_table_filters
+  database_name = "historic_api_mart"
+  extra_arns = [
     try(one(data.aws_iam_roles.mod_plat_roles.arns)),
     data.aws_iam_role.github_actions_role.arn,
     data.aws_iam_session_context.current.issuer_arn

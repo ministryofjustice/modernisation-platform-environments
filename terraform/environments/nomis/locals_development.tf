@@ -31,6 +31,25 @@ locals {
       }
     }
 
+    backup_plans = {
+      # delete once qa11g-nomis-web12-a removed
+      qa11g-nomis-web12-a-workaround = {
+        rule = {
+          schedule          = "cron(30 23 ? * MON-FRI *)"
+          start_window      = 60
+          completion_window = 3600
+          delete_after      = 10
+        }
+        selection = {
+          selection_tags = [{
+            type  = "STRINGEQUALS"
+            key   = "server-name"
+            value = "qa11g-nomis-web12-a"
+          }]
+        }
+      }
+    }
+
     cloudwatch_dashboards = {
       "CloudWatch-Default" = {
         periodOverride = "auto"
@@ -119,18 +138,9 @@ locals {
         })
       })
 
-      dev-nomis-web19c-a = merge(local.ec2_autoscaling_groups.web19c, {
-      })
-
-      dev-nomis-web19c-b = merge(local.ec2_autoscaling_groups.web19c, {
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.web19c.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-      })
-
+      # remember to delete associated backup plan
       qa11g-nomis-web12-a = merge(local.ec2_autoscaling_groups.web12, {
+        autoscaling_schedules = {}
         config = merge(local.ec2_autoscaling_groups.web12.config, {
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2Qa11GWeblogicPolicy",
@@ -190,34 +200,6 @@ locals {
         })
         tags = merge(local.ec2_instances.db.tags, {
           description         = "syscon nomis dev and qa databases"
-          instance-scheduling = "skip-scheduling"
-          nomis-environment   = "dev"
-          oracle-sids         = ""
-          update-ssm-agent    = "patchgroup2"
-        })
-      })
-
-      dev-nomis-db-1-b = merge(local.ec2_instances.db, {
-        config = merge(local.ec2_instances.db.config, {
-          ami_name          = "nomis_rhel_7_9_oracledb_11_2_release_2023-07-02T00-00-39.521Z"
-          availability_zone = "eu-west-2b"
-          instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
-            "Ec2DevDatabasePolicy",
-          ])
-        })
-        ebs_volumes = merge(local.ec2_instances.db.ebs_volumes, {
-          "/dev/sdb" = { label = "app", size = 100 }
-          "/dev/sdc" = { label = "app", size = 100 }
-        })
-        ebs_volume_config = merge(local.ec2_instances.db.ebs_volume_config, {
-          data  = { total_size = 500 }
-          flash = { total_size = 50 }
-        })
-        instance = merge(local.ec2_instances.db.instance, {
-          disable_api_termination = true
-        })
-        tags = merge(local.ec2_instances.db.tags, {
-          description         = "for testing oracle19c upgrade"
           instance-scheduling = "skip-scheduling"
           nomis-environment   = "dev"
           oracle-sids         = ""
@@ -312,6 +294,7 @@ locals {
         })
       })
 
+      # built by code and then handed over to Syscon for remaining manual configuration
       qa11g-nomis-web12-b = merge(local.ec2_instances.web12, {
         config = merge(local.ec2_instances.web12.config, {
           availability_zone = "eu-west-2b"
@@ -321,7 +304,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_instances.web12.user_data_cloud_init, {
           args = merge(local.ec2_instances.web12.user_data_cloud_init.args, {
-            branch = "TM-1185/nomis-web12-manual-build"
+            branch = "main"
           })
         })
         tags = merge(local.ec2_instances.web12.tags, {
@@ -500,34 +483,6 @@ locals {
                   }
                 }]
               }
-              dev-nomis-web19c-a-http-7777 = {
-                priority = 400
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "dev-nomis-web19c-a-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "dev-nomis-web19c-a.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
-              dev-nomis-web19c-b-http-7777 = {
-                priority = 410
-                actions = [{
-                  type              = "forward"
-                  target_group_name = "dev-nomis-web19c-b-http-7777"
-                }]
-                conditions = [{
-                  host_header = {
-                    values = [
-                      "dev-nomis-web19c-b.development.nomis.service.justice.gov.uk",
-                    ]
-                  }
-                }]
-              }
               qa11g-nomis-web12-a-http-7777 = {
                 priority = 500
                 actions = [{
@@ -592,8 +547,6 @@ locals {
           { name = "qa11r-nomis-web-b", type = "A", lbs_map_key = "private" },
           { name = "c-qa11r", type = "A", lbs_map_key = "private" },
           # weblogic 12
-          { name = "dev-nomis-web19c-a", type = "A", lbs_map_key = "private" },
-          { name = "dev-nomis-web19c-b", type = "A", lbs_map_key = "private" },
           { name = "qa11g-nomis-web12-a", type = "A", lbs_map_key = "private" },
         ]
       }

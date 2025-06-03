@@ -117,8 +117,8 @@ variable "retry_failed_after_recreate_metadata" {
 }
 
 variable "write_metadata_to_glue_catalog" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = "Whether to write metadata to glue catalog"
 }
 
@@ -129,8 +129,8 @@ variable "valid_files_mutable" {
 }
 
 variable "create_ancillary_static_roles" {
-  type = bool
-  default = true
+  type        = bool
+  default     = true
   description = <<EOF
     AWS DMS requires roles of a specific name to be created for vpc/cloudwatch, which can cause
     issues if two or more invocations of this module live in the same environment.

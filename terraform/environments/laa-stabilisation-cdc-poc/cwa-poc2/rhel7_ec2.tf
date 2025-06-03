@@ -102,7 +102,7 @@ resource "aws_instance" "rhel7_instance_1" {
   user_data_replace_on_change = false
 
   root_block_device {
-    encrypted = true
+    encrypted  = true
     kms_key_id = var.shared_ebs_kms_key_id
     tags = merge(
       { "instance-scheduling" = "skip-scheduling" },

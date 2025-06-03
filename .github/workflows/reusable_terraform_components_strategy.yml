@@ -84,17 +84,24 @@ jobs:
           echo "[" > final-list.json
           firstEntry=true
 
+          # Track component-environment pairs instead of just components
+          seen_pairs=()
+
           while IFS= read -r envobj; do
             for comp in $COMPONENTS; do
               if [ "$comp" = "root" ]; then
                 folder="$app_dir"
-                # For "root", only count changes to files directly in the app folder.
+                # For "root", count changes to any files directly in the app folder.
                 if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
                   merge_base=$(git merge-base origin/main "$head_commit")
                   changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$folder")
                 else
                   changed_files=$(git diff --name-only HEAD~1 HEAD -- "$folder")
                 fi
+
+                echo "Changed files in 'root': $changed_files"
+
+                # Check for top-level changes in the root folder.
                 top_level_changed=false
                 prefix="$folder/"
                 for f in $changed_files; do
@@ -106,10 +113,13 @@ jobs:
                     break
                   fi
                 done
+
                 if ! $top_level_changed; then
-                  echo "No top-level changes in '$folder'; skipping 'root'"
+                  echo "No top-level changes in 'root'; skipping 'root'."
                   continue
                 fi
+
+                echo "Including 'root' in the matrix due to top-level changes."
               else
                 # For non-root components, use the standard diff check.
                 folder="$app_dir/$comp"
@@ -127,7 +137,15 @@ jobs:
                 fi
               fi
 
-              # Add an entry for this component if changes are detected.
+              target=$(echo "$envobj" | jq -r '.target')
+              pair="${comp}_${target}"
+
+              if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                echo "Component-target pair '${pair}' is already in the matrix; skipping."
+                continue
+              fi
+
+              seen_pairs+=("$pair")
               if [ "$firstEntry" = true ]; then
                 firstEntry=false
               else
@@ -136,10 +154,94 @@ jobs:
               echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
             done
           done < envlist.json
+
+          # --------------------------------------------------------------------
+          # 5. Detect changes in the "modules" folder and update the matrix.
+          # --------------------------------------------------------------------
+
+          # Check for changes in the modules directory.
+          modules_dir="terraform/environments/${{ inputs.application }}/modules"
+          changed_modules=()
+          if [ -d "$modules_dir" ]; then
+            if [[ "${GITHUB_REF}" != "refs/heads/main" ]]; then
+              merge_base=$(git merge-base origin/main "$head_commit")
+              changed_files=$(git diff --name-only "$merge_base" "$head_commit" -- "$modules_dir")
+            else
+              changed_files=$(git diff --name-only HEAD~1 HEAD -- "$modules_dir")
+            fi
+
+            for f in $changed_files; do
+              module_name=$(dirname "${f#$modules_dir/}" | cut -d'/' -f1)
+              if [[ ! " ${changed_modules[@]} " =~ " ${module_name} " ]]; then
+                changed_modules+=("$module_name")
+              fi
+            done
+          fi
+
+          if [ ${#changed_modules[@]} -eq 0 ]; then
+            echo "No changes detected in modules."
+          else
+            echo "Changes detected in modules: ${changed_modules[@]}"
+          fi
+
+          # Identify components referencing the changed modules.
+          referencing_components=()
+          for module in "${changed_modules[@]}"; do
+            for comp in $COMPONENTS; do
+              if [ "$comp" = "root" ]; then
+                folder="$app_dir"
+                echo "Checking for module '$module' references in component '$comp'"
+                
+                if grep -qE "source.*=.*(\"modules/$module\"|\"./modules/$module\")" "$folder"/*.tf 2>/dev/null; then
+                  echo "Found module '$module' reference in root"
+                  referencing_components+=("$comp")
+                fi
+              else
+                folder="$app_dir/$comp"
+                echo "Checking for module '$module' references in component '$comp'"
+
+                if grep -qE "source.*=.*\"../modules/$module\"" "$folder"/*.tf 2>/dev/null; then
+                  echo "Found module '$module' reference in component '$comp'"
+                  referencing_components+=("$comp")
+                fi
+              fi
+            done
+          done
+
+          if [ ${#referencing_components[@]} -eq 0 ]; then
+            echo "No components referencing changed modules."
+          else
+            echo "Components referencing changed modules: ${referencing_components[@]}"
+          fi
+
+          # Append referencing components to the matrix.
+          while IFS= read -r envobj; do
+            for comp in "${referencing_components[@]}"; do
+              target=$(echo "$envobj" | jq -r '.target')
+              pair="${comp}_${target}"
+
+              if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                echo "Component-target pair '${pair}' is already in the matrix; skipping."
+                continue
+              fi
+
+              echo "Including '${comp}' because it references a changed module."
+              seen_pairs+=("$pair")
+
+              if $firstEntry; then
+                firstEntry=false
+              else
+                echo "," >> final-list.json
+              fi
+              echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp}' >> final-list.json
+            done
+          done < envlist.json
+
+          # Ensure the JSON array is properly closed.
           echo "]" >> final-list.json
 
           # --------------------------------------------------------------------
-          # 5. Wrap the JSON array in a matrix object.
+          # 6. Wrap the JSON array in a matrix object.
           # --------------------------------------------------------------------
           echo -n '{"include":' > matrix.out
           cat final-list.json >> matrix.out
@@ -150,7 +252,7 @@ jobs:
           echo "$matrix"
 
           # --------------------------------------------------------------------
-          # 6. Output the matrix for subsequent jobs.
+          # 7. Output the matrix for subsequent jobs.
           # --------------------------------------------------------------------
           echo 'matrix<<EOF' >> $GITHUB_OUTPUT
           echo "${matrix}" >> $GITHUB_OUTPUT

@@ -2,67 +2,118 @@ locals {
   ip_set_list = [for ip in split("\n", chomp(file("${path.module}/waf_ip_set.txt"))) : ip]
 }
 
-resource "aws_waf_ipset" "allow" {
-  name = "${upper(local.application_name)} Manual Allow Set"
+resource "aws_wafv2_ip_set" "wafmanualallowset" {
+  name = "${upper(local.application_name)}-manual-allow-set"
 
-  # Ranges from https://github.com/ministryofjustice/moj-ip-addresses/blob/master/moj-cidr-addresses.yml
-  # disc_internet_pipeline, disc_dom1, moj_digital_wifi, petty_france_office365, petty_france_wifi, ark_internet, gateway_proxies
+  # Ranges from https://github.com/ministryofjustice/laa-apex/blob/master/aws/application/application_stack.template
+  # removed redundant ip addresses such as RedCentric access and AWS Holborn offices Wifi
 
-  # TODO Note that there are CodeBuild IP Addresses here, which may not be required if CodeBuild is no longer needed for the testing
-
-  dynamic "ip_set_descriptors" {
-    for_each = local.ip_set_list
-    content {
-      type  = "IPV4"
-      value = ip_set_descriptors.value
-    }
-  }
+  scope              = "CLOUDFRONT"
+  provider           = aws.us-east-1
+  ip_address_version = "IPV4"
+  description        = "Manual Allow Set for ${local.application_name} WAF"
+  addresses          = local.ip_set_list
 }
 
-resource "aws_waf_ipset" "block" {
-  name = "${upper(local.application_name)} Manual Block Set"
+resource "aws_wafv2_ip_set" "wafmanualblockset" {
+  name               = "${upper(local.application_name)}-manual-block-set"
+  scope              = "CLOUDFRONT"
+  provider           = aws.us-east-1
+  description        = "Manual Block Set for ${local.application_name} WAF"
+  ip_address_version = "IPV4"
+  addresses          = []
 }
 
-resource "aws_waf_rule" "allow" {
-  name        = "${upper(local.application_name)} Manual Allow Rule"
-  metric_name = "${upper(local.application_name)}ManualAllowRule"
+resource "aws_wafv2_rule_group" "manual-rules" {
+  name        = "${upper(local.application_name)}-manual-rules"
+  provider    = aws.us-east-1
+  scope       = "CLOUDFRONT" # Use "CLOUDFRONT" for CloudFront
+  capacity    = 10           # Adjust based on complexity
+  description = "Manual Allow/Block Rules for ${local.application_name}"
 
-  predicates {
-    data_id = aws_waf_ipset.allow.id
-    negated = false
-    type    = "IPMatch"
-  }
-}
-
-resource "aws_waf_rule" "block" {
-  name        = "${upper(local.application_name)} Manual Block Rule"
-  metric_name = "${upper(local.application_name)}ManualBlockRule"
-
-  predicates {
-    data_id = aws_waf_ipset.block.id
-    negated = false
-    type    = "IPMatch"
-  }
-}
-
-resource "aws_waf_web_acl" "waf_acl" {
-  name        = "${upper(local.application_name)} Whitelisting Requesters"
-  metric_name = "${upper(local.application_name)}WhitelistingRequesters"
-  default_action {
-    type = "BLOCK"
-  }
-  rules {
-    action {
-      type = "ALLOW"
-    }
+  rule {
+    name     = "AllowIPs"
     priority = 1
-    rule_id  = aws_waf_rule.allow.id
-  }
-  rules {
-    action {
-      type = "BLOCK"
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.wafmanualallowset.arn
+      }
     }
+
+    action {
+      allow {}
+    }
+
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AllowIPs"
+    }
+  }
+
+  rule {
+    name     = "BlockIPs"
     priority = 2
-    rule_id  = aws_waf_rule.block.id
+
+    statement {
+      ip_set_reference_statement {
+        arn = aws_wafv2_ip_set.wafmanualblockset.arn
+      }
+    }
+
+    action {
+      block {}
+    }
+
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "BlockIPs"
+    }
+  }
+
+  visibility_config {
+    sampled_requests_enabled   = true
+    cloudwatch_metrics_enabled = true
+    metric_name                = "ManualRulesGroup"
+  }
+}
+
+resource "aws_wafv2_web_acl" "waf_acl" {
+  name        = "${upper(local.application_name)}-Whitelisting-Requesters"
+  provider    = aws.us-east-1
+  scope       = "CLOUDFRONT" # Use "CLOUDFRONT" for CloudFront
+  description = "Web ACL for ${local.application_name}"
+
+  default_action {
+    block {}
+  }
+
+  rule {
+    name     = "ManualAllowBlockRules"
+    priority = 1
+
+    statement {
+      rule_group_reference_statement {
+        arn = aws_wafv2_rule_group.manual-rules.arn
+      }
+    }
+
+    override_action {
+      none {}
+    }
+
+    visibility_config {
+      sampled_requests_enabled   = true
+      cloudwatch_metrics_enabled = true
+      metric_name                = "ManualAllowBlockRules"
+    }
+  }
+
+  visibility_config {
+    sampled_requests_enabled   = true
+    cloudwatch_metrics_enabled = true
+    metric_name                = "${upper(local.application_name)}-Whitelisting-Requesters"
   }
 }
