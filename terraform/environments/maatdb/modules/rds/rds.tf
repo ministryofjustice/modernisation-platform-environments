@@ -13,8 +13,8 @@ locals {
   rds_sg_group_ids = compact([
     aws_security_group.cloud_platform_sec_group.id,
     aws_security_group.bastion_sec_group.id,
-    aws_security_group.vpc_sec_group.id,
-    aws_security_group.mlra_ecs_sec_group.id
+    length(aws_security_group.vpc_sec_group) > 0 ? aws_security_group.vpc_sec_group[0].id : "",
+    length(aws_security_group.mlra_ecs_sec_group) > 0 ? aws_security_group.mlra_ecs_sec_group[0].id : ""
   ])
 
 }
