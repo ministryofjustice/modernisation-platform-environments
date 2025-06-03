@@ -6,7 +6,7 @@
 resource "aws_dynamodb_table" "non_working_days" {
   name         = "${var.env_name}-non-working-days"
   billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "date"
+  hash_key     = "code_value"
 
   attribute {
     name = "code_value"
