@@ -113,7 +113,7 @@ locals {
     }
 
     oracle_observer = {
-      image_tag        = "28"
+      image_tag        = "latest"
       container_cpu    = 512
       container_memory = 1024
     }
