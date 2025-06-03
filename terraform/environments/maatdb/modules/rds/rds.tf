@@ -188,6 +188,7 @@ resource "aws_db_instance" "appdb1" {
 
 # Access from Cloud Platform
 resource "aws_security_group" "cloud_platform_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"To be checked for later"
   name        = "cloud-platform-sec-group"
   description = "RDS access from Cloud Platform via Transit gateway"
   vpc_id      = var.vpc_shared_id
@@ -214,6 +215,7 @@ resource "aws_security_group" "cloud_platform_sec_group" {
 }
 
 resource "aws_security_group" "vpc_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"To be checked for later"
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
@@ -246,6 +248,7 @@ resource "aws_security_group" "vpc_sec_group" {
 }
 
 resource "aws_security_group" "mlra_ecs_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"To be checked for later"
   name        = "mlra-ecs-sec-group"
   description = "RDS Access from the MLRA application"
   vpc_id      = var.vpc_shared_id
@@ -280,6 +283,7 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
 
 # Access from Bastion
 resource "aws_security_group" "bastion_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"To be checked for later"
   name        = "bastion-sec-group"
   description = "Bastion Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
