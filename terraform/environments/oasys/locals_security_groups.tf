@@ -115,7 +115,6 @@ locals {
       "10.40.3.0/24", # prod prison nomis
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
       module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.azure_studio_hosting_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_data_engineering_prod,
     ])
     oracle_oem_agent = flatten([
