@@ -7,8 +7,9 @@
 # Consolidate security group IDs
 locals {
 
-  ecs_cluster_sg_valid = trimspace(var.ecs_cluster_sec_group_id) != "" ? [var.ecs_cluster_sec_group_id] : []
-  mlra_ecs_cluster_sg_valid = trimspace(var.mlra_ecs_cluster_sec_group_id) != "" ? [var.mlra_ecs_cluster_sec_group_id] : []
+  # As a workaround, we use the bastion security group as the source sec group id if the variables are empty
+  ecs_cluster_sg_valid = trimspace(var.ecs_cluster_sec_group_id) != "" ? var.ecs_cluster_sec_group_id : aws_security_group.bastion_sec_group.id
+  mlra_ecs_cluster_sg_valid = trimspace(var.mlra_ecs_cluster_sec_group_id) != "" ? var.mlra_ecs_cluster_sec_group_id : aws_security_group.bastion_sec_group.id
 
   rds_sg_group_ids = compact([
     aws_security_group.cloud_platform_sec_group.id,
