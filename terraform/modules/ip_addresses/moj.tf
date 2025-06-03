@@ -69,6 +69,7 @@ locals {
     aws_data_engineering_dev          = "172.24.0.0/16"
     aws_data_engineering_prod         = "172.25.0.0/16"
     aws_data_engineering_stage        = "172.26.0.0/16"
+    aws_xsiam_prod_vpc                = "10.180.96.0/22"
   }
 
   moj_cidrs = {

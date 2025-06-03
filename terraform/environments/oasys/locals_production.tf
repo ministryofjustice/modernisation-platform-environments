@@ -242,7 +242,7 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 }  # /u01
+          "/dev/sdb" = { label = "app", size = 200 }  # /u01
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
           "/dev/sde" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
           "/dev/sdf" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
@@ -272,7 +272,7 @@ locals {
           ])
         })
         ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 }  # /u01
+          "/dev/sdb" = { label = "app", size = 200 }  # /u01
           "/dev/sdc" = { label = "app", size = 1000 } # /u02
           "/dev/sde" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
           "/dev/sdf" = { label = "data", size = 2000, iops = 12000, throughput = 750 }
@@ -327,7 +327,7 @@ locals {
           instance_type           = "r6i.xlarge"
         })
         ebs_volumes = {
-          "/dev/sdb" = { label = "app", size = 100 }   # /u01
+          "/dev/sdb" = { label = "app", size = 200 }   # /u01
           "/dev/sdc" = { label = "app", size = 500 }   # /u02
           "/dev/sde" = { label = "data", size = 300 }  # DATA01
           "/dev/sdj" = { label = "flash", size = 200 } # FLASH01

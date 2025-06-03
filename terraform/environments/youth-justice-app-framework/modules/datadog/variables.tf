@@ -72,3 +72,8 @@ variable "ecs_task_exec_iam_role_arn" {
   description = "The ARN of the IAM role for the ECS task execution"
   type        = string
 }
+
+variable "aws_account_id" {
+  description = "The AWS account ID"
+  type        = string
+}

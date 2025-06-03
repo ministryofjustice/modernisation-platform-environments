@@ -169,6 +169,35 @@ resource "aws_secretsmanager_secret_version" "ndelius" {
   }
 }
 
+# ndmis Source Secrets
+resource "aws_secretsmanager_secret" "ndmis" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+  count = local.is_non_prod ? 1 : 0
+
+  name = "external/${local.project}-ndmis-source-secret"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-ndmis-source-secret"
+      Resource_Type = "Secrets"
+    }
+  )
+}
+
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "ndmis" {
+  count = local.is_non_prod ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.ndmis[0].id
+  secret_string = jsonencode(local.ndmis_secrets_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
 
 
 # DPS Source Secrets
@@ -523,6 +552,32 @@ resource "aws_secretsmanager_secret" "ods_dps_inc_reporting_access" {
 resource "aws_secretsmanager_secret_version" "ods_dps_inc_reporting_access" {
   secret_id     = aws_secretsmanager_secret.ods_dps_inc_reporting_access.id
   secret_string = jsonencode(local.ods_access_secret_placeholder)
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}
+
+# Windows EC2 RDP Admin Password
+resource "aws_secretsmanager_secret" "dpr_windows_rdp_credentials" {
+  #checkov:skip=CKV2_AWS_57: “Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+
+  name = "compute/dpr-windows-rdp-credentials"
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "compute/dpr-windows-rdp-credentials"
+      Resource_Type = "Secrets"
+      Jira          = "DPR2-1980"
+    }
+  )
+
+}
+
+resource "aws_secretsmanager_secret_version" "dpr_windows_rdp_credentials" {
+  secret_id     = aws_secretsmanager_secret.dpr_windows_rdp_credentials.id
+  secret_string = jsonencode(local.dpr_windows_rdp_credentials_placeholder)
 
   lifecycle {
     ignore_changes = [secret_string, ]

@@ -111,6 +111,11 @@ locals {
       container_cpu    = 16384
       container_memory = 32768
     }
+
+    sfs = {
+      container_cpu    = 16384
+      container_memory = 32768
+    }
   }
 
   bastion_config_preprod = {

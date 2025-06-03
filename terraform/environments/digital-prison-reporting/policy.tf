@@ -709,7 +709,10 @@ data "aws_iam_policy_document" "glue_catalog_readonly" {
     effect = "Allow"
     actions = [
       "glue:GetTable",
+      "glue:GetTables",
+      "glue:GetTableVersions",
       "glue:GetDatabase",
+      "glue:GetDatabases",
       "glue:GetPartition",
       "glue:List*",
       "glue:DeleteTable",
@@ -998,4 +1001,27 @@ resource "aws_iam_role" "lambda_function_invocation_role" {
 resource "aws_iam_role_policy_attachment" "lambda_function_invocation_role_policy_attachment" {
   role       = aws_iam_role.lambda_function_invocation_role.id
   policy_arn = aws_iam_policy.invoke_lambda_policy.arn
+}
+
+# Secrets Manager Read Access Policy
+resource "aws_iam_policy" "secretsmanager_read_policy" {
+  name        = local.secretsmanager_read_policy
+  description = "Read-only access to Secrets Manager"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowReadAccessToSecretsManager",
+        Effect = "Allow",
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "secretsmanager:DescribeSecret",
+          "secretsmanager:ListSecrets"
+        ],
+        Resource = [
+          "arn:aws:secretsmanager:${local.current_account_region}:${local.current_account_id}:secret:*"
+        ]
+      }
+    ]
+  })
 }

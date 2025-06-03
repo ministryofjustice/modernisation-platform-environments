@@ -60,7 +60,7 @@ module "cica_dms_tempus_database_credentials" {
       sid = "AllowDMSSourceRoleRead"
       principals = [{
         type        = "AWS"
-        identifiers = [for database in module.cica_dms_tempus_dms_implementation: database.dms_source_role_arn]
+        identifiers = [for database in module.cica_dms_tempus_dms_implementation : database.dms_source_role_arn]
       }]
       actions   = ["secretsmanager:GetSecretValue"]
       resources = ["*"]

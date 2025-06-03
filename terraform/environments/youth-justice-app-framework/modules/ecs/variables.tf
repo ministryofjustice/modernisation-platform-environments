@@ -23,6 +23,12 @@ variable "nameserver" {
   type        = string
 }
 
+variable "ec2_ami_id" {
+  description = "The AMI ID for the ECS cluster"
+  type        = string
+  default     = ""
+}
+
 variable "ecs_services" {
   description = "A list of ECS services to create. Will create the main container definition for the app itself"
   type = map(object({
@@ -280,7 +286,12 @@ variable "ecs_allowed_secret_arns" {
 
 
 variable "rds_postgresql_sg_id" {
-  description = "The ID of the security grouos that conteolls ingress to the PostgreSQL database."
+  description = "The ID of the security group that controlls ingress to the PostgreSQL database."
+  type        = string
+}
+
+variable "redshift_sg_id" {
+  description = "The ID of the security group that controlls ingress to the Redshift database."
   type        = string
 }
 

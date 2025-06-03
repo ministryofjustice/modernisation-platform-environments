@@ -69,3 +69,16 @@ variable "secret_kms_key_arn" {
   description = "The ARN of the KMS key to use for secrets"
   type        = string
 }
+
+variable "private_subnet_list" {
+  type = list(object({
+    id                = string
+    availability_zone = string
+    cidr_block        = string
+  }))
+}
+
+variable "management_server_sg_id" {
+  description = "The ID of the management server security group"
+  type        = string
+}
