@@ -265,7 +265,8 @@ resource "aws_security_group_rule" "maat_to_maatdb_sg_rule_outbound" {
 #### EC2 CLOUDWATCH LOG GROUP & Key ------
 
 resource "aws_kms_key" "maat_ec2_cloudwatch_log_key" {
-  description = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  description            = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  enable_key_rotation    = true
   tags = merge(
     local.tags,
     {
@@ -311,7 +312,7 @@ resource "aws_kms_key_policy" "maat_cloudwatch_logs_policy_ec2" {
 
 resource "aws_cloudwatch_log_group" "ec2_cloudwatch_log_group" {
   name              = local.application_data.accounts[local.environment].maat_ec2_log_group
-  retention_in_days = 90
+  retention_in_days = 365
   kms_key_id        = aws_kms_key.maat_ec2_cloudwatch_log_key.arn
 }
 
@@ -608,7 +609,9 @@ resource "aws_appautoscaling_policy" "maat_ecs_scaling_down_policy" {
 #### ECS CLOUDWATCH LOG GROUP & KEY ------
 
 resource "aws_kms_key" "maat_ecs_cloudwatch_log_key" {
-  description = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  description            = "KMS key to be used for encrypting the CloudWatch logs in the Log Groups"
+  enable_key_rotation    = true
+  
   tags = merge(
     local.tags,
     {
@@ -654,7 +657,7 @@ resource "aws_kms_key_policy" "maat_ecs_cloudwatch_log_key_policy" {
 
 resource "aws_cloudwatch_log_group" "maat_ecs_cloudwatch_log_group" {
   name              = local.application_data.accounts[local.environment].maat_ecs_log_group
-  retention_in_days = 90
+  retention_in_days = 365
   kms_key_id        = aws_kms_key.maat_ecs_cloudwatch_log_key.arn
 }
 

@@ -46,9 +46,9 @@ variable "vpc" {
 variable "ec2_sec_rules" {
   description = "A Map of map of security group Rules to associate with"
   type = map(object({
-    from_port = number
-    to_port   = number
-    protocol  = string
+    from_port  = number
+    to_port    = number
+    protocol   = string
     cidr_block = optional(string) # optional, fallback to var.cidr
   }))
   default = {
@@ -78,10 +78,10 @@ variable "ec2_sec_rules" {
       "protocol"  = "TCP"
     },
     "oracle" = {
-      "from_port" = 1521,
-      "to_port"   = 1521,
-      "protocol"  = "tcp"
-      "cidr_block"= "0.0.0.0/0"
+      "from_port"  = 1521,
+      "to_port"    = 1521,
+      "protocol"   = "tcp"
+      "cidr_block" = "0.0.0.0/0"
     }
   }
 }

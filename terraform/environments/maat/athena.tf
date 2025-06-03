@@ -1,6 +1,6 @@
 locals {
-    account_id = local.environment_management.account_ids[terraform.workspace]
-    region     = local.application_data.accounts[local.environment].region
+  account_id = local.environment_management.account_ids[terraform.workspace]
+  region     = local.application_data.accounts[local.environment].region
 }
 
 ### Setup S3 Bucket for Athena Queries ###
