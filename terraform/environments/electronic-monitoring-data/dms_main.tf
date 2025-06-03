@@ -19,7 +19,8 @@ module "dms_task" {
     "LCM_ARCHIVE_2020",
     "LCM_ARCHIVE_2021",
     "LCM_ARCHIVE_2022",
-    "LCM_ARCHIVE_2023"
+    "LCM_ARCHIVE_2023",
+    "lcm_archive_local_full"
   ] : ["test"])
 
   database_name = each.key
