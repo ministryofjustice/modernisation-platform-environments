@@ -233,7 +233,7 @@ resource "aws_security_group" "vpc_sec_group" {
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
-      security_groups = [local.ecs_cluster_sg_valid]
+      security_groups = local.ecs_cluster_sg_valid
     }
   }
 
@@ -244,7 +244,7 @@ resource "aws_security_group" "vpc_sec_group" {
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
-      security_groups = [local.ecs_cluster_sg_valid]
+      security_groups = local.ecs_cluster_sg_valid
     }
   }
 
@@ -266,7 +266,7 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
-      security_groups = [local.mlra_ecs_cluster_sg_valid]
+      security_groups = local.mlra_ecs_cluster_sg_valid
     }
   }
 
@@ -277,7 +277,7 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
-      security_groups = [local.mlra_ecs_cluster_sg_valid]
+      security_groups = local.mlra_ecs_cluster_sg_valid
     }
   }
 
