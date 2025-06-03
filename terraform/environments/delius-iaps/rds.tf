@@ -17,7 +17,8 @@ resource "aws_db_instance" "iaps" {
 
   # tflint-ignore: aws_db_instance_default_parameter_group
   parameter_group_name  = "default.oracle-ee-19"
-  option_group_name      = aws_db_option_group.oracle_oem_agent.name
+  # DBA-744 - uncomment below for adding OEM Agent once pre-reqs have been completed
+  #option_group_name      = aws_db_option_group.oracle_oem_agent.name
   ca_cert_identifier    = "rds-ca-rsa2048-g1"
   skip_final_snapshot   = local.application_data.accounts[local.environment].db_skip_final_snapshot
   allocated_storage     = local.application_data.accounts[local.environment].db_allocated_storage

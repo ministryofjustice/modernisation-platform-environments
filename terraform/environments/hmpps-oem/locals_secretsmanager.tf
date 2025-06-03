@@ -10,6 +10,8 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.nomis-combined-reporting-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.oasys-development}:role/EC2OracleEnterpriseManagementSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.delius-iaps-development}:role/EC2OracleEnterpriseManagementSecretsRole",
+      "arn:aws:iam::${module.environment.account_ids.delius-iaps-development}:role/modernisation-platform-oidc-cicd",
     ]
     test = [
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-test}:role/EC2OracleEnterpriseManagementSecretsRole",
