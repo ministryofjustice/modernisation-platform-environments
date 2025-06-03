@@ -3,60 +3,77 @@
 #########################################
 resource "aws_iam_role" "coat_github_actions_s3_reports_upload" {
   name               = "CoatGithubActionsS3ReportsUpload"
-  assume_role_policy = data.aws_iam_policy_document.coat_github_actions_upload_reports_s3.json
+  assume_role_policy =  templatefile("${path.module}/templates/coat-gh-actions-s3-assume-role-policy.json", 
+    {
+       gh_actions_oidc_provider = "token.actions.githubusercontent.com"
+       gh_actions_oidc_provider_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+    }
+  )
+  //data.aws_iam_policy_document.coat_github_actions_upload_reports_s3.json
 }
 
-data "aws_iam_policy_document" "coat_github_actions_upload_reports_s3" {
-  statement {
-    effect  = "Allow"
-    actions = ["sts:AssumeRoleWithWebIdentity"]
+# data "aws_iam_policy_document" "coat_github_actions_upload_reports_s3" {
+#   statement {
+#     effect  = "Allow"
+#     actions = ["sts:AssumeRoleWithWebIdentity"]
 
-    principals {
-      type = "Federated"
-      identifiers = [
-        "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
-      ]
-    }
+#     principals {
+#       type = "Federated"
+#       identifiers = [
+#         "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+#       ]
+#     }
 
-    condition {
-      test     = "StringEquals"
-      variable = "token.actions.githubusercontent.com:aud"
-      values   = ["sts.amazonaws.com"]
-    }
+#     condition {
+#       test     = "StringEquals"
+#       variable = "token.actions.githubusercontent.com:aud"
+#       values   = ["sts.amazonaws.com"]
+#     }
 
-    condition {
-      test     = "StringLike"
-      variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/cloud-optimisation-and-accountability:ref:refs/heads/main"]
-    }
-  }
-}
+#     condition {
+#       test     = "StringLike"
+#       variable = "token.actions.githubusercontent.com:sub"
+#       values   = ["repo:ministryofjustice/cloud-optimisation-and-accountability:ref:refs/heads/main"]
+#     }
+#   }
+# }
 
 resource "aws_iam_role_policy" "coat_github_actions_s3_upload" {
   name   = "GitHubActionsS3UploadPolicy"
-  role   = aws_iam_role.coat_github_actions_s3_reports_upload.id
+  role   = aws_iam_role.coat_github_actions_s3_reports_upload.name
 
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      { 
-        Sid      = "ReadWriteToReportsFolder",
-        Effect   = "Allow"
-        Action   = [
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:GetObject"
-        ]
-        Resource = "arn:aws:s3:::coat-reports${local.environment}/*"
-      },
-      {
-        Sid      = "ListReportsBucket",
-        Effect   = "Allow"
-        Action   = [
-          "s3:ListBucket"
-        ]
-        Resource = "arn:aws:s3:::coat-reports${local.environment}"
-      }
-    ]
-  })
+  policy = templatefile("${path.module}/templates/coat-gh-actions-s3-policy.json", 
+    {
+      environment = local.environment
+    }
+  )
+
+  # jsonencode({
+  #   Version = "2012-10-17"
+  #   Statement = [
+  #     { 
+  #       Sid      = "ReadWriteToReportsFolder",
+  #       Effect   = "Allow"
+  #       Action   = [
+  #         "s3:PutObject",
+  #         "s3:PutObjectAcl",
+  #         "s3:GetObject"
+  #       ]
+  #       Resource = "arn:aws:s3:::coat-reports${local.environment}/*"
+  #     },
+  #     {
+  #       Sid      = "ListReportsBucket",
+  #       Effect   = "Allow"
+  #       Action   = [
+  #         "s3:ListBucket"
+  #       ]
+  #       Resource = "arn:aws:s3:::coat-reports${local.environment}"
+  #     }
+  #   ]
+  # })
+}
+
+resource "aws_iam_role_policy_attachment" "coat_github_actions_s3_upload_attachment" {
+  role   = aws_iam_role.coat_github_actions_s3_reports_upload.id
+  policy_arn =  aws_iam_role_policy.coat_github_actions_s3_upload.policy_arn
 }
