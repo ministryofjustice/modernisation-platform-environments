@@ -34,6 +34,8 @@ echo "Stage: ${STAGE}"
 echo "Role: ${ROLE}"
 echo "Apply: ${APPLY}"
 
+aws-sso login
+
 aws-sso exec --profile ${ACCOUNT}-${STAGE}:${ROLE} -- terraform init
 
 aws-sso exec --profile ${ACCOUNT}-${STAGE}:${ROLE} -- terraform workspace select ${ACCOUNT}-${STAGE}

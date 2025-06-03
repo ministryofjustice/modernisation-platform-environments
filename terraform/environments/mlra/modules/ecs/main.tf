@@ -525,6 +525,20 @@ resource "aws_iam_policy" "ecs_task_execution_ssm_policy" {
         "ssm:GetParameters"
       ],
       "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.infox_client_secret}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maat_api_client_id_name}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maat_api_client_secret_name}"]
     }
   ]
 }
