@@ -227,7 +227,7 @@ resource "aws_security_group" "vpc_sec_group" {
   vpc_id      = var.vpc_shared_id
 
   dynamic "ingress" {
-    for_each = length(trimspace(local.ecs_cluster_sg_valid)) > 0 ? [1] : []
+    for_each = length(local.ecs_cluster_sg_valid) > 0 ? [1] : []
     content {
       description     = "Sql Net on 1521"
       from_port       = 1521
@@ -238,7 +238,7 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 
   dynamic "egress" {
-    for_each = length(trimspace(local.ecs_cluster_sg_valid)) > 0 ? [1] : []
+    for_each = length(local.ecs_cluster_sg_valid) > 0 ? [1] : []
     content {
       description     = "Sql Net on 1521"
       from_port       = 1521
@@ -260,7 +260,7 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
   vpc_id      = var.vpc_shared_id
 
   dynamic "ingress" {
-    for_each = length(trimspace(local.mlra_ecs_cluster_sg_valid)) > 0 ? [1] : []
+    for_each = length(local.mlra_ecs_cluster_sg_valid) > 0 ? [1] : []
     content {
       description     = "Sql Net on 1521"
       from_port       = 1521
@@ -271,7 +271,7 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
   }
 
   dynamic "egress" {
-    for_each = length(trimspace(local.mlra_ecs_cluster_sg_valid)) > 0 ? [1] : []
+    for_each = length(local.mlra_ecs_cluster_sg_valid) > 0 ? [1] : []
     content {
       description     = "Sql Net on 1521"
       from_port       = 1521
