@@ -1,17 +1,31 @@
 # Allow assume role access for obtaining the OEM Agent registration secret during plan/apply
 locals {
 
-  agentreg_assume_role_principal_ids = {
+  agentreg_assume_role_principals = {
     development = [
-      "arn:aws:iam::${module.environment.account_ids.delius-iaps-development}:role/*",
+      "arn:aws:iam::${module.environment.account_ids.delius-iaps-development}:role/*"
     ]
     test = [
     ]
     preproduction = [
-      "arn:aws:iam::${module.environment.account_ids.delius-iaps-preproduction}:role/*",
+      "arn:aws:iam::${module.environment.account_ids.delius-iaps-preproduction}:role/*"
     ]
     production = [
-      "arn:aws:iam::${module.environment.account_ids.delius-iaps-production}:role/*",
+      "arn:aws:iam::${module.environment.account_ids.delius-iaps-production}:role/*"
+    ]
+  }
+
+  agentreg_assume_role_account_ids = {
+    development = [
+      "${module.environment.account_ids.delius-iaps-development}"
+    ]
+    test = [
+    ]
+    preproduction = [
+      "${module.environment.account_ids.delius-iaps-preproduction}"
+    ]
+    production = [
+      "${module.environment.account_ids.delius-iaps-production}"
     ]
   }
 }
@@ -22,7 +36,10 @@ locals {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRole"]
-    resources = local.agentreg_assume_role_principal_ids[local.environment]
+    principals {
+      type        = "AWS"
+      identifiers = local.agentreg_assume_role_principals[local.environment]
+    }
   }
 }
 
@@ -41,7 +58,7 @@ data "aws_iam_policy_document" "oem-agentreg-read-access" {
       "secretsmanager:GetSecretValue"
     ]
     resources = [
-      "arn:aws:secretsmanager:${data.aws_region.current.name}:${local.environment_management.account_ids[terraform.workspace]}:secret:/oracle/oem/shared-passwords*"
+      "arn:aws:secretsmanager:${data.aws_region.current.name}:${local.agentreg_assume_role_account_ids[local.environment][0]}:secret:/oracle/oem/shared-passwords*"
     ]
   }
 }
