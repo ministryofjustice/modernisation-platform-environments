@@ -159,11 +159,11 @@ resource "aws_route_table" "juniper_management_route_table" {
   }
   route {
     cidr_block     = "10.0.24.0/24"
-    network_interface_id = aws_network_interface.vsrx01_enis["vSRX02 Internal Interface"].id
+    network_interface_id = aws_network_interface.vsrx02_enis["vSRX02 Internal Interface"].id
   }
   route {
     cidr_block     = "10.0.25.0/24"
-    network_interface_id = aws_network_interface.vsrx01_enis["vSRX02 Internal Interface"].id
+    network_interface_id = aws_network_interface.vsrx02_enis["vSRX02 Internal Interface"].id
   }
   tags = merge(local.tags, {
     Name = "Juniper Management Route Table"
