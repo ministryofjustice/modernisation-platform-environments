@@ -246,7 +246,6 @@ resource "aws_security_group" "vpc_sec_group" {
 }
 
 resource "aws_security_group" "mlra_ecs_sec_group" {
-  count = length(trimspace(var.mlra_ecs_cluster_sec_group_id)) > 0 ? 1 : 0
   name        = "mlra-ecs-sec-group"
   description = "RDS Access from the MLRA application"
   vpc_id      = var.vpc_shared_id
