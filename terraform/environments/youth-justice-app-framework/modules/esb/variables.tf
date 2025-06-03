@@ -44,3 +44,13 @@ variable "tableau_sg_id" {
   description = "Security group ID for Tableau"
   type        = string
 }
+
+variable "ecs_service_internal_sg_id" {
+  description = "The security group ID for internal ECS services"
+  type        = string
+}
+
+variable "ecs_service_external_sg_id" {
+  description = "The security group ID for external ECS services"
+  type        = string
+}
