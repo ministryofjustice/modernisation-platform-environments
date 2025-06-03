@@ -105,8 +105,8 @@ resource "aws_lambda_function" "ftp_lambda" {
       KEY          = var.ftp_key
       KEY_TYPE     = var.ftp_key_type
       USER         = var.ftp_user
-      PASSWORD     = ""
-      SSH_KEY      = ""
+      PASSWORD     = var.ftp_password_path
+      SSH_KEY      = var.ssh_key_path
       S3BUCKET     = var.ftp_bucket
       FILEREMOVE   = var.ftp_file_remove
     }

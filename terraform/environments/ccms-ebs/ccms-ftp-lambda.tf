@@ -73,6 +73,7 @@ locals {
     name => {
       user     = creds.USER
       password = creds.PASSWORD
+      ssh_key  = creds.SSH_KEY
     }
   }
 }
@@ -171,7 +172,7 @@ module "allpay_ftp_lambda_inbound" {
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
-  ssh_key_path        = ""
+  ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
   env                 = local.environment
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_client= aws_s3_object.ftp_client.key
@@ -206,7 +207,7 @@ module "allpay_ftp_lambda_outbound" {
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
-  ssh_key_path        = ""
+  ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
   env                 = local.environment
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_client= aws_s3_object.ftp_client.key
