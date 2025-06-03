@@ -78,56 +78,56 @@ locals {
 }
 
 
-#### bucket for laa-ccms-inbound for storing files from lambda
-resource "aws_s3_bucket" "inbound_bucket" {
-  bucket = lower(format("laa-ccms-inbound-%s-mp",local.environment))  # ccms inbound bucket
+# #### bucket for laa-ccms-inbound for storing files from lambda
+# resource "aws_s3_bucket" "inbound_bucket" {
+#   bucket = lower(format("laa-ccms-inbound-%s-mp",local.environment))  # ccms inbound bucket
 
-}
-
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption" {
-  bucket = aws_s3_bucket.inbound_bucket.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
+# }
 
 
-#### bucket for laa-ccms-inbound for storing files from lambda
-resource "aws_s3_bucket" "outbound_bucket" {
-  bucket = lower(format("laa-ccms-outbound-%s-mp",local.environment))  # ccms inbound bucket
+# resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption" {
+#   bucket = aws_s3_bucket.inbound_bucket.id
 
-}
-
-
-resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption_outbound" {
-  bucket = aws_s3_bucket.outbound_bucket.id
-
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm = "AES256"
+#     }
+#   }
+# }
 
 
-##### bucket for storing lambda layers and ftp client code
-resource "aws_s3_bucket" "ftp_bucket" {
-  bucket = lower(format("laa-ccms-ftp-lambda-%s-mp",local.environment))  # ccms lambda bucket
+# #### bucket for laa-ccms-inbound for storing files from lambda
+# resource "aws_s3_bucket" "outbound_bucket" {
+#   bucket = lower(format("laa-ccms-outbound-%s-mp",local.environment))  # ccms inbound bucket
 
-}
-resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption_ftp_lambda" {
-  bucket = aws_s3_bucket.ftp_bucket.id
+# }
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
+
+# resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption_outbound" {
+#   bucket = aws_s3_bucket.outbound_bucket.id
+
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm = "AES256"
+#     }
+#   }
+# }
+
+
+# ##### bucket for storing lambda layers and ftp client code
+# resource "aws_s3_bucket" "ftp_bucket" {
+#   bucket = lower(format("laa-ccms-ftp-lambda-%s-mp",local.environment))  # ccms lambda bucket
+
+# }
+# resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption_ftp_lambda" {
+#   bucket = aws_s3_bucket.ftp_bucket.id
+
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm = "AES256"
+#     }
+#   }
+# }
 
 
 
@@ -168,7 +168,7 @@ module "allpay_ftp_lambda_inbound" {
   ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
-  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.id
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
   ssh_key_path        = ""
@@ -203,7 +203,7 @@ module "allpay_ftp_lambda_outbound" {
   ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
-  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket.id
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
   ssh_key_path        = ""
