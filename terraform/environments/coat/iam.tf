@@ -38,9 +38,9 @@ resource "aws_iam_role" "coat_github_actions_s3_reports_upload" {
 #   }
 # }
 
-resource "aws_iam_role_policy" "coat_github_actions_s3_upload" {
+resource "aws_iam_policy" "coat_github_actions_s3_upload" {
   name = "GitHubActionsS3UploadPolicy"
-  role = aws_iam_role.coat_github_actions_s3_reports_upload.name
+  # role = aws_iam_role.coat_github_actions_s3_reports_upload.name
 
   policy = templatefile("${path.module}/templates/coat-gh-actions-s3-policy.json",
     {
@@ -74,6 +74,6 @@ resource "aws_iam_role_policy" "coat_github_actions_s3_upload" {
 }
 
 resource "aws_iam_role_policy_attachment" "coat_github_actions_s3_upload_attachment" {
-  role       = aws_iam_role.coat_github_actions_s3_reports_upload.id
-  policy_arn = aws_iam_role_policy.coat_github_actions_s3_upload.policy_arn
+  role = aws_iam_role.coat_github_actions_s3_reports_upload.name
+  policy_arn = aws_iam_policy.coat_github_actions_s3_upload.arn
 }
