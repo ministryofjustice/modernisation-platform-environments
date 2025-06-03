@@ -62,7 +62,7 @@ locals {
         }
 
         lifecycle = {
-          ignore_changes = [instance_type]
+          ignore_changes = "instance_type"
           # ignore changes to instance type so that we can rightsize the instance without having to destroy and recreate it
           }
 
