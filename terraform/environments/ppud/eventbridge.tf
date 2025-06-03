@@ -134,7 +134,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_disk_info_report_p
 
 # Eventbridge rule to invoke the Security Hub Report Production lambda function every Monday to Friday at 07:00
 # Set time to 07:00 during UTC and 06:00 during BST
-/*
+
 resource "aws_lambda_permission" "allow_eventbridge_invoke_securityhub_report_prod" {
   count         = local.is-production == true ? 1 : 0
   statement_id  = "AllowEventBridgeInvoke"
@@ -157,7 +157,7 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_securityhub_report
   target_id = "securityhub_report"
   arn       = aws_lambda_function.terraform_lambda_func_securityhub_report_prod[0].arn
 }
-*/
+
 # Eventbridge rule to invoke the Security Hub Report Dev lambda function every Monday to Friday at 07:00
 # Set time to 07:00 during UTC and 06:00 during BST
 

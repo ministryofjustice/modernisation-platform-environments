@@ -400,7 +400,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "moj-lambda-metrics-prod" {
       days_after_initiation = 3
     }
     expiration {
-      days = 30
+      days = 45
     }
   }
 }
