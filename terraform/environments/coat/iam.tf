@@ -2,11 +2,11 @@
 # CoatGithubActionsS3ReportsUpload
 #########################################
 resource "aws_iam_role" "coat_github_actions_s3_reports_upload" {
-  name               = "CoatGithubActionsS3ReportsUpload"
-  assume_role_policy =  templatefile("${path.module}/templates/coat-gh-actions-s3-assume-role-policy.json", 
+  name = "CoatGithubActionsS3ReportsUpload"
+  assume_role_policy = templatefile("${path.module}/templates/coat-gh-actions-s3-assume-role-policy.json",
     {
-       gh_actions_oidc_provider = "token.actions.githubusercontent.com"
-       gh_actions_oidc_provider_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+      gh_actions_oidc_provider     = "token.actions.githubusercontent.com"
+      gh_actions_oidc_provider_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
     }
   )
   //data.aws_iam_policy_document.coat_github_actions_upload_reports_s3.json
@@ -39,10 +39,10 @@ resource "aws_iam_role" "coat_github_actions_s3_reports_upload" {
 # }
 
 resource "aws_iam_role_policy" "coat_github_actions_s3_upload" {
-  name   = "GitHubActionsS3UploadPolicy"
-  role   = aws_iam_role.coat_github_actions_s3_reports_upload.name
+  name = "GitHubActionsS3UploadPolicy"
+  role = aws_iam_role.coat_github_actions_s3_reports_upload.name
 
-  policy = templatefile("${path.module}/templates/coat-gh-actions-s3-policy.json", 
+  policy = templatefile("${path.module}/templates/coat-gh-actions-s3-policy.json",
     {
       environment = local.environment
     }
@@ -74,6 +74,6 @@ resource "aws_iam_role_policy" "coat_github_actions_s3_upload" {
 }
 
 resource "aws_iam_role_policy_attachment" "coat_github_actions_s3_upload_attachment" {
-  role   = aws_iam_role.coat_github_actions_s3_reports_upload.id
-  policy_arn =  aws_iam_role_policy.coat_github_actions_s3_upload.policy_arn
+  role       = aws_iam_role.coat_github_actions_s3_reports_upload.id
+  policy_arn = aws_iam_role_policy.coat_github_actions_s3_upload.policy_arn
 }
