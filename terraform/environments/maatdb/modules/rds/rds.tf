@@ -123,8 +123,8 @@ locals {
   rds_sg_group_ids = compact([
     aws_security_group.cloud_platform_sec_group.id,
     aws_security_group.bastion_sec_group.id,
-    length(aws_security_group.vpc_sec_group) > 0 ? aws_security_group.vpc_sec_group[0].id : "",
-    length(aws_security_group.mlra_ecs_sec_group) > 0 ? aws_security_group.mlra_ecs_sec_group[0].id : ""
+    aws_security_group.vpc_sec_group.id,
+    aws_security_group.mlra_ecs_sec_group.id
   ])
 }
 
@@ -214,25 +214,30 @@ resource "aws_security_group" "cloud_platform_sec_group" {
 }
 
 resource "aws_security_group" "vpc_sec_group" {
-  count = length(trimspace(var.ecs_cluster_sec_group_id)) > 0 ? 1 : 0
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
-  ingress {
-    description     = "Sql Net on 1521"
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    security_groups = [var.ecs_cluster_sec_group_id]
+  dynamic "ingress" {
+    for_each = length(trimspace(var.ecs_cluster_sec_group_id)) > 0 ? [1] : []
+    content {
+      description     = "Sql Net on 1521"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      security_groups = [var.ecs_cluster_sec_group_id]
+    }
   }
 
-  egress {
-    description     = "Sql Net on 1521"
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    security_groups = [var.ecs_cluster_sec_group_id]
+  dynamic "egress" {
+    for_each = length(trimspace(var.ecs_cluster_sec_group_id)) > 0 ? [1] : []
+    content {
+      description     = "Sql Net on 1521"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      security_groups = [var.ecs_cluster_sec_group_id]
+    }
   }
 
   tags = {
@@ -246,20 +251,26 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
   description = "RDS Access from the MLRA application"
   vpc_id      = var.vpc_shared_id
 
-  ingress {
-    description     = "Sql Net on 1521"
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  dynamic "ingress" {
+    for_each = length(trimspace(var.mlra_ecs_cluster_sec_group_id)) > 0 ? [1] : []
+    content {
+      description     = "Sql Net on 1521"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      security_groups = [var.ecs_cluster_sec_group_id]
+    }
   }
 
-  egress {
-    description     = "Sql Net on 1521"
-    from_port       = 1521
-    to_port         = 1521
-    protocol        = "tcp"
-    security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  dynamic "egress" {
+    for_each = length(trimspace(var.mlra_ecs_cluster_sec_group_id)) > 0 ? [1] : []
+    content {
+      description     = "Sql Net on 1521"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      security_groups = [var.ecs_cluster_sec_group_id]
+    }
   }
 
   tags = {

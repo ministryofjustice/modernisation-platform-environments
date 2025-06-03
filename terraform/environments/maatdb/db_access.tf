@@ -34,7 +34,10 @@ module "bastion_linux" {
   autoscaling_cron = local.crontab
 
   # Tags
-  tags_common = local.tags
+  tags_common = merge(
+    { "instance-scheduling" = "skip-scheduling" },
+    local.tags
+  )
   tags_prefix = terraform.workspace
 }
 
