@@ -57,9 +57,9 @@ data "aws_iam_policy_document" "oem-agentreg-read-access" {
     actions = [
       "secretsmanager:GetSecretValue"
     ]
-    resources = [
+    resources = length(local.agentreg_assume_role_account_ids[local.environment]) > 0 ? [
       "arn:aws:secretsmanager:${data.aws_region.current.name}:${local.agentreg_assume_role_account_ids[local.environment][0]}:secret:/oracle/oem/shared-passwords*"
-    ]
+    ] : []
   }
 }
 resource "aws_iam_policy" "oem-agentreg-read-access" {
