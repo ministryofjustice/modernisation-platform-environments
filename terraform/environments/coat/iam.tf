@@ -39,17 +39,18 @@ resource "aws_iam_role_policy" "coat_github_actions_s3_upload" {
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
-      {
+      { 
+        Sid      = "ReadWriteToReportsFolder",
         Effect   = "Allow"
         Action   = [
           "s3:PutObject",
           "s3:PutObjectAcl",
-          "s3:AbortMultipartUpload",
-          "s3:ListMultipartUploadParts"
+          "s3:GetObject"
         ]
         Resource = "arn:aws:s3:::coat-reports${local.environment}/*"
       },
       {
+        Sid      = "ListReportsBucket",
         Effect   = "Allow"
         Action   = [
           "s3:ListBucket"
