@@ -63,7 +63,7 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name          = "ftpclientlibs"
-  compatible_runtimes = ["python3.9"]
+  compatible_runtimes = ["python3.7"]
   s3_bucket           = var.s3_bucket_ftp
   s3_key              = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
@@ -74,7 +74,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   function_name = var.lambda_name
   role          = aws_iam_role.ftp_lambda_role.arn
   handler       = "ftp-client.lambda_handler"
-  runtime       = "python3.9"
+  runtime       = "python3.7"
   timeout       = 300
   memory_size   = 256
   # filename         = "ftp-client.zip"
