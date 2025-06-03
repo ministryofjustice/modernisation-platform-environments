@@ -294,6 +294,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
           "logs:DescribeLogStreams",
           "s3:ListBucket",
           "s3:*Object*",
+          "s3:PutObjectAcl",
           "kms:Decrypt",
           "kms:Encrypt",
           "kms:ReEncrypt",
