@@ -1,5 +1,6 @@
 
 module "public_dns_zone" {
+  count               = local.environment != "production" ? 1 : 0
   source              = "./modules/dns/hosted_zone"
   domain_name         = local.application_data.accounts[local.environment].domain_name
   project_name        = local.project_name
@@ -10,6 +11,7 @@ module "public_dns_zone" {
 
 #used only for ses
 module "justice_public_dns_zone" {
+  count               = local.environment != "production" ? 1 : 0
   source              = "./modules/dns/hosted_zone"
   domain_name         = local.application_data.accounts[local.environment].justice_domain_name
   project_name        = local.project_name
