@@ -35,7 +35,7 @@ else
   AGENT_PATH="pre-prod/cortex-agent.tar.gz"
 fi
 
-aws s3 cp \$${XDR_AGENT_BUCKET}\$${AGENT_PATH} ${xdr_tar}
+aws s3 cp $${XDR_AGENT_BUCKET}$${AGENT_PATH} ${xdr_tar}
 
 if [[ -f ${xdr_tar} ]]; then
   mkdir -p ${xdr_dir}
