@@ -3,8 +3,25 @@
 #TODO 1) Get ARN for the Shared Key and apply for snapshots & PI.
 #TODO 2) Snapshot ARN in the vars
 
-# RDS Subnet Group
 
+# Consolidate security group IDs
+locals {
+
+  ecs_cluster_sg_valid = trimspace(var.ecs_cluster_sec_group_id) != "" ? [var.ecs_cluster_sec_group_id] : []
+  mlra_ecs_cluster_sg_valid = trimspace(var.mlra_ecs_cluster_sec_group_id) != "" ? [var.mlra_ecs_cluster_sec_group_id] : []
+
+  rds_sg_group_ids = compact([
+    aws_security_group.cloud_platform_sec_group.id,
+    aws_security_group.bastion_sec_group.id,
+    aws_security_group.vpc_sec_group.id,
+    aws_security_group.mlra_ecs_sec_group.id
+  ])
+
+}
+
+
+
+# RDS Subnet Group
 
 resource "aws_db_subnet_group" "subnet_group" {
   name       = "subnet-group"
@@ -117,17 +134,6 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 # }
 
 
-# Consolidate security group IDs
-# RDS database
-locals {
-  rds_sg_group_ids = compact([
-    aws_security_group.cloud_platform_sec_group.id,
-    aws_security_group.bastion_sec_group.id,
-    aws_security_group.vpc_sec_group.id,
-    aws_security_group.mlra_ecs_sec_group.id
-  ])
-}
-
 # RDS database
 
 # TODO: Ensure logging is enabled for the database and performance insights logs are encrypted
@@ -221,24 +227,24 @@ resource "aws_security_group" "vpc_sec_group" {
   vpc_id      = var.vpc_shared_id
 
   dynamic "ingress" {
-    for_each = length(trimspace(var.ecs_cluster_sec_group_id)) > 0 ? [1] : []
+    for_each = length(trimspace(local.ecs_cluster_sg_valid)) > 0 ? [1] : []
     content {
       description     = "Sql Net on 1521"
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
-      security_groups = [var.ecs_cluster_sec_group_id]
+      security_groups = [local.ecs_cluster_sg_valid]
     }
   }
 
   dynamic "egress" {
-    for_each = length(trimspace(var.ecs_cluster_sec_group_id)) > 0 ? [1] : []
+    for_each = length(trimspace(local.ecs_cluster_sg_valid)) > 0 ? [1] : []
     content {
       description     = "Sql Net on 1521"
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
-      security_groups = [var.ecs_cluster_sec_group_id]
+      security_groups = [local.ecs_cluster_sg_valid]
     }
   }
 
@@ -254,24 +260,24 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
   vpc_id      = var.vpc_shared_id
 
   dynamic "ingress" {
-    for_each = length(trimspace(var.mlra_ecs_cluster_sec_group_id)) > 0 ? [1] : []
+    for_each = length(trimspace(local.mlra_ecs_cluster_sg_valid)) > 0 ? [1] : []
     content {
       description     = "Sql Net on 1521"
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
-      security_groups = [var.ecs_cluster_sec_group_id]
+      security_groups = [local.mlra_ecs_cluster_sg_valid]
     }
   }
 
   dynamic "egress" {
-    for_each = length(trimspace(var.mlra_ecs_cluster_sec_group_id)) > 0 ? [1] : []
+    for_each = length(trimspace(local.mlra_ecs_cluster_sg_valid)) > 0 ? [1] : []
     content {
       description     = "Sql Net on 1521"
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
-      security_groups = [var.ecs_cluster_sec_group_id]
+      security_groups = [local.mlra_ecs_cluster_sg_valid]
     }
   }
 
