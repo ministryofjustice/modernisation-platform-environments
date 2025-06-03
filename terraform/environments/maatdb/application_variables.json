@@ -57,8 +57,8 @@
       "deletion_protection": true,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
-      "ecs_cluster_sec_group_id": "sg-07bf3c9d379e6d047",
-      "mlra_ecs_cluster_sec_group_id": "sg-07bf3c9d379e6d047",
+      "ecs_cluster_sec_group_id": "",
+      "mlra_ecs_cluster_sec_group_id": "",
       "build_s3": false,
       "build_ftp": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
