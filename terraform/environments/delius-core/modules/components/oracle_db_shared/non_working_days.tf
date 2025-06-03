@@ -9,7 +9,7 @@ resource "aws_dynamodb_table" "non_working_days" {
   hash_key     = "date"
 
   attribute {
-    name = "date"
+    name = "code_value"
     type = "S"
   }
 
