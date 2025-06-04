@@ -30,7 +30,6 @@ module "environment_stage" {
   bps_config = local.bps_config_stage
   bws_config = local.bws_config_stage
   dis_config = local.dis_config_stage
-  auto_config = local.auto_config_stage # empty - delete later
 
   dsd_db_config = local.dsd_db_config_stage
   boe_db_config = local.boe_db_config_stage
@@ -74,7 +73,6 @@ module "environment_preproduction" {
   bps_config = local.bps_config_preprod
   bws_config = local.bws_config_preprod
   dis_config = local.dis_config_preprod
-  auto_config = local.auto_config_preprod # empty - delete later
 
   dsd_db_config = local.dsd_db_config_preprod
   boe_db_config = local.boe_db_config_preprod
