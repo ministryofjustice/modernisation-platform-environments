@@ -182,7 +182,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ssm:RemoveTagsFromResource",
                 "ssm:StartAccessRequest",
                 "ssm:StartExecutionPreview",
-                "ssm:UpdateInstance*",
+                "ssm:UpdateInstance*"
             ],
             "Resource": "*"
         },
