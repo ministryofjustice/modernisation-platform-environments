@@ -231,6 +231,7 @@ locals {
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.db.config.instance_profile_policies, [
             "Ec2T1DatabasePolicy",
+            "Ec2T1DatabasePolicyTemp",
           ])
         })
         ebs_volumes = merge(local.ec2_instances.db.ebs_volumes, {
@@ -426,6 +427,21 @@ locals {
 
     iam_policies = {
       Ec2T1DatabasePolicy = {
+        description = "Permissions required for T1 Database EC2s"
+        statements = [
+          {
+            effect = "Allow"
+            actions = [
+              "secretsmanager:GetSecretValue",
+              "secretsmanager:PutSecretValue",
+            ]
+            resources = [
+              "arn:aws:secretsmanager:*:*:secret:/oracle/database/T1*/*",
+            ]
+          }
+        ]
+      }
+      Ec2T1DatabasePolicyTemp = {
         description = "Permissions required for T1 Database EC2s"
         statements = [
           {
