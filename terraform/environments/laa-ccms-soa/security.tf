@@ -99,6 +99,16 @@ resource "aws_security_group_rule" "ecs_tasks_admin_server" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
+resource "aws_security_group_rule" "ecs_tasks_admin_egress_all" {
+  security_group_id = aws_security_group.ecs_tasks_admin.id
+  type              = "egress"
+  description       = "All"
+  protocol          = -1
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
+}
+
 #--ECS Tasks Managed
 resource "aws_security_group" "ecs_tasks_managed" {
   name_prefix = "${local.application_data.accounts[local.environment].app_name}_ecs_tasks_managed"
