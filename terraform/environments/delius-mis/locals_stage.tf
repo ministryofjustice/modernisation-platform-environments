@@ -382,6 +382,8 @@ locals {
     }
   }
 
+  auto_config_stage = {}
+
   fsx_config_stage = {
     storage_capacity     = 200
     throughtput_capacity = 16

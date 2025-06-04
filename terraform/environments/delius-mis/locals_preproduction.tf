@@ -342,6 +342,8 @@ locals {
     }
   }
 
+  auto_config_preprod = {} # empty - delete later
+
   fsx_config_preprod = {
     storage_capacity     = 200
     throughtput_capacity = 16
