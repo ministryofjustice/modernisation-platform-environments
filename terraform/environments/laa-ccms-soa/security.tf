@@ -77,6 +77,7 @@ resource "aws_security_group_rule" "alb_managed_egress_all" {
   type              = "egress"
   description       = "All"
   protocol          = "TCP"
+  protocol          = -1
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW
