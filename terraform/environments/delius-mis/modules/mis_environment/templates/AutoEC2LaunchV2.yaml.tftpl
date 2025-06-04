@@ -14,31 +14,6 @@ tasks:
       type: powershell
       runAs: admin
       content: |-
-        # Set D:\ drive as the pagefile for the system, set to max size
-        $ErrorActionPreference = "Stop"
-        # Step 1: Get the total size of the D:\ drive in MB
-        $drive = Get-PSDrive -Name 'D'
-        $sizeBytes = ($drive.Used + $drive.Free) * 0.8
-        $sizeMB = [uint32]($sizeBytes / 1MB)
-
-        # Step 2: Define the registry path for paging file settings
-        $regPath = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management"
-
-        # Step 3: Disable automatic management of the paging file size
-        Set-ItemProperty -Path $regPath -Name "AutomaticManagedPagefile" -Value 0
-
-        # Step 4: Remove any existing paging file settings
-        Remove-ItemProperty -Path $regPath -Name "PagingFiles" -ErrorAction SilentlyContinue
-
-        # Step 5: Set the paging file on D:\ with initial and maximum sizes equal to 80% of the drive size
-        $PageFileValue = "D:\pagefile.sys $sizeMB $sizeMB"
-        Set-ItemProperty -Path $regPath -Name "PagingFiles" -Value $PageFileValue
-
-        # Step 6: Reboot will occurr during a subsequent task below
-    - frequency: once
-      type: powershell
-      runAs: admin
-      content: |-
         # Install / upgrade chocolatey since the version installed can be very old
         $ErrorActionPreference = "Stop"
         if (Get-Command choco.exe -ErrorAction SilentlyContinue) {
