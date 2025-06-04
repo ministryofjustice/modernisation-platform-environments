@@ -114,16 +114,21 @@ tasks:
           $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
           
           $instanceId = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -uri http://169.254.169.254/latest/meta-data/instance-id
-          Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -NewName $instanceId -Force
+          
+          # COMMENTING OUT DOMAIN JOIN FOR NOW!!
+          # Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -NewName $instanceId -Force
 
           # Install AD Management Tools
-          Install-WindowsFeature -Name RSAT-AD-PowerShell
-          Install-WindowsFeature -Name RSAT-ADDS-Tools
+          # Install-WindowsFeature -Name RSAT-AD-PowerShell
+          # Install-WindowsFeature -Name RSAT-ADDS-Tools
 
+          # COMMENTING OUT THIS STEP FOR NOW!!
           # Allow Domain Users to connect via RDP and give them local admin rights
-          Add-LocalGroupMember -Group "Administrators" -Member "Domain Users@${ad_domain_name}"
+          # Add-LocalGroupMember -Group "Administrators" -Member "Domain Users@${ad_domain_name}"
 
-          "Domain joined" | Out-File -FilePath C:\domain_join_log.txt
+          # COMMENTING OUT THIS STEP FOR NOW!!
+          # "Domain joined" | Out-File -FilePath C:\domain_join_log.txt
           
-          exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
+          # COMMENTING OUT THIS STEP FOR NOW!! REBOOT IS NOT NEEDED YET
+          # exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
         }
