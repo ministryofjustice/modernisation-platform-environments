@@ -7,7 +7,7 @@ resource "aws_security_group" "auto" {
 module "auto_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
 
-  count = var.auto_config.instance_count
+  count = var.auto_config != null ? var.auto_config.instance_count : 0
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -57,5 +57,5 @@ module "auto_instance" {
   subnet_id         = var.account_config.private_subnet_ids[count.index]
   tags              = var.tags
 
-  cloudwatch_metric_alarms = null
+  cloudwatch_metric_alarms = {}
 }
