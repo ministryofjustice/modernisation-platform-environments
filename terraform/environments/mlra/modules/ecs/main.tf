@@ -87,30 +87,6 @@ resource "aws_security_group" "cluster_ec2" {
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
 
-  dynamic "ingress" {
-    for_each = var.ec2_ingress_rules
-    content {
-      description     = lookup(ingress.value, "description", null)
-      from_port       = lookup(ingress.value, "from_port", null)
-      to_port         = lookup(ingress.value, "to_port", null)
-      protocol        = lookup(ingress.value, "protocol", null)
-      cidr_blocks     = lookup(ingress.value, "cidr_blocks", null)
-      security_groups = lookup(ingress.value, "security_groups", null)
-    }
-  }
-  dynamic "egress" {
-    for_each = var.ec2_egress_rules
-    content {
-      description = lookup(egress.value, "description", null)
-      from_port   = lookup(egress.value, "from_port", null)
-      to_port     = lookup(egress.value, "to_port", null)
-      protocol    = lookup(egress.value, "protocol", null)
-      #tfsec:ignore:AVD-AWS-0104:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/LASB-3390
-      cidr_blocks     = lookup(egress.value, "cidr_blocks", null)
-      security_groups = lookup(egress.value, "security_groups", null)
-    }
-  }
-
   tags = merge(
     var.tags_common,
     {
@@ -119,19 +95,47 @@ resource "aws_security_group" "cluster_ec2" {
   )
 }
 
-# Specific Security Group Rule for Access to MAATDB
 
+resource "aws_security_group_rule" "cluster_ec2_lb_ingress" {
+  type                     = "ingress"
+  from_port                = 32768
+  to_port                  = 61000
+  protocol                 = "tcp"
+  description              = "Cluster EC2 ingress"
+  security_group_id        = aws_security_group.cluster_ec2.id
+  source_security_group_id = var.alb_security_group_id
+}
+
+resource "aws_security_group_rule" "cluster_ec2_lb_egress" {
+  type                     = "egress"
+  from_port                = 32768
+  to_port                  = 61000
+  protocol                 = "tcp"
+  description              = "Cluster EC2 loadbalancer egress rule"
+  security_group_id        = aws_security_group.cluster_ec2.id
+  source_security_group_id = var.alb_security_group_id
+}
+
+resource "aws_security_group_rule" "mlra_sg_rule_outbound" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "This rule is needed for the ECS agent to reach the ECS API endpoints"
+  security_group_id = aws_security_group.cluster_ec2.id
+}
+
+# Specific Security Group Rule for Access to MAATDB
 resource "aws_security_group_rule" "mlra_to_maatdb_sg_rule_outbound" {
-  count                    = var.environment == "production" || var.environment == "development" ? 1 : 0
   type                     = "egress"
   from_port                = 1521
   to_port                  = 1521
   protocol                 = "tcp"
-  description              = "This rule is needed for MAATDB to reference the MLRA ECS sec group ID"
+  description              = "This rule is needed for the MLRA to connect to MAATDB"
   security_group_id        = aws_security_group.cluster_ec2.id
   source_security_group_id = var.maatdb_rds_sec_group_id
 }
-
 
 # always use the recommended ECS optimized linux 2 base image; used to obtain its AMI ID
 data "aws_ssm_parameter" "ecs_optimized_ami_1" {
@@ -282,7 +286,6 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
                 "ecr:BatchGetImage",
-                "ecr:*",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
                 "logs:CreateLogGroup",
@@ -299,8 +302,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "xray:PutTelemetryRecords",
                 "xray:GetSamplingRules",
                 "xray:GetSamplingTargets",
-                "xray:GetSamplingStatisticSummaries",
-                "xray:*"
+                "xray:GetSamplingStatisticSummaries"
             ],
             "Resource": "*"
         }
@@ -512,6 +514,27 @@ resource "aws_iam_policy" "ecs_task_execution_ssm_policy" { #tfsec:ignore:aws-ia
         "ssm:GetParameters"
       ],
       "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.gtm_id_secret_name}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.infox_client_secret}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maat_api_client_id_name}"]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:GetParameters"
+      ],
+      "Resource": ["arn:aws:ssm:${var.region}:${var.account_number}:parameter/${var.maat_api_client_secret_name}"]
     }
   ]
 }

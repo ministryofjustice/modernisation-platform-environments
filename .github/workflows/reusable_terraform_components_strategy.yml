@@ -84,8 +84,8 @@ jobs:
           echo "[" > final-list.json
           firstEntry=true
 
-          # Initialize an array to track components already added to the matrix.
-          seen_components=()
+          # Track component-environment pairs instead of just components
+          seen_pairs=()
 
           while IFS= read -r envobj; do
             for comp in $COMPONENTS; do
@@ -137,13 +137,15 @@ jobs:
                 fi
               fi
 
-              # Add the component to the matrix if it hasn't been added already.
-              if [[ " ${seen_components[@]} " =~ " ${comp} " ]]; then
-                echo "Component '${comp}' is already in the matrix; skipping."
+              target=$(echo "$envobj" | jq -r '.target')
+              pair="${comp}_${target}"
+
+              if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                echo "Component-target pair '${pair}' is already in the matrix; skipping."
                 continue
               fi
 
-              seen_components+=("$comp")
+              seen_pairs+=("$pair")
               if [ "$firstEntry" = true ]; then
                 firstEntry=false
               else
@@ -215,15 +217,18 @@ jobs:
           # Append referencing components to the matrix.
           while IFS= read -r envobj; do
             for comp in "${referencing_components[@]}"; do
-              # Add the component to the matrix if it hasn't been added already.
-              if [[ " ${seen_components[@]} " =~ " ${comp} " ]]; then
-                echo "Component '${comp}' is already in the matrix; skipping."
+              target=$(echo "$envobj" | jq -r '.target')
+              pair="${comp}_${target}"
+
+              if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                echo "Component-target pair '${pair}' is already in the matrix; skipping."
                 continue
               fi
 
               echo "Including '${comp}' because it references a changed module."
-              seen_components+=("$comp")
-              if [ "$firstEntry" = true ]; then
+              seen_pairs+=("$pair")
+
+              if $firstEntry; then
                 firstEntry=false
               else
                 echo "," >> final-list.json

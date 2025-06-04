@@ -51,6 +51,12 @@ resource "aws_kms_key" "firehose_backup" {
   enable_key_rotation     = true
 }
 
+# Create an alias for easier identification
+resource "aws_kms_alias" "firehose_kms_alias" {
+  name          = "alias/firehose-s3-backup-key"
+  target_key_id = aws_kms_key.firehose_backup.key_id
+}
+
 resource "aws_kms_key_policy" "firehose_backup_policy" {
   key_id = aws_kms_key.firehose_backup.id
 
