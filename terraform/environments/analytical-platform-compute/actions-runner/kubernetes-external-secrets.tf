@@ -22,7 +22,7 @@ resource "kubernetes_manifest" "actions_runners_token_apc_self_hosted_runners_se
       "data" = [
         {
           "remoteRef" = {
-            "key" = data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].id
+            "key" = module.actions_runners_token_apc_self_hosted_runners_secret[0].secret_id
           }
           "secretKey" = "token"
         }
@@ -55,7 +55,7 @@ resource "kubernetes_manifest" "actions_runners_token_moj_apc_self_hosted_runner
       "data" = [
         {
           "remoteRef" = {
-            "key" = module.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_id
+            "key" = module.actions_runners_token_moj_apc_self_hosted_runners_secret[0].secret_id
           }
           "secretKey" = "token"
         }
