@@ -9,7 +9,7 @@ resource "aws_lb" "admin" {
   security_groups    = [aws_security_group.alb_admin.id]
 }
 
-/* resource "aws_lb_target_group" "admin" {
+resource "aws_lb_target_group" "admin" {
   name                 = "${local.application_data.accounts[local.environment].app_name}-admin-target-group"
   port                 = local.application_data.accounts[local.environment].admin_server_port
   protocol             = "TCP"
@@ -22,10 +22,6 @@ resource "aws_lb" "admin" {
     interval            = "30"
     protocol            = "TCP"
     unhealthy_threshold = "3"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -49,7 +45,7 @@ resource "aws_lb_listener" "admin_server_port" {
     target_group_arn = aws_lb_target_group.admin.id
     type             = "forward"
   }
-} */
+}
 
 #--Managed
 resource "aws_lb" "managed" {
@@ -60,7 +56,7 @@ resource "aws_lb" "managed" {
   security_groups    = [aws_security_group.alb_managed.id]
 }
 
-/* resource "aws_lb_target_group" "managed" {
+resource "aws_lb_target_group" "managed" {
   name        = "${local.application_data.accounts[local.environment].app_name}-managed-target-group"
   port        = local.application_data.accounts[local.environment].managed_server_port
   protocol    = "TCP"
@@ -72,10 +68,6 @@ resource "aws_lb" "managed" {
     interval            = "30"
     protocol            = "TCP"
     unhealthy_threshold = "3"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -99,4 +91,4 @@ resource "aws_lb_listener" "managed_server_port" {
     target_group_arn = aws_lb_target_group.managed.id
     type             = "forward"
   }
-} */
+}
