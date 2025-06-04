@@ -3,15 +3,15 @@ locals {
 
   agentreg_assume_role_principals = {
     development = [
-      "arn:aws:iam::${module.environment.account_ids.delius-iaps-development}:role/*"
+      "arn:aws:iam::${module.environment.account_ids.delius-iaps-development}:root"
     ]
     test = [
     ]
     preproduction = [
-      "arn:aws:iam::${module.environment.account_ids.delius-iaps-preproduction}:role/*"
+      "arn:aws:iam::${module.environment.account_ids.delius-iaps-preproduction}:root"
     ]
     production = [
-      "arn:aws:iam::${module.environment.account_ids.delius-iaps-production}:role/*"
+      "arn:aws:iam::${module.environment.account_ids.delius-iaps-production}:root"
     ]
   }
 
