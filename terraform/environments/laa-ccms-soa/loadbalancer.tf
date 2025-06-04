@@ -12,7 +12,7 @@ resource "aws_lb" "admin" {
 resource "aws_lb_target_group" "admin" {
   name                 = "${local.application_data.accounts[local.environment].app_name}-admin-target-group"
   port                 = local.application_data.accounts[local.environment].admin_server_port
-  protocol             = "HTTP"
+  protocol             = "TCP"
   vpc_id               = data.aws_vpc.shared.id
   target_type          = "ip"
   deregistration_delay = 30
@@ -78,7 +78,7 @@ resource "aws_lb" "managed" {
 resource "aws_lb_target_group" "managed" {
   name        = "${local.application_data.accounts[local.environment].app_name}-managed-target-group"
   port        = local.application_data.accounts[local.environment].managed_server_port
-  protocol    = "HTTP"
+  protocol    = "TCP"
   vpc_id      = data.aws_vpc.shared.id
   target_type = "ip"
 
