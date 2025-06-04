@@ -19,8 +19,8 @@ locals {
   maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
   gtm_id_secret_name          = "APP_MLRA_GOOGLE_TAG_MANAGER_ID"
   infox_client_secret_name    = "APP_INFOX_CLIENT_SECRET"
-  maat_api_client_id_name    = "APP_MAAT_API_CLIENT_ID"
-  maat_api_client_secret_name    = "APP_MAAT_API_CLIENT_SECRET"
+  maat_api_client_id_name     = "APP_MAAT_API_CLIENT_ID"
+  maat_api_client_secret_name = "APP_MAAT_API_CLIENT_SECRET"
   task_definition = templatefile("task_definition.json", {
     app_name               = local.application_name
     ecr_url                = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
