@@ -4,19 +4,23 @@ data "aws_vpc" "apc" {
   }
 }
 
-data "aws_db_subnet_group" "apc" {
-  name = "${local.application_name}-${local.environment}"
-}
-
-data "aws_security_groups" "rds" {
+data "aws_subnets" "apc_private" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.apc.id]
   }
-  filter {
-    name   = "group-name"
-    values = ["rds"]
+  tags = {
+    Name = "${local.application_name}-${local.environment}-private*"
   }
+}
+
+data "aws_subnet" "apc_private" {
+  for_each = toset(data.aws_subnets.apc_private.ids)
+  id       = each.value
+}
+
+data "aws_db_subnet_group" "apc" {
+  name = "${local.application_name}-${local.environment}"
 }
 
 data "aws_eks_cluster" "eks" {

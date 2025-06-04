@@ -21,7 +21,7 @@ module "mlflow_auth_rds" {
 
   multi_az               = true
   db_subnet_group_name   = data.aws_db_subnet_group.apc.name
-  vpc_security_group_ids = data.aws_security_groups.rds.ids
+  vpc_security_group_ids = [module.rds_security_group.security_group_id]
 
   username                    = "mlflowauth"
   db_name                     = "mlflowauth"
@@ -91,7 +91,7 @@ module "mlflow_rds" {
 
   multi_az               = true
   db_subnet_group_name   = data.aws_db_subnet_group.apc.name
-  vpc_security_group_ids = data.aws_security_groups.rds.ids
+  vpc_security_group_ids = [module.rds_security_group.security_group_id]
 
   username                    = "mlflow"
   db_name                     = "mlflow"
