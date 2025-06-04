@@ -66,7 +66,8 @@ variable "fsx_config" {
 }
 
 variable "auto_config" {
-  type = any
+  type    = any
+  default = null #optional
 }
 
 variable "deploy_oracle_stats" {
