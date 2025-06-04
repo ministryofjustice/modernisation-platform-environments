@@ -118,7 +118,7 @@ resource "aws_iam_policy" "ec2_instance_policy" {
             "Action": [
                 "ds:CreateComputer",
                 "ds:DescribeDirectories",
-                "ec2messages:*"
+                "ec2messages:*",
                 "ec2:DescribeTags",
                 "ec2:DescribeInstanceStatus",
                 "cloudwatch:PutMetricData",
