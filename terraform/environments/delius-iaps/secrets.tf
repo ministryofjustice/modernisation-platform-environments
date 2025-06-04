@@ -52,10 +52,6 @@ resource "random_password" "dbsnmp_password" {
   upper   = true
   numeric = true
   special = true
-
-  lifecycle {
-    ignore_changes = [result]
-  }
 }
 
 resource "random_password" "oem_agentreg_password" {
@@ -64,10 +60,6 @@ resource "random_password" "oem_agentreg_password" {
   upper   = true
   numeric = true
   special = true
-
-  lifecycle {
-    ignore_changes = [result]
-  }
 }
 
 resource "aws_secretsmanager_secret_version" "database_dba_passwords" {
