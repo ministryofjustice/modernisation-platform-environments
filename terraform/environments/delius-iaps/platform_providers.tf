@@ -56,13 +56,3 @@ provider "aws" {
     role_arn = "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/ModernisationPlatformSSOReadOnly"
   }
 }
-
-# Provider for reading resources from OEM account to get the OEM agent password during terraform apply process
-provider "aws" {
-  alias  = "hmpps-oem"
-  region = "eu-west-2"
-  assume_role {
-    role_arn     = "arn:aws:iam::${local.oem_account_id}:role/oem-agentreg-read-access"
-    session_name = "tf-oem-secret-access"
-  }
-}

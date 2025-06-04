@@ -173,32 +173,3 @@ resource "aws_iam_role_policy_attachment" "ci_data_refresher" {
   policy_arn = aws_iam_policy.snapshot_sharer[0].arn
   role       = aws_iam_role.ci_data_refresher[0].name
 }
-
-####################
-# OEM Agent
-####################
-
-data "aws_iam_policy_document" "database_dba_passwords" {
-  #checkov:skip=CKV_AWS_108 "ignore"
-  #checkov:skip=CKV_AWS_356 "ignore"
-  statement {
-    sid    = "AllowOEMAccessToSecret"
-    effect = "Allow"
-    actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:PutSecretValue",
-    ]
-    principals {
-      type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.oem_account_id}:role/EC2OracleEnterpriseManagementSecretsRole"]
-    }
-    resources = [
-      aws_secretsmanager_secret.database_dba_passwords.arn,
-    ]
-  }
-}
-
-resource "aws_secretsmanager_secret_policy" "database_dba_passwords" {
-  secret_arn = aws_secretsmanager_secret.database_dba_passwords.arn
-  policy     = data.aws_iam_policy_document.database_dba_passwords.json
-}
