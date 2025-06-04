@@ -17,12 +17,12 @@ resource "aws_lb_target_group" "admin" {
   target_type          = "ip"
   deregistration_delay = 30
 
-  health_check {
+/*   health_check {
     healthy_threshold   = "3"
     interval            = "30"
     protocol            = "TCP"
     unhealthy_threshold = "3"
-  }
+  } */
 }
 
 resource "aws_lb_listener" "admin80" {
@@ -63,12 +63,12 @@ resource "aws_lb_target_group" "managed" {
   vpc_id      = data.aws_vpc.shared.id
   target_type = "ip"
 
-  health_check {
+/*   health_check {
     healthy_threshold   = "3"
     interval            = "30"
     protocol            = "TCP"
     unhealthy_threshold = "3"
-  }
+  } */
 }
 
 resource "aws_lb_listener" "managed80" {
