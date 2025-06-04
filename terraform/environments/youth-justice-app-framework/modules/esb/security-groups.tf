@@ -65,3 +65,14 @@ resource "aws_security_group_rule" "esb_to_ecs_int_rule" {
   source_security_group_id = aws_security_group.esb_service.id
   description              = "ESB to ECS int communication"
 }
+
+#ESB to Int load balancer
+resource "aws_security_group_rule" "allow_alb_from_esb" {
+  type                     = "ingress"
+  from_port                = 8080
+  to_port                  = 8080
+  protocol                 = "tcp"
+  security_group_id        = var.alb_security_group_id
+  source_security_group_id = aws_security_group.esb_service.id
+  description              = "ESB to YJAF Internal ALB"
+}
