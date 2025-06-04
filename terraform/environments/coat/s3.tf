@@ -313,3 +313,21 @@ module "coat_reports" {
     }
   ]
 }
+
+resource "aws_s3_object" "ebs_waste_reports" {
+  bucket = module.coat_reports.s3_bucket_id
+  key    = "ebs_waste_reports/"
+  acl    = "private"
+}
+
+resource "aws_s3_object" "rds_waste_reports" {
+  bucket = module.coat_reports.s3_bucket_id
+  key    = "rds_waste_reports/"
+  acl    = "private"
+}
+
+resource "aws_s3_object" "pod_waste_reports" {
+  bucket = module.coat_reports.s3_bucket_id
+  key    = "pod_waste_reports/"
+  acl    = "private"
+}
