@@ -1,6 +1,24 @@
 #### This file can be used to store secrets specific to the member account ####
 #### Secrets can be manually edited once created here ####
 
+# temporary secret for snapshot identifier #todo remove after migration
+resource "aws_secretsmanager_secret" "snapshot_identifier" {
+  #checkov:skip=CKV2_AWS_57:temporary secret, no rotation needed
+  name        = "yjaf-snapshot-identifier"
+  description = "Snapshot identifier for Aurora RDS"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "snapshot_identifier" {
+  #checkov:skip=CKV2_AWS_57:temporary secret, no rotation needed
+  secret_id     = aws_secretsmanager_secret.snapshot_identifier.id
+  secret_string = "dummy"
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
 #Auto-admit create secret but later manually change value
 resource "aws_secretsmanager_secret" "auto_admit_secret" {
   #checkov:skip=CKV2_AWS_57:todo add rotation if needed
@@ -93,6 +111,22 @@ resource "aws_secretsmanager_secret" "Unit_test" {
 
 resource "aws_secretsmanager_secret_version" "Unit_test" {
   secret_id     = aws_secretsmanager_secret.Unit_test.id
+  secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
+}
+
+resource "aws_secretsmanager_secret" "google_api" {
+  #checkov:skip=CKV2_AWS_57:doesn't need rotation
+  name        = "${local.project_name}_google_api"
+  description = "Used within UI for google maps"
+  kms_key_id  = module.kms.key_id
+  tags        = local.tags
+}
+
+resource "aws_secretsmanager_secret_version" "google_api" {
+  secret_id     = aws_secretsmanager_secret.google_api.id
   secret_string = "dummy" # InvalidRequestException: You must provide either SecretString or SecretBinary.
   lifecycle {
     ignore_changes = [secret_string]

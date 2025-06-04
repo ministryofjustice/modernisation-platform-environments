@@ -169,6 +169,11 @@ variable "gtm_id_secret_name" {
   description = "Parameter store secret name containing the Google Tag Manager Id"
 }
 
+variable "infox_client_secret" {
+  type        = string
+  description = "Parameter store secret name containing the InfoX client secret"
+}
+
 variable "ecs_target_capacity" {
   type        = string
   description = "The target value for the CloudWatch metric used in the Amazon ECS-managed target tracking scaling policy. For example, a value of 100 will result in the Amazon EC2 instances in your Auto Scaling group being completely utilized."
@@ -177,4 +182,24 @@ variable "ecs_target_capacity" {
 variable "environment" {
   type        = string
   description = "Environment of the application"
+}
+
+variable "maatdb_rds_sec_group_id" {
+  type        = string
+  description = "MAATDB sec group ID"
+}
+
+variable "alb_security_group_id" {
+  type        = string
+  description = "ALB Security Group ID"
+}
+
+variable "maat_api_client_id_name" {
+  type        = string
+  description = "Parameter store secret name containing the MAAT API Client ID"
+}
+
+variable "maat_api_client_secret_name" {
+  type        = string
+  description = "Parameter store secret name containing the MAAT API Client Secret"
 }

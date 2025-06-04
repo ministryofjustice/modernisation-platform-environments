@@ -53,16 +53,22 @@ resource "aws_kinesis_firehose_delivery_stream" "awsconfig_to_datadog" {
   }
 
   server_side_encryption {
-  enabled   = true
-  key_arn   = aws_kms_key.awsconfig_firehose_backup.arn
-  key_type  = "CUSTOMER_MANAGED_CMK"
- }
+    enabled  = true
+    key_arn  = aws_kms_key.awsconfig_firehose_backup.arn
+    key_type = "CUSTOMER_MANAGED_CMK"
+  }
 }
 
 resource "aws_kms_key" "awsconfig_firehose_backup" {
   description             = "KMS key for encrypting Firehose S3 backup bucket"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+}
+
+# Create an alias for easier identification
+resource "aws_kms_alias" "config_firehose_kms_alias" {
+  name          = "alias/config-firehose-s3-backup-key"
+  target_key_id = aws_kms_key.awsconfig_firehose_backup.key_id
 }
 
 resource "aws_kms_key_policy" "awsconfig_firehose_backup_policy" {
@@ -161,7 +167,7 @@ resource "aws_iam_policy" "awsconfig_firehose_policy" {
         Resource = aws_cloudwatch_log_group.awsconfig_firehose_log_group.arn
       },
       {
-        Sid = "cloudWatchLog",
+        Sid    = "cloudWatchLog",
         Effect = "Allow",
         Action = [
           "logs:PutLogEvents"
@@ -169,7 +175,7 @@ resource "aws_iam_policy" "awsconfig_firehose_policy" {
         Resource = aws_cloudwatch_log_group.awsconfig_firehose_log_group.arn
       },
       {
-        Sid = "CreateLogResources",
+        Sid    = "CreateLogResources",
         Effect = "Allow",
         Action = [
           "logs:CreateLogGroup",
@@ -178,7 +184,7 @@ resource "aws_iam_policy" "awsconfig_firehose_policy" {
         Resource = "*"
       },
       {
-        Sid = "s3Permissions",
+        Sid    = "s3Permissions",
         Effect = "Allow",
         Action = [
           "s3:AbortMultipartUpload",
@@ -189,8 +195,8 @@ resource "aws_iam_policy" "awsconfig_firehose_policy" {
           "s3:PutObject"
         ],
         Resource = [
-          aws_s3_bucket.awsconfig_firehose_backup.arn,       
-          "${aws_s3_bucket.awsconfig_firehose_backup.arn}/*"  
+          aws_s3_bucket.awsconfig_firehose_backup.arn,
+          "${aws_s3_bucket.awsconfig_firehose_backup.arn}/*"
         ]
       }
     ]
@@ -229,7 +235,7 @@ resource "aws_iam_policy" "awsconfig_firehose_kms_access" {
           "kms:DescribeKey"
         ],
         Resource = [
-          aws_kms_key.awsconfig_firehose_backup.arn,  
+          aws_kms_key.awsconfig_firehose_backup.arn,
           var.kms_key_arn
         ]
       }
@@ -244,9 +250,9 @@ resource "aws_iam_policy" "awsconfig_firehose_kms_secret_access" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid: "DecryptSecretWithKMSKey",
-        Effect = "Allow",
-        Action = "kms:Decrypt",
+        Sid : "DecryptSecretWithKMSKey",
+        Effect   = "Allow",
+        Action   = "kms:Decrypt",
         Resource = var.kms_key_arn, # this must match the KMS key that encrypts the secret
         Condition = {
           StringEquals = {
@@ -336,22 +342,8 @@ resource "aws_cloudwatch_log_group" "awsconfig_firehose_log_group" {
 }
 
 resource "aws_sns_topic_subscription" "datadog_config" {
-  topic_arn              = "arn:aws:sns:eu-west-2:${var.aws_account_id}:config"
-  protocol               = "firehose"
-  endpoint               = aws_kinesis_firehose_delivery_stream.awsconfig_to_datadog.arn
-  subscription_role_arn  = aws_iam_role.awsconfig_sns_to_datadog.arn
-}
-
-resource "aws_sns_topic_subscription" "datadog_inspector" {
-  topic_arn              = "arn:aws:sns:eu-west-2:${var.aws_account_id}:securityhub-alarms"
-  protocol               = "firehose"
-  endpoint               = aws_kinesis_firehose_delivery_stream.awsconfig_to_datadog.arn
-  subscription_role_arn  = aws_iam_role.awsconfig_sns_to_datadog.arn
-}
-
-resource "aws_sns_topic_subscription" "datadog_sechub_findings" {
-  topic_arn              = "arn:aws:sns:eu-west-2:${var.aws_account_id}:sechub_findings_sns_topic"
-  protocol               = "firehose"
-  endpoint               = aws_kinesis_firehose_delivery_stream.awsconfig_to_datadog.arn
-  subscription_role_arn  = aws_iam_role.awsconfig_sns_to_datadog.arn
+  topic_arn             = "arn:aws:sns:eu-west-2:${var.aws_account_id}:config"
+  protocol              = "firehose"
+  endpoint              = aws_kinesis_firehose_delivery_stream.awsconfig_to_datadog.arn
+  subscription_role_arn = aws_iam_role.awsconfig_sns_to_datadog.arn
 }

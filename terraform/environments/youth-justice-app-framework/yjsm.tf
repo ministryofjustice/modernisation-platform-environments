@@ -8,13 +8,14 @@ module "yjsm" {
   #Network details
   vpc_id              = data.aws_vpc.shared.id
   subnet_id           = one(tolist([for s in local.private_subnet_list : s.id if s.availability_zone == "eu-west-2a"]))
-  private_subnet_list = local.private_subnet_list 
+  private_subnet_list = local.private_subnet_list
   # Assigning private IP based on environment
   private_ip = lookup(
     {
       development   = "10.26.144.61"
       test          = "10.26.152.172"
       preproduction = "10.27.144.83"
+      production    = "10.27.152.21"
       # Add more environments when IP is known
     },
     local.environment,
@@ -23,8 +24,9 @@ module "yjsm" {
 
   ami = lookup(
     {
-      development   = "ami-007acc01ecffc3c6c"
-      preproduction = "ami-04ee6bb49367c4dd9"
+      development   = "ami-020f796d0dec4ed4c"
+      preproduction = "ami-0d79a6afc87dfa388"
+      production    = "ami-08e24cb718917177b"
       # Add more environments when AMIs are known
     },
     local.environment,
