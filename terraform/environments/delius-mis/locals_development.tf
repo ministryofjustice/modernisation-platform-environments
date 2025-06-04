@@ -206,21 +206,21 @@ locals {
     instance_count = 1
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
-      "/dev/sda1" = { type = "gp3", size = 150 } # root volume
-      "xvdd"      = { type = "gp3", size = 300 } # D:\ App drive
+      "/dev/sda1" = { size = 150 } # root volume
+      "xvdd"      = { size = 300 } # D:\ App drive
     }
-    # ebs_volumes_config = {
-    #   data = {
-    #     iops       = 3000
-    #     throughput = 125
-    #     type       = "gp3"
-    #   }
-    #   root = {
-    #     iops       = 3000
-    #     throughput = 125
-    #     type       = "gp3"
-    #   }
-    # }
+    ebs_volumes_config = {
+      data = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+      root = {
+        iops       = 3000
+        throughput = 125
+        type       = "gp3"
+      }
+    }
     instance_config = {
       associate_public_ip_address  = false
       disable_api_termination      = false
