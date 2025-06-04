@@ -26,10 +26,11 @@ module "environment_dev" {
 
   bastion_config = local.bastion_config_dev
 
-  bcs_config = local.bcs_config_dev
-  bps_config = local.bps_config_dev
-  bws_config = local.bws_config_dev
-  dis_config = local.dis_config_dev
+  bcs_config  = local.bcs_config_dev
+  bps_config  = local.bps_config_dev
+  bws_config  = local.bws_config_dev
+  dis_config  = local.dis_config_dev
+  auto_config = local.auto_config_dev
 
   dsd_db_config = local.dsd_db_config_dev
   boe_db_config = local.boe_db_config_dev
