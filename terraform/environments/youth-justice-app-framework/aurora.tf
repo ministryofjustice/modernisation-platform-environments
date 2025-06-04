@@ -1,3 +1,5 @@
+
+
 module "aurora" {
   source       = "./modules/aurora"
   project_name = local.project_name
@@ -14,8 +16,8 @@ module "aurora" {
   database_subnet_group_name = "yjaf-db-subnet-group"
   alb_route53_record_name    = "db-yjafrds01"
 
-  #one time restore from a shared snapshot on preprod
-  snapshot_identifier = local.application_data.accounts[local.environment].snapshot_identifier
+  #one time restore from a shared snapshot #todo remove this post migration. Take from secrets manager
+  snapshot_identifier = aws_secretsmanager_secret_version.snapshot_identifier.secret_string != "dummy" ? aws_secretsmanager_secret_version.snapshot_identifier.secret_string : local.application_data.accounts[local.environment].snapshot_identifier
 
   user_passwords_to_reset = ["postgres_rotated", "redshift_readonly", "ycs_team", "postgres"]
   db_name                 = "yjafrds01"
@@ -25,7 +27,7 @@ module "aurora" {
   engine_version  = "16.6"
   master_username = "root"
 
-  create_sheduler              = true
+  create_sheduler              = local.application_data.accounts[local.environment].create_rds_sheduler
   stop_aurora_cluster_schedule = "cron(00 00 ? * MON-FRI *)"
   performance_insights_enabled = true
 

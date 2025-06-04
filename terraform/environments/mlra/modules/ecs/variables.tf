@@ -189,12 +189,17 @@ variable "maatdb_rds_sec_group_id" {
   description = "MAATDB sec group ID"
 }
 
-variable "maat_api_client_id" {
+variable "alb_security_group_id" {
+  type        = string
+  description = "ALB Security Group ID"
+}
+
+variable "maat_api_client_id_name" {
   type        = string
   description = "Parameter store secret name containing the MAAT API Client ID"
 }
 
-variable "maat_api_client_secret" {
+variable "maat_api_client_secret_name" {
   type        = string
   description = "Parameter store secret name containing the MAAT API Client Secret"
 }
