@@ -1,27 +1,3 @@
-module "mlflow_bucket" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-
-  source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.6.1"
-
-  bucket = "mojap-compute-${local.environment}-mlflow"
-
-  force_destroy = true
-
-  server_side_encryption_configuration = {
-    rule = {
-      bucket_key_enabled = true
-      apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.mlflow_s3_kms.key_arn
-        sse_algorithm     = "aws:kms"
-      }
-    }
-  }
-
-  tags = local.tags
-}
-
 data "aws_iam_policy_document" "s3_server_access_logs_eu_west_2_policy" {
   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
   statement {
