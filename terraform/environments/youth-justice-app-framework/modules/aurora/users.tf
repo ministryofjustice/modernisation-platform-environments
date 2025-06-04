@@ -20,7 +20,7 @@ resource "aws_secretsmanager_secret" "user_admin_secret" {
   kms_key_id  = var.kms_key_id
 }
 
-resource "aws_secretsmanager_secret_version" "aurora_user_version" {
+resource "aws_secretsmanager_secret_version" "aurora_rotated_user_version" {
   for_each  = toset(local.user_passwords_to_reset)
   secret_id = aws_secretsmanager_secret.user_admin_secret[each.value].id
   secret_string = jsonencode({
