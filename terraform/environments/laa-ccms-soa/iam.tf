@@ -116,7 +116,12 @@ resource "aws_iam_policy" "ec2_instance_policy" {
         {
             "Effect": "Allow",
             "Action": [
+                "ds:CreateComputer",
+                "ds:DescribeDirectories",
+                "ec2messages:*"
                 "ec2:DescribeTags",
+                "ec2:DescribeInstanceStatus",
+                "cloudwatch:PutMetricData",
                 "ecs:CreateCluster",
                 "ecs:DeregisterContainerInstance",
                 "ecs:DiscoverPollEndpoint",
@@ -125,25 +130,13 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ecs:StartTelemetrySession",
                 "ecs:UpdateContainerInstancesState",
                 "ecs:Submit*",
+                "ecs:SubmitTaskStateChange",
                 "ecr:GetAuthorizationToken",
                 "ecr:BatchCheckLayerAvailability",
                 "ecr:GetDownloadUrlForLayer",
                 "ecr:BatchGetImage",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents"
-            ],
-            "Resource": "*"
-        },
-        {
-            "Effect": "Allow",
-            "Action": [
-                "cloudwatch:PutMetricData",
-                "ds:CreateComputer",
-                "ds:DescribeDirectories",
-                "ec2:DescribeInstanceStatus",
-                "logs:*",
-                "ssm:*",
-                "ec2messages:*"
             ],
             "Resource": "*"
         },
@@ -171,7 +164,25 @@ resource "aws_iam_policy" "ec2_instance_policy" {
                 "ssmmessages:CreateControlChannel",
                 "ssmmessages:CreateDataChannel",
                 "ssmmessages:OpenControlChannel",
-                "ssmmessages:OpenDataChannel"
+                "ssmmessages:OpenDataChannel",
+                "ssm:AddTagsToResource",
+                "ssm:DescribeDocument",
+                "ssm:ExecuteAPI",
+                "ssm:GetAccessToken",
+                "ssm:GetCalendar",
+                "ssm:GetDocument",
+                "ssm:GetManifest",
+                "ssm:GetParameter",
+                "ssm:ListInstanceAssociations",
+                "ssm:ListTagsForResource",
+                "ssm:PutCalendar",
+                "ssm:PutComplianceItems",
+                "ssm:PutConfigurePackageResult",
+                "ssm:PutInventory",
+                "ssm:RemoveTagsFromResource",
+                "ssm:StartAccessRequest",
+                "ssm:StartExecutionPreview",
+                "ssm:UpdateInstance*",
             ],
             "Resource": "*"
         },
