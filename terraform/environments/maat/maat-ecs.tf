@@ -59,6 +59,8 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
           "logs:DescribeLogStreams",
           "s3:ListBucket",
           "s3:*Object*",
+          "s3:GetObjectACL",
+          "s3:putObjectACL",
           "xray:PutTraceSegments",
           "xray:PutTelemetryRecords",
           "xray:GetSamplingRules",
