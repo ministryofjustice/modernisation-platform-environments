@@ -40,11 +40,6 @@ resource "aws_ses_configuration_set" "default_configuration_set" {
   }
   reputation_metrics_enabled = true
   sending_enabled            = true
-
-  tags = merge(local.tags,
-    { "ses:region" = data.aws_region.current.id },
-    { "laa:environment" = "${local.environment}" }
-  )
 }
 
 resource "aws_ses_event_destination" "cloudwatch" {
@@ -58,7 +53,6 @@ resource "aws_ses_event_destination" "cloudwatch" {
     dimension_name = "ses:configuration-set"
     value_source   = "messageTag"
   }
-
 }
 
 # TO DO: Kinesis configuration (including S3 bucket, IAM role and policy, ...).
