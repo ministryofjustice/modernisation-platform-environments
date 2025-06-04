@@ -3,7 +3,7 @@
 #Set variables
 aws_account_id_dest=$1
 
-aws quicksight delete-dashboard --aws-account-id ${aws_account_id_dest} --adashboard-id 89ded068-ff94-4391-984a-8bc8bb0ec7d5
+aws quicksight delete-dashboard --aws-account-id ${aws_account_id_dest} --dashboard-id 89ded068-ff94-4391-984a-8bc8bb0ec7d5
 
 aws quicksight delete-template --aws-account-id ${aws_account_id_dest} --template-id Disparity_Toolkit_v1_2
 

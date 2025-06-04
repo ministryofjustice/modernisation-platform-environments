@@ -107,7 +107,7 @@
     "ImportMode": "SPICE",
     "Permissions": [
         {
-            "Principal": "arn:aws:quicksight:eu-west-2:711387140977:role/quicksight-admin-access",
+            "Principal": "arn:aws:quicksight:eu-west-2:711387140977:user/default/quicksight-admin-access/david.seekins",
             "Actions": [
                 "quicksight:DeleteDataSet",
                 "quicksight:UpdateDataSetPermissions",
