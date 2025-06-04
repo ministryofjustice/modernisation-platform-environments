@@ -384,8 +384,8 @@ data "aws_iam_policy_document" "db_uplift_bucket_access" {
       "s3:List*"
     ]
     resources = [
-      "${module.s3_bucket_db_uplift.bucket.arn}",
-      "${module.s3_bucket_db_uplift.bucket.arn}/*"
+      "${module.s3_bucket_db_uplift[0].bucket.arn}",
+      "${module.s3_bucket_db_uplift[0].bucket.arn}/*"
     ]
   }
 }
