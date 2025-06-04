@@ -363,6 +363,7 @@ module "s3_bucket_oracle_statistics" {
 }
 
 module "s3_bucket_db_uplift" {
+  count = contains(["mis"], var.app_name) ? 0 : 1
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
 
   providers = {
