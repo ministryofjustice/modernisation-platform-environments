@@ -13,28 +13,23 @@
     "portMappings": [
       {
         "containerPort": ${managed_server_port},
-        "hostPort": 0,
-        "protocol": "tcp"
+        "hostPort": ${managed_server_port}
       },
       {
         "containerPort": 7574,
-        "hostPort": 0,
-        "protocol": "tcp"
+        "hostPort": 7574
       },
       {
         "containerPort": 7,
-        "hostPort": 0,
-        "protocol": "tcp"
+        "hostPort": 7
       },
       {
         "containerPort": 8088,
-        "hostPort": 0,
-        "protocol": "tcp"
+        "hostPort": 8088
       },
       {
         "containerPort": 8089,
-        "hostPort": 0,
-        "protocol": "tcp"
+        "hostPort": 8089
       }
     ],
     "mountPoints": [

@@ -3,7 +3,7 @@
 #--Admin
 resource "aws_lb" "admin" {
   name               = "${local.application_data.accounts[local.environment].app_name}-admin-lb"
-  load_balancer_type = "application"
+  load_balancer_type = "network"
   internal           = true
   subnets            = data.aws_subnets.shared-private.ids
   security_groups    = [aws_security_group.alb_admin.id]
@@ -14,16 +14,15 @@ resource "aws_lb_target_group" "admin" {
   port                 = local.application_data.accounts[local.environment].admin_server_port
   protocol             = "HTTP"
   vpc_id               = data.aws_vpc.shared.id
-  target_type          = "instance"
+  target_type          = "ip"
   deregistration_delay = 30
 
-  #--Need to find out the applications HTTP endpoints - AW
-  /*   health_check {
+    health_check {
     healthy_threshold   = "3"
     interval            = "30"
     protocol            = "TCP"
     unhealthy_threshold = "3"
-  } */
+  }
 
   lifecycle {
     create_before_destroy = true
@@ -33,7 +32,18 @@ resource "aws_lb_target_group" "admin" {
 resource "aws_lb_listener" "admin80" {
   load_balancer_arn = aws_lb.admin.id
   port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
-  protocol          = "HTTP"
+  protocol          = "TCP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.admin.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "admin_server_port" {
+  load_balancer_arn = aws_lb.admin.id
+  port              = local.application_data.accounts[local.environment].admin_server_port
+  protocol          = "TCP"
 
   default_action {
     target_group_arn = aws_lb_target_group.admin.id
@@ -45,7 +55,7 @@ resource "aws_lb_listener" "admin80" {
 /* resource "aws_lb_listener" "admin443" {
   load_balancer_arn = aws_lb.admin.id
   port              = 443
-  protocol          = "HTTPS"
+  protocol          = "TLS"
 
   ssl_policy      = "ELBSecurityPolicy-TLS13-1-2-2021-06"
   certificate_arn = local.application_data.accounts[local.environment].admin_loadbalancer_certificate_arn #--NEED TO POPULATE, MAKE A DUMMY CERT FOR NOW
@@ -56,21 +66,10 @@ resource "aws_lb_listener" "admin80" {
   }
 } */
 
-resource "aws_lb_listener" "admin7001" {
-  load_balancer_arn = aws_lb.admin.id
-  port              = 7001
-  protocol          = "HTTP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.admin.id
-    type             = "forward"
-  }
-}
-
 #--Managed
 resource "aws_lb" "managed" {
   name               = "${local.application_data.accounts[local.environment].app_name}-managed-api-lb"
-  load_balancer_type = "application"
+  load_balancer_type = "network"
   internal           = true
   subnets            = data.aws_subnets.shared-private.ids
   security_groups    = [aws_security_group.alb_managed.id]
@@ -81,15 +80,14 @@ resource "aws_lb_target_group" "managed" {
   port        = local.application_data.accounts[local.environment].managed_server_port
   protocol    = "HTTP"
   vpc_id      = data.aws_vpc.shared.id
-  target_type = "instance"
+  target_type = "ip"
 
-  #--Need to find out the applications HTTP endpoints - AW
-  /*   health_check {
+    health_check {
     healthy_threshold   = "3"
     interval            = "30"
     protocol            = "TCP"
     unhealthy_threshold = "3"
-  } */
+  }
 
   lifecycle {
     create_before_destroy = true
@@ -99,7 +97,18 @@ resource "aws_lb_target_group" "managed" {
 resource "aws_lb_listener" "managed80" {
   load_balancer_arn = aws_lb.managed.id
   port              = 80 #--Don't know why HTTP is being listened, is this a redirect? Why? - Revist. AW
-  protocol          = "HTTP"
+  protocol          = "TCP"
+
+  default_action {
+    target_group_arn = aws_lb_target_group.managed.id
+    type             = "forward"
+  }
+}
+
+resource "aws_lb_listener" "managed_server_port" {
+  load_balancer_arn = aws_lb.managed.id
+  port              = local.application_data.accounts[local.environment].managed_server_port
+  protocol          = "TCP"
 
   default_action {
     target_group_arn = aws_lb_target_group.managed.id
@@ -121,14 +130,3 @@ resource "aws_lb_listener" "managed80" {
     type             = "forward"
   }
 } */
-
-resource "aws_lb_listener" "managed8001" {
-  load_balancer_arn = aws_lb.managed.id
-  port              = 8001
-  protocol          = "HTTP"
-
-  default_action {
-    target_group_arn = aws_lb_target_group.managed.id
-    type             = "forward"
-  }
-}
