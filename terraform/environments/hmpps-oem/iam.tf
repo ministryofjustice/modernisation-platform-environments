@@ -17,15 +17,15 @@ locals {
 
   agentreg_assume_role_account_ids = {
     development = [
-      "${module.environment.account_ids.delius-iaps-development}"
+      module.environment.account_ids.delius-iaps-development
     ]
     test = [
     ]
     preproduction = [
-      "${module.environment.account_ids.delius-iaps-preproduction}"
+      module.environment.account_ids.delius-iaps-preproduction
     ]
     production = [
-      "${module.environment.account_ids.delius-iaps-production}"
+      module.environment.account_ids.delius-iaps-production
     ]
   }
 }
