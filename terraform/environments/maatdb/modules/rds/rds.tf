@@ -216,7 +216,7 @@ resource "aws_security_group" "cloud_platform_sec_group" {
 resource "aws_security_group" "vpc_sec_group" {
   count = length(trimspace(var.ecs_cluster_sec_group_id)) > 0 ? 1 : 0
   name        = "ecs-sec-group"
-  description = "RDS Access with the shared vpc"
+  description = "RDS Access for the MAAT application"
   vpc_id      = var.vpc_shared_id
 
   ingress {
@@ -243,7 +243,7 @@ resource "aws_security_group" "vpc_sec_group" {
 resource "aws_security_group" "mlra_ecs_sec_group" {
   count = length(trimspace(var.mlra_ecs_cluster_sec_group_id)) > 0 ? 1 : 0
   name        = "mlra-ecs-sec-group"
-  description = "RDS Access from the MLRA application"
+  description = "RDS Access for the MLRA application"
   vpc_id      = var.vpc_shared_id
 
   ingress {
@@ -271,7 +271,7 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
 # Access from Bastion
 resource "aws_security_group" "bastion_sec_group" {
   name        = "bastion-sec-group"
-  description = "Bastion Access with the shared vpc"
+  description = "RDS access for the EC2 SSM Bastion"
   vpc_id      = var.vpc_shared_id
 
   ingress {
