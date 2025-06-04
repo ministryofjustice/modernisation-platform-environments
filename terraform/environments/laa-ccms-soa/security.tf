@@ -76,7 +76,6 @@ resource "aws_security_group_rule" "alb_managed_egress_all" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "egress"
   description       = "All"
-  protocol          = "TCP"
   protocol          = -1
   from_port         = 0
   to_port           = 0
