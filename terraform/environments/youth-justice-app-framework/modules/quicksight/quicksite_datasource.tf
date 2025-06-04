@@ -26,7 +26,7 @@ resource "aws_quicksight_data_source" "redshift" {
   }
   
   permission {
-    principal = "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/quicksight-admin-access/${var.quicksight_admin_user}"
+    principal = "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/quicksight-admin-access/${var.quicksight_admin_user}"
     actions =  [
       "quicksight:PassDataSource",
       "quicksight:DescribeDataSourcePermissions",
@@ -84,7 +84,7 @@ resource "aws_quicksight_data_source" "postgresql" {
   }
 
   permission {
-   principal = "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/quicksight-admin-access/${var.quicksight_admin_user}"
+   principal = "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/quicksight-admin-access/${var.quicksight_admin_user}"
     actions =  [
       "quicksight:PassDataSource",
       "quicksight:DescribeDataSourcePermissions",
