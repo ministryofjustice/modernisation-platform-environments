@@ -1,12 +1,25 @@
 
 
-### THIS LINE IS A WORK AROUND AND NEEDS TO BE REMOVED ONCE WE FIX THE R53 ISSUE
-### zone_id  = var.environment == "production" && each.value.identity == "production.yjbservices.yjb.gov.uk" ? "Z03007883SPT4Z4CG736D" : null
+### WORK AROUND AND NEEDS TO BE REMOVED ONCE WE FIX THE R53 ISSUE 
+### ORIGINAL BLOCK BELOW
+### data "aws_route53_zone" "zones" {
+###  for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }
+###  name     = "${each.value.identity}."
+###   }
+
+data "aws_route53_zone" "zone_id_override" {
+  for_each = {
+    for k, v in var.ses_domain_identities :
+    k => v
+    if v.create_records && var.environment == "production" && v.identity == "production.yjbservices.yjb.gov.uk"
+  }
+  zone_id       = "Z03007883SPT4Z4CG736D"
+  private_zone  = false
+}
 
 data "aws_route53_zone" "zones" {
   for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }
   name     = "${each.value.identity}."
-  zone_id  = var.environment == "production" && each.value.identity == "production.yjbservices.yjb.gov.uk" ? "Z03007883SPT4Z4CG736D" : null
 }
 
 

@@ -60,23 +60,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     }
   }
 
-  target {
-    name           = "Volumes"
-    resource_type  = "aws:ec2:ebs-volume"
-    selection_mode = "COUNT(1)"
-    resource_tag {
-      key   = "AzImpairmentPower"
-      value = "ApiPauseVolume"
-    }
-    filter {
-      path   = "Attachments.DeleteOnTermination"
-      values = ["false"]
-    }
-    filter {
-    path   = "AvailabilityZone"
-    values = ["euw2-az3"] 
-    }
-  }
 
   target {
     name           = "RDSCluster"
@@ -164,21 +147,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
 
     parameter {
       key   = "startInstancesAfterDuration"
-      value = "PT1H"
-    }
-  }
-
-  action {
-    name      = "Pause-Volume-IO"
-    action_id = "aws:ebs:pause-volume-io"
-
-    target {
-      key   = "Volumes"
-      value = "Volumes"
-    }
-
-    parameter {
-      key   = "duration"
       value = "PT1H"
     }
   }
