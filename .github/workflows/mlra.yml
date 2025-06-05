@@ -32,7 +32,7 @@ permissions:
 
 jobs:
   strategy:
-    uses: ./.github/workflows/reusable_terraform_strategy.yml
+    uses: ./.github/workflows/reusable_terraform_components_strategy.yml
     if: inputs.action != 'destroy'
     with:
       application: "${{ github.workflow }}"
@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
-    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
       environment: "${{ matrix.target }}"
@@ -54,7 +54,7 @@ jobs:
 
   destroy-development:
     if: inputs.action == 'destroy-dev'
-    uses: ./.github/workflows/reusable_terraform_plan_apply.yml
+    uses: ./.github/workflows/reusable_terraform_components_plan_apply.yml
     with:
       application: "${{ github.workflow }}"
       environment: "development"
