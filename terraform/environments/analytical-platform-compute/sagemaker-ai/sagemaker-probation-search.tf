@@ -34,8 +34,9 @@ locals {
         target_invocations_per_instance = 300
         repository_name                 = "tei"
         image_tag                       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
+        s3_model_key                    = "ext/mixedbread-ai/mixedbread-ai_mxbai-embed-large-v1/"
         environment = {
-          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
+          HF_MODEL_ID           = "/opt/ml/model"
           MAX_CLIENT_BATCH_SIZE = 2048
           MAX_BATCH_TOKENS      = 65536
           AUTO_TRUNCATE         = true
@@ -49,8 +50,9 @@ locals {
         target_invocations_per_instance = 300
         repository_name                 = "tei"
         image_tag                       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
+        s3_model_key                    = "ext/mixedbread-ai/mixedbread-ai_mxbai-embed-large-v1/"
         environment = {
-          HF_MODEL_ID           = "mixedbread-ai/mxbai-embed-large-v1"
+          HF_MODEL_ID           = "/opt/ml/model"
           MAX_CLIENT_BATCH_SIZE = 2048
           MAX_BATCH_TOKENS      = 65536
           AUTO_TRUNCATE         = true
@@ -73,12 +75,12 @@ data "aws_sagemaker_prebuilt_ecr_image" "probation_search_huggingface_embedding_
 }
 
 resource "aws_sagemaker_model" "probation_search_huggingface_embedding_model" {
-  #checkov:skip=CKV_AWS_370:Network isolation must be disabled to enable us to pull the model from Huggingface
+  #checkov:skip=CKV_AWS_370:Network isolation is enabled conditionally, based on whether the model is pulled from S3 or Hugging Face
 
   for_each = tomap(local.probation_search_environment)
 
-  execution_role_arn = module.probation_search_sagemaker_execution_iam_role[each.key].iam_role_arn
-
+  execution_role_arn       = module.probation_search_sagemaker_execution_iam_role[each.key].iam_role_arn
+  enable_network_isolation = can(each.value.s3_model_key)
   primary_container {
     image       = data.aws_sagemaker_prebuilt_ecr_image.probation_search_huggingface_embedding_image[each.key].registry_path
     environment = each.value.environment
