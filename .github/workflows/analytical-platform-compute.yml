@@ -43,7 +43,7 @@
 
     terraform:
       needs: strategy
-      if: inputs.action != 'destroy'
+      if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
       strategy:
         fail-fast: false
         matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
@@ -56,8 +56,8 @@
         action: "${{ matrix.action }}"
         component: "${{ matrix.component }}"      # If your strategy workflow also outputs "matrix.component"
       secrets:
-        modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-        pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+        MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+        PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
     destroy-development:
       if: inputs.action == 'destroy'
@@ -69,5 +69,5 @@
         plan_apply_tfargs: "-destroy"
         # If you need component logic on destroy, pass it here as well, e.g. component: ...
       secrets:
-        modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-        pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+        MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+        PASSPHRASE: ${{ secrets.PASSPHRASE }}
