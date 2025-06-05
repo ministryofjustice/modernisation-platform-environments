@@ -11,6 +11,17 @@ variable "batch_only" {
   default     = false
 }
 
+variable "split_pipeline" {
+  description = "Determines if the pipeline is split into a Full-Load and a separate CDC tasks, True or False?"
+  type        = bool
+  default     = false
+
+  validation {
+    condition     = var.batch_only ? var.split_pipeline == false : true
+    error_message = "split_pipeline can only be 'true' when batch_only = false"
+  }
+}
+
 variable "data_ingestion_pipeline" {
   description = "Name for Data Ingestion Pipeline"
   type        = string
@@ -37,14 +48,50 @@ variable "dms_replication_task_arn" {
   type        = string
 }
 
+variable "dms_cdc_replication_task_arn" {
+  description = "ARN of the CDC replication task"
+  type        = string
+
+  validation {
+    condition     = var.split_pipeline == true ? var.dms_cdc_replication_task_arn != null : var.dms_cdc_replication_task_arn == null
+    error_message = "dms_cdc_replication_task_arn is only allowed when split_pipeline = true"
+  }
+}
+
 variable "replication_task_id" {
   description = "ID of the replication task"
   type        = string
 }
 
+variable "cdc_replication_task_id" {
+  description = "ID of the CDC replication task"
+  type        = string
+
+  validation {
+    condition     = var.split_pipeline == true ? var.cdc_replication_task_id != null : var.cdc_replication_task_id == null
+    error_message = "cdc_replication_task_id is only allowed when split_pipeline = true"
+  }
+}
+
 variable "pipeline_notification_lambda_function" {
   description = "Pipeline Notification Lambda Name"
   type        = string
+}
+
+variable "pipeline_notification_lambda_function_ignore_dms_failure" {
+  description = "Pipeline notification lambda function ignores DMS task failures"
+  type        = bool
+  default     = false
+}
+
+variable "set_cdc_dms_start_time_job" {
+  description = "Name of the Glue job which sets the start time of the CDC DMS task"
+  type        = string
+
+  validation {
+    condition     = var.split_pipeline == true ? var.set_cdc_dms_start_time_job != null : var.set_cdc_dms_start_time_job == null
+    error_message = "set_cdc_dms_start_time_job is only allowed when split_pipeline = true"
+  }
 }
 
 variable "glue_reporting_hub_batch_jobname" {

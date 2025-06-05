@@ -19,7 +19,9 @@ module "aurora" {
   #one time restore from a shared snapshot #todo remove this post migration. Take from secrets manager
   snapshot_identifier = aws_secretsmanager_secret_version.snapshot_identifier.secret_string != "dummy" ? aws_secretsmanager_secret_version.snapshot_identifier.secret_string : local.application_data.accounts[local.environment].snapshot_identifier
 
-  user_passwords_to_reset = ["postgres_rotated", "redshift_readonly", "ycs_team", "postgres"]
+  user_passwords_to_reset_rotated = ["postgres_rotated", "redshift_readonly"]
+  user_passwords_to_reset_static  = ["ycs_team", "postgres"]                   # Need to be static as they are used in Tableau data sources.
+
   db_name                 = "yjafrds01"
   aws_account_id          = data.aws_caller_identity.current.account_id
 
