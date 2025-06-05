@@ -20,6 +20,14 @@ variable "notification_email" {
   default     = "YJAFoperationsAWS@necsws.com"
 }
 
+# TODO Change this to a list of administrators
+variable "quicksight_admin_user" {
+  type        = string
+  description = "User whoe will be granted permisisons for the Quicksight Data Sources when assuming role quicksight-admin-access."
+}
+
+
+
 variable "vpc_id" {
   type        = string
   description = "VPC ID."
