@@ -70,8 +70,3 @@ module "actions_runners_github_app_apc_self_hosted_runners_secret" {
 
   tags = local.tags
 }
-
-moved {
-  from = module.actions_runners_token_apc_self_hosted_runners_github_app[0]
-  to   = module.actions_runners_github_app_apc_self_hosted_runners_secret[0]
-}
