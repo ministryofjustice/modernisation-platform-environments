@@ -24,7 +24,6 @@ resource "aws_wafv2_ip_set" "xbhibit_waf_ip_set" {
 }
 
 resource "aws_wafv2_web_acl" "xhibit_web_acl" {
-
   name        = "xbhibit_waf"
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL"
@@ -32,35 +31,12 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
   default_action {
     block {}
   }
-  rule {
-    name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
-    priority = 10 # Higher priority than your IP block rule
-    override_action {
-      none {}
-    }
-    statement {
-      managed_rule_group_statement {
-        name        = "AWSManagedRulesKnownBadInputsRuleSet"
-        vendor_name = "AWS"
-        rule_action_override {
-          action_to_use {
-            count {}
-          }
-          name = "Log4JRCE"
-        }
-      }
-    }
-    visibility_config {
-      cloudwatch_metrics_enabled = true
-      metric_name                = "AWSManagedRulesKnownBadInputsRuleSet"
-      sampled_requests_enabled   = true
-    }
-  }
 
+  # ✅ IP blocking rule (still active block)
   rule {
-    name = "xbhibit-waf-blocked-rule"
-
+    name     = "xbhibit-waf-blocked-rule"
     priority = 1
+
     action {
       block {}
     }
@@ -78,25 +54,156 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
     }
   }
 
-  tags = merge(local.tags,
-    { Name = lower(format("lb-%s-%s-xhibit-web-acl", local.application_name, local.environment)) }
-  )
+  # ✅ AWS Managed Rule Groups (all in COUNT mode)
+  rule {
+    name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
+    priority = 10
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesKnownBadInputsRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "KnownBadInputs"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesCommonRuleSet"
+    priority = 11
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesCommonRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "CommonRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesSQLiRuleSet"
+    priority = 12
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesSQLiRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "SQLiRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesLinuxRuleSet"
+    priority = 13
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesLinuxRuleSet"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "LinuxRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesAnonymousIpList"
+    priority = 14
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesAnonymousIpList"
+        vendor_name = "AWS"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "AnonymousIpList"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  rule {
+    name     = "AWS-AWSManagedRulesBotControlRuleSet"
+    priority = 16
+
+    override_action {
+      count {}
+    }
+
+    statement {
+      managed_rule_group_statement {
+        name        = "AWSManagedRulesBotControlRuleSet"
+        vendor_name = "AWS"
+        # Optional: scope_down_statement can be added here for finer control
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "BotControlRuleSet"
+      sampled_requests_enabled   = true
+    }
+  }
 
   visibility_config {
     cloudwatch_metrics_enabled = true
     metric_name                = "xhibit_waf_metrics"
     sampled_requests_enabled   = true
   }
+
+  tags = merge(local.tags,
+    { Name = lower(format("lb-%s-%s-xhibit-web-acl", local.application_name, local.environment)) }
+  )
 }
+
 
 resource "aws_wafv2_web_acl_association" "xhibit_portal_prtg" {
   resource_arn = aws_lb.prtg_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.xhibit_web_acl.arn
   depends_on = [aws_lb.prtg_lb]
-
-  lifecycle {
-    ignore_changes = [web_acl_arn]
-}
 }
 
 resource "aws_wafv2_web_acl_association" "xhibit_portal_waf" {
@@ -104,10 +211,6 @@ resource "aws_wafv2_web_acl_association" "xhibit_portal_waf" {
   web_acl_arn  = aws_wafv2_web_acl.xhibit_web_acl.arn
 
   depends_on = [aws_lb.waf_lb]  # Ensures ALB is ready before association
-
-  lifecycle {
-    ignore_changes = [web_acl_arn]
-}
 
 }
 
