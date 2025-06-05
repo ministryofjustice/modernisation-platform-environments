@@ -38,15 +38,15 @@ resource "aws_route53_record" "app1" {
 # }
 
 # Domain A record for ALB
-resource "aws_route53_record" "external" {
-  provider = aws.core-vpc
-  zone_id  = var.route53_zone_external_id
-  name     = "${local.application_name_short}.${var.route53_zone_external}" # cwa.dev.legalservices.gov.uk
-  type     = "A"
+# resource "aws_route53_record" "external" {
+#   provider = aws.core-vpc
+#   zone_id  = var.route53_zone_external_id
+#   name     = "${local.application_name_short}.${var.route53_zone_external}" # cwa.dev.legalservices.gov.uk
+#   type     = "A"
 
-  alias {
-    name                   = aws_lb.external.dns_name
-    zone_id                = aws_lb.external.zone_id
-    evaluate_target_health = true
-  }
-}
+#   alias {
+#     name                   = aws_lb.external.dns_name
+#     zone_id                = aws_lb.external.zone_id
+#     evaluate_target_health = true
+#   }
+# }
