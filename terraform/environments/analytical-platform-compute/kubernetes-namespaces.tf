@@ -52,34 +52,12 @@ resource "kubernetes_namespace" "keda" {
   }
 }
 
-resource "kubernetes_namespace" "actions_runners" {
-  count = terraform.workspace == "analytical-platform-compute-production" ? 1 : 0
-
-  metadata {
-    name = "actions-runners"
-    labels = {
-      "pod-security.kubernetes.io/enforce"                          = "baseline"
-      "compute.analytical-platform.service.justice.gov.uk/workload" = "actions-runners"
-    }
-  }
-}
-
 resource "kubernetes_namespace" "airflow" {
   metadata {
     name = "airflow"
     labels = {
       "pod-security.kubernetes.io/enforce"                          = "baseline" # This was restricted, but the current pod specification doesn't set the right metadata
       "compute.analytical-platform.service.justice.gov.uk/workload" = "airflow"
-    }
-  }
-}
-
-resource "kubernetes_namespace" "mlflow" {
-  metadata {
-    name = "mlflow"
-    labels = {
-      "pod-security.kubernetes.io/enforce"                          = "restricted"
-      "compute.analytical-platform.service.justice.gov.uk/workload" = "mlflow"
     }
   }
 }

@@ -1,4 +1,4 @@
-# Python script to retrieve elastic load balancer target uptime data from S3 and calculate the daily and monthly average uptime
+# Python script to retrieve elastic load balancer target uptime data from S3 and calculate the monthly average uptime
 # Nick Buckingham
 # Updated: 29 May 2025
 
@@ -67,19 +67,22 @@ def calculate_uptimes(csv_data, month_start, month_end):
     return overall_uptime, business_hours_uptime
 
 def send_email(overall_avg, business_avg):
-    body = f"""Hi Team,
+    body = f"""<html><body>
+    <p>Hi Team,</p>
 
-Please find below the PPUD Load Balancer availability figures for the last month:
+    <p>Please find below the PPUD Load Balancer availability figures for the last month:</p>
 
-Business day uptime (08:00 to 18:00 Mon to Fri): {business_avg:.2f}%
+    <p>Business day uptime time (08:00 to 18:00 Mon to Fri): <b>{business_avg:.5f} %</b></p>
+    <p>Overall uptime time (entire month): <b>{overall_avg:.5f} %</b></p>
 
-Overall uptime (24 hours): {overall_avg:.2f}%
+    <p>Note the uptime figures measure the availability of the PPUD web servers in the load balancer.</p>
 
-Note the uptime figures measure the availability of the PPUD web servers in the load balancer. It does not measure the availability of the backend PPUD system.
+    <p>It does not measure the availability of the PPUD backend systems such as the database or document conversion functions.</p>
 
-This is an automated email."""
+    <p>This is an automated email.</p>
+    </body></html>"""
 
-    msg = MIMEText(body)
+    msg = MIMEText(body, "html")  # Setting MIME type to HTML for formatting
     msg["Subject"] = SUBJECT
     msg["From"] = SENDER
     msg["To"] = ", ".join(RECIPIENTS)
@@ -114,8 +117,8 @@ def lambda_handler(event, context):
         return {
             "statusCode": 200,
             "body": (
-                f"Overall Average Uptime: {overall_avg:.2f}% | "
-                f"Business Hours Uptime: {business_avg:.2f}% (Email Sent)"
+                f"Overall Average Uptime: {overall_avg:.5f}% | "
+                f"Business Hours Uptime: {business_avg:.5f}% (Email Sent)"
             )
         }
 

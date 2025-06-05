@@ -6,9 +6,10 @@ locals {
 }
 
 module "rds" {
+
   source                                = "./modules/rds"
-  application_name                      = local.application_data.accounts[local.environment].application_name
-  identifier_name                       = local.application_data.accounts[local.environment].identifier_name
+  application_name                      = upper(local.application_name)
+  identifier_name                       = local.application_name
   environment                           = local.environment
   region                                = local.application_data.accounts[local.environment].region
   port                                  = local.application_data.accounts[local.environment].port

@@ -15,3 +15,8 @@ variable "r53_zone_id" {
 variable "project_name" {
   type = string
 }
+
+variable "validate_certs" {
+  type    = bool
+  default = true
+}
