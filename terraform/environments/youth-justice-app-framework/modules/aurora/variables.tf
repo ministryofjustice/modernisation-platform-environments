@@ -163,8 +163,14 @@ variable "snapshot_identifier" {
   default     = null
 }
 
-variable "user_passwords_to_reset" {
-  description = "List of user passwords to reset"
+variable "user_passwords_to_reset_rotated" {
+  description = "List of user passwords to reset with secret rotation function"
+  type        = list(string)
+  default     = []
+}
+
+variable "user_passwords_to_reset_static" {
+  description = "List of user passwords to reset without a secret rotation function"
   type        = list(string)
   default     = []
 }
