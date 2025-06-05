@@ -20,6 +20,7 @@ module "oracle_db_shared" {
   env_name           = var.env_name
   tags               = local.tags
   public_keys        = local.db_public_key_data.keys[var.account_info.mp_environment]
+  app_name           = var.app_name
 
   db_suffix = each.key
 
