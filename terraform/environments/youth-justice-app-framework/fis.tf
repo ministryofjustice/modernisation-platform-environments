@@ -168,10 +168,41 @@ resource "aws_iam_role" "fis_role" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "fis_asg_policy" {
-  role       = aws_iam_role.fis_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSFaultInjectionSimulatorASGAccess"
+resource "aws_iam_role_policy" "fis_asg_custom_policy" {
+  name = "FIS-ASG-Custom-Policy"
+  role = aws_iam_role.fis_role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowInjectAPI",
+        Effect = "Allow",
+        Action = [
+          "ec2:InjectApiError"
+        ],
+        Resource = ["*"],
+        Condition = {
+          "ForAnyValue:StringEquals" = {
+            "ec2:FisActionId" = [
+              "aws:ec2:api-insufficient-instance-capacity-error",
+              "aws:ec2:asg-insufficient-instance-capacity-error"
+            ]
+          }
+        }
+      },
+      {
+        Sid    = "DescribeAsg",
+        Effect = "Allow",
+        Action = [
+          "autoscaling:DescribeAutoScalingGroups"
+        ],
+        Resource = ["*"]
+      }
+    ]
+  })
 }
+
 
 resource "aws_iam_role_policy_attachment" "fis_ec2_policy" {
   role       = aws_iam_role.fis_role.name
