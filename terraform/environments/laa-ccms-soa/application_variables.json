@@ -47,7 +47,8 @@
       "inbound_s3_bucket_name": "",
       "outbound_s3_bucket_name": "",
       "workspace_cidr_nonprod": "10.200.0.0/20",
-      "workspace_cidr_prod": "10.200.16.0/20"
+      "workspace_cidr_prod": "10.200.16.0/20",
+      "cloud_platform_cidr": "172.20.0.0/16"
     },
     "test": {
       "app_name": "ccms-soa"

@@ -59,7 +59,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_80" {
   protocol          = "TCP"
   from_port         = 80
   to_port           = 80
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block, local.application_data.accounts[local.environment].cloud_platform_cidr]
 }
 
 resource "aws_security_group_rule" "alb_managed_ingress_8001" {
@@ -69,7 +69,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_8001" {
   protocol          = "TCP"
   from_port         = 8001
   to_port           = 8001
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block, local.application_data.accounts[local.environment].cloud_platform_cidr]
 }
 
 resource "aws_security_group_rule" "alb_managed_egress_all" {
