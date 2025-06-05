@@ -11,7 +11,12 @@
       }
     ],
     "memory": 256,
-    "environment": [{ "name": "AWS_REGION", "value": "${region}" }],
+    "environment": [
+      {
+        "name": "AWS_REGION",
+        "value": "${region}"
+      }
+    ],
     "logConfiguration": {
       "logDriver": "awslogs",
       "options": {
@@ -31,7 +36,9 @@
         "containerPort": 8080
       }
     ],
-    "links": ["xray-daemon"],
+    "links": [
+      "xray-daemon"
+    ],
     "memory": 5000,
     "logConfiguration": {
       "logDriver": "awslogs",
