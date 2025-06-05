@@ -234,6 +234,27 @@ resource "aws_iam_role" "fis_role" {
   })
 }
 
+resource "aws_iam_role_policy" "fis_ebs_policy" {
+  name = "FISEBSPermissionPolicy"
+  role = aws_iam_role.fis_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ec2:ListVolumes",
+          "ec2:DescribeVolumes",
+          "ec2:DescribeVolumeStatus",
+          "fis:InjectApiInternalError" 
+        ],
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "fis_ec2_policy" {
   role       = aws_iam_role.fis_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSFaultInjectionSimulatorEC2Access"
