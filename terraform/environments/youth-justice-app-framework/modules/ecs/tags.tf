@@ -9,6 +9,7 @@ locals {
     "module_version"    = local.module_version,
     "module_git_hash"   = local.module_git_hash,
     "project"           = var.project_name
+    "AzImpairmentPower" = "StopInstances"
     "AzImpairmentPower" = "IceAsg"
   }
 

@@ -71,20 +71,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     }
   }
 
-  target {
-    name           = "Subnets"
-    resource_type  = "aws:ec2:subnet"
-    selection_mode = "ALL"
-    resource_tag {
-      key   = "AzImpairmentPower"
-      value = "DisruptSubnet"
-    }
-    filter {
-      path   = "AvailabilityZone"
-      values = ["eu-west-2b"]
-    }
-  }
-
   # Actions
   action {
     name      = "Pause-ASG-Scaling"
@@ -158,26 +144,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     target {
       key   = "Clusters"
       value = "RDSCluster"
-    }
-  }
-
-  action {
-    name      = "Disrupt-Network"
-    action_id = "aws:network:disrupt-connectivity"
-
-    target {
-      key   = "Subnets"
-      value = "Subnets"
-    }
-
-    parameter {
-      key   = "duration"
-      value = "PT2M"
-    }
-
-    parameter {
-      key   = "scope"
-      value = "all"
     }
   }
 
