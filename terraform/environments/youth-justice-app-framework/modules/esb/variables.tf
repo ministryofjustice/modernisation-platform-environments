@@ -54,3 +54,8 @@ variable "ecs_service_external_sg_id" {
   description = "The security group ID for external ECS services"
   type        = string
 }
+
+variable "alb_security_group_id" {
+  description = "Security Group ID for ALB"
+  type        = string
+}
