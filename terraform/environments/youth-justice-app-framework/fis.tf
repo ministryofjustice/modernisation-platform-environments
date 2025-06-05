@@ -98,25 +98,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     }
   }
 
-  action {
-    name      = "Stop-EC2-Instances"
-    action_id = "aws:ec2:stop-instances"
-
-    target {
-      key   = "Instances"
-      value = "EC2Instances"
-    }
-
-    parameter {
-      key   = "completeIfInstancesTerminated"
-      value = "true"
-    }
-
-    parameter {
-      key   = "startInstancesAfterDuration"
-      value = "PT1H"
-    }
-  }
 
   action {
     name      = "Failover-RDS"
