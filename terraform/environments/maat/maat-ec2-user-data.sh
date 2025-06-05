@@ -28,14 +28,7 @@ sudo systemctl start awslogsd
 sudo systemctl enable awslogsd.service
 
 # Install XDR agent stored in S3 bucket
-XDR_AGENT_BUCKET="s3://modernisation-platform-software20230224000709766100000001/laa-platform/xdr-agent/"
-if [[ "production" = "${environment}" ]]; then
-  AGENT_PATH="prod/cortex-agent.tar.gz"
-else
-  AGENT_PATH="pre-prod/cortex-agent.tar.gz"
-fi
-
-aws s3 cp "\$${XDR_AGENT_BUCKET}\$${AGENT_PATH}" ${xdr_tar}
+aws s3 cp "s3://${xdr_bucket}/cortex-agent.tar.gz" ${xdr_tar}
 
 if [[ -f ${xdr_tar} ]]; then
   mkdir -p ${xdr_dir}
