@@ -92,12 +92,11 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
 resource "aws_wafv2_web_acl_association" "xhibit_portal_prtg" {
   resource_arn = aws_lb.prtg_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.xhibit_web_acl.arn
-
-  depends_on = [aws_lb.prtg_lb]  # Ensures ALB is ready before association
+  depends_on = [aws_lb.prtg_lb]
 
   lifecycle {
-    ignore_changes = [web_acl_arn]  # Prevents replacement if ARN changes externally
-  }
+    ignore_changes = [web_acl_arn]
+}
 }
 
 resource "aws_wafv2_web_acl_association" "xhibit_portal_waf" {
@@ -107,8 +106,9 @@ resource "aws_wafv2_web_acl_association" "xhibit_portal_waf" {
   depends_on = [aws_lb.waf_lb]  # Ensures ALB is ready before association
 
   lifecycle {
-    ignore_changes = [web_acl_arn]  # Prevents replacement if ARN changes externally
-  }
+    ignore_changes = [web_acl_arn]
+}
+
 }
 
 resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
