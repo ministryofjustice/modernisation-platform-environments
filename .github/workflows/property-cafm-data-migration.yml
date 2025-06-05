@@ -44,7 +44,7 @@ jobs:
 
   terraform:
     needs: strategy
-    if: inputs.action != 'destroy'
+    if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
