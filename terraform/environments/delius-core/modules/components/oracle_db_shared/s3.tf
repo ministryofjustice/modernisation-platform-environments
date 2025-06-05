@@ -176,7 +176,7 @@ data "aws_iam_policy_document" "combined" {
     try(data.aws_iam_policy_document.oracledb_backup_bucket_access.json, null),
     try(data.aws_iam_policy_document.oracle_remote_statistics_bucket_access[0].json, null),
     try(data.aws_iam_policy_document.oracledb_remote_backup_bucket_access[0].json, null),
-    try(data.aws_iam_policy_document.db_uplift_bucket_access.json, null)
+    try(data.aws_iam_policy_document.db_uplift_bucket_access[0].json, null)
   ])
 }
 
@@ -363,6 +363,7 @@ module "s3_bucket_oracle_statistics" {
 }
 
 module "s3_bucket_db_uplift" {
+  count = contains(["delius-mis"], var.app_name) ? 0 : 1
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.1"
 
   providers = {
@@ -375,6 +376,7 @@ module "s3_bucket_db_uplift" {
 }
 
 data "aws_iam_policy_document" "db_uplift_bucket_access" {
+  count = contains(["delius-mis"], var.app_name) ? 0 : 1
   statement {
     sid    = "allowAccessToUpliftBucket"
     effect = "Allow"
@@ -383,8 +385,8 @@ data "aws_iam_policy_document" "db_uplift_bucket_access" {
       "s3:List*"
     ]
     resources = [
-      "${module.s3_bucket_db_uplift.bucket.arn}",
-      "${module.s3_bucket_db_uplift.bucket.arn}/*"
+      "${module.s3_bucket_db_uplift[0].bucket.arn}",
+      "${module.s3_bucket_db_uplift[0].bucket.arn}/*"
     ]
   }
 }
