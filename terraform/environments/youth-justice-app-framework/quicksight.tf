@@ -10,6 +10,8 @@ module "quicksight" {
 
   notification_email = "david.seekins@necsws.com" # For testing change later.
 
+  quicksight_admin_user = "david.seekins" # for initial testing - needs to be a list of administrators.
+
   vpc_id = data.aws_vpc.shared.id
 
   database_subnet_ids = local.data_subnet_list[*].id

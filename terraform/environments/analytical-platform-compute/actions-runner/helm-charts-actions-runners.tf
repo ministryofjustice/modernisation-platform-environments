@@ -6,15 +6,15 @@ resource "helm_release" "actions_runner_mojas_airflow" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "airflow"
         github_runner_labels       = "analytical-platform"
@@ -32,15 +32,15 @@ resource "helm_release" "actions_runner_mojas_airflow_create_a_pipeline" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-airflow-create-a-pipeline"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/airflow-create-a-pipeline/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "airflow-create-a-pipeline"
         github_runner_labels       = "analytical-platform"
@@ -57,15 +57,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "analytical-platform"
@@ -81,15 +81,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_non_spot" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-non-spot"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "analytical-platform-non-spot"
@@ -109,15 +109,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_sandbox_a" 
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-cadt-sandbox-a"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "analytical-platform-sandbox-a"
@@ -133,15 +133,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_sandbox_a_n
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-cadt-sandbox-a-non-spot"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "analytical-platform-sandbox-a-non-spot"
@@ -161,15 +161,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-dpr"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "digital-prison-reporting"
@@ -185,15 +185,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr_pp" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-dpr-pp"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "digital-prison-reporting-pp"
@@ -209,15 +209,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr_test" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-dpr-test"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "digital-prison-reporting-test"
@@ -233,15 +233,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_dpr_dev" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-dpr-dev"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "digital-prison-reporting-dev"
@@ -257,15 +257,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds_test" 
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-emds-test"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "electronic-monitoring-data-test"
@@ -281,15 +281,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds_pp" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-emds-pp"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "electronic-monitoring-data-preprod"
@@ -305,15 +305,15 @@ resource "helm_release" "actions_runner_mojas_create_a_derived_table_emds" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-mojas-create-a-derived-table-emds"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/create-a-derived-table/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "moj-analytical-services"
         github_repository          = "create-a-derived-table"
         github_runner_labels       = "electronic-monitoring-data"
@@ -331,15 +331,15 @@ resource "helm_release" "actions_runner_moj_data_catalogue" {
   /* https://github.com/ministryofjustice/analytical-platform-actions-runner */
   name       = "actions-runner-moj-data-catalogue"
   repository = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
-  version    = "2.323.0-6"
+  version    = "2.325.0-1"
   chart      = "actions-runner"
-  namespace  = data.kubernetes_namespace.actions_runners[0].metadata[0].name
+  namespace  = kubernetes_namespace.actions_runners[0].metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/actions-runners/data-catalogue/values.yml.tftpl",
       {
-        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["app_id"]
-        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_token_apc_self_hosted_runners_github_app[0].secret_string)["installation_id"]
+        github_app_application_id  = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["app_id"]
+        github_app_installation_id = jsondecode(data.aws_secretsmanager_secret_version.actions_runners_github_app_apc_self_hosted_runners_secret[0].secret_string)["installation_id"]
         github_organisation        = "ministryofjustice"
         github_repository          = "data-catalogue"
         github_runner_labels       = "analytical-platform"
