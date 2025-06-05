@@ -1,6 +1,11 @@
-# The secret containing IP addresses
-data "aws_secretsmanager_secret_version" "ip_block_list" {
-  secret_id = aws_secretsmanager_secret.ip_block_list.id
+resource "aws_ssm_parameter" "ip_block_list" {
+  name  = "/waf/ip_block_list"
+  type  = "SecureString"
+  value = "[]" # or use a dummy like '[]'
+
+  lifecycle {
+    ignore_changes = [value] # 👈 this is critical
+  }
 }
 
 
@@ -11,10 +16,7 @@ resource "aws_wafv2_ip_set" "xbhibit_waf_ip_set" {
   description        = "List IP Addresses to be blockefd via WAF"
 
   addresses = local.blocked_ips
-  
-  lifecycle {
-    ignore_changes = [addresses]  # Prevents perpetual diff
-  }
+
 
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-ip-set", local.application_name, local.environment)) }

@@ -35,8 +35,8 @@ locals {
 
   # Used for the WAF
   blocked_ips = try(
-    toset(jsondecode(data.aws_secretsmanager_secret_version.ip_block_list.secret_string)),
-    toset([]) # Fallback if secret is invalid
+    toset(jsondecode(aws_ssm_parameter.ip_block_list.value)),
+    toset([])
   )
 
   # This is used to prevent our bare metal server from deploying in environments other than production
