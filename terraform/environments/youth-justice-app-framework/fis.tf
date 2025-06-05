@@ -72,6 +72,10 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
       path   = "Attachments.DeleteOnTermination"
       values = ["false"]
     }
+    filter {
+    path   = "AvailabilityZone"
+    values = ["eu-west-2b"] 
+  }
   }
 
   target {
