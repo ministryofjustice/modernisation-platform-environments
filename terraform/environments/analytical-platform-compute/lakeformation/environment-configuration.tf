@@ -41,8 +41,8 @@ locals {
       /* Dashboard Service */
       #   dashboard_service_auth0_domain = "dev-analytics-moj.eu.auth0.com"
       #   dashboard_service_hostname     = "dashboards.development.analytical-platform.service.justice.gov.uk"
-      # }
-      # test = {
+    }
+    test = {
       #   /* VPC */
       #   vpc_cidr                   = "10.200.64.0/18"
       #   vpc_public_subnets         = ["10.200.64.0/27", "10.200.64.32/27", "10.200.64.64/27"]
@@ -77,7 +77,7 @@ locals {
       #   aws_guardduty_agent    = "v1.9.0-eksbuild.2"
       #   eks_pod_identity_agent = "v1.3.5-eksbuild.2"
       #   vpc_cni                = "v1.19.3-eksbuild.1"
-      # }
+      #  }
 
       /* Data Engineering Airflow */
       # data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
