@@ -1,7 +1,14 @@
+
+
+### THIS LINE IS A WORK AROUND AND NEEDS TO BE REMOVED ONCE WE FIX THE R53 ISSUE
+### zone_id  = var.environment == "production" && each.value.identity == "production.yjbservices.yjb.gov.uk" ? "Z03007883SPT4Z4CG736D" : null
+
 data "aws_route53_zone" "zones" {
   for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }
   name     = "${each.value.identity}."
+  zone_id  = var.environment == "production" && each.value.identity == "production.yjbservices.yjb.gov.uk" ? "Z03007883SPT4Z4CG736D" : null
 }
+
 
 resource "aws_route53_record" "ses_verification" {
   for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }

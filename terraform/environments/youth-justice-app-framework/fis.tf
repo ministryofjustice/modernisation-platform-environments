@@ -74,8 +74,8 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     }
     filter {
     path   = "AvailabilityZone"
-    values = ["eu-west-2b"] 
-  }
+    values = ["euw2-az3"] 
+    }
   }
 
   target {
@@ -181,11 +181,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
       key   = "duration"
       value = "PT1H"
     }
-
-    parameter {
-    key   = "availabilityZoneIdentifiers"
-    value = "euw2-az3"
-  }
   }
 
   action {
