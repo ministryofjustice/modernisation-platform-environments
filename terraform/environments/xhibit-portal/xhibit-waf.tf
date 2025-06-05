@@ -29,7 +29,7 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
   description = "AWS WAF Web ACL"
 
   default_action {
-    block {}
+    allow {}
   }
 
   # ✅ IP blocking rule (still active block)
