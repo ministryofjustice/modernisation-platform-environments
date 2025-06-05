@@ -104,7 +104,7 @@ resource "aws_iam_role_policy_attachment" "rds_secret_rotation_policy_attach_cus
 
 
 resource "aws_lambda_permission" "allow_secrets_manager" {
-  for_each = toset(var.user_passwords_to_reset)
+  for_each = toset(var.user_passwords_to_reset_rotated)
 
   statement_id_prefix = "AllowSecretsManagerInvoke-${each.value}"
   action              = "lambda:InvokeFunction"
