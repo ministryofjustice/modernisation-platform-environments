@@ -45,7 +45,7 @@ locals {
         namespace                       = "hmpps-probation-search-prod"
         instance_type                   = "ml.g6.xlarge"
         min_instance_count              = 1
-        max_instance_count              = 4
+        max_instance_count              = 8
         target_invocations_per_instance = 300
         repository_name                 = "tei"
         image_tag                       = "2.0.1-tei1.2.3-gpu-py310-cu122-ubuntu22.04"
