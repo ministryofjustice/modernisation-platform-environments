@@ -9,7 +9,7 @@
                 "s3:PutObjectAcl",
                 "s3:GetObject"
             ],
-            "Resource": "arn:aws:s3:::coat-reports${environment}/*"
+            "Resource": "arn:aws:s3:::coat-reports-${environment}/*"
         },
         {
             "Sid": "ListReportsBucket",
@@ -17,7 +17,7 @@
             "Action": [
                 "s3:ListBucket"
             ],
-            "Resource": "arn:aws:s3:::coat-reports${environment}"
+            "Resource": "arn:aws:s3:::coat-reports-${environment}"
         }
     ]
 }

@@ -15,7 +15,7 @@
                     "${gh_actions_oidc_provider}:aud": "sts.amazonaws.com"
                 },
                 "StringLike": {
-                    "${gh_actions_oidc_provider}:sub": ["repo:ministryofjustice/cloud-optimisation-and-accountability:ref:refs/heads/main"]
+                    "${gh_actions_oidc_provider}:sub": ["repo:ministryofjustice/cloud-optimisation-and-accountability:ref:refs/heads/*"]
                 }
             }
         }
