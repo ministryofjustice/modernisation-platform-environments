@@ -43,25 +43,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
   }
 
   target {
-    name           = "EC2Instances"
-    resource_type  = "aws:ec2:instance"
-    selection_mode = "ALL"
-    resource_tag {
-      key   = "AzImpairmentPower"
-      value = "StopInstances"
-    }
-    filter {
-      path   = "State.Name"
-      values = ["running"]
-    }
-    filter {
-      path   = "Placement.AvailabilityZone"
-      values = ["eu-west-2b"]
-    }
-  }
-
-
-  target {
     name           = "RDSCluster"
     resource_type  = "aws:rds:cluster"
     selection_mode = "ALL"
