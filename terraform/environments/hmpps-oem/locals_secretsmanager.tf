@@ -5,6 +5,7 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-core-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-core-development}:role/modernisation-platform-oidc-cicd",
+      "arn:aws:iam::${module.environment.account_ids.delius-core-development}:role/AWSReservedSSO_modernisation-platform-sandbox_*",
       "arn:aws:iam::${module.environment.account_ids.delius-mis-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-mis-development}:role/modernisation-platform-oidc-cicd",
       "arn:aws:iam::${module.environment.account_ids.nomis-combined-reporting-development}:role/EC2OracleEnterpriseManagementSecretsRole",
