@@ -44,14 +44,10 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
 EOF
 }
 
+
 resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.ecs_secrets_policy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "ecs_s3_policy_attachment" {
-  role       = aws_iam_role.ecs_task_execution_role.name
-  policy_arn = aws_iam_policy.ecs_s3_policy.arn
 }
 
 resource "aws_iam_policy" "soa_s3_policy" {
