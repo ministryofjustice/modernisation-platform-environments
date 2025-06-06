@@ -108,6 +108,17 @@ module "maintenance_pipeline" {
             "NumberOfWorkers" : var.retention_curated_num_workers,
             "WorkerType" : var.retention_curated_worker_type
           },
+          "Next" : "Archive Raw Data"
+        },
+        "Archive Raw Data" : {
+          "Type" : "Task",
+          "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+          "Parameters" : {
+            "JobName" : var.glue_archive_job,
+            "Arguments" : {
+              "--dpr.raw.file.retention.period.amount" : "0"
+            }
+          },
           "Next" : "Resume DMS Replication Task"
         },
         "Resume DMS Replication Task" : {
