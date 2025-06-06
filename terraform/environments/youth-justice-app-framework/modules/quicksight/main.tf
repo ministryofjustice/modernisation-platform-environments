@@ -12,7 +12,7 @@ resource "aws_quicksight_account_subscription" "subscription" {
 */
 
 locals {
-  vpc_connection_suffix = var.environment == "Development" ? "-1" : ""
+  vpc_connection_suffix = var.environment == "development" ? "-1" : ""
 }
 
 resource "aws_quicksight_vpc_connection" "local" {
