@@ -36,103 +36,103 @@ resource "aws_secretsmanager_secret" "secrets" {
 #   secret_id = "${each.value}-${local.environment}"
 # }
 
-resource "aws_s3_bucket" "buckets" {
-  for_each = toset(local.bucket_names)
+# resource "aws_s3_bucket" "buckets" {
+#   for_each = toset(local.bucket_names)
 
-  bucket = each.value
+#   bucket = each.value
 
-  tags = {
-    Name        = each.value
-    Environment = local.environment
-  }
-}
+#   tags = {
+#     Name        = each.value
+#     Environment = local.environment
+#   }
+# }
 
-resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
-  for_each = aws_s3_bucket.buckets
+# resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption" {
+#   for_each = aws_s3_bucket.buckets
 
-  bucket = each.value.id
+#   bucket = each.value.id
 
-  rule {
-    apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
-    }
-  }
-}
+#   rule {
+#     apply_server_side_encryption_by_default {
+#       sse_algorithm = "AES256"
+#     }
+#   }
+# }
 
-resource "aws_s3_bucket_versioning" "s3_versioning" {
-  for_each = aws_s3_bucket.buckets
-  bucket = each.value.id
+# resource "aws_s3_bucket_versioning" "s3_versioning" {
+#   for_each = aws_s3_bucket.buckets
+#   bucket = each.value.id
 
-  versioning_configuration {
-    status = "Enabled"
-  }
-}
-
-
-resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
-
-  policy = jsonencode({
-    "Version": "2012-10-17",
-    "Id": "AccessFromMP",
-    "Statement": [
-        {
-            "Sid": "Access_for_ccms-ebs_and_soa",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": [
-                    "arn:aws:iam::${local.application_data.accounts[local.environment].soa_account_id}:role/ccms-soa-ec2-instance-role",
-                    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
-                ]
-            },
-            "Action": [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:DeleteObject"
-            ],
-            "Resource": [
-                aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
-                "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
-            ]
-        }
-    ]
-   }
-  )
-}
+#   versioning_configuration {
+#     status = "Enabled"
+#   }
+# }
 
 
-resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+# resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
+#   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
 
-  policy = jsonencode({
-    "Version": "2012-10-17",
-    "Id": "AccessFromMP",
-    "Statement": [
-        {
-            "Sid": "Access_for_ccms-ebs_and_soa",
-            "Effect": "Allow",
-            "Principal": {
-                "AWS": [
-                    "arn:aws:iam::${local.application_data.accounts[local.environment].soa_account_id}:role/ccms-soa-ec2-instance-role",
-                    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
-                ]
-            },
-            "Action": [
-                "s3:PutObject",
-                "s3:GetObject",
-                "s3:ListBucket",
-                "s3:DeleteObject"
-            ],
-            "Resource": [
-                aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
-                "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
-            ]
-        }
-    ]
-   }
-  )
-}
+#   policy = jsonencode({
+#     "Version": "2012-10-17",
+#     "Id": "AccessFromMP",
+#     "Statement": [
+#         {
+#             "Sid": "Access_for_ccms-ebs_and_soa",
+#             "Effect": "Allow",
+#             "Principal": {
+#                 "AWS": [
+#                     "arn:aws:iam::${local.application_data.accounts[local.environment].soa_account_id}:role/ccms-soa-ec2-instance-role",
+#                     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
+#                 ]
+#             },
+#             "Action": [
+#                 "s3:PutObject",
+#                 "s3:GetObject",
+#                 "s3:ListBucket",
+#                 "s3:DeleteObject"
+#             ],
+#             "Resource": [
+#                 aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
+#                 "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
+#             ]
+#         }
+#     ]
+#    }
+#   )
+# }
+
+
+# resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
+#   bucket = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+
+#   policy = jsonencode({
+#     "Version": "2012-10-17",
+#     "Id": "AccessFromMP",
+#     "Statement": [
+#         {
+#             "Sid": "Access_for_ccms-ebs_and_soa",
+#             "Effect": "Allow",
+#             "Principal": {
+#                 "AWS": [
+#                     "arn:aws:iam::${local.application_data.accounts[local.environment].soa_account_id}:role/ccms-soa-ec2-instance-role",
+#                     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
+#                 ]
+#             },
+#             "Action": [
+#                 "s3:PutObject",
+#                 "s3:GetObject",
+#                 "s3:ListBucket",
+#                 "s3:DeleteObject"
+#             ],
+#             "Resource": [
+#                 aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
+#                 "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
+#             ]
+#         }
+#     ]
+#    }
+#   )
+# }
 
 
 
