@@ -7,7 +7,6 @@ locals {
 
   baseline_presets_development = {
     options = {
-      enable_xsiam_cloudwatch_integration = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "nomis-development"
