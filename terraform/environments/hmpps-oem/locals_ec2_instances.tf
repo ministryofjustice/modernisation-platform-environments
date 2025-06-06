@@ -60,12 +60,6 @@ locals {
         tags = {
           backup-plan = "daily-and-weekly"
         }
-
-        lifecycle = {
-          ignore_changes = "instance_type"
-          # ignore changes to instance type so that we can rightsize the instance without having to destroy and recreate it
-          }
-
       }
 
       user_data_cloud_init = {
