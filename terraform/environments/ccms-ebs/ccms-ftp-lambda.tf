@@ -137,103 +137,103 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
 
 
 
-locals {
-  secrets_map = {
-    for name in local.secret_names :
-    name => jsondecode(data.aws_secretsmanager_secret_version.secrets[name].secret_string)
-  }
+# locals {
+#   secrets_map = {
+#     for name in local.secret_names :
+#     name => jsondecode(data.aws_secretsmanager_secret_version.secrets[name].secret_string)
+#   }
 
-  # Optionally extract just user/password maps
-  credentials_map = {
-    for name, creds in local.secrets_map :
-    name => {
-      user     = creds.USER
-      password = creds.PASSWORD
-      ssh_key  = creds.SSH_KEY
-    }
-  }
-}
-
-
-resource "aws_s3_object" "ftp_lambda_layer" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  key    = "lambda/ftpclientlibs.zip"
-  source = "lambda/ftpclientlibs.zip"
-}
-
-resource "aws_s3_object" "ftp_client" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  key    = "lambda/ftp-client.zip"
-  source = "lambda/ftp-client.zip"
-}
+#   # Optionally extract just user/password maps
+#   credentials_map = {
+#     for name, creds in local.secrets_map :
+#     name => {
+#       user     = creds.USER
+#       password = creds.PASSWORD
+#       ssh_key  = creds.SSH_KEY
+#     }
+#   }
+# }
 
 
+# resource "aws_s3_object" "ftp_lambda_layer" {
+#   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+#   key    = "lambda/ftpclientlibs.zip"
+#   source = "lambda/ftpclientlibs.zip"
+# }
 
-#LAA-ftp-allpay-inbound-ccms
-module "allpay_ftp_lambda_inbound" {
-  source              = "./modules/ftp-lambda"
-  lambda_name         = lower(format("LAA-ftp-allpay-inbound-ccms-%s",local.environment))
-  vpc_id              = data.aws_vpc.shared.id
-  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
-  ftp_host            = "sftp.allpay.cloud"
-  ftp_port            = "22"
-  ftp_protocol        = "FTPS"
-  ftp_transfer_type   = "SFTP_DOWNLOAD"
-  ftp_file_types      = ""
-  ftp_local_path      = "CCMS_PRD_Allpay/Inbound/"
-  ftp_remote_path     = "/Outbound/"
-  ftp_require_ssl     = "NO"
-  ftp_insecure        = "NO"
-  ftp_ca_cert         = ""
-  ftp_cert            = ""
-  ftp_key             = ""
-  ftp_key_type        = ""
-  ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
-  ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
-  ftp_file_remove     = "YES"
-  ftp_cron            = "cron(0 10 * * ? *)"
-  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
-  sns_topic_sev5      = ""
-  sns_topic_ops       = ""
-  ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
-  env                 = local.environment
-  s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  s3_object_ftp_client= aws_s3_object.ftp_client.key
-  s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
-
-}
+# resource "aws_s3_object" "ftp_client" {
+#   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+#   key    = "lambda/ftp-client.zip"
+#   source = "lambda/ftp-client.zip"
+# }
 
 
-#LAA-ftp-allpay-outbound-ccms
-module "allpay_ftp_lambda_outbound" {
-  source              = "./modules/ftp-lambda"
-  lambda_name         = lower(format("LAA-ftp-allpay-outbound-ccms-%s",local.environment))
-  vpc_id              = data.aws_vpc.shared.id
-  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
-  ftp_host            = "sftp.allpay.cloud"
-  ftp_port            = "22"
-  ftp_protocol        = "FTPS"
-  ftp_transfer_type   = "SFTP_UPLOAD"
-  ftp_file_types      = ""
-  ftp_local_path      = "CCMS_PRD_Allpay/Outbound/"
-  ftp_remote_path     = "/Inbound/"
-  ftp_require_ssl     = "NO"
-  ftp_insecure        = "NO"
-  ftp_ca_cert         = ""
-  ftp_cert            = ""
-  ftp_key             = ""
-  ftp_key_type        = ""
-  ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
-  ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
-  ftp_file_remove     = "YES"
-  ftp_cron            = "cron(0 10 * * ? *)"
-  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
-  sns_topic_sev5      = ""
-  sns_topic_ops       = ""
-  ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
-  env                 = local.environment
-  s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  s3_object_ftp_client= aws_s3_object.ftp_client.key
-  s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
 
-}
+# #LAA-ftp-allpay-inbound-ccms
+# module "allpay_ftp_lambda_inbound" {
+#   source              = "./modules/ftp-lambda"
+#   lambda_name         = lower(format("LAA-ftp-allpay-inbound-ccms-%s",local.environment))
+#   vpc_id              = data.aws_vpc.shared.id
+#   subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+#   ftp_host            = "sftp.allpay.cloud"
+#   ftp_port            = "22"
+#   ftp_protocol        = "FTPS"
+#   ftp_transfer_type   = "SFTP_DOWNLOAD"
+#   ftp_file_types      = ""
+#   ftp_local_path      = "CCMS_PRD_Allpay/Inbound/"
+#   ftp_remote_path     = "/Outbound/"
+#   ftp_require_ssl     = "NO"
+#   ftp_insecure        = "NO"
+#   ftp_ca_cert         = ""
+#   ftp_cert            = ""
+#   ftp_key             = ""
+#   ftp_key_type        = ""
+#   ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
+#   ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
+#   ftp_file_remove     = "YES"
+#   ftp_cron            = "cron(0 10 * * ? *)"
+#   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+#   sns_topic_sev5      = ""
+#   sns_topic_ops       = ""
+#   ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
+#   env                 = local.environment
+#   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+#   s3_object_ftp_client= aws_s3_object.ftp_client.key
+#   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
+
+# }
+
+
+# #LAA-ftp-allpay-outbound-ccms
+# module "allpay_ftp_lambda_outbound" {
+#   source              = "./modules/ftp-lambda"
+#   lambda_name         = lower(format("LAA-ftp-allpay-outbound-ccms-%s",local.environment))
+#   vpc_id              = data.aws_vpc.shared.id
+#   subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+#   ftp_host            = "sftp.allpay.cloud"
+#   ftp_port            = "22"
+#   ftp_protocol        = "FTPS"
+#   ftp_transfer_type   = "SFTP_UPLOAD"
+#   ftp_file_types      = ""
+#   ftp_local_path      = "CCMS_PRD_Allpay/Outbound/"
+#   ftp_remote_path     = "/Inbound/"
+#   ftp_require_ssl     = "NO"
+#   ftp_insecure        = "NO"
+#   ftp_ca_cert         = ""
+#   ftp_cert            = ""
+#   ftp_key             = ""
+#   ftp_key_type        = ""
+#   ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
+#   ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
+#   ftp_file_remove     = "YES"
+#   ftp_cron            = "cron(0 10 * * ? *)"
+#   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+#   sns_topic_sev5      = ""
+#   sns_topic_ops       = ""
+#   ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
+#   env                 = local.environment
+#   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+#   s3_object_ftp_client= aws_s3_object.ftp_client.key
+#   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
+
+# }
