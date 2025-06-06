@@ -46,25 +46,16 @@ yum install fuse-libs -y
 amazon-linux-extras install epel -y
 yum install s3fs-fuse -y
 
-cat > mount_s3.sh << EOF
-!/bin/bash
-
-s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o allow_other -o multireq_max=5 -o use_cache=/tmp -o uid=1000 -o gid=1000 ${inbound_bucket} /home/ec2-user/inbound
-s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o allow_other -o multireq_max=5 -o use_cache=/tmp -o uid=1000 -o gid=1000 ${outbound_bucket} /home/ec2-user/outbound
-EOF
-
-chmod 755 /etc/mount_s3.sh
-echo ./mount_s3.sh >> /etc/rc.local
-
 mkdir /home/ec2-user/inbound
 mkdir /home/ec2-user/outbound
 chmod 777 /home/ec2-user/inbound
 chmod 777 /home/ec2-user/outbound
 
-./mount_s3.sh
+s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o multireq_max=5 -o use_cache=/tmp -o uid=1000 -o gid=1000 ${inbound_bucket} /home/ec2-user/inbound
+s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o multireq_max=5 -o use_cache=/tmp -o uid=1000 -o gid=1000 ${outbound_bucket} /home/ec2-user/outbound
 
-echo s3fs#${inbound_bucket} /home/ec2-user/inbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
-echo s3fs#${outbound_bucket} /home/ec2-user/outbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
+echo s3fs#${inbound_bucket} /home/ec2-user/inbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
+echo s3fs#${outbound_bucket} /home/ec2-user/outbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
 
 # clear all admin files and entries from config.xml
 reset_admin() {
