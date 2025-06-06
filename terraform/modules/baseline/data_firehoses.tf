@@ -12,7 +12,7 @@ module "data_firehose" {
 
   cloudwatch_log_group_names          = each.value.cloudwatch_log_group_names
   destination_http_endpoint           = aws_ssm_parameter.placeholder[each.value.destination_http_endpoint_ssm_parameter_name].value
-  destination_http_apikey_secret_name = each.value.apikey_secret_name
+  destination_http_apikey_secret_name = each.value.destination_http_apikey_secret_name
   name                                = each.key
 
   tags = local.tags
