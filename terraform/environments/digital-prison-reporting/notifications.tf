@@ -91,8 +91,8 @@ module "dms_failure_state_rule" {
   event_pattern = <<PATTERN
 {
   "source": ["aws.dms"],
-  "type": ["REPLICATION_TASK"],
   "detail": {
+    "type": ["REPLICATION_TASK"],
     "category": ["Failure"]
   }
 }
