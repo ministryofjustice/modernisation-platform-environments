@@ -60,6 +60,14 @@ output "cloudwatch_metric_alarms_by_sns_topic" {
   value = local.cloudwatch_metric_alarms_by_sns_topic
 }
 
+output "data_firehoses" {
+  description = "Map of data firehoses"
+
+  value = {
+    for key, value in local.data_firehoses : key => value if contains(local.data_firehoses_filter, key)
+  }
+}
+
 output "iam_roles" {
   description = "Map of iam roles to create depending on options provided"
 
