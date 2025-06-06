@@ -35,13 +35,28 @@ module "kms" {
           test     = "ArnLike"
           variable = "kms:EncryptionContext:aws:logs:arn"
           values = [
-            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*",
+            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:*"
           ]
+        }
+      ]
+    },
+    {
+      sid = "AllowLambdaFunctionAccess"
+      actions = [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:GenerateDataKey"
+      ]
+      resources = ["*"]
+
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/update-dc-names-lambda-role"]
         }
       ]
     }
   ]
-
   tags = local.tags
 }
 #todo add to all secrets

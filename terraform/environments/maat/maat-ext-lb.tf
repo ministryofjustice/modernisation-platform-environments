@@ -13,7 +13,7 @@ locals {
 
 module "lb-s3-access-logs" {
   count  = local.existing_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
 
   providers = {
     aws.bucket-replication = aws
@@ -132,7 +132,7 @@ resource "aws_lb" "external" {
   subnets                    = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id, data.aws_subnet.public_subnets_c.id]
   enable_deletion_protection = local.application_data.accounts[local.environment].ext_lb_enable_deletion_protection
   idle_timeout               = local.external_lb_idle_timeout
-  drop_invalid_header_fields = false
+  drop_invalid_header_fields = true
 
   access_logs {
     bucket  = local.existing_bucket_name != "" ? local.existing_bucket_name : module.lb-s3-access-logs[0].bucket.id
@@ -159,23 +159,26 @@ resource "aws_security_group" "external_lb" {
     }
   )
 }
+data "aws_ec2_managed_prefix_list" "cloudfront" {
+  name = "com.amazonaws.global.cloudfront.origin-facing"
+}
 
 resource "aws_security_group_rule" "external_lb_ingress" {
   type              = "ingress"
   from_port         = 443
   to_port           = 443
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  prefix_list_ids   = [data.aws_ec2_managed_prefix_list.cloudfront.id]
   security_group_id = aws_security_group.external_lb.id
 }
 
 resource "aws_security_group_rule" "external_lb_egress" {
-  type              = "egress"
-  from_port         = 0
-  to_port           = 0
-  protocol          = "-1"
-  security_group_id = aws_security_group.external_lb.id
-  cidr_blocks       = ["0.0.0.0/0"]
+  type                     = "egress"
+  from_port                = 0
+  to_port                  = 0
+  protocol                 = "-1"
+  source_security_group_id = aws_security_group.maat_ecs_security_group.id
+  security_group_id        = aws_security_group.external_lb.id
 }
 
 resource "aws_lb_listener" "external" {
