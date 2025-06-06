@@ -12,37 +12,6 @@ chmod go+rw /home/ec2-user/efs
 # https://docs.aws.amazon.com/efs/latest/ug/performance.html
 dd if=/dev/urandom of=/home/ec2-user/efs/large_file_for_efs_performance bs=1024k count=10000
 
-# clear all admin files and entries from config.xml
-reset_admin() {
-  domain_home=/home/ec2-user/efs/domains/soainfra
-  config_location=$domain_home/config
-  curl http://fr2.rpmfind.net/linux/dag/redhat/el6/en/i386/dag/RPMS/xmlstarlet-1.5.0-1.el6.rf.i686.rpm --output xmlstarlet-1.5.0-1.el6.rf.i686.rpm
-  yum install -y xmlstarlet-1.5.0-1.el6.rf.i686.rpm
-
-  cp -p $config_location/config.xml $config_location/config.xml.$(date '+%Y%m%d-%H%M').bak
-  cp -p $config_location/config.xml $config_location/config.xml.none
-
-  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:server[./x:name[contains(text(),'ccms_soa_ms')]]" $config_location/config.xml.none
-  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:machine[./x:name[contains(text(),'MACHINE-')]]" $config_location/config.xml.none
-  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:migratable-target[./x:name[contains(text(),'ccms_soa_ms')]]" $config_location/config.xml.none
-  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -u "//x:coherence-cluster-system-resource/x:target" -v "AdminServer" $config_location/config.xml.none
-
-  cp -p $config_location/config.xml.none $config_location/config.xml
-
-  rm -rf $domain_home/original
-  rm -rf $domain_home/pending
-  rm -rf $domain_home/edit
-  rm -f $domain_home/edit.lok
-  rm -rf $domain_home/servers/domain_bak
-  rm -rf $domain_home/servers/AdminServer/cache
-  rm -rf $domain_home/servers/AdminServer/logs
-  rm -rf $domain_home/servers/AdminServer/tmp
-}
-
-if [[ -d /home/ec2-user/efs/domains/soainfra ]] && [[ "${server}" = "admin" ]]; then
-  reset_admin
-fi
-
 # install aws cli
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 yum install unzip -y
@@ -96,3 +65,34 @@ chmod 777 /home/ec2-user/outbound
 
 echo s3fs#${inbound_bucket} /home/ec2-user/inbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
 echo s3fs#${outbound_bucket} /home/ec2-user/outbound fuse iam_role=auto,url="https://s3-eu-west-2.amazonaws.com",endpoint=eu-west-2,allow_other,multireq_max=5,use_cache=/tmp,uid=1000,gid=1000 0 0 >> /etc/fstab
+
+# clear all admin files and entries from config.xml
+reset_admin() {
+  domain_home=/home/ec2-user/efs/domains/soainfra
+  config_location=$domain_home/config
+  curl http://fr2.rpmfind.net/linux/dag/redhat/el6/en/i386/dag/RPMS/xmlstarlet-1.5.0-1.el6.rf.i686.rpm --output xmlstarlet-1.5.0-1.el6.rf.i686.rpm
+  yum install -y xmlstarlet-1.5.0-1.el6.rf.i686.rpm
+
+  cp -p $config_location/config.xml $config_location/config.xml.$(date '+%Y%m%d-%H%M').bak
+  cp -p $config_location/config.xml $config_location/config.xml.none
+
+  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:server[./x:name[contains(text(),'ccms_soa_ms')]]" $config_location/config.xml.none
+  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:machine[./x:name[contains(text(),'MACHINE-')]]" $config_location/config.xml.none
+  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -d "//x:migratable-target[./x:name[contains(text(),'ccms_soa_ms')]]" $config_location/config.xml.none
+  xmlstarlet ed --inplace -N x="http://xmlns.oracle.com/weblogic/domain" -u "//x:coherence-cluster-system-resource/x:target" -v "AdminServer" $config_location/config.xml.none
+
+  cp -p $config_location/config.xml.none $config_location/config.xml
+
+  rm -rf $domain_home/original
+  rm -rf $domain_home/pending
+  rm -rf $domain_home/edit
+  rm -f $domain_home/edit.lok
+  rm -rf $domain_home/servers/domain_bak
+  rm -rf $domain_home/servers/AdminServer/cache
+  rm -rf $domain_home/servers/AdminServer/logs
+  rm -rf $domain_home/servers/AdminServer/tmp
+}
+
+if [[ -d /home/ec2-user/efs/domains/soainfra ]] && [[ "${server}" = "admin" ]]; then
+  reset_admin
+fi
