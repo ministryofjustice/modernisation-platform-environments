@@ -3,11 +3,6 @@ output "acm_certificates_validation_records_external" {
   value       = { for key, value in module.baseline.acm_certificates : key => value.validation_records_external }
 }
 
-output "data_firehose_secrets" {
-  description = "Secret ARNs for populating API token"
-  value       = { for key, value in module.baseline.data_firehoses : key => value.secretsmanager_secret_arn }
-}
-
 output "efs_dns_names" {
   description = "EFS DNS names"
   value       = { for key, value in module.baseline.efs : key => value.file_system.dns_name }
