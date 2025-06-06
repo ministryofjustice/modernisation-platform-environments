@@ -45,6 +45,10 @@ resource "aws_iam_role_policy_attachment" "qs_vpc" {
   policy_arn = aws_iam_policy.qs_vpc.arn
 }
 
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+}
+
 resource "aws_iam_policy" "qs_kms" {
   name = "QuickSightKMSReadPolicy"
   policy = jsonencode({
@@ -54,7 +58,7 @@ resource "aws_iam_policy" "qs_kms" {
         "Sid" : "VisualEditor0",
         "Effect" : "Allow",
         "Action" : "kms:Decrypt",
-        "Resource" : "arn:aws:kms:eu-west-2:711387140977:key/*"
+        "Resource" : "arn:aws:kms:eu-west-2:${data.aws_caller_identity.current.account_id}:key/*"
       }
     ]
   })
