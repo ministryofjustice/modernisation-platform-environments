@@ -6,9 +6,10 @@ module "landing_zone_antivirus_check" {
   name          = "${local.project}-landing-zone-check"
   tracing       = "Active"
 
-  memory_size            = 4096
-  timeout                = 900
-  ephemeral_storage_size = 512 # Can be increased up to 10240MB if required
+  memory_size                    = 4096
+  timeout                        = 900
+  ephemeral_storage_size         = 512 # Can be increased up to 10240MB if required
+  reserved_concurrent_executions = 10
 
   env_vars = {
     S3_OUTPUT_BUCKET_PATH     = "s3://${module.s3_landing_processing_bucket.bucket_id}"
