@@ -1,7 +1,8 @@
 # Used to store our custom clamav S3 scanner image for File Transfer In/Push
 resource "aws_ecr_repository" "file_transfer_in_clamav_scanner" {
-  name                 = "${local.project}-images-${local.env}/hmpps-data-hub-clamav-s3-scanner"
-  image_tag_mutability = "IMMUTABLE"
+  #checkov:skip=CKV_AWS_51:Ensure ECR Image Tags are immutable - we explicitly want to use a mutable latest tag to manage versions in the image repo
+  name                 = "${local.project}-images-${local.env}/hmpps-dpr-landing-zone-antivirus-check"
+  image_tag_mutability = "MUTABLE"
 
   image_scanning_configuration {
     scan_on_push = true
