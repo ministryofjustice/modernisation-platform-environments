@@ -60,3 +60,9 @@ variable "vpc_settings" {
   description = "Configuration block for VPC settings"
   default     = null
 }
+
+variable "reserved_concurrent_executions" {
+  description = "Amount of reserved concurrent executions for this lambda function. A value of 0 disables lambda from being triggered and -1 removes any concurrency limitations. Defaults to Unreserved Concurrency Limits -1"
+  type        = number
+  default     = -1
+}

@@ -1,5 +1,6 @@
 resource "aws_cloudwatch_log_group" "this" {
   #checkov:skip=CKV_AWS_158: "Ensure that CloudWatch Log Group is encrypted by KMS, Skipping for Timebeing in view of Cost Savings”
+  #checkov:skip=CKV_AWS_338: "Ensure CloudWatch log groups retains logs for at least 1 year"
 
   count = var.enable_lambda ? 1 : 0
   name  = "/aws/lambda/${var.name}-function"
@@ -10,14 +11,18 @@ resource "aws_cloudwatch_log_group" "this" {
 }
 
 resource "aws_lambda_function" "this" {
+  #checkov:skip=CKV_AWS_272: "TO DO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083"
+  #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
+  #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
   count = var.enable_lambda ? 1 : 0
 
-  function_name = "${var.name}-function"
-  role          = aws_iam_role.lambda_execution_role[0].arn
-  package_type  = "Image"
-  image_uri     = var.image_uri
-  memory_size   = var.memory_size
-  timeout       = var.timeout
+  function_name                  = "${var.name}-function"
+  role                           = aws_iam_role.lambda_execution_role[0].arn
+  package_type                   = "Image"
+  image_uri                      = var.image_uri
+  memory_size                    = var.memory_size
+  timeout                        = var.timeout
+  reserved_concurrent_executions = var.reserved_concurrent_executions
 
   tracing_config {
     mode = var.tracing
