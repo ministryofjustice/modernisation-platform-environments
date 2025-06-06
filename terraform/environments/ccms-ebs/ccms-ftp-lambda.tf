@@ -23,6 +23,8 @@ locals {
   ]
 }
 
+data "aws_caller_identity" "current" {}
+
 ### secrets for ftp user and password
 resource "aws_secretsmanager_secret" "secrets" {
   for_each = toset(local.secret_names)
@@ -58,6 +60,71 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption
   }
 }
 
+resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
+  bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Id": "AccessFromMP",
+    "Statement": [
+        {
+            "Sid": "Access_for_ccms-ebs_and_soa",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::${local.application_data.accounts[local.environment].soa_account_id}:role/ccms-soa-WorldTaskExecutionRole",
+                    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
+                ]
+            },
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket}",
+                "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket}/*"
+            ]
+        }
+    ]
+   }
+  )
+}
+
+
+resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
+  bucket = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Id": "AccessFromMP",
+    "Statement": [
+        {
+            "Sid": "Access_for_ccms-ebs_and_soa",
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::${local.application_data.accounts[local.environment].soa_account_id}:role/ccms-soa-WorldTaskExecutionRole",
+                    "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
+                ]
+            },
+            "Action": [
+                "s3:PutObject",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:DeleteObject"
+            ],
+            "Resource": [
+                "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket}",
+                "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket}/*"
+            ]
+        }
+    ]
+   }
+  )
+}
+
 
 
 
@@ -77,59 +144,6 @@ locals {
     }
   }
 }
-
-
-# #### bucket for laa-ccms-inbound for storing files from lambda
-# resource "aws_s3_bucket" "inbound_bucket" {
-#   bucket = lower(format("laa-ccms-inbound-%s-mp",local.environment))  # ccms inbound bucket
-
-# }
-
-
-# resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption" {
-#   bucket = aws_s3_bucket.inbound_bucket.id
-
-#   rule {
-#     apply_server_side_encryption_by_default {
-#       sse_algorithm = "AES256"
-#     }
-#   }
-# }
-
-
-# #### bucket for laa-ccms-inbound for storing files from lambda
-# resource "aws_s3_bucket" "outbound_bucket" {
-#   bucket = lower(format("laa-ccms-outbound-%s-mp",local.environment))  # ccms inbound bucket
-
-# }
-
-
-# resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption_outbound" {
-#   bucket = aws_s3_bucket.outbound_bucket.id
-
-#   rule {
-#     apply_server_side_encryption_by_default {
-#       sse_algorithm = "AES256"
-#     }
-#   }
-# }
-
-
-# ##### bucket for storing lambda layers and ftp client code
-# resource "aws_s3_bucket" "ftp_bucket" {
-#   bucket = lower(format("laa-ccms-ftp-lambda-%s-mp",local.environment))  # ccms lambda bucket
-
-# }
-# resource "aws_s3_bucket_server_side_encryption_configuration" "secure_bucket_encryption_ftp_lambda" {
-#   bucket = aws_s3_bucket.ftp_bucket.id
-
-#   rule {
-#     apply_server_side_encryption_by_default {
-#       sse_algorithm = "AES256"
-#     }
-#   }
-# }
-
 
 
 resource "aws_s3_object" "ftp_lambda_layer" {
