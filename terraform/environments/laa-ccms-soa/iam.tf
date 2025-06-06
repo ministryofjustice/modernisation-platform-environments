@@ -28,10 +28,8 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-#--Read the two keys used to clone and read gpg encrypted values from the repo
 resource "aws_iam_policy" "ecs_secrets_policy" {
   name = "${local.application_data.accounts[local.environment].app_name}-ecs_secrets_policy"
-
   policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -46,9 +44,52 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
 EOF
 }
 
+resource "aws_iam_policy" "ecs_s3_policy" {
+  name = "${local.application_data.accounts[local.environment].app_name}-ecs_s3_policy"
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${local.application_data.accounts[local.environment].inbound_s3_bucket_name}",
+        "arn:aws:s3:::${local.application_data.accounts[local.environment].inbound_s3_bucket_name}/*"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:DeleteObject"
+      ],
+      "Resource": [
+        "arn:aws:s3:::${local.application_data.accounts[local.environment].outbound_s3_bucket_name}",
+        "arn:aws:s3:::${local.application_data.accounts[local.environment].outbound_s3_bucket_name}/*"
+      ]
+    }
+  ]
+}
+EOF
+}
+
+
 resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.ecs_secrets_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_s3_policy_attachment" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_s3_policy.arn
 }
 
 resource "aws_iam_policy" "soa_s3_policy" {
