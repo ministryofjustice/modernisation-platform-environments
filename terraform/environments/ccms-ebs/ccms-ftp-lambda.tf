@@ -82,8 +82,8 @@ resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
                 "s3:DeleteObject"
             ],
             "Resource": [
-                "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket}",
-                "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket}/*"
+                "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn}",
+                "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket.arn}/*"
             ]
         }
     ]
