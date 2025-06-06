@@ -59,6 +59,16 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket_encryption
   }
 }
 
+resource "aws_s3_bucket_versioning" "s3_versioning" {
+  for_each = aws_s3_bucket.buckets
+  bucket = each.value.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+
 resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
   bucket = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
 
@@ -82,7 +92,7 @@ resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
                 "s3:DeleteObject"
             ],
             "Resource": [
-                "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}",
+                aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn,
                 "${aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].arn}/*"
             ]
         }
@@ -115,8 +125,8 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
                 "s3:DeleteObject"
             ],
             "Resource": [
-                "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket}",
-                "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket}/*"
+                aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn,
+                "${aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].arn}/*"
             ]
         }
     ]
