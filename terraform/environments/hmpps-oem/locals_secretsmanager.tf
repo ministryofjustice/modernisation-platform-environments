@@ -17,7 +17,7 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.delius-core-test}:role/modernisation-platform-oidc-cicd",
       "arn:aws:iam::${module.environment.account_ids.nomis-combined-reporting-test}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-test}:role/EC2OracleEnterpriseManagementSecretsRole",
-      "arn:aws:iam::${module.environment.account_ids.oasys-test}:role/EC2OracleEnterpriseManagementSecretsRole"
+      "arn:aws:iam::${module.environment.account_ids.oasys-test}:role/EC2OracleEnterpriseManagementSecretsRole",
     ]
     preproduction = [
       "arn:aws:iam::${module.environment.account_ids.corporate-staff-rostering-preproduction}:role/EC2OracleEnterpriseManagementSecretsRole",

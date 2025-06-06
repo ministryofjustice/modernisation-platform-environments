@@ -222,7 +222,6 @@ locals {
         resources = [
           "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.delius}:secret:*db-dba-*",
           "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.delius_mis}:secret:*db-dba-*",
-          "arn:aws:secretsmanager:*:${var.environment.cross_account_secret_account_ids.delius_iaps}:secret:*db-dba-*",
         ]
       }
     ]
