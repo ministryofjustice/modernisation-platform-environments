@@ -57,6 +57,7 @@ resource "aws_security_group_rule" "windows_ingress" {
   security_group_id = aws_security_group.windows_sg[0].id
   type              = "ingress"
   cidr_blocks       = var.cidr
+  description       = "Allow windows ingress from ${each.value.from_port} to ${each.value.to_port} via ${each.value.protocol}"
 }
 
 resource "aws_security_group_rule" "windows_egress" {
@@ -67,6 +68,7 @@ resource "aws_security_group_rule" "windows_egress" {
   type              = "egress"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = aws_security_group.windows_sg[0].id
+  description       = "Allow windows egress"
 }
 
 resource "aws_launch_template" "windows_template" {
