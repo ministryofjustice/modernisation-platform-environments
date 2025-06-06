@@ -4,7 +4,7 @@ resource "aws_ssm_parameter" "ip_block_list" {
   value = "[]" # or use a dummy like '[]'
 
   lifecycle {
-    ignore_changes = [value] # 👈 this is critical
+    ignore_changes = [value] # This is critical, so its not overwritten 
   }
 }
 
@@ -32,7 +32,7 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
     allow {}
   }
 
-  # ✅ IP blocking rule (still active block)
+  # IP blocking rule, the only blocking rule
   rule {
     name     = "xbhibit-waf-blocked-rule"
     priority = 1
@@ -54,7 +54,7 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
     }
   }
 
-  # ✅ AWS Managed Rule Groups (all in COUNT mode)
+  # AWS Managed Rule Groups (all in COUNT mode)
   rule {
     name     = "AWS-AWSManagedRulesKnownBadInputsRuleSet"
     priority = 10
