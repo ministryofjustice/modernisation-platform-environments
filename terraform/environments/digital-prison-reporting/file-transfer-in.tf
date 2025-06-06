@@ -1,15 +1,16 @@
-module "landing_zone_antivirus_check" {
+module "landing_zone_antivirus_check_lambda" {
   source = "./modules/lambdas/container-image"
 
-  enable_lambda = true
-  image_uri     = "${aws_ecr_repository.file_transfer_in_clamav_scanner.repository_url}:latest"
+  enable_lambda = local.landing_zone_antivirus_check_lambda_enable
+  image_uri     = "${aws_ecr_repository.file_transfer_in_clamav_scanner.repository_url}:${local.landing_zone_antivirus_check_lambda_version}"
   name          = "${local.project}-landing-zone-check"
   tracing       = "Active"
 
-  memory_size                    = 4096
-  timeout                        = 900
-  ephemeral_storage_size         = 512 # Can be increased up to 10240MB if required
-  reserved_concurrent_executions = 10
+  memory_size                    = local.landing_zone_antivirus_check_lambda_memory_size
+  timeout                        = local.landing_zone_antivirus_check_lambda_timeout
+  ephemeral_storage_size         = local.landing_zone_antivirus_check_lambda_ephemeral_storage_size # Can be increased up to 10240MB if required
+  reserved_concurrent_executions = local.landing_zone_antivirus_check_lambda_concurrent_executions
+  log_retention_in_days          = local.landing_zone_antivirus_check_log_retention_in_days
 
   env_vars = {
     S3_OUTPUT_BUCKET_PATH     = "s3://${module.s3_landing_processing_bucket.bucket_id}"
