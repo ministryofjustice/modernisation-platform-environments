@@ -6,7 +6,10 @@ data "aws_vpc" "shared" {
 
 data "aws_ecs_task_definition" "task_definition" {
   task_definition = "${var.app_name}-task-definition"
-  depends_on      = [aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition]
+  depends_on = [
+    aws_ecs_task_definition.windows_ecs_task_definition,
+    aws_ecs_task_definition.linux_ecs_task_definition
+  ]
 }
 
 data "aws_subnets" "shared-private" {
@@ -264,51 +267,49 @@ resource "aws_iam_policy" "ec2_instance_policy" {
       Name = "${var.app_name}-ec2-instance-policy"
     }
   )
-  policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Action": [
-                "ec2:DescribeTags",
-                "ec2:DescribeInstances",
-                "ecs:CreateCluster",
-                "ecs:DeregisterContainerInstance",
-                "ecs:DiscoverPollEndpoint",
-                "ecs:Poll",
-                "ecs:RegisterContainerInstance",
-                "ecs:StartTelemetrySession",
-                "ecs:UpdateContainerInstancesState",
-                "ecs:Submit*",
-                "ecs:TagResource",
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "logs:CreateLogGroup",
-                "logs:DescribeLogStreams",
-                "s3:ListBucket",
-                "s3:*Object*",
-                "kms:Decrypt",
-                "kms:Encrypt",
-                "kms:GenerateDataKey",
-                "kms:ReEncrypt",
-                "kms:GenerateDataKey",
-                "kms:DescribeKey",
-                "xray:PutTraceSegments",
-                "xray:PutTelemetryRecords",
-                "xray:GetSamplingRules",
-                "xray:GetSamplingTargets",
-                "xray:GetSamplingStatisticSummaries"
-            ],
-            "Resource": "*"
-        }
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeTags",
+          "ec2:DescribeInstances",
+          "ecs:CreateCluster",
+          "ecs:DeregisterContainerInstance",
+          "ecs:DiscoverPollEndpoint",
+          "ecs:Poll",
+          "ecs:RegisterContainerInstance",
+          "ecs:StartTelemetrySession",
+          "ecs:UpdateContainerInstancesState",
+          "ecs:Submit*",
+          "ecs:TagResource",
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:CreateLogGroup",
+          "logs:DescribeLogStreams",
+          "s3:ListBucket",
+          "s3:*Object*",
+          "s3:PutObjectAcl",
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:ReEncrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey",
+          "xray:PutTraceSegments",
+          "xray:PutTelemetryRecords",
+          "xray:GetSamplingRules",
+          "xray:GetSamplingTargets",
+          "xray:GetSamplingStatisticSummaries"
+        ],
+        "Resource" : "*"
+      }
     ]
-}
-EOF
+  })
 }
 
 resource "aws_iam_role_policy_attachment" "AmazonSSMManagedInstanceCore" {
@@ -415,7 +416,9 @@ resource "aws_ecs_service" "ecs_service" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.ecs_task_execution_role, aws_ecs_task_definition.windows_ecs_task_definition, aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
+    aws_iam_role_policy_attachment.ecs_task_execution_role,
+    aws_ecs_task_definition.windows_ecs_task_definition,
+    aws_ecs_task_definition.linux_ecs_task_definition, aws_cloudwatch_log_group.cloudwatch_group
   ]
 
   tags = merge(
@@ -489,7 +492,8 @@ resource "aws_iam_policy" "ecs_task_execution_s3_policy" {
 EOF
 }
 
-resource "aws_iam_policy" "ecs_task_execution_ssm_policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+resource "aws_iam_policy" "ecs_task_execution_ssm_policy" {
+  #tfsec:ignore:aws-iam-no-policy-wildcards
   name = "${var.app_name}-ecs-task-execution-ssm-policy"
   tags = merge(
     var.tags_common,

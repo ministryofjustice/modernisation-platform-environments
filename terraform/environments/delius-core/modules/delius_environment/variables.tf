@@ -108,3 +108,10 @@ variable "env_name_to_dms_config_map" {
   description = "Map of delius-core environments to DMS configurations"
   type        = any
 }
+
+# Only create one per account
+variable "create_backup_role" {
+  description = "Role used to run AWS Backuos i.e. dev-AWSBackupDefaultServiceRole"
+  type        = bool
+  default     = false
+}
