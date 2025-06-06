@@ -8,7 +8,7 @@ locals {
 module "data_firehose" {
   for_each = local.data_firehoses
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-data-firehose?ref=c53ab124236af5ebcb6709395b69042055bc31be"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-data-firehose?ref=204ccb4d5160a83774fa9585d060ee925640426b" # v2.0.0
 
   cloudwatch_log_group_names   = each.value.cloudwatch_log_group_names
   destination_http_endpoint    = aws_ssm_parameter.placeholder[each.value.destination_http_endpoint_ssm_parameter_name].value
