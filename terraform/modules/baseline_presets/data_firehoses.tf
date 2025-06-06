@@ -11,7 +11,7 @@ locals {
         "cwagent-var-log-messages",
         "cwagent-var-log-secure",
       ]
-      destination_http_apikey_secret_name          = "/xsiam/http_endpoint_token_linux_syslog"
+      destination_http_secret_name                 = "/xsiam/http_endpoint_token_linux_syslog"
       destination_http_endpoint_ssm_parameter_name = "/xsiam/http_endpoint_url"
     }
     windows-event-logs = {
@@ -20,14 +20,14 @@ locals {
         "cwagent-windows-application",
         "cwagent-windows-security",
       ]
-      destination_http_apikey_secret_name          = "/xsiam/http_endpoint_token_windows_event_logs"
+      destination_http_secret_name                 = "/xsiam/http_endpoint_token_windows_event_logs"
       destination_http_endpoint_ssm_parameter_name = "/xsiam/http_endpoint_url"
     }
     session-manager-logs = {
       cloudwatch_log_group_names = [
         "session-manager-logs",
       ]
-      destination_http_apikey_secret_name          = "/xsiam/http_endpoint_token_session_manager_logs"
+      destination_http_secret_name                 = "/xsiam/http_endpoint_token_session_manager_logs"
       destination_http_endpoint_ssm_parameter_name = "/xsiam/http_endpoint_url"
     }
   }

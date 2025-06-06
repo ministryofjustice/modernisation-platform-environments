@@ -169,7 +169,7 @@ variable "data_firehoses" {
   description = "map of data firehoses to create"
   type = map(object({
     cloudwatch_log_group_names                   = list(string)
-    destination_http_apikey_secret_name          = optional(string)
+    destination_http_secret_name                 = optional(string)
     destination_http_endpoint_ssm_parameter_name = string
   }))
 }
