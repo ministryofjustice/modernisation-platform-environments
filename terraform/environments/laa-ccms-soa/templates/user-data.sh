@@ -46,7 +46,7 @@ amazon-linux-extras install epel -y
 yum install s3fs-fuse -y
 
 #--Make S3 integration dirs and mount S3
-echo user_allow_other >> /etc/fuse.conf
+sudo sed -i '/^#.*user_allow_other/s/^#//' /etc/fuse.conf
 mkdir /home/ec2-user/inbound
 mkdir /home/ec2-user/outbound
 chmod 777 /home/ec2-user/inbound
