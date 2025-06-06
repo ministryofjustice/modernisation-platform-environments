@@ -31,10 +31,10 @@ resource "aws_secretsmanager_secret" "secrets" {
   name = "${each.value}-${local.environment}"
 }
 
-data "aws_secretsmanager_secret_version" "secrets" {
-  for_each  = toset(local.secret_names)
-  secret_id = "${each.value}-${local.environment}"
-}
+# data "aws_secretsmanager_secret_version" "secrets" {
+#   for_each  = toset(local.secret_names)
+#   secret_id = "${each.value}-${local.environment}"
+# }
 
 resource "aws_s3_bucket" "buckets" {
   for_each = toset(local.bucket_names)
