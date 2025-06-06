@@ -23,7 +23,6 @@ locals {
   ]
 }
 
-data "aws_caller_identity" "current" {}
 
 ### secrets for ftp user and password
 resource "aws_secretsmanager_secret" "secrets" {
