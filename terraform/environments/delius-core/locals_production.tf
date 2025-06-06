@@ -150,5 +150,4 @@ locals {
     # Auditing from the Pre-Prod environment is considered production data
     is-production = true
   }
-
 }

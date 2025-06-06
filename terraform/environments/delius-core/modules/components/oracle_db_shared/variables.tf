@@ -96,3 +96,10 @@ variable "ecs_cluster_arn" {
   type        = string
   default     = null
 }
+
+# Only create one per account
+variable "create_backup_role" {
+  description = "Role used to run AWS Backuos i.e. dev-AWSBackupDefaultServiceRole"
+  type        = bool
+  default     = false
+}

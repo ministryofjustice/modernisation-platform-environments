@@ -40,11 +40,7 @@ module "step_function_notification_lambda_trigger" {
 
   trigger_event_pattern = jsonencode(
     {
-      "source" : ["aws.dms"],
-      "detail-type" : ["DMS Replication Task State Change"],
-      "detail" : {
-        "eventId" : ["DMS-EVENT-0079", "DMS-EVENT-0078"] # https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Events.html
-      }
+      "source" : ["aws.dms"]
     }
   )
 }

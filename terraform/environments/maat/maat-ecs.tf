@@ -57,7 +57,16 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "logs:DescribeLogStreams",
-          # "ecr:*",
+          "s3:ListBucket",
+          "s3:*Object*",
+          "s3:GetObjectACL",
+          "s3:putObjectACL",
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:GenerateDataKey",
+          "kms:ReEncrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey",
           "xray:PutTraceSegments",
           "xray:PutTelemetryRecords",
           "xray:GetSamplingRules",
@@ -65,16 +74,6 @@ resource "aws_iam_policy" "maat_ec2_instance_role_policy" {
           "xray:GetSamplingStatisticSummaries"
         ]
         Resource = "*"
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "s3:GetObject"
-        ],
-        Resource = [
-          "arn:aws:s3:::${module.xdr-agent-s3.bucket.id}",
-          "arn:aws:s3:::${module.xdr-agent-s3.bucket.id}/*"
-        ]
       }
     ]
   })
@@ -154,7 +153,7 @@ resource "aws_launch_template" "maat_ec2_launch_template" {
   user_data = base64encode(templatefile("maat-ec2-user-data.sh", {
     maat_ec2_log_group = local.application_data.accounts[local.environment].maat_ec2_log_group,
     app_ecs_cluster    = aws_ecs_cluster.maat_ecs_cluster.name,
-    xdr_bucket         = module.xdr-agent-s3.bucket.id,
+    environment        = local.environment,
     xdr_dir            = "/tmp/cortex-agent",
     xdr_tar            = "/tmp/cortex-agent.tar.gz",
     xdr_tags           = local.xdr_tags
