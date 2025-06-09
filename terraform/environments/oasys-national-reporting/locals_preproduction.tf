@@ -183,11 +183,11 @@ locals {
           instance_profile_policies = concat(local.ec2_instances.windows_bip.config.instance_profile_policies, [
             "Ec2SecretPolicy",
           ])
-        })
-        user_data_raw = merge(local.ec2_instances.windows_bip.user_data_raw, {
-          args = merge(local.ec2_instances.windows_bip.user_data_raw.args, {
-            branch = "TM/TM-1329/windows-bip-server-onr-preprod"
-          })
+          user_data_raw = base64encode(templatefile(
+            "./templates/user-data-onr-windows-bip-pwsh.yaml.tftpl", {
+              branch = "TM/TM-1329/windows-bip-server-onr-preprod"
+            }
+          ))
         })
         tags = merge(local.ec2_instances.windows_bip.tags, {
           oasys-national-reporting-environment = "pp"
