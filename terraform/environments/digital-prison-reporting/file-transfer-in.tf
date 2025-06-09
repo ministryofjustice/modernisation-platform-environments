@@ -7,6 +7,7 @@ module "landing_zone_antivirus_check_lambda" {
   tracing            = "Active"
   lambda_trigger     = true
   trigger_bucket_arn = module.s3_landing_bucket.bucket_arn
+  policies           = ["arn:aws:iam::${local.account_id}:policy/${local.s3_read_write_policy}"]
 
   memory_size                    = local.landing_zone_antivirus_check_lambda_memory_size
   timeout                        = local.landing_zone_antivirus_check_lambda_timeout

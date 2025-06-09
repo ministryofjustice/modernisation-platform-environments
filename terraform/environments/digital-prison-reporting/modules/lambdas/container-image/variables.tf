@@ -43,6 +43,12 @@ variable "tracing" {
   type        = string
 }
 
+variable "policies" {
+  description = "Additional IAM policies to attach to the lambda's IAM role."
+  type        = list(any)
+  default     = []
+}
+
 variable "tags" {
   description = "Additional tags to apply to the log group."
   type        = map(any)
