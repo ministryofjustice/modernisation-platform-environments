@@ -8,6 +8,10 @@ output "lambda_name" {
   value       = var.enable_lambda ? join("", aws_lambda_function.this.*.function_name) : ""
 }
 
+output "lambda_function_arn" {
+  value = var.enable_lambda ? join("", aws_lambda_function.this.*.arn) : ""
+}
+
 output "lambda_invoke_arn" {
   value = var.enable_lambda ? join("", aws_lambda_function.this.*.invoke_arn) : ""
 }
