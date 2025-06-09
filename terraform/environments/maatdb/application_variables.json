@@ -57,8 +57,8 @@
       "deletion_protection": true,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
-      "ecs_cluster_sec_group_id": "",
-      "mlra_ecs_cluster_sec_group_id": "",
+      "ecs_cluster_sec_group_id": "sg-0c09051cb8543cc3e",
+      "mlra_ecs_cluster_sec_group_id": "sg-00dd7a4dcbcf3c22e",
       "build_s3": false,
       "build_ftp": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
@@ -88,8 +88,8 @@
       "deletion_protection": true,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
-      "ecs_cluster_sec_group_id": "",
-      "mlra_ecs_cluster_sec_group_id": "",
+      "ecs_cluster_sec_group_id": "sg-0035b7b87fb83ba52",
+      "mlra_ecs_cluster_sec_group_id": "sg-09943eaaa5ee1d160",
       "build_s3": false,
       "build_ftp": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
