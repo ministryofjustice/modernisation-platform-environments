@@ -652,6 +652,7 @@ module "s3_landing_bucket" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
+  enable_notification       = true
 
   bucket_notifications = {
     lambda_function_arn = module.landing_zone_antivirus_check_lambda.lambda_function,
