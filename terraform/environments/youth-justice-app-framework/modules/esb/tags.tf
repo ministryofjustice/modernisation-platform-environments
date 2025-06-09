@@ -5,12 +5,13 @@ locals {
   module_git_hash = contains(local.head, "unknown") ? "unknown" : trim(file(local.git_hash_path), "\n")
 
   tags = {
-    "module"          = "esb",
-    "module_version"  = local.module_version,
-    "module_git_hash" = local.module_git_hash,
-    "project"         = var.project_name
-    "environment"     = var.environment
-    "Name"            = "ESB"
+    "module"            = "esb",
+    "module_version"    = local.module_version,
+    "module_git_hash"   = local.module_git_hash,
+    "project"           = var.project_name
+    "environment"       = var.environment
+    "Name"              = "ESB"
+    "AzImpairmentPower" = "StopInstances"
   }
 
 
