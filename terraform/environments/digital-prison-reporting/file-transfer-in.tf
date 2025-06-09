@@ -1,10 +1,12 @@
 module "landing_zone_antivirus_check_lambda" {
   source = "./modules/lambdas/container-image"
 
-  enable_lambda = local.landing_zone_antivirus_check_lambda_enable
-  image_uri     = "${aws_ecr_repository.file_transfer_in_clamav_scanner.repository_url}:${local.landing_zone_antivirus_check_lambda_version}"
-  name          = "${local.project}-landing-zone-check"
-  tracing       = "Active"
+  enable_lambda      = local.landing_zone_antivirus_check_lambda_enable
+  image_uri          = "${aws_ecr_repository.file_transfer_in_clamav_scanner.repository_url}:${local.landing_zone_antivirus_check_lambda_version}"
+  name               = "${local.project}-landing-zone-check"
+  tracing            = "Active"
+  lambda_trigger     = true
+  trigger_bucket_arn = module.s3_landing_bucket.bucket_arn
 
   memory_size                    = local.landing_zone_antivirus_check_lambda_memory_size
   timeout                        = local.landing_zone_antivirus_check_lambda_timeout
