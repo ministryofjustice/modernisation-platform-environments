@@ -131,7 +131,11 @@ resource "aws_glue_crawler" "github_auditlog" {
   })
 
   recrawl_policy {
-    recrawl_behavior = "CRAWL_EVERYTHING"
+    recrawl_behavior = "CRAWL_NEW_FOLDERS_ONLY"
+  }
+  schema_change_policy {
+    delete_behavior = "LOG"
+    update_behavior = "LOG"
   }
   schedule = "cron(0 7 * * ? *)"
   tags     = local.tags
