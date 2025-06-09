@@ -1,7 +1,7 @@
 #### This file can be used to store locals specific to the member account ####
 
 locals {
-  env_account_id = local.environment_management.account_ids[terraform.workspace]
+  env_account_id       = local.environment_management.account_ids[terraform.workspace]
   application_test_url = "https://mlra.laa-development.modernisation-platform.service.justice.gov.uk/mlra/"
 
   # ECS local variables for ecs.tf
@@ -23,8 +23,8 @@ locals {
   maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
   gtm_id_secret_name          = "APP_MLRA_GOOGLE_TAG_MANAGER_ID"
   infox_client_secret_name    = "APP_INFOX_CLIENT_SECRET"
-  maat_api_client_id_name    = "APP_MAAT_API_CLIENT_ID"
-  maat_api_client_secret_name    = "APP_MAAT_API_CLIENT_SECRET"
+  maat_api_client_id_name     = "APP_MAAT_API_CLIENT_ID"
+  maat_api_client_secret_name = "APP_MAAT_API_CLIENT_SECRET"
   task_definition = templatefile("task_definition.json", {
     app_name               = local.application_name
     ecr_url                = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
@@ -45,7 +45,7 @@ locals {
   ecs_target_capacity = 100
 
   # SNS local variables for cloudwatch.tf
-  pagerduty_integration_keys = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
+  pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
 
   xdr_tags = join(", ", [
