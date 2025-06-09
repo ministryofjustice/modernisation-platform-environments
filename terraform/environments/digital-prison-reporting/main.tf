@@ -653,6 +653,11 @@ module "s3_landing_bucket" {
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
 
+  bucket_notifications = {
+    lambda_function_arn = module.landing_zone_antivirus_check_lambda.lambda_function,
+    events              = ["s3:ObjectCreated:*"]
+  }
+
   tags = merge(
     local.all_tags,
     {
