@@ -40,7 +40,12 @@ module "step_function_notification_lambda_trigger" {
 
   trigger_event_pattern = jsonencode(
     {
-      "source" : ["aws.dms"]
+      "source" : ["aws.dms"],
+      "detail-type" : ["DMS Replication Task State Change"],
+      "detail" : {
+        "type" : ["REPLICATION_TASK"],
+        "eventType" : ["REPLICATION_TASK_STOPPED", "REPLICATION_TASK_FAILED"]
+      }
     }
   )
 }

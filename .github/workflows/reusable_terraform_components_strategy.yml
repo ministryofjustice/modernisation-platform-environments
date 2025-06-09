@@ -237,6 +237,31 @@ jobs:
             done
           done < envlist.json
 
+          # --------------------------------------------------------------------
+          # 5.1. On main: ensure all component/environment pairs are included with plan_apply
+          # --------------------------------------------------------------------
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "On main: ensuring all component/environment pairs are included with plan_apply."
+            while IFS= read -r envobj; do
+              for comp in $COMPONENTS; do
+                target=$(echo "$envobj" | jq -r '.target')
+                pair="${comp}_${target}"
+
+                if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                  continue
+                fi
+
+                seen_pairs+=("$pair")
+                if [ "$firstEntry" = true ]; then
+                  firstEntry=false
+                else
+                  echo "," >> final-list.json
+                fi
+                echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp, "action": "plan_apply"}' >> final-list.json
+              done
+            done < envlist.json
+          fi
+          
           # Ensure the JSON array is properly closed.
           echo "]" >> final-list.json
 
