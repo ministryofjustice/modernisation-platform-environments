@@ -94,7 +94,7 @@ resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        Resource = "*"
+        Resource = "arn:aws:logs:${local.aws_region}:${local.account_id}:log-group:/aws-glue/crawlers:*"
       },
       {
         Sid    = "AllowKMSEncryptDecrypt",
