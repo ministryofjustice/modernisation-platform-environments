@@ -80,6 +80,11 @@ variable "stop_dms_task_job" {
   type        = string
 }
 
+variable "glue_archive_job" {
+  description = "Name of the glue job which archives the raw data"
+  type        = string
+}
+
 variable "compaction_structured_worker_type" {
   description = "(Optional) Worker type to use for the compaction job in structured zone"
   type        = string
