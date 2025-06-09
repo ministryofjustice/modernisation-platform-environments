@@ -172,6 +172,7 @@ variable "data_firehoses" {
     destination_http_secret_name                 = optional(string)
     destination_http_endpoint_ssm_parameter_name = string
   }))
+  default = {}
 }
 
 variable "ec2_autoscaling_groups" {
