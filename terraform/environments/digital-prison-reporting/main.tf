@@ -655,7 +655,7 @@ module "s3_landing_bucket" {
   enable_notification       = true
 
   bucket_notifications = {
-    lambda_function_arn = module.landing_zone_antivirus_check_lambda.lambda_function,
+    lambda_function_arn = module.landing_zone_antivirus_check_lambda.lambda_invoke_arn,
     events              = ["s3:ObjectCreated:*"]
   }
 
