@@ -177,6 +177,7 @@ locals {
         })
       })
 
+      # Temporary windows BIP server for migration only
       pp-win-bip-1 = merge(local.ec2_instances.windows_bip, {
         config = merge(local.ec2_instances.windows_bip.config, {
           instance_profile_policies = concat(local.ec2_instances.windows_bip.config.instance_profile_policies, [
@@ -185,7 +186,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_instances.windows_bip.user_data_cloud_init, {
           args = merge(local.ec2_instances.windows_bip.user_data_cloud_init.args, {
-            branch = "main"
+            branch = "TM/TM-1329/windows-bip-server-onr-preprod"
           })
         })
         tags = merge(local.ec2_instances.windows_bip.tags, {
