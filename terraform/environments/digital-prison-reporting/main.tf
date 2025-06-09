@@ -656,7 +656,9 @@ module "s3_landing_bucket" {
 
   bucket_notifications = {
     lambda_function_arn = module.landing_zone_antivirus_check_lambda.lambda_function_arn,
-    events              = ["s3:ObjectCreated:*"]
+    events              = ["s3:ObjectCreated:*"],
+    filter_prefix       = null,
+    filter_suffix       = null
   }
 
   tags = merge(
