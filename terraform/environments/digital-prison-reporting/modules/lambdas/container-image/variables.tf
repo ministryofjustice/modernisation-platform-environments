@@ -61,6 +61,18 @@ variable "vpc_settings" {
   default     = null
 }
 
+variable "lambda_trigger" {
+  description = "Set Permissions for LAMBDA Triggers,"
+  type        = bool
+  default     = false
+}
+
+variable "trigger_bucket_arn" {
+  description = "Lambda Trigger S3 Bucket ARN"
+  type        = string
+  default     = ""
+}
+
 variable "reserved_concurrent_executions" {
   description = "Amount of reserved concurrent executions for this lambda function. A value of 0 disables lambda from being triggered and -1 removes any concurrency limitations. Defaults to Unreserved Concurrency Limits -1"
   type        = number
