@@ -95,9 +95,8 @@ resource "aws_security_group" "cluster_ec2" {
 }
 
 # EC2 launch template - settings to use for new EC2s added to the group
-# Note - to force a new AMI you will need to manually terminate the EC2s
+# To force a new AMI you will need to manually terminate the EC2s
 # so that the autoscaling group creates new ones using the new launch template
-
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${var.app_name}-ec2-launch-template"
   image_id      = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-ECS_Optimized/image_id"
