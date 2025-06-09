@@ -16,11 +16,6 @@ locals {
     "LAA-ftp-1stlocate-ccms-inbound",
     "LAA-ftp-rossendales-nct-inbound-product"
   ]
-  base_buckets = ["laa-ccms-inbound", "laa-ccms-outbound", "laa-ccms-ftp-lambda"]
-
-  bucket_names = [
-    for name in local.base_buckets : "${name}-${local.environment}-mp"
-  ]
 }
 
 
