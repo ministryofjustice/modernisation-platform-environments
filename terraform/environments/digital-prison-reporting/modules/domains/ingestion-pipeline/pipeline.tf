@@ -511,7 +511,7 @@ module "data_ingestion_pipeline" {
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition,
       }
     }
-  ) : jsonencode(
+    ) : jsonencode(
     {
       "Comment" : "Data Ingestion Pipeline Step Function",
       "StartAt" : local.deactivate_archive_trigger.StepName,

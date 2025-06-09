@@ -6,11 +6,11 @@ module "s3_bucket" {
   count  = local.build_s3 ? length(local.bucket_names) : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
 
-  bucket_prefix      = lower(local.bucket_names[count.index])
-  versioning_enabled = false
-  force_destroy      = false
+  bucket_prefix       = lower(local.bucket_names[count.index])
+  versioning_enabled  = false
+  force_destroy       = false
   replication_enabled = false
-  replication_region = local.region
+  replication_region  = local.region
 
   providers = {
     aws.bucket-replication = aws

@@ -125,7 +125,6 @@
       "build_s3": false,
       "build_ftp": false,
       "pagerduty_integration_key_name": "laa_maat_prod_alarm"
-
     }
   }
 }
