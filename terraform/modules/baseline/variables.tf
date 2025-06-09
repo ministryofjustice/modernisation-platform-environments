@@ -165,6 +165,15 @@ variable "cloudwatch_metric_alarms" {
   default = {}
 }
 
+variable "data_firehoses" {
+  description = "map of data firehoses to create"
+  type = map(object({
+    cloudwatch_log_group_names                   = list(string)
+    destination_http_secret_name                 = optional(string)
+    destination_http_endpoint_ssm_parameter_name = string
+  }))
+}
+
 variable "ec2_autoscaling_groups" {
   description = "map of ec2 autoscaling groups to create where the map key is the tags.Name.  See ec2_autoscaling_group module for more variable details"
   type = map(object({

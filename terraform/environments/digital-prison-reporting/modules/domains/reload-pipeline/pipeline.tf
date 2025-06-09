@@ -26,7 +26,22 @@ locals {
           "--dpr.stop.glue.instance.job.name" : var.glue_archive_job
         }
       },
-      "Next" : local.stop_dms_replication_task.StepName
+      "Next" : var.split_pipeline ? local.stop_dms_cdc_replication_task.StepName : local.stop_dms_replication_task.StepName
+    }
+  }
+
+  stop_dms_cdc_replication_task = {
+    "StepName" : "Stop DMS CDC Replication Task",
+    "StepDefinition" : {
+      "Type" : "Task",
+      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters" : {
+        "JobName" : var.stop_dms_task_job,
+        "Arguments" : {
+          "--dpr.dms.replication.task.id" : var.cdc_replication_task_id
+        }
+      },
+      "Next" : local.check_all_pending_files_have_been_processed.StepName
     }
   }
 
@@ -207,6 +222,7 @@ locals {
       "Parameters" : {
         "Payload" : {
           "token.$" : "$$.Task.Token",
+          "ignoreDmsTaskFailure" : var.pipeline_notification_lambda_function_ignore_dms_failure,
           "replicationTaskArn" : var.dms_replication_task_arn
         },
         "FunctionName" : var.pipeline_notification_lambda_function
@@ -224,6 +240,22 @@ locals {
           "BackoffRate" : 2
         }
       ],
+      "Next" : var.split_pipeline ? local.set_dms_cdc_replication_task_start_time.StepName : local.run_glue_batch_job.StepName
+    }
+  }
+
+  set_dms_cdc_replication_task_start_time = {
+    "StepName" : "Set DMS CDC Replication Task Start Time",
+    "StepDefinition" : {
+      "Type" : "Task",
+      "Resource" : "arn:aws:states:::glue:startJobRun.sync",
+      "Parameters" : {
+        "JobName" : var.set_cdc_dms_start_time_job,
+        "Arguments" : {
+          "--dpr.dms.replication.task.id" : var.replication_task_id,
+          "--dpr.cdc.dms.replication.task.id" : var.cdc_replication_task_id
+        }
+      },
       "Next" : local.run_glue_batch_job.StepName
     }
   }
@@ -433,7 +465,20 @@ locals {
         "NumberOfWorkers" : var.retention_curated_num_workers,
         "WorkerType" : var.retention_curated_worker_type
       },
-      "Next" : var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName
+      "Next" : var.batch_only ? local.run_reconciliation_job.StepName : (var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.resume_dms_replication_task.StepName)
+    }
+  }
+
+  start_dms_cdc_replication_task = {
+    "StepName" : "Start DMS CDC Replication Task",
+    "StepDefinition" : {
+      "Type" : "Task",
+      "Resource" : "arn:aws:states:::aws-sdk:databasemigration:startReplicationTask",
+      "Parameters" : {
+        "ReplicationTaskArn" : var.dms_cdc_replication_task_arn,
+        "StartReplicationTaskType" : "start-replication"
+      },
+      "Next" : local.start_glue_streaming_job.StepName
     }
   }
 
@@ -570,6 +615,43 @@ module "reload_pipeline" {
         (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
         (local.run_reconciliation_job.StepName) : local.run_reconciliation_job.StepDefinition,
         (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+        (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
+      }
+    }
+    ) : var.split_pipeline ? jsonencode(
+    {
+      "Comment" : "Reload Pipeline Step Function (With Separated Full-Load and CDC Tasks)",
+      "StartAt" : local.deactivate_archive_trigger.StepName,
+      "States" : {
+        (local.deactivate_archive_trigger.StepName) : local.deactivate_archive_trigger.StepDefinition,
+        (local.stop_archive_job.StepName) : local.stop_archive_job.StepDefinition,
+        (local.stop_dms_cdc_replication_task.StepName) : local.stop_dms_cdc_replication_task.StepDefinition,
+        (local.check_all_pending_files_have_been_processed.StepName) : local.check_all_pending_files_have_been_processed.StepDefinition,
+        (local.stop_glue_streaming_job.StepName) : local.stop_glue_streaming_job.StepDefinition,
+        (local.archive_remaining_raw_files.StepName) : local.archive_remaining_raw_files.StepDefinition,
+        (local.update_hive_tables.StepName) : local.update_hive_tables.StepDefinition,
+        (local.prepare_temp_reload_bucket_data.StepName) : local.prepare_temp_reload_bucket_data.StepDefinition,
+        (local.copy_curated_data_to_temp_reload_bucket.StepName) : local.copy_curated_data_to_temp_reload_bucket.StepDefinition,
+        (local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepName) : local.switch_hive_tables_for_prisons_to_temp_reload_bucket.StepDefinition,
+        (local.empty_raw_structured_and_curated_data.StepName) : local.empty_raw_structured_and_curated_data.StepDefinition,
+        (local.start_dms_replication_task.StepName) : local.start_dms_replication_task.StepDefinition,
+        (local.invoke_dms_state_control_lambda.StepName) : local.invoke_dms_state_control_lambda.StepDefinition,
+        (local.set_dms_cdc_replication_task_start_time.StepName) : local.set_dms_cdc_replication_task_start_time.StepDefinition,
+        (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition,
+        (local.delete_existing_reload_diffs.StepName) : local.delete_existing_reload_diffs.StepDefinition,
+        (local.run_create_reload_diff_batch_job.StepName) : local.run_create_reload_diff_batch_job.StepDefinition,
+        (local.move_reload_diffs_toInsert_to_archive_bucket.StepName) : local.move_reload_diffs_toInsert_to_archive_bucket.StepDefinition,
+        (local.move_reload_diffs_toDelete_to_archive_bucket.StepName) : local.move_reload_diffs_toDelete_to_archive_bucket.StepDefinition,
+        (local.move_reload_diffs_toUpdate_to_archive_bucket.StepName) : local.move_reload_diffs_toUpdate_to_archive_bucket.StepDefinition,
+        (local.empty_raw_data.StepName) : local.empty_raw_data.StepDefinition,
+        (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
+        (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
+        (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
+        (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
+        (local.start_dms_cdc_replication_task.StepName) : local.start_dms_cdc_replication_task.StepDefinition,
+        (local.start_glue_streaming_job.StepName) : local.start_glue_streaming_job.StepDefinition,
+        (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
+        (local.reactivate_archive_trigger.StepName) : local.reactivate_archive_trigger.StepDefinition,
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }

@@ -28,8 +28,9 @@ module "environment_stage" {
 
   bastion_config = local.bastion_config_stage
 
-  ldap_config = local.ldap_config_stage
-  db_config   = local.db_config_stage
+  ldap_config        = local.ldap_config_stage
+  db_config          = local.db_config_stage
+  create_backup_role = false
 
   delius_microservice_configs = local.delius_microservices_configs_stage
 
@@ -67,8 +68,9 @@ module "environment_preprod" {
 
   bastion_config = local.bastion_config_preprod
 
-  ldap_config = local.ldap_config_preprod
-  db_config   = local.db_config_preprod
+  ldap_config        = local.ldap_config_preprod
+  db_config          = local.db_config_preprod
+  create_backup_role = true
 
   delius_microservice_configs = local.delius_microservices_configs_preprod
 

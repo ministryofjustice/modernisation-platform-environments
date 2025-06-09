@@ -35,9 +35,6 @@ locals {
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
-      /* MLFlow */
-      mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-development"
-
       /* UI */
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
@@ -85,9 +82,6 @@ locals {
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-dev-execution-role"
 
-      /* MLFlow */
-      mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow-test"
-
       /* UI */
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
     }
@@ -131,9 +125,6 @@ locals {
       /* Data Engineering Airflow */
       data_engineering_airflow_execution_role_arn = "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/airflow-prod-execution-role"
 
-      /* MLFlow */
-      mlflow_s3_bucket_name = "alpha-analytical-platform-mlflow"
-
       /* UI */
       ui_hostname = "analytical-platform.service.justice.gov.uk"
 
@@ -166,6 +157,7 @@ locals {
           "prison",
           "probation",
           "property",
+          "public",
           "risk",
           "sentence_offence",
           "staging",

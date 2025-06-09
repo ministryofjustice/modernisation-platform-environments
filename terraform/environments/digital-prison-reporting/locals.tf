@@ -93,11 +93,11 @@ locals {
   hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
 
   # Common Policies
-  kms_read_access_policy = "${local.project}_kms_read_policy"
-  s3_read_access_policy  = "${local.project}_s3_read_policy"
-  s3_read_write_policy   = "${local.project}_s3_read_write_policy"
-  apigateway_get_policy  = "${local.project}_apigateway_get_policy"
-  invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
+  kms_read_access_policy     = "${local.project}_kms_read_policy"
+  s3_read_access_policy      = "${local.project}_s3_read_policy"
+  s3_read_write_policy       = "${local.project}_s3_read_write_policy"
+  apigateway_get_policy      = "${local.project}_apigateway_get_policy"
+  invoke_lambda_policy       = "${local.project}_invoke_lambda_policy"
   secretsmanager_read_policy = "${local.project}_secretsmanager_read_policy"
 
 
@@ -521,7 +521,7 @@ locals {
   probation_discovery_windows_ami_id = "ami-0ba9276d1fb25ed77"
   enable_probation_discovery_node    = local.application_data.accounts[local.environment].enable_probation_discovery_node
 
- dpr_windows_rdp_credentials_placeholder = {
+  dpr_windows_rdp_credentials_placeholder = {
     username = "placeholder"
     password = "placeholder"
   }
