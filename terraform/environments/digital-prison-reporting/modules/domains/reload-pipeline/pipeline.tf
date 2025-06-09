@@ -655,7 +655,7 @@ module "reload_pipeline" {
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }
-  ) : jsonencode(
+    ) : jsonencode(
     {
       "Comment" : "Reload Pipeline Step Function",
       "StartAt" : local.deactivate_archive_trigger.StepName,

@@ -21,6 +21,6 @@ resource "aws_iam_policy" "coat_gh_actions_policy" {
 }
 
 resource "aws_iam_role_policy_attachment" "coat_github_actions_report_upload_attachment" {
-  role = aws_iam_role.coat_github_actions_report_upload.name
+  role       = aws_iam_role.coat_github_actions_report_upload.name
   policy_arn = aws_iam_policy.coat_gh_actions_policy.arn
 }

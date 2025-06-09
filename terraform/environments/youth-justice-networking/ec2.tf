@@ -74,7 +74,7 @@ resource "aws_security_group" "internal_sg" {
     description = "Management to Juniper SSH Interfaces"
   }
 
-ingress {
+  ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
