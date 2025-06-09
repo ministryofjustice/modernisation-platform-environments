@@ -184,8 +184,8 @@ locals {
             "Ec2SecretPolicy",
           ])
         })
-        user_data_cloud_init = merge(local.ec2_instances.windows_bip.user_data_cloud_init, {
-          args = merge(local.ec2_instances.windows_bip.user_data_cloud_init.args, {
+        user_data_raw = merge(local.ec2_instances.windows_bip.user_data_raw, {
+          args = merge(local.ec2_instances.windows_bip.user_data_raw.args, {
             branch = "TM/TM-1329/windows-bip-server-onr-preprod"
           })
         })
