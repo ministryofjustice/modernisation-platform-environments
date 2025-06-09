@@ -533,6 +533,9 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_tasks_role_policy_attachment
   policy_arn = aws_iam_policy.maat_ecs_policy_access_params.arn
 }
 #### ECS TASK DEFINITION -------
+data "aws_ecs_task_definition" "latest" {
+  task_definition = "${local.application_name}-task-definition"
+}
 
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
   family             = "${local.application_name}-ecs-task-definition"
