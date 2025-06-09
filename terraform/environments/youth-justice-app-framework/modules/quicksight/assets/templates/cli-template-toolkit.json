@@ -1,10 +1,10 @@
 {
-  "AwsAccountId": "711387140977",
+  "AwsAccountId": "${aws_account_id}",
   "Name": "Disparity Toolkit v1.2 template",
   "TemplateId": "Disparity_Toolkit_v1_2",
   "Permissions": [
     {
-      "Principal": "arn:aws:quicksight:eu-west-2:711387140977:user/default/quicksight-admin-access/david.seekins",
+      "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:user/default/quicksight-admin-access/david.seekins",
       "Actions": [
         "quicksight:UpdateTemplatePermissions",
         "quicksight:DescribeTemplate"
