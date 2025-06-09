@@ -176,6 +176,23 @@ locals {
           oasys-national-reporting-environment = "pp"
         })
       })
+
+      pp-win-bip-1 = merge(local.ec2_instances.windows_bip, {
+        config = merge(local.ec2_instances.windows_bip.config, {
+          instance_profile_policies = concat(local.ec2_instances.windows_bip.config.instance_profile_policies, [
+            "Ec2SecretPolicy",
+          ])
+        })
+        user_data_cloud_init = merge(local.ec2_instances.windows_bip.user_data_cloud_init, {
+          args = merge(local.ec2_instances.windows_bip.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.windows_bip.tags, {
+          oasys-national-reporting-environment = "pp"
+          domain-name                          = "azure.hmpp.root"
+        })
+      })
     }
 
     fsx_windows = {
