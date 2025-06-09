@@ -44,3 +44,8 @@ data "aws_db_subnet_group" "apc_database_subnet_group" {
 data "aws_kms_key" "common_secrets_manager_kms" {
   key_id = "alias/secretsmanager/common"
 }
+
+# EKS
+data "aws_eks_cluster" "eks" {
+  name = local.eks_cluster_name
+}
