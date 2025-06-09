@@ -1,5 +1,5 @@
 {
-  "AwsAccountId": "",
+  "AwsAccountId": "${aws_account_id}",
   "DashboardId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5",
   "Name": "Disparity Toolkit v1.2",
   "Permissions": [
