@@ -534,7 +534,7 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_tasks_role_policy_attachment
 }
 #### ECS TASK DEFINITION -------
 data "aws_ecs_task_definition" "latest" {
-  task_definition = "${local.application_name}-task-definition"
+  task_definition = "${local.application_name}-ecs-task-definition"
 }
 
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
