@@ -184,7 +184,7 @@ locals {
             "Ec2SecretPolicy",
           ])
           user_data_raw = base64encode(templatefile(
-            "./templates/user-data-onr-windows-bip-pwsh.yaml.tftpl", {
+            "./templates/user-data-onr-bip-pwsh.yaml.tftpl", {
               branch = "TM/TM-1329/windows-bip-server-onr-preprod"
             }
           ))
