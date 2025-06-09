@@ -180,6 +180,7 @@ locals {
       # Temporary windows BIP server for migration only
       pp-win-bip-1 = merge(local.ec2_instances.windows_bip, {
         config = merge(local.ec2_instances.windows_bip.config, {
+          ami_name          = "hmpps_windows_server_2022_release_2025-06-02T00-00-40.444Z"
           availability_zone = "eu-west-2a"
           instance_profile_policies = concat(local.ec2_instances.windows_bip.config.instance_profile_policies, [
             "Ec2SecretPolicy",

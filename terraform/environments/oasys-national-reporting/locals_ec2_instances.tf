@@ -296,7 +296,7 @@ locals {
 
     windows_bip = {
       config = {
-        ami_name                      = "base_windows_server_2022_release_2025-*"
+        ami_name                      = "hmpps_windows_server_2022_release_2025-*"
         ebs_volumes_copy_all_from_ami = false
         iam_resource_names_prefix     = "ec2-instance"
         instance_profile_policies = [
