@@ -22,8 +22,8 @@ module "dashboard_service_rds" {
   max_allocated_storage = 256
 
   multi_az               = true
-  db_subnet_group_name   = module.vpc.database_subnet_group              # needs data call
-  vpc_security_group_ids = [module.rds_security_group.security_group_id] # needs data call
+  db_subnet_group_name   = data.aws_db_subnet_group.apc_database_subnet_group.name
+  vpc_security_group_ids = [module.rds_security_group.security_group_id]
 
   username                    = "dashboard_service"
   db_name                     = "dashboard_service"
