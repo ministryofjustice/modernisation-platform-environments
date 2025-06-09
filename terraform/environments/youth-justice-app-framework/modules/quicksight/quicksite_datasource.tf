@@ -24,10 +24,10 @@ resource "aws_quicksight_data_source" "redshift" {
   credentials {
     secret_arn = var.redshift_quicksight_user_secret_arn
   }
-  
+
   permission {
     principal = "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/quicksight-admin-access/${var.quicksight_admin_user}"
-    actions =  [
+    actions = [
       "quicksight:PassDataSource",
       "quicksight:DescribeDataSourcePermissions",
       "quicksight:UpdateDataSource",
@@ -84,8 +84,8 @@ resource "aws_quicksight_data_source" "postgresql" {
   }
 
   permission {
-   principal = "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/quicksight-admin-access/${var.quicksight_admin_user}"
-    actions =  [
+    principal = "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/quicksight-admin-access/${var.quicksight_admin_user}"
+    actions = [
       "quicksight:PassDataSource",
       "quicksight:DescribeDataSourcePermissions",
       "quicksight:UpdateDataSource",
@@ -94,7 +94,7 @@ resource "aws_quicksight_data_source" "postgresql" {
       "quicksight:DeleteDataSource"
     ]
   }
-  
+
 
 
   depends_on = [aws_iam_role_policy_attachment.kms]
