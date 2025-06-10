@@ -165,9 +165,25 @@
       "enable_dbt_k8s_secrets": true,
       "dpr_generic_athena_workgroup": true,
       "analytics_generic_athena_workgroup": true,
+      "analytical_platform_share": [
+        {
+          "target_account_name": "analytical-platform-data-production",
+          "target_account_id": "593291632749",
+          "assume_account_name": "analytical-platform-management-production",
+          "assume_account_id": "042130406152",
+          "data_locations": ["dpr-structured-historical-development"],
+          "resource_shares": [
+            {
+              "glue_database": "*",
+              "glue_tables": ["*"]
+            }
+          ]
+        }
+      ],
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": true
+      "create_postgres_load_generator_job": true,
+      "enable_probation_discovery_node": true
     },
     "test": {
       "project_short_id": "dpr",
@@ -334,7 +350,8 @@
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": false
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -518,7 +535,8 @@
       ],
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": false
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false
     },
     "production": {
       "project_short_id": "dpr",
@@ -700,7 +718,8 @@
       ],
       "redshift_table_expiry_days": 1,
       "enable_s3_data_migrate_lambda": false,
-      "create_postgres_load_generator_job": false
+      "create_postgres_load_generator_job": false,
+      "enable_probation_discovery_node": false
     }
   }
 }

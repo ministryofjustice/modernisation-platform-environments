@@ -78,14 +78,14 @@ jobs:
 
           echo "Discovered components (folders with platform_backend.tf): $COMPONENTS"
 
-          # --------------------------------------------------------------------
-          # 4. Build the final matrix by checking each component independently.
-          # --------------------------------------------------------------------
+          # ----------------------------------------------------------------------------
+          # 4. Build the matrix by checking for changes in each component independently.
+          # ----------------------------------------------------------------------------
           echo "[" > final-list.json
           firstEntry=true
 
-          # Initialize an array to track components already added to the matrix.
-          seen_components=()
+          # Track component-environment pairs instead of just components
+          seen_pairs=()
 
           while IFS= read -r envobj; do
             for comp in $COMPONENTS; do
@@ -137,13 +137,15 @@ jobs:
                 fi
               fi
 
-              # Add the component to the matrix if it hasn't been added already.
-              if [[ " ${seen_components[@]} " =~ " ${comp} " ]]; then
-                echo "Component '${comp}' is already in the matrix; skipping."
+              target=$(echo "$envobj" | jq -r '.target')
+              pair="${comp}_${target}"
+
+              if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                echo "Component-target pair '${pair}' is already in the matrix; skipping."
                 continue
               fi
 
-              seen_components+=("$comp")
+              seen_pairs+=("$pair")
               if [ "$firstEntry" = true ]; then
                 firstEntry=false
               else
@@ -153,9 +155,9 @@ jobs:
             done
           done < envlist.json
 
-          # --------------------------------------------------------------------
+          # ----------------------------------------------------------------
           # 5. Detect changes in the "modules" folder and update the matrix.
-          # --------------------------------------------------------------------
+          # ----------------------------------------------------------------
 
           # Check for changes in the modules directory.
           modules_dir="terraform/environments/${{ inputs.application }}/modules"
@@ -215,15 +217,18 @@ jobs:
           # Append referencing components to the matrix.
           while IFS= read -r envobj; do
             for comp in "${referencing_components[@]}"; do
-              # Add the component to the matrix if it hasn't been added already.
-              if [[ " ${seen_components[@]} " =~ " ${comp} " ]]; then
-                echo "Component '${comp}' is already in the matrix; skipping."
+              target=$(echo "$envobj" | jq -r '.target')
+              pair="${comp}_${target}"
+
+              if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                echo "Component-target pair '${pair}' is already in the matrix; skipping."
                 continue
               fi
 
               echo "Including '${comp}' because it references a changed module."
-              seen_components+=("$comp")
-              if [ "$firstEntry" = true ]; then
+              seen_pairs+=("$pair")
+
+              if $firstEntry; then
                 firstEntry=false
               else
                 echo "," >> final-list.json
@@ -232,11 +237,65 @@ jobs:
             done
           done < envlist.json
 
+          # ----------------------------------------------------------------------------------------------------------------
+          # 6. If manually triggered: on main branch, ensure all component/environment pairs are included with plan_apply.
+          #    On feature branch, ensure all dev/test components are included with plan_apply,
+          #    and prod/preprod components are included with plan.
+          # ---------------------------------------------------------------------------------------------------------------
+          if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
+            if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+              echo "Manually triggered on main: ensuring all component/environment pairs are included with plan_apply."
+              while IFS= read -r envobj; do
+                for comp in $COMPONENTS; do
+                  target=$(echo "$envobj" | jq -r '.target')
+                  pair="${comp}_${target}"
+
+                  if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                    continue
+                  fi
+
+                  seen_pairs+=("$pair")
+                  if [ "$firstEntry" = true ]; then
+                    firstEntry=false
+                  else
+                    echo "," >> final-list.json
+                  fi
+                  echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp, "action": "plan_apply"}' >> final-list.json
+                done
+              done < envlist.json
+            else
+              echo "Manually triggered not on main: ensuring all component/environment pairs are included with plan or plan_apply as appropriate."
+              while IFS= read -r envobj; do
+                for comp in $COMPONENTS; do
+                  target=$(echo "$envobj" | jq -r '.target')
+                  pair="${comp}_${target}"
+
+                  if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                    continue
+                  fi
+
+                  seen_pairs+=("$pair")
+                  if [ "$firstEntry" = true ]; then
+                    firstEntry=false
+                  else
+                    echo "," >> final-list.json
+                  fi
+                  # Use plan for preprod/prod, plan_apply otherwise
+                  if [[ "$target" =~ preprod|prod ]]; then
+                    echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp, "action": "plan"}' >> final-list.json
+                  else
+                    echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp, "action": "plan_apply"}' >> final-list.json
+                  fi
+                done
+              done < envlist.json
+            fi
+          fi
+          
           # Ensure the JSON array is properly closed.
           echo "]" >> final-list.json
 
           # --------------------------------------------------------------------
-          # 6. Wrap the JSON array in a matrix object.
+          # 7. Wrap the JSON array in a matrix object.
           # --------------------------------------------------------------------
           echo -n '{"include":' > matrix.out
           cat final-list.json >> matrix.out
@@ -247,7 +306,7 @@ jobs:
           echo "$matrix"
 
           # --------------------------------------------------------------------
-          # 7. Output the matrix for subsequent jobs.
+          # 8. Output the matrix for subsequent jobs.
           # --------------------------------------------------------------------
           echo 'matrix<<EOF' >> $GITHUB_OUTPUT
           echo "${matrix}" >> $GITHUB_OUTPUT

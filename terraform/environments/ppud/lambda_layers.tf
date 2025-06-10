@@ -1,0 +1,51 @@
+########################################################
+# Lambda Layers and other dependencies for the functions
+########################################################
+
+############## Production Environment ##################
+
+# Lambda Layer for Matplotlib
+
+resource "aws_lambda_layer_version" "lambda_layer_matplotlib_prod_new" {
+  count               = local.is-production == true ? 1 : 0
+  layer_name          = "matplotlib-layer-prod"
+  description         = "matplotlib-layer for python 3.12"
+  s3_bucket           = aws_s3_bucket.moj-infrastructure[0].id
+  s3_key              = "lambda/layers/matplotlib-layer.zip"
+  compatible_runtimes = ["python3.12"]
+}
+
+# Lambda Layer for Boto3
+
+resource "aws_lambda_layer_version" "lambda_layer_boto3_prod" {
+  count               = local.is-production == true ? 1 : 0
+  layer_name          = "boto3-layer"
+  description         = "boto3-layer for python 3.12"
+  s3_bucket           = aws_s3_bucket.moj-infrastructure[0].id
+  s3_key              = "lambda/layers/boto3-layer.zip"
+  compatible_runtimes = ["python3.12"]
+}
+
+# Lambda Layer for Pandas
+
+resource "aws_lambda_layer_version" "lambda_layer_pandas_prod" {
+  count               = local.is-production == true ? 1 : 0
+  layer_name          = "pandas-layer"
+  description         = "pandas-layer for python 3.12"
+  s3_bucket           = aws_s3_bucket.moj-infrastructure[0].id
+  s3_key              = "lambda/layers/pandas-layer.zip"
+  compatible_runtimes = ["python3.12"]
+}
+
+############## Development Environment ##################
+
+# Lambda Layer for Matplotlib
+
+resource "aws_lambda_layer_version" "lambda_layer_matplotlib_dev" {
+  count               = local.is-development == true ? 1 : 0
+  layer_name          = "matplotlib-layer"
+  description         = "matplotlib-layer for python 3.12"
+  s3_bucket           = aws_s3_bucket.moj-lambda-layers-dev[0].id
+  s3_key              = "matplotlib-layer.zip"
+  compatible_runtimes = ["python3.12"]
+}

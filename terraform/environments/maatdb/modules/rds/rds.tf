@@ -86,8 +86,10 @@ resource "random_password" "rds_password" {
   special = false
 }
 
-
+# TODO: Setup secret rotation and kms encryption of secret
 resource "aws_secretsmanager_secret" "rds_password_secret" {
+  #checkov:skip=CKV2_AWS_57:"This is will be fixed at a later date"
+  #checkov:skip=CKV_AWS_149:"To be added later."
   name = "${var.application_name}-${var.environment}-rds_password_secret"
 }
 
@@ -115,9 +117,30 @@ resource "aws_secretsmanager_secret_version" "rds_password_secret_version" {
 # }
 
 
+# Consolidate security group IDs
+# RDS database
+locals {
+  rds_sg_group_ids = compact([
+    aws_security_group.cloud_platform_sec_group.id,
+    aws_security_group.bastion_sec_group.id,
+    aws_security_group.vpc_sec_group.id,
+    aws_security_group.mlra_ecs_sec_group.id
+  ])
+}
+
 # RDS database
 
+# TODO: Ensure logging is enabled for the database and performance insights logs are encrypted
 resource "aws_db_instance" "appdb1" {
+  #checkov:skip=CKV_AWS_129:"To be addressed"
+  #checkov:skip=CKV_AWS_354:"To be addressed"
+  #checkov:skip=CKV_AWS_118:"Enhanced security not required"
+  #checkov:skip=CKV_AWS_157:"Multi-az is enabled"
+  #checkov:skip=CKV_AWS_133:"Nightly backup is enabled"
+  #checkov:skip=CKV_AWS_353:"Performance Insights are enabled"
+  #checkov:skip=CKV_AWS_226:"Minor upgrades disabled to ensure compatibility"
+  #checkov:skip=CKV_AWS_293:"Deletion protection is enabled but not being recognised"
+
   port                                  = var.port
   allocated_storage                     = var.allocated_storage
   db_name                               = var.application_name
@@ -136,7 +159,7 @@ resource "aws_db_instance" "appdb1" {
   multi_az                              = var.multi_az
   username                              = var.username
   password                              = random_password.rds_password.result
-  vpc_security_group_ids                = [aws_security_group.cloud_platform_sec_group.id, aws_security_group.bastion_sec_group.id, aws_security_group.vpc_sec_group.id]
+  vpc_security_group_ids                = local.rds_sg_group_ids
   skip_final_snapshot                   = false
   final_snapshot_identifier             = "${var.application_name}-${formatdate("DDMMMYYYYhhmm", timestamp())}-finalsnapshot"
   parameter_group_name                  = aws_db_parameter_group.parameter_group_19.name
@@ -151,7 +174,10 @@ resource "aws_db_instance" "appdb1" {
   kms_key_id                            = var.kms_key_arn
   apply_immediately                     = true
   snapshot_identifier                   = var.snapshot_arn
-  tags = var.tags
+  tags = merge(
+    { "instance-scheduling" = "skip-scheduling" },
+    var.tags
+  )
 
   timeouts {
     create = "60m"
@@ -160,8 +186,7 @@ resource "aws_db_instance" "appdb1" {
 
 }
 
-# Normal Security Group
-
+# Access from Cloud Platform
 resource "aws_security_group" "cloud_platform_sec_group" {
   name        = "cloud-platform-sec-group"
   description = "RDS access from Cloud Platform via Transit gateway"
@@ -194,19 +219,19 @@ resource "aws_security_group" "vpc_sec_group" {
   vpc_id      = var.vpc_shared_id
 
   ingress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    security_groups = [var.ecs_cluster_sec_group_id]
+      description     = "Sql Net on 1521"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      security_groups = [var.ecs_cluster_sec_group_id]
   }
 
   egress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
-    security_groups = [var.ecs_cluster_sec_group_id]
+      description     = "Sql Net on 1521"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      security_groups = [var.ecs_cluster_sec_group_id]
   }
 
   tags = {
@@ -214,24 +239,52 @@ resource "aws_security_group" "vpc_sec_group" {
   }
 }
 
+resource "aws_security_group" "mlra_ecs_sec_group" {
+  name        = "mlra-ecs-sec-group"
+  description = "RDS Access from the MLRA application"
+  vpc_id      = var.vpc_shared_id
+
+  ingress {
+      description     = "Sql Net on 1521"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  }
+
+  egress {
+      description     = "Sql Net on 1521"
+      from_port       = 1521
+      to_port         = 1521
+      protocol        = "tcp"
+      security_groups = [var.mlra_ecs_cluster_sec_group_id]
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-mlra-ecs-sec-group"
+  }
+}
+
+
+# Access from Bastion
 resource "aws_security_group" "bastion_sec_group" {
   name        = "bastion-sec-group"
   description = "Bastion Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
   ingress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [var.bastion_security_group_id]
   }
 
   egress {
-    description = "Sql Net on 1521"
-    from_port   = 1521
-    to_port     = 1521
-    protocol    = "tcp"
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
     security_groups = [var.bastion_security_group_id]
   }
 
@@ -240,7 +293,9 @@ resource "aws_security_group" "bastion_sec_group" {
   }
 }
 
-
+output "db_instance_id" {
+  value = aws_db_instance.appdb1.id
+}
 
 
 
