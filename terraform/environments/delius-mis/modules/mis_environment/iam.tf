@@ -18,3 +18,22 @@ resource "aws_iam_policy" "secrets_manager" {
 
   tags = var.tags
 }
+
+data "aws_iam_policy_document" "ec2_describe" {
+  statement {
+    sid = "EC2DescribePermissions"
+    actions = [
+      "ec2:DescribeTags"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "ec2_describe" {
+  name        = "${var.env_name}-ec2-describe-instances"
+  path        = "/"
+  description = "Allow ec2 instance to describe instances"
+  policy      = data.aws_iam_policy_document.ec2_describe.json
+
+  tags = var.tags
+}
