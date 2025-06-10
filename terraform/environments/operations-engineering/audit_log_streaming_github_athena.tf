@@ -14,6 +14,11 @@ resource "aws_athena_workgroup" "github_auditlog" {
   configuration {
     result_configuration {
       output_location = "s3://${module.github_audit_log_athena_results.bucket.id}/results/"
+
+      encryption_configuration {
+        encryption_option = "SSE_KMS"
+        kms_key_arn       = data.aws_kms_key.github_auditlog.arn
+      }
     }
 
     enforce_workgroup_configuration    = true
