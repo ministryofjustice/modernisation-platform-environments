@@ -202,7 +202,7 @@ locals {
     }
   }
   # automation test instance only - do not use
-  # auto_config_dev = {
+  auto_config_dev = {
   #   instance_count = 1
   #   ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
   #   ebs_volumes = {
@@ -245,7 +245,7 @@ locals {
   #       }
   #     )
   #   }
-  # }
+  }
 
   # base config for each database
   base_db_config_dev = {
