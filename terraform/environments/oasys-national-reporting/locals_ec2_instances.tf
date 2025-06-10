@@ -308,7 +308,7 @@ locals {
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
           "./templates/user-data-onr-bip-pwsh.yaml.tftpl", {
-            branch = "TM/TM-1329/windows-bip-server-onr-preprod" # TODO: update back to main after merge
+            branch = "main"
           }
         ))
       }
@@ -318,7 +318,7 @@ locals {
       }
       instance = {
         disable_api_termination      = false
-        instance_type                = "r4.2xlarge" # Memory optimised 8 vCPU, 61 GiB RAM
+        instance_type                = "r6i.2xlarge" # Memory optimised 8 vCPU, 64 GiB RAM
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["private-jumpserver"]
