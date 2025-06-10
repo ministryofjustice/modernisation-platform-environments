@@ -23,7 +23,7 @@ resource "aws_athena_workgroup" "github_auditlog" {
 
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
-    bytes_scanned_cutoff_per_query     = 1000000000 # 1GB
+    bytes_scanned_cutoff_per_query     = 10000000000 # 10GB
     requester_pays_enabled             = false
   }
 
