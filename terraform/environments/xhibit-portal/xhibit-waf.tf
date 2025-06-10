@@ -224,7 +224,6 @@ resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
   )
 }
 
-# resource "aws_wafv2_web_acl_logging_configuration" "xhibit_waf_logging" {
-#   log_destination_configs = [aws_cloudwatch_log_group.xbhibit_waf_logs.arn]
-#   resource_arn            = aws_wafv2_web_acl.xhibit_web_acl.arn
-# }
+resource "aws_s3_bucket" "waf_logs_bucket" {
+  bucket = "xhibit-waf-logs-bucket"
+}
