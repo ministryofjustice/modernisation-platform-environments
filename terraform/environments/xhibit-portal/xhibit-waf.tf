@@ -24,6 +24,7 @@ resource "aws_wafv2_ip_set" "xbhibit_waf_ip_set" {
 }
 
 resource "aws_wafv2_web_acl" "xhibit_web_acl" {
+  # checkov:skip=CKV_AWS_192: Log4j protection is handled by AWSManagedRulesKnownBadInputsRuleSet
   name        = "xbhibit_waf"
   scope       = "REGIONAL"
   description = "AWS WAF Web ACL"
@@ -222,8 +223,4 @@ resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-xhibit-waf-logs", local.application_name, local.environment)) }
   )
-}
-
-resource "aws_s3_bucket" "waf_logs_bucket" {
-  bucket = "xhibit-waf-logs-bucket"
 }
