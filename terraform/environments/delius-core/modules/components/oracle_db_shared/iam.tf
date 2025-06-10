@@ -167,7 +167,8 @@ resource "aws_iam_policy" "combined_instance_policy" {
 
 # AWS Backup Role
 resource "aws_iam_role" "aws_backup_default_service_role" {
-  name  = "${var.env_name}-AWSBackupDefaultServiceRole"
+  count = var.create_backup_role ? 1 : 0
+  name  = "AWSBackupDefaultServiceRole"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
@@ -184,16 +185,19 @@ resource "aws_iam_role" "aws_backup_default_service_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "backup_policy" {
-  role       = aws_iam_role.aws_backup_default_service_role.name
+  count      = var.create_backup_role ? 1 : 0
+  role       = aws_iam_role.aws_backup_default_service_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForBackup"
 }
 
 resource "aws_iam_role_policy_attachment" "restore_policy" {
-  role       = aws_iam_role.aws_backup_default_service_role.name
+  count      = var.create_backup_role ? 1 : 0
+  role       = aws_iam_role.aws_backup_default_service_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSBackupServiceRolePolicyForRestores"
 }
 
 data "aws_iam_policy_document" "business_unit_kms_key_access" {
+  count = var.create_backup_role ? 1 : 0
   statement {
     effect = "Allow"
     actions = [
@@ -213,12 +217,14 @@ data "aws_iam_policy_document" "business_unit_kms_key_access" {
 }
 
 resource "aws_iam_policy" "business_unit_kms_key_access" {
+  count  = var.create_backup_role ? 1 : 0
   name   = "${var.env_name}-${var.db_suffix}-business-unit-kms-key-access-policy"
   path   = "/"
-  policy = data.aws_iam_policy_document.business_unit_kms_key_access.json
+  policy = data.aws_iam_policy_document.business_unit_kms_key_access[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "backup_service_kms_policy_attachment" {
-  role       = aws_iam_role.aws_backup_default_service_role.name
-  policy_arn = aws_iam_policy.business_unit_kms_key_access.arn
+  count      = var.create_backup_role ? 1 : 0
+  role       = aws_iam_role.aws_backup_default_service_role[0].name
+  policy_arn = aws_iam_policy.business_unit_kms_key_access[0].arn
 }

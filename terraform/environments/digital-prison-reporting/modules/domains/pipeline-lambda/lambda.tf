@@ -42,8 +42,8 @@ module "step_function_notification_lambda_trigger" {
     {
       "source" : ["aws.dms"],
       "detail-type" : ["DMS Replication Task State Change"],
-      "type" : ["REPLICATION_TASK"],
       "detail" : {
+        "type" : ["REPLICATION_TASK"],
         "eventType" : ["REPLICATION_TASK_STOPPED", "REPLICATION_TASK_FAILED"]
       }
     }

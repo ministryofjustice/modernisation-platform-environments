@@ -28,6 +28,7 @@ module "oracle_db_shared" {
   cluster_security_group_id   = aws_security_group.cluster.id
   delius_microservice_configs = var.delius_microservice_configs
   ecs_cluster_arn             = module.ecs.ecs_cluster_arn
+  create_backup_role          = var.create_backup_role
 
   providers = {
     aws.bucket-replication    = aws
