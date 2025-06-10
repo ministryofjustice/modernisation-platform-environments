@@ -9,6 +9,10 @@ locals {
     "${var.application_name}-production",
   ]
 
+  account_ids = merge(var.environment_management.account_ids, {
+    cortex_account_id = var.environment_management.cortex_account_id
+  })
+
   account_names = flatten([
     for name in local.possible_account_names : [
       contains(keys(var.environment_management.account_ids), name) ? [name] : []

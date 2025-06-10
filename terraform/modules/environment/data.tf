@@ -84,7 +84,7 @@ data "aws_route53_zone" "core_vpc" {
 
 data "aws_kms_key" "this" {
   for_each = toset(local.cmk_name_prefixes)
-  key_id   = "arn:aws:kms:eu-west-2:${var.environment_management.account_ids["core-shared-services-production"]}:alias/${each.key}-${var.business_unit}"
+  key_id   = "arn:aws:kms:eu-west-2:${local.account_ids["core-shared-services-production"]}:alias/${each.key}-${var.business_unit}"
 }
 
 #------------------------------------------------------------------------------
