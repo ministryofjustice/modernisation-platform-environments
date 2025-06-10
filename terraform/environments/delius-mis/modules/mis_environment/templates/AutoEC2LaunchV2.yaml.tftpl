@@ -67,7 +67,7 @@ tasks:
         Write-Output "git already installed, skipping fallback install"
         } else {
         Set-Location -Path ([System.IO.Path]::GetTempPath())
-        Url="https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
+        $Url="https://github.com/git-for-windows/git/releases/download/v2.49.0.windows.1/Git-2.49.0-64-bit.exe"
         Write-Output "Fallback installation for git - downloading from $Url"
         Invoke-WebRequest $Url -OutFile ".\Git.exe"
         .\Git.exe /VERYSILENT /NORESTART
