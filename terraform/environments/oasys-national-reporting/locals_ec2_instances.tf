@@ -293,5 +293,49 @@ locals {
       }
       cloudwatch_metric_alarms = local.cloudwatch_metric_alarms.windows
     }
+
+    windows_bip = {
+      config = {
+        ami_name                      = "hmpps_windows_server_2022_release_2025-*"
+        ebs_volumes_copy_all_from_ami = false
+        iam_resource_names_prefix     = "ec2-instance"
+        instance_profile_policies = [
+          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
+          "EC2Default",
+          "EC2S3BucketWriteAndDeleteAccessPolicy",
+          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
+        ]
+        subnet_name = "private"
+        user_data_raw = base64encode(templatefile(
+          "./templates/user-data-onr-bip-pwsh.yaml.tftpl", {
+            branch = "main"
+          }
+        ))
+      }
+      ebs_volumes = {
+        "/dev/sda1" = { type = "gp3", size = 160 } # root volume
+        "xvdd"      = { type = "gp3", size = 384 } # D:/ Temp
+      }
+      instance = {
+        disable_api_termination      = false
+        instance_type                = "r6i.2xlarge" # Memory optimised 8 vCPU, 64 GiB RAM
+        key_name                     = "ec2-user"
+        metadata_options_http_tokens = "required"
+        vpc_security_group_ids       = ["private-jumpserver"]
+      }
+      route53_records = {
+        create_internal_record = true
+        create_external_record = true
+      }
+      tags = {
+        ami              = "hmpps_windows_server_2022"
+        backup           = "false" # no need to backup as this is just for migrating data
+        description      = "Windows Server 2022 BIP instance for NART"
+        os-type          = "Windows"
+        server-type      = "BIPTemp"
+        update-ssm-agent = "patchgroup1"
+      }
+      cloudwatch_metric_alarms = {} # no alarms set as this is a temporary instance for migrating data
+    }
   }
 }

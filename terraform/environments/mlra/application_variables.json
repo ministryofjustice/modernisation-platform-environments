@@ -43,7 +43,7 @@
       "maat_api_end_point": "http://maat-cd-api.aws.uat.legalservices.gov.uk/maatApi/laaStatus",
       "maat_api_oauth_scope": "maat-api-test/standard",
       "maat_api_oauth_url": "https://maat-api-test.auth.eu-west-2.amazoncognito.com/oauth2/token",
-      "maat_db_url": "maatdb-test-database.c34sqk24m5bk.eu-west-2.rds.amazonaws.com",
+      "maat_db_url": "maatdb-test-database.c34sqk24m5bk.eu-west-2.rds.amazonaws.com:1521:MAATDB",
       "maat_libra_wsdl_url": "http://infox.aws.uat.legalservices.gov.uk/infoX/gateway",
       "ec2_desired_capacity": 2,
       "ec2_max_size": 6,
