@@ -5,8 +5,8 @@ locals {
 
   prod_environment     = "production"
   dev_environment      = "development"
-  coat_prod_account_id = local.environment_management.account_ids["coat-production"]  #"279191903737"
-  coat_dev_account_id  = local.environment_management.account_ids["coat-development"] #"082282578003"
+  coat_prod_account_id = "279191903737" #local.environment_management.account_ids["coat-production"] 
+  coat_dev_account_id  = "082282578003" #local.environment_management.account_ids["coat-development"]
 
   cross_environment = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" ? local.dev_environment : local.prod_environment
 
