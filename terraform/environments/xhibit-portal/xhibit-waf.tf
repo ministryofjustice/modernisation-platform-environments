@@ -1,4 +1,5 @@
 resource "aws_ssm_parameter" "ip_block_list" {
+  # checkov:skip=CKV_AWS_337: Standard KMS is fine
   name  = "/waf/ip_block_list"
   type  = "SecureString"
   value = "[]" # or use a dummy like '[]'
