@@ -1,5 +1,5 @@
 #!/bin/sh
-set -x
+#set -x
 
 #Set variables
 aws_account_id=$1
