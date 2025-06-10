@@ -12,6 +12,7 @@ locals {
     var.options.enable_ec2_reduced_ssm_policy ? ["SSMManagedInstanceCoreReducedPolicy"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["OracleEnterpriseManagementSecretsPolicy", "Ec2OracleEnterpriseManagedServerPolicy"] : [],
     var.options.enable_vmimport ? ["vmimportPolicy"] : [],
+    var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessPolicy"] : [],
     "EC2Default",
     "EC2Db",
   ]))
@@ -64,6 +65,11 @@ locals {
     CloudWatchAgentServerReducedPolicy = {
       description = "Same as CloudWatchAgentServerReducedPolicy but with CreateLogGroup permission removed to ensure groups are created in code"
       statements  = local.iam_policy_statements_ec2.CloudWatchAgentServerReduced
+    }
+
+    CortexXsiamS3AccessPolicy = {
+      description = "Policy allowing Cortex Xsiam access to S3 buckets for log collection"
+      statements  = local.iam_policy_statements_ec2.CortexXsiamS3Access
     }
 
     Ec2SelfProvisionPolicy = {
