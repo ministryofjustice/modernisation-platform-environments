@@ -101,11 +101,11 @@ locals {
           type        = "AWS"
           identifiers = ["cortex_account_id"] # baseline converts this to arn using aws account id secret
         }
-        condition = {
+        conditions = [{
           test     = "StringEquals"
           variable = "sts:ExternalId"
           values   = ["/xsiam/iam_role_external_id"] # baseline looks up from SSM param
-        }
+        }]
       }]
       policy_attachments = [
         "CortexXsiamS3AccessPolicy"
