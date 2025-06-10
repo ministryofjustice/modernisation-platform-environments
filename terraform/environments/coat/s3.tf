@@ -89,7 +89,7 @@ data "aws_iam_policy_document" "cur_v2_bucket_policy" {
   #   ]
   #   principals {
   #     type        = "AWS"
-  #     identifiers = ["arn:aws:iam::${local.cross_environment}:role/moj-coat-cur-reports-cross-role"]
+  #     identifiers = ["arn:aws:iam::${local.cross_environment}:role/moj-coat-${local.environment}-cur-reports-cross-role"]
   #   }
   # }
 
