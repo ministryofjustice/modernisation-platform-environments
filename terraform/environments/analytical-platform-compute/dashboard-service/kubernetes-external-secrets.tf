@@ -22,28 +22,28 @@ resource "kubernetes_manifest" "dashboard_service_app_secrets_secret" {
       "data" = [
         {
           "remoteRef" = {
-            "key"      = module.dashboard_service_app_secrets[0].secret_id
+            "key"      = tostring(module.dashboard_service_app_secrets[0].secret_id)
             "property" = "secret_key"
           }
           "secretKey" = "secret-key"
         },
         {
           "remoteRef" = {
-            "key"      = module.dashboard_service_app_secrets[0].secret_id
+            "key"      = tostring(module.dashboard_service_app_secrets[0].secret_id)
             "property" = "sentry_dsn"
           }
           "secretKey" = "sentry-dsn"
         },
         {
           "remoteRef" = {
-            "key"      = module.dashboard_service_app_secrets[0].secret_id
+            "key"      = tostring(module.dashboard_service_app_secrets[0].secret_id)
             "property" = "auth0_client_id"
           }
           "secretKey" = "auth0-client-id" #checkov:skip=CKV_SECRET_6:secretKey is a reference to the key in the secret
         },
         {
           "remoteRef" = {
-            "key"              = module.dashboard_service_app_secrets[0].secret_id
+            "key"              = tostring(module.dashboard_service_app_secrets[0].secret_id)
             "property"         = "auth0_client_secret"
             "decodingStrategy" = "Base64"
           }
