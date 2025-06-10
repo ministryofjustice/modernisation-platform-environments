@@ -116,6 +116,14 @@ resource "aws_glue_crawler" "github_auditlog" {
 
   s3_target {
     path = "s3://${module.github-cloudtrail-auditlog.github_auditlog_s3bucket}/"
+    exclusions = [
+      "2024/*",
+      "2025/01/*",
+      "2025/02/*",
+      "2025/03/*",
+      "2025/04/*",
+      "2025/05/*",
+    ]
   }
 
   configuration = jsonencode({
