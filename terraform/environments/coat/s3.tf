@@ -47,6 +47,24 @@ module "cur_s3_kms" {
           identifiers = ["glue.amazonaws.com"]
         }
       ]
+    },
+    {
+      sid       = "AllowGitHubActionsRole"
+      actions = [
+        "kms:Encrypt",
+        "kms:Decrypt",
+        "kms:ReEncrypt*",
+        "kms:GenerateDataKey*",
+        "kms:Describe*"
+        ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/CoatGithubActionsReportUpload"]
+        }
+      ]
     }
   ]
 
