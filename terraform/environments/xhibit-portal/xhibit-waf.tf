@@ -217,11 +217,37 @@ resource "aws_wafv2_web_acl_association" "xhibit_portal_waf" {
 }
 
 resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
-# checkov:skip=CKV_AWS_158: Default encryption is fine
-  name              = "aws-waf-logs/xhibit-waf-logs"
+  name              = "aws-waf-logs-xbhibit-waf"  # Must match this format
   retention_in_days = 365
-
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-xhibit-waf-logs", local.application_name, local.environment)) }
   )
+}
+
+
+
+resource "aws_wafv2_web_acl_logging_configuration" "xbhibit_waf_logging_config" {
+  log_destination_configs = [aws_cloudwatch_log_group.xbhibit_waf_logs.arn]
+  resource_arn            = aws_wafv2_web_acl.xhibit_web_acl.arn
+
+  depends_on = [aws_cloudwatch_log_resource_policy.xbhibit_waf_resource_policy]
+}
+
+resource "aws_cloudwatch_log_resource_policy" "xbhibit_waf_resource_policy" {
+  policy_document = data.aws_iam_policy_document.waf.json
+  policy_name     = "webacl-policy-uniq-name"
+}
+data "aws_iam_policy_document" "waf" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+    actions = [
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = ["${aws_cloudwatch_log_group.xbhibit_waf_logs.arn}:*"]
+  }
 }
