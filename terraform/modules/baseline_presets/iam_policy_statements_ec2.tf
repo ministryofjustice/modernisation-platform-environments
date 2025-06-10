@@ -90,6 +90,44 @@ locals {
       }
     ]
 
+    CortexXsiamS3Access = [
+      {
+        sid    = "CortexXsiamSQS"
+        effect = "Allow"
+        actions = [
+          "sqs:ChangeMessageVisibility",
+          "sqs:ReceiveMessage",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueues"
+        ]
+        resources = [
+          "arn:aws:sqs:::*",
+        ]
+      },
+      {
+        sid     = "CortexXsiamS3"
+        effect  = "Allow"
+        actions = ["s3:GetObject"]
+        resources = [
+          "arn:aws:s3:::*logs*",
+          "arn:aws:s3:::*logs*/*",
+        ]
+      },
+      {
+        sid    = "CortexXsiamSQSKms"
+        effect = "Allow"
+        actions = [
+          "kms:Decrypt",
+        ]
+        resources = [
+          var.environment.kms_keys["ebs"].arn,
+          var.environment.kms_keys["general"].arn
+        ]
+      }
+    ]
+
     Ec2SelfProvision = [
       {
         sid    = "Ec2SelfProvision"
