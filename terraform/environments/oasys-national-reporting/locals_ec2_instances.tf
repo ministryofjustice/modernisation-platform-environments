@@ -308,7 +308,7 @@ locals {
         subnet_name = "private"
         user_data_raw = base64encode(templatefile(
           "./templates/user-data-onr-bip-pwsh.yaml.tftpl", {
-            branch = "TM/TM-1329/windows-bip-server-onr-preprod" # TODO: update back to main after merge
+            branch = "main"
           }
         ))
       }
