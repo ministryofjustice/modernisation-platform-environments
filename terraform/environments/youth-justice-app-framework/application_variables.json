@@ -91,7 +91,7 @@
           "create_records": true
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     },
     "production": {
       "allow_s3_replication": true,
