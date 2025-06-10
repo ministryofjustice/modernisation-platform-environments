@@ -1131,6 +1131,7 @@ variable "ssm_parameters" {
         length  = number
         special = optional(bool)
       }))
+      uuid                 = optional(bool, false)
       value                = optional(string)
       value_s3_bucket_name = optional(string) # lookup from module.s3_bucket
     }))
