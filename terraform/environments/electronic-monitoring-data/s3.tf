@@ -3,13 +3,10 @@ locals {
 
   mdss_supplier_account_mapping = {
     "production" = null
-    "preproduction" = {
-      "account_number" = "173142358744"
-      "role_name"      = "juniper-datatransfer-lambda-role"
-    }
+    "preproduction" = null
     "test" = {
       "account_number" = "173142358744"
-      "role_name"      = "dev-datatransfer-lambda-role"
+      "role_name"      = "juniper-datatransfer-lambda-role"
     }
     "development" = {
       "account_number" = "173142358744"

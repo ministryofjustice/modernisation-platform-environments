@@ -389,7 +389,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : local.run_compaction_job_on_structured_zone.StepName
+      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_compaction_job_on_structured_zone.StepName
     }
   }
 
@@ -465,7 +465,7 @@ locals {
         "NumberOfWorkers" : var.retention_curated_num_workers,
         "WorkerType" : var.retention_curated_worker_type
       },
-      "Next" : var.batch_only ? local.run_reconciliation_job.StepName : (var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.resume_dms_replication_task.StepName)
+      "Next" : var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName
     }
   }
 
@@ -644,10 +644,6 @@ module "reload_pipeline" {
         (local.move_reload_diffs_toDelete_to_archive_bucket.StepName) : local.move_reload_diffs_toDelete_to_archive_bucket.StepDefinition,
         (local.move_reload_diffs_toUpdate_to_archive_bucket.StepName) : local.move_reload_diffs_toUpdate_to_archive_bucket.StepDefinition,
         (local.empty_raw_data.StepName) : local.empty_raw_data.StepDefinition,
-        (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
-        (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
-        (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
-        (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
         (local.start_dms_cdc_replication_task.StepName) : local.start_dms_cdc_replication_task.StepDefinition,
         (local.start_glue_streaming_job.StepName) : local.start_glue_streaming_job.StepDefinition,
         (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
@@ -655,7 +651,7 @@ module "reload_pipeline" {
         (local.empty_temp_reload_bucket_data.StepName) : local.empty_temp_reload_bucket_data.StepDefinition
       }
     }
-  ) : jsonencode(
+    ) : jsonencode(
     {
       "Comment" : "Reload Pipeline Step Function",
       "StartAt" : local.deactivate_archive_trigger.StepName,

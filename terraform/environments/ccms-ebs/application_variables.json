@@ -106,7 +106,8 @@
       "certificate_expiry_days": 45,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "soa_account_id": "345283705478"
     },
     "test": {
       "short_env": "tst",
@@ -210,7 +211,8 @@
       "certificate_expiry_days": 30,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "soa_account_id": "899824927119"
     },
     "preproduction": {
       "short_env": "prep",
@@ -314,7 +316,8 @@
       "certificate_expiry_days": 30,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
+      "soa_account_id": "860711763931"
     },
     "production": {
       "short_env": "prod",
@@ -420,7 +423,8 @@
       "certificate_expiry_days": 30,
       "certificate_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
-      "alerts_subscription_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com"
+      "alerts_subscription_email": "ccms-ebs-prod-monitor-aaaajvsud6ikkogrh4dyt53whq@moj.org.slack.com",
+      "soa_account_id": "822379434971"
     }
   },
   "webgate_ebs": {
