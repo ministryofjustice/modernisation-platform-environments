@@ -20,6 +20,33 @@ tasks:
 - task: executeScript
   inputs:
     - frequency: once
+      runAs: admin
+      type: powershell
+      content: |-
+        # Install / upgrade PSReadline module which doesn't work on base image
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
+
+        Install-Module -Name PSReadLine -Repository PSGallery -MinimumVersion 2.2.2 -Force -AllowClobber -Confirm:$false
+
+        # delete old versions of Windows PowerShell PSReadline which are the issue
+
+        $psreadlineModuleDirectories = Get-ChildItem -Path "C:\Program Files\WindowsPowerShell\Modules\PSReadline" -Directory
+
+        foreach ($psreadlineModuleDirectory in $psreadlineModuleDirectories) {
+          $moduleDirectoryPath = $psreadlineModuleDirectory.FullName
+          $moduleDirectoryName = $psreadlineModuleDirectory.Name
+
+          if ($moduleDirectoryName -le "2.2.2") {
+          Remove-Item -Recurse -Force -Path $moduleDirectoryPath
+          }
+        }
+
+        $PSReadlineVersion = (Get-Module -ListAvailable PSReadLine).Version
+
+        Write-Host "PSReadline Module Version: $PSReadlineVersion"
+- task: executeScript
+  inputs:
+    - frequency: once
       type: powershell
       runAs: admin
       content: |-
