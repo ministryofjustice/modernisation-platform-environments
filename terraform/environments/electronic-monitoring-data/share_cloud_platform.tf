@@ -30,6 +30,10 @@ locals {
     "am_visit_details",
   ]
 
+  cm_tables_to_share = [
+      "subject"
+    ]
+
   tables_to_share = [
     "contact_history",
     "equipment_details",
@@ -59,6 +63,10 @@ locals {
   am_table_filters = {
     for table in local.am_tables_to_share : table => ""
   }
+
+  cm_table_filters = {
+      for table in local.cm_tables_to_share : table => ""
+    }
 
   resolved-cloud-platform-iam-roles = coalesce(local.iam-dev, local.iam-test, local.iam-preprod, local.iam-prod)
 
@@ -175,6 +183,20 @@ module "share_specials_data_marts" {
   role_arn                = module.specials_cmt_front_end_assumable_role.iam_role_arn
 }
 
+module "share_crime_matching_data" {
+  source = "./modules/lakeformation_w_data_filter"
+
+  count         = local.is-development ? 0 : local.is-preproduction ? 0 : 1
+  table_filters = local.cm_table_filters
+  database_name = "crime_matching_test_db"
+  extra_arns = [
+    try(one(data.aws_iam_roles.mod_plat_roles.arns)),
+    data.aws_iam_role.github_actions_role.arn,
+    data.aws_iam_session_context.current.issuer_arn
+  ]
+  data_bucket_lf_resource = aws_lakeformation_resource.data_bucket.arn
+  role_arn                = module.cmt_front_end_assumable_role.iam_role_arn
+}
 
 data "aws_iam_policy_document" "standard_athena_access" {
   statement {
