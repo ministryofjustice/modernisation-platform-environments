@@ -555,5 +555,34 @@ locals {
         }
       }
     }
+    win-bip = {
+      description = "Security group for Temporary Windows BIP server"
+            ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        rdp_3389_tcp = {
+          description = "3389: rdp tcp"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rdp
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
+    }
   }
 }
