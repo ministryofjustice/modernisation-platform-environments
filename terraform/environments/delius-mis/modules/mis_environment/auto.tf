@@ -34,7 +34,7 @@ module "auto_instance" {
   instance_profile_policies = [
     "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
     aws_iam_policy.secrets_manager.arn,
-    aws_iam_policy.ec2_describe.arn
+    aws_iam_policy.ec2_automation.arn
   ]
 
   user_data_raw = base64encode(

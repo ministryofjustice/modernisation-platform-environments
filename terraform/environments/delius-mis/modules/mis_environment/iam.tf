@@ -19,21 +19,23 @@ resource "aws_iam_policy" "secrets_manager" {
   tags = var.tags
 }
 
-data "aws_iam_policy_document" "ec2_describe" {
+data "aws_iam_policy_document" "ec2_automation" {
   statement {
-    sid = "EC2DescribePermissions"
+    sid = "EC2AutomationPermissions"
     actions = [
-      "ec2:DescribeTags"
+      "ec2:DescribeTags",
+      "s3:GetObject",
+      "s3:ListBucket",
     ]
     resources = ["*"]
   }
 }
 
-resource "aws_iam_policy" "ec2_describe" {
-  name        = "${var.env_name}-ec2-describe-instances"
+resource "aws_iam_policy" "ec2_automation" {
+  name        = "${var.env_name}-ec2-automation-instances"
   path        = "/"
-  description = "Allow ec2 instance to describe instances"
-  policy      = data.aws_iam_policy_document.ec2_describe.json
+  description = "Allow ec2 instance to run automation"
+  policy      = data.aws_iam_policy_document.ec2_automation.json
 
   tags = var.tags
 }
