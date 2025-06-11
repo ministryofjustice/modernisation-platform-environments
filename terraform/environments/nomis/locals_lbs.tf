@@ -10,6 +10,12 @@ locals {
       subnets                  = module.environment.subnets["private"].ids
       security_groups          = ["private-lb"]
 
+      s3_notification_sqs_queues = {
+        "private-lb-access-logs-cortex-xsiam" = {
+          events = ["s3:ObjectCreated:*"]
+        }
+      }
+
       listeners = {
         http = {
           port     = 80
