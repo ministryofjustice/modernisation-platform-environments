@@ -8,7 +8,7 @@
         "sts:AssumeRole"
       ],
       "Principal": {
-        "Service": "s3.amazonaws.com"
+        "AWS": "${cross_account_role}"
       }
     }
   ]

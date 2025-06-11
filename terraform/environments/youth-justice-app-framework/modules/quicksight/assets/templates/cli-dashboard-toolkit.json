@@ -1,10 +1,10 @@
 {
-  "AwsAccountId": "",
+  "AwsAccountId": "${aws_account_id}",
   "DashboardId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5",
   "Name": "Disparity Toolkit v1.2",
   "Permissions": [
     {
-      "Principal": "arn:aws:quicksight:eu-west-2:711387140977:user/default/quicksight-admin-access/david.seekins",
+      "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:user/default/quicksight-admin-access/david.seekins",
       "Actions": [
         "quicksight:DescribeDashboard",
         "quicksight:ListDashboardVersions",
@@ -17,7 +17,7 @@
       ]
     },
     {
-      "Principal": "arn:aws:quicksight:eu-west-2:711387140977:namespace/default",
+      "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:namespace/default",
       "Actions": [
         "quicksight:DescribeDashboard",
         "quicksight:ListDashboardVersions",
@@ -28,7 +28,7 @@
   "LinkSharingConfiguration": {
     "Permissions": [
       {
-        "Principal": "arn:aws:quicksight:eu-west-2:711387140977:namespace/default",
+        "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:namespace/default",
         "Actions": [
           "quicksight:DescribeDashboard",
           "quicksight:ListDashboardVersions",
@@ -41,15 +41,15 @@
     "DataSetIdentifierDeclarations": [
       {
         "Identifier": "offence",
-        "DataSetArn": "arn:aws:quicksight:eu-west-2:711387140977:dataset/d8ea9805-4eff-40c6-b6f5-8e11f566a7a0"
+        "DataSetArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/d8ea9805-4eff-40c6-b6f5-8e11f566a7a0"
       },
       {
         "Identifier": "person",
-        "DataSetArn": "arn:aws:quicksight:eu-west-2:711387140977:dataset/03b1c5a2-fe9a-4219-b8cc-9b248cefd324"
+        "DataSetArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/03b1c5a2-fe9a-4219-b8cc-9b248cefd324"
       },
       {
         "Identifier": "Outcome",
-        "DataSetArn": "arn:aws:quicksight:eu-west-2:711387140977:dataset/b2717907-0301-4daa-b777-5f662a2ebd40"
+        "DataSetArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/b2717907-0301-4daa-b777-5f662a2ebd40"
       }
     ],
     "Sheets": [
