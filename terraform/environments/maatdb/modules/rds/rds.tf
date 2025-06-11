@@ -218,26 +218,20 @@ resource "aws_security_group" "vpc_sec_group" {
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
 
-  dynamic "ingress" {
-    for_each = contains(["development", "production"], var.environment) ? [1] : []
-    content {
+  ingress {
       description     = "Sql Net on 1521"
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
       security_groups = [var.ecs_cluster_sec_group_id]
-    }
   }
 
-  dynamic "egress" {
-    for_each = contains(["development", "production"], var.environment) ? [1] : []
-    content {
+  egress {
       description     = "Sql Net on 1521"
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
       security_groups = [var.ecs_cluster_sec_group_id]
-    }
   }
 
   tags = {
@@ -250,26 +244,20 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
   description = "RDS Access from the MLRA application"
   vpc_id      = var.vpc_shared_id
 
-  dynamic "ingress" {
-    for_each = contains(["development", "production"], var.environment) ? [1] : []
-    content {
+  ingress {
       description     = "Sql Net on 1521"
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
       security_groups = [var.mlra_ecs_cluster_sec_group_id]
-    }
   }
 
-  dynamic "egress" {
-    for_each = contains(["development", "production"], var.environment) ? [1] : []
-    content {
+  egress {
       description     = "Sql Net on 1521"
       from_port       = 1521
       to_port         = 1521
       protocol        = "tcp"
       security_groups = [var.mlra_ecs_cluster_sec_group_id]
-    }
   }
 
   tags = {

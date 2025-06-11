@@ -1,3 +1,6 @@
+locals {
+  account_id = data.aws_caller_identity.current.account_id
+}
 
 # Create a role to allow quicksight to create a VPC connection
 resource "aws_iam_role" "vpc_connection_role" {
@@ -54,7 +57,7 @@ resource "aws_iam_policy" "qs_kms" {
         "Sid" : "VisualEditor0",
         "Effect" : "Allow",
         "Action" : "kms:Decrypt",
-        "Resource" : "arn:aws:kms:eu-west-2:711387140977:key/*"
+        "Resource" : "arn:aws:kms:eu-west-2:${data.aws_caller_identity.current.account_id}:key/*"
       }
     ]
   })

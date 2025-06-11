@@ -60,7 +60,7 @@
           "create_records": false
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     },
     "preproduction": {
       "allow_s3_replication": true,
@@ -91,7 +91,7 @@
           "create_records": true
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     },
     "production": {
       "allow_s3_replication": true,
@@ -123,10 +123,10 @@
         },
         "production.yjbservices.yjb.gov.uk": {
           "identity": "production.yjbservices.yjb.gov.uk",
-          "create_records": true
+          "create_records": false
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     }
   }
 }
