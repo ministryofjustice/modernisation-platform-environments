@@ -4,6 +4,26 @@ resource "aws_security_group" "auto" {
   vpc_id      = var.account_info.vpc_id
 }
 
+resource "aws_vpc_security_group_egress_rule" "auto_oracle_db" {
+  description                  = "Oracle DB connection to DSD database"
+  security_group_id            = aws_security_group.auto.id
+  referenced_security_group_id = data.aws_security_group.dsd_db.id
+  ip_protocol                  = "tcp"
+  from_port                    = 1521
+  to_port                      = 1521
+}
+
+resource "aws_vpc_security_group_egress_rule" "auto_all_outbound" {
+  description       = "Allow all outbound traffic"
+  security_group_id = aws_security_group.auto.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+
+data "aws_security_group" "dsd_db" {
+  name = "delius-mis-${var.env_name}-dsd-db-ec2-instance-sg"
+}
+
 module "auto_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
 
