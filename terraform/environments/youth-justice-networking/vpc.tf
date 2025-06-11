@@ -149,6 +149,22 @@ resource "aws_route_table" "juniper_management_route_table" {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.juniper_nat_gateway.id
   }
+  route {
+    cidr_block           = "10.0.22.0/24"
+    network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 Internal Interface"].id
+  }
+  route {
+    cidr_block           = "10.0.23.0/24"
+    network_interface_id = aws_network_interface.vsrx01_enis["vSRX01 Internal Interface"].id
+  }
+  route {
+    cidr_block           = "10.0.24.0/24"
+    network_interface_id = aws_network_interface.vsrx02_enis["vSRX02 Internal Interface"].id
+  }
+  route {
+    cidr_block           = "10.0.25.0/24"
+    network_interface_id = aws_network_interface.vsrx02_enis["vSRX02 Internal Interface"].id
+  }
   tags = merge(local.tags, {
     Name = "Juniper Management Route Table"
   })

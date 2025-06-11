@@ -93,11 +93,13 @@ locals {
   hive_table_creation_job_schema_cache_max_size = local.application_data.accounts[local.environment].hive_table_creation_job_schema_cache_max_size
 
   # Common Policies
-  kms_read_access_policy = "${local.project}_kms_read_policy"
-  s3_read_access_policy  = "${local.project}_s3_read_policy"
-  s3_read_write_policy   = "${local.project}_s3_read_write_policy"
-  apigateway_get_policy  = "${local.project}_apigateway_get_policy"
-  invoke_lambda_policy   = "${local.project}_invoke_lambda_policy"
+  kms_read_access_policy     = "${local.project}_kms_read_policy"
+  s3_read_access_policy      = "${local.project}_s3_read_policy"
+  s3_read_write_policy       = "${local.project}_s3_read_write_policy"
+  apigateway_get_policy      = "${local.project}_apigateway_get_policy"
+  invoke_lambda_policy       = "${local.project}_invoke_lambda_policy"
+  secretsmanager_read_policy = "${local.project}_secretsmanager_read_policy"
+
 
   trigger_glue_job_policy = "${local.project}_start_glue_job_policy"
   start_dms_task_policy   = "${local.project}_start_dms_task_policy"
@@ -243,15 +245,15 @@ locals {
   reporting_lambda_code_s3_key = "build-artifacts/digital-prison-reporting-lambdas/jars/digital-prison-reporting-lambdas-vLatest-all.jar"
 
   # Multiphase Query Manager Lambda
-  lambda_multiphase_query_enabled         = local.application_data.accounts[local.environment].enable_multiphase_query_lambda
-  lambda_multiphase_query_name            = "${local.project}-multiphase-query"
-  lambda_multiphase_query_runtime         = "java21"
-  lambda_multiphase_query_tracing         = "Active"
-  lambda_multiphase_query_handler         = "uk.gov.justice.digital.hmpps.multiphasequery.ManageAthenaAsyncQueries::handleRequest"
-  lambda_multiphase_query_code_s3_bucket  = module.s3_artifacts_store.bucket_id
-  lambda_multiphase_query_jar_version     = local.application_data.accounts[local.environment].multiphase_query_lambda_version
-  lambda_multiphase_query_code_s3_key     = "build-artifacts/hmpps-dpr-multiphase-query-lambda/jars/hmpps-dpr-multiphase-query-lambda-${local.lambda_multiphase_query_jar_version}-all.jar"
-  lambda_multiphase_query_policies        = [
+  lambda_multiphase_query_enabled        = local.application_data.accounts[local.environment].enable_multiphase_query_lambda
+  lambda_multiphase_query_name           = "${local.project}-multiphase-query"
+  lambda_multiphase_query_runtime        = "java21"
+  lambda_multiphase_query_tracing        = "Active"
+  lambda_multiphase_query_handler        = "uk.gov.justice.digital.hmpps.multiphasequery.ManageAthenaAsyncQueries::handleRequest"
+  lambda_multiphase_query_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_multiphase_query_jar_version    = local.application_data.accounts[local.environment].multiphase_query_lambda_version
+  lambda_multiphase_query_code_s3_key    = "build-artifacts/hmpps-dpr-multiphase-query-lambda/jars/hmpps-dpr-multiphase-query-lambda-${local.lambda_multiphase_query_jar_version}-all.jar"
+  lambda_multiphase_query_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     aws_iam_policy.redshift_dataapi_cross_policy.arn,
@@ -514,4 +516,13 @@ locals {
   ]
 
   create_postgres_load_generator_job = local.application_data.accounts[local.environment].create_postgres_load_generator_job
+
+  # Probation Discovery
+  probation_discovery_windows_ami_id = "ami-0ba9276d1fb25ed77"
+  enable_probation_discovery_node    = local.application_data.accounts[local.environment].enable_probation_discovery_node
+
+  dpr_windows_rdp_credentials_placeholder = {
+    username = "placeholder"
+    password = "placeholder"
+  }
 }

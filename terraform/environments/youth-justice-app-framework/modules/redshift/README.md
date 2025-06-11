@@ -38,7 +38,7 @@ As, currently, the default AWS key is used for encryption, permissions are not n
 
 | Account | Old Secret | New Secret |
 | ------- | ---------- | ---------- |
-| postgres | `AuroraPostgres `| `yjafrds01-cluster-db-postgres-password` |
+| postgres | `AuroraPostgres`| `yjafrds01-cluster-db-postgres-password` |
 | read-only |`<env>/yjaf/rds` (e.g. `preprod/yjaf/rds`) |`yjafrds01-cluster-db-redshift_readonly-password` |
 
 

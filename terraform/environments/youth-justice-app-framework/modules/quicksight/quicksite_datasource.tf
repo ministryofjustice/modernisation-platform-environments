@@ -1,18 +1,20 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_quicksight_data_source" "redshift" {
   data_source_id = "Redshift"
   name           = "Redshift"
 
   parameters {
     redshift {
-        host = var.redshift_host
-        port = var.redshift_port
-        database   = "yjb_returns"
+      host     = var.redshift_host
+      port     = var.redshift_port
+      database = "yjb_returns"
     }
   }
   ssl_properties {
     disable_ssl = false
   }
-    
+
   vpc_connection_properties {
     vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
   }
@@ -23,7 +25,19 @@ resource "aws_quicksight_data_source" "redshift" {
     secret_arn = var.redshift_quicksight_user_secret_arn
   }
 
-   depends_on = [ aws_iam_role_policy_attachment.kms ]
+  permission {
+    principal = "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/quicksight-admin-access/${var.quicksight_admin_user}"
+    actions = [
+      "quicksight:PassDataSource",
+      "quicksight:DescribeDataSourcePermissions",
+      "quicksight:UpdateDataSource",
+      "quicksight:UpdateDataSourcePermissions",
+      "quicksight:DescribeDataSource",
+      "quicksight:DeleteDataSource"
+    ]
+  }
+
+  depends_on = [aws_iam_role_policy_attachment.kms]
 }
 
 /*
@@ -49,16 +63,16 @@ resource "aws_quicksight_data_source" "postgresql" {
 
   parameters {
     aurora_postgresql {
-        host = var.postgres_host
-        port = var.postgres_port
-        database   = "yjaf"
+      host     = var.postgres_host
+      port     = var.postgres_port
+      database = "yjaf"
     }
   }
 
   ssl_properties {
     disable_ssl = false
   }
-    
+
   vpc_connection_properties {
     vpc_connection_arn = aws_quicksight_vpc_connection.local.arn
   }
@@ -69,7 +83,21 @@ resource "aws_quicksight_data_source" "postgresql" {
     secret_arn = var.postgres_quicksight_user_secret_arn
   }
 
-  depends_on = [ aws_iam_role_policy_attachment.kms ]
+  permission {
+    principal = "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/quicksight-admin-access/${var.quicksight_admin_user}"
+    actions = [
+      "quicksight:PassDataSource",
+      "quicksight:DescribeDataSourcePermissions",
+      "quicksight:UpdateDataSource",
+      "quicksight:UpdateDataSourcePermissions",
+      "quicksight:DescribeDataSource",
+      "quicksight:DeleteDataSource"
+    ]
+  }
+
+
+
+  depends_on = [aws_iam_role_policy_attachment.kms]
 
 }
 
