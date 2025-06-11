@@ -45,9 +45,11 @@ sudo su ec2-user
 cd ~/efs/laa-ccms-app-soa/Scripts
 ```
 
-This directory contains a number of `build.properties.environment` files (one per environment). These files are encrypted with `git-crypt` and currently there is no automated process for decrypting them on the host. Because of this limitation, the best method currently available to get files in to EFS is to have a user who currently has access to [https://github.com/ministryofjustice/laa-ccms-app-soa/tree/master/Scripts](https://github.com/ministryofjustice/laa-ccms-app-soa/tree/master/Scripts) copy cleartext versions of these files to EFS, rather than adding another GPG key to the EFS share (a long term solution to this problem is WIP).
+This directory contains a number of `build.properties.environment` files (one per environment). These files are encrypted with `git-crypt` and currently there is no automated process for decrypting them on the host. Because of this limitation, the best method currently available to get the file you need on to EFS is to have a user who currently has access to [https://github.com/ministryofjustice/laa-ccms-app-soa/tree/master/Scripts](https://github.com/ministryofjustice/laa-ccms-app-soa/tree/master/Scripts) copy a cleartext version of these file you need to EFS, rather than adding another GPG key to the EFS share (a long term solution to this problem is WIP).
 
-With these files in place, any reference to passwords and endpoints should be updated to reflect:
+For example if you are building a dev environment, you will need to delete `build.properties.dev` from EFS, then create a new file and populate it with the cleartext contents of `build.properties.dev`. As each of these files is environment specific, there is no need to copy every environment's build files, only the single file for the environment you are building.
+
+With the configuration file in place, any reference to passwords and endpoints should be updated to reflect:
 
 - External Services
 - Newcastle created RDS Databses
@@ -102,7 +104,7 @@ With the application stable. Deploy the application Composites. Connect to the A
 ```bash
 sudo su ec2-user
 cd ~/efs/laa-ccms-app-soa/Scripts
-./prepare_env environment #--dev, stg, tst or prod
+./prepare_env environment #--dev, stg, tst or prod -- (stg should be used for Mod Platform preproduction. This is embedded in scripts for legacy reasons!!!)
 ./weblogic update
 ./weblogic deploy
 ```
