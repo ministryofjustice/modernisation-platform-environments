@@ -11,7 +11,7 @@ data "aws_iam_policy_document" "datadog_aws_integration_assume_role" {
       variable = "sts:ExternalId"
 
       values = [
-        "ToBePopulated"
+        "c915c3254375451ca61c8d37d8b195f7"
       ]
     }
   }
