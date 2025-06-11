@@ -178,7 +178,7 @@ resource "aws_ecs_service" "managed" {
   name                               = "${local.application_data.accounts[local.environment].app_name}-managed"
   cluster                            = aws_ecs_cluster.main.id
   task_definition                    = aws_ecs_task_definition.managed.arn
-  desired_count                      = local.application_data.accounts[local.environment].app_count_managed
+  desired_count                      = local.application_data.accounts[local.environment].managed_app_count
   deployment_maximum_percent         = 100
   deployment_minimum_healthy_percent = 50
   launch_type                        = "EC2"

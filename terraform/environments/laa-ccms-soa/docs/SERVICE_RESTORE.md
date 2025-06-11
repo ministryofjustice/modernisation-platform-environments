@@ -7,26 +7,9 @@ This document should serve as a detailed breakdown as to how to bring CCMS SOA (
 
 Whilst application backups would make a restoration easier, they are not essential. The data that passes through SOA is transient and SOA can be brought online with no backups.
 
-## External Dependencies
-
-### S3
-
-SOA depends on two external S3 buckets which are used for FTP integrations by a number of other applications. At time of writing, these buckets are part of the CCMS-EBS Infrastructure.
-
-From SOA's perspective, these buckets are mounted to all servers at the EC2 level and implicitly exposed to running SOA containers as below:
-
-| Bucket                           | Mount Point              | Mode |
-|----------------------------------|--------------------------|------|
-| laa-ccms-inbound-ENVIRONMENT-mp  | /home/ec2-user/Inbound   | 0777 |
-| laa-ccms-outbound-ENVIRONMENT-mp | /home/ec2-user/Outbound  | 0777 |
-
-Mounting is handled by the EC2 boot script which is baked in the to the EC2 Autoscaling Group Launch Template. If these Buckets are not present, boot of the EC2 instances will succeed and containers will still start, but the boot script will fail to complete properly, leading to issues deploying some Composites later in the deployment process. To this end it is better to ensure that the Buckets are in place before attempting a deployment.
-
-Buckets should be input via the `inbound_s3_bucket_name` and `outbound_s3_bucket_name` application variables. This will configure the appropriate IAM policies from the perspective of SOA. A corresponding Bucket Policy relationship will also need to be in place in the account hosting the Buckets to allow access.
-
 ## Apply Terraform and Populate Secrets
 
-Complete the `application_variables.json` file as appropriate for the environment being deployed to, ensuring in particular that the  `app_count_admin` and `app_count_managed` values are set to `0` and commit (this will prevent any ECS services from booting). If unsure on suitable variables for a cold start, see the file `_application_variables_starter.json`.
+Complete the `application_variables.json` file as appropriate for the environment being deployed to, ensuring in particular that the  `admin_app_count` and `managed_app_count` values are set to `0` and commit (this will prevent any ECS services from booting). If unsure on suitable variables for a cold start, see the file `_application_variables_starter.json`.
 
 In the Github Actions pipeline; Terraform will Plan and Apply for lower environments. When applying for the first time the apply will fail part way through due to missing Secret Values, this is to be expected. The Secrets themselves however will be created.
 
@@ -34,7 +17,22 @@ Log in to the AWS console for each environment and populate the Secrets with app
 
 ## Apply Terraform
 
-With the secrets populated, commit again (once again ensuring that `app_count_admin` and `app_count_managed` are still set to `0`). In the Github Actions Pipeline, run Terraform Plan and Apply to bring up the remaining infrastructure.
+With the secrets populated, commit again (once again ensuring that `admin_app_count` and `managed_app_count` are still set to `0`). In the Github Actions Pipeline, run Terraform Plan and Apply to bring up the remaining infrastructure.
+
+## External S3 Dependencies
+
+SOA depends on two external S3 buckets which are used for FTP integrations by a number of other applications. At time of writing, these buckets are part of the [CCMS-EBS Infrastructure](https://github.com/ministryofjustice/modernisation-platform-environments/tree/main/terraform/environments/ccms-ebs).
+
+From SOA's perspective, these buckets are mounted to all servers at the EC2 level and implicitly exposed to running SOA containers as below:
+
+| Bucket                           | EC2 Mount Point          | IAM Role                   |
+|----------------------------------|--------------------------|----------------------------|
+| laa-ccms-inbound-ENVIRONMENT-mp  | /home/ec2-user/Inbound   | ccms-soa-ec2-instance-role |
+| laa-ccms-outbound-ENVIRONMENT-mp | /home/ec2-user/Outbound  | ccms-soa-ec2-instance-role |
+
+Mounting is handled by the EC2 boot script which is baked in the to the EC2 Autoscaling Group Launch Template. If these Buckets are not present, boot of the EC2 instances will succeed and containers will still start, but the boot script will fail to complete properly, leading to issues deploying some Composites later in the deployment process. To this end it is better to ensure that the Buckets are in place before attempting a deployment.
+
+Buckets should be input via the `inbound_s3_bucket_name` and `outbound_s3_bucket_name` application variables. This will configure the appropriate IAM policies from the perspective of SOA. A corresponding Bucket Policy relationship will also need to be in place in the account hosting the Buckets to allow access. So to this end it is essential that the relevant IAM Roles shown above are already created within the SOA Account before attempting to configure inside the corresponding EBS Account.
 
 ## Git clone to EFS, only needs to be done once for all envs. This is handled by the script
 
@@ -85,13 +83,13 @@ EXECUTE rdsadmin.rdsadmin_util.grant_sys_object( p_obj_name => 'DBA_TABLESPACE_U
 
 ## Start the Admin Server
 
-In `application_variables.json`; set `app_count_admin` to `1` and commit. Allow the Github Actions pipeline to run. This will bring up the Admin Server.
+In `application_variables.json`; set `admin_app_count` to `1` and commit. Allow the Github Actions pipeline to run. This will bring up the Admin Server.
 
 Pay attention to the application logs. The boot process can take up to 30 minutes, as part of the boot process the Oracle [RCU](https://docs.oracle.com/cd/E21764_01/doc.1111/e14259/overview.htm) will run and configure the SOA-DB database ready for use. The application should be ready for use when the weblogic console is available and can be logged in to at http://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/console.
 
 ## Start a Managed Server
 
-In `application_variables.json`; set `app_count_managed` to `1` and commit. Allow the Github Actions pipeline to run. This will bring up the Admin Server.
+In `application_variables.json`; set `managed_app_count` to `1` and commit. Allow the Github Actions pipeline to run. This will bring up the Admin Server.
 
 Pay attention to the application logs. The boot process can take around 10-15 minutes. The service is stable when the EC2 shows a healthy service **AND** Weblogic shows a healthy server. To verify in Weblogic, browse to **Environments** > **Servers** and correlate the active servers to the IPs of the currently stable servers in the **MANAGED** EC2 Loadbalancers Target Group.
 
@@ -111,7 +109,7 @@ This will build and deploy Composites to Weblogic
 
 ## Scale Up
 
-Once Composites are successfully deployed, in `application_variables.json`; increment `app_count_managed` to the desired number (incrementing by 1, committing and applying) until the desired number has been reached. This should be:
+Once Composites are successfully deployed, in `application_variables.json`; increment `managed_app_count` to the desired number (incrementing by 1, committing and applying) until the desired number has been reached. This should be:
 
 | Environment | Count |
 |-------------|-------|
