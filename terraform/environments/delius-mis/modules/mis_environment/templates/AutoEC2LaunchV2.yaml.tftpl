@@ -20,8 +20,8 @@ tasks:
 - task: executeScript
   inputs:
     - frequency: once
-      runAs: admin
       type: powershell
+      runAs: admin
       content: |-
         # Install / upgrade PSReadline module which doesn't work on base image
         Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
@@ -44,8 +44,6 @@ tasks:
         $PSReadlineVersion = (Get-Module -ListAvailable PSReadLine).Version
 
         Write-Host "PSReadline Module Version: $PSReadlineVersion"
-- task: executeScript
-  inputs:
     - frequency: once
       type: powershell
       runAs: admin
