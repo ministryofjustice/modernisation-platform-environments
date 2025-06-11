@@ -29,7 +29,9 @@
       "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907",
       "build_s3": false,
       "build_ftp": false,
-      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
+      "build_ses": true,
+      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
+      "ses_domain_identity": "laa-development.modernisation-platform.internal"
     },
 
     "test": {
@@ -61,7 +63,9 @@
       "mlra_ecs_cluster_sec_group_id": "sg-0b27b5bb199b70f2b",
       "build_s3": false,
       "build_ftp": false,
-      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
+      "build_ses": false,
+      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
+      "ses_domain_identity": "laa-test.modernisation-platform.internal"
     },
     "preproduction": {
       "region": "eu-west-2",
@@ -92,7 +96,9 @@
       "mlra_ecs_cluster_sec_group_id": "sg-0da6dd3ffabf8c75e",
       "build_s3": false,
       "build_ftp": false,
-      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
+      "build_ses": false,
+      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
+      "ses_domain_identity": "laa-preproduction.modernisation-platform.internal"
     },
 
     "production": {
@@ -124,7 +130,9 @@
       "mlra_ecs_cluster_sec_group_id": "sg-0faa8fe022ea7e3aa",
       "build_s3": false,
       "build_ftp": false,
-      "pagerduty_integration_key_name": "laa_maat_prod_alarm"
+      "build_ses": false,
+      "pagerduty_integration_key_name": "laa_maat_prod_alarm",
+      "ses_domain_identity": "means-assessment-administration.service.justice.gov.uk"
     }
   }
 }

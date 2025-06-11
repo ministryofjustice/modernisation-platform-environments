@@ -2,6 +2,15 @@
 
 # These are build from the local bucket_names and whether the variable build_s3 is true.
 
+
+data "aws_kms_key" "laa_general" {
+  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-laa"
+}
+
+locals {
+  laa_general_kms_arn = data.aws_kms_key.laa_general.arn
+}
+
 module "s3_bucket" {
   count  = local.build_s3 ? length(local.bucket_names) : 0
   source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=474f27a3f9bf542a8826c76fb049cc84b5cf136f"
@@ -10,7 +19,9 @@ module "s3_bucket" {
   versioning_enabled  = false
   force_destroy       = false
   replication_enabled = false
-  replication_region  = local.region
+  replication_region = local.region
+  ownership_controls  = "BucketOwnerEnforced"
+  custom_kms_key      = local.laa_general_kms_arn
 
   providers = {
     aws.bucket-replication = aws
@@ -125,3 +136,5 @@ resource "aws_s3_bucket_policy" "ftp_user_access" {
   bucket = module.s3_bucket[count.index].bucket.bucket
   policy = data.aws_iam_policy_document.bucket_policy[count.index].json
 }
+
+
