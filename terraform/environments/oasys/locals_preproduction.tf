@@ -322,8 +322,8 @@ locals {
       "/oracle/database/OASPROD" = local.secretsmanager_secrets.db_oasys
 
       # for temporary use, remove when onr bip migrated to aws
-      "/oracle/database/BISYS42" = local.secretsmanager_secrets.db_bip
-      "/oracle/database/BIAUD42" = local.secretsmanager_secrets.db_bip
+      "/oracle/database/BISYS42" = local.secretsmanager_secrets.bip
+      "/oracle/database/BIAUD42" = local.secretsmanager_secrets.bip
     }
   }
 }
