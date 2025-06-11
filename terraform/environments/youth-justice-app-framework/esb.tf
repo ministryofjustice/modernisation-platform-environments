@@ -37,10 +37,11 @@ module "esb" {
   environment  = local.environment
   tags         = local.tags
 
-  yjsm_service_sg_id            = module.yjsm.yjsm_security_group_id
-  ecs_service_internal_sg_id    = module.ecs.ecs_service_internal_sg_id
-  ecs_service_external_sg_id    = module.ecs.ecs_service_external_sg_id
+  yjsm_service_sg_id         = module.yjsm.yjsm_security_group_id
+  ecs_service_internal_sg_id = module.ecs.ecs_service_internal_sg_id
+  ecs_service_external_sg_id = module.ecs.ecs_service_external_sg_id
+  alb_security_group_id      = module.internal_alb.alb_security_group_id
   #Keep until prod images are done
-  tableau_sg_id                 = module.tableau.tableau_sg_id
+  tableau_sg_id = module.tableau.tableau_sg_id
 
 }

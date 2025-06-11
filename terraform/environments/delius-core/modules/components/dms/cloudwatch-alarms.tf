@@ -192,7 +192,7 @@ module "disable_out_of_hours_alarms" {
   end_time        = local.disable_latency_alarms.end_time
   disable_weekend = local.disable_latency_alarms.disable_weekend
 
-  alarm_patterns = ["dms-cdc-latency-*","dms-cdc-task-not-running-*"]
+  alarm_patterns = ["dms-cdc-latency-*", "dms-cdc-task-not-running-*"]
 
   tags = var.tags
 }
@@ -204,8 +204,8 @@ resource "aws_iam_role" "lambda_exec" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
-      Action    = "sts:AssumeRole",
-      Effect    = "Allow",
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
       Principal = {
         Service = "lambda.amazonaws.com"
       }
@@ -312,8 +312,8 @@ resource "aws_cloudwatch_metric_alarm" "dms_alarm" {
   statistic           = "Maximum"
   threshold           = 1
 
-  alarm_description   = "Triggered when any DMS replication task is not running"
-  actions_enabled     = true
-  alarm_actions       = [aws_sns_topic.dms_alerts_topic.arn]
-  ok_actions          = [aws_sns_topic.dms_alerts_topic.arn]
+  alarm_description = "Triggered when any DMS replication task is not running"
+  actions_enabled   = true
+  alarm_actions     = [aws_sns_topic.dms_alerts_topic.arn]
+  ok_actions        = [aws_sns_topic.dms_alerts_topic.arn]
 }

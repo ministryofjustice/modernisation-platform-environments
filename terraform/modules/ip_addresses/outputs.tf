@@ -48,31 +48,6 @@ output "azure_fixngo_cidrs" {
   description = "Azure FixNGo aggregate cidrs: map(list(string))"
 }
 
-output "azure_nomisapi_cidr" {
-  value       = local.azure_nomisapi_cidr
-  description = "Azure Nomis API AKS cidrs: map(string)"
-}
-
-output "azure_nomisapi_cidrs" {
-  value       = local.azure_nomisapi_cidrs
-  description = "Azure Nomis API AKS aggregate cidrs: map(list(string))"
-}
-
-output "azure_studio_hosting_cidr" {
-  value       = local.azure_studio_hosting_cidr
-  description = "Azure Studio Hosting AKS cidrs: map(string)"
-}
-
-output "azure_studio_hosting_public" {
-  value       = local.azure_studio_hosting_public
-  description = "Azure Studio Hosting AKS public ips: map(string)"
-}
-
-output "azure_studio_hosting_cidrs" {
-  value       = local.azure_studio_hosting_cidrs
-  description = "Azure Studio Hosting AKS aggregate cidrs: map(list(string))"
-}
-
 output "external_cidrs" {
   value       = local.external_cidrs
   description = "External cidrs: map(list(string))"

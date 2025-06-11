@@ -1,5 +1,5 @@
 locals {
-  
+
   db_instance_id = local.application_name
 
   rds_oracle_metrics = [
@@ -45,7 +45,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_alarms" {
   }
 
   depends_on = [
-    module.rds, 
+    module.rds,
     aws_sns_topic.maatdb_alerting_topic
   ]
 
@@ -71,7 +71,7 @@ data "aws_secretsmanager_secret_version" "maatdb_pagerduty_integration_keys" {
 # Add a local to get the keys. Note we are reusing the MAAT application's PagerDuty Integration & Key Name.
 locals {
   maatdb_pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.maatdb_pagerduty_integration_keys.secret_string)
-  maatdb_pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name 
+  maatdb_pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
 }
 
 

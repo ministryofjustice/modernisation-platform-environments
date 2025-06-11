@@ -158,6 +158,7 @@ locals {
     var.options.enable_azure_sas_token ? ["/azure"] : [],
     var.options.enable_ec2_cloud_watch_agent && fileexists(local.cloud_watch_windows_filename) ? ["cloud-watch-config"] : [],
     try(length(var.options.cloudwatch_metric_oam_links_ssm_parameters), 0) != 0 ? ["/oam"] : [],
+    var.options.enable_xsiam_cloudwatch_integration ? ["/xsiam"] : [],
   ])
 
   ssm_parameters = {
@@ -186,6 +187,12 @@ locals {
         for oam_link in coalesce(var.options.cloudwatch_metric_oam_links_ssm_parameters, []) : oam_link => {
           description = "oam sink_identifier to use in aws_oam_link resource"
         }
+      }
+    }
+
+    "/xsiam" = {
+      parameters = {
+        http_endpoint_url = { description = "xsiam http endpoint url, e.g. https://xxx/logs/v1/aws, set outside of terraform" }
       }
     }
 

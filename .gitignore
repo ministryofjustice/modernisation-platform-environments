@@ -25,3 +25,4 @@ out/
 **/*.swp
 
 terraform/modules/**/*.zip
+terraform/environments/youth-justice-app-framework/modules/quicksight/assets/run_time

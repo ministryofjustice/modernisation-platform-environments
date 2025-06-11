@@ -13,14 +13,18 @@ locals {
   alb_security_group_id = module.alb.security_group.id
 
   user_data = base64encode(templatefile("user_data.sh", {
-    app_name = local.application_name
+    app_name    = local.application_name,
+    environment = local.environment,
+    xdr_dir     = "/tmp/cortex-agent",
+    xdr_tar     = "/tmp/cortex-agent.tar.gz",
+    xdr_tags    = local.xdr_tags
   }))
 
   maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
   gtm_id_secret_name          = "APP_MLRA_GOOGLE_TAG_MANAGER_ID"
   infox_client_secret_name    = "APP_INFOX_CLIENT_SECRET"
-  maat_api_client_id_name    = "APP_MAAT_API_CLIENT_ID"
-  maat_api_client_secret_name    = "APP_MAAT_API_CLIENT_SECRET"
+  maat_api_client_id_name     = "APP_MAAT_API_CLIENT_ID"
+  maat_api_client_secret_name = "APP_MAAT_API_CLIENT_SECRET"
   task_definition = templatefile("task_definition.json", {
     app_name               = local.application_name
     ecr_url                = "${local.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/mlra-ecr-repo"
@@ -43,4 +47,8 @@ locals {
   # SNS local variables for cloudwatch.tf
   pagerduty_integration_keys     = jsondecode(data.aws_secretsmanager_secret_version.pagerduty_integration_keys.secret_string)
   pagerduty_integration_key_name = local.application_data.accounts[local.environment].pagerduty_integration_key_name
+
+  xdr_tags = join(", ", [
+    upper(local.application_name), upper(local.environment), upper(var.networking[0].business-unit)
+  ])
 }

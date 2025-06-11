@@ -36,10 +36,10 @@ jobs:
     if: inputs.action != 'destroy'
     with:
       application: "${{ github.workflow }}"
-
+      
   terraform:
     needs: strategy
-    if: inputs.action != 'destroy'
+    if: inputs.action != 'destroy' && join(fromJson(needs.strategy.outputs.matrix).include) != ''
     strategy:
       fail-fast: false
       matrix: ${{ fromJson(needs.strategy.outputs.matrix) }}
@@ -50,8 +50,8 @@ jobs:
       action: "${{ matrix.action }}"
       component: "${{ matrix.component }}"
     secrets:
-      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
   destroy-development:
     if: inputs.action == 'destroy'
@@ -62,5 +62,5 @@ jobs:
       action: "plan_apply"
       plan_apply_tfargs: "-destroy"
     secrets:
-      modernisation_platform_environments: "${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}"
-      pipeline_github_token: "${{ secrets.MODERNISATION_PLATFORM_CI_USER_ENVIRONMENTS_REPO_PAT }}"
+      MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}

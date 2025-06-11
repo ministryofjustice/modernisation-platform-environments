@@ -30,10 +30,38 @@
       "build_s3": false,
       "build_ftp": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
-
     },
+
     "test": {
-      "example_var": "test-data"
+      "region": "eu-west-2",
+      "port": "1521",
+      "allocated_storage": 300,
+      "engine": "oracle-se2",
+      "engine_version": "19.0.0.0.ru-2025-01.rur-2025-01.r1",
+      "instance_class": "db.t3.medium",
+      "allow_major_version_upgrade": false,
+      "auto_minor_version_upgrade": false,
+      "storage_type": "gp2",
+      "iops": 0,
+      "backup_retention_period": 25,
+      "backup_window": "22:00-01:00",
+      "maintenance_window": "Mon:01:15-Mon:06:00",
+      "character_set_name": "WE8MSWIN1252",
+      "multi_az": true,
+      "username": "admin",
+      "db_password_rotation_period": 30,
+      "license_model": "license-included",
+      "performance_insights_enabled": true,
+      "performance_insights_retention_period": 7,
+      "snapshot_arn": "maatdb-test-kms",
+      "deletion_protection": true,
+      "cloud_platform_cidr": "172.20.0.0/16",
+      "manual_added_cidr": "10.221.0.0/16",
+      "ecs_cluster_sec_group_id": "sg-07fd7e0b7ad2c76e1",
+      "mlra_ecs_cluster_sec_group_id": "sg-0b27b5bb199b70f2b",
+      "build_s3": false,
+      "build_ftp": false,
+      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
     },
     "preproduction": {
       "region": "eu-west-2",
@@ -60,12 +88,13 @@
       "deletion_protection": true,
       "cloud_platform_cidr": "172.20.0.0/16",
       "manual_added_cidr": "10.221.0.0/16",
-      "ecs_cluster_sec_group_id": "",
-      "mlra_ecs_cluster_sec_group_id": "",
+      "ecs_cluster_sec_group_id": "sg-08fd4395619ac0879",
+      "mlra_ecs_cluster_sec_group_id": "sg-0da6dd3ffabf8c75e",
       "build_s3": false,
       "build_ftp": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
     },
+
     "production": {
       "region": "eu-west-2",
       "port": "1521",
@@ -96,7 +125,6 @@
       "build_s3": false,
       "build_ftp": false,
       "pagerduty_integration_key_name": "laa_maat_prod_alarm"
-
     }
   }
 }
