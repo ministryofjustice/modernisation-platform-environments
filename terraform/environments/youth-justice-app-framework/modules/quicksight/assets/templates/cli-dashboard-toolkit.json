@@ -1,44 +1,65 @@
 {
-  "AwsAccountId": "711387140977",
-  "AnalysisId": "4847a16c-19d4-4544-9631-e867127724e1",
-  "Name": "Disaprity Toolkit v1.1",
+  "AwsAccountId": "${aws_account_id}",
+  "DashboardId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5",
+  "Name": "Disparity Toolkit v1.2",
   "Permissions": [
     {
-      "Principal": "arn:aws:quicksight:eu-west-2:711387140977:user/default/quicksight-admin-access/david.seekins",
+      "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:user/default/quicksight-admin-access/david.seekins",
       "Actions": [
-        "quicksight:RestoreAnalysis",
-        "quicksight:UpdateAnalysisPermissions",
-        "quicksight:DeleteAnalysis",
-        "quicksight:DescribeAnalysisPermissions",
-        "quicksight:QueryAnalysis",
-        "quicksight:DescribeAnalysis",
-        "quicksight:UpdateAnalysis"
+        "quicksight:DescribeDashboard",
+        "quicksight:ListDashboardVersions",
+        "quicksight:UpdateDashboardPermissions",
+        "quicksight:QueryDashboard",
+        "quicksight:UpdateDashboard",
+        "quicksight:DeleteDashboard",
+        "quicksight:DescribeDashboardPermissions",
+        "quicksight:UpdateDashboardPublishedVersion"
+      ]
+    },
+    {
+      "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:namespace/default",
+      "Actions": [
+        "quicksight:DescribeDashboard",
+        "quicksight:ListDashboardVersions",
+        "quicksight:QueryDashboard"
       ]
     }
   ],
+  "LinkSharingConfiguration": {
+    "Permissions": [
+      {
+        "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:namespace/default",
+        "Actions": [
+          "quicksight:DescribeDashboard",
+          "quicksight:ListDashboardVersions",
+          "quicksight:QueryDashboard"
+        ]
+      }
+    ]
+  },
   "Definition": {
     "DataSetIdentifierDeclarations": [
       {
         "Identifier": "offence",
-        "DataSetArn": "arn:aws:quicksight:eu-west-2:711387140977:dataset/d8ea9805-4eff-40c6-b6f5-8e11f566a7a0"
+        "DataSetArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/d8ea9805-4eff-40c6-b6f5-8e11f566a7a0"
       },
       {
         "Identifier": "person",
-        "DataSetArn": "arn:aws:quicksight:eu-west-2:711387140977:dataset/03b1c5a2-fe9a-4219-b8cc-9b248cefd324"
+        "DataSetArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/03b1c5a2-fe9a-4219-b8cc-9b248cefd324"
       },
       {
         "Identifier": "Outcome",
-        "DataSetArn": "arn:aws:quicksight:eu-west-2:711387140977:dataset/b2717907-0301-4daa-b777-5f662a2ebd40"
+        "DataSetArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:dataset/b2717907-0301-4daa-b777-5f662a2ebd40"
       }
     ],
     "Sheets": [
       {
-        "SheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6",
+        "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6",
         "Name": "Landing Page",
         "Visuals": [
           {
             "TableVisual": {
-              "VisualId": "4a74ede6-1f2b-4814-b6f7-9ac1497463b2",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_4a74ede6-1f2b-4814-b6f7-9ac1497463b2",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -127,7 +148,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "0bc5cbce-6646-448d-8d5d-0deee7c7c670"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0bc5cbce-6646-448d-8d5d-0deee7c7c670"
                         }
                       }
                     }
@@ -138,7 +159,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "0ff72915-ce2c-49c7-80e4-714112cd2c63",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0ff72915-ce2c-49c7-80e4-714112cd2c63",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -227,7 +248,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "0079f0df-7201-4ce2-b3a9-72503e73a3e6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0079f0df-7201-4ce2-b3a9-72503e73a3e6"
                         }
                       }
                     }
@@ -238,7 +259,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "6ce94d8f-91ad-4732-adfc-f9012139401c",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_6ce94d8f-91ad-4732-adfc-f9012139401c",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -327,7 +348,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "328b84c7-bcb7-4db8-b702-7b2f4e05ab47"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_328b84c7-bcb7-4db8-b702-7b2f4e05ab47"
                         }
                       }
                     }
@@ -338,7 +359,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "6f149083-b081-4f59-8c32-4188c71c4170",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_6f149083-b081-4f59-8c32-4188c71c4170",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -427,7 +448,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "72cbe79f-e80d-4ed3-80ce-309eac908a05"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_72cbe79f-e80d-4ed3-80ce-309eac908a05"
                         }
                       }
                     }
@@ -438,7 +459,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "537d6e67-c938-4403-bb60-5e01a92e5d46",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_537d6e67-c938-4403-bb60-5e01a92e5d46",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -527,7 +548,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531"
                         }
                       }
                     }
@@ -538,7 +559,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "5e2d7cbe-0a29-470f-b3fd-2a0181e631f5",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_5e2d7cbe-0a29-470f-b3fd-2a0181e631f5",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -627,7 +648,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "39c84504-e03b-4454-b6ef-46948f1860b4"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4"
                         }
                       }
                     }
@@ -638,7 +659,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "a360a60a-2816-4a79-bffd-844f31868cc3",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_a360a60a-2816-4a79-bffd-844f31868cc3",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -725,7 +746,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "45ce91df-7a7f-4133-bdf3-30bbfef8cfa6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_45ce91df-7a7f-4133-bdf3-30bbfef8cfa6"
                         }
                       }
                     }
@@ -787,7 +808,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "a360a60a-2816-4a79-bffd-844f31868cc3",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_a360a60a-2816-4a79-bffd-844f31868cc3",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 14,
@@ -803,7 +824,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "5e2d7cbe-0a29-470f-b3fd-2a0181e631f5",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_5e2d7cbe-0a29-470f-b3fd-2a0181e631f5",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 14,
@@ -819,7 +840,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "537d6e67-c938-4403-bb60-5e01a92e5d46",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_537d6e67-c938-4403-bb60-5e01a92e5d46",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 14,
@@ -835,7 +856,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "6f149083-b081-4f59-8c32-4188c71c4170",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_6f149083-b081-4f59-8c32-4188c71c4170",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 14,
@@ -851,7 +872,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "0ff72915-ce2c-49c7-80e4-714112cd2c63",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0ff72915-ce2c-49c7-80e4-714112cd2c63",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 14,
@@ -867,7 +888,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "4a74ede6-1f2b-4814-b6f7-9ac1497463b2",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_4a74ede6-1f2b-4814-b6f7-9ac1497463b2",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 14,
@@ -883,7 +904,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "6ce94d8f-91ad-4732-adfc-f9012139401c",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_6ce94d8f-91ad-4732-adfc-f9012139401c",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 14,
@@ -920,7 +941,7 @@
         "ContentType": "INTERACTIVE"
       },
       {
-        "SheetId": "45ce91df-7a7f-4133-bdf3-30bbfef8cfa6",
+        "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_45ce91df-7a7f-4133-bdf3-30bbfef8cfa6",
         "Name": "Children cautioned or sentenced by ethnicity & gender",
         "ParameterControls": [
           {
@@ -983,7 +1004,7 @@
         "Visuals": [
           {
             "PivotTableVisual": {
-              "VisualId": "bd7da03f-a854-48e8-ac59-d2d044b7d289",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_bd7da03f-a854-48e8-ac59-d2d044b7d289",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -1304,7 +1325,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "2ec41d90-062f-442c-b0af-498a9395bcd5",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_2ec41d90-062f-442c-b0af-498a9395bcd5",
               "Title": {
                 "Visibility": "HIDDEN",
                 "FormatText": {
@@ -1433,7 +1454,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "a6e5ddab-f294-49ff-8948-c5891960bad2",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_a6e5ddab-f294-49ff-8948-c5891960bad2",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -1490,7 +1511,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -1516,7 +1537,7 @@
               "GridLayout": {
                 "Elements": [
                   {
-                    "ElementId": "a6e5ddab-f294-49ff-8948-c5891960bad2",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_a6e5ddab-f294-49ff-8948-c5891960bad2",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 4,
@@ -1540,7 +1561,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "bd7da03f-a854-48e8-ac59-d2d044b7d289",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_bd7da03f-a854-48e8-ac59-d2d044b7d289",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 26,
@@ -1548,7 +1569,7 @@
                     "RowSpan": 18
                   },
                   {
-                    "ElementId": "2ec41d90-062f-442c-b0af-498a9395bcd5",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_2ec41d90-062f-442c-b0af-498a9395bcd5",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 26,
                     "ColumnSpan": 10,
@@ -1593,7 +1614,7 @@
         "ContentType": "INTERACTIVE"
       },
       {
-        "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+        "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
         "Name": "Outcome group by gender and ethnicity",
         "ParameterControls": [
           {
@@ -1690,7 +1711,7 @@
         "Visuals": [
           {
             "TableVisual": {
-              "VisualId": "3c9f1d46-4469-4aac-8d9d-2de22582f532",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_3c9f1d46-4469-4aac-8d9d-2de22582f532",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -1747,7 +1768,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -1758,7 +1779,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "f01f2fb9-d011-439b-a174-fb8a580d1726",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_f01f2fb9-d011-439b-a174-fb8a580d1726",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -1815,7 +1836,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -1826,7 +1847,7 @@
           },
           {
             "PivotTableVisual": {
-              "VisualId": "7fd4c583-e714-4a23-a6b0-b8557463efa3",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_7fd4c583-e714-4a23-a6b0-b8557463efa3",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -2128,7 +2149,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "8312bf40-8e89-4c6c-8c16-af8511060f7f",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_8312bf40-8e89-4c6c-8c16-af8511060f7f",
               "Title": {
                 "Visibility": "HIDDEN",
                 "FormatText": {
@@ -2270,7 +2291,7 @@
               "GridLayout": {
                 "Elements": [
                   {
-                    "ElementId": "3c9f1d46-4469-4aac-8d9d-2de22582f532",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_3c9f1d46-4469-4aac-8d9d-2de22582f532",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 4,
@@ -2294,7 +2315,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "7fd4c583-e714-4a23-a6b0-b8557463efa3",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_7fd4c583-e714-4a23-a6b0-b8557463efa3",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 27,
@@ -2302,7 +2323,7 @@
                     "RowSpan": 17
                   },
                   {
-                    "ElementId": "8312bf40-8e89-4c6c-8c16-af8511060f7f",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_8312bf40-8e89-4c6c-8c16-af8511060f7f",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 27,
                     "ColumnSpan": 9,
@@ -2357,7 +2378,7 @@
         "ContentType": "INTERACTIVE"
       },
       {
-        "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+        "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
         "Name": "Outcome type by ethnicity",
         "ParameterControls": [
           {
@@ -2454,7 +2475,7 @@
         "Visuals": [
           {
             "TableVisual": {
-              "VisualId": "834ebade-4448-468a-a3d0-a5f6af6c7408",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_834ebade-4448-468a-a3d0-a5f6af6c7408",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -2511,7 +2532,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -2522,7 +2543,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "4ef4b6f3-7dc7-4b67-81ae-b10b4cb62573",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_4ef4b6f3-7dc7-4b67-81ae-b10b4cb62573",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -2579,7 +2600,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -2590,7 +2611,7 @@
           },
           {
             "PivotTableVisual": {
-              "VisualId": "aa2b63a2-5ce4-4147-b272-5f2628cfa6c2",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_aa2b63a2-5ce4-4147-b272-5f2628cfa6c2",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -2871,7 +2892,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "dc8ec45b-e929-473a-accd-b8bec6f14de7",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_dc8ec45b-e929-473a-accd-b8bec6f14de7",
               "Title": {
                 "Visibility": "HIDDEN",
                 "FormatText": {
@@ -3013,7 +3034,7 @@
               "GridLayout": {
                 "Elements": [
                   {
-                    "ElementId": "834ebade-4448-468a-a3d0-a5f6af6c7408",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_834ebade-4448-468a-a3d0-a5f6af6c7408",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 4,
@@ -3037,7 +3058,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "aa2b63a2-5ce4-4147-b272-5f2628cfa6c2",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_aa2b63a2-5ce4-4147-b272-5f2628cfa6c2",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 26,
@@ -3045,7 +3066,7 @@
                     "RowSpan": 17
                   },
                   {
-                    "ElementId": "dc8ec45b-e929-473a-accd-b8bec6f14de7",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_dc8ec45b-e929-473a-accd-b8bec6f14de7",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 26,
                     "ColumnSpan": 10,
@@ -3100,7 +3121,7 @@
         "ContentType": "INTERACTIVE"
       },
       {
-        "SheetId": "72cbe79f-e80d-4ed3-80ce-309eac908a05",
+        "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_72cbe79f-e80d-4ed3-80ce-309eac908a05",
         "Name": "Offence group by ethnicity and gender",
         "ParameterControls": [
           {
@@ -3167,7 +3188,7 @@
         "Visuals": [
           {
             "TableVisual": {
-              "VisualId": "d2c8d19e-61fa-4232-b4d9-8b3e73f3c689",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_d2c8d19e-61fa-4232-b4d9-8b3e73f3c689",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -3224,7 +3245,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -3235,7 +3256,7 @@
           },
           {
             "PivotTableVisual": {
-              "VisualId": "4a50837c-dc14-443f-ab6c-f00d702763a7",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_4a50837c-dc14-443f-ab6c-f00d702763a7",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -3602,7 +3623,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "2b1a9812-a44b-448e-9cdd-31dc93ee76fa",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_2b1a9812-a44b-448e-9cdd-31dc93ee76fa",
               "Title": {
                 "Visibility": "HIDDEN",
                 "FormatText": {
@@ -3736,7 +3757,7 @@
               "GridLayout": {
                 "Elements": [
                   {
-                    "ElementId": "d2c8d19e-61fa-4232-b4d9-8b3e73f3c689",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_d2c8d19e-61fa-4232-b4d9-8b3e73f3c689",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 4,
@@ -3760,7 +3781,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "4a50837c-dc14-443f-ab6c-f00d702763a7",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_4a50837c-dc14-443f-ab6c-f00d702763a7",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 26,
@@ -3768,7 +3789,7 @@
                     "RowSpan": 17
                   },
                   {
-                    "ElementId": "2b1a9812-a44b-448e-9cdd-31dc93ee76fa",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_2b1a9812-a44b-448e-9cdd-31dc93ee76fa",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 26,
                     "ColumnSpan": 10,
@@ -3811,7 +3832,7 @@
         "ContentType": "INTERACTIVE"
       },
       {
-        "SheetId": "0079f0df-7201-4ce2-b3a9-72503e73a3e6",
+        "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0079f0df-7201-4ce2-b3a9-72503e73a3e6",
         "Name": "Offence gravity score by ethnicity",
         "ParameterControls": [
           {
@@ -3878,7 +3899,7 @@
         "Visuals": [
           {
             "TableVisual": {
-              "VisualId": "2bbc90a6-b6ac-4193-a215-e876dc458aa2",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_2bbc90a6-b6ac-4193-a215-e876dc458aa2",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -3935,7 +3956,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -3946,7 +3967,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "c659ad75-6d11-4093-b7a3-1821f0b88762",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c659ad75-6d11-4093-b7a3-1821f0b88762",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -4003,7 +4024,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -4014,7 +4035,7 @@
           },
           {
             "PivotTableVisual": {
-              "VisualId": "f6ab170d-eff3-4371-8436-83065136bf7c",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_f6ab170d-eff3-4371-8436-83065136bf7c",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -4340,7 +4361,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "3a61f048-0f41-4ab5-92df-12e2795b9e3c",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_3a61f048-0f41-4ab5-92df-12e2795b9e3c",
               "Title": {
                 "Visibility": "HIDDEN",
                 "FormatText": {
@@ -4474,7 +4495,7 @@
               "GridLayout": {
                 "Elements": [
                   {
-                    "ElementId": "2bbc90a6-b6ac-4193-a215-e876dc458aa2",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_2bbc90a6-b6ac-4193-a215-e876dc458aa2",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 4,
@@ -4498,7 +4519,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "f6ab170d-eff3-4371-8436-83065136bf7c",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_f6ab170d-eff3-4371-8436-83065136bf7c",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 26,
@@ -4506,7 +4527,7 @@
                     "RowSpan": 17
                   },
                   {
-                    "ElementId": "3a61f048-0f41-4ab5-92df-12e2795b9e3c",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_3a61f048-0f41-4ab5-92df-12e2795b9e3c",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 26,
                     "ColumnSpan": 10,
@@ -4549,7 +4570,7 @@
         "ContentType": "INTERACTIVE"
       },
       {
-        "SheetId": "0bc5cbce-6646-448d-8d5d-0deee7c7c670",
+        "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0bc5cbce-6646-448d-8d5d-0deee7c7c670",
         "Name": "Offence gravity score by ethnicity and gender",
         "ParameterControls": [
           {
@@ -4616,7 +4637,7 @@
         "Visuals": [
           {
             "TableVisual": {
-              "VisualId": "9c1dec62-8cb7-4d52-8c05-b06967c8a5df",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_9c1dec62-8cb7-4d52-8c05-b06967c8a5df",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -4673,7 +4694,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -4684,7 +4705,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "a71d7364-1766-4134-8c8a-84a241689bcc",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_a71d7364-1766-4134-8c8a-84a241689bcc",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -4741,7 +4762,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -4752,7 +4773,7 @@
           },
           {
             "PivotTableVisual": {
-              "VisualId": "ed6114b9-7c17-4eaa-9802-9c8e1e73fcd3",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_ed6114b9-7c17-4eaa-9802-9c8e1e73fcd3",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -5050,7 +5071,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "2d5f8fbf-eb42-4360-8b8f-56e6929fe950",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_2d5f8fbf-eb42-4360-8b8f-56e6929fe950",
               "Title": {
                 "Visibility": "HIDDEN",
                 "FormatText": {
@@ -5184,7 +5205,7 @@
               "GridLayout": {
                 "Elements": [
                   {
-                    "ElementId": "9c1dec62-8cb7-4d52-8c05-b06967c8a5df",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_9c1dec62-8cb7-4d52-8c05-b06967c8a5df",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 4,
@@ -5208,7 +5229,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "ed6114b9-7c17-4eaa-9802-9c8e1e73fcd3",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_ed6114b9-7c17-4eaa-9802-9c8e1e73fcd3",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 26,
@@ -5216,7 +5237,7 @@
                     "RowSpan": 17
                   },
                   {
-                    "ElementId": "2d5f8fbf-eb42-4360-8b8f-56e6929fe950",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_2d5f8fbf-eb42-4360-8b8f-56e6929fe950",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 26,
                     "ColumnSpan": 10,
@@ -5263,7 +5284,7 @@
         "ContentType": "INTERACTIVE"
       },
       {
-        "SheetId": "328b84c7-bcb7-4db8-b702-7b2f4e05ab47",
+        "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_328b84c7-bcb7-4db8-b702-7b2f4e05ab47",
         "Name": "Offence group gravity score by ethnicity",
         "ParameterControls": [
           {
@@ -5330,7 +5351,7 @@
         "Visuals": [
           {
             "TableVisual": {
-              "VisualId": "ab41580f-3e1f-4aa3-a8c3-eee66576d4cf",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_ab41580f-3e1f-4aa3-a8c3-eee66576d4cf",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -5387,7 +5408,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -5398,7 +5419,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "2224e530-faf3-4d9c-b38e-9e64c5cb1e65",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_2224e530-faf3-4d9c-b38e-9e64c5cb1e65",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -5455,7 +5476,7 @@
                     {
                       "NavigationOperation": {
                         "LocalNavigationConfiguration": {
-                          "TargetSheetId": "c1d92471-8c16-46ae-922d-977c87bbdaf6"
+                          "TargetSheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_c1d92471-8c16-46ae-922d-977c87bbdaf6"
                         }
                       }
                     }
@@ -5466,7 +5487,7 @@
           },
           {
             "PivotTableVisual": {
-              "VisualId": "5dcc3cdb-42d3-4a57-8d65-7b89907270ba",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_5dcc3cdb-42d3-4a57-8d65-7b89907270ba",
               "Title": {
                 "Visibility": "HIDDEN"
               },
@@ -5764,7 +5785,7 @@
           },
           {
             "TableVisual": {
-              "VisualId": "d53ece6c-9135-4194-907c-742d2ff0349f",
+              "VisualId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_d53ece6c-9135-4194-907c-742d2ff0349f",
               "Title": {
                 "Visibility": "HIDDEN",
                 "FormatText": {
@@ -5897,7 +5918,7 @@
               "GridLayout": {
                 "Elements": [
                   {
-                    "ElementId": "ab41580f-3e1f-4aa3-a8c3-eee66576d4cf",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_ab41580f-3e1f-4aa3-a8c3-eee66576d4cf",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 4,
@@ -5921,7 +5942,7 @@
                     "RowSpan": 2
                   },
                   {
-                    "ElementId": "5dcc3cdb-42d3-4a57-8d65-7b89907270ba",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_5dcc3cdb-42d3-4a57-8d65-7b89907270ba",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 0,
                     "ColumnSpan": 26,
@@ -5929,7 +5950,7 @@
                     "RowSpan": 17
                   },
                   {
-                    "ElementId": "d53ece6c-9135-4194-907c-742d2ff0349f",
+                    "ElementId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_d53ece6c-9135-4194-907c-742d2ff0349f",
                     "ElementType": "VISUAL",
                     "ColumnIndex": 26,
                     "ColumnSpan": 10,
@@ -6247,7 +6268,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6280,7 +6301,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6313,7 +6334,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6346,7 +6367,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6379,7 +6400,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "45ce91df-7a7f-4133-bdf3-30bbfef8cfa6",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_45ce91df-7a7f-4133-bdf3-30bbfef8cfa6",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6412,7 +6433,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6445,7 +6466,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6478,7 +6499,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "45ce91df-7a7f-4133-bdf3-30bbfef8cfa6",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_45ce91df-7a7f-4133-bdf3-30bbfef8cfa6",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6511,7 +6532,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6544,7 +6565,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6577,7 +6598,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6610,7 +6631,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6643,7 +6664,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6676,7 +6697,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "72cbe79f-e80d-4ed3-80ce-309eac908a05",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_72cbe79f-e80d-4ed3-80ce-309eac908a05",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6709,7 +6730,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "72cbe79f-e80d-4ed3-80ce-309eac908a05",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_72cbe79f-e80d-4ed3-80ce-309eac908a05",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6742,7 +6763,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6775,7 +6796,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "0079f0df-7201-4ce2-b3a9-72503e73a3e6",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0079f0df-7201-4ce2-b3a9-72503e73a3e6",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6808,7 +6829,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "0079f0df-7201-4ce2-b3a9-72503e73a3e6",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0079f0df-7201-4ce2-b3a9-72503e73a3e6",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6841,7 +6862,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "0bc5cbce-6646-448d-8d5d-0deee7c7c670",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0bc5cbce-6646-448d-8d5d-0deee7c7c670",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6874,7 +6895,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "0bc5cbce-6646-448d-8d5d-0deee7c7c670",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_0bc5cbce-6646-448d-8d5d-0deee7c7c670",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6907,7 +6928,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "328b84c7-bcb7-4db8-b702-7b2f4e05ab47",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_328b84c7-bcb7-4db8-b702-7b2f4e05ab47",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6940,7 +6961,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "328b84c7-bcb7-4db8-b702-7b2f4e05ab47",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_328b84c7-bcb7-4db8-b702-7b2f4e05ab47",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -6973,7 +6994,7 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "45ce91df-7a7f-4133-bdf3-30bbfef8cfa6",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_45ce91df-7a7f-4133-bdf3-30bbfef8cfa6",
                 "Scope": "ALL_VISUALS"
               }
             ]
@@ -7006,9 +7027,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["f01f2fb9-d011-439b-a174-fb8a580d1726"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_f01f2fb9-d011-439b-a174-fb8a580d1726"
+                ]
               }
             ]
           }
@@ -7040,9 +7063,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["f01f2fb9-d011-439b-a174-fb8a580d1726"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_f01f2fb9-d011-439b-a174-fb8a580d1726"
+                ]
               }
             ]
           }
@@ -7074,9 +7099,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["f01f2fb9-d011-439b-a174-fb8a580d1726"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_f01f2fb9-d011-439b-a174-fb8a580d1726"
+                ]
               }
             ]
           }
@@ -7108,9 +7135,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["3c9f1d46-4469-4aac-8d9d-2de22582f532"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_3c9f1d46-4469-4aac-8d9d-2de22582f532"
+                ]
               }
             ]
           }
@@ -7142,9 +7171,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["3c9f1d46-4469-4aac-8d9d-2de22582f532"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_3c9f1d46-4469-4aac-8d9d-2de22582f532"
+                ]
               }
             ]
           }
@@ -7176,9 +7207,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "39c84504-e03b-4454-b6ef-46948f1860b4",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_39c84504-e03b-4454-b6ef-46948f1860b4",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["3c9f1d46-4469-4aac-8d9d-2de22582f532"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_3c9f1d46-4469-4aac-8d9d-2de22582f532"
+                ]
               }
             ]
           }
@@ -7210,9 +7243,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["4ef4b6f3-7dc7-4b67-81ae-b10b4cb62573"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_4ef4b6f3-7dc7-4b67-81ae-b10b4cb62573"
+                ]
               }
             ]
           }
@@ -7244,9 +7279,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["4ef4b6f3-7dc7-4b67-81ae-b10b4cb62573"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_4ef4b6f3-7dc7-4b67-81ae-b10b4cb62573"
+                ]
               }
             ]
           }
@@ -7278,9 +7315,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["4ef4b6f3-7dc7-4b67-81ae-b10b4cb62573"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_4ef4b6f3-7dc7-4b67-81ae-b10b4cb62573"
+                ]
               }
             ]
           }
@@ -7312,9 +7351,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["834ebade-4448-468a-a3d0-a5f6af6c7408"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_834ebade-4448-468a-a3d0-a5f6af6c7408"
+                ]
               }
             ]
           }
@@ -7346,9 +7387,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["834ebade-4448-468a-a3d0-a5f6af6c7408"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_834ebade-4448-468a-a3d0-a5f6af6c7408"
+                ]
               }
             ]
           }
@@ -7380,9 +7423,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "abea0c9d-91f6-49be-b2f2-7ee71f114531",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_abea0c9d-91f6-49be-b2f2-7ee71f114531",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["834ebade-4448-468a-a3d0-a5f6af6c7408"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_834ebade-4448-468a-a3d0-a5f6af6c7408"
+                ]
               }
             ]
           }
@@ -7414,9 +7459,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "72cbe79f-e80d-4ed3-80ce-309eac908a05",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_72cbe79f-e80d-4ed3-80ce-309eac908a05",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["d2c8d19e-61fa-4232-b4d9-8b3e73f3c689"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_d2c8d19e-61fa-4232-b4d9-8b3e73f3c689"
+                ]
               }
             ]
           }
@@ -7448,9 +7495,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "72cbe79f-e80d-4ed3-80ce-309eac908a05",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_72cbe79f-e80d-4ed3-80ce-309eac908a05",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["d2c8d19e-61fa-4232-b4d9-8b3e73f3c689"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_d2c8d19e-61fa-4232-b4d9-8b3e73f3c689"
+                ]
               }
             ]
           }
@@ -7482,9 +7531,11 @@
           "SelectedSheets": {
             "SheetVisualScopingConfigurations": [
               {
-                "SheetId": "72cbe79f-e80d-4ed3-80ce-309eac908a05",
+                "SheetId": "89ded068-ff94-4391-984a-8bc8bb0ec7d5_72cbe79f-e80d-4ed3-80ce-309eac908a05",
                 "Scope": "SELECTED_VISUALS",
-                "VisualIds": ["d2c8d19e-61fa-4232-b4d9-8b3e73f3c689"]
+                "VisualIds": [
+                  "89ded068-ff94-4391-984a-8bc8bb0ec7d5_d2c8d19e-61fa-4232-b4d9-8b3e73f3c689"
+                ]
               }
             ]
           }
@@ -7522,9 +7573,38 @@
         "SheetContentType": "INTERACTIVE"
       }
     },
-    "Options": {},
-    "QueryExecutionOptions": {
-      "QueryExecutionMode": "AUTO"
+    "Options": {}
+  },
+  "DashboardPublishOptions": {
+    "AdHocFilteringOption": {
+      "AvailabilityStatus": "DISABLED"
+    },
+    "ExportToCSVOption": {
+      "AvailabilityStatus": "ENABLED"
+    },
+    "SheetControlsOption": {
+      "VisibilityState": "COLLAPSED"
+    },
+    "SheetLayoutElementMaximizationOption": {
+      "AvailabilityStatus": "ENABLED"
+    },
+    "VisualMenuOption": {
+      "AvailabilityStatus": "ENABLED"
+    },
+    "VisualAxisSortOption": {
+      "AvailabilityStatus": "ENABLED"
+    },
+    "ExportWithHiddenFieldsOption": {
+      "AvailabilityStatus": "DISABLED"
+    },
+    "DataPointDrillUpDownOption": {
+      "AvailabilityStatus": "ENABLED"
+    },
+    "DataPointMenuLabelOption": {
+      "AvailabilityStatus": "ENABLED"
+    },
+    "DataPointTooltipOption": {
+      "AvailabilityStatus": "ENABLED"
     }
   }
 }
