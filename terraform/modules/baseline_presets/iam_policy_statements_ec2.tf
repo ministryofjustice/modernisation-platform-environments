@@ -103,7 +103,7 @@ locals {
           "sqs:ListQueues"
         ]
         resources = [
-          "arn:aws:sqs:::*",
+          "arn:aws:sqs:::*logs*",
         ]
       },
       {
