@@ -86,6 +86,7 @@ module "autoscaling" {
     AmazonSESFullAccess                 = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
     ecs-eni-policy                      = aws_iam_policy.ecs-eni-policy.arn
     ecs-secrets-policy                  = aws_iam_policy.ecs-secrets-policy.arn
+    ecs-quicksight-policy               = aws_iam_policy.ecs-quicksight-policy.arn
   }
   security_groups = [module.autoscaling_sg.security_group_id]
 
@@ -276,6 +277,66 @@ resource "aws_iam_policy" "ecs-secrets-policy" { #tfsec:ignore:aws-iam-no-policy
           "ec2:DescribeNetworkInterfaces"
         ]
         Resource = "*"
+      }
+    ]
+  })
+}
+
+data "aws_caller_identity" "current" {}
+
+resource "aws_iam_policy" "ecs-quicksight-policy" { #tfsec:ignore:aws-iam-no-policy-wildcards
+  #checkov:skip=CKV_AWS_290: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_289: [TODO] Consider adding Constraints.
+  #checkov:skip=CKV_AWS_355: [TODO] Consider making the Resource reference more restrictive.
+  #checkov:skip=CKV_AWS_288: [TODO] Ensure IAM policies does not allow data exfiltration
+
+  name = "${var.cluster_name}-quicksight-access"
+  tags = local.all_tags
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Sid": "VisualEditor0",
+        "Effect": "Allow",
+        "Action": [
+          "quicksight:ListDashboards",
+           "quicksight:GetDashboardEmbedUrl"
+        ],
+        "Resource": [
+           "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:dashboard/*"
+        ]
+      },
+      {
+        "Sid": "VisualEditor1",
+        "Effect": "Allow",
+        "Action": [
+          "quicksight:GetAuthCode",
+          "quicksight:DescribeUser",
+          "quicksight:RegisterUser",
+          "quicksight:DeleteUser",
+          "quicksight:ListUserGroups",
+          "quicksight:ListUsers"
+        ],
+        "Resource": [
+          "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/*",
+          "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/quicksight-admin-access/*"
+        ]
+      },
+      {
+        "Sid": "VisualEditor2",
+        "Effect": "Allow",
+        "Action": [
+          "quicksight:DescribeGroup",
+          "quicksight:CreateGroup",
+          "quicksight:ListGroups",
+          "quicksight:ListGroupMemberships",
+          "quicksight:CreateGroupMembership",
+          "quicksight:DeleteGroupMembership",
+          "quicksight:DeleteGroup"
+        ],
+        "Resource": [
+          "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:group/default/*"
+        ]
       }
     ]
   })
