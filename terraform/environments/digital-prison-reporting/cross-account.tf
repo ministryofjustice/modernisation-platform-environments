@@ -119,3 +119,11 @@ resource "aws_iam_role_policy_attachment" "lake_formation_data_access" {
   role       = aws_iam_role.dataapi_cross_role.name
   policy_arn = aws_iam_policy.lake_formation_data_access.arn
 }
+
+# Lake Formation Tag Management Attachement
+resource "aws_iam_role_policy_attachment" "lake_formation_tag_management" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_tag_management.arn
+}
+
+
