@@ -146,8 +146,8 @@ locals {
     is-production = false
     # Times must be specified in UTC
     disable_latency_alarms = {
-      start_time      = "12:40"
-      end_time        = "13:10"
+      start_time      = "12:25"
+      end_time        = "13:35"
       disable_weekend = true
     }
   }
