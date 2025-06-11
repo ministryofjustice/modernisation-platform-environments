@@ -60,7 +60,7 @@
           "create_records": false
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     },
     "preproduction": {
       "allow_s3_replication": true,
@@ -91,7 +91,7 @@
           "create_records": true
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     },
     "production": {
       "allow_s3_replication": true,
@@ -126,7 +126,7 @@
           "create_records": false
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     }
   }
 }

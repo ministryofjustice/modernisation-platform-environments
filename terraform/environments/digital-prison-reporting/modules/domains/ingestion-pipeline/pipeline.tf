@@ -257,7 +257,7 @@ locals {
           "--dpr.config.key" : var.domain
         }
       },
-      "Next" : "Run Compaction Job on Structured Zone"
+      "Next" : var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.run_compaction_job_on_structured_zone.StepName
     }
   }
 
@@ -333,7 +333,7 @@ locals {
         "NumberOfWorkers" : var.retention_curated_num_workers,
         "WorkerType" : var.retention_curated_worker_type
       },
-      "Next" : var.batch_only ? local.run_reconciliation_job.StepName : (var.split_pipeline ? local.start_dms_cdc_replication_task.StepName : local.resume_dms_replication_task.StepName)
+      "Next" : var.batch_only ? local.run_reconciliation_job.StepName : local.resume_dms_replication_task.StepName
     }
   }
 
@@ -500,10 +500,6 @@ module "data_ingestion_pipeline" {
         (local.set_dms_cdc_replication_task_start_time.StepName) : local.set_dms_cdc_replication_task_start_time.StepDefinition,
         (local.run_glue_batch_job.StepName) : local.run_glue_batch_job.StepDefinition,
         (local.archive_raw_data.StepName) : local.archive_raw_data.StepDefinition,
-        (local.run_compaction_job_on_structured_zone.StepName) : local.run_compaction_job_on_structured_zone.StepDefinition,
-        (local.run_vacuum_job_on_structured_zone.StepName) : local.run_vacuum_job_on_structured_zone.StepDefinition,
-        (local.run_compaction_job_on_curated_zone.StepName) : local.run_compaction_job_on_curated_zone.StepDefinition,
-        (local.run_vacuum_job_on_curated_zone.StepName) : local.run_vacuum_job_on_curated_zone.StepDefinition,
         (local.start_dms_cdc_replication_task.StepName) : local.start_dms_cdc_replication_task.StepDefinition,
         (local.start_glue_streaming_job.StepName) : local.start_glue_streaming_job.StepDefinition,
         (local.switch_hive_tables_for_prisons_to_curated.StepName) : local.switch_hive_tables_for_prisons_to_curated.StepDefinition,
