@@ -9,7 +9,6 @@ locals {
   coat_dev_account_id  = "082282578003" #local.environment_management.account_ids["coat-development"]
 
   cross_environment = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" ? local.dev_environment : local.prod_environment
-
   cross_env_account_id = substr(terraform.workspace, length(local.application_name), length(terraform.workspace)) == "-production" ? local.coat_dev_account_id : local.coat_prod_account_id
 
 }
