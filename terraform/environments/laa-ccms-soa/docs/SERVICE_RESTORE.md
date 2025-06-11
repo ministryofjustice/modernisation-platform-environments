@@ -32,7 +32,9 @@ From SOA's perspective, these buckets are mounted to all servers at the EC2 leve
 
 Mounting is handled by the EC2 boot script which is baked in the to the EC2 Autoscaling Group Launch Template. If these Buckets are not present, boot of the EC2 instances will succeed and containers will still start, but the boot script will fail to complete properly, leading to issues deploying some Composites later in the deployment process. To this end it is better to ensure that the Buckets are in place before attempting a deployment.
 
-Buckets should be input via the `inbound_s3_bucket_name` and `outbound_s3_bucket_name` application variables. This will configure the appropriate IAM policies from the perspective of SOA. A corresponding Bucket Policy relationship will also need to be in place in the account hosting the Buckets to allow access. So to this end it is essential that the relevant IAM Roles shown above are already created within the SOA Account before attempting to configure inside the corresponding EBS Account.
+Buckets should be input via the `inbound_s3_bucket_name` and `outbound_s3_bucket_name` application variables. This will configure the appropriate IAM policies from the perspective of SOA. A corresponding Bucket Policy relationship will also need to be in place in the account hosting the Buckets to allow access. So to this end it is **essential that the relevant IAM Roles shown above are already created within the SOA Account before attempting to configure inside the corresponding EBS Account**.
+
+Once the IAM/S3 integration is completed. Log in to the AWS console and **TERMINATE** any EC2 Instances (both Admin and Managed). The Auto Scaling Group will start new instances which should mount the newly integrated S3 Buckets during boot.
 
 ## Git clone to EFS, only needs to be done once for all envs. This is handled by the script
 

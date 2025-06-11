@@ -12,13 +12,11 @@ chmod go+rw /home/ec2-user/efs
 # https://docs.aws.amazon.com/efs/latest/ug/performance.html
 dd if=/dev/urandom of=/home/ec2-user/efs/large_file_for_efs_performance bs=1024k count=10000
 
+#--Add EPEL Repo
+amazon-linux-extras install epel -y
+
 #--Install AWSCLI
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-yum install unzip -y
-unzip awscliv2.zip
-./aws/install
-rm -rf aws
-rm awscliv2.zip
+yum install -y awscli
 
 # Configure SSH and pull git repo
 yum install git -y
@@ -27,10 +25,10 @@ chown ec2-user /home/ec2-user/.ssh/id_rsa
 chgrp ec2-user /home/ec2-user/.ssh/id_rsa
 chmod 400 /home/ec2-user/.ssh/id_rsa
 cat <<EOF > /home/ec2-user/.ssh/config
-host github.com
- HostName ssh.github.com
- Port 443
- User git
+host ssh.github.com
+  HostName ssh.github.com
+  Port 443
+  User git
 StrictHostKeyChecking no
 EOF
 chown ec2-user /home/ec2-user/.ssh/config
@@ -42,7 +40,6 @@ su ec2-user bash -c "git clone --single-branch --branch feat-laa-ccms-soa-mp ssh
 #--Install s3fs and pre-reqs
 yum install fuse -y
 yum install fuse-libs -y
-amazon-linux-extras install epel -y
 yum install s3fs-fuse -y
 
 #--Make S3 integration dirs and mount S3
