@@ -18,11 +18,31 @@ resource "aws_security_group_rule" "alb_admin_ingress_80" {
 resource "aws_security_group_rule" "alb_admin_ingress_7001" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
-  description       = "Admin Weblogic - Internal Subnets" #--Maybe?
+  description       = "Admin Weblogic - Internal Subnets"
   protocol          = "TCP"
   from_port         = 7001
   to_port           = 7001
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
+
+resource "aws_security_group_rule" "alb_admin_workspace_ingress_80" {
+  security_group_id = aws_security_group.alb_admin.id
+  type              = "ingress"
+  description       = "Admin Weblogic - AWS Workspaces" #--Why?
+  protocol          = "TCP"
+  from_port         = 80
+  to_port           = 80
+  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
+}
+
+resource "aws_security_group_rule" "alb_admin_workspace_ingress_7001" {
+  security_group_id = aws_security_group.alb_admin.id
+  type              = "ingress"
+  description       = "Admin Weblogic - AWS Workspaces"
+  protocol          = "TCP"
+  from_port         = 7001
+  to_port           = 7001
+  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
 }
 
 resource "aws_security_group_rule" "alb_admin_egress_all" {
@@ -45,7 +65,7 @@ resource "aws_security_group" "alb_managed" {
 resource "aws_security_group_rule" "alb_managed_ingress_80" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
-  description       = "EM HTTP - Internal Subnets"
+  description       = "EM HTTP - Internal Subnets" #--Why?
   protocol          = "TCP"
   from_port         = 80
   to_port           = 80
@@ -65,7 +85,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_8001" {
 resource "aws_security_group_rule" "alb_managed_ingress_cp80" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
-  description       = "EM HTTP - Cloud Platform"
+  description       = "EM HTTP - Cloud Platform" #--Why?
   protocol          = "TCP"
   from_port         = 80
   to_port           = 80
@@ -139,7 +159,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_server" {
 resource "aws_security_group_rule" "ecs_tasks_managed_7" {
   security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
-  description       = "SOA Managed Application" #--What?
+  description       = "SOA Managed Application" #--What does this port do?
   protocol          = "TCP"
   from_port         = 7
   to_port           = 7
@@ -149,7 +169,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_7" {
 resource "aws_security_group_rule" "ecs_tasks_managed_7574_tcp" {
   security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
-  description       = "SOA Managed Application" #--What?
+  description       = "SOA Managed Application" #--What does this port do?
   protocol          = "TCP"
   from_port         = 7574
   to_port           = 7574
@@ -159,7 +179,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_7574_tcp" {
 resource "aws_security_group_rule" "ecs_tasks_managed_8088_8089" {
   security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
-  description       = "SOA Managed Application" #--What?
+  description       = "SOA Managed Application" #--What does this port do?
   protocol          = "TCP"
   from_port         = 8088
   to_port           = 8089
@@ -230,25 +250,14 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_ingress" {
   cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
 }
 
-resource "aws_vpc_security_group_ingress_rule" "soa_db_workspace_ingress_nonprod" {
-  count             = local.is-production ? 0 : 1
+/* resource "aws_vpc_security_group_ingress_rule" "soa_db_workspace_ingress" {
   security_group_id = aws_security_group.soa_db.id
   description       = "Workspace to Database Ingress"
   ip_protocol       = "TCP"
   from_port         = 1521
   to_port           = 1521
-  cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr_nonprod
-}
-
-resource "aws_vpc_security_group_ingress_rule" "soa_db_workspace_ingress_prod" {
-  count             = local.is-production ? 1 : 0
-  security_group_id = aws_security_group.soa_db.id
-  description       = "Workspace to Database Ingress"
-  ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr_prod
-}
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace_cidr
+} */
 
 resource "aws_security_group_rule" "soa_db_egress_all" {
   security_group_id = aws_security_group.soa_db.id
@@ -277,15 +286,14 @@ resource "aws_vpc_security_group_ingress_rule" "tds_db_ingress" {
   cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
 }
 
-resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress_nonprod" {
-  count             = local.is-production ? 0 : 1
+/* resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
   security_group_id = aws_security_group.tds_db.id
   description       = "Workspace to Database Ingress"
   ip_protocol       = "TCP"
   from_port         = 1521
   to_port           = 1521
-  cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr_nonprod
-}
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace_cidr
+} */
 
 resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress_prod" {
   count             = local.is-production ? 1 : 0
