@@ -145,6 +145,7 @@ locals {
         })
         instance = merge(local.ec2_instances.oem.instance, {
           disable_api_termination = true
+          instance_type           = "r7i.large"
         })
         user_data_cloud_init = merge(local.ec2_instances.oem.user_data_cloud_init, {
           args = merge(local.ec2_instances.oem.user_data_cloud_init.args, {
