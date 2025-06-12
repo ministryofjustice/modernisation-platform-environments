@@ -54,7 +54,7 @@ resource "aws_ecs_task_definition" "edrms" {
       spring_datasource_password    = aws_secretsmanager_secret.spring_datasource_password.arn
       target_northgate_hub_dime_url = local.application_data.accounts[local.environment].target_northgate_hub_dime_url
       northgate_timeout             = local.application_data.accounts[local.environment].northgate_timeout
-      spring_datasource_url         = local.application_data.accounts[local.environment].soa-tds-db-endpoint
+      spring_datasource_url         = aws_db_instance.tds_db.endpoint
       logging_level_root            = local.application_data.accounts[local.environment].logging_level_root
     }
   )
