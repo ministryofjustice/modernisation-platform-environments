@@ -197,11 +197,11 @@ resource "aws_security_group_rule" "ecs_tasks_managed_egress_all" {
 }
 
 #--Cluster EC2 Instances
-/* resource "aws_security_group" "cluster_ec2" {
+resource "aws_security_group" "cluster_ec2" {
   name        = "${local.application_data.accounts[local.environment].app_name}-cluster-ec2-security-group"
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
-} */
+}
 
 /* resource "aws_security_group_rule" "cluster_ec2_ingress_admin_alb" {
   type                     = "ingress"
@@ -221,7 +221,7 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_managed_alb" {
   security_group_id       = aws_security_group.cluster_ec2.id
   source_security_group_id = aws_security_group.alb_managed.id
   description             = "Allow ingress from managed ALB"
-}
+} */
 
 resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   security_group_id = aws_security_group.cluster_ec2.id
@@ -231,7 +231,7 @@ resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
-} */
+}
 
 #--Database SOA
 resource "aws_security_group" "soa_db" {
