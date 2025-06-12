@@ -7,9 +7,30 @@ This document should serve as a detailed breakdown as to how to bring CCMS SOA (
 
 Whilst application backups would make a restoration easier, they are not essential. The data that passes through SOA is transient and SOA can be brought online with no backups.
 
+## MP ECR Dependency
+
+An ECR Repository needs to exist to house the application images that will be pulled for SOA before any services can be expected to start.
+
+Configurations are located [here](https://github.com/ministryofjustice/modernisation-platform/blob/main/terraform/environments/core-shared-services/ecr_repos.tf). If in a DR scenario, the initial images will likley need to be pushed manually by the MP engineers, or a build pipeline created manually.
+
+At present, the location of the existing images is:
+
+- `374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-admin:latest`
+- `374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed:latest`
+
+Permission is granted to pull these images by the ECR Control Plane.
+
 ## Apply Terraform and Populate Secrets
 
-Complete the `application_variables.json` file as appropriate for the environment being deployed to, ensuring in particular that the  `admin_app_count` and `managed_app_count` values are set to `0` and commit (this will prevent any ECS services from booting). If unsure on suitable variables for a cold start, see the file `_application_variables_starter.json`.
+Complete the `application_variables.json` file as appropriate for the environment being deployed to, ensuring in particular that:
+
+- The  `admin_app_count` and `managed_app_count` values are set to `0` (this will prevent any ECS services from booting).
+- The `certificate_authority_arn` is configured correctly (login to the AWS Console and check the **Private certificate authorities** page to verify).
+- The `inbound_s3_bucket_name` and `outbound_s3_bucket_name` values are set as appropriate for the environment being configured (see the corresponding EBS environment to confirm).
+
+If unsure on suitable variables for a cold start, see the file `_application_variables_starter.json`.
+
+Once verified, commit.
 
 In the Github Actions pipeline; Terraform will Plan and Apply for lower environments. When applying for the first time the apply will fail part way through due to missing Secret Values, this is to be expected. The Secrets themselves however will be created.
 
@@ -19,7 +40,7 @@ Log in to the AWS console for each environment and populate the Secrets with app
 
 With the secrets populated, commit again (once again ensuring that `admin_app_count` and `managed_app_count` are still set to `0`). In the Github Actions Pipeline, run Terraform Plan and Apply to bring up the remaining infrastructure.
 
-## External S3 Dependencies
+## External S3 Dependency
 
 SOA depends on two external S3 buckets which are used for FTP integrations by a number of other applications. At time of writing, these buckets are part of the [CCMS-EBS Infrastructure](https://github.com/ministryofjustice/modernisation-platform-environments/tree/main/terraform/environments/ccms-ebs).
 
@@ -52,7 +73,7 @@ For example if you are building a dev environment, you will need to delete `buil
 With the configuration file in place, any reference to passwords and endpoints should be updated to reflect:
 
 - External Services
-- Newcastle created RDS Databses
+- Newcastle created RDS Databases
 - Passwords added to Secrets Manager
 
 ## Configure the Databases
