@@ -14,7 +14,7 @@ resource "aws_route53_record" "admin" {
 resource "aws_route53_record" "admin_internal" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.inner.zone_id
-  name     = local.application_data.accounts[local.environment].admin_hostname
+  name     = "soa-admin"
   type     = "A"
   alias {
     name                   = aws_lb.admin.dns_name
@@ -39,7 +39,7 @@ resource "aws_route53_record" "managed" {
 resource "aws_route53_record" "managed_internal" {
   provider = aws.core-vpc
   zone_id  = data.aws_route53_zone.inner.zone_id
-  name     = local.application_data.accounts[local.environment].managed_hostname
+  name     = "soa-managed"
   type     = "A"
   alias {
     name                   = aws_lb.managed.dns_name
