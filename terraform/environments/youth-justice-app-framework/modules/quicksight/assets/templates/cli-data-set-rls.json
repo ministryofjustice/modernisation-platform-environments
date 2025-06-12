@@ -1,11 +1,11 @@
 {
-  "AwsAccountId": "711387140977",
+  "AwsAccountId": "${aws_account_id}",
   "DataSetId": "7d6329ad-b523-4c4e-ad6b-86d8b1a06f81",
   "Name": "RowLevelData",
   "PhysicalTableMap": {
     "4477ed2c-81c3-4f10-abb6-d7a8fd303be7": {
       "CustomSql": {
-        "DataSourceArn": "arn:aws:quicksight:eu-west-2:711387140977:datasource/postgresql",
+        "DataSourceArn": "arn:aws:quicksight:eu-west-2:${aws_account_id}:datasource/postgresql",
         "Name": "RowLevelData",
         "SqlQuery": "select distinct  \"GroupName\", CASE WHEN \"GroupName\" = 'yot_f00' then  ''   ELSE ltrim(rtrim(yotoucode)) END AS \"yotoucode\"\r\nfrom auth.quicksight_rls_yjs\r\ngroup by \"GroupName\", CASE WHEN \"GroupName\" = 'yot_f00' then  ''   ELSE ltrim(rtrim(yotoucode)) END \r\norder by \"GroupName\"",
         "Columns": [
@@ -39,7 +39,7 @@
   "ImportMode": "DIRECT_QUERY",
   "Permissions": [
     {
-      "Principal": "arn:aws:quicksight:eu-west-2:711387140977:user/default/quicksight-admin-access/david.seekins",
+      "Principal": "arn:aws:quicksight:eu-west-2:${aws_account_id}:user/default/quicksight-admin-access/david.seekins",
       "Actions": [
         "quicksight:DeleteDataSet",
         "quicksight:UpdateDataSetPermissions",
