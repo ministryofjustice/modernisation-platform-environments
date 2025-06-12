@@ -95,32 +95,52 @@ Pay attention to the application logs. The boot process can take up to 30 minute
 
 In `application_variables.json`; set `managed_app_count` to `1` and commit. Allow the Github Actions pipeline to run. This will bring up the Admin Server.
 
-Pay attention to the application logs. The boot process can take around 10-15 minutes. The service is stable when the EC2 shows a healthy service **AND** Weblogic shows a healthy server. To verify in Weblogic, browse to **Environments** > **Servers** and correlate the active servers to the IPs of the currently stable servers in the **MANAGED** EC2 Loadbalancers Target Group.
+Pay attention to the application logs. The boot process usually takes around 5 minutes. The service is stable when the EC2 shows a healthy service **AND** Weblogic shows a healthy server with an **OK** status. To verify in Weblogic, browse to **Environments** > **Servers** and correlate the active servers to the IPs of the currently stable servers in the **MANAGED** EC2 Loadbalancers Target Group.
 
 ## Deploy Composites
 
-With the application stable. Deploy the application Composites. Connect to the Admin Server via the SSM console and execute:
+With the application stable. Deploy the application Composites. Connect to the single running **Managed Server** via the SSM console and execute:
 
 ```bash
-sudo su ec2-user
-cd ~/efs/laa-ccms-app-soa/Scripts
-./prepare_env environment #--dev, stg, tst or prod -- (stg should be used for Mod Platform preproduction. This is embedded in scripts for legacy reasons!!!)
-./weblogic update
-./weblogic deploy
+sudo docker container ls
 ```
 
-This will build and deploy Composites to Weblogic
+You will be shown a list of running containers, I.E:
+
+```bash
+# CONTAINER ID   IMAGE                                                           COMMAND                  CREATED             STATUS                       PORTS     NAMES
+# b4cef7645cdf   374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-managed:latest   "/bin/sh -c /usr/loc…"   17 hours ago   Up 17 hours (healthy)             ecs-ccms-soa-managed-task-1-ccms-soa-managed-98ab9e8089fcbcfcd901
+# eccf3782f3ab   amazon/amazon-ecs-pause:0.1.0                                     "/pause"                 17 hours ago   Up 17 hours                       ecs-ccms-soa-managed-task-1-internalecspause-88eb9ac29b91f68bd301
+# 35fffa04cf76   amazon/amazon-ecs-agent:latest                                    "/agent"                 20 hours ago   Up 20 hours (healthy)             ecs-agent
+```
+
+Connect to the container running the `soa-managed` using it's **CONTAINER ID**:
+
+```bash
+sudo docker exec -it --tty b4cef7645cdf /bin/sh
+```
+
+Once connected to the container's console, execute the below:
+
+```bash
+cd /u01/oracle/user_projects/laa-ccms-app-soa/Scripts/
+./prepare_env.sh $env #--dev, stg, tst or prod -- (stg should be used for Mod Platform preproduction. This is embedded in scripts for legacy reasons!!!)
+./weblogic.sh update #--If an error is encountered here, there is likely an issue with a specific composite, debug this with a DBA and do not attempt to run the deploy!
+./weblogic.sh deploy
+```
+
+If this process completes without errors, composites have successfully deployed to Weblogic.
 
 ## Scale Up
 
 Once Composites are successfully deployed, in `application_variables.json`; increment `managed_app_count` to the desired number (incrementing by 1, committing and applying) until the desired number has been reached. This should be:
 
-| Environment | Count |
-|-------------|-------|
-| Prod        | 6     |
-| Preprod     | 2     |
-| Test        | 2     |
-| Dev         | 2     |
+| Environment   | Count |
+|---------------|-------|
+| Prod          | 6     |
+| Preproduction | 2     |
+| Test          | 2     |
+| Dev           | 2     |
 
 ## Create apply_user
 

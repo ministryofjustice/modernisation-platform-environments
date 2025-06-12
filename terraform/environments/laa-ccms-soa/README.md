@@ -86,7 +86,7 @@ Modernisation Platform
 Accessible from a [Shared Services AWS Workspace](https://dsdmoj.atlassian.net/wiki/spaces/aws/pages/4450288123/Self+Workspace+Creation+-+User+Guide) or other services within Mod Platform (MP):
 
 - **Administration Consle**: http://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/console
-- **EM (Enterprise Manager)**: http://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/em/console
+- **EM (Enterprise Manager)**: http://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/em
 
 Exposed to other Mod Platform (MP) and Cloud Platform (CP) services:
 - **Composite Integrations** (http://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk:8001)

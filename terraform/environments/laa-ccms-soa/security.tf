@@ -156,7 +156,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_server" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "ecs_tasks_managed_7" {
+/* resource "aws_security_group_rule" "ecs_tasks_managed_7" {
   security_group_id = aws_security_group.ecs_tasks_managed.id
   type              = "ingress"
   description       = "SOA Managed Application" #--What does this port do?
@@ -184,7 +184,7 @@ resource "aws_security_group_rule" "ecs_tasks_managed_8088_8089" {
   from_port         = 8088
   to_port           = 8089
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
+} */
 
 resource "aws_security_group_rule" "ecs_tasks_managed_egress_all" {
   security_group_id = aws_security_group.ecs_tasks_managed.id
@@ -197,13 +197,13 @@ resource "aws_security_group_rule" "ecs_tasks_managed_egress_all" {
 }
 
 #--Cluster EC2 Instances
-resource "aws_security_group" "cluster_ec2" {
+/* resource "aws_security_group" "cluster_ec2" {
   name        = "${local.application_data.accounts[local.environment].app_name}-cluster-ec2-security-group"
   description = "controls access to the cluster ec2 instance"
   vpc_id      = data.aws_vpc.shared.id
-}
+} */
 
-resource "aws_security_group_rule" "cluster_ec2_ingress_admin_alb" {
+/* resource "aws_security_group_rule" "cluster_ec2_ingress_admin_alb" {
   type                     = "ingress"
   from_port               = 0
   to_port                 = 0
@@ -221,7 +221,7 @@ resource "aws_security_group_rule" "cluster_ec2_ingress_managed_alb" {
   security_group_id       = aws_security_group.cluster_ec2.id
   source_security_group_id = aws_security_group.alb_managed.id
   description             = "Allow ingress from managed ALB"
-}
+} */
 
 resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   security_group_id = aws_security_group.cluster_ec2.id
