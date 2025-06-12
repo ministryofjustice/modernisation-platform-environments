@@ -127,9 +127,9 @@ module "cur_v2_hourly" {
 
   policy = local.is-development ? templatefile("${path.module}/templates/coat-cur-v2-hourly-dev-bucket-policy.json",
     {
-      environment       = local.environment
-      root_account_id   = local.environment_management.aws_organizations_root_account_id
-      cross_environment = local.cross_environment
+      environment          = local.environment
+      root_account_id      = local.environment_management.aws_organizations_root_account_id
+      cross_env_account_id = local.cross_env_account_id
     }
     ) : templatefile("${path.module}/templates/coat-cur-v2-hourly-prod-bucket-policy.json",
     {
