@@ -124,6 +124,7 @@ module "cur_v2_hourly" {
 
   attach_deny_insecure_transport_policy = true
   attach_policy                         = true
+
   policy = local.is-development ? templatefile("${path.module}/templates/coat-cur-v2-hourly-dev-bucket-policy.json",
     {
       environment       = local.environment
@@ -136,8 +137,6 @@ module "cur_v2_hourly" {
       root_account_id = local.environment_management.aws_organizations_root_account_id
     }
   )
-
-  # data.aws_iam_policy_document.cur_v2_bucket_policy.json
 
   server_side_encryption_configuration = {
     rule = {
