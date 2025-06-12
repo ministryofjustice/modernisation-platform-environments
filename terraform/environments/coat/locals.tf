@@ -8,7 +8,4 @@ locals {
   coat_prod_account_id = "279191903737" #local.environment_management.account_ids["coat-production"] 
   coat_dev_account_id  = "082282578003" #local.environment_management.account_ids["coat-development"]
 
-  cross_environment    = local.is-production ? local.dev_environment : local.prod_environment
-  cross_env_account_id = local.is-production ? local.coat_dev_account_id : local.coat_prod_account_id
-
 }

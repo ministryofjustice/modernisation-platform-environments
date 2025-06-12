@@ -129,7 +129,7 @@ module "cur_v2_hourly" {
     {
       environment          = local.environment
       root_account_id      = local.environment_management.aws_organizations_root_account_id
-      cross_env_account_id = local.cross_env_account_id
+      cross_env_account_id = local.coat_prod_account_id
     }
     ) : templatefile("${path.module}/templates/coat-cur-v2-hourly-prod-bucket-policy.json",
     {
