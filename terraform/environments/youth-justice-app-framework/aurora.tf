@@ -10,7 +10,7 @@ module "aurora" {
   alb_route53_record_zone_id = data.aws_route53_zone.yjaf-inner.id
 
 
-  name                       = "yjafrds01-cluster"
+  name                       = "yjafrds01-cluster-rollback"
   azs                        = ["eu-west-2a", "eu-west-2b"]
   db_cluster_instance_class  = local.application_data.accounts[local.environment].database_instance_class
   database_subnet_group_name = "yjaf-db-subnet-group"
