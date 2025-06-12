@@ -21,16 +21,19 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
+# Create the 'domain' tag with values
 resource "aws_lakeformation_lf_tag" "domain_tag" {
   key    = "domain"
   values = ["prisons", "probation", "electronic-monitoring"]
 }
 
+# Create the 'sensitive' tag - with values agreed with Justice Digital
 resource "aws_lakeformation_lf_tag" "sensitive_tag" {
   key    = "sensitive"
   values = ["true", "false", "data_linking"]
 }
 
+# Domain tag: Now grant the permissions to the CaDeT cross account role
 resource "aws_lakeformation_permissions" "domain_grant" {
   principal   = aws_iam_role.dataapi_cross_role.arn
   permissions = ["DESCRIBE", "ASSOCIATE", "GRANT_WITH_LF_TAG_EXPRESSION"]
@@ -41,6 +44,7 @@ resource "aws_lakeformation_permissions" "domain_grant" {
   }
 }
 
+# Sensitive tag: Now grant the permissions to the CaDeT cross account role
 resource "aws_lakeformation_permissions" "sensitive_grant" {
   principal   = aws_iam_role.dataapi_cross_role.arn
   permissions = ["DESCRIBE", "ASSOCIATE", "GRANT_WITH_LF_TAG_EXPRESSION"]
