@@ -36,7 +36,7 @@ resource "aws_lb_listener" "admin80" {
   }
 }
 
-resource "aws_lb_listener" "admin443" {
+/* resource "aws_lb_listener" "admin443" {
   load_balancer_arn = aws_lb.admin.id
   port              = 443
   protocol          = "TCP"
@@ -46,7 +46,7 @@ resource "aws_lb_listener" "admin443" {
     target_group_arn = aws_lb_target_group.admin.id
     type             = "forward"
   }
-}
+} */
 
 resource "aws_lb_listener" "admin_server_port" {
   load_balancer_arn = aws_lb.admin.id
@@ -94,7 +94,7 @@ resource "aws_lb_listener" "managed80" {
   }
 }
 
-resource "aws_lb_listener" "managed443" {
+/* resource "aws_lb_listener" "managed443" {
   load_balancer_arn = aws_lb.managed.id
   port              = 443
   protocol          = "TCP"
@@ -104,7 +104,7 @@ resource "aws_lb_listener" "managed443" {
     target_group_arn = aws_lb_target_group.managed.id
     type             = "forward"
   }
-}
+} */
 
 resource "aws_lb_listener" "managed_server_port" {
   load_balancer_arn = aws_lb.managed.id
