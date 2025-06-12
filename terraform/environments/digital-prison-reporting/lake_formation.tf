@@ -3,9 +3,8 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
     data.aws_iam_session_context.current.issuer_arn,
 
-    # Make Data engineer/developer role a LF admin
+    # Make Data engineer role a LF admin
     try(one(data.aws_iam_roles.data_engineering_roles.arns), []),
-    try(one(data.aws_iam_roles.aws_iam_roles.developer_roles.arns), []),
 
     # Make the cross-account runner used by create-a-derived table LF admin
     aws_iam_role.dataapi_cross_role.arn
@@ -26,7 +25,16 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
+# Give mod platform developer role some LF permissions for accessing data
+resource "aws_lakeformation_permissions" "mod_platform_developer_get_data_access" {
+  count      = length(try(one(data.aws_iam_roles.developer_roles.arns), [])) > 0 ? 1 : 0
+  principal  = try(one(data.aws_iam_roles.developer_roles.arns), "")
+  permissions = ["GET_DATA_ACCESS"]
 
+  data_location {
+    arn = "arn:aws:s3:::${local.project}-structured-historical-${local.environment}"
+  }
+}
 
 # Create the 'domain' tag with values
 resource "aws_lakeformation_lf_tag" "domain_tag" {
