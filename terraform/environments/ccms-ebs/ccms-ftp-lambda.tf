@@ -82,7 +82,7 @@ resource "aws_s3_bucket_policy" "inbound_bucket_policy" {
             "Effect": "Allow",
             "Principal": {
                 "AWS": [
-                    "arn:aws:iam::${local.application_data.accounts[local.environment].soa_account_id}:role/ccms-soa-ec2-instance-role",
+                    "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-ec2-instance-role",
                     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
                 ]
             },
@@ -115,7 +115,7 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
             "Effect": "Allow",
             "Principal": {
                 "AWS": [
-                    "arn:aws:iam::${local.application_data.accounts[local.environment].soa_account_id}:role/ccms-soa-ec2-instance-role",
+                    "arn:aws:iam::${local.environment_management.account_ids["laa-ccms-soa-${local.environment}"]}:role/ccms-soa-ec2-instance-role",
                     "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/role_stsassume_oracle_base"
                 ]
             },
