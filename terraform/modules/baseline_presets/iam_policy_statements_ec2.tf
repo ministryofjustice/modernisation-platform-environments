@@ -103,7 +103,8 @@ locals {
           "sqs:ListQueues"
         ]
         resources = [
-          "arn:aws:sqs:::*logs*",
+          # "arn:aws:sqs:::*logs*",
+          "arn:aws:sqs:::*",
         ]
       },
       {
@@ -111,8 +112,9 @@ locals {
         effect  = "Allow"
         actions = ["s3:GetObject"]
         resources = [
-          "arn:aws:s3:::*logs*",
-          "arn:aws:s3:::*logs*/*",
+          # "arn:aws:s3:::*logs*",
+          # "arn:aws:s3:::*logs*/*",
+          "arn:aws:s3:::*",
         ]
       },
       {
@@ -123,7 +125,8 @@ locals {
         ]
         resources = [
           var.environment.kms_keys["ebs"].arn,
-          var.environment.kms_keys["general"].arn
+          var.environment.kms_keys["general"].arn,
+          var.environment.kms_keys["s3"].arn
         ]
       }
     ]
