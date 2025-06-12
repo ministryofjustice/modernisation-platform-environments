@@ -68,8 +68,12 @@ locals {
     }
   }
 
-  cmk_name_prefixes = ["general", "ebs", "rds"]
-
+  kms_keys = {
+    ebs     = "arn:aws:kms:eu-west-2:${local.account_ids.core-shared-services-production}:alias/ebs-${var.business_unit}"
+    general = "arn:aws:kms:eu-west-2:${local.account_ids.core-shared-services-production}:alias/general-${var.business_unit}"
+    rds     = "arn:aws:kms:eu-west-2:${local.account_ids.core-shared-services-production}:alias/rds-${var.business_unit}"
+    s3      = "alias/aws/s3"
+  }
 
   environments_file   = jsondecode(data.http.environments_file.response_body)
   environments_access = { for item in local.environments_file.environments : item.name => item.access }
