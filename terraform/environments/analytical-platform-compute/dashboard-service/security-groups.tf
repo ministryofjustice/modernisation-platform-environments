@@ -1,4 +1,5 @@
 module "rds_security_group" {
+  count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
