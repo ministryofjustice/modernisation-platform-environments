@@ -786,6 +786,30 @@ resource "aws_iam_policy" "lake_formation_data_access" {
   policy      = data.aws_iam_policy_document.lake_formation_data_access.json
 }
 
+
+# LakeFormation Tag management
+# Policy Document
+
+data "aws_iam_policy_document" "lake_formation_tag_management" {
+  statement {
+    actions = [
+      "lakeformation:AddLFTagsToResource",
+      "lakeformation:RemoveLFTagsFromResource",
+      "lakeformation:GetLFTag",
+      "lakeformation:GetResourceLFTags"
+    ]
+    resources = [
+      "*"
+    ]
+  }
+}
+
+resource "aws_iam_policy" "lake_formation_tag_management" {
+  name        = "${local.project}-lake-formation-tag-management"
+  description = "Lake Formation Tag Management Policy"
+  policy      = data.aws_iam_policy_document.lake_formation_tag_management.json
+}
+
 # Analytical Platform Share Policy & Role
 
 data "aws_iam_policy_document" "analytical_platform_share_policy" {
@@ -794,6 +818,8 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   statement {
     effect = "Allow"
     actions = [
+
+      # Permission management
       "lakeformation:GrantPermissions",
       "lakeformation:RevokePermissions",
       "lakeformation:BatchGrantPermissions",
@@ -802,6 +828,11 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
       "lakeformation:DeregisterResource",
       "lakeformation:ListPermissions",
       "lakeformation:DescribeResource",
+
+      # LF tag read permissions (needed to grant tag-based access)
+      "lakeformation:GetResourceLFTags",
+      "lakeformation:ListLFTags", 
+      "lakeformation:GetLFTag"
 
     ]
     resources = [
