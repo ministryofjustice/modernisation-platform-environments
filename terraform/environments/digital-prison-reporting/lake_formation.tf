@@ -70,14 +70,3 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
   }
 }
 
-resource "aws_lakeformation_permissions" "developer_roles_get_data_access" {
-  for_each    = toset(data.aws_iam_roles.developer_roles.arns)
-  principal   = each.value
-  permissions = ["DATA_LOCATION_ACCESS"]
-
-  data_location {
-    arn = "arn:aws:s3:::${local.project}-*" // Adjust this ARN as needed for your data locations
-  }
-}
-
-
