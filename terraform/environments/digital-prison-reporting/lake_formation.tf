@@ -25,15 +25,11 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
-# Give mod platform developer role some LF permissions for accessing data
-resource "aws_lakeformation_permissions" "mod_platform_developer_get_data_access" {
+# Attach the lake_formation_data_access policy to the mod platform developer role
+resource "aws_iam_role_policy_attachment" "mod_platform_developer_lake_formation_data_access" {
   count      = length(try(one(data.aws_iam_roles.developer_roles.arns), [])) > 0 ? 1 : 0
-  principal  = try(one(data.aws_iam_roles.developer_roles.arns), "")
-  permissions = ["GET_DATA_ACCESS"]
-
-  data_location {
-    arn = "arn:aws:s3:::${local.project}-structured-historical-${local.environment}"
-  }
+  role       = try(one(data.aws_iam_roles.developer_roles.arns), "")
+  policy_arn = aws_iam_policy.lake_formation_data_access.arn
 }
 
 # Create the 'domain' tag with values
