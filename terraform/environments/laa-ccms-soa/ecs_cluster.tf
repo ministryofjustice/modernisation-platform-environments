@@ -112,7 +112,7 @@ resource "aws_ecs_service" "admin" {
 
   network_configuration {
     security_groups = [aws_security_group.ecs_tasks_admin.id]
-    subnets = data.aws_subnets.shared-private.ids
+    subnets         = data.aws_subnets.shared-private.ids
   }
 
   load_balancer {
@@ -202,7 +202,7 @@ resource "aws_ecs_service" "managed" {
 
   network_configuration {
     security_groups = [aws_security_group.ecs_tasks_managed.id]
-    subnets = data.aws_subnets.shared-private.ids
+    subnets         = data.aws_subnets.shared-private.ids
   }
 
   load_balancer {

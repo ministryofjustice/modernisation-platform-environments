@@ -29,7 +29,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role" {
 }
 
 resource "aws_iam_policy" "ecs_secrets_policy" {
-  name = "${local.application_data.accounts[local.environment].app_name}-ecs_secrets_policy"
+  name   = "${local.application_data.accounts[local.environment].app_name}-ecs_secrets_policy"
   policy = <<EOF
 {
   "Version": "2012-10-17",

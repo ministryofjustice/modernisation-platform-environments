@@ -1,4 +1,4 @@
-/* resource "aws_acm_certificate" "admin" {
+resource "aws_acm_certificate" "admin" {
   provider          = aws.core-vpc
   domain_name       = aws_route53_record.admin.fqdn
   validation_method = "DNS"
@@ -15,4 +15,3 @@ resource "aws_acm_certificate" "managed" {
     create_before_destroy = true
   }
 }
- */
