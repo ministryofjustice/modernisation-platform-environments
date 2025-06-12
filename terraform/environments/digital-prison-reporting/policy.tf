@@ -796,7 +796,9 @@ data "aws_iam_policy_document" "lake_formation_tag_management" {
       "lakeformation:AddLFTagsToResource",
       "lakeformation:RemoveLFTagsFromResource",
       "lakeformation:GetLFTag",
-      "lakeformation:GetResourceLFTags"
+      "lakeformation:GetResourceLFTags",
+      "lakeformation:AssociateLFTag",
+      "lakeformation:DisassociateLFTag"
     ]
     resources = [
       "*"
