@@ -98,6 +98,9 @@ def lambda_handler(event, context):
                     logger.info(f"Disabled {len(batch)} alarms")
                 elif action == "ENABLE":
                     cloudwatch.enable_alarm_actions(AlarmNames=batch)
+                    # We put newly re-enabled alarms into INSUFFICIENT_DATA state to force a re-evaulation.
+                    # A new PagerDuty notification will be sent for any which go into ALARM state on re-evaluation.
+                    cloudwatch.set_alarm_state(AlarmNames=batch,StateValue='INSUFFICIENT_DATA',StateReason='Re-evaluate alarm after AlarmActions re-enabled')
                     logger.info(f"Enabled {len(batch)} alarms")
                 else:
                     raise ValueError(f"Invalid action: {action}")
