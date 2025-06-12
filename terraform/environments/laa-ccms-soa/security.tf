@@ -5,7 +5,7 @@ resource "aws_security_group" "alb_admin" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "alb_admin_ingress_80" {
+/* resource "aws_security_group_rule" "alb_admin_ingress_80" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
   description       = "Admin HTTP - Private Subnets" #--Why?
@@ -13,7 +13,7 @@ resource "aws_security_group_rule" "alb_admin_ingress_80" {
   from_port         = 80
   to_port           = 80
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
+} */
 
 resource "aws_security_group_rule" "alb_admin_ingress_7001" {
   security_group_id = aws_security_group.alb_admin.id
@@ -25,7 +25,7 @@ resource "aws_security_group_rule" "alb_admin_ingress_7001" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "alb_admin_workspace_ingress_80" {
+/* resource "aws_security_group_rule" "alb_admin_workspace_ingress_80" {
   security_group_id = aws_security_group.alb_admin.id
   type              = "ingress"
   description       = "Admin Weblogic - AWS Workspaces" #--Why?
@@ -33,7 +33,7 @@ resource "aws_security_group_rule" "alb_admin_workspace_ingress_80" {
   from_port         = 80
   to_port           = 80
   cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
-}
+} */
 
 resource "aws_security_group_rule" "alb_admin_workspace_ingress_7001" {
   security_group_id = aws_security_group.alb_admin.id
@@ -62,7 +62,7 @@ resource "aws_security_group" "alb_managed" {
   vpc_id      = data.aws_vpc.shared.id
 }
 
-resource "aws_security_group_rule" "alb_managed_ingress_80" {
+/* resource "aws_security_group_rule" "alb_managed_ingress_80" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
   description       = "EM HTTP - Internal Subnets" #--Why?
@@ -70,7 +70,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_80" {
   from_port         = 80
   to_port           = 80
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
-}
+} */
 
 resource "aws_security_group_rule" "alb_managed_ingress_8001" {
   security_group_id = aws_security_group.alb_managed.id
@@ -82,7 +82,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_8001" {
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
 }
 
-resource "aws_security_group_rule" "alb_managed_ingress_cp80" {
+/* resource "aws_security_group_rule" "alb_managed_ingress_cp80" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
   description       = "EM HTTP - Cloud Platform" #--Why?
@@ -90,7 +90,7 @@ resource "aws_security_group_rule" "alb_managed_ingress_cp80" {
   from_port         = 80
   to_port           = 80
   cidr_blocks       = [local.application_data.accounts[local.environment].cloud_platform_cidr]
-}
+} */
 
 resource "aws_security_group_rule" "alb_managed_ingress_cp8001" {
   security_group_id = aws_security_group.alb_managed.id
