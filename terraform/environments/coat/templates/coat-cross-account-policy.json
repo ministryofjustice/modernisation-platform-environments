@@ -5,12 +5,15 @@
       "Sid": "S3CrossAccountReadWrite",
       "Effect": "Allow",
       "Action": [
+            "s3:ListBucket",
             "s3:GetObject",
             "s3:PutObject", 
             "s3:PutObjectAcl"
       ],
       "Resource": [
+            "arn:aws:s3:::coat-${environment}-cur-v2-hourly",
             "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*",
+            "arn:aws:s3:::coat-reports-${environment}",
             "arn:aws:s3:::coat-reports-${environment}/*"
       ]
     }

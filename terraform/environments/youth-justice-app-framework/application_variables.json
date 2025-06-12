@@ -126,7 +126,7 @@
           "create_records": false
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     }
   }
 }

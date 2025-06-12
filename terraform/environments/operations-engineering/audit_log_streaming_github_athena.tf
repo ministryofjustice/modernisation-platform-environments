@@ -14,11 +14,16 @@ resource "aws_athena_workgroup" "github_auditlog" {
   configuration {
     result_configuration {
       output_location = "s3://${module.github_audit_log_athena_results.bucket.id}/results/"
+
+      encryption_configuration {
+        encryption_option = "SSE_KMS"
+        kms_key_arn       = data.aws_kms_key.github_auditlog.arn
+      }
     }
 
     enforce_workgroup_configuration    = true
     publish_cloudwatch_metrics_enabled = true
-    bytes_scanned_cutoff_per_query     = 1000000000 # 1GB
+    bytes_scanned_cutoff_per_query     = 10000000000 # 10GB
     requester_pays_enabled             = false
   }
 
@@ -94,7 +99,7 @@ resource "aws_iam_role_policy" "glue_github_auditlog_policy" {
           "logs:CreateLogStream",
           "logs:PutLogEvents"
         ],
-        Resource = "*"
+        Resource = "arn:aws:logs:${local.aws_region}:${local.account_id}:log-group:/aws-glue/crawlers:*"
       },
       {
         Sid    = "AllowKMSEncryptDecrypt",
@@ -116,6 +121,14 @@ resource "aws_glue_crawler" "github_auditlog" {
 
   s3_target {
     path = "s3://${module.github-cloudtrail-auditlog.github_auditlog_s3bucket}/"
+    exclusions = [
+      "2024/*",
+      "2025/01/*",
+      "2025/02/*",
+      "2025/03/*",
+      "2025/04/*",
+      "2025/05/*",
+    ]
   }
 
   configuration = jsonencode({
@@ -131,7 +144,11 @@ resource "aws_glue_crawler" "github_auditlog" {
   })
 
   recrawl_policy {
-    recrawl_behavior = "CRAWL_EVERYTHING"
+    recrawl_behavior = "CRAWL_NEW_FOLDERS_ONLY"
+  }
+  schema_change_policy {
+    delete_behavior = "LOG"
+    update_behavior = "LOG"
   }
   schedule = "cron(0 7 * * ? *)"
   tags     = local.tags
