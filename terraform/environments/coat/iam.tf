@@ -48,6 +48,6 @@ resource "aws_iam_policy" "coat_cross_account_policy" {
 
 resource "aws_iam_role_policy_attachment" "coat_cross_account_attachment" {
   count      = local.is-production ? 1 : 0
-  role       = aws_iam_role.coat_cross_account_role.name
-  policy_arn = aws_iam_policy.coat_cross_account_policy.arn
+  role       = aws_iam_role.coat_cross_account_role.0.name
+  policy_arn = aws_iam_policy.coat_cross_account_policy.0.arn
 }
