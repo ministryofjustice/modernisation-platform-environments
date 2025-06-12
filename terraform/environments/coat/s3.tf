@@ -53,65 +53,6 @@ module "cur_s3_kms" {
   tags = local.tags
 }
 
-# data "aws_iam_policy_document" "cur_v2_bucket_policy" {
-#   #checkov:skip=CKV_AWS_356:resource "*" limited by condition
-#   statement {
-#     effect  = "Allow"
-#     actions = ["s3:PutObject"]
-#     resources = [
-#       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
-#       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
-#     ]
-#     principals {
-#       type        = "Service"
-#       identifiers = ["bcm-data-exports.amazonaws.com"]
-#     }
-#   }
-
-#   statement {
-#     effect  = "Allow"
-#     actions = ["s3:ListBucket", "s3:GetBucketLocation"]
-#     resources = [
-#       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
-#     ]
-#     principals {
-#       type        = "Service"
-#       identifiers = ["bcm-data-exports.amazonaws.com"]
-#     }
-#   }
-
-#   statement {
-#     effect  = "Allow"
-#     actions = ["s3:ReplicateObject", "s3:ReplicateDelete", "s3:GetBucketVersioning", "s3:PutBucketVersioning"]
-#     resources = [
-#       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/*",
-#       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly"
-#     ]
-#     principals {
-#       type        = "AWS"
-#       identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
-#     }
-#   }
-
-#   statement {
-#     effect = "Allow"
-
-#     actions = [
-#       "s3:GetObject",
-#       "s3:PutObject"
-#     ]
-
-#     resources = [
-#       "arn:aws:s3:::coat-${local.environment}-cur-v2-hourly/athena-results/*"
-#     ]
-
-#     principals {
-#       type        = "Service"
-#       identifiers = ["athena.amazonaws.com"]
-#     }
-#   }
-# }
-
 module "cur_v2_hourly" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
