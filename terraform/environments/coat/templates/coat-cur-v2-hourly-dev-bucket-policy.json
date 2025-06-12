@@ -46,7 +46,7 @@
            "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
       ],
       "Principal": {
-        "AWS": ["arn:aws:iam::${cross_env_account_id}:role/moj-coat-cur-reports-cross-role"]
+        "AWS": ["arn:aws:iam::${cross_env_account_id}:role/moj-coat-${prod_environment}-cur-reports-cross-role"]
       }
     },
     {
