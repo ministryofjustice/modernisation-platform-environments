@@ -125,3 +125,39 @@ resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"] # Restrict to what's needed
 }
+
+# RDS Security Group
+resource "aws_security_group" "tds_db" {
+  name        = "${local.application_name}-tds-allow-db"
+  description = "Allow DB inbound traffic"
+  vpc_id      = data.aws_vpc.shared.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "tds_db_ingress" {
+  count             = length(local.private_subnets_cidr_blocks)
+  security_group_id = aws_security_group.tds_db.id
+  description       = "Database Ingress"
+  ip_protocol       = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
+}
+
+resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
+  security_group_id = aws_security_group.tds_db.id
+  description       = "Workspace to Database Ingress"
+  ip_protocol       = "TCP"
+  from_port         = 1521
+  to_port           = 1521
+  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace
+}
+
+resource "aws_security_group_rule" "tds_db_egress_all" {
+  security_group_id = aws_security_group.tds_db.id
+  type              = "egress"
+  description       = "All Egress"
+  protocol          = -1
+  from_port         = 0
+  to_port           = 0
+  cidr_blocks       = ["0.0.0.0/0"]
+}
