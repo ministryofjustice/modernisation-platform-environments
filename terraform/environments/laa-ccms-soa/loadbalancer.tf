@@ -36,17 +36,17 @@ resource "aws_lb_listener" "admin80" {
   }
 }
 
-/* resource "aws_lb_listener" "admin443" {
+resource "aws_lb_listener" "admin443" {
   load_balancer_arn = aws_lb.admin.id
   port              = 443
   protocol          = "TCP"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = aws_acm_certificate.admin.arn
+  certificate_arn   = aws_acm_certificate.soa.arn
   default_action {
     target_group_arn = aws_lb_target_group.admin.id
     type             = "forward"
   }
-} */
+}
 
 resource "aws_lb_listener" "admin_server_port" {
   load_balancer_arn = aws_lb.admin.id
@@ -94,17 +94,17 @@ resource "aws_lb_listener" "managed80" {
   }
 }
 
-/* resource "aws_lb_listener" "managed443" {
+resource "aws_lb_listener" "managed443" {
   load_balancer_arn = aws_lb.managed.id
   port              = 443
   protocol          = "TCP"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-  certificate_arn   = aws_acm_certificate.managed.arn
+  certificate_arn   = aws_acm_certificate.soa.arn
   default_action {
     target_group_arn = aws_lb_target_group.managed.id
     type             = "forward"
   }
-} */
+}
 
 resource "aws_lb_listener" "managed_server_port" {
   load_balancer_arn = aws_lb.managed.id
