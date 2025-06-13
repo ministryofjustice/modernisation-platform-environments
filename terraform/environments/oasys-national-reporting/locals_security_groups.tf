@@ -565,6 +565,20 @@ locals {
           protocol    = -1
           self        = true
         }
+        oasys_db_onr_db_1521 = {
+          description = "1521: TCP Oracle DB access ingress from Oasys db servers to ONR DB server"
+          from_port   = 1521
+          to_port     = 1521
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oasys_db
+        }
+        oasys_db_onr_db_7443 = {
+          description = "7443: TCP Oracle DB access ingress from Oasys db servers to ONR DB server"
+          from_port   = 7443
+          to_port     = 7443
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.oasys_db
+        }
         rdp_3389_tcp = {
           description = "3389: rdp tcp"
           from_port   = 3389
