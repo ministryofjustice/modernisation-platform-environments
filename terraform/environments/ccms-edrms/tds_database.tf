@@ -30,6 +30,7 @@ resource "aws_db_instance" "tds_db" {
   port                                = "1521"
   kms_key_id                          = data.aws_kms_key.rds_shared.arn
   storage_encrypted                   = true
+  skip_final_snapshot                 = true
   iam_database_authentication_enabled = false
   vpc_security_group_ids = [
     aws_security_group.tds_db.id
@@ -42,7 +43,7 @@ resource "aws_db_instance" "tds_db" {
   db_subnet_group_name    = aws_db_subnet_group.tds.id
   option_group_name       = aws_db_option_group.tds_oracle_19.id
   license_model           = "bring-your-own-license"
-  skip_final_snapshot     = true
+
 
   timeouts {
     create = "40m"
