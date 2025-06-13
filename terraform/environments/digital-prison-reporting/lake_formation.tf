@@ -27,6 +27,13 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
+# Give the cadet cross-account role LF data access
+resource "aws_iam_role_policy_attachment" "dataapi_cross_role_lake_formation_data_access" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_data_access.arn
+}
+
+
 # Create the 'domain' tag with values
 resource "aws_lakeformation_lf_tag" "domain_tag" {
   key    = "domain"
@@ -60,4 +67,5 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
     values = aws_lakeformation_lf_tag.sensitive_tag.values
   }
 }
+
 
