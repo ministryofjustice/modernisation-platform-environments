@@ -116,6 +116,21 @@ resource "aws_vpc_security_group_ingress_rule" "rds_glue_ingress" {
 }
 
 # -------------------------------------------------------
+# Glue-S3 & S3-Glue Security Group Rules
+# -------------------------------------------------------
+
+resource "aws_security_group_rule" "glue_s3_egress" {
+
+  security_group_id = aws_security_group.glue_rds_conn_security_group.id
+  type              = "egress"
+  cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
+  protocol          = "tcp"
+  from_port         = 433
+  to_port           = 433
+  description       = "Glue          -----[https]-----+ S3 endpoints"
+}
+
+# -------------------------------------------------------
 # Glue self-referencing rules
 # -------------------------------------------------------
 
