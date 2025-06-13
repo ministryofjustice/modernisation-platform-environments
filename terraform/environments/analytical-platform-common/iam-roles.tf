@@ -24,7 +24,7 @@ module "analytical_platform_github_actions_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
-  version = "5.52.2"
+  version = "5.58.0"
 
   name = "analytical-platform-github-actions"
 
@@ -42,7 +42,7 @@ module "analytical_platform_terraform_iam_role" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
-  version = "5.52.2"
+  version = "5.58.0"
 
   create_role = true
 
@@ -52,6 +52,43 @@ module "analytical_platform_terraform_iam_role" {
   trusted_role_arns = [module.analytical_platform_github_actions_iam_role.arn]
 
   custom_role_policy_arns = [module.analytical_platform_terraform_iam_policy.arn]
+
+  tags = local.tags
+}
+
+module "data_engineering_github_actions_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-github-oidc-role"
+  version = "5.58.0"
+
+  name = "data-engineering-github-actions"
+
+  subjects = ["ministryofjustice/data-engineering-datalake-access:*"]
+
+  policies = {
+    data_engineering_github_actions = module.data_engineering_github_actions_iam_policy.arn
+  }
+
+  tags = local.tags
+}
+
+module "data_engineering_terraform_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.58.0"
+
+  create_role = true
+
+  role_name         = "data-engineering-terraform"
+  role_requires_mfa = false
+
+  trusted_role_arns = [module.data_engineering_github_actions_iam_role.arn]
+
+  custom_role_policy_arns = [module.data_engineering_terraform_iam_policy.arn]
 
   tags = local.tags
 }

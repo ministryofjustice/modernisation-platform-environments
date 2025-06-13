@@ -115,7 +115,7 @@ module "analytical_platform_terraform_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.2"
+  version = "5.58.0"
 
   name_prefix = "analytical-platform-terraform"
 
@@ -163,11 +163,77 @@ module "analytical_platform_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.52.2"
+  version = "5.58.0"
 
   name_prefix = "analytical-platform-github-actions"
 
   policy = data.aws_iam_policy_document.analytical_platform_github_actions.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "data_engineering_github_actions" {
+  statement {
+    sid       = "AllowAssumeRole"
+    effect    = "Allow"
+    actions   = ["sts:AssumeRole"]
+    resources = [module.analytical_platform_terraform_iam_role.iam_role_arn]
+  }
+}
+
+module "data_engineering_github_actions_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.58.0"
+
+  name_prefix = "data-engineering-github-actions"
+
+  policy = data.aws_iam_policy_document.data_engineering_github_actions.json
+
+  tags = local.tags
+}
+
+data "aws_iam_policy_document" "data_engineering_terraform" {
+  statement {
+    sid    = "AllowKMS"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:Encrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [module.terraform_s3_kms.key_arn]
+  }
+  statement {
+    sid       = "AllowS3List"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [module.terraform_bucket.s3_bucket_arn]
+  }
+  statement {
+    sid    = "AllowS3Write"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = ["${module.terraform_bucket.s3_bucket_arn}/data-engineering/*"]
+  }
+}
+
+module "data_engineering_terraform_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.58.0"
+
+  name_prefix = "data-engineering-terraform"
+
+  policy = data.aws_iam_policy_document.data_engineering_terraform.json
 
   tags = local.tags
 }
