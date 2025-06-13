@@ -29,15 +29,3 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     principal   = "IAM_ALLOWED_PRINCIPALS"
   }
 }
-
-# Create the 'domain' tag with values
-resource "aws_lakeformation_lf_tag" "domain_tag" {
-  key    = "domain"
-  values = ["prisons", "probation", "electronic-monitoring"]
-}
-
-# Create the 'sensitive' tag - with values agreed with Justice Digital
-resource "aws_lakeformation_lf_tag" "sensitive_tag" {
-  key    = "sensitive"
-  values = ["true", "false", "data_linking"]
-}
