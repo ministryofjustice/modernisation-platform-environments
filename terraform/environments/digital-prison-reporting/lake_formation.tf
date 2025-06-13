@@ -7,6 +7,7 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     try(one(data.aws_iam_roles.data_engineering_roles.arns), []),
 
     # Make Developer role a LF admin
+    # As cannot give them the permissions (lakeformation:GetDataAccess)
     length(data.aws_iam_roles.developer_roles.arns) > 0 ? [one(data.aws_iam_roles.developer_roles.arns)] : [],
 
 
