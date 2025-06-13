@@ -120,14 +120,14 @@ resource "aws_vpc_security_group_ingress_rule" "rds_glue_ingress" {
 # -------------------------------------------------------
 
 resource "aws_security_group_rule" "glue_s3_egress" {
-
+  for_each          = toset([for port in var.sqlserver_https_ports : tostring(port)])
   security_group_id = aws_security_group.glue_rds_conn_security_group.id
   type              = "egress"
   cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
   protocol          = "tcp"
-  from_port         = 433
-  to_port           = 433
-  description       = "Glue          -----[https]-----+ S3 endpoints"
+  from_port         = each.value
+  to_port           = each.value
+  description       = "Glue          -----[https+443/1443]-----+ S3 endpoints"
 }
 
 # -------------------------------------------------------
