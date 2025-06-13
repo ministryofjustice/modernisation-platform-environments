@@ -601,6 +601,7 @@ module "share_glue_db_with_glue_role" {
   data_bucket_lf_resource = aws_lakeformation_resource.rds_bucket.arn
   role_arn                = aws_iam_role.dms_dv_glue_job_iam_role.arn
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+  db_exists               = true
 }
 
 data "aws_secretsmanager_secret" "airflow_ssh_secret" {
