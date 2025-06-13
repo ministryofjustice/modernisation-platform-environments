@@ -6,3 +6,8 @@ resource "aws_acm_certificate" "soa" {
     create_before_destroy = true
   }
 }
+
+resource "aws_acm_certificate_validation" "soa" {
+  certificate_arn         = aws_acm_certificate.soa.arn
+  validation_record_fqdns = [for record in aws_route53_record.validation : record.fqdn]
+}
