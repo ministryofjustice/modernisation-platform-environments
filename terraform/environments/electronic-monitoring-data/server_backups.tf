@@ -136,6 +136,20 @@ resource "aws_db_subnet_group" "db" {
   tags = local.tags
 }
 
+# -----------------------------------------------------------------------
+# Rule necessary for at least one security group to open all egress ports
+# -----------------------------------------------------------------------
+
+resource "aws_vpc_security_group_egress_rule" "rds_egress_all" {
+
+  security_group_id            = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.db.id
+  ip_protocol                  = "tcp"
+  from_port                    = 0
+  to_port                      = 65535
+  description                  = "RDS Database -----[mssql]-----+ * All egress traffic"
+}
+
 #------------------------------------------------------------------------------
 # Option group configuration for database
 #------------------------------------------------------------------------------
