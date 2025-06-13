@@ -1,16 +1,18 @@
-module "ui_rds" {
+module "dashboard_service_rds" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/rds/aws"
-  version = "6.11.0"
+  count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
-  identifier = "ui"
+  source  = "terraform-aws-modules/rds/aws"
+  version = "6.12.0"
+
+  identifier = "dashboard-service"
 
   engine               = "postgres"
-  engine_version       = "16"
-  family               = "postgres16"
-  major_engine_version = "16"
+  engine_version       = "17"
+  family               = "postgres17"
+  major_engine_version = "17"
   instance_class       = "db.t4g.medium"
 
   ca_cert_identifier = "rds-ca-rsa2048-g1"
@@ -20,14 +22,15 @@ module "ui_rds" {
   max_allocated_storage = 256
 
   multi_az               = true
-  db_subnet_group_name   = module.vpc.database_subnet_group
-  vpc_security_group_ids = [module.rds_security_group.security_group_id]
+  db_subnet_group_name   = data.aws_db_subnet_group.apc_database_subnet_group.name
+  vpc_security_group_ids = terraform.workspace == "analytical-platform-compute-test" ? [] : [module.rds_security_group[0].security_group_id]
 
-  username                    = "ui"
-  db_name                     = "ui"
+
+  username                    = "dashboard_service"
+  db_name                     = "dashboard_service"
   manage_master_user_password = false
-  password                    = random_password.ui_rds.result
-  kms_key_id                  = module.ui_rds_kms.key_arn
+  password                    = random_password.dashboard_service_rds[0].result
+  kms_key_id                  = module.dashboard_service_rds_kms[0].key_arn
 
   parameters = [
     {
@@ -58,8 +61,8 @@ module "ui_rds" {
 
   create_monitoring_role          = true
   monitoring_role_use_name_prefix = true
-  monitoring_role_name            = "ui-rds-monitoring"
-  monitoring_role_description     = "Enhanced Monitoring for UI RDS"
+  monitoring_role_name            = "dashboard-service-rds-monitoring"
+  monitoring_role_description     = "Enhanced Monitoring for Dashbaord Service RDS"
   monitoring_interval             = 30
   enabled_cloudwatch_logs_exports = ["postgresql", "upgrade"]
 
