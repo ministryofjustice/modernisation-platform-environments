@@ -6,6 +6,9 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     # Make Data engineer role a LF admin
     try(one(data.aws_iam_roles.data_engineering_roles.arns), []),
 
+    # Make Developer role a LF admin
+    try(one(data.aws_iam_roles.developer_roles.arns), []),
+
     # Make the cross-account runner used by create-a-derived table LF admin
     aws_iam_role.dataapi_cross_role.arn
     ]
@@ -24,15 +27,6 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     principal   = "IAM_ALLOWED_PRINCIPALS"
   }
 }
-
-# Attach the lake_formation_data_access policy to all mod platform developer roles
-resource "aws_iam_role_policy_attachment" "lake_formation_data_access_attachment" {
-  for_each = toset(data.aws_iam_roles.developer_roles.arns != null ? data.aws_iam_roles.developer_roles.arns : [])
-  
-  policy_arn = aws_iam_policy.lake_formation_data_access.arn
-  role       = basename(each.value)
-}
-
 
 # Create the 'domain' tag with values
 resource "aws_lakeformation_lf_tag" "domain_tag" {
