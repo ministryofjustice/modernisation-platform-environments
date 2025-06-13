@@ -23,7 +23,8 @@ module "dashboard_service_rds" {
 
   multi_az               = true
   db_subnet_group_name   = data.aws_db_subnet_group.apc_database_subnet_group.name
-  vpc_security_group_ids = [module.rds_security_group.security_group_id]
+  vpc_security_group_ids = terraform.workspace == "analytical-platform-compute-test" ? [] : [module.rds_security_group[0].security_group_id]
+
 
   username                    = "dashboard_service"
   db_name                     = "dashboard_service"
