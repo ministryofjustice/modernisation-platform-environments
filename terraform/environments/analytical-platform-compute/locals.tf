@@ -17,7 +17,7 @@ locals {
   eks_cloudwatch_log_group_retention_in_days = 400
 
   /* Kube Prometheus Stack */
-  prometheus_operator_crd_version = "v0.81.0"
+  prometheus_operator_crd_version = "v0.82.2"
 
   /* Mapping Analytical Platform Environments to Modernisation Platform */
 
