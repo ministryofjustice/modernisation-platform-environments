@@ -32,6 +32,7 @@ resource "aws_iam_role" "coat_cross_account_role" {
   assume_role_policy = templatefile("${path.module}/templates/coat-cross-account-assume-role-policy.json",
     {
       cross_account_role = "arn:aws:iam::${local.coat_prod_account_id}:role/moj-coat-${local.prod_environment}-cur-reports-cross-role"
+      mp_dev_role_arn    = data.aws_iam_role.moj_mp_dev_role[0].arn
     }
   )
 }
