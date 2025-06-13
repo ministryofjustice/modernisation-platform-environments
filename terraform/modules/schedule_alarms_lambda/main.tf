@@ -92,6 +92,7 @@ data "aws_iam_policy_document" "lambda_cloudwatch" {
       "cloudwatch:DescribeAlarms",
       "cloudwatch:DisableAlarmActions",
       "cloudwatch:EnableAlarmActions",
+      "cloudwatch:SetAlarmState",
     ]
     resources = ["arn:aws:cloudwatch:*:*:alarm:*"]
   }
