@@ -42,6 +42,7 @@ resource "aws_db_instance" "tds_db" {
   db_subnet_group_name    = aws_db_subnet_group.tds.id
   option_group_name       = aws_db_option_group.tds_oracle_19.id
   license_model           = "bring-your-own-license"
+  skip_final_snapshot     = true
 
   timeouts {
     create = "40m"
