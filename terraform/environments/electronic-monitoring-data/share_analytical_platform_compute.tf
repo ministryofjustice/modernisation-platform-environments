@@ -594,6 +594,14 @@ module "share_non_cadt_dbs_with_roles" {
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
+module "share_glue_db_with_glue_role" {
+  count                   = local.is-production ? 1 : 0
+  source                  = "./modules/lakeformation_database_share"
+  dbs_to_grant            = ["dms_data_validation"]
+  data_bucket_lf_resource = aws_lakeformation_resource.rds_bucket.arn
+  role_arn                = aws_iam_role.dms_dv_glue_job_iam_role.arn
+  de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
+}
 
 data "aws_secretsmanager_secret" "airflow_ssh_secret" {
   name = aws_secretsmanager_secret.airflow_secret[0].id
