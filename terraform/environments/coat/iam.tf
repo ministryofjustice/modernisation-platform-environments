@@ -25,7 +25,7 @@ resource "aws_iam_role_policy_attachment" "coat_github_actions_report_upload_att
   policy_arn = aws_iam_policy.coat_gh_actions_policy.arn
 }
 
-#COAT Cross account role policies
+#COAT Cross account role policies with mp dev SSO role
 resource "aws_iam_role" "coat_cross_account_role" {
   count = local.is-production ? 1 : 0
   name  = "moj-coat-${local.environment}-cur-reports-cross-role"
