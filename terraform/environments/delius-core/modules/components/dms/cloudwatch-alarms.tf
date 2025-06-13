@@ -171,6 +171,7 @@ module "pagerduty_core_alerts" {
 # It is not practical to block these alarms in PagerDuty since it does not support recurring maintenance windows.
 # Therefore we want to stop the alarm being raised in the first place.   We can do this by disabling the alarm actions out
 # of hours.   Cloud Watch alarms do not have this functionality natively so we use a scheduled Lambda function to implement it.
+# This function will also disable the CDC task not-running alarm out of hours.
 locals {
   disable_latency_alarm_defaults = {
     start_time      = null
@@ -191,156 +192,128 @@ module "disable_out_of_hours_alarms" {
   end_time        = local.disable_latency_alarms.end_time
   disable_weekend = local.disable_latency_alarms.disable_weekend
 
-  alarm_patterns = ["dms-cdc-latency-*"]
+  alarm_patterns = ["dms-cdc-latency-*", "dms-cdc-task-not-running-*"]
 
   tags = var.tags
 }
 
-
-# Raising a Cloudwatch Alarm on a DMS Replication Task Event is not directly possible using the 
-# Cloudwatch Alarm Integration in PagerDuty as the JSON payload is different.   Therefore, as
-# workaround for this we create a custom Cloudwatch Metric which is populated by the replication event and
-# create a Cloudwatch Alarm on this Metric in the usual way to allow for raising alarms.
-
-# Create Role which allows Lamdba to put a custom cloudwatch metric
-resource "aws_iam_role" "lambda_put_metric_data_role" {
-  name = "lambda-put-metric-data-role"
+# IAM Role for Lambda
+resource "aws_iam_role" "lambda_exec" {
+  name = "dms-checker-lambda-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [
-      {
-        Action = "sts:AssumeRole",
-        Effect = "Allow",
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Effect = "Allow",
+      Principal = {
+        Service = "lambda.amazonaws.com"
       }
-    ]
+    }]
   })
 }
 
-resource "aws_iam_policy" "lambda_put_metric_data_policy" {
-  name = "lambda-put-metric-data-policy"
+# IAM Policy for Lambda (permissions to describe DMS tasks and write to the clodwatch logs)
+resource "aws_iam_role_policy" "lambda_policy" {
+  name = "dms-checker-policy"
+  role = aws_iam_role.lambda_exec.id
 
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
+      {
+        Action = [
+          "dms:DescribeReplicationTasks"
+        ],
+        Effect   = "Allow",
+        Resource = "*"
+      },
       {
         Effect = "Allow",
         Action = [
           "cloudwatch:PutMetricData"
         ],
         Resource = "*"
+      },
+      {
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        Effect   = "Allow",
+        Resource = "*"
       }
     ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_policy_attach" {
-  role       = aws_iam_role.lambda_put_metric_data_role.name
-  policy_arn = aws_iam_policy.lambda_put_metric_data_policy.arn
+
+# Creates a ZIP file which
+# contains a Python script to check if any DMS replication task is not running
+data "archive_file" "lambda_dms_replication_stopped_zip" {
+  type        = "zip"
+  source_file = "${path.module}/lambda/detect_stopped_replication.py"
+  output_path = "${path.module}/lambda/detect_stopped_replication.zip"
 }
 
-# Allow Cloudwatch Logging
-resource "aws_iam_role_policy_attachment" "lambda_put_metric_data_logging_attach" {
-  role       = aws_iam_role.lambda_put_metric_data_role.name
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
+# Lambda Function to check DMS replication is not running (source in Zip archive)
+resource "aws_lambda_function" "dms_checker" {
+  function_name = "dms-task-health-checker"
+  role          = aws_iam_role.lambda_exec.arn
+  handler       = "detect_stopped_replication.lambda_handler"
+  runtime       = "python3.11"
+  timeout       = 30
+  filename      = "${path.module}/lambda/detect_stopped_replication.zip"
 
-locals {
-  rendered_metric_template = templatefile("${path.module}/lambda/dms_replication_metric.py.tmpl", { oracle_db_instance_scheduling = var.oracle_db_instance_scheduling })
-}
+  # Automatically triggers redeploy when code changes
+  source_code_hash = data.archive_file.lambda_dms_replication_stopped_zip.output_base64sha256
 
-# Creates a ZIP file containing the contents of the lambda directory which
-# contains a Python script to calculate and put the custom metric
-data "archive_file" "lambda_dms_replication_metric_zip" {
-  type                    = "zip"
-  source_content          = local.rendered_metric_template
-  source_content_filename = "dms_replication_metric.py"
-  output_path             = "${path.module}/lambda/dms_replication_metric.zip"
-}
-
-# Define a Lambda Function using the python script in the ZIP file -
-# we define the namespace of the custom metric (CustomDMSMetrics)
-# and the Metric Name (DMSReplication Failure).   The value of this
-# metric is 0 if the replication task is not stopped (normal state),
-# and 1 if not (whether it has been stopped manually or has failed)
-resource "aws_lambda_function" "dms_replication_metric_publisher" {
-  function_name    = "dms-replication-metric-publisher"
-  role             = aws_iam_role.lambda_put_metric_data_role.arn
-  handler          = "dms_replication_metric.lambda_handler"
-  runtime          = "python3.8"
-  filename         = data.archive_file.lambda_dms_replication_metric_zip.output_path
-  source_code_hash = data.archive_file.lambda_dms_replication_metric_zip.output_base64sha256
   environment {
     variables = {
-      METRIC_NAMESPACE = "CustomDMSMetrics",
-      METRIC_NAME      = "DMSReplicationFailure"
-      TZ               = "Europe/London"
+      SNS_TOPIC_ARN = aws_sns_topic.dms_alerts_topic.arn
     }
   }
-
-  depends_on = [data.archive_file.lambda_dms_replication_metric_zip]
 }
 
-# Set Lambda function to allow the Replication Events call this functions
-resource "aws_lambda_permission" "allow_sns_invoke_dms_replication_metric_publisher_handler" {
-  statement_id  = "AllowSNSInvoke"
+# EventBridge Rule to Trigger Lambda Every 15 Minutes (We hardcode this for now for simplicity - can change it if it needs to be configurable)
+resource "aws_cloudwatch_event_rule" "check_dms_every_15_min" {
+  name                = "check-dms-every-15-minutes"
+  schedule_expression = "rate(15 minutes)"
+}
+
+resource "aws_cloudwatch_event_target" "lambda_trigger" {
+  rule      = aws_cloudwatch_event_rule.check_dms_every_15_min.name
+  target_id = "dms-task-check"
+  arn       = aws_lambda_function.dms_checker.arn
+}
+
+# Permission for EventBridge to invoke Lambda
+resource "aws_lambda_permission" "allow_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.dms_replication_metric_publisher.function_name
-  principal     = "sns.amazonaws.com"
-
-  source_arn = aws_sns_topic.dms_events_topic.arn
+  function_name = aws_lambda_function.dms_checker.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.check_dms_every_15_min.arn
 }
 
-resource "aws_cloudwatch_metric_alarm" "dms_replication_stopped_alarm" {
-  for_each            = toset(local.replication_task_names)
-  alarm_name          = "DMSReplicationStoppedAlarm_${each.key}"
-  alarm_description   = "Alarm when Stopped Replication Task for ${each.key}"
-  comparison_operator = "GreaterThanThreshold"
+# Raising a Cloudwatch Alarm on a DMS Replication Task Event is not directly possible using the 
+# Cloudwatch Alarm Integration in PagerDuty as the JSON payload is different.   Therefore, as
+# workaround for this we create a custom Cloudwatch Metric which is populated by the
+# DMS Health Checker Lambda Function.
+
+resource "aws_cloudwatch_metric_alarm" "dms_alarm" {
+  alarm_name          = "dms-cdc-task-not-running-in-${var.env_name}"
+  comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = 1
-  threshold           = 0
-  treat_missing_data  = "ignore"
-  datapoints_to_alarm = 1
-  namespace           = "CustomDMSMetrics"
-  metric_name         = "DMSReplicationStopped"
+  metric_name         = "DMSTaskNotRunning"
+  namespace           = "Custom/DMS"
+  period              = 300
   statistic           = "Maximum"
-  period              = "60"
+  threshold           = 1
 
-  dimensions = {
-    SourceId = each.key
-  }
-
-  alarm_actions = [aws_sns_topic.dms_alerts_topic.arn]
-  ok_actions    = [aws_sns_topic.dms_alerts_topic.arn]
-}
-
-
-
-# SNS Topic for DMS replication events
-# This is NOT the same as for DMS Cloudwatch Alarms (dms_alerting)
-# and is used to trigger the Lamda function if an event happens during
-# DMS Replication (Events are NOT detected by CloudWatch Alarms)
-resource "aws_sns_topic" "dms_events_topic" {
-  name = "delius-dms-events-topic"
-
-  lambda_success_feedback_role_arn    = aws_iam_role.sns_logging_role.arn
-  lambda_success_feedback_sample_rate = 100
-  lambda_failure_feedback_role_arn    = aws_iam_role.sns_logging_role.arn
-}
-
-resource "aws_sns_topic_subscription" "dms_events_lambda_subscription" {
-  topic_arn = aws_sns_topic.dms_events_topic.arn
-  protocol  = "lambda"
-  endpoint  = aws_lambda_function.dms_replication_metric_publisher.arn
-}
-
-# We handle State Change and Failure DMS Events
-resource "aws_dms_event_subscription" "dms_task_event_subscription" {
-  name             = "dms-task-event-alerts"
-  sns_topic_arn    = aws_sns_topic.dms_events_topic.arn
-  source_type      = "replication-task"
-  event_categories = ["state change", "failure"]
-  enabled          = true
+  alarm_description = "Triggered when any DMS replication task is not running"
+  actions_enabled   = true
+  alarm_actions     = [aws_sns_topic.dms_alerts_topic.arn]
+  ok_actions        = [aws_sns_topic.dms_alerts_topic.arn]
 }

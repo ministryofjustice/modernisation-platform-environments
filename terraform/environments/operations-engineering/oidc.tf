@@ -1,8 +1,3 @@
-locals {
-  oidc_provider = "token.actions.githubusercontent.com"
-  account_id    = local.environment_management.account_ids[terraform.workspace]
-}
-
 resource "aws_iam_openid_connect_provider" "github" {
   url = "https://oidc-configuration.audit-log.githubusercontent.com"
 
@@ -38,3 +33,4 @@ data "aws_iam_policy_document" "github_actions_assume_role_policy_document" {
     }
   }
 }
+

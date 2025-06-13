@@ -8,7 +8,7 @@ locals {
 }
 
 module "bastion_linux" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=v4.4.2"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=aa44d28a832a5071f7bde436646d4639b0444737" #v4.4.2
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -31,7 +31,7 @@ module "bastion_linux" {
   environment        = local.environment
   region             = "eu-west-2"
   # Autoscaling
-  autoscaling_cron   = local.crontab
+  autoscaling_cron = local.crontab
 
   # Tags
   tags_common = local.tags

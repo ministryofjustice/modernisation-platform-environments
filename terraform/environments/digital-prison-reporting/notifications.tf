@@ -92,6 +92,7 @@ module "dms_failure_state_rule" {
 {
   "source": ["aws.dms"],
   "detail": {
+    "type": ["REPLICATION_TASK"],
     "category": ["Failure"]
   }
 }

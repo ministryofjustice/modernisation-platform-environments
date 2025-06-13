@@ -67,6 +67,22 @@ resource "aws_security_group" "internal_sg" {
   }
 
   ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["10.100.50.0/24"]
+    description = "Management to Juniper SSH Interfaces"
+  }
+
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["10.100.50.0/24"]
+    description = "Management to Juniper HTTPS interfaces"
+  }
+
+  ingress {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"

@@ -43,58 +43,12 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
   }
 
   target {
-    name           = "EC2Instances"
-    resource_type  = "aws:ec2:instance"
-    selection_mode = "ALL"
-    resource_tag {
-      key   = "AzImpairmentPower"
-      value = "StopInstances"
-    }
-    filter {
-      path   = "State.Name"
-      values = ["running"]
-    }
-    filter {
-      path   = "Placement.AvailabilityZone"
-      values = ["eu-west-2b"]
-    }
-  }
-
-  target {
-    name           = "Volumes"
-    resource_type  = "aws:ec2:ebs-volume"
-    selection_mode = "COUNT(1)"
-    resource_tag {
-      key   = "AzImpairmentPower"
-      value = "ApiPauseVolume"
-    }
-    filter {
-      path   = "Attachments.DeleteOnTermination"
-      values = ["false"]
-    }
-  }
-
-  target {
     name           = "RDSCluster"
     resource_type  = "aws:rds:cluster"
     selection_mode = "ALL"
     resource_tag {
       key   = "AzImpairmentPower"
       value = "DisruptRds"
-    }
-  }
-
-  target {
-    name           = "Subnets"
-    resource_type  = "aws:ec2:subnet"
-    selection_mode = "ALL"
-    resource_tag {
-      key   = "AzImpairmentPower"
-      value = "DisruptSubnet"
-    }
-    filter {
-      path   = "AvailabilityZone"
-      values = ["eu-west-2b"]
     }
   }
 
@@ -144,40 +98,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     }
   }
 
-  action {
-    name      = "Stop-EC2-Instances"
-    action_id = "aws:ec2:stop-instances"
-
-    target {
-      key   = "Instances"
-      value = "EC2Instances"
-    }
-
-    parameter {
-      key   = "completeIfInstancesTerminated"
-      value = "true"
-    }
-
-    parameter {
-      key   = "startInstancesAfterDuration"
-      value = "PT1H"
-    }
-  }
-
-  action {
-    name      = "Pause-Volume-IO"
-    action_id = "aws:ebs:pause-volume-io"
-
-    target {
-      key   = "Volumes"
-      value = "Volumes"
-    }
-
-    parameter {
-      key   = "duration"
-      value = "PT1H"
-    }
-  }
 
   action {
     name      = "Failover-RDS"
@@ -186,26 +106,6 @@ resource "aws_fis_experiment_template" "az_power_interrupt" {
     target {
       key   = "Clusters"
       value = "RDSCluster"
-    }
-  }
-
-  action {
-    name      = "Disrupt-Network"
-    action_id = "aws:network:disrupt-connectivity"
-
-    target {
-      key   = "Subnets"
-      value = "Subnets"
-    }
-
-    parameter {
-      key   = "duration"
-      value = "PT2M"
-    }
-
-    parameter {
-      key   = "scope"
-      value = "all"
     }
   }
 
@@ -229,6 +129,42 @@ resource "aws_iam_role" "fis_role" {
     }]
   })
 }
+
+resource "aws_iam_role_policy" "fis_asg_custom_policy" {
+  name = "FIS-ASG-Custom-Policy"
+  role = aws_iam_role.fis_role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "AllowInjectAPI",
+        Effect = "Allow",
+        Action = [
+          "ec2:InjectApiError"
+        ],
+        Resource = ["*"],
+        Condition = {
+          "ForAnyValue:StringEquals" = {
+            "ec2:FisActionId" = [
+              "aws:ec2:api-insufficient-instance-capacity-error",
+              "aws:ec2:asg-insufficient-instance-capacity-error"
+            ]
+          }
+        }
+      },
+      {
+        Sid    = "DescribeAsg",
+        Effect = "Allow",
+        Action = [
+          "autoscaling:DescribeAutoScalingGroups"
+        ],
+        Resource = ["*"]
+      }
+    ]
+  })
+}
+
 
 resource "aws_iam_role_policy_attachment" "fis_ec2_policy" {
   role       = aws_iam_role.fis_role.name

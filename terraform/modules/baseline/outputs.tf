@@ -43,6 +43,11 @@ output "cloudwatch_metric_alarms" {
   value       = aws_cloudwatch_metric_alarm.this
 }
 
+output "data_firehoses" {
+  description = "map of data_firehose modules"
+  value       = module.data_firehose
+}
+
 output "ec2_autoscaling_groups" {
   description = "map of ec2_autoscaling_group module outputs corresponding to var.ec2_autoscaling_groups"
   value       = module.ec2_autoscaling_group

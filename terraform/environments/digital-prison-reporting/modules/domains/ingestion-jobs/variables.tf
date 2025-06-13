@@ -671,7 +671,6 @@ variable "glue_create_reload_diff_job_spark_event_logs" {
   description = "(Optional) Specifies an Amazon S3 path to a bucket that can be used as a Spark Event Logs directory for the job."
 }
 
-
 variable "s3_kms_arn" {
   type        = string
   default     = ""

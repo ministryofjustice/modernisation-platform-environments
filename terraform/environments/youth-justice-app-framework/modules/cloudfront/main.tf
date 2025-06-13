@@ -35,22 +35,22 @@ resource "aws_cloudfront_distribution" "external" {
   }
 
   ordered_cache_behavior {
-  path_pattern           = "/custom-503.html"
-  target_origin_id       = "s3-error-page"
-  
-  viewer_protocol_policy = "redirect-to-https"
+    path_pattern     = "/custom-503.html"
+    target_origin_id = "s3-error-page"
 
-  allowed_methods  = ["GET", "HEAD"]
-  cached_methods   = ["GET", "HEAD"]
+    viewer_protocol_policy = "redirect-to-https"
 
-  cache_policy_id            = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Managed-CachingDisabled
-  origin_request_policy_id   = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
-  response_headers_policy_id = aws_cloudfront_response_headers_policy.strict_transport_security.id
+    allowed_methods = ["GET", "HEAD"]
+    cached_methods  = ["GET", "HEAD"]
 
-  compress = true
-}
+    cache_policy_id            = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # Managed-CachingDisabled
+    origin_request_policy_id   = "88a5eaf4-2fd4-4709-b370-b4c650ea3fcf" # Managed-CORS-S3Origin
+    response_headers_policy_id = aws_cloudfront_response_headers_policy.strict_transport_security.id
 
-  
+    compress = true
+  }
+
+
   price_class = "PriceClass_100"
 
   viewer_certificate {
@@ -77,16 +77,16 @@ resource "aws_cloudfront_distribution" "external" {
 
   # Custom error pages
   origin {
-  domain_name = aws_s3_bucket.error_page.bucket_regional_domain_name
-  origin_id   = "s3-error-page"
+    domain_name = aws_s3_bucket.error_page.bucket_regional_domain_name
+    origin_id   = "s3-error-page"
 
-  s3_origin_config {
-    # This is still required by Terraform (even though unused)
-    origin_access_identity = ""
+    s3_origin_config {
+      # This is still required by Terraform (even though unused)
+      origin_access_identity = ""
+    }
+
+    origin_access_control_id = aws_cloudfront_origin_access_control.s3_oac.id
   }
-
-  origin_access_control_id = aws_cloudfront_origin_access_control.s3_oac.id
-}
 
   default_root_object = "index.html"
 
@@ -98,10 +98,10 @@ resource "aws_cloudfront_distribution" "external" {
   }
 
   custom_error_response {
-  error_code            = 504
-  response_code         = 200
-  response_page_path    = "/custom-503.html"
-  error_caching_min_ttl = 300
+    error_code            = 504
+    response_code         = 200
+    response_page_path    = "/custom-503.html"
+    error_caching_min_ttl = 300
   }
   #   is_ipv6_enabled = true
 
