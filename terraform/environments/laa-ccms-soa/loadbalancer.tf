@@ -39,7 +39,7 @@ resource "aws_lb_listener" "admin80" {
 resource "aws_lb_listener" "admin443" {
   load_balancer_arn = aws_lb.admin.id
   port              = 443
-  protocol          = "TCP"
+  protocol          = "TLS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = aws_acm_certificate.soa.arn
   default_action {
@@ -97,7 +97,7 @@ resource "aws_lb_listener" "managed80" {
 resource "aws_lb_listener" "managed443" {
   load_balancer_arn = aws_lb.managed.id
   port              = 443
-  protocol          = "TCP"
+  protocol          = "TLS"
   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
   certificate_arn   = aws_acm_certificate.soa.arn
   default_action {

@@ -37,7 +37,7 @@ Application state is held on an EFS storage volume, this is mounted to the ECS c
 ### **Service URLs:**
 
 - **Administration Consle**: http://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/console
-- **EM (Enterprise Manager)**: http://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/em/console
+- **EM (Enterprise Manager)**: http://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/em
 - **Composite Integrations**: http://ccms-soa-maanaged.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk:8001
 
 ENVIRONMENT values:
