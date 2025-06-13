@@ -35,7 +35,7 @@
       },
       {
         "name": "SPRING_DATASOURCE_URL",
-        "value": "jdbc:oracle:thin:@${spring_datasource_url}/SOATDSDB"
+        "value": "jdbc:oracle:thin:@${spring_datasource_url}/EDRMSTDS"
       },
       {
         "name": "logging_level_root",
