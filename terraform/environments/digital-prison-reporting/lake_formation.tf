@@ -25,12 +25,14 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   }
 }
 
-# Attach the lake_formation_data_access policy to the mod platform developer role
-resource "aws_iam_role_policy_attachment" "mod_platform_developer_lake_formation_data_access" {
-  count      = length(try(one(data.aws_iam_roles.developer_roles.arns), [])) > 0 ? 1 : 0
-  role       = try(one(data.aws_iam_roles.developer_roles.arns), "")
+# Attach the lake_formation_data_access policy to all mod platform developer roles
+resource "aws_iam_role_policy_attachment" "lake_formation_data_access_attachment" {
+  for_each = toset(data.aws_iam_roles.developer_roles.arns != null ? data.aws_iam_roles.developer_roles.arns : [])
+  
   policy_arn = aws_iam_policy.lake_formation_data_access.arn
+  role       = basename(each.value)
 }
+
 
 # Create the 'domain' tag with values
 resource "aws_lakeformation_lf_tag" "domain_tag" {
