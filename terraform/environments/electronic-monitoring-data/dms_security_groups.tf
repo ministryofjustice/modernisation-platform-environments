@@ -116,14 +116,23 @@ resource "aws_vpc_security_group_ingress_rule" "rds_glue_ingress" {
 }
 
 # -------------------------------------------------------
-# Glue self-referencing rule
+# Glue self-referencing rules
 # -------------------------------------------------------
 
-resource "aws_vpc_security_group_ingress_rule" "glue_glue_ingress" {
+resource "aws_vpc_security_group_ingress_rule" "glue_ingress_all" {
   security_group_id            = aws_security_group.glue_rds_conn_security_group.id
   referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
   ip_protocol                  = "tcp"
   from_port                    = 0
   to_port                      = 65535
   description                  = "Glue         +-----[mssql]----- Glue"
+}
+
+resource "aws_vpc_security_group_egress_rule" "glue_egress_all" {
+  security_group_id            = aws_security_group.glue_rds_conn_security_group.id
+  referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
+  ip_protocol                  = "tcp"
+  from_port                    = 0
+  to_port                      = 65535
+  description                  = "Glue         -----[mssql]----+ Glue"
 }
