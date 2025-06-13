@@ -595,7 +595,7 @@ module "share_non_cadt_dbs_with_roles" {
 }
 
 module "share_glue_db_with_glue_role" {
-  count                   = local.is-production ? 1 : 0
+  count                   = local.is-production || local.is-development ? 1 : 0
   source                  = "./modules/lakeformation_database_share"
   dbs_to_grant            = ["dms_data_validation"]
   data_bucket_lf_resource = aws_lakeformation_resource.rds_bucket.arn
