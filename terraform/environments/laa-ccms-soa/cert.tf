@@ -1,5 +1,5 @@
 resource "aws_acm_certificate" "soa" {
-  domain_name               = data.aws_route53_zone.external.name
+  domain_name               = trim(data.aws_route53_zone.external.name, ".") #--Remove the trailing dot from the zone name
   subject_alternative_names = [aws_route53_record.admin.fqdn, aws_route53_record.admin.fqdn]
   validation_method         = "DNS"
   lifecycle {
