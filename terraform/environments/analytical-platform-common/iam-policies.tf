@@ -172,7 +172,7 @@ module "analytical_platform_github_actions_iam_policy" {
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "data_engineering_github_actions" {
+data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions" {
   statement {
     sid       = "AllowAssumeRole"
     effect    = "Allow"
@@ -181,21 +181,21 @@ data "aws_iam_policy_document" "data_engineering_github_actions" {
   }
 }
 
-module "data_engineering_github_actions_iam_policy" {
+module "data_engineering_datalake_access_github_actions_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.58.0"
 
-  name_prefix = "data-engineering-github-actions"
+  name_prefix = "data-engineering-datalake-access-github-actions"
 
-  policy = data.aws_iam_policy_document.data_engineering_github_actions.json
+  policy = data.aws_iam_policy_document.data_engineering_datalake_access_github_actions.json
 
   tags = local.tags
 }
 
-data "aws_iam_policy_document" "data_engineering_terraform" {
+data "aws_iam_policy_document" "data_engineering_datalake_access_terraform" {
   statement {
     sid    = "AllowKMS"
     effect = "Allow"
@@ -220,20 +220,20 @@ data "aws_iam_policy_document" "data_engineering_terraform" {
       "s3:GetObject",
       "s3:PutObject"
     ]
-    resources = ["${module.terraform_bucket.s3_bucket_arn}/data-engineering/*"]
+    resources = ["${module.terraform_bucket.s3_bucket_arn}/data-engineering-datalake-access/*"]
   }
 }
 
-module "data_engineering_terraform_iam_policy" {
+module "data_engineering_datalake_access_terraform_iam_policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
   version = "5.58.0"
 
-  name_prefix = "data-engineering-terraform"
+  name_prefix = "data-engineering-datalake-access-terraform"
 
-  policy = data.aws_iam_policy_document.data_engineering_terraform.json
+  policy = data.aws_iam_policy_document.data_engineering_datalake_access_terraform.json
 
   tags = local.tags
 }
