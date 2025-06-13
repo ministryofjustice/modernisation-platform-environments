@@ -174,10 +174,13 @@ module "analytical_platform_github_actions_iam_policy" {
 
 data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions" {
   statement {
-    sid       = "AllowAssumeRole"
-    effect    = "Allow"
-    actions   = ["sts:AssumeRole"]
-    resources = [module.data_engineering_datalake_access_terraform_iam_role.iam_role_arn]
+    sid     = "AllowAssumeRole"
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    resources = [
+      module.data_engineering_datalake_access_terraform_iam_role.iam_role_arn,
+      "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/data-engineering-datalake-access"
+    ]
   }
 }
 
