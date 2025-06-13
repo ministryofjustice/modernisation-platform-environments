@@ -177,7 +177,7 @@ data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions"
     sid       = "AllowAssumeRole"
     effect    = "Allow"
     actions   = ["sts:AssumeRole"]
-    resources = [module.analytical_platform_terraform_iam_role.iam_role_arn]
+    resources = [module.data_engineering_datalake_access_terraform_iam_role.iam_role_arn]
   }
 }
 
