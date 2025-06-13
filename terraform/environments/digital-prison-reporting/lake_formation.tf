@@ -10,9 +10,6 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     # As cannot give them the permissions (lakeformation:GetDataAccess)
     length(data.aws_iam_roles.developer_roles.arns) > 0 ? [one(data.aws_iam_roles.developer_roles.arns)] : [],
 
-
-    # Make the cross-account runner used by create-a-derived table LF admin
-    aws_iam_role.dataapi_cross_role.arn
     ]
   )
 
