@@ -166,6 +166,13 @@ output "secretsmanager_secrets" {
   }
 }
 
+output "security_groups" {
+  description = "Map of common security_groupss to create"
+  value = {
+    for key, value in local.security_groups : key => value if contains(local.security_groups_filter, key)
+  }
+}
+
 output "ssm_associations" {
   description = "Map of common ssm associations to create"
   value = {
