@@ -33,6 +33,25 @@ resource "aws_iam_role_policy_attachment" "dataapi_cross_role_lake_formation_dat
   policy_arn = aws_iam_policy.lake_formation_data_access.arn
 }
 
+# Give the cadet cross-account role data location access
+# structured and working are required
+resource "aws_lakeformation_permissions" "data_location_access_structured_historical" {
+  principal   = aws_iam_role.dataapi_cross_role.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn = "arn:aws:s3:::${local.project}-structured-historical-${local.environment}"
+  }
+}
+
+resource "aws_lakeformation_permissions" "data_location_access_working" {
+  principal   = aws_iam_role.dataapi_cross_role.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+
+  data_location {
+    arn = "arn:aws:s3:::${local.project}-working-${local.environment}"
+  }
+}
 
 # Create the 'domain' tag with values
 resource "aws_lakeformation_lf_tag" "domain_tag" {
