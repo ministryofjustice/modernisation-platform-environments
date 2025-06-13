@@ -7,7 +7,8 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     try(one(data.aws_iam_roles.data_engineering_roles.arns), []),
 
     # Make Developer role a LF admin
-    length(data.aws_iam_roles.developer_roles.arns) > 0 ? one(data.aws_iam_roles.developer_roles.arns) : [],
+    try(one(data.aws_iam_roles.developer_roles.arns), []),
+
 
     # Make the cross-account runner used by create-a-derived table LF admin
     aws_iam_role.dataapi_cross_role.arn
