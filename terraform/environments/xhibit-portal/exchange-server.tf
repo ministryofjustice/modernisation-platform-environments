@@ -1,6 +1,6 @@
 resource "aws_eip" "exchange" {
   instance = aws_instance.exchange-server.id
-  vpc      = true
+  domain   = "vpc"
 }
 
 resource "aws_instance" "exchange-server" {

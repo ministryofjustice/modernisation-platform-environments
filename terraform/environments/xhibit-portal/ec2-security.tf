@@ -22,7 +22,6 @@ resource "aws_iam_role" "xp_ec2_role" {
       ]
     }
   )
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
   tags = merge(
     local.tags,
     {
@@ -31,8 +30,15 @@ resource "aws_iam_role" "xp_ec2_role" {
   )
 }
 
+# Attach AmazonSSMManagedInstanceCore policy to the role
+resource "aws_iam_role_policy_attachment" "xp_ec2_role_ssm" {
+  role       = aws_iam_role.xp_ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
 resource "aws_iam_instance_profile" "ec2_xp_profile" {
   name = "xp-ec2-profile"
   role = aws_iam_role.xp_ec2_role.name
   path = "/"
 }
+

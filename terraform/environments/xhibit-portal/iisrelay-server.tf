@@ -1,6 +1,6 @@
 resource "aws_eip" "iisrelay" {
   instance = aws_instance.iisrelay-server.id
-  vpc      = true
+  domain   = "vpc"
 }
 
 resource "aws_instance" "iisrelay-server" {
