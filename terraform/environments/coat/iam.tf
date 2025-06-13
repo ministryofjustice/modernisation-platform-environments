@@ -42,7 +42,7 @@ resource "aws_iam_policy" "coat_cross_account_policy" {
   policy = templatefile("${path.module}/templates/coat-cross-account-policy.json",
     {
       environment     = local.environment
-      mp_dev_role_arn = data.aws_iam_role.moj_mp_dev_role.arn
+      mp_dev_role_arn = data.aws_iam_role.moj_mp_dev_role[0].arn
     }
   )
 }
