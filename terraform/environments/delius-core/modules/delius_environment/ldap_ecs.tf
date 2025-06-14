@@ -11,7 +11,8 @@ module "ldap_ecs" {
     "LDAP_HOST"          = "0.0.0.0",
     "SLAPD_LOG_LEVEL"    = var.delius_microservice_configs.ldap.slapd_log_level,
     "LDAP_PORT"          = "389",
-    "DELIUS_ENVIRONMENT" = "delius-core-${var.env_name}"
+    "DELIUS_ENVIRONMENT" = "delius-core-${var.env_name}",
+    "EXPORT_USERS_SCRIPT"   = file("${path.module}/scripts/data_refresh_user_export.sh")
   }
 
   container_vars_env_specific = try(var.delius_microservice_configs.ldap.container_vars_env_specific, {})
