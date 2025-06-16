@@ -296,20 +296,20 @@ resource "aws_iam_policy" "ecs-quicksight-policy" { #tfsec:ignore:aws-iam-no-pol
     Version = "2012-10-17"
     Statement = [
       {
-        "Sid": "VisualEditor0",
-        "Effect": "Allow",
-        "Action": [
+        "Sid" : "VisualEditor0",
+        "Effect" : "Allow",
+        "Action" : [
           "quicksight:ListDashboards",
-           "quicksight:GetDashboardEmbedUrl"
+          "quicksight:GetDashboardEmbedUrl"
         ],
-        "Resource": [
-           "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:dashboard/*"
+        "Resource" : [
+          "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:dashboard/*"
         ]
       },
       {
-        "Sid": "VisualEditor1",
-        "Effect": "Allow",
-        "Action": [
+        "Sid" : "VisualEditor1",
+        "Effect" : "Allow",
+        "Action" : [
           "quicksight:GetAuthCode",
           "quicksight:DescribeUser",
           "quicksight:RegisterUser",
@@ -317,15 +317,15 @@ resource "aws_iam_policy" "ecs-quicksight-policy" { #tfsec:ignore:aws-iam-no-pol
           "quicksight:ListUserGroups",
           "quicksight:ListUsers"
         ],
-        "Resource": [
+        "Resource" : [
           "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/*",
           "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:user/default/quicksight-admin-access/*"
         ]
       },
       {
-        "Sid": "VisualEditor2",
-        "Effect": "Allow",
-        "Action": [
+        "Sid" : "VisualEditor2",
+        "Effect" : "Allow",
+        "Action" : [
           "quicksight:DescribeGroup",
           "quicksight:CreateGroup",
           "quicksight:ListGroups",
@@ -334,7 +334,7 @@ resource "aws_iam_policy" "ecs-quicksight-policy" { #tfsec:ignore:aws-iam-no-pol
           "quicksight:DeleteGroupMembership",
           "quicksight:DeleteGroup"
         ],
-        "Resource": [
+        "Resource" : [
           "arn:aws:quicksight:eu-west-2:${data.aws_caller_identity.current.account_id}:group/default/*"
         ]
       }

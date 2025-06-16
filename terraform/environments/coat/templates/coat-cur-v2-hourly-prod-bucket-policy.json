@@ -7,8 +7,8 @@
       "Effect": "Allow",
       "Action": ["s3:PutObject"],
       "Resource": [
-          "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*",
-          "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*",
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
       ],
       "Principal": {
         "Service": ["bcm-data-exports.amazonaws.com"]
@@ -18,9 +18,7 @@
       "Sid": "S3ListGetObject",
       "Effect": "Allow",
       "Action": ["s3:ListBucket", "s3:GetBucketLocation"],
-      "Resource": [
-          "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
-      ],
+      "Resource": ["arn:aws:s3:::coat-${environment}-cur-v2-hourly"],
       "Principal": {
         "Service": ["bcm-data-exports.amazonaws.com"]
       }
@@ -28,13 +26,20 @@
     {
       "Sid": "S3ReplicateObject",
       "Effect": "Allow",
-      "Action": ["s3:ReplicateObject", "s3:ReplicateDelete", "s3:GetBucketVersioning", "s3:PutBucketVersioning"],
+      "Action": [
+        "s3:ReplicateObject",
+        "s3:ReplicateDelete",
+        "s3:GetBucketVersioning",
+        "s3:PutBucketVersioning"
+      ],
       "Resource": [
-           "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*",
-           "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/*",
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly"
       ],
       "Principal": {
-        "AWS": ["arn:aws:iam::${root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
+        "AWS": [
+          "arn:aws:iam::${root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"
+        ]
       }
     },
     {
@@ -42,7 +47,7 @@
       "Effect": "Allow",
       "Action": ["s3:GetObject", "s3:PutObject"],
       "Resource": [
-          "arn:aws:s3:::coat-${environment}-cur-v2-hourly/athena-results/*"
+        "arn:aws:s3:::coat-${environment}-cur-v2-hourly/athena-results/*"
       ],
       "Principal": {
         "Service": ["athena.amazonaws.com"]

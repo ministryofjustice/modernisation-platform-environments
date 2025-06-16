@@ -2,7 +2,7 @@ locals {
   bucket_prefix = "emds-${local.environment_shorthand}"
 
   mdss_supplier_account_mapping = {
-    "production" = null
+    "production"    = null
     "preproduction" = null
     "test" = {
       "account_number" = "173142358744"
