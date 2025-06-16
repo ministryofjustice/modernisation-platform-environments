@@ -108,35 +108,36 @@ resource "aws_iam_role" "delete_snapshot_lambda" {
   name = "delete_snapshot_lambda"
 
   assume_role_policy = data.aws_iam_policy_document.lambda_delete_assume_role_policy.json
+}
 
-  inline_policy {
-    name = "delete_snapshot_lambda_policy"
+resource "aws_iam_role_policy" "delete_snapshot_lambda_inline" {
+  name = "delete_snapshot_lambda_policy"
+  role = aws_iam_role.delete_snapshot_lambda.name
 
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action = [
-            "ec2:DescribeImageAttribute",
-            "ec2:DeregisterImage",
-            "ec2:DescribeImages",
-            "ec2:DescribeInstances",
-            "ec2:DescribeSnapshotAttribute",
-            "ec2:DescribeSnapshots",
-            "ec2:DescribeTags",
-            "ec2:CreateTags",
-            "ec2:DeleteTags",
-            "ec2:DeleteSnapshot",
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents",
-          ]
-          Effect   = "Allow"
-          Resource = "*"
-        },
-      ]
-    })
-  }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:DescribeImageAttribute",
+          "ec2:DeregisterImage",
+          "ec2:DescribeImages",
+          "ec2:DescribeInstances",
+          "ec2:DescribeSnapshotAttribute",
+          "ec2:DescribeSnapshots",
+          "ec2:DescribeTags",
+          "ec2:CreateTags",
+          "ec2:DeleteTags",
+          "ec2:DeleteSnapshot",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
 }
 
 #Create ZIP archive and lambda
