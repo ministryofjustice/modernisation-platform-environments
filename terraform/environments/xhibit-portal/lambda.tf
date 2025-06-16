@@ -14,34 +14,35 @@ resource "aws_iam_role" "snapshot_lambda" {
   name = "snapshot_lambda"
 
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
+}
 
-  inline_policy {
-    name = "snapshot_lambda_policy"
+resource "aws_iam_role_policy" "snapshot_lambda_inline" {
+  name = "snapshot_lambda_policy"
+  role = aws_iam_role.snapshot_lambda.name
 
-    policy = jsonencode({
-      Version = "2012-10-17"
-      Statement = [
-        {
-          Action = [
-            "ec2:DescribeImageAttribute",
-            "ec2:RegisterImage",
-            "ec2:DescribeImages",
-            "ec2:DescribeSnapshotAttribute",
-            "ec2:DescribeSnapshots",
-            "ec2:DescribeTags",
-            "ec2:CreateTags",
-            "ec2:DeleteTags",
-            "ec2:CreateImage",
-            "logs:CreateLogGroup",
-            "logs:CreateLogStream",
-            "logs:PutLogEvents",
-          ]
-          Effect   = "Allow"
-          Resource = "*"
-        },
-      ]
-    })
-  }
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:DescribeImageAttribute",
+          "ec2:RegisterImage",
+          "ec2:DescribeImages",
+          "ec2:DescribeSnapshotAttribute",
+          "ec2:DescribeSnapshots",
+          "ec2:DescribeTags",
+          "ec2:CreateTags",
+          "ec2:DeleteTags",
+          "ec2:CreateImage",
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+    ]
+  })
 }
 
 #Create ZIP archive and lambda
