@@ -1026,7 +1026,7 @@ variable "security_groups" {
   description = "map of security groups and associated rules to create where key is the name of the group"
   type = map(object({
     description = string
-    ingress = map(object({
+    ingress = optional(map(object({
       description     = optional(string)
       from_port       = number
       to_port         = number
@@ -1035,8 +1035,8 @@ variable "security_groups" {
       cidr_blocks     = optional(list(string))
       self            = optional(bool)
       prefix_list_ids = optional(list(string))
-    }))
-    egress = map(object({
+    })), [])
+    egress = optional(map(object({
       description     = optional(string)
       from_port       = number
       to_port         = number
@@ -1045,7 +1045,7 @@ variable "security_groups" {
       cidr_blocks     = optional(list(string))
       self            = optional(bool)
       prefix_list_ids = optional(list(string))
-    }))
+    })), [])
     tags = optional(map(string), {})
   }))
   default = {}
