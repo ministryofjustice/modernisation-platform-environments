@@ -27,7 +27,7 @@ resource "aws_iam_role_policy_attachment" "coat_github_actions_report_upload_att
 
 #COAT Cross account role policies with mp dev SSO role
 resource "aws_iam_role" "coat_cross_account_role" {
-  count = local.is-production ? 1 : 0
+  count = local.is-development ? 1 : 0
   name  = "moj-coat-${local.environment}-cur-reports-cross-role"
   assume_role_policy = templatefile("${path.module}/templates/coat-cross-account-assume-role-policy.json",
     {
@@ -38,11 +38,33 @@ resource "aws_iam_role" "coat_cross_account_role" {
 }
 
 resource "aws_iam_policy" "coat_cross_account_policy" {
-  count = local.is-production ? 1 : 0
+  count = local.is-development ? 1 : 0
   name  = "moj-coat-${local.environment}-cur-reports-cross-role-policy"
   policy = templatefile("${path.module}/templates/coat-cross-account-policy.json",
     {
       environment = local.environment
+    }
+  )
+}
+
+resource "aws_iam_role_policy_attachment" "coat_cross_account_attachment" {
+  count      = local.is-development ? 1 : 0
+  role       = aws_iam_role.coat_cross_account_role[0].name
+  policy_arn = aws_iam_policy.coat_cross_account_policy[0].arn
+}
+
+resource "aws_iam_role" "coat_cross_account_role" {
+  count = local.is-production ? 1 : 0
+  name  = "moj-coat-${local.environment}-cur-reports-cross-role"
+  assume_role_policy = templatefile("${path.module}/templates/coat-cross-prod-assume-role-policy.json", {})
+}
+
+resource "aws_iam_policy" "coat_cross_account_policy" {
+  count = local.is-production ? 1 : 0
+  name  = "moj-coat-${local.environment}-cur-reports-cross-role-policy"
+  policy = templatefile("${path.module}/templates/coat-cross-dev-account-policy.json",
+    {
+      cross_account_role = "arn:aws:iam::${local.coat_dev_account_id}:role/moj-coat-${local.dev_environment}-cur-reports-cross-role"
     }
   )
 }
