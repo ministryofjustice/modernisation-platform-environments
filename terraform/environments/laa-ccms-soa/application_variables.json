@@ -64,7 +64,7 @@
       "admin_app_count": "1",
       "admin_wl_mem_args": " -Xms4096m -Xmx6144m ",
       "admin_xxsoa_ds_username": "XXSOA",
-      "admin_ebs_ds_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-test.modernisation-platform.service.justice.gov.uk:1521:EBSDB",
+      "admin_ebs_ds_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-test.modernisation-platform.service.justice.gov.uk:1522:EBSE10",
       "admin_ebs_ds_username": "apps",
       "admin_ebssms_ds_url": "jdbc:oracle:thin:@cwa-db.aws.tst.legalservices.gov.uk:1571:CWA",
       "admin_hostname": "ccms-soa-admin",
