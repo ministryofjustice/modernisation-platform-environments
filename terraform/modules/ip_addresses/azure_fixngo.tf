@@ -42,8 +42,10 @@ locals {
 
     noms_prod_domain_controller_PCMCW0011 = "10.40.128.196/32"
     noms_prod_domain_controller_PCMCW0012 = "10.40.0.133/32"
+    noms_prod_rdgateway_PDMRW0001         = "10.40.128.133/32"
 
     noms_devtest_domain_controller_MGMCW0002 = "10.102.0.196/32"
+    noms_devtest_rdgateway_MGMRW0001         = "10.102.0.132/32"
   }
 
   noms_live_subnet = {
@@ -165,6 +167,10 @@ locals {
       local.noms_mgmt_subnet.nomsmgmt_remoteaccess,
     ]
 
+    devtest_rdgateways = [
+      local.azure_fixngo_cidr.noms_devtest_rdgateway_MGMRW0001,
+    ]
+
     devtest_oasys_db = [
       local.noms_test_subnet.t1_oasys_clientaccess,
       local.noms_test_subnet.t2_oasys_clientaccess,
@@ -193,6 +199,10 @@ locals {
     prod_jumpservers = [
       local.noms_mgmt_live_subnet.noms_mgmt_live_jumpservers,
       local.noms_mgmt_live_subnet.noms_mgmt_live_remoteaccess,
+    ]
+
+    prod_rdgateways = [
+      local.azure_fixngo_cidr.noms_prod_rdgateway_PDMRW0001,
     ]
 
     prod_oasys_db = [

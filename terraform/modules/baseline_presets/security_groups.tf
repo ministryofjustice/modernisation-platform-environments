@@ -1,7 +1,8 @@
 locals {
 
   security_groups_filter = flatten([
-    var.options.enable_hmpps_domain ? ["ad_join"] : []
+    var.options.enable_hmpps_domain ? ["ad_join"] : [],
+    var.options.enable_hmpps_domain ? ["rdp_from_gateways"] : [],
   ])
 
   ad_netbios_name = contains(["development", "test"], var.environment.environment) ? "azure" : "hmpp"
@@ -159,6 +160,31 @@ locals {
           to_port     = 65535
           protocol    = "TCP"
           cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
+        }
+      }
+    }
+    rdp_from_gateways = {
+      description = "Security group to allow RDP from ${local.ad_netbios_name} remote desktop gateways"
+      ingress = {
+        rpd-tcp = {
+          description = "Allow TCP RDP from Remote Desktop Gateways"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = concat(
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          )
+        }
+        rdp-udp = {
+          description = "Allow UDP RDP from Remote Desktop Gateways"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = concat(
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          )
         }
       }
     }
