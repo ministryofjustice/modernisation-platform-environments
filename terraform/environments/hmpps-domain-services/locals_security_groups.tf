@@ -48,16 +48,9 @@ locals {
 
   security_groups = {
 
-    jumpserver = {
-      description = "Security group for jumpservers"
+    rd-session-host = {
+      description = "Security group for RD Session Hosts"
       ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
         rpc-from-rds = {
           description     = "Allow RPC from remote desktop connection broker"
           from_port       = 135
@@ -87,27 +80,10 @@ locals {
           security_groups = ["rds"]
         }
       }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
     }
     rdgw = {
       description = "Security group for Remote Desktop Gateways"
       ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
         http-from-lb = {
           description = "Allow http ingress"
           from_port   = 80
@@ -132,13 +108,6 @@ locals {
     rds = {
       description = "Security group for Remote Desktop Services (ConnectionBroker and RDWeb)"
       ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
         http-from-lb = {
           description = "Allow http ingress"
           from_port   = 80

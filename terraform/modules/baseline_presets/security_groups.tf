@@ -53,11 +53,11 @@ locals {
           #  - LDAP GC     tcp/3268 tcp/3269 (Global Catalog for Cross Domain)
           #  - ADWS        tcp/9389
           #  - RPD Dynamic tcp/49152 - tcp/65536
-          description     = "Allow all egress to DCs"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
+          description = "Allow all egress to DCs"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
         }
       }
     }
@@ -78,11 +78,11 @@ locals {
         all = {
           # allow all since internal resources are protected by inbound SGs
           # and outbound internet is protected by firewall
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
@@ -103,11 +103,11 @@ locals {
         all = {
           # allow all since internal resources are protected by inbound SGs
           # and outbound internet is protected by firewall
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
