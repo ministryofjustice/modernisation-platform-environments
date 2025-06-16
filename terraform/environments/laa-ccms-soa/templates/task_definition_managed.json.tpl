@@ -97,7 +97,11 @@
       },
       {
         "name": "JAVA_OPTION",
-        "value": "-Djava.security.egd=file:/dev/./urandom"
+        "value": "-Djava.security.egd=file:/dev/./urandom -Djavax.net.ssl.trustStore=/etc/ssl/certs"
+      },
+      {
+        "name": "JAVA_OPTS",
+        "value": "-Djava.security.egd=file:/dev/./urandom -Djavax.net.ssl.trustStore=/etc/ssl/certs"
       },
      {
        "name": "TZ",
