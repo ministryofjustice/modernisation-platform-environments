@@ -557,7 +557,7 @@ locals {
     }
     win-bip = {
       description = "Security group for Temporary Windows BIP server"
-            ingress = {
+      ingress = {
         all-from-self = {
           description = "Allow all ingress to self"
           from_port   = 0

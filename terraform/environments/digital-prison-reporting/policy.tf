@@ -831,7 +831,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 
       # LF tag read permissions (needed to grant tag-based access)
       "lakeformation:GetResourceLFTags",
-      "lakeformation:ListLFTags", 
+      "lakeformation:ListLFTags",
       "lakeformation:GetLFTag"
 
     ]
