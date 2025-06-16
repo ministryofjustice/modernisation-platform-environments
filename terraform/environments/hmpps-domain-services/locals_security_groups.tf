@@ -80,6 +80,15 @@ locals {
           security_groups = ["rds"]
         }
       }
+      egress = {
+        all-to-rds = {
+          description     = "Allow all egress to remote desktop connection broker"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          security_groups = ["rds"]
+        }
+      }
     }
     rdgw = {
       description = "Security group for Remote Desktop Gateways"
@@ -101,6 +110,15 @@ locals {
           security_groups = [
             "public-lb", "public-lb-2"
           ]
+        }
+      }
+      egress = {
+        all-rdp-to-rdsessionhosts = {
+          description = "Allow RDP egress to all RD Session Hosts"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
       }
     }
@@ -133,11 +151,20 @@ locals {
             "public-lb", "public-lb-2"
           ]
         }
-        rpc-dynamic-from-rdsessionhost = {
+        rpc-dynamic-from-rdsessionhosts = {
           description = "Allow RPC dynamic ports from remote desktop session hosts"
           from_port   = 49152
           to_port     = 65535
           protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.rd_session_hosts
+        }
+      }
+      egress = {
+        all-to-rdsessionhosts = {
+          description = "Allow all egress to remote desktop session hosts"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
           cidr_blocks = local.security_group_cidrs.rd_session_hosts
         }
       }
