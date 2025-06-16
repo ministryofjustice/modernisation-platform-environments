@@ -98,6 +98,56 @@ locals {
           protocol    = -1
           self        = true
         }
+        rpc-from-jumpservers = {
+          description = "Allow RPC from jumpservers"
+          from_port   = 135
+          to_port     = 135
+          protocol    = "TCP"
+          cidr_blocks = flatten([
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          ])
+        }
+        smb-from-jumpserver = {
+          description = "Allow SMB from jumpservers"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "TCP"
+          cidr_blocks = flatten([
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          ])
+        }
+        rdp-from-jumpservers = {
+          description = "Allow RDP from jumpservers"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = flatten([
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          ])
+        }
+        winrm-from-jumpservers = {
+          description = "Allow WinRM from jumpservers"
+          from_port   = 5985
+          to_port     = 5986
+          protocol    = "TCP"
+          cidr_blocks = flatten([
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          ])
+        }
+        rpc-dynamic_from-jumpservers = {
+          description = "Allow RPC dynamic from jumpservers"
+          from_port   = 49152
+          to_port     = 65535
+          protocol    = "TCP"
+          cidr_blocks = flatten([
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          ])
+        }
       }
       egress = {
         all = {
