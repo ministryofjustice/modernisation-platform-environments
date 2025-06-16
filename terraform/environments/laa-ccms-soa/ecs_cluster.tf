@@ -171,7 +171,7 @@ resource "aws_ecs_task_definition" "managed" {
       soa_password        = aws_secretsmanager_secret.soa_password.arn
       ms_hostname         = aws_route53_record.managed.fqdn
       wl_mem_args         = local.application_data.accounts[local.environment].managed_wl_mem_args
-      java_tool_options   = local.application_data.accounts[local.environment].managed_java_options
+      java_tool_options   = local.application_data.accounts[local.environment].managed_java_tool_options
     }
   )
 }
