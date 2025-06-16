@@ -96,6 +96,12 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "cloudwatch_log_groups", {}),
   )
 
+  data_firehoses = merge(
+    module.baseline_presets.data_firehoses,
+    lookup(local.baseline_all_environments, "data_firehoses", {}),
+    lookup(local.baseline_environment_specific, "data_firehoses", {}),
+  )
+
   ec2_autoscaling_groups = merge(
     lookup(local.baseline_all_environments, "ec2_autoscaling_groups", {}),
     lookup(local.baseline_environment_specific, "ec2_autoscaling_groups", {}),
@@ -196,6 +202,7 @@ module "baseline" {
   )
 
   security_groups = merge(
+    module.baseline_presets.security_groups,
     lookup(local.baseline_all_environments, "security_groups", {}),
     lookup(local.baseline_environment_specific, "security_groups", {}),
   )

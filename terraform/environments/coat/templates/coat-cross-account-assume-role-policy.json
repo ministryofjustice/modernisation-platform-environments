@@ -4,14 +4,9 @@
     {
       "Sid": "AssumeRoleAccess",
       "Effect": "Allow",
-      "Action": [
-          "sts:AssumeRole"
-      ],
+      "Action": ["sts:AssumeRole"],
       "Principal": {
-        "AWS": [
-          "${cross_account_role}",
-          "${mp_dev_role_arn}"
-        ]
+        "AWS": ["${cross_account_role}", "${mp_dev_role_arn}"]
       }
     }
   ]
