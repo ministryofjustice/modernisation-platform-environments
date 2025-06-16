@@ -101,8 +101,8 @@
       },
       {
         "name": "JAVA_TOOL_OPTIONS",
-        "value": "${java_tool_options}"
-      },
+        "value": "-Djavax.net.ssl.trustStore=/home/ec2-user/efs/pki/soa-trust-store.p12 -Djavax.net.ssl.trustStorePassword=${managed_soa_trust_store_password}"
+      }
      {
        "name": "TZ",
        "value": "GB"
@@ -112,7 +112,11 @@
         {
           "name": "ADMIN_PASSWORD",
           "valueFrom": "${soa_password}"
-        }
+        },
+        {
+          "name": "JAVA_CERT_TRUST_STORE_PASS",
+          "value": "${managed_soa_trust_store_password}"
+        },
     ]
   }
 ]

@@ -60,10 +60,6 @@
         "value": " -Djava.security.egd=file:/tmp/big.random.file"
       },
       {
-        "name": "JAVA_TOOL_OPTIONS",
-        "value": "${java_tool_options}"
-      },
-      {
         "name": "USER_MEM_ARGS",
         "value": "${wl_admin_mem_args} -Djava.security.egd=file:/tmp/big.random.file"
       },
@@ -156,7 +152,11 @@
         {
           "name": "EBS_USER_PASSWORD",
           "valueFrom": "${ebs_user_password}"
-        }
+        },
+        {
+          "name": "JAVA_CERT_TRUST_STORE_PASS",
+          "value": "${managed_soa_trust_store_password}"
+        },
     ]
   }
 ]

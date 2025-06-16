@@ -42,6 +42,10 @@ chmod 600 $EC2_USER_HOME_FOLDER/.ssh/config
 #--TEMP CLONE A SINGLE BRANCH WHERE SECRETS HAVE BEEN CHANGED! - AW
 su ec2-user bash -c "git clone --single-branch --branch feat-laa-ccms-soa-mp ssh://git@ssh.github.com:443/ministryofjustice/laa-ccms-app-soa.git $EFS_MOUNT_POINT/laa-ccms-app-soa || git -C $EFS_MOUNT_POINT/laa-ccms-app-soa pull"
 
+#--Create dir for PKI
+mkdir -p $EC2_USER_HOME_FOLDER/pki
+chmod 755 $EC2_USER_HOME_FOLDER/pki
+
 #--Install s3fs and pre-reqs
 yum install fuse -y
 yum install fuse-libs -y
@@ -49,8 +53,8 @@ yum install s3fs-fuse -y
 
 #--Make S3 integration dirs and mount S3
 sudo sed -i '/^#.*user_allow_other/s/^#//' /etc/fuse.conf
-mkdir $INBOUND_S3_MOUNT_POINT
-mkdir $OUTBOUND_S3_MOUNT_POINT
+mkdir -p $INBOUND_S3_MOUNT_POINT
+mkdir -p $OUTBOUND_S3_MOUNT_POINT
 chmod 777 $INBOUND_S3_MOUNT_POINT
 chmod 777 $OUTBOUND_S3_MOUNT_POINT
 s3fs -o iam_role=auto -o url="https://s3-eu-west-2.amazonaws.com" -o endpoint=eu-west-2 -o allow_other -o multireq_max=5 -o use_cache=/tmp -o uid=1000 -o gid=1000 ${inbound_bucket} $INBOUND_S3_MOUNT_POINT
