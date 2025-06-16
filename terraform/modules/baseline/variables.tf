@@ -1035,7 +1035,7 @@ variable "security_groups" {
       cidr_blocks     = optional(list(string))
       self            = optional(bool)
       prefix_list_ids = optional(list(string))
-    })), [])
+    })), {})
     egress = optional(map(object({
       description     = optional(string)
       from_port       = number
@@ -1045,7 +1045,7 @@ variable "security_groups" {
       cidr_blocks     = optional(list(string))
       self            = optional(bool)
       prefix_list_ids = optional(list(string))
-    })), [])
+    })), {})
     tags = optional(map(string), {})
   }))
   default = {}
