@@ -45,3 +45,7 @@ resource "aws_secretsmanager_secret" "soa_pkcs12_passphrase" {
   name        = "ccms/soa/ca_truststore_passphrase"
   description = "Passphrase For PKCS12 Trust Store"
 }
+
+data "aws_secretsmanager_secret_version" "soa_pkcs12_passphrase" {
+  secret_id = aws_secretsmanager_secret.soa_pkcs12_passphrase.id
+}

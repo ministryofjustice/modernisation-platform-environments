@@ -56,31 +56,32 @@ resource "aws_ecs_task_definition" "admin" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_admin.json.tpl",
     {
-      app_name                 = local.application_data.accounts[local.environment].app_name
-      app_image                = local.application_data.accounts[local.environment].admin_app_image
-      admin_server_port        = local.application_data.accounts[local.environment].admin_server_port
-      aws_region               = local.application_data.accounts[local.environment].aws_region
-      container_version        = local.application_data.accounts[local.environment].admin_container_version
-      soa_password             = aws_secretsmanager_secret.soa_password.arn
-      db_user                  = local.application_data.accounts[local.environment].soa_db_user
-      db_role                  = local.application_data.accounts[local.environment].soa_db_role
-      db_instance_endpoint     = aws_db_instance.soa_db.endpoint
-      as_hostname              = aws_route53_record.admin.fqdn
-      wl_admin_mem_args        = local.application_data.accounts[local.environment].admin_wl_mem_args
-      xxsoa_ds_host            = aws_db_instance.tds_db.endpoint
-      xxsoa_ds_username        = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
-      xxsoa_ds_password        = aws_secretsmanager_secret.xxsoa_ds_password.arn
-      ebs_ds_url               = local.application_data.accounts[local.environment].admin_ebs_ds_url
-      ebs_ds_username          = local.application_data.accounts[local.environment].admin_ebs_ds_username
-      ebs_ds_password          = aws_secretsmanager_secret.ebs_ds_password.arn
-      ebssms_ds_url            = local.application_data.accounts[local.environment].admin_ebssms_ds_url
-      ebssms_ds_username       = local.application_data.accounts[local.environment].admin_ebs_ds_username
-      ebssms_ds_password       = aws_secretsmanager_secret.ebssms_ds_password.arn
-      pui_user_password        = aws_secretsmanager_secret.pui_user_password.arn
-      ebs_user_username        = local.application_data.accounts[local.environment].admin_ebs_user_username
-      ebs_user_password        = aws_secretsmanager_secret.ebs_user_password.arn
-      run_rcu                  = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
-      soa_trust_store_password = aws_secretsmanager_secret.soa_pkcs12_passphrase.arn
+      app_name                     = local.application_data.accounts[local.environment].app_name
+      app_image                    = local.application_data.accounts[local.environment].admin_app_image
+      admin_server_port            = local.application_data.accounts[local.environment].admin_server_port
+      aws_region                   = local.application_data.accounts[local.environment].aws_region
+      container_version            = local.application_data.accounts[local.environment].admin_container_version
+      soa_password                 = aws_secretsmanager_secret.soa_password.arn
+      db_user                      = local.application_data.accounts[local.environment].soa_db_user
+      db_role                      = local.application_data.accounts[local.environment].soa_db_role
+      db_instance_endpoint         = aws_db_instance.soa_db.endpoint
+      as_hostname                  = aws_route53_record.admin.fqdn
+      wl_admin_mem_args            = local.application_data.accounts[local.environment].admin_wl_mem_args
+      xxsoa_ds_host                = aws_db_instance.tds_db.endpoint
+      xxsoa_ds_username            = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
+      xxsoa_ds_password            = aws_secretsmanager_secret.xxsoa_ds_password.arn
+      ebs_ds_url                   = local.application_data.accounts[local.environment].admin_ebs_ds_url
+      ebs_ds_username              = local.application_data.accounts[local.environment].admin_ebs_ds_username
+      ebs_ds_password              = aws_secretsmanager_secret.ebs_ds_password.arn
+      ebssms_ds_url                = local.application_data.accounts[local.environment].admin_ebssms_ds_url
+      ebssms_ds_username           = local.application_data.accounts[local.environment].admin_ebs_ds_username
+      ebssms_ds_password           = aws_secretsmanager_secret.ebssms_ds_password.arn
+      pui_user_password            = aws_secretsmanager_secret.pui_user_password.arn
+      ebs_user_username            = local.application_data.accounts[local.environment].admin_ebs_user_username
+      ebs_user_password            = aws_secretsmanager_secret.ebs_user_password.arn
+      run_rcu                      = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
+      soa_trust_store_password     = data.aws_secretsmanager_secret_version.soa_pkcs12_passphrase.secret_string #--This is a quite ugly hack to overcome 
+      soa_trust_store_password_arn = aws_secretsmanager_secret.soa_pkcs12_passphrase.arn                        #--a templating limitation. Revisit. AW
     }
   )
 }
