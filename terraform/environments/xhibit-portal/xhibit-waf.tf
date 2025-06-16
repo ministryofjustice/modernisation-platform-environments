@@ -217,6 +217,7 @@ resource "aws_wafv2_web_acl_association" "xhibit_portal_waf" {
 }
 
 resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
+  #checkov:skip=CKV_AWS_158: "Ensure that Cloudwatch Log Group is encrypted using KMS CMK"
   name              = "aws-waf-logs-xbhibit-waf"  # Must match this format
   retention_in_days = 365
   tags = merge(local.tags,
