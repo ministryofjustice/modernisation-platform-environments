@@ -53,13 +53,13 @@ resource "aws_iam_role_policy_attachment" "coat_cross_account_attachment" {
   policy_arn = aws_iam_policy.coat_cross_account_policy[0].arn
 }
 
-resource "aws_iam_role" "coat_cross_account_role" {
+resource "aws_iam_role" "coat_cross_sync_account_role" {
   count = local.is-production ? 1 : 0
   name  = "moj-coat-${local.environment}-cur-reports-cross-role"
   assume_role_policy = templatefile("${path.module}/templates/coat-cross-prod-assume-role-policy.json", {})
 }
 
-resource "aws_iam_policy" "coat_cross_account_policy" {
+resource "aws_iam_policy" "coat_cross_sync_account_policy" {
   count = local.is-production ? 1 : 0
   name  = "moj-coat-${local.environment}-cur-reports-cross-role-policy"
   policy = templatefile("${path.module}/templates/coat-cross-dev-account-policy.json",
@@ -69,7 +69,7 @@ resource "aws_iam_policy" "coat_cross_account_policy" {
   )
 }
 
-resource "aws_iam_role_policy_attachment" "coat_cross_account_attachment" {
+resource "aws_iam_role_policy_attachment" "coat_cross_sync_account_attachment" {
   count      = local.is-production ? 1 : 0
   role       = aws_iam_role.coat_cross_account_role[0].name
   policy_arn = aws_iam_policy.coat_cross_account_policy[0].arn
