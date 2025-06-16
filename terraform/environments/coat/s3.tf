@@ -26,7 +26,10 @@ module "cur_s3_kms" {
       principals = [
         {
           type        = "AWS"
-          identifiers = ["arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role"]
+          identifiers = [
+            "arn:aws:iam::${local.environment_management.aws_organizations_root_account_id}:role/moj-cur-reports-v2-hourly-replication-role",
+            "arn:aws:iam::${local.coat_prod_account_id}:role/moj-coat-${local.prod_environment}-cur-reports-cross-role"
+          ]
         }
       ]
     },
