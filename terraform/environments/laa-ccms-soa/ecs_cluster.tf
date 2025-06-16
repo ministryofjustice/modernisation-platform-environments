@@ -80,8 +80,7 @@ resource "aws_ecs_task_definition" "admin" {
       ebs_user_username            = local.application_data.accounts[local.environment].admin_ebs_user_username
       ebs_user_password            = aws_secretsmanager_secret.ebs_user_password.arn
       run_rcu                      = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
-      soa_trust_store_password     = data.aws_secretsmanager_secret_version.soa_pkcs12_passphrase.secret_string #--This is a quite ugly hack to overcome 
-      soa_trust_store_password_arn = aws_secretsmanager_secret.soa_pkcs12_passphrase.arn                        #--a templating limitation. Revisit. AW
+      soa_trust_store_password_arn = aws_secretsmanager_secret.soa_pkcs12_passphrase.arn
     }
   )
 }
@@ -162,17 +161,18 @@ resource "aws_ecs_task_definition" "managed" {
   container_definitions = templatefile(
     "${path.module}/templates/task_definition_managed.json.tpl",
     {
-      app_name                 = local.application_data.accounts[local.environment].app_name
-      app_image                = local.application_data.accounts[local.environment].managed_app_image
-      managed_server_port      = local.application_data.accounts[local.environment].managed_server_port
-      admin_server_port        = local.application_data.accounts[local.environment].admin_server_port
-      aws_region               = local.application_data.accounts[local.environment].aws_region
-      container_version        = local.application_data.accounts[local.environment].managed_container_version
-      admin_host               = aws_route53_record.admin.fqdn
-      soa_password             = aws_secretsmanager_secret.soa_password.arn
-      ms_hostname              = aws_route53_record.managed.fqdn
-      wl_mem_args              = local.application_data.accounts[local.environment].managed_wl_mem_args
-      soa_trust_store_password = aws_secretsmanager_secret.soa_pkcs12_passphrase.arn
+      app_name                     = local.application_data.accounts[local.environment].app_name
+      app_image                    = local.application_data.accounts[local.environment].managed_app_image
+      managed_server_port          = local.application_data.accounts[local.environment].managed_server_port
+      admin_server_port            = local.application_data.accounts[local.environment].admin_server_port
+      aws_region                   = local.application_data.accounts[local.environment].aws_region
+      container_version            = local.application_data.accounts[local.environment].managed_container_version
+      admin_host                   = aws_route53_record.admin.fqdn
+      soa_password                 = aws_secretsmanager_secret.soa_password.arn
+      ms_hostname                  = aws_route53_record.managed.fqdn
+      wl_mem_args                  = local.application_data.accounts[local.environment].managed_wl_mem_args
+      soa_trust_store_password     = data.aws_secretsmanager_secret_version.soa_pkcs12_passphrase.secret_string #--This is a quite ugly hack to overcome 
+      soa_trust_store_password_arn = aws_secretsmanager_secret.soa_pkcs12_passphrase.arn                        #--a templating limitation. Revisit. AW
     }
   )
 }
