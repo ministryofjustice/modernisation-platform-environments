@@ -68,20 +68,20 @@ locals {
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"
-          cidr_blocks = concat(
+          cidr_blocks = flatten([
             var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
             var.ip_addresses.mp_cidr[var.environment.vpc_name],
-          )
+          ])
         }
         rdp-udp = {
           description = "Allow UDP RDP from Remote Desktop Gateways"
           from_port   = 3389
           to_port     = 3389
           protocol    = "UDP"
-          cidr_blocks = concat(
+          cidr_blocks = flatten([
             var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
             var.ip_addresses.mp_cidr[var.environment.vpc_name],
-          )
+          ])
         }
       }
     }
