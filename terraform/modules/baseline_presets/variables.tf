@@ -34,6 +34,7 @@ variable "options" {
     enable_ec2_self_provision                    = optional(bool, false)           # create EC2 policy for ansible provisioning
     enable_ec2_reduced_ssm_policy                = optional(bool, false)           # create standard AWS SSM policy minus ssm:GetParameter
     enable_ec2_oracle_enterprise_managed_server  = optional(bool, false)           # create role for accessing secrets in hmpps-oem accounts
+    enable_ec2_security_groups                   = optional(bool, false)           # create default security groups for EC2s
     enable_ec2_session_manager_cloudwatch_logs   = optional(bool, false)           # create SSM doc and log group for session manager logs
     enable_ec2_ssm_agent_update                  = optional(bool, false)           # create SSM association for auto-update of SSM agent. update-ssm-agent tag needs to be set on EC2s also
     enable_ec2_user_keypair                      = optional(bool, false)           # create secret and key-pair for ec2-user

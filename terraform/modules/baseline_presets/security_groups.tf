@@ -3,6 +3,8 @@ locals {
   security_groups_filter = flatten([
     var.options.enable_hmpps_domain ? ["ad-join"] : [],
     var.options.enable_hmpps_domain ? ["rdp-from-gateways"] : [],
+    var.options.enable_ec2_security_groups ? ["ec2-linux"] : [],
+    var.options.enable_ec2_security_groups ? ["ec2-windows"] : [],
   ])
 
   ad_netbios_name = contains(["development", "test"], var.environment.environment) ? "azure" : "hmpp"
@@ -56,10 +58,60 @@ locals {
           to_port         = 0
           protocol        = "-1"
           cidr_blocks     = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-          security_groups = []
         }
       }
     }
+
+    ec2-linux = {
+      description = "Security group for linux EC2s"
+
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+      }
+      egress = {
+        all = {
+          # allow all since internal resources are protected by inbound SGs
+          # and outbound internet is protected by firewall
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+        }
+      }
+    }
+
+    ec2-windows = {
+      description = "Security group for windows EC2s"
+
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+      }
+      egress = {
+        all = {
+          # allow all since internal resources are protected by inbound SGs
+          # and outbound internet is protected by firewall
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+        }
+      }
+    }
+
     rdp-from-gateways = {
       description = "Security group to allow RDP from ${local.ad_netbios_name} remote desktop gateways"
       ingress = {
