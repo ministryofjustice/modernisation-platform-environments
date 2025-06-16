@@ -115,7 +115,7 @@
         },
         {
           "name": "JAVA_CERT_TRUST_STORE_PASS",
-          "value": "${managed_soa_trust_store_password}"
+          "value": "${soa_trust_store_password}"
         },
     ]
   }
