@@ -97,11 +97,11 @@
       },
       {
         "name": "JAVA_OPTION",
-        "value": "${java_opts}"
+        "value": "-Djava.security.egd=file:/dev/./urandom"
       },
       {
-        "name": "JAVA_OPTS",
-        "value": "${java_opts}"
+        "name": "JAVA_TOOL_OPTIONS",
+        "value": "${java_tool_options}"
       },
      {
        "name": "TZ",

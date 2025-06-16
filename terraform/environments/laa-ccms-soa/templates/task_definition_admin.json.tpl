@@ -58,15 +58,10 @@
       {
         "name": "CONFIG_JVM_ARGS",
         "value": " -Djava.security.egd=file:/tmp/big.random.file"
-        
       },
       {
-        "name": "JAVA_OPTION",
-        "value": "${java_opts}"
-      },
-      {
-        "name": "JAVA_OPTS",
-        "value": "${java_opts}"
+        "name": "JAVA_TOOL_OPTIONS",
+        "value": "${java_tool_options}"
       },
       {
         "name": "USER_MEM_ARGS",
