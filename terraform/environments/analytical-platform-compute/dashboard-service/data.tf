@@ -26,16 +26,6 @@ data "aws_subnet" "apc_private" {
   id       = each.value
 }
 
-# data "aws_subnets" "apc_database_subnet_group" {
-#   filter {
-#     name   = "vpc-id"
-#     values = [data.aws_vpc.apc_vpc.id]
-#   }
-#   tags = {
-#     Name = "${var.networking[0].application}-${local.environment}-db*"
-#   }
-# }
-
 data "aws_db_subnet_group" "apc_database_subnet_group" {
   name = "${local.application_name}-${local.environment}"
 }
