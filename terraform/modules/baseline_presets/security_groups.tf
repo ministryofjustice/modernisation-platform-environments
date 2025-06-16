@@ -9,7 +9,7 @@ locals {
   security_groups = {
 
     ad_join = {
-      description = "Security group for resources that need to join the ${local.ad_netbois_name} active directory domain"
+      description = "Security group for resources that need to join the ${local.ad_netbios_name} active directory domain"
       ingress = {
         icmp = {
           description = "Allow ICMP ingress"
