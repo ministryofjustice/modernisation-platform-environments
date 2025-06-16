@@ -102,11 +102,11 @@
       {
         "name": "JAVA_TOOL_OPTIONS",
         "value": "-Djavax.net.ssl.trustStore=/home/ec2-user/efs/pki/soa-trust-store.p12 -Djavax.net.ssl.trustStorePassword=${soa_trust_store_password}"
+      },
+      {
+        "name": "TZ",
+        "value": "GB"
       }
-     {
-       "name": "TZ",
-       "value": "GB"
-     }
     ],
     "secrets": [
         {
