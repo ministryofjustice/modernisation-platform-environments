@@ -1,15 +1,15 @@
 locals {
 
   security_groups_filter = flatten([
-    var.options.enable_hmpps_domain ? ["domain_controllers"] : []
+    var.options.enable_hmpps_domain ? ["ad_join"] : []
   ])
 
   ad_netbios_name = contains(["development", "test"], var.environment.environment) ? "azure" : "hmpp"
 
   security_groups = {
 
-    domain_controllers = {
-      description = "Security group for Domain Controllers"
+    ad_join = {
+      description = "Security group for resources that need to join the ${local.ad_netbois_name} active directory domain"
       ingress = {
         icmp = {
           description = "Allow ICMP ingress"
