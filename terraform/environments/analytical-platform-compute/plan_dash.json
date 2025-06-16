@@ -1,0 +1,734 @@
+Terraform will perform the following actions:
+
+  # helm_release.dashboard_service[0] will be created
+  + resource "helm_release" "dashboard_service" {
+      + atomic                     = false
+      + chart                      = "dashboard-service"
+      + cleanup_on_fail            = false
+      + create_namespace           = false
+      + dependency_update          = false
+      + disable_crd_hooks          = false
+      + disable_openapi_validation = false
+      + disable_webhooks           = false
+      + force_update               = false
+      + id                         = (known after apply)
+      + lint                       = false
+      + manifest                   = (known after apply)
+      + max_history                = 0
+      + metadata                   = (known after apply)
+      + name                       = "dashboard-service"
+      + namespace                  = "dashboard-service"
+      + pass_credentials           = false
+      + recreate_pods              = false
+      + render_subchart_notes      = true
+      + replace                    = false
+      + repository                 = "oci://ghcr.io/ministryofjustice/analytical-platform-charts"
+      + reset_values               = false
+      + reuse_values               = false
+      + skip_crds                  = false
+      + status                     = "deployed"
+      + timeout                    = 300
+      + values                     = [
+          + <<-EOT
+                ---
+                ingress:
+                  enabled: true
+                  className: "default"
+                  annotations:
+                    cert-manager.io/cluster-issuer: letsencrypt-production-http01
+                  hosts:
+                    - host: dashboards.analytical-platform.service.justice.gov.uk
+                      paths:
+                        - path: /
+                          pathType: ImplementationSpecific
+                  tls:
+                    - secretName: ui-tls
+                      hosts:
+                        - dashboards.analytical-platform.service.justice.gov.uk
+                
+                app:
+                  environment:
+                    - name: DJANGO_SETTINGS_MODULE
+                      value: dashboard_service.settings.production
+                    - name: APP_ENV
+                      value: production
+                    - name: SECRET_KEY
+                      valueFrom:
+                        secretKeyRef:
+                          name: dashboard-service-app-secrets
+                          key: secret-key
+                    - name: SENTRY_DSN
+                      valueFrom:
+                        secretKeyRef:
+                          name: dashboard-service-app-secrets
+                          key: sentry-dsn
+                    - name: AUTH0_CLIENT_ID
+                      valueFrom:
+                        secretKeyRef:
+                          name: dashboard-service-app-secrets
+                          key: auth0-client-id
+                    - name: AUTH0_CLIENT_SECRET
+                      valueFrom:
+                        secretKeyRef:
+                          name: dashboard-service-app-secrets
+                          key: auth0-client-secret
+                    - name: AUTH0_DOMAIN
+                      value: alpha-analytics-moj.eu.auth0.com
+                    - name: DB_USER
+                      valueFrom:
+                        secretKeyRef:
+                          name: dashboard-service-rds
+                          key: username
+                    - name: DB_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          name: dashboard-service-rds
+                          key: password
+                    - name: DB_HOST
+                      valueFrom:
+                        secretKeyRef:
+                          name: dashboard-service-rds
+                          key: address
+                    - name: DB_PORT
+                      valueFrom:
+                        secretKeyRef:
+                          name: dashboard-service-rds
+                          key: port
+                    - name: DB_NAME
+                      value: "dashboard_service"
+            EOT,
+        ]
+      + verify                     = false
+      + version                    = "0.1.9"
+      + wait                       = true
+      + wait_for_jobs              = false
+    }
+
+  # kubernetes_manifest.dashboard_service_app_secrets_secret[0] will be created
+  + resource "kubernetes_manifest" "dashboard_service_app_secrets_secret" {
+      + manifest = {
+          + apiVersion = "external-secrets.io/v1beta1"
+          + kind       = "ExternalSecret"
+          + metadata   = {
+              + name      = "dashboard-service-app-secrets"
+              + namespace = "dashboard-service"
+            }
+          + spec       = {
+              + data            = [
+                  + {
+                      + remoteRef = {
+                          + key      = (known after apply)
+                          + property = "secret_key"
+                        }
+                      + secretKey = "secret-key"
+                    },
+                  + {
+                      + remoteRef = {
+                          + key      = (known after apply)
+                          + property = "sentry_dsn"
+                        }
+                      + secretKey = "sentry-dsn"
+                    },
+                  + {
+                      + remoteRef = {
+                          + key      = (known after apply)
+                          + property = "auth0_client_id"
+                        }
+                      + secretKey = "auth0-client-id"
+                    },
+                  + {
+                      + remoteRef = {
+                          + decodingStrategy = "Base64"
+                          + key              = (known after apply)
+                          + property         = "auth0_client_secret"
+                        }
+                      + secretKey = "auth0-client-secret"
+                    },
+                ]
+              + refreshInterval = "1m"
+              + secretStoreRef  = {
+                  + kind = "ClusterSecretStore"
+                  + name = "aws-secretsmanager"
+                }
+              + target          = {
+                  + name = "dashboard-service-app-secrets"
+                }
+            }
+        }
+      + object   = {
+          + apiVersion = "external-secrets.io/v1beta1"
+          + kind       = "ExternalSecret"
+          + metadata   = {
+              + annotations                = (known after apply)
+              + creationTimestamp          = (known after apply)
+              + deletionGracePeriodSeconds = (known after apply)
+              + deletionTimestamp          = (known after apply)
+              + finalizers                 = (known after apply)
+              + generateName               = (known after apply)
+              + generation                 = (known after apply)
+              + labels                     = (known after apply)
+              + managedFields              = (known after apply)
+              + name                       = "dashboard-service-app-secrets"
+              + namespace                  = "dashboard-service"
+              + ownerReferences            = (known after apply)
+              + resourceVersion            = (known after apply)
+              + selfLink                   = (known after apply)
+              + uid                        = (known after apply)
+            }
+          + spec       = {
+              + data            = [
+                  + {
+                      + remoteRef = {
+                          + conversionStrategy = (known after apply)
+                          + decodingStrategy   = (known after apply)
+                          + key                = (known after apply)
+                          + metadataPolicy     = (known after apply)
+                          + property           = "secret_key"
+                          + version            = (known after apply)
+                        }
+                      + secretKey = "secret-key"
+                      + sourceRef = {
+                          + generatorRef = {
+                              + apiVersion = (known after apply)
+                              + kind       = (known after apply)
+                              + name       = (known after apply)
+                            }
+                          + storeRef     = {
+                              + kind = (known after apply)
+                              + name = (known after apply)
+                            }
+                        }
+                    },
+                  + {
+                      + remoteRef = {
+                          + conversionStrategy = (known after apply)
+                          + decodingStrategy   = (known after apply)
+                          + key                = (known after apply)
+                          + metadataPolicy     = (known after apply)
+                          + property           = "sentry_dsn"
+                          + version            = (known after apply)
+                        }
+                      + secretKey = "sentry-dsn"
+                      + sourceRef = {
+                          + generatorRef = {
+                              + apiVersion = (known after apply)
+                              + kind       = (known after apply)
+                              + name       = (known after apply)
+                            }
+                          + storeRef     = {
+                              + kind = (known after apply)
+                              + name = (known after apply)
+                            }
+                        }
+                    },
+                  + {
+                      + remoteRef = {
+                          + conversionStrategy = (known after apply)
+                          + decodingStrategy   = (known after apply)
+                          + key                = (known after apply)
+                          + metadataPolicy     = (known after apply)
+                          + property           = "auth0_client_id"
+                          + version            = (known after apply)
+                        }
+                      + secretKey = "auth0-client-id"
+                      + sourceRef = {
+                          + generatorRef = {
+                              + apiVersion = (known after apply)
+                              + kind       = (known after apply)
+                              + name       = (known after apply)
+                            }
+                          + storeRef     = {
+                              + kind = (known after apply)
+                              + name = (known after apply)
+                            }
+                        }
+                    },
+                  + {
+                      + remoteRef = {
+                          + conversionStrategy = (known after apply)
+                          + decodingStrategy   = "Base64"
+                          + key                = (known after apply)
+                          + metadataPolicy     = (known after apply)
+                          + property           = "auth0_client_secret"
+                          + version            = (known after apply)
+                        }
+                      + secretKey = "auth0-client-secret"
+                      + sourceRef = {
+                          + generatorRef = {
+                              + apiVersion = (known after apply)
+                              + kind       = (known after apply)
+                              + name       = (known after apply)
+                            }
+                          + storeRef     = {
+                              + kind = (known after apply)
+                              + name = (known after apply)
+                            }
+                        }
+                    },
+                ]
+              + dataFrom        = (known after apply)
+              + refreshInterval = "1m"
+              + refreshPolicy   = (known after apply)
+              + secretStoreRef  = {
+                  + kind = "ClusterSecretStore"
+                  + name = "aws-secretsmanager"
+                }
+              + target          = {
+                  + creationPolicy = (known after apply)
+                  + deletionPolicy = (known after apply)
+                  + immutable      = (known after apply)
+                  + name           = "dashboard-service-app-secrets"
+                  + template       = {
+                      + data          = (known after apply)
+                      + engineVersion = (known after apply)
+                      + mergePolicy   = (known after apply)
+                      + metadata      = {
+                          + annotations = (known after apply)
+                          + labels      = (known after apply)
+                        }
+                      + templateFrom  = (known after apply)
+                      + type          = (known after apply)
+                    }
+                }
+            }
+        }
+    }
+
+  # kubernetes_namespace.dashboard_service[0] will be created
+  + resource "kubernetes_namespace" "dashboard_service" {
+      + id                               = (known after apply)
+      + wait_for_default_service_account = false
+
+      + metadata {
+          + generation       = (known after apply)
+          + labels           = {
+              + "compute.analytical-platform.service.justice.gov.uk/workload" = "dashboard-service"
+              + "pod-security.kubernetes.io/enforce"                          = "restricted"
+            }
+          + name             = "dashboard-service"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # kubernetes_secret.dashboard_service_rds[0] will be created
+  + resource "kubernetes_secret" "dashboard_service_rds" {
+      + binary_data_wo                 = (write-only attribute)
+      + data                           = (sensitive value)
+      + data_wo                        = (write-only attribute)
+      + id                             = (known after apply)
+      + type                           = "Opaque"
+      + wait_for_service_account_token = true
+
+      + metadata {
+          + generation       = (known after apply)
+          + name             = "dashboard-service-rds"
+          + namespace        = "dashboard-service"
+          + resource_version = (known after apply)
+          + uid              = (known after apply)
+        }
+    }
+
+  # random_password.dashboard_service_rds[0] will be created
+  + resource "random_password" "dashboard_service_rds" {
+      + bcrypt_hash = (sensitive value)
+      + id          = (known after apply)
+      + length      = 32
+      + lower       = true
+      + min_lower   = 0
+      + min_numeric = 0
+      + min_special = 0
+      + min_upper   = 0
+      + number      = true
+      + numeric     = true
+      + result      = (sensitive value)
+      + special     = false
+      + upper       = true
+    }
+
+  # random_password.dashboard_service_secret_key[0] will be created
+  + resource "random_password" "dashboard_service_secret_key" {
+      + bcrypt_hash = (sensitive value)
+      + id          = (known after apply)
+      + length      = 32
+      + lower       = true
+      + min_lower   = 0
+      + min_numeric = 0
+      + min_special = 0
+      + min_upper   = 0
+      + number      = true
+      + numeric     = true
+      + result      = (sensitive value)
+      + special     = false
+      + upper       = true
+    }
+
+  # module.dashboard_service_app_secrets[0].aws_secretsmanager_secret.this[0] will be created
+  + resource "aws_secretsmanager_secret" "this" {
+      + arn                            = (known after apply)
+      + force_overwrite_replica_secret = false
+      + id                             = (known after apply)
+      + kms_key_id                     = "arn:aws:kms:eu-west-2:REDACTED:key/bc9a79f1-426e-44a3-9eac-fa68a73e7898"
+      + name                           = "dashboard-service/app-secrets"
+      + name_prefix                    = (known after apply)
+      + policy                         = (known after apply)
+      + recovery_window_in_days        = 30
+      + tags                           = {
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      + tags_all                       = {
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+
+      + replica (known after apply)
+    }
+
+  # module.dashboard_service_app_secrets[0].aws_secretsmanager_secret_version.ignore_changes[0] will be created
+  + resource "aws_secretsmanager_secret_version" "ignore_changes" {
+      + arn                  = (known after apply)
+      + has_secret_string_wo = (known after apply)
+      + id                   = (known after apply)
+      + secret_id            = (known after apply)
+      + secret_string        = (sensitive value)
+      + secret_string_wo     = (write-only attribute)
+      + version_id           = (known after apply)
+      + version_stages       = (known after apply)
+    }
+
+  # module.dashboard_service_rds_kms[0].aws_kms_alias.this["rds/dashboard-service"] will be created
+  + resource "aws_kms_alias" "this" {
+      + arn            = (known after apply)
+      + id             = (known after apply)
+      + name           = "alias/rds/dashboard-service"
+      + name_prefix    = (known after apply)
+      + target_key_arn = (known after apply)
+      + target_key_id  = (known after apply)
+    }
+
+  # module.dashboard_service_rds_kms[0].aws_kms_key.this[0] will be created
+  + resource "aws_kms_key" "this" {
+      + arn                                = (known after apply)
+      + bypass_policy_lockout_safety_check = false
+      + customer_master_key_spec           = "SYMMETRIC_DEFAULT"
+      + deletion_window_in_days            = 7
+      + description                        = "Dashboard Service RDS KMS key"
+      + enable_key_rotation                = true
+      + id                                 = (known after apply)
+      + is_enabled                         = true
+      + key_id                             = (known after apply)
+      + key_usage                          = "ENCRYPT_DECRYPT"
+      + multi_region                       = false
+      + policy                             = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "kms:*"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + AWS = "arn:aws:iam::REDACTED:root"
+                        }
+                      + Resource  = "*"
+                      + Sid       = "Default"
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + rotation_period_in_days            = (known after apply)
+      + tags                               = {
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      + tags_all                           = {
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+    }
+
+  # module.rds_security_group[0].aws_security_group.this_name_prefix[0] will be created
+  + resource "aws_security_group" "this_name_prefix" {
+      + arn                    = (known after apply)
+      + description            = "Security Group managed by Terraform"
+      + egress                 = (known after apply)
+      + id                     = (known after apply)
+      + ingress                = (known after apply)
+      + name                   = (known after apply)
+      + name_prefix            = "dashboard-service-"
+      + owner_id               = (known after apply)
+      + revoke_rules_on_delete = false
+      + tags                   = {
+          + "Name"                   = "dashboard-service"
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      + tags_all               = {
+          + "Name"                   = "dashboard-service"
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      + vpc_id                 = "vpc-041dfc4a5c598ef8c"
+
+      + timeouts {
+          + create = "10m"
+          + delete = "15m"
+        }
+    }
+
+  # module.rds_security_group[0].aws_security_group_rule.ingress_with_cidr_blocks[0] will be created
+  + resource "aws_security_group_rule" "ingress_with_cidr_blocks" {
+      + cidr_blocks              = [
+          + "10.201.160.0/19",
+          + "10.201.128.0/19",
+          + "10.201.192.0/19",
+        ]
+      + description              = "Ingress Rule"
+      + from_port                = 5432
+      + id                       = (known after apply)
+      + protocol                 = "tcp"
+      + security_group_id        = (known after apply)
+      + security_group_rule_id   = (known after apply)
+      + self                     = false
+      + source_security_group_id = (known after apply)
+      + to_port                  = 5432
+      + type                     = "ingress"
+    }
+
+  # module.dashboard_service_rds[0].module.db_instance.aws_db_instance.this[0] will be created
+  + resource "aws_db_instance" "this" {
+      + address                               = (known after apply)
+      + allocated_storage                     = 64
+      + allow_major_version_upgrade           = false
+      + apply_immediately                     = false
+      + arn                                   = (known after apply)
+      + auto_minor_version_upgrade            = true
+      + availability_zone                     = (known after apply)
+      + backup_retention_period               = 7
+      + backup_target                         = (known after apply)
+      + backup_window                         = "03:00-06:00"
+      + ca_cert_identifier                    = "rds-ca-rsa2048-g1"
+      + character_set_name                    = (known after apply)
+      + copy_tags_to_snapshot                 = false
+      + database_insights_mode                = (known after apply)
+      + db_name                               = "dashboard_service"
+      + db_subnet_group_name                  = "analytical-platform-compute-production"
+      + dedicated_log_volume                  = false
+      + delete_automated_backups              = true
+      + deletion_protection                   = true
+      + domain_fqdn                           = (known after apply)
+      + enabled_cloudwatch_logs_exports       = [
+          + "postgresql",
+          + "upgrade",
+        ]
+      + endpoint                              = (known after apply)
+      + engine                                = "postgres"
+      + engine_lifecycle_support              = (known after apply)
+      + engine_version                        = "17"
+      + engine_version_actual                 = (known after apply)
+      + hosted_zone_id                        = (known after apply)
+      + iam_database_authentication_enabled   = false
+      + id                                    = (known after apply)
+      + identifier                            = "dashboard-service"
+      + identifier_prefix                     = (known after apply)
+      + instance_class                        = "db.t4g.medium"
+      + iops                                  = (known after apply)
+      + kms_key_id                            = (known after apply)
+      + latest_restorable_time                = (known after apply)
+      + license_model                         = (known after apply)
+      + listener_endpoint                     = (known after apply)
+      + maintenance_window                    = "mon:00:00-mon:03:00"
+      + master_user_secret                    = (known after apply)
+      + master_user_secret_kms_key_id         = (known after apply)
+      + max_allocated_storage                 = 256
+      + monitoring_interval                   = 30
+      + monitoring_role_arn                   = (known after apply)
+      + multi_az                              = true
+      + nchar_character_set_name              = (known after apply)
+      + network_type                          = (known after apply)
+      + option_group_name                     = (known after apply)
+      + parameter_group_name                  = (known after apply)
+      + password                              = (sensitive value)
+      + password_wo                           = (write-only attribute)
+      + performance_insights_enabled          = true
+      + performance_insights_kms_key_id       = (known after apply)
+      + performance_insights_retention_period = 7
+      + port                                  = (known after apply)
+      + publicly_accessible                   = false
+      + replica_mode                          = (known after apply)
+      + replicas                              = (known after apply)
+      + resource_id                           = (known after apply)
+      + skip_final_snapshot                   = true
+      + snapshot_identifier                   = (known after apply)
+      + status                                = (known after apply)
+      + storage_encrypted                     = true
+      + storage_throughput                    = (known after apply)
+      + storage_type                          = "gp2"
+      + tags                                  = {
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      + tags_all                              = {
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      + timezone                              = (known after apply)
+      + username                              = "dashboard_service"
+      + vpc_security_group_ids                = (known after apply)
+
+      + timeouts {}
+    }
+
+  # module.dashboard_service_rds[0].module.db_instance.aws_iam_role.enhanced_monitoring[0] will be created
+  + resource "aws_iam_role" "enhanced_monitoring" {
+      + arn                   = (known after apply)
+      + assume_role_policy    = jsonencode(
+            {
+              + Statement = [
+                  + {
+                      + Action    = "sts:AssumeRole"
+                      + Effect    = "Allow"
+                      + Principal = {
+                          + Service = "monitoring.rds.amazonaws.com"
+                        }
+                    },
+                ]
+              + Version   = "2012-10-17"
+            }
+        )
+      + create_date           = (known after apply)
+      + description           = "Enhanced Monitoring for Dashbaord Service RDS"
+      + force_detach_policies = false
+      + id                    = (known after apply)
+      + managed_policy_arns   = (known after apply)
+      + max_session_duration  = 3600
+      + name                  = (known after apply)
+      + name_prefix           = "dashboard-service-rds-monitoring-"
+      + path                  = "/"
+      + tags                  = {
+          + "Name"                   = "dashboard-service-rds-monitoring"
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      + tags_all              = {
+          + "Name"                   = "dashboard-service-rds-monitoring"
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      + unique_id             = (known after apply)
+
+      + inline_policy (known after apply)
+    }
+
+  # module.dashboard_service_rds[0].module.db_instance.aws_iam_role_policy_attachment.enhanced_monitoring[0] will be created
+  + resource "aws_iam_role_policy_attachment" "enhanced_monitoring" {
+      + id         = (known after apply)
+      + policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonRDSEnhancedMonitoringRole"
+      + role       = (known after apply)
+    }
+
+  # module.dashboard_service_rds[0].module.db_parameter_group.aws_db_parameter_group.this[0] will be created
+  + resource "aws_db_parameter_group" "this" {
+      + arn          = (known after apply)
+      + description  = "dashboard-service parameter group"
+      + family       = "postgres17"
+      + id           = (known after apply)
+      + name         = (known after apply)
+      + name_prefix  = "dashboard-service-"
+      + skip_destroy = false
+      + tags         = {
+          + "Name"                   = "dashboard-service"
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+      + tags_all     = {
+          + "Name"                   = "dashboard-service"
+          + "application"            = "analytical-platform-compute"
+          + "business-unit"          = "Platforms"
+          + "environment-name"       = "analytical-platform-compute-production"
+          + "infrastructure-support" = "analytical-platform@digital.justice.gov.uk"
+          + "is-production"          = "true"
+          + "owner"                  = "Analytical Platform: analytical-platform@digital.justice.gov.uk"
+          + "source-code"            = "https://github.com/ministryofjustice/modernisation-platform-environments"
+        }
+
+      + parameter {
+          + apply_method = "immediate"
+          + name         = "log_connections"
+          + value        = "1"
+        }
+      + parameter {
+          + apply_method = "immediate"
+          + name         = "log_hostname"
+          + value        = "1"
+        }
+      + parameter {
+          + apply_method = "immediate"
+          + name         = "log_statement"
+          + value        = "all"
+        }
+      + parameter {
+          + apply_method = "pending-reboot"
+          + name         = "rds.force_ssl"
+          + value        = "1"
+        }
+    }
+
+Plan: 16 to add, 0 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
