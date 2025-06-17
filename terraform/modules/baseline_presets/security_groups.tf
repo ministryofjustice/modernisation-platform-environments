@@ -187,7 +187,7 @@ locals {
           to_port     = 3389
           protocol    = "TCP"
           cidr_blocks = flatten([
-            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
             var.ip_addresses.mp_cidr[var.environment.vpc_name],
           ])
         }
@@ -197,7 +197,7 @@ locals {
           to_port     = 3389
           protocol    = "UDP"
           cidr_blocks = flatten([
-            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
             var.ip_addresses.mp_cidr[var.environment.vpc_name],
           ])
         }
