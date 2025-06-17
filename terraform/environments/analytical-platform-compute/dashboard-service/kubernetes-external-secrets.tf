@@ -4,7 +4,7 @@ resource "kubernetes_manifest" "dashboard_service_app_secrets_secret" {
   count = terraform.workspace == "analytical-platform-compute-test" ? 0 : 1
 
   manifest = {
-    "apiVersion" = "external-secrets.io/v1beta1"
+    "apiVersion" = "external-secrets.io/v1"
     "kind"       = "ExternalSecret"
     "metadata" = {
       "name"      = "dashboard-service-app-secrets"
