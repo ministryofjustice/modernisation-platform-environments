@@ -4,7 +4,6 @@
     "ParallelApplyQueuesPerThread": 0,
     "ParallelApplyThreads": 0,
     "TargetSchema": "DELIUS_APP_SCHEMA",
-    "InlineLobMaxSize": 0,
     "ParallelLoadQueuesPerThread": 0,
     "SupportLobs": true,
     "LobChunkSize": 64,
