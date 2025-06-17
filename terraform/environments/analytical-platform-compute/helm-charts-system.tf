@@ -71,7 +71,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "73.2.0"
+  version    = "75.2.0"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
