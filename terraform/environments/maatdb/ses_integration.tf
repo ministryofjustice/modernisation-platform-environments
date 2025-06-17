@@ -3,7 +3,7 @@
 
 # Get the Route 53 hosted zone for the domain
 data "aws_route53_zone" "zone" {
-  name         = local.ses_domain
+  name         = local.hosted_zone
   private_zone = false
 }
 
@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "smtp_user_policy" {
   statement {
     effect = "Allow"
     actions = ["ses:SendRawEmail"]
-    resources = [aws_ses_domain_identity.domain[0].arn]
+    resources = length(aws_ses_domain_identity.domain) > 0 ? [aws_ses_domain_identity.domain[0].arn] : []
   }
 }
 
@@ -102,16 +102,14 @@ resource "aws_route53_record" "dkim" {
 }
 
 
-
 # Outputs
 output "smtp_username" {
-  value       = aws_iam_access_key.smtp_user_key[0].id
-  description = "SES SMTP Username"
-  sensitive   = true
+  description = "The IAM access key ID for SMTP user"
+  value       = length(aws_iam_access_key.smtp_user_key) > 0 ? aws_iam_access_key.smtp_user_key[0].id : null
 }
 
 output "smtp_password" {
-  value       = aws_iam_access_key.smtp_user_key[0].ses_smtp_password_v4
-  description = "SES SMTP Password"
+  description = "The SMTP password for SES (derived from access key)"
+  value       = length(aws_iam_access_key.smtp_user_key) > 0 ? aws_iam_access_key.smtp_user_key[0].ses_smtp_password_v4 : null
   sensitive   = true
 }

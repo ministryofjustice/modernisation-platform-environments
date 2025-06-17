@@ -29,9 +29,9 @@
       "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907",
       "build_s3": false,
       "build_ftp": false,
-      "build_ses": true,
+      "build_ses": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
-      "ses_domain_identity": "laa-development.modernisation-platform.internal"
+      "hosted_zone": "dev.legalservices.gov.uk"
     },
 
     "test": {
@@ -65,7 +65,8 @@
       "build_ftp": false,
       "build_ses": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
-      "ses_domain_identity": "laa-test.modernisation-platform.internal"
+      "hosted_zone": "tst.legalservices.gov.uk"
+
     },
     "preproduction": {
       "region": "eu-west-2",
@@ -96,9 +97,9 @@
       "mlra_ecs_cluster_sec_group_id": "sg-0da6dd3ffabf8c75e",
       "build_s3": false,
       "build_ftp": false,
-      "build_ses": false,
+      "build_ses": true,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
-      "ses_domain_identity": "laa-preproduction.modernisation-platform.internal"
+      "hosted_zone": "uat.legalservices.gov.uk"
     },
 
     "production": {
@@ -132,7 +133,7 @@
       "build_ftp": false,
       "build_ses": false,
       "pagerduty_integration_key_name": "laa_maat_prod_alarm",
-      "ses_domain_identity": "means-assessment-administration.service.justice.gov.uk"
+      "hosted_zone": "legalservices.gov.uk"
     }
   }
 }
