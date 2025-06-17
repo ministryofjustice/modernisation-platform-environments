@@ -12,11 +12,6 @@ locals {
   baseline_development = {
 
     ec2_autoscaling_groups = {
-      dev-ncr-client-a = merge(local.ec2_autoscaling_groups.jumpserver, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.jumpserver.autoscaling_group, {
-          desired_capacity = 0
-        })
-      })
     }
 
     route53_zones = {
