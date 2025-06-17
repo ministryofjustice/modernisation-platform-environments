@@ -594,6 +594,7 @@ module "share_non_cadt_dbs_with_roles" {
   de_role_arn             = try(one(data.aws_iam_roles.mod_plat_roles.arns))
 }
 
+
 data "aws_secretsmanager_secret" "airflow_ssh_secret" {
   name = aws_secretsmanager_secret.airflow_secret[0].id
 
