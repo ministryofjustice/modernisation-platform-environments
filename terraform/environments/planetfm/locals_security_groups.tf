@@ -97,7 +97,7 @@ locals {
           from_port       = 80
           to_port         = 80
           protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.jumpserver2
+          cidr_blocks     = local.security_group_cidrs.jumpservers2
           security_groups = ["loadbalancer"]
         }
         https_web = {
