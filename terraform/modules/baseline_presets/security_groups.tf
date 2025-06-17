@@ -5,6 +5,7 @@ locals {
     var.options.enable_hmpps_domain ? ["rdp-from-gateways"] : [],
     var.options.enable_ec2_security_groups ? ["ec2-linux"] : [],
     var.options.enable_ec2_security_groups ? ["ec2-windows"] : [],
+    var.options.enable_ec2_security_groups && var.options.enable_ec2_oracle_enterprise_managed_server ? ["oem-agent"] : [],
   ])
 
   ad_netbios_name = contains(["development", "test"], var.environment.environment) ? "azure" : "hmpp"
@@ -174,6 +175,57 @@ locals {
           to_port     = 0
           protocol    = "-1"
           cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+
+    oem-agent = {
+      description = "Security group for EC2s with Oracle OEM agent"
+
+      ingress = {
+        icmp = {
+          description = "Allow ICMP ingress from OEM"
+          protocol    = "ICMP"
+          from_port   = 8
+          to_port     = 0
+          cidr_blocks = var.ip_addresses.mp_cidr[var.environment.vpc_name],
+        }
+        echo = {
+          description = "Allow echo from OEM"
+          protocol    = "TCP"
+          from_port   = 7
+          to_port     = 7
+          cidr_blocks = var.ip_addresses.mp_cidr[var.environment.vpc_name],
+        }
+        ssh = {
+          description = "Allow SSH from OEM"
+          from_port   = 22
+          to_port     = 22
+          protocol    = "tcp"
+          cidr_blocks = var.ip_addresses.mp_cidr[var.environment.vpc_name],
+        }
+        oracle-db-1521 = {
+          description = "Allow oracle database 1521 ingress from OEM"
+          from_port   = "1521"
+          to_port     = "1521"
+          protocol    = "TCP"
+          cidr_blocks = var.ip_addresses.mp_cidr[var.environment.vpc_name],
+        }
+        oem-agent-3872 = {
+          description = "Allow oem agent ingress from OEM"
+          from_port   = "3872"
+          to_port     = "3872"
+          protocol    = "TCP"
+          cidr_blocks = var.ip_addresses.mp_cidr[var.environment.vpc_name],
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all egress to OEM"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = var.ip_addresses.mp_cidr[var.environment.vpc_name],
         }
       }
     }
