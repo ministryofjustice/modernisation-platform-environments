@@ -19,11 +19,14 @@ on:
   workflow_dispatch:
 
 env:
+  # ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
+  # NUKE_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE }}
+  # NUKE_BLOCKLIST_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE_BLOCKLIST }}
   AWS_REGION: "eu-west-2"
-  ENVIRONMENT_MANAGEMENT: ${{ secrets.MODERNISATION_PLATFORM_ENVIRONMENTS }}
   TF_IN_AUTOMATION: true
-  NUKE_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE }}
-  NUKE_BLOCKLIST_ACCOUNTS: ${{ secrets.MODERNISATION_PLATFORM_AUTONUKE_BLOCKLIST }}
+  MODERNISATION_PLATFORM_ACCOUNT_ID: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+  PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
 permissions: {}
 
 defaults:
@@ -53,6 +56,12 @@ jobs:
           done <<< "$(jq -c -r '.[]' <<< $NUKE_BLOCKLIST_ACCOUNTS)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
           # Encoding and passing blocklist string as an output
           echo "account_blocklist_str=$(echo -n "${account_blocklist_str}" | base64 -w 0)" >> $GITHUB_OUTPUT
+  
+  fetch-secrets:
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@ace6113171b798cd9a1251b5a0b6bc04ae324bf3 # myBranch
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
   nuke:
     strategy:
@@ -64,10 +73,19 @@ jobs:
       id-token: write # This is required for requesting the JWT
       contents: read # This is required for actions/checkout
     runs-on: ubuntu-latest
-    needs: setup-prerequisites
+    needs: [setup-prerequisites, fetch-secrets]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+      
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c46848c0f17b1550dcf8ecffa0cdad8f0fc858ef # v3.2.3
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
+          testing_ci_iam_user_keys: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_keys }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
       - name: Set Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
@@ -164,7 +182,7 @@ jobs:
           payload: |
             {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
         if: ${{ failure() }}
     env:
       ACCOUNT_NAME: ${{ matrix.nuke_accts }}
@@ -176,10 +194,18 @@ jobs:
     permissions:
       contents: read # This is required for actions/checkout
     runs-on: ubuntu-latest
-    needs: setup-prerequisites
+    needs: [setup-prerequisites, fetch-secrets]
     steps:
       - name: Checkout Repository
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
+
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c46848c0f17b1550dcf8ecffa0cdad8f0fc858ef # v3.2.3
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+
       - name: Set Account Number
         run: |
           ACCOUNT_NUMBER=$(jq -r -e --arg account_name "${ACCOUNT_NAME}" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
@@ -269,7 +295,7 @@ jobs:
           payload: |
             {"blocks":[{"type": "section","text": {"type": "mrkdwn","text": ":no_entry: Failed GitHub Action:"}},{"type": "section","fields":[{"type": "mrkdwn","text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"},{"type": "mrkdwn","text": "*Job:*\n${{ github.job }}"},{"type": "mrkdwn","text": "*Repo:*\n${{ github.repository }}"}]}]}
         env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
         if: ${{ failure() }}
     env:
       AWS_ACCESS_KEY_ID: ${{ secrets.TESTING_AWS_ACCESS_KEY_ID }}
