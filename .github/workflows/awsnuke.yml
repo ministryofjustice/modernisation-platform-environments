@@ -34,12 +34,24 @@ defaults:
     shell: bash
 
 jobs:
+
+  fetch-secrets:
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@ace6113171b798cd9a1251b5a0b6bc04ae324bf3 # myBranch
+    secrets:
+      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+      PASSPHRASE: ${{ secrets.PASSPHRASE }}
   setup-prerequisites:
     runs-on: ubuntu-latest
+    needs: fetch-secrets
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
       account_blocklist_str: ${{ steps.set-blocklist-string.outputs.account_blocklist_str }}
     steps:
+      - name: Decrypt Secrets
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c46848c0f17b1550dcf8ecffa0cdad8f0fc858ef # v3.2.3
+        with:
+          environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
       - id: set-matrix
         name: Set Up Matrix
         run: |
@@ -56,12 +68,6 @@ jobs:
           done <<< "$(jq -c -r '.[]' <<< $NUKE_BLOCKLIST_ACCOUNTS)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
           # Encoding and passing blocklist string as an output
           echo "account_blocklist_str=$(echo -n "${account_blocklist_str}" | base64 -w 0)" >> $GITHUB_OUTPUT
-  
-  fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@ace6113171b798cd9a1251b5a0b6bc04ae324bf3 # myBranch
-    secrets:
-      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
-      PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
   nuke:
     strategy:
