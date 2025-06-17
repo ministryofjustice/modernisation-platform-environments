@@ -23,7 +23,10 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["private-web"]
+        vpc_security_group_ids = [
+          "private-web",
+          "ec2-linux",
+        ]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -88,7 +91,11 @@ locals {
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional"
-        vpc_security_group_ids       = ["data-db"]
+        vpc_security_group_ids = [
+          "data-db",
+          "ec2-linux",
+          "oem-agent",
+        ]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -162,7 +169,11 @@ locals {
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional"
-        vpc_security_group_ids       = ["data-db"]
+        vpc_security_group_ids = [
+          "data-db",
+          "ec2-linux",
+          "oem-agent",
+        ]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -218,7 +229,10 @@ locals {
         instance_type                = "t2.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional"
-        vpc_security_group_ids       = ["private-web"]
+        vpc_security_group_ids = [
+          "private-web",
+          "ec2-linux",
+        ]
       }
       route53_records = {
         create_internal_record = true
@@ -267,7 +281,10 @@ locals {
         instance_type                = "t3.large"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["private-web"]
+        vpc_security_group_ids = [
+          "private-web",
+          "ec2-linux",
+        ]
 
         tags = {
           backup-plan = "daily-and-weekly"
@@ -310,7 +327,10 @@ locals {
         disable_api_termination = false
         instance_type           = "t2.large"
         key_name                = "ec2-user"
-        vpc_security_group_ids  = ["private-web"]
+        vpc_security_group_ids = [
+          "private-web",
+          "ec2-linux",
+        ]
       }
       user_data_cloud_init = {
         args = {

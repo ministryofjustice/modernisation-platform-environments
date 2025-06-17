@@ -23,10 +23,13 @@ locals {
         subnet_name = "private"
       }
       instance = {
-        disable_api_termination      = false
-        instance_type                = "t3.medium"
-        key_name                     = "ec2-user"
-        vpc_security_group_ids       = ["private-web"]
+        disable_api_termination = false
+        instance_type           = "t3.medium"
+        key_name                = "ec2-user"
+        vpc_security_group_ids = [
+          "private-web",
+          "ec2-linux",
+        ]
         metadata_options_http_tokens = "required"
       }
       user_data_cloud_init = {
@@ -99,7 +102,11 @@ locals {
         instance_type                = "t3.large"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["private-jumpserver"]
+        vpc_security_group_ids = [
+          "private-jumpserver",
+          "ad-join",
+          "ec2-windows",
+        ]
       }
       tags = {
         backup                          = "false"
@@ -186,10 +193,13 @@ locals {
         "/dev/sdb" = { label = "app", type = "gp3", size = 100 }
       }
       instance = {
-        disable_api_termination      = false
-        instance_type                = "t3.large"
-        key_name                     = "ec2-user"
-        vpc_security_group_ids       = ["private-web"]
+        disable_api_termination = false
+        instance_type           = "t3.large"
+        key_name                = "ec2-user"
+        vpc_security_group_ids = [
+          "private-web",
+          "ec2-linux",
+        ]
         metadata_options_http_tokens = "required"
       }
       lb_target_groups = {
@@ -268,10 +278,13 @@ locals {
         "/dev/sdb" = { label = "app", type = "gp3", size = 100 }
       }
       instance = {
-        disable_api_termination      = false
-        instance_type                = "t3.large"
-        key_name                     = "ec2-user"
-        vpc_security_group_ids       = ["private-web"]
+        disable_api_termination = false
+        instance_type           = "t3.large"
+        key_name                = "ec2-user"
+        vpc_security_group_ids = [
+          "private-web",
+          "ec2-linux",
+        ]
         metadata_options_http_tokens = "required"
       }
       lb_target_groups = {
