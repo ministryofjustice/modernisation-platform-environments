@@ -78,7 +78,7 @@ locals {
   security_groups = {
 
     load-balancer = {
-      description = "Security group for load-balancer"
+      description = "New security group for load-balancer"
       ingress = {
         all-from-self = {
           description = "Allow all ingress to self"
@@ -128,7 +128,7 @@ locals {
     }
 
     web = {
-      description = "Security group for web-servers"
+      description = "New security group for web-servers"
       ingress = {
         http_web = {
           description     = "80: http allow ingress"
@@ -201,7 +201,7 @@ locals {
     }
 
     app = {
-      description = "Security group for application servers"
+      description = "New security group for application servers"
       ingress = {
         all-from-web = {
           description     = "Allow all ingress from web"
@@ -439,7 +439,7 @@ locals {
     }
 
     database = {
-      description = "Security group for database servers"
+      description = "New security group for database servers"
       ingress = {
         oracle_1521_db = {
           description     = "Allow oracle database 1521 ingress"
