@@ -200,6 +200,8 @@ jobs:
     name: Sandbox Nuke (testing-test)
     permissions:
       contents: read # This is required for actions/checkout
+    env:
+      ACCOUNT_NAME: "testing-test"
     runs-on: ubuntu-latest
     needs: [setup-prerequisites, fetch-secrets]
     steps:
@@ -213,6 +215,12 @@ jobs:
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
           testing_ci_iam_user_keys: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_keys }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
+      
+      - name: Export Testing_CI credentials from JSON
+        run: |
+          echo "${TESTING_CI_IAM_USER_KEYS}" > keys.json
+          echo "AWS_ACCESS_KEY_ID=$(jq -r '.AWS_ACCESS_KEY_ID' keys.json)" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(jq -r '.AWS_SECRET_ACCESS_KEY' keys.json)" >> $GITHUB_ENV
 
       - name: Set Account Number
         run: |
@@ -305,7 +313,3 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ env.SLACK_WEBHOOK_URL }}
         if: ${{ failure() }}
-    env:
-      AWS_ACCESS_KEY_ID: ${{ secrets.TESTING_AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.TESTING_AWS_SECRET_ACCESS_KEY }}
-      ACCOUNT_NAME: "testing-test"
