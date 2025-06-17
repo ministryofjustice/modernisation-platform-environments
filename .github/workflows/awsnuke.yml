@@ -91,7 +91,6 @@ jobs:
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
-          testing_ci_iam_user_keys: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_keys }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Set Account Number
@@ -212,6 +211,7 @@ jobs:
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
+          testing_ci_iam_user_keys: ${{ needs.fetch-secrets.outputs.testing_ci_iam_user_keys }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
 
       - name: Set Account Number
