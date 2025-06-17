@@ -42,7 +42,7 @@ resource "aws_iam_role_policy" "snapshot_lambda_inline" {
         ]
         Effect   = "Allow"
         Resource = "*"
-      },
+      }
     ]
   })
 }
@@ -139,7 +139,7 @@ resource "aws_iam_role_policy" "delete_snapshot_lambda_inline" {
         ]
         Effect   = "Allow"
         Resource = "*"
-      },
+      }
     ]
   })
 }
