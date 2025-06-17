@@ -1,3 +1,5 @@
+
+
 data "aws_route53_zone" "zones" {
   for_each = { for k, v in var.ses_domain_identities : k => v if v.create_records }
   name     = "${each.value.identity}."

@@ -25,8 +25,10 @@ module "esb" {
   ami = lookup(
     {
       development   = "ami-0cc0dad47bc769c08"
+      test          = "ami-0ada811b153e02322"
       preproduction = "ami-04a6fa2443473cfd5"
       production    = "ami-0b14bd01e84f3e0a5"
+
       # Add more environments when AMIs are known
     },
     local.environment,
@@ -37,11 +39,11 @@ module "esb" {
   environment  = local.environment
   tags         = local.tags
 
-  yjsm_service_sg_id            = module.yjsm.yjsm_security_group_id
-  ecs_service_internal_sg_id    = module.ecs.ecs_service_internal_sg_id
-  ecs_service_external_sg_id    = module.ecs.ecs_service_external_sg_id
-  alb_security_group_id         = module.internal_alb.alb_security_group_id
+  yjsm_service_sg_id         = module.yjsm.yjsm_security_group_id
+  ecs_service_internal_sg_id = module.ecs.ecs_service_internal_sg_id
+  ecs_service_external_sg_id = module.ecs.ecs_service_external_sg_id
+  alb_security_group_id      = module.internal_alb.alb_security_group_id
   #Keep until prod images are done
-  tableau_sg_id                 = module.tableau.tableau_sg_id
+  tableau_sg_id = module.tableau.tableau_sg_id
 
 }

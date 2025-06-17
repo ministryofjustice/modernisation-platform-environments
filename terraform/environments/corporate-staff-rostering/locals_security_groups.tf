@@ -24,7 +24,10 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers,
       module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers,
     ])
-    jumpservers = module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers
+    jumpservers = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers,
+      # module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
   }
 
   security_group_cidrs_preprod_prod = {
@@ -59,7 +62,10 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers,
       # module.ip_addresses.mp_cidrs.ad_fixngo_hmpp_domain_controllers, # hits rule limit, remove azure DCs first
     ])
-    jumpservers = module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers
+    jumpservers = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
+      # module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
   }
   security_group_cidrs_by_environment = {
     development   = local.security_group_cidrs_devtest
@@ -81,14 +87,6 @@ locals {
           protocol    = -1
           self        = true
         }
-        # IMPORTANT: check if an 'allow all from azure' rule is required, rather than subsequent load-balancer rules
-        /* all-from-fixngo = {
-          description = "Allow all ingress from fixngo"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          cidr_blocks = local.security_group_cidrs.enduserclient
-        } */
         http_lb = {
           description = "Allow http ingress"
           from_port   = 80
@@ -128,6 +126,7 @@ locals {
         }
       }
     }
+
     web = {
       description = "New security group for web-servers"
       ingress = {
@@ -138,7 +137,6 @@ locals {
           protocol    = -1
           self        = true
         }
-        # IMPORTANT: check if an 'allow all from load-balancer' rule is required
         http_web = {
           description     = "80: http allow ingress"
           from_port       = 80
@@ -146,15 +144,6 @@ locals {
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.enduserclient
           security_groups = ["load-balancer"]
-          # NOTE: will need to be changed to point to client access possibly
-        }
-        rpc_tcp_web = { # typo in name - this is for UDP but can't easily be changed
-          description     = "135: UDP MS-RPC allow ingress from app and db servers"
-          from_port       = 135
-          to_port         = 135
-          protocol        = "UDP"
-          security_groups = ["app", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rpc_tcp_web2 = {
           description     = "135: TCP MS-RPC allow ingress from app and db servers"
@@ -162,7 +151,6 @@ locals {
           to_port         = 135
           protocol        = "TCP"
           security_groups = ["app", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         netbios_web_tcp = {
           description = "137-139: TCP NetBIOS services"
@@ -185,7 +173,6 @@ locals {
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.enduserclient
           security_groups = ["load-balancer"]
-          # IMPORTANT: this doesn't seem to be part of the existing Azure SG's? NEEDS CHECKING
         }
         smb_tcp_web = {
           description = "445: TCP SMB allow ingress from 10.0.0.0/8"
@@ -193,51 +180,6 @@ locals {
           to_port     = 445
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
-        smb_udp_web = {
-          description = "445: UDP SMB allow ingress from 10.0.0.0/8"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
-        rdp_tcp_web = {
-          description = "3389: Allow RDP ingress"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-          # NOTE: AllowRDPPortForwardingInbound not applied from azurefirewallsubnet = "10.40.165.0/26" on TCP 3389
-        }
-        rdp_udp_web = {
-          description = "3389: Allow RDP ingress"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rdp_tcp_gw = {
-          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.rdgateway
-        }
-        rdp_udp_gw = {
-          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.rdgateway
-        }
-        winrm_web = {
-          description = "5985-6: Allow WinRM ingress"
-          from_port   = 5985
-          to_port     = 5986
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
         }
         http7770_1_web = {
           description     = "Allow ingress from port 7770-7771"
@@ -246,7 +188,6 @@ locals {
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.enduserclient
           security_groups = ["load-balancer"]
-          # NOTE: will need to be changed to include client access but load-balancer access allowed in
         }
         http7780_1_web = {
           description     = "Allow ingress from port 7780-7781"
@@ -255,15 +196,6 @@ locals {
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.enduserclient
           security_groups = ["load-balancer"]
-          # NOTE: will need to be changed to include client access but load-balancer access allowed in
-        }
-        rpc_dynamic_udp_web = {
-          description     = "49152-65535: UDP Dynamic Port range"
-          from_port       = 49152
-          to_port         = 65535
-          protocol        = "UDP"
-          security_groups = ["app", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rpc_dynamic_tcp_web = {
           description     = "49152-65535: TCP Dynamic Port range"
@@ -271,7 +203,6 @@ locals {
           to_port         = 65535
           protocol        = "TCP"
           security_groups = ["app", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
       }
       egress = {
@@ -285,6 +216,7 @@ locals {
         }
       }
     }
+
     app = {
       description = "New security group for application servers"
       ingress = {
@@ -296,23 +228,12 @@ locals {
           self            = true
           security_groups = ["web"]
         }
-        # IMPORTANT: check if an 'allow all from load-balancer' rule is required
-        # IMPORTANT: check whether http/https traffic is still needed? It's in the original but not used at an app level
-        rpc_tcp_app = { # typo in name - this is for UDP but can't easily be changed
-          description     = "135: UDP MS-RPC allow ingress from app and db servers"
-          from_port       = 135
-          to_port         = 135
-          protocol        = "UDP"
-          security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
         rpc_tcp_app2 = {
           description     = "135: TCP MS-RPC allow ingress from app and db servers"
           from_port       = 135
           to_port         = 135
           protocol        = "TCP"
           security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         smb_tcp_app = {
           description     = "445: TCP SMB allow ingress from app and db servers"
@@ -320,15 +241,6 @@ locals {
           to_port         = 445
           protocol        = "TCP"
           security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
-        smb_udp_app = {
-          description     = "445: UDP SMB allow ingress from app and db servers"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "UDP"
-          security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         http_2109_csr = {
           description = "2109: TCP CSR ingress"
@@ -336,42 +248,6 @@ locals {
           to_port     = 2109
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
-          # IMPORTANT: check if this needs to be changed to include client access
-        }
-        rdp_tcp_app = {
-          description = "3389: Allow RDP ingress"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rdp_udp_app = {
-          description = "3389: Allow RDP ingress"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rdp_tcp_gw = {
-          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.rdgateway
-        }
-        rdp_udp_gw = {
-          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.rdgateway
-        }
-        winrm_app = {
-          description = "5985-6: Allow WinRM ingress"
-          from_port   = 5985
-          to_port     = 5986
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
         }
         http_45054_csr_app = {
           description = "45054: TCP CSR ingress"
@@ -379,15 +255,6 @@ locals {
           to_port     = 45054
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
-          # IMPORTANT: check if this needs to be changed to include client access
-        }
-        rpc_dynamic_udp_app = {
-          description     = "49152-65535: UDP Dynamic Port range"
-          from_port       = 49152
-          to_port         = 65535
-          protocol        = "UDP"
-          security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rpc_dynamic_tcp_app = {
           description     = "49152-65535: TCP Dynamic Port range"
@@ -408,6 +275,7 @@ locals {
         }
       }
     }
+
     domain = {
       description = "Common Windows security group for fixngo domain(s) access from Jumpservers and Azure DCs"
       ingress = {
@@ -502,6 +370,7 @@ locals {
         }
       }
     }
+
     jumpserver = {
       description = "New security group for jump-servers"
       ingress = {
@@ -596,6 +465,7 @@ locals {
         }
       }
     }
+
     database = {
       description = "New security group for database servers"
       ingress = {
@@ -676,6 +546,7 @@ locals {
         }
       }
     }
+
     fsx_windows = {
       description = "Security group for fsx windows"
       ingress = {
@@ -720,6 +591,3 @@ locals {
     }
   }
 }
-
-
-

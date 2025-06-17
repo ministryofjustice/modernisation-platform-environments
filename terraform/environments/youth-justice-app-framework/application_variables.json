@@ -60,7 +60,7 @@
           "create_records": false
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     },
     "preproduction": {
       "allow_s3_replication": true,
@@ -91,7 +91,7 @@
           "create_records": true
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     },
     "production": {
       "allow_s3_replication": true,
@@ -101,7 +101,7 @@
       "source_account": "066012302209",
       "ad_management_instance_count": 2,
       "desired_number_of_domain_controllers": 3,
-      "snapshot_identifier": "arn:aws:rds:eu-west-2:066012302209:cluster-snapshot:moj-prod-encypted-snapshot-1",
+      "snapshot_identifier": "arn:aws:rds:eu-west-2:066012302209:cluster-snapshot:moj-encrypted",
       "test_mode": true,
       "tableau_website_name": "tableau",
       "database_instance_class": "db.r5.2xlarge",
@@ -123,10 +123,10 @@
         },
         "production.yjbservices.yjb.gov.uk": {
           "identity": "production.yjbservices.yjb.gov.uk",
-          "create_records": true
+          "create_records": false
         }
       },
-      "quicksight_setup": false
+      "quicksight_setup": true
     }
   }
 }

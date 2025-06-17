@@ -26,8 +26,11 @@ locals {
         instance_type                = "t3.large"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["domain", "app", "jumpserver", "remotedesktop_sessionhost"]
-
+        vpc_security_group_ids = [
+          "app",
+          "ad-join",
+          "ec2-windows",
+        ]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -67,8 +70,11 @@ locals {
         instance_type                = "t3.large"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["domain", "database", "jumpserver"]
-
+        vpc_security_group_ids = [
+          "database",
+          "ad-join",
+          "ec2-windows",
+        ]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -110,8 +116,11 @@ locals {
         instance_type                = "t3.large"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["domain", "web", "jumpserver", "remotedesktop_sessionhost"]
-
+        vpc_security_group_ids = [
+          "web",
+          "ad-join",
+          "ec2-windows",
+        ]
         tags = {
           backup-plan = "daily-and-weekly"
         }

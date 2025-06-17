@@ -28,7 +28,11 @@ locals {
         tags = {
           backup-plan = "daily-and-weekly"
         }
-        vpc_security_group_ids = ["domain", "app", "jumpserver"]
+        vpc_security_group_ids = [
+          "app",
+          "ad-join",
+          "ec2-windows",
+        ]
       }
       route53_records = {
         create_external_record = true
@@ -140,7 +144,11 @@ locals {
         tags = {
           backup-plan = "daily-and-weekly"
         }
-        vpc_security_group_ids = ["domain", "web", "jumpserver"]
+        vpc_security_group_ids = [
+          "web",
+          "ad-join",
+          "ec2-windows",
+        ]
       }
       route53_records = {
         create_external_record = true
