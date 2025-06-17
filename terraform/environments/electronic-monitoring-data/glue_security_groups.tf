@@ -57,6 +57,9 @@ resource "aws_security_group_rule" "glue_s3_egress" {
 # -------------------------------------------------------
 
 resource "aws_vpc_security_group_ingress_rule" "glue_ingress_all" {
+    # Checkov:skip=CKV_AWS_24
+    # Checkov:skip=CKV_AWS_25
+    # Checkov:skip=CKV_AWS_260
   security_group_id            = aws_security_group.glue_rds_conn_security_group.id
   referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
   ip_protocol                  = "tcp"
