@@ -39,7 +39,8 @@
         "kms:GenerateDataKey*"
       ],
       "Resource": [
-        "${kms_master_key_id}"
+        "${kms_master_key_id}",
+        "${kms_dev_key_id}"
       ]
     }
   ]
