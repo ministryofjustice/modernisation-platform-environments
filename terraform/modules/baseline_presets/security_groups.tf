@@ -2,7 +2,6 @@ locals {
 
   security_groups_filter = flatten([
     var.options.enable_hmpps_domain ? ["ad-join"] : [],
-    var.options.enable_hmpps_domain ? ["rdp-from-gateways"] : [],
     var.options.enable_ec2_security_groups ? ["ec2-linux"] : [],
     var.options.enable_ec2_security_groups ? ["ec2-windows"] : [],
   ])
@@ -118,12 +117,24 @@ locals {
             var.ip_addresses.mp_cidr[var.environment.vpc_name],
           ])
         }
-        rdp-from-jumpservers = {
-          description = "Allow RDP from jumpservers"
+        rdp-tcp-from-jumpservers = {
+          description = "Allow RDP TCP from jumpservers"
           from_port   = 3389
           to_port     = 3389
           protocol    = "TCP"
           cidr_blocks = flatten([
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          ])
+        }
+        rdp-udp-from-jumpservers = {
+          description = "Allow RDP UDP from jumpservers"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "UDP"
+          cidr_blocks = flatten([
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
             var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
             var.ip_addresses.mp_cidr[var.environment.vpc_name],
           ])
@@ -158,32 +169,6 @@ locals {
           to_port     = 0
           protocol    = "-1"
           cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
-    }
-
-    rdp-from-gateways = {
-      description = "Security group to allow RDP from ${local.ad_netbios_name} remote desktop gateways"
-      ingress = {
-        rpd-tcp = {
-          description = "Allow TCP RDP from Remote Desktop Gateways"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = flatten([
-            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
-            var.ip_addresses.mp_cidr[var.environment.vpc_name],
-          ])
-        }
-        rdp-udp = {
-          description = "Allow UDP RDP from Remote Desktop Gateways"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "UDP"
-          cidr_blocks = flatten([
-            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
-            var.ip_addresses.mp_cidr[var.environment.vpc_name],
-          ])
         }
       }
     }

@@ -101,9 +101,9 @@ locals {
           key_name                     = "ec2-user"
           metadata_options_http_tokens = "required"
           vpc_security_group_ids = [
-            "ad-join",
-            "rdp-from-gateways",
             "web",
+            "ad-join",
+            "ec2-windows",
           ]
         }
         tags = {
@@ -153,9 +153,9 @@ locals {
           key_name                     = "ec2-user"
           metadata_options_http_tokens = "required"
           vpc_security_group_ids = [
-            "ad-join",
-            "rdp-from-gateways",
             "web",
+            "ad-join",
+            "ec2-windows",
           ]
         }
         tags = {
