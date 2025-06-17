@@ -147,7 +147,7 @@ resource "aws_vpc_security_group_egress_rule" "rds_egress_all" {
   ip_protocol                  = "tcp"
   from_port                    = 0
   to_port                      = 65535
-  description                  = "RDS Database -----[mssql]-----+ * All egress traffic"
+  description                  = "RDS Database -----[all ports]-----+ RDS Database"
 }
 
 #------------------------------------------------------------------------------
