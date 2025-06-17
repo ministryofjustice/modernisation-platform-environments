@@ -44,8 +44,8 @@ resource "aws_iam_policy" "ftp_policy" {
         Resource = "*"
       },
       {
-        Action   = ["s3:*"],
-        Effect   = "Allow",
+        Action = ["s3:*"],
+        Effect = "Allow",
         Resource = [
           "arn:aws:s3:::${var.ftp_bucket}",
           "arn:aws:s3:::${var.ftp_bucket}/*"
@@ -63,10 +63,10 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
 
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
-  layer_name          = "ftpclientlibs"
-  compatible_runtimes = ["python3.7"]
-  s3_bucket           = var.s3_bucket_ftp
-  s3_key              = var.s3_object_ftp_clientlibs
+  layer_name               = "ftpclientlibs"
+  compatible_runtimes      = ["python3.7"]
+  s3_bucket                = var.s3_bucket_ftp
+  s3_key                   = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ccms ebs ftp lambda"
 }
@@ -80,9 +80,9 @@ resource "aws_lambda_function" "ftp_lambda" {
   memory_size   = 256
   # filename         = "ftp-client.zip"
   # source_code_hash = filebase64sha256(data.archive_file.ftp_zip.output_path)
-  s3_bucket           = var.s3_bucket_ftp
-  s3_key              = var.s3_object_ftp_client
-  layers        = [aws_lambda_layer_version.ftp_layer.arn]
+  s3_bucket = var.s3_bucket_ftp
+  s3_key    = var.s3_object_ftp_client
+  layers    = [aws_lambda_layer_version.ftp_layer.arn]
 
   vpc_config {
     subnet_ids         = var.subnet_ids

@@ -1,14 +1,18 @@
 locals {
 
   security_groups_filter = flatten([
-    var.options.enable_hmpps_domain ? ["ad_join"] : []
+    var.options.enable_hmpps_domain ? ["ad-join"] : [],
+    var.options.enable_hmpps_domain ? ["rdp-from-gateways"] : [],
+    var.options.enable_ec2_security_groups ? ["ec2-linux"] : [],
+    var.options.enable_ec2_security_groups ? ["ec2-windows"] : [],
+    var.options.enable_ec2_security_groups && var.options.enable_ec2_oracle_enterprise_managed_server ? ["oem-agent"] : [],
   ])
 
   ad_netbios_name = contains(["development", "test"], var.environment.environment) ? "azure" : "hmpp"
 
   security_groups = {
 
-    ad_join = {
+    ad-join = {
       description = "Security group for resources that need to join the ${local.ad_netbios_name} active directory domain"
       ingress = {
         icmp = {
@@ -34,131 +38,220 @@ locals {
         }
       }
       egress = {
+        all = {
+          # Ideally, we'd lock down to specific ports but we exceed maximum number of rules for SG
+          # Ports required:
+          #  - ICMP
+          #  - DNS         tcp/53 udp/53
+          #  - Kerberos    tcp/88 udp/88
+          #  - NTP         udp/123
+          #  - RPC         tcp/135
+          #  - Netbios     udp/137 udp/138 tcp/139
+          #  - LDAP        tcp/389 udp/389
+          #  - SMB         tcp/445
+          #  - Kerberos    tcp/464 udp/464 (Password Change)
+          #  - LDAPs       tcp/636
+          #  - LDAP GC     tcp/3268 tcp/3269 (Global Catalog for Cross Domain)
+          #  - ADWS        tcp/9389
+          #  - RPD Dynamic tcp/49152 - tcp/65536
+          description = "Allow all egress to DCs"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
+        }
+      }
+    }
+
+    ec2-linux = {
+      description = "Security group for linux EC2s"
+
+      ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+      }
+      egress = {
+        all = {
+          # allow all since internal resources are protected by inbound SGs
+          # and outbound internet is protected by firewall
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+
+    ec2-windows = {
+      description = "Security group for windows EC2s"
+
+      ingress = merge(
+        {
+          all-from-self = {
+            description = "Allow all ingress to self"
+            from_port   = 0
+            to_port     = 0
+            protocol    = -1
+            self        = true
+          }
+        },
+        var.options.enable_hmpps_domain ? {
+          rpc-from-jumpservers = {
+            description = "Allow RPC from jumpservers"
+            from_port   = 135
+            to_port     = 135
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          smb-from-jumpserver = {
+            description = "Allow SMB from jumpservers"
+            from_port   = 445
+            to_port     = 445
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          rdp-tcp-from-jumpservers = {
+            description = "Allow RDP TCP from jumpservers"
+            from_port   = 3389
+            to_port     = 3389
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          rdp-udp-from-jumpservers = {
+            description = "Allow RDP UDP from jumpservers"
+            from_port   = 3389
+            to_port     = 3389
+            protocol    = "UDP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          winrm-from-jumpservers = {
+            description = "Allow WinRM from jumpservers"
+            from_port   = 5985
+            to_port     = 5986
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          rpc-dynamic_from-jumpservers = {
+            description = "Allow RPC dynamic from jumpservers"
+            from_port   = 49152
+            to_port     = 65535
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+        } : {}
+      )
+      egress = {
+        all = {
+          # allow all since internal resources are protected by inbound SGs
+          # and outbound internet is protected by firewall
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
+        }
+      }
+    }
+
+    oem-agent = {
+      description = "Security group for EC2s with Oracle OEM agent"
+
+      ingress = {
         icmp = {
-          description = "Allow ICMP egress"
+          description = "Allow ICMP ingress from OEM"
+          protocol    = "ICMP"
           from_port   = 8
           to_port     = 0
-          protocol    = "ICMP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
+          cidr_blocks = [var.ip_addresses.mp_cidr[var.environment.vpc_name]],
         }
-        dns_udp = {
-          description = "Allow DNS UDP egress"
-          from_port   = 53
-          to_port     = 53
+        echo = {
+          description = "Allow echo from OEM"
+          protocol    = "TCP"
+          from_port   = 7
+          to_port     = 7
+          cidr_blocks = [var.ip_addresses.mp_cidr[var.environment.vpc_name]],
+        }
+        ssh = {
+          description = "Allow SSH from OEM"
+          from_port   = 22
+          to_port     = 22
+          protocol    = "tcp"
+          cidr_blocks = [var.ip_addresses.mp_cidr[var.environment.vpc_name]],
+        }
+        oracle-db-1521 = {
+          description = "Allow oracle database 1521 ingress from OEM"
+          from_port   = "1521"
+          to_port     = "1521"
+          protocol    = "TCP"
+          cidr_blocks = [var.ip_addresses.mp_cidr[var.environment.vpc_name]],
+        }
+        oem-agent-3872 = {
+          description = "Allow oem agent ingress from OEM"
+          from_port   = "3872"
+          to_port     = "3872"
+          protocol    = "TCP"
+          cidr_blocks = [var.ip_addresses.mp_cidr[var.environment.vpc_name]],
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all egress to OEM"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = [var.ip_addresses.mp_cidr[var.environment.vpc_name]],
+        }
+      }
+    }
+
+    rdp-from-gateways = {
+      description = "Security group to allow RDP from ${local.ad_netbios_name} remote desktop gateways"
+      ingress = {
+        rpd-tcp = {
+          description = "Allow TCP RDP from Remote Desktop Gateways"
+          from_port   = 3389
+          to_port     = 3389
+          protocol    = "TCP"
+          cidr_blocks = flatten([
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          ])
+        }
+        rdp-udp = {
+          description = "Allow UDP RDP from Remote Desktop Gateways"
+          from_port   = 3389
+          to_port     = 3389
           protocol    = "UDP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        dns_tcp = {
-          description = "Allow DNS TCP egress"
-          from_port   = 53
-          to_port     = 53
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        kerberos_udp = {
-          description = "Allow Kerberos UDP egress"
-          from_port   = 88
-          to_port     = 88
-          protocol    = "UDP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        kerberos_tcp = {
-          description = "Allow Kerberos TCP egress"
-          from_port   = 88
-          to_port     = 88
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        ntp_udp = {
-          description = "Allow NTP UDP egress"
-          from_port   = 123
-          to_port     = 123
-          protocol    = "UDP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        rpc_tcp = {
-          description = "Allow RPC TCP egress"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        netbios_udp = {
-          description = "Allow Netbios UDP egress"
-          from_port   = 137
-          to_port     = 139
-          protocol    = "UDP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        netbios_tcp = {
-          description = "Allow Netbios TCP egress"
-          from_port   = 137
-          to_port     = 139
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        ldap_udp = {
-          description = "Allow Ldap UDP egress"
-          from_port   = 389
-          to_port     = 389
-          protocol    = "UDP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        ldap_tcp = {
-          description = "Allow Ldap TCP egress"
-          from_port   = 389
-          to_port     = 389
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        smb_tcp = {
-          description = "Allow SMB TCP egress"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        kerberos_password_change_udp = {
-          description = "Allow Kerberos Password Change UDP egress"
-          from_port   = 464
-          to_port     = 464
-          protocol    = "UDP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        kerberos_password_change_tcp = {
-          description = "Allow Kerberos Password Change TCP egress"
-          from_port   = 464
-          to_port     = 464
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        ldaps_tcp = {
-          description = "Allow Ldaps TCP egress"
-          from_port   = 636
-          to_port     = 636
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        ldap_global_catalog_tcp = {
-          description = "Allow Ldaps Global Catalog TCP egress"
-          from_port   = 3268
-          to_port     = 3269
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        adws_tcp = {
-          description = "Allow ADWS TCP egress"
-          from_port   = 9389
-          to_port     = 9389
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
-        }
-        rpc_tcp_dynamic2 = {
-          description = "Allow RPC dynamic port range"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "TCP"
-          cidr_blocks = var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].domain_controllers
+          cidr_blocks = flatten([
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
+            var.ip_addresses.mp_cidr[var.environment.vpc_name],
+          ])
         }
       }
     }

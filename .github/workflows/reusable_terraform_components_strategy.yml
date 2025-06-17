@@ -242,54 +242,39 @@ jobs:
           #    On feature branch, ensure all dev/test components are included with plan_apply,
           #    and prod/preprod components are included with plan.
           # ---------------------------------------------------------------------------------------------------------------
+          # Ensure this block always runs for manual runs
           if [[ "${GITHUB_EVENT_NAME}" == "workflow_dispatch" ]]; then
-            if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
-              echo "Manually triggered on main: ensuring all component/environment pairs are included with plan_apply."
-              while IFS= read -r envobj; do
-                for comp in $COMPONENTS; do
-                  target=$(echo "$envobj" | jq -r '.target')
-                  pair="${comp}_${target}"
+            echo "Workflow was manually triggered"
+            while IFS= read -r envobj; do
+              for comp in $COMPONENTS; do
+                target=$(echo "$envobj" | jq -r '.target')
+                pair="${comp}_${target}"
 
-                  if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
-                    continue
-                  fi
+                if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
+                continue
+                fi
 
-                  seen_pairs+=("$pair")
-                  if [ "$firstEntry" = true ]; then
-                    firstEntry=false
-                  else
-                    echo "," >> final-list.json
-                  fi
+                seen_pairs+=("$pair")
+                if [ "$firstEntry" = true ]; then
+                  firstEntry=false
+                else
+                  echo "," >> final-list.json
+                fi
+
+                if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
                   echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp, "action": "plan_apply"}' >> final-list.json
-                done
-              done < envlist.json
-            else
-              echo "Manually triggered not on main: ensuring all component/environment pairs are included with plan or plan_apply as appropriate."
-              while IFS= read -r envobj; do
-                for comp in $COMPONENTS; do
-                  target=$(echo "$envobj" | jq -r '.target')
-                  pair="${comp}_${target}"
-
-                  if [[ " ${seen_pairs[@]} " =~ " ${pair} " ]]; then
-                    continue
-                  fi
-
-                  seen_pairs+=("$pair")
-                  if [ "$firstEntry" = true ]; then
-                    firstEntry=false
-                  else
-                    echo "," >> final-list.json
-                  fi
-                  # Use plan for preprod/prod, plan_apply otherwise
+                else
+                  # On branch: plan for prod/preprod, plan_apply otherwise
                   if [[ "$target" =~ preprod|prod ]]; then
                     echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp, "action": "plan"}' >> final-list.json
                   else
                     echo -n "$envobj" | jq --arg comp "$comp" '. + {"component": $comp, "action": "plan_apply"}' >> final-list.json
                   fi
-                done
-              done < envlist.json
-            fi
+                fi
+              done
+            done < envlist.json
           fi
+
           
           # Ensure the JSON array is properly closed.
           echo "]" >> final-list.json
