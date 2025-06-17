@@ -57,9 +57,9 @@ resource "aws_security_group_rule" "glue_s3_egress" {
 # -------------------------------------------------------
 
 resource "aws_vpc_security_group_ingress_rule" "glue_ingress_all" {
-    # Checkov:skip=CKV_AWS_24:Serverless ETL architecture managed by AWS, practically no risk of port 22 (SSH) based attacks
-    # Checkov:skip=CKV_AWS_25:Serverless ETL architecture managed by AWS, practically no risk of port 3389 (RDP) based attacks
-    # Checkov:skip=CKV_AWS_260:No legitimate HTTP web server running on port 80 within the Glue environment for external access
+  # checkov:skip=CKV_AWS_24:Serverless ETL architecture managed by AWS, practically no risk of port 22 (SSH) based attacks
+  # checkov:skip=CKV_AWS_25:Serverless ETL architecture managed by AWS, practically no risk of port 3389 (RDP) based attacks
+  # checkov:skip=CKV_AWS_260:No legitimate HTTP web server running on port 80 within the Glue environment for external access
   security_group_id            = aws_security_group.glue_rds_conn_security_group.id
   referenced_security_group_id = aws_security_group.glue_rds_conn_security_group.id
   ip_protocol                  = "tcp"
