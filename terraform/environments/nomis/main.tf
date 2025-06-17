@@ -202,6 +202,7 @@ module "baseline" {
   )
 
   security_groups = merge(
+    module.baseline_presets.security_groups,
     lookup(local.baseline_all_environments, "security_groups", {}),
     lookup(local.baseline_environment_specific, "security_groups", {}),
   )
