@@ -87,7 +87,11 @@ locals {
         tags = {
           backup-plan = "daily-and-weekly"
         }
-        vpc_security_group_ids = ["database"]
+        vpc_security_group_ids = [
+          "database",
+          "ec2-linux",
+          "oem-agent",
+        ]
       }
       route53_records = {
         create_external_record = true

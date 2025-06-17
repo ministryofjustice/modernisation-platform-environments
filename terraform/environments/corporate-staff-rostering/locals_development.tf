@@ -40,7 +40,11 @@ locals {
           instance_type                = "t3.medium"
           key_name                     = "ec2-user"
           metadata_options_http_tokens = "required"
-          vpc_security_group_ids       = ["database"]
+          vpc_security_group_ids = [
+            "database",
+            "ec2-linux",
+            "oem-agent",
+          ]
         }
         user_data_cloud_init = {
           args = {

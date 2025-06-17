@@ -130,13 +130,6 @@ locals {
     web = {
       description = "New security group for web-servers"
       ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
         http_web = {
           description     = "80: http allow ingress"
           from_port       = 80
@@ -205,27 +198,16 @@ locals {
           security_groups = ["app", "database"]
         }
       }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
     }
 
     app = {
       description = "New security group for application servers"
       ingress = {
-        all-from-self = {
-          description     = "Allow all ingress to self"
+        all-from-web = {
+          description     = "Allow all ingress from web"
           from_port       = 0
           to_port         = 0
           protocol        = -1
-          self            = true
           security_groups = ["web"]
         }
         rpc_tcp_app2 = {
@@ -262,16 +244,6 @@ locals {
           to_port         = 65535
           protocol        = "TCP"
           security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
@@ -469,50 +441,6 @@ locals {
     database = {
       description = "New security group for database servers"
       ingress = {
-        all-from-self = {
-          description     = "Allow all ingress to self"
-          from_port       = 0
-          to_port         = 0
-          protocol        = -1
-          self            = true
-          security_groups = ["web", "app"]
-        }
-        # IMPORTANT: check if an 'allow all from load-balancer' rule is required
-        echo_core_tcp_db = {
-          description = "7: Allow ingress from port 7 oem agent echo" # Not sure what this is
-          from_port   = 7
-          to_port     = 7
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-        }
-        echo_core_udp_db = {
-          description = "7: Allow ingress from port 7 oem agent echo" # Not sure what this is
-          from_port   = 7
-          to_port     = 7
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-        }
-        ssh-db = {
-          description = "22: SSH allow ingress"
-          from_port   = 22
-          to_port     = 22
-          protocol    = "tcp"
-          cidr_blocks = local.security_group_cidrs.ssh
-        }
-        rpc_tcp_db = {
-          description = "135: TCP MS-RPC AD connect ingress from Azure DC and Jumpserver"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "TCP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-        }
-        rpc_udp_db = {
-          description = "135: UDP MS-RPC AD connect ingress from Azure DC and Jumpserver"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "UDP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-        }
         oracle_1521_db = {
           description     = "Allow oracle database 1521 ingress"
           from_port       = "1521"
@@ -520,29 +448,6 @@ locals {
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.oracle_db
           security_groups = ["web", "app"]
-        }
-        oracleoem_3872_db = {
-          description = "Allow oem agent ingress"
-          from_port   = "3872"
-          to_port     = "3872"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-        }
-        rpc_dynamic_tcp_db = {
-          description = "49152-65535: TCP Dynamic Port range"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "TCP"
-          cidr_blocks = concat(local.security_group_cidrs.jumpservers, local.security_group_cidrs.domain_controllers)
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
