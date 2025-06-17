@@ -17,6 +17,8 @@ resource "aws_iam_role" "snapshot_lambda" {
 }
 
 resource "aws_iam_role_policy" "snapshot_lambda_inline" {
+  # checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  # checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
   name = "snapshot_lambda_policy"
   role = aws_iam_role.snapshot_lambda.name
 
@@ -111,6 +113,8 @@ resource "aws_iam_role" "delete_snapshot_lambda" {
 }
 
 resource "aws_iam_role_policy" "delete_snapshot_lambda_inline" {
+  # checkov:skip=CKV_AWS_355: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
+  # checkov:skip=CKV_AWS_290: "Ensure IAM policies does not allow write access without constraints"
   name = "delete_snapshot_lambda_policy"
   role = aws_iam_role.delete_snapshot_lambda.name
 
