@@ -113,49 +113,53 @@ locals {
         }
       }
     }
+
+    # ideally would attach ec2-linux to EC2 as well but they are in an
+    # ASG, so just merge the rules instead
     private-web = {
       description = "Security group for web servers"
-      ingress = {
-        http7001 = {
-          description = "Allow http7001 ingress"
-          from_port   = 7001
-          to_port     = 7001
-          protocol    = "tcp"
-          security_groups = [
-            "private-lb",
-          ]
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        },
-        http7777 = {
-          description = "Allow http7777 ingress"
-          from_port   = 7777
-          to_port     = 7777
-          protocol    = "tcp"
-          security_groups = [
-            "private-lb",
-          ]
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        },
-      }
+      ingress = merge(
+        module.baseline_presets.security_groups["ec2-linux"].ingress,
+        {
+          http7001 = {
+            description = "Allow http7001 ingress"
+            from_port   = 7001
+            to_port     = 7001
+            protocol    = "tcp"
+            security_groups = [
+              "private-lb",
+            ]
+            cidr_blocks = local.security_group_cidrs.http7xxx
+          }
+          http7777 = {
+            description = "Allow http7777 ingress"
+            from_port   = 7777
+            to_port     = 7777
+            protocol    = "tcp"
+            security_groups = [
+              "private-lb",
+            ]
+            cidr_blocks = local.security_group_cidrs.http7xxx
+          }
+        }
+      )
+      egress = merge(
+        module.baseline_presets.security_groups["ec2-linux"].egress,
+      )
     }
+
+    # ideally would attach ec2-linux to EC2 as well but they are in an
+    # ASG, so just merge the rules instead
     private-jumpserver = {
       description = "Security group for jumpservers"
-      ingress = {
-        rdp_tcp_web = {
-          description = "3389: Allow RDP TCP ingress"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
-        }
-        rdp_udp_web = {
-          description = "3389: Allow RDP UDP ingress"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.remotedesktop_gateways
-        }
-      }
+      ingress = merge(
+        module.baseline_presets.security_groups["ec2-windows"].ingress,
+        module.baseline_presets.security_groups["ad-join"].ingress,
+      )
+      egress = merge(
+        module.baseline_presets.security_groups["ec2-windows"].egress,
+        module.baseline_presets.security_groups["ad-join"].egress,
+      )
     }
 
     data-db = {
