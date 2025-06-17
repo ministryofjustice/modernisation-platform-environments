@@ -9,7 +9,12 @@ locals {
         local.mp_cidrs.ad_fixngo_azure_domain_controllers
       )
 
-      rd_gateways = concat(
+      jumpservers = concat(
+        local.azure_fixngo_cidrs.devtest_jumpservers,
+        # MP jumpservers are in ASGs so could be any IP in hmpps VPC
+      )
+
+      rdgateways = concat(
         local.azure_fixngo_cidrs.devtest_rdgateways,
         # MP gateways are in ASGs so could be any IP in hmpps VPC
       )
@@ -22,7 +27,12 @@ locals {
         local.mp_cidrs.ad_fixngo_hmpp_domain_controllers
       )
 
-      rd_gateways = concat(
+      jumpservers = concat(
+        local.azure_fixngo_cidrs.prod_jumpservers,
+        # MP jumpservers are in ASGs so could be any IP in hmpps VPC
+      )
+
+      rdgateways = concat(
         local.azure_fixngo_cidrs.prod_rdgateways,
         # MP gateways are in ASGs so could be any IP in hmpps VPC
       )
