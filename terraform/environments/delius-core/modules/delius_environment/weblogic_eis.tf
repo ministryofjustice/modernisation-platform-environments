@@ -88,7 +88,7 @@ module "weblogic_eis" {
   alb_listener_rule_paths            = ["/eis"]
   alb_listener_rule_priority         = 4
 
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-eis-ecr-repo:${var.delius_microservice_configs.weblogic_eis.image_tag}"
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic_eis.image_tag}"
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
