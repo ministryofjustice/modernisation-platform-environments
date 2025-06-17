@@ -64,6 +64,8 @@ module "weblogic_eis" {
   name     = "weblogic-eis"
   env_name = var.env_name
 
+  pin_task_definition_revision = try(var.delius_microservice_configs.weblogic_eis.task_definition_revision, 0)
+
   ecs_cluster_arn  = module.ecs.ecs_cluster_arn
   container_memory = var.delius_microservice_configs.weblogic_eis.container_memory
   container_cpu    = var.delius_microservice_configs.weblogic_eis.container_cpu
@@ -95,7 +97,7 @@ module "weblogic_eis" {
   platform_vars = var.platform_vars
   tags          = var.tags
 
-  ignore_changes_service_task_definition = true
+  ignore_changes_service_task_definition = false
 
   providers = {
     aws.core-vpc              = aws.core-vpc
