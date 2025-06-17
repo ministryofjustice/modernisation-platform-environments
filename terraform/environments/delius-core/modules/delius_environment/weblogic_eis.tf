@@ -64,6 +64,8 @@ module "weblogic_eis" {
   name     = "weblogic-eis"
   env_name = var.env_name
 
+  pin_task_definition_revision = try(var.delius_microservice_configs.weblogic_eis.task_definition_revision, 0)
+
   ecs_cluster_arn  = module.ecs.ecs_cluster_arn
   container_memory = var.delius_microservice_configs.weblogic_eis.container_memory
   container_cpu    = var.delius_microservice_configs.weblogic_eis.container_cpu
@@ -88,14 +90,14 @@ module "weblogic_eis" {
   alb_listener_rule_paths            = ["/eis"]
   alb_listener_rule_priority         = 4
 
-  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic-eis-ecr-repo:${var.delius_microservice_configs.weblogic_eis.image_tag}"
+  container_image = "${var.platform_vars.environment_management.account_ids["core-shared-services-production"]}.dkr.ecr.eu-west-2.amazonaws.com/delius-core-weblogic:${var.delius_microservice_configs.weblogic_eis.image_tag}"
 
   bastion_sg_id = module.bastion_linux.bastion_security_group
 
   platform_vars = var.platform_vars
   tags          = var.tags
 
-  ignore_changes_service_task_definition = true
+  ignore_changes_service_task_definition = false
 
   providers = {
     aws.core-vpc              = aws.core-vpc
