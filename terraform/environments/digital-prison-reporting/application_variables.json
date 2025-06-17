@@ -601,7 +601,7 @@
       "enable_generate_dataset_lambda": false,
       "enable_multiphase_query_lambda": false,
       "multiphase_query_lambda_version": "vLatest",
-      "landing_zone_antivirus_check_lambda_enable": true,
+      "landing_zone_antivirus_check_lambda_enable": false,
       "landing_zone_antivirus_check_lambda_version": "latest",
       "landing_zone_antivirus_check_lambda_memory_size": 2048,
       "landing_zone_antivirus_check_lambda_timeout": 300,
