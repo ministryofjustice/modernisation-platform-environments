@@ -34,9 +34,12 @@ jobs:
 
   fetch-secrets:
     uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@ace6113171b798cd9a1251b5a0b6bc04ae324bf3 # myBranch
+    permissions:
+      id-token: write
+      contents: read
     secrets:
-      MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
-      PASSPHRASE: ${{ secrets.PASSPHRASE }}
+        MODERNISATION_PLATFORM_ACCOUNT_NUMBER: ${{ secrets.MODERNISATION_PLATFORM_ACCOUNT_ID }}
+        PASSPHRASE: ${{ secrets.PASSPHRASE }}
   setup-prerequisites:
     runs-on: ubuntu-latest
     needs: fetch-secrets
