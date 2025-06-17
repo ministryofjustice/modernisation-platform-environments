@@ -283,7 +283,7 @@ resource "helm_release" "external_secrets" {
   name       = "external-secrets"
   repository = "https://charts.external-secrets.io"
   chart      = "external-secrets"
-  version    = "0.17.0"
+  version    = "0.16.2"
   namespace  = kubernetes_namespace.external_secrets.metadata[0].name
   values = [
     templatefile(
