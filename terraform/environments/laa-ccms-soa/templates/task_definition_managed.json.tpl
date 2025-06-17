@@ -101,7 +101,7 @@
       },
       {
         "name": "JAVA_TOOL_OPTIONS",
-        "value": "-Djavax.net.ssl.trustStore=/u01/oracle/user_projects/pki/soa-trust-store.p12 -Djavax.net.ssl.trustStorePassword=${soa_trust_store_password}, -Dhttps.protocols=TLSv1.2,TLSv1.3 -Djdk.tls.client.protocols=TLSv1.2,TLSv1.3"
+        "value": "-Djavax.net.ssl.trustStore=/u01/oracle/user_projects/pki/soa-trust-store.p12 -Djavax.net.ssl.trustStorePassword=${soa_trust_store_password}, -Dhttps.protocols=TLSv1.2 -Djdk.tls.client.protocols=TLSv1.2, -Djavax.net.ssl.trustStoreType=PKCS12"
       },
       {
         "name": "TZ",
