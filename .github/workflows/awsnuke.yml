@@ -35,7 +35,7 @@ defaults:
 jobs:
 
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@ace6113171b798cd9a1251b5a0b6bc04ae324bf3 # myBranch
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@7ad54ab21c06e09467e8f682956eee04846a3a63 # myBranch
     permissions:
       id-token: write
       contents: read
@@ -50,7 +50,7 @@ jobs:
       account_blocklist_str: ${{ steps.set-blocklist-string.outputs.account_blocklist_str }}
     steps:
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c46848c0f17b1550dcf8ecffa0cdad8f0fc858ef # v3.2.3
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7ad54ab21c06e09467e8f682956eee04846a3a63 # myBranch
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -87,7 +87,7 @@ jobs:
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c46848c0f17b1550dcf8ecffa0cdad8f0fc858ef # v3.2.3
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7ad54ab21c06e09467e8f682956eee04846a3a63 # myBranch
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
@@ -208,7 +208,7 @@ jobs:
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
 
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c46848c0f17b1550dcf8ecffa0cdad8f0fc858ef # v3.2.3
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@7ad54ab21c06e09467e8f682956eee04846a3a63 # myBranch
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
