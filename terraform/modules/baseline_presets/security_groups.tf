@@ -90,15 +90,81 @@ locals {
     ec2-windows = {
       description = "Security group for windows EC2s"
 
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-      }
+      ingress = merge(
+        {
+          all-from-self = {
+            description = "Allow all ingress to self"
+            from_port   = 0
+            to_port     = 0
+            protocol    = -1
+            self        = true
+          }
+        },
+        var.options.enable_hmpps_domain ? {
+          rpc-from-jumpservers = {
+            description = "Allow RPC from jumpservers"
+            from_port   = 135
+            to_port     = 135
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          smb-from-jumpserver = {
+            description = "Allow SMB from jumpservers"
+            from_port   = 445
+            to_port     = 445
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          rdp-tcp-from-jumpservers = {
+            description = "Allow RDP TCP from jumpservers"
+            from_port   = 3389
+            to_port     = 3389
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          rdp-udp-from-jumpservers = {
+            description = "Allow RDP UDP from jumpservers"
+            from_port   = 3389
+            to_port     = 3389
+            protocol    = "UDP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          winrm-from-jumpservers = {
+            description = "Allow WinRM from jumpservers"
+            from_port   = 5985
+            to_port     = 5986
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+          rpc-dynamic_from-jumpservers = {
+            description = "Allow RPC dynamic from jumpservers"
+            from_port   = 49152
+            to_port     = 65535
+            protocol    = "TCP"
+            cidr_blocks = flatten([
+              var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].jumpservers,
+              var.ip_addresses.mp_cidr[var.environment.vpc_name],
+            ])
+          }
+        } : {}
+      )
       egress = {
         all = {
           # allow all since internal resources are protected by inbound SGs
@@ -121,7 +187,7 @@ locals {
           to_port     = 3389
           protocol    = "TCP"
           cidr_blocks = flatten([
-            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
             var.ip_addresses.mp_cidr[var.environment.vpc_name],
           ])
         }
@@ -131,7 +197,7 @@ locals {
           to_port     = 3389
           protocol    = "UDP"
           cidr_blocks = flatten([
-            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rd_gateways,
+            var.ip_addresses.active_directory_cidrs[local.ad_netbios_name].rdgateways,
             var.ip_addresses.mp_cidr[var.environment.vpc_name],
           ])
         }

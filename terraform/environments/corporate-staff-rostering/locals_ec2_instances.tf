@@ -29,10 +29,9 @@ locals {
           backup-plan = "daily-and-weekly"
         }
         vpc_security_group_ids = [
-          "ad-join",
           "app",
-          "remote-management",
-          "rdp-from-gateways",
+          "ad-join",
+          "ec2-windows",
         ]
       }
       route53_records = {
@@ -146,10 +145,9 @@ locals {
           backup-plan = "daily-and-weekly"
         }
         vpc_security_group_ids = [
-          "ad-join",
           "web",
-          "remote-management",
-          "rdp-from-gateways",
+          "ad-join",
+          "ec2-windows",
         ]
       }
       route53_records = {

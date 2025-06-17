@@ -589,59 +589,5 @@ locals {
         }
       }
     }
-
-    remote-management = {
-      description = "Security group for managing windows servers remotely"
-      ingress = {
-        rpc-from-jumpservers = {
-          description = "135: TCP MS-RPC AD connect ingress from jumpservers"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        smb-from-jumpserver = {
-          description = "445: TCP SMB ingress from jumpservers"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rdp-from-jumpservers = {
-          description = "3389: Allow RDP ingress from jumpservers"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        winrm-from-jumpservers = {
-          description = "5985-6: Allow WinRM ingress from jumpservers"
-          from_port   = 5985
-          to_port     = 5986
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rpc-dynamic_from-jumpservers = {
-          description = "49152-65535: TCP Dynamic Port range from jumpservers"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-      }
-      egress = {
-        all-to-jumpservers = {
-          description = "Allow all egress to jumpservers"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-      }
-    }
-
   }
 }
-
-
-
