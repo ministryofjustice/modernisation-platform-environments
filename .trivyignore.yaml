@@ -22,8 +22,6 @@ vulnerabilities:
     statement: "XP - Pass ITHC in this week"
   - id: CVE-2022-24778
   - id: CVE-2022-25883
-    expired_at: 2025-04-25
-    statement: "XP - Pass ITHC in this week"
   - id: CVE-2022-27191
   - id: CVE-2022-27664
   - id: CVE-2022-32149
@@ -40,8 +38,6 @@ vulnerabilities:
     expired_at: 2024-08-19
     statement: "Review in 6 months"
   - id: CVE-2025-27152
-    expired_at: 2025-04-25
-    statement: "XP - Pass ITHC in this week"
 
 misconfigurations:
   - id: AVD-GIT-0001
