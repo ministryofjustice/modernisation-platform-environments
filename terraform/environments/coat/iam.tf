@@ -42,7 +42,8 @@ resource "aws_iam_policy" "coat_cross_account_policy" {
   name  = "moj-coat-${local.environment}-cur-reports-cross-role-policy"
   policy = templatefile("${path.module}/templates/coat-cross-account-policy.json",
     {
-      environment = local.environment
+      environment     = local.environment
+      dev_environment = local.dev_environment
     }
   )
 }
