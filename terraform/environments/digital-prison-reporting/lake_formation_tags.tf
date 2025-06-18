@@ -1,3 +1,24 @@
+resource "aws_glue_resource_policy" "lakeformation_cross_account_sharing" {
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid    = "LakeFormationCrossAccountSharing",
+        Effect = "Allow",
+        Principal = {
+          Service = "ram.amazonaws.com"
+        },
+        Action = "glue:ShareResource",
+        Resource = [
+          "arn:aws:glue:${var.aws_region}:${data.aws_caller_identity.current.account_id}:catalog",
+          "arn:aws:glue:${var.aws_region}:${data.aws_caller_identity.current.account_id}:database/*",
+          "arn:aws:glue:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/*/*"
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_lakeformation_permissions" "grant_tag_to_consumer" {
   principal   = "arn:aws:iam::593291632749:role/alpha_user_andrewc-moj"
   permissions = ["DESCRIBE", "ASSOCIATE"]
