@@ -201,59 +201,6 @@ locals {
       }
     }
 
-    boe_web = {
-      config = {
-        ami_name                  = "base_rhel_7_9_*"
-        iam_resource_names_prefix = "ec2-instance"
-        instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-          "EC2Default",
-          "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-        ]
-        subnet_name = "private"
-      }
-      ebs_volumes = {
-        "/dev/sda1" = { type = "gp3", size = 32 }  # root volume
-        "/dev/sdb"  = { type = "gp3", size = 128 } # /u01
-        "/dev/sdc"  = { type = "gp3", size = 128 } # /u02
-      }
-      instance = {
-        disable_api_termination      = false
-        instance_type                = "t3.medium"
-        key_name                     = "ec2-user"
-        metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["web", "ec2-linux"]
-        tags = {
-          backup-plan         = "daily-and-weekly"
-          instance-scheduling = "skip-scheduling"
-        }
-      }
-      route53_records = {
-        create_internal_record = true
-        create_external_record = true
-      }
-      user_data_cloud_init = {
-        args = {
-          branch       = "main"
-          ansible_args = "--tags ec2provision"
-        }
-        scripts = [ # paths are relative to templates/ dir
-          "../../../modules/baseline_presets/ec2-user-data/install-ssm-agent.sh",
-          "../../../modules/baseline_presets/ec2-user-data/ansible-ec2provision.sh.tftpl",
-          "../../../modules/baseline_presets/ec2-user-data/post-ec2provision.sh",
-        ]
-      }
-      tags = {
-        ami              = "base_rhel_7_9"
-        backup           = "false"
-        os-type          = "Linux"
-        component        = "web"
-        server-type      = "onr-web"
-        update-ssm-agent = "patchgroup1"
-      }
-    }
-
     windows_bip = {
       config = {
         ami_name                      = "hmpps_windows_server_2022_release_2025-*"

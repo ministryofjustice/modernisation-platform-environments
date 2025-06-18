@@ -137,67 +137,6 @@ locals {
     }
     web = {
       description = "Security group for web servers"
-      ingress = {
-        oracle_oem_web_3872 = {
-          description = "3872: oracle oem agent"
-          from_port   = 3872
-          to_port     = 3872
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        }
-        oracle_oem_web_4983 = {
-          description = "4983: oracle oem agent"
-          from_port   = 4983
-          to_port     = 4983
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        }
-        weblogic_node_manager_web = {
-          description = "5556: weblogic node manager"
-          from_port   = 5556
-          to_port     = 5556
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        }
-        http7010 = {
-          description     = "Allow http7010 ingress"
-          from_port       = 7010
-          to_port         = 7010
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["public-lb", "public-lb-2"]
-        }
-        weblogic_admin = {
-          description = "7001: Weblogic admin port"
-          from_port   = 7001
-          to_port     = 7001
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        }
-        oracle_weblogic_admin = {
-          description = "7777: Main Weblogic admin"
-          from_port   = 7777
-          to_port     = 7777
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        }
-        http_web = {
-          description = "8080: Allow HTTP ingress"
-          from_port   = 8080
-          to_port     = 8080
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.http7xxx
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
     }
 
     bip-web = {
@@ -293,25 +232,6 @@ locals {
 
     boe = {
       description = "Security group for Windows App Servers"
-      ingress = {
-        all-from-self = {
-          description     = "Allow all ingress to self"
-          from_port       = 0
-          to_port         = 0
-          protocol        = -1
-          self            = true
-          security_groups = ["web", "onr_db"]
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
     }
 
     bods = {
