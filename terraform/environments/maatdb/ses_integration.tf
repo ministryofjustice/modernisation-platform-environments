@@ -112,6 +112,10 @@ resource "aws_route53_record" "dkim" {
   records = ["${aws_ses_domain_dkim.dkim[0].dkim_tokens[count.index]}.dkim.amazonses.com"]
 }
 
+# Add the reporders email address
+resource "aws_ses_email_identity" "noreply" {
+  email = "laareporders@${local.ses_domain}"
+}
 
 # Outputs
 output "smtp_username" {
