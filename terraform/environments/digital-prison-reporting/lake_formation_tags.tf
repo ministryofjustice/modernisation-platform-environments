@@ -10,9 +10,9 @@ resource "aws_glue_resource_policy" "lakeformation_cross_account_sharing" {
         },
         Action = "glue:ShareResource",
         Resource = [
-          "arn:aws:glue:${var.aws_region}:${data.aws_caller_identity.current.account_id}:catalog",
-          "arn:aws:glue:${var.aws_region}:${data.aws_caller_identity.current.account_id}:database/*",
-          "arn:aws:glue:${var.aws_region}:${data.aws_caller_identity.current.account_id}:table/*/*"
+          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/dpr_ap_integration_test_tag_dev_dbt",
+          "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/dpr_ap_integration_test_tag_dev_dbt/*"
         ]
       }
     ]
