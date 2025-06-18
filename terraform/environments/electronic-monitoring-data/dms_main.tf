@@ -39,7 +39,7 @@ module "dms_task" {
   # DMS Migration Task Inputs
   dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
   rep_task_settings_filepath      = trimspace(file("${path.module}/dms_replication_task_settings.json"))
-  rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_${each.key}_task_tables_selection.json"))
+  rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_database_json_settings/dms_${each.key}_task_tables_selection.json"))
 
   local_tags = local.tags
 }
