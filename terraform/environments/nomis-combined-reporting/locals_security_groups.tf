@@ -23,6 +23,10 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
+    cms_ingress = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
   }
 
   security_group_cidrs_preprod_prod = {
@@ -46,6 +50,10 @@ locals {
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_agent = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
+    cms_ingress = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
@@ -240,7 +248,7 @@ locals {
           to_port         = 6500
           protocol        = "tcp"
           security_groups = ["web"]
-          cidr_blocks     = ["10.0.0.0/8"] # added for testing, remove later
+          cidr_blocks     = local.security_group_cidrs.cms_ingress
         }
       }
     }
