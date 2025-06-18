@@ -17,7 +17,7 @@ resource "aws_glue_resource_policy" "lakeformation_cross_account_sharing" {
       }
     ]
   })
-  enable_hybrid = true
+  enable_hybrid = "TRUE"
 }
 
 resource "aws_lakeformation_permissions" "grant_tag_to_consumer" {
