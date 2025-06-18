@@ -5,8 +5,9 @@ locals {
   connection_string_nomis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.nomis.name}}@//${local.nomis_host}:${local.nomis_port}/${local.nomis_service_name}"
 
   bodmis_host              = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["endpoint"]
+  bodmis_port              = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["port"]
   bodmis_service_name      = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["db_name"]
-  connection_string_bodmis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.bodmis.name}}@//${local.bodmis_host}:1522/${local.bodmis_service_name}"
+  connection_string_bodmis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.bodmis.name}}@//${local.bodmis_host}:${local.bodmis_port}/${local.bodmis_service_name}"
 
   oasys_host              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["endpoint"] : ""
   oasys_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["port"] : ""

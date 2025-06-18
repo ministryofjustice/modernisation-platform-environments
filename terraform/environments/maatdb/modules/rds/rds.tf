@@ -33,6 +33,11 @@ resource "aws_db_parameter_group" "parameter_group_19" {
     value = "10"
   }
 
+  parameter {
+  name  = "db_cache_size"
+  value = "2000000000"
+  }
+
   tags = {
     Name = "${var.application_name}-${var.environment}-parameter-group"
   }
@@ -219,19 +224,19 @@ resource "aws_security_group" "vpc_sec_group" {
   vpc_id      = var.vpc_shared_id
 
   ingress {
-      description     = "Sql Net on 1521"
-      from_port       = 1521
-      to_port         = 1521
-      protocol        = "tcp"
-      security_groups = [var.ecs_cluster_sec_group_id]
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.ecs_cluster_sec_group_id]
   }
 
   egress {
-      description     = "Sql Net on 1521"
-      from_port       = 1521
-      to_port         = 1521
-      protocol        = "tcp"
-      security_groups = [var.ecs_cluster_sec_group_id]
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.ecs_cluster_sec_group_id]
   }
 
   tags = {
@@ -245,19 +250,19 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
   vpc_id      = var.vpc_shared_id
 
   ingress {
-      description     = "Sql Net on 1521"
-      from_port       = 1521
-      to_port         = 1521
-      protocol        = "tcp"
-      security_groups = [var.mlra_ecs_cluster_sec_group_id]
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mlra_ecs_cluster_sec_group_id]
   }
 
   egress {
-      description     = "Sql Net on 1521"
-      from_port       = 1521
-      to_port         = 1521
-      protocol        = "tcp"
-      security_groups = [var.mlra_ecs_cluster_sec_group_id]
+    description     = "Sql Net on 1521"
+    from_port       = 1521
+    to_port         = 1521
+    protocol        = "tcp"
+    security_groups = [var.mlra_ecs_cluster_sec_group_id]
   }
 
   tags = {

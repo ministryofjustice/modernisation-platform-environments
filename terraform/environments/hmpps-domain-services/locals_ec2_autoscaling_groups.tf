@@ -27,7 +27,10 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["rds-ec2s"]
+        vpc_security_group_ids = [
+          "ec2-linux",
+          "ad-join",
+        ]
         tags = {
           patch-manager = "group2"
         }
@@ -86,7 +89,11 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["rds-ec2s"]
+        vpc_security_group_ids = [
+          "ad-join",
+          "ec2-windows",
+          "rd-session-host",
+        ]
         tags = {
           patch-manager = "group2"
         }
@@ -140,7 +147,11 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["rds-ec2s"]
+        vpc_security_group_ids = [
+          "rdgw",
+          "ad-join",
+          "ec2-windows",
+        ]
         tags = {
           patch-manager = "group2"
         }
@@ -199,7 +210,11 @@ locals {
         instance_type                = "t3.medium"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["rds-ec2s"]
+        vpc_security_group_ids = [
+          "rds",
+          "ad-join",
+          "ec2-windows",
+        ]
         tags = {
           patch-manager = "group2"
         }

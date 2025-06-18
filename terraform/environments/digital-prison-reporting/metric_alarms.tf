@@ -127,7 +127,7 @@ module "dpr_postgres_tickle_function_failure_alarm" {
   period              = local.period_postgres_tickle_function_failure_alarm
   unit                = "Count"
 
-  treat_missing_data  = "notBreaching"
+  treat_missing_data = "notBreaching"
 
   namespace   = "AWS/Lambda"
   metric_name = "Errors"

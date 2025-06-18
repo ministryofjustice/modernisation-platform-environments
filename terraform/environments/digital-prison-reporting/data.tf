@@ -217,3 +217,9 @@ data "aws_iam_session_context" "current" {
 data "aws_iam_roles" "data_engineering_roles" {
   name_regex = "AWSReservedSSO_modernisation-platform-data-eng.*"
 }
+
+# Retrieves role for developers
+
+data "aws_iam_roles" "developer_roles" {
+  name_regex = "AWSReservedSSO_modernisation-platform-developer.*"
+}

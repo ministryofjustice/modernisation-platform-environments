@@ -29,6 +29,7 @@ data "aws_subnets" "waf-shared-public" {
 resource "aws_lb" "waf_lb" {
   # checkov:skip=CKV_AWS_131: "Ensure that ALB drops HTTP headers"
   # checkov:skip=CKV_AWS_150: "Ensure that Load Balancer has deletion protection enabled"
+  # checkov:skip=CKV2_AWS_76: "Ensure AWS ALB attached WAFv2 WebACL is configured with AMR for Log4j Vulnerability"
   depends_on = [
     aws_security_group.waf_lb,
   ]
