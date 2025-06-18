@@ -251,7 +251,6 @@ locals {
       }
     }
 
-    # DO NOT FULLY DEPLOY YET AS WEB INSTANCES ARE NOT IN USE
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
