@@ -211,6 +211,38 @@ resource "aws_ses_active_receipt_rule_set" "activate" {
   rule_set_name = aws_ses_receipt_rule_set.default.rule_set_name
 }
 
+# This routes incoming email to S3 solely to capture the above validation email
+
+data "aws_route53_zone" "mx_zone" {
+  provider     = aws.core-network-services
+  name         = "${local.ses_domain}."  
+  private_zone = false
+}
+
+locals {
+  mx_zone_id = try(data.aws_route53_zone.mx_zone.zone_id, null)
+}
+
+resource "aws_route53_record" "ses_inbound_mx" {
+  count = local.route_ses_s3 && local.mx_zone_id != null ? 1 : 0
+
+  zone_id = local.mx_zone_id
+  name    = "team1.company.com"
+  type    = "MX"
+  ttl     = 300
+
+  records = [
+    "10 inbound-smtp.eu-west-2.amazonaws.com."
+  ]
+
+  depends_on = [
+    aws_ses_domain_identity.domain,
+    aws_ses_receipt_rule.receive_noreply,
+    aws_ses_receipt_rule_set.default,
+    aws_ses_active_receipt_rule_set.activate,
+    aws_s3_bucket.ses_incoming_email
+  ]
+}
 
 # Outputs
 output "smtp_username" {
