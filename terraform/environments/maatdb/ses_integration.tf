@@ -14,6 +14,8 @@ locals {
   hosted_zone = local.application_data.accounts[local.environment].hosted_zone
   ses_domain = local.application_data.accounts[local.environment].ses_domain
    
+  mx_zone_id = try(data.aws_route53_zone.zone.zone_id, null)
+
 }
 
 resource "aws_iam_user" "smtp_user" {
@@ -211,17 +213,7 @@ resource "aws_ses_active_receipt_rule_set" "activate" {
   rule_set_name = aws_ses_receipt_rule_set.default.rule_set_name
 }
 
-# This routes incoming email to S3 solely to capture the above validation email
-
-data "aws_route53_zone" "mx_zone" {
-  provider     = aws.core-network-services
-  name         = local.hosted_zone
-  private_zone = false
-}
-
-locals {
-  mx_zone_id = try(data.aws_route53_zone.mx_zone.zone_id, null)
-}
+# This routes incoming email to S3 solely to capture the above validation email. It is only to be used in the initial set up.
 
 resource "aws_route53_record" "ses_inbound_mx" {
   count = local.route_ses_s3 && local.mx_zone_id != null ? 1 : 0

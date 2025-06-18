@@ -30,7 +30,7 @@
       "build_s3": false,
       "build_ftp": false,
       "build_ses": true,
-      "route_ses_s3": true,
+      "route_ses_s3": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
       "hosted_zone": "modernisation-platform.service.justice.gov.uk",
       "ses_domain": "maatdb.dev.modernisation-platform.service.justice.gov.uk"
@@ -66,6 +66,7 @@
       "build_s3": false,
       "build_ftp": false,
       "build_ses": false,
+      "route_ses_s3": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
       "hosted_zone": "modernisation-platform.service.justice.gov.uk",
       "ses_domain": "maatdb.tst.modernisation-platform.service.justice.gov.uk"
@@ -101,6 +102,7 @@
       "build_s3": false,
       "build_ftp": false,
       "build_ses": true,
+      "route_ses_s3": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
       "hosted_zone": "modernisation-platform.service.justice.gov.uk",
       "ses_domain": "maatdb.uat.modernisation-platform.service.justice.gov.uk"
@@ -136,6 +138,7 @@
       "build_s3": false,
       "build_ftp": false,
       "build_ses": false,
+      "route_ses_s3": false,
       "pagerduty_integration_key_name": "laa_maat_prod_alarm",
       "hosted_zone": "legalservices.gov.uk",
       "ses_domain": "legalservices.gov.uk"
