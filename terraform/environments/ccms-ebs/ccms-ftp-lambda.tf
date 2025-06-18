@@ -138,22 +138,22 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
 
 
 
-locals {
-  secrets_map = {
-    for name in local.secret_names :
-    name => jsondecode(data.aws_secretsmanager_secret_version.secrets[name].secret_string)
-  }
+# locals {
+#   secrets_map = {
+#     for name in local.secret_names :
+#     name => jsondecode(data.aws_secretsmanager_secret_version.secrets[name].secret_string)
+#   }
 
-  # Optionally extract just user/password maps
-  credentials_map = {
-    for name, creds in local.secrets_map :
-    name => {
-      user     = creds.USER
-      password = creds.PASSWORD
-      ssh_key  = creds.SSH_KEY
-    }
-  }
-}
+#   # Optionally extract just user/password maps
+#   credentials_map = {
+#     for name, creds in local.secrets_map :
+#     name => {
+#       user     = creds.USER
+#       password = creds.PASSWORD
+#       ssh_key  = creds.SSH_KEY
+#     }
+#   }
+# }
 
 
 resource "aws_s3_object" "ftp_lambda_layer" {
