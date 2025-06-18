@@ -225,7 +225,7 @@ locals {
 
 resource "aws_route53_record" "ses_inbound_mx" {
   count = local.route_ses_s3 && local.mx_zone_id != null ? 1 : 0
-
+  provider = aws.core-network-services
   zone_id = local.mx_zone_id
   name    = local.ses_domain
   type    = "MX"
