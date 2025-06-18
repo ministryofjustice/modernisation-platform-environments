@@ -215,7 +215,7 @@ resource "aws_ses_active_receipt_rule_set" "activate" {
 
 data "aws_route53_zone" "mx_zone" {
   provider     = aws.core-network-services
-  name         = local.ses_domain  
+  name         = local.hosted_zone
   private_zone = false
 }
 
