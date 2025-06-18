@@ -32,10 +32,10 @@ resource "aws_secretsmanager_secret" "secrets" {
   name = "${each.value}-${local.environment}"
 }
 
-data "aws_secretsmanager_secret_version" "secrets" {
-  for_each  = toset(local.secret_names)
-  secret_id = "${each.value}-${local.environment}"
-}
+# data "aws_secretsmanager_secret_version" "secrets" {
+#   for_each  = toset(local.secret_names)
+#   secret_id = "${each.value}-${local.environment}"
+# }
 
 resource "aws_s3_bucket" "buckets" {
   for_each = toset(local.bucket_names)
@@ -203,14 +203,17 @@ module "allpay_ftp_lambda_inbound" {
   ftp_cert            = ""
   ftp_key             = ""
   ftp_key_type        = ""
-  ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
-  ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
+  # ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
+  # ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
+  ftp_user            = ""
+  ftp_password_path   = ""
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
-  ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
+  # ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
+  ssh_key_path        = ""
   env                 = local.environment
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_client= aws_s3_object.ftp_client.key
@@ -238,14 +241,17 @@ module "LAA-ftp-xerox-cis-pay-outbound" {
   ftp_cert            = ""
   ftp_key             = ""
   ftp_key_type        = ""
-  ftp_user            = local.credentials_map["LAA-ftp-rossendales-ccms-csv-inbound"].user
-  ftp_password_path   = local.credentials_map["LAA-ftp-rossendales-ccms-csv-inbound"].password
+  # ftp_user            = local.credentials_map["LAA-ftp-rossendales-ccms-csv-inbound"].user
+  # ftp_password_path   = local.credentials_map["LAA-ftp-rossendales-ccms-csv-inbound"].password
+  ftp_user            = ""
+  ftp_password_path   = ""
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
-  ssh_key_path        = local.credentials_map["LAA-ftp-rossendales-ccms-csv-inbound"].ssh_key
+  # ssh_key_path        = local.credentials_map["LAA-ftp-rossendales-ccms-csv-inbound"].ssh_key
+  ssh_key_path        = ""
   env                 = local.environment
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_client= aws_s3_object.ftp_client.key

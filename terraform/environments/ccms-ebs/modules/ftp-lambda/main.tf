@@ -55,6 +55,9 @@ resource "aws_iam_policy" "ftp_policy" {
   })
 }
 
+
+
+
 resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   role       = aws_iam_role.ftp_lambda_role.name
   policy_arn = aws_iam_policy.ftp_policy.arn
