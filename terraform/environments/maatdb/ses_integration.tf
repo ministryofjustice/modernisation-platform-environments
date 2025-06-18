@@ -85,6 +85,7 @@ resource "aws_ses_domain_identity" "domain" {
 
 # Add SES verification TXT record to Route 53
 resource "aws_route53_record" "verification" {
+  provider = aws.core-network-services
   count   = local.build_ses ? 1 : 0
   zone_id = data.aws_route53_zone.zone.zone_id
   name    = "_amazonses.${local.ses_domain}"
@@ -101,6 +102,7 @@ resource "aws_ses_domain_dkim" "dkim" {
 
 # Add DKIM CNAME records to Route 53
 resource "aws_route53_record" "dkim" {
+  provider = aws.core-network-services
   count   = local.build_ses ? 3 : 0
   zone_id = data.aws_route53_zone.zone.zone_id
   name    = "${aws_ses_domain_dkim.dkim[0].dkim_tokens[count.index]}._domainkey.${local.ses_domain}"
