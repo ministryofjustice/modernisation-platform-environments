@@ -140,7 +140,7 @@
       },
       {
         "name": "APP_CAA_OAUTH_SCOPE",
-        "value": "caa-api-dev/standard"
+        "value": "${maat_caa_oauth_scope}"
       },
       {
         "name": "AWS_XRAY_DAEMON_ADDRESS",
