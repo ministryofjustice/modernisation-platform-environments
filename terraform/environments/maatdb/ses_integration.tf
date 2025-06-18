@@ -215,7 +215,7 @@ resource "aws_ses_active_receipt_rule_set" "activate" {
 
 data "aws_route53_zone" "mx_zone" {
   provider     = aws.core-network-services
-  name         = "${local.ses_domain}."  
+  name         = local.ses_domain  
   private_zone = false
 }
 
@@ -227,7 +227,7 @@ resource "aws_route53_record" "ses_inbound_mx" {
   count = local.route_ses_s3 && local.mx_zone_id != null ? 1 : 0
 
   zone_id = local.mx_zone_id
-  name    = "team1.company.com"
+  name    = local.ses_domain
   type    = "MX"
   ttl     = 300
 
