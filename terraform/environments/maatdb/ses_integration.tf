@@ -3,6 +3,7 @@
 
 # Get the Route 53 hosted zone for the domain
 data "aws_route53_zone" "zone" {
+  provider     = aws.core-network-services
   name         = local.hosted_zone
   private_zone = false
 }
