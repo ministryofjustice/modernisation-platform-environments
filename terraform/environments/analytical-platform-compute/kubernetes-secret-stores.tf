@@ -1,6 +1,6 @@
-resource "kubernetes_manifest" "secretstore_sample" {
+resource "kubernetes_manifest" "eso_secretstore_data_production" {
   manifest = {
-    "apiVersion" = "external-secrets.io/v1beta1"
+    "apiVersion" = "external-secrets.io/v1"
     "kind"       = "SecretStore"
     "metadata" = {
       "namespace" = kubernetes_namespace.mwaa.metadata[0].name
@@ -22,4 +22,9 @@ resource "kubernetes_manifest" "secretstore_sample" {
       }
     }
   }
+}
+
+moved {
+  from = kubernetes_manifest.secretstore_sample
+  to   = kubernetes_manifest.eso_secretstore_data_production
 }

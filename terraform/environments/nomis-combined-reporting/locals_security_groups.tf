@@ -23,6 +23,10 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
+    cms_ingress = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.devtest,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
   }
 
   security_group_cidrs_preprod_prod = {
@@ -46,6 +50,10 @@ locals {
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     oracle_oem_agent = flatten([
+      module.ip_addresses.azure_fixngo_cidrs.prod,
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
+    cms_ingress = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
@@ -130,12 +138,11 @@ locals {
       }
       egress = {
         all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
@@ -166,25 +173,17 @@ locals {
       }
       egress = {
         all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          description = "Allow all egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
     web = {
       description = "Security group for tomcat web servers"
       ingress = {
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
         http7010 = {
           description     = "Allow http7010 ingress"
           from_port       = 7010
@@ -218,16 +217,6 @@ locals {
           security_groups = ["lb", "public-lb", "public-lb-2"]
         }
       }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
     }
     bip = {
       description = "Security group for bip"
@@ -238,13 +227,6 @@ locals {
           to_port         = 0
           protocol        = -1
           security_groups = ["web"]
-        }
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
         }
         host-agent = {
           description     = "Allow http1128 ingress"
@@ -265,104 +247,20 @@ locals {
           from_port       = 6400
           to_port         = 6500
           protocol        = "tcp"
-          security_groups = ["web", "private-jumpserver"]
-          cidr_blocks     = ["10.0.0.0/8"] # added for testing, remove later
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
-    etl = {
-      description = "Security group for etl"
-      ingress = {
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        subversion = {
-          description     = "Allow http3690 ingress"
-          from_port       = 3690
-          to_port         = 3690
-          protocol        = "tcp"
-          security_groups = []
-        }
-        http6450 = {
-          description     = "Allow http6450 ingress"
-          from_port       = 6450
-          to_port         = 6450
-          protocol        = "tcp"
-          security_groups = []
-        }
-        http6455 = {
-          description     = "Allow http6455 ingress"
-          from_port       = 6455
-          to_port         = 6455
-          protocol        = "tcp"
-          security_groups = []
-        }
-        http28080 = {
-          description     = "Allow http28080 ingress"
-          from_port       = 28080
-          to_port         = 28080
-          protocol        = "tcp"
-          security_groups = []
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
+          security_groups = ["web"]
+          cidr_blocks     = local.security_group_cidrs.cms_ingress
         }
       }
     }
     data = {
       description = "Security group for data subnet"
       ingress = {
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
         oracle1521 = {
           description = "Allow oracle database 1521 ingress"
           from_port   = "1521"
           to_port     = "1521"
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.oracle_db
-        }
-        oracle3872 = {
-          description = "Allow oem agent ingress"
-          from_port   = "3872"
-          to_port     = "3872"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
         }
       }
     }

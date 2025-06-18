@@ -11,4 +11,6 @@ locals {
 
   mp_dev_role = "AWSReservedSSO_modernisation-platform-developer_cd1b8f85b1611d20"
 
+  kms_dev_key_id = "arn:aws:kms:${data.aws_region.current.name}:${local.coat_dev_account_id}:key/b6c2960d-bc58-4fec-b941-ab8e602269ef"
+
 }
