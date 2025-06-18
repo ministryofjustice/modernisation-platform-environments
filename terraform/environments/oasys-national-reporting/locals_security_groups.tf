@@ -134,40 +134,6 @@ locals {
     }
     lb = {
       description = "Security group for public subnet"
-      ingress = {
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        http = {
-          description     = "Allow http ingress"
-          from_port       = 80
-          to_port         = 80
-          protocol        = "tcp"
-          security_groups = ["private-jumpserver"]
-          cidr_blocks     = local.security_group_cidrs.enduserclient_internal
-        }
-        https = {
-          description     = "Allow https ingress"
-          from_port       = 443
-          to_port         = 443
-          protocol        = "tcp"
-          security_groups = ["private-jumpserver"]
-          cidr_blocks     = local.security_group_cidrs.enduserclient_internal
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all egress"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
     }
     web = {
       description = "Security group for web servers"
@@ -186,7 +152,7 @@ locals {
           to_port         = 3872
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "private-jumpserver"]
+          security_groups = ["private-jumpserver"]
         }
         oracle_oem_web_4983 = {
           description     = "4983: oracle oem agent"
@@ -194,7 +160,7 @@ locals {
           to_port         = 4983
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "private-jumpserver"]
+          security_groups = ["private-jumpserver"]
         }
 
         weblogic_node_manager_web = {
@@ -203,7 +169,7 @@ locals {
           to_port         = 5556
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "private-jumpserver"]
+          security_groups = ["private-jumpserver"]
         }
         http7010 = {
           description     = "Allow http7010 ingress"
@@ -211,7 +177,7 @@ locals {
           to_port         = 7010
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "public-lb", "public-lb-2"]
+          security_groups = ["public-lb", "public-lb-2"]
         }
         weblogic_admin = {
           description     = "7001: Weblogic admin port"
@@ -219,7 +185,7 @@ locals {
           to_port         = 7001
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "private-jumpserver"]
+          security_groups = ["private-jumpserver"]
         }
         oracle_weblogic_admin = {
           description     = "7777: Main Weblogic admin"
@@ -227,7 +193,7 @@ locals {
           to_port         = 7777
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "private-jumpserver"]
+          security_groups = ["private-jumpserver"]
         }
         http_web = {
           description     = "8080: Allow HTTP ingress"
@@ -235,7 +201,7 @@ locals {
           to_port         = 8080
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "private-jumpserver"]
+          security_groups = ["private-jumpserver"]
         }
       }
       egress = {
@@ -265,7 +231,7 @@ locals {
           to_port         = 7010
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "public-lb", "public-lb-2"]
+          security_groups = ["public-lb", "public-lb-2"]
         }
         http7777 = {
           description     = "Allow http7777 ingress"
@@ -273,7 +239,7 @@ locals {
           to_port         = 7777
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "public-lb", "public-lb-2"]
+          security_groups = ["public-lb", "public-lb-2"]
         }
         http8005 = {
           description     = "Allow http8005 ingress"
@@ -281,7 +247,7 @@ locals {
           to_port         = 8005
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "public-lb", "public-lb-2"]
+          security_groups = ["public-lb", "public-lb-2"]
         }
         http8443 = {
           description     = "Allow http8443 ingress"
@@ -289,7 +255,7 @@ locals {
           to_port         = 8443
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["lb", "public-lb", "public-lb-2"]
+          security_groups = ["public-lb", "public-lb-2"]
         }
       }
       egress = {
