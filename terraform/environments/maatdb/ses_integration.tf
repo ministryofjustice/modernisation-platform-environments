@@ -113,9 +113,9 @@ resource "aws_route53_record" "dkim" {
 }
 
 # Add the reporders email address
-resource "aws_ses_email_identity" "noreply" {
-  email = "laareporders@${local.ses_domain}"
-}
+# resource "aws_ses_email_identity" "noreply" {
+#   email = "laareporders@${local.ses_domain}"
+# }
 
 # Outputs
 output "smtp_username" {
