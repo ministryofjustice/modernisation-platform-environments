@@ -1,3 +1,15 @@
+# Need to give database the lf_tag - cannot be done by DBT
+resource "aws_lakeformation_resource_lf_tag" "tag_database_with_domain" {
+  database {
+    name = "dpr_ap_integration_test_tag_dev_dbt"  
+  }
+
+  lf_tag {
+    key   = aws_lakeformation_lf_tag.domain_tag.key
+    value = "prisons"
+  }
+}
+
 resource "aws_lakeformation_permissions" "grant_tag_to_consumer" {
   principal   = "arn:aws:iam::593291632749:role/alpha_user_andrewc-moj"
   permissions = ["DESCRIBE", "ASSOCIATE"]
