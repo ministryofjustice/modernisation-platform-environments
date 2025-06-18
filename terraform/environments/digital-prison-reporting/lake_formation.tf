@@ -13,6 +13,10 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     ]
   )
 
+   parameters = {
+    "CROSS_ACCOUNT_VERSION" = "4"
+  }
+
   # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
   create_database_default_permissions {}
   create_table_default_permissions {}
