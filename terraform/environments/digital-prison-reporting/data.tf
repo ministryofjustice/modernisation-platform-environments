@@ -63,6 +63,7 @@ data "aws_secretsmanager_secret_version" "onr" {
   depends_on = [aws_secretsmanager_secret.onr[0]]
 }
 
+
 # Source nDelius Secrets
 data "aws_secretsmanager_secret" "ndelius" {
   count = local.is_dev_or_test ? 1 : 0
