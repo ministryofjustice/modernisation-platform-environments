@@ -138,38 +138,26 @@ locals {
     web = {
       description = "Security group for web servers"
       ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-
         oracle_oem_web_3872 = {
-          description     = "3872: oracle oem agent"
-          from_port       = 3872
-          to_port         = 3872
-          protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["private-jumpserver"]
+          description = "3872: oracle oem agent"
+          from_port   = 3872
+          to_port     = 3872
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
         oracle_oem_web_4983 = {
-          description     = "4983: oracle oem agent"
-          from_port       = 4983
-          to_port         = 4983
-          protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["private-jumpserver"]
+          description = "4983: oracle oem agent"
+          from_port   = 4983
+          to_port     = 4983
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
-
         weblogic_node_manager_web = {
-          description     = "5556: weblogic node manager"
-          from_port       = 5556
-          to_port         = 5556
-          protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["private-jumpserver"]
+          description = "5556: weblogic node manager"
+          from_port   = 5556
+          to_port     = 5556
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
         http7010 = {
           description     = "Allow http7010 ingress"
@@ -180,28 +168,25 @@ locals {
           security_groups = ["public-lb", "public-lb-2"]
         }
         weblogic_admin = {
-          description     = "7001: Weblogic admin port"
-          from_port       = 7001
-          to_port         = 7001
-          protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["private-jumpserver"]
+          description = "7001: Weblogic admin port"
+          from_port   = 7001
+          to_port     = 7001
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
         oracle_weblogic_admin = {
-          description     = "7777: Main Weblogic admin"
-          from_port       = 7777
-          to_port         = 7777
-          protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["private-jumpserver"]
+          description = "7777: Main Weblogic admin"
+          from_port   = 7777
+          to_port     = 7777
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
         http_web = {
-          description     = "8080: Allow HTTP ingress"
-          from_port       = 8080
-          to_port         = 8080
-          protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["private-jumpserver"]
+          description = "8080: Allow HTTP ingress"
+          from_port   = 8080
+          to_port     = 8080
+          protocol    = "TCP"
+          cidr_blocks = local.security_group_cidrs.http7xxx
         }
       }
       egress = {
@@ -287,12 +272,11 @@ locals {
           security_groups = ["bip-web"]
         }
         cms-ingress = {
-          description     = "Allow http6400-http6500 ingress"
-          from_port       = 6400
-          to_port         = 6500
-          protocol        = "tcp"
-          security_groups = ["private-jumpserver"]
-          cidr_blocks     = ["10.0.0.0/8"] # added for testing, remove later
+          description = "Allow http6400-http6500 ingress"
+          from_port   = 6400
+          to_port     = 6500
+          protocol    = "tcp"
+          cidr_blocks = ["10.0.0.0/8"] # added for testing, remove later
         }
       }
       egress = {
@@ -348,25 +332,23 @@ locals {
           cidr_blocks = local.security_group_cidrs.rdp
         }
         http_6400 = {
-          description     = "6400: boe cms"
-          from_port       = 6400
-          to_port         = 6400
-          protocol        = "TCP"
-          security_groups = ["private-jumpserver"]
+          description = "6400: boe cms"
+          from_port   = 6400
+          to_port     = 6400
+          protocol    = "TCP"
         }
         http_6410_6500 = {
-          description     = "6410-6500: boe sia"
-          from_port       = 6410
-          to_port         = 6500
-          protocol        = "TCP"
-          security_groups = ["private-jumpserver"]
+          description = "6410-6500: boe sia"
+          from_port   = 6410
+          to_port     = 6500
+          protocol    = "TCP"
         }
         http_28080 = {
           description     = "28080: bods tomcat http"
           from_port       = 28080
           to_port         = 28080
           protocol        = "TCP"
-          security_groups = ["public-lb", "private-jumpserver"]
+          security_groups = ["public-lb"] # TODO check?
         }
       }
       egress = {
@@ -501,25 +483,6 @@ locals {
     }
     private-jumpserver = {
       description = "Security group for jumpservers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
     }
     win-bip = {
       description = "Security group for Temporary Windows BIP server"
