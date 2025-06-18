@@ -1,5 +1,6 @@
 #### This file can be used to store locals specific to the member account ####
 
+# Global Locals
 
 locals {
 
@@ -9,10 +10,4 @@ locals {
   build_ftp = local.application_data.accounts[local.environment].build_ftp
   build_ses = local.application_data.accounts[local.environment].build_ses
 
-# SES Specific Locals
-
-  hosted_zone = local.application_data.accounts[local.environment].hosted_zone
-
-  ses_domain = local.application_data.accounts[local.environment].hosted_zone
-   
 }

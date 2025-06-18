@@ -29,10 +29,10 @@
       "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907",
       "build_s3": false,
       "build_ftp": false,
-      "build_ses": false,
+      "build_ses": true,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
-      "hosted_zone": "dev.legalservices.gov.uk",
-      "ses_domain": "dev.legalservices.gov.uk"
+      "hosted_zone": "modernisation-platform.service.justice.gov.uk",
+      "ses_domain": "maatdb.dev.modernisation-platform.service.justice.gov.uk"
     },
 
     "test": {
@@ -66,8 +66,8 @@
       "build_ftp": false,
       "build_ses": false,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
-      "hosted_zone": "tst.legalservices.gov.uk",
-      "ses_domain": "tst.legalservices.gov.uk"
+      "hosted_zone": "modernisation-platform.service.justice.gov.uk",
+      "ses_domain": "maatdb.tst.modernisation-platform.service.justice.gov.uk"
 
     },
     "preproduction": {
@@ -101,8 +101,8 @@
       "build_ftp": false,
       "build_ses": true,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
-      "hosted_zone": "uat.legalservices.gov.uk",
-      "ses_domain": "uat.legalservices.gov.uk"
+      "hosted_zone": "modernisation-platform.service.justice.gov.uk",
+      "ses_domain": "maatdb.uat.modernisation-platform.service.justice.gov.uk"
     },
 
     "production": {

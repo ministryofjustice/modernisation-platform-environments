@@ -7,6 +7,14 @@ data "aws_route53_zone" "zone" {
   private_zone = false
 }
 
+locals {
+
+  # SES Specific Locals
+  hosted_zone = local.application_data.accounts[local.environment].hosted_zone
+  ses_domain = local.application_data.accounts[local.environment].ses_domain
+   
+}
+
 resource "aws_iam_user" "smtp_user" {
   # checkov:skip=CKV_AWS_273:Required for SMTP
   count = local.build_ses ? 1 : 0
