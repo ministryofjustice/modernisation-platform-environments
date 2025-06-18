@@ -112,10 +112,105 @@ resource "aws_route53_record" "dkim" {
   records = ["${aws_ses_domain_dkim.dkim[0].dkim_tokens[count.index]}.dkim.amazonses.com"]
 }
 
-# Add the reporders email address
-# resource "aws_ses_email_identity" "noreply" {
-#   email = "laareporders@${local.ses_domain}"
-# }
+
+
+# This adds email receipt verification for the primary laareporders address. This is required if SES is in sandbox mode - the default for a new account.
+
+resource "aws_s3_bucket" "ses_incoming_email" {
+  bucket = "ses-inbound-verification-${local.application_name}-${local.environment}"
+  force_destroy = true
+
+  tags = {
+    Name = "SES Inbound Verification"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "ses_incoming_email" {
+  bucket = aws_s3_bucket.ses_incoming_email.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "allow_ses" {
+  bucket = aws_s3_bucket.ses_incoming_email.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      # 1. Allow SES to write email
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ses.amazonaws.com"
+        },
+        Action = "s3:PutObject",
+        Resource = "${aws_s3_bucket.ses_incoming_email.arn}/*",
+        Condition = {
+          StringEquals = {
+            "aws:Referer" = local.environment_management.account_ids[terraform.workspace]
+          }
+        }
+      },
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"
+        },
+        Action = [
+          "s3:GetObject"
+        ],
+        Resource = "${aws_s3_bucket.ses_incoming_email.arn}/*"
+      },
+      {
+        Effect = "Allow",
+        Principal = {
+          AWS = "arn:aws:iam::${local.environment_management.account_ids[terraform.workspace]}:root"
+        },
+        Action = [
+          "s3:ListBucket"
+        ],
+        Resource = "${aws_s3_bucket.ses_incoming_email.arn}",
+        Condition = {
+          StringLike = {
+            "s3:prefix" = ["inbound/*"]
+          }
+        }
+      }
+    ]
+  })
+}
+
+
+
+resource "aws_ses_receipt_rule_set" "default" {
+  rule_set_name = "default-receipt-rule-set"
+}
+
+resource "aws_ses_receipt_rule" "accept_verification_email" {
+  depends_on = [ aws_s3_bucket.ses_incoming_email ]
+  name          = "receive-noreply"
+  rule_set_name = aws_ses_receipt_rule_set.default.rule_set_name
+  recipients    = ["laareporders@${local.ses_domain}"]
+  enabled       = true
+  scan_enabled  = true
+  tls_policy    = "Optional"
+
+  s3_action {
+    position          = 1
+    bucket_name       = aws_s3_bucket.ses_incoming_email.bucket
+    object_key_prefix = "inbound/"
+  }
+}
+
+resource "aws_ses_active_receipt_rule_set" "activate" {
+  depends_on = [ aws_s3_bucket.ses_incoming_email ]
+  rule_set_name = aws_ses_receipt_rule_set.default.rule_set_name
+}
+
 
 # Outputs
 output "smtp_username" {
