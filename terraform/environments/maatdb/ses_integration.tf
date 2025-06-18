@@ -237,7 +237,6 @@ resource "aws_route53_record" "ses_inbound_mx" {
 
   depends_on = [
     aws_ses_domain_identity.domain,
-    aws_ses_receipt_rule.receive_noreply,
     aws_ses_receipt_rule_set.default,
     aws_ses_active_receipt_rule_set.activate,
     aws_s3_bucket.ses_incoming_email
