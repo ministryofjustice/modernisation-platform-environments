@@ -156,6 +156,16 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
       "arn:aws:eks:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:cluster/*"
     ]
   }
+  statement {
+    sid    = "AllowDynamodb"
+    effect = "Allow"
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:ListTables"
+    ]
+    resources = [module.analytical_platform_airflow_auto_approval_dynamodb_table.dynamodb_table_arn]
+  }
 }
 
 module "analytical_platform_github_actions_iam_policy" {
