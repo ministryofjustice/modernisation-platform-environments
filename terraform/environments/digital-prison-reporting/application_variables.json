@@ -182,7 +182,9 @@
           "resource_shares": [
             {
               "glue_database": "*",
-              "glue_tables": ["*"]
+              "glue_tables": ["*"],
+              "lf_tags": ["domain", "sensitive"]
+                
             }
           ]
         }
