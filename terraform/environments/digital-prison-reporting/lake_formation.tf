@@ -85,3 +85,22 @@ resource "aws_lakeformation_permissions" "sensitive_grant_internal" {
   }
 }
 
+resource "aws_lakeformation_permissions" "domain_grant_external" {
+  principal   = "arn:aws:iam::593291632749:root"
+  permissions = ["DESCRIBE", "ASSOCIATE"]
+
+  lf_tag {
+    key    = aws_lakeformation_lf_tag.domain_tag.key
+    values = aws_lakeformation_lf_tag.domain_tag.values
+  }
+}
+
+resource "aws_lakeformation_permissions" "sensitive_grant_external" {
+  principal   = "arn:aws:iam::593291632749:root"
+  permissions = ["DESCRIBE", "ASSOCIATE"]
+
+  lf_tag {
+    key    = aws_lakeformation_lf_tag.sensitive_tag.key
+    values = aws_lakeformation_lf_tag.sensitive_tag.values
+  }
+}
