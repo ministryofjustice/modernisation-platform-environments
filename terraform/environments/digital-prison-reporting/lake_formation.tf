@@ -1,4 +1,3 @@
-data "aws_caller_identity" "current" {}
 
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([
