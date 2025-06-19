@@ -83,24 +83,3 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
   }
 }
 
-
-# Share domain and sensitive tags via RAM
-resource "aws_ram_resource_share" "lf_tag_share_apdp" {
-  name                      = "lf-tag-share-to-apdp"
-  allow_external_principals = false
-}
-
-resource "aws_ram_principal_association" "lf_tag_share_apdp_principal" {
-  principal          = "593291632749"  # APDP account ID
-  resource_share_arn = aws_ram_resource_share.lf_tag_share_apdp.arn
-}
-
-resource "aws_ram_resource_association" "share_domain_tag" {
-  resource_arn = "arn:aws:lakeformation:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:lf-tag/domain"
-  resource_share_arn = aws_ram_resource_share.lf_tag_share_apdp.arn
-}
-
-resource "aws_ram_resource_association" "share_sensitive_tag" {
-  resource_arn = "arn:aws:lakeformation:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:lf-tag/sensitive"
-  resource_share_arn = aws_ram_resource_share.lf_tag_share_apdp.arn
-}
