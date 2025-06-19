@@ -45,12 +45,14 @@ resource "aws_lb_listener" "this" {
     }
   }
 
-  load_balancer_arn = module.alb.arn
-  port              = each.value.port
-  protocol          = each.value.protocol
-  certificate_arn   = try(each.value.certificate_arn, null)
-  ssl_policy        = contains(["HTTPS", "TLS"], each.value.protocol) ? try(each.value.ssl_policy, "ELBSecurityPolicy-TLS13-1-2-Res-2021-06") : try(each.value.ssl_policy, null)
-  tags              = local.all_tags
+  load_balancer_arn                    = module.alb.arn
+  port                                 = each.value.port
+  protocol                             = each.value.protocol
+  certificate_arn                      = try(each.value.certificate_arn, null)
+  ssl_policy                           = contains(["HTTPS", "TLS"], each.value.protocol) ? try(each.value.ssl_policy, "ELBSecurityPolicy-TLS13-1-2-Res-2021-06") : try(each.value.ssl_policy, null)
+  routing_http_response_server_enabled = try(each.value.routing_http_response_server_enabled, true)
+
+  tags = local.all_tags
   lifecycle {
     ignore_changes = [default_action]
   }
