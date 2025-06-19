@@ -35,4 +35,13 @@ locals {
   # example usage:
   # example_data = local.application_data.accounts[local.environment].example_var
   application_data = fileexists("./application_variables.json") ? jsondecode(file("./application_variables.json")) : null
+
+  # Extract Lake formation (LF) tag keys from resource shares in the current environment
+  lf_tags = distinct(flatten([
+    for share in try(local.application_data.accounts[local.environment].analytical_platform_share, []) :
+    flatten([
+      for rs in try(share.resource_shares, []) :
+      try(rs.lf_tags, [])
+    ])
+  ]))
 }
