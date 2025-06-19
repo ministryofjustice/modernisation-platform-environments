@@ -119,6 +119,18 @@ resource "aws_route53_record" "dkim" {
 # This adds email receipt verification for the primary laareporders address. This is required if SES is in sandbox mode - the default for a new account.
 
 resource "aws_s3_bucket" "ses_incoming_email" {
+  #checkov:skip=CKV_AWS_149:"To be ignored for now - bucket is only used to capture an single validation email"
+  #checkov:skip=CKV2_AWS_5:"See above"
+  #checkov:skip=CKV2_AWS_61:"See above"
+  #checkov:skip=CKV2_AWS_57:"See above"
+  #checkov:skip=CKV2_AWS_62:"See above"
+  #checkov:skip=CKV_AWS_21:"See above"
+  #checkov:skip=CKV2_AWS_6:"See above"
+  #checkov:skip=CKV_AWS_144:"See above"
+  #checkov:skip=CKV_AWS_18:"See above"
+  #checkov:skip=CKV_AWS_145:"See above"
+
+
   bucket = "ses-inbound-verification-${local.application_name}-${local.environment}"
   force_destroy = true
 
@@ -132,7 +144,8 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "ses_incoming_emai
 
   rule {
     apply_server_side_encryption_by_default {
-      sse_algorithm = "AES256"
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = data.aws_kms_key.general_shared.arn
     }
   }
 }
