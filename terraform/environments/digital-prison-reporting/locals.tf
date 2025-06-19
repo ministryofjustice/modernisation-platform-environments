@@ -278,7 +278,8 @@ locals {
   lambda_multiphase_cleanup_policies            = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
-    aws_iam_policy.redshift_dataapi_cross_policy.arn
+    aws_iam_policy.redshift_dataapi_cross_policy.arn,
+    aws_iam_policy.glue_catalog_readonly.arn
   ]
   lambda_multiphase_cleanup_secret_arn          = module.datamart.credential_secret_arn
   lambda_multiphase_cleanup_cluster_id          = module.datamart.cluster_id
