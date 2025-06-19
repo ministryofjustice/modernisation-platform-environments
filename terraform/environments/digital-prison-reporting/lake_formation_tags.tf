@@ -32,9 +32,9 @@ resource "aws_lakeformation_permissions" "lf_data_location_alpha" {
 
 # Grant external account database access by tag (all values)
 resource "aws_lakeformation_permissions" "grant_database_access_by_tag" {
-  principal              = "593291632749"
-  permissions            = ["DESCRIBE"]
-  permissions_with_grant = ["DESCRIBE"]
+  principal                     = "593291632749"
+  permissions                   = ["DESCRIBE"]
+  permissions_with_grant_option = ["DESCRIBE"]
 
   lf_tag_policy {
     resource_type = "DATABASE"
@@ -47,9 +47,9 @@ resource "aws_lakeformation_permissions" "grant_database_access_by_tag" {
 
 # Grant external account table access by tag (all values)
 resource "aws_lakeformation_permissions" "grant_table_access_by_tag" {
-  principal              = "593291632749"
-  permissions            = ["DESCRIBE"]
-  permissions_with_grant = ["DESCRIBE"]
+  principal                     = "593291632749"
+  permissions                   = ["DESCRIBE"]
+  permissions_with_grant_option = ["DESCRIBE"]
 
   lf_tag_policy {
     resource_type = "TABLE"
