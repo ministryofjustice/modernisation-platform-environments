@@ -4,7 +4,7 @@ resource "helm_release" "kyverno" {
   name       = "kyverno"
   repository = "https://kyverno.github.io/kyverno"
   chart      = "kyverno"
-  version    = "3.4.2"
+  version    = "3.4.3"
   namespace  = kubernetes_namespace.kyverno.metadata[0].name
   values = [
     templatefile(
@@ -71,7 +71,7 @@ resource "helm_release" "amazon_prometheus_proxy" {
   name       = "amazon-prometheus-proxy"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
-  version    = "75.3.0"
+  version    = "75.3.5"
   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
@@ -209,7 +209,7 @@ resource "helm_release" "cert_manager" {
   name       = "cert-manager"
   repository = "https://charts.jetstack.io"
   chart      = "cert-manager"
-  version    = "v1.18.0"
+  version    = "v1.18.1"
   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
   values = [
     templatefile(
@@ -310,7 +310,7 @@ resource "helm_release" "keda" {
   name       = "keda"
   repository = "https://kedacore.github.io/charts"
   chart      = "keda"
-  version    = "2.17.1"
+  version    = "2.17.2"
   namespace  = kubernetes_namespace.keda.metadata[0].name
   values = [
     templatefile(

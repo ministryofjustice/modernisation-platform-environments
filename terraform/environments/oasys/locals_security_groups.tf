@@ -4,7 +4,6 @@ locals {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
-    ssh = module.ip_addresses.azure_fixngo_cidrs.devtest
     https_internal = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
@@ -24,10 +23,6 @@ locals {
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
       module.ip_addresses.moj_cidr.aws_data_engineering_dev,
     ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
     http7xxx = flatten([
       "10.0.0.0/8",
     ])
@@ -36,7 +31,6 @@ locals {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
-    ssh = ["10.0.0.0/8"]
     https_internal = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
@@ -69,10 +63,6 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
       module.ip_addresses.moj_cidr.aws_data_engineering_stage,
     ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
     http7xxx = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -82,7 +72,6 @@ locals {
     icmp = flatten([
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc
     ])
-    ssh = ["10.0.0.0/8"]
     https_internal = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc, # "172.20.0.0/16"
@@ -117,10 +106,6 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_data_engineering_prod,
     ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
     http7xxx = flatten([
       "10.0.0.0/8",
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
@@ -135,28 +120,6 @@ locals {
   security_group_cidrs = local.security_group_cidrs_by_environment[local.environment]
 
   security_groups = {
-    private = {
-      description = "Security group for private subnet"
-      ingress = {
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
-    }
     private_lb = {
       description = "Security group for internal load balancer"
       ingress = {
@@ -253,58 +216,31 @@ locals {
     }
     private_web = {
       description = "Security group for web servers"
-      ingress = {
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        http8080 = {
-          description     = "Allow http8080 ingress"
-          from_port       = 0
-          to_port         = 8080
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.https_internal
-          security_groups = ["private_lb", "public_lb", "public_lb_2"]
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
+      ingress = merge(
+        module.baseline_presets.security_groups["ec2-linux"].ingress,
+        {
+          http8080 = {
+            description     = "Allow http8080 ingress"
+            from_port       = 0
+            to_port         = 8080
+            protocol        = "tcp"
+            cidr_blocks     = local.security_group_cidrs.https_internal
+            security_groups = ["private_lb", "public_lb", "public_lb_2"]
+          }
+      })
+      egress = merge(
+        module.baseline_presets.security_groups["ec2-linux"].egress,
+      )
     }
     data = {
       description = "Security group for data subnet"
       ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
         icmp = {
           description = "Allow icmp ingress"
           from_port   = -1
           to_port     = -1
           protocol    = "icmp"
           cidr_blocks = local.security_group_cidrs.icmp
-        }
-        ssh = {
-          description     = "Allow ssh ingress"
-          from_port       = "22"
-          to_port         = "22"
-          protocol        = "TCP"
-          cidr_blocks     = local.security_group_cidrs.ssh
-          security_groups = []
         }
         http8080 = {
           description = "Allow http 8080 ingress"
@@ -329,35 +265,11 @@ locals {
             "private_web",
           ]
         }
-        oracle3872 = {
-          description = "Allow oem agent ingress"
-          from_port   = "3872"
-          to_port     = "3872"
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.oracle_oem_agent
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
       }
     }
     bip = {
       description = "Security group for bip"
       ingress = {
-        all-within-subnet = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
         http7001 = {
           description     = "Allow http7001 ingress"
           from_port       = 7001
@@ -383,17 +295,6 @@ locals {
           cidr_blocks     = local.security_group_cidrs.http7xxx
         }
       }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
     }
-
   }
 }

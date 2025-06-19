@@ -32,6 +32,9 @@ resource "aws_secretsmanager_secret_version" "aurora_rotated_user_version" {
     dbname              = var.db_name
     dbClusterIdentifier = module.aurora.cluster_id
   })
+  lifecycle {
+    ignore_changes = [secret_string]
+  }
 }
 
 resource "aws_secretsmanager_secret_rotation" "aurora_rotated_user" {

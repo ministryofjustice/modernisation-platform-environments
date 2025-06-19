@@ -6,7 +6,7 @@ module "eks" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws"
-  version = "20.37.0"
+  version = "20.37.1"
 
   cluster_name    = local.eks_cluster_name
   cluster_version = local.environment_configuration.eks_cluster_version
@@ -66,6 +66,9 @@ module "eks" {
     eks-pod-identity-agent = {
       addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
     }
+    eks-node-monitoring-agent = {
+      addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_node_monitoring_agent
+    }
     vpc-cni = {
       addon_version            = local.environment_configuration.eks_cluster_addon_versions.vpc_cni
       service_account_role_arn = module.vpc_cni_iam_role.iam_role_arn
@@ -111,6 +114,10 @@ module "eks" {
       AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
       CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
       EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
+    }
+
+    node_repair_config = {
+      enabled = true
     }
   }
 
@@ -223,7 +230,7 @@ module "karpenter" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/eks/aws//modules/karpenter"
-  version = "20.37.0"
+  version = "20.37.1"
 
   cluster_name = module.eks.cluster_name
 

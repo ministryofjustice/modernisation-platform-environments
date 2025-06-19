@@ -19,7 +19,7 @@ module "alb" {
   web_acl_arn           = var.web_acl_arn
 
   idle_timeout               = 240
-  drop_invalid_header_fields = true
+  drop_invalid_header_fields = false
   access_logs                = local.access_logs
 
   tags = local.all_tags

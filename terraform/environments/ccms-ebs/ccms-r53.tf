@@ -13,6 +13,20 @@ resource "aws_route53_record" "external" {
   }
 }
 
+## Prod Network Loadbalancer
+resource "aws_route53_record" "prod_ebs_nlb" {
+  provider = aws.core-network-services
+  count    = local.is-production ? 1 : 0
+  zone_id  = data.aws_route53_zone.legalservices.zone_id
+  name     = "ccmsebs.legalservices.gov.uk"
+  type     = "A"
+  alias {
+    name                   = aws_lb.ebsapps_nlb.dns_name
+    zone_id                = aws_lb.ebsapps_nlb.zone_id
+    evaluate_target_health = true
+  }
+}
+
 # Prod LB EBS Apps DNS
 resource "aws_route53_record" "prod_ebsapp_lb" {
   count    = local.is-production ? 1 : 0
