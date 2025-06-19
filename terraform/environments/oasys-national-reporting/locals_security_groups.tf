@@ -14,10 +14,6 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
     ])
-    oasys_db = flatten([
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-      module.ip_addresses.azure_fixngo_cidrs.devtest_oasys_db,
-    ])
     cms_ingress = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
@@ -38,10 +34,6 @@ locals {
     enduserclient_public2 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.mp_cidrs.live_eu_west_nat,
-    ])
-    oasys_db = flatten([
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-      module.ip_addresses.azure_fixngo_cidrs.prod_oasys_db,
     ])
     cms_ingress = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
