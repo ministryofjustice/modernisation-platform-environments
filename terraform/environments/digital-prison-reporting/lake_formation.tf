@@ -1,3 +1,4 @@
+
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([
     [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
@@ -13,18 +14,13 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     ]
   )
 
-  # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
-  create_database_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
+   parameters = {
+    "CROSS_ACCOUNT_VERSION" = "4"
   }
 
-  create_table_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
+  # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
+  create_database_default_permissions {}
+  create_table_default_permissions {}
 }
 
 # Give the cadet cross-account role LF data access
@@ -88,3 +84,23 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
 }
 
 
+# Share domain and sensitive tags via RAM
+resource "aws_ram_resource_share" "lf_tag_share_apdp" {
+  name                      = "lf-tag-share-to-apdp"
+  allow_external_principals = false
+}
+
+resource "aws_ram_principal_association" "lf_tag_share_apdp_principal" {
+  principal          = "593291632749"  # APDP account ID
+  resource_share_arn = aws_ram_resource_share.lf_tag_share_apdp.arn
+}
+
+resource "aws_ram_resource_association" "share_domain_tag" {
+  resource_arn = "arn:aws:lakeformation:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:lf-tag/domain"
+  resource_share_arn = aws_ram_resource_share.lf_tag_share_apdp.arn
+}
+
+resource "aws_ram_resource_association" "share_sensitive_tag" {
+  resource_arn = "arn:aws:lakeformation:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:lf-tag/sensitive"
+  resource_share_arn = aws_ram_resource_share.lf_tag_share_apdp.arn
+}
