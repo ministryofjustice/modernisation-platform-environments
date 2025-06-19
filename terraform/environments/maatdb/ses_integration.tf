@@ -22,6 +22,12 @@ resource "aws_iam_user" "smtp_user" {
   # checkov:skip=CKV_AWS_273:Required for SMTP
   count = local.build_ses ? 1 : 0
   name  = "${local.application_name}-smtp-user"
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-smtp-user"
+    }
+  )
 }
 
 resource "aws_iam_access_key" "smtp_user_key" {
@@ -34,6 +40,12 @@ resource "aws_secretsmanager_secret" "smtp_access_key_secret" {
   #checkov:skip=CKV2_AWS_57:"Secret to be manually rotated"
   count = local.build_ses ? 1 : 0
   name  = "ses-smtp-user-access-key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ses-smtp-user-access-key"
+    }
+  )
 }
 
 resource "aws_secretsmanager_secret_version" "smtp_access_key_secret_version" {
@@ -69,6 +81,12 @@ resource "aws_secretsmanager_secret" "smtp_credentials" {
   #checkov:skip=CKV2_AWS_57:"Secret to be manually rotated"
   count = local.build_ses ? 1 : 0
   name  = "ses-smtp-credentials"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ses-smtp-credentials"
+    }
+  )
 }
 
 resource "aws_secretsmanager_secret_version" "smtp_secret_version" {
@@ -137,9 +155,12 @@ resource "aws_s3_bucket" "ses_incoming_email" {
   bucket = "ses-inbound-verification-${local.application_name}-${local.environment}"
   force_destroy = true
 
-  tags = {
-    Name = "SES Inbound Verification"
-  }
+  tags = merge(
+    local.tags,
+    {
+      Name = "ses-inbound-verification-${local.application_name}-${local.environment}"
+    }
+  )
 }
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "ses_incoming_email" {
