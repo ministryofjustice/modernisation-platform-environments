@@ -1,3 +1,4 @@
+
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([
     [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
@@ -13,18 +14,13 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     ]
   )
 
-  # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
-  create_database_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
+   parameters = {
+    "CROSS_ACCOUNT_VERSION" = "4"
   }
 
-  create_table_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
+  # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
+  create_database_default_permissions {}
+  create_table_default_permissions {}
 }
 
 # Give the cadet cross-account role LF data access
@@ -65,8 +61,10 @@ resource "aws_lakeformation_lf_tag" "sensitive_tag" {
   values = ["true", "false", "data_linking"]
 }
 
-# Domain tag: Now grant the permissions to the CaDeT cross account role
-resource "aws_lakeformation_permissions" "domain_grant" {
+# Internal LF tag permissions
+
+# Domain tag: Grant to inernal role
+resource "aws_lakeformation_permissions" "domain_grant_internal" {
   principal   = aws_iam_role.dataapi_cross_role.arn
   permissions = ["DESCRIBE", "ASSOCIATE", "GRANT_WITH_LF_TAG_EXPRESSION"]
 
@@ -76,8 +74,8 @@ resource "aws_lakeformation_permissions" "domain_grant" {
   }
 }
 
-# Sensitive tag: Now grant the permissions to the CaDeT cross account role
-resource "aws_lakeformation_permissions" "sensitive_grant" {
+# Sensitive tag: Grant to internal role
+resource "aws_lakeformation_permissions" "sensitive_grant_internal" {
   principal   = aws_iam_role.dataapi_cross_role.arn
   permissions = ["DESCRIBE", "ASSOCIATE", "GRANT_WITH_LF_TAG_EXPRESSION"]
 
@@ -86,5 +84,4 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
     values = aws_lakeformation_lf_tag.sensitive_tag.values
   }
 }
-
 
