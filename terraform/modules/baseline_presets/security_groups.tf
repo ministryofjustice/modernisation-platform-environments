@@ -38,7 +38,7 @@ locals {
         }
       }
       egress = {
-        all = {
+        all-to-dc = {
           # Ideally, we'd lock down to specific ports but we exceed maximum number of rules for SG
           # Ports required:
           #  - ICMP
@@ -220,7 +220,7 @@ locals {
         }
       }
       egress = {
-        all = {
+        all-to-oem = {
           description = "Allow all egress to OEM"
           from_port   = 0
           to_port     = 0
