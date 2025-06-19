@@ -10,18 +10,9 @@ resource "aws_lakeformation_resource_lf_tag" "tag_database_with_domain" {
   }
 }
 
-# Alpha user describe/associate on domain = prisons (can add more later)
-resource "aws_lakeformation_permissions" "grant_tag_to_consumer" {
-  principal   = "arn:aws:iam::593291632749:role/alpha_user_andrewc-moj"
-  permissions = ["DESCRIBE", "ASSOCIATE"]
-
-  lf_tag {
-    key    = aws_lakeformation_lf_tag.domain_tag.key
-    values = ["prisons"]
-  }
-}
 
 # Data eng role
+# This let's the DE role see the tag on the consumer account
 resource "aws_lakeformation_permissions" "grant_tag_describe_to_sso_role" {
   principal   = "arn:aws:iam::593291632749:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
   permissions = ["DESCRIBE", "ASSOCIATE"]
