@@ -23,7 +23,7 @@ locals {
         disable_api_termination = false
         instance_type           = "m6i.4xlarge"
         key_name                = "ec2-user"
-        vpc_security_group_ids  = ["bip"]
+        vpc_security_group_ids  = ["bip", "ec2-linux"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -71,7 +71,7 @@ locals {
         disable_api_termination = false
         instance_type           = "m6i.xlarge"
         key_name                = "ec2-user"
-        vpc_security_group_ids  = ["bip"]
+        vpc_security_group_ids  = ["bip", "ec2-linux"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -119,7 +119,7 @@ locals {
         disable_api_termination = false
         instance_type           = "r6i.large"
         key_name                = "ec2-user"
-        vpc_security_group_ids  = ["web"]
+        vpc_security_group_ids  = ["web", "ec2-linux"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -167,7 +167,7 @@ locals {
         disable_api_termination = false
         instance_type           = "r6i.xlarge"
         key_name                = "ec2-user"
-        vpc_security_group_ids  = ["web"]
+        vpc_security_group_ids  = ["web", "ec2-linux"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -189,49 +189,6 @@ locals {
         instance-access-policy = "full"
         os-type                = "Linux"
         server-type            = "ncr-web"
-        update-ssm-agent       = "patchgroup1"
-      }
-    }
-
-    bods = {
-      config = {
-        ami_name                      = "hmpps_windows_server_2019_release_*"
-        ebs_volumes_copy_all_from_ami = false
-        iam_resource_names_prefix     = "ec2-etl"
-        instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-          "EC2Default",
-          "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-        ]
-        subnet_name = "private"
-        user_data_raw = base64encode(templatefile(
-          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-            branch = "main"
-          }
-        ))
-      }
-      ebs_volumes = {
-        "/dev/sda1" = { type = "gp3", size = 100 } # root volume
-        "xvdd"      = { type = "gp3", size = 100 } # D:/ Temp
-        "xvde"      = { type = "gp3", size = 100 } # E:/ App
-        "xvdf"      = { type = "gp3", size = 100 } # F:/ Storage
-      }
-      instance = {
-        disable_api_termination = false
-        instance_type           = "t3.large"
-        key_name                = "ec2-user"
-        vpc_security_group_ids  = ["etl"]
-        tags = {
-          backup-plan = "daily-and-weekly"
-        }
-      }
-      tags = {
-        ami                    = "hmpps_windows_server_2019"
-        backup                 = "false"
-        instance-access-policy = "full"
-        os-type                = "Windows"
-        server-type            = "Bods"
         update-ssm-agent       = "patchgroup1"
       }
     }
@@ -262,7 +219,7 @@ locals {
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional" # the Oracle installer cannot accommodate a token
-        vpc_security_group_ids       = ["data"]
+        vpc_security_group_ids       = ["data", "ec2-linux", "oem-agent"]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -298,42 +255,5 @@ locals {
       }
     }
 
-    jumpserver = {
-      config = {
-        ami_name                      = "base_windows_server_2012_r2_release_2024-*"
-        ebs_volumes_copy_all_from_ami = false
-        iam_resource_names_prefix     = "ec2-instance"
-        instance_profile_policies = [
-          "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore",
-          "EC2Default",
-          "EC2S3BucketWriteAndDeleteAccessPolicy",
-          "ImageBuilderS3BucketWriteAndDeleteAccessPolicy",
-        ]
-        subnet_name = "private"
-        user_data_raw = base64encode(templatefile(
-          "../../modules/baseline_presets/ec2-user-data/user-data-pwsh.yaml.tftpl", {
-            branch = "main"
-          }
-        ))
-      }
-      ebs_volumes = {
-        "/dev/sda1" = { type = "gp3", size = 200 }
-      }
-      instance = {
-        disable_api_termination = false
-        instance_type           = "m4.large"
-        key_name                = "ec2-user"
-        vpc_security_group_ids  = ["private-jumpserver"]
-      }
-      tags = {
-        ami                    = "hmpps_windows_server_2019"
-        backup                 = "false" # no need to backup as these shouldn't contain persistent data
-        description            = "Windows Server 2012 R2 client testing for NART"
-        instance-access-policy = "full"
-        os-type                = "Windows"
-        server-type            = "NcrClient"
-        update-ssm-agent       = "patchgroup1"
-      }
-    }
   }
 }
