@@ -208,12 +208,7 @@ resource "aws_ses_receipt_rule" "accept_verification_email" {
   }
 }
 
-resource "aws_ses_active_receipt_rule_set" "activate" {
-  depends_on = [ aws_s3_bucket.ses_incoming_email ]
-  rule_set_name = aws_ses_receipt_rule_set.default.rule_set_name
-}
-
-# This routes incoming email to S3 solely to capture the above validation email. It is only to be used in the initial set up.
+# This routes incoming email to S3 solely to capture any validation emails based on the above aws_ses_receipt_rule. It is only to be used in the initial set up.
 
 resource "aws_route53_record" "ses_inbound_mx" {
   count = local.route_ses_s3 && local.mx_zone_id != null ? 1 : 0
@@ -230,7 +225,6 @@ resource "aws_route53_record" "ses_inbound_mx" {
   depends_on = [
     aws_ses_domain_identity.domain,
     aws_ses_receipt_rule_set.default,
-    aws_ses_active_receipt_rule_set.activate,
     aws_s3_bucket.ses_incoming_email
   ]
 }
