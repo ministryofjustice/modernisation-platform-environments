@@ -162,11 +162,6 @@ locals {
       local.azure_fixngo_cidr.noms_devtest_rdgateway_MGMRW0001,
     ]
 
-    devtest_oasys_db = [
-      local.noms_test_subnet.t1_oasys_clientaccess,
-      local.noms_test_subnet.t2_oasys_clientaccess,
-    ]
-
     devtest_tools = [
       local.noms_mgmt_subnet.nomsmgmt_tools,
     ]
@@ -192,15 +187,6 @@ locals {
 
     prod_rdgateways = [
       local.azure_fixngo_cidr.noms_prod_rdgateway_PDMRW0001,
-    ]
-
-    prod_oasys_db = [
-      local.noms_live_subnet.pd_oasys_db,
-      local.noms_live_subnet.pp_oasys_db,
-      local.noms_live_subnet.pd_oasys_app,
-      local.noms_live_subnet.pp_oasys_app,
-      local.noms_live_subnet.pd_oasys_clientaccess,
-      local.noms_live_subnet.pp_oasys_clientaccess,
     ]
 
     prod_tools = [
