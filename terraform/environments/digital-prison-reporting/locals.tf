@@ -286,7 +286,7 @@ locals {
   lambda_multiphase_cleanup_database_name       = module.datamart.cluster_database_name
   lambda_multiphase_cleanup_timeout_seconds     = 900
   lambda_multiphase_cleanup_memory_size         = 1024
-  lambda_multiphase_cleanup_schedule_expression = "rate(5 minutes)"
+  lambda_multiphase_cleanup_schedule_expression = "rate(1 day)"
 
   # Landing Zone antivirus check lambda
   landing_zone_antivirus_check_lambda_enable                 = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_enable
