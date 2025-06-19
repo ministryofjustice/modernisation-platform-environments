@@ -200,7 +200,7 @@ resource "aws_s3_bucket_policy" "allow_ses" {
         Action = [
           "s3:ListBucket"
         ],
-        Resource = "${aws_s3_bucket.ses_incoming_email.arn}",
+        Resource = aws_s3_bucket.ses_incoming_email.arn
         Condition = {
           StringLike = {
             "s3:prefix" = ["inbound/*"]

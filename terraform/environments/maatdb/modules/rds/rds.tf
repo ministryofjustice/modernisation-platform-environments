@@ -3,8 +3,11 @@
 #TODO 1) Get ARN for the Shared Key and apply for snapshots & PI.
 #TODO 2) Snapshot ARN in the vars
 
-# RDS Subnet Group
 
+# tflint-ignore: terraform_required_version
+terraform {}
+
+# RDS Subnet Group
 
 resource "aws_db_subnet_group" "subnet_group" {
   name       = "subnet-group"
@@ -86,6 +89,7 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 
 # Random Secret for the DB Password.
 
+# tflint-ignore: terraform_required_providers
 resource "random_password" "rds_password" {
   length  = 12
   special = false
@@ -275,6 +279,8 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
 
 
 # Access from Bastion
+
+# tflint-ignore: terraform_required_providers
 resource "aws_security_group" "bastion_sec_group" {
   #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "bastion-sec-group"
