@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   admins = flatten([
     [for share in local.analytical_platform_share : aws_iam_role.analytical_platform_share_role[share.target_account_name].arn],
@@ -83,8 +85,7 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
 }
 
 
-# Share LF tags with APDP account (593291632749)
-
+# Share domain and sensitive tags via RAM
 resource "aws_ram_resource_share" "lf_tag_share_apdp" {
   name                      = "lf-tag-share-to-apdp"
   allow_external_principals = false
@@ -96,11 +97,11 @@ resource "aws_ram_principal_association" "lf_tag_share_apdp_principal" {
 }
 
 resource "aws_ram_resource_association" "share_domain_tag" {
-  resource_arn       = aws_lakeformation_lf_tag.domain_tag.arn
+  resource_arn = "arn:aws:lakeformation:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:lf-tag/domain"
   resource_share_arn = aws_ram_resource_share.lf_tag_share_apdp.arn
 }
 
 resource "aws_ram_resource_association" "share_sensitive_tag" {
-  resource_arn       = aws_lakeformation_lf_tag.sensitive_tag.arn
+  resource_arn = "arn:aws:lakeformation:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:lf-tag/sensitive"
   resource_share_arn = aws_ram_resource_share.lf_tag_share_apdp.arn
 }
