@@ -18,13 +18,6 @@ locals {
       module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    remotedesktop_gateways = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name]
-    ])
   }
   security_group_cidrs_preprod_prod = {
     icmp = flatten([
@@ -44,13 +37,6 @@ locals {
       module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
       module.ip_addresses.moj_cidr.aws_xsiam_prod_vpc,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    remotedesktop_gateways = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name]
     ])
   }
 
