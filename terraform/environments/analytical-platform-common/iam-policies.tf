@@ -189,7 +189,8 @@ data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions"
     actions = ["sts:AssumeRole"]
     resources = [
       module.data_engineering_datalake_access_terraform_iam_role.iam_role_arn,
-      "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/data-engineering-datalake-access"
+      "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/data-engineering-datalake-access",
+      "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-test"]}:role/analytical-platform-data-production-share-role",
     ]
   }
 }
