@@ -30,6 +30,8 @@ resource "aws_iam_access_key" "smtp_user_key" {
 }
 
 resource "aws_secretsmanager_secret" "smtp_access_key_secret" {
+  #checkov:skip=CKV_AWS_149:"Secret to be manually rotated"
+  #checkov:skip=CKV2_AWS_57:"Secret to be manually rotated"
   count = local.build_ses ? 1 : 0
   name  = "ses-smtp-user-access-key"
 }
@@ -63,6 +65,8 @@ data "aws_iam_policy_document" "smtp_user_policy" {
 # These resources generate the SMTP password required to access SES SMTP.
 
 resource "aws_secretsmanager_secret" "smtp_credentials" {
+  #checkov:skip=CKV_AWS_149:"Secret to be manually rotated"
+  #checkov:skip=CKV2_AWS_57:"Secret to be manually rotated"
   count = local.build_ses ? 1 : 0
   name  = "ses-smtp-credentials"
 }
@@ -120,7 +124,6 @@ resource "aws_route53_record" "dkim" {
 
 resource "aws_s3_bucket" "ses_incoming_email" {
   #checkov:skip=CKV_AWS_149:"To be ignored for now - bucket is only used to capture an single validation email"
-  #checkov:skip=CKV2_AWS_5:"See above"
   #checkov:skip=CKV2_AWS_61:"See above"
   #checkov:skip=CKV2_AWS_57:"See above"
   #checkov:skip=CKV2_AWS_62:"See above"
