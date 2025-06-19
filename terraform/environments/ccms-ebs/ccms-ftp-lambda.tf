@@ -32,10 +32,10 @@ resource "aws_secretsmanager_secret" "secrets" {
   name = "${each.value}-${local.environment}"
 }
 
-# data "aws_secretsmanager_secret_version" "secrets" {
-#   for_each  = toset(local.secret_names)
-#   secret_id = "${each.value}-${local.environment}"
-# }
+data "aws_secretsmanager_secret_version" "secrets" {
+  for_each  = toset(local.secret_names)
+  secret_id = "${each.value}-${local.environment}"
+}
 
 resource "aws_s3_bucket" "buckets" {
   for_each = toset(local.bucket_names)
@@ -138,22 +138,22 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
 
 
 
-# locals {
-#   secrets_map = {
-#     for name in local.secret_names :
-#     name => jsondecode(data.aws_secretsmanager_secret_version.secrets[name].secret_string)
-#   }
+locals {
+  secrets_map = {
+    for name in local.secret_names :
+    name => jsondecode(data.aws_secretsmanager_secret_version.secrets[name].secret_string)
+  }
 
-#   # Optionally extract just user/password maps
-#   credentials_map = {
-#     for name, creds in local.secrets_map :
-#     name => {
-#       user     = creds.USER
-#       password = creds.PASSWORD
-#       ssh_key  = creds.SSH_KEY
-#     }
-#   }
-# }
+  # Optionally extract just user/password maps
+  credentials_map = {
+    for name, creds in local.secrets_map :
+    name => {
+      user     = creds.USER
+      password = creds.PASSWORD
+      ssh_key  = creds.SSH_KEY
+    }
+  }
+}
 
 
 resource "aws_s3_object" "ftp_lambda_layer" {
@@ -172,16 +172,16 @@ resource "aws_sns_topic" "slack_notifications" {
   name = "ftp-lambda-notifications"
 }
 
-module "slack_notification_configuration" {
+# module "slack_notification_configuration" {
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
+#   source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
 
-  slack_channel_id = "C08QQNG543F"
-  sns_topic_arns   = [aws_sns_topic.slack_notifications.arn]
-  tags             = local.tags
-  application_name = local.application_name
+#   slack_channel_id = "C08QQNG543F"
+#   sns_topic_arns   = [aws_sns_topic.slack_notifications.arn]
+#   tags             = local.tags
+#   application_name = local.application_name
 
-}
+# }
 
 
 # #LAA-ftp-allpay-inbound-ccms
@@ -203,17 +203,15 @@ module "allpay_ftp_lambda_inbound" {
   ftp_cert            = ""
   ftp_key             = ""
   ftp_key_type        = ""
-  # ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
-  # ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
-  ftp_user            = ""
-  ftp_password_path   = ""
+  ftp_user            = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].user
+  ftp_password_path   = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].password
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
-  # ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
-  ssh_key_path        = ""
+  ssh_key_path        = local.credentials_map["LAA-ftp-allpay-inbound-ccms"].ssh_key
+  # ssh_key_path        = ""
   env                 = local.environment
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_client= aws_s3_object.ftp_client.key
@@ -241,17 +239,17 @@ module "LAA-ftp-xerox-cis-pay-outbound" {
   ftp_cert            = ""
   ftp_key             = ""
   ftp_key_type        = ""
-  # ftp_user            = local.credentials_map["LAA-ftp-rossendales-ccms-csv-inbound"].user
-  # ftp_password_path   = local.credentials_map["LAA-ftp-rossendales-ccms-csv-inbound"].password
-  ftp_user            = ""
-  ftp_password_path   = ""
+  ftp_user            = local.credentials_map["LAA-ftp-xerox-outbound"].user
+  ftp_password_path   = local.credentials_map["LAA-ftp-xerox-outbound"].password
+  # ftp_user            = ""
+  # ftp_password_path   = ""
   ftp_file_remove     = "YES"
   ftp_cron            = "cron(0 10 * * ? *)"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   sns_topic_sev5      = ""
   sns_topic_ops       = ""
-  # ssh_key_path        = local.credentials_map["LAA-ftp-rossendales-ccms-csv-inbound"].ssh_key
-  ssh_key_path        = ""
+  ssh_key_path        = local.credentials_map["LAA-ftp-xerox-outbound"].ssh_key
+  # ssh_key_path        = ""
   env                 = local.environment
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_client= aws_s3_object.ftp_client.key

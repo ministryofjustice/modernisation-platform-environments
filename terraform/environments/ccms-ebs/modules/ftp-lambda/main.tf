@@ -78,7 +78,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   function_name = var.lambda_name
   role          = aws_iam_role.ftp_lambda_role.arn
   handler       = "ftp-client.lambda_handler"
-  runtime       = "python3.7"
+  runtime       = "python3.13"
   timeout       = 300
   memory_size   = 256
   # filename         = "ftp-client.zip"
