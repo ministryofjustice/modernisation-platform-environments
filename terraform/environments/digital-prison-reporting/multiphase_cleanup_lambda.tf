@@ -16,7 +16,7 @@ module "multiphase_cleanup_lambda" {
   log_retention_in_days = local.lambda_log_retention_in_days
 
   env_vars = {
-    "REDSHIFT_CREDENTIAL_SECRET_ARN" = local.lambda_multiphase_cleanup_cluster_id
+    "REDSHIFT_CLUSTER_ID"            = local.lambda_multiphase_cleanup_cluster_id
     "DB_NAME"                        = local.lambda_multiphase_cleanup_database_name
     "REDSHIFT_CREDENTIAL_SECRET_ARN" = local.lambda_multiphase_cleanup_secret_arn
   }
