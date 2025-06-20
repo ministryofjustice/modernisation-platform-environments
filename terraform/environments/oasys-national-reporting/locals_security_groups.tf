@@ -222,20 +222,20 @@ locals {
       description = "Security group for BODS servers"
       ingress = {
         smb = {
-          description     = "Allow fsx smb ingress"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.fsx_ingress
-          security_groups = ["bods"]
+          description = "Allow fsx smb ingress"
+          from_port   = 445
+          to_port     = 445
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.fsx_ingress
+          self        = true
         }
         winrm = {
-          description     = "Allow fsx winrm ingress"
-          from_port       = 5985
-          to_port         = 5986
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.fsx_ingress
-          security_groups = ["bods"]
+          description = "Allow fsx winrm ingress"
+          from_port   = 5985
+          to_port     = 5986
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.fsx_ingress
+          self        = true
         }
         cms-ingress = {
           description = "Allow http6400-http6500 ingress"
