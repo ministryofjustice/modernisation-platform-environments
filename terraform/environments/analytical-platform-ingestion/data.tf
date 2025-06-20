@@ -49,3 +49,10 @@ data "aws_secretsmanager_secret_version" "datasync_exclude_path" {
 data "aws_secretsmanager_secret_version" "datasync_include_paths" {
   secret_id = module.datasync_include_paths_secret.secret_id
 }
+
+data "aws_route53_resolver_query_log_config" "core_logging_s3" {
+  filter {
+    name   = "Name"
+    values = ["core-logging-rlq-s3"]
+  }
+}
