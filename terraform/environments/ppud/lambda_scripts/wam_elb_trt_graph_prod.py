@@ -20,9 +20,9 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 CURRENT_DATE = datetime.now().strftime('%a %d %b %Y')
 SENDER = 'noreply@internaltest.ppud.justice.gov.uk'
 RECIPIENTS = ['nick.buckingham@colt.net']
-SUBJECT = f'AWS PPUD Load Balancer Target Response Time Report - {CURRENT_DATE}'
+SUBJECT = f'AWS WAM Load Balancer Target Response Time Report - {CURRENT_DATE}'
 AWS_REGION = 'eu-west-2'
-ELB_NAME = "app/PPUD-ALB/9d129853721723f4"  # Replace with your ELB name
+ELB_NAME = "app/WAM-ALB-PROD/bfc963544454bdde"
 SMTP_SERVER = "10.27.9.39"
 SMTP_PORT = 25
 
@@ -31,8 +31,8 @@ cloudwatch = boto3.client("cloudwatch", region_name=AWS_REGION)
 
 def get_elb_response_times(ELB_NAME):
     """Fetches TargetResponseTime for the ELB from CloudWatch."""
-    #start_time = datetime(2025, 6, 19, 8, 0, 0)  # 08:00 UTC, 28 Nov 2024
-    #end_time = datetime(2025, 6, 19, 18, 0, 0)  # 17:00 UTC, 28 Nov 2024
+    #start_time = datetime(2025, 6, 19, 8, 0, 0)  # UTC
+    #end_time = datetime(2025, 6, 19, 18, 0, 0)  # UTC
     current_time = datetime.utcnow() + timedelta(hours=1)
     end_time = datetime.utcnow()
     start_time = end_time - timedelta(hours=10)
@@ -42,8 +42,7 @@ def get_elb_response_times(ELB_NAME):
         MetricName="TargetResponseTime",
         Dimensions=[
             {"Name": "LoadBalancer", "Value": ELB_NAME},
-        #   {"Name": "AvailabilityZone", "Value": "eu-west-2b"},
-        #   {"Name": "AvailabilityZone", "Value": "eu-west-2c"}
+        #    {"Name": "AvailabilityZone", "Value": "eu-west-2a"}
         ],
         StartTime=start_time,
         EndTime=end_time,
@@ -62,7 +61,7 @@ def create_graph(response_data):
 
     plt.figure(figsize=(20, 6))
     plt.plot(times, response_times, color="blue")
-    plt.title(f"Target Response Time for PPUD Load Balancer on {CURRENT_DATE} (Every 1 Minute)")
+    plt.title(f"Target Response Time for WAM Load Balancer on {CURRENT_DATE} (Every 1 Minute)")
     plt.xlabel("Time (UTC)")
     plt.ylabel("Response Time (Seconds)")
 
@@ -92,10 +91,9 @@ def email_image_to_users(graph_base64):
     <html>
     <body>
         <p>Hi Team,</p>
-        <p>Please find below the PPUD load balancer target response time report for {CURRENT_DATE}.</p>
-        <img src="data:image/png;base64,{graph_base64}" alt="PPUD ELB Report" />
+        <p>Please find below the WAM load balancer target response time report for {CURRENT_DATE}.</p>
+        <img src="data:image/png;base64,{graph_base64}" alt="WAM ELB Report" />
         <p>Note the times above are in UTC time, for BST time please add one hour to the above times</p>
-        <p>The data displayed is the averaged value of the response time of both web servers.</p>
         <p>This is an automated email.</p>
     </body>
     </html>
