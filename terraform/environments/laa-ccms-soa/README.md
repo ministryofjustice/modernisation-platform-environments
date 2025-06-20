@@ -85,11 +85,20 @@ Modernisation Platform
 
 Accessible from a [Shared Services AWS Workspace](https://dsdmoj.atlassian.net/wiki/spaces/aws/pages/4450288123/Self+Workspace+Creation+-+User+Guide) or other services within Mod Platform (MP):
 
-- **Administration Consle**: http://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/console
-- **EM (Enterprise Manager)**: http://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/em
+- **Administration Console**: https://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk/console
+- **EM (Enterprise Manager)**: https://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk/em
 
-Exposed to other Mod Platform (MP) and Cloud Platform (CP) services:
-- **Composite Integrations** (http://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk:8001)
+Exposed to other Mod Platform (MP) and Cloud Platform (CP) services. Available from Accessible from a [Shared Services AWS Workspace](https://dsdmoj.atlassian.net/wiki/spaces/aws/pages/4450288123/Self+Workspace+Creation+-+User+Guide) (for the purposes of integration testing):
+- **Composite Integrations** (https://ccms-soa-admin.laa-$ENVIRONMENT.modernisation-platform.service.justice.gov.uk)
+
+See the below table for which Workspace should be used for which Workspace should be used to access which environment:
+
+| Environment   | Workspace |
+|---------------|-----------|
+| Development   | Non-Prod  |
+| Test          | Prod      |
+| Preproduction | Prod      |
+| Production    | Prod      |
 
 ### **How to resolve specific issues:**
 
