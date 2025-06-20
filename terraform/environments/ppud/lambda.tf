@@ -1204,7 +1204,8 @@ resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_ppud_elb_trt_
 resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_graph_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/ppud_elb_trt_graph_prod.zip"
+  s3_bucket                      = "moj-infrastructure"
+  s3_key                         = "lambda/functions/ppud_elb_trt_graph_prod.zip"
   function_name                  = "ppud_elb_trt_graph_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
   handler                        = "ppud_elb_trt_graph_prod.lambda_handler"
@@ -1262,7 +1263,8 @@ resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_wam_elb_trt_g
 resource "aws_lambda_function" "terraform_lambda_func_wam_elb_trt_graph_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/wam_elb_trt_graph_prod.zip"
+  s3_bucket                      = "moj-infrastructure"
+  s3_key                         = "lambda/functions/wam_elb_trt_graph_prod.zip"
   function_name                  = "wam_elb_trt_graph_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
   handler                        = "wam_elb_trt_graph_prod.lambda_handler"
