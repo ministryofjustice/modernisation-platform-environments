@@ -91,7 +91,7 @@
       "soa_db_storage_gb": "100",
       "soa_db_deletion_protection": "false",
       "tds_db_endpoint": "ccms-soa-tds-db.c5wemicsoznx.eu-west-2.rds.amazonaws.com",
-      "tds_ds_db": "XXSOA",
+      "tds_ds_db": "SOATDSDB",
       "tds_db_user": "admin",
       "tds_db_deploy_to_multi_azs": "false",
       "tds_db_instance_type": "db.t3.small",
