@@ -57,7 +57,7 @@ jobs:
       - id: set-matrix
         name: Set Up Matrix
         run: |
-          echo "matrix=$(jq -c '.nuke_accounts | map(select(. != \"testing-test\")) | sort' <<< $NUKE_ACCOUNT_IDS)" >> $GITHUB_OUTPUT
+          echo "matrix=$(jq -c '.nuke_accounts | map(select(. != "testing-test")) | sort' <<< $NUKE_ACCOUNT_IDS)" >> $GITHUB_OUTPUT
 
       - id: set-blocklist-string
         name: Set Up Blocklist
