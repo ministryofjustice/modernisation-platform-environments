@@ -173,7 +173,7 @@ locals {
       user     = creds.USER
       password = creds.PASSWORD
       ssh_key  = creds.SSH_KEY
-      host_name= creds.HOST_NAME
+      # host_name= creds.HOST_NAME
     }
   }
 }
