@@ -243,7 +243,7 @@ resource "aws_security_group_rule" "cluster_ec2_egress_all" {
   cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
 }
 
-#--Database SOA
+#--Database
 resource "aws_security_group" "soa_db" {
   name_prefix = "soa_allow_db"
   description = "Allow DB inbound traffic"
@@ -271,52 +271,6 @@ resource "aws_vpc_security_group_ingress_rule" "soa_db_workspace_ingress" {
 
 resource "aws_security_group_rule" "soa_db_egress_all" {
   security_group_id = aws_security_group.soa_db.id
-  type              = "egress"
-  description       = "All Egress"
-  protocol          = -1
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"] #--Tighten - AW.
-}
-
-#--Database TDS
-resource "aws_security_group" "tds_db" {
-  name        = "ccms-soa-tds-allow-db"
-  description = "Allow DB inbound traffic"
-  vpc_id      = data.aws_vpc.shared.id
-}
-
-resource "aws_vpc_security_group_ingress_rule" "tds_db_ingress" {
-  count             = length(local.private_subnets_cidr_blocks)
-  security_group_id = aws_security_group.tds_db.id
-  description       = "Database Ingress"
-  ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = local.private_subnets_cidr_blocks[count.index]
-}
-
-resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
-  security_group_id = aws_security_group.tds_db.id
-  description       = "Workspace to Database Ingress"
-  ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace_cidr
-}
-
-resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress_prod" {
-  count             = local.is-production ? 1 : 0
-  security_group_id = aws_security_group.tds_db.id
-  description       = "Workspace to Database Ingress"
-  ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr_prod
-}
-
-resource "aws_security_group_rule" "tds_db_egress_all" {
-  security_group_id = aws_security_group.tds_db.id
   type              = "egress"
   description       = "All Egress"
   protocol          = -1
