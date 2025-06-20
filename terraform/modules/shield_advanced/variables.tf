@@ -30,3 +30,16 @@ variable "log_retention_in_days" {
   default     = 60
   description = "Number of days to retain logs in CloudWatch Logs."
 }
+
+# For central waf loggining
+
+variable "firehose_stream_arn" {
+  description = "ARN of the central Firehose stream in the core logging account"
+  type        = string
+  default     = "arn:aws:firehose:${var.region}:${local.core_logging_account_id}:deliverystream/waf-logs-to-s3"
+}
+
+variable "region" {
+  description = "AWS region"
+  type        = string
+}
