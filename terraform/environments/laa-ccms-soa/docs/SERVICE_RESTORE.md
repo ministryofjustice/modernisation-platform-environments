@@ -25,8 +25,8 @@ Permission is granted to pull these images by the ECR Control Plane.
 Complete the `application_variables.json` file as appropriate for the environment being deployed to, ensuring in particular that:
 
 - The  `admin_app_count` and `managed_app_count` values are set to `0` (this will prevent any ECS services from booting).
-- The `certificate_authority_arn` is configured correctly (login to the AWS Console and check the **Private certificate authorities** page to verify).
 - The `inbound_s3_bucket_name` and `outbound_s3_bucket_name` values are set as appropriate for the environment being configured (see the corresponding EBS environment to confirm).
+- The `tds_db_endpoint` value is set as appropriate for the environment being configured (see the corresponding EDRMS environment to confirm).
 
 If unsure on suitable variables for a cold start, see the file `_application_variables_starter.json`.
 
