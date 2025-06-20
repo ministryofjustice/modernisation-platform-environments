@@ -67,7 +67,7 @@ jobs:
           account_number=$(jq -r -e --arg account_name "$account_alias" '.account_ids[$account_name]' <<< $ENVIRONMENT_MANAGEMENT)
           account_blocklist_str+="  - \"${account_number}\" # ${account_alias}"
           account_blocklist_str+=$'\n'
-          done <<< "$(jq -c -r '.[]' <<< $NUKE_ACCOUNT_BLOCKLIST)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
+          done <<< "$(jq -c -r '.blocklist[]' <<< $NUKE_ACCOUNT_BLOCKLIST)" # Taking this approach as piping (|) to a read opens a subshell and passes the variables to it by value
           # Encoding and passing blocklist string as an output
           echo "account_blocklist_str=$(echo -n "${account_blocklist_str}" | base64 -w 0)" >> $GITHUB_OUTPUT
 
