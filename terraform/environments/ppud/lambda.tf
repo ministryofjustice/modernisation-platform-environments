@@ -1211,6 +1211,11 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_graph_prod" {
   tracing_config {
     mode = "Active"
   }
+  layers = [
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
+    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
+  ]
   # VPC configuration
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_b.id]
@@ -1262,6 +1267,11 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_elb_trt_graph_prod" {
   tracing_config {
     mode = "Active"
   }
+  layers = [
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-numpy:8",
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_prod[0].value}:layer:Klayers-p312-pillow:1",
+    aws_lambda_layer_version.lambda_layer_matplotlib_prod_new[0].arn
+  ]
   # VPC configuration
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_b.id]
