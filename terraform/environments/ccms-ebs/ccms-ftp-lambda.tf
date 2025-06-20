@@ -25,20 +25,20 @@ locals {
   # Only include secrets if:
   # - Current environment is NOT excluded
   # - The secret name is NOT in the excluded list
-    filtered_secret_names = (
-      contains(local.excluded_environments, local.environment)
-      ? []
-      : [
-          for name in local.secret_names : name
-          if !contains(local.excluded_secret_names, name)
-        ]
-    )
+    # filtered_secret_names = (
+    #   contains(local.excluded_environments, local.environment)
+    #   ? []
+    #   : [
+    #       for name in local.secret_names : name
+    #       if !contains(local.excluded_secret_names, name)
+    #     ]
+    # )
 
-  # # Exclude any secrets that match a condition
-  #   filtered_secret_names = [
-  #     for name in local.secret_names : name
-  #     if !contains(["LAA-ftp-rossendales-maat-outbound"], name)
-  # ]
+  # Exclude any secrets that match a condition
+    filtered_secret_names = [
+      for name in local.secret_names : name
+      if !contains(["LAA-ftp-rossendales-maat-outbound"], name)
+  ]
   base_buckets = ["laa-ccms-inbound", "laa-ccms-outbound", "laa-ccms-ftp-lambda"]
 
   bucket_names = [
