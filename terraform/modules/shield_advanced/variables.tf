@@ -31,8 +31,6 @@ variable "log_retention_in_days" {
   description = "Number of days to retain logs in CloudWatch Logs."
 }
 
-# For central waf loggining
-
 variable "firehose_stream_arn" {
   description = "ARN of the central Firehose stream in the core logging account"
   type        = string
