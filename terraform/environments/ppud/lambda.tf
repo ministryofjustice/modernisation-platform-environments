@@ -1192,19 +1192,11 @@ resource "aws_cloudwatch_log_group" "lambda_ppud_elb_uptime_calculate_prod_log_g
 # Lambda Function to graph the PPUD load balancer target respone time - PROD
 ############################################################################
 
-resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_ppud_elb_trt_graph_prod" {
-  count         = local.is-production == true ? 1 : 0
-  statement_id  = "AllowAccesstoCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_ppud_elb_trt_graph_prod[0].function_name
-  principal     = "cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
-}
-
 resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_graph_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/ppud_elb_trt_graph_prod.zip"
+  s3_bucket                      = "moj-infrastructure"
+  s3_key                         = "lambda/functions/ppud_elb_trt_graph_prod.zip"
   function_name                  = "ppud_elb_trt_graph_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
   handler                        = "ppud_elb_trt_graph_prod.lambda_handler"
@@ -1226,13 +1218,15 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_graph_prod" {
   }
 }
 
-# Archive the zip file
+# Permission statement for lambda function
 
-data "archive_file" "zip_the_ppud_elb_trt_graph_prod" {
-  count       = local.is-production == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/ppud_elb_trt_graph_prod.zip"
+resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_ppud_elb_trt_graph_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowAccesstoCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_ppud_elb_trt_graph_prod[0].function_name
+  principal     = "cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
 }
 
 # Cloudwatch log group for the lambda function
@@ -1245,24 +1239,15 @@ resource "aws_cloudwatch_log_group" "lambda_ppud_elb_trt_graph_prod_log_group" {
   retention_in_days = 30
 }
 
-
 ############################################################################
 # Lambda Function to graph the WAM load balancer target response time - PROD
 ############################################################################
 
-resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_wam_elb_trt_graph_prod" {
-  count         = local.is-production == true ? 1 : 0
-  statement_id  = "AllowAccesstoCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_wam_elb_trt_graph_prod[0].function_name
-  principal     = "cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
-}
-
 resource "aws_lambda_function" "terraform_lambda_func_wam_elb_trt_graph_prod" {
   # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/wam_elb_trt_graph_prod.zip"
+  s3_bucket                      = "moj-infrastructure"
+  s3_key                         = "lambda/functions/wam_elb_trt_graph_prod.zip"
   function_name                  = "wam_elb_trt_graph_prod"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_prod[0].arn
   handler                        = "wam_elb_trt_graph_prod.lambda_handler"
@@ -1284,13 +1269,15 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_elb_trt_graph_prod" {
   }
 }
 
-# Archive the zip file
+# Permission statement for lambda function
 
-data "archive_file" "zip_the_wam_elb_trt_graph_prod" {
-  count       = local.is-production == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/wam_elb_trt_graph_prod.zip"
+resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_wam_elb_trt_graph_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowAccesstoCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_wam_elb_trt_graph_prod[0].function_name
+  principal     = "cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
 }
 
 # Cloudwatch log group for the lambda function
