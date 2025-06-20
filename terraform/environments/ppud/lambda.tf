@@ -1227,15 +1227,6 @@ resource "aws_lambda_function" "terraform_lambda_func_ppud_elb_trt_graph_prod" {
   }
 }
 
-# Archive the zip file
-
-data "archive_file" "zip_the_ppud_elb_trt_graph_prod" {
-  count       = local.is-production == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/ppud_elb_trt_graph_prod.zip"
-}
-
 # Cloudwatch log group for the lambda function
 
 resource "aws_cloudwatch_log_group" "lambda_ppud_elb_trt_graph_prod_log_group" {
@@ -1284,15 +1275,6 @@ resource "aws_lambda_function" "terraform_lambda_func_wam_elb_trt_graph_prod" {
     subnet_ids         = [data.aws_subnet.private_subnets_b.id]
     security_group_ids = [aws_security_group.PPUD-Mail-Server[0].id]
   }
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_wam_elb_trt_graph_prod" {
-  count       = local.is-production == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/wam_elb_trt_graph_prod.zip"
 }
 
 # Cloudwatch log group for the lambda function
