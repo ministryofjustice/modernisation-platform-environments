@@ -89,16 +89,7 @@ locals {
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
 
       /* Network Monitoring */
-      hmcts_sdp_onecrown_endpoints = {
-        mi-synapse-dev-sql = {
-          destination      = "10.168.1.14"
-          destination_port = 1433
-        }
-        mi-synapse-prod-sql = {
-          destination      = "10.168.5.16"
-          destination_port = 1433
-        }
-      }
+      hmcts_sdp_onecrown_endpoints = {}
     }
     production = {
       /* VPC */
@@ -177,6 +168,18 @@ locals {
           "victims",
           "victims_case_management"
         ]
+      }
+
+      /* Network Monitoring */
+      hmcts_sdp_onecrown_endpoints = {
+        mi-synapse-dev-sql = {
+          destination      = "10.168.1.14"
+          destination_port = 1433
+        }
+        mi-synapse-prod-sql = {
+          destination      = "10.168.5.16"
+          destination_port = 1433
+        }
       }
     }
   }
