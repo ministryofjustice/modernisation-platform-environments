@@ -28,6 +28,12 @@ locals {
   }
 }
 
+locals {
+  environment_management_accounts = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
+  core_logging_account_id         = local.environment_management_accounts["core-logging-production"]
+  firehose_stream_arn             = "arn:aws:firehose:${var.region}:${local.core_logging_account_id}:deliverystream/waf-logs-to-s3"
+}
+
 resource "aws_shield_drt_access_role_arn_association" "main" {
   role_arn = data.aws_iam_role.srt_access.arn
 }
@@ -101,4 +107,43 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf" {
   count                   = var.enable_logging ? 1 : 0
   log_destination_configs = try([aws_cloudwatch_log_group.waf[0].arn], [])
   resource_arn            = aws_wafv2_web_acl.main.arn
+}
+
+# IAM role for CloudWatch Logs to Firehose
+resource "aws_iam_role" "cwl_to_firehose" {
+  count = var.enable_logging && local.firehose_stream_arn != null ? 1 : 0
+  name  = "CWLtoKinesisFirehoseRole"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "logs.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "cwl_to_firehose_policy" {
+  count = var.enable_logging && local.firehose_stream_arn != null ? 1 : 0
+  role  = aws_iam_role.cwl_to_firehose[0].id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = "firehose:PutRecord"
+      Resource = local.firehose_stream_arn
+    }]
+  })
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "waf_to_firehose" {
+  count           = var.enable_logging && local.firehose_stream_arn != null ? 1 : 0
+  name            = "waf-to-firehose"
+  log_group_name  = aws_cloudwatch_log_group.waf[0].name
+  filter_pattern  = "{$.action = * }"
+  destination_arn = local.firehose_stream_arn
+  role_arn        = aws_iam_role.cwl_to_firehose[0].arn
+  depends_on      = [aws_iam_role_policy.cwl_to_firehose_policy]
 }
