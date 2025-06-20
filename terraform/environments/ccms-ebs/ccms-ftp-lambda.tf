@@ -16,11 +16,11 @@ locals {
     "LAA-ftp-1stlocate-ccms-inbound",
     "LAA-ftp-rossendales-nct-inbound-product",
     "LAA-ftp-xerox-outbound",
-    "LAA-ftp-rossendales-maat-outbound"
+    "LAA-ftp-rossendales-maat-tf-outbound"
   ]
 
   excluded_environments   = ["preproduction", "production"]
-  excluded_secret_names   = ["LAA-ftp-rossendales-maat-outbound"]
+  excluded_secret_names   = ["LAA-ftp-rossendales-maat-tf-outbound"]
 
   # Only include secrets if:
   # - Current environment is NOT excluded
@@ -174,11 +174,14 @@ locals {
       user     = creds.USER
       password = creds.PASSWORD
       ssh_key  = creds.SSH_KEY
-      host_name= creds.HOST_NAME
+      # host_name= creds.HOST_NAME
     }
   }
 }
 
+output "local_secret_names" {
+  value = local.credentials_map
+}
 
 resource "aws_s3_object" "ftp_lambda_layer" {
   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
