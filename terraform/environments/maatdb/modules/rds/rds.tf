@@ -133,7 +133,8 @@ locals {
     aws_security_group.cloud_platform_sec_group.id,
     aws_security_group.bastion_sec_group.id,
     aws_security_group.vpc_sec_group.id,
-    aws_security_group.mlra_ecs_sec_group.id
+    aws_security_group.mlra_ecs_sec_group.id,
+    aws_security_group.ses_sec_group
   ])
 }
 
