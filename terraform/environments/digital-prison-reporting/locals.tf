@@ -287,15 +287,6 @@ locals {
   lambda_multiphase_cleanup_memory_size         = 1024
   lambda_multiphase_cleanup_schedule_expression = "rate(1 day)"
 
-  # Landing Zone antivirus check lambda
-  landing_zone_antivirus_check_lambda_enable                 = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_enable
-  landing_zone_antivirus_check_lambda_version                = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_version
-  landing_zone_antivirus_check_lambda_memory_size            = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_memory_size
-  landing_zone_antivirus_check_lambda_timeout                = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_timeout
-  landing_zone_antivirus_check_lambda_ephemeral_storage_size = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_ephemeral_storage_size
-  landing_zone_antivirus_check_lambda_concurrent_executions  = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_concurrent_executions
-  landing_zone_antivirus_check_log_retention_in_days         = local.application_data.accounts[local.environment].landing_zone_antivirus_check_log_retention_in_days
-
   # s3 transfer
   scheduled_s3_file_transfer_retention_period_amount = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_amount
   scheduled_s3_file_transfer_retention_period_unit   = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_unit

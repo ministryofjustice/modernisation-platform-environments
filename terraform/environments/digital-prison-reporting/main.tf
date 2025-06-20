@@ -652,16 +652,6 @@ module "s3_landing_bucket" {
   custom_kms_key            = local.s3_kms_arn
   create_notification_queue = false # For SQS Queue
   enable_lifecycle          = true
-  enable_notification       = true
-
-  dependency_lambda = [module.landing_zone_antivirus_check_lambda.lambda_function] # Required if bucket_notifications is enabled
-
-  bucket_notifications = {
-    lambda_function_arn = module.landing_zone_antivirus_check_lambda.lambda_function_arn,
-    events              = ["s3:ObjectCreated:*"],
-    filter_prefix       = null,
-    filter_suffix       = null
-  }
 
   tags = merge(
     local.all_tags,
