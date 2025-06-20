@@ -12,7 +12,7 @@ data "external" "shield_protections" {
 data "external" "shield_waf" {
   program = [
     "bash", "-c",
-    "aws wafv2 list-web-acls --scope REGIONAL --output json | jq -c '{arn: .WebACLs[] | select(.Name | contains(\"FMManagedWebACL\")) | .ARN, name: .WebACLs[] | select(.Name | contains(\"FMManagedWebACL\")) | .Name}'"
+    "aws wafv2 list-web-acls --scope REGIONAL --output json | jq -c '[.WebACLs[] | select(.Name | startswith(\"FMManagedWebACL\"))] | sort_by(.Name) | .[0] | {arn: .ARN, name: .Name}'"
   ]
 }
 
