@@ -31,7 +31,7 @@ defaults:
 
 jobs:
   fetch-secrets:
-    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@c7c07086996156187dce2d02d69044e24a265aa9 # myBranch
+    uses: ministryofjustice/modernisation-platform-github-actions/.github/workflows/aws-secrets-management.yml@c1e0b8a7db1410268afe2f3377b5d82b09a1b336 # v3.2.4
     permissions:
       id-token: write
       contents: read
@@ -45,7 +45,7 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c7c07086996156187dce2d02d69044e24a265aa9 # myBranch
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c1e0b8a7db1410268afe2f3377b5d82b09a1b336 # v3.2.4
         with:
           nuke_rebuild_account_ids: ${{ needs.fetch-secrets.outputs.nuke_rebuild_account_ids }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
@@ -67,7 +67,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4.1.4
       - name: Decrypt Secrets
-        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c7c07086996156187dce2d02d69044e24a265aa9 # myBranch
+        uses: ministryofjustice/modernisation-platform-github-actions/decrypt-secrets@c1e0b8a7db1410268afe2f3377b5d82b09a1b336 # v3.2.4
         with:
           environment_management: ${{ needs.fetch-secrets.outputs.environment_management }}
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
@@ -96,18 +96,18 @@ jobs:
         run: |
           terraform --version
           echo "Terraform Plan - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
-          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
-          terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
-          bash scripts/terraform-plan.sh terraform/environments/${ACCOUNT_NAME%-development}
+          # bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
+          # terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
+          # bash scripts/terraform-plan.sh terraform/environments/${ACCOUNT_NAME%-development}
 
       - name: Apply after nuke - ${{ matrix.nuke_accts }}
         if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
         run: |
           terraform --version
           echo "Terraform apply - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
-          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
-          terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
-          bash scripts/terraform-apply.sh terraform/environments/${ACCOUNT_NAME%-development}
+          # bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
+          # terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
+          # bash scripts/terraform-apply.sh terraform/environments/${ACCOUNT_NAME%-development}
 
       - name: Slack failure notification
         uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
