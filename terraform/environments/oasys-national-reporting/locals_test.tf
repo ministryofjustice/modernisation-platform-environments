@@ -163,7 +163,7 @@ locals {
         aliases                         = ["t2-onr-fs.azure.noms.root"]
         automatic_backup_retention_days = 0
         deployment_type                 = "SINGLE_AZ_1"
-        security_groups                 = ["fsx"]
+        security_groups                 = ["bods"]
         skip_final_backup               = true
         storage_capacity                = 128
         throughput_capacity             = 8

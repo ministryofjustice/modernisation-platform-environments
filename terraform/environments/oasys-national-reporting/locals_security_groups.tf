@@ -155,37 +155,6 @@ locals {
         }
       }
     }
-    fsx = {
-      description = "Security group for FSX"
-      ingress = {
-        smb = {
-          description     = "Allow smb ingress"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.fsx_ingress
-          security_groups = ["bods"]
-        }
-        winrm = {
-          description     = "Allow winrm ingress"
-          from_port       = 5985
-          to_port         = 5986
-          protocol        = "tcp"
-          cidr_blocks     = local.security_group_cidrs.fsx_ingress
-          security_groups = ["bods"]
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress to bip and web"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = local.security_group_cidrs.fsx_ingress
-          security_groups = ["bods"]
-        }
-      }
-    }
 
     bip-web = {
       description = "Security group for bip web tier"
@@ -249,8 +218,25 @@ locals {
     }
 
     bods = {
+      # this is also the SG for FSX but we can't change description or FSX SG without recreating the resource
       description = "Security group for BODS servers"
       ingress = {
+        smb = {
+          description     = "Allow fsx smb ingress"
+          from_port       = 445
+          to_port         = 445
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.fsx_ingress
+          security_groups = ["bods"]
+        }
+        winrm = {
+          description     = "Allow fsx winrm ingress"
+          from_port       = 5985
+          to_port         = 5986
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.fsx_ingress
+          security_groups = ["bods"]
+        }
         cms-ingress = {
           description = "Allow http6400-http6500 ingress"
           from_port   = 6400
@@ -264,6 +250,15 @@ locals {
           to_port         = 28080
           protocol        = "TCP"
           security_groups = ["public-lb", "public-lb-2"]
+        }
+      }
+      egress = {
+        all = {
+          description = "Allow all FSX egress"
+          from_port   = 0
+          to_port     = 0
+          protocol    = "-1"
+          cidr_blocks = local.security_group_cidrs.fsx_ingress
         }
       }
     }
