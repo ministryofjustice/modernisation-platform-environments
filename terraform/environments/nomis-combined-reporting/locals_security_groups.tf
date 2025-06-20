@@ -127,6 +127,27 @@ locals {
         }
       }
     }
+    efs = {
+      description = "Security group for EFS"
+      ingress = {
+        nfs = {
+          description     = "Allow http7010 ingress"
+          from_port       = 2049
+          to_port         = 2049
+          protocol        = "tcp"
+          security_groups = ["bip", "web"]
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress to bip and web"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          security_groups = ["bip", "web"]
+        }
+      }
+    }
     web = {
       description = "Security group for tomcat web servers"
       ingress = {
