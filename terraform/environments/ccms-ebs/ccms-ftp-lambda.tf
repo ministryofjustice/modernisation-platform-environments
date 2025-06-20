@@ -20,7 +20,7 @@ locals {
   ]
 
   excluded_environments   = ["preproduction", "production"]
-  excluded_secret_names   = ["LAA-ftp-rossendales-maat-tf-outbound"]
+  excluded_secret_names   = [""]
 
   # Only include secrets if:
   # - Current environment is NOT excluded
