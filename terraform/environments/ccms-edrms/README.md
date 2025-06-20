@@ -74,3 +74,20 @@ Modernisation Platform
 ### **How to resolve specific issues:**
 
 <!-- Describe the steps someone might take to resolve a specific issue or incident, often for use when on call. This may be a large amount of information, so may need to be split out into multiple pages, or link to other documents.-->
+
+### **Bringing Up a New TDS Database**
+
+When bringing up a new database for the first time. The below commands must be manually run before SOA will be able to be make inbound connections:
+
+```bash
+CREATE TABLESPACE "CCMSSOA_MDS" EXTENT MANAGEMENT LOCAL AUTOALLOCATE SEGMENT SPACE MANAGEMENT AUTO DATAFILE SIZE 100M AUTOEXTEND ON NEXT 30M MAXSIZE UNLIMITED;
+
+#--Obtain password from Secrets Manager -- ccms/edrms/datasource
+CREATE USER CCMSSOA_MDS IDENTIFIED BY PASSWORD12345! DEFAULT TABLESPACE CCMSSOA_MDS;
+GRANT CREATE SESSION TO CCMSSOA_MDS;
+GRANT CREATE JOB TO CCMSSOA_MDS;
+GRANT CREATE PROCEDURE TO CCMSSOA_MDS;
+GRANT CREATE SEQUENCE TO CCMSSOA_MDS;
+GRANT CREATE TABLE TO CCMSSOA_MDS;
+ALTER USER CCMSSOA_MDS QUOTA UNLIMITED ON CCMSSOA_MDS;
+```
