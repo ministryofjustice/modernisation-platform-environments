@@ -2,7 +2,7 @@ module "definition_upload_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "7.21.1"
 
   publish        = true
   create_package = false
@@ -60,7 +60,7 @@ module "scan_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "7.21.1"
 
   publish        = true
   create_package = false
@@ -136,7 +136,7 @@ module "transfer_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "7.21.1"
 
   publish        = true
   create_package = false
@@ -245,7 +245,7 @@ module "notify_quarantined_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "7.21.1"
 
   publish        = true
   create_package = false
@@ -311,7 +311,7 @@ module "notify_transferred_lambda" {
   #checkov:skip=CKV_TF_1:Module is from Terraform registry
 
   source  = "terraform-aws-modules/lambda/aws"
-  version = "7.21.0"
+  version = "7.21.1"
 
   publish        = true
   create_package = false
