@@ -112,6 +112,16 @@ resource "aws_security_group_rule" "alb_managed_ingress_443_databases" {
   cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
 }
 
+resource "aws_security_group_rule" "alb_managed_workspace_ingress_443" {
+  security_group_id = aws_security_group.alb_managed.id
+  type              = "ingress"
+  description       = "HTTPS - AWS Workspaces"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [local.application_data.accounts[local.environment].aws_workspace_cidr]
+}
+
 resource "aws_security_group_rule" "alb_managed_ingress_8001" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
