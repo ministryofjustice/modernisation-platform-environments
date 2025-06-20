@@ -2,55 +2,6 @@ locals {
 
   lbs = {
 
-    private = {
-      access_logs                      = true
-      drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
-      enable_cross_zone_load_balancing = true
-      enable_delete_protection         = false
-      force_destroy_bucket             = true
-      idle_timeout                     = 3600
-      internal_lb                      = true
-      load_balancer_type               = "application"
-      security_groups                  = ["lb"]
-      subnets                          = module.environment.subnets["private"].ids
-
-      instance_target_groups = {
-        http-7777 = {
-          port     = 7777
-          protocol = "HTTP"
-          health_check = {
-            enabled             = true
-            healthy_threshold   = 3
-            interval            = 30
-            matcher             = "200-399"
-            path                = "/keepalive.htm"
-            port                = 7777
-            timeout             = 5
-            unhealthy_threshold = 5
-          }
-          stickiness = {
-            enabled = true
-            type    = "lb_cookie"
-          }
-        }
-      }
-      listeners = {
-        http-7777 = {
-          port     = 7777
-          protocol = "HTTP"
-
-          default_action = {
-            type = "fixed-response"
-            fixed_response = {
-              content_type = "text/plain"
-              message_body = "Not implemented"
-              status_code  = "501"
-            }
-          }
-        }
-      }
-    }
-
     public = {
       access_logs                      = true
       drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
