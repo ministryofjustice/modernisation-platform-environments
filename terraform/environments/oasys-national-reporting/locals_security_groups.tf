@@ -14,6 +14,9 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.mp_cidrs.non_live_eu_west_nat,
     ])
+    fsx_ingress = flatten([
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
+    ])
     cms_ingress = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
@@ -34,6 +37,9 @@ locals {
     enduserclient_public2 = flatten([
       module.ip_addresses.azure_fixngo_cidrs.internet_egress,
       module.ip_addresses.mp_cidrs.live_eu_west_nat,
+    ])
+    fsx_ingress = flatten([
+      module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     cms_ingress = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
@@ -127,6 +133,58 @@ locals {
     }
     web = {
       description = "Security group for web servers"
+    }
+    efs = {
+      description = "Security group for EFS"
+      ingress = {
+        nfs = {
+          description     = "Allow nfs ingress"
+          from_port       = 2049
+          to_port         = 2049
+          protocol        = "tcp"
+          security_groups = ["bip-app", "bip-web"]
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress to bip and web"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          security_groups = ["bip-app", "bip-web"]
+        }
+      }
+    }
+    fsx = {
+      description = "Security group for FSX"
+      ingress = {
+        smb = {
+          description     = "Allow smb ingress"
+          from_port       = 445
+          to_port         = 445
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.fsx_ingress
+          security_groups = ["bods"]
+        }
+        winrm = {
+          description     = "Allow winrm ingress"
+          from_port       = 5985
+          to_port         = 5986
+          protocol        = "tcp"
+          cidr_blocks     = local.security_group_cidrs.fsx_ingress
+          security_groups = ["bods"]
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress to bip and web"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = local.security_group_cidrs.fsx_ingress
+          security_groups = ["bods"]
+        }
+      }
     }
 
     bip-web = {
