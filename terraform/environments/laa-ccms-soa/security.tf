@@ -95,11 +95,21 @@ resource "aws_security_group_rule" "alb_managed_ingress_80" {
 resource "aws_security_group_rule" "alb_managed_ingress_443" {
   security_group_id = aws_security_group.alb_managed.id
   type              = "ingress"
-  description       = "EM HTTPS - Internal Subnets"
+  description       = "HTTPS - Internal Subnets"
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
   cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+}
+
+resource "aws_security_group_rule" "alb_managed_ingress_443_databases" {
+  security_group_id = aws_security_group.alb_managed.id
+  type              = "ingress"
+  description       = "HTTPS - Database Connections"
+  protocol          = "TCP"
+  from_port         = 443
+  to_port           = 443
+  cidr_blocks       = [data.aws_subnet.data_subnets_a.cidr_block, data.aws_subnet.data_subnets_b.cidr_block, data.aws_subnet.data_subnets_c.cidr_block]
 }
 
 resource "aws_security_group_rule" "alb_managed_ingress_8001" {

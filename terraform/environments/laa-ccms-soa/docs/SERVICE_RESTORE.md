@@ -112,37 +112,6 @@ In `application_variables.json`; set `admin_app_count` to `1` and commit. Allow 
 
 Pay attention to the application logs. The boot process can take up to 30 minutes, as part of the boot process the Oracle [RCU](https://docs.oracle.com/cd/E21764_01/doc.1111/e14259/overview.htm) will run and configure the SOA-DB database ready for use. The application should be ready for use when the weblogic console is available and can be logged in to at http://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/console.
 
-## Configure PKI
-
-Connect to the single running **Admin Server** via the SSM console and execute:
-
-```bash
-sudo docker container ls
-```
-
-You will be shown a list of running containers, I.E:
-
-```bash
-# CONTAINER ID   IMAGE                                                           COMMAND                  CREATED          STATUS                             PORTS     NAMES
-# b0108714cbc1   374269020027.dkr.ecr.eu-west-2.amazonaws.com/soa-admin:latest   "/bin/sh -c /usr/loc…"   20 seconds ago   Up 18 seconds (health: starting)             ecs-ccms-soa-admin-task-19-ccms-soa-admin-98f6afc8f2d2dcd31700
-# 35a2b745ee66   amazon/amazon-ecs-pause:0.1.0                                   "/pause"                 21 seconds ago   Up 20 seconds                                ecs-ccms-soa-admin-task-19-internalecspause-f2f69486beb6bdbf3600
-# a837a233e82a   amazon/amazon-ecs-agent:latest                                  "/agent"                 9 days ago       Up 9 days (healthy)                          ecs-agent
-```
-
-Connect to the container running the `soa-admin` using it's **CONTAINER ID**:
-
-```bash
-sudo docker exec -it --tty b0108714cbc1 /bin/sh
-```
-
-When connected, execute the below commands in order to export the hosts CA certificate bundles to a Java Keystore that can be shared between hosts:
-
-```bash
-sudo su ec2-user
-cd /u01/oracle/user_projects/laa-ccms-app-soa/Scripts
-./pki-configuration.sh
-```
-
 ## Start a Managed Server
 
 In `application_variables.json`; set `managed_app_count` to `1` and commit. Allow the Github Actions pipeline to run. This will bring up the Admin Server.
