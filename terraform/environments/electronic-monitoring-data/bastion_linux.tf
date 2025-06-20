@@ -172,6 +172,7 @@ module "zip_bastion" {
   # s3 - used for logs and user ssh public keys
   bucket_name   = "zip-bastion"
   instance_name = "zip_bastion_linux"
+  instance_type = "m5.large"
   # public keys
   public_key_data = local.public_key_data.keys[local.environment]
 
