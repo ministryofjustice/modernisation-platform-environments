@@ -15,7 +15,13 @@ locals {
     "LAA-ftp-eckoh-inbound-ccms",
     "LAA-ftp-1stlocate-ccms-inbound",
     "LAA-ftp-rossendales-nct-inbound-product",
-    "LAA-ftp-xerox-outbound"
+    "LAA-ftp-xerox-outbound",
+    "LAA-ftp-rossendales-maat-outbound"
+  ]
+  # Exclude any secrets that match a condition
+    filtered_secret_names = [
+      for name in local.secret_names : name
+      if !contains(["LAA-ftp-rossendales-maat-outbound"], name)
   ]
   base_buckets = ["laa-ccms-inbound", "laa-ccms-outbound", "laa-ccms-ftp-lambda"]
 
@@ -33,7 +39,7 @@ resource "aws_secretsmanager_secret" "secrets" {
 }
 
 data "aws_secretsmanager_secret_version" "secrets" {
-  for_each  = toset(local.secret_names)
+  for_each  = toset(local.filtered_secret_names)
   secret_id = "${each.value}-${local.environment}"
 }
 
@@ -140,7 +146,7 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
 
 locals {
   secrets_map = {
-    for name in local.secret_names :
+    for name in local.filtered_secret_names :
     name => jsondecode(data.aws_secretsmanager_secret_version.secrets[name].secret_string)
   }
 
@@ -151,6 +157,7 @@ locals {
       user     = creds.USER
       password = creds.PASSWORD
       ssh_key  = creds.SSH_KEY
+      host_name= creds.HOST_NAME
     }
   }
 }
