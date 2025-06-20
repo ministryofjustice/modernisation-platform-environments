@@ -41,6 +41,7 @@ locals {
       ui_hostname = "development.analytical-platform.service.justice.gov.uk"
 
       /* Network Monitoring */
+      hmcts_sdp_endpoints          = {}
       hmcts_sdp_onecrown_endpoints = {}
     }
     test = {
@@ -89,6 +90,7 @@ locals {
       ui_hostname = "test.analytical-platform.service.justice.gov.uk"
 
       /* Network Monitoring */
+      hmcts_sdp_endpoints          = {}
       hmcts_sdp_onecrown_endpoints = {}
     }
     production = {
