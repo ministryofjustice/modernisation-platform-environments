@@ -50,7 +50,7 @@ jobs:
           nuke_rebuild_account_ids: ${{ needs.fetch-secrets.outputs.nuke_rebuild_account_ids }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
       - id: set-matrix
-        run: echo "matrix=$(jq -c '.|sort' <<< $NUKE_REBUILD_ACCOUNT_IDS)" >> $GITHUB_OUTPUT
+        run: echo "matrix=$(jq -c '.rebuild_accounts | sort' <<< $NUKE_REBUILD_ACCOUNT_IDS)" >> $GITHUB_OUTPUT
 
   redeploy-after-nuke:
     permissions:
