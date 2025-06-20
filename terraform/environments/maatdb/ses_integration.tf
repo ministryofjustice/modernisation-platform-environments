@@ -25,7 +25,7 @@ resource "aws_iam_user" "smtp_user" {
   tags = merge(
     local.tags,
     {
-      Name = "${local.application_name}-smtp-user"
+       Name = "${local.application_name}-smtp-user"
     }
   )
 }

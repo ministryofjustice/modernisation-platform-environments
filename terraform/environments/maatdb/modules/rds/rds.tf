@@ -308,6 +308,30 @@ resource "aws_security_group" "bastion_sec_group" {
   }
 }
 
+# Outbound to Port 587 for SES SMTP Endpoint Access
+
+# tflint-ignore: terraform_required_providers
+resource "aws_security_group" "ses_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
+  name        = "ses-sec-group"
+  description = "SES Outbound Access"
+  vpc_id      = var.vpc_shared_id
+
+
+  egress {
+    description     = "SMTP Outbound to 587"
+    from_port       = 587
+    to_port         = 587
+    protocol        = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-ses-sec-group"
+  }
+}
+
 output "db_instance_id" {
   value = aws_db_instance.appdb1.id
 }
