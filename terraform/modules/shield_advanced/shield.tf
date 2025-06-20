@@ -103,9 +103,6 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf" {
   resource_arn            = aws_wafv2_web_acl.main.arn
 }
 
-
-# Waf Central logging: 
-
 # IAM role for CloudWatch Logs to Firehose
 resource "aws_iam_role" "cwl_to_firehose" {
   count = var.enable_logging && var.firehose_stream_arn != null ? 1 : 0
