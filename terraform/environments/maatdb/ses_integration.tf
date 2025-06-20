@@ -70,7 +70,7 @@ data "aws_iam_policy_document" "smtp_user_policy" {
   statement {
     effect = "Allow"
     actions = ["ses:SendRawEmail"]
-    resources = length(aws_ses_domain_identity.domain) > 0 ? [aws_ses_domain_identity.domain[0].arn] : []
+    resources = ["*"]
   }
 }
 
