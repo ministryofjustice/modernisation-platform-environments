@@ -80,7 +80,6 @@ resource "aws_ecs_task_definition" "admin" {
       ebs_user_username            = local.application_data.accounts[local.environment].admin_ebs_user_username
       ebs_user_password            = aws_secretsmanager_secret.ebs_user_password.arn
       run_rcu                      = local.application_data.accounts[local.environment].admin_run_rcu_bootstrap
-      soa_trust_store_password_arn = aws_secretsmanager_secret.soa_pkcs12_passphrase.arn
     }
   )
 }
@@ -171,8 +170,6 @@ resource "aws_ecs_task_definition" "managed" {
       soa_password                 = aws_secretsmanager_secret.soa_password.arn
       ms_hostname                  = aws_route53_record.managed.fqdn
       wl_mem_args                  = local.application_data.accounts[local.environment].managed_wl_mem_args
-      soa_trust_store_password     = data.aws_secretsmanager_secret_version.soa_pkcs12_passphrase.secret_string #--This is a quite ugly hack to overcome 
-      soa_trust_store_password_arn = aws_secretsmanager_secret.soa_pkcs12_passphrase.arn                        #--a templating limitation. Revisit. AW
     }
   )
 }
