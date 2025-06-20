@@ -62,7 +62,7 @@ jobs:
       matrix:
         nuke_accts: ${{ fromJSON(needs.setup-matrix.outputs.matrix) }}
     name: Redeploy after nuke
-    needs: setup-matrix
+    needs: [setup-matrix,fetch-secrets]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
