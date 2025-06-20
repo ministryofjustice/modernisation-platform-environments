@@ -68,6 +68,7 @@ resource "aws_ecs_task_definition" "admin" {
       as_hostname                  = aws_route53_record.admin.fqdn
       wl_admin_mem_args            = local.application_data.accounts[local.environment].admin_wl_mem_args
       xxsoa_ds_host                = local.application_data.accounts[local.environment].tds_db_endpoint
+      xxsoa_ds_db                  = local.application_data.accounts[local.environment].tds_ds_db
       xxsoa_ds_username            = local.application_data.accounts[local.environment].admin_xxsoa_ds_username
       xxsoa_ds_password            = aws_secretsmanager_secret.xxsoa_ds_password.arn
       ebs_ds_url                   = local.application_data.accounts[local.environment].admin_ebs_ds_url

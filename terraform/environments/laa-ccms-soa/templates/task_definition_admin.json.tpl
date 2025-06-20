@@ -65,7 +65,7 @@
       },
       {
         "name": "XXSOA_DS_URL",
-        "value": "jdbc:oracle:thin:@${xxsoa_ds_host}:EDRMSTDS"
+        "value": "jdbc:oracle:thin:@${xxsoa_ds_host}:${xxsoa_ds_db}"
       },
       {
         "name": "XXSOA_DS_USERNAME",
