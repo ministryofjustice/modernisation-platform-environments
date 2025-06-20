@@ -19,21 +19,24 @@ resource "aws_lakeformation_permissions" "grant_tag_describe_to_sso_role" {
 
   lf_tag {
     key    = aws_lakeformation_lf_tag.domain_tag.key
-    values = ["prisons"]
+    values = ["prisons", "probation", "electronic-monitoring"]
   }
 }
 
-# Alpha user data location
-resource "aws_lakeformation_permissions" "lf_data_location_alpha" {
-  principal   = "arn:aws:iam::593291632749:role/alpha_user_andrewc-moj"
-  permissions = ["DATA_LOCATION_ACCESS"]
 
-  data_location {
-    arn = "arn:aws:s3:::dpr-structured-historical-development"
+# External account tag
+resource "aws_lakeformation_permissions" "grant_tag_access_to_external_account" {
+  principal   = "593291632749"
+  permissions = ["DESCRIBE", "ASSOCIATE"]
+
+  lf_tag {
+    key    = aws_lakeformation_lf_tag.domain_tag.key
+    values = ["prisons", "probation", "electronic-monitoring"]
   }
 }
 
-# Grant external account database access by tag (all values)
+
+# Grant external account  account database access by tag (all values)
 resource "aws_lakeformation_permissions" "grant_database_access_by_tag" {
   principal                     = "593291632749"
   permissions                   = ["DESCRIBE"]
