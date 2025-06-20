@@ -58,7 +58,7 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a"]
-          security_groups    = ["boe", "bip-app"]
+          security_groups    = ["efs"]
         }]
         tags = {
           backup      = "false"
@@ -204,7 +204,7 @@ locals {
         aliases                         = ["pp-onr-fs.azure.hmpp.root"]
         automatic_backup_retention_days = 0
         deployment_type                 = "SINGLE_AZ_1"
-        security_groups                 = ["bods"]
+        security_groups                 = ["fsx"]
         skip_final_backup               = true
         storage_capacity                = 600
         throughput_capacity             = 8

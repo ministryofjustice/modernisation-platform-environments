@@ -188,7 +188,7 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
-          security_groups    = ["boe", "bip-app"]
+          security_groups    = ["efs"]
         }]
         tags = {
           backup      = "false"
@@ -203,7 +203,7 @@ locals {
         automatic_backup_retention_days = 0
         deployment_type                 = "MULTI_AZ_1"
         preferred_availability_zone     = "eu-west-2a"
-        security_groups                 = ["bods"]
+        security_groups                 = ["fsx"]
         skip_final_backup               = true
         storage_capacity                = 600
         throughput_capacity             = 8
