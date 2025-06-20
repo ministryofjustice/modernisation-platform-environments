@@ -179,9 +179,9 @@ locals {
   }
 }
 
-output "local_secret_names" {
-  value = local.credentials_map
-}
+# output "local_secret_names" {
+#   value = local.credentials_map
+# }
 
 resource "aws_s3_object" "ftp_lambda_layer" {
   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
