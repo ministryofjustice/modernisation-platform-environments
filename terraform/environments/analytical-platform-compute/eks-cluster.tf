@@ -63,6 +63,10 @@ module "eks" {
     aws-guardduty-agent = {
       addon_version = local.environment_configuration.eks_cluster_addon_versions.aws_guardduty_agent
     }
+    aws-network-flow-monitoring-agent = {
+      addon_version            = local.environment_configuration.eks_cluster_addon_versions.aws_network_flow_monitoring_agent
+      service_account_role_arn = module.aws_cloudwatch_network_flow_monitor_iam_role.iam_role_arn
+    }
     eks-pod-identity-agent = {
       addon_version = local.environment_configuration.eks_cluster_addon_versions.eks_pod_identity_agent
     }
