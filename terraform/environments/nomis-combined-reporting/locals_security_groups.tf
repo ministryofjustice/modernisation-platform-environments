@@ -4,6 +4,9 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
+    enduserclient_internal = [
+      "10.0.0.0/8"
+    ]
     enduserclient_public1 = flatten([
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     ])
@@ -27,6 +30,9 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
+    enduserclient_internal = [
+      "10.0.0.0/8"
+    ]
     enduserclient_public1 = flatten([
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     ])
@@ -56,6 +62,46 @@ locals {
   security_groups = {
     lb = {
       description = "Security group for public subnet"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+        http = {
+          description = "Allow http ingress"
+          from_port   = 80
+          to_port     = 80
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
+        }
+        http7777 = {
+          description = "Allow http7777 ingress"
+          from_port   = 7777
+          to_port     = 7777
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.http7xxx
+        }
+        https = {
+          description = "Allow https ingress"
+          from_port   = 443
+          to_port     = 443
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.enduserclient_internal
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          cidr_blocks     = ["0.0.0.0/0"]
+          security_groups = []
+        }
+      }
     }
     public-lb = {
       description = "Security group for public load balancer"
@@ -157,7 +203,7 @@ locals {
           to_port         = 7010
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["public-lb", "public-lb-2"]
+          security_groups = ["lb", "public-lb", "public-lb-2"]
         }
         http7777 = {
           description     = "Allow http7777 ingress"
@@ -165,7 +211,7 @@ locals {
           to_port         = 7777
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["public-lb", "public-lb-2"]
+          security_groups = ["lb", "public-lb", "public-lb-2"]
         }
         http8005 = {
           description     = "Allow http8005 ingress"
@@ -173,7 +219,7 @@ locals {
           to_port         = 8005
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["public-lb", "public-lb-2"]
+          security_groups = ["lb", "public-lb", "public-lb-2"]
         }
         http8443 = {
           description     = "Allow http8443 ingress"
@@ -181,7 +227,7 @@ locals {
           to_port         = 8443
           protocol        = "tcp"
           cidr_blocks     = local.security_group_cidrs.http7xxx
-          security_groups = ["public-lb", "public-lb-2"]
+          security_groups = ["lb", "public-lb", "public-lb-2"]
         }
       }
     }
