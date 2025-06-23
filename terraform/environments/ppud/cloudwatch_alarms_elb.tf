@@ -21,7 +21,7 @@ resource "aws_cloudwatch_metric_alarm" "high_target_response_time_wam_elb" {
   alarm_description   = "This metric monitors the target response time of the WAM load balancer. If the target response time averages over 0.01 for 1 minute, the alarm will trigger."
   alarm_actions       = [aws_sns_topic.cw_alerts[0].arn]
   dimensions = {
-    LoadBalancer      = "app/WAM-ALB-PROD/bfc963544454bdde"
-    AvailabilityZone  = "eu-west-2a"
+    LoadBalancer     = "app/WAM-ALB-PROD/bfc963544454bdde"
+    AvailabilityZone = "eu-west-2a"
   }
 }

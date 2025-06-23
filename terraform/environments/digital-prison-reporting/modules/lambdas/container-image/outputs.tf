@@ -18,5 +18,5 @@ output "lambda_invoke_arn" {
 
 output "lambda_execution_role_id" {
   description = "ID of the lambda execution role. Can be used to attach additional policies through aws_iam_role_policy_attachment"
-  value = var.enable_lambda ? aws_iam_role.lambda_execution_role[0].id : ""
+  value       = var.enable_lambda ? aws_iam_role.lambda_execution_role[0].id : ""
 }

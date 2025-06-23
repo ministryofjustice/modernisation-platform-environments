@@ -34,8 +34,8 @@ resource "aws_db_parameter_group" "parameter_group_19" {
   }
 
   parameter {
-  name  = "db_cache_size"
-  value = "2000000000"
+    name  = "db_cache_size"
+    value = "2000000000"
   }
 
   tags = {
