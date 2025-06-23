@@ -77,7 +77,7 @@ Modernisation Platform
 
 ### **Bringing Up a New EDRMS TDS Database**
 
-When bringing up a new database for the first time. The below commands must be manually run before EDRMS will be able to be make inbound connections:
+When bringing up a new database for the first time. The below commands must be manually run before SOA:
 
 PS: This is copied from location https://github.com/ministryofjustice/laa-ccms-edrms-web-service/blob/main/sql/liquibase/xxsoa_schema.sql
 ```bash
