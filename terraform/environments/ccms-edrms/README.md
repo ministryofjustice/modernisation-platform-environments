@@ -80,6 +80,7 @@ Modernisation Platform
 When bringing up a new database for the first time. The below commands must be manually run before SOA:
 
 PS: This is copied from location https://github.com/ministryofjustice/laa-ccms-edrms-web-service/blob/main/sql/liquibase/xxsoa_schema.sql
+
 ```bash
 
 --------------------------------------------------------
@@ -96,7 +97,11 @@ CREATE USER XXEDRMS IDENTIFIED BY INJECT_COMPLEX_PASSWORD_HERE ;
 GRANT CREATE SESSION TO XXEDRMS ;
 GRANT UNLIMITED TABLESPACE TO XXEDRMS ;
 
+```
 
+Password **INJECT_COMPLEX_PASSWORD_HERE** Should be provided to SOA team so that this can be stored in SOA Env secrets , for weblogic XXSOA Data source to work.
+
+```bash
 --------------------------------------------------------
 --  Switch if you are not connected as XXEDRMS user 
 --------------------------------------------------------
