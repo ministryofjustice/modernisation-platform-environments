@@ -263,7 +263,6 @@ locals {
       health_check_grace_period_seconds = 600
       autoscaling_max_capacity          = 1
       ecs_task_iam_role_name            = "gateway-custom-role"
-      deployment_controller             = "ECS"
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
@@ -316,7 +315,6 @@ locals {
       health_check_grace_period_seconds = 600
       autoscaling_max_capacity          = 1
       ecs_task_iam_role_name            = "gateway-custom-role"
-      deployment_controller             = "ECS"
       additional_environment_variables = [
         {
           "name" : "GATEWAY_SERVICE_URI"
