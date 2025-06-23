@@ -67,7 +67,10 @@ module "ecs" {
     aws_iam_policy.s3-access.arn
   ]
 
-  target_group_arns = module.alb.target_group_arns
+  target_group_arns = merge(
+    module.external_alb.target_group_arns,
+    module.internal_alb.target_group_arns
+  )
 
   depends_on = [module.internal_alb, module.external_alb, module.aurora, module.redshift]
 }
