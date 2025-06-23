@@ -2,6 +2,276 @@
 # Lambda Functions, Permissions Statement and Zipped Archive Statements
 #######################################################################
 
+#########################
+# Development Environment
+#########################
+
+######################################################
+# Lambda Function to Terminate MS Word Processes - DEV
+######################################################
+
+resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  count                          = local.is-development == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-dev"
+  s3_key                         = "lambda/functions/terminate_cpu_process_dev.zip"
+  function_name                  = "terminate_cpu_process"
+  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
+  handler                        = "terminate_cpu_process_dev.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowCloudWatchAccess"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_dev[0].function_name
+  principal     = "cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+}
+
+################################################
+# Lambda Function to send CPU notification - DEV
+################################################
+
+resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  count                          = local.is-development == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-dev"
+  s3_key                         = "lambda/functions/send_cpu_notification_dev.zip"
+  function_name                  = "send_cpu_notification"
+  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
+  handler                        = "send_cpu_notification_dev.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notification_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_dev[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
+}
+
+################################################
+# Lambda Function to graph CPU Utilization - DEV
+################################################
+
+resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
+  count                          = local.is-development == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-dev"
+  s3_key                         = "lambda/functions/send_cpu_graph_dev.zip"
+  function_name                  = "send_cpu_graph"
+  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].arn
+  handler                        = "send_cpu_graph_dev.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev]
+  reserved_concurrent_executions = 5
+  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+  layers = [
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-numpy:8",
+    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-pillow:1",
+    aws_lambda_layer_version.lambda_layer_matplotlib_dev[0].arn
+  ]
+}
+
+resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_send_cpu_graph_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowAccesstoCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_send_cpu_graph_dev[0].function_name
+  principal     = "cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+}
+
+###############################################
+# Lambda Function for Security Hub Report - DEV
+###############################################
+
+resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_dev" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
+  count                          = local.is-development == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-dev"
+  s3_key                         = "lambda/functions/securityhub_report_dev.zip"
+  function_name                  = "securityhub_report_dev"
+  role                           = aws_iam_role.lambda_role_securityhub_get_data_dev[0].arn
+  handler                        = "securityhub_report_dev.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_dev]
+  reserved_concurrent_executions = 5
+  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+}
+
+resource "aws_lambda_permission" "allow_lambda_to_query_securityhub_securityhub_report_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowAccesstoSecurityHub"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_securityhub_report_dev[0].function_name
+  principal     = "securityhub.amazonaws.com"
+  source_arn    = "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_security_hub_report_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/securityhub_report_dev"
+  retention_in_days = 30
+}
+
+###########################
+# Preproduction Environment
+###########################
+
+######################################################
+# Lambda Function to Terminate MS Word Processes - UAT
+######################################################
+
+resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  count                          = local.is-preproduction == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-uat"
+  s3_key                         = "lambda/functions/terminate_cpu_process_uat.zip"
+  function_name                  = "terminate_cpu_process"
+  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].arn
+  handler                        = "terminate_cpu_process_uat.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_uat[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
+}
+
+################################################
+# Lambda Function to send CPU notification - UAT
+################################################
+
+resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  count                          = local.is-preproduction == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-uat"
+  s3_key                         = "lambda/functions/send_cpu_notification_uat.zip"
+  function_name                  = "send_cpu_notification"
+  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].arn
+  handler                        = "send_cpu_notification_uat.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
+  reserved_concurrent_executions = 5
+  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+}
+
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notification_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_uat[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
+}
+
+###############################################
+# Lambda Function for Security Hub Report - UAT
+###############################################
+
+resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_uat" {
+  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
+  count                          = local.is-preproduction == true ? 1 : 0
+  s3_bucket                      = "moj-infrastructure-uat"
+  s3_key                         = "lambda/functions/securityhub_report_uat.zip"
+  function_name                  = "securityhub_report_uat"
+  role                           = aws_iam_role.lambda_role_securityhub_get_data_uat[0].arn
+  handler                        = "securityhub_report_uat.lambda_handler"
+  runtime                        = "python3.12"
+  timeout                        = 300
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_uat]
+  reserved_concurrent_executions = 5
+  #  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
+  dead_letter_config {
+    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
+  }
+  tracing_config {
+    mode = "Active"
+  }
+}
+
+resource "aws_lambda_permission" "allow_lambda_to_query_securityhub_securityhub_report_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowAccesstoSecurityHub"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_securityhub_report_uat[0].function_name
+  principal     = "securityhub.amazonaws.com"
+  source_arn    = "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_security_hub_report_uat_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-preproduction == true ? 1 : 0
+  name              = "/aws/lambda/securityhub_report_uat"
+  retention_in_days = 30
+}
+
 ##################################################
 # Lambda functions to stop and start EC2 Instances
 ##################################################
@@ -166,90 +436,7 @@ resource "aws_cloudwatch_log_group" "lambda_enable_cpu_alarm_prod_log_group" {
   retention_in_days = 30
 }
 
-######################################################
-# Lambda Function to Terminate MS Word Processes - DEV
-######################################################
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_dev" {
-  count         = local.is-development == true ? 1 : 0
-  statement_id  = "AllowCloudWatchAccess"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_dev[0].function_name
-  principal     = "cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev" {
-  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
-  count                          = local.is-development == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/terminate_cpu_process_dev.zip"
-  function_name                  = "terminate_cpu_process"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
-  handler                        = "terminate_cpu_process_dev.lambda_handler"
-  runtime                        = "python3.12"
-  timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
-  reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
-  }
-  tracing_config {
-    mode = "Active"
-  }
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_terminate_cpu_process_code_dev" {
-  count       = local.is-development == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/terminate_cpu_process_dev.zip"
-}
-
-######################################################
-# Lambda Function to Terminate MS Word Processes - UAT
-######################################################
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_process_uat" {
-  count         = local.is-preproduction == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_uat[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_uat" {
-  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
-  count                          = local.is-preproduction == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/terminate_cpu_process_uat.zip"
-  function_name                  = "terminate_cpu_process"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].arn
-  handler                        = "terminate_cpu_process_uat.lambda_handler"
-  runtime                        = "python3.12"
-  timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
-  reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
-  }
-  tracing_config {
-    mode = "Active"
-  }
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_terminate_cpu_process_code_uat" {
-  count       = local.is-preproduction == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/terminate_cpu_process_uat.zip"
-}
-
+###
 #######################################################
 # Lambda Function to Terminate MS Word Processes - PROD
 #######################################################
@@ -302,89 +489,7 @@ resource "aws_cloudwatch_log_group" "lambda_terminate_cpu_process_prod_log_group
   retention_in_days = 30
 }
 
-################################################
-# Lambda Function to send CPU notification - DEV
-################################################
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notification_dev" {
-  count         = local.is-development == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_dev[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev" {
-  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
-  count                          = local.is-development == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/send_cpu_notification_dev.zip"
-  function_name                  = "send_cpu_notification"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
-  handler                        = "send_cpu_notification_dev.lambda_handler"
-  runtime                        = "python3.12"
-  timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
-  reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
-  }
-  tracing_config {
-    mode = "Active"
-  }
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_send_cpu_notification_code_dev" {
-  count       = local.is-development == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/send_cpu_notification_dev.zip"
-}
-
-################################################
-# Lambda Function to send CPU notification - UAT
-################################################
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notification_uat" {
-  count         = local.is-preproduction == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_uat[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_uat" {
-  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
-  count                          = local.is-preproduction == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/send_cpu_notification_uat.zip"
-  function_name                  = "send_cpu_notification"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_uat[0].arn
-  handler                        = "send_cpu_notification_uat.lambda_handler"
-  runtime                        = "python3.12"
-  timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_uat]
-  reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
-  }
-  tracing_config {
-    mode = "Active"
-  }
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_send_cpu_notification_code_uat" {
-  count       = local.is-preproduction == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/send_cpu_notification_uat.zip"
-}
 
 #################################################
 # Lambda Function to send CPU notification - PROD
@@ -438,53 +543,6 @@ resource "aws_cloudwatch_log_group" "lambda_send_cpu_notification_prod_log_group
   retention_in_days = 30
 }
 
-################################################
-# Lambda Function to graph CPU Utilization - DEV
-################################################
-
-resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_send_cpu_graph_dev" {
-  count         = local.is-development == true ? 1 : 0
-  statement_id  = "AllowAccesstoCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_send_cpu_graph_dev[0].function_name
-  principal     = "cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
-  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
-  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
-  count                          = local.is-development == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/send_cpu_graph_dev.zip"
-  function_name                  = "send_cpu_graph"
-  role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].arn
-  handler                        = "send_cpu_graph_dev.lambda_handler"
-  runtime                        = "python3.12"
-  timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev]
-  reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
-  }
-  tracing_config {
-    mode = "Active"
-  }
-  layers = [
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-numpy:8",
-    "arn:aws:lambda:eu-west-2:${data.aws_ssm_parameter.klayers_account_dev[0].value}:layer:Klayers-p312-pillow:1",
-    aws_lambda_layer_version.lambda_layer_matplotlib_dev[0].arn
-  ]
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_send_cpu_graph_code_dev" {
-  count       = local.is-development == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/send_cpu_graph_dev.zip"
-}
 
 #################################################
 # Lambda Function to graph CPU Utilization - PROD
@@ -797,111 +855,6 @@ resource "aws_cloudwatch_log_group" "lambda_disk_info_report_prod_log_group" {
   retention_in_days = 30
 }
 
-###############################################
-# Lambda Function for Security Hub Report - DEV
-###############################################
-
-resource "aws_lambda_permission" "allow_lambda_to_query_securityhub_securityhub_report_dev" {
-  count         = local.is-development == true ? 1 : 0
-  statement_id  = "AllowAccesstoSecurityHub"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_securityhub_report_dev[0].function_name
-  principal     = "securityhub.amazonaws.com"
-  source_arn    = "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_dev" {
-  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
-  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
-  count                          = local.is-development == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/securityhub_report_dev.zip"
-  function_name                  = "securityhub_report_dev"
-  role                           = aws_iam_role.lambda_role_securityhub_get_data_dev[0].arn
-  handler                        = "securityhub_report_dev.lambda_handler"
-  runtime                        = "python3.12"
-  timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_dev]
-  reserved_concurrent_executions = 5
-  # code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
-  }
-  tracing_config {
-    mode = "Active"
-  }
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_securityhub_report_code_dev" {
-  count       = local.is-development == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/securityhub_report_dev.zip"
-}
-
-# Cloudwatch log group for the lambda function
-
-resource "aws_cloudwatch_log_group" "lambda_security_hub_report_dev_log_group" {
-  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
-  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
-  count             = local.is-development == true ? 1 : 0
-  name              = "/aws/lambda/securityhub_report_dev"
-  retention_in_days = 30
-}
-
-###############################################
-# Lambda Function for Security Hub Report - UAT
-###############################################
-
-resource "aws_lambda_permission" "allow_lambda_to_query_securityhub_securityhub_report_uat" {
-  count         = local.is-preproduction == true ? 1 : 0
-  statement_id  = "AllowAccesstoSecurityHub"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_securityhub_report_uat[0].function_name
-  principal     = "securityhub.amazonaws.com"
-  source_arn    = "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
-}
-
-resource "aws_lambda_function" "terraform_lambda_func_securityhub_report_uat" {
-  # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
-  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing temporarily disabled for maintenance purposes"
-  count                          = local.is-preproduction == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/securityhub_report_uat.zip"
-  function_name                  = "securityhub_report_uat"
-  role                           = aws_iam_role.lambda_role_securityhub_get_data_uat[0].arn
-  handler                        = "securityhub_report_uat.lambda_handler"
-  runtime                        = "python3.12"
-  timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_uat]
-  reserved_concurrent_executions = 5
-  #  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
-  dead_letter_config {
-    target_arn = aws_sqs_queue.lambda_queue_uat[0].arn
-  }
-  tracing_config {
-    mode = "Active"
-  }
-}
-
-# Archive the zip file
-
-data "archive_file" "zip_the_securityhub_report_code_uat" {
-  count       = local.is-preproduction == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/securityhub_report_uat.zip"
-}
-
-# Cloudwatch log group for the lambda function
-
-resource "aws_cloudwatch_log_group" "lambda_security_hub_report_uat_log_group" {
-  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
-  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
-  count             = local.is-preproduction == true ? 1 : 0
-  name              = "/aws/lambda/securityhub_report_uat"
-  retention_in_days = 30
-}
 
 ################################################
 # Lambda Function for Security Hub Report - PROD
