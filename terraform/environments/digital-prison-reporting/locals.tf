@@ -267,15 +267,15 @@ locals {
   lambda_multiphase_query_memory_size     = 1024
 
   # Multiphase Cleanup Lambda
-  lambda_multiphase_cleanup_enabled             = local.application_data.accounts[local.environment].enable_multiphase_cleanup_lambda
-  lambda_multiphase_cleanup_name                = "${local.project}-multiphase-cleanup"
-  lambda_multiphase_cleanup_runtime             = "java21"
-  lambda_multiphase_cleanup_tracing             = "Active"
-  lambda_multiphase_cleanup_handler             = "uk.gov.justice.digital.hmpps.multiphasecleanup.MultiphaseCleanUpService::handleRequest"
-  lambda_multiphase_cleanup_code_s3_bucket      = module.s3_artifacts_store.bucket_id
-  lambda_multiphase_cleanup_jar_version         = local.application_data.accounts[local.environment].multiphase_cleanup_lambda_version
-  lambda_multiphase_cleanup_code_s3_key         = "build-artifacts/hmpps-dpr-multiphase-cleanup-lambda/jars/hmpps-dpr-multiphase-cleanup-lambda-${local.lambda_multiphase_cleanup_jar_version}-all.jar"
-  lambda_multiphase_cleanup_policies            = [
+  lambda_multiphase_cleanup_enabled        = local.application_data.accounts[local.environment].enable_multiphase_cleanup_lambda
+  lambda_multiphase_cleanup_name           = "${local.project}-multiphase-cleanup"
+  lambda_multiphase_cleanup_runtime        = "java21"
+  lambda_multiphase_cleanup_tracing        = "Active"
+  lambda_multiphase_cleanup_handler        = "uk.gov.justice.digital.hmpps.multiphasecleanup.MultiphaseCleanUpService::handleRequest"
+  lambda_multiphase_cleanup_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_multiphase_cleanup_jar_version    = local.application_data.accounts[local.environment].multiphase_cleanup_lambda_version
+  lambda_multiphase_cleanup_code_s3_key    = "build-artifacts/hmpps-dpr-multiphase-cleanup-lambda/jars/hmpps-dpr-multiphase-cleanup-lambda-${local.lambda_multiphase_cleanup_jar_version}-all.jar"
+  lambda_multiphase_cleanup_policies = [
     "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
     "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
     aws_iam_policy.redshift_dataapi_cross_policy.arn

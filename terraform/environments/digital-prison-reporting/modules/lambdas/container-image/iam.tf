@@ -70,7 +70,7 @@ resource "aws_iam_policy" "lambda_execution_policy" {
 resource "aws_iam_role" "lambda_execution_role" {
   count = var.enable_lambda ? 1 : 0
 
-  name = "${var.name}-role"
+  name               = "${var.name}-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
