@@ -308,6 +308,7 @@ resource "aws_launch_template" "ec2-launch-template" {
     resource_type = "volume"
     tags = merge(tomap({
       "Name" = "${local.application_name}-ecs-cluster"
+      "ForceRefresh" = timestamp()
     }), local.tags)
   }
 
