@@ -1032,16 +1032,15 @@ resource "aws_cloudwatch_log_group" "lambda_wam_elb_trt_graph_prod_log_group" {
   retention_in_days = 30
 }
 
-##################################################
-# Lambda functions to stop and start EC2 Instances
-##################################################
-
-# Lambda Function for Stop of Instance
+###############################################
+# Lambda functions to stop EC2 Instances - PROD
+###############################################
 
 resource "aws_lambda_function" "terraform_lambda_func_stop" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/stop-instance/StopEC2Instances.zip"
+  s3_bucket                      = "moj-infrastructure"
+  s3_key                         = "lambda/functions/stop_ec2_instances_prod.zip"
   function_name                  = "stop_Lambda_Function"
   role                           = aws_iam_role.lambda_role[0].arn
   handler                        = "StopEC2Instances.lambda_handler"
@@ -1057,15 +1056,6 @@ resource "aws_lambda_function" "terraform_lambda_func_stop" {
   }
 }
 
-data "archive_file" "zip_the_stop_instance_code" {
-  count       = local.is-production == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/stop-instance/"
-  output_path = "${path.module}/stop-instance/StopEC2Instances.zip"
-}
-
-# Cloudwatch log group for the lambda function
-
 resource "aws_cloudwatch_log_group" "lambda_stop_lambda_function_prod_log_group" {
   # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
   count             = local.is-production == true ? 1 : 0
@@ -1073,12 +1063,15 @@ resource "aws_cloudwatch_log_group" "lambda_stop_lambda_function_prod_log_group"
   retention_in_days = 365
 }
 
-# Lambda Function for Start of Instance
+################################################
+# Lambda functions to start EC2 Instances - PROD
+################################################
 
 resource "aws_lambda_function" "terraform_lambda_func_start" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/start-instance/StartEC2Instances.zip"
+  s3_bucket                      = "moj-infrastructure"
+  s3_key                         = "lambda/functions/start_ec2_instances_prod.zip"
   function_name                  = "start_Lambda_Function"
   role                           = aws_iam_role.lambda_role[0].arn
   handler                        = "StartEC2Instances.lambda_handler"
@@ -1094,20 +1087,9 @@ resource "aws_lambda_function" "terraform_lambda_func_start" {
   }
 }
 
-data "archive_file" "zip_the_start_instance_code" {
-  count       = local.is-production == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/start-instance/"
-  output_path = "${path.module}/start-instance/StartEC2Instances.zip"
-}
-
-# Cloudwatch log group for the lambda function
-
 resource "aws_cloudwatch_log_group" "lambda_start_lambda_function_prod_log_group" {
   # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
   count             = local.is-production == true ? 1 : 0
   name              = "/aws/lambda/start_Lambda_Function"
   retention_in_days = 365
 }
-
-

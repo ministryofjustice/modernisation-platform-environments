@@ -143,20 +143,12 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_certificate_approaching_ex
 
 # Lambda Function to check for Certificate Expiration - PROD
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_prod" {
-  count         = local.is-production == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_prod[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
-}
-
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
   count                          = local.is-production == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/certificate_expiry_prod.zip"
+  s3_bucket                      = "moj-infrastructure"
+  s3_key                         = "lambda/functions/certificate_expiry_prod.zip"
   function_name                  = "certificate_expiry_prod"
   role                           = aws_iam_role.lambda_role_certificate_expiry_prod[0].arn
   handler                        = "certificate_expiry_prod.lambda_handler"
@@ -179,13 +171,13 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   }
 }
 
-# Archive the zip file - PROD
-
-data "archive_file" "zip_the_certificate_expiry_prod" {
-  count       = local.is-production == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/certificate_expiry_prod.zip"
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_prod" {
+  count         = local.is-production == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_prod[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
 }
 
 # Eventbridge Rule for Certificate Expiration - PROD
