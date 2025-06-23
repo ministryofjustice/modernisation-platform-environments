@@ -1,23 +1,15 @@
-##############################################################################
-# Lambda Function and Eventbridge Rules for Certificate Approaching Expiration
-##############################################################################
+###############################################################################
+# Lambda Functions and Eventbridge Rules for Certificate Approaching Expiration
+###############################################################################
 
 # Lambda Function to check for Certificate Expiration - DEV
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_dev" {
-  count         = local.is-development == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_dev[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
-}
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
   count                          = local.is-development == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/certificate_expiry_dev.zip"
+  s3_bucket                      = "moj-infrastructure-dev"
+  s3_key                         = "lambda/functions/certificate_expiry_dev.zip"
   function_name                  = "certificate_expiry_dev"
   role                           = aws_iam_role.lambda_role_certificate_expiry_dev[0].arn
   handler                        = "certificate_expiry_dev.lambda_handler"
@@ -40,13 +32,13 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   }
 }
 
-# Archive the zip file - DEV
-
-data "archive_file" "zip_the_certificate_expiry_dev" {
-  count       = local.is-development == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/certificate_expiry_dev.zip"
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_dev" {
+  count         = local.is-development == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_dev[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
 }
 
 # Eventbridge Rule for Certificate Expiration - DEV
@@ -79,23 +71,14 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_certificate_approaching_ex
   source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration_dev[0].arn
 }
 
-
 # Lambda Function to check for Certificate Expiration - UAT
-
-resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_uat" {
-  count         = local.is-preproduction == true ? 1 : 0
-  statement_id  = "AllowExecutionFromCloudWatch"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_uat[0].function_name
-  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
-  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
-}
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
   count                          = local.is-preproduction == true ? 1 : 0
-  filename                       = "${path.module}/lambda_scripts/certificate_expiry_uat.zip"
+  s3_bucket                      = "moj-infrastructure-uat"
+  s3_key                         = "lambda/functions/certificate_expiry_uat.zip"
   function_name                  = "certificate_expiry_uat"
   role                           = aws_iam_role.lambda_role_certificate_expiry_uat[0].arn
   handler                        = "certificate_expiry_uat.lambda_handler"
@@ -118,13 +101,13 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   }
 }
 
-# Archive the zip file - UAT
-
-data "archive_file" "zip_the_certificate_expiry_uat" {
-  count       = local.is-preproduction == true ? 1 : 0
-  type        = "zip"
-  source_dir  = "${path.module}/lambda_scripts/"
-  output_path = "${path.module}/lambda_scripts/certificate_expiry_uat.zip"
+resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_expiry_uat" {
+  count         = local.is-preproduction == true ? 1 : 0
+  statement_id  = "AllowExecutionFromCloudWatch"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_uat[0].function_name
+  principal     = "lambda.alarms.cloudwatch.amazonaws.com"
+  source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
 }
 
 # Eventbridge Rule for Certificate Expiration - UAT
