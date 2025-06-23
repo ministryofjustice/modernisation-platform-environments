@@ -39,21 +39,19 @@ jobs:
         with:
           slack_webhook_url: ${{ needs.fetch-secrets.outputs.slack_webhook_url }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
-      - name: Test
-        run: exit 1 
 
-      # - name: Generate file
-      #   run: bash ./scripts/generate-dependabot-file.sh
+      - name: Generate file
+        run: bash ./scripts/generate-dependabot-file.sh
         
-      # - name: Set up git user
-      #   run: bash ./scripts/git-setup.sh
+      - name: Set up git user
+        run: bash ./scripts/git-setup.sh
 
-      # - name: Commit and Create PR with Signed Commit
-      #   uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     pr_title: "Automated Update: Dependabot File"
-      #     pr_body: "This PR updates the Dependabot configuration file."
+      - name: Commit and Create PR with Signed Commit
+        uses: ministryofjustice/modernisation-platform-github-actions/signed-commit@3f9fb1af00462c69c806640652ddf41292963615 # v3.2.5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          pr_title: "Automated Update: Dependabot File"
+          pr_body: "This PR updates the Dependabot configuration file."
 
       - name: Slack failure notification
         uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v1.26.0
