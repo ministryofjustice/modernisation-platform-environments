@@ -416,11 +416,6 @@ resource "aws_ecs_capacity_provider" "ifs" {
     }
   }
 
-  launch_template {
-    id      = aws_launch_template.ec2-launch-template.id
-    version = "$Latest"
-  }
-
   tags = merge(
     local.tags,
     {
@@ -447,6 +442,17 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     id      = aws_launch_template.ec2-launch-template.id
     version = aws_launch_template.ec2-launch-template.latest_version
   }
+
+  instance_refresh {
+  strategy = "Rolling"
+
+  preferences {
+    min_healthy_percentage = 50
+    instance_warmup        = 60
+  }
+
+  triggers = ["launch_template"]
+}
 
   tag {
     key                 = "Name"
