@@ -25,7 +25,7 @@
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "debug"
+      "logging_level_root": "info"
     },
     "test": {
       "app_name": "ccms-edrms",
@@ -52,7 +52,7 @@
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "debug"
+      "logging_level_root": "info"
     },
     "preproduction": {
       "app_name": "ccms-edrms",
