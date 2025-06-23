@@ -67,6 +67,8 @@ module "ecs" {
     aws_iam_policy.s3-access.arn
   ]
 
+  target_group_arns = module.alb.target_group_arns
+
   depends_on = [module.internal_alb, module.external_alb, module.aurora, module.redshift]
 }
 

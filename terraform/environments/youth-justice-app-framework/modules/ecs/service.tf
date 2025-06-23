@@ -6,16 +6,6 @@ data "aws_secretsmanager_secret_version" "postgres_secret" {
   secret_id = var.ecs_service_postgres_secret_arn
 }
 
-data "aws_lb_target_group" "target_group" {
-  for_each = var.ecs_services
-  name     = "${each.value.name}-target-group-1"
-}
-
-data "aws_lb_target_group" "external_target_group" {
-  #for each ecs service if internal_lb is false create a target group
-  for_each = { for k, v in var.ecs_services : k => v if v.internal_lb == false }
-  name     = "${each.value.name}-target-group-2"
-}
 /* commented out as not allowed and may not need it anyway
 resource "aws_service_discovery_service" "service_discovery" {
   for_each     = var.ecs_services
@@ -124,14 +114,14 @@ module "ecs_service" {
   load_balancer = each.value.internal_lb ? {
     service = {
       #      elb_name = var.internal_alb_name
-      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : data.aws_lb_target_group.target_group[each.key].arn
+      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : var.target_group_arns[each.key]
       container_name   = each.value.name
       container_port   = each.value.container_port
     }
     } : {
     cloudfront = {
       #      elb_name = var.external_alb_name
-      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : data.aws_lb_target_group.external_target_group[each.key].arn
+      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : var.target_group_arns[each.key]
       container_name   = each.value.name
       container_port   = each.value.container_port
     }

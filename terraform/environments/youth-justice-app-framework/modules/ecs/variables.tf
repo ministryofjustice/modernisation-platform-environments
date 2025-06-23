@@ -310,3 +310,9 @@ variable "secret_kms_key_arn" {
   description = "The ARN of the KMS key to use for secrets"
   type        = string
 }
+
+variable "target_group_arns" {
+  description = "A map of target group ARNs to use for the listeners"
+  type        = map(string)
+  default     = {}
+}
