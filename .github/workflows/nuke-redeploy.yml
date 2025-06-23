@@ -97,18 +97,18 @@ jobs:
         run: |
           terraform --version
           echo "Terraform Plan - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
-          # bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
-          # terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
-          # bash scripts/terraform-plan.sh terraform/environments/${ACCOUNT_NAME%-development}
+          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
+          terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
+          bash scripts/terraform-plan.sh terraform/environments/${ACCOUNT_NAME%-development}
 
       - name: Apply after nuke - ${{ matrix.nuke_accts }}
         if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') }}
         run: |
           terraform --version
           echo "Terraform apply - ${ACCOUNT_NAME%-development}" # removes the -development suffix in order to get the directory name
-          # bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
-          # terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
-          # bash scripts/terraform-apply.sh terraform/environments/${ACCOUNT_NAME%-development}
+          bash scripts/terraform-init.sh terraform/environments/${ACCOUNT_NAME%-development}
+          terraform -chdir="terraform/environments/${ACCOUNT_NAME%-development}" workspace select "${ACCOUNT_NAME}"
+          bash scripts/terraform-apply.sh terraform/environments/${ACCOUNT_NAME%-development}
 
       - name: Slack failure notification
         uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
