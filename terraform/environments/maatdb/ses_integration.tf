@@ -136,7 +136,37 @@ resource "aws_route53_record" "dkim" {
   records = ["${aws_ses_domain_dkim.dkim[0].dkim_tokens[count.index]}.dkim.amazonses.com"]
 }
 
+# This is the validation of the outgoing email address (laareporders)
 
+# ✅ Option 1: Custom MAIL FROM domain
+resource "aws_ses_domain_mail_from" "mail_from" {
+  count                  = local.build_ses ? 1 : 0
+  domain                 = aws_ses_domain_identity.domain[0].domain
+  mail_from_domain       = "laareporders.${local.ses_domain}"
+  behavior_on_mx_failure = "RejectMessage"  # Ensures misconfigured MAIL FROM bounces
+}
+
+# MX record for MAIL FROM
+resource "aws_route53_record" "mail_from_mx" {
+  provider = aws.core-network-services
+  count    = local.build_ses ? 1 : 0
+  zone_id  = data.aws_route53_zone.zone.zone_id
+  name     = aws_ses_domain_mail_from.mail_from[0].mail_from_domain
+  type     = "MX"
+  ttl      = 600
+  records  = ["10 feedback-smtp.${local.region}.amazonses.com"]
+}
+
+# SPF record for MAIL FROM
+resource "aws_route53_record" "mail_from_spf" {
+  provider = aws.core-network-services
+  count    = local.build_ses ? 1 : 0
+  zone_id  = data.aws_route53_zone.zone.zone_id
+  name     = aws_ses_domain_mail_from.mail_from[0].mail_from_domain
+  type     = "TXT"
+  ttl      = 600
+  records  = ["v=spf1 include:amazonses.com ~all"]
+}
 
 # This adds email receipt verification for the primary laareporders address. This is required if SES is in sandbox mode - the default for a new account.
 
