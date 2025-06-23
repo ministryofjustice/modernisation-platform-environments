@@ -20,7 +20,6 @@ resource "aws_iam_instance_profile" "esb_ec2_profile" {
   role = aws_iam_role.esb_ec2_role.name
 }
 
-#todo add missing policies to this role
 resource "aws_iam_role_policy_attachment" "esb_ec2_policy" {
   role       = aws_iam_role.esb_ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"

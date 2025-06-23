@@ -22,7 +22,7 @@ module "ecs" {
   ec2_min_size                = 11
   ec2_max_size                = 11
   ec2_desired_capacity        = 11
-  disable_overnight_scheduler = local.application_data.accounts[local.environment].disable_overnight_ecs_scheduler                                  #todo shared from old yjaf, replace with output of ami builder
+  disable_overnight_scheduler = local.application_data.accounts[local.environment].disable_overnight_ecs_scheduler
   nameserver                  = join(".", [split(".", data.aws_vpc.shared.cidr_block)[0], split(".", data.aws_vpc.shared.cidr_block)[1], "0", "2"]) #eg "10.23.0.2"
 
   spot_overrides = [
@@ -40,7 +40,6 @@ module "ecs" {
     }
   ]
 
-  #todo should be a ecs specific user instead of root user
   ecs_service_postgres_secret_arn = module.aurora.app_rotated_postgres_secret_arn
   ecs_allowed_secret_arns         = [module.aurora.app_rotated_postgres_secret_arn, aws_secretsmanager_secret.LDAP_administration_secret.arn]
   ecs_services                    = local.ecs_services

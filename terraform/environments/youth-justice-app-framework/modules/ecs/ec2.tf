@@ -4,7 +4,7 @@
 
 #todo replace me with image builder output
 # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html#ecs-optimized-ami-linux
-data "aws_ssm_parameter" "ecs_optimized_ami" { #todo what should this be?
+data "aws_ssm_parameter" "ecs_optimized_ami" {
   name = "/aws/service/ecs/optimized-ami/amazon-linux-2/recommended"
 }
 
@@ -102,11 +102,10 @@ module "autoscaling" {
   # Launch template settings
   create_launch_template = true
   ebs_optimized          = false
-  #launch_template_id     = aws_launch_template.this.id #todo try creating within the module instead
-  launch_template_name = "${var.cluster_name}-ec2-launch-template"
-  image_id             = var.ec2_ami_id != "" ? var.ec2_ami_id : local.ecs_optimized_ami.image_id #todo change to output of image builder
-  instance_type        = var.ec2_instance_type
-  key_name             = module.key_pair.key_pair_name
+  launch_template_name   = "${var.cluster_name}-ec2-launch-template"
+  image_id               = var.ec2_ami_id != "" ? var.ec2_ami_id : local.ecs_optimized_ami.image_id #todo change to output of image builder
+  instance_type          = var.ec2_instance_type
+  key_name               = module.key_pair.key_pair_name
   #instance_market_options = {
   #  market_type = "spot" #todo change this later, spot temporarily to save money
   #}

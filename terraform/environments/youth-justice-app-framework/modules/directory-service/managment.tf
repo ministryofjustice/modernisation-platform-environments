@@ -177,7 +177,7 @@ resource "aws_secretsmanager_secret" "ad_instance_admin_secret" {
   #checkov:skip=CKV2_AWS_57:todo add rotation if needed
   #checkov:skip=CKV_AWS_149: it is added
   name        = "ad_instance_password_secret_1"
-  description = "Local Admin for management instance" #todo do I need this?
+  description = "Local Admin for management instance"
   kms_key_id  = var.ds_managed_ad_secret_key
 
   tags = local.all_tags

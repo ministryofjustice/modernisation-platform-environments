@@ -153,7 +153,7 @@ locals {
           actions = [
             {
               type             = "forward"
-              target_group_key = "gateway-target-group-1"
+              target_group_key = "gateway-internal-target-group-1"
             }
           ]
           conditions = [{

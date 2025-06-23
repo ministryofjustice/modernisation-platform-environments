@@ -36,7 +36,7 @@ variable "ecs_services" {
     image                    = string
     container_port           = optional(number, 8080)
     deployment_controller    = optional(string, "CODE_DEPLOY")
-    internal_only            = optional(bool, true)
+    internal_lb              = optional(bool, true)
     additional_port_mappings = optional(any, [])
     enable_healthcheck       = optional(bool, true)
     health_check = optional(object({
@@ -193,7 +193,7 @@ variable "ec2_instance_type" {
 variable "ec2_min_size" {
   description = "The minimum number of EC2 instances in the ECS cluster"
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "ec2_max_size" {

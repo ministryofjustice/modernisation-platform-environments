@@ -12,8 +12,8 @@ data "aws_lb_target_group" "target_group" {
 }
 
 data "aws_lb_target_group" "external_target_group" {
-  #for each ecs service if internal_only is false create a target group
-  for_each = { for k, v in var.ecs_services : k => v if v.internal_only == false }
+  #for each ecs service if internal_lb is false create a target group
+  for_each = { for k, v in var.ecs_services : k => v if v.internal_lb == false }
   name     = "${each.value.name}-target-group-2"
 }
 /* commented out as not allowed and may not need it anyway
@@ -121,7 +121,7 @@ module "ecs_service" {
     }
   })
   ignore_task_definition_changes = true
-  load_balancer = each.value.internal_only ? {
+  load_balancer = each.value.internal_lb ? {
     service = {
       #      elb_name = var.internal_alb_name
       target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : data.aws_lb_target_group.target_group[each.key].arn
@@ -129,12 +129,6 @@ module "ecs_service" {
       container_port   = each.value.container_port
     }
     } : {
-    service = {
-      #      elb_name = var.internal_alb_name
-      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : data.aws_lb_target_group.target_group[each.key].arn
-      container_name   = each.value.name
-      container_port   = each.value.container_port
-    },
     cloudfront = {
       #      elb_name = var.external_alb_name
       target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : data.aws_lb_target_group.external_target_group[each.key].arn
@@ -154,7 +148,7 @@ module "ecs_service" {
 
   subnet_ids                 = var.ecs_subnet_ids
   create_security_group      = false
-  security_group_ids         = each.value.internal_only ? [aws_security_group.common_ecs_service_internal.id] : [aws_security_group.common_ecs_service_external.id]
+  security_group_ids         = each.value.internal_lb ? [aws_security_group.common_ecs_service_internal.id] : [aws_security_group.common_ecs_service_external.id]
   tasks_iam_role_name        = each.value.ecs_task_iam_role_name
   tasks_iam_role_arn         = aws_iam_role.ecs_task_role.arn
   create_tasks_iam_role      = false

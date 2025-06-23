@@ -49,69 +49,14 @@ module "aurora" {
 
   }
 
-  # todo - some of these rules are commented out as the resource doesn't exist yet. 
-  # It would make more sense the add the rules in their respective modules rather than here
-  # Default rule for whole VPC needs to be removed later
   rds_security_group_ingress = {
     "dummy_rule" = {
       from_port   = "5432"
       to_port     = "5432"
       protocol    = "tcp"
       description = "Allow PosgreSQL access from whole VPC"
-      cidr_blocks = [data.aws_vpc.shared.cidr_block] #todo change to real sg rules
+      cidr_blocks = [data.aws_vpc.shared.cidr_block]
     }
-
-    /*
-    windows_mgmt_servers = {
-      from_port   = "5432"
-      to_port     = "5432"
-      protocol    = "tcp"
-      description = "Access from mgmt servers on the local account"
-      source_security_group_id = "sg-blablabla"
-    }
-    quicksight = {
-      source_security_group_id = "sg-blablabla"
-      from_port   = "5432"
-      to_port     = "5432"
-      protocol    = "tcp"
-      description = "Quicksight access to postgres"
-    }
-    redshift = {
-      source_security_group_id = "sg-blablabla"
-      from_port   = "5432"
-      to_port     = "5432"
-      protocol    = "tcp"
-      description = "Redshift access to postgres"
-    }
-    yjsm = {
-      source_security_group_id = "sg-blablabla" 
-      from_port   = "5432"
-      to_port     = "5432"
-      protocol    = "tcp"
-      description = "YJSM access to postgres"
-    }
-    tableau = {
-      source_security_group_id = "sg-blablabla"
-      from_port   = "5432"
-      to_port     = "5432"
-      protocol    = "tcp"
-      description = "Tableau access to postgres"
-    }
-    ecs_to_postgres = {
-      source_security_group_id = "sg-blablabla" 
-      from_port   = "5432"
-      to_port     = "5432"
-      protocol    = "tcp"
-      description = "ECS to Postgres access"
-    }
-    mgmt_access = {
-      source_security_group_id = "sg-blablabla" 
-      from_port   = "5432"
-      to_port     = "5432"
-      protocol    = "tcp"
-      description = "Whitelisted mgmt account access"
-    }
-  */
   }
 }
 

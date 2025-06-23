@@ -46,16 +46,3 @@ resource "aws_directory_service_directory" "ds_managed_ad" {
 data "aws_directory_service_directory" "built_ad" {
   directory_id = aws_directory_service_directory.ds_managed_ad.id
 }
-
-## Sets MAD security group egress
-/* #todo duplicate rule?
-resource "aws_security_group_rule" "ds_managed_ad_secgroup" {
-  type              = "egress"
-  description       = "Allowing outbound traffic"
-  to_port           = 0
-  protocol          = "-1"
-  cidr_blocks       = ["0.0.0.0/0"]
-  from_port         = 0
-  security_group_id = aws_directory_service_directory.ds_managed_ad.security_group_id
-}
-*/

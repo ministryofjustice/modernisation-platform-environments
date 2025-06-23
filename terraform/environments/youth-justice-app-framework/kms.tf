@@ -59,4 +59,3 @@ module "kms" {
   ]
   tags = local.tags
 }
-#todo add to all secrets
