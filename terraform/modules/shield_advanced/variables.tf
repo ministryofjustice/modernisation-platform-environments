@@ -34,4 +34,5 @@ variable "log_retention_in_days" {
 variable "region" {
   description = "AWS region"
   type        = string
+  default     = "eu-west-2"
 }
