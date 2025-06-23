@@ -114,14 +114,14 @@ module "ecs_service" {
   load_balancer = each.value.internal_lb ? {
     service = {
       #      elb_name = var.internal_alb_name
-      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : var.target_group_arns[each.key]
+      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : var.target_group_arns["${each.key}-target-group-1"]
       container_name   = each.value.name
       container_port   = each.value.container_port
     }
     } : {
     cloudfront = {
       #      elb_name = var.external_alb_name
-      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : var.target_group_arns[each.key]
+      target_group_arn = each.value.load_balancer_target_group_arn != null ? each.value.load_balancer_target_group_arn : var.target_group_arns["${each.key}-target-group-1"]
       container_name   = each.value.name
       container_port   = each.value.container_port
     }
