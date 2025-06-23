@@ -53,9 +53,9 @@ resource "aws_lb_listener" "this" {
   routing_http_response_server_enabled = try(each.value.routing_http_response_server_enabled, true)
 
   tags = local.all_tags
-  lifecycle {
-    ignore_changes = [default_action]
-  }
+  #lifecycle {
+  #ignore_changes = [default_action]
+  #}
 }
 
 resource "aws_lb_listener_rule" "this" {
@@ -194,9 +194,9 @@ resource "aws_lb_listener_rule" "this" {
   }
 
   tags = local.all_tags
-  lifecycle {
-    ignore_changes = [action]
-  }
+  #lifecycle {
+  #  ignore_changes = [action]
+  #}
 }
 
 # Add SNI if certificate_arn is present
