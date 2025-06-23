@@ -16,6 +16,8 @@ module "codedeploy" {
     { "dal" = "internal" },
     { "documents" = "internal" },
     { "placements" = "internal" },
+    { "gateway-internal" = "internal" },
+    { "gateway-external" = "external" },
     { "refdata" = "internal" },
     { "returns" = "internal" },
     { "sentences" = "internal" },
