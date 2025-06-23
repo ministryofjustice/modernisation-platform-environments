@@ -416,6 +416,11 @@ resource "aws_ecs_capacity_provider" "ifs" {
     }
   }
 
+  launch_template {
+    id      = aws_launch_template.ec2-launch-template.id
+    version = "$Latest"
+  }
+
   tags = merge(
     local.tags,
     {
