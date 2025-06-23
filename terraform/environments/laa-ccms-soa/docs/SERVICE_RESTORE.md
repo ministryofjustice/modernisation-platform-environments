@@ -82,14 +82,14 @@ These steps should be undertaken by a DBA.
 
 **NOTE: Prior to boot of the application, ONLY THESE STATEMENTS SHOULD BE RUN**. When the Admin Server boots for the first time, the Oracle [RCU](https://docs.oracle.com/cd/E21764_01/doc.1111/e14259/overview.htm) will initiate the SOA-DB and create various components. If any of these are created manually, the application will find itself in a crash loop.
 
-### TDS-DB
+### SOA-DB
 
 ```bash
 CREATE TABLESPACE "CCMSSOA_MDS" EXTENT MANAGEMENT LOCAL AUTOALLOCATE SEGMENT SPACE MANAGEMENT AUTO DATAFILE SIZE 100M AUTOEXTEND ON NEXT 30M MAXSIZE UNLIMITED;
 ```
 
 ```bash
-#--Obtain password from Secrets Manager -- ccms/soa/xxsoa/ds/password
+#--Obtain password from Secrets Manager -- ccms/soa/password
 CREATE USER CCMSSOA_MDS IDENTIFIED BY PASSWORD12345! DEFAULT TABLESPACE CCMSSOA_MDS;
 GRANT CREATE SESSION TO CCMSSOA_MDS;
 GRANT CREATE JOB TO CCMSSOA_MDS;
@@ -99,7 +99,7 @@ GRANT CREATE TABLE TO CCMSSOA_MDS;
 ALTER USER CCMSSOA_MDS QUOTA UNLIMITED ON CCMSSOA_MDS;
 ```
 
-### SOA-DB
+
 
 ```bash
 #--This fix is needed to allow RCU to execute

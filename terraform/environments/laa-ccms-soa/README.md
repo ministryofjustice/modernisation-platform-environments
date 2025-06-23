@@ -24,7 +24,13 @@ This is a custom DB used by Document Service SOA composite for caching documents
 
 **TDS-DB:**
 
-This DB is required for Oracle SOA product to support some of the built-in features like Enterprise Schedule Service, SOA Test Bench, MDS, IAU etc. Most of these aren't relevant for CCMS-EBS, but are required for standard SOA installation.
+This database is essential for the SOA system to inject documents that are ultimately transmitted to NEC (Northgate). 
+Previously, the database was tightly coupled with the SOA infrastructure. 
+However, it has since been decoupled and is now managed under the ownership of the EDRMS application.
+
+Given that EDRMS is the primary stakeholder of this database, EDRMS should ideally be deployed first. 
+The database should be initialized using the scripts provided in the EDRMS environment. 
+Additionally, the necessary configuration details—such as the JDBC URL, username, and password—should be stored in a secret, which can then be referenced by the SOA WebLogic cluster through its datasource binding.
 
 ### **Storage:**
 
