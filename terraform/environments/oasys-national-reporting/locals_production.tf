@@ -329,5 +329,6 @@ locals {
       "/oracle/database/PDBOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PDBOAUD" = local.secretsmanager_secrets.db
     }
+    security_groups = local.security_groups_old
   }
 }
