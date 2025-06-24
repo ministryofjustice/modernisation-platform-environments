@@ -3,11 +3,11 @@ data "aws_iam_policy_document" "cloud_formation_access" {
         sid     = "CloudFormationPermissions"
         effect  = "Allow"
         actions = [
-          "cloudcontrol:CreateResource",
-          "cloudcontrol:GetResource",
-          "cloudcontrol:UpdateResource",
-          "cloudcontrol:DeleteResource",
-          "cloudcontrol:ListResources"
+          "cloudformation:CreateResource",
+          "cloudformation:GetResource",
+          "cloudformation:UpdateResource",
+          "cloudformation:DeleteResource",
+          "cloudformation:ListResources"
         ]
         resources = ["*"]
     }
