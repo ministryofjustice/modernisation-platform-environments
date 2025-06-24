@@ -213,53 +213,53 @@ resource "aws_cloudwatch_event_target" "trigger_lambda_target_securityhub_report
 # Eventbridge Rule to Disable CPU Alarms each Friday at 20:00
 # Set time to 20:00 during UTC and 19:00 during BST
 
-resource "aws_cloudwatch_event_rule" "disable_cpu_alarm" {
+resource "aws_cloudwatch_event_rule" "disable_cpu_alarm_prod" {
   count               = local.is-production == true ? 1 : 0
-  name                = "disable_cpu_alarm"
+  name                = "disable_cpu_alarm_prod"
   description         = "Runs Weekly every Friday at 20:00"
   schedule_expression = "cron(0 19 ? * FRI *)" # Time Zone is in UTC
 }
 
-resource "aws_cloudwatch_event_target" "trigger_lambda_disable_cpu_alarm" {
+resource "aws_cloudwatch_event_target" "trigger_lambda_disable_cpu_alarm_prod" {
   count     = local.is-production == true ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.disable_cpu_alarm[0].name
-  target_id = "disable_cpu_alarm"
-  arn       = aws_lambda_function.terraform_lambda_disable_cpu_alarm[0].arn
+  rule      = aws_cloudwatch_event_rule.disable_cpu_alarm_prod[0].name
+  target_id = "disable_cpu_alarm_prod"
+  arn       = aws_lambda_function.terraform_lambda_disable_cpu_alarm_prod[0].arn
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_disable_cpu_alarm" {
+resource "aws_lambda_permission" "allow_cloudwatch_to_disable_cpu_alarm_prod" {
   count         = local.is-production == true ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_disable_cpu_alarm[0].function_name
+  function_name = aws_lambda_function.terraform_lambda_disable_cpu_alarm_prod[0].function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.disable_cpu_alarm[0].arn
+  source_arn    = aws_cloudwatch_event_rule.disable_cpu_alarm_prod[0].arn
 }
 
 # Eventbridge Rule to Enable CPU Alarms each Monday at 08:00
 # Set time to 08:00 during UTC and 07:00 during BST
 
-resource "aws_cloudwatch_event_rule" "enable_cpu_alarm" {
+resource "aws_cloudwatch_event_rule" "enable_cpu_alarm_prod" {
   count               = local.is-production == true ? 1 : 0
-  name                = "enable_cpu_alarm"
+  name                = "enable_cpu_alarm_prod"
   description         = "Runs Weekly every Monday at 08:00 am"
   schedule_expression = "cron(0 7 ? * MON *)" # Time Zone is in UTC
 }
 
-resource "aws_cloudwatch_event_target" "trigger_lambda_enable_cpu_alarm" {
+resource "aws_cloudwatch_event_target" "trigger_lambda_enable_cpu_alarm_prod" {
   count     = local.is-production == true ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.enable_cpu_alarm[0].name
-  target_id = "enable_cpu_alarm"
-  arn       = aws_lambda_function.terraform_lambda_enable_cpu_alarm[0].arn
+  rule      = aws_cloudwatch_event_rule.enable_cpu_alarm_prod[0].name
+  target_id = "enable_cpu_alarm_prod"
+  arn       = aws_lambda_function.terraform_lambda_enable_cpu_alarm_prod[0].arn
 }
 
-resource "aws_lambda_permission" "allow_cloudwatch_to_enable_cpu_alarm" {
+resource "aws_lambda_permission" "allow_cloudwatch_to_enable_cpu_alarm_prod" {
   count         = local.is-production == true ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.terraform_lambda_enable_cpu_alarm[0].function_name
+  function_name = aws_lambda_function.terraform_lambda_enable_cpu_alarm_prod[0].function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.enable_cpu_alarm[0].arn
+  source_arn    = aws_cloudwatch_event_rule.enable_cpu_alarm_prod[0].arn
 }
 
 
