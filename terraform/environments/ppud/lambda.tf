@@ -15,7 +15,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev"
   count                          = local.is-development == true ? 1 : 0
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/terminate_cpu_process_dev.zip"
-  function_name                  = "terminate_cpu_process"
+  function_name                  = "terminate_cpu_process_dev"
   role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
   handler                        = "terminate_cpu_process_dev.lambda_handler"
   runtime                        = "python3.12"
@@ -38,6 +38,14 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
   function_name = aws_lambda_function.terraform_lambda_func_terminate_cpu_process_dev[0].function_name
   principal     = "cloudwatch.amazonaws.com"
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_terminate_cpu_process_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/terminate_cpu_process_dev"
+  retention_in_days = 30
 }
 
 ################################################
@@ -72,6 +80,14 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
   function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_dev[0].function_name
   principal     = "lambda.alarms.cloudwatch.amazonaws.com"
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_terminate_send_cpu_notificaion_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/send_cpu_notificaion_dev"
+  retention_in_days = 30
 }
 
 ################################################
@@ -114,6 +130,14 @@ resource "aws_lambda_permission" "allow_lambda_to_query_cloudwatch_send_cpu_grap
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
 }
 
+resource "aws_cloudwatch_log_group" "lambda_send_cpu_graph_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/send_cpu_graph_dev"
+  retention_in_days = 30
+}
+
 ###############################################
 # Lambda Function for Security Hub Report - DEV
 ###############################################
@@ -149,7 +173,7 @@ resource "aws_lambda_permission" "allow_lambda_to_query_securityhub_securityhub_
   source_arn    = "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
 }
 
-resource "aws_cloudwatch_log_group" "lambda_security_hub_report_dev_log_group" {
+resource "aws_cloudwatch_log_group" "lambda_securityhub_report_dev_log_group" {
   # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
   # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
   count             = local.is-development == true ? 1 : 0
@@ -195,6 +219,14 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_terminate_cpu_
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
 }
 
+resource "aws_cloudwatch_log_group" "lambda_terminate_cpu_process_uat_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/terminate_cpu_process_uat"
+  retention_in_days = 30
+}
+
 ################################################
 # Lambda Function to send CPU notification - UAT
 ################################################
@@ -227,6 +259,14 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_send_cpu_notif
   function_name = aws_lambda_function.terraform_lambda_func_send_cpu_notification_uat[0].function_name
   principal     = "lambda.alarms.cloudwatch.amazonaws.com"
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_send_cpu_notification_uat_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/send_cpu_notification_uat"
+  retention_in_days = 30
 }
 
 ###############################################
@@ -282,14 +322,14 @@ resource "aws_cloudwatch_log_group" "lambda_security_hub_report_uat_log_group" {
 
 # Permissions statement is in iam.tf
 
-resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm" {
+resource "aws_lambda_function" "terraform_lambda_disable_cpu_alarm_prod" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count                          = local.is-production == true ? 1 : 0
   s3_bucket                      = "moj-infrastructure"
-  s3_key                         = "lambda/functions/disable_cpu_alarm.zip"
-  function_name                  = "disable_cpu_alarm"
+  s3_key                         = "lambda/functions/disable_cpu_alarm_prod.zip"
+  function_name                  = "disable_cpu_alarm_prod"
   role                           = aws_iam_role.lambda_role_alarm_suppression[0].arn
-  handler                        = "disable_cpu_alarm.lambda_handler"
+  handler                        = "disable_cpu_alarm_prod.lambda_handler"
   runtime                        = "python3.12"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
   reserved_concurrent_executions = 5
@@ -306,10 +346,9 @@ resource "aws_cloudwatch_log_group" "lambda_disable_cpu_alarm_prod_log_group" {
   # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
   # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
   count             = local.is-production == true ? 1 : 0
-  name              = "/aws/lambda/disable_cpu_alarm"
+  name              = "/aws/lambda/disable_cpu_alarm_prod"
   retention_in_days = 30
 }
-
 
 ###############################################################
 # Lambda functions to enable CPU alarms over the weekend - PROD
@@ -317,14 +356,14 @@ resource "aws_cloudwatch_log_group" "lambda_disable_cpu_alarm_prod_log_group" {
 
 # Permissions statement is in iam.tf
 
-resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm" {
+resource "aws_lambda_function" "terraform_lambda_enable_cpu_alarm_prod" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   count                          = local.is-production == true ? 1 : 0
   s3_bucket                      = "moj-infrastructure"
-  s3_key                         = "lambda/functions/enable_cpu_alarm.zip"
-  function_name                  = "enable_cpu_alarm"
+  s3_key                         = "lambda/functions/enable_cpu_alarm_prod.zip"
+  function_name                  = "enable_cpu_alarm_prod"
   role                           = aws_iam_role.lambda_role_alarm_suppression[0].arn
-  handler                        = "enable_cpu_alarm.lambda_handler"
+  handler                        = "enable_cpu_alarm_prod.lambda_handler"
   runtime                        = "python3.12"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_alarm_suppression_to_lambda_role_alarm_suppression]
   reserved_concurrent_executions = 5
@@ -341,7 +380,7 @@ resource "aws_cloudwatch_log_group" "lambda_enable_cpu_alarm_prod_log_group" {
   # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
   # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
   count             = local.is-production == true ? 1 : 0
-  name              = "/aws/lambda/enable_cpu_alarm"
+  name              = "/aws/lambda/enable_cpu_alarm_prod"
   retention_in_days = 30
 }
 

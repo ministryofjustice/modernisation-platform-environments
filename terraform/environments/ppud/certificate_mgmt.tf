@@ -41,6 +41,14 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:alarm:*"
 }
 
+resource "aws_cloudwatch_log_group" "lambda_certificate_expiry_dev_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-development == true ? 1 : 0
+  name              = "/aws/lambda/certificate_expiry_dev"
+  retention_in_days = 30
+}
+
 # Eventbridge Rule for Certificate Expiration - DEV
 
 resource "aws_cloudwatch_event_rule" "certificate_approaching_expiration_dev" {
@@ -108,6 +116,14 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
   function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_uat[0].function_name
   principal     = "lambda.alarms.cloudwatch.amazonaws.com"
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:alarm:*"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_certificate_expiry_uat_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-preproduction == true ? 1 : 0
+  name              = "/aws/lambda/certificate_expiry_uat"
+  retention_in_days = 30
 }
 
 # Eventbridge Rule for Certificate Expiration - UAT
@@ -178,6 +194,14 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_call_lambda_certificates_e
   function_name = aws_lambda_function.terraform_lambda_func_certificate_expiry_prod[0].function_name
   principal     = "lambda.alarms.cloudwatch.amazonaws.com"
   source_arn    = "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
+}
+
+resource "aws_cloudwatch_log_group" "lambda_certificate_expiry_prod_log_group" {
+  # checkov:skip=CKV_AWS_338: "Log group is only required for 30 days."
+  # checkov:skip=CKV_AWS_158: "Log group does not require KMS encryption."
+  count             = local.is-production == true ? 1 : 0
+  name              = "/aws/lambda/certificate_expiry_prod"
+  retention_in_days = 30
 }
 
 # Eventbridge Rule for Certificate Expiration - PROD
