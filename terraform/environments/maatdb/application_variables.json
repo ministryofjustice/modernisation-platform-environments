@@ -137,7 +137,7 @@
       "build_ses": true,
       "pagerduty_integration_key_name": "laa_maat_prod_alarm",
       "hosted_zone": "legalservices.gov.uk",
-      "ses_domain": "legalservices.gov.uk"
+      "ses_domain": "maat.legalservices.gov.uk"
     }
   }
 }
