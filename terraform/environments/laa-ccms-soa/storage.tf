@@ -1,6 +1,6 @@
 resource "aws_efs_file_system" "storage" {
   encrypted        = true
-  performance_mode = "generalPurpose" # we may want to change to "maxIo"	
+  performance_mode = local.application_data.accounts[local.environment].efs_performance_mode # we may want to change to "maxIo"	
   # throughput_mode and provisioned_throughput_in_mibps we may want to set (default is bursting)	
   tags = merge(local.tags,
     { Name = lower(format("%s-%s-efs", local.application_name, local.environment)) }
