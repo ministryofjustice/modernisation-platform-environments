@@ -21,7 +21,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev"
   handler                        = "terminate_cpu_process_dev.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_policies_to_lambda_cloudwatch_invoke_lambda_2_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
