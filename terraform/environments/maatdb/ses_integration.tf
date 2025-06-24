@@ -60,8 +60,6 @@ resource "aws_secretsmanager_secret_version" "smtp_access_key_secret_version" {
 resource "aws_iam_user_policy" "smtp_user_policy" {
   #checkov:skip=CKV_AWS_40:Policy attached to User due to Modernisation Platform restrictions
   #checkov:skip=CKV_AWS_290:Policy does not deal with write access
-  #checkov:skip=CKV_AWS_111:Wildcard is required given use of email-based identities for testing.
-  #checkov:skip=CKV_AWS_356:Wildcard is required given use of email-based identities for testing.
   count  = local.build_ses ? 1 : 0
   name   = "${local.application_name}-SMTPUserPolicy"
   user   = aws_iam_user.smtp_user[0].name
@@ -69,6 +67,8 @@ resource "aws_iam_user_policy" "smtp_user_policy" {
 }
 
 data "aws_iam_policy_document" "smtp_user_policy" {
+  # checkov:skip=CKV_AWS_111: Wildcard is required given use of email-based identities for testing.
+  # checkov:skip=CKV_AWS_356: Wildcard is required given use of email-based identities for testing.
   statement {
     effect = "Allow"
     actions = ["ses:SendRawEmail"]
