@@ -7,7 +7,8 @@ data "aws_iam_policy_document" "cloud_formation_access" {
           "cloudformation:GetResource",
           "cloudformation:UpdateResource",
           "cloudformation:DeleteResource",
-          "cloudformation:ListResources"
+          "cloudformation:ListResources",
+          "cloudformation:GetResourceRequestStatus"
         ]
         resources = ["*"]
     }
