@@ -17,7 +17,7 @@ resource "aws_lambda_function" "terraform_lambda_func_terminate_cpu_process_dev"
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/terminate_cpu_process_dev.zip"
   function_name                  = "terminate_cpu_process_dev"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
+  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_2_dev[0].arn
   handler                        = "terminate_cpu_process_dev.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
@@ -58,7 +58,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev"
   count                          = local.is-development == true ? 1 : 0
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/send_cpu_notification_dev.zip"
-  function_name                  = "send_cpu_notification"
+  function_name                  = "send_cpu_notification_dev"
   role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
   handler                        = "send_cpu_notification_dev.lambda_handler"
   runtime                        = "python3.12"
@@ -100,7 +100,7 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_graph_dev" {
   count                          = local.is-development == true ? 1 : 0
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/send_cpu_graph_dev.zip"
-  function_name                  = "send_cpu_graph"
+  function_name                  = "send_cpu_graph_dev"
   role                           = aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].arn
   handler                        = "send_cpu_graph_dev.lambda_handler"
   runtime                        = "python3.12"
