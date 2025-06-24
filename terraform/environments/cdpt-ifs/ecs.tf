@@ -445,15 +445,15 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
   }
 
   instance_refresh {
-  strategy = "Rolling"
-
-  preferences {
-    min_healthy_percentage = 50
-    instance_warmup        = 60
+    strategy = "Rolling"
+    
+    preferences {
+      min_healthy_percentage = 50
+      instance_warmup        = 60
   }
 
-  triggers = ["launch_template"]
-}
+    triggers = ["launch_template"]
+  }
 
   tag {
     key                 = "Name"
