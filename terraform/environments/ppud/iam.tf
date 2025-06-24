@@ -1,7 +1,186 @@
-
 ####################################################
 # IAM Policy, Role, Profile for SSM, S3 & Cloudwatch
 ####################################################
+
+#########################
+# Development Environment
+#########################
+
+resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_2_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Invoke_Lambda_2_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "iam_policy_sns_publish_to_sqs_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_sns_publish_to_sqs_${local.environment}"
+  path        = "/"
+  description = "Allows SNS to publish messages to SQS queues in ppud-development account"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sns:Publish"
+        ],  
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_send_logs_cloudwatch_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_send_logs_cloudwatch_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to send logs to cloudwatch in ppud development account"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource" : [
+          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_get_ssm_parameter_klayers_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_get_ssm_parameters_klayers_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to get ssm parameters (account ID) for the klayers account"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:parameter/klayers-account"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_invoke_ssm_powershell_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_invoke_ssm_powershell_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to invoke ssm to allow it to execute powershell commands"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
+        ],
+        "Resource" : [
+          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
+          "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_describe_ec2_instances_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_describe_ec22_instances_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to describe ec2 instances"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ec2:DescribeInstances"
+        ],
+        "Resource" : [
+          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_invoke_sqs_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_invoke_sqs_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to invoke sqs commands"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:ChangeMessageVisibility",
+          "sqs:DeleteMessage",
+          "sqs:GetQueueAttributes",
+          "sqs:GetQueueUrl",
+          "sqs:ListQueueTags",
+          "sqs:ReceiveMessage",
+          "sqs:SendMessage"
+        ],
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      }
+    ]
+  })
+}
+
+locals {
+  lambda_cloudwatch_invoke_lambda_policies = {
+    cloudwatch_invoke_lambda = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_dev[0].arn
+    sns_publish_to_sqs       = aws_iam_policy.iam_policy_sns_publish_to_sqs_dev[0].arn
+    send_logs_to_cloudwatch  = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    invoke_ssm_powershell    = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
+    describe_ec2_instances   = aws_iam_policy.iam_policy_lambda_describe_ec2_instances_dev[0].arn
+    invoke_sqs               = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "attach_policies_to_lambda_cloudwatch_invoke_lambda_dev" {
+  for_each   = local.is-development ? local.lambda_cloudwatch_invoke_lambda_policies : {}
+  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_2_dev[0].name
+  policy_arn = each.value
+}
+
+
+
 
 # IAM EC2 Policy with Assume Role 
 
@@ -354,7 +533,6 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
     }]
   })
 }
-
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev" {
   count      = local.is-development == true ? 1 : 0
@@ -908,189 +1086,6 @@ data "aws_iam_policy_document" "email" {
     ]
     resources = ["*"]
   }
-}
-
-############################################################
-# IAM Role & Policy for Lambda Signing Configuration - PROD
-############################################################
-
-resource "aws_iam_role" "aws_signer_role_prod" {
-  count = local.is-production == true ? 1 : 0
-  name  = "Signer-Role-For-Lambda-Production"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Principal = {
-        Service = "signer.amazonaws.com"
-      },
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_policy" "aws_signer_policy_prod" {
-  count = local.is-production == true ? 1 : 0
-  name  = "Signer-Policy-For-Lambda-Production"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "lambda:UpdateFunctionCodeSigningConfig",
-          "lambda:GetFunctionCodeSigningConfig",
-          "lambda:PutFunctionCodeSigningConfig",
-          "lambda:InvokeFunction"
-        ],
-        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:function:*" # Grant access to all Lambda functions in the account
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "signer:StartSigningJob",
-          "signer:DescribeSigningJob",
-          "signer:PutSigningProfile",
-          "signer:GetSigningProfile",
-          "signer:ListSigningJobs"
-        ],
-        Resource = [
-          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002",
-          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:/signing-profiles/0r1ihd4swpgdxsjmfe1ibqhvdpm3zg05le4uni20241008100713396700000002/HzoPedNoUr"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_prod" {
-  count      = local.is-production == true ? 1 : 0
-  role       = aws_iam_role.aws_signer_role_prod[0].name
-  policy_arn = aws_iam_policy.aws_signer_policy_prod[0].arn
-}
-
-############################################################
-# IAM Role & Policy for Lambda Signing Configuration - UAT
-############################################################
-
-resource "aws_iam_role" "aws_signer_role_uat" {
-  count = local.is-preproduction == true ? 1 : 0
-  name  = "Signer-Role-For-Lambda-UAT"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Principal = {
-        Service = "signer.amazonaws.com"
-      },
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_policy" "aws_signer_policy_uat" {
-  count = local.is-preproduction == true ? 1 : 0
-  name  = "Signer-Policy-For-Lambda-UAT"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "lambda:UpdateFunctionCodeSigningConfig",
-          "lambda:GetFunctionCodeSigningConfig",
-          "lambda:PutFunctionCodeSigningConfig",
-          "lambda:InvokeFunction"
-        ],
-        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:function:*" # Grant access to all Lambda functions in the account
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "signer:StartSigningJob",
-          "signer:DescribeSigningJob",
-          "signer:PutSigningProfile",
-          "signer:GetSigningProfile",
-          "signer:ListSigningJobs"
-        ],
-        Resource = [
-          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002",
-          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:/signing-profiles/ucjvuurx21fa91xmhktdde5ognhxig1vahls8z20241008084937718900000002/ZYACVFPo1R"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_uat" {
-  count      = local.is-preproduction == true ? 1 : 0
-  role       = aws_iam_role.aws_signer_role_uat[0].name
-  policy_arn = aws_iam_policy.aws_signer_policy_uat[0].arn
-}
-
-############################################################
-# IAM Role & Policy for Lambda Signing Configuration - DEV
-############################################################
-
-resource "aws_iam_role" "aws_signer_role_dev" {
-  count = local.is-development == true ? 1 : 0
-  name  = "Signer-Role-For-Lambda-Dev"
-
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Principal = {
-        Service = "signer.amazonaws.com"
-      },
-      Action = "sts:AssumeRole"
-    }]
-  })
-}
-
-resource "aws_iam_policy" "aws_signer_policy_dev" {
-  count = local.is-development == true ? 1 : 0
-  name  = "Signer-Policy-For-Lambda-Development"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Effect = "Allow",
-        Action = [
-          "lambda:UpdateFunctionCodeSigningConfig",
-          "lambda:GetFunctionCodeSigningConfig",
-          "lambda:PutFunctionCodeSigningConfig",
-          "lambda:InvokeFunction"
-        ],
-        Resource = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:function:*" # Grant access to all Lambda functions in the account
-      },
-      {
-        Effect = "Allow",
-        Action = [
-          "signer:StartSigningJob",
-          "signer:DescribeSigningJob",
-          "signer:PutSigningProfile",
-          "signer:GetSigningProfile",
-          "signer:ListSigningJobs"
-        ],
-        Resource = [
-          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002",
-          "arn:aws:signer:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:/signing-profiles/grw77tzk96phtwcrceot5xlbt9veqixuyck04420241008100655411100000002/AHvOa02ifI"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "attach_aws_signer_policy_to_aws_signer_role_dev" {
-  count      = local.is-development == true ? 1 : 0
-  role       = aws_iam_role.aws_signer_role_dev[0].name
-  policy_arn = aws_iam_policy.aws_signer_policy_dev[0].arn
 }
 
 #############################################
