@@ -178,7 +178,7 @@
       "managed_server_port": "8001",
       "managed_app_count": "1",
       "managed_container_version": "0.0.1",
-      "managed_wl_mem_args": " -Xms4096m -Xmx6144m -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:G1ReservePercent=15 -XX:InitiatingHeapOccupancyPercent=45 -XX:+ParallelRefProcEnabled -XX:+AlwaysPreTouch -XX:+DisableExplicitGC  -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCCause -XX:+PrintAdaptiveSizePolicy -XX:+PrintTenuringDistribution -verbose:gc",
+      "managed_wl_mem_args": " -Xms4096m -Xmx6144m",
       "managed_hostname": "ccms-soa-managed",
       "soa_db_user": "soapdb",
       "soa_db_role": "system",
