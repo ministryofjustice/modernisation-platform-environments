@@ -2,11 +2,16 @@
 # Lambda Functions and Eventbridge Rules for Certificate Approaching Expiration
 ###############################################################################
 
+#########################
+# Development Environment
+#########################
+
 # Lambda Function to check for Certificate Expiration - DEV
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-development == true ? 1 : 0
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/certificate_expiry_dev.zip"
@@ -16,7 +21,6 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_dev" {
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:code-signing-config:csc-0c7136ccff2de748f"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_dev]
   environment {
     variables = {
@@ -79,11 +83,16 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_certificate_approaching_ex
   source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration_dev[0].arn
 }
 
+###########################
+# Preproduction Environment
+###########################
+
 # Lambda Function to check for Certificate Expiration - UAT
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-preproduction == true ? 1 : 0
   s3_bucket                      = "moj-infrastructure-uat"
   s3_key                         = "lambda/functions/certificate_expiry_uat.zip"
@@ -93,7 +102,6 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:code-signing-config:csc-0db408c5170a8eba6"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
   environment {
     variables = {
@@ -156,12 +164,16 @@ resource "aws_lambda_permission" "allow_cloudwatch_to_certificate_approaching_ex
   source_arn    = aws_cloudwatch_event_rule.certificate_approaching_expiration_uat[0].arn
 }
 
+########################
+# Production Environment
+########################
 
 # Lambda Function to check for Certificate Expiration - PROD
 
 resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   # checkov:skip=CKV_AWS_117: "PPUD Lambda functions do not require VPC access and can run in no-VPC mode"
   # checkov:skip=CKV_AWS_173: "PPUD Lambda environmental variables do not contain sensitive information"
+  # checkov:skip=CKV_AWS_272: "PPUD Lambda code signing not required"
   count                          = local.is-production == true ? 1 : 0
   s3_bucket                      = "moj-infrastructure"
   s3_key                         = "lambda/functions/certificate_expiry_prod.zip"
@@ -171,7 +183,6 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_prod" {
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  code_signing_config_arn        = "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:code-signing-config:csc-0bafee04a642a41c1"
   depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_prod]
   environment {
     variables = {
