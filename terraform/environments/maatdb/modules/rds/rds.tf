@@ -3,8 +3,11 @@
 #TODO 1) Get ARN for the Shared Key and apply for snapshots & PI.
 #TODO 2) Snapshot ARN in the vars
 
-# RDS Subnet Group
 
+# tflint-ignore: terraform_required_version
+terraform {}
+
+# RDS Subnet Group
 
 resource "aws_db_subnet_group" "subnet_group" {
   name       = "subnet-group"
@@ -86,6 +89,7 @@ resource "aws_db_option_group" "appdboptiongroup19" {
 
 # Random Secret for the DB Password.
 
+# tflint-ignore: terraform_required_providers
 resource "random_password" "rds_password" {
   length  = 12
   special = false
@@ -129,7 +133,8 @@ locals {
     aws_security_group.cloud_platform_sec_group.id,
     aws_security_group.bastion_sec_group.id,
     aws_security_group.vpc_sec_group.id,
-    aws_security_group.mlra_ecs_sec_group.id
+    aws_security_group.mlra_ecs_sec_group.id,
+    aws_security_group.ses_sec_group.id
   ])
 }
 
@@ -193,6 +198,7 @@ resource "aws_db_instance" "appdb1" {
 
 # Access from Cloud Platform
 resource "aws_security_group" "cloud_platform_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "cloud-platform-sec-group"
   description = "RDS access from Cloud Platform via Transit gateway"
   vpc_id      = var.vpc_shared_id
@@ -219,6 +225,7 @@ resource "aws_security_group" "cloud_platform_sec_group" {
 }
 
 resource "aws_security_group" "vpc_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "ecs-sec-group"
   description = "RDS Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
@@ -245,6 +252,7 @@ resource "aws_security_group" "vpc_sec_group" {
 }
 
 resource "aws_security_group" "mlra_ecs_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "mlra-ecs-sec-group"
   description = "RDS Access from the MLRA application"
   vpc_id      = var.vpc_shared_id
@@ -272,7 +280,10 @@ resource "aws_security_group" "mlra_ecs_sec_group" {
 
 
 # Access from Bastion
+
+# tflint-ignore: terraform_required_providers
 resource "aws_security_group" "bastion_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
   name        = "bastion-sec-group"
   description = "Bastion Access with the shared vpc"
   vpc_id      = var.vpc_shared_id
@@ -295,6 +306,30 @@ resource "aws_security_group" "bastion_sec_group" {
 
   tags = {
     Name = "${var.application_name}-${var.environment}-bastion-sec-group"
+  }
+}
+
+# Outbound to Port 587 for SES SMTP Endpoint Access
+
+# tflint-ignore: terraform_required_providers
+resource "aws_security_group" "ses_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
+  name        = "ses-sec-group"
+  description = "SES Outbound Access"
+  vpc_id      = var.vpc_shared_id
+
+
+  egress {
+    description     = "SMTP Outbound to 587"
+    from_port       = 587
+    to_port         = 587
+    protocol        = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-ses-sec-group"
   }
 }
 
