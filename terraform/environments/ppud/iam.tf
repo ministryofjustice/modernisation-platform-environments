@@ -164,22 +164,20 @@ resource "aws_iam_policy" "iam_policy_lambda_invoke_sqs_dev" {
 
 locals {
   lambda_cloudwatch_invoke_lambda_policies = {
-    cloudwatch_invoke_lambda = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_dev.arn
-    sns_publish_to_sqs       = aws_iam_policy.iam_policy_sns_publish_to_sqs_dev.arn
-    send_logs_to_cloudwatch  = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev.arn
-    invoke_ssm_powershell    = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev.arn
-    describe_ec2_instances   = aws_iam_policy.iam_policy_lambda_describe_ec2_instances_dev.arn
-    invoke_sqs               = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev.arn
+    "cloudwatch_invoke_lambda" = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_dev[0].arn
+    "sns_publish_to_sqs"       = aws_iam_policy.iam_policy_sns_publish_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"  = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "invoke_ssm_powershell"    = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
+    "describe_ec2_instances"   = aws_iam_policy.iam_policy_lambda_describe_ec2_instances_dev[0].arn
+    "invoke_sqs"               = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
   }
 }
 
-resource "aws_iam_role_policy_attachment" "attach_policies_to_lambda_cloudwatch_invoke_lambda_2_dev" {
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies" {
   for_each   = local.is-development ? local.lambda_cloudwatch_invoke_lambda_policies : {}
-  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_2_dev[0].name
+  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].name
   policy_arn = each.value
 }
-
-
 
 
 # IAM EC2 Policy with Assume Role 
