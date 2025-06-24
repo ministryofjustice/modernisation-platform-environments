@@ -676,5 +676,7 @@ locals {
       "/oracle/database/DRCNMAUD" = local.secretsmanager_secrets.db
       "/oracle/database/DRMIS"    = local.secretsmanager_secrets.db_mis
     }
+
+    security_groups = local.security_groups_old
   }
 }
