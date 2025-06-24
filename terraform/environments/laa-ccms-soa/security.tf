@@ -305,15 +305,16 @@ resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress" {
   cidr_ipv4         = local.application_data.accounts[local.environment].aws_workspace_cidr
 }
 
-resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress_prod" {
-  count             = local.is-production ? 1 : 0
-  security_group_id = aws_security_group.tds_db.id
-  description       = "Workspace to Database Ingress"
-  ip_protocol       = "TCP"
-  from_port         = 1521
-  to_port           = 1521
-  cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr_prod
-}
+## Dont need this block we can use the same variable key name with a production workspace cidr as done above
+# resource "aws_vpc_security_group_ingress_rule" "tds_db_workspace_ingress_prod" {
+#   count             = local.is-production ? 1 : 0
+#   security_group_id = aws_security_group.tds_db.id
+#   description       = "Workspace to Database Ingress"
+#   ip_protocol       = "TCP"
+#   from_port         = 1521
+#   to_port           = 1521
+#   cidr_ipv4         = local.application_data.accounts[local.environment].workspace_cidr_prod
+# }
 
 resource "aws_security_group_rule" "tds_db_egress_all" {
   security_group_id = aws_security_group.tds_db.id
