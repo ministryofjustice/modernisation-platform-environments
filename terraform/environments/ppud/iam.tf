@@ -308,8 +308,7 @@ resource "aws_iam_policy" "iam_policy_lambda_get_cloudwatch_metrics_dev" {
       {
 	      "Effect" : "Allow",
         "Action" : [
-          "cloudwatch:*",
-          "cloudwatch:GetMetricData"
+          "cloudwatch:*"
         ],
         "Resource" : [
           "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
@@ -416,6 +415,13 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_cloudwatch
   for_each   = local.is-development ? local.lambda_get_cloudwatch_policies : {}
   role       = aws_iam_role.lambda_role_get_cloudwatch_dev[0].name
   policy_arn = each.value
+}
+
+resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_dev" {
+  count      = local.is-development == true ? 1 : 0
+  name       = "lambda-cloudwatch-full-access-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_get_cloudwatch_dev[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
 }
 
 # IAM EC2 Policy with Assume Role 
