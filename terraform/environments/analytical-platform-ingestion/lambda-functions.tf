@@ -158,7 +158,6 @@ module "transfer_lambda" {
     SNS_TOPIC_ARN         = module.transferred_topic.topic_arn
   }
 
-  # TODO: Check if KMS key is actually needed below
   attach_policy_statements = true
   policy_statements = {
     kms_access = {
@@ -175,7 +174,8 @@ module "transfer_lambda" {
         module.s3_processed_kms.key_arn,
         module.supplier_data_kms.key_arn,
         module.transferred_sns_kms.key_arn,
-        module.quarantined_sns_kms.key_arn
+        module.quarantined_sns_kms.key_arn,
+        "arn:aws:kms:eu-west-2:593291632749:key/62503ba6-316e-473d-ae4b-042f8420dd07" # s3/mojap-data-production-shared-services-client-team-gov-29148
       ]
     },
     secretsmanager_access = {

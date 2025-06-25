@@ -77,7 +77,10 @@ locals {
       notify_image_version   = "0.0.22"
 
       /* Target Buckets */
-      target_buckets              = ["mojap-land"]
+      target_buckets = [
+        "mojap-land",
+        "mojap-data-production-shared-services-client-team-gov-29148"
+      ]
       datasync_target_buckets     = ["mojap-land"]
       datasync_opg_target_buckets = ["mojap-data-production-datasync-opg-ingress-production"]
 
@@ -103,6 +106,10 @@ locals {
         "glenn-barber" = {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCm18Znrr+VfF3K/6frPwEPY7HCBHbUprYpgyCMIykwmn6SL9SEGUehpghd/xjNiFBz27VMTWraZYZ4RFtHQGOPaOzdMIDO+Z9RGX2rt/sjJemA01MOxfW0m9UfZ4wgoh92eYrq7ZnRWbadP2H6W1aUcGBqjh0JJ5VxtSp3wePL4HY90FLI8hMs3xwXpAqCo3ZjYzZCTOpzghwataMEmw5c//vNzGDUa+JGu1U2iGyCJCVaENcKhsKAyK2UbYAkSYBeRjQ7tdkL21Mq4KqHKBVIVlXF6l4fgIFaU11eJthkno5XAGTC3+H0MR8yjGcmufv6Ln2aeZ6zz9e/69wtrrS1qjbgYuPMtTQb7o6FbBwkr0mmfB78xNFNNv5GRzVkwSTiRWF2wjikMaadEJsSH+tKpdmYGgM5THLAyOhuy8Zg0MTsmN2TT3a4i//+T0h8v7mb5w4A87uBDenxIGNSNFKVzUkLL2uSxmn7s0UnuTuDoIthZBUVGYKaEuP2VVWDYWU= glenn.barber@L0429"
           cidr_blocks = ["35.176.93.186/32"]
+        }
+        "cgi-ssct-sop" = {
+          ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCjIt9llDtg10ftA9enAnKrG7IkQ3OGNGvSA+2rfCzS7fMOo16BBhQWX3bFZLhy1WKMkACMyIs69+KtN/xAybgIvvInu/6FPJfhoKjVHBF8yAbeOOJXTlDjIEeVUyl5xsJufcPoHYs/Z/qZTOPIegyNdap0aomftQaolwuRdcDFzpJWm8DxMk+ZIAPQfSgRZ3apxKzI8Jr6b5sAtFWj0GMWRBja0H+So3YMCRe6Vvqcx9lEQJs12urRTyMrrknFFIve9jarYoPCqx5X+9210RVhxVfJdD0klQ/3KkjVJ1Kx1fFmQj13DTJROBuxK1ChnoFZL+7DaYSgwmbdQx64XcWmTeRW79wffaUsUONIAEufZxwuxJSLvNloKVMcRkCUeN7giiR6+IhuQch2kyzjxdS2JZ8szUM+hu8QHwYxvK14zXxPPb5o2q/v0yItwWTwgqJS4NH8GkwDT1oIZt/UqNVJRJYFiOj1wIOhMJ8UmlL6FwaD3JnPbBzJLYJb07DC6jsrl1ZCTQaASgp90KrVGiZtTmpbZsDw0I+TSXk2+5AIfIpoXqKyqk+ksWjlado+QJNubUkalKp1h2HiZJMNWmzPIewByFACq1vKNPVjMPsr7HYsgM/7dYggVrqDoppMPQ/Nm7KEx6rYWvn1zjeykZATSHl1vYs0w43CrMHTuKoKtQ=="
+          cidr_blocks = ["20.50.108.242/32", "20.50.109.148/32", "51.11.124.205/32", "51.11.124.216/32"]
         }
       }
       transfer_server_sftp_users_with_egress = {
