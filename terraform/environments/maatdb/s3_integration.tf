@@ -62,41 +62,102 @@ module "s3_bucket" {
 
 # Bucket policy
 
-resource "aws_s3_bucket_policy" "ftp_user_access" {
-  count  = local.build_s3 ? 1 : 0
-  bucket = module.s3_bucket[count.index].bucket.bucket
-  policy = data.aws_iam_policy_document.bucket_policy[count.index].json
+resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
+  for_each = local.build_s3 ? module.s3_bucket : {}
+  bucket = each.value.bucket.bucket
+  policy = data.aws_iam_policy_document.bucket_policy[each.key].json
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
+  for_each = local.build_s3 ? module.s3_bucket : {}
 
   statement {
-    sid    = "AllowFTPUserAccess"
+    sid    = "AllowLambdaBucketAccess"
     effect = "Allow"
 
     principals {
       type        = "AWS"
-      identifiers = length(aws_iam_user.ftp_user) > 0 ? [aws_iam_user.ftp_user[0].arn] : []
+      identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
     }
 
     actions = [
-      "s3:DeleteObject",
-      "s3:DeleteObjectVersion",
       "s3:GetObject",
-      "s3:GetObjectVersion",
-      "s3:GetBucketPolicy",
-      "s3:ListBucket",
-      "s3:PutObject"
+      "s3:DeleteObject"
     ]
 
-    resources = flatten([
-      for bucket in values(module.s3_bucket) : [
-        bucket.bucket.arn,
-        "${bucket.bucket.arn}/*"
+    resources = [
+      "${each.value.bucket.arn}/*"
+    ]
+  }
+
+  statement {
+    sid    = "AllowLambdaListBucket"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
+    }
+
+    actions = [
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      each.value.bucket.arn
+    ]
+  }
+
+  dynamic "statement" {
+    for_each = length(aws_iam_user.ftp_user) > 0 ? [1] : []
+
+    content {
+      sid    = "AllowFTPUserObjectAccess"
+      effect = "Allow"
+
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_user.ftp_user[0].arn]
+      }
+
+      actions = [
+        "s3:GetObject",
+        "s3:PutObject",
+        "s3:DeleteObject",
+        "s3:GetObjectVersion",
+        "s3:DeleteObjectVersion"
       ]
-    ])
+
+      resources = [
+        "${each.value.bucket.arn}/*"
+      ]
+    }
+  }
+
+  dynamic "statement" {
+    for_each = length(aws_iam_user.ftp_user) > 0 ? [1] : []
+
+    content {
+      sid    = "AllowFTPUserBucketAccess"
+      effect = "Allow"
+
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_user.ftp_user[0].arn]
+      }
+
+      actions = [
+        "s3:GetBucketPolicy",
+        "s3:ListBucket"
+      ]
+
+      resources = [
+        each.value.bucket.arn
+      ]
+    }
   }
 }
+
 
 # FTP IAM User
 
@@ -110,6 +171,35 @@ resource "aws_iam_user" "ftp_user" {
       Name = "${local.application_name}-ftp-user"
     }
   )
+}
+
+resource "aws_iam_access_key" "ftp_user_key" {
+  count = local.build_s3 ? 1 : 0
+  user  = aws_iam_user.ftp_user[0].name
+}
+
+# Secrets Manager to capture the access key
+
+resource "aws_secretsmanager_secret" "ftp_access_key_secret" {
+  #checkov:skip=CKV_AWS_149:"Secret to be manually rotated"
+  #checkov:skip=CKV2_AWS_57:"Secret to be manually rotated"
+  count = local.build_s3 ? 1 : 0
+  name  = "ses-ftp-user-access-key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ses-ftp-user-access-key"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "ftp_access_key_secret_version" {
+  count = local.build_s3 ? 1 : 0
+  secret_id  = aws_secretsmanager_secret.ftp_access_key_secret[0].id
+  secret_string = jsonencode({
+    IAM_ACCESS_KEY_ID     = aws_iam_access_key.ftp_user_key[0].id
+    IAM_SECRET_ACCESS_KEY = aws_iam_access_key.ftp_user_key[0].secret
+  })
 }
 
 # IAM Policy for FTP User (access to all buckets)
