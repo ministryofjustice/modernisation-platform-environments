@@ -828,3 +828,39 @@ resource "aws_cloudwatch_log_group" "app" {
     },
   )
 }
+
+#------------------------------------------------------------------------------
+# Shield Advance logging
+#------------------------------------------------------------------------------
+import {
+  id = "8b056d45-12c3-4e07-9ffb-bbabf2153940/FMManagedWebACLV2-shield_advanced_auto_remediate-1649415410948/REGIONAL"
+  to = module.shield.aws_wafv2_web_acl.main
+}
+
+module "shield" {
+  source = "../../modules/shield_advanced"
+  providers = {
+    aws.modernisation-platform = aws.modernisation-platform
+  }
+  application_name        = local.application_name
+  enable_logging          = true
+  excluded_protections    = local.application_data.accounts[local.environment].excluded_protections
+  resources = {
+    public_lb = {
+      action = "count"
+      arn    = aws_lb.external.arn
+    }
+    inner_lb = {
+      action = "count"
+      arn    = aws_lb.inner.arn
+    }
+  }
+  waf_acl_rules = {
+    example = {
+      "action"    = "count"
+      "name"      = "example-count-rule"
+      "priority"  = 0
+      "threshold" = "1000"
+    }
+  }
+}

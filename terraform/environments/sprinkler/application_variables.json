@@ -6,7 +6,8 @@
       "ecs_type": "FARGATE",
       "rds_storage": 5,
       "rds_postgresql_version": "12.15",
-      "rds_instance_class": "db.t3.micro"
+      "rds_instance_class": "db.t3.micro",
+      "excluded_protections": []
     },
     "production": {
       "key_name": "sprinkler-ec2",
