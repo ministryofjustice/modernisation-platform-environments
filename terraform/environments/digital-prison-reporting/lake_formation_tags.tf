@@ -41,19 +41,6 @@ resource "aws_lakeformation_permissions" "grant_tag_access_de_role" {
 # External Account Permissions
 ###########################
 
-resource "aws_lakeformation_permissions" "grant_tag_policy_table_external_account" {
-  principal   = "593291632749"
-  permissions = ["DESCRIBE", "ASSOCIATE"]
-
-  lf_tag_policy {
-    resource_type = "TABLE"
-    expression {
-      key    = aws_lakeformation_lf_tag.domain_tag.key
-      values = ["prisons"]
-    }
-  }
-}
-
 resource "aws_lakeformation_permissions" "grant_tag_access_external_account" {
   principal   = "593291632749"
   permissions = ["DESCRIBE", "ASSOCIATE"]
