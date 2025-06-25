@@ -20,10 +20,6 @@ resource "aws_vpc_security_group_egress_rule" "dfi_all_outbound" {
   ip_protocol       = "-1"
 }
 
-data "aws_security_group" "dsd_db" {
-  name = "delius-mis-${var.env_name}-dsd-db-ec2-instance-sg"
-}
-
 module "dfi_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
 
