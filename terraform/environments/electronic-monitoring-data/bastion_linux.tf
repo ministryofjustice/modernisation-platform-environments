@@ -162,7 +162,7 @@ data "aws_iam_policy_document" "zip_s3_policy" {
 
 # tfsec:ignore:aws-s3-enable-bucket-encryption tfsec:ignore:aws-s3-encryption-customer-key tfsec:ignore:aws-s3-enable-bucket-logging tfsec:ignore:aws-s3-enable-versioning
 module "zip_bastion" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=95ed3c3"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-bastion-linux?ref=e4a3840"
 
   providers = {
     aws.share-host   = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
@@ -172,6 +172,7 @@ module "zip_bastion" {
   # s3 - used for logs and user ssh public keys
   bucket_name   = "zip-bastion"
   instance_name = "zip_bastion_linux"
+  instance_type = "m5.large"
   # public keys
   public_key_data = local.public_key_data.keys[local.environment]
 
