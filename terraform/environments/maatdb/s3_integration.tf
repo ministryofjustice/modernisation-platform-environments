@@ -63,12 +63,13 @@ module "s3_bucket" {
 # Bucket policy
 
 resource "aws_s3_bucket_policy" "ftp_user_access" {
-  count  = local.build_s3 ? 1 : 0
-  bucket = module.s3_bucket[count.index].bucket.bucket
-  policy = data.aws_iam_policy_document.bucket_policy[count.index].json
+  for_each = local.build_s3 ? module.s3_bucket : {}
+  bucket = each.value.bucket.bucket
+  policy = data.aws_iam_policy_document.bucket_policy[each.key].json
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
+  for_each = local.build_s3 ? module.s3_bucket : {}
 
   statement {
     sid    = "AllowFTPUserAccess"
@@ -89,12 +90,10 @@ data "aws_iam_policy_document" "bucket_policy" {
       "s3:PutObject"
     ]
 
-    resources = flatten([
-      for bucket in values(module.s3_bucket) : [
-        bucket.bucket.arn,
-        "${bucket.bucket.arn}/*"
-      ]
-    ])
+    resources = [
+      each.value.bucket.arn,
+      "${each.value.bucket.arn}/*"
+    ]
   }
 }
 
@@ -110,6 +109,35 @@ resource "aws_iam_user" "ftp_user" {
       Name = "${local.application_name}-ftp-user"
     }
   )
+}
+
+resource "aws_iam_access_key" "ftp_user_key" {
+  count = local.build_s3 ? 1 : 0
+  user  = aws_iam_user.ftp_user[0].name
+}
+
+# Secrets Manager to capture the access key
+
+resource "aws_secretsmanager_secret" "ftp_access_key_secret" {
+  #checkov:skip=CKV_AWS_149:"Secret to be manually rotated"
+  #checkov:skip=CKV2_AWS_57:"Secret to be manually rotated"
+  count = local.build_s3 ? 1 : 0
+  name  = "ses-ftp-user-access-key"
+  tags = merge(
+    local.tags,
+    {
+      Name = "ses-ftp-user-access-key"
+    }
+  )
+}
+
+resource "aws_secretsmanager_secret_version" "ftp_access_key_secret_version" {
+  count = local.build_s3 ? 1 : 0
+  secret_id  = aws_secretsmanager_secret.ftp_access_key_secret[0].id
+  secret_string = jsonencode({
+    IAM_ACCESS_KEY_ID     = aws_iam_access_key.ftp_user_key[0].id
+    IAM_SECRET_ACCESS_KEY = aws_iam_access_key.ftp_user_key[0].secret
+  })
 }
 
 # IAM Policy for FTP User (access to all buckets)

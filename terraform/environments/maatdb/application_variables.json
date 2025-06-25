@@ -27,12 +27,15 @@
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "sg-050fb73f9c212d1bb",
       "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907",
-      "build_s3": false,
-      "build_ftp": false,
+      "build_s3": true,
+      "build_ftp": true,
       "build_ses": true,
       "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
       "hosted_zone": "modernisation-platform.service.justice.gov.uk",
-      "ses_domain": "maatdb.dev.modernisation-platform.service.justice.gov.uk"
+      "ses_domain": "maatdb.dev.modernisation-platform.service.justice.gov.uk",
+      "ftp_layer_bucket": "modernisation-platform-laa-shared20250605080758955300000001",
+      "ftp_layer_folder_location": "laa-ftp/",
+      "ftp_source_version_id": "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj"
     },
 
     "test": {
