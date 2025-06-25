@@ -228,7 +228,7 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
   }
 
   dynamic "placement_constraints" {
-    for_each = lower(local.environment_name) == "development" ? [] : [1]
+    for_each = lower(local.application_data.accounts[local.environment].environment_name) == "development" ? [] : [1]
 
     content {
       type = "distinctInstance"
