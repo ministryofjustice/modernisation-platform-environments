@@ -26,6 +26,26 @@ resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_2_dev" {
 EOF
 }
 
+resource "aws_iam_role" "lambda_role_invoke_ssm_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Invoke_SSM_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
 resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_dev" {
   count       = local.is-development == true ? 1 : 0
   name        = "aws_iam_policy_send_message_to_sqs_${local.environment}"
