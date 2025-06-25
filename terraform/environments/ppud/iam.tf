@@ -399,7 +399,7 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_dev" {
         "securityhub:*"
       ],
       "Resource" : [
-        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
       ]
       }
     ]
