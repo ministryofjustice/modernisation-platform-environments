@@ -156,7 +156,7 @@ locals {
   }
 
   dis_config_dev = {
-    instance_count = 2
+    instance_count = 0
     ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 100 }
