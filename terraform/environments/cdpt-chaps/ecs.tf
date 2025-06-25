@@ -227,9 +227,13 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
     weight            = 1
   }
 
-  placement_constraints = local.environment == "dev" ? [] : [{
-    type = "distinctInstance"
-  }]
+  dynamic "placement_constraints" {
+    for_each = lower(local.environment_name) == "development" ? [] : [1]
+
+    content {
+      type = "distinctInstance"
+    }
+  } 
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
