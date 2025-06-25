@@ -1345,7 +1345,6 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
     ]
   })
 }
-*/
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev" {
   count      = local.is-development == true ? 1 : 0
@@ -1373,6 +1372,7 @@ resource "aws_iam_policy_attachment" "attach_lambda_ec2_read_only_access_dev" {
   roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
 }
+*/
 
 #resource "aws_iam_policy_attachment" "attach_ses_full_access" {
 #  count      = local.is-development == true ? 1 : 0
