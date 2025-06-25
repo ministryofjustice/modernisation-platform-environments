@@ -59,11 +59,11 @@ resource "aws_lambda_function" "terraform_lambda_func_send_cpu_notification_dev"
   s3_bucket                      = "moj-infrastructure-dev"
   s3_key                         = "lambda/functions/send_cpu_notification_dev.zip"
   function_name                  = "send_cpu_notification_dev"
-  role                           = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].arn
+  role                           = aws_iam_role.lambda_role_invoke_ssm_dev[0].arn
   handler                        = "send_cpu_notification_dev.lambda_handler"
   runtime                        = "python3.12"
   timeout                        = 300
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_invoke_ssm_dev]
   reserved_concurrent_executions = 5
   dead_letter_config {
     target_arn = aws_sqs_queue.lambda_queue_dev[0].arn
