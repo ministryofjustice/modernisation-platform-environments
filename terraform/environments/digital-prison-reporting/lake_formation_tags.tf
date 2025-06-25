@@ -1,3 +1,9 @@
+locals {
+  glue_tables_to_describe = {
+    dev_model_1_notag = "dpr_ap_integration_test_tag2_dev_dbt"
+    dev_model_2_tag   = "dpr_ap_integration_test_tag2_dev_dbt"
+  }
+}
 # Assign LF tag to the database
 resource "aws_lakeformation_resource_lf_tag" "tag_database_with_domain" {
   database {
@@ -32,7 +38,7 @@ resource "aws_lakeformation_permissions" "grant_tag_access_external_account" {
 
 resource "aws_lakeformation_permissions" "grant_tag_policy_table_de_role" {
   principal   = "arn:aws:iam::593291632749:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
-  permissions = ["DESCRIBE", "ASSOCIATE"]
+  permissions = ["DESCRIBE"]
 
   lf_tag_policy {
     resource_type = "TABLE"
