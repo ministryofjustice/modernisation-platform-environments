@@ -26,7 +26,7 @@ resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_2_dev" {
 EOF
 }
 
-resource "aws_iam_policy" "iam_policy_sns_publish_to_sqs_dev" {
+resource "aws_iam_policy" "iam_policy_lambda_sns_publish_to_sqs_dev" {
   count       = local.is-development == true ? 1 : 0
   name        = "aws_iam_policy_for_sns_publish_to_sqs_${local.environment}"
   path        = "/"
@@ -114,18 +114,20 @@ resource "aws_iam_policy" "iam_policy_lambda_invoke_ssm_powershell_dev" {
   })
 }
 
-resource "aws_iam_policy" "iam_policy_lambda_describe_ec2_instances_dev" {
+resource "aws_iam_policy" "iam_policy_lambda_ssm_invoke_ec2_instances_dev" {
   count       = local.is-development == true ? 1 : 0
-  name        = "aws_iam_policy_for_lambda_describe_ec22_instances_${local.environment}"
+  name        = "aws_iam_policy_for_lambda_ssm_invoke_ec2_instances_${local.environment}"
   path        = "/"
-  description = "Allows lambda functions to describe ec2 instances"
+  description = "Allows lambda functions to invoke ssm commands on ec2 instances"
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
       {
         "Effect" : "Allow",
         "Action" : [
-          "ec2:DescribeInstances"
+          "ec2:DescribeInstances",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
         ],
         "Resource" : [
           "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
@@ -162,20 +164,44 @@ resource "aws_iam_policy" "iam_policy_lambda_invoke_sqs_dev" {
   })
 }
 
+resource "aws_iam_policy" "iam_policy_lambda_invoke_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_ssm_invoke_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to invoke functions"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "lambda:InvokeAsync",
+          "lambda:InvokeFunction",
+          "ssm:SendCommand",
+          "ssm:GetCommandInvocation"
+        ],
+        "Resource" : [
+          "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      }
+    ]
+  })
+}
+
 locals {
   lambda_cloudwatch_invoke_lambda_policies = local.is-development ? {
-    "cloudwatch_invoke_lambda" = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_dev[0].arn
-    "sns_publish_to_sqs"       = aws_iam_policy.iam_policy_sns_publish_to_sqs_dev[0].arn
-    "send_logs_to_cloudwatch"  = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
-    "invoke_ssm_powershell"    = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
-    "describe_ec2_instances"   = aws_iam_policy.iam_policy_lambda_describe_ec2_instances_dev[0].arn
-    "invoke_sqs"               = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
+    "sns_publish_to_sqs"         = aws_iam_policy.iam_policy_lambda_sns_publish_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "invoke_ssm_powershell"      = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
+    "ssm_invoke_ec2_instances"   = aws_iam_policy.iam_policy_lambda_ssm_invoke_ec2_instances_dev[0].arn
+    "invoke_sqs"                 = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
+    "lambda_invoke"              = aws_iam_policy.iam_policy_lambda_invoke_dev[0].arn
   } : {}
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policies" {
   for_each   = local.is-development ? local.lambda_cloudwatch_invoke_lambda_policies : {}
-  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].name
+  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_2_dev[0].name
   policy_arn = each.value
 }
 
