@@ -503,7 +503,7 @@ module "full_reload_fms" {
   full_reload        = true
 }
 
-module "full_reload_gps" {
+module "load_gps" {
   count  = local.is-development ? 0 : 1
   source = "./modules/ap_airflow_load_data_iam_role"
 
@@ -523,7 +523,7 @@ module "full_reload_gps" {
   full_reload        = true
 }
 
-module "load_gps" {
+module "inc_load_gps" {
   count  = local.is-development ? 0 : 1
   source = "./modules/ap_airflow_load_data_iam_role"
 
