@@ -10,7 +10,7 @@ module "powerbi_gateway_ec2" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "5.8.0"
+  version = "6.0.0"
 
   name                        = local.powerbi_gateway_instance_name
   ami                         = data.aws_ami.windows_server_2025.id
