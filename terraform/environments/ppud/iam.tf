@@ -600,6 +600,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_alarm_suppressio
   policy_arn = aws_iam_policy.iam_policy_for_lambda_alarm_suppression[0].arn
 }
 
+/*
 ###########################################################
 # IAM Role & Policy for Cloudwatch - Lambda Functions - DEV
 ###########################################################
@@ -688,6 +689,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invok
   role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].name
   policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_dev[0].arn
 }
+*/
 
 ##########################################################
 # IAM Role & Policy for Lambda Terminate CPU Process - UAT
