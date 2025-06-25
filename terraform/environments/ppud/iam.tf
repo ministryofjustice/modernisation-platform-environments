@@ -308,7 +308,8 @@ resource "aws_iam_policy" "iam_policy_lambda_get_cloudwatch_metrics_dev" {
       {
 	      "Effect" : "Allow",
         "Action" : [
-          "cloudwatch:*"
+          "cloudwatch:*",
+          "cloudwatch:GetMetricData"
         ],
         "Resource" : [
           "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
