@@ -39,7 +39,7 @@ resource "aws_lakeformation_permissions" "grant_tag_describe_to_sso_role" {
 ##################
 
 # External account tag (databae level)
-resource "aws_lakeformation_permissions" "grant_tag_access_to_external_account" {
+resource "aws_lakeformation_permissions" "grant_tag_policy_db_external_account" {
   principal   = "593291632749"
   permissions = ["DESCRIBE", "ASSOCIATE"]
 
@@ -53,7 +53,7 @@ resource "aws_lakeformation_permissions" "grant_tag_access_to_external_account" 
 }
 
 # External account tag (databae level)
-resource "aws_lakeformation_permissions" "grant_tag_access_to_external_account" {
+resource "aws_lakeformation_permissions" "grant_tag_policy_tbl_external_account" {
   principal   = "593291632749"
   permissions = ["DESCRIBE", "ASSOCIATE"]
 
