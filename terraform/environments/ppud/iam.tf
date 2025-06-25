@@ -1236,6 +1236,7 @@ data "aws_iam_policy_document" "email" {
   }
 }
 
+/*
 #############################################
 # IAM Role & Policy for Send CPU graph - DEV
 #############################################
@@ -1344,6 +1345,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev"
     ]
   })
 }
+*/
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev" {
   count      = local.is-development == true ? 1 : 0
