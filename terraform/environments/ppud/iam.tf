@@ -317,7 +317,7 @@ locals {
   lambda_get_certificate_policies = local.is-development ? {
     "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
     "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
-    "sns_publish"                = aws_iam_policy.iam_policy_lambda_sns_publish_to_sqs_dev[].arn
+    "sns_publish"                = aws_iam_policy.iam_policy_lambda_sns_publish_to_sqs_dev[0].arn
     "get_certificate"            = aws_iam_policy.iam_policy_lambda_get_certificate_dev[0].arn
     "sqs_invoke"                 = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
   } : {}
