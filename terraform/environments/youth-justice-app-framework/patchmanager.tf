@@ -224,6 +224,6 @@ resource "aws_ssm_association" "patch_schedule" {
 
   automation_target_parameter_name = "InstanceId"
   parameters = {
-    Operation = ["Install"]  # Use "Scan" if you want to just scan
-  }
+  Operation = ["Install"]
+}
 }
