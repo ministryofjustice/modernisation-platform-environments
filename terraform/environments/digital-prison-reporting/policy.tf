@@ -919,19 +919,7 @@ resource "aws_iam_role" "analytical_platform_share_role" {
 
   name = "${each.value.target_account_name}-share-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          # In case consumer has a central location for terraform state storage that isn't the target account.
-          AWS = "arn:aws:iam::${try(each.value.assume_account_id, each.value.target_account_id)}:root"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
+  assume_role_policy = data.aws_iam_policy_document.ap_assume_role.json
 }
 
 resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {
