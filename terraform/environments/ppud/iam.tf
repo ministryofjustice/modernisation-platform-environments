@@ -26,6 +26,27 @@ resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_2_dev" {
 EOF
 }
 
+resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_send_message_to_sqs_${local.environment}"
+  path        = "/"
+  description = "Allows lambda to send messages to SQS queues in ppud-development account"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:SendMessage"
+        ],  
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_policy" "iam_policy_lambda_sns_publish_to_sqs_dev" {
   count       = local.is-development == true ? 1 : 0
   name        = "aws_iam_policy_for_sns_publish_to_sqs_${local.environment}"
@@ -190,7 +211,7 @@ resource "aws_iam_policy" "iam_policy_lambda_invoke_dev" {
 
 locals {
   lambda_cloudwatch_invoke_lambda_policies = local.is-development ? {
-    "sns_publish_to_sqs"         = aws_iam_policy.iam_policy_lambda_sns_publish_to_sqs_dev[0].arn
+    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
     "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
     "invoke_ssm_powershell"      = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
     "ssm_invoke_ec2_instances"   = aws_iam_policy.iam_policy_lambda_ssm_invoke_ec2_instances_dev[0].arn
@@ -199,9 +220,19 @@ locals {
   } : {}
 }
 
-resource "aws_iam_role_policy_attachment" "attach_lambda_policies" {
-  for_each   = local.is-development ? local.lambda_cloudwatch_invoke_lambda_policies : {}
-  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_2_dev[0].name
+locals {
+  lambda_invoke_ssm_policies = local.is-development ? {
+    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "invoke_ssm_powershell"      = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
+    "ssm_invoke_ec2_instances"   = aws_iam_policy.iam_policy_lambda_ssm_invoke_ec2_instances_dev[0].arn
+    "lambda_invoke"              = aws_iam_policy.iam_policy_lambda_invoke_dev[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_invoke_ssm_dev" {
+  for_each   = local.is-development ? local.lambda_invoke_ssm_policies : {}
+  role       = aws_iam_role.lambda_role_invoke_ssm_dev[0].name
   policy_arn = each.value
 }
 
