@@ -305,8 +305,8 @@ resource "aws_iam_policy" "iam_policy_lambda_get_cloudwatch_metrics_dev" {
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
-	    {
-        "Effect" : "Allow",
+      {
+	      "Effect" : "Allow",
         "Action" : [
           "cloudwatch:*"
         ],
@@ -326,6 +326,7 @@ resource "aws_iam_policy" "iam_policy_lambda_get_s3_data_dev" {
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
+      {
         "Effect" : "Allow",
         "Action" : [
           "s3:GetObject",
@@ -337,6 +338,7 @@ resource "aws_iam_policy" "iam_policy_lambda_get_s3_data_dev" {
           "arn:aws:s3:::moj-infrastructure-dev",
           "arn:aws:s3:::moj-infrastructure-dev/*"
         ]
+      }
     ]
   })
 }
@@ -349,6 +351,7 @@ resource "aws_iam_policy" "iam_policy_lambda_invoke_ses_dev" {
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
+      {
         "Effect" : "Allow",
         "Action" : [
           "ses:*"
@@ -357,6 +360,7 @@ resource "aws_iam_policy" "iam_policy_lambda_invoke_ses_dev" {
           "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
           "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
         ]
+      }
     ]
   })
 }
