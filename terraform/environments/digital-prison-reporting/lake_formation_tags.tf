@@ -36,9 +36,19 @@ resource "aws_lakeformation_permissions" "grant_tag_access_external_account" {
 # Data Engineering SSO Role
 ###########################
 
+resource "aws_lakeformation_permissions" "grant_tag_access_de_role" {
+  principal   = "arn:aws:iam::593291632749:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DESCRIBE", "ASSOCIATE"]
+
+  lf_tag {
+    key    = aws_lakeformation_lf_tag.domain_tag.key
+    values = ["prisons", "probation", "electronic-monitoring"]
+  }
+}
+
 resource "aws_lakeformation_permissions" "grant_tag_policy_table_de_role" {
   principal   = "arn:aws:iam::593291632749:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
-  permissions = ["DESCRIBE"]
+  permissions = ["DESCRIBE", "SELECT"]
 
   lf_tag_policy {
     resource_type = "TABLE"
@@ -49,12 +59,3 @@ resource "aws_lakeformation_permissions" "grant_tag_policy_table_de_role" {
   }
 }
 
-resource "aws_lakeformation_permissions" "grant_tag_access_de_role" {
-  principal   = "arn:aws:iam::593291632749:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
-  permissions = ["DESCRIBE", "ASSOCIATE"]
-
-  lf_tag {
-    key    = aws_lakeformation_lf_tag.domain_tag.key
-    values = ["prisons", "probation", "electronic-monitoring"]
-  }
-}
