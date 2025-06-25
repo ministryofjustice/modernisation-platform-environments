@@ -170,13 +170,12 @@ module "transfer_lambda" {
         "kms:DescribeKey",
         "kms:Decrypt"
       ]
-      resources = [
+      resources = concat([
         module.s3_processed_kms.key_arn,
         module.supplier_data_kms.key_arn,
         module.transferred_sns_kms.key_arn,
         module.quarantined_sns_kms.key_arn,
-        "arn:aws:kms:eu-west-2:593291632749:key/62503ba6-316e-473d-ae4b-042f8420dd07" # s3/mojap-data-production-shared-services-client-team-gov-29148
-      ]
+      ], coalesce(local.environment_configuration.target_kms_keys, []))
     },
     secretsmanager_access = {
       sid       = "AllowSecretsManager"
