@@ -41,7 +41,7 @@ resource "aws_ssm_patch_baseline" "yjaf_amazon_linux_2" {
 
     patch_filter {
       key    = "SEVERITY"
-      values = ["High"]
+      values = ["Important"]
     }
   }
 
@@ -165,7 +165,7 @@ resource "aws_ssm_patch_baseline" "yjaf_windows_patch_baseline" {
 
     patch_filter {
       key    = "MSRC_SEVERITY"
-      values = ["High"]
+      values = ["Important"]
     }
   }
 
@@ -216,7 +216,7 @@ resource "aws_ssm_association" "patch_schedule" {
     values = ["Linux2", "Ubuntu", "Windows"]
   }
 
-  schedule_expression = "cron(0 14 ? * WED *)"  # Every Sunday at 3:00 AM UTC
+  schedule_expression = "cron(0 8 * * ? *)"  # Every Sunday at 3:00 AM UTC
 
   compliance_severity = "HIGH"
   max_concurrency     = "50%"
