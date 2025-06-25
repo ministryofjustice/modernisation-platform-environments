@@ -890,6 +890,30 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   }
 }
 
+data "aws_iam_policy_document" "ap_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/data-engineering-datalake-access-github-actions"]
+    }
+  }
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:oidc-provider/token.actions.githubusercontent.com"]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = ["repo:ministryofjustice/data-engineering-datalake-access:ref:refs/heads/*"]
+    }
+  }
+}
+
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
 
