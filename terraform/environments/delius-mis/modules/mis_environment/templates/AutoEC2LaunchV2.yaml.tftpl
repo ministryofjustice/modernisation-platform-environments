@@ -151,7 +151,7 @@ tasks:
           
           Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -NewName $instanceId -Force
 
-          Install AD Management Tools
+          # Install AD Management Tools
           Install-WindowsFeature -Name RSAT-AD-PowerShell
           Install-WindowsFeature -Name RSAT-ADDS-Tools
 
