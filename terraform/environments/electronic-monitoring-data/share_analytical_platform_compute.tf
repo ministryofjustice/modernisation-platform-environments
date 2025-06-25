@@ -530,7 +530,7 @@ data "aws_iam_policy_document" "ap_assume_role" {
     }
   }
   statement {
-    effect = "Allow"
+    effect  = "Allow"
     actions = ["sts:AssumeRoleWithWebIdentity"]
     principals {
       type        = "Federated"
@@ -549,7 +549,7 @@ resource "aws_iam_role" "analytical_platform_share_role" {
 
   name                 = "${each.value.target_account_name}-share-role"
   max_session_duration = 12 * 60 * 60
-  assume_role_policy = data.aws_iam_policy_document.ap_assume_role.json
+  assume_role_policy   = data.aws_iam_policy_document.ap_assume_role.json
 }
 
 resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {

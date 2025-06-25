@@ -108,3 +108,9 @@ data "aws_s3_bucket" "mwaa_bucket" {
   bucket = "mojap-compute-${local.environment}-mwaa"
 }
 
+data "aws_route53_resolver_query_log_config" "core_logging_s3" {
+  filter {
+    name   = "Name"
+    values = ["core-logging-rlq-s3"]
+  }
+}

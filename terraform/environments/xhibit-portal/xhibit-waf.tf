@@ -205,20 +205,20 @@ resource "aws_wafv2_web_acl" "xhibit_web_acl" {
 resource "aws_wafv2_web_acl_association" "xhibit_portal_prtg" {
   resource_arn = aws_lb.prtg_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.xhibit_web_acl.arn
-  depends_on = [aws_lb.prtg_lb]
+  depends_on   = [aws_lb.prtg_lb]
 }
 
 resource "aws_wafv2_web_acl_association" "xhibit_portal_waf" {
   resource_arn = aws_lb.waf_lb.arn
   web_acl_arn  = aws_wafv2_web_acl.xhibit_web_acl.arn
 
-  depends_on = [aws_lb.waf_lb]  # Ensures ALB is ready before association
+  depends_on = [aws_lb.waf_lb] # Ensures ALB is ready before association
 
 }
 
 resource "aws_cloudwatch_log_group" "xbhibit_waf_logs" {
   #checkov:skip=CKV_AWS_158: "Ensure that Cloudwatch Log Group is encrypted using KMS CMK"
-  name              = "aws-waf-logs-xbhibit-waf"  # Must match this format
+  name              = "aws-waf-logs-xbhibit-waf" # Must match this format
   retention_in_days = 365
   tags = merge(local.tags,
     { Name = lower(format("lb-%s-%s-xhibit-waf-logs", local.application_name, local.environment)) }

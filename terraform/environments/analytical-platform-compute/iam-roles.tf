@@ -214,3 +214,26 @@ module "analytical_platform_ui_service_role" {
   }
   tags = local.tags
 }
+
+module "aws_cloudwatch_network_flow_monitor_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.58.0"
+
+  role_name_prefix = "aws-cloudwatch-network-flow-monitor"
+
+  role_policy_arns = {
+    CloudWatchNetworkFlowMonitorAgentPublishPolicy = "arn:aws:iam::aws:policy/CloudWatchNetworkFlowMonitorAgentPublishPolicy"
+  }
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["amazon-network-flow-monitor:aws-network-flow-monitor-agent-service-account"]
+    }
+  }
+
+  tags = local.tags
+}
