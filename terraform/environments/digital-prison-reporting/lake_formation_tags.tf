@@ -21,15 +21,15 @@ resource "aws_lakeformation_resource_lf_tag" "tag_database_with_domain" {
 # External Account Permissions
 ###########################
 
-resource "aws_lakeformation_permissions" "grant_tag_access_external_account" {
-  principal   = "593291632749"
-  permissions = ["DESCRIBE", "ASSOCIATE"]
+# resource "aws_lakeformation_permissions" "grant_tag_access_external_account" {
+#   principal   = "593291632749"
+#   permissions = ["DESCRIBE", "ASSOCIATE"]
 
-  lf_tag {
-    key    = aws_lakeformation_lf_tag.domain_tag.key
-    values = ["prisons", "probation", "electronic-monitoring"]
-  }
-}
+#   lf_tag {
+#     key    = aws_lakeformation_lf_tag.domain_tag.key
+#     values = ["prisons", "probation", "electronic-monitoring"]
+#   }
+# }
 
 
 ###########################
