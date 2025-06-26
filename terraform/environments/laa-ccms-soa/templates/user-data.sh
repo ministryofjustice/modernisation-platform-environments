@@ -99,7 +99,7 @@ mkdir -p \
 reset_admin() {
   domain_home=$EFS_MOUNT_POINT/domains/soainfra
   config_location=$domain_home/config
-  
+
   yum install -y xmlstarlet
 
   cp -p $config_location/config.xml $config_location/config.xml.$(date '+%Y%m%d-%H%M').bak
@@ -126,4 +126,3 @@ if [[ "${server}" = "admin" ]]; then
   reset_admin
 fi
 
-start ecs
