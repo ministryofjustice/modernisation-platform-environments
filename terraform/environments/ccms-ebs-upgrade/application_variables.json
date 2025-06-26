@@ -215,7 +215,7 @@
       "ebs_iops_ebsdb_dbf01": 12000,
       "ebs_size_ebsdb_dbf01": 4000,
       "ebs_iops_ebsdb_dbf02": 14000,
-      "ebs_size_ebsdb_dbf02": 5500,
+      "ebs_size_ebsdb_dbf02": 5800,
       "ebs_iops_ebsdb_dbf03": 12000,
       "ebs_size_ebsdb_dbf03": 3000,
       "ebs_iops_ebsdb_dbf04": 3000,
