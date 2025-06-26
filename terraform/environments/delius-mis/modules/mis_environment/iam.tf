@@ -7,7 +7,8 @@ data "aws_iam_policy_document" "secrets_manager" {
     resources = [
       aws_secretsmanager_secret.ad_admin_password.arn,
       "arn:aws:secretsmanager:*:*:secret:NDMIS_DFI_SERVICEACCOUNTS_DEV-*",
-      "arn:aws:secretsmanager:*:*:secret:delius-mis-dev-oracle-mis-db-application-passwords-*"
+      "arn:aws:secretsmanager:*:*:secret:delius-mis-dev-oracle-mis-db-application-passwords-*",
+      "arn:aws:secretsmanager:*:*:secret:delius-mis-dev-oracle-dsd-db-application-passwords-*"
     ]
   }
 }
