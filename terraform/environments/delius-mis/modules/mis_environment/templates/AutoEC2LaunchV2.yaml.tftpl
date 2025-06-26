@@ -156,7 +156,7 @@ tasks:
           $newName = $nameTagValue.replace('delius-mis','ndmis')
           
           # Truncate name further to be <= 15 characters if needed
-          if (newName.Length -gt 15) {
+          if ($newName.Length -gt 15) {
             Write-Output "Truncating computer name to 15 chars or less failed"
             Write-Output "Truncating by removing hyphens"
             $newName = $newName.Replace('-','')
