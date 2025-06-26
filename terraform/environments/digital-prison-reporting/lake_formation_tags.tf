@@ -5,16 +5,16 @@ locals {
   }
 }
 # Assign LF tag to the database
-resource "aws_lakeformation_resource_lf_tag" "tag_database_with_domain" {
-  database {
-    name = "dpr_ap_integration_test_tag_dev_dbt"
-  }
+# resource "aws_lakeformation_resource_lf_tag" "tag_database_with_domain" {
+#   database {
+#     name = "dpr_ap_integration_test_tag_dev_dbt"
+#   }
 
-  lf_tag {
-    key   = aws_lakeformation_lf_tag.domain_tag.key
-    value = "prisons"
-  }
-}
+#   lf_tag {
+#     key   = aws_lakeformation_lf_tag.domain_tag.key
+#     value = "prisons"
+#   }
+# }
 
 
 ###########################
