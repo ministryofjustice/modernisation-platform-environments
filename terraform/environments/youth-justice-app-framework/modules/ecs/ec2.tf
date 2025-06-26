@@ -71,7 +71,7 @@ resource "aws_iam_policy" "ecs-fetch-secrets-policy" {
 module "autoscaling" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/autoscaling/aws"
-  version = "7.6.1"
+  version = "8.3.1"
 
   # Autoscaling group settings
   name                        = "${var.cluster_name}-ecs-instances"
