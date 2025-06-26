@@ -3,7 +3,7 @@ module "terraform_bucket" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/s3-bucket/aws"
-  version = "4.10.1"
+  version = "5.0.2"
 
   bucket = "mojap-common-${local.environment}-tfstate"
 
