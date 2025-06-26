@@ -62,7 +62,6 @@ locals {
           treat_missing_data  = "notBreaching"
           alarm_description   = "Triggers if misload process is taking longer than 4 hours, see https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615798942"
           alarm_actions       = ["pagerduty"]
-          ok_actions          = ["pagerduty"]
           dimensions = {
             type          = "duration"
             type_instance = "misload_running"
@@ -74,22 +73,8 @@ locals {
     web = merge(
       module.baseline_presets.cloudwatch_metric_alarms.ec2,
       module.baseline_presets.cloudwatch_metric_alarms.ec2_cwagent_linux,
-      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os, {
-        service-status-error-weblogic-healthcheck-stopped = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer, {
-          alarm_description = "Triggers if weblogic-keepalive service not running. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615406362"
-          dimensions = {
-            type          = "exitcode"
-            type_instance = "weblogic-healthcheck-service"
-          }
-        })
-        service-status-error-app-layer = merge(module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app.service-status-error-app-layer, {
-          alarm_description = "Triggers if keepalive.htm not accessible. See https://dsdmoj.atlassian.net/wiki/spaces/DSTT/pages/4615406362"
-          dimensions = {
-            type          = "exitcode"
-            type_instance = "weblogic-keepalive-file"
-          }
-        })
-      }
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_os,
+      module.baseline_presets.cloudwatch_metric_alarms.ec2_instance_cwagent_collectd_service_status_app,
     )
 
     xtag = merge(
