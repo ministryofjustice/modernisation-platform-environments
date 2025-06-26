@@ -161,10 +161,10 @@ tasks:
           # }
 
           # Rename computer to match the Name tag in AWS
-          # Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -NewName $newName
+          # Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -NewName $newName -Force
           
           # Use default EC2AMAZ- hostname
-          Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential
+          Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -Force
 
           # Install AD Management Tools
           Install-WindowsFeature -Name RSAT-AD-PowerShell
