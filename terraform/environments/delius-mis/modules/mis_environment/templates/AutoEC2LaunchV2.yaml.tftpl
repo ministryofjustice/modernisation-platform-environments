@@ -122,20 +122,6 @@ tasks:
       type: powershell
       runAs: admin
       content: |-
-        # Run UserData powershell from modernisation-platform-configuration-management repo
-        $ErrorActionPreference = "Stop"
-        Write-Output "Downloading and running Run-GitScript.ps1"
-        Set-Location -Path ([System.IO.Path]::GetTempPath())
-        $GitBranch = "${branch}"
-        $Script = "Invoke-UserDataScript.ps1"
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
-        Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
-        . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch
-        Exit $LASTEXITCODE
-    - frequency: always
-      type: powershell
-      runAs: admin
-      content: |-
         # Join computer to domain if not already joined
         if (! ((Get-WmiObject -Class Win32_ComputerSystem).PartOfDomain) ) {
           # Server is not joined to the domain
@@ -149,15 +135,24 @@ tasks:
           $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
           
           $instanceId = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -uri http://169.254.169.254/latest/meta-data/instance-id
+          Write-Output "Instance ID: $instanceId"
 
-          $nameTagValue = ((aws ec2 describe-tags --filters "Name=resource-id,Values=$InstanceId" | ConvertFrom-Json).Tags | Where-Object { $_.Key -eq "Name" }).Value
+          $tagsJson = aws ec2 describe-tags --filters "Name=resource-id,Values=$instanceId"
+          Write-Output "Tags JSON: $tagsJson"
 
-          # Make the name shorter so it's <= 15 characters
-          $newName = $nameTagValue.replace('delius-mis','ndmis')
+          $nameTagValue = ($tagsJson | ConvertFrom-Json).Tags | Where-Object { $_.Key -eq "Name" } | Select-Object -ExpandProperty Value
+          Write-Output "Name tag value: $nameTagValue"
+
+          if (-not $nameTagValue) {
+            Write-Output "ERROR: Name tag not found for instance $instanceId"
+            exit 1
+          }
+
+          $newName = $nameTagValue -replace 'delius-mis','ndmis'
+          Write-Output "New name after replace: $newName"
           
           # Truncate name further to be <= 15 characters if needed
           if ($newName.Length -gt 15) {
-            Write-Output "Truncating computer name to 15 chars or less failed"
             Write-Output "Truncating by removing hyphens"
             $newName = $newName.Replace('-','')
           }
@@ -176,3 +171,17 @@ tasks:
           
           exit 3010 # Reboot instance, see https://docs.aws.amazon.com/AWSEC2/latest/WindowsGuide/ec2launch-v2-settings.html#ec2launch-v2-exit-codes-reboots
         }
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
+        # Run UserData powershell from modernisation-platform-configuration-management repo
+        $ErrorActionPreference = "Stop"
+        Write-Output "Downloading and running Run-GitScript.ps1"
+        Set-Location -Path ([System.IO.Path]::GetTempPath())
+        $GitBranch = "${branch}"
+        $Script = "Invoke-UserDataScript.ps1"
+        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12 # since powershell 4 uses Tls1 as default
+        Invoke-WebRequest "https://raw.githubusercontent.com/ministryofjustice/modernisation-platform-configuration-management/$${GitBranch}/powershell/Scripts/Run-GitScript.ps1" -OutFile "Run-GitScript.ps1"
+        . ./Run-GitScript.ps1 $Script -GitBranch $GitBranch
+        Exit $LASTEXITCODE
