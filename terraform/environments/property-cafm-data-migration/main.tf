@@ -9,7 +9,7 @@ module "rds_export" {
   source = "github.com/ministryofjustice/terraform-rds-export?ref=sql-backup-restore"
 
   kms_key_arn = aws_kms_key.export.arn
-  name = "${local.application_name}-${local.environment}"
+  name = "cafm-${local.environment}"
   vpc_id = module.vpc.vpc_id
   database_subnet_ids = module.vpc.private_subnets
 
