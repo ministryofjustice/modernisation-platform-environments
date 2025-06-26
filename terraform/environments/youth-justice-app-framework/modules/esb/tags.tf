@@ -12,6 +12,7 @@ locals {
     "environment"       = var.environment
     "Name"              = "ESB"
     "AzImpairmentPower" = "StopInstances"
+    "Patch Group"       = "Linux2"
   }
 
 
