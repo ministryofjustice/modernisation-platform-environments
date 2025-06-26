@@ -76,7 +76,11 @@ module "dfi_instance" {
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
   subnet_id         = var.account_config.private_subnet_ids[count.index]
-  tags              = var.tags
-
+  tags              = merge(
+    var.tags,
+    {
+        domain-name = var.environment_config.ad_domain_name
+    }
+  )
   cloudwatch_metric_alarms = {}
 }
