@@ -6,6 +6,10 @@
 # Development Environment
 #########################
 
+####################### IAM Roles #######################
+
+# Lambda role and attachment for retrieving data and metrics from cloudwatch
+
 resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_2_dev" {
   count              = local.is-development == true ? 1 : 0
   name               = "PPUD_Lambda_Function_Role_Cloudwatch_Invoke_Lambda_2_Dev"
@@ -24,6 +28,190 @@ resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_2_dev" {
  ]
 }
 EOF
+}
+
+# Lambda role and attachment for invoking SSM & powershell on EC2 instances
+
+resource "aws_iam_role" "lambda_role_invoke_ssm_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Invoke_SSM_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_invoke_ssm_policies = local.is-development ? {
+    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "invoke_ssm_powershell"      = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
+    "ssm_invoke_ec2_instances"   = aws_iam_policy.iam_policy_lambda_ssm_invoke_ec2_instances_dev[0].arn
+    "lambda_invoke"              = aws_iam_policy.iam_policy_lambda_invoke_dev[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_invoke_ssm_dev" {
+  for_each   = local.is-development ? local.lambda_invoke_ssm_policies : {}
+  role       = aws_iam_role.lambda_role_invoke_ssm_dev[0].name
+  policy_arn = each.value
+}
+
+# Lambda role and attachment for retrieving ACM certificate expiry dates
+
+resource "aws_iam_role" "lambda_role_get_certificate_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_Certificate_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+
+locals {
+  lambda_get_certificate_policies = local.is-development ? {
+    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "sns_publish"                = aws_iam_policy.iam_policy_lambda_sns_publish_to_sqs_dev[0].arn
+    "get_certificate"            = aws_iam_policy.iam_policy_lambda_get_certificate_dev[0].arn
+    "sqs_invoke"                 = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
+    "get_cloudwatch_metrics"     = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_certificate_dev" {
+  for_each   = local.is-development ? local.lambda_get_certificate_policies : {}
+  role       = aws_iam_role.lambda_role_get_certificate_dev[0].name
+  policy_arn = each.value
+}
+
+# Lambda role and attachment for getting cloudwatch data
+
+resource "aws_iam_role" "lambda_role_get_cloudwatch_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_Cloudwatch_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_get_cloudwatch_policies = local.is-development ? {
+    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "get_cloudwatch_metrics"     = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
+    "invoke_ses"                 = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
+    "get_data_s3"                = aws_iam_policy.iam_policy_lambda_get_s3_data_dev[0].arn
+    "get_klayers"                = aws_iam_policy.iam_policy_lambda_get_ssm_parameter_klayers_dev[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_cloudwatch_dev" {
+  for_each   = local.is-development ? local.lambda_get_cloudwatch_policies : {}
+  role       = aws_iam_role.lambda_role_get_cloudwatch_dev[0].name
+  policy_arn = each.value
+}
+
+resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_dev" {
+  count      = local.is-development == true ? 1 : 0
+  name       = "lambda-cloudwatch-full-access-iam-attachment"
+  roles      = [aws_iam_role.lambda_role_get_cloudwatch_dev[0].id]
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
+}
+
+# Lambda role and attachment for retrieving security hub data
+
+resource "aws_iam_role" "lambda_role_get_securityhub_data_dev" {
+  count              = local.is-development == true ? 1 : 0
+  name               = "PPUD_Lambda_Function_Role_Get_Securityhub_Data_Dev"
+  assume_role_policy = <<EOF
+{
+ "Version": "2012-10-17",
+ "Statement": [
+   {
+     "Action": "sts:AssumeRole",
+     "Principal": {
+       "Service": "lambda.amazonaws.com"
+     },
+     "Effect": "Allow",
+     "Sid": ""
+   }
+ ]
+}
+EOF
+}
+
+locals {
+  lambda_get_securityhub_policies = local.is-development ? {
+    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "invoke_ses"                 = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
+    "get_securityhub_data"       = aws_iam_policy.iam_policy_lambda_get_securityhub_data_dev[0].arn
+  } : {}
+}
+
+resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_securityhub_data_dev" {
+  for_each   = local.is-development ? local.lambda_get_securityhub_policies : {}
+  role       = aws_iam_role.lambda_role_get_securityhub_data_dev[0].name
+  policy_arn = each.value
+}
+
+####################### IAM Policies #######################
+
+resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_send_message_to_sqs_${local.environment}"
+  path        = "/"
+  description = "Allows lambda to send messages to SQS queues in ppud-development account"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sqs:SendMessage"
+        ],  
+        "Resource" : [
+          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      }
+    ]
+  })
 }
 
 resource "aws_iam_policy" "iam_policy_lambda_sns_publish_to_sqs_dev" {
@@ -188,22 +376,122 @@ resource "aws_iam_policy" "iam_policy_lambda_invoke_dev" {
   })
 }
 
-locals {
-  lambda_cloudwatch_invoke_lambda_policies = local.is-development ? {
-    "sns_publish_to_sqs"         = aws_iam_policy.iam_policy_lambda_sns_publish_to_sqs_dev[0].arn
-    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
-    "invoke_ssm_powershell"      = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
-    "ssm_invoke_ec2_instances"   = aws_iam_policy.iam_policy_lambda_ssm_invoke_ec2_instances_dev[0].arn
-    "invoke_sqs"                 = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
-    "lambda_invoke"              = aws_iam_policy.iam_policy_lambda_invoke_dev[0].arn
-  } : {}
+resource "aws_iam_policy" "iam_policy_lambda_get_certificate_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_get_certificate_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to get certificate details"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "acm:DescribeCertificate",
+          "acm:GetCertificate",
+          "acm:ListCertificates",
+          "acm:ListTagsForCertificate"
+        ],
+        "Resource" : [
+          "arn:aws:acm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:certificate/*"
+        ]
+      }
+    ]
+  })
 }
 
-resource "aws_iam_role_policy_attachment" "attach_lambda_policies" {
-  for_each   = local.is-development ? local.lambda_cloudwatch_invoke_lambda_policies : {}
-  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_2_dev[0].name
-  policy_arn = each.value
+resource "aws_iam_policy" "iam_policy_lambda_get_cloudwatch_metrics_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_get_cloudwatch_metrics_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to get cloudwatch metrics"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+	      "Effect" : "Allow",
+        "Action" : [
+          "cloudwatch:*"
+        ],
+        "Resource" : [
+          "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      }
+    ]
+  })
 }
+
+resource "aws_iam_policy" "iam_policy_lambda_get_s3_data_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_get_s3_data_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to get data from S3"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:ListBucket"
+        ],
+        "Resource" : [
+          "arn:aws:s3:::moj-infrastructure-dev",
+          "arn:aws:s3:::moj-infrastructure-dev/*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_invoke_ses_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_invoke_ses_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to get send messages via ses"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ses:*"
+        ],
+        "Resource" : [
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
+          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_get_securityhub_data_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to get security hub data "
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+      "Action" : [
+        "securityhub:*"
+      ],
+      "Resource" : [
+        "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+      ]
+      }
+    ]
+  })
+}
+
+###########################
+# Preproduction Environment
+###########################
 
 
 # IAM EC2 Policy with Assume Role 
@@ -475,95 +763,6 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_alarm_suppressio
   policy_arn = aws_iam_policy.iam_policy_for_lambda_alarm_suppression[0].arn
 }
 
-###########################################################
-# IAM Role & Policy for Cloudwatch - Lambda Functions - DEV
-###########################################################
-
-resource "aws_iam_role" "lambda_role_cloudwatch_invoke_lambda_dev" {
-  count              = local.is-development == true ? 1 : 0
-  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Invoke_Lambda_Dev"
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "lambda.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_invoke_lambda_dev" {
-  count       = local.is-development == true ? 1 : 0
-  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_invoke_lambda_dev"
-  path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role cloudwatch invoke lambda development"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [{
-      "Effect" : "Allow",
-      "Action" : [
-        "ssm:SendCommand",
-        "ssm:GetCommandInvocation"
-      ],
-      "Resource" : [
-        "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
-        "arn:aws:ssm:eu-west-2::document/AWS-RunPowerShellScript"
-      ]
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "ec2:DescribeInstances",
-          "ssm:SendCommand",
-          "ssm:GetCommandInvocation"
-        ],
-        "Resource" : [
-          "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-        ]
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "lambda:InvokeAsync",
-          "lambda:InvokeFunction",
-          "ssm:SendCommand",
-          "ssm:GetCommandInvocation"
-        ],
-        "Resource" : [
-          "arn:aws:lambda:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-        ]
-      },
-      {
-        "Effect" : "Allow",
-        "Action" : [
-          "sqs:ChangeMessageVisibility",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes",
-          "sqs:GetQueueUrl",
-          "sqs:ListQueueTags",
-          "sqs:ReceiveMessage",
-          "sqs:SendMessage"
-        ],
-        "Resource" : [
-          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-        ]
-    }]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invoke_lambda_to_lambda_role_cloudwatch_invoke_lambda_dev" {
-  count      = local.is-development == true ? 1 : 0
-  role       = aws_iam_role.lambda_role_cloudwatch_invoke_lambda_dev[0].name
-  policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_dev[0].arn
-}
-
 ##########################################################
 # IAM Role & Policy for Lambda Terminate CPU Process - UAT
 ##########################################################
@@ -742,6 +941,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_invok
   policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_invoke_lambda_prod[0].arn
 }
 
+/*
 ###########################################################
 # IAM Role & Policy for Lambda Certificate Expiration - DEV
 ###########################################################
@@ -844,6 +1044,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policy_certificate_expi
   role       = aws_iam_role.lambda_role_certificate_expiry_dev[0].name
   policy_arn = aws_iam_policy.iam_policy_for_lambda_certificate_expiry_dev[0].arn
 }
+*/
 
 ###########################################################
 # IAM Role & Policy for Lambda Certificate Expiration - UAT
@@ -1113,150 +1314,6 @@ data "aws_iam_policy_document" "email" {
 }
 
 #############################################
-# IAM Role & Policy for Send CPU graph - DEV
-#############################################
-
-resource "aws_iam_role" "lambda_role_cloudwatch_get_metric_data_dev" {
-  count              = local.is-development == true ? 1 : 0
-  name               = "PPUD_Lambda_Function_Role_Cloudwatch_Get_Metric_Data_Dev"
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "lambda.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "iam_policy_for_lambda_cloudwatch_get_metric_data_dev" {
-  count       = local.is-development == true ? 1 : 0
-  name        = "aws_iam_policy_for_terraform_aws_lambda_role_cloudwatch_get_metric_data_dev"
-  path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role cloudwatch get_metric_data development"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [
-      {
-        "Sid" : "CloudwatchMetricPolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "cloudwatch:*"
-        ],
-        "Resource" : [
-          "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-        ]
-      },
-      {
-        "Sid" : "S3BucketPolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:DeleteObject",
-          "s3:ListBucket"
-        ],
-        "Resource" : [
-          "arn:aws:s3:::moj-lambda-layers-dev",
-          "arn:aws:s3:::moj-lambda-layers-dev/*"
-        ]
-      },
-      {
-        "Sid" : "SSMPolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "ssm:GetParameter"
-        ],
-        "Resource" : [
-          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:parameter/klayers-account"
-        ]
-      },
-      {
-        "Sid" : "LogPolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "logs:CreateLogStream",
-          "logs:CreateLogGroup",
-          "logs:PutLogEvents"
-        ],
-        "Resource" : [
-          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-        ]
-      },
-      {
-        "Sid" : "SQSPolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "sqs:ChangeMessageVisibility",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes",
-          "sqs:GetQueueUrl",
-          "sqs:ListQueueTags",
-          "sqs:ReceiveMessage",
-          "sqs:SendMessage"
-        ],
-        "Resource" : [
-          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-        ]
-      },
-      {
-        "Sid" : "SESPolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "ses:*"
-        ],
-        "Resource" : [
-          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
-          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy_cloudwatch_get_metric_data_to_lambda_role_cloudwatch_get_metric_data_dev" {
-  count      = local.is-development == true ? 1 : 0
-  role       = aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].name
-  policy_arn = aws_iam_policy.iam_policy_for_lambda_cloudwatch_get_metric_data_dev[0].arn
-}
-
-resource "aws_iam_policy_attachment" "attach_lambda_read_only_access_dev" {
-  count      = local.is-development == true ? 1 : 0
-  name       = "lambda-read-only-access-iam-attachment"
-  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
-  policy_arn = "arn:aws:iam::aws:policy/AWSLambda_ReadOnlyAccess"
-}
-
-resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_dev" {
-  count      = local.is-development == true ? 1 : 0
-  name       = "lambda-cloudwatch-full-access-iam-attachment"
-  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchFullAccessV2"
-}
-
-resource "aws_iam_policy_attachment" "attach_lambda_ec2_read_only_access_dev" {
-  count      = local.is-development == true ? 1 : 0
-  name       = "lambda-ec2-read-only-access-iam-attachment"
-  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess"
-}
-
-#resource "aws_iam_policy_attachment" "attach_ses_full_access" {
-#  count      = local.is-development == true ? 1 : 0
-#  name       = "ses-full-access-iam-attachment"
-#  roles      = [aws_iam_role.lambda_role_cloudwatch_get_metric_data_dev[0].id]
-#  policy_arn = "arn:aws:iam::aws:policy/AmazonSESFullAccess"
-#}
-
-
-#############################################
 # IAM Role & Policy for Send CPU graph - PROD
 #############################################
 
@@ -1472,103 +1529,6 @@ resource "aws_iam_role_policy_attachment" "lambda_vpc_access_policy_to_lambda_ro
   count      = local.is-production == true ? 1 : 0
   role       = aws_iam_role.lambda_role_securityhub_get_data_prod[0].id
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
-}
-
-################################################
-# IAM Role & Policy for Security Hub report- DEV
-################################################
-
-resource "aws_iam_role" "lambda_role_securityhub_get_data_dev" {
-  count              = local.is-development == true ? 1 : 0
-  name               = "PPUD_Lambda_Function_Role_Securityhub_Get_Data_Dev"
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "lambda.amazonaws.com"
-     },
-     "Effect": "Allow",
-     "Sid": ""
-   }
- ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "iam_policy_for_lambda_securityhub_get_data_dev" {
-  count       = local.is-development == true ? 1 : 0
-  name        = "aws_iam_policy_for_terraform_aws_lambda_role_securityhub_get_data_dev"
-  path        = "/"
-  description = "AWS IAM Policy for managing aws lambda role securityhub get data production"
-  policy = jsonencode({
-    "Version" : "2012-10-17",
-    "Statement" : [{
-      "Sid" : "SecurityHubPolicy",
-      "Effect" : "Allow",
-      "Action" : [
-        "securityhub:*"
-      ],
-      "Resource" : [
-        "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-      ]
-      },
-      {
-        "Sid" : "LogPolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "logs:CreateLogStream",
-          "logs:CreateLogGroup",
-          "logs:PutLogEvents"
-        ],
-        "Resource" : [
-          "arn:aws:logs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-        ]
-      },
-      {
-        "Sid" : "SQSPolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "sqs:ChangeMessageVisibility",
-          "sqs:DeleteMessage",
-          "sqs:GetQueueAttributes",
-          "sqs:GetQueueUrl",
-          "sqs:ListQueueTags",
-          "sqs:ReceiveMessage",
-          "sqs:SendMessage"
-        ],
-        "Resource" : [
-          "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-        ]
-      },
-      {
-        "Sid" : "SESPolicy",
-        "Effect" : "Allow",
-        "Action" : [
-          "ses:*"
-        ],
-        "Resource" : [
-          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*",
-          "arn:aws:ses:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:identity/internaltest.ppud.justice.gov.uk"
-        ]
-      }
-    ]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "attach_lambda_policy_securityhub_get_data_to_lambda_role_securityhub_get_data_dev" {
-  count      = local.is-development == true ? 1 : 0
-  role       = aws_iam_role.lambda_role_securityhub_get_data_dev[0].name
-  policy_arn = aws_iam_policy.iam_policy_for_lambda_securityhub_get_data_dev[0].arn
-}
-
-resource "aws_iam_policy_attachment" "attach_lambda_securityhub_readonly_dev" {
-  count      = local.is-development == true ? 1 : 0
-  name       = "lambda-securityhub-readonly-iam-attachment"
-  roles      = [aws_iam_role.lambda_role_securityhub_get_data_dev[0].id]
-  policy_arn = "arn:aws:iam::aws:policy/AWSSecurityHubReadOnlyAccess"
 }
 
 ################################################
