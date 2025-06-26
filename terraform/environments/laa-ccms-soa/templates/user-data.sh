@@ -122,6 +122,8 @@ reset_admin() {
   rm -rf $domain_home/servers/AdminServer/tmp
 }
 
-if [[ -d $EFS_MOUNT_POINT/domains/soainfra ]] && [[ "${server}" = "admin" ]]; then
+if [[ "${server}" = "admin" ]]; then
   reset_admin
 fi
+
+start ecs
