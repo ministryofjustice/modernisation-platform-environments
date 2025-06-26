@@ -73,7 +73,7 @@ locals {
   lambda_get_certificate_policies_dev = local.is-development ? {
     "send_message_to_sqs"            = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
     "send_logs_to_cloudwatch"        = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
- #  "sns_publish"                    = aws_iam_policy.iam_policy_lambda_sns_publish_to_sqs_dev[0].arn
+    "publish_sns"                    = aws_iam_policy.iam_policy_lambda_publish_to_sns_dev[0].arn
     "get_certificate"                = aws_iam_policy.iam_policy_lambda_get_certificate_dev[0].arn
  #  "sqs_invoke"                     = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
     "get_cloudwatch_metrics"         = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
@@ -193,6 +193,27 @@ resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_dev" {
         ],  
         "Resource" : [
           "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_publish_to_sns_dev" {
+  count       = local.is-development == true ? 1 : 0
+  name        = "aws_iam_policy_publish_sns_${local.environment}"
+  path        = "/"
+  description = "Allows lambda to publish to sns"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sns:Publish"
+        ],  
+        "Resource" : [
+          "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
         ]
       }
     ]
@@ -533,6 +554,7 @@ locals {
   lambda_get_certificate_policies_uat = local.is-preproduction ? {
     "send_message_to_sqs"             = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
     "send_logs_to_cloudwatch"         = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
+    "publish_to_sns"                  = aws_iam_policy.iam_policy_lambda_publish_to_sns_uat[0].arn
     "get_certificate"                 = aws_iam_policy.iam_policy_lambda_get_certificate_uat[0].arn
     "get_cloudwatch_metrics"          = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_uat[0].arn
   } : {}
@@ -568,6 +590,27 @@ resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_uat" {
         ],  
         "Resource" : [
           "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy" "iam_policy_lambda_publish_to_sns_uat" {
+  count       = local.is-preproduction == true ? 1 : 0
+  name        = "aws_iam_policy_publish_sns_${local.environment}"
+  path        = "/"
+  description = "Allows lambda to publish to sns"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "sns:Publish"
+        ],  
+        "Resource" : [
+          "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
         ]
       }
     ]
