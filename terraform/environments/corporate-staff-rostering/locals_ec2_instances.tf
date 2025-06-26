@@ -28,11 +28,7 @@ locals {
         tags = {
           backup-plan = "daily-and-weekly"
         }
-        vpc_security_group_ids = [
-          "app",
-          "ad-join",
-          "ec2-windows",
-        ]
+        vpc_security_group_ids = ["domain", "app", "jumpserver", "ad-join", "ec2-windows"]
       }
       route53_records = {
         create_external_record = true
@@ -87,11 +83,7 @@ locals {
         tags = {
           backup-plan = "daily-and-weekly"
         }
-        vpc_security_group_ids = [
-          "database",
-          "ec2-linux",
-          "oem-agent",
-        ]
+        vpc_security_group_ids = ["database", "oem-agent", "ec2-linux"]
       }
       route53_records = {
         create_external_record = true
@@ -148,11 +140,7 @@ locals {
         tags = {
           backup-plan = "daily-and-weekly"
         }
-        vpc_security_group_ids = [
-          "web",
-          "ad-join",
-          "ec2-windows",
-        ]
+        vpc_security_group_ids = ["domain", "web", "jumpserver", "ad-join", "ec2-windows"]
       }
       route53_records = {
         create_external_record = true

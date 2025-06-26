@@ -55,6 +55,7 @@ module "ecs_service" {
   deployment_minimum_healthy_percent = each.value.deployment_minimum_healthy_percent
   health_check_grace_period_seconds  = each.value.health_check_grace_period_seconds
   autoscaling_max_capacity           = try(each.value.autoscaling_max_capacity, 4)
+  autoscaling_min_capacity           = try(each.value.autoscaling_min_capacity, 2)
   autoscaling_policies               = local.autoscaling_policies
   force_new_deployment               = false
   #ec2 capacity_provider_strategy  spread (attribute:ecs.availability-zone), spread (instanceId) todo
