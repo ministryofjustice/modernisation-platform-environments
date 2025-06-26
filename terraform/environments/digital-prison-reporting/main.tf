@@ -1143,15 +1143,15 @@ module "generate_test_postgres_data" {
   )
 
   arguments = {
-    "--extra-jars"                             = "s3://dpr-artifact-store-development/build-artifacts/dev-sandbox/digital-prison-reporting-jobs/jars/digital-prison-reporting-jobs-vLatest-all.jar"
+    "--extra-jars"                             = local.glue_jobs_latest_jar_location
     "--extra-files"                            = local.shared_log4j_properties_path
     "--class"                                  = "uk.gov.justice.digital.job.generator.PostgresLoadGeneratorJob"
     "--dpr.aws.region"                         = local.account_region
     "--dpr.log.level"                          = local.glue_job_common_log_level
     "--dpr.test.database.secret.id"            = "external/dpr-dps-testing2-source-secrets"
-    "--dpr.test.data.batch.size"               = 1000
+    "--dpr.test.data.batch.size"               = 5
     "--dpr.test.data.parallelism"              = 100
-    "--dpr.test.data.inter.batch.delay.millis" = 20
+    "--dpr.test.data.inter.batch.delay.millis" = 2000
   }
 }
 
