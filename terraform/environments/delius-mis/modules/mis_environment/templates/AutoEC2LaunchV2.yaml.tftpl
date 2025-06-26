@@ -145,27 +145,26 @@ tasks:
           
           $domainJoinCredential = New-Object System.Management.Automation.PSCredential($domainJoinUserName, $domainJoinPassword)
           
-          # Possible not renaming this 
-          # $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
+          # Get the instance ID to look up Name tag value 
+          $token = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token-ttl-seconds"=3600} -Method PUT -Uri http://169.254.169.254/latest/api/token
           
-          # $instanceId = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -uri http://169.254.169.254/latest/meta-data/instance-id
+          $instanceId = invoke-restmethod -Headers @{"X-aws-ec2-metadata-token" = $token} -Method GET -uri http://169.254.169.254/latest/meta-data/instance-id
 
-          # $nameTagValue = ((aws ec2 describe-tags --filters "Name=resource-id,Values=$InstanceId" | ConvertFrom-Json).Tags | Where-Object { $_.Key -eq "Name" }).Value
+          $nameTagValue = ((aws ec2 describe-tags --filters "Name=resource-id,Values=$InstanceId" | ConvertFrom-Json).Tags | Where-Object { $_.Key -eq "Name" }).Value
 
-          # Truncate name to be <= 15 characters
-          # $newName = $nameTagValue.replace('delius-mis','ndmis')
-          # if (newName.Length -gt 15) {
-          #   Write-Output "Truncating computer name to 15 chars or less failed"
-          #   Write-Output "Truncating by removing hyphens"
-          #   $newName = $newName.Replace('-','')
-          # }
-
-          # Rename computer to match the Name tag in AWS
-          # Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -NewName $newName -Force
+          # Make the name shorter so it's <= 15 characters
+          $newName = $nameTagValue.replace('delius-mis','ndmis')
           
-          # Use default EC2AMAZ- hostname
-          Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -Force
+          # Truncate name further to be <= 15 characters if needed
+          if (newName.Length -gt 15) {
+            Write-Output "Truncating computer name to 15 chars or less failed"
+            Write-Output "Truncating by removing hyphens"
+            $newName = $newName.Replace('-','')
+          }
 
+          # Rename computer to match the ndelius-mis naming convention
+          Add-Computer -DomainName "${ad_domain_name}" -Credential $domainJoinCredential -NewName $newName -Force
+          
           # Install AD Management Tools
           Install-WindowsFeature -Name RSAT-AD-PowerShell
           Install-WindowsFeature -Name RSAT-ADDS-Tools
