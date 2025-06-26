@@ -16,6 +16,12 @@ data "external" "shield_waf" {
   ]
 }
 
+
+data "aws_region" "current" {}
+
+data "aws_caller_identity" "current" {}
+
+
 data "aws_secretsmanager_secret" "environment_management" {
   provider = aws.modernisation-platform
   name     = "environment_management"
@@ -42,7 +48,8 @@ locals {
 locals {
   environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
-  core_logging_cw_destination_arn = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination/waf-logs-destination"
+  core_logging_cw_destination_arn = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination:waf-logs-destination"
+  core_logging_cw_destination_resource = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination/waf-logs-destination"
 }
 
 resource "aws_shield_drt_access_role_arn_association" "main" {
@@ -120,11 +127,58 @@ resource "aws_wafv2_web_acl_logging_configuration" "waf" {
   resource_arn            = aws_wafv2_web_acl.main.arn
 }
 
+resource "aws_iam_role" "cwl_to_core_logging" {
+  count = var.enable_logging ? 1 : 0
+  name  = "CWLtoCoreLogging"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "logs.eu-west-2.amazonaws.com"
+      },
+      Action = "sts:AssumeRole",
+      Condition = {
+        StringLike = {
+          "aws:SourceArn" = [
+            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+          ]
+        }
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "cwl_to_core_logging_policy" {
+  count = var.enable_logging ? 1 : 0
+
+  name = "Permissions-Policy-For-CWL"
+  role = aws_iam_role.cwl_to_core_logging[0].name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = ["logs:PutSubscriptionFilter"],
+      Resource = local.core_logging_cw_destination_resource
+    }]
+  })
+}
+
 resource "aws_cloudwatch_log_subscription_filter" "waf_to_core_logging" {
   count           = var.enable_logging ? 1 : 0
   name            = "waf-to-core-logging"
   log_group_name  = aws_cloudwatch_log_group.waf[0].name
   filter_pattern  = "{$.action = * }"
-  # destination_arn = local.core_logging_cw_destination_arn
-  destination_arn = "arn:aws:logs:eu-west-2:624384546187:destination/waf-logs-destination"
+  destination_arn = local.core_logging_cw_destination_arn
+  role_arn        = aws_iam_role.cwl_to_core_logging[0].arn
+
+  depends_on = [aws_cloudwatch_log_group.waf]
+}
+
+
+output "core_logging_cw_destination_arn" {
+  value = local.core_logging_cw_destination_arn
+   sensitive = true
 }

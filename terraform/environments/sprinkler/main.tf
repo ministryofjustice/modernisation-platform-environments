@@ -829,7 +829,7 @@ resource "aws_cloudwatch_log_group" "app" {
   )
 }
 
-#------------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 # Shield Advance logging
 #------------------------------------------------------------------------------
 import {
@@ -842,9 +842,9 @@ module "shield" {
   providers = {
     aws.modernisation-platform = aws.modernisation-platform
   }
-  application_name        = local.application_name
-  enable_logging          = true
-  excluded_protections    = local.application_data.accounts[local.environment].excluded_protections
+  application_name     = local.application_name
+  enable_logging       = true
+  excluded_protections = local.application_data.accounts[local.environment].excluded_protections
   resources = {
     public_lb = {
       action = "count"
@@ -864,3 +864,9 @@ module "shield" {
     }
   }
 }
+
+output "debug_destination_arn" {
+  value     = module.shield.core_logging_cw_destination_arn
+  sensitive = true
+}
+
