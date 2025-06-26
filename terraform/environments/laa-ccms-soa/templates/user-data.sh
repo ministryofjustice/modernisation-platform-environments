@@ -99,8 +99,8 @@ mkdir -p \
 reset_admin() {
   domain_home=$EFS_MOUNT_POINT/domains/soainfra
   config_location=$domain_home/config
-  curl http://fr2.rpmfind.net/linux/dag/redhat/el6/en/i386/dag/RPMS/xmlstarlet-1.5.0-1.el6.rf.i686.rpm --output xmlstarlet-1.5.0-1.el6.rf.i686.rpm
-  yum install -y xmlstarlet-1.5.0-1.el6.rf.i686.rpm
+  
+  yum install -y xmlstarlet
 
   cp -p $config_location/config.xml $config_location/config.xml.$(date '+%Y%m%d-%H%M').bak
   cp -p $config_location/config.xml $config_location/config.xml.none
