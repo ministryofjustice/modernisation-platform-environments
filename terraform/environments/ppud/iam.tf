@@ -31,7 +31,7 @@ EOF
 }
 
 locals {
-  lambda_invoke_ssm_policies = local.is-development ? {
+  lambda_invoke_ssm_policies_dev = local.is-development ? {
     "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
     "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
     "invoke_ssm_powershell"      = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
@@ -41,7 +41,7 @@ locals {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policies_invoke_ssm_dev" {
-  for_each   = local.is-development ? local.lambda_invoke_ssm_policies : {}
+  for_each   = local.is-development ? local.lambda_invoke_ssm_policies_dev : {}
   role       = aws_iam_role.lambda_role_invoke_ssm_dev[0].name
   policy_arn = each.value
 }
@@ -70,18 +70,18 @@ EOF
 
 
 locals {
-  lambda_get_certificate_policies = local.is-development ? {
-    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
-    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
- #  "sns_publish"                = aws_iam_policy.iam_policy_lambda_sns_publish_to_sqs_dev[0].arn
-    "get_certificate"            = aws_iam_policy.iam_policy_lambda_get_certificate_dev[0].arn
- #  "sqs_invoke"                 = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
-    "get_cloudwatch_metrics"     = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
+  lambda_get_certificate_policies_dev = local.is-development ? {
+    "send_message_to_sqs"            = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"        = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+ #  "sns_publish"                    = aws_iam_policy.iam_policy_lambda_sns_publish_to_sqs_dev[0].arn
+    "get_certificate"                = aws_iam_policy.iam_policy_lambda_get_certificate_dev[0].arn
+ #  "sqs_invoke"                     = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
+    "get_cloudwatch_metrics"         = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
   } : {}
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_certificate_dev" {
-  for_each   = local.is-development ? local.lambda_get_certificate_policies : {}
+  for_each   = local.is-development ? local.lambda_get_certificate_policies_dev : {}
   role       = aws_iam_role.lambda_role_get_certificate_dev[0].name
   policy_arn = each.value
 }
@@ -109,18 +109,18 @@ EOF
 }
 
 locals {
-  lambda_get_cloudwatch_policies = local.is-development ? {
-    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
-    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
-    "get_cloudwatch_metrics"     = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
-    "invoke_ses"                 = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
-    "get_data_s3"                = aws_iam_policy.iam_policy_lambda_get_s3_data_dev[0].arn
-    "get_klayers"                = aws_iam_policy.iam_policy_lambda_get_ssm_parameter_klayers_dev[0].arn
+  lambda_get_cloudwatch_policies_dev = local.is-development ? {
+    "send_message_to_sqs"            = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"        = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "get_cloudwatch_metrics"         = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
+    "invoke_ses"                     = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
+    "get_data_s3"                    = aws_iam_policy.iam_policy_lambda_get_s3_data_dev[0].arn
+    "get_klayers"                    = aws_iam_policy.iam_policy_lambda_get_ssm_parameter_klayers_dev[0].arn
   } : {}
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_cloudwatch_dev" {
-  for_each   = local.is-development ? local.lambda_get_cloudwatch_policies : {}
+  for_each   = local.is-development ? local.lambda_get_cloudwatch_policies_dev : {}
   role       = aws_iam_role.lambda_role_get_cloudwatch_dev[0].name
   policy_arn = each.value
 }
@@ -155,16 +155,16 @@ EOF
 }
 
 locals {
-  lambda_get_securityhub_policies = local.is-development ? {
-    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
-    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
-    "invoke_ses"                 = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
-    "get_securityhub_data"       = aws_iam_policy.iam_policy_lambda_get_securityhub_data_dev[0].arn
+  lambda_get_securityhub_policies_dev = local.is-development ? {
+    "send_message_to_sqs"             = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"         = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "invoke_ses"                      = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
+    "get_securityhub_data"            = aws_iam_policy.iam_policy_lambda_get_securityhub_data_dev[0].arn
   } : {}
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_securityhub_data_dev" {
-  for_each   = local.is-development ? local.lambda_get_securityhub_policies : {}
+  for_each   = local.is-development ? local.lambda_get_securityhub_policies_dev : {}
   role       = aws_iam_role.lambda_role_get_securityhub_data_dev[0].name
   policy_arn = each.value
 }
@@ -455,7 +455,7 @@ EOF
 }
 
 locals {
-  lambda_invoke_ssm_policies = local.is-preproduction ? {
+  lambda_invoke_ssm_policies_uat = local.is-preproduction ? {
     "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
     "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
     "invoke_ssm_powershell"      = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_uat[0].arn
@@ -465,7 +465,7 @@ locals {
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policies_invoke_ssm_uat" {
-  for_each   = local.is-preproduction ? local.lambda_invoke_ssm_policies : {}
+  for_each   = local.is-preproduction ? local.lambda_invoke_ssm_policies_uat : {}
   role       = aws_iam_role.lambda_role_invoke_ssm_uat[0].name
   policy_arn = each.value
 }
@@ -493,16 +493,16 @@ EOF
 }
 
 locals {
-  lambda_get_securityhub_policies = local.is-preproduction ? {
-    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
-    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
-    "invoke_ses"                 = aws_iam_policy.iam_policy_lambda_invoke_ses_uat[0].arn
-    "get_securityhub_data"       = aws_iam_policy.iam_policy_lambda_get_securityhub_data_uat[0].arn
+  lambda_get_securityhub_policies_uat = local.is-preproduction ? {
+    "send_message_to_sqs"             = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
+    "send_logs_to_cloudwatch"         = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
+    "invoke_ses"                      = aws_iam_policy.iam_policy_lambda_invoke_ses_uat[0].arn
+    "get_securityhub_data"            = aws_iam_policy.iam_policy_lambda_get_securityhub_data_uat[0].arn
   } : {}
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_securityhub_data_uat" {
-  for_each   = local.is-development ? local.lambda_get_securityhub_policies : {}
+  for_each   = local.is-development ? local.lambda_get_securityhub_policies_uat : {}
   role       = aws_iam_role.lambda_role_get_securityhub_data_uat[0].name
   policy_arn = each.value
 }
@@ -530,16 +530,16 @@ EOF
 }
 
 locals {
-  lambda_get_certificate_policies = local.is-preproduction ? {
-    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
-    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
-    "get_certificate"            = aws_iam_policy.iam_policy_lambda_get_certificate_uat[0].arn
-    "get_cloudwatch_metrics"     = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_uat[0].arn
+  lambda_get_certificate_policies_uat = local.is-preproduction ? {
+    "send_message_to_sqs"             = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
+    "send_logs_to_cloudwatch"         = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
+    "get_certificate"                 = aws_iam_policy.iam_policy_lambda_get_certificate_uat[0].arn
+    "get_cloudwatch_metrics"          = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_uat[0].arn
   } : {}
 }
 
 resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_certificate_uat" {
-  for_each   = local.is-preproduction ? local.lambda_get_certificate_policies : {}
+  for_each   = local.is-preproduction ? local.lambda_get_certificate_policies_uat : {}
   role       = aws_iam_role.lambda_role_get_certificate_uat[0].name
   policy_arn = each.value
 }
