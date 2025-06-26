@@ -110,10 +110,10 @@
       "port": "1521",
       "allocated_storage": 600,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-01.rur-2025-01.r1",
+      "engine_version": "19.0.0.0.ru-2025-04.rur-2025-04.r1",
       "instance_class": "db.m5.xlarge",
-      "allow_major_version_upgrade": true,
-      "auto_minor_version_upgrade": true,
+      "allow_major_version_upgrade": false,
+      "auto_minor_version_upgrade": false,
       "storage_type": "io1",
       "iops": 6000,
       "backup_retention_period": 35,
@@ -137,7 +137,7 @@
       "build_ses": true,
       "pagerduty_integration_key_name": "laa_maat_prod_alarm",
       "hosted_zone": "legalservices.gov.uk",
-      "ses_domain": "maat.legalservices.gov.uk"
+      "ses_domain": "legalservices.gov.uk"
     }
   }
 }

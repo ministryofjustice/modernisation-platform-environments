@@ -99,6 +99,18 @@
       {
         "name": "APP_ATS_OAUTH_SCOPE",
         "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_ATS_OAUTH_SCOPE"
+      },
+      {
+        "name": "APP_MASTER_PASSWORD",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_MASTER_PASSWORD"
+      },
+      {
+        "name": "APP_SALT",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_SALT"
+      },
+      {
+        "name": "APP_DERIVATION_ITERATIONS",
+        "valueFrom": "arn:aws:ssm:${env_account_region}:${env_account_id}:parameter/maat/APP_DERIVATION_ITERATIONS"
       }
     ],
     "environment": [
