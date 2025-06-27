@@ -193,9 +193,9 @@ module "LAA-ftp-xerox-cis-pay-outbound" {
   ftp_cron            = "cron(0 10 * * ? *)"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   env                 = local.environment
-  s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  s3_object_ftp_client= aws_s3_object.ftp_client.key
-  s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
+  # s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  # s3_object_ftp_client= aws_s3_object.ftp_client.key
+  # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
   slack_webhook = local.application_data.accounts[local.environment].ftp_slack_notification_webhook
   skip_key_verification = "YES"
