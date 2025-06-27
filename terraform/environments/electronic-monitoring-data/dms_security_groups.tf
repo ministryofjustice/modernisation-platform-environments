@@ -37,8 +37,7 @@ resource "aws_security_group" "dms_ri_security_group" {
 }
 
 resource "aws_security_group_rule" "dms_tcp_outbound" {
-  count = local.is-production || local.is-development ? 1 : 0
-  for_each          = toset([for port in var.sqlserver_https_ports : tostring(port)])
+  for_each          = local.is-production || local.is-development ? toset([for port in var.sqlserver_https_ports : tostring(port)]): toset([])
   security_group_id = aws_security_group.dms_ri_security_group.id
   type              = "egress"
   cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
