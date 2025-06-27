@@ -131,7 +131,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "3eb0c12d22fe24c416216d176989e24963a932b0" # for testing install-nomis-release fix
+            branch = "main"
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {

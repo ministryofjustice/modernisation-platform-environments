@@ -21,6 +21,9 @@ locals {
   }))
 
   maatdb_password_secret_name = "APP_MAATDB_DBPASSWORD_MLA1"
+  app_master_password_name    = "APP_MASTER_PASSWORD"
+  app_salt_name               = "APP_SALT"
+  app_derivation_iterations_name = "APP_DERIVATION_ITERATIONS"
   gtm_id_secret_name          = "APP_MLRA_GOOGLE_TAG_MANAGER_ID"
   infox_client_secret_name    = "APP_INFOX_CLIENT_SECRET"
   maat_api_client_id_name     = "APP_MAAT_API_CLIENT_ID"
@@ -41,6 +44,9 @@ locals {
     infox_client_secret    = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.infox_client_secret_name}"
     maat_api_client_id     = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maat_api_client_id_name}"
     maat_api_client_secret = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.maat_api_client_secret_name}"
+    app_master_password    = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_master_password_name}"
+    app_salt               = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_salt_name}"
+    app_derivation_iterations = "arn:aws:ssm:${local.application_data.accounts[local.environment].region}:${local.env_account_id}:parameter/${local.app_derivation_iterations_name}"
   })
   ecs_target_capacity = 100
 
