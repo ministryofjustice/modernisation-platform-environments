@@ -4,9 +4,14 @@ locals {
   dbt_k8s_secrets_placeholder = {
     oidc_cluster_identifier = "placeholder2"
   }
-  dbt_suffix = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
-  suffix     = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
-  live_feed_dbs = [
+  airflow_dbs    = [
+    "serco_fms",
+    "allied_mdss",
+  ]
+  airflow_suffix = local.is-production ? "" : "_${local.environment_shorthand}"
+  dbt_suffix     = local.is-production ? "" : "_${local.environment_shorthand}_dbt"
+  suffix         = local.is-production ? "" : local.is-preproduction ? "-pp" : local.is-test ? "-test" : "-dev"
+  live_feed_dbs  = [
     "serco_fms",
     "allied_mdss",
     "staged_fms",
@@ -35,7 +40,8 @@ locals {
   "sar_ear_reports_mart"] : []
   dev_dbs_to_grant       = local.is-production ? [for db in local.prod_dbs_to_grant : "${db}_historic_dev_dbt"] : []
   live_feed_dbs_to_grant = [for db in local.live_feed_dbs : "${db}${local.dbt_suffix}"]
-  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.live_feed_dbs_to_grant]))
+  airflow_dbs_to_grant   = [for db in local.airflow_dbs : "${db}${local.airflow_suffix}"]
+  dbs_to_grant           = toset(flatten([local.prod_dbs_to_grant, local.dev_dbs_to_grant, local.live_feed_dbs_to_grant, local.airflow_dbs_to_grant]))
 }
 
 # Source Analytics DBT Secrets
