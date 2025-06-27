@@ -110,7 +110,7 @@ resource "aws_lambda_function" "ftp_lambda" {
   role          = aws_iam_role.ftp_lambda_role.arn
   handler       = "ftp-client.lambda_handler"
   runtime       = "python3.13"
-  timeout       = 6000
+  timeout       = 900
   memory_size   = 256
   # s3_bucket = var.s3_bucket_ftp
   # s3_key    = var.s3_object_ftp_client
