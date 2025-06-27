@@ -1,9 +1,45 @@
-resource "aws_kms_key" "export" {
+resource "aws_kms_key" "rds_export" {
   description             = "KMS key for RDS export"
   deletion_window_in_days = 7
-
+  enable_key_rotation     = true
   tags = local.tags
 }
+
+resource "aws_kms_key_policy" "rds_export" {
+  key_id = aws_kms_key.cloudwatch_logs_key.id
+  policy = jsonencode({
+    Id = "key-default-1"
+    Statement = [
+      {
+        Action = "kms:*"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.modernisation_platform_account_id}:root"
+        }
+
+        Resource = "*"
+        Sid      = "Enable IAM User Permissions"
+      },
+      {
+        Action = [
+          "kms:Encrypt*",
+          "kms:Decrypt*",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:Describe*"
+        ]
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.eu-west-2.amazonaws.com"
+        }
+        Resource = "*"
+        Sid      = "Enable log service Permissions"
+      }
+    ]
+    Version = "2012-10-17"
+  })
+}
+
 
 module "rds_export" {
   source = "github.com/ministryofjustice/terraform-rds-export?ref=sql-backup-restore"
@@ -17,21 +53,6 @@ module "rds_export" {
     business-unit = "HMPPS"
     application   = "property-cafm-data-migration"
     is-production = "false"
-    owner         = "jyotiranjan.nayak@justice.gov.uk"
+    owner         = "shanmugapriya.basker@justice.gov.uk"
   }
 }
-
-# Create an S3 bucket for SFTP storage
-resource "aws_s3_bucket" "sftp_bucket" {
-  bucket = "property-datahub-landing-${local.environment}"
-}
-
-resource "aws_s3_bucket_public_access_block" "sftp_bucket" {
-  bucket = aws_s3_bucket.sftp_bucket.id
-
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-}
-
