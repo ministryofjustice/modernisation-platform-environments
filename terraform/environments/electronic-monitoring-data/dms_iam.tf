@@ -99,7 +99,6 @@ resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_policy_attachment" {
 resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   name                = "dms-cloudwatch-logs-role"
   assume_role_policy  = data.aws_iam_policy_document.dms_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"]
   tags = merge(
     local.tags,
     {
@@ -108,19 +107,28 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   )
 }
 
+resource "aws_iam_role_policy_attachment" "dms_cloudwatch_logs_role_attachment" {
+  role       = aws_iam_role.dms_cloudwatch_logs_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
+}
+
 # -------------------------------------------------------------
 
 # Error: creating DMS Replication Subnet Group (rds-replication-subnet-group-tf): AccessDeniedFault: The IAM Role arn:aws:iam::############:role/dms-vpc-role is not configured properly.
 resource "aws_iam_role" "dms_vpc_role" {
   name                = "dms-vpc-role"
   assume_role_policy  = data.aws_iam_policy_document.dms_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"]
   tags = merge(
     local.tags,
     {
       Resource_Type = "Role having DMS access policies",
     }
   )
+}
+
+resource "aws_iam_role_policy_attachment" "dms_vpc_role_attachment" {
+  role       = aws_iam_role.dms_vpc_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 
 # -------------------------------------------------------------

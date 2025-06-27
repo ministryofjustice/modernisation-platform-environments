@@ -15,11 +15,11 @@ module "dms_task" {
     "g4s_fep",
     "g4s_emsys_tpims",
     "capita_forms_and_subject_id",
-    "LCM_ARCHIVE_2019",
-    "LCM_ARCHIVE_2020",
-    "LCM_ARCHIVE_2021",
-    "LCM_ARCHIVE_2022",
-    "LCM_ARCHIVE_2023",
+    "lcm_archive_2019",
+    "lcm_archive_2020",
+    "lcm_archive_2021",
+    "lcm_archive_2022",
+    "lcm_archive_2023",
     "lcm_archive_local_full"
   ] : ["test"])
 
