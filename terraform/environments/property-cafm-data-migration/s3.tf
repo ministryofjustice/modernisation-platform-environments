@@ -9,11 +9,6 @@
 # S3 Bucket for Files copying between the CAFM Environments
 
 resource "aws_s3_bucket" "CAFM" {
-  # checkov:skip=CKV_AWS_145: "S3 bucket is not public facing, does not contain any sensitive information and does not need encryption"
-  # checkov:skip=CKV_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV2_AWS_62: "S3 bucket event notification is not required"
-  # checkov:skip=CKV_AWS_144: "CAFM has a UK Sovereignty requirement so cross region replication is prohibited"
-  # checkov:skip=CKV_AWS_18: "S3 bucket logging is not required"
   bucket = "property-datahub-landing-${local.environment}"
 
   lifecycle {
@@ -60,6 +55,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "CAFM" {
     }
   }
 }
+
+resource "aws_s3_bucket_logging" "CAFM" {
+  bucket        = aws_s3_bucket.CAFM.id
+  target_bucket = aws_s3_bucket.LOG.id
+  target_prefix = "s3-logs/cafm-files-production-logs/"
+}
+
 
 # S3 block public access
 resource "aws_s3_bucket_public_access_block" "CAFM" {
@@ -114,4 +116,94 @@ resource "aws_s3_bucket_policy" "CAFM" {
       }
     ]
   })
+}
+
+
+resource "aws_s3_bucket" "LOG" {
+  bucket = "property-datahub-logs-${local.environment}"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "${local.application_name}-LOGS-S3"
+    }
+  )
+}
+
+resource "aws_s3_bucket_acl" "LOG_ACL" {
+  bucket = aws_s3_bucket.LOG.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_versioning" "LOG" {
+  bucket = aws_s3_bucket.LOG.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# S3 block public access
+resource "aws_s3_bucket_public_access_block" "LOG" {
+  bucket = aws_s3_bucket.LOG.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_iam_role" "lambda_exec_role" {
+  name = "cafm_s3_trigger_lambda_exec_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action = "sts:AssumeRole",
+      Principal = {
+        Service = "lambda.amazonaws.com"
+      },
+      Effect = "Allow",
+      Sid = ""
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logging" {
+  role       = aws_iam_role.lambda_exec_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_lambda_function" "cafm_s3_trigger_lambda" {
+  function_name = "cafm-s3-triggered-function"
+  handler       = "lambda_function.lambda_handler"
+  runtime       = "python3.9"
+  role          = aws_iam_role.lambda_exec_role.arn
+
+  filename         = "lambda_function_payload.zip"  # path to your ZIP file
+  source_code_hash = filebase64sha256("lambda_function_payload.zip")
+}
+
+resource "aws_s3_bucket_notification" "s3_trigger" {
+  bucket = aws_s3_bucket.CAFM.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.cafm_s3_trigger_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+    filter_prefix       = "uploads/"
+    filter_suffix       = ".jpg"
+  }
+
+  depends_on = [aws_lambda_permission.allow_s3_invocation]
+}
+
+resource "aws_lambda_permission" "allow_s3_invocation" {
+  statement_id  = "AllowExecutionFromS3"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.cafm_s3_trigger_lambda.function_name
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.CAFM.arn
 }
