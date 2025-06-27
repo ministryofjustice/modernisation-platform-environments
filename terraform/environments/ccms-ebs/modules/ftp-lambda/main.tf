@@ -2,7 +2,7 @@
 locals {
   lambda_src_dir = "${path.module}/lambda/ftp-client"
   lambda_zip     = "${path.module}/lambda/ftp-client.zip"
-  layer_zip_file = "${path.module}/lambda/lambda_layer.zip"
+  layer_zip_file = "${path.module}/lambda/lambda-layer.zip"
 }
 
 ## sg for ftp
