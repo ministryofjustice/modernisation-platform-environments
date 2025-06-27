@@ -824,7 +824,7 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_uat" {
 }
 
 ###########################
-# Preproduction Environment
+# Production Environment
 ###########################
 
 ####################### IAM Roles and Attachments #######################

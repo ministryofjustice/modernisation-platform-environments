@@ -102,7 +102,7 @@ resource "aws_lambda_function" "terraform_lambda_func_certificate_expiry_uat" {
   runtime                        = "python3.13"
   timeout                        = 30
   reserved_concurrent_executions = 5
-  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policy_certificate_expiry_to_lambda_role_certificate_expiry_uat]
+  depends_on                     = [aws_iam_role_policy_attachment.attach_lambda_policies_get_certificate_uat]
   environment {
     variables = {
       EXPIRY_DAYS   = "45",
