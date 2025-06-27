@@ -32,7 +32,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_rds_to_s3_parquet_v1" {
   count = local.is-production || local.is-development ? 1 : 0
   name              = "dms-dv-rds-to-s3-parquet-v1"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v1" {
@@ -85,7 +85,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_to_s3_parquet_v1.py"
@@ -112,7 +112,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_rds_to_s3_parquet_v2" {
   count = local.is-production || local.is-development ? 1 : 0
   name              = "dms-dv-rds-to-s3-parquet-v2"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 resource "aws_s3_object" "dms_dv_rds_to_s3_parquet_v2" {
@@ -165,7 +165,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_rds_to_s3_parquet_v2.py"
@@ -184,7 +184,7 @@ EOF
 # resource "aws_cloudwatch_log_group" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
 #   name              = "etl-rds-to-s3-parquet-partitionby-yyyy-mm"
 #   retention_in_days = 365
-#   kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+#   kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 # }
 
 # resource "aws_s3_object" "etl_rds_to_s3_parquet_partitionby_yyyy_mm" {
@@ -235,7 +235,7 @@ EOF
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_to_s3_parquet_partitionby_yyyy_mm.py"
@@ -256,7 +256,7 @@ EOF
 # resource "aws_cloudwatch_log_group" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
 #   name              = "etl-dv-rds-to-s3-parquet-partitionby-yyyy-mm"
 #   retention_in_days = 365
-#   kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+#   kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 # }
 
 # resource "aws_s3_object" "etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm" {
@@ -319,7 +319,7 @@ EOF
 
 #   }
 
-#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+#   connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
 #   command {
 #     python_version  = "3"
 #     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_dv_rds_to_s3_parquet_partitionby_yyyy_mm.py"
@@ -340,7 +340,7 @@ resource "aws_cloudwatch_log_group" "parquet_resize_or_partitionby_yyyy_mm_dd" {
   count = local.is-production || local.is-development ? 1 : 0
   name              = "parquet-resize-or-partitionby-yyyy-mm-dd"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 resource "aws_s3_object" "parquet_resize_or_partitionby_yyyy_mm_dd" {
@@ -392,7 +392,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/parquet_resize_or_partitionby_yyyy_mm_dd.py"
@@ -413,7 +413,7 @@ resource "aws_cloudwatch_log_group" "etl_table_rows_hashvalue_to_parquet" {
   count = local.is-production || local.is-development ? 1 : 0
   name              = "etl-table-rows-hashvalue-to-parquet"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 resource "aws_s3_object" "etl_table_rows_hashvalue_to_parquet" {
@@ -461,7 +461,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_table_rows_hashvalue_to_parquet.py"
@@ -483,7 +483,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_on_rows_hashvalue" {
   count = local.is-production || local.is-development ? 1 : 0
   name              = "dms-dv-on-rows-hashvalue"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 resource "aws_s3_object" "dms_dv_on_rows_hashvalue" {
@@ -532,7 +532,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_on_rows_hashvalue.py"
@@ -554,7 +554,7 @@ resource "aws_cloudwatch_log_group" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_m
   count = local.is-production || local.is-development ? 1 : 0
   name              = "etl-rds-tbl-rows-hashvalue-to-s3-prq-yyyy-mm"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 resource "aws_s3_object" "etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm" {
@@ -617,7 +617,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_tbl_rows_hashvalue_to_s3_prq_yyyy_mm.py"
@@ -637,7 +637,7 @@ resource "aws_cloudwatch_log_group" "etl_rds_sqlserver_query_to_s3_parquet" {
   count = local.is-production || local.is-development ? 1 : 0
   name              = "etl-rds-sqlserver-query-to-s3-parquet"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 resource "aws_s3_object" "etl_rds_sqlserver_query_to_s3_parquet" {
@@ -689,7 +689,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/etl_rds_sqlserver_query_to_s3_parquet.py"
@@ -726,7 +726,7 @@ resource "aws_cloudwatch_log_group" "create_or_refresh_dv_table" {
   count = local.is-production || local.is-development ? 1 : 0
   name              = "create-or-refresh-dv-table"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 
@@ -816,7 +816,7 @@ resource "aws_cloudwatch_log_group" "dms_dv_on_rows_hashvalue_partitionby_yyyy_m
   count = local.is-production || local.is-development ? 1 : 0
   name              = "dms-dv-on-rows-hashvalue-partitionby-yyyy-mm"
   retention_in_days = 365
-  kms_key_id        = aws_kms_key.cloudwatch_log_group_key.arn
+  kms_key_id        = aws_kms_key.cloudwatch_log_group_key[0].arn
 }
 
 resource "aws_s3_object" "dms_dv_on_rows_hashvalue_partitionby_yyyy_mm" {
@@ -871,7 +871,7 @@ EOF
 
   }
 
-  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection.name]
+  connections = [aws_glue_connection.glue_rds_sqlserver_db_connection[0].name]
   command {
     python_version  = "3"
     script_location = "s3://${module.s3-glue-job-script-bucket.bucket.id}/dms_dv_on_rows_hashvalue_partitionby_yyyy_mm.py"

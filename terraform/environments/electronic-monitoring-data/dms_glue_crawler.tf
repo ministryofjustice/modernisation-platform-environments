@@ -39,12 +39,12 @@ resource "aws_glue_crawler" "rds_sqlserver_db_glue_crawler" {
   #checkov:skip=CKV_AWS_195
   name          = "rds-sqlserver-${aws_db_instance.database_2022.identifier}-tf"
   role          = aws_iam_role.dms_dv_glue_job_iam_role.arn
-  database_name = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db.name
+  database_name = aws_glue_catalog_database.rds_sqlserver_glue_catalog_db[0].name
   description   = "Crawler to fetch database names"
   #   table_prefix  = "your_table_prefix"
 
   jdbc_target {
-    connection_name = aws_glue_connection.glue_rds_sqlserver_db_connection.name
+    connection_name = aws_glue_connection.glue_rds_sqlserver_db_connection[0].name
     path            = "%"
   }
   tags = merge(

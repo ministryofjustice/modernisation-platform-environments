@@ -4,7 +4,7 @@
 resource "aws_iam_role" "dms_endpoint_role" {
   count = local.is-production || local.is-development ? 1 : 0
   name               = "dms-endpoint-access-role-tf"
-  assume_role_policy = data.aws_iam_policy_document.dms_assume_role.json
+  assume_role_policy = data.aws_iam_policy_document.dms_assume_role[0].json
 
   tags = merge(
     local.tags,
@@ -101,7 +101,7 @@ resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_policy_attachment" {
 resource "aws_iam_role" "dms_cloudwatch_logs_role" {
   count = local.is-production || local.is-development ? 1 : 0
   name                = "dms-cloudwatch-logs-role"
-  assume_role_policy  = data.aws_iam_policy_document.dms_assume_role.json
+  assume_role_policy  = data.aws_iam_policy_document.dms_assume_role[0].json
   tags = merge(
     local.tags,
     {
@@ -122,7 +122,7 @@ resource "aws_iam_role_policy_attachment" "dms_cloudwatch_logs_role_attachment" 
 resource "aws_iam_role" "dms_vpc_role" {
   count = local.is-production || local.is-development ? 1 : 0
   name                = "dms-vpc-role"
-  assume_role_policy  = data.aws_iam_policy_document.dms_assume_role.json
+  assume_role_policy  = data.aws_iam_policy_document.dms_assume_role[0].json
   tags = merge(
     local.tags,
     {

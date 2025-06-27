@@ -46,7 +46,7 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
   )
 
   vpc_security_group_ids = [
-    aws_security_group.dms_ri_security_group.id,
+    aws_security_group.dms_ri_security_group[0].id,
   ]
 
   depends_on = [
