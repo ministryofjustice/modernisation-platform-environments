@@ -46,3 +46,14 @@ module "mlra-ecs" {
   maat_api_client_id_name     = local.maat_api_client_id_name
   maat_api_client_secret_name = local.maat_api_client_secret_name
 }
+
+data "aws_ecs_task_definitions" "all" {
+  family_prefix = "${local.application_name}-ecs-task-definition"
+  sort          = "DESC"
+  status        = "ACTIVE"
+  max_results   = 1
+}
+
+data "aws_ecs_task_definition" "latest" {
+  task_definition = data.aws_ecs_task_definitions.all.arns[0]
+}
