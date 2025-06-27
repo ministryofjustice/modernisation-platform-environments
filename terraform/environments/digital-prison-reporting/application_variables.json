@@ -265,7 +265,8 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-testing"
       ],
       "alarms": {
         "setup_cw_alarms": true,
