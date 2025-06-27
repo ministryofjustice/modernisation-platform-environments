@@ -1,4 +1,10 @@
 
+locals {
+  lambda_src_dir = "${path.module}/lambda/ftp-client"
+  lambda_zip     = "${path.module}/lambda/ftp-client.zip"
+  layer_zip_file = "${path.module}/lambda/lambda_layer.zip"
+}
+
 ## sg for ftp
 resource "aws_security_group" "ftp_sg" {
   name        = "${var.lambda_name}-sg"
@@ -72,13 +78,29 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
 
+# Create ZIP archive of lambda_code/
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = local.lambda_src_dir
+  output_path = local.lambda_zip
+}
+
+
+# Create ZIP archive of lambda layer/
+data "archive_file" "lambda_layer" {
+  type        = "zip"
+  source_file = local.layer_zip_file
+  output_path = "${path.module}/.terraform/tmp/lambda_layer.zip"
+}
 
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name               = "ftpclientlibs"
   compatible_runtimes      = ["python3.13"]
-  s3_bucket                = var.s3_bucket_ftp
-  s3_key                   = var.s3_object_ftp_clientlibs
+  # s3_bucket                = var.s3_bucket_ftp
+  # s3_key                   = var.s3_object_ftp_clientlibs
+  filename    = data.archive_file.lambda_layer.output_path
+  source_code_hash = data.archive_file.lambda_layer.output_base64sha256
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ccms ebs ftp lambda contains pycurl and other dependencies"
 }
@@ -88,11 +110,13 @@ resource "aws_lambda_function" "ftp_lambda" {
   role          = aws_iam_role.ftp_lambda_role.arn
   handler       = "ftp-client.lambda_handler"
   runtime       = "python3.13"
-  timeout       = 300
+  timeout       = 6000
   memory_size   = 256
-  s3_bucket = var.s3_bucket_ftp
-  s3_key    = var.s3_object_ftp_client
+  # s3_bucket = var.s3_bucket_ftp
+  # s3_key    = var.s3_object_ftp_client
   layers    = [aws_lambda_layer_version.ftp_layer.arn]
+  filename      = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   vpc_config {
     subnet_ids         = var.subnet_ids
