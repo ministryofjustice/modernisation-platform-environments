@@ -92,6 +92,7 @@ resource "aws_iam_policy" "dms_ep_s3_role_policy" {
 
 # Attach predefined IAM Policy to the Role for DMS S3 Endpoint
 resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_policy_attachment" {
+  count      = local.is-production || local.is-development ? 1 : 0
   role       = aws_iam_role.dms_endpoint_role[0].name
   policy_arn = aws_iam_policy.dms_ep_s3_role_policy[0].arn
 }
