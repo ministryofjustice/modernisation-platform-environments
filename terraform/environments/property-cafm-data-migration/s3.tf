@@ -9,6 +9,7 @@
 # S3 Bucket for Files copying between the CAFM Environments
 
 resource "aws_s3_bucket" "CAFM" {
+  # checkov:skip=CKV_AWS_144: "S3 bucket has cross-region not required"
   bucket = "property-datahub-landing-${local.environment}"
 
   lifecycle {
@@ -41,6 +42,9 @@ resource "aws_s3_bucket_lifecycle_configuration" "CAFM" {
   rule {
     id     = "tf-s3-lifecycle"
     status = "Enabled"
+    filter {
+      prefix = "uploads/"
+    }
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
     }
@@ -74,7 +78,6 @@ resource "aws_s3_bucket_public_access_block" "CAFM" {
 }
 
 # S3 bucket policy
-
 resource "aws_s3_bucket_policy" "CAFM" {
   bucket = aws_s3_bucket.CAFM.id
 
@@ -118,8 +121,63 @@ resource "aws_s3_bucket_policy" "CAFM" {
   })
 }
 
+resource "aws_s3_bucket_server_side_encryption_configuration" "CAFM" {
+  bucket = aws_s3_bucket.CAFM.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = "alias/aws/s3"  # Use the default AWS-managed KMS key
+    }
+  }
+}
+
+resource "aws_sns_topic" "s3_event_topic" {
+  name = "cafm-landing-s3-event-topic"
+}
+
+resource "aws_s3_bucket_notification" "bucket_notify" {
+  bucket = aws_s3_bucket.CAFM.id
+
+  topic {
+    topic_arn = aws_sns_topic.s3_event_topic.arn
+    events    = ["s3:ObjectCreated:*"]
+    filter_prefix = "uploads/planetfm/"
+    filter_suffix = ".bak"
+  }
+
+  topic {
+  topic_arn = aws_sns_topic.s3_event_topic.arn
+  events    = ["s3:ObjectCreated:*"]
+  filter_prefix = "uploads/concept/"
+  filter_suffix = ".csv"
+}
+}
+
+resource "aws_sns_topic_policy" "s3_publish_policy" {
+  arn = aws_sns_topic.s3_event_topic.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect    = "Allow",
+      Principal = { Service = "s3.amazonaws.com" },
+      Action    = "SNS:Publish",
+      Resource  = aws_sns_topic.s3_event_topic.arn,
+      Condition = {
+        ArnLike = {
+          "aws:SourceArn" = aws_s3_bucket.CAFM.arn
+        }
+      }
+    }]
+  })
+}
+
 
 resource "aws_s3_bucket" "LOG" {
+  # checkov:skip=CKV_AWS_144: "S3 bucket has cross-region not required"
+  # checkov:skip=CKV_AWS_145: "S3 bucket encryption not required"
+  # checkov:skip=CKV2_AWS_61: "S3 bucket lifecycle policy not required"
   bucket = "property-datahub-logs-${local.environment}"
 
   lifecycle {
