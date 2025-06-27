@@ -4,7 +4,6 @@ variable "vpc_id" {}
 variable "subnet_ids" {
   type = list(string)
 }
-variable "ftp_host" {}
 variable "ftp_port" {}
 variable "ftp_protocol" {}
 variable "ftp_transfer_type" {}
@@ -17,15 +16,14 @@ variable "ftp_ca_cert" {}
 variable "ftp_cert" {}
 variable "ftp_key" {}
 variable "ftp_key_type" {}
-variable "ftp_user" {}
-variable "ftp_password_path" {}
+variable "slack_webhook" {}
+variable "skip_key_verification" {}
 variable "ftp_file_remove" {}
 variable "ftp_cron" {}
 variable "ftp_bucket" {}
-variable "sns_topic_sev5" {}
-variable "sns_topic_ops" {}
-variable "ssh_key_path" {}
+variable "secret_name" {}
 variable "env" {}
 variable "s3_bucket_ftp" {}
 variable "s3_object_ftp_client" {}
 variable "s3_object_ftp_clientlibs" {}
+variable "secret_arn" {}
