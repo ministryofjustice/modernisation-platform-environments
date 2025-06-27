@@ -210,20 +210,6 @@ locals {
           self            = true
           security_groups = ["web"]
         }
-        rpc_tcp_app2 = {
-          description     = "135: TCP MS-RPC allow ingress from app and db servers"
-          from_port       = 135
-          to_port         = 135
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
-        }
-        smb_tcp_app = {
-          description     = "445: TCP SMB allow ingress from app and db servers"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
-        }
         http_2109_csr = {
           description = "2109: TCP CSR ingress"
           from_port   = 2109
@@ -237,13 +223,6 @@ locals {
           to_port     = 45054
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
-        }
-        rpc_dynamic_tcp_app = {
-          description     = "49152-65535: TCP Dynamic Port range"
-          from_port       = 49152
-          to_port         = 65535
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
         }
       }
     }
