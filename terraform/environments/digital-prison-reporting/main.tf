@@ -1123,7 +1123,7 @@ module "generate_test_postgres_data" {
   enable_continuous_log_filter = false
   project_id                   = local.project
   aws_kms_key                  = local.s3_kms_arn
-  connections                  = ["dpr-dps-testing2-connection"]
+  connections                  = ["dpr-dps-testing-connection"]
 
   execution_class             = "STANDARD"
   worker_type                 = "G.1X"
@@ -1148,7 +1148,7 @@ module "generate_test_postgres_data" {
     "--class"                                  = "uk.gov.justice.digital.job.generator.PostgresLoadGeneratorJob"
     "--dpr.aws.region"                         = local.account_region
     "--dpr.log.level"                          = local.glue_job_common_log_level
-    "--dpr.test.database.secret.id"            = "external/dpr-dps-testing2-source-secrets"
+    "--dpr.test.database.secret.id"            = "external/dpr-dps-testing-source-secrets"
     "--dpr.test.data.batch.size"               = 5
     "--dpr.test.data.parallelism"              = 100
     "--dpr.test.data.inter.batch.delay.millis" = 2000
