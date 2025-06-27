@@ -210,23 +210,12 @@ locals {
           self            = true
           security_groups = ["web"]
         }
-        # IMPORTANT: check if an 'allow all from load-balancer' rule is required
-        # IMPORTANT: check whether http/https traffic is still needed? It's in the original but not used at an app level
-        rpc_tcp_app = { # typo in name - this is for UDP but can't easily be changed
-          description     = "135: UDP MS-RPC allow ingress from app and db servers"
-          from_port       = 135
-          to_port         = 135
-          protocol        = "UDP"
-          security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
         rpc_tcp_app2 = {
           description     = "135: TCP MS-RPC allow ingress from app and db servers"
           from_port       = 135
           to_port         = 135
           protocol        = "TCP"
           security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         smb_tcp_app = {
           description     = "445: TCP SMB allow ingress from app and db servers"
@@ -234,15 +223,6 @@ locals {
           to_port         = 445
           protocol        = "TCP"
           security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
-        smb_udp_app = {
-          description     = "445: UDP SMB allow ingress from app and db servers"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "UDP"
-          security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         http_2109_csr = {
           description = "2109: TCP CSR ingress"
@@ -250,42 +230,6 @@ locals {
           to_port     = 2109
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
-          # IMPORTANT: check if this needs to be changed to include client access
-        }
-        rdp_tcp_app = {
-          description = "3389: Allow RDP ingress"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rdp_udp_app = {
-          description = "3389: Allow RDP ingress"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rdp_tcp_gw = {
-          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.rdgateway
-        }
-        rdp_udp_gw = {
-          description = "3389: Allow RDP ingress from hmpps domain services RDGateway"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.rdgateway
-        }
-        winrm_app = {
-          description = "5985-6: Allow WinRM ingress"
-          from_port   = 5985
-          to_port     = 5986
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
         }
         http_45054_csr_app = {
           description = "45054: TCP CSR ingress"
@@ -293,15 +237,6 @@ locals {
           to_port     = 45054
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
-          # IMPORTANT: check if this needs to be changed to include client access
-        }
-        rpc_dynamic_udp_app = {
-          description     = "49152-65535: UDP Dynamic Port range"
-          from_port       = 49152
-          to_port         = 65535
-          protocol        = "UDP"
-          security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
         }
         rpc_dynamic_tcp_app = {
           description     = "49152-65535: TCP Dynamic Port range"
@@ -309,16 +244,6 @@ locals {
           to_port         = 65535
           protocol        = "TCP"
           security_groups = ["web", "database"]
-          # NOTE: csr_clientaccess will need to be added here to cidr_blocks
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }
