@@ -61,10 +61,10 @@ resource "aws_glue_crawler" "rds_sqlserver_db_glue_crawler" {
 
 resource "aws_glue_trigger" "rds_sqlserver_db_glue_trigger" {
   count = local.is-production || local.is-development ? 1 : 0
-  name = aws_glue_crawler.rds_sqlserver_db_glue_crawler.name
+  name = aws_glue_crawler.rds_sqlserver_db_glue_crawler[0].name
   type = "ON_DEMAND"
 
   actions {
-    crawler_name = aws_glue_crawler.rds_sqlserver_db_glue_crawler.name
+    crawler_name = aws_glue_crawler.rds_sqlserver_db_glue_crawler[0].name
   }
 }

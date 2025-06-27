@@ -92,8 +92,8 @@ resource "aws_iam_policy" "dms_ep_s3_role_policy" {
 
 # Attach predefined IAM Policy to the Role for DMS S3 Endpoint
 resource "aws_iam_role_policy_attachment" "dms_ep_s3_role_policy_attachment" {
-  role       = aws_iam_role.dms_endpoint_role.name
-  policy_arn = aws_iam_policy.dms_ep_s3_role_policy.arn
+  role       = aws_iam_role.dms_endpoint_role[0].name
+  policy_arn = aws_iam_policy.dms_ep_s3_role_policy[0].arn
 }
 
 # -------------------------------------------------------------
@@ -112,7 +112,7 @@ resource "aws_iam_role" "dms_cloudwatch_logs_role" {
 
 resource "aws_iam_role_policy_attachment" "dms_cloudwatch_logs_role_attachment" {
   count = local.is-production || local.is-development ? 1 : 0
-  role       = aws_iam_role.dms_cloudwatch_logs_role.name
+  role       = aws_iam_role.dms_cloudwatch_logs_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSCloudWatchLogsRole"
 }
 
@@ -133,7 +133,7 @@ resource "aws_iam_role" "dms_vpc_role" {
 
 resource "aws_iam_role_policy_attachment" "dms_vpc_role_attachment" {
   count = local.is-production || local.is-development ? 1 : 0
-  role       = aws_iam_role.dms_vpc_role.name
+  role       = aws_iam_role.dms_vpc_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonDMSVPCManagementRole"
 }
 

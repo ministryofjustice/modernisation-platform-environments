@@ -36,7 +36,7 @@ resource "aws_dms_replication_instance" "dms_replication_instance" {
   publicly_accessible         = false
   replication_instance_class  = var.dms_replication_instance_class
   replication_instance_id     = "dms-replication-instance-tf"
-  replication_subnet_group_id = aws_dms_replication_subnet_group.dms_replication_subnet_group.id
+  replication_subnet_group_id = aws_dms_replication_subnet_group.dms_replication_subnet_group[0].id
 
   tags = merge(
     local.tags,
