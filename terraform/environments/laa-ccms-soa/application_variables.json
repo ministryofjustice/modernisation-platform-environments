@@ -13,7 +13,7 @@
       "admin_container_memory": "15360",
       "admin_app_count": "1",
       "admin_wl_mem_args": "-Xms8192m -Xmx12288m",
-      "admin_xxsoa_ds_username": "XXEDRMS",
+      "admin_xxsoa_ds_username": "XXSOA",
       "admin_ebs_ds_url": "jdbc:oracle:thin:@ccms-ebs-db.laa-development.modernisation-platform.service.justice.gov.uk:1521:EBSDB",
       "admin_ebs_ds_username": "apps",
       "admin_ebssms_ds_url": "jdbc:oracle:thin:@cwa-db.aws.dev.legalservices.gov.uk:1571:CWA",
