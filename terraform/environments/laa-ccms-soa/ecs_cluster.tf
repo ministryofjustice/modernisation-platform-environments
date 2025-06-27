@@ -94,7 +94,7 @@ resource "aws_ecs_service" "admin" {
   deployment_minimum_healthy_percent = 0
   launch_type                        = "EC2"
 
-  health_check_grace_period_seconds = 3600
+  health_check_grace_period_seconds = 1800
 
   ordered_placement_strategy {
     field = "attribute:ecs.availability-zone"
