@@ -199,7 +199,7 @@ module "LAA-ftp-xerox-cis-pay-outbound" {
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
   slack_webhook = local.application_data.accounts[local.environment].ftp_slack_notification_webhook
   skip_key_verification = "YES"
-  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound-${local.environment}"].arn
+  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
 }
 
 
