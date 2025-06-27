@@ -1,5 +1,6 @@
 # Create a new replication subnet group
 resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
+  count = local.is-production || local.is-development ? 1 : 0
   replication_subnet_group_description = "RDS subnet group"
   replication_subnet_group_id          = "rds-replication-subnet-group-tf"
 
@@ -22,6 +23,7 @@ resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
 # Create a new replication instance
 
 resource "aws_dms_replication_instance" "dms_replication_instance" {
+  count = local.is-production || local.is-development ? 1 : 0
   #checkov:skip=CKV_AWS_212
   allocated_storage          = var.dms_allocated_storage_gib
   apply_immediately          = true

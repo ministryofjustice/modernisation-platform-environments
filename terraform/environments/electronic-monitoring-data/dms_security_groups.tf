@@ -23,6 +23,7 @@ variable "sqlserver_https_ports" {
 # -------------------------------------------------------
 
 resource "aws_security_group" "dms_ri_security_group" {
+  count = local.is-production || local.is-development ? 1 : 0
   name        = "dms_rep_instance_access_tf"
   description = "Secuity Group having relevant acess for DMS"
   vpc_id      = data.aws_vpc.shared.id
@@ -36,6 +37,7 @@ resource "aws_security_group" "dms_ri_security_group" {
 }
 
 resource "aws_security_group_rule" "dms_tcp_outbound" {
+  count = local.is-production || local.is-development ? 1 : 0
   for_each          = toset([for port in var.sqlserver_https_ports : tostring(port)])
   security_group_id = aws_security_group.dms_ri_security_group.id
   type              = "egress"
@@ -47,7 +49,7 @@ resource "aws_security_group_rule" "dms_tcp_outbound" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "dms_db_ob_access" {
-
+  count = local.is-production || local.is-development ? 1 : 0
   security_group_id            = aws_security_group.dms_ri_security_group.id
   description                  = "dms_rds_db_outbound"
   ip_protocol                  = "tcp"
@@ -57,6 +59,7 @@ resource "aws_vpc_security_group_egress_rule" "dms_db_ob_access" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "dms_to_rds_sg_rule" {
+  count = local.is-production || local.is-development ? 1 : 0
   security_group_id = aws_security_group.db.id
 
   referenced_security_group_id = aws_security_group.dms_ri_security_group.id
@@ -67,6 +70,7 @@ resource "aws_vpc_security_group_ingress_rule" "dms_to_rds_sg_rule" {
 }
 
 resource "aws_security_group_rule" "allow_glue_athena" {
+  count = local.is-production || local.is-development ? 1 : 0
   type                     = "ingress"
   from_port                = 443
   to_port                  = 443

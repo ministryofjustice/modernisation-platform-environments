@@ -1,4 +1,5 @@
 resource "aws_glue_connection" "glue_rds_sqlserver_db_connection" {
+  count = local.is-production || local.is-development ? 1 : 0
   connection_properties = {
     JDBC_CONNECTION_URL = "jdbc:sqlserver://${aws_db_instance.database_2022.endpoint}"
     PASSWORD            = aws_secretsmanager_secret_version.db_password.secret_string
@@ -22,6 +23,7 @@ resource "aws_glue_connection" "glue_rds_sqlserver_db_connection" {
 }
 
 resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
+  count = local.is-production || local.is-development ? 1 : 0
   name = "rds_sqlserver_dms"
   # create_table_default_permission {
   #   permissions = ["SELECT"]
@@ -33,6 +35,7 @@ resource "aws_glue_catalog_database" "rds_sqlserver_glue_catalog_db" {
 }
 
 resource "aws_glue_crawler" "rds_sqlserver_db_glue_crawler" {
+  count = local.is-production || local.is-development ? 1 : 0
   #checkov:skip=CKV_AWS_195
   name          = "rds-sqlserver-${aws_db_instance.database_2022.identifier}-tf"
   role          = aws_iam_role.dms_dv_glue_job_iam_role.arn
@@ -57,6 +60,7 @@ resource "aws_glue_crawler" "rds_sqlserver_db_glue_crawler" {
 }
 
 resource "aws_glue_trigger" "rds_sqlserver_db_glue_trigger" {
+  count = local.is-production || local.is-development ? 1 : 0
   name = aws_glue_crawler.rds_sqlserver_db_glue_crawler.name
   type = "ON_DEMAND"
 

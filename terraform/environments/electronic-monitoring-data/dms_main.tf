@@ -21,7 +21,7 @@ module "dms_task" {
     "lcm_archive_2022",
     "lcm_archive_2023",
     "lcm_archive_local_full"
-  ] : ["test"])
+  ] : local.is-development ? ["test"] : [])
 
   database_name = each.key
 
