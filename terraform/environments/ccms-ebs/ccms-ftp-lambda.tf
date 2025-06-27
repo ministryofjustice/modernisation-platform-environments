@@ -18,7 +18,7 @@ locals {
     "LAA-ftp-xerox-outbound",
     "LAA-ftp-rossendales-maat-tf-outbound"
   ]
-  base_buckets = ["laa-ccms-inbound", "laa-ccms-outbound", "laa-ccms-ftp-lambda"]
+  base_buckets = ["laa-ccms-inbound", "laa-ccms-outbound"]
 
   bucket_names = [
     for name in local.base_buckets : "${name}-${local.environment}-mp"
@@ -130,17 +130,17 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
   )
 }
 
-resource "aws_s3_object" "ftp_lambda_layer" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  key    = "lambda/ftpclientlibs.zip"
-  source = "lambda/ftpclientlibs.zip"
-}
+# resource "aws_s3_object" "ftp_lambda_layer" {
+#   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+#   key    = "lambda/ftpclientlibs.zip"
+#   source = "lambda/ftpclientlibs.zip"
+# }
 
-resource "aws_s3_object" "ftp_client" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  key    = "lambda/ftp-client.zip"
-  source = "lambda/ftp-client.zip"
-}
+# resource "aws_s3_object" "ftp_client" {
+#   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+#   key    = "lambda/ftp-client.zip"
+#   source = "lambda/ftp-client.zip"
+# }
 
 # # #LAA-ftp-allpay-inbound-ccms
 # module "allpay_ftp_lambda_inbound" {
