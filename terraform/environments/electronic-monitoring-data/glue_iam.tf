@@ -1,20 +1,9 @@
-# IAM role used to run the data validation glue job
+# -------------------------------------------------------------
+# IAM roles and policies used to run the data validation glue job
+# -------------------------------------------------------------
 resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
   name               = "dms-dv-glue-job-tf"
   assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole",
-    "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
-  ]
-  inline_policy {
-    name   = "DV-S3-Policies"
-    policy = data.aws_iam_policy_document.dms_dv_s3_iam_policy_document.json
-  }
-
-  inline_policy {
-    name   = "DV-Athena-Policies"
-    policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
-  }
 
   tags = merge(
     local.tags,
@@ -27,26 +16,34 @@ resource "aws_iam_role" "dms_dv_glue_job_iam_role" {
   }
 }
 
-# # IAM role used to run the glue-notebook
+resource "aws_iam_role_policy_attachment" "dms_dv_glue_job_iam_role_glue_service_role_policy_attachment" {
+  role       = aws_iam_role.dms_dv_glue_job_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+}
+
+resource "aws_iam_role_policy_attachment" "dms_dv_glue_job_iam_role_rds_read_only_access_policy_attachment" {
+  role       = aws_iam_role.dms_dv_glue_job_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy" "dms_dv_glue_job_iam_role_s3_policy" {
+  name   = "DV-S3-Policies"
+  role   = aws_iam_role.dms_dv_glue_job_iam_role.name
+  policy = data.aws_iam_policy_document.dms_dv_s3_iam_policy_document.json
+}
+
+resource "aws_iam_role_policy" "dms_dv_glue_job_iam_role_athena_policy" {
+  name   = "DV-Athena-Policies"
+  role   = aws_iam_role.dms_dv_glue_job_iam_role.name
+  policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
+}
+
+# -------------------------------------------------------------
+# IAM roles and policies used to run the glue-notebook
+# -------------------------------------------------------------
 resource "aws_iam_role" "glue_notebook_iam_role" {
   name               = "glue-notebook-role-tf"
   assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceNotebookRole",
-    "arn:aws:iam::aws:policy/service-role/AwsGlueSessionUserRestrictedNotebookServiceRole",
-    "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess",
-    "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-  ]
-
-  inline_policy {
-    name   = "DV-Athena-Policies"
-    policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
-  }
-
-  inline_policy {
-    name   = "Notebook-EC2-Policies"
-    policy = data.aws_iam_policy_document.glue_notebook_ec2_iam_policy_document.json
-  }
 
   tags = merge(
     local.tags,
@@ -54,6 +51,38 @@ resource "aws_iam_role" "glue_notebook_iam_role" {
       Resource_Type = "Role having Glue-Notebook execution policies",
     }
   )
+}
+
+resource "aws_iam_role_policy_attachment" "glue_notebook_iam_role_glue_service_notebook_role_policy_attachment" {
+  role       = aws_iam_role.glue_notebook_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceNotebookRole"
+}
+
+resource "aws_iam_role_policy_attachment" "glue_notebook_iam_role_glue_session_user_restricted_notebook_service_role_policy_attachment" {
+  role       = aws_iam_role.glue_notebook_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AwsGlueSessionUserRestrictedNotebookServiceRole"
+}
+
+resource "aws_iam_role_policy_attachment" "glue_notebook_iam_role_rds_read_only_access_policy_attachment" {
+  role       = aws_iam_role.glue_notebook_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy_attachment" "glue_notebook_iam_role_s3_read_only_access_policy_attachment" {
+  role       = aws_iam_role.glue_notebook_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy" "glue_notebook_iam_role_dms_dv_policy" {
+  name   = "DV-Athena-Policies"
+  role   = aws_iam_role.glue_notebook_iam_role.name
+  policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
+}
+
+resource "aws_iam_role_policy" "glue_notebook_iam_role_ec2_policy" {
+  name   = "Notebook-EC2-Policies"
+  role   = aws_iam_role.glue_notebook_iam_role.name
+  policy = data.aws_iam_policy_document.glue_notebook_ec2_iam_policy_document.json
 }
 
 resource "aws_iam_policy" "glue_user_restricted_notebook_service_role_iam_policy" {
@@ -175,22 +204,13 @@ resource "aws_iam_role_policy_attachment" "glue_user_restricted_notebook_service
   policy_arn = aws_iam_policy.glue_user_restricted_notebook_service_role_iam_policy.arn
 }
 
+# -------------------------------------------------------------
+# IAM roles and policies used to run the Glue Migration and Validation job
+# -------------------------------------------------------------
+
 resource "aws_iam_role" "glue_mig_and_val_iam_role" {
   name               = "glue-mig-and-val-iam-role-tf"
   assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole",
-    "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
-  ]
-  inline_policy {
-    name   = "Migration-Validation-S3-Policies"
-    policy = data.aws_iam_policy_document.glue_mig_and_val_s3_iam_policy_document.json
-  }
-
-  inline_policy {
-    name   = "DV-Athena-Policies"
-    policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
-  }
 
   tags = merge(
     local.tags,
@@ -201,4 +221,26 @@ resource "aws_iam_role" "glue_mig_and_val_iam_role" {
   lifecycle {
     create_before_destroy = false
   }
+}
+
+resource "aws_iam_role_policy_attachment" "glue_mig_and_val_iam_role_glue_service_role_policy_attachment" {
+  role       = aws_iam_role.glue_mig_and_val_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole"
+}
+
+resource "aws_iam_role_policy_attachment" "glue_mig_and_val_iam_role_rds_read_only_access_policy_attachment" {
+  role       = aws_iam_role.glue_mig_and_val_iam_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonRDSReadOnlyAccess"
+}
+
+resource "aws_iam_role_policy" "glue_mig_and_val_iam_role_dms_dv_policy" {
+  name   = "Migration-Validation-S3-Policies"
+  role   = aws_iam_role.glue_mig_and_val_iam_role.name
+  policy = data.aws_iam_policy_document.glue_mig_and_val_s3_iam_policy_document.json
+}
+
+resource "aws_iam_role_policy" "glue_mig_and_val_iam_role_ec2_policy" {
+  name   = "DV-Athena-Policies"
+  role   = aws_iam_role.glue_mig_and_val_iam_role.name
+  policy = data.aws_iam_policy_document.dms_dv_athena_iam_policy_document.json
 }
