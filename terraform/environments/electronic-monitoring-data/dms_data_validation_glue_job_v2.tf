@@ -151,7 +151,7 @@ resource "aws_glue_job" "dms_dv_rds_to_s3_parquet_v2" {
     "--parquet_output_bucket_name"        = module.s3-dms-data-validation-bucket.bucket.id
     "--glue_catalog_db_name"              = aws_glue_catalog_database.dms_dv_glue_catalog_db[0].name
     "--glue_catalog_tbl_name"             = "glue_df_output"
-    "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_rds_to_s3_parquet_v2.name}"
+    "--continuous-log-logGroup"           = "/aws-glue/jobs/${aws_cloudwatch_log_group.dms_dv_rds_to_s3_parquet_v2[0].name}"
     "--enable-continuous-cloudwatch-log"  = "true"
     "--enable-continuous-log-filter"      = "true"
     "--enable-metrics"                    = "true"

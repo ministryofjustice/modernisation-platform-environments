@@ -37,7 +37,7 @@ module "dms_task" {
   ep_service_access_role_arn = aws_iam_role.dms_endpoint_role[0].arn
 
   # DMS Migration Task Inputs
-  dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance.replication_instance_arn
+  dms_replication_instance_arn    = aws_dms_replication_instance.dms_replication_instance[0].replication_instance_arn
   rep_task_settings_filepath      = trimspace(file("${path.module}/dms_replication_task_settings.json"))
   rep_task_table_mapping_filepath = trimspace(file("${path.module}/dms_${each.key}_task_tables_selection.json"))
 
