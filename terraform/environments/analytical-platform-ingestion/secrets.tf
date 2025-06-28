@@ -86,3 +86,19 @@ module "laa_data_analysis_bucket_list" {
 
   tags = local.tags
 }
+
+module "laa_data_analysis_keys" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.3.1"
+
+  name       = "laa/keys"
+  kms_key_id = module.secretsmanager_common_kms.key_arn
+
+  ignore_secret_changes = true
+  secret_string         = "CHANGEME"
+
+  tags = local.tags
+}
