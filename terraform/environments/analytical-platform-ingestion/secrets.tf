@@ -70,3 +70,19 @@ module "datasync_exclude_path_secret" {
 
   tags = local.tags
 }
+
+module "laa_data_analysis_bucket_list" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.3.1"
+
+  name       = "laa/bucket-list"
+  kms_key_id = module.secretsmanager_common_kms.key_arn
+
+  ignore_secret_changes = true
+  secret_string         = "CHANGEME"
+
+  tags = local.tags
+}
