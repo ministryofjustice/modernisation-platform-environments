@@ -115,6 +115,10 @@ locals {
           ssh_key     = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCjIt9llDtg10ftA9enAnKrG7IkQ3OGNGvSA+2rfCzS7fMOo16BBhQWX3bFZLhy1WKMkACMyIs69+KtN/xAybgIvvInu/6FPJfhoKjVHBF8yAbeOOJXTlDjIEeVUyl5xsJufcPoHYs/Z/qZTOPIegyNdap0aomftQaolwuRdcDFzpJWm8DxMk+ZIAPQfSgRZ3apxKzI8Jr6b5sAtFWj0GMWRBja0H+So3YMCRe6Vvqcx9lEQJs12urRTyMrrknFFIve9jarYoPCqx5X+9210RVhxVfJdD0klQ/3KkjVJ1Kx1fFmQj13DTJROBuxK1ChnoFZL+7DaYSgwmbdQx64XcWmTeRW79wffaUsUONIAEufZxwuxJSLvNloKVMcRkCUeN7giiR6+IhuQch2kyzjxdS2JZ8szUM+hu8QHwYxvK14zXxPPb5o2q/v0yItwWTwgqJS4NH8GkwDT1oIZt/UqNVJRJYFiOj1wIOhMJ8UmlL6FwaD3JnPbBzJLYJb07DC6jsrl1ZCTQaASgp90KrVGiZtTmpbZsDw0I+TSXk2+5AIfIpoXqKyqk+ksWjlado+QJNubUkalKp1h2HiZJMNWmzPIewByFACq1vKNPVjMPsr7HYsgM/7dYggVrqDoppMPQ/Nm7KEx6rYWvn1zjeykZATSHl1vYs0w43CrMHTuKoKtQ=="
           cidr_blocks = ["20.50.108.242/32", "20.50.109.148/32", "51.11.124.205/32", "51.11.124.216/32"]
         }
+        "laa-data-analysis" = {
+          ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILzCNJEbwbdrYM7B4OmdA3f/OX5j7ZS5/V4PKZswHT8J"
+          cidr_blocks = ["145.224.66.26/32"]
+        }
       }
       transfer_server_sftp_users_with_egress = {
         "essex-police" = {
