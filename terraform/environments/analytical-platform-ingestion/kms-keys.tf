@@ -252,3 +252,17 @@ module "secretsmanager_common_kms" {
 
   deletion_window_in_days = 7
 }
+
+module "s3_laa_data_analysis_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  count = local.environment == "production" ? 1 : 0
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.0"
+
+  aliases               = ["s3/laa-data-analysis"]
+  description           = "LAA Data Analysis S3 KMS Key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+}

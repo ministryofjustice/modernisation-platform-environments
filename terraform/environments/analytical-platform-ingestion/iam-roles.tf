@@ -100,8 +100,19 @@ module "datasync_laa_data_analysis_iam_role" {
   custom_role_policy_arns = [module.laa_data_analysis_iam_policy[0].arn]
 }
 
-# Moved blocks to preserve existing resources
-moved {
-  from = module.datasync_laa_data_analysis_iam_role
-  to   = module.datasync_laa_data_analysis_iam_role[0]
+module "laa_data_analysis_replication_iam_role" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  count = local.environment == "production" ? 1 : 0
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.44.1"
+
+  create_role = true
+
+  role_name         = "laa-data-analysis-${local.environment}-replication"
+  role_requires_mfa = false
+
+  trusted_role_services = ["s3.amazonaws.com"]
+
+  custom_role_policy_arns = [module.laa_data_analysis_replication_iam_policy[0].arn]
 }
