@@ -348,3 +348,91 @@ module "guard_duty_s3_malware_protection_iam_policy" {
 
   policy = data.aws_iam_policy_document.guard_duty_malware_protection_iam_policy.json
 }
+
+data "aws_iam_policy_document" "laa_data_analysis" {
+  # Only create this resource if we're in the production environment
+  count = local.environment == "production" ? 1 : 0
+
+  statement {
+    sid    = "AllowSourceBucketKMSAccess"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = jsondecode(data.aws_secretsmanager_secret_version.laa_data_analysis_keys[0].secret_string).keys
+  }
+
+  statement {
+    sid    = "AllowSourceBucketListActions"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads"
+    ]
+    resources = [for bucket in jsondecode(data.aws_secretsmanager_secret_version.laa_data_analysis_bucket_list[0].secret_string).buckets : "arn:aws:s3:::${bucket}"]
+  }
+
+  statement {
+    sid    = "AllowSourceBucketObjectActions"
+    effect = "Allow"
+    actions = [
+      "s3:AbortMultipartUpload",
+      "s3:GetObject",
+      "s3:GetObjectTagging",
+      "s3:GetObjectVersion",
+      "s3:GetObjectVersionTagging",
+      "s3:ListMultipartUploadParts"
+    ]
+    resources = [for bucket in jsondecode(data.aws_secretsmanager_secret_version.laa_data_analysis_bucket_list[0].secret_string).buckets : "arn:aws:s3:::${bucket}/*"]
+  }
+
+  statement {
+    sid    = "AllowLandingBucketActions"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectTagging"
+    ]
+    resources = ["${module.landing_bucket.s3_bucket_arn}/laa-data-analysis/*"]
+  }
+
+  statement {
+    sid    = "AllowLandingBucketKMSActions"
+    effect = "Allow"
+    actions = [
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:Encrypt",
+      "kms:DescribeKey",
+      "kms:Decrypt"
+    ]
+    resources = [module.s3_landing_kms.key_arn]
+  }
+}
+
+module "laa_data_analysis_iam_policy" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  count = local.environment == "production" ? 1 : 0
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+  version = "5.44.1"
+
+  name_prefix = "laa-data-analysis"
+
+  policy = data.aws_iam_policy_document.laa_data_analysis[0].json
+}
+
+# Moved blocks to preserve existing resources
+moved {
+  from = module.laa_data_analysis_iam_policy
+  to   = module.laa_data_analysis_iam_policy[0]
+}
+
+moved {
+  from = data.aws_iam_policy_document.laa_data_analysis
+  to   = data.aws_iam_policy_document.laa_data_analysis[0]
+}
+
+
