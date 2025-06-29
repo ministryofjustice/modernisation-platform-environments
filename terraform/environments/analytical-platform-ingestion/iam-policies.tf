@@ -486,7 +486,9 @@ data "aws_iam_policy_document" "laa_data_analysis_replication" {
     effect = "Allow"
     actions = [
       "kms:Decrypt",
-      "kms:GenerateDataKey"
+      "kms:GenerateDataKey",
+      "kms:Encrypt",
+      "kms:ReEncrypt*"
     ]
     resources = [module.s3_laa_data_analysis_kms[0].key_arn]
   }
@@ -509,7 +511,11 @@ data "aws_iam_policy_document" "laa_data_analysis_replication" {
       "s3:GetObjectVersionAcl",
       "s3:GetObjectVersionTagging",
       "s3:ObjectOwnerOverrideToBucketOwner",
-      "s3:GetObjectVersion"
+      "s3:GetObjectVersion",
+      "s3:GetObject",        # for batch replication
+      "s3:GetObjectTagging", # for batch replication
+      "s3:PutObject",        # for batch replication
+      "s3:PutObjectTagging"  # for batch replication
     ]
     resources = ["${module.laa_data_analysis_bucket[0].s3_bucket_arn}/*"]
   }
