@@ -112,7 +112,7 @@ module "laa_data_analysis_replication_iam_role" {
   role_name         = "laa-data-analysis-${local.environment}-replication"
   role_requires_mfa = false
 
-  trusted_role_services = ["s3.amazonaws.com"]
+  trusted_role_services = ["s3.amazonaws.com", "batchoperations.s3.amazonaws.com"] # I want to replicate after scanning only, so need to do it as a batch job
 
   custom_role_policy_arns = [module.laa_data_analysis_replication_iam_policy[0].arn]
 }
