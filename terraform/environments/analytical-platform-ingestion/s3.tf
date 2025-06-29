@@ -403,6 +403,70 @@ module "laa_data_analysis_bucket" {
     }
   }
 
+  attach_inventory_destination_policy = true
+  inventory_self_source_destination   = true
+
+  inventory_configuration = {
+    laa-data-analysis-inventory-csv = {
+      included_object_versions = "All"
+
+      destination = {
+        format = "CSV"
+        prefix = "inventory/csv/"
+      }
+
+
+      frequency = "Weekly"
+
+      optional_fields = [
+        "Size",
+        "LastModifiedDate",
+        "StorageClass",
+        "ETag",
+        "IsMultipartUploaded",
+        "ReplicationStatus",
+        "EncryptionStatus",
+        "ObjectLockRetainUntilDate",
+        "ObjectLockMode",
+        "ObjectLockLegalHoldStatus",
+        "IntelligentTieringAccessTier",
+        "BucketKeyStatus",
+        "ChecksumAlgorithm",
+        "ObjectAccessControlList",
+        "ObjectOwner"
+      ]
+    },
+
+    laa-data-analysis-inventory-parquet = {
+      included_object_versions = "All"
+
+      destination = {
+        format = "Parquet"
+        prefix = "inventory/parquet/"
+      }
+
+      frequency = "Weekly"
+
+      optional_fields = [
+        "Size",
+        "LastModifiedDate",
+        "StorageClass",
+        "ETag",
+        "IsMultipartUploaded",
+        "ReplicationStatus",
+        "EncryptionStatus",
+        "ObjectLockRetainUntilDate",
+        "ObjectLockMode",
+        "ObjectLockLegalHoldStatus",
+        "IntelligentTieringAccessTier",
+        "BucketKeyStatus",
+        "ChecksumAlgorithm",
+        "ObjectAccessControlList",
+        "ObjectOwner"
+      ]
+    }
+  }
+
   tags = local.tags
 }
 

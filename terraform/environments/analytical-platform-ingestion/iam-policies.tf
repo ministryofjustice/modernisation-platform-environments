@@ -495,7 +495,9 @@ data "aws_iam_policy_document" "laa_data_analysis_replication" {
     effect = "Allow"
     actions = [
       "s3:GetReplicationConfiguration",
-      "s3:ListBucket"
+      "s3:ListBucket",
+      "s3:PutInventoryConfiguration",
+      "s3:InitiateReplication"
     ]
     resources = [module.laa_data_analysis_bucket[0].s3_bucket_arn]
   }

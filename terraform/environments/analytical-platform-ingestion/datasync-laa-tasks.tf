@@ -50,7 +50,7 @@ resource "aws_datasync_task" "laa_data_analysis_tasks" {
   name                     = "laa-data-analysis-${each.key}-to-dedicated"
   source_location_arn      = local.source_location_arns[each.key]
   destination_location_arn = aws_datasync_location_s3.laa_bucket_locations[each.key].arn
-  cloudwatch_log_group_arn = module.datasync_enhanced_logs.cloudwatch_log_group_arn
+  cloudwatch_log_group_arn = "${module.datasync_enhanced_logs.cloudwatch_log_group_arn}:*"
   task_mode                = "ENHANCED"
 
   options {
