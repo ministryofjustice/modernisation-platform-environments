@@ -375,7 +375,8 @@ data "aws_iam_policy_document" "laa_data_analysis" {
     actions = [
       "s3:GetBucketLocation",
       "s3:ListBucket",
-      "s3:ListBucketMultipartUploads"
+      "s3:ListBucketMultipartUploads",
+      "s3:GetBucketAcl"
     ]
     resources = [for bucket in jsondecode(data.aws_secretsmanager_secret_version.laa_data_analysis_bucket_list[0].secret_string).buckets : "arn:aws:s3:::${bucket}"]
   }
@@ -389,7 +390,9 @@ data "aws_iam_policy_document" "laa_data_analysis" {
       "s3:GetObjectTagging",
       "s3:GetObjectVersion",
       "s3:GetObjectVersionTagging",
-      "s3:ListMultipartUploadParts"
+      "s3:ListMultipartUploadParts",
+      "s3:GetObjectAcl",
+      "s3:GetObjectVersionAcl"
     ]
     resources = [for bucket in jsondecode(data.aws_secretsmanager_secret_version.laa_data_analysis_bucket_list[0].secret_string).buckets : "arn:aws:s3:::${bucket}/*"]
   }
