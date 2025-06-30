@@ -182,6 +182,7 @@ resource "aws_sns_topic_policy" "s3_publish_policy" {
 }
 
 #tfsec:ignore:AVD-AWS-0132
+#tfsec:ignore:AVD-AWS-0088
 resource "aws_s3_bucket" "LOG" {
   # checkov:skip=CKV_AWS_144: "S3 bucket has cross-region not required"
   # checkov:skip=CKV_AWS_145: "S3 bucket encryption not required"
