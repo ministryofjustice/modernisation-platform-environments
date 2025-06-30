@@ -195,7 +195,7 @@ locals {
 
       tags = merge(
         local.tags,
-        { 
+        {
           backup = true
         }
       )
