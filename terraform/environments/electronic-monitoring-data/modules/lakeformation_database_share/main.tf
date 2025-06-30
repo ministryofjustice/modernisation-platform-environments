@@ -1,6 +1,6 @@
 locals {
   dbs_to_create = var.db_exists ? toset([]) : toset(var.dbs_to_grant)
-  grant_dbs     = var.db_exists ? {for db in var.dbs_to_grant : db => db} : { for k, v in aws_glue_catalog_database.cadt_databases : k => v.name }
+  grant_dbs     = var.db_exists ? { for db in var.dbs_to_grant : db => db } : { for k, v in aws_glue_catalog_database.cadt_databases : k => v.name }
 }
 data "aws_caller_identity" "current" {}
 
