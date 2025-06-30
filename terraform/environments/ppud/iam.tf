@@ -32,11 +32,11 @@ EOF
 
 locals {
   lambda_invoke_ssm_policies_dev = local.is-development ? {
-    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
-    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
-    "invoke_ssm_powershell"      = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
-    "invoke_ssm_ec2_instances"   = aws_iam_policy.iam_policy_lambda_invoke_ssm_ec2_instances_dev[0].arn
-    "lambda_invoke"              = aws_iam_policy.iam_policy_lambda_invoke_dev[0].arn
+    "send_message_to_sqs"      = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch"  = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "invoke_ssm_powershell"    = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_dev[0].arn
+    "invoke_ssm_ec2_instances" = aws_iam_policy.iam_policy_lambda_invoke_ssm_ec2_instances_dev[0].arn
+    "lambda_invoke"            = aws_iam_policy.iam_policy_lambda_invoke_dev[0].arn
   } : {}
 }
 
@@ -71,12 +71,12 @@ EOF
 
 locals {
   lambda_get_certificate_policies_dev = local.is-development ? {
-    "send_message_to_sqs"            = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
-    "send_logs_to_cloudwatch"        = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
-    "publish_sns"                    = aws_iam_policy.iam_policy_lambda_publish_to_sns_dev[0].arn
-    "get_certificate"                = aws_iam_policy.iam_policy_lambda_get_certificate_dev[0].arn
- #  "sqs_invoke"                     = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
-    "get_cloudwatch_metrics"         = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "publish_sns"             = aws_iam_policy.iam_policy_lambda_publish_to_sns_dev[0].arn
+    "get_certificate"         = aws_iam_policy.iam_policy_lambda_get_certificate_dev[0].arn
+    #  "sqs_invoke"                     = aws_iam_policy.iam_policy_lambda_invoke_sqs_dev[0].arn
+    "get_cloudwatch_metrics" = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
   } : {}
 }
 
@@ -110,12 +110,12 @@ EOF
 
 locals {
   lambda_get_cloudwatch_policies_dev = local.is-development ? {
-    "send_message_to_sqs"            = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
-    "send_logs_to_cloudwatch"        = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
-    "get_cloudwatch_metrics"         = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
-    "invoke_ses"                     = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
-    "get_data_s3"                    = aws_iam_policy.iam_policy_lambda_get_s3_data_dev[0].arn
-    "get_klayers"                    = aws_iam_policy.iam_policy_lambda_get_ssm_parameter_klayers_dev[0].arn
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "get_cloudwatch_metrics"  = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_dev[0].arn
+    "invoke_ses"              = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
+    "get_data_s3"             = aws_iam_policy.iam_policy_lambda_get_s3_data_dev[0].arn
+    "get_klayers"             = aws_iam_policy.iam_policy_lambda_get_ssm_parameter_klayers_dev[0].arn
   } : {}
 }
 
@@ -156,10 +156,10 @@ EOF
 
 locals {
   lambda_get_securityhub_policies_dev = local.is-development ? {
-    "send_message_to_sqs"             = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
-    "send_logs_to_cloudwatch"         = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
-    "invoke_ses"                      = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
-    "get_securityhub_data"            = aws_iam_policy.iam_policy_lambda_get_securityhub_data_dev[0].arn
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_dev[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_dev[0].arn
+    "invoke_ses"              = aws_iam_policy.iam_policy_lambda_invoke_ses_dev[0].arn
+    "get_securityhub_data"    = aws_iam_policy.iam_policy_lambda_get_securityhub_data_dev[0].arn
   } : {}
 }
 
@@ -190,7 +190,7 @@ resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_dev" {
           "sqs:ListQueueTags",
           "sqs:ReceiveMessage",
           "sns:Publish"
-        ],  
+        ],
         "Resource" : [
           "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
         ]
@@ -211,7 +211,7 @@ resource "aws_iam_policy" "iam_policy_lambda_publish_to_sns_dev" {
         "Effect" : "Allow",
         "Action" : [
           "sns:Publish"
-        ],  
+        ],
         "Resource" : [
           "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
         ]
@@ -367,7 +367,7 @@ resource "aws_iam_policy" "iam_policy_lambda_get_cloudwatch_metrics_dev" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-	      "Effect" : "Allow",
+        "Effect" : "Allow",
         "Action" : [
           "cloudwatch:*"
         ],
@@ -436,12 +436,12 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_dev" {
     "Statement" : [
       {
         "Effect" : "Allow",
-      "Action" : [
-        "securityhub:*"
-      ],
-      "Resource" : [
-        "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
-      ]
+        "Action" : [
+          "securityhub:*"
+        ],
+        "Resource" : [
+          "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-development"]}:*"
+        ]
       }
     ]
   })
@@ -477,11 +477,11 @@ EOF
 
 locals {
   lambda_invoke_ssm_policies_uat = local.is-preproduction ? {
-    "send_message_to_sqs"        = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
-    "send_logs_to_cloudwatch"    = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
-    "invoke_ssm_powershell"      = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_uat[0].arn
-    "invoke_ssm_ec2_instances"   = aws_iam_policy.iam_policy_lambda_invoke_ssm_ec2_instances_uat[0].arn
-    "lambda_invoke"              = aws_iam_policy.iam_policy_lambda_invoke_uat[0].arn
+    "send_message_to_sqs"      = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
+    "send_logs_to_cloudwatch"  = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
+    "invoke_ssm_powershell"    = aws_iam_policy.iam_policy_lambda_invoke_ssm_powershell_uat[0].arn
+    "invoke_ssm_ec2_instances" = aws_iam_policy.iam_policy_lambda_invoke_ssm_ec2_instances_uat[0].arn
+    "lambda_invoke"            = aws_iam_policy.iam_policy_lambda_invoke_uat[0].arn
   } : {}
 }
 
@@ -515,10 +515,10 @@ EOF
 
 locals {
   lambda_get_securityhub_policies_uat = local.is-preproduction ? {
-    "send_message_to_sqs"             = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
-    "send_logs_to_cloudwatch"         = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
-    "invoke_ses"                      = aws_iam_policy.iam_policy_lambda_invoke_ses_uat[0].arn
-    "get_securityhub_data"            = aws_iam_policy.iam_policy_lambda_get_securityhub_data_uat[0].arn
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
+    "invoke_ses"              = aws_iam_policy.iam_policy_lambda_invoke_ses_uat[0].arn
+    "get_securityhub_data"    = aws_iam_policy.iam_policy_lambda_get_securityhub_data_uat[0].arn
   } : {}
 }
 
@@ -552,11 +552,11 @@ EOF
 
 locals {
   lambda_get_certificate_policies_uat = local.is-preproduction ? {
-    "send_message_to_sqs"             = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
-    "send_logs_to_cloudwatch"         = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
-    "publish_to_sns"                  = aws_iam_policy.iam_policy_lambda_publish_to_sns_uat[0].arn
-    "get_certificate"                 = aws_iam_policy.iam_policy_lambda_get_certificate_uat[0].arn
-    "get_cloudwatch_metrics"          = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_uat[0].arn
+    "send_message_to_sqs"     = aws_iam_policy.iam_policy_lambda_send_message_to_sqs_uat[0].arn
+    "send_logs_to_cloudwatch" = aws_iam_policy.iam_policy_lambda_send_logs_cloudwatch_uat[0].arn
+    "publish_to_sns"          = aws_iam_policy.iam_policy_lambda_publish_to_sns_uat[0].arn
+    "get_certificate"         = aws_iam_policy.iam_policy_lambda_get_certificate_uat[0].arn
+    "get_cloudwatch_metrics"  = aws_iam_policy.iam_policy_lambda_get_cloudwatch_metrics_uat[0].arn
   } : {}
 }
 
@@ -587,7 +587,7 @@ resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_uat" {
           "sqs:ListQueueTags",
           "sqs:ReceiveMessage",
           "sns:Publish"
-        ],  
+        ],
         "Resource" : [
           "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
         ]
@@ -608,7 +608,7 @@ resource "aws_iam_policy" "iam_policy_lambda_publish_to_sns_uat" {
         "Effect" : "Allow",
         "Action" : [
           "sns:Publish"
-        ],  
+        ],
         "Resource" : [
           "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
         ]
@@ -743,7 +743,7 @@ resource "aws_iam_policy" "iam_policy_lambda_get_cloudwatch_metrics_uat" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-	      "Effect" : "Allow",
+        "Effect" : "Allow",
         "Action" : [
           "cloudwatch:*"
         ],
@@ -812,12 +812,12 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_uat" {
     "Statement" : [
       {
         "Effect" : "Allow",
-      "Action" : [
-        "securityhub:*"
-      ],
-      "Resource" : [
-        "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
-      ]
+        "Action" : [
+          "securityhub:*"
+        ],
+        "Resource" : [
+          "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-preproduction"]}:*"
+        ]
       }
     ]
   })
@@ -852,7 +852,7 @@ resource "aws_iam_policy" "iam_policy_lambda_send_message_to_sqs_prod" {
           "sqs:ListQueueTags",
           "sqs:ReceiveMessage",
           "sns:Publish"
-        ],  
+        ],
         "Resource" : [
           "arn:aws:sqs:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         ]
@@ -873,7 +873,7 @@ resource "aws_iam_policy" "iam_policy_lambda_publish_to_sns_prod" {
         "Effect" : "Allow",
         "Action" : [
           "sns:Publish"
-        ],  
+        ],
         "Resource" : [
           "arn:aws:sns:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
         ]
@@ -916,8 +916,8 @@ resource "aws_iam_policy" "iam_policy_lambda_disable_alarms_cloudwatch_prod" {
       {
         "Effect" : "Allow",
         "Action" : [
-           "cloudwatch:DisableAlarmActions",
-           "cloudwatch:EnableAlarmActions"
+          "cloudwatch:DisableAlarmActions",
+          "cloudwatch:EnableAlarmActions"
         ],
         "Resource" : [
           "arn:aws:cloudwatch:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:alarm:*"
@@ -1054,7 +1054,7 @@ resource "aws_iam_policy" "iam_policy_lambda_get_cloudwatch_metrics_prod" {
     "Version" : "2012-10-17",
     "Statement" : [
       {
-	      "Effect" : "Allow",
+        "Effect" : "Allow",
         "Action" : [
           "cloudwatch:*"
         ],
@@ -1076,12 +1076,12 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_prod" {
     "Statement" : [
       {
         "Effect" : "Allow",
-      "Action" : [
-        "securityhub:*"
-      ],
-      "Resource" : [
-        "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
-      ]
+        "Action" : [
+          "securityhub:*"
+        ],
+        "Resource" : [
+          "arn:aws:securityhub:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:*"
+        ]
       }
     ]
   })

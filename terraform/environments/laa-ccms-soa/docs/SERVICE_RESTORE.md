@@ -26,7 +26,7 @@ In MP, permission is granted to pull these images by the ECR Control Plane, mean
 
 ### CCMS-EDRMS-TDS Database
 
-Each environment requires access to TDS database, managed by CCMS-EDRMS (Electronic Documents and Record Management System). This database is essential for the SOA system to inject documents that are ultimately transmitted to NEC (Northgate). 
+Each environment requires access to TDS database, managed by CCMS-EDRMS (Electronic Documents and Record Management System). This database is essential for the SOA system to inject documents that are ultimately transmitted to NEC (Northgate).
 
 In order for SOA to boot directly, this database must be available before attempting boot, and must be network accessible via both TCP and DNS from the SOA application.
 
@@ -125,7 +125,7 @@ EXECUTE rdsadmin.rdsadmin_util.grant_sys_object( p_obj_name => 'DBA_TABLESPACE_U
 
 In `application_variables.json`; set `admin_app_count` to `1` and commit. Allow the Github Actions pipeline to run. This will bring up the Admin Server.
 
-Pay attention to the application logs. The boot process can take up to 30 minutes, as part of the boot process the Oracle [RCU](https://docs.oracle.com/cd/E21764_01/doc.1111/e14259/overview.htm) will run and configure the SOA-DB database ready for use. The application should be ready for use when the weblogic console is available and can be logged in to at https://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk/console.
+Pay attention to the application logs. The boot process can take up to 30 minutes, as part of the boot process the Oracle [RCU](https://docs.oracle.com/cd/E21764_01/doc.1111/e14259/overview.htm) will run and configure the SOA-DB database ready for use. The application should be ready for use when the weblogic console is available and can be logged in to at <https://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk/console>.
 
 ### Start a Managed Server
 
