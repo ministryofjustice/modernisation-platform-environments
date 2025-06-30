@@ -1,6 +1,6 @@
 
 locals {
-  lambda_src_dir = "${path.module}/lambda/ftp-client"
+  lambda_src_dir = "${path.module}/lambda"
   lambda_zip     = "${path.module}/lambda/ftp-client.zip"
   layer_zip_file = "${path.module}/lambda/lambda-layer.zip"
 }
@@ -78,12 +78,12 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
 
-# # Create ZIP archive of lambda_code/
-# data "archive_file" "lambda_zip" {
-#   type        = "zip"
-#   source_dir  = local.lambda_src_dir
-#   output_path = local.lambda_zip
-# }
+# Create ZIP archive of lambda_code/
+data "archive_file" "lambda_zip" {
+  type        = "zip"
+  source_dir  = local.lambda_src_dir
+  output_path = local.lambda_zip
+}
 
 
 # # Create ZIP archive of lambda layer/
@@ -112,11 +112,11 @@ resource "aws_lambda_function" "ftp_lambda" {
   runtime       = "python3.13"
   timeout       = 900
   memory_size   = 256
-  s3_bucket = var.s3_bucket_ftp
-  s3_key    = var.s3_object_ftp_client
+  # s3_bucket = var.s3_bucket_ftp
+  # s3_key    = var.s3_object_ftp_client
   layers    = [aws_lambda_layer_version.ftp_layer.arn]
-  # filename      = data.archive_file.lambda_zip.output_path
-  # source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  filename      = data.archive_file.lambda_zip.output_path
+  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
   vpc_config {
     subnet_ids         = var.subnet_ids
