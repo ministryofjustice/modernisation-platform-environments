@@ -78,20 +78,20 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
 
-# Create ZIP archive of lambda_code/
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = local.lambda_src_dir
-  output_path = local.lambda_zip
-}
+# # Create ZIP archive of lambda_code/
+# data "archive_file" "lambda_zip" {
+#   type        = "zip"
+#   source_dir  = local.lambda_src_dir
+#   output_path = local.lambda_zip
+# }
 
 
-# Create ZIP archive of lambda layer/
-data "archive_file" "lambda_layer" {
-  type        = "zip"
-  source_file = local.layer_zip_file
-  output_path = "${path.module}/.terraform/tmp/lambda_layer.zip"
-}
+# # Create ZIP archive of lambda layer/
+# data "archive_file" "lambda_layer" {
+#   type        = "zip"
+#   source_file = local.layer_zip_file
+#   output_path = "${path.module}/.terraform/tmp/lambda_layer.zip"
+# }
 
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
