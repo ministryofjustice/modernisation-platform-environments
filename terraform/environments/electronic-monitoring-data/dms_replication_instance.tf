@@ -1,6 +1,6 @@
 # Create a new replication subnet group
 resource "aws_dms_replication_subnet_group" "dms_replication_subnet_group" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count                                = local.is-production || local.is-development ? 1 : 0
   replication_subnet_group_description = "RDS subnet group"
   replication_subnet_group_id          = "rds-replication-subnet-group-tf"
 
