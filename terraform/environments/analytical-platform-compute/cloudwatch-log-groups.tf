@@ -5,8 +5,9 @@ module "eks_log_group" {
   source  = "terraform-aws-modules/cloudwatch/aws//modules/log-group"
   version = "5.7.1"
 
-  name              = local.eks_cloudwatch_log_group_name
-  kms_key_id        = module.eks_cluster_logs_kms.key_arn
+  name = local.eks_cloudwatch_log_group_name
+  # kms_key_id        = module.eks_cluster_logs_kms.key_arn
+  kms_key_id        = data.aws_kms_key.eks_logs.arn
   retention_in_days = local.eks_cloudwatch_log_group_retention_in_days
 
   tags = local.tags

@@ -14,9 +14,9 @@ module "eks" {
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
 
-  vpc_id                   = module.vpc.vpc_id
-  control_plane_subnet_ids = module.vpc.intra_subnets
-  subnet_ids               = module.vpc.private_subnets
+  vpc_id                   = data.aws_vpc.apc.id
+  control_plane_subnet_ids = data.aws_subnets.apc_intra.ids # not sure this is correct bde
+  subnet_ids               = data.aws_subnets.apc_private.ids
   cluster_security_group_additional_rules = {
     vpc = {
       description = "Allow traffic from the VPC"
@@ -24,7 +24,7 @@ module "eks" {
       to_port     = 65535
       protocol    = "tcp"
       type        = "ingress"
-      cidr_blocks = [module.vpc.vpc_cidr_block]
+      cidr_blocks = [data.aws_vpc.apc.cidr_block]
     }
   }
 
@@ -259,6 +259,27 @@ module "karpenter" {
     AmazonSSMManagedInstanceCore  = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
     CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
     EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
+  }
+
+  tags = local.tags
+}
+
+module "vpc_cni_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.58.0"
+
+  role_name_prefix      = "vpc-cni"
+  attach_vpc_cni_policy = true
+  vpc_cni_enable_ipv4   = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:aws-node"]
+    }
   }
 
   tags = local.tags

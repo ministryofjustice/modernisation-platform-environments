@@ -1,18 +1,18 @@
 /* Policy */
-resource "helm_release" "kyverno" {
-  /* https://artifacthub.io/packages/helm/kyverno/kyverno */
-  name       = "kyverno"
-  repository = "https://kyverno.github.io/kyverno"
-  chart      = "kyverno"
-  version    = "3.4.3"
-  namespace  = kubernetes_namespace.kyverno.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/kyverno/values.yml.tftpl",
-      {}
-    )
-  ]
-}
+# resource "helm_release" "kyverno" {
+#   /* https://artifacthub.io/packages/helm/kyverno/kyverno */
+#   name       = "kyverno"
+#   repository = "https://kyverno.github.io/kyverno"
+#   chart      = "kyverno"
+#   version    = "3.4.3"
+#   namespace  = kubernetes_namespace.kyverno.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/kyverno/values.yml.tftpl",
+#       {}
+#     )
+#   ]
+# }
 
 /* AWS Observability */
 /*
@@ -32,7 +32,7 @@ resource "helm_release" "aws_cloudwatch_metrics" {
     templatefile(
       "${path.module}/src/helm/values/aws-cloudwatch-metrics/values.yml.tftpl",
       {
-        cluster_name = module.eks.cluster_name
+        cluster_name = data.aws_eks_cluster.eks.name
       }
     )
   ]
@@ -52,7 +52,7 @@ resource "helm_release" "aws_for_fluent_bit" {
       "${path.module}/src/helm/values/aws-for-fluent-bit/values.yml.tftpl",
       {
         aws_region                = data.aws_region.current.name
-        cluster_name              = module.eks.cluster_name
+        cluster_name              = data.aws_eks_cluster.eks.name
         cloudwatch_log_group_name = module.eks_log_group.cloudwatch_log_group_name
         eks_role_arn              = module.aws_for_fluent_bit_iam_role.iam_role_arn
       }
@@ -90,232 +90,232 @@ resource "helm_release" "amazon_prometheus_proxy" {
   ]
 }
 
-/* Cluster Autoscaler */
-resource "helm_release" "cluster_autoscaler" {
-  /* https://artifacthub.io/packages/helm/cluster-autoscaler/cluster-autoscaler */
-  name       = "cluster-autoscaler"
-  repository = "https://kubernetes.github.io/autoscaler"
-  chart      = "cluster-autoscaler"
-  version    = "9.46.6"
-  namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
+# /* Cluster Autoscaler */
+# resource "helm_release" "cluster_autoscaler" {
+#   /* https://artifacthub.io/packages/helm/cluster-autoscaler/cluster-autoscaler */
+#   name       = "cluster-autoscaler"
+#   repository = "https://kubernetes.github.io/autoscaler"
+#   chart      = "cluster-autoscaler"
+#   version    = "9.46.6"
+#   namespace  = kubernetes_namespace.cluster_autoscaler.metadata[0].name
 
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/cluster-autoscaler/values.yml.tftpl",
-      {
-        aws_region                = data.aws_region.current.name
-        cluster_name              = module.eks.cluster_name
-        eks_role_arn              = module.cluster_autoscaler_iam_role.iam_role_arn
-        service_monitor_namespace = kubernetes_namespace.cluster_autoscaler.metadata[0].name
-      }
-    )
-  ]
-  depends_on = [module.cluster_autoscaler_iam_role]
-}
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/cluster-autoscaler/values.yml.tftpl",
+#       {
+#         aws_region                = data.aws_region.current.name
+#         cluster_name              = data.aws_eks_cluster.eks.name
+#         eks_role_arn              = module.cluster_autoscaler_iam_role.iam_role_arn
+#         service_monitor_namespace = kubernetes_namespace.cluster_autoscaler.metadata[0].name
+#       }
+#     )
+#   ]
+#   depends_on = [module.cluster_autoscaler_iam_role]
+# }
 
 /* Karpenter */
-resource "helm_release" "karpenter_crd" {
-  /* https://github.com/aws/karpenter-provider-aws/releases */
-  name       = "karpenter-crd"
-  repository = "oci://public.ecr.aws/karpenter"
-  chart      = "karpenter-crd"
-  version    = "1.5.0"
-  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+# resource "helm_release" "karpenter_crd" {
+#   /* https://github.com/aws/karpenter-provider-aws/releases */
+#   name       = "karpenter-crd"
+#   repository = "oci://public.ecr.aws/karpenter"
+#   chart      = "karpenter-crd"
+#   version    = "1.5.0"
+#   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/karpenter-crd/values.yml.tftpl",
-      {
-        service_namespace = kubernetes_namespace.karpenter.metadata[0].name
-      }
-    )
-  ]
-  depends_on = [
-    aws_iam_service_linked_role.spot,
-    module.karpenter
-  ]
-}
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/karpenter-crd/values.yml.tftpl",
+#       {
+#         service_namespace = kubernetes_namespace.karpenter.metadata[0].name
+#       }
+#     )
+#   ]
+#   depends_on = [
+#     aws_iam_service_linked_role.spot,
+#     module.karpenter
+#   ]
+# }
 
-resource "helm_release" "karpenter" {
-  /* https://github.com/aws/karpenter-provider-aws/releases */
-  name       = "karpenter"
-  repository = "oci://public.ecr.aws/karpenter"
-  chart      = "karpenter"
-  version    = "1.5.0"
-  namespace  = kubernetes_namespace.karpenter.metadata[0].name
+# resource "helm_release" "karpenter" {
+#   /* https://github.com/aws/karpenter-provider-aws/releases */
+#   name       = "karpenter"
+#   repository = "oci://public.ecr.aws/karpenter"
+#   chart      = "karpenter"
+#   version    = "1.5.0"
+#   namespace  = kubernetes_namespace.karpenter.metadata[0].name
 
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/karpenter/values.yml.tftpl",
-      {
-        service_account_name = module.karpenter.service_account
-        cluster_name         = module.eks.cluster_name
-        cluster_endpoint     = module.eks.cluster_endpoint
-        interruption_queue   = module.karpenter.queue_name
-      }
-    )
-  ]
-  depends_on = [
-    aws_iam_service_linked_role.spot,
-    module.karpenter,
-    helm_release.karpenter_crd
-  ]
-}
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/karpenter/values.yml.tftpl",
+#       {
+#         service_account_name = module.karpenter.service_account
+#         cluster_name         = module.eks.cluster_name
+#         cluster_endpoint     = module.eks.cluster_endpoint
+#         interruption_queue   = module.karpenter.queue_name
+#       }
+#     )
+#   ]
+#   depends_on = [
+#     aws_iam_service_linked_role.spot,
+#     module.karpenter,
+#     helm_release.karpenter_crd
+#   ]
+# }
 
-resource "helm_release" "karpenter_configuration" {
-  name      = "karpenter-configuration"
-  chart     = "./src/helm/charts/karpenter-configuration"
-  namespace = kubernetes_namespace.karpenter.metadata[0].name
+# resource "helm_release" "karpenter_configuration" {
+#   name      = "karpenter-configuration"
+#   chart     = "./src/helm/charts/karpenter-configuration"
+#   namespace = kubernetes_namespace.karpenter.metadata[0].name
 
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/karpenter-configuration/values.yml.tftpl",
-      {
-        cluster_name    = module.eks.cluster_name
-        cluster_version = module.eks.cluster_version
-        ebs_kms_key_id  = module.eks_ebs_kms.key_id
-        node_role       = module.karpenter.node_iam_role_name
-        node_version    = local.environment_configuration.eks_node_version
-      }
-    )
-  ]
-  depends_on = [helm_release.karpenter]
-}
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/karpenter-configuration/values.yml.tftpl",
+#       {
+#         cluster_name    = module.eks.cluster_name
+#         cluster_version = module.eks.cluster_version
+#         ebs_kms_key_id  = module.eks_ebs_kms.key_id
+#         node_role       = module.karpenter.node_iam_role_name
+#         node_version    = local.environment_configuration.eks_node_version
+#       }
+#     )
+#   ]
+#   depends_on = [helm_release.karpenter]
+# }
 
 /* External DNS */
-resource "helm_release" "external_dns" {
-  /* https://artifacthub.io/packages/helm/external-dns/external-dns */
-  name       = "external-dns"
-  repository = "https://kubernetes-sigs.github.io/external-dns"
-  chart      = "external-dns"
-  version    = "1.17.0"
-  namespace  = kubernetes_namespace.external_dns.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/external-dns/values.yml.tftpl",
-      {
-        domain_filter = local.environment_configuration.route53_zone
-        eks_role_arn  = module.external_dns_iam_role.iam_role_arn
-        txt_owner_id  = module.eks.cluster_name
-      }
-    )
-  ]
-  depends_on = [module.external_dns_iam_role]
-}
+# resource "helm_release" "external_dns" {
+#   /* https://artifacthub.io/packages/helm/external-dns/external-dns */
+#   name       = "external-dns"
+#   repository = "https://kubernetes-sigs.github.io/external-dns"
+#   chart      = "external-dns"
+#   version    = "1.17.0"
+#   namespace  = kubernetes_namespace.external_dns.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/external-dns/values.yml.tftpl",
+#       {
+#         domain_filter = local.environment_configuration.route53_zone
+#         eks_role_arn  = module.external_dns_iam_role.iam_role_arn
+#         txt_owner_id  = data.aws_eks_cluster.eks.name
+#       }
+#     )
+#   ]
+#   depends_on = [module.external_dns_iam_role]
+# }
 
 /* Cert Manager */
-resource "helm_release" "cert_manager" {
-  /* https://artifacthub.io/packages/helm/cert-manager/cert-manager */
-  name       = "cert-manager"
-  repository = "https://charts.jetstack.io"
-  chart      = "cert-manager"
-  version    = "v1.18.1"
-  namespace  = kubernetes_namespace.cert_manager.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/cert-manager/values.yml.tftpl",
-      {
-        eks_role_arn = module.cert_manager_iam_role.iam_role_arn
-      }
-    )
-  ]
-  depends_on = [module.cert_manager_iam_role]
-}
+# resource "helm_release" "cert_manager" {
+#   /* https://artifacthub.io/packages/helm/cert-manager/cert-manager */
+#   name       = "cert-manager"
+#   repository = "https://charts.jetstack.io"
+#   chart      = "cert-manager"
+#   version    = "v1.18.1"
+#   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/cert-manager/values.yml.tftpl",
+#       {
+#         eks_role_arn = module.cert_manager_iam_role.iam_role_arn
+#       }
+#     )
+#   ]
+#   depends_on = [module.cert_manager_iam_role]
+# }
 
-resource "helm_release" "cert_manager_issuers" {
-  name      = "cert-manager-issuers"
-  chart     = "./src/helm/charts/cert-manager-issuers"
-  namespace = kubernetes_namespace.cert_manager.metadata[0].name
+# resource "helm_release" "cert_manager_issuers" {
+#   name      = "cert-manager-issuers"
+#   chart     = "./src/helm/charts/cert-manager-issuers"
+#   namespace = kubernetes_namespace.cert_manager.metadata[0].name
 
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/cert-manager-issuers/values.yml.tftpl",
-      {
-        acme_email               = "analytical-platform+compute-cert-manager@digital.justice.gov.uk"
-        aws_region               = data.aws_region.current.name
-        http_issuer_ingress_name = "default"
-      }
-    )
-  ]
-  depends_on = [helm_release.cert_manager]
-}
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/cert-manager-issuers/values.yml.tftpl",
+#       {
+#         acme_email               = "analytical-platform+compute-cert-manager@digital.justice.gov.uk"
+#         aws_region               = data.aws_region.current.name
+#         http_issuer_ingress_name = "default"
+#       }
+#     )
+#   ]
+#   depends_on = [helm_release.cert_manager]
+# }
 
 /* Ingress NGINX */
-resource "helm_release" "ingress_nginx_default_certificate" {
-  name      = "ingress-nginx-default-certificate"
-  chart     = "./src/helm/charts/ingress-nginx-default-certificate"
-  namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
+# resource "helm_release" "ingress_nginx_default_certificate" {
+#   name      = "ingress-nginx-default-certificate"
+#   chart     = "./src/helm/charts/ingress-nginx-default-certificate"
+#   namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
 
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/ingress-nginx-default-certificate/values.yml.tftpl",
-      {
-        default_certificate_dns_name = "*.${local.environment_configuration.route53_zone}"
-      }
-    )
-  ]
-  depends_on = [helm_release.cert_manager_issuers]
-}
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/ingress-nginx-default-certificate/values.yml.tftpl",
+#       {
+#         default_certificate_dns_name = "*.${local.environment_configuration.route53_zone}"
+#       }
+#     )
+#   ]
+#   depends_on = [helm_release.cert_manager_issuers]
+# }
 
-resource "helm_release" "ingress_nginx" {
-  /* https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx */
-  name       = "ingress-nginx"
-  repository = "https://kubernetes.github.io/ingress-nginx"
-  chart      = "ingress-nginx"
-  version    = "4.12.3"
-  namespace  = kubernetes_namespace.ingress_nginx.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/ingress-nginx/values.yml.tftpl",
-      {
-        default_ssl_certificate   = "${kubernetes_namespace.ingress_nginx.metadata[0].name}/default-certificate"
-        ingress_hostname          = "ingress.${local.environment_configuration.route53_zone}"
-        service_monitor_namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
-      }
-    )
-  ]
-  depends_on = [helm_release.ingress_nginx_default_certificate]
-}
+# resource "helm_release" "ingress_nginx" {
+#   /* https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx */
+#   name       = "ingress-nginx"
+#   repository = "https://kubernetes.github.io/ingress-nginx"
+#   chart      = "ingress-nginx"
+#   version    = "4.12.3"
+#   namespace  = kubernetes_namespace.ingress_nginx.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/ingress-nginx/values.yml.tftpl",
+#       {
+#         default_ssl_certificate   = "${kubernetes_namespace.ingress_nginx.metadata[0].name}/default-certificate"
+#         ingress_hostname          = "ingress.${local.environment_configuration.route53_zone}"
+#         service_monitor_namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
+#       }
+#     )
+#   ]
+#   depends_on = [helm_release.ingress_nginx_default_certificate]
+# }
 
 /* External Secrets */
-resource "helm_release" "external_secrets" {
-  /* https://artifacthub.io/packages/helm/external-secrets-operator/external-secrets */
-  name       = "external-secrets"
-  repository = "https://charts.external-secrets.io"
-  chart      = "external-secrets"
-  version    = "0.18.0"
-  namespace  = kubernetes_namespace.external_secrets.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/external-secrets/values.yml.tftpl",
-      {
-        eks_role_arn = module.external_secrets_iam_role.iam_role_arn
-      }
-    )
-  ]
-  depends_on = [module.external_secrets_iam_role]
-}
+# resource "helm_release" "external_secrets" {
+#   /* https://artifacthub.io/packages/helm/external-secrets-operator/external-secrets */
+#   name       = "external-secrets"
+#   repository = "https://charts.external-secrets.io"
+#   chart      = "external-secrets"
+#   version    = "0.18.0"
+#   namespace  = kubernetes_namespace.external_secrets.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/external-secrets/values.yml.tftpl",
+#       {
+#         eks_role_arn = module.external_secrets_iam_role.iam_role_arn
+#       }
+#     )
+#   ]
+#   depends_on = [module.external_secrets_iam_role]
+# }
 
-resource "helm_release" "external_secrets_cluster_secret_store" {
-  name      = "external-secrets-cluster-secret-store"
-  chart     = "./src/helm/charts/external-secrets-cluster-secret-store"
-  namespace = kubernetes_namespace.external_secrets.metadata[0].name
+# resource "helm_release" "external_secrets_cluster_secret_store" {
+#   name      = "external-secrets-cluster-secret-store"
+#   chart     = "./src/helm/charts/external-secrets-cluster-secret-store"
+#   namespace = kubernetes_namespace.external_secrets.metadata[0].name
 
-  depends_on = [helm_release.external_secrets]
-}
+#   depends_on = [helm_release.external_secrets]
+# }
 
-/* KEDA */
-resource "helm_release" "keda" {
-  /* https://artifacthub.io/packages/helm/kedacore/keda */
-  name       = "keda"
-  repository = "https://kedacore.github.io/charts"
-  chart      = "keda"
-  version    = "2.17.2"
-  namespace  = kubernetes_namespace.keda.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/keda/values.yml.tftpl",
-      {}
-    )
-  ]
-}
+# /* KEDA */
+# resource "helm_release" "keda" {
+#   /* https://artifacthub.io/packages/helm/kedacore/keda */
+#   name       = "keda"
+#   repository = "https://kedacore.github.io/charts"
+#   chart      = "keda"
+#   version    = "2.17.2"
+#   namespace  = kubernetes_namespace.keda.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/keda/values.yml.tftpl",
+#       {}
+#     )
+#   ]
+# }

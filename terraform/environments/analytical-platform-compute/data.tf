@@ -114,3 +114,21 @@ data "aws_route53_resolver_query_log_config" "core_logging_s3" {
     values = ["core-logging-rlq-s3"]
   }
 }
+
+# move cluster to component
+
+data "aws_kms_alias" "eks_logs" {
+  name = "alias/eks/cluster-logs"
+}
+
+data "aws_kms_key" "eks_logs" {
+  key_id = data.aws_kms_alias.eks_logs.target_key_id
+}
+
+data "aws_eks_cluster" "eks" {
+  name = local.eks_cluster_name
+}
+
+data "aws_iam_openid_connect_provider" "eks" {
+  url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
+}
