@@ -130,45 +130,49 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
   )
 }
 
-# resource "aws_s3_object" "ftp_lambda_layer" {
-#   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-#   key    = "lambda/ftpclientlibs.zip"
-#   source = "lambda/ftpclientlibs.zip"
-# }
+resource "aws_s3_object" "ftp_lambda_layer" {
+  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  key    = "lambda/lambda-layer.zip"
+  source = "lambda/lambda-layer.zip"
+}
 
-# resource "aws_s3_object" "ftp_client" {
-#   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-#   key    = "lambda/ftp-client.zip"
-#   source = "lambda/ftp-client.zip"
-# }
+resource "aws_s3_object" "ftp_client" {
+  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  key    = "lambda/ftp-client.zip"
+  source = "lambda/ftp-client.zip"
+}
 
-# # #LAA-ftp-allpay-inbound-ccms
-# module "allpay_ftp_lambda_inbound" {
-#   source              = "./modules/ftp-lambda"
-#   lambda_name         = lower(format("LAA-ftp-allpay-inbound-ccms-%s",local.environment))
-#   vpc_id              = data.aws_vpc.shared.id
-#   subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
-#   ftp_port            = "22"
-#   ftp_protocol        = "SFTP"
-#   ftp_transfer_type   = "SFTP_DOWNLOAD"
-#   ftp_file_types      = ""
-#   ftp_local_path      = "CCMS_PRD_Allpay/Inbound/"
-#   ftp_remote_path     = "/Outbound/"
-#   ftp_require_ssl     = "NO"
-#   ftp_insecure        = "NO"
-#   ftp_ca_cert         = ""
-#   ftp_cert            = ""
-#   ftp_key             = ""
-#   ftp_key_type        = ""
-#   ftp_file_remove     = "YES"
-#   ftp_cron            = "cron(0 10 * * ? *)"
-#   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
-#   env                 = local.environment
-#   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-#   s3_object_ftp_client= aws_s3_object.ftp_client.key
-#   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
+# #LAA-ftp-allpay-inbound-ccms
+module "allpay_ftp_lambda_outbound" {
+  source              = "./modules/ftp-lambda"
+  lambda_name         = lower(format("LAA-ftp-allpay-outbound-ccms-%s",local.environment))
+  vpc_id              = data.aws_vpc.shared.id
+  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+  ftp_port            = "22"
+  ftp_protocol        = "SFTP"
+  ftp_transfer_type   = "SFTP_DOWNLOAD"
+  ftp_file_types      = ""
+  ftp_local_path      = "CCMS_PRD_Allpay/Inbound/"
+  ftp_remote_path     = "/Outbound/"
+  ftp_require_ssl     = "NO"
+  ftp_insecure        = "NO"
+  ftp_ca_cert         = ""
+  ftp_cert            = ""
+  ftp_key             = ""
+  ftp_key_type        = ""
+  ftp_file_remove     = "YES"
+  ftp_cron            = "cron(0 10 * * ? *)"
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  env                 = local.environment
+  s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_object_ftp_client= aws_s3_object.ftp_client.key
+  s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
+  secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
+  slack_webhook = local.application_data.accounts[local.environment].ftp_slack_notification_webhook
+  skip_key_verification = "YES"
+  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
 
-# }
+}
 
 
 #LAA-xerox-outbound-ccms
@@ -193,9 +197,9 @@ module "LAA-ftp-xerox-cis-pay-outbound" {
   ftp_cron            = "cron(0 10 * * ? *)"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   env                 = local.environment
-  # s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  # s3_object_ftp_client= aws_s3_object.ftp_client.key
-  # s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
+  s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+  s3_object_ftp_client= aws_s3_object.ftp_client.key
+  s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
   slack_webhook = local.application_data.accounts[local.environment].ftp_slack_notification_webhook
   skip_key_verification = "YES"
