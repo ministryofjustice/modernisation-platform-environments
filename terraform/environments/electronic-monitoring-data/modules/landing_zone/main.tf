@@ -183,8 +183,8 @@ resource "aws_transfer_server" "this" {
 # AWS IAM role for transfer server
 #------------------------------------------------------------------------------
 resource "aws_iam_role" "iam_for_transfer" {
-  name_prefix         = "${var.supplier}-iam-for-transfer-"
-  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
+  name_prefix        = "${var.supplier}-iam-for-transfer-"
+  assume_role_policy = data.aws_iam_policy_document.transfer_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "iam_for_transfer_logging" {
@@ -257,8 +257,8 @@ resource "aws_transfer_workflow" "this" {
 #-------------------------------------------------------------------------------
 
 resource "aws_iam_role" "this_transfer_workflow" {
-  name                = "${var.supplier}-transfer-workflow-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
+  name               = "${var.supplier}-transfer-workflow-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.transfer_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "this_transfer_workflow_logging" {
