@@ -77,6 +77,24 @@ resource "aws_db_instance" "default" {
   )
 }
 
+resource "aws_db_instance" "replica" {
+  count = (var.enable_rds && var.create_rds_replica) ? 1 : 0
+
+  replicate_source_db     = aws_db_instance.default[0].identifier
+  replica_mode            = "mounted"
+  backup_retention_period = 7
+  identifier              = "${var.db_name}-replica"
+  instance_class          = var.db_instance_class
+  skip_final_snapshot     = true
+  kms_key_id              = var.kms
+  storage_encrypted       = true
+  apply_immediately       = true
+  allocated_storage       = var.allocated_size
+  max_allocated_storage   = var.max_allocated_size
+  ca_cert_identifier      = var.ca_cert_identifier
+  copy_tags_to_snapshot   = true
+}
+
 resource "random_password" "password" {
   length           = 16
   special          = true

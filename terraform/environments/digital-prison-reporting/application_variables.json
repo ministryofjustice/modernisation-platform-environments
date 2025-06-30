@@ -185,7 +185,19 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
-      "enable_probation_discovery_node": true
+      "enable_probation_discovery_node": true,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "test-db",
+        "db_identifier": "test_db",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group": "default:postgres-16"
+      }
     },
     "test": {
       "project_short_id": "dpr",
@@ -356,7 +368,19 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "test-db",
+        "db_identifier": "test_db",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group": "default:postgres-16"
+      }
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -543,7 +567,19 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "test-db",
+        "db_identifier": "test_db",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group": "default:postgres-16"
+      }
     },
     "production": {
       "project_short_id": "dpr",
@@ -728,7 +764,19 @@
       "redshift_table_expiry_days": 1,
       "enable_s3_data_migrate_lambda": false,
       "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "test-db",
+        "db_identifier": "test_db",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group": "default:postgres-16"
+      }
     }
   }
 }

@@ -91,3 +91,9 @@ variable "master_user" {
   description = "Default Super User,"
   default     = "domain_builder"
 }
+
+variable "create_rds_replica" {
+  type        = bool
+  description = "Whether to create the RDS replica. Set to `false` to prevent the RDS replica from being created"
+  default     = false
+}
