@@ -136,11 +136,11 @@ resource "aws_s3_object" "ftp_lambda_layer" {
   source = "lambda/lambda-layer.zip"
 }
 
-resource "aws_s3_object" "ftp_client" {
-  bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  key    = "lambda/ftpclient.zip"
-  source = "lambda/ftpclient.zip"
-}
+# resource "aws_s3_object" "ftp_client" {
+#   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
+#   key    = "lambda/ftpclient.zip"
+#   source = "lambda/ftpclient.zip"
+# }
 
 # #LAA-ftp-allpay-inbound-ccms
 module "allpay_ftp_lambda_outbound" {
