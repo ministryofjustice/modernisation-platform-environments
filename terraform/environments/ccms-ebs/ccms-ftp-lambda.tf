@@ -18,7 +18,7 @@ locals {
     "LAA-ftp-xerox-outbound",
     "LAA-ftp-rossendales-maat-tf-outbound"
   ]
-  base_buckets = ["laa-ccms-inbound", "laa-ccms-outbound"]
+  base_buckets = ["laa-ccms-inbound", "laa-ccms-outbound","laa-ccms-ftp-lambda"]
 
   bucket_names = [
     for name in local.base_buckets : "${name}-${local.environment}-mp"

@@ -106,8 +106,7 @@
       "certificate_expiry_days": 45,
       "certificate_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
       "payment_load_monitor_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com",
-      "ftp_slack_notification_webhook": "https://hooks.slack.com/services/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"
+      "alerts_subscription_email": "ccms-ebs-nonprod-moni-aaaajv4v2trhfezlzkd5sevpsm@moj.org.slack.com"
     },
     "test": {
       "short_env": "tst",
