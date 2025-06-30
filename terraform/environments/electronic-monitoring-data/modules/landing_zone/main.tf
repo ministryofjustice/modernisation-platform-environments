@@ -335,7 +335,7 @@ resource "aws_iam_role_policy" "this_transfer_workflow" {
 #------------------------------------------------------------------------------
 
 module "landing_zone_users" {
-  source = "./landing_zone_user"
+  source = "../landing_zone_user"
 
   for_each = { for idx, item in var.user_accounts : idx => item }
 
@@ -354,7 +354,7 @@ module "landing_zone_users" {
 #------------------------------------------------------------------------------
 
 module "landing_zone_security_groups" {
-  source = "./server_security_group"
+  source = "../server_security_group"
 
   for_each = { for idx, item in var.user_accounts : idx => item }
 
