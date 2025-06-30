@@ -23,7 +23,7 @@ variable "sqlserver_https_ports" {
 # -------------------------------------------------------
 
 resource "aws_security_group" "dms_ri_security_group" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count       = local.is-production || local.is-development ? 1 : 0
   name        = "dms_rep_instance_access_tf"
   description = "Secuity Group having relevant acess for DMS"
   vpc_id      = data.aws_vpc.shared.id
@@ -37,7 +37,7 @@ resource "aws_security_group" "dms_ri_security_group" {
 }
 
 resource "aws_security_group_rule" "dms_tcp_outbound" {
-  for_each          = local.is-production || local.is-development ? toset([for port in var.sqlserver_https_ports : tostring(port)]): toset([])
+  for_each          = local.is-production || local.is-development ? toset([for port in var.sqlserver_https_ports : tostring(port)]) : toset([])
   security_group_id = aws_security_group.dms_ri_security_group[0].id
   type              = "egress"
   cidr_blocks       = data.aws_ip_ranges.london_s3.cidr_blocks
@@ -48,7 +48,7 @@ resource "aws_security_group_rule" "dms_tcp_outbound" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "dms_db_ob_access" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count                        = local.is-production || local.is-development ? 1 : 0
   security_group_id            = aws_security_group.dms_ri_security_group[0].id
   description                  = "dms_rds_db_outbound"
   ip_protocol                  = "tcp"
@@ -58,7 +58,7 @@ resource "aws_vpc_security_group_egress_rule" "dms_db_ob_access" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "dms_to_rds_sg_rule" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count             = local.is-production || local.is-development ? 1 : 0
   security_group_id = aws_security_group.db.id
 
   referenced_security_group_id = aws_security_group.dms_ri_security_group[0].id
@@ -69,7 +69,7 @@ resource "aws_vpc_security_group_ingress_rule" "dms_to_rds_sg_rule" {
 }
 
 resource "aws_security_group_rule" "allow_glue_athena" {
-  count = local.is-production || local.is-development ? 1 : 0
+  count                    = local.is-production || local.is-development ? 1 : 0
   type                     = "ingress"
   from_port                = 443
   to_port                  = 443
