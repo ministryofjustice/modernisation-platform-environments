@@ -69,8 +69,9 @@ module "aws_for_fluent_bit_iam_role" {
   role_name_prefix = "aws-for-fluent-bit"
 
   role_policy_arns = {
-    CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
-    EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
+    CloudWatchAgentServerPolicy = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    # EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
+    EKSClusterLogsKMSAccessPolicy = data.aws_iam_policy.eks_cluster_logs_kms_access.arn
   }
 
   oidc_providers = {

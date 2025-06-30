@@ -14,19 +14,19 @@ data "aws_iam_policy_document" "eks_cluster_logs_kms_access" {
   }
 }
 
-module "eks_cluster_logs_kms_access_iam_policy" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+# module "eks_cluster_logs_kms_access_iam_policy" {
+#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-  source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.58.0"
+#   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
+#   version = "5.58.0"
 
-  name_prefix = "eks-cluster-logs-kms-access"
+#   name_prefix = "eks-cluster-logs-kms-access"
 
-  policy = data.aws_iam_policy_document.eks_cluster_logs_kms_access.json
+#   policy = data.aws_iam_policy_document.eks_cluster_logs_kms_access.json
 
-  tags = local.tags
-}
+#   tags = local.tags
+# }
 
 # data "aws_iam_policy_document" "karpenter_sqs_kms_access" {
 #   statement {
