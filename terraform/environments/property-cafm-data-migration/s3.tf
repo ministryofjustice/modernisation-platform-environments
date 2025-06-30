@@ -24,10 +24,6 @@ resource "aws_s3_bucket" "CAFM" {
   )
 }
 
-resource "aws_s3_bucket_acl" "CAFM_ACL" {
-  bucket = aws_s3_bucket.CAFM.id
-  acl    = "private"
-}
 
 resource "aws_s3_bucket_versioning" "CAFM" {
   bucket = aws_s3_bucket.CAFM.id
@@ -139,20 +135,31 @@ resource "aws_sns_topic" "s3_event_topic" {
 resource "aws_s3_bucket_notification" "bucket_notify" {
   bucket = aws_s3_bucket.CAFM.id
 
-  topic {
-    topic_arn = aws_sns_topic.s3_event_topic.arn
-    events    = ["s3:ObjectCreated:*"]
-    filter_prefix = "uploads/planetfm/"
-    filter_suffix = ".bak"
-  }
+  dynamic "topic" {
+    for_each = [
+      {
+        topic_arn     = aws_sns_topic.s3_event_topic.arn
+        events        = ["s3:ObjectCreated:*"]
+        filter_prefix = "uploads/planetfm/"
+        filter_suffix = ".bak"
+      },
+      {
+        topic_arn     = aws_sns_topic.s3_event_topic.arn
+        events        = ["s3:ObjectCreated:*"]
+        filter_prefix = "uploads/concept/"
+        filter_suffix = ".csv"
+      }
+    ]
 
-  topic {
-  topic_arn = aws_sns_topic.s3_event_topic.arn
-  events    = ["s3:ObjectCreated:*"]
-  filter_prefix = "uploads/concept/"
-  filter_suffix = ".csv"
+    content {
+      topic_arn     = topic.value.topic_arn
+      events        = topic.value.events
+      filter_prefix = topic.value.filter_prefix
+      filter_suffix = topic.value.filter_suffix
+    }
+  }
 }
-}
+
 
 resource "aws_sns_topic_policy" "s3_publish_policy" {
   arn = aws_sns_topic.s3_event_topic.arn
@@ -214,7 +221,7 @@ resource "aws_s3_bucket_policy" "LOG" {
   bucket = aws_s3_bucket.LOG.id
 
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
         "Sid" : "RequireSSLRequests",
@@ -247,10 +254,26 @@ resource "aws_s3_bucket_policy" "LOG" {
           "s3:PutBucketNotification",
           "s3:GetBucketNotification",
           "s3:GetBucketAcl",
-          "s3:DeleteObject",
+          "s3:ListBucket"
+        ]
+        Resource = aws_s3_bucket.LOG.arn
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/sandbox",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-preproduction"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-preproduction"]}:role/migration",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/migration"
+          ]
+        }
+        Action = [
           "s3:GetObject",
           "s3:PutObject",
-          "s3:ListBucket"
+          "s3:DeleteObject"
         ]
         Resource = "${aws_s3_bucket.LOG.arn}/*"
       }
