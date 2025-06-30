@@ -179,11 +179,20 @@ resource "aws_transfer_server" "this" {
   )
 }
 
+#------------------------------------------------------------------------------
+# AWS IAM role for transfer server
+#------------------------------------------------------------------------------
 resource "aws_iam_role" "iam_for_transfer" {
-  name_prefix         = "${var.supplier}-iam-for-transfer-"
-  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
+  name_prefix        = "${var.supplier}-iam-for-transfer-"
+  assume_role_policy = data.aws_iam_policy_document.transfer_assume_role.json
 }
+
+resource "aws_iam_role_policy_attachment" "iam_for_transfer_logging" {
+  role       = aws_iam_role.iam_for_transfer.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
+}
+
+#------------------------------------------------------------------------------
 
 resource "aws_cloudwatch_log_group" "this" {
   name_prefix       = "transfer_${var.supplier}"
@@ -243,11 +252,20 @@ resource "aws_transfer_workflow" "this" {
   )
 }
 
+#------------------------------------------------------------------------------
+# AWS IAM role for transfer workflow
+#-------------------------------------------------------------------------------
+
 resource "aws_iam_role" "this_transfer_workflow" {
-  name                = "${var.supplier}-transfer-workflow-iam-role"
-  assume_role_policy  = data.aws_iam_policy_document.transfer_assume_role.json
-  managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"]
+  name               = "${var.supplier}-transfer-workflow-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.transfer_assume_role.json
 }
+
+resource "aws_iam_role_policy_attachment" "this_transfer_workflow_logging" {
+  role       = aws_iam_role.this_transfer_workflow.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
+}
+#------------------------------------------------------------------------------
 
 #tfsec:ignore:aws-iam-no-policy-wildcards
 data "aws_iam_policy_document" "this_transfer_workflow" {

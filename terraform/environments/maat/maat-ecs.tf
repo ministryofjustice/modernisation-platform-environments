@@ -533,9 +533,6 @@ resource "aws_iam_role_policy_attachment" "maat_ecs_tasks_role_policy_attachment
   policy_arn = aws_iam_policy.maat_ecs_policy_access_params.arn
 }
 #### ECS TASK DEFINITION -------
-data "aws_ecs_task_definition" "latest" {
-  task_definition = "${local.application_name}-ecs-task-definition"
-}
 
 resource "aws_ecs_task_definition" "maat_ecs_task_definition" {
   family             = "${local.application_name}-ecs-task-definition"
@@ -689,7 +686,7 @@ resource "aws_ecs_service" "maat_ecs_service" {
   name            = "${local.application_name}-ecs-service"
   cluster         = aws_ecs_cluster.maat_ecs_cluster.id
   desired_count   = local.application_data.accounts[local.environment].maat_ecs_service_desired_count
-  task_definition = data.aws_ecs_task_definition.latest.arn
+  task_definition = aws_ecs_task_definition.maat_ecs_task_definition.arn
   # iam_role                          = aws_iam_role.maat_ecs_service_role.arn
   depends_on = [aws_lb_listener.external, aws_lb_listener.maat_internal_lb_https_listener]
 
