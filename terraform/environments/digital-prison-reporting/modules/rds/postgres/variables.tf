@@ -16,6 +16,24 @@ variable "db_name" {
   description = "RDS Identifier"
 }
 
+variable "engine" {
+  type = string
+  description = "RDS Engine"
+  default = "postgres"
+}
+
+variable "engine_version" {
+  type        = string
+  description = "RDS Engine Version"
+  default     = null
+}
+
+variable "license_model" {
+  type        = string
+  description = "License Model"
+  default     = null
+}
+
 variable "backup_window" {
   type        = string
   description = "Backup window"
@@ -90,4 +108,10 @@ variable "master_user" {
   type        = string
   description = "Default Super User,"
   default     = "domain_builder"
+}
+
+variable "create_rds_replica" {
+  type        = bool
+  description = "Whether to create the RDS replica. Set to `false` to prevent the RDS replica from being created"
+  default     = false
 }

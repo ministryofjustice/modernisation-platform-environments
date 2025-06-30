@@ -51,7 +51,8 @@ resource "aws_db_instance" "default" {
   count                   = var.enable_rds ? 1 : 0
   identifier              = var.name
   db_name                 = var.db_name
-  engine                  = "postgres"
+  engine                  = var.engine
+  engine_version          = var.engine_version
   instance_class          = var.db_instance_class
   username                = var.master_user
   password                = data.aws_secretsmanager_secret_version.password.secret_string
@@ -60,7 +61,7 @@ resource "aws_db_instance" "default" {
   maintenance_window      = var.maintenance_window
   backup_window           = var.backup_window
   backup_retention_period = var.back_up_period
-  vpc_security_group_ids  = [aws_security_group.rds[0].id, ]
+  vpc_security_group_ids  = [aws_security_group.rds[0].id, aws_security_group.ec2_sec_group[0].id, ]
   skip_final_snapshot     = true
   kms_key_id              = var.kms
   storage_encrypted       = true
@@ -68,6 +69,7 @@ resource "aws_db_instance" "default" {
   allocated_storage       = var.allocated_size
   max_allocated_storage   = var.max_allocated_size
   ca_cert_identifier      = var.ca_cert_identifier
+  multi_az                = false
   tags = merge(
     var.tags,
     {
@@ -75,6 +77,24 @@ resource "aws_db_instance" "default" {
       Name          = "${var.name}-rds"
     }
   )
+}
+
+resource "aws_db_instance" "replica" {
+  count = (var.enable_rds && var.create_rds_replica) ? 1 : 0
+
+  replicate_source_db     = aws_db_instance.default[0].identifier
+  backup_retention_period = 7
+  identifier              = "${var.name}-replica"
+  instance_class          = var.db_instance_class
+  vpc_security_group_ids  = [aws_security_group.rds[0].id, aws_security_group.ec2_sec_group[0].id, ]
+  skip_final_snapshot     = true
+  kms_key_id              = var.kms
+  storage_encrypted       = true
+  apply_immediately       = true
+  max_allocated_storage   = var.max_allocated_size
+  ca_cert_identifier      = var.ca_cert_identifier
+  copy_tags_to_snapshot   = true
+  multi_az                = false
 }
 
 resource "random_password" "password" {
