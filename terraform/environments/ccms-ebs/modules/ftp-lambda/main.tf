@@ -132,7 +132,6 @@ resource "aws_lambda_function" "ftp_lambda" {
       LOCALPATH    = var.ftp_local_path
       REMOTEPATH   = var.ftp_remote_path
       REQUIRE_SSL  = var.ftp_require_ssl
-      INSECURE     = var.ftp_insecure
       CA_CERT      = var.ftp_ca_cert
       CERT         = var.ftp_cert
       KEY          = var.ftp_key

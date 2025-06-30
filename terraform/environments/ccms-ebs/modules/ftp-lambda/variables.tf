@@ -11,7 +11,6 @@ variable "ftp_file_types" {}
 variable "ftp_local_path" {}
 variable "ftp_remote_path" {}
 variable "ftp_require_ssl" {}
-variable "ftp_insecure" {}
 variable "ftp_ca_cert" {}
 variable "ftp_cert" {}
 variable "ftp_key" {}
