@@ -130,6 +130,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "CAFM" {
 
 resource "aws_sns_topic" "s3_event_topic" {
   name = "cafm-landing-s3-event-topic"
+  kms_master_key_id = "alias/aws/sns"  # AWS-managed KMS key for SNS
 }
 
 resource "aws_s3_bucket_notification" "bucket_notify" {
@@ -180,11 +181,12 @@ resource "aws_sns_topic_policy" "s3_publish_policy" {
   })
 }
 
-
+#tfsec:ignore:AVD-AWS-0132
 resource "aws_s3_bucket" "LOG" {
   # checkov:skip=CKV_AWS_144: "S3 bucket has cross-region not required"
   # checkov:skip=CKV_AWS_145: "S3 bucket encryption not required"
   # checkov:skip=CKV2_AWS_61: "S3 bucket lifecycle policy not required"
+  # checkov:skip=CKV2_AWS_62: "S3 bucket event notifications not required"
   bucket = "property-datahub-logs-${local.environment}"
 
   lifecycle {
