@@ -192,11 +192,6 @@ resource "aws_s3_bucket" "LOG" {
   )
 }
 
-resource "aws_s3_bucket_acl" "LOG_ACL" {
-  bucket = aws_s3_bucket.LOG.id
-  acl    = "private"
-}
-
 resource "aws_s3_bucket_versioning" "LOG" {
   bucket = aws_s3_bucket.LOG.id
   versioning_configuration {
@@ -212,4 +207,53 @@ resource "aws_s3_bucket_public_access_block" "LOG" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+# S3 bucket policy
+resource "aws_s3_bucket_policy" "LOG" {
+  bucket = aws_s3_bucket.LOG.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        "Sid" : "RequireSSLRequests",
+        "Effect" : "Deny",
+        "Principal" : "*",
+        "Action" : "s3:*",
+        "Resource" : [
+          aws_s3_bucket.LOG.arn,
+          "${aws_s3_bucket.LOG.arn}/*"
+        ],
+        "Condition" : {
+          "Bool" : {
+            "aws:SecureTransport" : "false"
+          }
+        }
+      },
+      {
+        Effect = "Allow"
+        Principal = {
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/sandbox",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-preproduction"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-preproduction"]}:role/migration",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/migration"
+          ]
+        }
+        Action = [
+          "s3:PutBucketNotification",
+          "s3:GetBucketNotification",
+          "s3:GetBucketAcl",
+          "s3:DeleteObject",
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ]
+        Resource = "${aws_s3_bucket.LOG.arn}/*"
+      }
+    ]
+  })
 }
