@@ -49,7 +49,7 @@ resource "aws_iam_role_policy" "this_transfer_user" {
 
 resource "aws_iam_role_policy_attachment" "this_transfer_user" {
   role       = aws_iam_role.this_transfer_user.name
-  policy_arn = "arn:aws:iam::aws:policy/AWSTransferLoggingAccess"
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
 }
 
 data "aws_iam_policy_document" "this_transfer_user" {
