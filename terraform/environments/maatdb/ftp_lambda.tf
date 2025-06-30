@@ -37,13 +37,14 @@ locals {
       require_ssl     = "NO"
       insecure        = "YES"
       file_types      = "zip"
+      ca_cert         = ""
+      cert            = ""
+      key             = ""
+      key_type        = ""
+      ssh_key         = ""
+      file_remove     = "YES"
       ftp_cron        = ""
       sns_topic_arn   = ""
-      remote_host     = local.endpoint_details["${job.job_name}.remote-host"]
-      remote_port     = local.endpoint_details["${job.job_name}.remote-port"]
-      remote_folder   = local.endpoint_details["${job.job_name}.remote-folder"]
-      username        = local.endpoint_details["${job.job_name}.username"]
-      password        = local.endpoint_details["${job.job_name}.password"]
     }
   ]
 
@@ -202,6 +203,9 @@ resource "aws_lambda_function" "ftp" {
   runtime       = "python3.12"
   handler       = "ftpclient.lambda_handler"
 
+  memory_size = 512
+  timeout     = 300
+
   # Using the same bucket as the layer.
   s3_bucket = local.ftp_layer_bucket
   s3_key    = "${local.ftp_layer_bucket}/${local.ftp_source_location}}"
@@ -220,14 +224,24 @@ resource "aws_lambda_function" "ftp" {
 
   environment {
     variables = {
-      BUCKET_NAME     = each.value.bucket_name
-      BUCKET_FOLDER   = each.value.bucket_folder
-      FTP_PROTOCOL    = each.value.ftp_protocol
-      FTP_TYPE        = each.value.ftp_type
+      HOST            = local.endpoint_details["${each.key}.remote-host"]
+      PORT            = local.endpoint_details["${each.key}.remote-port"]
+      PROTOCOL        = each.value.ftp_protocol
+      FILETYPES       = each.value.file_types
+      TRANSFERTYPE    = each.value.ftp_type
+      LOCALPATH       = each.value.bucket_folder
+      REMOTEPATH      = local.endpoint_details["${each.key}.remote-folder"]
       REQUIRE_SSL     = each.value.require_ssl
       INSECURE        = each.value.insecure
-      REMOTE_HOST     = each.value.remote_host
-      REMOTE_PORT     = each.value.remote_port
+      CA_CERT         = each.value.ca_cert
+      CERT            = each.value.cert
+      KEY             = each.value.key
+      KEY_TYPE        = each.value.key_type
+      USER            = local.endpoint_details["${each.key}.username"]
+      PASSWORD        = local.endpoint_details["${each.key}.password"]
+      SSH_KEY         = each.value.ssh_key
+      S3BUCKET        = each.value.bucket_name
+      FILEREMOVE      = each.value.file_remove
       FILE_TYPES      = each.value.file_types
       FTP_CRON        = each.value.ftp_cron
       SNS_TOPIC_ARN   = each.value.sns_topic_arn
@@ -246,7 +260,7 @@ resource "aws_lambda_function" "ftp" {
 
 resource "aws_security_group" "lambda" {
   for_each = local.build_ftp ? {
-    for job in local.ftp_jobs : job.job_name => job
+    for job in local.ftp_job_definitions : job.job_name => job
   } : {}
 
   name        = "lambda-${each.key}-sg"
@@ -255,10 +269,10 @@ resource "aws_security_group" "lambda" {
 
   egress {
     description = "Allow sftp outbound for ${each.key}"
-    from_port   = each.value.remote_port
-    to_port     = each.value.remote_port
+    from_port   = local.endpoint_details["${each.key}.remote-port"]
+    to_port     = local.endpoint_details["${each.key}.remote-port"]
     protocol    = "tcp"
-    cidr_blocks = [each.value.remote_host]
+    cidr_blocks = [local.endpoint_details["${each.key}.remote-host"]]
   }
 
   tags = merge(
@@ -268,7 +282,6 @@ resource "aws_security_group" "lambda" {
       Job  = each.key
     }
   )
-
 }
 
 
