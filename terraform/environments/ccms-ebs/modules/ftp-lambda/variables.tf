@@ -22,6 +22,6 @@ variable "ftp_bucket" {}
 variable "secret_name" {}
 variable "env" {}
 variable "s3_bucket_ftp" {}
-variable "s3_object_ftp_client" {}
+# variable "s3_object_ftp_client" {}
 variable "s3_object_ftp_clientlibs" {}
 variable "secret_arn" {}

@@ -164,7 +164,7 @@ module "allpay_ftp_lambda_outbound" {
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   env                 = local.environment
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  s3_object_ftp_client= aws_s3_object.ftp_client.key
+  # s3_object_ftp_client= aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
   skip_key_verification = "YES"
@@ -195,7 +195,7 @@ module "LAA-ftp-xerox-cis-pay-outbound" {
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   env                 = local.environment
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-  s3_object_ftp_client= aws_s3_object.ftp_client.key
+  # s3_object_ftp_client= aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
   skip_key_verification = "YES"
