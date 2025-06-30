@@ -82,3 +82,37 @@ module "guard_duty_malware_s3_scan_iam_role" {
 
   custom_role_policy_arns = [module.guard_duty_s3_malware_protection_iam_policy.arn]
 }
+
+module "datasync_laa_data_analysis_iam_role" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  count = local.environment == "production" ? 1 : 0
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.44.1"
+
+  create_role = true
+
+  role_name         = "datasync-laa-data-analysis"
+  role_requires_mfa = false
+
+  trusted_role_services = ["datasync.amazonaws.com"]
+
+  custom_role_policy_arns = [module.laa_data_analysis_iam_policy[0].arn]
+}
+
+module "laa_data_analysis_replication_iam_role" {
+  #checkov:skip=CKV_TF_1:Module is from Terraform registry
+  count = local.environment == "production" ? 1 : 0
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
+  version = "5.44.1"
+
+  create_role = true
+
+  role_name         = "laa-data-analysis-${local.environment}-replication"
+  role_requires_mfa = false
+
+  trusted_role_services = ["s3.amazonaws.com", "batchoperations.s3.amazonaws.com"] # I want to replicate after scanning only, so need to do it as a batch job
+
+  custom_role_policy_arns = [module.laa_data_analysis_replication_iam_policy[0].arn]
+}
