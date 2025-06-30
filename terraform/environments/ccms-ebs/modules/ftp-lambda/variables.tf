@@ -16,7 +16,6 @@ variable "ftp_ca_cert" {}
 variable "ftp_cert" {}
 variable "ftp_key" {}
 variable "ftp_key_type" {}
-variable "slack_webhook" {}
 variable "skip_key_verification" {}
 variable "ftp_file_remove" {}
 variable "ftp_cron" {}

@@ -139,7 +139,6 @@ resource "aws_lambda_function" "ftp_lambda" {
       KEY_TYPE     = var.ftp_key_type
       S3BUCKET     = var.ftp_bucket
       FILEREMOVE   = var.ftp_file_remove
-      SLACK_WEBHOOK = var.slack_webhook
       SKIP_KEY_VERIFICATION= var.skip_key_verification
       SECRET_NAME = var.secret_name
     }

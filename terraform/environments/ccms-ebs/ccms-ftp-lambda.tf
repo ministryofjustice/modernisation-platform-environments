@@ -168,7 +168,6 @@ module "allpay_ftp_lambda_outbound" {
   s3_object_ftp_client= aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
-  slack_webhook = local.application_data.accounts[local.environment].ftp_slack_notification_webhook
   skip_key_verification = "YES"
   secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
 
@@ -201,7 +200,6 @@ module "LAA-ftp-xerox-cis-pay-outbound" {
   s3_object_ftp_client= aws_s3_object.ftp_client.key
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
-  slack_webhook = local.application_data.accounts[local.environment].ftp_slack_notification_webhook
   skip_key_verification = "YES"
   secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
 }
