@@ -98,8 +98,6 @@ data "archive_file" "lambda_layer" {
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name               = "ftpclientlibs"
   compatible_runtimes      = ["python3.13"]
-  # s3_bucket                = var.s3_bucket_ftp
-  # s3_key                   = var.s3_object_ftp_clientlibs
   filename    = data.archive_file.lambda_layer.output_path
   source_code_hash = data.archive_file.lambda_layer.output_base64sha256
   compatible_architectures = ["x86_64"]
@@ -113,8 +111,6 @@ resource "aws_lambda_function" "ftp_lambda" {
   runtime       = "python3.13"
   timeout       = 900
   memory_size   = 256
-  # s3_bucket = var.s3_bucket_ftp
-  # s3_key    = var.s3_object_ftp_client
   layers    = [aws_lambda_layer_version.ftp_layer.arn]
   filename      = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
