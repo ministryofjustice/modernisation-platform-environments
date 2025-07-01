@@ -5,8 +5,8 @@ resource "aws_transfer_server" "this" {
 
   endpoint_type = "VPC"
   endpoint_details {
-    vpc_id     = vpc.vpc_id
-    subnet_ids = vpc.public_subnets
+    vpc_id     = module.vpc.vpc_id
+    subnet_ids = module.vpc.public_subnets
     address_allocation_ids = [
       aws_eip.transfer_server[0].id,
       aws_eip.transfer_server[1].id,
@@ -19,7 +19,7 @@ resource "aws_transfer_server" "this" {
 
   security_policy_name = "TransferSecurityPolicy-2024-01"
 
-  logging_role                = module.transfer_server_iam_role.iam_role_arn
+  logging_role                = module.transfer_family_service_role.iam_role_arn
   structured_log_destinations = ["${module.transfer_structured_logs.cloudwatch_log_group_arn}:*"]
 }
 

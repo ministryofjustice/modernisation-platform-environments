@@ -11,5 +11,5 @@ module "sftp_users" {
   transfer_server_security_group = aws_security_group.transfer_server.id
   landing_bucket                 = aws_s3_bucket.CAFM.id
   landing_bucket_kms_key         = aws_kms_key.sns_kms.arn
-  supplier_data_kms_key          = module.supplier_data_kms.key_arn
+  supplier_data_kms_key          = aws_kms_key.sns_kms.arn
 }
