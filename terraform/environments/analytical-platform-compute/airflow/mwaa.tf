@@ -15,9 +15,9 @@ resource "aws_mwaa_environment" "main" {
   plugins_s3_path                = "plugins.zip"
   plugins_s3_object_version      = module.airflow_plugins_object.s3_object_version_id
 
-  max_workers = 2
-  min_workers = 1
-  schedulers  = 2
+  max_workers = local.environment_configuration.airflow_max_workers
+  min_workers = local.environment_configuration.airflow_min_workers
+  schedulers  = local.environment_configuration.airflow_schedulers
 
   webserver_access_mode = "PRIVATE_ONLY"
 
@@ -33,6 +33,7 @@ resource "aws_mwaa_environment" "main" {
     "webserver.warn_deployment_exposure" = 0
     "webserver.base_url"                 = "airflow.${local.environment_configuration.route53_zone}"
     "webserver.instance_name"            = local.environment_configuration.airflow_webserver_instance_name
+    "celery.worker_autoscale"            = local.environment_configuration.airflow_celery_worker_autoscale
   }
 
   network_configuration {
