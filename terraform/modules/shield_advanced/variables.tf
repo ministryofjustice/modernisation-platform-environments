@@ -27,7 +27,7 @@ variable "enable_logging" {
 
 variable "log_retention_in_days" {
   type        = number
-  default     = 60
+  default     = 365
   description = "Number of days to retain logs in CloudWatch Logs."
 }
 
