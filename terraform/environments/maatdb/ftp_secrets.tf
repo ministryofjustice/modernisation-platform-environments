@@ -40,14 +40,19 @@
 # ]
 
 resource "aws_secretsmanager_secret" "ftp_jobs_secret" {
-  #checkov:skip=CKV2_AWS_57:"This is will be fixed at a later date"
+  #checkov:skip=CKV2_AWS_57:"This will be fixed at a later date"
   #checkov:skip=CKV_AWS_149:"To be added later."
   name = "${local.application_name}-${local.environment}-ftp-endpoint"
 }
 
-# Create blank versions so that the locals do not error:
-
+resource "aws_secretsmanager_secret_version" "ftp_jobs_secret_values" {
+  secret_id     = aws_secretsmanager_secret.ftp_jobs_secret.id
+  secret_string = jsonencode({
+    organisation_id = "CHANGE_ME_IN_THE_CONSOLE"
+  })
+}
 
 data "aws_secretsmanager_secret_version" "ftp_jobs_secret_version" {
+  count     = local.build_ftp ? 1 : 0
   secret_id = aws_secretsmanager_secret.ftp_jobs_secret.id
 }
