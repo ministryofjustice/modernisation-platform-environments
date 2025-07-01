@@ -1,7 +1,5 @@
 resource "aws_eip" "transfer_server" {
-  count = length(module.vpc.public_subnets)
-  domain = "vpc"
-
+  
   tags = merge(
     local.tags,
     {
@@ -9,3 +7,4 @@ resource "aws_eip" "transfer_server" {
     }
   )
 }
+
