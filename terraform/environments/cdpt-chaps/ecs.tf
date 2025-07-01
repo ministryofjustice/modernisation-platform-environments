@@ -227,8 +227,12 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
     weight            = 1
   }
 
-  placement_constraints {
-    type = "distinctInstance"
+  dynamic "placement_constraints" {
+    for_each = lower(local.application_data.accounts[local.environment].environment_name) == "development" ? [] : [1]
+
+    content {
+      type = "distinctInstance"
+    }
   }
 
   network_configuration {
@@ -349,7 +353,7 @@ resource "aws_security_group" "cluster_ec2" {
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized/image_id"
+  image_id      = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-ECS_Optimized/image_id"
   instance_type = local.application_data.accounts[local.environment].instance_type
   key_name      = "${local.application_name}-ec2"
   ebs_optimized = true

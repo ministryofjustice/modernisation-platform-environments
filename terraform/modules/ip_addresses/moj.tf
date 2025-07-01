@@ -32,7 +32,7 @@ locals {
       "194.33.197.0/25"
     ]
 
-    # Ian Norris: for sites that don't go through prisma
+    # Ian Norris: for sites that don't go through prisma
     vodafone_dia_networks = [
       "194.33.200.0/21",
       "194.33.216.0/23",

@@ -164,8 +164,8 @@ resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Successful" {
   log_group_name = aws_cloudwatch_log_group.SQL-Server-Logs[count.index].name
   pattern        = "[date, time, Instance, SQLBackup, status=Successful]"
   metric_transformation {
-    name      = "Successful"
-    namespace = "SQLBackupStatus"
+    name      = "SQLBackupStatus"
+    namespace = "SQLBackup"
     value     = "1"
     dimensions = {
       Instance = "$Instance"
@@ -177,10 +177,10 @@ resource "aws_cloudwatch_log_metric_filter" "SQLBackupStatus-Failed" {
   count          = local.is-production == true ? 1 : 0
   name           = "SQLBackupStatus-Failed"
   log_group_name = aws_cloudwatch_log_group.SQL-Server-Logs[count.index].name
-  pattern        = "[date, time, Instance, SQLBackup, status=Failed]"
+  pattern        = "[date, time, Instance, SQLBackup, status!=Successful]"
   metric_transformation {
-    name      = "Failed"
-    namespace = "SQLBackupStatus"
+    name      = "SQLBackupStatus"
+    namespace = "SQLBackup"
     value     = "0"
     dimensions = {
       Instance = "$Instance"

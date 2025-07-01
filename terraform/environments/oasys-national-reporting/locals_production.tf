@@ -42,6 +42,7 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          vpc_security_group_ids  = ["bods", "oasys_db", "ec2-windows", "ad-join"]
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -67,6 +68,7 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
+          vpc_security_group_ids  = ["bods", "oasys_db", "ec2-windows", "ad-join"]
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -188,7 +190,7 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a", "eu-west-2b", "eu-west-2c"]
-          security_groups    = ["boe", "bip-app"]
+          security_groups    = ["efs"]
         }]
         tags = {
           backup      = "false"
@@ -251,7 +253,6 @@ locals {
       }
     }
 
-    # DO NOT FULLY DEPLOY YET AS WEB INSTANCES ARE NOT IN USE
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
@@ -330,5 +331,6 @@ locals {
       "/oracle/database/PDBOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PDBOAUD" = local.secretsmanager_secrets.db
     }
+    security_groups = local.security_groups_old
   }
 }

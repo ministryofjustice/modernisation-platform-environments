@@ -88,7 +88,11 @@ locals {
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional"
-        vpc_security_group_ids       = ["data-db"]
+        vpc_security_group_ids = [
+          "data-db",
+          "ec2-linux",
+          "oem-agent",
+        ]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -162,7 +166,11 @@ locals {
         instance_type                = "r6i.xlarge"
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "optional"
-        vpc_security_group_ids       = ["data-db"]
+        vpc_security_group_ids = [
+          "data-db",
+          "ec2-linux",
+          "oem-agent",
+        ]
         tags = {
           backup-plan = "daily-and-weekly"
         }
@@ -268,7 +276,6 @@ locals {
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
         vpc_security_group_ids       = ["private-web"]
-
         tags = {
           backup-plan = "daily-and-weekly"
         }

@@ -42,6 +42,8 @@
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
       "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": true,
+      "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -227,6 +229,8 @@
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
       "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": true,
+      "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -261,7 +265,8 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-testing"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -350,7 +355,7 @@
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": false,
+      "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": false
     },
     "preproduction": {
@@ -395,6 +400,8 @@
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
       "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": true,
+      "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -580,6 +587,8 @@
       "enable_generate_dataset_lambda": false,
       "enable_multiphase_query_lambda": false,
       "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": false,
+      "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,

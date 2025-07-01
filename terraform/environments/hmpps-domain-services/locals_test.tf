@@ -146,31 +146,6 @@ locals {
       })
     }
 
-    fsx_windows = {
-      # test-win-fs = {
-      #   subnets = [{
-      #     name               = "private"
-      #     availability_zones = ["eu-west-2a", "eu-west-2b"]
-      #   }]
-      #   preferred_subnet_name       = "private"
-      #   preferred_availability_zone = "eu-west-2a"
-      #   deployment_type             = "MULTI_AZ_1"
-      #   security_groups             = ["rds-ec2s"]
-      #   skip_final_backup           = true
-      #   storage_capacity            = 32
-      #   throughput_capacity         = 8
-      #   self_managed_active_directory = {
-      #     dns_ips = [
-      #       module.ip_addresses.mp_ip.ad-azure-dc-a,
-      #       module.ip_addresses.mp_ip.ad-azure-dc-b,
-      #     ]
-      #     domain_name          = "azure.noms.root"
-      #     username             = "svc_join_domain"
-      #     password_secret_name = "/microsoft/AD/azure.noms.root/shared-passwords"
-      #   }
-      # }
-    }
-
     iam_policies = {
       Ec2SecretPolicy = {
         description = "Permissions required for secret value access by instances"

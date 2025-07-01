@@ -313,6 +313,7 @@ locals {
       "/oracle/database/PPONRBDS" = local.secretsmanager_secrets.db
       "/oracle/database/PPMISTN2" = local.secretsmanager_secrets.db
       "/oracle/database/PPOASRP2" = local.secretsmanager_secrets.db
+      "/oracle/database/PPOBODS4" = local.secretsmanager_secrets.db
       "/oracle/database/PPMISTN3" = local.secretsmanager_secrets.db # for AWS BODS testing
       "/oracle/database/PPOASRP3" = local.secretsmanager_secrets.db # for AWS BODS testing
       "/oracle/database/PPBOSYS"  = local.secretsmanager_secrets.db_bip
@@ -320,6 +321,10 @@ locals {
 
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets.db_oasys
+
+      # for temporary use, remove when onr bip migrated to aws
+      "/oracle/database/PPBISY42" = local.secretsmanager_secrets.bip
+      "/oracle/database/PPBIAD42" = local.secretsmanager_secrets.bip
     }
   }
 }

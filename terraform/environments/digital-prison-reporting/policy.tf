@@ -795,7 +795,6 @@ data "aws_iam_policy_document" "lake_formation_tag_management" {
     actions = [
       "lakeformation:AddLFTagsToResource",
       "lakeformation:RemoveLFTagsFromResource",
-      "lakeformation:ListLFTagsForResource",
       "lakeformation:GetLFTag",
       "lakeformation:GetResourceLFTags"
     ]
@@ -832,7 +831,7 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
 
       # LF tag read permissions (needed to grant tag-based access)
       "lakeformation:GetResourceLFTags",
-      "lakeformation:ListLFTags", 
+      "lakeformation:ListLFTags",
       "lakeformation:GetLFTag"
 
     ]
@@ -891,24 +890,36 @@ data "aws_iam_policy_document" "analytical_platform_share_policy" {
   }
 }
 
+data "aws_iam_policy_document" "ap_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:role/data-engineering-datalake-access-github-actions"]
+    }
+  }
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    principals {
+      type        = "Federated"
+      identifiers = ["arn:aws:iam::${local.environment_management.account_ids["analytical-platform-common-production"]}:oidc-provider/token.actions.githubusercontent.com"]
+    }
+    condition {
+      test     = "StringLike"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = ["repo:ministryofjustice/data-engineering-datalake-access:ref:refs/heads/*"]
+    }
+  }
+}
+
 resource "aws_iam_role" "analytical_platform_share_role" {
   for_each = local.analytical_platform_share
 
   name = "${each.value.target_account_name}-share-role"
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Principal = {
-          # In case consumer has a central location for terraform state storage that isn't the target account.
-          AWS = "arn:aws:iam::${try(each.value.assume_account_id, each.value.target_account_id)}:root"
-        }
-        Action = "sts:AssumeRole"
-      }
-    ]
-  })
+  assume_role_policy = data.aws_iam_policy_document.ap_assume_role.json
 }
 
 resource "aws_iam_role_policy" "analytical_platform_share_policy_attachment" {

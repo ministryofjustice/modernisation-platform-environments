@@ -176,3 +176,36 @@ resource "aws_ssm_parameter" "maat_app_ats_oauth_scope" {
     ]
   }
 }
+
+resource "aws_ssm_parameter" "maat_app_master_password" {
+  name  = "/maat/APP_MASTER_PASSWORD"
+  type  = "SecureString"
+  value = "replace in console"
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "maat_app_salt" {
+  name  = "/maat/APP_SALT"
+  type  = "SecureString"
+  value = "replace in console"
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
+
+resource "aws_ssm_parameter" "maat_app_derivation_iterations" {
+  name  = "/maat/APP_DERIVATION_ITERATIONS"
+  type  = "SecureString"
+  value = "replace in console"
+  lifecycle {
+    ignore_changes = [
+      value,
+    ]
+  }
+}
