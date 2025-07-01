@@ -150,3 +150,27 @@ module "external_secrets_iam_role" {
 
   tags = local.tags
 }
+
+module "aws_for_fluent_bit_iam_role" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+  version = "5.58.0"
+
+  role_name_prefix = "aws-for-fluent-bit"
+
+  role_policy_arns = {
+    CloudWatchAgentServerPolicy   = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+    EKSClusterLogsKMSAccessPolicy = module.eks_cluster_logs_kms_access_iam_policy.arn
+  }
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["${data.kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
+    }
+  }
+
+  tags = local.tags
+}

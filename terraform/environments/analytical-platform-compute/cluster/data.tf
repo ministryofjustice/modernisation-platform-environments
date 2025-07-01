@@ -80,3 +80,9 @@ data "http" "prometheus_operator_crds" {
 data "aws_route53_zone" "route53_zone_zone" {
   name = local.environment_configuration.route53_zone
 }
+
+data "kubernetes_namespace" "aws_observability" {
+  metadata {
+    name = "aws-observability"
+  }
+}
