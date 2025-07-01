@@ -31,7 +31,7 @@ locals {
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
-          vpc_security_group_ids  = ["app", "jumpserver", "remotedesktop_sessionhost", "ad-join", "ec2-windows"]
+          vpc_security_group_ids  = ["app", "ad-join", "ec2-windows"]
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-10-b"
@@ -57,7 +57,7 @@ locals {
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
-          vpc_security_group_ids  = ["app", "jumpserver", "remotedesktop_sessionhost", "ad-join", "ec2-windows"]
+          vpc_security_group_ids  = ["app", "ad-join", "ec2-windows"]
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-11-a"
@@ -83,7 +83,7 @@ locals {
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
-          vpc_security_group_ids  = ["app", "jumpserver", "remotedesktop_sessionhost", "ad-join", "ec2-windows"]
+          vpc_security_group_ids  = ["app", "ad-join", "ec2-windows"]
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-12-b"
@@ -109,7 +109,7 @@ locals {
         instance = merge(local.ec2_instances.app.instance, {
           disable_api_termination = true
           instance_type           = "t3.xlarge"
-          vpc_security_group_ids  = ["app", "jumpserver", "remotedesktop_sessionhost", "ad-join", "ec2-windows"]
+          vpc_security_group_ids  = ["app", "ad-join", "ec2-windows"]
         })
         tags = merge(local.ec2_instances.app.tags, {
           ami              = "pd-cafm-a-13-a"
@@ -143,7 +143,7 @@ locals {
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
           instance_type           = "r6i.4xlarge"
-          vpc_security_group_ids  = ["database", "jumpserver", "ad-join", "ec2-windows"]
+          vpc_security_group_ids  = ["database", "ad-join", "ec2-windows"]
         })
         tags = merge(local.ec2_instances.db.tags, {
           ami              = "pd-cafm-db-a"
@@ -176,7 +176,7 @@ locals {
         instance = merge(local.ec2_instances.db.instance, {
           disable_api_termination = true
           instance_type           = "r6i.4xlarge"
-          vpc_security_group_ids  = ["database", "jumpserver", "ad-join", "ec2-windows"]
+          vpc_security_group_ids  = ["database", "ad-join", "ec2-windows"]
         })
         tags = merge(local.ec2_instances.db.tags, {
           ami              = "pd-cafm-db-b"
@@ -215,7 +215,7 @@ locals {
         instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
           instance_type           = "t3.2xlarge"
-          vpc_security_group_ids  = ["web", "jumpserver", "remotedesktop_sessionhost", "ad-join", "ec2-windows"]
+          vpc_security_group_ids  = ["web", "ad-join", "ec2-windows"]
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-36-b"
@@ -253,7 +253,7 @@ locals {
         instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
           instance_type           = "t3.2xlarge"
-          vpc_security_group_ids  = ["web", "jumpserver", "remotedesktop_sessionhost", "ad-join", "ec2-windows"]
+          vpc_security_group_ids  = ["web", "ad-join", "ec2-windows"]
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-37-a"
@@ -279,7 +279,7 @@ locals {
         instance = merge(local.ec2_instances.web.instance, {
           disable_api_termination = true
           instance_type           = "t3.large"
-          vpc_security_group_ids  = ["web", "jumpserver", "remotedesktop_sessionhost", "ad-join", "ec2-windows"]
+          vpc_security_group_ids  = ["web", "ad-join", "ec2-windows"]
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami              = "pd-cafm-w-38-b"
