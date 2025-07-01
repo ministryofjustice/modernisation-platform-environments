@@ -71,41 +71,49 @@ resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
 data "aws_iam_policy_document" "bucket_policy" {
   for_each = local.build_s3 ? module.s3_bucket : {}
 
-  statement {
-    sid    = "AllowLambdaBucketAccess"
-    effect = "Allow"
+  dynamic "statement" {
+    for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
 
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
+    content {
+      sid    = "AllowLambdaBucketAccess"
+      effect = "Allow"
+
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
+      }
+
+      actions = [
+        "s3:GetObject",
+        "s3:DeleteObject"
+      ]
+
+      resources = [
+        "${each.value.bucket.arn}/*"
+      ]
     }
-
-    actions = [
-      "s3:GetObject",
-      "s3:DeleteObject"
-    ]
-
-    resources = [
-      "${each.value.bucket.arn}/*"
-    ]
   }
 
-  statement {
-    sid    = "AllowLambdaListBucket"
-    effect = "Allow"
+  dynamic "statement" {
+    for_each = length(aws_iam_role.ftp_lambda_role) > 0 ? [1] : []
 
-    principals {
-      type        = "AWS"
-      identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
+    content {
+      sid    = "AllowLambdaListBucket"
+      effect = "Allow"
+
+      principals {
+        type        = "AWS"
+        identifiers = [aws_iam_role.ftp_lambda_role[0].arn]
+      }
+
+      actions = [
+        "s3:ListBucket"
+      ]
+
+      resources = [
+        each.value.bucket.arn
+      ]
     }
-
-    actions = [
-      "s3:ListBucket"
-    ]
-
-    resources = [
-      each.value.bucket.arn
-    ]
   }
 
   dynamic "statement" {
@@ -157,6 +165,7 @@ data "aws_iam_policy_document" "bucket_policy" {
     }
   }
 }
+
 
 
 # FTP IAM User
