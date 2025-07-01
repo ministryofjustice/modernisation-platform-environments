@@ -21,7 +21,7 @@ variable "waf_acl_rules" {
 
 variable "enable_logging" {
   type        = bool
-  default     = false
+  default     = true
   description = "Enable logging for the WAF ACL."
 }
 
