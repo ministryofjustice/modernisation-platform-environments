@@ -7,7 +7,11 @@
 locals {
 
   decoded_ftp_secret = try(
-    jsondecode(data.aws_secretsmanager_secret_version.ftp_jobs_secret_version.secret_string),
+    jsondecode(
+      length(data.aws_secretsmanager_secret_version.ftp_jobs_secret_version) > 0 ?
+      data.aws_secretsmanager_secret_version.ftp_jobs_secret_version[0].secret_string :
+      "{}"
+    ),
     []
   )
 
