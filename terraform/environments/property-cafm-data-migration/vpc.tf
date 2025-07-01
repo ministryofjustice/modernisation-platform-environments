@@ -73,3 +73,10 @@ resource "aws_security_group_rule" "allow_all_vpc" {
   to_port           = 65535
   type              = "ingress"
 }
+
+resource "aws_security_group" "transfer_server" {
+  description = "Security Group for Transfer Server"
+  name        = "transfer-server"
+  vpc_id      = module.vpc.vpc_id
+  tags        = local.tags
+}
