@@ -9,7 +9,7 @@ variable "tags" {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  name              = "cafm-migration"
+  name              = "/aws/transfer/cafm-migration"
   retention_in_days = var.retention_in_days
   tags              = var.tags
 }
