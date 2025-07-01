@@ -127,15 +127,6 @@ locals {
         }
       }
     }
-    domain = {
-      description = "Common Windows security group for fixngo domain(s) access from Jumpservers and Azure DCs"
-    }
-    remotedesktop_sessionhost = {
-      description = "Security group required for AWS remote desktop solution"
-    }
-    jumpserver = {
-      description = "New security group for jump-servers"
-    }
     database = {
       description = "Security group for WINDOWS SQL database servers"
       ingress = {
