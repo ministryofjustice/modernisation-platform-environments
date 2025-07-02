@@ -183,7 +183,7 @@ module "LAA-ftp-xerox-ccms-outbound" {
 #LAA-xerox-outbound-ccms-peterborough
 module "LAA-ftp-xerox-ccms-outbound-peterborough" {
   source              = "./modules/ftp-lambda"
-  lambda_name         = lower(format("LAA-ftp-xerox-ccms-outbound-%s",local.environment))
+  lambda_name         = lower(format("LAA-ftp-xerox-ccms-outbound-peterborough-%s",local.environment))
   vpc_id              = data.aws_vpc.shared.id
   subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
   ftp_transfer_type   = "SFTP_UPLOAD"
