@@ -150,14 +150,14 @@ module "allpay_ftp_lambda_outbound" {
 
 
 #LAA-xerox-outbound-ccms
-module "LAA-ftp-xerox-cis-pay-outbound" {
+module "LAA-ftp-xerox-ccms-outbound" {
   source              = "./modules/ftp-lambda"
-  lambda_name         = lower(format("LAA-ftp-xerox-cis-pay-outbound-%s",local.environment))
+  lambda_name         = lower(format("LAA-ftp-xerox-ccms-outbound-%s",local.environment))
   vpc_id              = data.aws_vpc.shared.id
   subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
   ftp_transfer_type   = "SFTP_UPLOAD"
   ftp_local_path      = "CCMS_PRD_DST/Outbound/"
-  ftp_remote_path     = "/Production/outbound/Cheques/"
+  ftp_remote_path     = "/Production/outbound/CCMS/ "
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   env                 = local.environment
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
