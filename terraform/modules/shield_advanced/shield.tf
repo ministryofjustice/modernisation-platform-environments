@@ -53,7 +53,9 @@ locals {
 }
 
 # KMS key for encrypting WAF CloudWatch logs
+
 resource "aws_kms_key" "waf_logs" {
+  #checkov:skip=CKV2_AWS_64: "KMS key policy is defined via separate aws_kms_key_policy resource"
   count                   = var.enable_logging ? 1 : 0
   description             = "KMS key for encrypting WAF CloudWatch logs"
   enable_key_rotation     = true
