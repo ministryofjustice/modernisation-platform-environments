@@ -103,7 +103,7 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
   policy = data.aws_iam_policy_document.ec2_s3_policy.json
 }
 
-resource "aws_iam_policy_attachment" "ssm-attachments" {
+resource "aws_iam_policy_attachment" "ssm-attachments-rds" {
   count = local.is-production || local.is-development ? 1 : 0
 
   name       = "ssm-attach-instance-role-rds"
@@ -111,7 +111,7 @@ resource "aws_iam_policy_attachment" "ssm-attachments" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
-resource "aws_iam_policy_attachment" "ssm-attachments" {
+resource "aws_iam_policy_attachment" "ssm-attachments-zip" {
   name       = "ssm-attach-instance-role-zip"
   roles      = [module.zip_bastion.bastion_iam_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
