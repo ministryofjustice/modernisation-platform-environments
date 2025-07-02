@@ -122,23 +122,6 @@ resource "aws_kms_key_policy" "waf_logs" {
             "kms:ViaService" = "logs.${data.aws_region.current.name}.amazonaws.com"
           }
         }
-      },
-      {
-        Sid    = "AllowSubscriptionFilterService"
-        Effect = "Allow"
-        Principal = {
-          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
-        }
-        Action = [
-          "kms:Decrypt",
-          "kms:DescribeKey"
-        ]
-        Resource = "*"
-        Condition = {
-          ArnLike = {
-            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
-          }
-        }
       }
     ]
   })
