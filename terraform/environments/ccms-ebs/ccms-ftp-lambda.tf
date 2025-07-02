@@ -130,17 +130,7 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
   )
 }
 
-# resource "aws_s3_object" "ftp_lambda_layer" {
-#   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-#   key    = "lambda/lambda-layer.zip"
-#   source = "lambda/lambda-layer.zip"
-# }
 
-# resource "aws_s3_object" "ftp_client" {
-#   bucket = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-#   key    = "lambda/ftpclient.zip"
-#   source = "lambda/ftpclient.zip"
-# }
 
 # #LAA-ftp-allpay-inbound-ccms
 module "allpay_ftp_lambda_outbound" {
@@ -148,24 +138,13 @@ module "allpay_ftp_lambda_outbound" {
   lambda_name         = lower(format("LAA-ftp-allpay-outbound-ccms-%s",local.environment))
   vpc_id              = data.aws_vpc.shared.id
   subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
-  ftp_port            = "22"
-  ftp_protocol        = "SFTP"
-  ftp_transfer_type   = "SFTP_DOWNLOAD"
-  ftp_file_types      = ""
-  ftp_local_path      = "CCMS_PRD_Allpay/Inbound/"
-  ftp_remote_path     = "/Outbound/"
-  ftp_require_ssl     = "NO"
-  ftp_ca_cert         = ""
-  ftp_cert            = ""
-  ftp_key             = ""
-  ftp_key_type        = ""
-  ftp_file_remove     = "YES"
-  ftp_cron            = "cron(0 10 * * ? *)"
-  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  ftp_transfer_type   = "SFTP_UPLOAD"
+  ftp_local_path      = "CCMS_PRD_Allpay/Outbound/"
+  ftp_remote_path     = "/Inbound/"
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   env                 = local.environment
-  secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
-  skip_key_verification = "YES"
-  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
+  secret_name = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
+  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
 
 }
 
@@ -175,24 +154,13 @@ module "LAA-ftp-xerox-cis-pay-outbound" {
   source              = "./modules/ftp-lambda"
   lambda_name         = lower(format("LAA-ftp-xerox-cis-pay-outbound-%s",local.environment))
   vpc_id              = data.aws_vpc.shared.id
-  subnet_ids          = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id,data.aws_subnet.public_subnets_c.id]
-  ftp_port            = "22"
-  ftp_protocol        = "SFTP"
+  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
   ftp_transfer_type   = "SFTP_UPLOAD"
-  ftp_file_types      = ""
-  ftp_local_path      = "CCMS_DEV_Allpay/Outbound/"
-  ftp_remote_path     = "/home/s3xfer/outbound-lambda-runs/"
-  ftp_require_ssl     = "NO"
-  ftp_ca_cert         = ""
-  ftp_cert            = ""
-  ftp_key             = ""
-  ftp_key_type        = ""
-  ftp_file_remove     = "YES"
-  ftp_cron            = "cron(0 10 * * ? *)"
+  ftp_local_path      = "CCMS_PRD_DST/Outbound/"
+  ftp_remote_path     = "/Production/outbound/Cheques/"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   env                 = local.environment
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
-  skip_key_verification = "YES"
   secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
 }
 
