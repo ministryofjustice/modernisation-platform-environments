@@ -828,3 +828,131 @@ resource "aws_cloudwatch_log_group" "app" {
     },
   )
 }
+
+#------------------------------------------------------------------------------
+# Custom WAF Logging Tests
+#------------------------------------------------------------------------------
+
+locals {
+  core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
+  core_logging_cw_destination_arn = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination:waf-logs-destination"
+  core_logging_cw_destination_resource = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination/waf-logs-destination"
+}
+
+# Simple WAF for demonstration/testing purposes
+resource "aws_wafv2_web_acl" "simple_demo_waf" {
+  name  = "simple-demo-waf"
+  scope = "REGIONAL"
+
+  default_action {
+    allow {}
+  }
+
+  # Simple rule to block requests from specific countries (example)
+  rule {
+    name     = "BlockHighRiskCountries"
+    priority = 1
+
+    action {
+      block {}
+    }
+
+    statement {
+      geo_match_statement {
+        country_codes = ["CN", "RU"]
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "BlockHighRiskCountriesRule"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  # Simple rate limiting rule
+  rule {
+    name     = "RateLimitRule"
+    priority = 2
+
+    action {
+      block {}
+    }
+
+    statement {
+      rate_based_statement {
+        limit              = 1000
+        aggregate_key_type = "IP"
+      }
+    }
+
+    visibility_config {
+      cloudwatch_metrics_enabled = true
+      metric_name                = "RateLimitRule"
+      sampled_requests_enabled   = true
+    }
+  }
+
+  visibility_config {
+    cloudwatch_metrics_enabled = true
+    metric_name                = "SimpleDemoWAF"
+    sampled_requests_enabled   = true
+  }
+
+  tags = local.tags
+}
+
+resource "aws_cloudwatch_log_group" "custom_waf" {
+  name              = "custom-waf-logs"
+  retention_in_days = 365
+}
+
+resource "aws_wafv2_web_acl_logging_configuration" "custom_waf_log_config" {
+  log_destination_configs = [aws_cloudwatch_log_group.custom_waf.arn]
+  resource_arn            = aws_wafv2_web_acl.simple_demo_waf.arn
+}
+
+resource "aws_iam_role" "custom_cwl_to_core_logging" {
+  name  = "CWLtoCoreLogging"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "logs.eu-west-2.amazonaws.com"
+      },
+      Action = "sts:AssumeRole",
+      Condition = {
+        StringLike = {
+          "aws:SourceArn" = [
+            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+          ]
+        }
+      }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "custom_cwl_to_core_logging_policy" {
+  name = "Custom-Permissions-Policy-For-CWL"
+  role = aws_iam_role.custom_cwl_to_core_logging.name
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect   = "Allow",
+      Action   = ["logs:PutSubscriptionFilter"],
+      Resource = local.core_logging_cw_destination_resource
+    }]
+  })
+}
+
+resource "aws_cloudwatch_log_subscription_filter" "custom_waf_to_core_logging" {
+  name            = "custom-waf-to-core-logging"
+  log_group_name  = aws_cloudwatch_log_group.custom_waf.name
+  filter_pattern  = "{$.action = * }"
+  destination_arn = local.core_logging_cw_destination_arn
+  role_arn        = aws_iam_role.custom_cwl_to_core_logging.arn
+
+  depends_on = [aws_cloudwatch_log_group.custom_waf]
+}
