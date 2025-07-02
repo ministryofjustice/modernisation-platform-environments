@@ -42,7 +42,7 @@ module "rds_bastion" {
 resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
   count = local.is-production || local.is-development ? 1 : 0
 
-  security_group_id = module.rds_bastion.bastion_security_group
+  security_group_id = module.rds_bastion[0].bastion_security_group
   description       = "EC2 MSSQL Access"
   ip_protocol       = "tcp"
   from_port         = 1433
@@ -53,7 +53,7 @@ resource "aws_vpc_security_group_egress_rule" "access_ms_sql_server" {
 resource "aws_vpc_security_group_egress_rule" "vpc_access" {
   count = local.is-production || local.is-development ? 1 : 0
 
-  security_group_id = module.rds_bastion.bastion_security_group
+  security_group_id = module.rds_bastion[0].bastion_security_group
   description       = "Reach vpc endpoints"
   ip_protocol       = "tcp"
   from_port         = 443
@@ -69,7 +69,7 @@ resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id = module.rds_bastion.bastion_security_group
+  referenced_security_group_id =  module.rds_bastion[0].bastion_security_group
 }
 
 data "aws_iam_policy_document" "ec2_s3_policy" {
@@ -99,15 +99,21 @@ resource "aws_iam_role_policy" "ec2_s3_policy" {
   count = local.is-production || local.is-development ? 1 : 0
 
   name   = "ec2-s3-policy"
-  role   = module.rds_bastion.bastion_iam_role.name
+  role   = module.rds_bastion[0].bastion_iam_role.name
   policy = data.aws_iam_policy_document.ec2_s3_policy.json
 }
 
 resource "aws_iam_policy_attachment" "ssm-attachments" {
   count = local.is-production || local.is-development ? 1 : 0
 
-  name       = "ssm-attach-instance-role"
-  roles      = [module.rds_bastion.bastion_iam_role.name, module.zip_bastion.bastion_iam_role.name]
+  name       = "ssm-attach-instance-role-rds"
+  roles      = [module.rds_bastion[0].bastion_iam_role.name]
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_policy_attachment" "ssm-attachments" {
+  name       = "ssm-attach-instance-role-zip"
+  roles      = [module.zip_bastion.bastion_iam_role.name]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
