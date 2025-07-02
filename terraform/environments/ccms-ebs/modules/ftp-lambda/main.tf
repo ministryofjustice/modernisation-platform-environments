@@ -115,10 +115,10 @@ resource "aws_lambda_function" "ftp_lambda" {
   filename      = data.archive_file.lambda_zip.output_path
   source_code_hash = data.archive_file.lambda_zip.output_base64sha256
 
-  # vpc_config {
-  #   subnet_ids         = var.subnet_ids
-  #   security_group_ids = [aws_security_group.ftp_sg.id]
-  # }
+  vpc_config {
+    subnet_ids         = var.subnet_ids
+    security_group_ids = [aws_security_group.ftp_sg.id]
+  }
 
   environment {
     variables = {
