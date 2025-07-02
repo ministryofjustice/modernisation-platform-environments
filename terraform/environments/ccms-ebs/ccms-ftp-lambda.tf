@@ -132,7 +132,7 @@ resource "aws_s3_bucket_policy" "outbound_bucket_policy" {
 
 
 
-# #LAA-ftp-allpay-inbound-ccms
+# #LAA-ftp-allpay-outbound-ccms
 module "allpay_ftp_lambda_outbound" {
   source              = "./modules/ftp-lambda"
   lambda_name         = lower(format("LAA-ftp-allpay-outbound-ccms-%s",local.environment))
@@ -149,6 +149,22 @@ module "allpay_ftp_lambda_outbound" {
 }
 
 
+# #LAA-ftp-allpay-inbound-ccms
+module "allpay_ftp_lambda_inbound" {
+  source              = "./modules/ftp-lambda"
+  lambda_name         = lower(format("LAA-ftp-allpay-inbound-ccms-%s",local.environment))
+  vpc_id              = data.aws_vpc.shared.id
+  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+  ftp_transfer_type   = "SFTP_DOWNLOAD"
+  ftp_local_path      = "CCMS_PRD_Allpay/Inbound/"
+  ftp_remote_path     = "/Outbound/"
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  env                 = local.environment
+  secret_name = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
+  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
+
+}
+
 #LAA-xerox-outbound-ccms
 module "LAA-ftp-xerox-ccms-outbound" {
   source              = "./modules/ftp-lambda"
@@ -157,38 +173,86 @@ module "LAA-ftp-xerox-ccms-outbound" {
   subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
   ftp_transfer_type   = "SFTP_UPLOAD"
   ftp_local_path      = "CCMS_PRD_DST/Outbound/"
-  ftp_remote_path     = "/Production/outbound/CCMS/ "
+  ftp_remote_path     = "/Production/outbound/CCMS/"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   env                 = local.environment
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
   secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
 }
 
+#LAA-xerox-outbound-ccms-peterborough
+module "LAA-ftp-xerox-ccms-outbound" {
+  source              = "./modules/ftp-lambda"
+  lambda_name         = lower(format("LAA-ftp-xerox-ccms-outbound-%s",local.environment))
+  vpc_id              = data.aws_vpc.shared.id
+  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+  ftp_transfer_type   = "SFTP_UPLOAD"
+  ftp_local_path      = "CCMS_PRD_DST/Outbound/Peterborough/"
+  ftp_remote_path     = "/Production/outbound/PETER/"
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+  env                 = local.environment
+  secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
+  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-xerox-outbound"].arn
+}
 
-# #LAA-ftp-cds-cis-pay-outbound
-# module "LAA-ftp-cds-cis-pay-outbound" {
-#   source              = "./modules/ftp-lambda"
-#   lambda_name         = lower(format("LAA-ftp-cds-cis-pay-outbound-%s",local.environment))
-#   vpc_id              = data.aws_vpc.shared.id
-#   subnet_ids          = [data.aws_subnet.public_subnets_a.id, data.aws_subnet.public_subnets_b.id,data.aws_subnet.public_subnets_c.id]
-#   ftp_port            = "22"
-#   ftp_protocol        = "SFTP"
-#   ftp_transfer_type   = "SFTP_UPLOAD"
-#   ftp_file_types      = ""
-#   ftp_local_path      = "CIS_PAY_DST/Outbound/"
-#   ftp_remote_path     = "/Test/Outbound/PETER/"
-#   ftp_require_ssl     = "NO"
-#   ftp_insecure        = "NO"
-#   ftp_ca_cert         = ""
-#   ftp_cert            = ""
-#   ftp_key             = ""
-#   ftp_key_type        = ""
-#   ftp_file_remove     = "YES"
-#   ftp_cron            = "cron(0 10 * * ? *)"
-#   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
-#   env                 = local.environment
-#   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
-#   s3_object_ftp_client= aws_s3_object.ftp_client.key
-#   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
+# #LAA-ftp-eckoh-outbound-ccms
+module "LAA-ftp-eckoh-outbound-ccms" {
+  source              = "./modules/ftp-lambda"
+  lambda_name         = lower(format("LAA-ftp-eckoh-outbound-ccms-%s",local.environment))
+  vpc_id              = data.aws_vpc.shared.id
+  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+  ftp_transfer_type   = "SFTP_UPLOAD"
+  ftp_local_path      = "CCMS_PRD_Eckoh/Outbound/"
+  ftp_remote_path     = "/inbound/"
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
+  env                 = local.environment
+  secret_name = "LAA-ftp-eckoh-inbound-ccms-${local.environment}"
+  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-eckoh-inbound-ccms"].arn
+}
 
-# }
+
+# #LAA-ftp-eckoh-inbound-ccms
+module "LAA-ftp-eckoh-inbound-ccms" {
+  source              = "./modules/ftp-lambda"
+  lambda_name         = lower(format("LAA-ftp-eckoh-inbound-ccms-%s",local.environment))
+  vpc_id              = data.aws_vpc.shared.id
+  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+  ftp_transfer_type   = "SFTP_DOWNLOAD"
+  ftp_local_path      = "CCMS_PRD_Eckoh/Inbound/"
+  ftp_remote_path     = "/outbound/"
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  env                 = local.environment
+  secret_name = "LAA-ftp-allpay-inbound-ccms-${local.environment}"
+  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
+}
+
+# #LAA-ftp-rossendales-ccms-inbound
+module "LAA-ftp-rossendales-ccms-inbound" {
+  source              = "./modules/ftp-lambda"
+  lambda_name         = lower(format("LAA-ftp-rossendales-ccms-inbound-%s",local.environment))
+  vpc_id              = data.aws_vpc.shared.id
+  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+  ftp_transfer_type   = "SFTP_DOWNLOAD"
+  ftp_local_path      = "CCMS_PRD_Rossendales/Inbound/"
+  ftp_remote_path     = "ccms/OutBound/"
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  env                 = local.environment
+  secret_name = "LAA-ftp-rossendales-ccms-inbound-${local.environment}"
+  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-rossendales-ccms-inbound"].arn
+}
+
+
+# #LAA-ftp-1stlocate-ccms-inbound
+module "LAA-ftp-1stlocate-ccms-inbound" {
+  source              = "./modules/ftp-lambda"
+  lambda_name         = lower(format("LAA-ftp-1stlocate-ccms-inbound-%s",local.environment))
+  vpc_id              = data.aws_vpc.shared.id
+  subnet_ids          = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id,data.aws_subnet.private_subnets_c.id]
+  ftp_transfer_type   = "SFTP_DOWNLOAD"
+  ftp_local_path      = "CCMS_PRD_TDX_DECRYPTED/Inbound/"
+  ftp_remote_path     = "/LAA_Direct/ToLAADirect/"
+  ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
+  env                 = local.environment
+  secret_name = "LAA-ftp-1stlocate-ccms-inbound-${local.environment}"
+  secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-1stlocate-ccms-inbound"].arn
+}
