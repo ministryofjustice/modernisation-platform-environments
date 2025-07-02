@@ -215,5 +215,27 @@ locals {
       "/microsoft/AD/azure.hmpp.root" = local.secretsmanager_secrets.domain
       "/GFSL"                         = local.secretsmanager_secrets.gfsl
     }
+
+    security_groups = {
+      rdp-from-gateways = {
+        description = "Security group to allow RDP from hmpp remote desktop gateways"
+        ingress = {
+          rpd-tcp = {
+            description = "Allow TCP RDP from Remote Desktop Gateways"
+            from_port   = 3389
+            to_port     = 3389
+            protocol    = "TCP"
+            cidr_blocks = ["10.40.128.133/32", "10.27.8.0/21"]
+          }
+          rdp-udp = {
+            description = "Allow UDP RDP from Remote Desktop Gateways"
+            from_port   = 3389
+            to_port     = 3389
+            protocol    = "UDP"
+            cidr_blocks = ["10.40.128.133/32", "10.27.8.0/21"]
+          }
+        }
+      }
+    }
   }
 }
