@@ -1,7 +1,8 @@
 locals {
   operational_db_jdbc_connection_string = "jdbc:postgresql://${module.aurora_operational_db.rds_cluster_endpoints["static"]}:${local.operational_db_port}/${local.operational_db_default_database}"
   nomis_jdbc_connection_string          = "jdbc:oracle:thin:@${local.nomis_host}:${local.nomis_port}/${local.nomis_service_name}"
-  dpr_test_connection_string            = try("jdbc:postgresql://${module.dpr_rds_db[0].rds_host}:5432/postgres", "")
+
+  dpr_test_connection_string = try("jdbc:postgresql://${module.dpr_rds_db[0].rds_host}:${module.dpr_rds_db[0].rds_port}/${jsondecode(data.aws_secretsmanager_secret_version.test_db[0].secret_string)["db_name"]}", "")
 
   dps_endpoint = {
     for item in local.dps_domains_list :

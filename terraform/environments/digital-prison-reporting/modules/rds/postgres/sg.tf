@@ -24,38 +24,62 @@ resource "aws_security_group" "rds" {
 }
 
 # EC2 Security Group
-resource "aws_security_group" "ec2_sec_group" {
+resource "aws_security_group" "rds_ec2_sec_group" {
   count = var.enable_rds ? 1 : 0
 
-  name        = "${var.name}-ec2-sgroup"
-  description = "RDS EC2 security group"
+  name        = "${var.name}-rds-ec2-sgroup"
+  description = "RDS to EC2 security group"
   vpc_id      = data.aws_vpc.dpr.id
   tags        = var.tags
 }
 
-resource "aws_security_group_rule" "ingress_traffic" {
+resource "aws_security_group_rule" "ingress_traffic_block_1" {
   count = var.enable_rds ? 1 : 0
 
   type              = "ingress"
-  description       = "RDS EC2 security group rule to allow incoming connections from EC2 instances to RDS"
+  description       = "Security group rule to allow incoming connections between ports 0-21"
   protocol          = "tcp"
   from_port         = 0
-  to_port           = 65535
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.ec2_sec_group[0].id
+  to_port           = 21
+  cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
+  security_group_id = aws_security_group.rds_ec2_sec_group[0].id
 }
 
-resource "aws_security_group_rule" "egress_traffic" {
-  #checkov:skip=CKV_AWS_382: "Ensure no security groups allow egress from 0.0.0.0:0 to port -1"
+resource "aws_security_group_rule" "ingress_traffic_block_2" {
   count = var.enable_rds ? 1 : 0
 
-  type              = "egress"
-  description       = "RDS EC2 security group rule to allow outgoing connections from RDS to EC2 instances"
-  protocol          = "-1"
-  from_port         = 0
-  to_port           = 0
-  cidr_blocks       = ["0.0.0.0/0"]
-  security_group_id = aws_security_group.ec2_sec_group[0].id
+  type              = "ingress"
+  description       = "Security group rule to allow incoming connections between ports 23-79"
+  protocol          = "tcp"
+  from_port         = 23
+  to_port           = 79
+  cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
+  security_group_id = aws_security_group.rds_ec2_sec_group[0].id
+}
+
+
+resource "aws_security_group_rule" "ingress_traffic_block_3" {
+  count = var.enable_rds ? 1 : 0
+
+  type              = "ingress"
+  description       = "Security group rule to allow incoming connections between ports 81-3388"
+  protocol          = "tcp"
+  from_port         = 81
+  to_port           = 3388
+  cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
+  security_group_id = aws_security_group.rds_ec2_sec_group[0].id
+}
+
+resource "aws_security_group_rule" "ingress_traffic_block_4" {
+  count = var.enable_rds ? 1 : 0
+
+  type              = "ingress"
+  description       = "Security group rule to allow incoming connections between ports 3390-65535"
+  protocol          = "tcp"
+  from_port         = 3390
+  to_port           = 65535
+  cidr_blocks       = [data.aws_vpc.dpr.cidr_block, ]
+  security_group_id = aws_security_group.rds_ec2_sec_group[0].id
 }
 
 resource "aws_security_group_rule" "rule" {

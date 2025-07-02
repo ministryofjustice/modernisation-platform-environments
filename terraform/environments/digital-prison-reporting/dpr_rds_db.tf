@@ -1,4 +1,58 @@
-# DPR RDS Database Instance
+################################################################################
+# DPR RDS - Parameter Group
+################################################################################
+module "dpr_rds_parameter_group" {
+  source = "./modules/rds/parameter_group"
+
+  count = local.is_dev_or_test ? 1 : 0
+
+  create_db_parameter_group          = true
+  db_parameter_group_use_name_prefix = false
+  db_parameter_group_name            = local.dpr_rds_parameter_group_name
+  db_parameter_group_family          = local.dpr_rds_parameter_group_family
+
+  db_parameter_group_parameters = [
+    {
+      name         = "rds.logical_replication"
+      value        = "1"
+      apply_method = "pending-reboot"
+    },
+    {
+      name         = "shared_preload_libraries"
+      value        = "pglogical"
+      apply_method = "pending-reboot"
+    },
+    {
+      name         = "max_wal_size"
+      value        = "1024"
+      apply_method = "immediate"
+    },
+    {
+      name         = "wal_sender_timeout"
+      value        = "0"
+      apply_method = "immediate"
+    },
+    {
+      name         = "max_slot_wal_keep_size"
+      value        = "40000"
+      apply_method = "immediate"
+    }
+  ]
+
+  tags = merge(
+    local.all_tags,
+    {
+      Resource_Group = "RDS"
+      Jira           = "DPR2-2072"
+      Resource_Type  = "RDS Parameter Group"
+      Name           = local.dpr_rds_parameter_group_name
+    }
+  )
+}
+
+################################################################################
+# DPR RDS - Database
+################################################################################
 module "dpr_rds_db" {
   source = "./modules/rds/postgres"
 
@@ -18,9 +72,10 @@ module "dpr_rds_db" {
   db_instance_class  = local.dpr_rds_inst_class
   master_user        = jsondecode(data.aws_secretsmanager_secret_version.test_db[0].secret_string)["user"]
   storage_type       = local.dpr_rds_store_type
-  parameter_group    = local.dpr_rds_parameter_group
   ca_cert_identifier = "rds-ca-rsa2048-g1" # Expiry on June 16, 2026
   license_model      = "postgresql-license"
+
+  parameter_group = module.dpr_rds_parameter_group[0].parameter_group_name
 
   tags = merge(
     local.all_tags,
@@ -31,4 +86,6 @@ module "dpr_rds_db" {
       Name           = local.dpr_rds_name
     }
   )
+
+  depends_on = [module.dpr_rds_parameter_group]
 }

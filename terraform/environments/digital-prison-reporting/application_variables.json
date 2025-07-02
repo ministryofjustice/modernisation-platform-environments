@@ -187,18 +187,19 @@
       "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": true,
       "dpr_rds_db": {
-        "enable": false,
-        "create_replica": false,
+        "enable": true,
+        "create_replica": true,
         "engine": "postgres",
         "engine_version": "16.8",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
-        "db_identifier": "test-database",
+        "db_identifier": "test-database-alt",
         "inst_class": "db.t4g.large",
         "user": "postgres",
         "store_type": "gp3",
-        "parameter_group": "default:postgres-16"
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
       }
     },
     "test": {
@@ -382,7 +383,8 @@
         "inst_class": "db.t4g.large",
         "user": "postgres",
         "store_type": "gp3",
-        "parameter_group": "default:postgres-16"
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
       }
     },
     "preproduction": {
@@ -583,7 +585,8 @@
         "inst_class": "db.t4g.large",
         "user": "postgres",
         "store_type": "gp3",
-        "parameter_group": "default:postgres-16"
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
       }
     },
     "production": {
@@ -782,7 +785,8 @@
         "inst_class": "db.t4g.large",
         "user": "postgres",
         "store_type": "gp3",
-        "parameter_group": "default:postgres-16"
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
       }
     }
   }

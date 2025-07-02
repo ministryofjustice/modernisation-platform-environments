@@ -52,9 +52,21 @@ variable "back_up_period" {
   default     = 1
 }
 
+variable "skip_final_snapshot" {
+  type        = bool
+  description = "Flag to skip the final snapshot"
+  default     = true
+}
+
 variable "parameter_group" {
   type        = string
   description = "Parameter_group"
+}
+
+variable "backup_retention_period" {
+  type        = number
+  description = "The backup retention period of the RDS instance"
+  default     = 7
 }
 
 variable "storage_type" {
@@ -80,6 +92,54 @@ variable "kms" {
   default     = ""
 }
 
+variable "storage_encrypted" {
+  type        = bool
+  description = "Flag to encrypt the storage"
+  default     = true
+}
+
+variable "apply_immediately" {
+  type        = bool
+  description = "Flag to apply changes immediately"
+  default     = true
+}
+
+variable "multi_az" {
+  type        = bool
+  description = "Flag to allow Multi-AZ"
+  default     = false
+}
+
+variable "deletion_protection" {
+  type        = bool
+  description = "Ensure deletion protection"
+  default     = false
+}
+
+variable "auto_minor_version_upgrade" {
+  type        = bool
+  description = "Allow automatic minor version upgrades"
+  default     = true
+}
+
+variable "performance_insights_enabled" {
+  type        = bool
+  description = "Enable performance insights"
+  default     = false
+}
+
+variable "performance_insights_kms_key_id" {
+  type        = string
+  description = "KMS key for the performance insights"
+  default     = null
+}
+
+variable "performance_insights_retention_period" {
+  type        = number
+  description = "Performance insights retention period"
+  default     = 0
+}
+
 variable "allocated_size" {
   type        = string
   description = "Allocated Storage"
@@ -90,6 +150,12 @@ variable "ca_cert_identifier" {
   description = "The identifier of the CA certificate for the DB instance"
   type        = string
   default     = null
+}
+
+variable "monitoring_interval" {
+  description = "The monitoring interval for the DB instance"
+  type        = number
+  default     = 0
 }
 
 variable "max_allocated_size" {

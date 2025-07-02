@@ -54,6 +54,7 @@ resource "aws_db_instance" "default" {
   engine                  = var.engine
   engine_version          = var.engine_version
   instance_class          = var.db_instance_class
+  parameter_group_name    = var.parameter_group
   username                = var.master_user
   password                = data.aws_secretsmanager_secret_version.password.secret_string
   storage_type            = var.storage_type
@@ -61,15 +62,23 @@ resource "aws_db_instance" "default" {
   maintenance_window      = var.maintenance_window
   backup_window           = var.backup_window
   backup_retention_period = var.back_up_period
-  vpc_security_group_ids  = [aws_security_group.rds[0].id, aws_security_group.ec2_sec_group[0].id, ]
-  skip_final_snapshot     = true
+  vpc_security_group_ids  = [aws_security_group.rds[0].id, aws_security_group.rds_ec2_sec_group[0].id, ]
+  skip_final_snapshot     = var.skip_final_snapshot
   kms_key_id              = var.kms
-  storage_encrypted       = true
-  apply_immediately       = true
+  storage_encrypted       = var.storage_encrypted
+  apply_immediately       = var.apply_immediately
   allocated_storage       = var.allocated_size
   max_allocated_storage   = var.max_allocated_size
   ca_cert_identifier      = var.ca_cert_identifier
-  multi_az                = false
+  multi_az                = var.multi_az
+  monitoring_interval     = var.monitoring_interval
+  deletion_protection     = var.deletion_protection
+
+  auto_minor_version_upgrade            = var.auto_minor_version_upgrade
+  performance_insights_enabled          = var.performance_insights_enabled
+  performance_insights_kms_key_id       = var.performance_insights_kms_key_id
+  performance_insights_retention_period = var.performance_insights_retention_period
+
   tags = merge(
     var.tags,
     {
@@ -77,24 +86,47 @@ resource "aws_db_instance" "default" {
       Name          = "${var.name}-rds"
     }
   )
+
+  depends_on = [aws_security_group.rds[0], aws_security_group.rds_ec2_sec_group[0]]
 }
 
 resource "aws_db_instance" "replica" {
+  #checkov:skip=CKV_AWS_129: "Ensure that respective logs of Amazon Relational Database Service (Amazon RDS) are enabled"
+  #checkov:skip=CKV_AWS_79: "Ensure Instance Metadata Service Version 1 is not enabled"
+
   count = (var.enable_rds && var.create_rds_replica) ? 1 : 0
 
   replicate_source_db     = aws_db_instance.default[0].identifier
-  backup_retention_period = 7
+  parameter_group_name    = aws_db_instance.default[0].parameter_group_name
+  backup_retention_period = aws_db_instance.default[0].backup_retention_period
   identifier              = "${var.name}-replica"
-  instance_class          = var.db_instance_class
-  vpc_security_group_ids  = [aws_security_group.rds[0].id, aws_security_group.ec2_sec_group[0].id, ]
-  skip_final_snapshot     = true
+  instance_class          = aws_db_instance.default[0].instance_class
+  vpc_security_group_ids  = [aws_security_group.rds[0].id, aws_security_group.rds_ec2_sec_group[0].id, ]
+  skip_final_snapshot     = aws_db_instance.default[0].skip_final_snapshot
   kms_key_id              = var.kms
-  storage_encrypted       = true
-  apply_immediately       = true
+  storage_encrypted       = aws_db_instance.default[0].storage_encrypted
+  apply_immediately       = aws_db_instance.default[0].apply_immediately
   max_allocated_storage   = var.max_allocated_size
   ca_cert_identifier      = var.ca_cert_identifier
-  copy_tags_to_snapshot   = true
-  multi_az                = false
+  copy_tags_to_snapshot   = aws_db_instance.default[0].copy_tags_to_snapshot
+  multi_az                = aws_db_instance.default[0].multi_az
+  monitoring_interval     = aws_db_instance.default[0].monitoring_interval
+  deletion_protection     = aws_db_instance.default[0].deletion_protection
+
+  auto_minor_version_upgrade            = aws_db_instance.default[0].auto_minor_version_upgrade
+  performance_insights_enabled          = aws_db_instance.default[0].performance_insights_enabled
+  performance_insights_kms_key_id       = aws_db_instance.default[0].performance_insights_kms_key_id
+  performance_insights_retention_period = aws_db_instance.default[0].performance_insights_retention_period
+
+  tags = merge(
+    var.tags,
+    {
+      Resource_Type = "rds"
+      Name          = "${var.name}-rds"
+    }
+  )
+
+  depends_on = [aws_db_instance.default[0], aws_security_group.rds[0], aws_security_group.rds_ec2_sec_group[0]]
 }
 
 resource "random_password" "password" {
