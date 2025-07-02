@@ -2,13 +2,12 @@ resource "aws_transfer_server" "this" {
   protocols              = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
   domain                 = "S3"
-
   endpoint_type = "VPC"
   endpoint_details {
     address_allocation_ids = [aws_eip.transfer_server.id]
     vpc_id                 = module.vpc.vpc_id
     subnet_ids             = module.vpc.public_subnets
-    security_group_ids     = [aws_security_group.transfer.id]
+    security_group_ids = [aws_security_group.transfer_server.id]
   }
 
   security_policy_name = "TransferSecurityPolicy-2024-01"

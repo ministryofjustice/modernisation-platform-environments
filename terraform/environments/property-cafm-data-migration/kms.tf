@@ -9,7 +9,7 @@ resource "aws_kms_key" "shared" {
 }
 
 resource "aws_kms_key_policy" "shared_policy" {
-  key_id = aws_kms_key.sns_kms.id
+  key_id = aws_kms_key.shared.id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -27,10 +27,17 @@ resource "aws_kms_key_policy" "shared_policy" {
         Resource = "*"
       },
       {
-        Sid = "AllowAccountAdmin",
+        Sid = "AllowAccountAccess",
         Effect = "Allow",
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+          AWS = [
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-development"]}:role/sandbox",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-preproduction"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-preproduction"]}:role/migration",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/developer",
+            "arn:aws:iam::${local.environment_management.account_ids["property-cafm-data-migration-production"]}:role/migration"
+          ]
         },
         Action = "kms:*",
         Resource = "*"
