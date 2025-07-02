@@ -159,6 +159,13 @@ locals {
     bip-web = {
       description = "Security group for bip web tier"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         http7010 = {
           description     = "Allow http7010 ingress"
           from_port       = 7010
@@ -196,6 +203,13 @@ locals {
     bip-app = {
       description = "Security group for bip application tier"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         all-from-web = {
           description     = "Allow all ingress from web"
           from_port       = 0
@@ -221,13 +235,19 @@ locals {
       # this is also the SG for FSX but we can't change description or FSX SG without recreating the resource
       description = "Security group for BODS servers"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         smb = {
           description = "Allow fsx smb ingress"
           from_port   = 445
           to_port     = 445
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.fsx_ingress
-          self        = true
         }
         winrm = {
           description = "Allow fsx winrm ingress"
@@ -235,7 +255,6 @@ locals {
           to_port     = 5986
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.fsx_ingress
-          self        = true
         }
         cms-ingress = {
           description = "Allow http6400-http6500 ingress"
@@ -254,7 +273,7 @@ locals {
       }
       egress = {
         all = {
-          description = "Allow all FSX egress"
+          description = "Allow all traffic outbound"
           from_port   = 0
           to_port     = 0
           protocol    = "-1"
@@ -616,55 +635,6 @@ locals {
       }
     }
 
-    bods = {
-      description = "Security group for BODS servers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        rdp_3389_tcp = {
-          description = "3389: rdp tcp"
-          from_port   = 3389
-          to_port     = 3389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs_old.rdp
-        }
-        http_6400 = {
-          description     = "6400: boe cms"
-          from_port       = 6400
-          to_port         = 6400
-          protocol        = "TCP"
-          security_groups = ["private-jumpserver"]
-        }
-        http_6410_6500 = {
-          description     = "6410-6500: boe sia"
-          from_port       = 6410
-          to_port         = 6500
-          protocol        = "TCP"
-          security_groups = ["private-jumpserver"]
-        }
-        http_28080 = {
-          description     = "28080: bods tomcat http"
-          from_port       = 28080
-          to_port         = 28080
-          protocol        = "TCP"
-          security_groups = ["public-lb", "private-jumpserver"]
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
-    }
     onr_db = {
       description = "Security group for ONR DB server"
       ingress = {
