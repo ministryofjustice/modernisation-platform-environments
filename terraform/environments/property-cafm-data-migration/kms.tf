@@ -4,7 +4,7 @@ resource "aws_kms_key" "shared" {
   deletion_window_in_days = 10
 
   tags = {
-    Purpose = "SNS topic encryption"
+    Purpose = "Shared key for S3 + CloudWatch"
   }
 }
 
