@@ -201,19 +201,3 @@ moved {
   from = module.datasync_security_group
   to   = module.datasync_instance_security_group
 }
-
-/* This security group is temporary and will be retired when we're satisfied with DataSync end-to-end */
-module "mojo_network_debug_security_group" {
-  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-
-  source  = "terraform-aws-modules/security-group/aws"
-  version = "5.3.0"
-
-  name   = "mojo-network-debug"
-  vpc_id = module.connected_vpc.vpc_id
-
-  egress_cidr_blocks = ["0.0.0.0/0"]
-  egress_rules       = ["all-all"]
-
-  tags = local.tags
-}
