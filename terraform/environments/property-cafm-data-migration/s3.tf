@@ -122,7 +122,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "CAFM" {
   rule {
     apply_server_side_encryption_by_default {
       sse_algorithm     = "aws:kms"
-      kms_master_key_id = aws_kms_key.sns_kms.arn
+      kms_master_key_id = aws_kms_key.shared.arn
     }
     bucket_key_enabled = true
   }
@@ -130,7 +130,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "CAFM" {
 
 resource "aws_sns_topic" "s3_event_topic" {
   name = "cafm-landing-s3-event-topic"
-  kms_master_key_id = aws_kms_key.sns_kms.arn
+  kms_master_key_id = aws_kms_key.shared.arn
 }
 
 resource "aws_s3_bucket_notification" "bucket_notify" {
@@ -185,8 +185,6 @@ resource "aws_sns_topic_policy" "s3_publish_policy" {
 #tfsec:ignore:AVD-AWS-0088
 resource "aws_s3_bucket" "LOG" {
   # checkov:skip=CKV_AWS_144: "S3 bucket has cross-region not required"
-  # checkov:skip=CKV_AWS_145: "S3 bucket encryption not required"
-  # checkov:skip=CKV2_AWS_61: "S3 bucket lifecycle policy not required"
   # checkov:skip=CKV2_AWS_62: "S3 bucket event notifications not required"
   bucket = "property-datahub-logs-${local.environment}"
 
@@ -206,6 +204,39 @@ resource "aws_s3_bucket_versioning" "LOG" {
   bucket = aws_s3_bucket.LOG.id
   versioning_configuration {
     status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "LOG" {
+  bucket = aws_s3_bucket.LOG.id
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm     = "aws:kms"
+      kms_master_key_id = aws_kms_key.shared.arn
+    }
+    bucket_key_enabled = true
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "LOG" {
+  # checkov:skip=CKV_AWS_300: "S3 bucket has a set period for aborting failed uploads, this is a false positive finding"
+  bucket = aws_s3_bucket.LOG.id
+  rule {
+    id     = "tf-s3-lifecycle"
+    status = "Enabled"
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+    noncurrent_version_transition {
+      noncurrent_days = 30
+      storage_class   = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "STANDARD_IA"
+    }
   }
 }
 
