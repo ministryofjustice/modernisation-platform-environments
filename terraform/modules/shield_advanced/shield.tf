@@ -16,6 +16,7 @@ data "external" "shield_waf" {
   ]
 }
 
+
 data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
@@ -30,6 +31,7 @@ data "aws_secretsmanager_secret_version" "environment_management" {
   provider  = aws.modernisation-platform
   secret_id = data.aws_secretsmanager_secret.environment_management.id
 }
+
 
 locals {
   shield_protections_json = {
@@ -48,6 +50,98 @@ locals {
   core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
   core_logging_cw_destination_arn = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination:waf-logs-destination"
   core_logging_cw_destination_resource = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination/waf-logs-destination"
+}
+
+resource "aws_kms_key" "waf_logs" {
+  #checkov:skip=CKV2_AWS_64: "KMS key policy is defined via separate aws_kms_key_policy resource"
+  count                   = var.enable_logging ? 1 : 0
+  description             = "KMS key for encrypting WAF CloudWatch logs"
+  enable_key_rotation     = true
+  deletion_window_in_days = 7
+
+  tags = {
+    Name = "waf-logs-kms-key"
+  }
+}
+
+resource "aws_kms_alias" "waf_logs" {
+  count         = var.enable_logging ? 1 : 0
+  name          = "alias/waf-logs-kms-key"
+  target_key_id = aws_kms_key.waf_logs[0].key_id
+}
+
+resource "aws_kms_key_policy" "waf_logs" {
+  count  = var.enable_logging ? 1 : 0
+  key_id = aws_kms_key.waf_logs[0].id
+  
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableIAMUserPermissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogsAccess"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnEquals = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:aws-waf-logs-${data.external.shield_waf.result["name"]}"
+          }
+        }
+      },
+      {
+        Sid    = "AllowCoreLoggingCrossAccountAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.core_logging_account_id}:root"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "logs.${data.aws_region.current.name}.amazonaws.com"
+          }
+        }
+      },
+      {
+        Sid    = "AllowSubscriptionFilterService"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnLike = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:*"
+          }
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_shield_drt_access_role_arn_association" "main" {
@@ -117,6 +211,7 @@ resource "aws_cloudwatch_log_group" "waf" {
   count             = var.enable_logging ? 1 : 0
   name              = "aws-waf-logs-${data.external.shield_waf.result["name"]}"
   retention_in_days = var.log_retention_in_days
+  kms_key_id        = var.enable_logging ? aws_kms_key.waf_logs[0].arn : null
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf" {
@@ -174,7 +269,6 @@ resource "aws_cloudwatch_log_subscription_filter" "waf_to_core_logging" {
 
   depends_on = [aws_cloudwatch_log_group.waf]
 }
-
 
 output "core_logging_cw_destination_arn" {
   value = local.core_logging_cw_destination_arn
