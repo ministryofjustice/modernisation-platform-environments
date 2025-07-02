@@ -47,7 +47,7 @@ module "policy" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/iam/aws//modules/iam-policy"
-  version = "5.44.1"
+  version = "5.58.0"
 
   name_prefix = "transfer-user-${var.name}"
 
