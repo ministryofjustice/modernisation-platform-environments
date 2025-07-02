@@ -224,6 +224,10 @@ resource "aws_s3_bucket_lifecycle_configuration" "LOG" {
   rule {
     id     = "tf-s3-lifecycle"
     status = "Enabled"
+    
+    filter {
+      prefix = "s3-logs/"
+    }
 
     abort_incomplete_multipart_upload {
       days_after_initiation = 7
