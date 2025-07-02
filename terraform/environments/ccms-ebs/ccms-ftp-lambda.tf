@@ -181,7 +181,7 @@ module "LAA-ftp-xerox-ccms-outbound" {
 }
 
 #LAA-xerox-outbound-ccms-peterborough
-module "LAA-ftp-xerox-ccms-outbound" {
+module "LAA-ftp-xerox-ccms-outbound-peterborough" {
   source              = "./modules/ftp-lambda"
   lambda_name         = lower(format("LAA-ftp-xerox-ccms-outbound-%s",local.environment))
   vpc_id              = data.aws_vpc.shared.id
