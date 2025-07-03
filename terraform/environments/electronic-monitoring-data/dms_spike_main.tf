@@ -18,6 +18,6 @@ module "dms_rds_spike" {
 
   # RDS Data Source and target details
   s3_bucket_name  = "emds-${var.local.environment}-data-20240917144025201600000001"
-  table_mappings = file("${path.module}/table_mappings/lcm_archive_2019.json")
+  table_mappings = file("table_mappings/lcm_archive_2019.json")
   database_name  = "lcm_archive_2019"
 }
