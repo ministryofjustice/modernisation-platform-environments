@@ -15,13 +15,13 @@ module "dms_task" {
     "g4s_fep",
     "g4s_emsys_tpims",
     "capita_forms_and_subject_id",
-    "lcm_archive_2019",
-    "lcm_archive_2020",
-    "lcm_archive_2021",
-    "lcm_archive_2022",
-    "lcm_archive_2023",
-    "lcm_archive_local_full",
-    "centurion"
+    "g4s_lcm_archive_2019",
+    "g4s_lcm_archive_2020",
+    "g4s_lcm_archive_2021",
+    "g4s_lcm_archive_2022",
+    "g4s_lcm_archive_2023",
+    "g4s_lcm_archive_local_full",
+    "g4s_centurion"
   ] : local.is-development ? ["test"] : [])
 
   database_name = each.key
