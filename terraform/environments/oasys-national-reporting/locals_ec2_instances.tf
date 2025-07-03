@@ -173,7 +173,7 @@ locals {
         instance_type                = "r6i.2xlarge" # Memory optimised 8 vCPU, 64 GiB RAM
         key_name                     = "ec2-user"
         metadata_options_http_tokens = "required"
-        vpc_security_group_ids       = ["win-bip", "bods", "ec2-windows", "ad-join"]
+        vpc_security_group_ids       = ["bods", "ec2-windows", "ad-join"]
       }
       route53_records = {
         create_internal_record = true
