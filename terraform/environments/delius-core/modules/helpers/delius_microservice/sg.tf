@@ -30,7 +30,8 @@ resource "aws_vpc_security_group_egress_rule" "ecs_service_to_db" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "alb_to_ecs_service" {
-  count                        = var.alb_security_group_id == null ? 0 : 1
+  # count                        = var.alb_security_group_id == null ? 0 : 1
+  count                        = 0
   security_group_id            = aws_security_group.ecs_service.id
   description                  = "load balancer to ecs service"
   from_port                    = var.container_port_config[0].containerPort

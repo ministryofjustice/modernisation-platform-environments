@@ -72,47 +72,62 @@ data "aws_ssm_parameter" "delius_core_frontend_env_var_dev_password" {
 locals {
   weblogic_ssm = {
     vars = [
-      "PSR_SERVICE_URL",
-      "PREPARE_CASE_FOR_SENTENCE_URL",
-      "TZ",
-      "PDFCREATION_URL",
-      "OFFENDER_SEARCH_API_URL",
-      "DMS_OFFICE_URI_PORT",
-      "MERGE_URL",
-      "OAUTH_TOKEN_VERIFICATION_URL",
       "API_CLIENT_ID",
-      "DMS_PROTOCOL",
-      "JDBC_CONNECTION_POOL_MIN_CAPACITY",
-      "PDFCREATION_TEMPLATES",
-      "DMS_HOST",
-      "COOKIE_SECURE",
-      "USERMANAGEMENT_URL",
-      "DELIUS_API_URL",
-      "OAUTH_DEFAULT_SCOPE",
-      "GDPR_URL",
       "AWS_REGION",
-      "OAUTH_LOGIN_ENABLED",
+
+      "BREACH_NOTICE_API_URL",
+      "BREACH_NOTICE_UI_URL_FORMAT",
+
+      "COOKIE_SECURE",
+
+      "DELIUS_API_URL",
+      "DMS_HOST",
       "DMS_OFFICE_URI_HOST",
-      "JDBC_CONNECTION_POOL_MAX_CAPACITY",
+      "DMS_OFFICE_URI_PORT",
       "DMS_PORT",
-      "OAUTH_LOGIN_NAME",
-      "JDBC_USERNAME",
-      "USER_MEM_ARGS",
-      "NDELIUS_CLIENT_ID",
-      "JDBC_URL",
-      "USER_CONTEXT",
-      "OAUTH_URL",
-      "PASSWORD_RESET_URL",
-      "LOG_LEVEL_NDELIUS",
-      "LDAP_HOST",
-      "MERGE_API_URL",
-      "ELASTICSEARCH_URL",
-      "TRAINING_MODE_APP_NAME",
-      "OAUTH_CLIENT_ID",
-      "LDAP_PRINCIPAL",
-      "OAUTH_CALLBACK_URL",
+      "DMS_PROTOCOL",
+
       "EIS_USER_CONTEXT",
-      "MERGE_OAUTH_URL"
+      "ELASTICSEARCH_URL",
+
+      "GDPR_URL",
+
+      "JDBC_CONNECTION_POOL_MAX_CAPACITY",
+      "JDBC_CONNECTION_POOL_MIN_CAPACITY",
+      "JDBC_URL",
+      "JDBC_USERNAME",
+
+      "LDAP_HOST",
+      "LDAP_PRINCIPAL",
+      "LOG_LEVEL_NDELIUS",
+
+      "MERGE_API_URL",
+      "MERGE_OAUTH_URL",
+      "MERGE_URL",
+
+      "NDELIUS_CLIENT_ID",
+
+      "OAUTH_CALLBACK_URL",
+      "OAUTH_CLIENT_ID",
+      "OAUTH_DEFAULT_SCOPE",
+      "OAUTH_LOGIN_ENABLED",
+      "OAUTH_LOGIN_NAME",
+      "OAUTH_TOKEN_VERIFICATION_URL",
+      "OAUTH_URL",
+      "OFFENDER_SEARCH_API_URL",
+
+      "PASSWORD_RESET_URL",
+      "PDFCREATION_TEMPLATES",
+      "PDFCREATION_URL",
+      "PREPARE_CASE_FOR_SENTENCE_URL",
+      "PSR_SERVICE_URL",
+
+      "TRAINING_MODE_APP_NAME",
+      "TZ",
+
+      "USER_CONTEXT",
+      "USER_MEM_ARGS",
+      "USERMANAGEMENT_URL"
     ]
     secrets = [
       "ADMIN_PASSWORD",
@@ -121,12 +136,21 @@ locals {
       "APPLICATIONINSIGHTS_CONNECTION_STRING",
       "AWS_ACCESS_KEY_ID",
       "AWS_SECRET_ACCESS_KEY",
+
       "JDBC_PASSWORD",
+
       "LDAP_CREDENTIAL",
+
       "MERGE_SECRET",
+
+      "NOTIFICATION_API_KEY",
+
       "OAUTH_CLIENT_SECRET",
+
       "PDFCREATION_SECRET",
+
       "TOPIC_ARN",
+
       "USERMANAGEMENT_SECRET"
     ]
   }

@@ -7,3 +7,8 @@ output "rds_host" {
   description = "RDS Host Endpoint"
   value       = try(aws_db_instance.default[0].address, "")
 }
+
+output "rds_port" {
+  description = "RDS port"
+  value       = try(aws_db_instance.default[0].port, "")
+}

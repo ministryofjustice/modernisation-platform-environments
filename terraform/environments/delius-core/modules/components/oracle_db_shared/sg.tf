@@ -48,7 +48,7 @@ resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_rman" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_legacy_oracle" {
-  for_each = toset(var.environment_config.migration_environment_private_cidr)
+  for_each = toset(var.environment_config.migration_environment_db_cidr)
 
   security_group_id = aws_security_group.db_ec2.id
   cidr_ipv4         = each.key
@@ -62,7 +62,7 @@ resource "aws_vpc_security_group_egress_rule" "db_ec2_instance_legacy_oracle" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "db_ec2_instance_legacy_oracle" {
-  for_each = toset(var.environment_config.migration_environment_private_cidr)
+  for_each = toset(var.environment_config.migration_environment_db_cidr)
 
   security_group_id = aws_security_group.db_ec2.id
   cidr_ipv4         = each.key

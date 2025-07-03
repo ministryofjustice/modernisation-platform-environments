@@ -233,7 +233,7 @@ resource "aws_ecs_service" "chaps_yarp_combined_service" {
     content {
       type = "distinctInstance"
     }
-  } 
+  }
 
   network_configuration {
     subnets         = data.aws_subnets.shared-private.ids
@@ -292,7 +292,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     id      = aws_launch_template.ec2-launch-template.id
     version = aws_launch_template.ec2-launch-template.latest_version
   }
-  
+
   tag {
     key                 = "Name"
     value               = "${local.application_name}-cluster-scaling-group"

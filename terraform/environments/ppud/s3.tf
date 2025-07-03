@@ -292,7 +292,7 @@ resource "aws_s3_bucket_policy" "moj-infrastructure" {
         "Principal" : {
           "AWS" : [
             "arn:aws:iam::${local.environment_management.account_ids["ppud-production"]}:role/ec2-iam-role"
-         ]
+          ]
         }
       },
       {

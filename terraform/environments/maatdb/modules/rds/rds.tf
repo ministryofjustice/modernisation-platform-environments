@@ -320,10 +320,10 @@ resource "aws_security_group" "ses_sec_group" {
 
 
   egress {
-    description     = "SMTP Outbound to 587"
-    from_port       = 587
-    to_port         = 587
-    protocol        = "tcp"
+    description = "SMTP Outbound to 587"
+    from_port   = 587
+    to_port     = 587
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
 
   }

@@ -294,6 +294,35 @@ locals {
         })
       })
 
+      # temporary instance for testing SAR
+      qa11g-nomis-web-b = merge(local.ec2_instances.web, {
+        config = merge(local.ec2_instances.web.config, {
+          availability_zone = "eu-west-2b"
+          instance_profile_policies = concat(local.ec2_instances.web.config.instance_profile_policies, [
+            "Ec2Qa11GWeblogicPolicy",
+          ])
+        })
+        instance = merge(local.ec2_instances.web.instance, {
+          disable_api_termination = true
+          instance_type           = "t2.large"
+          tags = {
+            backup-plan = "daily-and-weekly"
+          }
+        })
+        user_data_cloud_init = merge(local.ec2_instances.web.user_data_cloud_init, {
+          args = merge(local.ec2_instances.web.user_data_cloud_init.args, {
+            branch = "main"
+          })
+        })
+        tags = merge(local.ec2_instances.web.tags, {
+          instance-scheduling  = "skip-scheduling"
+          nomis-environment    = "qa11g"
+          oracle-db-hostname-a = "dev-nomis-db-1-a"
+          oracle-db-hostname-b = "none"
+          oracle-db-name       = "qa11g"
+        })
+      })
+
       # built by code and then handed over to Syscon for remaining manual configuration
       qa11g-nomis-web12-b = merge(local.ec2_instances.web12, {
         config = merge(local.ec2_instances.web12.config, {

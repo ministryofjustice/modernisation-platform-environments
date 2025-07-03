@@ -79,7 +79,7 @@ Modernisation Platform
 
 When bringing up a new database for the first time. The below commands must be manually run before SOA:
 
-PS: This is copied from location https://github.com/ministryofjustice/laa-ccms-edrms-web-service/blob/main/sql/liquibase/xxsoa_schema.sql
+PS: This is copied from location <https://github.com/ministryofjustice/laa-ccms-edrms-web-service/blob/main/sql/liquibase/xxsoa_schema.sql>
 
 ```bash
 
@@ -132,7 +132,7 @@ CREATE SEQUENCE  "XXEDRMS"."XXSOA_ERDMS_DOCUMENTS_ID_S"  MINVALUE 1 MAXVALUE 999
 --  DDL for Table XXSOA_EDRMS_DOCUMENTS
 --------------------------------------------------------
 CREATE TABLE "XXEDRMS"."XXSOA_EDRMS_DOCUMENTS"
-(	"ID" NUMBER,
+( "ID" NUMBER,
      "SOA_INSTANCE_ID" VARCHAR2(256 BYTE),
      "SOURCE_DOCUMENT_ID" NUMBER,
      "EDRMS_DOCUMENT_ID" VARCHAR2(150 BYTE),

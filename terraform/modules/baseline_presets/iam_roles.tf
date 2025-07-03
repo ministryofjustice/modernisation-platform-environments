@@ -18,7 +18,7 @@ locals {
         actions = ["sts:AssumeRole"]
         principals = {
           type        = "AWS"
-          identifiers = ["core-shared-services-production"]
+          identifiers = [var.environment.account_root_arns["core-shared-services-production"]]
         }
       }]
       policy_attachments = [
@@ -81,7 +81,9 @@ locals {
         actions = ["sts:AssumeRole"]
         principals = {
           type        = "AWS"
-          identifiers = var.options.cloudwatch_metric_oam_links
+          identifiers = [
+            for identifier in coalesce(var.options.cloudwatch_metric_oam_links, []) : var.environment.account_root_arns[identifier]
+          ]
         }
       }]
       policy_attachments = [

@@ -42,7 +42,6 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
-          vpc_security_group_ids  = ["bods", "oasys_db", "ec2-windows", "ad-join"]
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -68,7 +67,6 @@ locals {
         instance = merge(local.ec2_instances.bods.instance, {
           instance_type           = "r6i.2xlarge"
           disable_api_termination = true
-          vpc_security_group_ids  = ["bods", "oasys_db", "ec2-windows", "ad-join"]
         })
         tags = merge(local.ec2_instances.bods.tags, {
           oasys-national-reporting-environment = "pd"
@@ -331,6 +329,5 @@ locals {
       "/oracle/database/PDBOSYS" = local.secretsmanager_secrets.db
       "/oracle/database/PDBOAUD" = local.secretsmanager_secrets.db
     }
-    security_groups = local.security_groups_old
   }
 }

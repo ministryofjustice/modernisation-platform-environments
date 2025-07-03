@@ -10,6 +10,7 @@ locals {
     "module_git_hash"   = local.module_git_hash,
     "project"           = var.project_name
     "AzImpairmentPower" = "IceAsg"
+    "Patch Group"       = "Linux2"
   }
 
 

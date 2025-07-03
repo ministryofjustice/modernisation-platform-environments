@@ -583,3 +583,33 @@ resource "aws_secretsmanager_secret_version" "dpr_windows_rdp_credentials" {
     ignore_changes = [secret_string, ]
   }
 }
+
+# Nomis Test Source Secrets (for Unit Test)
+resource "aws_secretsmanager_secret" "dpr-test" {
+  #checkov:skip=CKV2_AWS_57: "Ignore - Ensure Secrets Manager secrets should have automatic rotation enabled"
+  #checkov:skip=CKV_AWS_149: "Ensure that Secrets Manager secret is encrypted using KMS CMK"
+  count = local.is_dev_or_test ? 1 : 0
+
+  name = "external/${local.project}-dps-test-db-source-secrets"
+
+  tags = merge(
+    local.all_tags,
+    {
+      Name          = "external/${local.project}-dps-test-db-source-secrets"
+      Resource_Type = "Secrets"
+      Jira          = "DPR2-2072"
+    }
+  )
+}
+
+# PlaceHolder Secrets
+resource "aws_secretsmanager_secret_version" "dpr-test" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id     = aws_secretsmanager_secret.dpr-test[0].id
+  secret_string = jsonencode(local.dps_secrets_placeholder) # Uses the DPS secret placeholder format
+
+  lifecycle {
+    ignore_changes = [secret_string, ]
+  }
+}

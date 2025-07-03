@@ -21,12 +21,18 @@ variable "waf_acl_rules" {
 
 variable "enable_logging" {
   type        = bool
-  default     = false
+  default     = true
   description = "Enable logging for the WAF ACL."
 }
 
 variable "log_retention_in_days" {
   type        = number
-  default     = 60
+  default     = 365
   description = "Number of days to retain logs in CloudWatch Logs."
+}
+
+variable "region" {
+  description = "AWS region"
+  type        = string
+  default     = "eu-west-2"
 }
