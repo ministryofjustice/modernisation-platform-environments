@@ -1,7 +1,7 @@
 
 
 module "dms_rds_spike" {
-  source = "../modules/dms_spike"
+  source = "./modules/dms_spike"
 
   # Instance Configuration
   dms_instance_id    = "mysql-rds-spike-${var.local.environment}"
