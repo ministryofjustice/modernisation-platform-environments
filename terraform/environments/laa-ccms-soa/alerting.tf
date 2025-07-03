@@ -39,7 +39,6 @@ resource "aws_sns_topic_subscription" "alerts" {
 #--Altering SNS
 resource "aws_sns_topic" "alerts" {
   name            = "${local.application_data.accounts[local.environment].app_name}-alerts"
-  policy          = data.aws_iam_policy_document.alerting_sns.json
   delivery_policy = <<EOF
 {
   "http": {
@@ -59,6 +58,11 @@ resource "aws_sns_topic" "alerts" {
   }
 }
 EOF
+}
+
+resource "aws_sns_topic_policy" "default" {
+  arn = aws_sns_topic.alerts.arn
+  policy = data.aws_iam_policy_document.alerting_sns.json
 }
 
 #--Alerts RDS
