@@ -23,6 +23,20 @@ resource "aws_lambda_function" "alerts" {
   }
 }
 
+resource "aws_lambda_permission" "alerts_sns_invoke" {
+  statement_id  = "AllowExecutionFromSNS"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.alerts.arn
+  principal     = "sns.amazonaws.com"
+  source_arn    = aws_sns_topic.alerts.arn
+}
+
+resource "aws_sns_topic_subscription" "alerts" {
+  topic_arn = aws_sns_topic.alerts.arn
+  protocol  = "lambda"
+  endpoint  = aws_lambda_function.alerts.arn
+}
+
 #--Altering SNS
 resource "aws_sns_topic" "alerts" {
   name            = "${local.application_data.accounts[local.environment].app_name}-alerts"
@@ -46,10 +60,4 @@ resource "aws_sns_topic" "alerts" {
   }
 }
 EOF
-}
-
-resource "aws_sns_topic_subscription" "alerts" {
-  topic_arn = aws_sns_topic.alerts.arn
-  protocol  = "lambda"
-  endpoint  = aws_lambda_function.alerts.arn
 }
