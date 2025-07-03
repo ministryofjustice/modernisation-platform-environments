@@ -209,7 +209,7 @@ resource "aws_iam_role_policy_attachment" "attach_s3_policy" {
 data "aws_iam_policy_document" "alerting_lambda" {
   version = "2012-10-17"
   statement {
-    sid    = "Allow_Write_To_Cloudwatch_Logs"
+    sid    = "AllowWriteToCloudwatchLogs"
     effect = "Allow"
     actions = [
       "logs:PutLogEvents",
@@ -222,7 +222,7 @@ data "aws_iam_policy_document" "alerting_lambda" {
 }
 
 resource "aws_iam_policy" "alerting_lambda" {
-  name   = "${local.application_data.accounts[local.environment].app_name}-alerting-lambda"
+  name   = "${local.application_data.accounts[local.environment].app_name}AlertingLambda"
   policy = data.aws_iam_policy_document.alerting_lambda.json
 }
 
@@ -251,7 +251,7 @@ resource "aws_iam_role_policy_attachment" "alerting_lambda" {
 data "aws_iam_policy_document" "alerting_sns" {
   version = "2012-10-17"
   statement {
-    sid    = "Events_Allow_Publish_SnsTopic"
+    sid    = "EventsAllowPublishSnsTopic"
     effect = "Allow"
     actions = [
       "sns:Publish",
@@ -267,7 +267,7 @@ data "aws_iam_policy_document" "alerting_sns" {
     }
   }
   statement {
-    sid    = "Alarms_Allow_Publish_SnsTopic"
+    sid    = "AlarmsAllowPublishSnsTopic"
     effect = "Allow"
     actions = [
       "sns:Publish",
@@ -290,7 +290,7 @@ data "aws_iam_policy_document" "alerting_sns" {
     }
   }
   statement {
-    sid    = "Allow_Publish_SnsTopic_root"
+    sid    = "AllowPublishSnsTopicRoot"
     effect = "Allow"
     actions = [
       "sns:Publish",
