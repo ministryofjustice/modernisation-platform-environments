@@ -33,7 +33,7 @@ resource "aws_lambda_function" "alerts" {
 #--Altering SNS
 resource "aws_sns_topic" "alerts" {
   name = "${local.application_data.accounts[local.environment].app_name}-alerts"
-  policy = daataa.aws_iam_policy_document.alerting.json
+  policy = data.aws_iam_policy_document.alerting.json
   delivery_policy = <<EOF
 {
   "http": {
