@@ -11,7 +11,10 @@ data "aws_iam_policy_document" "this" {
       "kms:DescribeKey",
       "kms:Decrypt",
     ]
-    resources = [var.landing_bucket_kms_key]
+    resources = [
+      var.landing_bucket_kms_key,
+      var.egress_bucket_kms_key
+    ]
   }
   statement {
     sid     = "AllowS3ListBucket"
@@ -19,7 +22,7 @@ data "aws_iam_policy_document" "this" {
     actions = ["s3:ListBucket"]
     resources = [
       "arn:aws:s3:::${var.landing_bucket}",
-      "arn:aws:s3:::${var.landing_bucket}/${var.name}/*"
+      "arn:aws:s3:::${var.egress_bucket}"
     ]
   }
   statement {
@@ -27,6 +30,16 @@ data "aws_iam_policy_document" "this" {
     effect    = "Allow"
     actions   = ["s3:PutObject"]
     resources = ["arn:aws:s3:::${var.landing_bucket}/${var.name}/*"]
+  }
+  statement {
+    sid    = "AllowS3EgressBucketObjectActions"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectAcl",
+      "s3:GetObjectVersion"
+    ]
+    resources = ["arn:aws:s3:::${var.egress_bucket}/${var.name}/*"]
   }
 }
 
@@ -58,10 +71,20 @@ module "role" {
 }
 
 resource "aws_transfer_user" "this" {
-  server_id      = var.transfer_server
-  user_name      = var.name
-  role           = module.role.iam_role_arn
-  home_directory = "/${var.landing_bucket}/${var.name}"
+  server_id = var.transfer_server
+  user_name = var.name
+  role      = module.role.iam_role_arn
+
+  home_directory_type = "LOGICAL"
+  home_directory_mappings {
+    entry  = "/upload"
+    target = "/${var.landing_bucket}/${var.name}"
+  }
+
+  home_directory_mappings {
+    entry  = "/download"
+    target = "/${var.egress_bucket}/${var.name}"
+  }
 }
 
 resource "aws_transfer_ssh_key" "this" {
@@ -70,21 +93,18 @@ resource "aws_transfer_ssh_key" "this" {
   body      = var.ssh_key
 }
 
-resource "aws_security_group_rule" "this" {
-  description       = var.name
-  type              = "ingress"
-  from_port         = 2222
-  to_port           = 2222
-  protocol          = "tcp"
-  cidr_blocks       = var.cidr_blocks
-  security_group_id = var.transfer_server_security_group
-}
+module "secret" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-resource "aws_secretsmanager_secret" "this" {
-  #checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
+  source  = "terraform-aws-modules/secrets-manager/aws"
+  version = "1.3.1"
 
   for_each = toset(["technical-contact", "data-contact", "target-bucket", "slack-channel"])
 
-  name       = "ingestion/sftp/${var.name}/${each.key}"
+  name       = "transfer/sftp/${var.name}/${each.key}"
   kms_key_id = var.supplier_data_kms_key
+
+  ignore_secret_changes = true
+  secret_string         = "CHANGEME"
 }

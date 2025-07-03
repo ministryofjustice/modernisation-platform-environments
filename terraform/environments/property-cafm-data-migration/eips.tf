@@ -1,5 +1,8 @@
 resource "aws_eip" "transfer_server" {
-  # checkov:skip=CKV2_AWS_19: "Ensure that all EIP addresses allocated to a VPC are attached to EC2 instances"
+  count = length(module.isolated_vpc.public_subnets)
+
+  domain = "vpc"
+
   tags = merge(
     local.tags,
     {
@@ -7,4 +10,3 @@ resource "aws_eip" "transfer_server" {
     }
   )
 }
-
