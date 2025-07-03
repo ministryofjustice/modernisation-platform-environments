@@ -13,6 +13,18 @@ locals {
       s3_notification_sqs_queues = {
         "private-lb-access-logs-cortex-xsiam" = {
           events = ["s3:ObjectCreated:*"]
+          policy_statements = [{
+            effect = "Allow"
+            actions = [
+              "sqs:ChangeMessageVisibility",
+              "sqs:DeleteMessage",
+              "sqs:ReceiveMessage"
+            ]
+            principals = {
+              type        = "AWS"
+              identifiers = ["arn:aws:iam::${module.environment.account_id}:role/CortexXsiamS3AccessRole"]
+            }
+          }]
         }
       }
 
