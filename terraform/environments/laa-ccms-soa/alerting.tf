@@ -332,7 +332,7 @@ resource "aws_cloudwatch_metric_alarm" "Managed_Ecs_Memory_Over_Threshold" {
   namespace           = "AWS/ECS"
   period              = "60"
   evaluation_periods  = "5"
-  threshold           = "75"
+  threshold           = "95"
   treat_missing_data  = "breaching"
   dimensions = {
     ClusterName = aws_ecs_cluster.main.name
