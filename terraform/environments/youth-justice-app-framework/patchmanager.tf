@@ -216,7 +216,7 @@ resource "aws_ssm_association" "patch_schedule" {
     values = ["Linux2", "Ubuntu", "Windows"]
   }
 
-  schedule_expression = "cron(0 10 * * ? *)"  #Change back to Every Sunday at 3:00 AM UTC
+  schedule_expression = "cron(0 3 ? * SUN *)"  # Every Sunday at 3:00 AM UTC
 
   compliance_severity = "HIGH"
   max_concurrency     = "50%"
