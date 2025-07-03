@@ -3,6 +3,7 @@ locals {
   lambda_src_dir = "${path.module}/lambda/ftp-client"
   lambda_zip     = "${path.module}/lambda/ftp-client/ftp-client.zip"
   layer_src_dir = "${path.module}/lambda/lambda-layer"
+  layer_output_dir = "${path.module}/lambda/output"
 }
 
 ## sg for ftp
@@ -90,7 +91,7 @@ data "archive_file" "lambda_zip" {
 data "archive_file" "lambda_layer" {
   type        = "zip"
   source_dir  = local.layer_src_dir   # folder containing 'python/' directory
-  output_path = "${local.layer_src_dir}/lambda-layer.zip"
+  output_path = "${local.layer_output_dir}/lambda-layer.zip"
 }
 
 
