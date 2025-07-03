@@ -6,6 +6,7 @@ variable "dms_instance_id" {
 variable "rds_instance_arn" {
   description = "ARN value for RDS"
   type        = string
+  sensitive   = true
 }
 
 variable "dms_subnet_id" {
@@ -19,8 +20,9 @@ variable "dms_security_group" {
 }
 
 variable "s3_bucket_name" {
-  description = "target s3 bucket name"
-  type        = list(string)
+  description  = "target s3 bucket name"
+  type         = string
+  sensitive    = true
 }
 
 variable "table_mappings" {
@@ -31,6 +33,7 @@ variable "table_mappings" {
 variable "database_name" {
   description = "Target Database inside RDS"
   type        = string
+  sensitive   = true
 }
 
 variable "engine_name" {
@@ -41,6 +44,7 @@ variable "engine_name" {
 variable "username" {
   description = "User name for RDS"
   type        = string
+  sensitive   = true
 }
 
 variable "password" {
@@ -52,6 +56,7 @@ variable "password" {
 variable "server_name" {
   description = "Server name of the RDS instance"
   type        = string
+  sensitive   = true
 }
 
 variable "port" {

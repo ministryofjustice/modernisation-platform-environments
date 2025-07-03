@@ -9,10 +9,9 @@ resource "aws_dms_endpoint" "dms_spike_source_endpoint" {
   database_name = var.database_name
 }
 
-resource "aws_dms_endpoint" "dms_spike_target_endpoint" {
+resource "aws_dms_s3_endpoint" "dms_spike_target_endpoint" {
   endpoint_id                      = "${var.dms_instance_id}-tagret"
   endpoint_type                    = "target"
-  engine_name                      = "s3"
   bucket_name                      = var.s3_bucket_name
   bucket_folder                    = "dms-spike-output/"
   data_format                      = "parquet"
@@ -20,5 +19,5 @@ resource "aws_dms_endpoint" "dms_spike_target_endpoint" {
   timestamp_column_name            = "dms_spike_timestamp"
   enable_statistics                = true
   parquet_timestamp_in_millisecond = true
-  service_access_role              = aws_iam_role.dms_spike_s3_access_role.arn
+  service_access_role_arn             = aws_iam_role.dms_spike_s3_access_role.arn
 }
