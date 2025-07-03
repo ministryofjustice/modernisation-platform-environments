@@ -42,14 +42,6 @@ chmod 600 $EC2_USER_HOME_FOLDER/.ssh/config
 #--TEMP CLONE A SINGLE BRANCH WHERE SECRETS HAVE BEEN CHANGED! - AW
 su ec2-user bash -c "git clone --single-branch --branch feat-laa-ccms-soa-mp ssh://git@ssh.github.com:443/ministryofjustice/laa-ccms-app-soa.git $EFS_MOUNT_POINT/laa-ccms-app-soa || git -C $EFS_MOUNT_POINT/laa-ccms-app-soa pull"
 
-# #--Configure PKI Files -- Removing as baked into the image now
-# mkdir -p $EC2_USER_HOME_FOLDER/pki
-# chmod 755 $EC2_USER_HOME_FOLDER/pki
-# su ec2-user bash -c "curl -O https://letsencrypt.org/certs/isrgrootx1.pem -O --output-dir /home/ec2-user/efs/pki/"
-# su ec2-user bash -c "curl -O https://letsencrypt.org/certs/lets-encrypt-r3.pem -O --output-dir /home/ec2-user/efs/pki/"
-# su ec2-user bash -c "curl -O https://letsencrypt.org/certs/2024/r10.pem -O --output-dir /home/ec2-user/efs/pki/"
-# su ec2-user bash -c "curl -O https://letsencrypt.org/certs/2024/r11.pem -O --output-dir /home/ec2-user/efs/pki/"
-
 #--Install s3fs and pre-reqs
 yum install fuse -y
 yum install fuse-libs -y

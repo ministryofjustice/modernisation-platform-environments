@@ -47,7 +47,7 @@ Complete the `application_variables.json` file as appropriate for the environmen
 - The `tds_db_endpoint` value is set as appropriate for the environment being configured (see the corresponding **EDRMS** environment to confirm).
 - `managed_ami_image_id` and `admin_ami_image_id` values are set to `ami-0d6d764bbe794b8ca` which is the ECS optimised Amazon Linux. If this AMI is deprecated at the time of using this document, an equivalent ECS optimmised Amazon Linux should be used.
 
-If unsure on suitable variables for a cold start, see the file `_application_variables_starter.json`.
+If unsure on suitable variables for a cold start, see the file `templates/_application_variables_starter.json`.
 
 Once verified, commit.
 
