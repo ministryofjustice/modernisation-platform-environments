@@ -18,7 +18,7 @@ resource "aws_lambda_function" "alerts" {
       SLACK_CHANNEL     = local.application_data.accounts[local.environment].alerting_slack_channel
       SLACK_EMOJI       = ":aws2:"
       SLACK_USERNAME    = local.application_data.accounts[local.environment].alerting_slack_user
-      SLACK_WEBHOOK_URL = aws_secretsmanager_secret_version.alerting_webhook_url.secret_string
+      SLACK_WEBHOOK_URL = data.aws_secretsmanager_secret_version.alerting_webhook_url.secret_string
     }
   }
 }
