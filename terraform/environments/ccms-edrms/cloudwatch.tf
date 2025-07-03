@@ -2,7 +2,7 @@
 
 resource "aws_cloudwatch_metric_alarm" "container_count" {
   alarm_name                = "${local.application_name}-ecs-task-count"
-  alarm_description         = "This alarm fires if the number of EDRMS ECS tasks is less than or equal to the threshold"
+  alarm_description         = "This alarm fires if the number of EDRMS ECS tasks is less than the threshold"
   comparison_operator       = "LessThanThreshold"
   metric_name               = "DesiredTaskCount"
   namespace                 = "ECS/ContainerInsights"
