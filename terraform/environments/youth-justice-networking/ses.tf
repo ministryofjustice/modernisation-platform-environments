@@ -1,3 +1,4 @@
+
 resource "aws_ses_domain_identity" "yjb" {
   domain = "yjb.gov.uk"
 }
@@ -37,6 +38,7 @@ resource "aws_iam_access_key" "ses_smtp_user" {
 }
 
 resource "aws_secretsmanager_secret" "ses_smtp" {
+  #checkov:skip=CKV2_AWS_57:Automatic rotation is not required for this secret
   name       = "ses-smtp-credentials"
   kms_key_id = aws_kms_key.ses_smtp.arn
 }
@@ -53,6 +55,36 @@ resource "aws_kms_key" "ses_smtp" {
   description             = "KMS key for encrypting SES SMTP credentials secret"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Id      = "key-default-1"
+    Statement = [
+      {
+        Sid    = "Allow account root full access"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "Allow Secrets Manager to use the key"
+        Effect = "Allow"
+        Principal = {
+          Service = "secretsmanager.amazonaws.com"
+        }
+        Action = [
+          "kms:GenerateDataKey",
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 }
 
 resource "aws_kms_alias" "ses_smtp" {
