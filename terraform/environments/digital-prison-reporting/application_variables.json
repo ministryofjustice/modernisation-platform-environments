@@ -265,7 +265,8 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations"
+        "dps-organisations",
+        "dps-testing"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -354,7 +355,7 @@
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": false,
+      "create_postgres_load_generator_job": true,
       "enable_probation_discovery_node": false
     },
     "preproduction": {

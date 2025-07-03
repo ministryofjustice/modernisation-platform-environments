@@ -27,9 +27,15 @@
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "sg-050fb73f9c212d1bb",
       "mlra_ecs_cluster_sec_group_id": "sg-08c5bdc7e3c480907",
-      "build_s3": false,
-      "build_ftp": false,
-      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
+      "build_s3": true,
+      "build_ftp": true,
+      "build_ses": true,
+      "build_ec2": true,
+      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
+      "hosted_zone": "modernisation-platform.service.justice.gov.uk",
+      "ses_domain": "maatdb.dev.modernisation-platform.service.justice.gov.uk",
+      "ftp_layer_bucket": "modernisation-platform-laa-shared20250605080758955300000001",
+      "ftp_layer_folder_location": "laa-ftp"
     },
 
     "test": {
@@ -59,9 +65,13 @@
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "sg-07fd7e0b7ad2c76e1",
       "mlra_ecs_cluster_sec_group_id": "sg-0b27b5bb199b70f2b",
-      "build_s3": false,
+      "build_s3": true,
       "build_ftp": false,
-      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
+      "build_ses": true,
+      "build_ec2": false,
+      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
+      "hosted_zone": "modernisation-platform.service.justice.gov.uk",
+      "ses_domain": "maatdb.tst.modernisation-platform.service.justice.gov.uk"
     },
     "preproduction": {
       "region": "eu-west-2",
@@ -90,9 +100,13 @@
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "sg-08fd4395619ac0879",
       "mlra_ecs_cluster_sec_group_id": "sg-0da6dd3ffabf8c75e",
-      "build_s3": false,
+      "build_s3": true,
       "build_ftp": false,
-      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms"
+      "build_ses": true,
+      "build_ec2": false,
+      "pagerduty_integration_key_name": "laa_maat_nonprod_alarms",
+      "hosted_zone": "modernisation-platform.service.justice.gov.uk",
+      "ses_domain": "maatdb.uat.modernisation-platform.service.justice.gov.uk"
     },
 
     "production": {
@@ -100,10 +114,10 @@
       "port": "1521",
       "allocated_storage": 600,
       "engine": "oracle-se2",
-      "engine_version": "19.0.0.0.ru-2025-01.rur-2025-01.r1",
+      "engine_version": "19.0.0.0.ru-2025-04.rur-2025-04.r1",
       "instance_class": "db.m5.xlarge",
-      "allow_major_version_upgrade": true,
-      "auto_minor_version_upgrade": true,
+      "allow_major_version_upgrade": false,
+      "auto_minor_version_upgrade": false,
       "storage_type": "io1",
       "iops": 6000,
       "backup_retention_period": 35,
@@ -122,9 +136,13 @@
       "manual_added_cidr": "10.221.0.0/16",
       "ecs_cluster_sec_group_id": "sg-065ac58b9f6a06bb1",
       "mlra_ecs_cluster_sec_group_id": "sg-0faa8fe022ea7e3aa",
-      "build_s3": false,
+      "build_s3": true,
       "build_ftp": false,
-      "pagerduty_integration_key_name": "laa_maat_prod_alarm"
+      "build_ses": true,
+      "build_ec2": false,
+      "pagerduty_integration_key_name": "laa_maat_prod_alarm",
+      "hosted_zone": "legalservices.gov.uk",
+      "ses_domain": "legalservices.gov.uk"
     }
   }
 }

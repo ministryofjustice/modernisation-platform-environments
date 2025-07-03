@@ -107,6 +107,13 @@ locals {
       ingress = merge(
         module.baseline_presets.security_groups["ec2-linux"].ingress,
         {
+          all-from-self = {
+            description = "Allow all ingress to self"
+            from_port   = 0
+            to_port     = 0
+            protocol    = -1
+            self        = true
+          }
           http7001 = {
             description = "Allow http7001 ingress"
             from_port   = 7001
@@ -141,6 +148,15 @@ locals {
       ingress = merge(
         module.baseline_presets.security_groups["ec2-windows"].ingress,
         module.baseline_presets.security_groups["ad-join"].ingress,
+        {
+          all-from-self = {
+            description = "Allow all ingress to self"
+            from_port   = 0
+            to_port     = 0
+            protocol    = -1
+            self        = true
+          }
+        }
       )
       egress = merge(
         module.baseline_presets.security_groups["ec2-windows"].egress,
@@ -151,6 +167,13 @@ locals {
     data-db = {
       description = "Security group for databases"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         icmp = {
           description = "Allow icmp ingress"
           from_port   = -1
