@@ -839,7 +839,7 @@ locals {
   core_logging_cw_destination_resource = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination/waf-logs-destination"
 }
 
-# Simple WAF for demonstration/testing purposes
+# Custom WAF with simple rules for demo purposes
 resource "aws_wafv2_web_acl" "custom_simple_demo_waf" {
   name  = "custom-simple-demo-waf"
   scope = "REGIONAL"
@@ -848,7 +848,6 @@ resource "aws_wafv2_web_acl" "custom_simple_demo_waf" {
     allow {}
   }
 
-  # Simple rule to block requests from specific countries (example)
   rule {
     name     = "BlockHighRiskCountries"
     priority = 1
