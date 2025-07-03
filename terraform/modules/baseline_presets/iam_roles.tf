@@ -6,7 +6,7 @@ locals {
     var.options.enable_image_builder ? ["EC2ImageBuilderDistributionCrossAccountRole"] : [],
     var.options.enable_ec2_oracle_enterprise_managed_server ? ["EC2OracleEnterpriseManagementSecretsRole"] : [],
     try(length(var.options.cloudwatch_metric_oam_links), 0) != 0 ? ["CloudWatch-CrossAccountSharingRole"] : [],
-    var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessRole"] : [],
+    # var.options.enable_xsiam_s3_integration ? ["CortexXsiamS3AccessRole"] : [],
     var.options.enable_vmimport ? ["vmimport"] : [],
   ]))
 
@@ -101,7 +101,7 @@ locals {
         actions = ["sts:AssumeRole"]
         principals = {
           type        = "AWS"
-          identifiers = ["cortex_account_id"] # baseline converts this to arn using aws account id secret
+          identifiers = [var.environment.account_ids["cortex_account_id"]]
         }
         conditions = [{
           test     = "StringEquals"
