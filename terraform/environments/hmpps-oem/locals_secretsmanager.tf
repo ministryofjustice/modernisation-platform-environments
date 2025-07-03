@@ -45,7 +45,7 @@ locals {
       ]
       principals = {
         type        = "AWS"
-        identifiers = ["hmpps-oem-${local.environment}"]
+        identifiers = [module.environment.account_root_arns["hmpps-oem-${local.environment}"]]
       }
       resources = ["*"]
     }
