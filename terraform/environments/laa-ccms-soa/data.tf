@@ -3,5 +3,3 @@
 data "aws_kms_alias" "ebs" {
   name = "alias/aws/ebs"
 }
-
-data "aws_caller_identity" "current" {}

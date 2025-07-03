@@ -223,7 +223,7 @@ data "aws_iam_policy_document" "alerting" {
         "events.amazonaws.com",
       ]
     }
-  },
+  }
   statement {
     sid    = "Alarms_Allow_Publish_SnsTopic"
     effect = "Allow"
@@ -246,7 +246,7 @@ data "aws_iam_policy_document" "alerting" {
             "arn:aws:cloudwatch:eu-west-2:${local.aws_account_id}:alarm:*"
         ]
     }
-  },
+  }
   statement {
     sid    = "Allow_Publish_SnsTopic_root"
     effect = "Allow"
