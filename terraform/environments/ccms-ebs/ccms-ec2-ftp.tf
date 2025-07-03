@@ -18,7 +18,7 @@ resource "aws_instance" "ec2_ftp" {
       user_data_replace_on_change
     ]
   }
-  user_data_replace_on_change = false
+  user_data_replace_on_change = true
   user_data = base64encode(templatefile("./templates/ec2_user_data_ftp.sh", {
     environment               = "${local.environment}"
     lz_aws_account_id_env     = "${local.application_data.accounts[local.environment].lz_aws_account_id_env}"
