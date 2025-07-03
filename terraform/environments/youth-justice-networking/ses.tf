@@ -45,11 +45,3 @@ resource "aws_secretsmanager_secret_version" "ses_smtp_version" {
     smtp_password = aws_iam_access_key.ses_smtp_user.ses_smtp_password_v4
   })
 }
-
-output "ses_verification_token" {
-  value = aws_ses_domain_identity.yjb.verification_token
-}
-
-output "ses_dkim_tokens" {
-  value = aws_ses_domain_dkim.yjb.dkim_tokens
-}
