@@ -62,6 +62,25 @@ EOF
 }
 
 #--Alerts RDS
+resource "aws_db_event_subscription" "rds_events" {
+  name        = "${local.application_data.accounts[local.environment].app_name}-rds-event-sub"
+  sns_topic   = aws_sns_topic.alerts.arn
+  source_type = "db-instance"
+  source_ids  = [aws_db_instance.soa_db.identifier]
+  event_categories = [
+    "availability",
+    "configuration change",
+    "deletion",
+    "failover",
+    "failure",
+    "low storage",
+    "maintenance",
+    "notification",
+    "recovery",
+    "restoration",
+  ]
+}
+
 resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-CPU-high-threshold-alarm"
   alarm_description   = "${local.aws_account_id} | RDS CPU is above 75% please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
@@ -243,25 +262,6 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Read_IOPS_Threshold" {
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
-}
-
-resource "aws_db_event_subscription" "rds_events" {
-  name        = "${local.application_data.accounts[local.environment].app_name}-rds-event-sub"
-  sns_topic   = aws_sns_topic.alerts.arn
-  source_type = "db-instance"
-  source_ids  = [aws_db_instance.soa_db.identifier]
-  event_categories = [
-    "availability",
-    "configuration change",
-    "deletion",
-    "failover",
-    "failure",
-    "low storage",
-    "maintenance",
-    "notification",
-    "recovery",
-    "restoration",
-  ]
 }
 
 #--Alerts ECS

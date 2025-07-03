@@ -1,7 +1,7 @@
 #--Admin
 resource "aws_cloudwatch_log_group" "log_group_admin" {
   name              = "${local.application_data.accounts[local.environment].app_name}-admin-ecs"
-  retention_in_days = 30
+  retention_in_days = local.application_data.accounts[local.environment].admin_log_retention_days
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_admin" {
@@ -53,7 +53,7 @@ resource "aws_cloudwatch_log_metric_filter" "soa_generic_error_admin" {
 #--Managed
 resource "aws_cloudwatch_log_group" "log_group_managed" {
   name              = "${local.application_data.accounts[local.environment].app_name}-managed-ecs"
-  retention_in_days = 30
+  retention_in_days = local.application_data.accounts[local.environment].managed_log_retention_days
 }
 
 resource "aws_cloudwatch_log_stream" "log_stream_managed" {
@@ -112,6 +112,22 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
     namespace = "CCMS-SOA-APP"
     value     = "1"
   }
+}
+
+#--RDS (SOA DB)
+resource "aws_cloudwatch_log_group" "rds_alert" {
+  name              = "/aws/rds/instance/oracle-db/alert"
+  retention_in_days = local.application_data.accounts[local.environment].soa_db_log_retention_days
+}
+
+resource "aws_cloudwatch_log_group" "rds_audit" {
+  name              = "/aws/rds/instance/oracle-db/audit"
+  retention_in_days = local.application_data.accounts[local.environment].soa_db_log_retention_days
+}
+
+resource "aws_cloudwatch_log_group" "rds_listener" {
+  name              = "/aws/rds/instance/oracle-db/listener"
+  retention_in_days = local.application_data.accounts[local.environment].soa_db_log_retention_days
 }
 
 #--Alerting
