@@ -834,14 +834,14 @@ resource "aws_cloudwatch_log_group" "app" {
 #------------------------------------------------------------------------------
 
 locals {
-  core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
-  core_logging_cw_destination_arn = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination:waf-logs-destination"
+  core_logging_account_id              = local.environment_management.account_ids["core-logging-production"]
+  core_logging_cw_destination_arn      = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination:waf-logs-destination"
   core_logging_cw_destination_resource = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination/waf-logs-destination"
 }
 
 # Simple WAF for demonstration/testing purposes
-resource "aws_wafv2_web_acl" "simple_demo_waf" {
-  name  = "simple-demo-waf"
+resource "aws_wafv2_web_acl" "custom_simple_demo_waf" {
+  name  = "custom-simple-demo-waf"
   scope = "REGIONAL"
 
   default_action {
@@ -902,24 +902,143 @@ resource "aws_wafv2_web_acl" "simple_demo_waf" {
   tags = local.tags
 }
 
+# KMS key for WAF logs encryption
+resource "aws_kms_key" "custom_waf_logs" {
+  #checkov:skip=CKV2_AWS_64: "KMS key policy is defined via separate aws_kms_key_policy resource"
+  description             = "KMS key for encrypting WAF CloudWatch logs"
+  enable_key_rotation     = true
+  deletion_window_in_days = 7
+
+  tags = merge(
+    local.tags,
+    {
+      Name = "custom-waf-logs-kms-key"
+    }
+  )
+}
+
+resource "aws_kms_alias" "custom_waf_logs" {
+  name          = "alias/custom-waf-logs-kms-key"
+  target_key_id = aws_kms_key.custom_waf_logs.key_id
+}
+
+resource "aws_kms_key_policy" "custom_waf_logs" {
+  key_id = aws_kms_key.custom_waf_logs.id
+  
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableIAMUserPermissions"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogsAccess"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.${data.aws_region.current.name}.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          ArnEquals = {
+            "kms:EncryptionContext:aws:logs:arn" = "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:aws-waf-logs-custom-simple-demo-waf"
+          }
+        }
+      },
+      {
+        Sid    = "AllowCoreLoggingCrossAccountAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${local.core_logging_account_id}:root"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "logs.${data.aws_region.current.name}.amazonaws.com"
+          }
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_cloudwatch_log_group" "custom_waf" {
-  name              = "custom-waf-logs"
+  name              = "aws-waf-logs-custom-simple-demo-waf"
   retention_in_days = 365
+  kms_key_id        = aws_kms_key.custom_waf_logs.arn
+}
+
+# CloudWatch Logs resource policy to allow WAF to write logs
+resource "aws_cloudwatch_log_resource_policy" "custom_waf_log_policy" {
+  policy_name = "CustomWAFLogDeliveryRolePolicy"
+  
+  policy_document = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Service = "wafv2.amazonaws.com"
+        }
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ]
+        Resource = "${aws_cloudwatch_log_group.custom_waf.arn}:*"
+        Condition = {
+          StringEquals = {
+            "aws:SourceAccount" = data.aws_caller_identity.current.account_id
+          }
+        }
+      }
+    ]
+  })
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "custom_waf_log_config" {
   log_destination_configs = [aws_cloudwatch_log_group.custom_waf.arn]
-  resource_arn            = aws_wafv2_web_acl.simple_demo_waf.arn
+  resource_arn            = aws_wafv2_web_acl.custom_simple_demo_waf.arn
+  
+  depends_on = [aws_cloudwatch_log_resource_policy.custom_waf_log_policy]
+}
+
+# Associate WAF with the external load balancer
+resource "aws_wafv2_web_acl_association" "custom_external_lb_waf" {
+  resource_arn = aws_lb.external.arn
+  web_acl_arn  = aws_wafv2_web_acl.custom_simple_demo_waf.arn
+}
+
+# Associate WAF with the internal load balancer (optional)
+resource "aws_wafv2_web_acl_association" "custom_internal_lb_waf" {
+  resource_arn = aws_lb.inner.arn
+  web_acl_arn  = aws_wafv2_web_acl.custom_simple_demo_waf.arn
 }
 
 resource "aws_iam_role" "custom_cwl_to_core_logging" {
-  name  = "CWLtoCoreLogging"
+  name = "CWLtoCoreLogging"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [{
       Effect = "Allow",
       Principal = {
-        Service = "logs.eu-west-2.amazonaws.com"
+        Service = "logs.amazonaws.com"
       },
       Action = "sts:AssumeRole",
       Condition = {
