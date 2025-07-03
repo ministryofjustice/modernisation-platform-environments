@@ -1,0 +1,39 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "401",
+      "rule-name": "select_locally_populated_audit",
+      "object-locator": {
+        "schema-name": "DELIUS_APP_SCHEMA",
+        "table-name": "AUDITED_INTERACTION"
+      },
+      "rule-action": "include"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "402",
+      "rule-name": "rename_to_staging_schema",
+      "rule-target": "schema",
+      "object-locator": {
+        "schema-name": "DELIUS_APP_SCHEMA"
+      },
+      "rule-action": "rename",
+      "value": "DELIUS_AUDIT_DMS_POOL",
+      "old-value": null
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "403",
+      "rule-name": "rename_to_staging_table",
+      "rule-target": "table",
+      "object-locator": {
+        "schema-name": "DELIUS_APP_SCHEMA",
+        "table-name": "AUDITED_INTERACTION"
+      },
+      "rule-action": "rename",
+      "value": "DMS_AUDITED_INTERACTION",
+      "old-value": null
+    }
+  ]
+}
