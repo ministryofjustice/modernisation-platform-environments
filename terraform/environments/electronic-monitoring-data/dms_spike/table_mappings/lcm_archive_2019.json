@@ -1,0 +1,15 @@
+{
+  "rules" :[
+
+    {
+      "rule-types":  "selection",
+      "rule-id": "1",
+      "rule-name": "lcm_spike",
+      "object_locator": {
+        "schema-name": "dbo",
+        "table-name": "ConversationLog"
+      }
+    }
+  ]
+
+}
