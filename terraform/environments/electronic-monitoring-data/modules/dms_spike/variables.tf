@@ -3,6 +3,11 @@ variable "dms_instance_id" {
   type        = string
 }
 
+variable "local_tags" {
+  description = "The predefined local.tags"
+  type        = map(string)
+}
+
 variable "rds_instance_arn" {
   description = "ARN value for RDS"
   type        = string

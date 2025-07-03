@@ -13,7 +13,7 @@ module "dms_rds_spike" {
   engine_name = "sqlserver"
   username    = aws_db_instance.database_2022.username
   password    = aws_db_instance.database_2022.password
-  server_name = split(":", data.aws_db_instance.database_2022.endpoint)[0]
+  server_name = split(":", aws_db_instance.database_2022.endpoint)[0]
   port        = aws_db_instance.database_2022.port
 
   # RDS Data Source and target details

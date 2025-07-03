@@ -22,8 +22,7 @@ resource "aws_dms_replication_instance" "dms_spike_instance" {
   multi_az                    = false
   auto_minor_version_upgrade  = false
 
-  tags = merge(
-    var.local.tags,
+  tags = merge(var.local.tags,
     {
       Resource_Type = "DMS SPIKE Replication  Instance",
     }
