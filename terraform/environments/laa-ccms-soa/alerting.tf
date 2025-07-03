@@ -210,7 +210,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-WriteIOPS-high-threshold-alarm"
-  alarm_description   = "${local.aws_account_id} | RDS Write IOPS is above ${var.cloudwatch_rds_write_iops_threshold} please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description   = "${local.aws_account_id} | RDS Write IOPS is above ${local.application_data.accounts[local.environment].logging_cloudwatch_rds_write_iops_threshold} please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "WriteIOPS"
   statistic           = "Average"
@@ -229,7 +229,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Read_IOPS_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-ReadIOPS-high-threshold-alarm"
-  alarm_description   = "${local.aws_account_id} | RDS Read IOPS is above ${var.cloudwatch_rds_read_iops_threshold} please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description   = "${local.aws_account_id} | RDS Read IOPS is above ${local.application_data.accounts[local.environment].logging_cloudwatch_rds_read_iops_threshold} please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "ReadIOPS"
   statistic           = "Average"
