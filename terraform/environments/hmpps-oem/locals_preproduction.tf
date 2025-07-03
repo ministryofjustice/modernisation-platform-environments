@@ -278,6 +278,22 @@ locals {
       })
     }
 
+    oam_sinks = {
+      "CloudWatchMetricOamSink" = {
+        resource_types = ["AWS::CloudWatch::Metric"]
+        source_account_names = [
+          "corporate-staff-rostering-preproduction",
+          "hmpps-domain-services-preproduction",
+          "nomis-preproduction",
+          "nomis-combined-reporting-preproduction",
+          "nomis-data-hub-preproduction",
+          "oasys-preproduction",
+          "oasys-national-reporting-preproduction",
+          "planetfm-preproduction",
+        ]
+      }
+    }
+
     route53_zones = {
       "hmpps-preproduction.modernisation-platform.service.justice.gov.uk" = {
         records = [
