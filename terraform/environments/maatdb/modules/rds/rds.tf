@@ -333,6 +333,28 @@ resource "aws_security_group" "ses_sec_group" {
   }
 }
 
+# tflint-ignore: terraform_required_providers
+resource "aws_security_group" "s3_sec_group" {
+  #checkov:skip=CKV2_AWS_5:"Not applicable"
+  name        = "s3-sec-group"
+  description = "S3 Endpoint Access"
+  vpc_id      = var.vpc_shared_id
+
+
+  egress {
+    description = "Access to S3 VPC endpoint"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_shared_cidr]
+
+  }
+
+  tags = {
+    Name = "${var.application_name}-${var.environment}-s3-sec-group"
+  }
+}
+
 output "db_instance_id" {
   value = aws_db_instance.appdb1.id
 }
