@@ -8,8 +8,6 @@ resource "aws_kms_key" "shared" {
   }
 }
 
-data "aws_caller_identity" "current" {}
-
 resource "aws_kms_key_policy" "shared_policy" {
   key_id = aws_kms_key.shared.id
 
