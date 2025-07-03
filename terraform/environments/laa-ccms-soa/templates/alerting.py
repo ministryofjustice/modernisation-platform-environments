@@ -235,12 +235,10 @@ def get_slack_message_payload(
     """
 
     slack_channel = os.environ["SLACK_CHANNEL"]
-    slack_username = os.environ["SLACK_USERNAME"]
     slack_emoji = os.environ["SLACK_EMOJI"]
 
     payload = {
         "channel": slack_channel,
-        "username": slack_username,
         "icon_emoji": slack_emoji,
     }
     attachment = None
