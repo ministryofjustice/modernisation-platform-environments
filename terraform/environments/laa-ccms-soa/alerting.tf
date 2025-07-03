@@ -9,7 +9,7 @@ resource "aws_lambda_function" "alerts" {
   filename         = data.archive_file.alerts.output_path
   function_name    = "${local.application_data.accounts[local.environment].app_name}-soa-alerting"
   role             = aws_iam_role.alerting_lambda.arn
-  handler          = "notify_slack.lambda_handler"
+  handler          = "alerting.lambda_handler"
   source_code_hash = data.archive_file.alerts.output_base64sha256
   runtime          = "python3.8"
   environment {
