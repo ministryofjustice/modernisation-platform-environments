@@ -21,24 +21,24 @@ resource "helm_release" "kyverno" {
   The DaemonSet uses the node role to which has arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy attached
   The Helm chart also doesn't have support for IRSA, so a EKS Pod Identity has been been made ready to use module.aws_cloudwatch_metrics_pod_identity
 */
-# resource "helm_release" "aws_cloudwatch_metrics" {
-#   /* https://artifacthub.io/packages/helm/aws/aws-cloudwatch-metrics */
-#   name       = "aws-cloudwatch-metrics"
-#   repository = "https://aws.github.io/eks-charts"
-#   chart      = "aws-cloudwatch-metrics"
-#   version    = "0.0.11"
-#   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
-#   values = [
-#     templatefile(
-#       "${path.module}/src/helm/values/aws-cloudwatch-metrics/values.yml.tftpl",
-#       {
-#         cluster_name = module.eks.cluster_name
-#       }
-#     )
-#   ]
+resource "helm_release" "aws_cloudwatch_metrics" {
+  /* https://artifacthub.io/packages/helm/aws/aws-cloudwatch-metrics */
+  name       = "aws-cloudwatch-metrics"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-cloudwatch-metrics"
+  version    = "0.0.11"
+  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
+  values = [
+    templatefile(
+      "${path.module}/src/helm/values/aws-cloudwatch-metrics/values.yml.tftpl",
+      {
+        cluster_name = module.eks.cluster_name
+      }
+    )
+  ]
 
-#   depends_on = [module.aws_cloudwatch_metrics_pod_identity]
-# }
+  depends_on = [module.aws_cloudwatch_metrics_pod_identity]
+}
 
 resource "helm_release" "aws_for_fluent_bit" {
   /* https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit */
@@ -46,8 +46,8 @@ resource "helm_release" "aws_for_fluent_bit" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-for-fluent-bit"
   version    = "0.1.35"
-  # namespace  = kubernetes_namespace.aws_observability.metadata[0].name
-  namespace = data.kubernetes_namespace.aws_observability.metadata[0].name
+  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
+  # namespace = data.kubernetes_namespace.aws_observability.metadata[0].name
   values = [
     templatefile(
       "${path.module}/src/helm/values/aws-for-fluent-bit/values.yml.tftpl",

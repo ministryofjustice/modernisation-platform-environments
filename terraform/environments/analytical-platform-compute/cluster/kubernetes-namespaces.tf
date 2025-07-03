@@ -4,11 +4,11 @@ resource "kubernetes_namespace" "kyverno" {
   }
 }
 
-# resource "kubernetes_namespace" "aws_observability" {
-#   metadata {
-#     name = "aws-observability"
-#   }
-# }
+resource "kubernetes_namespace" "aws_observability" {
+  metadata {
+    name = "aws-observability"
+  }
+}
 
 resource "kubernetes_namespace" "cluster_autoscaler" {
   metadata {

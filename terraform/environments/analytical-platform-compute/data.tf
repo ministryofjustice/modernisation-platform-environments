@@ -132,3 +132,15 @@ data "aws_eks_cluster" "eks" {
 data "aws_iam_openid_connect_provider" "eks" {
   url = data.aws_eks_cluster.eks.identity[0].oidc[0].issuer
 }
+
+data "kubernetes_namespace" "aws_observability" {
+  metadata {
+    name = "aws-observability"
+  }
+}
+
+data "kubernetes_namespace" "mwaa" {
+  metadata {
+    name = "mwaa"
+  }
+}

@@ -18,6 +18,9 @@ provider "kubernetes" {
   }
 }
 
+
+
+
 # Provider for interacting with the EKS cluster using Helm
 provider "helm" {
   kubernetes {

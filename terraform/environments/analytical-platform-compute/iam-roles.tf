@@ -102,7 +102,8 @@ module "amazon_prometheus_proxy_iam_role" {
     main = {
       # provider_arn               = module.eks.oidc_provider_arn
       provider_arn               = data.aws_iam_openid_connect_provider.eks.arn
-      namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
+      # namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
+      namespace_service_accounts = ["${data.kubernetes_namespace.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
     }
   }
 

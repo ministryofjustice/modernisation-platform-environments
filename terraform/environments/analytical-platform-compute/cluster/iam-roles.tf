@@ -167,8 +167,9 @@ module "aws_for_fluent_bit_iam_role" {
 
   oidc_providers = {
     main = {
-      provider_arn               = module.eks.oidc_provider_arn
-      namespace_service_accounts = ["${data.kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
+      provider_arn = module.eks.oidc_provider_arn
+      # namespace_service_accounts = ["${data.kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
+      namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
     }
   }
 

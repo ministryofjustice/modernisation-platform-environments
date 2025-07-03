@@ -21,24 +21,24 @@
   The DaemonSet uses the node role to which has arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy attached
   The Helm chart also doesn't have support for IRSA, so a EKS Pod Identity has been been made ready to use module.aws_cloudwatch_metrics_pod_identity
 */
-resource "helm_release" "aws_cloudwatch_metrics" {
-  /* https://artifacthub.io/packages/helm/aws/aws-cloudwatch-metrics */
-  name       = "aws-cloudwatch-metrics"
-  repository = "https://aws.github.io/eks-charts"
-  chart      = "aws-cloudwatch-metrics"
-  version    = "0.0.11"
-  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
-  values = [
-    templatefile(
-      "${path.module}/src/helm/values/aws-cloudwatch-metrics/values.yml.tftpl",
-      {
-        cluster_name = data.aws_eks_cluster.eks.name
-      }
-    )
-  ]
+# resource "helm_release" "aws_cloudwatch_metrics" {
+#   /* https://artifacthub.io/packages/helm/aws/aws-cloudwatch-metrics */
+#   name       = "aws-cloudwatch-metrics"
+#   repository = "https://aws.github.io/eks-charts"
+#   chart      = "aws-cloudwatch-metrics"
+#   version    = "0.0.11"
+#   namespace  = kubernetes_namespace.aws_observability.metadata[0].name
+#   values = [
+#     templatefile(
+#       "${path.module}/src/helm/values/aws-cloudwatch-metrics/values.yml.tftpl",
+#       {
+#         cluster_name = data.aws_eks_cluster.eks.name
+#       }
+#     )
+#   ]
 
-  depends_on = [module.aws_cloudwatch_metrics_pod_identity]
-}
+#   depends_on = [module.aws_cloudwatch_metrics_pod_identity]
+# }
 
 # resource "helm_release" "aws_for_fluent_bit" {
 #   /* https://artifacthub.io/packages/helm/aws/aws-for-fluent-bit */
@@ -72,7 +72,9 @@ resource "helm_release" "amazon_prometheus_proxy" {
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
   version    = "75.3.5"
-  namespace  = kubernetes_namespace.aws_observability.metadata[0].name
+  # namespace  = kubernetes_namespace.aws_observability.metadata[0].name
+  namespace  = data.kubernetes_namespace.aws_observability.metadata[0].name
+  
   values = [
     templatefile(
       "${path.module}/src/helm/values/amazon-prometheus-proxy/values.yml.tftpl",
