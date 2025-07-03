@@ -212,7 +212,7 @@ locals {
         principals = {
           type = "AWS"
           identifiers = [
-            try(var.environment.account_root_arns["${var.environment.application_name}-development"], "${var.environment.application_name} - NOT FOUND")
+            try(var.environment.account_root_arns["${var.environment.application_name}-development"], "${var.environment.application_name}-not-found")
           ]
         }
       }
