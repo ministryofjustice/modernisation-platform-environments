@@ -96,7 +96,7 @@ data "archive_file" "lambda_layer" {
 
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
-  layer_name               = "ftpclientlibs"
+  layer_name               = "ftpclientlayer"
   compatible_runtimes      = ["python3.13"]
   filename    = data.archive_file.lambda_layer.output_path
   source_code_hash = data.archive_file.lambda_layer.output_base64sha256
