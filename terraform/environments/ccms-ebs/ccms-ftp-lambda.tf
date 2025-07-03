@@ -255,4 +255,4 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   env                 = local.environment
   secret_name = "LAA-ftp-1stlocate-ccms-inbound-${local.environment}"
   secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-1stlocate-ccms-inbound"].arn
-}
+} 
