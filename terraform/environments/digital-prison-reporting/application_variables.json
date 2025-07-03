@@ -185,7 +185,22 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
-      "enable_probation_discovery_node": true
+      "enable_probation_discovery_node": true,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database-alt",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     },
     "test": {
       "project_short_id": "dpr",
@@ -265,8 +280,7 @@
         "dps-calc-rel-date",
         "dps-prison-reg",
         "dps-personal-rela",
-        "dps-organisations",
-        "dps-testing"
+        "dps-organisations"
       ],
       "alarms": {
         "setup_cw_alarms": true,
@@ -356,7 +370,22 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -543,7 +572,22 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     },
     "production": {
       "project_short_id": "dpr",
@@ -728,7 +772,22 @@
       "redshift_table_expiry_days": 1,
       "enable_s3_data_migrate_lambda": false,
       "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     }
   }
 }
