@@ -8,7 +8,6 @@ locals {
       "arn:aws:iam::${module.environment.account_ids.delius-core-development}:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-sandbox_2b97f512e6658764",
       "arn:aws:iam::${module.environment.account_ids.delius-mis-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.delius-mis-development}:role/modernisation-platform-oidc-cicd",
-      "arn:aws:iam::${module.environment.account_ids.nomis-combined-reporting-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.nomis-development}:role/EC2OracleEnterpriseManagementSecretsRole",
       "arn:aws:iam::${module.environment.account_ids.oasys-development}:role/EC2OracleEnterpriseManagementSecretsRole",
     ]
@@ -46,7 +45,7 @@ locals {
       ]
       principals = {
         type        = "AWS"
-        identifiers = ["hmpps-oem-${local.environment}"]
+        identifiers = [module.environment.account_root_arns["hmpps-oem-${local.environment}"]]
       }
       resources = ["*"]
     }

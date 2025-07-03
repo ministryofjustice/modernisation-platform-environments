@@ -42,6 +42,8 @@
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
       "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": true,
+      "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -183,7 +185,22 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": true,
-      "enable_probation_discovery_node": true
+      "enable_probation_discovery_node": true,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database-alt",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     },
     "test": {
       "project_short_id": "dpr",
@@ -227,6 +244,8 @@
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
       "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": true,
+      "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -350,8 +369,23 @@
       "analytics_generic_athena_workgroup": true,
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
-      "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "create_postgres_load_generator_job": true,
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": true,
+        "create_replica": true,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     },
     "preproduction": {
       "project_short_id": "dpr",
@@ -395,6 +429,8 @@
       "enable_generate_dataset_lambda": true,
       "enable_multiphase_query_lambda": true,
       "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": true,
+      "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -536,7 +572,22 @@
       "redshift_table_expiry_days": 7,
       "enable_s3_data_migrate_lambda": true,
       "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     },
     "production": {
       "project_short_id": "dpr",
@@ -580,6 +631,8 @@
       "enable_generate_dataset_lambda": false,
       "enable_multiphase_query_lambda": false,
       "multiphase_query_lambda_version": "vLatest",
+      "enable_multiphase_cleanup_lambda": false,
+      "multiphase_cleanup_lambda_version": "vLatest",
       "scheduled_s3_file_transfer_retention_period_amount": 0,
       "scheduled_s3_file_transfer_retention_period_unit": "days",
       "enable_domain_builder_rds": true,
@@ -719,7 +772,22 @@
       "redshift_table_expiry_days": 1,
       "enable_s3_data_migrate_lambda": false,
       "create_postgres_load_generator_job": false,
-      "enable_probation_discovery_node": false
+      "enable_probation_discovery_node": false,
+      "dpr_rds_db": {
+        "enable": false,
+        "create_replica": false,
+        "engine": "postgres",
+        "engine_version": "16.8",
+        "init_size": "158",
+        "max_size": "1000",
+        "name": "testdatabase",
+        "db_identifier": "test-database",
+        "inst_class": "db.t4g.large",
+        "user": "postgres",
+        "store_type": "gp3",
+        "parameter_group_family": "postgres16",
+        "parameter_group_name": "with-pglogical"
+      }
     }
   }
 }

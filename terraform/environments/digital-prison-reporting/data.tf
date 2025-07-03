@@ -127,6 +127,19 @@ data "aws_secretsmanager_secret_version" "dps" {
   depends_on = [aws_secretsmanager_secret.dps]
 }
 
+# DPR Secret
+data "aws_secretsmanager_secret" "test_db" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  name = "external/${local.project}-dps-test-db-source-secrets"
+}
+
+data "aws_secretsmanager_secret_version" "test_db" {
+  count = local.is_dev_or_test ? 1 : 0
+
+  secret_id = data.aws_secretsmanager_secret.test_db[0].id
+}
+
 # AWS _IAM_ Policy
 data "aws_iam_policy" "rds_full_access" {
   #checkov:skip=CKV_AWS_275:Disallow policies from using the AWS AdministratorAccess policy
@@ -216,4 +229,10 @@ data "aws_iam_session_context" "current" {
 
 data "aws_iam_roles" "data_engineering_roles" {
   name_regex = "AWSReservedSSO_modernisation-platform-data-eng.*"
+}
+
+# Retrieves role for developers
+
+data "aws_iam_roles" "developer_roles" {
+  name_regex = "AWSReservedSSO_modernisation-platform-developer.*"
 }

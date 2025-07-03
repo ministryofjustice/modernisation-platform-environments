@@ -1,1 +1,4 @@
-#### This file can be used to store data specific to the member account ####
+#--TEMPORARY. SHOULD USE A CMK. AW
+data "aws_kms_alias" "ebs" {
+  name = "alias/aws/ebs"
+}

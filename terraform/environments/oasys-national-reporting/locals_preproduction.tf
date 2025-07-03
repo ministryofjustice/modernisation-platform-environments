@@ -58,7 +58,7 @@ locals {
         mount_targets = [{
           subnet_name        = "private"
           availability_zones = ["eu-west-2a"]
-          security_groups    = ["boe", "bip-app"]
+          security_groups    = ["efs"]
         }]
         tags = {
           backup      = "false"
@@ -252,7 +252,6 @@ locals {
       }
     }
 
-    # DO NOT FULLY DEPLOY YET AS WEB INSTANCES ARE NOT IN USE
     lbs = {
       public = merge(local.lbs.public, {
         instance_target_groups = {
@@ -303,110 +302,6 @@ locals {
           })
         })
       })
-
-      # No web instances built yet, not in use
-      # private = {
-      #   drop_invalid_header_fields       = false # https://me.sap.com/notes/0003348935
-      #   enable_cross_zone_load_balancing = true
-      #   enable_delete_protection         = false
-      #   idle_timeout                     = 3600
-      #   internal_lb                      = true
-      #   load_balancer_type               = "application"
-      #   security_groups                  = ["lb"]
-      #   subnets                          = module.environment.subnets["private"].ids
-
-      #   instance_target_groups = {
-      #     pp-onr-web-1-a = {
-      #       port     = 7777
-      #       protocol = "HTTP"
-      #       health_check = {
-      #         enabled             = true
-      #         healthy_threshold   = 3
-      #         interval            = 30
-      #         matcher             = "200-399"
-      #         path                = "/"
-      #         port                = 7777
-      #         timeout             = 5
-      #         unhealthy_threshold = 5
-      #       }
-      #       stickiness = {
-      #         enabled = true
-      #         type    = "lb_cookie"
-      #       }
-      #       attachments = [
-      #         { ec2_instance_name = "pp-onr-web-1-a" },
-      #       ]
-      #     }
-      #   }
-
-      #   listeners = {
-      #     http = {
-      #       port     = 7777
-      #       protocol = "HTTP"
-
-      #       default_action = {
-      #         type = "fixed-response"
-      #         fixed_response = {
-      #           content_type = "text/plain"
-      #           message_body = "Not implemented"
-      #           status_code  = "501"
-      #         }
-      #       }
-      #       rules = {
-      #         pp-onr-web-1-a = {
-      #           priority = 4000
-
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "pp-onr-web-1-a"
-      #           }]
-
-      #           conditions = [{
-      #             host_header = {
-      #               values = [
-      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
-      #               ]
-      #             }
-      #           }]
-      #         }
-      #       }
-      #     }
-      #     https = {
-      #       certificate_names_or_arns = ["oasys_national_reporting_wildcard_cert"]
-      #       port                      = 443
-      #       protocol                  = "HTTPS"
-      #       ssl_policy                = "ELBSecurityPolicy-2016-08"
-
-      #       default_action = {
-      #         type = "fixed-response"
-      #         fixed_response = {
-      #           content_type = "text/plain"
-      #           message_body = "Not implemented"
-      #           status_code  = "501"
-      #         }
-      #       }
-
-      #       rules = {
-      #         pp-onr-web-1-a = {
-      #           priority = 4580
-
-      #           actions = [{
-      #             type              = "forward"
-      #             target_group_name = "pp-onr-web-1-a"
-      #           }]
-
-      #           conditions = [{
-      #             host_header = {
-      #               values = [
-      #                 "pp-onr-web-1-a.oasys-national-reporting.hmpps-preproduction.modernisation-platform.service.justice.gov.uk",
-      #               ]
-      #             }
-      #           }]
-      #         }
-      #       }
-      #     }
-      #   }
-      # }
     } # end of lbs
 
     route53_zones = {

@@ -261,7 +261,7 @@ resource "aws_iam_role_policy" "app_execution" {
 
 resource "aws_launch_template" "ec2-launch-template" {
   name_prefix   = "${local.application_name}-ec2-launch-template"
-  image_id      = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-ECS_Optimized/image_id"
+  image_id      = "resolve:ssm:/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-ECS_Optimized/image_id"
   instance_type = local.application_data.accounts[local.environment].instance_type
   key_name      = "${local.application_name}-ec2"
   ebs_optimized = true
@@ -307,7 +307,8 @@ resource "aws_launch_template" "ec2-launch-template" {
   tag_specifications {
     resource_type = "volume"
     tags = merge(tomap({
-      "Name" = "${local.application_name}-ecs-cluster"
+      "Name"         = "${local.application_name}-ecs-cluster"
+      "ForceRefresh" = timestamp()
     }), local.tags)
   }
 
@@ -442,6 +443,7 @@ resource "aws_autoscaling_group" "cluster-scaling-group" {
     id      = aws_launch_template.ec2-launch-template.id
     version = aws_launch_template.ec2-launch-template.latest_version
   }
+
 
   tag {
     key                 = "Name"

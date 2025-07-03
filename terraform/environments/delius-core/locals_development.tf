@@ -86,10 +86,11 @@ locals {
     }
 
     weblogic_eis = {
-      image_tag        = "6.2.0.3"
-      container_port   = 8080
-      container_memory = 2048
-      container_cpu    = 1024
+      image_tag                = "6.3.9-eis"
+      container_port           = 8080
+      container_memory         = 2048
+      container_cpu            = 1024
+      task_definition_revision = 6
     }
 
     pwm = {
@@ -147,7 +148,7 @@ locals {
     # Times must be specified in UTC
     disable_latency_alarms = {
       start_time      = "19:59"
-      end_time        = "06:00"
+      end_time        = "06:45"
       disable_weekend = true
     }
   }

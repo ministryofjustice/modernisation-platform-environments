@@ -129,31 +129,25 @@ resource "aws_vpc_security_group_ingress_rule" "db_ipv4_lb" {
   cidr_ipv4 = "209.35.83.77/32"
 }
 
-resource "aws_vpc_security_group_ingress_rule" "db_glue_access" {
-
-  security_group_id            = aws_security_group.db.id
-  description                  = "glue"
-  ip_protocol                  = "tcp"
-  from_port                    = 1433
-  to_port                      = 1433
-  referenced_security_group_id = aws_security_group.db.id
-}
-
-resource "aws_vpc_security_group_egress_rule" "db_glue_access" {
-
-  security_group_id            = aws_security_group.db.id
-  description                  = "glue"
-  ip_protocol                  = "tcp"
-  from_port                    = 0
-  to_port                      = 65535
-  referenced_security_group_id = aws_security_group.db.id
-}
-
 resource "aws_db_subnet_group" "db" {
   name       = "db-subnet-group"
   subnet_ids = data.aws_subnets.shared-public.ids
 
   tags = local.tags
+}
+
+# -----------------------------------------------------------------------
+# Rule necessary for at least one security group to open all egress ports
+# -----------------------------------------------------------------------
+
+resource "aws_vpc_security_group_egress_rule" "rds_egress_all" {
+
+  security_group_id            = aws_security_group.db.id
+  referenced_security_group_id = aws_security_group.db.id
+  ip_protocol                  = "tcp"
+  from_port                    = 0
+  to_port                      = 65535
+  description                  = "RDS Database -----[all ports]-----+ RDS Database"
 }
 
 #------------------------------------------------------------------------------

@@ -53,6 +53,7 @@ variable "ecs_services" {
       start_period = 60
     })
     desired_count                          = optional(number, 2)
+    autoscaling_min_capacity               = optional(number, 2)
     autoscaling_max_capacity               = optional(number, 4)
     health_check_grace_period_seconds      = optional(number, 360)
     stop_timeout                           = optional(number, 30)

@@ -28,6 +28,11 @@ output "mp_cidrs" {
   description = "Modernisation Platform cidrs: map(list(string))"
 }
 
+output "active_directory_cidrs" {
+  value       = local.active_directory_cidrs
+  description = "Active Directory cidrs: map(list(string))"
+}
+
 output "azure_fixngo_ip" {
   value       = local.azure_fixngo_ip
   description = "Azure FixNGo ips: map(string)"

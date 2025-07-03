@@ -1,4 +1,5 @@
 #Internal
+# trivy:ignore:AVD-AWS-0052 reason: (HIGH): Todo - we only want to allow in remote_domain. post migration task to only allow in that
 module "alb" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   source  = "terraform-aws-modules/alb/aws"
@@ -19,7 +20,7 @@ module "alb" {
   web_acl_arn           = var.web_acl_arn
 
   idle_timeout               = 240
-  drop_invalid_header_fields = true
+  drop_invalid_header_fields = false
   access_logs                = local.access_logs
 
   tags = local.all_tags

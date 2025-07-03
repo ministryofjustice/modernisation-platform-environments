@@ -25,6 +25,7 @@ module "yjsm" {
   ami = lookup(
     {
       development   = "ami-020f796d0dec4ed4c"
+      test          = "ami-0b84f8ede56f98adf"
       preproduction = "ami-0d79a6afc87dfa388"
       production    = "ami-08e24cb718917177b"
       # Add more environments when AMIs are known
@@ -48,4 +49,8 @@ module "yjsm" {
   management_server_sg_id       = module.ds.management_server_sg_id
   #Keep until prod images are done
   tableau_sg_id = module.tableau.tableau_sg_id
+
+  region       = data.aws_region.current.name
+  account_id   = data.aws_caller_identity.current.account_id
+  cluster_name = "yjaf-cluster"
 }

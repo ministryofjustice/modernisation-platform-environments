@@ -13,23 +13,50 @@ _If you have any questions surrounding this page please post in the `#team-name`
 
 ### **Description:**
 
-<!-- A short (less than 50 word) description of what your service does, and who it’s for.-->
+Description of YJAF:
+The Youth Justice Application Framework (YJAF) comprises of a set of core YJAF application modules which reside on Amazon Web Services (AWS) managed infrastructure which is operated by the MoJ Digital team. These modules provide a number of services to both the Youth Justice Board and Youth Custody Services for overseeing children who needs to be placed into a custodial environment.
+The YJAF Core Product modules are:
+Analytics
+AssetPlus
+BedUnlock
+Budget and Staffing
+Connectivity
+CMM
+Document Library
+Placements
+Quarterly Returns
+Serious Incidents (Go Live December 2022)
+User Management
+Youth Custody Secure Estate
+Local Interfaces/extract services are provided through:
+YJSM/Juniper Network
 
 ### **Service URLs:**
 
-<!--  The URL(s) of the service’s production environment, and test environments if possible-->
+<https://yjaf.yjbservices.yjb.gov.uk>
+<https://reporting.yjbservices.yjb.gov.uk/>
 
 ### **Incident response hours:**
 
-<!-- When your service receives support for urgent issues. This should be written in a clear, unambiguous way. For example: 24/7/365, Office hours, usually 9am-6pm on working days, or 7am-10pm, 365 days a year. -->
+The Core Hours are:
+08:00 to 18:00 Monday to Friday
+(Excluding Bank Holidays)
+Saturdays 08:00 - 13:00
+
+
+When customers contact the
+Service Desk outside of the Core Hours, the NEC Service Desk
+team will log the call and it will be allocated to the Support Team to be picked up at the start of the next working day (during core hours).
 
 ### **Incident contact details:**
 
-<!-- How people can raise an urgent issue with your service. This must not be the email address or phone number of an individual on your team, it should be a shared email address, phone number, or website that allows someone with an urgent issue to raise it quickly. -->
+📍 HelpHub: NEC Software Solutions | HelpHub
+📧 Email: <yajfsupport@necsws.com>
+☎️ Call: 01429 558255
 
 ### **Service team contact:**
 
-<!-- How people with non-urgent issues or questions can get in touch with your team. As with incident contact details, this must not be the email address or phone number of an individual on the team, it should be a shared email address or a ticket tracking system.-->
+<necdigital-subscription@necsws.com>
 
 ### **Hosting environment:**
 

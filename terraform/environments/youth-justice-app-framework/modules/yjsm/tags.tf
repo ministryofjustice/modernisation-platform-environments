@@ -9,9 +9,10 @@ locals {
     "module_version"    = local.module_version,
     "module_git_hash"   = local.module_git_hash,
     "project"           = var.project_name
-    "environment"       = "moj-${var.environment}"
+    "environment"       = var.environment
     "Name"              = "YJSM"
     "AzImpairmentPower" = "StopInstances"
+    "Patch Group"       = "Linux2"
   }
 
 
