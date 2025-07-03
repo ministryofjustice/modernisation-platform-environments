@@ -7,33 +7,26 @@ data "archive_file" "alerts" {
 
 resource "aws_lambda_function" "alerts" {
   filename         = data.archive_file.alerts.output_path
-  function_name    = "example_lambda_function"
-  role             = aws_iam_role.example.arn
-  handler          = "index.handler"
+  function_name    = "${local.application_data.accounts[local.environment].app_name}-soa-alerting"
+  role             = aws_iam_role.alerting_lambda.arn
+  handler          = "notify_slack.lambda_handler"
   source_code_hash = data.archive_file.alerts.output_base64sha256
-
-  runtime = "python3.8"
-
+  runtime          = "python3.8"
   environment {
     variables = {
-      ENVIRONMENT = "production"
-      LOG_LEVEL   = "info"
+      LOG_EVENTS        = "False"
+      SLACK_CHANNEL     = local.application_data.accounts[local.environment].alerting_slack_channel
+      SLACK_EMOJI       = ":aws2:"
+      SLACK_USERNAME    = local.application_data.accounts[local.environment].alerting_slack_user
+      SLACK_WEBHOOK_URL = aws_secretsmanager_secret_version.alerting_webhook_url.secret_string
     }
-  }
-
-  tags = {
-    LOG_EVENTS = "False"
-    SLACK_CHANNEL = local.application_data.accounts[local.environment].alerting_slack_channel
-    SLACK_EMOJI = ":aws2:"
-    SLACK_USERNAME = local.application_data.accounts[local.environment].alerting_slack_user
-    SLACK_WEBHOOK_URL = aws_secretsmanager_secret_version.alerting_webhook_url.secret_string
   }
 }
 
 #--Altering SNS
 resource "aws_sns_topic" "alerts" {
-  name = "${local.application_data.accounts[local.environment].app_name}-alerts"
-  policy = data.aws_iam_policy_document.alerting.json
+  name            = "${local.application_data.accounts[local.environment].app_name}-alerts"
+  policy          = data.aws_iam_policy_document.alerting_sns.json
   delivery_policy = <<EOF
 {
   "http": {

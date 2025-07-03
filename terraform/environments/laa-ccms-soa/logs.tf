@@ -78,7 +78,6 @@ resource "aws_cloudwatch_log_metric_filter" "soa_stuck_thread_managed" {
   }
 }
 
-
 resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_managed" {
   name           = "SOABenefitCheckerManaged"
   pattern        = "\"<Error>\" \"benefitchecker\""
@@ -113,4 +112,10 @@ resource "aws_cloudwatch_log_metric_filter" "soa_custom_checks_error_managed" {
     namespace = "CCMS-SOA-APP"
     value     = "1"
   }
+}
+
+#--Alerting
+resource "aws_cloudwatch_log_group" "log_group_alerting" {
+  name              = "/aws/lambda/${local.application_data.accounts[local.environment].app_name}-soa-alerting"
+  retention_in_days = local.application_data.accounts[local.environment].alerting_log_retention_days
 }

@@ -205,8 +205,28 @@ resource "aws_iam_role_policy_attachment" "attach_s3_policy" {
   policy_arn = aws_iam_policy.soa_s3_policy.arn
 }
 
-#--SNS (Alerting)
-data "aws_iam_policy_document" "alerting" {
+#--Alerting
+data "aws_iam_policy_document" "alerting_lambda" {
+  version = "2012-10-17"
+  statement {
+    sid    = "Allow_Write_To_Cloudwatch_Logs"
+    effect = "Allow"
+    actions = [
+      "logs:PutLogEvents",
+      "logs:CreateLogStream",
+    ]
+    resources = [
+      "${aws_cloudwatch_log_group.log_group_alerting.arn}:*",
+    ]
+  }
+}
+
+resource "aws_iam_role" "alerting_lambda" {
+  name               = "${local.application_data.accounts[local.environment].app_name}-alerting-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.alerting_lambda.json
+}
+
+data "aws_iam_policy_document" "alerting_sns" {
   version = "2012-10-17"
   statement {
     sid    = "Events_Allow_Publish_SnsTopic"
@@ -240,11 +260,11 @@ data "aws_iam_policy_document" "alerting" {
       ]
     }
     condition {
-        test = "ArnLike"
-        variable = "AWS:SourceArn"
-        values = [
-            "arn:aws:cloudwatch:eu-west-2:${local.aws_account_id}:alarm:*"
-        ]
+      test     = "ArnLike"
+      variable = "AWS:SourceArn"
+      values = [
+        "arn:aws:cloudwatch:eu-west-2:${local.aws_account_id}:alarm:*"
+      ]
     }
   }
   statement {
