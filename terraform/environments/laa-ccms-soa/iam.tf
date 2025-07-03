@@ -221,9 +221,31 @@ data "aws_iam_policy_document" "alerting_lambda" {
   }
 }
 
+resource "aws_iam_policy" "alerting_lambda" {
+  name   = "${local.application_data.accounts[local.environment].app_name}-alerting-lambda"
+  policy = data.aws_iam_policy_document.alerting_lambda.json
+}
+
+data "aws_iam_policy_document" "alerting_lambda_assume" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = ["sts:AssumeRole"]
+  }
+}
+
 resource "aws_iam_role" "alerting_lambda" {
   name               = "${local.application_data.accounts[local.environment].app_name}-alerting-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.alerting_lambda.json
+  assume_role_policy = data.aws_iam_policy_document.alerting_lambda_assume.json
+}
+
+resource "aws_iam_role_policy_attachment" "alerting_lambda" {
+  role       = aws_iam_role.alerting_lambda.name
+  policy_arn = aws_iam_policy.alerting_lambda.arn
 }
 
 data "aws_iam_policy_document" "alerting_sns" {
