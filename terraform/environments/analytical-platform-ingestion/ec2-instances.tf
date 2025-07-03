@@ -2,7 +2,7 @@ module "datasync_instance" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "5.7.1"
+  version = "6.0.1"
 
   name = "${local.application_name}-${local.environment}-datasync"
   # ami                    = data.aws_ssm_parameter.datasync_ami.value
@@ -20,18 +20,16 @@ module "datasync_instance" {
   }
 
   enable_volume_tags = false
-  root_block_device = [
-    {
-      encrypted   = true
-      kms_key_id  = module.ec2_ebs_kms.key_arn
-      volume_type = "gp2"
-      volume_size = 200
-      tags = merge(
-        local.tags,
-        { Name = "${local.application_name}-${local.environment}-datasync-root" }
-      )
-    }
-  ]
+  root_block_device = {
+    encrypted   = true
+    kms_key_id  = module.ec2_ebs_kms.key_arn
+    volume_type = "gp2"
+    volume_size = 200
+    tags = merge(
+      local.tags,
+      { Name = "${local.application_name}-${local.environment}-datasync-root" }
+    )
+  }
 
   tags = merge(
     local.tags,
