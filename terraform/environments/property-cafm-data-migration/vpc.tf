@@ -77,7 +77,7 @@ resource "aws_security_group_rule" "allow_all_vpc" {
 resource "aws_security_group" "transfer_server" {
   description = "Security Group for Transfer Server"
   name        = "transfer-server"
-  vpc_id      = module.vpc.vpc_id
+  vpc_id      = module.isolated_vpc.vpc_id
   tags        = local.tags
 }
 
