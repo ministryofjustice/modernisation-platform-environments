@@ -41,7 +41,7 @@ resource "aws_iam_role_policy" "sftp_policy" {
           "s3:GetObjectVersion"
         ]
         Effect   = "Allow"
-        Resource = "arn:aws:s3:::${aws_s3_bucket.sftp_bucket.bucket}/*"
+        Resource = "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/*"
       }
     ]
   })
@@ -50,14 +50,25 @@ resource "aws_iam_role_policy" "sftp_policy" {
 # Create the AWS Transfer Family SFTP server
 resource "aws_transfer_server" "sftp_server" {
   identity_provider_type = "SERVICE_MANAGED"
-  endpoint_type = "PUBLIC"
+  endpoint_type = "VPC"
+
+  endpoint_details {
+    vpc_id             = module.vpc.vpc_id
+    subnet_ids         = [module.vpc.private_subnets]
+    security_group_ids = [aws_security_group.sftp_sg.id] # ✅ Attached here
+  }
+
+  protocols            = ["SFTP"]
+  security_policy_name = "TransferSecurityPolicy-2023-05"
+  
   tags = {
     Name = "CAFM SFTP Server"
   }
 }
 
-resource "aws_security_group" "sftp" {
+resource "aws_security_group" "sftp_sg" {
   name        = "sftp-access"
+  description = "Security group for SFTP servers"
   vpc_id      = "vpc-0b2907e67278ff255"
 
   ingress {
@@ -74,7 +85,7 @@ resource "aws_security_group" "sftp" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/8"]
   }
 }
 
