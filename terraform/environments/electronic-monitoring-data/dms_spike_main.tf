@@ -30,6 +30,7 @@ module "dms_rds_spike" {
   table_mappings = file("table_mappings/lcm_archive_2019.json")
   database_name  = "lcm_archive_2019"
 
-  local_tags  = local.tags
-  environment = local.environment
+  local_tags      = local.tags
+  environment     = local.environment
+  env_account_id  = local.env_account_id
 }

@@ -37,7 +37,7 @@ resource "aws_iam_policy" "dms_spike_s3_write_policy" {
             "athena:GetQueryExecution",
             "athena:CreateWorkGroup"
           ],
-          "Resource" : "arn:aws:athena:eu-west-2:${var.local.env_account_id}:workgroup/dms_validation_workgroup_for_task_*"
+          "Resource" : "arn:aws:athena:eu-west-2:${var.env_account_id}:workgroup/dms_validation_workgroup_for_task_*"
         },
         {
           "Effect" : "Allow",
@@ -51,10 +51,10 @@ resource "aws_iam_policy" "dms_spike_s3_write_policy" {
             "glue:GetTable"
           ],
           "Resource" : [
-            "arn:aws:glue:eu-west-2:${var.local.env_account_id}:catalog",
-            "arn:aws:glue:eu-west-2:${var.local.env_account_id}:database/aws_dms_s3_validation_*",
-            "arn:aws:glue:eu-west-2:${var.local.env_account_id}:table/aws_dms_s3_validation_*/*",
-            "arn:aws:glue:eu-west-2:${var.local.env_account_id}:userDefinedFunction/aws_dms_s3_validation_*/*"
+            "arn:aws:glue:eu-west-2:${var.env_account_id}:catalog",
+            "arn:aws:glue:eu-west-2:${var.env_account_id}:database/aws_dms_s3_validation_*",
+            "arn:aws:glue:eu-west-2:${var.env_account_id}:table/aws_dms_s3_validation_*/*",
+            "arn:aws:glue:eu-west-2:${var.env_account_id}:userDefinedFunction/aws_dms_s3_validation_*/*"
           ]
         },
         {

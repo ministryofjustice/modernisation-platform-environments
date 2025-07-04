@@ -5,7 +5,7 @@ resource "aws_dms_replication_subnet_group" "dms_spike_subnet_group" {
 
 
   tags = merge(
-    var.local.tags,
+    var.local_tags,
     {
       Resource_Type = "DMS SPIKE Replication Subnet Group",
     }
@@ -22,7 +22,7 @@ resource "aws_dms_replication_instance" "dms_spike_instance" {
   multi_az                    = false
   auto_minor_version_upgrade  = false
 
-  tags = merge(var.local.tags,
+  tags = merge(var.local_tags,
     {
       Resource_Type = "DMS SPIKE Replication  Instance",
     }

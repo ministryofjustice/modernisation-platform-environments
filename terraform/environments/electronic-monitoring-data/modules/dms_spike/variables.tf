@@ -13,6 +13,12 @@ variable "environment" {
   type        = string
 }
 
+variable "env_account_id" {
+  description = "Deployment environment"
+  type        = string
+  sensitive   = true
+}
+
 variable "rds_instance_arn" {
   description = "ARN value for RDS"
   type        = string
