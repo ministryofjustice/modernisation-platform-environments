@@ -82,7 +82,7 @@ resource "aws_cloudwatch_metric_alarm" "tds_rds_cpu_over_threshold" {
   threshold           = "85"
   treat_missing_data  = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.tds-db.id
+    DBInstanceIdentifier = aws_db_instance.tds_db.id
   }
 
   alarm_actions = [aws_sns_topic.cloudwatch_slack.arn]
@@ -104,7 +104,7 @@ resource "aws_cloudwatch_metric_alarm" "TDS_RDS_Free_Storage_Space_Over_Threshol
   threshold           = "30"
   treat_missing_data  = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.tds-db.id
+    DBInstanceIdentifier = aws_db_instance.tds_db.id
   }
 
   alarm_actions = [aws_sns_topic.cloudwatch_slack.arn]
