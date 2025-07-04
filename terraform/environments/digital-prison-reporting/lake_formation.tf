@@ -4,7 +4,7 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     data.aws_iam_session_context.current.issuer_arn,
 
     # Make the cross-account runner used by create-a-derived table LF admin
-    aws_iam_role.dataapi_cross_role.arn,
+    # aws_iam_role.dataapi_cross_role.arn,
 
     # Make Data engineer role a LF admin
     try(one(data.aws_iam_roles.data_engineering_roles.arns), []),
@@ -23,10 +23,10 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 }
 
 # Give the cadet cross-account role LF data access
-# resource "aws_iam_role_policy_attachment" "dataapi_cross_role_lake_formation_data_access" {
-#   role       = aws_iam_role.dataapi_cross_role.name
-#   policy_arn = aws_iam_policy.lake_formation_data_access.arn
-# }
+resource "aws_iam_role_policy_attachment" "dataapi_cross_role_lake_formation_data_access" {
+  role       = aws_iam_role.dataapi_cross_role.name
+  policy_arn = aws_iam_policy.lake_formation_data_access.arn
+}
 
 # Give the cadet cross-account role data location access
 # structured and working are required
