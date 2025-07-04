@@ -17,7 +17,7 @@ resource "aws_dms_replication_instance" "dms_spike_instance" {
   replication_instance_class  = "dms.t3.micro"
   allocated_storage           = 5
   replication_subnet_group_id = aws_dms_replication_subnet_group.dms_spike_subnet_group.id
-  vpc_security_group_ids      = [var.dms_security_group]
+  vpc_security_group_ids      = [var.vpc_ids]
   publicly_accessible         = false
   multi_az                    = false
   auto_minor_version_upgrade  = false

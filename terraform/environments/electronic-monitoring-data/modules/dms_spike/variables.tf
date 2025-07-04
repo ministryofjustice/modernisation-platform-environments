@@ -26,13 +26,14 @@ variable "rds_instance_arn" {
 }
 
 variable "dms_subnet_id" {
-  description = "subnet ids for DMS"
+  description = "subnet ids for DMS subnet grop"
   type        = list(string)
 }
 
-variable "dms_security_group" {
+variable "vpc_ids" {
   description = "security group for DMS"
-  type        = list(string)
+  type        = string
+  sensitive   = true
 }
 
 variable "s3_bucket_name" {
