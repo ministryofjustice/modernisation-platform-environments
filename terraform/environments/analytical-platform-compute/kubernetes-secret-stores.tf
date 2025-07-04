@@ -3,7 +3,8 @@ resource "kubernetes_manifest" "eso_secretstore_data_production" {
     "apiVersion" = "external-secrets.io/v1"
     "kind"       = "SecretStore"
     "metadata" = {
-      "namespace" = kubernetes_namespace.mwaa.metadata[0].name
+      # "namespace" = kubernetes_namespace.mwaa.metadata[0].name
+      "namespace" = data.kubernetes_namespace.mwaa.metadata[0].name
       "name"      = "analytical-platform-data-production"
     }
     "spec" = {
