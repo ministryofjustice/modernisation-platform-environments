@@ -1,5 +1,5 @@
 locals {
-  target_bucket = "emds-${local.environment}-data-20240917144025201600000001"
+  target_bucket = "emds-${local.environment_shorthand}-data-20240917144025201600000001"
 }
 
 
@@ -12,7 +12,7 @@ module "dms_rds_spike" {
   source = "./modules/dms_spike"
 
   # Instance Configuration
-  dms_instance_id     = "mysql-rds-spike-${local.environment}"
+  dms_instance_id     = "mysql-rds-spike-${local.environment_shorthand}"
   rds_instance_arn    = aws_db_instance.database_2022.arn
   dms_subnet_id       = tolist(aws_db_subnet_group.db.subnet_ids)
   vpc_ids             = aws_security_group.dms_ri_security_group[0].id
@@ -31,6 +31,5 @@ module "dms_rds_spike" {
   database_name       = "lcm_archive_2019"
 
   local_tags          = local.tags
-  environment         = local.environment
   env_account_id      = local.env_account_id
 }

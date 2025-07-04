@@ -8,13 +8,8 @@ variable "local_tags" {
   type        = map(string)
 }
 
-variable "environment" {
-  description = "Deployment environment"
-  type        = string
-}
-
 variable "env_account_id" {
-  description = "Deployment environment"
+  description = "Deployment environment ID"
   type        = string
   sensitive   = true
 }
@@ -39,7 +34,6 @@ variable "vpc_ids" {
 variable "s3_bucket_name" {
   description = "target s3 bucket name"
   type        = string
-  sensitive   = true
 }
 
 variable "s3_bucket_arn" {
