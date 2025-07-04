@@ -118,6 +118,10 @@ module "ecs_service_datadog_agent" {
         {
           "name" : "DD_DOGSTATSD_NON_LOCAL_TRAFFIC",
           "value" : "true"
+        },
+        {
+          "name" : "DD_ECS_TASK_COLLECTION_ENABLED",
+          "value" : "true"
         }
       ]
 
