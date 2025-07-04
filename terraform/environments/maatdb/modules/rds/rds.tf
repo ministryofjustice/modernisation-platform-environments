@@ -342,7 +342,9 @@ resource "aws_security_group" "ses_sec_group" {
   }
 }
 
-
+output "db_instance_id" {
+  value = aws_db_instance.appdb1.id
+}
 
 
 
