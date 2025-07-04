@@ -79,3 +79,11 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
 }
 
 
+resource "aws_lakeformation_permissions" "de_role_db_describe" {
+  principal   = "arn:aws:iam::593291632749:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DESCRIBE"]
+
+  database {
+    name = "dpr_ap_integration_test_newtag_dev_dbt"
+  }
+}
