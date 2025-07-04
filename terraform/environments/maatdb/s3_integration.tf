@@ -223,6 +223,7 @@ resource "aws_iam_user_policy" "ftp_user_policy" {
 
 data "aws_iam_policy_document" "ftp_user_policy" {
   statement {
+    sid   = "S3BucketAccess"
     effect = "Allow"
     actions = [
       "s3:DeleteObject",
@@ -239,6 +240,15 @@ data "aws_iam_policy_document" "ftp_user_policy" {
         "${bucket.bucket.arn}/*"
       ]
     ])
+  }
+  statement {
+    sid   = "KMSPermissions"
+    effect = "Allow"
+    actions = [
+    "kms:GenerateDataKey",
+    "kms:Decrypt",
+    "kms:Encrypt"    ]
+    resources = [local.laa_general_kms_arn]
   }
 }
 
