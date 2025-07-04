@@ -10,25 +10,61 @@ data "aws_vpc" "apc" {
   }
 }
 
+# data "aws_subnets" "apc_private" {
+#   filter {
+#     name   = "vpc-id"
+#     values = [data.aws_vpc.apc.id]
+#   }
+#   tags = {
+#     Name = "${local.application_name}-${local.environment}-private*"
+#   }
+# }
+
 data "aws_subnets" "apc_private" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.apc.id]
   }
-  tags = {
-    Name = "${local.application_name}-${local.environment}-private*"
+
+  filter {
+    name   = "tag:Name"
+    values = ["${local.application_name}-${local.environment}-private*"]
   }
 }
+
+data "aws_subnet" "apc_private_subnet_details" {
+  for_each = toset(data.aws_subnets.apc_private.ids)
+
+  id = each.value
+}
+
+
+# data "aws_subnets" "apc_intra" {
+#   filter {
+#     name   = "vpc-id"
+#     values = [data.aws_vpc.apc.id]
+#   }
+#   tags = {
+#     Name = "${local.application_name}-${local.environment}-intra*"
+#   }
+# }
 
 data "aws_subnets" "apc_intra" {
   filter {
     name   = "vpc-id"
     values = [data.aws_vpc.apc.id]
   }
-  tags = {
-    Name = "${local.application_name}-${local.environment}-intra*"
+  filter {
+    name   = "tag:Name"
+    values = ["${local.application_name}-${local.environment}-intra*"]
   }
 }
+
+data "aws_db_subnet_group" "apc_database" {
+  name = "${local.application_name}-${local.environment}"
+}
+
+
 
 data "aws_iam_roles" "platform_engineer_admin_sso_role" {
   name_regex  = "AWSReservedSSO_platform-engineer-admin_.*"

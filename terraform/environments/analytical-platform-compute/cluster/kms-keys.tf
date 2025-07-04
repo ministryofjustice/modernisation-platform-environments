@@ -125,48 +125,80 @@ module "karpenter_sqs_kms" {
   tags = local.tags
 }
 
-# module "managed_prometheus_kms" {
-#   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
-#   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+module "managed_prometheus_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
-#   source  = "terraform-aws-modules/kms/aws"
-#   version = "3.1.1"
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
 
-#   aliases                 = ["amp/default"]
-#   description             = "AMP KMS key"
-#   enable_default_policy   = true
-#   deletion_window_in_days = 7
-#   key_statements = [
-#     {
-#       sid = "AllowAmazonManagedPrometheus"
-#       actions = [
-#         "kms:DescribeKey",
-#         "kms:CreateGrant",
-#         "kms:GenerateDataKey",
-#         "kms:Decrypt"
-#       ]
-#       resources = ["*"]
-#       effect    = "Allow"
-#       principals = [
-#         {
-#           type        = "AWS"
-#           identifiers = ["*"]
-#         }
-#       ]
-#       conditions = [
-#         {
-#           test     = "StringEquals"
-#           variable = "kms:ViaService"
-#           values   = ["aps.${data.aws_region.current.name}.amazonaws.com"]
-#         },
-#         {
-#           test     = "StringEquals"
-#           variable = "kms:CallerAccount"
-#           values   = [data.aws_caller_identity.current.account_id]
-#         }
-#       ]
-#     }
-#   ]
+  aliases                 = ["amp/default"]
+  description             = "AMP KMS key"
+  enable_default_policy   = true
+  deletion_window_in_days = 7
+  key_statements = [
+    {
+      sid = "AllowAmazonManagedPrometheus"
+      actions = [
+        "kms:DescribeKey",
+        "kms:CreateGrant",
+        "kms:GenerateDataKey",
+        "kms:Decrypt"
+      ]
+      resources = ["*"]
+      effect    = "Allow"
+      principals = [
+        {
+          type        = "AWS"
+          identifiers = ["*"]
+        }
+      ]
+      conditions = [
+        {
+          test     = "StringEquals"
+          variable = "kms:ViaService"
+          values   = ["aps.${data.aws_region.current.name}.amazonaws.com"]
+        },
+        {
+          test     = "StringEquals"
+          variable = "kms:CallerAccount"
+          values   = [data.aws_caller_identity.current.account_id]
+        }
+      ]
+    }
+  ]
 
-#   tags = local.tags
-# }
+  tags = local.tags
+}
+
+module "ui_rds_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["rds/ui"]
+  description           = "UI RDS KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+}
+
+module "common_secrets_manager_kms" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+  #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
+
+  source  = "terraform-aws-modules/kms/aws"
+  version = "3.1.1"
+
+  aliases               = ["secretsmanager/common"]
+  description           = "Common Secrets Manager KMS key"
+  enable_default_policy = true
+
+  deletion_window_in_days = 7
+
+  tags = local.tags
+}
