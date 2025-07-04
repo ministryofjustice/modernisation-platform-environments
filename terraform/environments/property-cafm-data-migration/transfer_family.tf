@@ -59,7 +59,7 @@ resource "aws_transfer_server" "sftp_server" {
   }
 
   protocols            = ["SFTP"]
-  security_policy_name = "TransferSecurityPolicy-2023-05"
+  security_policy_name = "TransferSecurityPolicy-2024-01"
   
   tags = {
     Name = "CAFM SFTP Server"
@@ -72,6 +72,7 @@ resource "aws_security_group" "sftp_sg" {
   vpc_id      = "vpc-0b2907e67278ff255"
 
   ingress {
+    description = "Only allow specific IPs"
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -82,6 +83,7 @@ resource "aws_security_group" "sftp_sg" {
   }
 
   egress {
+    description = "Allow all protocols to internal VPC range"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
