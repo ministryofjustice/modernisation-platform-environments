@@ -8,9 +8,10 @@ resource "aws_transfer_server" "this" {
     vpc_id     = module.isolated_vpc.vpc_id
     subnet_ids = module.isolated_vpc.public_subnets
     address_allocation_ids = [
-      aws_eip.transfer_server[0].id,
-      aws_eip.transfer_server[1].id,
-      aws_eip.transfer_server[2].id,
+      aws_eip.transfer_server[0].id
+      # ,
+      # aws_eip.transfer_server[1].id,
+      # aws_eip.transfer_server[2].id,
     ]
     security_group_ids = [
       aws_security_group.transfer_server.id
