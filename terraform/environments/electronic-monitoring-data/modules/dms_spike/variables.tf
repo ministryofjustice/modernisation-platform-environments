@@ -8,6 +8,11 @@ variable "local_tags" {
   type        = map(string)
 }
 
+variable "environment" {
+  description = "Deployment environment"
+  type        = string
+}
+
 variable "rds_instance_arn" {
   description = "ARN value for RDS"
   type        = string
@@ -25,9 +30,15 @@ variable "dms_security_group" {
 }
 
 variable "s3_bucket_name" {
-  description  = "target s3 bucket name"
-  type         = string
-  sensitive    = true
+  description = "target s3 bucket name"
+  type        = string
+  sensitive   = true
+}
+
+variable "s3_bucket_arn" {
+  description = "target s3 bucket arn"
+  type        = string
+  sensitive   = true
 }
 
 variable "table_mappings" {

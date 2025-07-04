@@ -1,3 +1,11 @@
+locals {
+  target_bucket = "emds-${local.environment}-data-20240917144025201600000001"
+}
+
+
+data "aws_s3_bucket" "dms_spike_target_bucket_arn" {
+  bucket = local.target_bucket
+}
 
 
 module "dms_rds_spike" {
@@ -17,7 +25,11 @@ module "dms_rds_spike" {
   port        = aws_db_instance.database_2022.port
 
   # RDS Data Source and target details
-  s3_bucket_name  = "emds-${local.environment}-data-20240917144025201600000001"
+  s3_bucket_name = local.target_bucket
+  s3_bucket_arn  = data.aws_s3_bucket.dms_spike_target_bucket_arn
   table_mappings = file("table_mappings/lcm_archive_2019.json")
   database_name  = "lcm_archive_2019"
+
+  local_tags  = local.tags
+  environment = local.environment
 }

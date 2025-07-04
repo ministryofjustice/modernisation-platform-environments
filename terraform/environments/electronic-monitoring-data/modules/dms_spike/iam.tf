@@ -98,8 +98,8 @@ resource "aws_iam_policy" "dms_spike_s3_write_policy" {
             "logs:PutLogEvents"
           ]
           "Resource" : [
-            "arn:aws:logs:${data.aws_region.current_name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/dms*",
-            "arn:aws:logs:${data.aws_region.current_name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/dms*:log-stream:*",
+            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/dms*",
+            "arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/dms*:log-stream:*",
           ]
 
         }
