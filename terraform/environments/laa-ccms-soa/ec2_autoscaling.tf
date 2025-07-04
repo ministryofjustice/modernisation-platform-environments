@@ -46,7 +46,6 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
   name          = "${local.application_data.accounts[local.environment].app_name}-launch-template-managed"
   image_id      = local.application_data.accounts[local.environment].managed_ami_image_id
   instance_type = local.application_data.accounts[local.environment].managed_ec2_instance_type
-  #key_name      = local.application_data.accounts[local.environment].managed_ec2_key_name
   ebs_optimized = true
 
   monitoring {
@@ -68,8 +67,8 @@ resource "aws_launch_template" "ec2-launch-template-managed" {
     ebs {
       delete_on_termination = true
       encrypted             = true
-      kms_key_id            = data.aws_kms_alias.ebs.target_key_arn #--TEMPORARY. SHOULD USE A CMK. AW
-      volume_size           = 30
+      kms_key_id            = data.aws_kms_alias.ebs.target_key_arn #--Instances would not book with a CMK and time to debug was not available.
+      volume_size           = 30                                    #  Ideally this needs to be debugged and migrated on to a CMK! - AW
       volume_type           = "gp2"
       iops                  = 0
     }

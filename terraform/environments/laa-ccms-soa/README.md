@@ -6,13 +6,15 @@ _If you have any questions surrounding this page please post in the `#laa-appops
 
 ### **Last review date:**
 
-09/06/2025 - Andy Welsh. Service Redeployment
+02/07/2025 - Andy Welsh. Service Redeployment
 
 ### **Description:**
 
 CCMS-SOA (Service Orinted Architecture) acts as the service bus for CCMS. The application runs in an AWS ECS Cluster using manually configured, ECS-Optimised, EC2 Instances as it's underlying compute. These instances are provisioned via an Auto Scaling Group and deployed using a Launch Template and associated User Data boot script.
 
 SOA operates in a client-server arrangement with a single _Admin Server_ on it's own EC2 instance, running a single container and a variable number of _Enterprise Management Servers_, often referred to as simply _Managed Servers_. These managed servers may run across a variable amount of individual EC2 instances and a variable amount of containers, spread across these instances.
+
+For an architecture diagram, see the [LLD in the central architecture diagram repo](https://github.com/ministryofjustice/laa-architectural-diagrams/blob/main/docs/diagrams/lld/ccms/ccms-soa.png).
 
 ### **Databases:**
 
@@ -36,15 +38,11 @@ Additionally, the necessary configuration details—such as the JDBC URL, userna
 
 Application state is held on an EFS storage volume, this is mounted to the ECS clusters EC2 Instances as part of their boot process and exposed to the running containers.
 
-### Architecture Diagram
-
-![SOA Architecture](docs/SOA-Infrastructure.png)
-
 ### **Service URLs:**
 
-- **Administration Consle**: <http://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/console>
-- **EM (Enterprise Manager)**: <http://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk:7001/em>
-- **Composite Integrations**: <http://ccms-soa-maanaged.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk:8001>
+- **Administration Consle**: `https://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk/console`
+- **EM (Enterprise Manager)**: `https://ccms-soa-admin.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk/em`
+- **Composite Integrations**: `https://ccms-soa-managed.laa-ENVIRONMENT.modernisation-platform.service.justice.gov.uk`
 
 ENVIRONMENT values:
 - development
@@ -54,7 +52,7 @@ ENVIRONMENT values:
 
 ### **Incident response hours:**
 
-**TBC**
+Best Endeavours
 
 ### **Incident contact details:**
 
