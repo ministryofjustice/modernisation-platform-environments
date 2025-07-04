@@ -97,7 +97,7 @@ resource "aws_transfer_user" "sftp_user" {
   server_id = aws_transfer_server.sftp_server.id
   user_name = "sftp-user"
   role      = aws_iam_role.sftp_role.arn
-  home_directory = "/${aws_s3_bucket.sftp_bucket.bucket}"
+  home_directory = "/${aws_s3_bucket.CAFM.bucket}"
 }
 
 
