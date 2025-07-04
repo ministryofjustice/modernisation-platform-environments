@@ -57,7 +57,7 @@ resource "aws_cloudwatch_metric_alarm" "Status_Check_Failure" {
   period              = "60"
   evaluation_periods  = "5"
   threshold           = "1"
-  treat_missing_data  = "breaching"
+  treat_missing_data  = "notBreaching"
   dimensions = {
     AutoScalingGroupName = aws_autoscaling_group.cluster-scaling-group.name
   }
@@ -80,7 +80,7 @@ resource "aws_cloudwatch_metric_alarm" "tds_rds_cpu_over_threshold" {
   period              = "60"
   evaluation_periods  = "5"
   threshold           = "85"
-  treat_missing_data  = "breaching"
+  treat_missing_data  = "notBreaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.tds_db.id
   }
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "TDS_RDS_Free_Storage_Space_Over_Threshol
   period              = "60"
   evaluation_periods  = "5"
   threshold           = "30"
-  treat_missing_data  = "breaching"
+  treat_missing_data  = "notBreaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.tds_db.id
   }
