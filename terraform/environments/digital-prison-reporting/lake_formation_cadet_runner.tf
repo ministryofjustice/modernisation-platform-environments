@@ -26,3 +26,4 @@ resource "aws_lakeformation_permissions" "dataapi_cross_role_table_access" {
     wildcard      = true
   }
 }
+
