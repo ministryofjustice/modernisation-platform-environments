@@ -40,7 +40,7 @@ locals {
       ftp_type        = "SFTP_UPLOAD"
       require_ssl     = "NO"
       insecure        = "YES"
-      file_types      = "zip"
+      file_types      = "pdf,xml"
       ca_cert         = ""
       cert            = ""
       key             = ""
@@ -202,6 +202,29 @@ resource "aws_iam_role_policy" "s3_access" {
                 "${bucket.bucket.arn}/*"
             ]
         ])  
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "shared_kms_access" {
+  count = local.build_ftp ? 1 : 0
+  name  = "SharedKMSAccess"
+  role  = aws_iam_role.ftp_lambda_role[0].id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "kms:Decrypt",
+          "kms:Encrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey*",
+          "kms:DescribeKey"
+        ],
+        Resource = local.laa_general_kms_arn
       }
     ]
   })

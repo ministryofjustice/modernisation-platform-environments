@@ -3,13 +3,7 @@
 # These are build from the local bucket_names and whether the variable build_s3 is true.
 
 
-data "aws_kms_key" "laa_general" {
-  key_id = "arn:aws:kms:eu-west-2:${local.environment_management.account_ids["core-shared-services-production"]}:alias/general-laa"
-}
-
 locals {
-
-  laa_general_kms_arn = data.aws_kms_key.laa_general.arn
 
   ftp_directions = ["inbound", "outbound"]
 
@@ -193,11 +187,11 @@ resource "aws_secretsmanager_secret" "ftp_access_key_secret" {
   #checkov:skip=CKV_AWS_149:"Secret to be manually rotated"
   #checkov:skip=CKV2_AWS_57:"Secret to be manually rotated"
   count = local.build_s3 ? 1 : 0
-  name  = "ses-ftp-user-access-key"
+  name  = "s3-ftp-user-access-key"
   tags = merge(
     local.tags,
     {
-      Name = "ses-ftp-user-access-key"
+      Name = "s3-ftp-user-access-key"
     }
   )
 }
@@ -245,9 +239,10 @@ data "aws_iam_policy_document" "ftp_user_policy" {
     sid   = "KMSPermissions"
     effect = "Allow"
     actions = [
-    "kms:GenerateDataKey",
-    "kms:Decrypt",
-    "kms:Encrypt"    ]
+      "kms:GenerateDataKey",
+      "kms:Decrypt",
+      "kms:Encrypt"    
+    ]
     resources = [local.laa_general_kms_arn]
   }
 }

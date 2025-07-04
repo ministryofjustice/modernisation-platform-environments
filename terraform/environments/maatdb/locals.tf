@@ -11,4 +11,6 @@ locals {
   build_ses    = local.application_data.accounts[local.environment].build_ses
   build_ec2    = local.application_data.accounts[local.environment].build_ec2
 
+  laa_general_kms_arn = data.aws_kms_key.general_shared.arn
+
 }
