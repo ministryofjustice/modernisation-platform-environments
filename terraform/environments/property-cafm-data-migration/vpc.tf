@@ -21,7 +21,7 @@ module "vpc" {
 module "vpc_endpoints" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
-  source = "github.com/terraform-aws-modules/terraform-aws-vpc//modules/vpc-endpoints?ref=25322b6b6be69db6cca7f167d7b0e5327156a595" # v5.8.1
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git//modules/vpc-endpoints?ref=v5.21.0"
 
   security_group_ids = [aws_security_group.vpc_endpoints.id]
   subnet_ids         = module.vpc.private_subnets
@@ -72,4 +72,35 @@ resource "aws_security_group_rule" "allow_all_vpc" {
   security_group_id = aws_security_group.vpc_endpoints.id
   to_port           = 65535
   type              = "ingress"
+}
+
+resource "aws_security_group" "transfer_server" {
+  description = "Security Group for Transfer Server"
+  name        = "transfer-server"
+  vpc_id      = module.isolated_vpc.vpc_id
+  tags        = local.tags
+}
+
+
+module "isolated_vpc" {
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/vpc/aws"
+  version = "5.13.0"
+
+  name            = "${local.application_name}-${local.environment}-isolated"
+  azs             = slice(data.aws_availability_zones.available.names, 0, 3)
+  cidr            = local.environment_configuration.isolated_vpc_cidr
+  public_subnets  = local.environment_configuration.isolated_vpc_public_subnets
+  private_subnets = local.environment_configuration.isolated_vpc_private_subnets
+
+  enable_nat_gateway     = local.environment_configuration.isolated_vpc_enable_nat_gateway
+  one_nat_gateway_per_az = local.environment_configuration.isolated_vpc_one_nat_gateway_per_az
+
+  enable_flow_log                      = true
+  create_flow_log_cloudwatch_log_group = true
+  create_flow_log_cloudwatch_iam_role  = true
+  flow_log_max_aggregation_interval    = 60
+
+  tags = local.tags
 }
