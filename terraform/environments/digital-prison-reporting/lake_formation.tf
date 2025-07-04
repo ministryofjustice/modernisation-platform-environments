@@ -81,3 +81,23 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
     values = aws_lakeformation_lf_tag.sensitive_tag.values
   }
 }
+
+
+resource "aws_lakeformation_permissions" "de_role_prisons_and_non_sensitive" {
+  principal   = "arn:aws:iam::593291632749:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DESCRIBE", "SELECT"]
+
+  lf_tag_policy {
+    resource_type = "TABLE"
+
+    expression {
+      key    = "domain"
+      values = ["prisons"]
+    }
+
+    expression {
+      key    = "sensitive"
+      values = ["false", "true", "data_linking"]
+    }
+  }
+}
