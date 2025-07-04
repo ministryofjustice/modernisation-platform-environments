@@ -116,6 +116,12 @@ variable "deletion_protection" {
   default     = false
 }
 
+variable "allow_major_version_upgrade" {
+  type        = bool
+  description = "Allow major version upgrade"
+  default     = true
+}
+
 variable "auto_minor_version_upgrade" {
   type        = bool
   description = "Allow automatic minor version upgrades"
