@@ -36,6 +36,16 @@ module "dpr_rds_parameter_group" {
       name         = "max_slot_wal_keep_size"
       value        = "40000"
       apply_method = "immediate"
+    },
+    {
+      name         = "max_standby_streaming_delay"
+      value        = "-1"
+      apply_method = "immediate"
+    },
+    {
+      name         = "max_standby_archive_delay"
+      value        = "-1"
+      apply_method = "immediate"
     }
   ]
 
