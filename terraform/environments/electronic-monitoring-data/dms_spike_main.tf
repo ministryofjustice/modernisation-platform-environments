@@ -3,9 +3,9 @@ locals {
 }
 
 
-data "aws_s3_bucket" "dms_spike_target_bucket_arn" {
-  bucket = local.target_bucket
-}
+# data "aws_s3_bucket" "dms_spike_target_bucket_arn" {
+#   bucket = local.target_bucket
+# }
 
 
 module "dms_rds_spike" {
@@ -26,7 +26,7 @@ module "dms_rds_spike" {
 
   # RDS Data Source and target details
   s3_bucket_name      = local.target_bucket
-  s3_bucket_arn       = data.aws_s3_bucket.dms_spike_target_bucket_arn
+  s3_bucket_arn       = "arn:aws:s3:::${local.target_bucket}"
   table_mappings      = file("table_mappings/lcm_archive_2019.json")
   database_name       = "lcm_archive_2019"
 
