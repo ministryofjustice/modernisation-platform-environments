@@ -1,13 +1,3 @@
-# Create an S3 bucket for SFTP storage
-resource "aws_s3_bucket" "sftp_bucket" {
-  bucket = "property-datahub-landing-${local.environment}" # Replace with a unique bucket name
-
-  tags = {
-    Name = "MoJ Property DataHub SFTP Bucket"
-  }
-}
-
-
 # Create an IAM role for the SFTP server
 resource "aws_iam_role" "sftp_role" {
   name = "sftp-server-role"
@@ -40,7 +30,7 @@ resource "aws_iam_role_policy" "sftp_policy" {
           "s3:GetBucketLocation"
         ]
         Effect   = "Allow"
-        Resource = "arn:aws:s3:::${aws_s3_bucket.sftp_bucket.bucket}"
+        Resource = "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}"
       },
       {
         Action = [
