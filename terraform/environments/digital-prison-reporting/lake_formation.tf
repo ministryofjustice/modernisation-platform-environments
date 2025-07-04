@@ -101,3 +101,15 @@ resource "aws_lakeformation_permissions" "de_role_prisons_and_non_sensitive" {
     }
   }
 }
+
+
+resource "aws_lakeformation_permissions" "table_permissions_2" {
+
+  principal   = "arn:aws:iam::593291632749:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DESCRIBE"]
+
+  table {
+    name          = "dev_model_2_tag"
+    database_name = "dpr_ap_integration_test_tag2_dev_dbt"
+  }
+}
