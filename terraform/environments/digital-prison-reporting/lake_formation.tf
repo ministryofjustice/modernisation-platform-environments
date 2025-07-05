@@ -13,17 +13,8 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
     ]
   )
 
-  # ref: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lakeformation_data_lake_settings#principal
-  create_database_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
-  }
-
-  create_table_default_permissions {
-    # These settings should replicate current behaviour: LakeFormation is Ignored
-    permissions = ["ALL"]
-    principal   = "IAM_ALLOWED_PRINCIPALS"
+  parameters = {
+    "CROSS_ACCOUNT_VERSION" = "4"
   }
 }
 
@@ -88,3 +79,21 @@ resource "aws_lakeformation_permissions" "sensitive_grant" {
 }
 
 
+resource "aws_lakeformation_permissions" "de_role_prisons_and_non_sensitive" {
+  principal   = "arn:aws:iam::593291632749:role/aws-reserved/sso.amazonaws.com/eu-west-2/AWSReservedSSO_modernisation-platform-data-eng_499410b42334a7d7"
+  permissions = ["DESCRIBE", "SELECT"]
+
+  lf_tag_policy {
+    resource_type = "TABLE"
+
+    expression {
+      key    = "domain"
+      values = ["prisons"]
+    }
+
+    expression {
+      key    = "sensitive"
+      values = ["false", "true", "data_linking"]
+    }
+  }
+}
