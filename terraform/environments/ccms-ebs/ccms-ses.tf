@@ -42,6 +42,19 @@ resource "aws_ses_configuration_set" "default_configuration_set" {
   sending_enabled            = true
 }
 
+resource "aws_ses_event_destination" "cloudwatch" {
+  name                   = "ses-default-${local.environment}"
+  configuration_set_name = aws_ses_configuration_set.default_configuration_set.name
+  enabled                = true
+  matching_types         = ["bounce", "click", "complaint", "delivery", "open", "reject", "renderingFailure", "send"]
+
+  cloudwatch_destination {
+    default_value  = aws_ses_configuration_set.default_configuration_set.name
+    dimension_name = "ses:configuration-set"
+    value_source   = "messageTag"
+  }
+}
+
 # TO DO: Kinesis configuration (including S3 bucket, IAM role and policy, ...).
 # https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kinesis_firehose_delivery_stream
 #
