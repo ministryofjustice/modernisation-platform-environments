@@ -20,8 +20,8 @@ module "chatbot_prod" {
 #--Altering SNS
 resource "aws_sns_topic_subscription" "alerts" {
   topic_arn = aws_sns_topic.alerts.arn
-  protocol  = "lambda"
-  endpoint  = aws_lambda_function.alerts.arn
+  protocol  = "https"
+  endpoint  = "https://global.sns-api.chatbot.amazonaws.com"
 }
 
 resource "aws_sns_topic" "alerts" {
