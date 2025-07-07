@@ -124,7 +124,7 @@ data "aws_iam_policy_document" "metadata_generator_lambda_function" {
       test     = "StringLike"
       variable = "kms:ViaService"
       values = [
-        "secretsmanager.${data.aws_region.current.name}.amazonaws.com",
+        "secretsmanager.${data.aws_region.current.region}.amazonaws.com",
       ]
     }
   }
