@@ -55,6 +55,7 @@ resource "aws_transfer_server" "sftp_server" {
   tags = {
     Name = "CAFM SFTP Server"
   }
+  security_policy_name = "TransferSecurityPolicy-2024-01"
 }
 
 # Create an SFTP user
