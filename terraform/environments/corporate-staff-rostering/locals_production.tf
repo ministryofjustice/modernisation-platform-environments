@@ -317,8 +317,7 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type          = "m5.4xlarge"
-          vpc_security_group_ids = ["web", "ad-join", "ec2-windows"]
+          instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-2-b"
@@ -410,40 +409,6 @@ locals {
           pre-migration = "PDCWW00006"
         })
       })
-    }
-
-    fsx_windows = {
-
-      pd-csr-win-share = {
-        aliases                     = ["prisoner-retail.azure.hmpp.root"]
-        preferred_availability_zone = "eu-west-2a"
-        deployment_type             = "MULTI_AZ_1"
-        security_groups             = ["fsx_windows"]
-        skip_final_backup           = true
-        storage_capacity            = 32
-        throughput_capacity         = 8
-
-        subnets = [
-          {
-            name               = "private"
-            availability_zones = ["eu-west-2a", "eu-west-2b"]
-          }
-        ]
-
-        self_managed_active_directory = {
-          dns_ips = [
-            module.ip_addresses.azure_fixngo_ip.PCMCW0011,
-            module.ip_addresses.azure_fixngo_ip.PCMCW0012,
-          ]
-          domain_name                      = "azure.hmpp.root"
-          username                         = "svc_fsx_windows"
-          password_secret_name             = "/fsx_windows/passwords"
-          file_system_administrators_group = "Domain Join"
-        }
-        tags = {
-          backup = true
-        }
-      }
     }
 
     iam_policies = {
@@ -713,11 +678,6 @@ locals {
       "/oracle/database/DIWFM" = {
         secrets = {
           passwords = { description = "database passwords" }
-        }
-      }
-      "/fsx_windows" = {
-        secrets = {
-          passwords = { description = "fsx passwords" }
         }
       }
     }

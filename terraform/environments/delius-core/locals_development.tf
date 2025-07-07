@@ -78,7 +78,7 @@ locals {
 
   delius_microservices_configs_dev = {
     weblogic = {
-      image_tag                = "6.2.0.3"
+      image_tag                = "6.3.10"
       container_port           = 8080
       container_memory         = 4096
       container_cpu            = 2048
