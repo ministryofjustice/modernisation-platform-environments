@@ -82,14 +82,6 @@ resource "aws_kms_alias" "cloudwatch_logs" {
   target_key_id = aws_kms_key.cloudwatch_logs.key_id
 }
 
-resource "aws_cloudwatch_log_group" "yjaf_logs" {
-  for_each          = local.log_groups
-  name              = each.key
-  retention_in_days = each.value
-  kms_key_id        = aws_kms_key.cloudwatch_logs.arn
-}
-
-
 # Create instance profile for syslog server
 
 resource "aws_iam_role_policy_attachment" "ssm_attach" {
