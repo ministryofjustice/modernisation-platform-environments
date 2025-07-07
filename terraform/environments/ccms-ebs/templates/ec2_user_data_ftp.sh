@@ -27,6 +27,8 @@ echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
 
 systemctl restart vsftpd.service
 
+# create mount directories
+mkdir /s3xfer/S3/laa-ccms-inbound-${environment}-mp /s3xfer/S3/laa-ccms-inbound-${environment}-mp
 # Backup fstab first
 cp /etc/fstab /etc/fstab.bak.$(date +%F-%H%M%S)
 
