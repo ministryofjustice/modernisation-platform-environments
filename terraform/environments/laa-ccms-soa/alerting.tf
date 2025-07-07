@@ -1,42 +1,27 @@
-#--Alerting Lambda
-data "archive_file" "alerts" {
-  type        = "zip"
-  source_file = "./templates/alerting.py"
-  output_path = "./templates/alerting"
+#--Alerting Chatbot
+module "chatbot_nonprod" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
+  count    = local.is-production ? 0 : 1
+  slack_channel_id = local.application_data.accounts[local.environment].alerting_slack_channel_id
+  sns_topic_arns   = [aws_sns_topic.alerts.arn]
+  application_name = local.application_data.accounts[local.environment].app_name
 }
 
-resource "aws_lambda_function" "alerts" {
-  filename         = data.archive_file.alerts.output_path
-  function_name    = "${local.application_data.accounts[local.environment].app_name}-soa-alerting"
-  role             = aws_iam_role.alerting_lambda.arn
-  handler          = "alerting.lambda_handler"
-  source_code_hash = data.archive_file.alerts.output_base64sha256
-  runtime          = "python3.8"
-  environment {
-    variables = {
-      LOG_EVENTS        = "False"
-      SLACK_CHANNEL     = local.application_data.accounts[local.environment].alerting_slack_channel
-      SLACK_EMOJI       = ":aws2:"
-      SLACK_WEBHOOK_URL = data.aws_secretsmanager_secret_version.alerting_webhook_url.secret_string
-    }
-  }
+module "chatbot_prod" {
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
+  count    = local.is-production ? 1 : 0
+  slack_channel_id = local.application_data.accounts[local.environment].alerting_slack_channel_id
+  sns_topic_arns   = [aws_sns_topic.alerts.arn]
+  application_name = local.application_data.accounts[local.environment].app_name
 }
 
-resource "aws_lambda_permission" "alerts_sns_invoke" {
-  statement_id  = "AllowExecutionFromSNS"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.alerts.arn
-  principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.alerts.arn
-}
-
+#--Altering SNS
 resource "aws_sns_topic_subscription" "alerts" {
   topic_arn = aws_sns_topic.alerts.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.alerts.arn
 }
 
-#--Altering SNS
 resource "aws_sns_topic" "alerts" {
   name            = "${local.application_data.accounts[local.environment].app_name}-alerts"
   delivery_policy = <<EOF

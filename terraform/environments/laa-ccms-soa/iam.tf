@@ -206,48 +206,6 @@ resource "aws_iam_role_policy_attachment" "attach_s3_policy" {
 }
 
 #--Alerting
-data "aws_iam_policy_document" "alerting_lambda" {
-  version = "2012-10-17"
-  statement {
-    sid    = "AllowWriteToCloudwatchLogs"
-    effect = "Allow"
-    actions = [
-      "logs:PutLogEvents",
-      "logs:CreateLogStream",
-    ]
-    resources = [
-      "${aws_cloudwatch_log_group.log_group_alerting.arn}:*",
-    ]
-  }
-}
-
-resource "aws_iam_policy" "alerting_lambda" {
-  name   = "${local.application_data.accounts[local.environment].app_name}AlertingLambda"
-  policy = data.aws_iam_policy_document.alerting_lambda.json
-}
-
-data "aws_iam_policy_document" "alerting_lambda_assume" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com"]
-    }
-
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-resource "aws_iam_role" "alerting_lambda" {
-  name               = "${local.application_data.accounts[local.environment].app_name}-alerting-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.alerting_lambda_assume.json
-}
-
-resource "aws_iam_role_policy_attachment" "alerting_lambda" {
-  role       = aws_iam_role.alerting_lambda.name
-  policy_arn = aws_iam_policy.alerting_lambda.arn
-}
-
 data "aws_iam_policy_document" "alerting_sns" {
   version = "2012-10-17"
   statement {
