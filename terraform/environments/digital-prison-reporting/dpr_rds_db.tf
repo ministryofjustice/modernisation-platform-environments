@@ -36,6 +36,16 @@ module "dpr_rds_parameter_group" {
       name         = "max_slot_wal_keep_size"
       value        = "40000"
       apply_method = "immediate"
+    },
+    {
+      name         = "max_standby_streaming_delay"
+      value        = "-1"
+      apply_method = "immediate"
+    },
+    {
+      name         = "max_standby_archive_delay"
+      value        = "-1"
+      apply_method = "immediate"
     }
   ]
 
@@ -74,6 +84,8 @@ module "dpr_rds_db" {
   storage_type       = local.dpr_rds_store_type
   ca_cert_identifier = "rds-ca-rsa2048-g1" # Expiry on June 16, 2026
   license_model      = "postgresql-license"
+
+  allow_major_version_upgrade = true
 
   parameter_group = module.dpr_rds_parameter_group[0].parameter_group_name
 

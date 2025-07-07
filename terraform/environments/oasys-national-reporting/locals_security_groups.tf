@@ -128,12 +128,6 @@ locals {
         }
       }
     }
-    lb = {
-      description = "Security group for public subnet"
-    }
-    web = {
-      description = "Security group for web servers"
-    }
     efs = {
       description = "Security group for EFS"
       ingress = {
@@ -227,10 +221,6 @@ locals {
       }
     }
 
-    boe = {
-      description = "Security group for Windows App Servers"
-    }
-
     bods = {
       # this is also the SG for FSX but we can't change description or FSX SG without recreating the resource
       description = "Security group for BODS servers"
@@ -280,21 +270,6 @@ locals {
           cidr_blocks = ["0.0.0.0/0"]
         }
       }
-    }
-    onr_db = {
-      description = "Security group for ONR DB server"
-    }
-    oasys_db = {
-      description = "Allow traffic in from Oasys db servers"
-    }
-    oasys_db_onr_db = {
-      description = "Allow traffic from Oasys db servers to ONR DB server"
-    }
-    private-jumpserver = {
-      description = "Security group for jumpservers"
-    }
-    win-bip = {
-      description = "Security group for Temporary Windows BIP server"
     }
   }
 }
