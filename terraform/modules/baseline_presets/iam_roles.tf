@@ -80,7 +80,7 @@ locals {
         effect  = "Allow"
         actions = ["sts:AssumeRole"]
         principals = {
-          type        = "AWS"
+          type = "AWS"
           identifiers = [
             for identifier in coalesce(var.options.cloudwatch_metric_oam_links, []) : var.environment.account_root_arns[identifier]
           ]
