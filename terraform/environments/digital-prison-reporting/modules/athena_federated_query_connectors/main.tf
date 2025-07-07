@@ -4,10 +4,13 @@ locals {
   default_connection = { "default" = values(var.connection_strings)[0] }
   # Transform connection_strings to the format required by the connector environment properties and add a default
   connection_strings = merge({ for k, v in var.connection_strings : "${k}_connection_string" => v }, local.default_connection)
+  is_oracle          = var.athena_connector_type == "oracle"
+  is_postgresql      = var.athena_connector_type == "postgresql"
 }
 
 resource "aws_security_group" "athena_federated_query_lambda_sg" {
   #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
+  count        = local.is_oracle ? 1 : 0
   name_prefix = "${var.project_prefix}-athena-federated-query-lambda-security-group"
   description = "Athena Federated Query Oracle Lambda Security Group"
   vpc_id      = var.vpc_id
@@ -43,6 +46,7 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
 
 resource "aws_security_group" "athena_federated_query_lambda_sg_postgresql" {
   #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
+  count        = local.is_postgresql ? 1 : 0
   name_prefix = "${var.project_prefix}-athena-federated-query-lambda-security-group-postgresql"
   description = "Athena Federated Query PostgreSQL Lambda Security Group"
   vpc_id      = var.vpc_id
@@ -90,10 +94,10 @@ resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
   }
 
   vpc_config {
-    security_group_ids = var.athena_connector_type == "oracle" ? [
-      aws_security_group.athena_federated_query_lambda_sg.id
+    security_group_ids = local.is_oracle ? [
+      aws_security_group.athena_federated_query_lambda_sg[0].id
     ] : [
-      aws_security_group.athena_federated_query_lambda_sg_postgresql.id
+      aws_security_group.athena_federated_query_lambda_sg_postgresql[0].id
     ]
 
     subnet_ids = [

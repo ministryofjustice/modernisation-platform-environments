@@ -70,7 +70,7 @@ locals {
   ] : []
 
   dev_and_test_federated_query_credentials_secret_arns_postgresql = local.is_dev_or_test ? [
-    aws_secretsmanager_secret.dps["dps_locations"].arn
+    aws_secretsmanager_secret.dps["dps-locations"].arn
   ] : []
 
   preproduction_federated_query_credentials_secret_arns_oracle = local.is-preproduction ? [
