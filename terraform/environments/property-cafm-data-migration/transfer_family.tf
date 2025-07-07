@@ -50,17 +50,7 @@ resource "aws_iam_role_policy" "sftp_policy" {
 # Create the AWS Transfer Family SFTP server
 resource "aws_transfer_server" "sftp_server" {
   identity_provider_type = "SERVICE_MANAGED"
-  endpoint_type = "VPC"
-
-  endpoint_details {
-    vpc_id             = module.vpc.vpc_id
-    subnet_ids         = module.vpc.private_subnets
-    security_group_ids = [aws_security_group.sftp_sg.id] # ✅ Attached here
-  }
-
-  protocols            = ["SFTP"]
-  security_policy_name = "TransferSecurityPolicy-2024-01"
-  
+  endpoint_type = "PUBLIC"
   tags = {
     Name = "CAFM SFTP Server"
   }
@@ -69,7 +59,7 @@ resource "aws_transfer_server" "sftp_server" {
 resource "aws_security_group" "sftp_sg" {
   name        = "sftp-access"
   description = "Security group for SFTP servers"
-  vpc_id      = "vpc-0b2907e67278ff255"
+  vpc_id      = module.vpc.vpc_id
 
   ingress {
     description = "Only allow specific IPs"
