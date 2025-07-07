@@ -49,38 +49,13 @@ resource "aws_iam_role_policy" "sftp_policy" {
 
 # Create the AWS Transfer Family SFTP server
 resource "aws_transfer_server" "sftp_server" {
+# checkov:skip=CKV_AWS_164: "using public endpoint option for AWS Transfer"
   identity_provider_type = "SERVICE_MANAGED"
   endpoint_type = "PUBLIC"
   tags = {
     Name = "CAFM SFTP Server"
   }
 }
-
-resource "aws_security_group" "sftp_sg" {
-  name        = "sftp-access"
-  description = "Security group for SFTP servers"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    description = "Only allow specific IPs"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["192.168.0.58/32",
-                   "94.195.119.194/32",
-                   "100.64.11.172/32"] # ✅ Only allow specific IPs
-    # cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    description = "Allow all protocols to internal VPC range"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["10.0.0.0/8"]
-  }
-}
-
 
 # Create an SFTP user
 resource "aws_transfer_user" "sftp_user" {
