@@ -229,6 +229,22 @@ locals {
       })
     }
 
+    oam_sinks = {
+      "CloudWatchMetricOamSink" = {
+        resource_types = ["AWS::CloudWatch::Metric"]
+        source_account_names = [
+          "corporate-staff-rostering-test",
+          "hmpps-domain-services-test",
+          "nomis-test",
+          "nomis-combined-reporting-test",
+          "nomis-data-hub-test",
+          "oasys-test",
+          "oasys-national-reporting-test",
+          "planetfm-test",
+        ]
+      }
+    }
+
     route53_zones = {
       "hmpps-test.modernisation-platform.service.justice.gov.uk" = {
         records = [
