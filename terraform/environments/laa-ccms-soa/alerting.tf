@@ -1,17 +1,19 @@
 #--Alerting Chatbot
 module "chatbot_nonprod" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
-  count    = local.is-production ? 0 : 1
+  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
+  count            = local.is-production ? 0 : 1
   slack_channel_id = local.application_data.accounts[local.environment].alerting_slack_channel_id
   sns_topic_arns   = [aws_sns_topic.alerts.arn]
+  tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
   application_name = local.application_data.accounts[local.environment].app_name
 }
 
 module "chatbot_prod" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
-  count    = local.is-production ? 1 : 0
+  source           = "github.com/ministryofjustice/modernisation-platform-terraform-aws-chatbot"
+  count            = local.is-production ? 1 : 0
   slack_channel_id = local.application_data.accounts[local.environment].alerting_slack_channel_id
   sns_topic_arns   = [aws_sns_topic.alerts.arn]
+  tags             = local.tags #--This doesn't seem to pass to anything in the module but is a mandatory var. Consider submitting a PR to the module. AW
   application_name = local.application_data.accounts[local.environment].app_name
 }
 
@@ -46,7 +48,7 @@ EOF
 }
 
 resource "aws_sns_topic_policy" "default" {
-  arn = aws_sns_topic.alerts.arn
+  arn    = aws_sns_topic.alerts.arn
   policy = data.aws_iam_policy_document.alerting_sns.json
 }
 
