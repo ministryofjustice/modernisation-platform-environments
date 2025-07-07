@@ -20,6 +20,7 @@ data "aws_iam_policy_document" "datadog_aws_integration_assume_role" {
 data "aws_iam_policy_document" "datadog_aws_integration" {
   #checkov:skip=CKV_AWS_356: datadog required
   #checkov:skip=CKV_AWS_111: datadog required
+  #trivy:ignore:avd-aws-0057: datadog required
   statement {
     actions = [
       "apigateway:GET",

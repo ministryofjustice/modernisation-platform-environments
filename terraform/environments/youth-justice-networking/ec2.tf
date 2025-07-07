@@ -1,5 +1,12 @@
 # External Security Group (YJBJuniperEXT-SG)
+#trivy:ignore:AVD-AWS-0107: "vSRX instances are configured as network firewalls with DDOS protection mitigating the risk of open SG rules"
 resource "aws_security_group" "external_sg" {
+  #checkov:skip=CKV_AWS_24: "vSRX instances are configured as network firewalls with DDOS protection mitigating the risk of open SG rules"
+  #checkov:skip=CKV_AWS_25:
+  #checkov:skip=CKV_AWS_260:
+  #checkov:skip=CKV_AWS_277:
+  #checkov:skip=CKV_AWS_382:
+
   name        = "YJBJuniperEXT-SG"
   description = "External Interface Juniper Security Group"
   vpc_id      = module.vpc.vpc_id
@@ -271,8 +278,15 @@ resource "aws_iam_instance_profile" "ssm_instance_profile" {
 resource "aws_instance" "vsrx01" {
   ami                  = "ami-0ad7c5b240d3318e2" # Juniper VSRX marketplace AMI
   instance_type        = "c5.xlarge"
+  ebs_optimized        = true
   key_name             = "Juniper_KeyPair" # Replace with your SSH key name
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  metadata_options {
+    http_tokens = "required"
+  }
+  root_block_device {
+    encrypted = true
+  }
 
   # Attach the Management Interface
   network_interface {
@@ -307,8 +321,15 @@ resource "aws_instance" "vsrx01" {
 resource "aws_instance" "vsrx02" {
   ami                  = "ami-0ad7c5b240d3318e2" # Juniper VSRX marketplace AMI
   instance_type        = "c5.xlarge"
+  ebs_optimized        = true
   key_name             = "Juniper_KeyPair" # Replace with your SSH key name
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
+  metadata_options {
+    http_tokens = "required"
+  }
+  root_block_device {
+    encrypted = true
+  }
 
   # Attach the Management Interface
   network_interface {
@@ -343,10 +364,17 @@ resource "aws_instance" "vsrx02" {
 resource "aws_instance" "juniper_kms" {
   ami                    = "ami-079423e9cb7067f4b" # AMI snapshot migrated from the old account
   instance_type          = "t3.medium"
+  ebs_optimized          = true
   iam_instance_profile   = aws_iam_instance_profile.ssm_instance_profile.name
   subnet_id              = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
   private_ip             = "10.100.50.100"
   vpc_security_group_ids = [aws_security_group.internal_sg.id]
+  metadata_options {
+    http_tokens = "required"
+  }
+  root_block_device {
+    encrypted = true
+  }
 
   tags = merge(local.tags, {
     Name          = "Juniper Key Management Server"
@@ -358,14 +386,19 @@ resource "aws_instance" "juniper_kms" {
 resource "aws_instance" "juniper_syslog" {
   ami                    = data.aws_ami.amazon_linux_2.id # Use data source instead of hardcoded AMI
   instance_type          = "t3.medium"
+  ebs_optimized          = true
   key_name               = "Juniper_KeyPair" # Replace with your SSH key name
   iam_instance_profile   = aws_iam_instance_profile.yjb_juniper_instance_profile.name
   subnet_id              = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
   private_ip             = "10.100.50.50"
   vpc_security_group_ids = [aws_security_group.internal_sg.id]
-
+  metadata_options {
+    http_tokens = "required"
+  }
   user_data = file("${path.module}/scripts/cloudwatch-syslog-userdata.sh")
-
+  root_block_device {
+    encrypted = true
+  }
   lifecycle {
     ignore_changes = [ami]
   }
@@ -380,16 +413,20 @@ resource "aws_instance" "juniper_syslog" {
 resource "aws_instance" "juniper_management" {
   ami                  = data.aws_ami.windows_server.id # Use data source instead of hardcoded AMI
   instance_type        = "t3.large"
+  ebs_optimized        = true
   key_name             = "Juniper_KeyPair"
   iam_instance_profile = aws_iam_instance_profile.ssm_instance_profile.name
   subnet_id            = aws_subnet.vsrx_subnets["Juniper Management & KMS"].id
   private_ip           = "10.100.50.150"
   root_block_device {
+    encrypted   = true
     volume_size = 70    # Define the root volume size in GB
     volume_type = "gp3" # Optional: Specify the volume type (e.g., gp3, gp2, io1)
   }
   vpc_security_group_ids = [aws_security_group.internal_sg.id]
-
+  metadata_options {
+    http_tokens = "required"
+  }
   lifecycle {
     ignore_changes = [ami]
   }
