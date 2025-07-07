@@ -580,11 +580,11 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Benefit_Checker_Admin" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
-resource "aws_cloudwatch_metric_alarm" "SOA_Generic_Error_Managed" {
+resource "aws_cloudwatch_metric_alarm" "SOA_Benefit_Checker_Rollback_Error_Managed" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-generic-errors"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple errors on the SOA managed servers in the last 5 minutes, please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple instances of benefit checker transactions being rolled back on the SOA managed servers in the last 5 minutes, please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
-  metric_name         = aws_cloudwatch_log_metric_filter.soa_generic_error_managed.id
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_benefit_checker_rollback_error_managed.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "300"
@@ -596,11 +596,11 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Generic_Error_Managed" {
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
-resource "aws_cloudwatch_metric_alarm" "SOA_Generic_Error_Admin" {
+resource "aws_cloudwatch_metric_alarm" "SOA_Benefit_Checker_Rollback_Error_Admin" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-admin-generic-errors"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple errors on the SOA admin servers in the last 5 minutes, please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple instances of benefit checker transactions being rolled back on the SOA admin servers in the last 5 minutes, please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
-  metric_name         = aws_cloudwatch_log_metric_filter.soa_generic_error_admin.id
+  metric_name         = aws_cloudwatch_log_metric_filter.soa_benefit_checker_rollback_error_admin.id
   statistic           = "Sum"
   namespace           = "CCMS-SOA-APP"
   period              = "300"

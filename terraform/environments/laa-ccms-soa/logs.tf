@@ -38,13 +38,13 @@ resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_admin" {
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "soa_generic_error_admin" {
-  name           = "SOAGenericErrorAdmin"
+resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_rollback_error_admin" {
+  name           = "SOABenefitCheckerRollbackErrorAdmin"
   pattern        = "\"<Error>\" -\"benefitchecker\" -\"<ADFC-64007>\" -\"Transaction rolledback\" -\"transaction has been rolled back\""
   log_group_name = aws_cloudwatch_log_group.log_group_admin.name
 
   metric_transformation {
-    name      = "SOAGenericErrorAdmin"
+    name      = "SOABenefitCheckerRollbackErrorAdmin"
     namespace = "CCMS-SOA-APP"
     value     = "1"
   }
@@ -90,13 +90,13 @@ resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_managed" {
   }
 }
 
-resource "aws_cloudwatch_log_metric_filter" "soa_generic_error_managed" {
-  name           = "SOAGenericErrorManaged"
+resource "aws_cloudwatch_log_metric_filter" "soa_benefit_checker_rollback_error_managed" {
+  name           = "SOABenefitCheckerRollbackErrorManaged"
   pattern        = "\"<Error>\" -\"benefitchecker\" -\"Transaction rolledback\" -\"transaction has been rolled back\""
   log_group_name = aws_cloudwatch_log_group.log_group_managed.name
 
   metric_transformation {
-    name      = "SOAGenericErrorManaged"
+    name      = "SOABenefitCheckerRollbackErrorManaged"
     namespace = "CCMS-SOA-APP"
     value     = "1"
   }
