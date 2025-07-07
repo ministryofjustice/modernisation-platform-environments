@@ -129,7 +129,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "CAFM" {
 }
 
 resource "aws_sns_topic" "s3_event_topic" {
-  name = "cafm-landing-s3-event-topic"
+  name              = "cafm-landing-s3-event-topic"
   kms_master_key_id = aws_kms_key.sns_kms.arn
 }
 

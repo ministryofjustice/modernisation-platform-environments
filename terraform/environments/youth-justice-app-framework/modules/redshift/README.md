@@ -54,7 +54,7 @@ As, currently, the default AWS key is used for encryption, permissions are not n
 2. In the AWS Management Console for the destination account, launch `Redshift query editor v2`. This can be done using the `Query data` link on the `Amazon Redshift Serverless` `Namespace configuration` page.
 3. On environments, except production, create a user for the IAM role used by the YJB team by running the following command:
     `CREATE USER "IAMR:redshift-serverless-yjb-reporting-moj_ap" PASSWORD DISABLE`
-4. Run script `recreate_external_schemas.sql` to recreate the External Schemas. 
+4. Run script `recreate_external_schemas.sql` to recreate the External Schemas.
 
 **Note:** The above script will remove aout 130 Materialise Views that are dependant on the Externl Schemas (directly or indirectly).
 

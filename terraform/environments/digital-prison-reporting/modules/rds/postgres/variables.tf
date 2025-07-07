@@ -17,9 +17,9 @@ variable "db_name" {
 }
 
 variable "engine" {
-  type = string
+  type        = string
   description = "RDS Engine"
-  default = "postgres"
+  default     = "postgres"
 }
 
 variable "engine_version" {
