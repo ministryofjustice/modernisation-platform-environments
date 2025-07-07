@@ -54,7 +54,7 @@ resource "aws_transfer_server" "sftp_server" {
 
   endpoint_details {
     vpc_id             = module.vpc.vpc_id
-    subnet_ids         = [module.vpc.private_subnets]
+    subnet_ids         = module.vpc.private_subnets
     security_group_ids = [aws_security_group.sftp_sg.id] # ✅ Attached here
   }
 
