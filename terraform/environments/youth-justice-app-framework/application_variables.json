@@ -103,7 +103,7 @@
       "desired_number_of_domain_controllers": 3,
       "snapshot_identifier": "arn:aws:rds:eu-west-2:066012302209:cluster-snapshot:moj-failonpurpose",
       "test_mode": true,
-      "tableau_website_name": "tableau",
+      "tableau_website_name": "reporting",
       "database_instance_class": "db.r5.2xlarge",
       "enable_datadog_agent_apm": true,
       "create_rds_sheduler": false,

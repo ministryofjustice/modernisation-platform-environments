@@ -129,5 +129,7 @@ locals {
       "/ndh/pd" = local.secretsmanager_secrets.ndh
       "/ndh/dr" = local.secretsmanager_secrets.ndh
     }
+
+    security_groups = local.security_groups_old
   }
 }

@@ -49,4 +49,8 @@ module "yjsm" {
   management_server_sg_id       = module.ds.management_server_sg_id
   #Keep until prod images are done
   tableau_sg_id = module.tableau.tableau_sg_id
+
+  region       = data.aws_region.current.name
+  account_id   = data.aws_caller_identity.current.account_id
+  cluster_name = "yjaf-cluster"
 }

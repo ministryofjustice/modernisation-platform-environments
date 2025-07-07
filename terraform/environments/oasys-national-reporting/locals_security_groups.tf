@@ -128,12 +128,6 @@ locals {
         }
       }
     }
-    lb = {
-      description = "Security group for public subnet"
-    }
-    web = {
-      description = "Security group for web servers"
-    }
     efs = {
       description = "Security group for EFS"
       ingress = {
@@ -159,6 +153,13 @@ locals {
     bip-web = {
       description = "Security group for bip web tier"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         http7010 = {
           description     = "Allow http7010 ingress"
           from_port       = 7010
@@ -196,6 +197,13 @@ locals {
     bip-app = {
       description = "Security group for bip application tier"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         all-from-web = {
           description     = "Allow all ingress from web"
           from_port       = 0
@@ -213,21 +221,23 @@ locals {
       }
     }
 
-    boe = {
-      description = "Security group for Windows App Servers"
-    }
-
     bods = {
       # this is also the SG for FSX but we can't change description or FSX SG without recreating the resource
       description = "Security group for BODS servers"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         smb = {
           description = "Allow fsx smb ingress"
           from_port   = 445
           to_port     = 445
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.fsx_ingress
-          self        = true
         }
         winrm = {
           description = "Allow fsx winrm ingress"
@@ -235,7 +245,6 @@ locals {
           to_port     = 5986
           protocol    = "tcp"
           cidr_blocks = local.security_group_cidrs.fsx_ingress
-          self        = true
         }
         cms-ingress = {
           description = "Allow http6400-http6500 ingress"
@@ -254,28 +263,13 @@ locals {
       }
       egress = {
         all = {
-          description = "Allow all FSX egress"
+          description = "Allow all traffic outbound"
           from_port   = 0
           to_port     = 0
           protocol    = "-1"
           cidr_blocks = ["0.0.0.0/0"]
         }
       }
-    }
-    onr_db = {
-      description = "Security group for ONR DB server"
-    }
-    oasys_db = {
-      description = "Allow traffic in from Oasys db servers"
-    }
-    oasys_db_onr_db = {
-      description = "Allow traffic from Oasys db servers to ONR DB server"
-    }
-    private-jumpserver = {
-      description = "Security group for jumpservers"
-    }
-    win-bip = {
-      description = "Security group for Temporary Windows BIP server"
     }
   }
 }

@@ -1,6 +1,6 @@
 resource "aws_secretsmanager_secret" "soa_password" {
   name        = "ccms/soa/password"
-  description = "SOA Weblogic EM Console and Database Password" #--Is the same password shared between two services? Don't like that. Revisit. AW
+  description = "SOA Weblogic EM Console for user weblogic and RDS Database Password for SOAPDB admin" #--Is the same password shared between two services? Don't like that. Revisit. AW
 }
 
 data "aws_secretsmanager_secret_version" "soa_password" {
@@ -9,7 +9,7 @@ data "aws_secretsmanager_secret_version" "soa_password" {
 
 resource "aws_secretsmanager_secret" "xxsoa_ds_password" {
   name        = "ccms/soa/xxsoa/ds/password"
-  description = "TDS XXSOA Data Source Password"
+  description = "EDRMS TDS XXSOA Data Source Password User XXEDRMS - Comes from different account EDRMS"
 }
 
 data "aws_secretsmanager_secret_version" "xxsoa_ds_password" {
@@ -18,22 +18,22 @@ data "aws_secretsmanager_secret_version" "xxsoa_ds_password" {
 
 resource "aws_secretsmanager_secret" "ebs_ds_password" {
   name        = "ccms/soa/ebs/ds/password"
-  description = "EBS Data Source Password"
+  description = "EBS Data Source Password for APPS User"
 }
 
 resource "aws_secretsmanager_secret" "ebssms_ds_password" {
   name        = "ccms/soa/ebs/sms/ds/password"
-  description = "EBS SMS Data Source Password"
+  description = "EBS SMS Data Source Password CWA APPS User"
 }
 
 resource "aws_secretsmanager_secret" "pui_user_password" {
   name        = "ccms/soa/pui/user/password"
-  description = "PUI User Password"
+  description = "PUI_USER Password for security realm"
 }
 
 resource "aws_secretsmanager_secret" "ebs_user_password" {
   name        = "ccms/soa/ebs/user/password"
-  description = "EBS User Password"
+  description = "EBS DB User ebs_soa_super_user Password for security realm"
 }
 
 resource "aws_secretsmanager_secret" "soa_deploy_ssh_key" {

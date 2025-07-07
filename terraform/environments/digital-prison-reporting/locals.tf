@@ -116,6 +116,21 @@ locals {
   enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
   enable_pagerduty_alerts = local.application_data.accounts[local.environment].enable_pagerduty_alerts
 
+  # DPR RDS Database
+  enable_dpr_rds_db              = local.application_data.accounts[local.environment].dpr_rds_db.enable
+  create_rds_replica             = local.application_data.accounts[local.environment].dpr_rds_db.create_replica
+  dpr_rds_engine                 = local.application_data.accounts[local.environment].dpr_rds_db.engine
+  dpr_rds_engine_version         = local.application_data.accounts[local.environment].dpr_rds_db.engine_version
+  dpr_rds_init_size              = local.application_data.accounts[local.environment].dpr_rds_db.init_size
+  dpr_rds_max_size               = local.application_data.accounts[local.environment].dpr_rds_db.max_size
+  dpr_rds_name                   = local.application_data.accounts[local.environment].dpr_rds_db.name
+  dpr_rds_db_identifier          = local.application_data.accounts[local.environment].dpr_rds_db.db_identifier
+  dpr_rds_inst_class             = local.application_data.accounts[local.environment].dpr_rds_db.inst_class
+  dpr_rds_user                   = local.application_data.accounts[local.environment].dpr_rds_db.user
+  dpr_rds_store_type             = local.application_data.accounts[local.environment].dpr_rds_db.store_type
+  dpr_rds_parameter_group_family = local.application_data.accounts[local.environment].dpr_rds_db.parameter_group_family
+  dpr_rds_parameter_group_name   = local.application_data.accounts[local.environment].dpr_rds_db.parameter_group_name
+
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
   dpr_subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
@@ -128,7 +143,7 @@ locals {
   rds_dbuilder_store_type        = "gp2"
   rds_dbuilder_init_size         = 10
   rds_dbuilder_max_size          = 50
-  rds_dbuilder_parameter_group   = "postgres14"
+  rds_dbuilder_parameter_group   = "default.postgres14"
   rds_dbuilder_port              = 5432
   rds_dbuilder_user              = "domain_builder"
   enable_dbuilder_lambda         = local.application_data.accounts[local.environment].enable_domain_builder_lambda

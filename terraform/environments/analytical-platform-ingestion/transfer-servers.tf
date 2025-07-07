@@ -1,4 +1,3 @@
-
 resource "aws_transfer_server" "this" {
   protocols              = ["SFTP"]
   identity_provider_type = "SERVICE_MANAGED"
