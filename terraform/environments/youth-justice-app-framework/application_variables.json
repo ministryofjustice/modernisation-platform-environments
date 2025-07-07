@@ -95,7 +95,7 @@
     },
     "production": {
       "allow_s3_replication": true,
-      "domain_name": "yjbservices.yjb.gov.uk",
+      "domain_name": "production.yjbservices.yjb.gov.uk",
       "justice_domain_name": "justice.gov.uk",
       "validate_certs": true,
       "source_account": "066012302209",

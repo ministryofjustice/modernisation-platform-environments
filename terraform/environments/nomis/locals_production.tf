@@ -240,7 +240,7 @@ locals {
         })
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
-            branch = "753de472568b54954ea0cb8fe6fb8d28ecf33aa3" # 2025-01-14 nomis release
+            branch = "f8ea577571c5ea360da9f7582f0ac1c11ae1268f" # 2025-06-26 tag_release_detail fix
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -284,7 +284,7 @@ locals {
         user_data_cloud_init = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init, {
           args = merge(local.ec2_autoscaling_groups.web.user_data_cloud_init.args, {
             # Comment in instance refresh above if changing branch + want automated instance refresh
-            branch = "753de472568b54954ea0cb8fe6fb8d28ecf33aa3" # 2025-01-14 nomis release
+            branch = "f8ea577571c5ea360da9f7582f0ac1c11ae1268f" # 2025-06-26 tag_release_detail fix
           })
         })
         tags = merge(local.ec2_autoscaling_groups.web.tags, {
@@ -676,7 +676,5 @@ locals {
       "/oracle/database/DRCNMAUD" = local.secretsmanager_secrets.db
       "/oracle/database/DRMIS"    = local.secretsmanager_secrets.db_mis
     }
-
-    security_groups = local.security_groups_old
   }
 }

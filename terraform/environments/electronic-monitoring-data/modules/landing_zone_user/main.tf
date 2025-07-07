@@ -32,18 +32,24 @@ resource "aws_transfer_user" "this" {
   )
 }
 
+#------------------------------------------------------------------------------
+# AWS transfer user IAM role
+#-------------------------------------------------------------------------------
+
 resource "aws_iam_role" "this_transfer_user" {
   name               = "${var.supplier}-${var.user_name}-transfer-user-iam-role"
   assume_role_policy = data.aws_iam_policy_document.transfer_assume_role.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
-  ]
 }
 
 resource "aws_iam_role_policy" "this_transfer_user" {
   name   = "${var.user_name}-transfer-user-iam-policy"
   role   = aws_iam_role.this_transfer_user.id
   policy = data.aws_iam_policy_document.this_transfer_user.json
+}
+
+resource "aws_iam_role_policy_attachment" "this_transfer_user" {
+  role       = aws_iam_role.this_transfer_user.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
 }
 
 data "aws_iam_policy_document" "this_transfer_user" {

@@ -31,7 +31,7 @@ locals {
         aws_network_flow_monitoring_agent = "v1.0.2-eksbuild.5"
         eks_pod_identity_agent            = "v1.3.7-eksbuild.2"
         eks_node_monitoring_agent         = "v1.3.0-eksbuild.2"
-        vpc_cni                           = "v1.19.5-eksbuild.3"
+        vpc_cni                           = "v1.19.6-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -80,7 +80,7 @@ locals {
         aws_network_flow_monitoring_agent = "v1.0.2-eksbuild.5"
         eks_pod_identity_agent            = "v1.3.7-eksbuild.2"
         eks_node_monitoring_agent         = "v1.3.0-eksbuild.2"
-        vpc_cni                           = "v1.19.5-eksbuild.3"
+        vpc_cni                           = "v1.19.6-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
@@ -129,7 +129,7 @@ locals {
         aws_network_flow_monitoring_agent = "v1.0.2-eksbuild.5"
         eks_pod_identity_agent            = "v1.3.7-eksbuild.2"
         eks_node_monitoring_agent         = "v1.3.0-eksbuild.2"
-        vpc_cni                           = "v1.19.5-eksbuild.3"
+        vpc_cni                           = "v1.19.6-eksbuild.1"
       }
 
       /* Data Engineering Airflow */
