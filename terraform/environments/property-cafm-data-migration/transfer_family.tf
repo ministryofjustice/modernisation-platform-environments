@@ -1,3 +1,14 @@
+terraform {
+  required_providers {
+    aws = {
+      version = "~> 5.0, != 5.86.0"
+      source  = "hashicorp/aws"
+    }
+
+  }
+  required_version = "~> 1.10"
+}
+
 # Create an IAM role for the SFTP server
 resource "aws_iam_role" "sftp_role" {
   name = "sftp-server-role"
