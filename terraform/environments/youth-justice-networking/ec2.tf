@@ -3,10 +3,9 @@ resource "aws_security_group" "external_sg" {
   #checkov:skip=CKV_AWS_24: "vSRX instances are configured as network firewalls with DDOS protection mitigating the risk of open SG rules"
   #checkov:skip=CKV_AWS_25:
   #checkov:skip=CKV_AWS_260:
-  #checkov:skip=CKV_AWS_277: 
-  #checkov:skip=382:
-  #trivy:ignore:avd-aws-0107:
-
+  #checkov:skip=CKV_AWS_277:
+  #checkov:skip=CKV_AWS_382:
+  #trivy:ignore:AVD-AWS-0107:
   name        = "YJBJuniperEXT-SG"
   description = "External Interface Juniper Security Group"
   vpc_id      = module.vpc.vpc_id
