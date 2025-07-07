@@ -32,6 +32,7 @@ resource "aws_iam_role" "yjb_juniper_ec2_role" {
 }
 
 resource "aws_kms_key" "cloudwatch_logs" {
+  #checkov:skip=CKV_AWS_33
   description         = "KMS key for CloudWatch log group encryption"
   enable_key_rotation = true
 

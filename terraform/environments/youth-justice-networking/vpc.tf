@@ -178,6 +178,7 @@ resource "aws_route_table_association" "juniper_management_route_table_associati
 
 # Create Elastic IPs
 resource "aws_eip" "eips" {
+  #checkov:skip=CKV2_AWS_19: "EIP attachment is handled through separate resource"
   count = 6
   tags = {
     Name = [
