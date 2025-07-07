@@ -1,5 +1,6 @@
 #### This file can be used to store locals specific to the member account ####
 
+# Global Locals
 
 locals {
 
@@ -7,10 +8,7 @@ locals {
 
   build_s3  = local.application_data.accounts[local.environment].build_s3
   build_ftp = local.application_data.accounts[local.environment].build_ftp
-
-  bucket_names = [
-    "ftp-${local.application_name}-${local.environment}-outbouond",
-    "ftp-${local.application_name}-${local.environment}-inbound",
-  ]
+  build_ses = local.application_data.accounts[local.environment].build_ses
+  build_ec2 = local.application_data.accounts[local.environment].build_ec2
 
 }

@@ -349,7 +349,8 @@ resource "aws_instance" "juniper_kms" {
   vpc_security_group_ids = [aws_security_group.internal_sg.id]
 
   tags = merge(local.tags, {
-    Name = "Juniper Key Management Server"
+    Name          = "Juniper Key Management Server"
+    "Patch Group" = "Windows"
   })
 }
 
@@ -370,7 +371,8 @@ resource "aws_instance" "juniper_syslog" {
   }
 
   tags = merge(local.tags, {
-    Name = "Juniper Syslog Server"
+    Name          = "Juniper Syslog Server"
+    "Patch Group" = "Linux2"
   })
 }
 
@@ -393,7 +395,8 @@ resource "aws_instance" "juniper_management" {
   }
 
   tags = merge(local.tags, {
-    Name = "Juniper Management Server"
+    Name          = "Juniper Management Server"
+    "Patch Group" = "Windows"
   })
 }
 

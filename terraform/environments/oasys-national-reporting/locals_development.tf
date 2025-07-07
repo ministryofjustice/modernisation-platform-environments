@@ -11,69 +11,6 @@ locals {
   # please keep resources in alphabetical order
   baseline_development = {
 
-    ec2_autoscaling_groups = {
-      dev-web-asg = merge(local.ec2_autoscaling_groups.boe_web, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.boe_web.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.boe_web.config, {
-        })
-        instance = merge(local.ec2_autoscaling_groups.boe_web.instance, {
-          instance_type = "t3.large"
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.boe_web.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.boe_web.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        cloudwatch_metric_alarms = null
-      })
-
-      dev-boe-asg = merge(local.ec2_autoscaling_groups.boe_app, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.boe_app.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.boe_app.config, {
-        })
-        instance = merge(local.ec2_autoscaling_groups.boe_app.instance, {
-          instance_type = "t2.large"
-        })
-        user_data_cloud_init = merge(local.ec2_autoscaling_groups.boe_app.user_data_cloud_init, {
-          args = merge(local.ec2_autoscaling_groups.boe_app.user_data_cloud_init.args, {
-            branch = "main"
-          })
-        })
-        cloudwatch_metric_alarms = null
-      })
-
-      dev-onr-bods-1 = merge(local.ec2_autoscaling_groups.bods, {
-        autoscaling_group = merge(local.ec2_autoscaling_groups.bods.autoscaling_group, {
-          desired_capacity = 0
-        })
-        config = merge(local.ec2_autoscaling_groups.bods.config, {
-          instance_profile_policies = concat(local.ec2_autoscaling_groups.bods.config.instance_profile_policies, [
-            "Ec2SecretPolicy",
-          ])
-          user_data_raw = base64encode(templatefile(
-            "./templates/user-data-onr-bods-pwsh.yaml.tftpl", {
-              branch = "TM/combine-bods-installers"
-          }))
-        })
-        instance = merge(local.ec2_autoscaling_groups.bods.instance, {
-          instance_type = "t3.large"
-        })
-        tags = merge(local.ec2_autoscaling_groups.bods.tags, {
-          oasys-national-reporting-environment = "dev"
-          domain-name                          = "azure.noms.root"
-          server-type                          = "Bods"
-        })
-        cloudwatch_metric_alarms = null
-      })
-    }
-
-    ec2_instances = {
-    }
-
     iam_policies = {
       Ec2SecretPolicy = {
         description = "Permissions required for secret value access by instances"

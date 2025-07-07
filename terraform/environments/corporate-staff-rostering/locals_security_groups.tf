@@ -1,70 +1,25 @@
 locals {
   security_group_cidrs_devtest = {
-    core = module.ip_addresses.azure_fixngo_cidrs.devtest_core
-    ssh  = module.ip_addresses.azure_fixngo_cidrs.devtest
     enduserclient = [
       "10.0.0.0/8"
     ]
-    rdp = {
-      inbound = ["10.40.165.0/26", "10.112.3.0/26", "10.102.0.0/16"]
-    }
-    rdgateway = [module.ip_addresses.mp_cidr.development_test]
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-      module.ip_addresses.azure_fixngo_cidrs.devtest_core,
-    ])
-    domain_controllers = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest_domain_controllers,
-      module.ip_addresses.mp_cidrs.ad_fixngo_azure_domain_controllers,
-    ])
-    jumpservers = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest_jumpservers,
-      # module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
   }
 
   security_group_cidrs_preprod_prod = {
-    core = module.ip_addresses.azure_fixngo_cidrs.prod_core
-    ssh = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
-      # AllowProdStudioHostingSshInBound from 10.244.0.0/22 not included
-      module.ip_addresses.azure_fixngo_cidrs.prod_core,
-      module.ip_addresses.azure_fixngo_cidrs.prod, # NOTE: may need removing at some point
-    ])
     enduserclient = [
       "10.0.0.0/8"
     ]
-    rdp = {
-      inbound = flatten([
-        module.ip_addresses.azure_fixngo_cidrs.prod,
-      ])
-    }
-    rdgateway = [module.ip_addresses.mp_cidr.preproduction_production]
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.moj_cidr.aws_analytical_platform_aggregate,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-      module.ip_addresses.azure_fixngo_cidrs.prod_core,
-    ])
-    domain_controllers = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod_domain_controllers,
-      # module.ip_addresses.mp_cidrs.ad_fixngo_hmpp_domain_controllers, # hits rule limit, remove azure DCs first
-    ])
-    jumpservers = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod_jumpservers,
-      # module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
   }
   security_group_cidrs_by_environment = {
@@ -126,10 +81,16 @@ locals {
         }
       }
     }
-
     web = {
       description = "New security group for web-servers"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         http_web = {
           description     = "80: http allow ingress"
           from_port       = 80
@@ -199,30 +160,16 @@ locals {
         }
       }
     }
-
     app = {
       description = "New security group for application servers"
       ingress = {
-        all-from-web = {
-          description     = "Allow all ingress from web"
+        all-from-self = {
+          description     = "Allow all ingress to self"
           from_port       = 0
           to_port         = 0
           protocol        = -1
+          self            = true
           security_groups = ["web"]
-        }
-        rpc_tcp_app2 = {
-          description     = "135: TCP MS-RPC allow ingress from app and db servers"
-          from_port       = 135
-          to_port         = 135
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
-        }
-        smb_tcp_app = {
-          description     = "445: TCP SMB allow ingress from app and db servers"
-          from_port       = 445
-          to_port         = 445
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
         }
         http_2109_csr = {
           description = "2109: TCP CSR ingress"
@@ -238,209 +185,19 @@ locals {
           protocol    = "TCP"
           cidr_blocks = local.security_group_cidrs.enduserclient
         }
-        rpc_dynamic_tcp_app = {
-          description     = "49152-65535: TCP Dynamic Port range"
-          from_port       = 49152
-          to_port         = 65535
-          protocol        = "TCP"
-          security_groups = ["web", "database"]
-        }
       }
     }
-
-    domain = {
-      description = "Common Windows security group for fixngo domain(s) access from Jumpservers and Azure DCs"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        rpc_udp_domain = {
-          description = "135: UDP MS-RPC AD connect ingress from Azure DC"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-        }
-        rpc_tcp_domain = {
-          description = "135: TCP MS-RPC AD connect ingress from Azure DC"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-        }
-        netbios_tcp_domain = {
-          description = "137-139: TCP NetBIOS ingress from Azure DC"
-          from_port   = 137
-          to_port     = 139
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-        }
-        netbios_udp_domain = {
-          description = "137-139: UDP NetBIOS ingress from Azure DC"
-          from_port   = 137
-          to_port     = 139
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-        }
-        ldap_tcp_domain = {
-          description = "389: TCP Allow LDAP ingress from Azure DC"
-          from_port   = 389
-          to_port     = 389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
-        }
-        ldap_udp_domain = {
-          description = "389: UDP Allow LDAP ingress from Azure DC"
-          from_port   = 389
-          to_port     = 389
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
-        }
-
-        smb_tcp_domain = {
-          description = "445: TCP SMB ingress from Azure DC"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-        }
-        smb_udp_domain = {
-          description = "445: UDP SMB ingress from Azure DC"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-        }
-        rpc_dynamic_udp_domain = {
-          description = "49152-65535: UDP Dynamic Port range"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-        }
-        rpc_dynamic_tcp_domain = {
-          description = "49152-65535: TCP Dynamic Port range"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.domain_controllers
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
-    }
-
-    jumpserver = {
-      description = "New security group for jump-servers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        rpc_udp_jumpserver = {
-          description = "135: UDP MS-RPC AD connect ingress from Azure Jumpservers"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rpc_tcp_jumpserver = {
-          description = "135: TCP MS-RPC AD connect ingress from Azure Jumpservers"
-          from_port   = 135
-          to_port     = 135
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        netbios_tcp_jumpserver = {
-          description = "137-139: TCP NetBIOS ingress from Azure Jumpservers"
-          from_port   = 137
-          to_port     = 139
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        netbios_udp_jumpserver = {
-          description = "137-139: UDP NetBIOS ingress from Azure Jumpservers"
-          from_port   = 137
-          to_port     = 139
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        ldap_tcp_jumpserver = {
-          description = "389: TCP Allow LDAP ingress from Azure Jumpservers"
-          from_port   = 389
-          to_port     = 389
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
-        }
-        ldap_udp_jumpserver = {
-          description = "389: UDP Allow LDAP ingress from Azure Jumpservers"
-          from_port   = 389
-          to_port     = 389
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-          # NOTE: not completely clear this is needed as it's not in the existing Azure SG's
-        }
-
-        smb_tcp_jumpserver = {
-          description = "445: TCP SMB ingress from Azure Jumpservers"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        smb_udp_jumpserver = {
-          description = "445: UDP SMB ingress from Azure Jumpservers"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rpc_dynamic_udp_jumpserver = {
-          description = "49152-65535: UDP Dynamic Port rang from Azure Jumpservers"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "UDP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-        rpc_dynamic_tcp_jumpserver = {
-          description = "49152-65535: TCP Dynamic Port range from Azure Jumpservers"
-          from_port   = 49152
-          to_port     = 65535
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.jumpservers
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
-        }
-      }
-    }
-
     database = {
       description = "New security group for database servers"
       ingress = {
+        all-from-self = {
+          description     = "Allow all ingress to self"
+          from_port       = 0
+          to_port         = 0
+          protocol        = -1
+          self            = true
+          security_groups = ["web", "app"]
+        }
         oracle_1521_db = {
           description     = "Allow oracle database 1521 ingress"
           from_port       = "1521"
@@ -448,49 +205,6 @@ locals {
           protocol        = "TCP"
           cidr_blocks     = local.security_group_cidrs.oracle_db
           security_groups = ["web", "app"]
-        }
-      }
-    }
-
-    fsx_windows = {
-      description = "Security group for fsx windows"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-        netbios_fsx = {
-          description = "139: NetBIOS Session Service"
-          from_port   = 139
-          to_port     = 139
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-        }
-        smb_fsx = {
-          description = "445: Directory Services SMB file sharing"
-          from_port   = 445
-          to_port     = 445
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-        }
-        winrm_fsx = {
-          description = "5985-5986: WinRM 2.0 (Microsoft Windows Remote Management)"
-          from_port   = 5985
-          to_port     = 5986
-          protocol    = "TCP"
-          cidr_blocks = local.security_group_cidrs.enduserclient
-        }
-      }
-      egress = {
-        all = {
-          description = "Allow all traffic outbound"
-          from_port   = 0
-          to_port     = 0
-          protocol    = "-1"
-          cidr_blocks = ["0.0.0.0/0"]
         }
       }
     }

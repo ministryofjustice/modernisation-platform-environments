@@ -24,14 +24,14 @@ locals {
   }
 
   azure_fixngo_cidr = {
-    noms_live_vnet            = "10.40.0.0/18"
-    noms_mgmt_live_vnet       = "10.40.128.0/20"
-    noms_transit_live_vnet    = "10.40.160.0/20"
-    noms_test_vnet            = "10.101.0.0/16"
-    noms_mgmt_vnet            = "10.102.0.0/16"
+    noms_live_vnet         = "10.40.0.0/18"
+    noms_mgmt_live_vnet    = "10.40.128.0/20"
+    noms_transit_live_vnet = "10.40.160.0/20"
+    noms_test_vnet         = "10.101.0.0/16"
+    noms_mgmt_vnet         = "10.102.0.0/16"
 
-    noms_transit_live_fw_devtest    = "52.142.189.87/32"
-    noms_transit_live_fw_prod       = "52.142.189.118/32"
+    noms_transit_live_fw_devtest = "52.142.189.87/32"
+    noms_transit_live_fw_prod    = "52.142.189.118/32"
 
     noms_prod_domain_controller_PCMCW0011 = "10.40.128.196/32"
     noms_prod_domain_controller_PCMCW0012 = "10.40.0.133/32"
@@ -162,11 +162,6 @@ locals {
       local.azure_fixngo_cidr.noms_devtest_rdgateway_MGMRW0001,
     ]
 
-    devtest_oasys_db = [
-      local.noms_test_subnet.t1_oasys_clientaccess,
-      local.noms_test_subnet.t2_oasys_clientaccess,
-    ]
-
     devtest_tools = [
       local.noms_mgmt_subnet.nomsmgmt_tools,
     ]
@@ -192,15 +187,6 @@ locals {
 
     prod_rdgateways = [
       local.azure_fixngo_cidr.noms_prod_rdgateway_PDMRW0001,
-    ]
-
-    prod_oasys_db = [
-      local.noms_live_subnet.pd_oasys_db,
-      local.noms_live_subnet.pp_oasys_db,
-      local.noms_live_subnet.pd_oasys_app,
-      local.noms_live_subnet.pp_oasys_app,
-      local.noms_live_subnet.pd_oasys_clientaccess,
-      local.noms_live_subnet.pp_oasys_clientaccess,
     ]
 
     prod_tools = [

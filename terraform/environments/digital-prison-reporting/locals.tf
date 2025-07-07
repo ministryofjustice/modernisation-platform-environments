@@ -112,6 +112,21 @@ locals {
   enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
   enable_pagerduty_alerts = local.application_data.accounts[local.environment].enable_pagerduty_alerts
 
+  # DPR RDS Database
+  enable_dpr_rds_db              = local.application_data.accounts[local.environment].dpr_rds_db.enable
+  create_rds_replica             = local.application_data.accounts[local.environment].dpr_rds_db.create_replica
+  dpr_rds_engine                 = local.application_data.accounts[local.environment].dpr_rds_db.engine
+  dpr_rds_engine_version         = local.application_data.accounts[local.environment].dpr_rds_db.engine_version
+  dpr_rds_init_size              = local.application_data.accounts[local.environment].dpr_rds_db.init_size
+  dpr_rds_max_size               = local.application_data.accounts[local.environment].dpr_rds_db.max_size
+  dpr_rds_name                   = local.application_data.accounts[local.environment].dpr_rds_db.name
+  dpr_rds_db_identifier          = local.application_data.accounts[local.environment].dpr_rds_db.db_identifier
+  dpr_rds_inst_class             = local.application_data.accounts[local.environment].dpr_rds_db.inst_class
+  dpr_rds_user                   = local.application_data.accounts[local.environment].dpr_rds_db.user
+  dpr_rds_store_type             = local.application_data.accounts[local.environment].dpr_rds_db.store_type
+  dpr_rds_parameter_group_family = local.application_data.accounts[local.environment].dpr_rds_db.parameter_group_family
+  dpr_rds_parameter_group_name   = local.application_data.accounts[local.environment].dpr_rds_db.parameter_group_name
+
   # Domain Builder, Variables
   dpr_vpc                        = data.aws_vpc.shared.id
   dpr_subnets                    = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
@@ -124,7 +139,7 @@ locals {
   rds_dbuilder_store_type        = "gp2"
   rds_dbuilder_init_size         = 10
   rds_dbuilder_max_size          = 50
-  rds_dbuilder_parameter_group   = "postgres14"
+  rds_dbuilder_parameter_group   = "default.postgres14"
   rds_dbuilder_port              = 5432
   rds_dbuilder_user              = "domain_builder"
   enable_dbuilder_lambda         = local.application_data.accounts[local.environment].enable_domain_builder_lambda
@@ -266,14 +281,26 @@ locals {
   lambda_multiphase_query_timeout_seconds = 900
   lambda_multiphase_query_memory_size     = 1024
 
-  # Landing Zone antivirus check lambda
-  landing_zone_antivirus_check_lambda_enable                 = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_enable
-  landing_zone_antivirus_check_lambda_version                = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_version
-  landing_zone_antivirus_check_lambda_memory_size            = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_memory_size
-  landing_zone_antivirus_check_lambda_timeout                = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_timeout
-  landing_zone_antivirus_check_lambda_ephemeral_storage_size = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_ephemeral_storage_size
-  landing_zone_antivirus_check_lambda_concurrent_executions  = local.application_data.accounts[local.environment].landing_zone_antivirus_check_lambda_concurrent_executions
-  landing_zone_antivirus_check_log_retention_in_days         = local.application_data.accounts[local.environment].landing_zone_antivirus_check_log_retention_in_days
+  # Multiphase Cleanup Lambda
+  lambda_multiphase_cleanup_enabled        = local.application_data.accounts[local.environment].enable_multiphase_cleanup_lambda
+  lambda_multiphase_cleanup_name           = "${local.project}-multiphase-cleanup"
+  lambda_multiphase_cleanup_runtime        = "java21"
+  lambda_multiphase_cleanup_tracing        = "Active"
+  lambda_multiphase_cleanup_handler        = "uk.gov.justice.digital.hmpps.multiphasecleanup.MultiphaseCleanUpService::handleRequest"
+  lambda_multiphase_cleanup_code_s3_bucket = module.s3_artifacts_store.bucket_id
+  lambda_multiphase_cleanup_jar_version    = local.application_data.accounts[local.environment].multiphase_cleanup_lambda_version
+  lambda_multiphase_cleanup_code_s3_key    = "build-artifacts/hmpps-dpr-multiphase-cleanup-lambda/jars/hmpps-dpr-multiphase-cleanup-lambda-${local.lambda_multiphase_cleanup_jar_version}-all.jar"
+  lambda_multiphase_cleanup_policies = [
+    "arn:aws:iam::${local.account_id}:policy/${local.s3_read_access_policy}",
+    "arn:aws:iam::${local.account_id}:policy/${local.kms_read_access_policy}",
+    aws_iam_policy.redshift_dataapi_cross_policy.arn
+  ]
+  lambda_multiphase_cleanup_secret_arn          = module.datamart.credential_secret_arn
+  lambda_multiphase_cleanup_cluster_id          = module.datamart.cluster_id
+  lambda_multiphase_cleanup_database_name       = module.datamart.cluster_database_name
+  lambda_multiphase_cleanup_timeout_seconds     = 900
+  lambda_multiphase_cleanup_memory_size         = 1024
+  lambda_multiphase_cleanup_schedule_expression = "rate(1 day)"
 
   # s3 transfer
   scheduled_s3_file_transfer_retention_period_amount = local.application_data.accounts[local.environment].scheduled_s3_file_transfer_retention_period_amount

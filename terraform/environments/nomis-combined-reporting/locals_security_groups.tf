@@ -4,9 +4,9 @@ locals {
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
-    enduserclient_internal = flatten([
-      "10.0.0.0/8",
-    ])
+    enduserclient_internal = [
+      "10.0.0.0/8"
+    ]
     enduserclient_public1 = flatten([
       module.ip_addresses.moj_cidrs.trusted_moj_digital_staff_public,
     ])
@@ -17,10 +17,6 @@ locals {
     oracle_db = flatten([
       module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.devtest,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
     cms_ingress = flatten([
@@ -49,10 +45,6 @@ locals {
       module.ip_addresses.moj_cidr.aws_cloud_platform_vpc,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
     ])
-    oracle_oem_agent = flatten([
-      module.ip_addresses.azure_fixngo_cidrs.prod,
-      module.ip_addresses.mp_cidr[module.environment.vpc_name],
-    ])
     cms_ingress = flatten([
       module.ip_addresses.azure_fixngo_cidrs.prod,
       module.ip_addresses.mp_cidr[module.environment.vpc_name],
@@ -60,7 +52,6 @@ locals {
   }
 
   security_group_cidrs_by_environment = {
-    development   = local.security_group_cidrs_devtest
     test          = local.security_group_cidrs_devtest
     preproduction = local.security_group_cidrs_preprod_prod
     production    = local.security_group_cidrs_preprod_prod
@@ -181,6 +172,27 @@ locals {
         }
       }
     }
+    efs = {
+      description = "Security group for EFS"
+      ingress = {
+        nfs = {
+          description     = "Allow http7010 ingress"
+          from_port       = 2049
+          to_port         = 2049
+          protocol        = "tcp"
+          security_groups = ["bip", "web"]
+        }
+      }
+      egress = {
+        all = {
+          description     = "Allow all egress to bip and web"
+          from_port       = 0
+          to_port         = 0
+          protocol        = "-1"
+          security_groups = ["bip", "web"]
+        }
+      }
+    }
     web = {
       description = "Security group for tomcat web servers"
       ingress = {
@@ -228,27 +240,12 @@ locals {
           protocol        = -1
           security_groups = ["web"]
         }
-        host-agent = {
-          description     = "Allow http1128 ingress"
-          from_port       = 1128
-          to_port         = 1128
-          protocol        = "tcp"
-          security_groups = ["web"]
-        }
-        subversion = {
-          description     = "Allow http3690 ingress"
-          from_port       = 3690
-          to_port         = 3690
-          protocol        = "tcp"
-          security_groups = ["web"]
-        }
         cms-ingress = {
-          description     = "Allow http6400-http6500 ingress"
-          from_port       = 6400
-          to_port         = 6500
-          protocol        = "tcp"
-          security_groups = ["web"]
-          cidr_blocks     = local.security_group_cidrs.cms_ingress
+          description = "Allow http6400-http6500 ingress"
+          from_port   = 6400
+          to_port     = 6500
+          protocol    = "tcp"
+          cidr_blocks = local.security_group_cidrs.cms_ingress
         }
       }
     }
@@ -266,25 +263,6 @@ locals {
     }
     private-jumpserver = {
       description = "Security group for jumpservers"
-      ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
-      }
-      egress = {
-        all = {
-          description     = "Allow all egress"
-          from_port       = 0
-          to_port         = 0
-          protocol        = "-1"
-          cidr_blocks     = ["0.0.0.0/0"]
-          security_groups = []
-        }
-      }
     }
   }
 }

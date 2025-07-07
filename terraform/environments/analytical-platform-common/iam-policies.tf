@@ -156,6 +156,16 @@ data "aws_iam_policy_document" "analytical_platform_github_actions" {
       "arn:aws:eks:eu-west-2:${local.environment_management.account_ids["analytical-platform-compute-production"]}:cluster/*"
     ]
   }
+  statement {
+    sid    = "AllowDynamodb"
+    effect = "Allow"
+    actions = [
+      "dynamodb:DescribeTable",
+      "dynamodb:GetItem",
+      "dynamodb:ListTables"
+    ]
+    resources = [module.analytical_platform_airflow_auto_approval_dynamodb_table.dynamodb_table_arn]
+  }
 }
 
 module "analytical_platform_github_actions_iam_policy" {
@@ -179,7 +189,14 @@ data "aws_iam_policy_document" "data_engineering_datalake_access_github_actions"
     actions = ["sts:AssumeRole"]
     resources = [
       module.data_engineering_datalake_access_terraform_iam_role.iam_role_arn,
-      "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/data-engineering-datalake-access"
+      "arn:aws:iam::${local.environment_management.account_ids["analytical-platform-data-production"]}:role/data-engineering-datalake-access",
+      "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-test"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-preproduction"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["electronic-monitoring-data-production"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-development"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-test"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-preproduction"]}:role/analytical-platform-data-production-share-role",
+      "arn:aws:iam::${local.environment_management.account_ids["digital-prison-reporting-production"]}:role/analytical-platform-data-production-share-role",
     ]
   }
 }

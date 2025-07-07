@@ -832,6 +832,8 @@ locals {
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets.db_oasys
     }
+
+    security_groups = local.security_groups_old
   }
 
 }

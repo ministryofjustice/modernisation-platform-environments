@@ -1,8 +1,9 @@
 locals {
   internal_listeners = {
     internal_listener = {
-      port     = 8080
-      protocol = "HTTP"
+      port                                 = 8080
+      protocol                             = "HTTP"
+      routing_http_response_server_enabled = true
       forward = {
         target_group_key = "ui-target-group-1"
       }
