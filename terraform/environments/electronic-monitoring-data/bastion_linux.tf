@@ -69,7 +69,7 @@ resource "aws_vpc_security_group_ingress_rule" "rds_via_vpc_access" {
   ip_protocol                  = "tcp"
   from_port                    = 1433
   to_port                      = 1433
-  referenced_security_group_id =  module.rds_bastion[0].bastion_security_group
+  referenced_security_group_id = module.rds_bastion[0].bastion_security_group
 }
 
 data "aws_iam_policy_document" "ec2_s3_policy" {

@@ -1,4 +1,4 @@
- # FTP Lambda
+# FTP Lambda
 
 # Locals
 
@@ -22,37 +22,37 @@ locals {
   }
 
 
-# This local is used to create the lambdas.
+  # This local is used to create the lambdas.
 
   ftp_job_definitions = [
     {
       job_name = "xerox_outbound"
-      bucket = try(module.s3_bucket.outbound.bucket.bucket, "")
+      bucket   = try(module.s3_bucket.outbound.bucket.bucket, "")
     }
   ]
 
   ftp_jobs = [
     for job in local.ftp_job_definitions : {
-      job_name        = job.job_name
-      bucket_name     = job.bucket
-      bucket_folder   = "export/home/ccmtdb/central_print/rep_orders/"
-      ftp_protocol    = "SFTP"
-      ftp_type        = "SFTP_UPLOAD"
-      require_ssl     = "NO"
-      insecure        = "YES"
-      file_types      = "zip"
-      ca_cert         = ""
-      cert            = ""
-      key             = ""
-      key_type        = ""
-      ssh_key         = ""
-      file_remove     = "YES"
-      ftp_cron        = ""
-      sns_topic_arn   = ""
+      job_name      = job.job_name
+      bucket_name   = job.bucket
+      bucket_folder = "export/home/ccmtdb/central_print/rep_orders/"
+      ftp_protocol  = "SFTP"
+      ftp_type      = "SFTP_UPLOAD"
+      require_ssl   = "NO"
+      insecure      = "YES"
+      file_types    = "zip"
+      ca_cert       = ""
+      cert          = ""
+      key           = ""
+      key_type      = ""
+      ssh_key       = ""
+      file_remove   = "YES"
+      ftp_cron      = ""
+      sns_topic_arn = ""
     }
   ]
 
-# Global FTP Locals
+  # Global FTP Locals
 
   ftp_layer_bucket          = "modernisation-platform-laa-shared20250605080758955300000001"
   ftp_layer_folder_location = "laa-ftp/"
@@ -65,7 +65,7 @@ locals {
 
 resource "aws_iam_role" "ftp_lambda_role" {
   count = local.build_ftp ? 1 : 0
-  name = "rFTPLambdaRole"
+  name  = "rFTPLambdaRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -87,7 +87,7 @@ resource "aws_iam_role" "ftp_lambda_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "basic_execution" {
-  count = local.build_ftp ? 1 : 0
+  count      = local.build_ftp ? 1 : 0
   role       = aws_iam_role.ftp_lambda_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
@@ -109,8 +109,8 @@ resource "aws_iam_role_policy" "shared_bucket_access" {
         Resource = "arn:aws:s3:::${local.ftp_layer_bucket}/laa-ftp/*"
       },
       {
-        Effect = "Allow",
-        Action = "s3:ListBucket",
+        Effect   = "Allow",
+        Action   = "s3:ListBucket",
         Resource = "arn:aws:s3:::${local.ftp_layer_bucket}"
       }
     ]
@@ -158,8 +158,8 @@ resource "aws_iam_role_policy" "secretsmanager_access" {
 
 resource "aws_iam_role_policy" "vpc_eni_access" {
   count = local.build_ftp ? 1 : 0
-  name = "VPCEniPolicy"
-  role = aws_iam_role.ftp_lambda_role[0].id
+  name  = "VPCEniPolicy"
+  role  = aws_iam_role.ftp_lambda_role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -183,25 +183,25 @@ resource "aws_iam_role_policy" "s3_access" {
   role  = aws_iam_role.ftp_lambda_role[0].id
 
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = [
-            "s3:DeleteObject",
-            "s3:DeleteObjectVersion",
-            "s3:GetObject",
-            "s3:GetObjectVersion",
-            "s3:GetBucketPolicy",
-            "s3:ListBucket",
-            "s3:PutObject"
+        Effect = "Allow",
+        Action = [
+          "s3:DeleteObject",
+          "s3:DeleteObjectVersion",
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:GetBucketPolicy",
+          "s3:ListBucket",
+          "s3:PutObject"
         ],
         Resource = flatten([
-            for bucket in module.s3_bucket : [
-                bucket.bucket.arn,
-                "${bucket.bucket.arn}/*"
-            ]
-        ])  
+          for bucket in module.s3_bucket : [
+            bucket.bucket.arn,
+            "${bucket.bucket.arn}/*"
+          ]
+        ])
       }
     ]
   })
@@ -209,8 +209,8 @@ resource "aws_iam_role_policy" "s3_access" {
 
 resource "aws_iam_role_policy" "secrets_manager_access" {
   count = local.build_ftp ? 1 : 0
-  name = "SecretsManagerAccess"
-  role = aws_iam_role.ftp_lambda_role[0].id
+  name  = "SecretsManagerAccess"
+  role  = aws_iam_role.ftp_lambda_role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -230,11 +230,11 @@ resource "aws_iam_role_policy" "secrets_manager_access" {
 # Lambda Layer. Pulls the layer compiled libs from the shared s3.
 
 resource "aws_lambda_layer_version" "ftpclientlibs" {
-  count = local.build_ftp ? 1 : 0
+  count               = local.build_ftp ? 1 : 0
   layer_name          = "ftpclientlibs"
   description         = "FtpClient Dependencies"
   compatible_runtimes = ["python3.9"]
-  s3_bucket           = "${local.application_data.accounts[local.environment].ftp_layer_bucket}"
+  s3_bucket           = local.application_data.accounts[local.environment].ftp_layer_bucket
   s3_key              = "${local.application_data.accounts[local.environment].ftp_layer_folder_location}/ftpclient-python-requirements.zip"
 }
 
@@ -260,8 +260,8 @@ resource "aws_lambda_function" "ftp" {
 
   vpc_config {
     subnet_ids = [
-      data.aws_subnet.private_subnets_a.id, 
-      data.aws_subnet.private_subnets_b.id, 
+      data.aws_subnet.private_subnets_a.id,
+      data.aws_subnet.private_subnets_b.id,
       data.aws_subnet.private_subnets_c.id
     ]
     security_group_ids = [aws_security_group.lambda[each.key].id]
@@ -271,27 +271,27 @@ resource "aws_lambda_function" "ftp" {
 
   environment {
     variables = {
-      HOST            = local.endpoint_details["${each.key}.remote-host"]
-      PORT            = local.endpoint_details["${each.key}.remote-port"]
-      PROTOCOL        = each.value.ftp_protocol
-      FILETYPES       = each.value.file_types
-      TRANSFERTYPE    = each.value.ftp_type
-      LOCALPATH       = each.value.bucket_folder
-      REMOTEPATH      = local.endpoint_details["${each.key}.remote-folder"]
-      REQUIRE_SSL     = each.value.require_ssl
-      INSECURE        = each.value.insecure
-      CA_CERT         = each.value.ca_cert
-      CERT            = each.value.cert
-      KEY             = each.value.key
-      KEY_TYPE        = each.value.key_type
-      USER            = local.endpoint_details["${each.key}.username"]
-      PASSWORD        = local.endpoint_details["${each.key}.password"]
-      SSH_KEY         = each.value.ssh_key
-      S3BUCKET        = each.value.bucket_name
-      FILEREMOVE      = each.value.file_remove
-      FILE_TYPES      = each.value.file_types
-      FTP_CRON        = each.value.ftp_cron
-      SNS_TOPIC_ARN   = each.value.sns_topic_arn
+      HOST          = local.endpoint_details["${each.key}.remote-host"]
+      PORT          = local.endpoint_details["${each.key}.remote-port"]
+      PROTOCOL      = each.value.ftp_protocol
+      FILETYPES     = each.value.file_types
+      TRANSFERTYPE  = each.value.ftp_type
+      LOCALPATH     = each.value.bucket_folder
+      REMOTEPATH    = local.endpoint_details["${each.key}.remote-folder"]
+      REQUIRE_SSL   = each.value.require_ssl
+      INSECURE      = each.value.insecure
+      CA_CERT       = each.value.ca_cert
+      CERT          = each.value.cert
+      KEY           = each.value.key
+      KEY_TYPE      = each.value.key_type
+      USER          = local.endpoint_details["${each.key}.username"]
+      PASSWORD      = local.endpoint_details["${each.key}.password"]
+      SSH_KEY       = each.value.ssh_key
+      S3BUCKET      = each.value.bucket_name
+      FILEREMOVE    = each.value.file_remove
+      FILE_TYPES    = each.value.file_types
+      FTP_CRON      = each.value.ftp_cron
+      SNS_TOPIC_ARN = each.value.sns_topic_arn
     }
   }
 

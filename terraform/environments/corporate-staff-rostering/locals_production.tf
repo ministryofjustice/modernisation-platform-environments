@@ -317,7 +317,7 @@ locals {
           "/dev/sdd"  = { type = "gp3", size = 112 }
         }
         instance = merge(local.ec2_instances.web.instance, {
-          instance_type          = "m5.4xlarge"
+          instance_type = "m5.4xlarge"
         })
         tags = merge(local.ec2_instances.web.tags, {
           ami           = "pd-csr-w-2-b"

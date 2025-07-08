@@ -190,7 +190,7 @@
         "enable": true,
         "create_replica": true,
         "engine": "postgres",
-        "engine_version": "16.8",
+        "engine_version": "17.5",
         "init_size": "158",
         "max_size": "1000",
         "name": "testdatabase",
@@ -198,8 +198,8 @@
         "inst_class": "db.t4g.large",
         "user": "postgres",
         "store_type": "gp3",
-        "parameter_group_family": "postgres16",
-        "parameter_group_name": "with-pglogical"
+        "parameter_group_family": "postgres17",
+        "parameter_group_name": "pg17-with-pglogical"
       }
     },
     "test": {

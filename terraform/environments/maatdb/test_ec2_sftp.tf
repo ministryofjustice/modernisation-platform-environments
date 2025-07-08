@@ -108,7 +108,7 @@ resource "aws_instance" "sftp_server" {
     }
   )
 
- # This prevents the ec2 from being redeployed & so wiping any configurations.
+  # This prevents the ec2 from being redeployed & so wiping any configurations.
   lifecycle {
     ignore_changes = all
   }

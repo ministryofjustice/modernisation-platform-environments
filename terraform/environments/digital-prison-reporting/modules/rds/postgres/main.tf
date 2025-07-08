@@ -74,6 +74,7 @@ resource "aws_db_instance" "default" {
   monitoring_interval     = var.monitoring_interval
   deletion_protection     = var.deletion_protection
 
+  allow_major_version_upgrade           = var.allow_major_version_upgrade
   auto_minor_version_upgrade            = var.auto_minor_version_upgrade
   performance_insights_enabled          = var.performance_insights_enabled
   performance_insights_kms_key_id       = var.performance_insights_kms_key_id
@@ -113,6 +114,7 @@ resource "aws_db_instance" "replica" {
   monitoring_interval     = aws_db_instance.default[0].monitoring_interval
   deletion_protection     = aws_db_instance.default[0].deletion_protection
 
+  allow_major_version_upgrade           = aws_db_instance.default[0].allow_major_version_upgrade
   auto_minor_version_upgrade            = aws_db_instance.default[0].auto_minor_version_upgrade
   performance_insights_enabled          = aws_db_instance.default[0].performance_insights_enabled
   performance_insights_kms_key_id       = aws_db_instance.default[0].performance_insights_kms_key_id

@@ -85,6 +85,8 @@ module "dpr_rds_db" {
   ca_cert_identifier = "rds-ca-rsa2048-g1" # Expiry on June 16, 2026
   license_model      = "postgresql-license"
 
+  allow_major_version_upgrade = true
+
   parameter_group = module.dpr_rds_parameter_group[0].parameter_group_name
 
   tags = merge(

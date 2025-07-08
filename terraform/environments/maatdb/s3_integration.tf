@@ -64,8 +64,8 @@ module "s3_bucket" {
 
 resource "aws_s3_bucket_policy" "ftp_user_and_lambda_access" {
   for_each = local.build_s3 ? module.s3_bucket : {}
-  bucket = each.value.bucket.bucket
-  policy = data.aws_iam_policy_document.bucket_policy[each.key].json
+  bucket   = each.value.bucket.bucket
+  policy   = data.aws_iam_policy_document.bucket_policy[each.key].json
 }
 
 data "aws_iam_policy_document" "bucket_policy" {
@@ -203,8 +203,8 @@ resource "aws_secretsmanager_secret" "ftp_access_key_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "ftp_access_key_secret_version" {
-  count = local.build_s3 ? 1 : 0
-  secret_id  = aws_secretsmanager_secret.ftp_access_key_secret[0].id
+  count     = local.build_s3 ? 1 : 0
+  secret_id = aws_secretsmanager_secret.ftp_access_key_secret[0].id
   secret_string = jsonencode({
     IAM_ACCESS_KEY_ID     = aws_iam_access_key.ftp_user_key[0].id
     IAM_SECRET_ACCESS_KEY = aws_iam_access_key.ftp_user_key[0].secret

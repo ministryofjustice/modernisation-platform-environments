@@ -46,9 +46,9 @@ locals {
 }
 
 locals {
-  environment_management = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
-  core_logging_account_id = local.environment_management.account_ids["core-logging-production"]
-  core_logging_cw_destination_arn = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination:waf-logs-destination"
+  environment_management               = jsondecode(data.aws_secretsmanager_secret_version.environment_management.secret_string)
+  core_logging_account_id              = local.environment_management.account_ids["core-logging-production"]
+  core_logging_cw_destination_arn      = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination:waf-logs-destination"
   core_logging_cw_destination_resource = "arn:aws:logs:eu-west-2:${local.core_logging_account_id}:destination/waf-logs-destination"
 }
 
@@ -73,7 +73,7 @@ resource "aws_kms_alias" "waf_logs" {
 resource "aws_kms_key_policy" "waf_logs" {
   count  = var.enable_logging ? 1 : 0
   key_id = aws_kms_key.waf_logs[0].id
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -254,6 +254,6 @@ resource "aws_cloudwatch_log_subscription_filter" "waf_to_core_logging" {
 }
 
 output "core_logging_cw_destination_arn" {
-  value = local.core_logging_cw_destination_arn
-   sensitive = true
+  value     = local.core_logging_cw_destination_arn
+  sensitive = true
 }
