@@ -15,7 +15,7 @@ resource "aws_kms_key_policy" "sns_kms_policy" {
     Version = "2012-10-17",
     Statement = [
       {
-        Sid = "AllowSNSUsage",
+        Sid    = "AllowSNSUsage",
         Effect = "Allow",
         Principal = {
           Service = "sns.amazonaws.com"
@@ -27,12 +27,12 @@ resource "aws_kms_key_policy" "sns_kms_policy" {
         Resource = "*"
       },
       {
-        Sid = "AllowAccountAdmin",
+        Sid    = "AllowAccountAdmin",
         Effect = "Allow",
         Principal = {
           AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
         },
-        Action = "kms:*",
+        Action   = "kms:*",
         Resource = "*"
       }
     ]
