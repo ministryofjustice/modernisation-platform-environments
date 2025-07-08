@@ -60,10 +60,6 @@ data "aws_iam_policy_document" "sftp_access" {
   statement {
     sid    = "AllowSftpFromWhitelistedIps"
     effect = "Allow"
-    principals {
-      type        = "AWS"
-      identifiers = ["*"] # Or specific ARNs if you want to restrict to a service principal
-    }
     actions = [
       "s3:PutObject",
       "s3:GetObject",
@@ -72,7 +68,7 @@ data "aws_iam_policy_document" "sftp_access" {
       "s3:GetBucketLocation",
       "transfer:Describe*",
       "transfer:List*",
-      "transfer:SendWorkflowStepState",
+      "transfer:SendWorkflowStepState"
     ]
     resources = ["*"]
     condition {
@@ -83,7 +79,7 @@ data "aws_iam_policy_document" "sftp_access" {
   }
 }
 
-resource "aws_iam_policy" "sftp_policy" {
+resource "aws_iam_policy" "sftp_access_policy" {
   name   = "sftp-access-policy"
   policy = data.aws_iam_policy_document.sftp_access.json
 }
