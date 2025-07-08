@@ -42,6 +42,9 @@ chmod 600 $EC2_USER_HOME_FOLDER/.ssh/config
 #--TEMP CLONE A SINGLE BRANCH WHERE SECRETS HAVE BEEN CHANGED! - AW
 su ec2-user bash -c "git clone --single-branch --branch feat-laa-ccms-soa-mp ssh://git@ssh.github.com:443/ministryofjustice/laa-ccms-app-soa.git $EFS_MOUNT_POINT/laa-ccms-app-soa || git -C $EFS_MOUNT_POINT/laa-ccms-app-soa pull"
 
+#--Populate custom monitoring files
+su ec2-user bash -c "cp $EFS_MOUNT_POINT/laa-ccms-app-soa/monitoring/* $EFS_MOUNT_POINT/"
+
 #--Install s3fs and pre-reqs
 yum install fuse -y
 yum install fuse-libs -y

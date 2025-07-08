@@ -6,11 +6,11 @@ _If you have any questions surrounding this page please post in the `#laa-appops
 
 ### **Last review date:**
 
-02/07/2025 - Andy Welsh. Service Redeployment
+08/07/2025 - Andy Welsh. Service Redeployment
 
 ### **Description:**
 
-CCMS-SOA (Service Orinted Architecture) acts as the service bus for CCMS. The application runs in an AWS ECS Cluster using manually configured, ECS-Optimised, EC2 Instances as it's underlying compute. These instances are provisioned via an Auto Scaling Group and deployed using a Launch Template and associated User Data boot script.
+CCMS-SOA (Service Oriented Architecture) acts as the service bus for CCMS. The application runs in an AWS ECS Cluster using manually configured, ECS-Optimised, EC2 Instances as it's underlying compute. These instances are provisioned via an Auto Scaling Group and deployed using a Launch Template and associated User Data boot script.
 
 SOA operates in a client-server arrangement with a single _Admin Server_ on it's own EC2 instance, running a single container and a variable number of _Enterprise Management Servers_, often referred to as simply _Managed Servers_. These managed servers may run across a variable amount of individual EC2 instances and a variable amount of containers, spread across these instances.
 
@@ -68,7 +68,22 @@ Modernisation Platform
 
 ### **Automatic alerts:**
 
-**TBC**
+Alerting will be sent to the following slack channels:
+
+- `#laa-alerts-ccms-soa-nonprod`
+- `#laa-alerts-ccms-soa-prod`
+
+Depending on environment. Alerts are based on Cloudwatch Metric filters, and are relayed on as Cloudwatch Alarms being tripped, relayed via SNS to Amazon Q (Chatbot).
+
+Alerts include infrastructure level monitoring for compute overconsumption as well as application level issues such unavailable endpoints. Rather than attempt to list all metric filters and alarms in this document (as they will evolve over time), see the configurations in code [here](./logs.tf) for metric filters and [here](./alerting.tf) for alarms.
+
+**NOTE ON MONITORING COMPOSITE ENDPOINTS**
+
+Composite endpoints are individually monitored by SOA by an internal process and the outcomes of their checks relayed on to the same Cloudwatch alerting mechanism described above.
+
+A list of custom endpoints (which includes all composites that need to be managed) is defined in a file named `paths_to_check.txt` at the root of the shared EFS volume for each environment. This file is stored in the `laa-ccms-soa-app` and is loaded on to the EFS filesystem as part of the EC2 boot script for each instance.
+
+If a composite is taken offline, this will result in errors being fired, to remove an endpoint from constant monitoring, simply remove it from the `paths_to_check.txt` file. These changes take effect in real time and do not require a restart of any services, containers or underlying hosts.
 
 ### **Impact of an outage:**
 
