@@ -599,9 +599,9 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Benefit_Checker_Rollback_Error_Admin
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
 
-/* resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_Error_Managed" {
+resource "aws_cloudwatch_metric_alarm" "SOA_Custom_Checks_Error_Managed" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-managed-custom-checks-errors"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, please investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | There have been multiple custom check script errors on the SOA managed servers in the last 5 minutes, this likely means please that a composite endpoint is unreachable. Investigate, runbook - https://dsdmoj.atlassian.net/wiki/spaces/CCMS/pages/1408598133/Monitoring+and+Alerts"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = aws_cloudwatch_log_metric_filter.soa_custom_checks_error_managed.id
   statistic           = "Sum"
@@ -614,4 +614,3 @@ resource "aws_cloudwatch_metric_alarm" "SOA_Benefit_Checker_Rollback_Error_Admin
   alarm_actions       = [aws_sns_topic.alerts.arn]
   ok_actions          = [aws_sns_topic.alerts.arn]
 }
- */
