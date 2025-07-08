@@ -251,8 +251,6 @@ resource "aws_athena_data_catalog" "ndmis_catalog" {
 
 # Adds an Athena data source / catalog for dps_locations
 resource "aws_athena_data_catalog" "dps_locations_catalog" {
-  count = local.is_non_prod ? 1 : 0
-
   name        = "dps_locations"
   description = "dps_locations Athena data catalog"
   type        = "LAMBDA"
