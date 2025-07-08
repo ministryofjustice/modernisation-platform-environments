@@ -814,7 +814,6 @@ resource "aws_iam_policy" "lake_formation_tag_management" {
 # LakeFormation service linked role
 resource "aws_iam_service_linked_role" "lakeformation" {
   aws_service_name = "lakeformation.amazonaws.com"
-  custom_suffix    = "AWSServiceRoleForLakeFormationDataAccess"
 }
 
 # Analytical Platform Share Policy & Role
