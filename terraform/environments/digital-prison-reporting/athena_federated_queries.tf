@@ -29,10 +29,10 @@ locals {
   ndmis_service_name      = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["db_name"] : ""
   connection_string_ndmis = local.is_non_prod ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndmis[0].name}}@//${local.ndmis_host}:${local.ndmis_port}/${local.ndmis_service_name}" : ""
 
-  dps_locations_host              = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.dps["dps-locations"].secret_string)["endpoint"] : ""
-  dps_locations_port              = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.dps["dps-locations"].secret_string)["port"] : ""
-  dps_locations_service_name      = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.dps["dps-locations"].secret_string)["db_name"] : ""
-  connection_string_dps_locations = local.is_non_prod ? "postgres://jdbc:postgresql://${local.dps_locations_host}:${local.dps_locations_port}/${local.dps_locations_service_name}?$${${aws_secretsmanager_secret.dps["dps-locations"].name}}" : ""
+  dps_locations_host              = jsondecode(data.aws_secretsmanager_secret_version.dps["dps-locations"].secret_string)["endpoint"]
+  dps_locations_port              = jsondecode(data.aws_secretsmanager_secret_version.dps["dps-locations"].secret_string)["port"]
+  dps_locations_service_name      = jsondecode(data.aws_secretsmanager_secret_version.dps["dps-locations"].secret_string)["db_name"]
+  connection_string_dps_locations = "postgres://jdbc:postgresql://${local.dps_locations_host}:${local.dps_locations_port}/${local.dps_locations_service_name}?$${${aws_secretsmanager_secret.dps["dps-locations"].name}}"
 
   # OASys, ONR and nDelius are currently only included in Dev and Test
   # ndmis is only included in Dev, Test and PreProduction
