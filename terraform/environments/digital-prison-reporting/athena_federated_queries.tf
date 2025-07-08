@@ -45,7 +45,7 @@ locals {
     ndmis   = local.connection_string_ndmis
   }
 
-  dev_and_test_federated_query_connections_postgresql = {
+  federated_query_connections_postgresql = {
     dps_locations = local.connection_string_dps_locations
   }
 
@@ -69,9 +69,9 @@ locals {
     aws_secretsmanager_secret.ndmis[0].arn
   ] : []
 
-  dev_and_test_federated_query_credentials_secret_arns_postgresql = local.is_dev_or_test ? [
+  federated_query_credentials_secret_arns_postgresql = [
     aws_secretsmanager_secret.dps["dps-locations"].arn
-  ] : []
+  ]
 
   preproduction_federated_query_credentials_secret_arns_oracle = local.is-preproduction ? [
     aws_secretsmanager_secret.nomis.arn,
@@ -91,9 +91,9 @@ locals {
   federated_query_credentials_secret_arns_oracle = (local.is_dev_or_test ? local.dev_and_test_federated_query_credentials_secret_arns_oracle :
   (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns_oracle : local.production_federated_query_credentials_secret_arns_oracle))
 
-  federated_query_connection_strings_map_postgresql = (local.is_dev_or_test ? local.dev_and_test_federated_query_connections_postgresql : {})
+  federated_query_connection_strings_map_postgresql = local.federated_query_connections_postgresql
 
-  federated_query_credentials_secret_arns_postgresql = (local.is_dev_or_test ? local.dev_and_test_federated_query_credentials_secret_arns_postgresql : [])
+  federated_query_credentials_secret_arns_postgresql = local.federated_query_credentials_secret_arns_postgresql
 
 }
 
@@ -166,6 +166,9 @@ module "athena_federated_query_connector_postgresql" {
   # A map that links catalog names to database connection strings
   connection_strings = local.federated_query_connection_strings_map_postgresql
 }
+
+# ORACLE ATHENA DATA CATALOGS
+# ---------------------------
 
 # Adds an Athena data source / catalog for NOMIS
 resource "aws_athena_data_catalog" "nomis_catalog" {
@@ -241,6 +244,10 @@ resource "aws_athena_data_catalog" "ndmis_catalog" {
     "function" = module.athena_federated_query_connector_oracle.lambda_function_arn
   }
 }
+
+
+# POSTGRESQL ATHENA DATA CATALOGS
+# --------------------------------
 
 # Adds an Athena data source / catalog for dps_locations
 resource "aws_athena_data_catalog" "dps_locations_catalog" {
