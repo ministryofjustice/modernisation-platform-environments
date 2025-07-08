@@ -15,12 +15,15 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
 
   # Ensure permissions are null to avoid LF being
   create_database_default_permissions {
+    # These settings should replicate current behaviour: LakeFormation is Ignored
     permissions = []
-    principal   = "arn:aws:iam::771283872747:role/NullRole"
+    principal   = "IAM_ALLOWED_PRINCIPALS"
   }
+
   create_table_default_permissions {
+    # These settings should replicate current behaviour: LakeFormation is Ignored
     permissions = []
-    principal   = "arn:aws:iam::771283872747:role/NullRole"
+    principal   = "IAM_ALLOWED_PRINCIPALS"
   }
 
   parameters = {
