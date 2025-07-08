@@ -1,5 +1,5 @@
 module "transfer_server_security_group" {
-  source  = "terraform-aws-modules/security-group/aws"
+  source  = "terraform-aws-modules/security-group/aws.git?ref=badbab67cd0d7f976523fd44647e1ee9fb87001b" # commit hash of version 5.3.0
   version = "5.3.0"
 
   name        = "transfer-server"
