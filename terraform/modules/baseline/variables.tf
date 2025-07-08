@@ -1071,6 +1071,26 @@ variable "sns_topics" {
   default = {}
 }
 
+variable "sqs_queues" {
+  description = "map of sqs queues where map key is the name of the queue"
+  type = map(object({
+    policy = list(object({
+      sid     = optional(string, null)
+      effect  = string
+      actions = list(string)
+      principals = optional(object({
+        type        = string
+        identifiers = list(string)
+      }))
+      conditions = optional(list(object({
+        test     = string
+        variable = string
+        values   = list(string)
+      })), [])
+    }))
+  }))
+}
+
 variable "ssm_associations" {
   description = "A map of ssm associations to create where map key is the association name"
   type = map(object({

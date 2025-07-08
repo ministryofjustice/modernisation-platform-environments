@@ -110,7 +110,7 @@ module "lb" {
 
   for_each = var.lbs
 
-  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=f6fe0d9c4fcc20561864cff292c6ef2d3a0f80b3"
+  source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-loadbalancer.git?ref=3dd3ea0d2b52f2e278c5dcc5a6c5b613e63a4cb8"
 
   providers = {
     aws.bucket-replication = aws
@@ -129,10 +129,15 @@ module "lb" {
   enable_cross_zone_load_balancing = each.value.enable_cross_zone_load_balancing
   dns_record_client_routing_policy = each.value.dns_record_client_routing_policy
   s3_versioning                    = each.value.s3_versioning
-  s3_notification_queues           = each.value.s3_notification_queues
   access_logs_lifecycle_rule       = each.value.access_logs_lifecycle_rule
 
   existing_bucket_name = try(module.s3_bucket[each.value.existing_bucket_name].bucket.id, each.value.existing_bucket_name)
+
+  s3_notification_queues = {
+    for k, v in each.value.s3_notification_queues : k => merge(v, {
+      queue_arn = try(aws_sqs_queue.this[v.queue_arn].arn, v.queue_arn),
+    })
+  }
 
   security_groups = [
     for sg in each.value.security_groups : lookup(aws_security_group.this, sg, null) != null ? aws_security_group.this[sg].id : sg
