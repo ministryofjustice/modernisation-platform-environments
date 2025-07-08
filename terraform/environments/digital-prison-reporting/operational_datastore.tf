@@ -58,7 +58,7 @@ module "operational_db_parameter_group" {
   tags = merge(
     local.operational_db_tags,
     {
-      Resource_Type  = "RDS Parameter Group"
+      Resource_Type = "RDS Parameter Group"
     }
   )
 }
@@ -134,8 +134,8 @@ module "aurora_operational_db" {
   apply_immediately   = true
   skip_final_snapshot = true
 
-  create_db_subnet_group                 = true
-  subnets                                = local.dpr_subnets
+  create_db_subnet_group = true
+  subnets                = local.dpr_subnets
 
   db_parameter_group_name         = local.create_db_parameter_group ? module.operational_db_parameter_group.parameter_group_id : local.db_parameter_group_name
   db_cluster_parameter_group_name = local.create_db_cluster_parameter_group ? module.operational_db_cluster_parameter_group.db_cluster_parameter_group_id : local.db_cluster_parameter_group_name

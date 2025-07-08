@@ -31,6 +31,16 @@ data "aws_iam_policy_document" "node4_s3_read_write_policy" {
       "${aws_s3_bucket.ospt_transfer.arn}/*"
     ]
   }
+  statement {
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+
+    resources = [
+      aws_secretsmanager_secret.s3_user_secret.arn
+    ]
+  }
 }
 
 # Policies
