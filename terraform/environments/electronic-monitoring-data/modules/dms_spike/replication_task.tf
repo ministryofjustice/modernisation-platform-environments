@@ -1,6 +1,6 @@
 resource "aws_dms_replication_task" "dms_spike_replication_task" {
   replication_task_id      = "${var.dms_instance_id}-task"
-  migration_type           = "full-load"
+  migration_type           = "full-load-cdc"
   replication_instance_arn = aws_dms_replication_instance.dms_spike_instance.replication_instance_arn
   source_endpoint_arn      = aws_dms_endpoint.dms_spike_source_endpoint.endpoint_arn
   target_endpoint_arn      = aws_dms_s3_endpoint.dms_spike_target_endpoint.endpoint_arn
