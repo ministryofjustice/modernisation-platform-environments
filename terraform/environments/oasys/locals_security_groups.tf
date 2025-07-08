@@ -219,6 +219,13 @@ locals {
       ingress = merge(
         module.baseline_presets.security_groups["ec2-linux"].ingress,
         {
+          all-from-self = {
+            description = "Allow all ingress to self"
+            from_port   = 0
+            to_port     = 0
+            protocol    = -1
+            self        = true
+          }
           http8080 = {
             description     = "Allow http8080 ingress"
             from_port       = 0
@@ -235,6 +242,13 @@ locals {
     data = {
       description = "Security group for data subnet"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         icmp = {
           description = "Allow icmp ingress"
           from_port   = -1
@@ -270,6 +284,13 @@ locals {
     bip = {
       description = "Security group for bip"
       ingress = {
+        all-from-self = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         http7001 = {
           description     = "Allow http7001 ingress"
           from_port       = 7001
