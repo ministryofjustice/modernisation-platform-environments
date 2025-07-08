@@ -69,7 +69,7 @@ locals {
     aws_secretsmanager_secret.ndmis[0].arn
   ] : []
 
-  federated_query_credentials_secret_arns_postgresql = [
+  federated_query_credentials_secret_arns_postgresql_list = [
     aws_secretsmanager_secret.dps["dps-locations"].arn
   ]
 
@@ -93,7 +93,7 @@ locals {
 
   federated_query_connection_strings_map_postgresql = local.federated_query_connections_postgresql
 
-  federated_query_credentials_secret_arns_postgresql = local.federated_query_credentials_secret_arns_postgresql
+  federated_query_credentials_secret_arns_postgresql = local.federated_query_credentials_secret_arns_postgresql_list
 
 }
 
@@ -151,7 +151,7 @@ module "athena_federated_query_connector_postgresql" {
   connector_jar_bucket_key              = "third-party/athena-postgresql/athena-postgresql-2025.23.1.jar"
   connector_jar_bucket_name             = module.s3_artifacts_store.bucket_id
   spill_bucket_name                     = module.s3_working_bucket.bucket_id
-  credentials_secret_arns               = local.federated_query_credentials_secret_arns_postgresql
+  credentials_secret_arns               = local.federated_query_credentials_secret_arns_postgresql_list
   project_prefix                        = local.project
   account_id                            = local.account_id
   region                                = local.account_region
