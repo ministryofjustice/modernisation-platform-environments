@@ -5,44 +5,18 @@ resource "aws_dms_replication_task" "dms_spike_replication_task" {
   source_endpoint_arn      = aws_dms_endpoint.dms_spike_source_endpoint.endpoint_arn
   target_endpoint_arn      = aws_dms_s3_endpoint.dms_spike_target_endpoint.endpoint_arn
   table_mappings           = var.table_mappings
-
+ 
   replication_task_settings = jsonencode(
     {
       Logging = {
-        "EnableLogging" : true,
-        "LogComponents" : [
-          {
-            "Id" : "SOURCE_CAPTURE",
-            "Severity" : "LOGGER_SEVERITY_DEFAULT"
-          },
-          {
-            "Id" : "SOURCE_UNLOAD",
-            "Severity" : "LOGGER_SEVERITY_DEFAULT"
-          },
-          {
-            "Id" : "TARGET_APPLY",
-            "Severity" : "LOGGER_SEVERITY_DEFAULT"
-          },
-          {
-            "Id" : "TARGET_LOAD",
-            "Severity" : "LOGGER_SEVERITY_DEFAULT"
-          },
-          {
-            "Id" : "TRANSFORMATION",
-            "Severity" : "LOGGER_SEVERITY_DEBUG"
-          },
-          {
-            "Id" : "VALIDATOR",
-            "Severity" : "LOGGER_SEVERITY_DEFAULT"
-          }
-        ],
+        "EnableLogging" = true,
       }
-      "ValidationSettings" : {
-        "EnableValidation" : true,
-        "ValidationMode" : "table-level",
-        "ThreadCount" : 2,
-        "TableFailureMaxCount" : 5,
-        "RecordFailureDelayLimitInMinutes" : 5,
+      "ValidationSettings" = {
+        "EnableValidation" = true,
+        "ValidationMode" = "table-level",
+        "ThreadCount" = 2,
+        "TableFailureMaxCount" = 5,
+        "RecordFailureDelayLimitInMinutes" = 5,
       }
     }
   )
