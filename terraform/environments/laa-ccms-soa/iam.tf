@@ -204,3 +204,63 @@ resource "aws_iam_role_policy_attachment" "attach_s3_policy" {
   role       = aws_iam_role.ec2_instance_role.name
   policy_arn = aws_iam_policy.soa_s3_policy.arn
 }
+
+#--Alerting
+data "aws_iam_policy_document" "alerting_sns" {
+  version = "2012-10-17"
+  statement {
+    sid    = "EventsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.alerts.arn,
+    ]
+    principals {
+      type = "Service"
+      identifiers = [
+        "events.amazonaws.com",
+      ]
+    }
+  }
+  statement {
+    sid    = "AlarmsAllowPublishSnsTopic"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.alerts.arn,
+    ]
+    principals {
+      type = "AWS"
+      identifiers = [
+        "*",
+      ]
+    }
+    condition {
+      test     = "ArnLike"
+      variable = "AWS:SourceArn"
+      values = [
+        "arn:aws:cloudwatch:eu-west-2:${local.aws_account_id}:alarm:*"
+      ]
+    }
+  }
+  statement {
+    sid    = "AllowPublishSnsTopicRoot"
+    effect = "Allow"
+    actions = [
+      "sns:Publish",
+    ]
+    resources = [
+      aws_sns_topic.alerts.arn,
+    ]
+    principals {
+      type = "AWS"
+      identifiers = [
+        "arn:aws:iam::${local.aws_account_id}:root",
+      ]
+    }
+  }
+}

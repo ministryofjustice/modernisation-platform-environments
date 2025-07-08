@@ -74,3 +74,13 @@ variable "lambda_reserved_concurrent_executions" {
   type        = number
   description = "Amount of reserved concurrent executions for the Connector lambda function. A value of 0 disables the lambda from being triggered and -1 removes any concurrency limitations"
 }
+
+variable "lambda_handler" {
+  type        = string
+  description = "The handler which will handle the Lambda invocation."
+}
+
+variable "athena_connector_type" {
+  type        = string
+  description = "The Athena connector type. Example values: oracle, postgresql "
+}

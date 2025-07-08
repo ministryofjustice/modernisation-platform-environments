@@ -55,6 +55,12 @@ resource "aws_db_instance" "soa_db" {
   db_subnet_group_name    = aws_db_subnet_group.soa.id
   option_group_name       = aws_db_option_group.soa_oracle_19.id
 
+  enabled_cloudwatch_logs_exports = [
+    "alert",
+    "audit",
+    "listener"
+  ]
+
   timeouts {
     create = "40m"
     delete = "40m"
