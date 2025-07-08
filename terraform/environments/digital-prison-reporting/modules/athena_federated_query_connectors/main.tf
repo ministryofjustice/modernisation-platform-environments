@@ -4,11 +4,14 @@ locals {
   default_connection = { "default" = values(var.connection_strings)[0] }
   # Transform connection_strings to the format required by the connector environment properties and add a default
   connection_strings = merge({ for k, v in var.connection_strings : "${k}_connection_string" => v }, local.default_connection)
+  is_oracle          = var.athena_connector_type == "oracle"
+  is_postgresql      = var.athena_connector_type == "postgresql"
 }
 
-resource "aws_security_group" "athena_federated_query_lambda_sg" {
+resource "aws_security_group" "athena_federated_query_lambda_sg_oracle" {
   #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
-  name_prefix = "${var.project_prefix}-athena-federated-query-lambda-security-group"
+  count        = local.is_oracle ? 1 : 0
+  name_prefix = "${var.project_prefix}-athena-federated-query-lambda-security-group-oracle"
   description = "Athena Federated Query Oracle Lambda Security Group"
   vpc_id      = var.vpc_id
 
@@ -41,15 +44,44 @@ resource "aws_security_group" "athena_federated_query_lambda_sg" {
   }
 }
 
-resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
+resource "aws_security_group" "athena_federated_query_lambda_sg_postgresql" {
+  #checkov:skip=CKV_AWS_272: "Ensure AWS Lambda function is configured to validate code-signing"
+  count        = local.is_postgresql ? 1 : 0
+  name_prefix = "${var.project_prefix}-athena-federated-query-lambda-security-group-postgresql"
+  description = "Athena Federated Query PostgreSQL Lambda Security Group"
+  vpc_id      = var.vpc_id
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  egress {
+    description = "Allow connections to Postgresql"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+
+  egress {
+    description = "Allow connections to Secrets Manager"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "TCP"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_lambda_function" "athena_federated_query_lambda" {
   #checkov:skip=CKV_AWS_173: "Check encryption settings for Lambda environmental variable"
   #checkov:skip=CKV_AWS_116: "Ensure that AWS Lambda function is configured for a Dead Letter Queue(DLQ)"
   #checkov:skip=CKV_AWS_272:TODO Will be addressed as part of https://dsdmoj.atlassian.net/browse/DPR2-1083
 
 
-  function_name                  = "${var.project_prefix}-athena-federated-query-oracle-function"
+  function_name                  = "${var.project_prefix}-athena-federated-query-${var.athena_connector_type}-function"
   role                           = aws_iam_role.athena_federated_query_lambda_execution_role.arn
-  handler                        = "com.amazonaws.athena.connectors.oracle.OracleMuxCompositeHandler"
+  handler                        = var.lambda_handler
   runtime                        = "java11"
   memory_size                    = var.lambda_memory_allocation_mb
   timeout                        = var.lambda_timeout_seconds
@@ -62,8 +94,10 @@ resource "aws_lambda_function" "athena_federated_query_oracle_lambda" {
   }
 
   vpc_config {
-    security_group_ids = [
-      aws_security_group.athena_federated_query_lambda_sg.id
+    security_group_ids = local.is_oracle ? [
+      aws_security_group.athena_federated_query_lambda_sg_oracle[0].id
+    ] : [
+      aws_security_group.athena_federated_query_lambda_sg_postgresql[0].id
     ]
 
     subnet_ids = [
