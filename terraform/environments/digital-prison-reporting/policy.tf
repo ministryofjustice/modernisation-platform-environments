@@ -813,6 +813,7 @@ resource "aws_iam_policy" "lake_formation_tag_management" {
 
 # LakeFormation service linked role
 resource "aws_iam_service_linked_role" "lakeformation" {
+  count            = local.is-test ? 1 : 0
   aws_service_name = "lakeformation.amazonaws.com"
 }
 
