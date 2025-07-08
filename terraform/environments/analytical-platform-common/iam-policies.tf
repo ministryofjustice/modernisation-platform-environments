@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "ecr_access" {
     condition {
       test     = "StringEquals"
       variable = "aws:RequestedRegion"
-      values   = [data.aws_region.current.name]
+      values   = [data.aws_region.current.region]
     }
     condition {
       test     = "StringEquals"
@@ -24,13 +24,13 @@ data "aws_iam_policy_document" "ecr_access" {
       "ecr:GetRepositoryPolicy",
       "ecr:SetRepositoryPolicy"
     ]
-    resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
+    resources = ["arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
   statement {
     sid       = "DenyECRRepositoryPermissions"
     effect    = "Deny"
     actions   = ["ecr:DeleteRepository"]
-    resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
+    resources = ["arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
   statement {
     sid    = "AllowECRImagePermissions"
@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "ecr_access" {
       "ecr:PutImage",
       "ecr:UploadLayerPart"
     ]
-    resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
+    resources = ["arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
   statement {
     sid    = "DenyECRImagePermissions"
@@ -54,7 +54,7 @@ data "aws_iam_policy_document" "ecr_access" {
       "ecr:BatchDeleteImage",
       "ecr:DeleteImage",
     ]
-    resources = ["arn:aws:ecr:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:repository/*"]
+    resources = ["arn:aws:ecr:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:repository/*"]
   }
   statement {
     sid    = "AllowECRKMSKeyPermissions"
