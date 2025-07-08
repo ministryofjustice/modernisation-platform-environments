@@ -13,7 +13,7 @@ resource "aws_dms_replication_task" "dms_spike_replication_task" {
       },
       ValidationSettings = {
         EnableValidation = true,
-        ValidationMode = "ROW_LEVEL",
+        ValidationMode = "GROUP_LEVEL",
         ThreadCount = 2,
         TableFailureMaxCount = 5,
         RecordFailureDelayLimitInMinutes = 5,
