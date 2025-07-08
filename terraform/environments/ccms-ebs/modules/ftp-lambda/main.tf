@@ -1,10 +1,10 @@
 
-locals {
-  lambda_src_dir = "${path.module}/lambda/ftp-client"
-  lambda_zip     = "${path.module}/lambda/ftp-client/ftp-client.zip"
-  layer_src_dir = "${path.module}/lambda/lambda-layer"
-  layer_output_dir = "${path.module}/lambda/output"
-}
+# locals {
+#   lambda_src_dir = "${path.module}/lambda/ftp-client"
+#   lambda_zip     = "${path.module}/lambda/ftp-client/ftp-client.zip"
+#   # layer_src_dir = "${path.module}/lambda/lambda-layer"
+#   # layer_output_dir = "${path.module}/lambda/output"
+# }
 
 ## sg for ftp
 resource "aws_security_group" "ftp_sg" {
@@ -80,27 +80,29 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
 }
 
 # Create ZIP archive of lambda_code/
-data "archive_file" "lambda_zip" {
-  type        = "zip"
-  source_dir  = local.lambda_src_dir
-  output_path = local.lambda_zip
-}
+# data "archive_file" "lambda_zip" {
+#   type        = "zip"
+#   source_dir  = local.lambda_src_dir
+#   output_path = local.lambda_zip
+# }
 
 
-# Create ZIP archive of lambda layer/
-data "archive_file" "lambda_layer" {
-  type        = "zip"
-  source_dir  = local.layer_src_dir   # folder containing 'python/' directory
-  output_path = "${local.layer_output_dir}/lambda-layer.zip"
-}
+# # Create ZIP archive of lambda layer/
+# data "archive_file" "lambda_layer" {
+#   type        = "zip"
+#   source_dir  = local.layer_src_dir   # folder containing 'python/' directory
+#   output_path = "${local.layer_output_dir}/lambda-layer.zip"
+# }
 
 
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name               = "ftpclientlayer"
   compatible_runtimes      = ["python3.13"]
-  filename    = data.archive_file.lambda_layer.output_path
-  source_code_hash = data.archive_file.lambda_layer.output_base64sha256
+  # filename    = data.archive_file.lambda_layer.output_path
+  # source_code_hash = data.archive_file.lambda_layer.output_base64sha256
+  s3_bucket                = var.s3_bucket_ftp
+  s3_key                   = var.s3_object_ftp_clientlibs
   compatible_architectures = ["x86_64"]
   description              = "Lambda Layer for ccms ebs ftp lambda contains pycurl and other dependencies"
 }
@@ -113,8 +115,10 @@ resource "aws_lambda_function" "ftp_lambda" {
   timeout       = 900
   memory_size   = 256
   layers    = [aws_lambda_layer_version.ftp_layer.arn]
-  filename      = data.archive_file.lambda_zip.output_path
-  source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  # filename      = data.archive_file.lambda_zip.output_path
+  # source_code_hash = data.archive_file.lambda_zip.output_base64sha256
+  s3_bucket = var.s3_bucket_ftp
+  s3_key    = var.s3_object_ftp_client
 
   vpc_config {
     subnet_ids         = var.subnet_ids
