@@ -14,8 +14,8 @@ resource "aws_lakeformation_data_lake_settings" "lake_formation" {
   )
 
   # Ensure permissions are null to avoid LF being
-  create_database_default_permissions = {} # explicitly remove permissions
-  create_table_default_permissions    = {} # explicitly remove permissions
+  create_database_default_permissions {} # explicitly remove permissions
+  create_table_default_permissions {}    # explicitly remove permissions
 
   parameters = {
     "CROSS_ACCOUNT_VERSION" = "4"
