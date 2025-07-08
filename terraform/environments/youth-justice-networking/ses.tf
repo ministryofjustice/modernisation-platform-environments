@@ -21,7 +21,7 @@ resource "aws_iam_policy" "ses_smtp_send_policy" {
       {
         Effect   = "Allow"
         Action   = "ses:SendRawEmail"
-        Resource = aws_ses_domain_identity.yjb.arn
+        Resource = "arn:aws:ses:eu-west-2:${data.aws_caller_identity.current.account_id}:identity/*"
       }
     ]
   })

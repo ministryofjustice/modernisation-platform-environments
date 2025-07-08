@@ -17,9 +17,9 @@ variable "db_name" {
 }
 
 variable "engine" {
-  type = string
+  type        = string
   description = "RDS Engine"
-  default = "postgres"
+  default     = "postgres"
 }
 
 variable "engine_version" {
@@ -114,6 +114,12 @@ variable "deletion_protection" {
   type        = bool
   description = "Ensure deletion protection"
   default     = false
+}
+
+variable "allow_major_version_upgrade" {
+  type        = bool
+  description = "Allow major version upgrade"
+  default     = true
 }
 
 variable "auto_minor_version_upgrade" {

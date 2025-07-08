@@ -666,7 +666,8 @@ data "aws_iam_policy_document" "athena_api" {
       "lambda:InvokeFunction"
     ]
     resources = [
-      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function"
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function"
     ]
   }
 
@@ -808,6 +809,12 @@ resource "aws_iam_policy" "lake_formation_tag_management" {
   name        = "${local.project}-lake-formation-tag-management"
   description = "Lake Formation Tag Management Policy"
   policy      = data.aws_iam_policy_document.lake_formation_tag_management.json
+}
+
+# LakeFormation service linked role
+resource "aws_iam_service_linked_role" "lakeformation" {
+  count            = local.is-test ? 1 : 0
+  aws_service_name = "lakeformation.amazonaws.com"
 }
 
 # Analytical Platform Share Policy & Role
