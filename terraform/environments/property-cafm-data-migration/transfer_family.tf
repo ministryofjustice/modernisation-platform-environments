@@ -77,9 +77,7 @@ data "aws_iam_policy_document" "sftp_access" {
     resources = ["*"]
     condition {
       test     = "IpAddress"
-      values   = ["192.168.0.58/32",
-                  "94.195.119.194/32",
-                  "100.64.11.172/32"] # ✅ Only allow specific IPs
+      values   = ["94.195.119.194/32"] # ✅ Only allow specific IPs
       variable = "aws:SourceIP"
     }
   }
