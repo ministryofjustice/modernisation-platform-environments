@@ -666,7 +666,8 @@ data "aws_iam_policy_document" "athena_api" {
       "lambda:InvokeFunction"
     ]
     resources = [
-      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function"
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-oracle-function",
+      "arn:aws:lambda:${local.account_region}:${local.account_id}:function:dpr-athena-federated-query-postgresql-function"
     ]
   }
 
