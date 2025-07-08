@@ -6,7 +6,7 @@
       "rule-id": "1",
       "rule-name": "lcm_spike",
       "rule-action": "include",
-      "object_locator": {
+      "object-locator": {
         "schema-name": "dbo",
         "table-name": "ConversationLog"
       }
