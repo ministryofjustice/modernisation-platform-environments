@@ -11,10 +11,9 @@ locals {
       security_groups          = ["private-lb"]
 
       s3_notification_queues = {
-        "private-lb-access-logs-cortex-xsiam" = {
+        "cortex-xsiam-s3-log-collection" = {
           events    = ["s3:ObjectCreated:*"]
-          queue_arn = "private-lb-access-logs-cortex-xsiam"
-
+          queue_arn = "cortex-xsiam-s3-log-collection"
         }
       }
 
