@@ -12,35 +12,55 @@ resource "aws_dms_replication_task" "dms_spike_replication_task" {
         EnableLogging = true,
         EnableLogContext = true,
         LogComponents  = [
-            {
-                "Id": "VALIDATOR",
-                "Severity": "LOGGER_SEVERITY_DEFAULT"
-            },
-            {
-                "Id": "VALIDATOR_TARGET",
-                "Severity": "LOGGER_SEVERITY_DEFAULT"
-            },
-            # {
-            #     "Id": "SOURCE_UNLOAD",
-            #     "Severity": "LOGGER_SEVERITY_DEFAULT"
-            # },
-            # {
-            #     "Id": "SOURCE_CAPTURE",
-            #     "Severity": "LOGGER_SEVERITY_DEFAULT"
-            # },
-            # {
-            #     "Id": "TARGET_LOAD",
-            #     "Severity": "LOGGER_SEVERITY_DEFAULT"
-            # },
-            # {
-            #     "Id": "TARGET_APPLY",
-            #     "Severity": "LOGGER_SEVERITY_DEFAULT"
-            # },
-            # {
-            #     "Id": "TASK_MANAGER",
-            #     "Severity": "LOGGER_SEVERITY_DEFAULT"
-            # }
-        ]
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "TRANSFORMATION"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "SOURCE_UNLOAD"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "IO"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "TARGET_LOAD"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "PERFORMANCE"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "SOURCE_CAPTURE"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "SORTER"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "REST_SERVER"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "VALIDATOR_EXT"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "TARGET_APPLY"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "TASK_MANAGER"
+        },
+        {
+            Severity =  "LOGGER_SEVERITY_DEFAULT",
+            Id =  "TABLES_MANAGER"
+        },
+    ],
 
       },
       ValidationSettings = {

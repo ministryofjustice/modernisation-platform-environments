@@ -80,7 +80,8 @@ resource "aws_iam_policy" "dms_spike_s3_write_policy" {
             "s3:DeleteObject",
             "s3:ListBucketMultipartUploads",
             "s3:AbortMultipartUpload",
-            "s3:ListMultipartUploadParts"
+            "s3:ListMultipartUploadParts",
+            "s3:GetObjectVersion"
           ],
           "Effect" : "Allow",
           "Resource" : [

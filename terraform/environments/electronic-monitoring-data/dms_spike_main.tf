@@ -1,5 +1,5 @@
 locals {
-  target_bucket = "emds-${local.environment_shorthand}-data-20240917144025201600000001"
+  target_bucket = "emds-${local.environment_shorthand}-dms-rds-to-parquet-20240917144026892300000002"
 }
 
 
