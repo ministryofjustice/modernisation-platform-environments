@@ -657,6 +657,24 @@ variable "lbs" {
     enable_cross_zone_load_balancing = optional(bool, false)                     # network and gateway lb types only, application lb's this is always true
     dns_record_client_routing_policy = optional(string, "any_availability_zone") # network load-balancer types only
     s3_versioning                    = optional(bool, true)
+    s3_notification_sqs_queues = optional(map(object({
+      events        = list(string)      # e.g. ["s3:ObjectCreated:*"]
+      filter_prefix = optional(string)  # e.g. "images/"
+      filter_suffix = optional(string)  # e.g. ".gz"
+      policy_statements = list(object({ # add policy statements to the SQS policy, e.g. granting receive access
+        effect  = string
+        actions = list(string)
+        principals = optional(object({
+          type        = string
+          identifiers = list(string)
+        }))
+        conditions = optional(list(object({
+          test     = string
+          variable = string
+          values   = list(string)
+        })), [])
+      }))
+    })), {})
     instance_target_groups = optional(map(object({
       port                 = optional(number)
       protocol             = optional(string)
@@ -1131,6 +1149,7 @@ variable "ssm_parameters" {
         length  = number
         special = optional(bool)
       }))
+      uuid                 = optional(bool, false)
       value                = optional(string)
       value_s3_bucket_name = optional(string) # lookup from module.s3_bucket
     }))
