@@ -1,5 +1,7 @@
 module "transfer_server_security_group" {
-  source  = "terraform-aws-modules/security-group/aws.git?ref=badbab67cd0d7f976523fd44647e1ee9fb87001b" # commit hash of version 5.3.0
+  #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
+
+  source  = "terraform-aws-modules/security-group/aws"
   version = "5.3.0"
 
   name        = "transfer-server"
