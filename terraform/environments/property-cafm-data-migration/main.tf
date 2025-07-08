@@ -3,7 +3,7 @@ module "rds_export" {
 
   # Replace the kms_key_arn, name, vpc_id and (database_subnet_ids in a list)
   kms_key_arn = aws_kms_key.sns_kms.arn
-  name =local.application_name
+  name = "cafm"
   vpc_id = module.vpc.vpc_id
   database_subnet_ids = module.vpc.private_subnets
 
