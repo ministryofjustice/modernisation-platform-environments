@@ -105,6 +105,7 @@ resource "aws_iam_policy" "sftp_user_policies" {
         Sid: "AllowFullAccessToOwnFolder",
         Effect: "Allow",
         Action: [
+          "s3:ListBucket",
           "s3:GetObject",
           "s3:PutObject",
           "s3:DeleteObject",
@@ -136,6 +137,7 @@ resource "aws_transfer_user" "sftp_users" {
   server_id      = aws_transfer_server.sftp_server.id
   user_name      = each.key
   role           = aws_iam_role.sftp_user_roles[each.key].arn
+
   home_directory = "/uploads/${each.key}"
   home_directory_type = "LOGICAL"
 
