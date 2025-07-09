@@ -103,6 +103,23 @@ resource "aws_s3_object" "user_folders" {
   content  = ""
 }
 
+resource "aws_iam_role" "sftp_user_roles" {
+  for_each = var.sftp_users
+
+  name = "sftp-role-${each.key}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Effect = "Allow",
+      Principal = {
+        Service = "transfer.amazonaws.com"
+      },
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
 resource "aws_iam_policy" "sftp_user_policies" {
   for_each = var.sftp_users
 
