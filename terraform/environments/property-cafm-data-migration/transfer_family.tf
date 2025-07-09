@@ -85,30 +85,38 @@ resource "aws_iam_policy" "sftp_user_policies" {
   name = "sftp-policy-${each.key}"
 
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version = "2012-10-17",
     Statement = [
-      {
-        Sid    = "ListUserPrefix",
+        {
+        Sid = "ListUserPrefix",
         Effect = "Allow",
         Action = ["s3:ListBucket"],
         Resource = "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}",
         Condition = {
-          StringLike = {
+            StringLike = {
             "s3:prefix": [
-              "uploads/${each.key}",
-              "uploads/${each.key}/*"
+                "uploads/${each.key}",
+                "uploads/${each.key}/*"
             ]
-          }
+            }
         }
-      },
-      {
-        Sid    = "UserFolderAccess",
+        },
+        {
+        Sid = "FullObjectAccessForUserFolder",
         Effect = "Allow",
-        Action = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+        Action = [
+            "s3:GetObject",
+            "s3:PutObject",
+            "s3:DeleteObject",
+            "s3:GetObjectTagging",
+            "s3:PutObjectTagging",
+            "s3:AbortMultipartUpload",
+            "s3:ListMultipartUploadParts"
+        ],
         Resource = "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/uploads/${each.key}/*"
-      }
+        }
     ]
-  })
+    })
 }
 
 resource "aws_iam_role" "sftp_user_roles" {
