@@ -106,15 +106,14 @@ resource "aws_iam_policy" "sftp_user_policies" {
         Sid: "AllowFullAccessToOwnFolder",
         Effect: "Allow",
         Action: [
-          "s3:ListBucket",
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:PutObjectAcl",
-          "s3:DeleteObject",
-          "s3:GetObjectTagging",
-          "s3:PutObjectTagging",
-          "s3:AbortMultipartUpload",
-          "s3:ListMultipartUploadParts"
+            "s3:PutObjectTagging",
+            "s3:PutObjectAcl",
+            "s3:PutObject",
+            "s3:ListMultipartUploadParts",
+            "s3:GetObjectTagging",
+            "s3:GetObject",
+            "s3:DeleteObject",
+            "s3:AbortMultipartUpload"
         ],
         Resource: "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/${each.key}/*"
       }
