@@ -186,7 +186,7 @@ module "data_landing_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
 }
 
 module "s3_athena_query_results_bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.2"
 
   bucket_name        = "athena-data-product-query-results-${data.aws_caller_identity.current.account_id}"
   versioning_enabled = false
