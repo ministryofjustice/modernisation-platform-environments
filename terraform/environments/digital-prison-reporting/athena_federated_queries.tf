@@ -29,10 +29,7 @@ locals {
   ndmis_service_name      = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["db_name"] : ""
   connection_string_ndmis = local.is_non_prod ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndmis[0].name}}@//${local.ndmis_host}:${local.ndmis_port}/${local.ndmis_service_name}" : ""
 
-  dps_locations_host              = jsondecode(data.aws_secretsmanager_secret_version.dps["dps-locations"].secret_string)["endpoint"]
-  dps_locations_port              = jsondecode(data.aws_secretsmanager_secret_version.dps["dps-locations"].secret_string)["port"]
-  dps_locations_service_name      = jsondecode(data.aws_secretsmanager_secret_version.dps["dps-locations"].secret_string)["db_name"]
-  connection_string_dps_locations = "postgres://jdbc:postgresql://${local.dps_locations_host}:${local.dps_locations_port}/${local.dps_locations_service_name}?$${${aws_secretsmanager_secret.dps["dps-locations"].name}}"
+  excluded_catalogs       = toset(["dps-testing", "dps-testing2", "dps-locations"])
 
   # OASys, ONR and nDelius are currently only included in Dev and Test
   # ndmis is only included in Dev, Test and PreProduction
@@ -45,8 +42,21 @@ locals {
     ndmis   = local.connection_string_ndmis
   }
 
-  federated_query_connections_postgresql = {
-    dps_locations = local.connection_string_dps_locations
+  dps_host = {
+    for item in local.dps_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["endpoint"]
+  }
+  dps_port_num = {
+    for item in local.dps_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["port"]
+  }
+  dps_database_name = {
+    for item in local.dps_domains_list :
+    item => jsondecode(data.aws_secretsmanager_secret_version.dps[item].secret_string)["db_name"]
+  }
+  dps_full_connection_string = {
+    for item in local.dps_domains_list :
+    replace(item, "-", "_") => "postgres://jdbc:postgresql://${local.dps_host[item]}:${local.dps_port_num[item]}/${local.dps_database_name[item]}?$${${aws_secretsmanager_secret.dps[item].name}}"
   }
 
   preproduction_federated_query_connections_oracle = {
@@ -70,7 +80,8 @@ locals {
   ] : []
 
   federated_query_credentials_secret_arns_postgresql_list = [
-    aws_secretsmanager_secret.dps["dps-locations"].arn
+    for item in local.dps_domains_list : aws_secretsmanager_secret.dps[item].arn
+    if !contains(local.excluded_catalogs, item)
   ]
 
   preproduction_federated_query_credentials_secret_arns_oracle = local.is-preproduction ? [
@@ -91,10 +102,7 @@ locals {
   federated_query_credentials_secret_arns_oracle = (local.is_dev_or_test ? local.dev_and_test_federated_query_credentials_secret_arns_oracle :
   (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns_oracle : local.production_federated_query_credentials_secret_arns_oracle))
 
-  federated_query_connection_strings_map_postgresql = local.federated_query_connections_postgresql
-
-  federated_query_credentials_secret_arns_postgresql = local.federated_query_credentials_secret_arns_postgresql_list
-
+  federated_query_connection_strings_map_postgresql = local.dps_full_connection_string
 }
 
 module "athena_federated_query_connector_oracle" {
@@ -250,9 +258,15 @@ resource "aws_athena_data_catalog" "ndmis_catalog" {
 # --------------------------------
 
 # Adds an Athena data source / catalog for dps_locations
-resource "aws_athena_data_catalog" "dps_locations_catalog" {
-  name        = "dps_locations"
-  description = "dps_locations Athena data catalog"
+resource "aws_athena_data_catalog" "dps_data_catalog" {
+  for_each    = toset(
+    [
+      for item in local.dps_domains_list: item
+      if !contains(local.excluded_catalogs, item)
+    ]
+  )
+  name        = replace(each.value, "-", "_")
+  description = "${replace(each.value, "-", "_")} Athena data catalog"
   type        = "LAMBDA"
 
   parameters = {
