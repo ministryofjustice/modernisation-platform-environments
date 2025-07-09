@@ -1089,6 +1089,7 @@ variable "sqs_queues" {
       })), [])
     }))
   }))
+  default = {}
 }
 
 variable "ssm_associations" {
