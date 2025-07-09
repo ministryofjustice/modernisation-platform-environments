@@ -250,8 +250,8 @@ locals {
 
   # new DFI instance config to differentiate from DIS
   dfi_config_dev = {
-    instance_count = 1
-    ami_name       = "delius_mis_windows_server_patch_2024-02-07T11-03-13.202Z"
+    instance_count = 0
+    ami_name       = "delius_mis_windows_server_patch_2025-07-09T12:56:15.901Z"
     ebs_volumes = {
       "/dev/sda1" = { label = "root", size = 150 } # root volume
       "xvdd"      = { label = "data", size = 300 } # D:\ App drive
