@@ -21,7 +21,7 @@ data "aws_iam_policy_document" "s3_bucket_oracledb_backups" {
 
 module "s3_bucket_oracledb_backups" {
   #checkov:skip=CKV_TF_1 "ignore"
-  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source              = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.2"
   bucket_name         = local.oracle_backup_bucket_prefix
   versioning_enabled  = false
   ownership_controls  = "BucketOwnerEnforced"
