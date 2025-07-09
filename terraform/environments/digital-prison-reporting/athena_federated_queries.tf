@@ -259,7 +259,12 @@ resource "aws_athena_data_catalog" "ndmis_catalog" {
 
 # Adds an Athena data source / catalog for dps_locations
 resource "aws_athena_data_catalog" "dps_data_catalog" {
-  for_each    = setsubtract(toset(local.dps_domains_list), local.excluded_catalogs)
+  for_each    = toset(
+    [
+      for item in local.dps_domains_list: item
+      if !contains(local.excluded_catalogs, item)
+    ]
+  )
   name        = replace(each.value, "-", "_")
   description = "${replace(each.value, "-", "_")} Athena data catalog"
   type        = "LAMBDA"
