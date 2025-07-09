@@ -18,10 +18,26 @@ locals {
     }
     management_server = {
       description = "Security group for management server"
+      ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
+      }
     }
     ndh_app = {
       description = "Security group for ndh app"
       ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         all-from-ems = {
           description     = "Allow all ingress from ems tier"
           from_port       = 0
@@ -48,6 +64,13 @@ locals {
     ndh_ems = {
       description = "Security group for ndh ems"
       ingress = {
+        all-within-subnet = {
+          description = "Allow all ingress to self"
+          from_port   = 0
+          to_port     = 0
+          protocol    = -1
+          self        = true
+        }
         all-from-app = {
           description     = "Allow all ingress from app tier"
           from_port       = 0
