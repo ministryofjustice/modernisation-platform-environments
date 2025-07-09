@@ -149,6 +149,14 @@ resource "aws_iam_policy" "sftp_user_policies" {
   })
 }
 
+resource "aws_iam_role" "sftp_user_roles" {
+  for_each = var.sftp_users
+
+  name = "sftp-role-${each.key}"
+
+  assume_role_policy = data.aws_iam_policy_document.sftp_access_assume_role.json
+}
+
 resource "aws_iam_role_policy_attachment" "attach_sftp_user_policies" {
   for_each   = var.sftp_users
 
