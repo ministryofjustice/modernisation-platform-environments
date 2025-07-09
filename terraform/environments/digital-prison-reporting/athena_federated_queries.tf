@@ -80,7 +80,8 @@ locals {
   ] : []
 
   federated_query_credentials_secret_arns_postgresql_list = [
-    aws_secretsmanager_secret.dps["dps-locations"].arn
+    for item in local.dps_domains_list : aws_secretsmanager_secret.dps[item].arn
+    if !contains(local.excluded_catalogs, item)
   ]
 
   preproduction_federated_query_credentials_secret_arns_oracle = local.is-preproduction ? [
@@ -102,9 +103,6 @@ locals {
   (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns_oracle : local.production_federated_query_credentials_secret_arns_oracle))
 
   federated_query_connection_strings_map_postgresql = local.dps_full_connection_string
-
-  federated_query_credentials_secret_arns_postgresql = local.federated_query_credentials_secret_arns_postgresql_list
-
 }
 
 module "athena_federated_query_connector_oracle" {
