@@ -45,7 +45,7 @@ module "data_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
 
 
 module "metadata_s3_bucket" { #tfsec:ignore:aws-s3-enable-versioning
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.2"
 
   bucket_prefix      = "metadata-${local.environment}"
   versioning_enabled = false
