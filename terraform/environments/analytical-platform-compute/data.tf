@@ -144,3 +144,16 @@ data "kubernetes_namespace" "mwaa" {
     name = "mwaa"
   }
 }
+
+data "kubernetes_service_account" "mwaa_external_secrets" {
+  metadata {
+    name      = "external-secrets-analytical-platform-data-production"
+    namespace = data.kubernetes_namespace.mwaa.metadata[0].name
+  }
+}
+
+data "kubernetes_service_account" "mwaa_external_secrets_analytical_platform_data_production_name" {
+  metadata {
+    name = "external-secrets-analytical-platform-data-production"
+  }
+}

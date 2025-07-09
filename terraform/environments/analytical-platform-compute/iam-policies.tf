@@ -1,18 +1,18 @@
-data "aws_iam_policy_document" "eks_cluster_logs_kms_access" {
-  statement {
-    sid    = "AllowKMS"
-    effect = "Allow"
-    actions = [
-      "kms:Encrypt*",
-      "kms:Decrypt*",
-      "kms:ReEncrypt*",
-      "kms:GenerateDataKey*",
-      "kms:Describe*"
-    ]
-    # resources = [module.eks_cluster_logs_kms.key_arn]
-    resources = [data.aws_kms_key.eks_logs.arn]
-  }
-}
+# data "aws_iam_policy_document" "eks_cluster_logs_kms_access" {
+#   statement {
+#     sid    = "AllowKMS"
+#     effect = "Allow"
+#     actions = [
+#       "kms:Encrypt*",
+#       "kms:Decrypt*",
+#       "kms:ReEncrypt*",
+#       "kms:GenerateDataKey*",
+#       "kms:Describe*"
+#     ]
+#     # resources = [module.eks_cluster_logs_kms.key_arn]
+#     resources = [data.aws_kms_key.eks_logs.arn]
+#   }
+# }
 
 # module "eks_cluster_logs_kms_access_iam_policy" {
 #   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
