@@ -83,53 +83,40 @@ resource "aws_iam_policy" "sftp_user_policies" {
   for_each = var.sftp_users
 
   name = "sftp-policy-${each.key}"
+
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
-        {
-        Effect = "Allow",
-        Action = "s3:*",
-        Resource = [
-            "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}",
-            "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/*"
-        ]
+      {
+        Sid: "AllowListOwnFolder",
+        Effect: "Allow",
+        Action: ["s3:ListBucket"],
+        Resource: "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}",
+        Condition: {
+          StringLike: {
+            "s3:prefix": [
+              "uploads/${each.key}",
+              "uploads/${each.key}/*"
+            ]
+          }
         }
+      },
+      {
+        Sid: "AllowFullAccessToOwnFolder",
+        Effect: "Allow",
+        Action: [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject",
+          "s3:GetObjectTagging",
+          "s3:PutObjectTagging",
+          "s3:AbortMultipartUpload",
+          "s3:ListMultipartUploadParts"
+        ],
+        Resource: "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/uploads/${each.key}/*"
+      }
     ]
-    })
-
-#   policy = jsonencode({
-#     Version = "2012-10-17",
-#     Statement = [
-#         {
-#         Sid = "ListUserPrefix",
-#         Effect = "Allow",
-#         Action = ["s3:ListBucket"],
-#         Resource = "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}",
-#         Condition = {
-#             StringLike = {
-#             "s3:prefix": [
-#                 "uploads/${each.key}",
-#                 "uploads/${each.key}/*"
-#             ]
-#             }
-#         }
-#         },
-#         {
-#         Sid = "FullObjectAccessForUserFolder",
-#         Effect = "Allow",
-#         Action = [
-#             "s3:GetObject",
-#             "s3:PutObject",
-#             "s3:DeleteObject",
-#             "s3:GetObjectTagging",
-#             "s3:PutObjectTagging",
-#             "s3:AbortMultipartUpload",
-#             "s3:ListMultipartUploadParts"
-#         ],
-#         Resource = "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/uploads/${each.key}/*"
-#         }
-#     ]
-#     })
+  })
 }
 
 resource "aws_iam_role" "sftp_user_roles" {
