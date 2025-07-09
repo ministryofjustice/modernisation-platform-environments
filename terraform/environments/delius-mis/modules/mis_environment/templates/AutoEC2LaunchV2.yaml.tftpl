@@ -44,6 +44,35 @@ tasks:
       type: powershell
       runAs: admin
       content: |-
+        # Install WinRAR to un-pack executables - set specific version that's available
+        $ErrorActionPreference = "Stop"
+        choco install winrar --version=7.11.0 -y
+        
+        # Add WinRAR to the system PATH permanently
+        Write-Output "Adding WinRAR to system PATH..."
+        $winrarPath = "C:\Program Files\WinRAR"
+        
+        # Check if WinRAR directory exists
+        if (Test-Path $winrarPath) {
+            # Get current system PATH
+            $currentPath = [Environment]::GetEnvironmentVariable("PATH", "Machine")
+            
+            # Check if WinRAR path is already in PATH
+            if ($currentPath -notlike "*$winrarPath*") {
+                # Add WinRAR path to system PATH
+                $newPath = $currentPath + ";" + $winrarPath
+                [Environment]::SetEnvironmentVariable("PATH", $newPath, "Machine")
+                Write-Output "Successfully added WinRAR to system PATH"
+            } else {
+                Write-Output "WinRAR path already exists in system PATH"
+            }
+        } else {
+            Write-Output "Warning: WinRAR directory not found at $winrarPath"
+        }
+    - frequency: once
+      type: powershell
+      runAs: admin
+      content: |-
         Write-Output "choco upgrade all -y"
         choco upgrade all -y
         Start-Sleep -Seconds 1 # helps debugging as logs have different timestamps
