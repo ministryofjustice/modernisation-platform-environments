@@ -288,4 +288,5 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
   s3_object_ftp_client= aws_s3_object.ftp_client.key
+  ftp_port = "8022"
 } 
