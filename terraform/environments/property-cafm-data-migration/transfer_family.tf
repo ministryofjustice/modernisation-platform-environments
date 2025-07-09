@@ -95,6 +95,7 @@ resource "aws_iam_policy" "sftp_user_policies" {
         Condition: {
           StringLike: {
             "s3:prefix": [
+              "",
               "uploads/${each.key}",
               "uploads/${each.key}/*"
             ]
@@ -108,6 +109,7 @@ resource "aws_iam_policy" "sftp_user_policies" {
           "s3:ListBucket",
           "s3:GetObject",
           "s3:PutObject",
+          "s3:PutObjectAcl",
           "s3:DeleteObject",
           "s3:GetObjectTagging",
           "s3:PutObjectTagging",
