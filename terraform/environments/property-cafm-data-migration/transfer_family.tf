@@ -149,12 +149,12 @@ resource "aws_transfer_user" "sftp_users" {
   server_id      = aws_transfer_server.sftp_server.id
   user_name      = each.key
   role           = aws_iam_role.sftp_user_roles[each.key].arn
-  home_directory = "/${aws_s3_bucket.CAFM.bucket}/uploads/${each.key}"
+  home_directory = "/uploads/${each.key}"
   home_directory_type = "LOGICAL"
 
   home_directory_mappings {
     entry  = "/"
-    target = "/${aws_s3_bucket.CAFM.bucket}/uploads/${each.key}"
+    target = "/uploads/${each.key}"
   }
 }
 
