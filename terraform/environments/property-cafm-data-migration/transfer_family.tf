@@ -96,8 +96,8 @@ resource "aws_iam_policy" "sftp_user_policies" {
           StringLike: {
             "s3:prefix": [
               "",
-              "uploads/${each.key}",
-              "uploads/${each.key}/*"
+              "${each.key}",
+              "${each.key}/*"
             ]
           }
         }
@@ -116,7 +116,7 @@ resource "aws_iam_policy" "sftp_user_policies" {
           "s3:AbortMultipartUpload",
           "s3:ListMultipartUploadParts"
         ],
-        Resource: "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/uploads/${each.key}/*"
+        Resource: "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/${each.key}/*"
       }
     ]
   })
@@ -140,12 +140,12 @@ resource "aws_transfer_user" "sftp_users" {
   user_name      = each.key
   role           = aws_iam_role.sftp_user_roles[each.key].arn
 
-  home_directory = "/uploads/${each.key}"
+  home_directory = "/"
   home_directory_type = "LOGICAL"
 
   home_directory_mappings {
     entry  = "/"
-    target = "/uploads/${each.key}"
+    target = "/${ aws_s3_bucket.CAFM.bucket}/${each.key}"
   }
 }
 
@@ -159,6 +159,6 @@ resource "aws_transfer_ssh_key" "sftp_ssh_keys" {
 resource "aws_s3_object" "user_folders" {
   for_each = var.sftp_users
   bucket   = aws_s3_bucket.CAFM.bucket
-  key      = "uploads/${each.key}/.keep"
+  key      = "${each.key}/.keep"
   content  = ""
 }
