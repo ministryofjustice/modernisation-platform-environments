@@ -103,8 +103,7 @@ locals {
           "sqs:ListQueues"
         ]
         resources = [
-          # "arn:aws:sqs:::*logs*",
-          "arn:aws:sqs:::*",
+          "arn:aws:sqs:::*log*",
         ]
       },
       {
@@ -112,9 +111,8 @@ locals {
         effect  = "Allow"
         actions = ["s3:GetObject"]
         resources = [
-          # "arn:aws:s3:::*logs*",
-          # "arn:aws:s3:::*logs*/*",
-          "arn:aws:s3:::*",
+          "arn:aws:s3:::*log*",
+          "arn:aws:s3:::*log*/*",
         ]
       },
       {
