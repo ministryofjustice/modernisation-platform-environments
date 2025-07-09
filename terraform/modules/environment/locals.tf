@@ -50,19 +50,19 @@ locals {
   }
 
   route53_zones = {
-    "${local.domains.public.modernisation_platform}" = {
+    (local.domains.public.modernisation_platform) = {
       account      = "core-network-services"
       private_zone = false
     }
-    "${local.domains.public.business_unit_environment}" = {
+    (local.domains.public.business_unit_environment) = {
       account      = "core-vpc"
       private_zone = false
     }
-    "${local.domains.internal.modernisation_platform}" = {
+    (local.domains.internal.modernisation_platform) = {
       account      = "core-network-services"
       private_zone = true
     }
-    "${local.domains.internal.business_unit_environment}" = {
+    (local.domains.internal.business_unit_environment) = {
       account      = "core-vpc"
       private_zone = true
     }
