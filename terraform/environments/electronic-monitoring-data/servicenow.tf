@@ -23,3 +23,43 @@ resource "aws_secretsmanager_secret_version" "servicenow_credentials" {
 
   depends_on = [aws_secretsmanager_secret.servicenow_credentials]
 }
+
+
+data "aws_iam_policy_document" "glue_connection_snow" {
+    statement {
+        effect = "Allow"
+        actions = ["secretsmanager:*"]
+        resources = [
+            aws_secretsmanager_secret_version.servicenow_credentials.arn,
+            aws_secretsmanager_secret.servicenow_credentials.arn
+        ]
+    }
+}
+
+resource "aws_iam_policy" "glue_connection_snow_access" {
+    name = "glue_connection_snow_access"
+    policy = data.aws_iam_policy_document.glue_connection_snow.json
+}
+
+resource "aws_iam_role" "glue_connection_snow_access" {
+    name = "glue_connection_snow_access"
+    assume_role_policy = data.aws_iam_policy_document.glue_assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "glue_connection_snow_access" {
+    role = aws_iam_role.glue_connection_snow_access.name
+    policy_arn = aws_iam_policy.glue_connection_snow_access.arn
+}
+
+# resource "aws_glue_connection" "servicenow" {
+#   name            = "servicenow"
+#   connection_type = "MARKETPLACE"
+#   connection_properties = {
+#     CONNECTOR_CLASS_NAME = "net.snowflake.client.jdbc.SnowflakeDriver"
+#     CONNECTION_TYPE      = "Jdbc"
+#     CONNECTOR_URL        = "s3://example/snowflake-jdbc.jar" # S3 path to the snowflake jdbc jar
+#     JDBC_CONNECTION_URL  = "[[\"default=jdbc❄//example.com/?user=$${user}&password=$${password}\"],\",\"]"
+#   }
+#   match_criteria = ["template-connection"]
+# }
+
