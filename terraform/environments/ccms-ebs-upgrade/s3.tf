@@ -95,7 +95,7 @@ data "aws_iam_policy_document" "artefacts_s3_policy" {
 
 # S3 Bucket - Logging
 module "s3-bucket-logging" {
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.0.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.2"
 
   bucket_name        = local.logging_bucket_name
   versioning_enabled = false
