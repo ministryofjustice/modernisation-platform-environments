@@ -77,7 +77,7 @@ resource "aws_transfer_user" "sftp_users" {
   for_each       = var.sftp_users
   server_id      = aws_transfer_server.sftp_server.id
   user_name      = each.key
-  role           = aws_iam_role.sftp_role.arn
+  role           = aws_iam_role.sftp_user_roles[each.key].arn
   home_directory = "/${aws_s3_bucket.CAFM.bucket}/uploads/${each.key}"
 
   home_directory_type = "LOGICAL"
@@ -123,7 +123,7 @@ resource "aws_iam_role" "sftp_user_roles" {
 resource "aws_iam_policy" "sftp_user_policies" {
   for_each = var.sftp_users
 
-  name = "sftp-policy-${each.key}-${substr(uuid(), 0, 8)}"
+  name = "sftp-policy-${each.key}"
 
   policy = jsonencode({
     Version = "2012-10-17",
