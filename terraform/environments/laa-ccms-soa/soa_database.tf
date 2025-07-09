@@ -30,7 +30,7 @@ resource "aws_db_option_group" "soa_oracle_19" {
 resource "aws_db_instance" "soa_db" {
   identifier                          = "soa-db"
   allocated_storage                   = local.application_data.accounts[local.environment].soa_db_storage_gb
-  auto_minor_version_upgrade          = local.application_data.accounts[local.environment].soa_db_minor_version_upgrade_allowed
+  auto_minor_version_upgrade          = local.application_data.accounts[local.environment].soa_db_minor_version_upgrade_allowed #--This needs to be set to true if using a JVM in the above option group
   storage_type                        = "gp2"
   engine                              = "oracle-ee"
   engine_version                      = local.application_data.accounts[local.environment].soa_db_version
