@@ -103,6 +103,10 @@ resource "aws_s3_object" "user_folders" {
   content  = ""
 }
 
+locals {
+  user_prefix = "uploads/$${aws:username}/*"
+}
+
 data "aws_iam_policy_document" "sftp_user_policy" {
   statement {
     sid       = "ListUserPrefix"
@@ -112,7 +116,7 @@ data "aws_iam_policy_document" "sftp_user_policy" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["uploads/$${aws:username}/*"]
+      values   = [local.user_prefix]
     }
   }
 
@@ -124,11 +128,10 @@ data "aws_iam_policy_document" "sftp_user_policy" {
       "s3:DeleteObject"
     ]
     resources = [
-      "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/uploads/$${aws:username}/*"
+      "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/${local.user_prefix}"
     ]
   }
 }
-
 
 resource "aws_iam_role_policy" "sftp_user_policy" {
   name   = "SFTPUserAccessPolicy"
