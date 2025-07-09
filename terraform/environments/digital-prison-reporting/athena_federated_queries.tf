@@ -29,7 +29,7 @@ locals {
   ndmis_service_name      = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["db_name"] : ""
   connection_string_ndmis = local.is_non_prod ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndmis[0].name}}@//${local.ndmis_host}:${local.ndmis_port}/${local.ndmis_service_name}" : ""
 
-  excluded_catalogs       = toset(["dps-testing", "dps-testing2"])
+  excluded_catalogs       = toset(["dps-testing", "dps-testing2", "dps-locations"])
 
   # OASys, ONR and nDelius are currently only included in Dev and Test
   # ndmis is only included in Dev, Test and PreProduction
