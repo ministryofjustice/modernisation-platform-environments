@@ -1,7 +1,7 @@
 module "s3_bucket_migration" {
   #checkov:skip=CKV_TF_1
 
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.2"
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
