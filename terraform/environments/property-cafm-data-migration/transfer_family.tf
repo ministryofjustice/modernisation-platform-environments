@@ -123,7 +123,7 @@ resource "aws_iam_role" "sftp_user_roles" {
 resource "aws_iam_policy" "sftp_user_policies" {
   for_each = var.sftp_users
 
-  name = "sftp-policy-${each.key}"
+  name = "sftp-policy-${each.key}-${substr(uuid(), 0, 8)}"
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -151,6 +151,12 @@ resource "aws_iam_policy" "sftp_user_policies" {
 
 resource "aws_iam_role_policy_attachment" "attach_sftp_user_policies" {
   for_each   = var.sftp_users
-  role       = aws_iam_role.sftp_user_roles[each.key].name
+
+  role       = aws_iam_role.sftp_user_roles[each.key].id
   policy_arn = aws_iam_policy.sftp_user_policies[each.key].arn
+
+  depends_on = [
+    aws_iam_policy.sftp_user_policies,
+    aws_iam_role.sftp_user_roles
+  ]
 }
