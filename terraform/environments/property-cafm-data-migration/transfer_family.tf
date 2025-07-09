@@ -103,38 +103,42 @@ resource "aws_s3_object" "user_folders" {
   content  = ""
 }
 
+# Create the policy as a JSON string with a placeholder
 locals {
-  user_prefix = "uploads/$${aws:username}/*"
-}
-
-data "aws_iam_policy_document" "sftp_user_policy" {
-  statement {
-    sid       = "ListUserPrefix"
-    actions   = ["s3:ListBucket"]
-    resources = ["arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}"]
-
-    condition {
-      test     = "StringLike"
-      variable = "s3:prefix"
-      values   = [local.user_prefix]
-    }
-  }
-
-  statement {
-    sid     = "UserFolderAccess"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-      "s3:DeleteObject"
+  sftp_user_policy_template = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Sid = "ListUserPrefix",
+        Effect = "Allow",
+        Action = ["s3:ListBucket"],
+        Resource = "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}",
+        Condition = {
+          StringLike = {
+            "s3:prefix" = [
+              "uploads/__USERNAME__/*"
+            ]
+          }
+        }
+      },
+      {
+        Sid = "UserFolderAccess",
+        Effect = "Allow",
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ],
+        Resource = "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/uploads/__USERNAME__/*"
+      }
     ]
-    resources = [
-      "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/${local.user_prefix}"
-    ]
-  }
+  })
+
+  sftp_user_policy = replace(local.sftp_user_policy_template, "__USERNAME__", "$${aws:username}")
 }
 
 resource "aws_iam_role_policy" "sftp_user_policy" {
   name   = "SFTPUserAccessPolicy"
   role   = aws_iam_role.sftp_role.id
-  policy = data.aws_iam_policy_document.sftp_user_policy.json
+  policy = local.sftp_user_policy
 }
