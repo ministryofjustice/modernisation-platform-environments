@@ -95,7 +95,7 @@ data "aws_ec2_managed_prefix_list" "cloudfront" {
 
 module "s3-bucket" {
   count  = var.existing_bucket_name == "" ? 1 : 0
-  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v7.1.0"
+  source = "github.com/ministryofjustice/modernisation-platform-terraform-s3-bucket?ref=v8.2.2"
 
   providers = {
     aws.bucket-replication = aws.bucket-replication
