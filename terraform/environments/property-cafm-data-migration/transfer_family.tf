@@ -4,11 +4,34 @@ resource "aws_transfer_server" "sftp_server" {
   identity_provider_type = "SERVICE_MANAGED"
   endpoint_type          = "PUBLIC"
   security_policy_name   = "TransferSecurityPolicy-2024-01"
-
+  logging_role  = aws_iam_role.transfer_logging.arn
   tags = {
     Name = "CAFM SFTP Server"
   }
 }
+
+resource "aws_iam_role" "transfer_logging" {
+  name = "TransferFamilyLoggingRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "transfer.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "transfer_logging_policy" {
+  role       = aws_iam_role.transfer_logging.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSTransferLoggingAccess"
+}
+
 
 # --- Common Assume Role Policy Document ---
 data "aws_iam_policy_document" "assume_role" {
@@ -64,100 +87,88 @@ resource "aws_iam_role_policy_attachment" "sftp_role_attachment" {
   policy_arn = aws_iam_policy.sftp_access_policy.arn
 }
 
-# --- SFTP User Definitions ---
-variable "sftp_users" {
-  type = map(object({
-    ssh_key = string
-  }))
-  description = "Map of SFTP usernames to their SSH public keys"
-
-  default = {
-    "test_user1" = {
-      ssh_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDaa4nS966z8WHgWZ0n2pDr+0/BNf06mTW4CdD6RJ1qIDIVVv55P4BN6dBSJVqDfkuOg0urG06LsE4FiRvYGViN4/fHc5mU0Jw0r6Gzu+g+yC7zLpV4LIhjHLxgEv86GzxIF3WjKDalbW0SrNyxoxJD6IKxr/IKLMAwsuVNSIXA18IZZwhdfvrT36YOBW+3+mSAblnOZkZh4ltpA7ATa7GSnQPFnoBmCT//wA8t/7aZ+OmN6ytERMiBpjI8DjFuUBlCHPKeSBsK2WGuXiNLrRocCqkAO3WpX5kmC8x3SXQOsjsuWRTloOycBFRdzNCL7RKIdS3cqyrkGpdJr4H7t0O/lYenVews5Plgau+H4/nnBIjIXmdLq8He6G0r/nxcIeTyTOpYwQ0pw+WzNQQJPeWmGnzOjEaiPJbZ/GHwI6j67KzIVcmYYeyfJnrF14VEj+tJSlsn8Rl6+Bu/nTtYjVMlLZOwqH33HQrSUmiycukN4CWc69LYg1hezfbABkVKRFcRcfl4v0HzDJ2wqQS5NU2m8NQWL18zqi4hy5X+Hx4NyAIRCqX3+7YhEpfQrbYVvGjILGFSc4O0PwtW4jHmmjIresPfz7QXoXRlAe2aAQlWYGfBVP3y0xMNk0QGoEJHDjOgVCsmHvUtC62qfdadqhPNMY9pf3YQ10PBfkIq96LDAQ== jyotiranjan.nayak@MJ005734"
+# --- User-specific Resources ---
+data "aws_iam_policy_document" "sftp_user_policy" {
+  statement {
+    sid = "ListBucket"
+    effect = "Allow"
+    actions = ["s3:ListBucket"]
+    resources = ["arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}"]
+    condition {
+      test     = "StringLike"
+      variable = "s3:prefix"
+      values   = ["test_user1", "test_user1/*"]
     }
+  }
+
+  statement {
+    sid = "FullAccessToUserFolder"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject",
+      "s3:GetObjectTagging",
+      "s3:PutObjectTagging",
+      "s3:AbortMultipartUpload",
+      "s3:ListMultipartUploadParts",
+      "s3:PutObjectAcl"
+    ]
+    resources = ["arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/test_user1/*"]
   }
 }
 
-# --- User-specific Resources ---
-resource "aws_iam_policy" "sftp_user_policies" {
-  for_each = var.sftp_users
-
-  name = "sftp-policy-${each.key}"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Sid: "AllowListOwnFolder",
-        Effect: "Allow",
-        Action: ["s3:ListBucket"],
-        Resource: "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}",
-        Condition: {
-          StringLike: {
-            "s3:prefix": [
-              "",
-              "${each.key}",
-              "${each.key}/*"
-            ]
-          }
-        }
-      },
-      {
-        Sid: "AllowFullAccessToOwnFolder",
-        Effect: "Allow",
-        Action: [
-            "s3:PutObjectTagging",
-            "s3:PutObjectAcl",
-            "s3:PutObject",
-            "s3:ListMultipartUploadParts",
-            "s3:GetObjectTagging",
-            "s3:GetObject",
-            "s3:DeleteObject",
-            "s3:AbortMultipartUpload"
-        ],
-        Resource: "arn:aws:s3:::${aws_s3_bucket.CAFM.bucket}/${each.key}/*"
-      }
-    ]
-  })
+resource "aws_iam_policy" "sftp_user_policy" {
+  name   = "sftp-user-policy"
+  policy = data.aws_iam_policy_document.sftp_user_policy.json
 }
 
-resource "aws_iam_role" "sftp_user_roles" {
-  for_each           = var.sftp_users
-  name               = "sftp-role-${each.key}"
+
+# ------------------------
+# IAM Role for Transfer Family
+# ------------------------
+resource "aws_iam_role" "sftp_user_role" {
+  name               = "sftp-user-role"
   assume_role_policy = data.aws_iam_policy_document.assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "attach_user_policy" {
-  for_each   = var.sftp_users
-  role       = aws_iam_role.sftp_user_roles[each.key].name
-  policy_arn = aws_iam_policy.sftp_user_policies[each.key].arn
+  role       = aws_iam_role.sftp_user_role.name
+  policy_arn = aws_iam_policy.sftp_user_policy.arn
 }
 
-resource "aws_transfer_user" "sftp_users" {
-  for_each       = var.sftp_users
-  server_id      = aws_transfer_server.sftp_server.id
-  user_name      = each.key
-  role           = aws_iam_role.sftp_user_roles[each.key].arn
-
-  home_directory = "/"
-  home_directory_type = "LOGICAL"
+# ------------------------
+# Transfer User
+# ------------------------
+resource "aws_transfer_user" "sftp_user" {
+  server_id            = aws_transfer_server.sftp_server.id
+  user_name            = "test_user1"
+  role                 = aws_iam_role.sftp_user_role.arn
+  home_directory       = "/"
+  home_directory_type  = "LOGICAL"
 
   home_directory_mappings {
     entry  = "/"
-    target = "/${ aws_s3_bucket.CAFM.bucket}/${each.key}"
+    target = "/${ aws_s3_bucket.CAFM.bucket}/test_user1"
   }
 }
 
-resource "aws_transfer_ssh_key" "sftp_ssh_keys" {
-  for_each  = var.sftp_users
+# ------------------------
+# SSH Key for SFTP Login
+# ------------------------
+resource "aws_transfer_ssh_key" "sftp_ssh_key" {
   server_id = aws_transfer_server.sftp_server.id
-  user_name = each.key
-  body      = each.value.ssh_key
+  user_name = aws_transfer_user.sftp_user.user_name
+  body      = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDaa4nS966z8WHgWZ0n2pDr+0/BNf06mTW4CdD6RJ1qIDIVVv55P4BN6dBSJVqDfkuOg0urG06LsE4FiRvYGViN4/fHc5mU0Jw0r6Gzu+g+yC7zLpV4LIhjHLxgEv86GzxIF3WjKDalbW0SrNyxoxJD6IKxr/IKLMAwsuVNSIXA18IZZwhdfvrT36YOBW+3+mSAblnOZkZh4ltpA7ATa7GSnQPFnoBmCT//wA8t/7aZ+OmN6ytERMiBpjI8DjFuUBlCHPKeSBsK2WGuXiNLrRocCqkAO3WpX5kmC8x3SXQOsjsuWRTloOycBFRdzNCL7RKIdS3cqyrkGpdJr4H7t0O/lYenVews5Plgau+H4/nnBIjIXmdLq8He6G0r/nxcIeTyTOpYwQ0pw+WzNQQJPeWmGnzOjEaiPJbZ/GHwI6j67KzIVcmYYeyfJnrF14VEj+tJSlsn8Rl6+Bu/nTtYjVMlLZOwqH33HQrSUmiycukN4CWc69LYg1hezfbABkVKRFcRcfl4v0HzDJ2wqQS5NU2m8NQWL18zqi4hy5X+Hx4NyAIRCqX3+7YhEpfQrbYVvGjILGFSc4O0PwtW4jHmmjIresPfz7QXoXRlAe2aAQlWYGfBVP3y0xMNk0QGoEJHDjOgVCsmHvUtC62qfdadqhPNMY9pf3YQ10PBfkIq96LDAQ== jyotiranjan.nayak@MJ005734"
+
+  depends_on = [aws_transfer_user.sftp_user]
 }
 
-resource "aws_s3_object" "user_folders" {
-  for_each = var.sftp_users
+# ------------------------
+# Create S3 Folder Placeholder
+# ------------------------
+resource "aws_s3_object" "CAFM" {
   bucket   = aws_s3_bucket.CAFM.bucket
-  key      = "${each.key}/.keep"
+  key      = "test_user1/.keep"
   content  = ""
 }
