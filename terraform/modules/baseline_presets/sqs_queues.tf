@@ -2,7 +2,7 @@ locals {
 
   sqs_queues = merge(
     var.options.enable_xsiam_s3_integration ? {
-      cortex-xsiam-s3-log-collection = {
+      cortex-xsiam-s3-alb-log-collection = {
         policy = [
           {
             effect = "Allow"

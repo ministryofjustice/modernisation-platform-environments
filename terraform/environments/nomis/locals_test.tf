@@ -7,7 +7,6 @@ locals {
 
   baseline_presets_test = {
     options = {
-      enable_xsiam_s3_integration = true
       sns_topics = {
         pagerduty_integrations = {
           pagerduty = "nomis-test"
