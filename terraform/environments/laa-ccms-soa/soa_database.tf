@@ -30,10 +30,10 @@ resource "aws_db_option_group" "soa_oracle_19" {
 resource "aws_db_instance" "soa_db" {
   identifier                          = "soa-db"
   allocated_storage                   = local.application_data.accounts[local.environment].soa_db_storage_gb
-  auto_minor_version_upgrade          = true
+  auto_minor_version_upgrade          = local.application_data.accounts[local.environment].soa_db_minor_version_upgrade_allowed
   storage_type                        = "gp2"
   engine                              = "oracle-ee"
-  engine_version                      = "19.0.0.0.ru-2025-01.rur-2025-01.r1"
+  engine_version                      = local.application_data.accounts[local.environment].soa_db_version
   instance_class                      = local.application_data.accounts[local.environment].soa_db_instance_type
   multi_az                            = local.application_data.accounts[local.environment].soa_db_deploy_to_multi_azs
   db_name                             = "SOADB"
