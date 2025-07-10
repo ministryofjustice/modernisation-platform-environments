@@ -1,11 +1,4 @@
 
-# locals {
-#   lambda_src_dir = "${path.module}/lambda/ftp-client"
-#   lambda_zip     = "${path.module}/lambda/ftp-client/ftp-client.zip"
-#   # layer_src_dir = "${path.module}/lambda/lambda-layer"
-#   # layer_output_dir = "${path.module}/lambda/output"
-# }
-
 ## sg for ftp
 resource "aws_security_group" "ftp_sg" {
   name        = "${var.lambda_name}-sg"
@@ -79,22 +72,6 @@ resource "aws_iam_role_policy_attachment" "ftp_lambda_policy_attach" {
   policy_arn = aws_iam_policy.ftp_policy.arn
 }
 
-# Create ZIP archive of lambda_code/
-# data "archive_file" "lambda_zip" {
-#   type        = "zip"
-#   source_dir  = local.lambda_src_dir
-#   output_path = local.lambda_zip
-# }
-
-
-# # Create ZIP archive of lambda layer/
-# data "archive_file" "lambda_layer" {
-#   type        = "zip"
-#   source_dir  = local.layer_src_dir   # folder containing 'python/' directory
-#   output_path = "${local.layer_output_dir}/lambda-layer.zip"
-# }
-
-
 ### lambda layer for python dependencies
 resource "aws_lambda_layer_version" "ftp_layer" {
   layer_name               = "ftpclientlayer"
@@ -147,18 +124,21 @@ resource "aws_lambda_function" "ftp_lambda" {
 }
 ### cw rule for schedule
 resource "aws_cloudwatch_event_rule" "ftp_schedule" {
+  count = var.env == "production" ? 1 : 0
   name                = "${var.lambda_name}-schedule"
   schedule_expression = var.ftp_cron
 }
 ### cw event lambda target
 resource "aws_cloudwatch_event_target" "ftp_target" {
+  count = var.env == "production" ? 1 : 0
   rule      = aws_cloudwatch_event_rule.ftp_schedule.name
   target_id = "ftp-lambda"
   arn       = aws_lambda_function.ftp_lambda.arn
 }
 
-### attaching lambda iam role to inbound bucket
+### allow cw to event in lambda
 resource "aws_lambda_permission" "ftp_permission" {
+  count = var.env == "production" ? 1 : 0
   statement_id  = "AllowExecutionFromCloudWatch"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ftp_lambda.function_name

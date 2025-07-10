@@ -79,6 +79,16 @@ resource "aws_security_group_rule" "egress_traffic_ftp_22" {
   cidr_blocks       = ["0.0.0.0/0"]
 }
 
+### SFTP
+resource "aws_security_group_rule" "egress_traffic_ftp_8022" {
+  security_group_id = aws_security_group.ec2_sg_ftp.id
+  type              = "egress"
+  description       = "SFTP"
+  protocol          = "TCP"
+  from_port         = 8022
+  to_port           = 8022
+  cidr_blocks       = ["0.0.0.0/0"]
+}
 ### HTTPS
 
 resource "aws_security_group_rule" "egress_traffic_ftp_443" {
