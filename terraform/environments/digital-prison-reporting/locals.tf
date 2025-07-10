@@ -116,6 +116,8 @@ locals {
   enable_slack_alerts     = local.application_data.accounts[local.environment].enable_slack_alerts
   enable_pagerduty_alerts = local.application_data.accounts[local.environment].enable_pagerduty_alerts
 
+  enable_dms_failure_alerts = local.application_data.accounts[local.environment].enable_dms_failure_alerts
+
   # DPR RDS Database
   enable_dpr_rds_db              = local.application_data.accounts[local.environment].dpr_rds_db.enable
   create_rds_replica             = local.application_data.accounts[local.environment].dpr_rds_db.create_replica
@@ -361,6 +363,7 @@ locals {
   thrld_dms_cdc_inc_events_check    = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.threshold
   period_dms_cdc_inc_events_check   = local.application_data.accounts[local.environment].alarms.dms.cdc_inc_events_check.period
 
+  create_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.create
   enable_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.enable
   thrld_postgres_tickle_function_failure_alarm  = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.threshold
   period_postgres_tickle_function_failure_alarm = local.application_data.accounts[local.environment].alarms.lambda.postgres_tickle_function_failure.period
