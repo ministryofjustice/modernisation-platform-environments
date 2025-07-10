@@ -1,0 +1,33 @@
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "50",
+      "rule-name": "select_clientdb_audit_data_checksum",
+      "object-locator": {
+        "schema-name": "DELIUS_AUDIT_DMS_POOL",
+        "table-name": "AUDITED_INTERACTION_CHECKSUM"
+      },
+      "rule-action": "include"
+    },
+    {
+      "rule-type": "transformation",
+      "rule-id": "51",
+      "rule-name": "set_not_validated",
+      "rule-target": "column",
+      "object-locator": {
+        "schema-name": "DELIUS_AUDIT_DMS_POOL",
+        "table-name": "AUDITED_INTERACTION_CHECKSUM"
+      },
+      "rule-action": "add-column",
+      "value": "CHECKSUM_VALIDATED",
+      "expression": "'N'",
+      "old-value": null,
+      "data-type": {
+        "type": "string",
+        "length": "1",
+        "scale": ""
+      }
+    }
+  ]
+}

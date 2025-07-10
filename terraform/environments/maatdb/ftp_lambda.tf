@@ -1,4 +1,4 @@
- # FTP Lambda
+# FTP Lambda
 
 locals {
 
@@ -42,12 +42,11 @@ locals {
 }
 
 
-
 # IAM  Resources
 
 resource "aws_iam_role" "ftp_lambda_role" {
   count = local.build_ftp ? 1 : 0
-  name = "rFTPLambdaRole"
+  name  = "rFTPLambdaRole"
   assume_role_policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -69,7 +68,7 @@ resource "aws_iam_role" "ftp_lambda_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "basic_execution" {
-  count = local.build_ftp ? 1 : 0
+  count      = local.build_ftp ? 1 : 0
   role       = aws_iam_role.ftp_lambda_role[0].name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
@@ -91,8 +90,8 @@ resource "aws_iam_role_policy" "shared_bucket_access" {
         Resource = "arn:aws:s3:::${local.ftp_layer_bucket}/laa-ftp/*"
       },
       {
-        Effect = "Allow",
-        Action = "s3:ListBucket",
+        Effect   = "Allow",
+        Action   = "s3:ListBucket",
         Resource = "arn:aws:s3:::${local.ftp_layer_bucket}"
       },
       {
@@ -154,8 +153,8 @@ resource "aws_iam_role_policy" "secretsmanager_access" {
 
 resource "aws_iam_role_policy" "vpc_eni_access" {
   count = local.build_ftp ? 1 : 0
-  name = "VPCEniPolicy"
-  role = aws_iam_role.ftp_lambda_role[0].id
+  name  = "VPCEniPolicy"
+  role  = aws_iam_role.ftp_lambda_role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17",
@@ -179,25 +178,25 @@ resource "aws_iam_role_policy" "s3_access" {
   role  = aws_iam_role.ftp_lambda_role[0].id
 
   policy = jsonencode({
-    Version   = "2012-10-17",
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect   = "Allow",
-        Action   = [
-            "s3:DeleteObject",
-            "s3:DeleteObjectVersion",
-            "s3:GetObject",
-            "s3:GetObjectVersion",
-            "s3:GetBucketPolicy",
-            "s3:ListBucket",
-            "s3:PutObject"
+        Effect = "Allow",
+        Action = [
+          "s3:DeleteObject",
+          "s3:DeleteObjectVersion",
+          "s3:GetObject",
+          "s3:GetObjectVersion",
+          "s3:GetBucketPolicy",
+          "s3:ListBucket",
+          "s3:PutObject"
         ],
         Resource = flatten([
-            for bucket in module.s3_bucket : [
-                bucket.bucket.arn,
-                "${bucket.bucket.arn}/*"
-            ]
-        ])  
+          for bucket in module.s3_bucket : [
+            bucket.bucket.arn,
+            "${bucket.bucket.arn}/*"
+          ]
+        ])
       }
     ]
   })
@@ -205,8 +204,8 @@ resource "aws_iam_role_policy" "s3_access" {
 
 resource "aws_iam_role_policy" "secrets_manager_access" {
   count = local.build_ftp ? 1 : 0
-  name = "SecretsManagerAccess"
-  role = aws_iam_role.ftp_lambda_role[0].id
+  name  = "SecretsManagerAccess"
+  role  = aws_iam_role.ftp_lambda_role[0].id
 
   policy = jsonencode({
     Version = "2012-10-17",

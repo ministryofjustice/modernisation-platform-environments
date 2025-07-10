@@ -38,7 +38,7 @@ output "modernisation_platform_account_id" {
 # with terraform (for_each loops) so marking as nonsensitive
 output "account_id" {
   description = "id of the application account"
-  value       = nonsensitive(var.environment_management.account_ids[local.account_name])
+  value       = nonsensitive(local.account_ids[local.account_name])
 }
 
 output "application_name" {
@@ -58,25 +58,25 @@ output "subnet_set" {
 
 output "account_ids" {
   description = "account id map where the key is the account name and the value is the account id"
-  value       = nonsensitive(var.environment_management.account_ids)
+  value       = nonsensitive(local.account_ids)
 }
 
 output "cross_account_secret_account_ids" {
   description = "account id lookup for cross-account secrets"
   value = {
-    delius     = try(var.environment_management.account_ids["delius-core-${var.environment}"], "delius-core-${var.environment}-not-found")
-    delius_mis = try(var.environment_management.account_ids["delius-mis-${var.environment}"], "delius-mis-${var.environment}-not-found")
-    hmpps_oem  = var.environment_management.account_ids["hmpps-oem-${var.environment}"]
+    delius     = try(local.account_ids["delius-core-${var.environment}"], "delius-core-${var.environment}-not-found")
+    delius_mis = try(local.account_ids["delius-mis-${var.environment}"], "delius-mis-${var.environment}-not-found")
+    hmpps_oem  = local.account_ids["hmpps-oem-${var.environment}"]
     hmpps_domain = (contains(["development", "test"], var.environment) ?
-      var.environment_management.account_ids["hmpps-domain-services-test"] :
-      var.environment_management.account_ids["hmpps-domain-services-production"]
+      local.account_ids["hmpps-domain-services-test"] :
+      local.account_ids["hmpps-domain-services-production"]
     )
   }
 }
 
 output "account_root_arns" {
   description = "account arn map where the key is the account name and the value is the account id"
-  value       = nonsensitive({ for name, id in var.environment_management.account_ids : name => "arn:aws:iam::${id}:root" })
+  value       = nonsensitive({ for name, id in local.account_ids : name => "arn:aws:iam::${id}:root" })
 }
 
 output "access" {

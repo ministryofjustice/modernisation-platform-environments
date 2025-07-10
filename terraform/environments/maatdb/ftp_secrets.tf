@@ -46,7 +46,7 @@ resource "aws_secretsmanager_secret" "ftp_jobs_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "ftp_jobs_secret_values" {
-  secret_id     = aws_secretsmanager_secret.ftp_jobs_secret.id
+  secret_id = aws_secretsmanager_secret.ftp_jobs_secret.id
   secret_string = jsonencode({
     organisation_id = "CHANGE_ME_IN_THE_CONSOLE"
   })

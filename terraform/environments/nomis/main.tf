@@ -213,6 +213,12 @@ module "baseline" {
     lookup(local.baseline_environment_specific, "sns_topics", {}),
   )
 
+  sqs_queues = merge(
+    module.baseline_presets.sqs_queues,
+    lookup(local.baseline_all_environments, "sqs_queues", {}),
+    lookup(local.baseline_environment_specific, "sqs_queues", {}),
+  )
+
   ssm_associations = merge(
     module.baseline_presets.ssm_associations,
     lookup(local.baseline_all_environments, "ssm_associations", {}),

@@ -25,5 +25,4 @@ locals {
   zip_lambda_source_file_version = local.application_data.accounts[local.environment].zip_lambda_source_file_version 
 
   laa_general_kms_arn = data.aws_kms_key.general_shared.arn
-
 }
