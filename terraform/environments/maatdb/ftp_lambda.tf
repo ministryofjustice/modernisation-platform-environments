@@ -122,6 +122,8 @@ resource "aws_iam_role_policy" "shared_kms_access" {
         Effect = "Allow",
         Action = [
           "kms:Decrypt",
+          "kms:DescribeKey",
+          "kms:Encrypt",
           "kms:GenerateDataKey"
         ],
         Resource = local.laa_general_kms_arn
@@ -165,7 +167,7 @@ resource "aws_iam_role_policy" "vpc_eni_access" {
           "ec2:DescribeNetworkInterfaces",
           "ec2:DeleteNetworkInterface"
         ],
-        Resource = "*"
+        Resource = "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:network-interface/*"
       }
     ]
   })
@@ -238,6 +240,7 @@ resource "aws_security_group" "ftp_lambda" {
   count  = local.build_ftp ? 1 : 0
   name   = "ftp-lambda-${local.ftp_job.job_name}-sg"
   vpc_id = data.aws_vpc.shared.id
+  description = "ftp lambda security group"
 
   egress {
     description = "Allow SFTP outbound"
@@ -260,6 +263,8 @@ resource "aws_security_group" "zip_lambda" {
   count  = local.build_ftp ? 1 : 0
   name   = "zip-lambda-${local.ftp_job.job_name}-sg"
   vpc_id = data.aws_vpc.shared.id
+  description = "zip lambda security group"
+
 
   egress {
     description = "S3 outbound"
@@ -274,6 +279,9 @@ resource "aws_security_group" "zip_lambda" {
 # Lambda that sends the zip bundle from the s3 folder to the remove endpoint
 
 resource "aws_lambda_function" "ftp" {
+  #checkov:skip=CKV_AWS_272:"To be ignored for now as not implemented in LZ lambdas"
+  #checkov:skip=CKV_AWS_116:"To be ignored for now as not implemented in LZ lambdas"
+  #checkov:skip=CKV_AWS_50:"To be ignored for now as not implemented in LZ lambdas"
   count         = local.build_ftp ? 1 : 0
   function_name = "${local.ftp_job.job_name}-ftp"
   role          = aws_iam_role.ftp_lambda_role[0].arn
@@ -285,6 +293,10 @@ resource "aws_lambda_function" "ftp" {
   s3_bucket          = local.ftp_layer_bucket
   s3_key             = "${local.ftp_layer_folder_location}/${local.ftp_lambda_source_file}"
   s3_object_version  = local.ftp_lambda_source_file_version
+
+  reserved_concurrent_executions = 1
+
+  kms_key_arn = local.laa_general_kms_arn
 
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
@@ -315,6 +327,9 @@ resource "aws_lambda_function" "ftp" {
 # Lambda that generates the zip bundles
 
 resource "aws_lambda_function" "zip" {
+  #checkov:skip=CKV_AWS_272:"To be ignored for now as not implemented in LZ lambdas"
+  #checkov:skip=CKV_AWS_116:"To be ignored for now as not implemented in LZ lambdas"
+  #checkov:skip=CKV_AWS_50:"To be ignored for now as not implemented in LZ lambdas"
   count         = local.build_ftp ? 1 : 0
   function_name = "${local.zip_job.job_name}-zip"
   role          = aws_iam_role.ftp_lambda_role[0].arn
@@ -326,6 +341,10 @@ resource "aws_lambda_function" "zip" {
   s3_bucket          = local.ftp_layer_bucket
   s3_key             = "${local.ftp_layer_folder_location}/${local.zip_lambda_source_file}"
   s3_object_version  = local.zip_lambda_source_file_version
+
+  reserved_concurrent_executions = 1
+
+  kms_key_arn = local.laa_general_kms_arn
 
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
