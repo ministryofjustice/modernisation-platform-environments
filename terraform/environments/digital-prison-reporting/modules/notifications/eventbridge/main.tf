@@ -3,6 +3,8 @@ resource "aws_cloudwatch_event_rule" "event_rule" {
 
   event_pattern = var.event_pattern
 
+  state = var.state
+
   tags = merge(
     var.tags,
     {
