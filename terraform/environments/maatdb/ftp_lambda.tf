@@ -21,29 +21,19 @@ locals {
     job_name          = "xerox-outbound"
     bucket_name       = try(module.s3_bucket.outbound.bucket.bucket, "")
     bucket_folder     = "export/home/ccmtdb/central_print/rep_orders/"
-    source_location   = "laa-ftp/ftpclient_1.2.zip"
-    source_version_id = "LKYb32.Rqjizm17IiAsa.YZhOXfumTGj"
     ftp_protocol      = "SFTP"
     ftp_type          = "SFTP_UPLOAD"
     require_ssl       = "NO"
     insecure          = "YES"
     ftp_file_types    = "zip"
-    ca_cert           = ""
-    cert              = ""
-    key               = ""
-    key_type          = ""
-    ssh_key           = ""
     file_remove       = "YES"
     cron_rule         = local.application_data.accounts[local.environment].ftp_lambda_eventbridge_cron
-    sns_topic_arn     = ""
   }
 
   zip_job = {
     job_name          = "xerox-outbound"
     bucket_name       = try(module.s3_bucket.outbound.bucket.bucket, "")
     bucket_folder     = "export/home/ccmtdb/central_print/rep_orders/"
-    source_location   = "laa-ftp/zip_s3_objects.zip"
-    source_version_id = "E.U4jcCEI2iQa0pIP48MvUzN4BJ6M1H5"
     file_remove       = "YES"
     zip_file_types    = "pdf,PDF,xml"
     cron_rule         = local.application_data.accounts[local.environment].zip_lambda_eventbridge_cron
@@ -238,7 +228,7 @@ resource "aws_lambda_layer_version" "ftpclientlibs" {
   description         = "FtpClient Dependencies"
   compatible_runtimes = ["python3.12"]
   s3_bucket           = local.ftp_layer_bucket
-  s3_key              = "laa-ftp/ftpclient-python-requirements312.zip"
+  s3_key              = "${local.ftp_layer_folder_location}/${local.ftp_layer_source_zip}"
 }
 
 
@@ -287,14 +277,14 @@ resource "aws_lambda_function" "ftp" {
   count         = local.build_ftp ? 1 : 0
   function_name = "${local.ftp_job.job_name}-ftp"
   role          = aws_iam_role.ftp_lambda_role[0].arn
-  runtime       = "python3.12"
+  runtime       = local.python_runtime
   handler       = "ftpclient.lambda_handler"
 
   memory_size        = 512
   timeout            = 300
   s3_bucket          = local.ftp_layer_bucket
-  s3_key             = local.ftp_job.source_location
-  s3_object_version  = local.ftp_job.source_version_id
+  s3_key             = "${local.ftp_layer_folder_location}/${local.ftp_lambda_source_file}"
+  s3_object_version  = local.ftp_lambda_source_file_version
 
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
@@ -328,14 +318,14 @@ resource "aws_lambda_function" "zip" {
   count         = local.build_ftp ? 1 : 0
   function_name = "${local.zip_job.job_name}-zip"
   role          = aws_iam_role.ftp_lambda_role[0].arn
-  runtime       = "python3.12"
+  runtime       = local.python_runtime
   handler       = "zip_s3_objects.lambda_handler"
 
   memory_size        = 512
   timeout            = 900
   s3_bucket          = local.ftp_layer_bucket
-  s3_key             = local.zip_job.source_location
-  s3_object_version  = local.zip_job.source_version_id
+  s3_key             = "${local.ftp_layer_folder_location}/${local.zip_lambda_source_file}"
+  s3_object_version  = local.zip_lambda_source_file_version
 
   vpc_config {
     subnet_ids         = [data.aws_subnet.private_subnets_a.id, data.aws_subnet.private_subnets_b.id, data.aws_subnet.private_subnets_c.id]
