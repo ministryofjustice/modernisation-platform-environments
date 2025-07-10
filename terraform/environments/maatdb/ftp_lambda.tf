@@ -166,7 +166,7 @@ resource "aws_iam_role_policy" "vpc_eni_access" {
           "ec2:DescribeNetworkInterfaces",
           "ec2:DeleteNetworkInterface"
         ],
-        Resource = "arn:aws:ec2:eu-west-2:${local.environment_management.account_ids[terraform.workspace]}:network-interface/*"
+        Resource = "*"
       }
     ]
   })
