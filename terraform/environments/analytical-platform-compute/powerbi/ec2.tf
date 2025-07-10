@@ -10,7 +10,7 @@ module "powerbi_gateway_ec2" {
   count = terraform.workspace == "analytical-platform-compute-development" ? 1 : 0
 
   source  = "terraform-aws-modules/ec2-instance/aws"
-  version = "5.8.0"
+  version = "6.0.2"
 
   name                        = local.powerbi_gateway_instance_name
   ami                         = data.aws_ami.windows_server_2025.id
@@ -40,22 +40,24 @@ module "powerbi_gateway_ec2" {
     }
   ]
 
-  ebs_block_device = [
-    {
-      volume_type = "gp3"
-      device_name = "/dev/sdf"
-      volume_size = local.environment_configuration.powerbi_gateway.data_volume_size
-      encrypted   = true
+  ebs_volumes = {
+    "/dev/sdf" = {
+      size       = local.environment_configuration.powerbi_gateway.data_volume_size
+      throughput = 200
+      encrypted  = true
       tags = merge({
-        Name = "${local.powerbi_gateway_instance_name}-data-volume"
+        Name       = "${local.powerbi_gateway_instance_name}-data-volume"
+        MountPoint = "/mnt/data"
       }, local.tags, local.environment_configuration.powerbi_gateway.tags)
     }
-  ]
+  }
+
 
   metadata_options = {
     http_tokens = "required"
   }
 
+  create_security_group  = false
   vpc_security_group_ids = [module.powerbi_gateway_security_group.security_group_id]
   subnet_id              = data.aws_subnet.private_subnets_a.id
 
