@@ -29,16 +29,15 @@ module "powerbi_gateway_ec2" {
     ReadOnlyAccess = "arn:aws:iam::aws:policy/ReadOnlyAccess"
   }
 
-  root_block_device = [
-    {
-      encrypted   = true
-      volume_type = "gp3"
-      volume_size = local.environment_configuration.powerbi_gateway.root_volume_size
-      tags = merge({
-        Name = "${local.powerbi_gateway_instance_name}-root-volume"
-      }, local.tags, local.environment_configuration.powerbi_gateway.tags)
-    }
-  ]
+  root_block_device = {
+    encrypted  = true
+    type       = "gp3"
+    throughput = 200
+    size       = local.environment_configuration.powerbi_gateway.root_volume_size
+    tags = merge({
+      Name = "${local.powerbi_gateway_instance_name}-root-volume"
+    }, local.tags, local.environment_configuration.powerbi_gateway.tags)
+  }
 
   ebs_volumes = {
     "/dev/sdf" = {
