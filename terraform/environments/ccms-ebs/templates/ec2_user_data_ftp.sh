@@ -27,52 +27,26 @@ echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
 
 systemctl restart vsftpd.service
 
-cat > /etc/mount_s3.sh <<- EOM
-#!/bin/bash
+# create mount directories
+mkdir -p /s3xfer/S3/laa-ccms-inbound-${environment}-mp /s3xfer/S3/laa-ccms-outbound-${environment}-mp
+# Backup fstab first
+cp /etc/fstab /etc/fstab.bak.$(date +%F-%H%M%S)
 
-B=(laa-ccms-inbound-${lz_ftp_bucket_environment} laa-ccms-outbound-${lz_ftp_bucket_environment} laa-cis-outbound-${lz_ftp_bucket_environment} laa-cis-inbound-${lz_ftp_bucket_environment} bacway-${lz_ftp_bucket_environment}-eu-west-2-${lz_aws_account_id_env})
+# Define mount entries
+LINE1="s3fs#laa-ccms-inbound-${environment}-mp /s3xfer/S3/laa-ccms-inbound-${environment}-mp fuse _netdev,iam_role=auto,allow_other,nonempty 0 0"
+LINE2="s3fs#laa-ccms-outbound-${environment}-mp /s3xfer/S3/laa-ccms-outbound-${environment}-mp fuse _netdev,iam_role=auto,allow_other,nonempty 0 0"
 
-C=\$(aws secretsmanager get-secret-value --secret-id ftp-s3-${environment}-aws-key --region eu-west-2)
-K=\$(jq -r '.SecretString' <<< \$${C} |cut -d'"' -f2)
-S=\$(jq -r '.SecretString' <<< \$${C} |cut -d'"' -f4)
-U=\$(id -u s3xfer)
-G=\$(id -g s3xfer)
-F=/etc/passwd-s3fs
-echo "\$${K}:\$${S}" > "\$${F}"
-chmod 600 \$${F}
+# Append to fstab if not already present
+grep -qxF "$LINE1" /etc/fstab || echo "$LINE1" >> /etc/fstab
+grep -qxF "$LINE2" /etc/fstab || echo "$LINE2" >> /etc/fstab
 
-for b in "\$${B[@]}"; do
-  D=/s3xfer/S3/\$${b}
-
-  if [[ -d \$${D} ]]; then
-    echo "\$${D} exists."
-  else
-    mkdir -p \$${D}
-  fi
-
-  chown -R s3xfer:users \$${D}
-  chmod 755 \$${D}
-
-  s3fs \$${b} \$${D} -o passwd_file=\$${F} -o _netdev,allow_other,use_cache=/tmp,url=https://s3-eu-west-2.amazonaws.com,endpoint=eu-west-2,umask=022,uid=\$${U},gid=\$${G}
-  if [[ \$? -eq 0 ]]; then
-    s3fs \$${b} \$${D} -o passwd_file=\$${F}
-    echo "\$${b} has been mounted in \$${D}"
-  else
-    echo "\$${b} has not been mounted! Please investigate."
-  fi
-done
-
-ln -s /s3xfer/S3/laa-ccms-inbound-${lz_ftp_bucket_environment}/CCMS_PRD_TDX/Inbound /home/s3xfer/CCMS_PRD_TDX_Inbound
-ln -s /s3xfer/S3/laa-ccms-outbound-${lz_ftp_bucket_environment}/CCMS_PRD_TDX/Outbound /home/s3xfer/CCMS_PRD_TDX_Outbound
-
-chown -h s3xfer:s3xfer /home/s3xfer/CCMS_PRD_TDX_Inbound
-chown -h s3xfer:s3xfer /home/s3xfer/CCMS_PRD_TDX_Outbound
-
-rm \$${F}
-EOM
-
-chmod +x /etc/mount_s3.sh
-
-chmod +x /etc/rc.d/rc.local
-echo "/etc/mount_s3.sh" >> /etc/rc.local
-systemctl start rc-local.service
+echo "fstab updated."
+# Test mounting all entries and capture errors
+echo "Testing mounts with: mount -a"
+if ! sudo mount -a 2>&1 | tee /etc/mount_errors.log; then
+  echo "[ERROR] One or more mounts failed. See /tmp/mount_errors.log:"
+  cat /etc/mount_errors.log
+  exit 1
+else
+  echo "[SUCCESS] All mounts applied successfully."
+fi
