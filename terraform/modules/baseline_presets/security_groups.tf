@@ -65,6 +65,9 @@ locals {
     ec2-linux = {
       description = "Security group for linux EC2s"
 
+      ingress = {
+      }
+
       egress = {
         all = {
           # allow all since internal resources are protected by inbound SGs
