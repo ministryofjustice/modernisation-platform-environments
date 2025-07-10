@@ -1,6 +1,6 @@
 # Reference the secret for 1stlocate ftp thirdparty
 data "aws_secretsmanager_secret" "ftp_tp_secret" {
-  name = "LAA-ftp-1stlocate-ccms-inbound"
+  name = "LAA-ftp-1stlocate-ccms-inbound-${local.environment}"
 }
 
 # Get the latest version of the secret value for1stlocate ftp thirdparty
