@@ -25,7 +25,8 @@
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "info"
+      "logging_level_root": "info",
+      "db_log_retention_days": "7"
     },
     "test": {
       "app_name": "ccms-edrms",
@@ -52,7 +53,8 @@
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "info"
+      "logging_level_root": "info",
+      "db_log_retention_days": "14"
     },
     "preproduction": {
       "app_name": "ccms-edrms",
@@ -79,7 +81,8 @@
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "info"
+      "logging_level_root": "info",
+      "db_log_retention_days": "14"
     },
     "production": {
       "app_name": "ccms-edrms",
@@ -106,7 +109,8 @@
       "northgate_timeout": "300000",
       "target_min_capacity": "1",
       "target_max_capacity": "3",
-      "logging_level_root": "info"
+      "logging_level_root": "info",
+      "db_log_retention_days": "0"
     }
   }
 }
