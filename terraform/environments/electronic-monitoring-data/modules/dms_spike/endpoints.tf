@@ -17,9 +17,9 @@ resource "aws_dms_s3_endpoint" "dms_spike_target_endpoint" {
   data_format                      = "parquet"
   parquet_version                  = "parquet-2-0"
   timestamp_column_name            = "dms_spike_timestamp"
-  date_partition_enabled           = true
-  date_partition_sequence          = "YYYYMMDD"
-  date_partition_delimiter         = "DASH"
+  # date_partition_enabled           = true
+  # date_partition_sequence          = "YYYYMMDD"
+  # date_partition_delimiter         = "DASH"
   enable_statistics                = true
   parquet_timestamp_in_millisecond = true
   service_access_role_arn          = aws_iam_role.dms_spike_s3_access_role.arn
