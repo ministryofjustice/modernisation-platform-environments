@@ -131,7 +131,7 @@ resource "aws_cloudwatch_event_rule" "ftp_schedule" {
 ### cw event lambda target
 resource "aws_cloudwatch_event_target" "ftp_target" {
   count = var.env == "production" ? 1 : 0
-  rule      = aws_cloudwatch_event_rule.ftp_schedule.name
+  rule      = aws_cloudwatch_event_rule.ftp_schedule[count.index].name
   target_id = "ftp-lambda"
   arn       = aws_lambda_function.ftp_lambda.arn
 }
@@ -143,5 +143,5 @@ resource "aws_lambda_permission" "ftp_permission" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.ftp_lambda.function_name
   principal     = "events.amazonaws.com"
-  source_arn    = aws_cloudwatch_event_rule.ftp_schedule.arn
+  source_arn    = aws_cloudwatch_event_rule.ftp_schedule[count.index].arn
 }
