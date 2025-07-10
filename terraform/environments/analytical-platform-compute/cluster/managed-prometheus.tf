@@ -9,6 +9,7 @@ module "managed_prometheus" {
   kms_key_arn     = module.managed_prometheus_kms.key_arn
   logging_configuration = {
     log_group_arn = "${module.managed_prometheus_log_group.cloudwatch_log_group_arn}:*"
+    # log_group_arn = "${data.aws_cloudwatch_log_group.prometheus_logs.arn}:*"
   }
 
   tags = local.tags

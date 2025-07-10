@@ -19,7 +19,7 @@ resource "kubernetes_manifest" "ui_sentry_dsn_external_secret" {
       "data" = [
         {
           "remoteRef" = {
-            "key" = module.ui_sentry_dsn_secret.secret_id
+            "key" = tostring(module.ui_sentry_dsn_secret.secret_id)
           }
           "secretKey" = "dsn"
         },
@@ -49,13 +49,13 @@ resource "kubernetes_manifest" "ui_azure_external_secret" {
       "data" = [
         {
           "remoteRef" = {
-            "key" = module.ui_azure_client_secret.secret_id
+            "key" = tostring(module.ui_azure_client_secret.secret_id)
           }
           "secretKey" = "client-id"
         },
         {
           "remoteRef" = {
-            "key" = module.ui_azure_tenant_secret.secret_id
+            "key" = tostring(module.ui_azure_tenant_secret.secret_id)
           }
           "secretKey" = "tenant-id"
         },
