@@ -66,14 +66,8 @@ locals {
       description = "Security group for linux EC2s"
 
       ingress = {
-        all-from-self = {
-          description = "Allow all ingress to self"
-          from_port   = 0
-          to_port     = 0
-          protocol    = -1
-          self        = true
-        }
       }
+
       egress = {
         all = {
           # allow all since internal resources are protected by inbound SGs
@@ -91,15 +85,6 @@ locals {
       description = "Security group for windows EC2s"
 
       ingress = merge(
-        {
-          all-from-self = {
-            description = "Allow all ingress to self"
-            from_port   = 0
-            to_port     = 0
-            protocol    = -1
-            self        = true
-          }
-        },
         var.options.enable_hmpps_domain ? {
           rpc-from-jumpservers = {
             description = "Allow RPC from jumpservers"

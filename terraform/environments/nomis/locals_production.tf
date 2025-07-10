@@ -9,6 +9,7 @@ locals {
   baseline_presets_production = {
     options = {
       enable_xsiam_cloudwatch_integration = true
+      enable_xsiam_s3_integration         = true
       route53_resolver_rules = {
         outbound-data-and-private-subnets = ["azure-fixngo-domain", "infra-int-domain"]
       }
@@ -511,8 +512,15 @@ locals {
 
     lbs = {
       private = merge(local.lbs.private, {
-
         access_logs_lifecycle_rule = [module.baseline_presets.s3_lifecycle_rules.general_purpose_one_year]
+
+        s3_notification_queues = {
+          "cortex-xsiam-s3-alb-log-collection" = {
+            events    = ["s3:ObjectCreated:*"]
+            queue_arn = "cortex-xsiam-s3-alb-log-collection"
+          }
+        }
+
         listeners = merge(local.lbs.private.listeners, {
           https = merge(local.lbs.private.listeners.https, {
             certificate_names_or_arns = ["nomis_wildcard_cert_v3"]

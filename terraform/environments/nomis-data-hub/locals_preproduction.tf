@@ -88,7 +88,5 @@ locals {
     secretsmanager_secrets = {
       "/ndh/pp" = local.secretsmanager_secrets.ndh
     }
-
-    security_groups = local.security_groups_old
   }
 }

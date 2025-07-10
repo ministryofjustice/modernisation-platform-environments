@@ -29,7 +29,7 @@ module "analytical_platform_jml_report_ecr_repository" {
         {
           test     = "StringLike"
           variable = "aws:sourceArn"
-          values   = ["arn:aws:lambda:${data.aws_region.current.name}:${local.environment_management.account_ids["analytical-platform-data-production"]}:function:analytical-platform-jml-report"]
+          values   = ["arn:aws:lambda:${data.aws_region.current.region}:${local.environment_management.account_ids["analytical-platform-data-production"]}:function:analytical-platform-jml-report"]
         }
       ]
     }
