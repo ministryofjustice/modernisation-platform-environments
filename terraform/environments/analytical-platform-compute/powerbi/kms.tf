@@ -4,7 +4,7 @@ module "auth0_secrets_kms" {
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "2.1.0"
+  version = "4.0.0"
 
   description             = "KMS key for Auth0 provider secrets"
   key_usage               = "ENCRYPT_DECRYPT"
