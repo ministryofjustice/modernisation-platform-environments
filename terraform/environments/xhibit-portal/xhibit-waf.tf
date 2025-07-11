@@ -3,6 +3,7 @@ module "waf" {
   enable_ddos_protection = false
   ddos_rate_limit        = 5000
   block_non_uk_traffic   = false
+  associated_resource_arns = [aws_lb.waf_lb.arn]
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
