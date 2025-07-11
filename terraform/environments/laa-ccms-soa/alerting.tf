@@ -84,7 +84,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
   threshold           = "75"
   treat_missing_data  = "missing"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -102,7 +102,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
   threshold           = "4"
   treat_missing_data  = "missing"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -121,7 +121,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_free_storage_threshold_gb
   treat_missing_data  = "missing"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -139,7 +139,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
   threshold           = "1"
   treat_missing_data  = "missing"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -158,7 +158,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_write_iops_threshold
   treat_missing_data  = "missing"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -177,7 +177,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Read_IOPS_Threshold" {
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_read_iops_threshold
   treat_missing_data  = "missing"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
