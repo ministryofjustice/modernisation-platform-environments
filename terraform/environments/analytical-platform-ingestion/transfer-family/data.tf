@@ -28,20 +28,20 @@ data "aws_subnets" "isolated_public" {
 data "aws_subnet" "isolated_private_subnets_a" {
   vpc_id = data.aws_vpc.isolated.id
   tags = {
-    "Name" = "${local.application_name}-${local.environment}-isolated-private-${data.aws_region.current.name}a"
+    "Name" = "${local.application_name}-${local.environment}-isolated-private-${data.aws_region.current.region}a"
   }
 }
 
 data "aws_subnet" "isolated_private_subnets_b" {
   vpc_id = data.aws_vpc.isolated.id
   tags = {
-    "Name" = "${local.application_name}-${local.environment}-isolated-private-${data.aws_region.current.name}b"
+    "Name" = "${local.application_name}-${local.environment}-isolated-private-${data.aws_region.current.region}b"
   }
 }
 
 data "aws_subnet" "isolated_private_subnets_c" {
   vpc_id = data.aws_vpc.isolated.id
   tags = {
-    "Name" = "${local.application_name}-${local.environment}-isolated-private-${data.aws_region.current.name}c"
+    "Name" = "${local.application_name}-${local.environment}-isolated-private-${data.aws_region.current.region}c"
   }
 }

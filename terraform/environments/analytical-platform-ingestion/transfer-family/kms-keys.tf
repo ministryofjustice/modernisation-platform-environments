@@ -2,7 +2,7 @@ module "transfer_server_logs_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["logs/transfer-server"]
   description           = "CloudWatch Logs for the Transfer Server"
@@ -22,14 +22,14 @@ module "transfer_server_logs_kms" {
       principals = [
         {
           type        = "Service"
-          identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
       conditions = [
         {
           test     = "ArnEquals"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:/aws/transfer-server-structured-logs"]
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:/aws/transfer-server-structured-logs"]
         }
       ]
     }
@@ -42,7 +42,7 @@ module "s3_transfer_landing_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["s3/transfer/landing"]
   description           = "Family SFTP Server, Landing S3 KMS Key"
@@ -55,7 +55,7 @@ module "supplier_data_kms" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
 
   source  = "terraform-aws-modules/kms/aws"
-  version = "3.1.0"
+  version = "3.1.1"
 
   aliases               = ["secretsmanager/transfer/supplier-data"]
   description           = "Key for SFTP supplier data"
