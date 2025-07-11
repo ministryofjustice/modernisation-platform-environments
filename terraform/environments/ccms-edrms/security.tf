@@ -17,8 +17,9 @@ resource "aws_security_group_rule" "alb_ingress_443" {
   protocol          = "TCP"
   from_port         = 443
   to_port           = 443
-  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block]
+  cidr_blocks       = [data.aws_subnet.private_subnets_a.cidr_block, data.aws_subnet.private_subnets_b.cidr_block, data.aws_subnet.private_subnets_c.cidr_block, local.application_data.accounts[local.environment].northgate_proxy]
 }
+
 
 resource "aws_security_group_rule" "alb_egress_all" {
   security_group_id = aws_security_group.load_balancer.id
