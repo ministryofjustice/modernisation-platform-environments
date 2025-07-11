@@ -88,9 +88,9 @@ locals {
       priority = 9
       managed_rule_group_statement = {
         name = "AWSManagedRulesWindowsRuleSet"
-        excluded_rule {
-        name = "WindowsShellCommands_BODY"
-        }
+        excluded_rule = [
+          { name = "WindowsShellCommands_BODY" }
+        ]
       }
     },
     {
