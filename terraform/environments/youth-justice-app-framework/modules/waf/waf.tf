@@ -50,13 +50,6 @@ resource "aws_wafv2_web_acl" "waf" {
           name        = rule.value.managed_rule_group_statement.name
           vendor_name = lookup(rule.value.managed_rule_group_statement, "vendor_name", "AWS")
 
-          dynamic "excluded_rule" {
-            for_each = lookup(rule.value.managed_rule_group_statement, "excluded_rule", [])
-            content {
-              name = excluded_rule.value.name
-              }
-          }
-
           dynamic "rule_action_override" {
             for_each = lookup(rule.value.managed_rule_group_statement, "rule_action_override", [])
             content {
@@ -184,14 +177,6 @@ resource "aws_wafv2_web_acl" "cf" {
         managed_rule_group_statement {
           name        = rule.value.managed_rule_group_statement.name
           vendor_name = lookup(rule.value.managed_rule_group_statement, "vendor_name", "AWS")
-
-
-          dynamic "excluded_rule" {
-            for_each = lookup(rule.value.managed_rule_group_statement, "excluded_rule", [])
-            content {
-              name = excluded_rule.value.name
-              }
-          }
 
           dynamic "rule_action_override" {
             for_each = lookup(rule.value.managed_rule_group_statement, "rule_action_override", [])
