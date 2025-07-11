@@ -916,7 +916,9 @@ data "aws_iam_policy_document" "ap_assume_role" {
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:ministryofjustice/data-engineering-datalake-access:ref:refs/heads/*"]
+      values = ["repo:ministryofjustice/data-engineering-datalake-access:ref:refs/heads/*",
+        "repo:ministryofjustice/analytical-platform:ref:refs/heads/*"
+      ]
     }
   }
 }
