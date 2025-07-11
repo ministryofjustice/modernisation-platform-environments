@@ -48,6 +48,6 @@ module "endpoints" {
     }
   }
 
-  tags = "${local.application_name}-s3-secrets-endpoint"
+  tags = {Name = "${local.application_name}-s3-secrets-endpoint"}
 
 }
