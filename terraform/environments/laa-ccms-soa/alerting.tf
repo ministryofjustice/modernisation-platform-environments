@@ -117,7 +117,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
   namespace           = "AWS/RDS"
   period              = "300"
   evaluation_periods  = "3"
-  datapoints_to_alarm = "5"
+  datapoints_to_alarm = "3"
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_free_storage_threshold_gb
   treat_missing_data  = "missing"
   dimensions = {
