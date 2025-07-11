@@ -296,11 +296,11 @@ resource "aws_wafv2_web_acl" "waf_acl" {
 
 }
 
-resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
-  resource_arn = aws_lb.waf_lb.arn
-  count        = local.is-production ? 0 : 1
-  web_acl_arn  = aws_wafv2_web_acl.waf_acl[0].arn
-}
+# resource "aws_wafv2_web_acl_association" "aws_lb_waf_association" {
+#   resource_arn = aws_lb.waf_lb.arn
+#   count        = local.is-production ? 0 : 1
+#   web_acl_arn  = aws_wafv2_web_acl.waf_acl[0].arn
+# }
 
 # trivy:ignore:AVD-AWS-0086 reason: (HIGH): No public access block so not blocking public acls
 # trivy:ignore:AVD-AWS-0087 reason: (HIGH): No public access block so not blocking public policies
