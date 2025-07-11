@@ -1,13 +1,13 @@
 module "waf" {
   source = "git::https://github.com/ministryofjustice/modernisation-platform-terraform-waf?ref=v0.0.1"
-  enable_ddos_protection = false
+  enable_ddos_protection = true
   ddos_rate_limit        = 5000
-  block_non_uk_traffic   = false
+  block_non_uk_traffic   = true
   associated_resource_arns = [aws_lb.waf_lb.arn]
 
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
-    AWSManagedRulesCommonRuleSet         = false
+    AWSManagedRulesCommonRuleSet         = true
     AWSManagedRulesSQLiRuleSet           = false
     AWSManagedRulesLinuxRuleSet          = false
     AWSManagedRulesAnonymousIpList       = false
