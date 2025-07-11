@@ -48,6 +48,6 @@ module "endpoints" {
     }
   }
 
-  tags = merge(var.tags, { network = "Private" })
+  tags = "${local.application_name}-s3-secrets-endpoint"
 
 }
