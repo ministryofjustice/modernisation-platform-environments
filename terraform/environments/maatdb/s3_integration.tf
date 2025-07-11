@@ -36,6 +36,10 @@ module "s3_bucket" {
         autoclean = "false"
       }
 
+      noncurrent_version_expiration = {
+        days = 31
+      }
+    
       transition = [
         {
           days          = 90

@@ -41,7 +41,6 @@ locals {
 
 }
 
-
 # IAM  Resources
 
 resource "aws_iam_role" "ftp_lambda_role" {
@@ -73,9 +72,9 @@ resource "aws_iam_role_policy_attachment" "basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy" "shared_bucket_access" {
+resource "aws_iam_role_policy" "general_lambda_access" {
   count = local.build_ftp ? 1 : 0
-  name  = "S3SharedBucketAccess"
+  name  = "GeneralLambdaAccess"
   role  = aws_iam_role.ftp_lambda_role[0].id
 
   policy = jsonencode({
@@ -95,15 +94,22 @@ resource "aws_iam_role_policy" "shared_bucket_access" {
         Resource = "arn:aws:s3:::${local.ftp_layer_bucket}"
       },
       {
-        Effect = "Allow",
-        Action = [
+        Effect = "Allow"
+        actions = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
-          "logs:PutLogEvents",
+          "logs:PutLogEvents"
+        ]
+        resources = [
+          "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*"
+        ]
+      },
+      {
+        effect = "Allow"
+        actions = [
           "cloudwatch:PutMetricData"
-        ],
-        Resource = "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*"
-
+        ]
+        resources = ["*"]
       }
     ]
   })
