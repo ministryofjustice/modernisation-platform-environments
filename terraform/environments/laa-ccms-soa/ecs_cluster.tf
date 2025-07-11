@@ -2,7 +2,7 @@
 resource "aws_ecs_capacity_provider" "managed" {
   name = "${local.application_data.accounts[local.environment].app_name}-capacity-provider-managed"
   auto_scaling_group_provider {
-    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group-managed.arn #--OUTSTANDING RESOURCE
+    auto_scaling_group_arn = aws_autoscaling_group.cluster-scaling-group-managed.arn
   }
 }
 
@@ -45,12 +45,12 @@ resource "aws_ecs_task_definition" "admin" {
   }
   volume {
     name      = "inbound_volume"
-    host_path = "/home/ec2-user/inbound" #--Don't like the look of this, revisit. AW
+    host_path = "/home/ec2-user/inbound"
   }
 
   volume {
     name      = "outbound_volume"
-    host_path = "/home/ec2-user/outbound" #--Don't like the look of this, revisit. AW
+    host_path = "/home/ec2-user/outbound"
   }
 
   container_definitions = templatefile(
