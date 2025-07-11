@@ -157,8 +157,7 @@ module "allpay_ftp_lambda_outbound" {
   secret_arn = aws_secretsmanager_secret.secrets["LAA-ftp-allpay-inbound-ccms"].arn
   s3_bucket_ftp       = aws_s3_bucket.buckets["laa-ccms-ftp-lambda-${local.environment}-mp"].bucket
   s3_object_ftp_clientlibs = aws_s3_object.ftp_lambda_layer.key
-   s3_object_ftp_client= aws_s3_object.ftp_client.key
-
+  s3_object_ftp_client= aws_s3_object.ftp_client.key
 }
 
 
@@ -189,6 +188,7 @@ module "LAA-ftp-xerox-ccms-outbound" {
   ftp_transfer_type   = "SFTP_UPLOAD"
   ftp_local_path      = "CCMS_PRD_DST/Outbound/"
   ftp_remote_path     = "/Production/outbound/CCMS/"
+  ftp_file_types      = "zip"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-outbound-${local.environment}-mp"].bucket
   env                 = local.environment
   secret_name = "LAA-ftp-xerox-outbound-${local.environment}"
@@ -281,6 +281,7 @@ module "LAA-ftp-1stlocate-ccms-inbound" {
   ftp_transfer_type   = "SFTP_DOWNLOAD"
   ftp_local_path      = "CCMS_PRD_TDX_DECRYPTED/Inbound/"
   ftp_remote_path     = "/LAA_Direct/ToLAADirect/"
+  ftp_port            = "8022"
   ftp_bucket          = aws_s3_bucket.buckets["laa-ccms-inbound-${local.environment}-mp"].bucket
   env                 = local.environment
   secret_name = "LAA-ftp-1stlocate-ccms-inbound-${local.environment}"
