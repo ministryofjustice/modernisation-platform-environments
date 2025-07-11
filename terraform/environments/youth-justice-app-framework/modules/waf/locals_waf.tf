@@ -84,17 +84,6 @@ locals {
       }
     },
     {
-      name     = "AWSManagedRulesWindowsRuleSet"
-      priority = 9
-      managed_rule_group_statement = {
-        name = "AWSManagedRulesWindowsRuleSet"
-        vendor_name = "AWS"
-        excluded_rule = [
-          { name = "WindowsShellCommands_BODY" }
-        ]
-      }
-    },
-    {
       name     = "AWSManagedRulesKnownBadInputsRuleSet"
       priority = 10
       managed_rule_group_statement = {
