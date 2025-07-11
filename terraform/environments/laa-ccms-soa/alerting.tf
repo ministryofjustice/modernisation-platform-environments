@@ -82,7 +82,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
   period              = "300"
   evaluation_periods  = "3"
   threshold           = "75"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
@@ -100,7 +100,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
   period              = "300"
   evaluation_periods  = "3"
   threshold           = "4"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
@@ -119,7 +119,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
   evaluation_periods  = "3"
   datapoints_to_alarm = "3"
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_free_storage_threshold_gb
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
@@ -137,7 +137,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
   period              = "300"
   evaluation_periods  = "3"
   threshold           = "1"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
@@ -156,7 +156,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
   datapoints_to_alarm = "3"
   evaluation_periods  = "3"
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_write_iops_threshold
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
@@ -175,7 +175,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Read_IOPS_Threshold" {
   datapoints_to_alarm = "3"
   evaluation_periods  = "3"
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_read_iops_threshold
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
     DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
