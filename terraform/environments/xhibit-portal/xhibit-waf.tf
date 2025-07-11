@@ -4,8 +4,6 @@ module "waf" {
   ddos_rate_limit        = 5000
   block_non_uk_traffic   = false
 
-  associated_resource_arns = [""]
-
   managed_rule_actions = {
     AWSManagedRulesKnownBadInputsRuleSet = false
     AWSManagedRulesCommonRuleSet         = false
