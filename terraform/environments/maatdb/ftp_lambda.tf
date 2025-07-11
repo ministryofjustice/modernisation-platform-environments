@@ -94,22 +94,22 @@ resource "aws_iam_role_policy" "general_lambda_access" {
         Resource = "arn:aws:s3:::${local.ftp_layer_bucket}"
       },
       {
-        Effect = "Allow"
-        actions = [
+        Effect = "Allow",
+        Action = [
           "logs:CreateLogGroup",
           "logs:CreateLogStream",
           "logs:PutLogEvents"
-        ]
-        resources = [
+        ],
+        Resource = [
           "arn:aws:logs:*:${local.environment_management.account_ids[terraform.workspace]}:*"
         ]
       },
       {
-        effect = "Allow"
-        actions = [
+        Effect = "Allow",
+        Action = [
           "cloudwatch:PutMetricData"
-        ]
-        resources = ["*"]
+        ],
+        Resource = ["*"]
       }
     ]
   })
