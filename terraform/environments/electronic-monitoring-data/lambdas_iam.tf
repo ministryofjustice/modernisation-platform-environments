@@ -533,6 +533,15 @@ data "aws_iam_policy_document" "zero_etl" {
     ]
   }
   statement {
+    sid       = "CreateDatabase"
+    effect    = "Allow"
+    actions   = ["glue:CreateDatabase"]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database/*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
+    ]
+  }
+  statement {
     sid       = "ListAccountAlias"
     effect    = "Allow"
     actions   = ["iam:ListAccountAliases"]
