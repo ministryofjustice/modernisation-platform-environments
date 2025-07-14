@@ -41,6 +41,6 @@ module "endpoints" {
     }
   }
 
-  tags = {Name = "${local.application_name}"}
+  tags = {Name = "${local.application_name}-secrets-endpoint"}
 
 }
