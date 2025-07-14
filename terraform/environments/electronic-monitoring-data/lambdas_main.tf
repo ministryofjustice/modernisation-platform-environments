@@ -208,5 +208,24 @@ module "calculate_checksum" {
 
 }
 
+#-----------------------------------------------------------------------------------
+# Deploy/destroy zero etl
+#-----------------------------------------------------------------------------------
 
-
+module "zero_etl" {
+  source                  = "./modules/lambdas"
+  is_image                = true
+  function_name           = "zero_etl"
+  role_name               = aws_iam_role.zero_etl.name
+  role_arn                = aws_iam_role.zero_etl.arn
+  handler                 = "zero_etl.handler"
+  memory_size             = 4096
+  timeout                 = 900
+  security_group_ids      = [aws_security_group.lambda_generic.id]
+  subnet_ids              = data.aws_subnets.shared-public.ids
+  core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
+  production_dev          = local.is-production ? "prod" : "dev"
+  environment_variables   = {
+    CONN_AWS_ROLE_ARN = aws_iam_role.glue_connection_snow_access.arn
+  }
+}

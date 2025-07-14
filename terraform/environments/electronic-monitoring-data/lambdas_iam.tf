@@ -495,3 +495,63 @@ resource "aws_iam_role_policy" "calculate_checksum" {
   policy = data.aws_iam_policy_document.calculate_checksum.json
 }
 
+#-----------------------------------------------------------------------------------
+# Deploy/destroy zero etl
+#-----------------------------------------------------------------------------------
+
+resource "aws_iam_role" "zero_etl" {
+  name               = "zero-etl-lambda-iam-role"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
+}
+
+data "aws_iam_policy_document" "zero_etl" {
+  statement {
+    sid = "AllowIntegrationDeploymentDestruction"
+    effect = "Allow"
+    actions = [
+      "glue:CreateIntegration*",
+      "glue:DeleteIntegration*",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:integration*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:connection*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:database*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog*",
+    ]
+  }
+  statement {
+    sid = "AllowConnectionDeploymentDestruction"
+    effect = "Allow"
+    actions = [
+      "glue:CreateConnection",
+      "glue:DeleteConnection",
+      "glue:BatchDeleteConnection",
+    ]
+    resources = [
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:rootcatalog*",
+      "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:connection*",
+    ]
+  }
+  statement {
+    sid       = "ListAccountAlias"
+    effect    = "Allow"
+    actions   = ["iam:ListAccountAliases"]
+    resources = ["*"]
+  }
+  statement {
+    sid    = "ListAllSecrets"
+    effect = "Allow"
+    actions = ["secretsmanager:ListSecrets"]
+    resources = ["arn:aws:secretsmanager:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:secret"]
+  }
+}
+
+resource "aws_iam_policy" "zero_etl" {
+  name   = "zero-etl-policy"
+  policy = data.aws_iam_policy_document.zero_etl.json
+}
+
+resource "aws_iam_role_policy_attachment" "zero_etl" {
+  role       = aws_iam_role.zero_etl.name
+  policy_arn = aws_iam_policy.zero_etl.arn
+}

@@ -52,14 +52,12 @@ resource "aws_iam_role_policy_attachment" "glue_connection_snow_access" {
 }
 
 # resource "aws_glue_connection" "servicenow" {
-#   name            = "servicenow"
-#   connection_type = "MARKETPLACE"
+#   name            = "servicenow-connector"
+#   connection_type = "SERVICENOW"
 #   connection_properties = {
-#     CONNECTOR_CLASS_NAME = "net.snowflake.client.jdbc.SnowflakeDriver"
+#     SECRET_ID = "net.snowflake.client.jdbc.SnowflakeDriver"
 #     CONNECTION_TYPE      = "Jdbc"
 #     CONNECTOR_URL        = "s3://example/snowflake-jdbc.jar" # S3 path to the snowflake jdbc jar
 #     JDBC_CONNECTION_URL  = "[[\"default=jdbc❄//example.com/?user=$${user}&password=$${password}\"],\",\"]"
 #   }
-#   match_criteria = ["template-connection"]
 # }
-
