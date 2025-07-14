@@ -28,42 +28,42 @@ resource "aws_security_group" "ec2_sg_ftp" {
 
 ### FTP
 
-resource "aws_security_group_rule" "ingress_traffic_ftp_20" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "ingress"
-  description       = "FTP"
-  protocol          = "TCP"
-  from_port         = 20
-  to_port           = 21
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-  local.application_data.accounts[local.environment].lz_aws_subnet_env]
-}
+# resource "aws_security_group_rule" "ingress_traffic_ftp_20" {
+#   security_group_id = aws_security_group.ec2_sg_ftp.id
+#   type              = "ingress"
+#   description       = "FTP"
+#   protocol          = "TCP"
+#   from_port         = 20
+#   to_port           = 21
+#   cidr_blocks = [data.aws_vpc.shared.cidr_block,
+#   local.application_data.accounts[local.environment].lz_aws_subnet_env]
+# }
 
-### FTP Passive Ports
+# ### FTP Passive Ports
 
-resource "aws_security_group_rule" "ingress_traffic_ftp_3000" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "ingress"
-  description       = "FTP Passive Ports"
-  protocol          = "TCP"
-  from_port         = 3000
-  to_port           = 3010
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-  local.application_data.accounts[local.environment].lz_aws_subnet_env]
-}
+# resource "aws_security_group_rule" "ingress_traffic_ftp_3000" {
+#   security_group_id = aws_security_group.ec2_sg_ftp.id
+#   type              = "ingress"
+#   description       = "FTP Passive Ports"
+#   protocol          = "TCP"
+#   from_port         = 3000
+#   to_port           = 3010
+#   cidr_blocks = [data.aws_vpc.shared.cidr_block,
+#   local.application_data.accounts[local.environment].lz_aws_subnet_env]
+# }
 
-### SSH
+# ### SSH
 
-resource "aws_security_group_rule" "ingress_traffic_ftp_22" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "ingress"
-  description       = "SSH"
-  protocol          = "TCP"
-  from_port         = 22
-  to_port           = 22
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-  local.application_data.accounts[local.environment].lz_aws_subnet_env]
-}
+# resource "aws_security_group_rule" "ingress_traffic_ftp_22" {
+#   security_group_id = aws_security_group.ec2_sg_ftp.id
+#   type              = "ingress"
+#   description       = "SSH"
+#   protocol          = "TCP"
+#   from_port         = 22
+#   to_port           = 22
+#   cidr_blocks = [data.aws_vpc.shared.cidr_block,
+#   local.application_data.accounts[local.environment].lz_aws_subnet_env]
+# }
 
 
 
@@ -71,28 +71,28 @@ resource "aws_security_group_rule" "ingress_traffic_ftp_22" {
 
 ### FTP
 
-resource "aws_security_group_rule" "egress_traffic_ftp_20" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "egress"
-  description       = "FTP"
-  protocol          = "TCP"
-  from_port         = 20
-  to_port           = 21
-  cidr_blocks = [data.aws_vpc.shared.cidr_block,
-  local.application_data.accounts[local.environment].lz_aws_subnet_env]
-}
+# resource "aws_security_group_rule" "egress_traffic_ftp_20" {
+#   security_group_id = aws_security_group.ec2_sg_ftp.id
+#   type              = "egress"
+#   description       = "FTP"
+#   protocol          = "TCP"
+#   from_port         = 20
+#   to_port           = 21
+#   cidr_blocks = [data.aws_vpc.shared.cidr_block,
+#   local.application_data.accounts[local.environment].lz_aws_subnet_env]
+# }
 
 ### SSH
 
-resource "aws_security_group_rule" "egress_traffic_ftp_22" {
-  security_group_id = aws_security_group.ec2_sg_ftp.id
-  type              = "egress"
-  description       = "SSH"
-  protocol          = "TCP"
-  from_port         = 22
-  to_port           = 22
-  cidr_blocks       = ["0.0.0.0/0"]
-}
+# resource "aws_security_group_rule" "egress_traffic_ftp_22" {
+#   security_group_id = aws_security_group.ec2_sg_ftp.id
+#   type              = "egress"
+#   description       = "SSH"
+#   protocol          = "TCP"
+#   from_port         = 22
+#   to_port           = 22
+#   cidr_blocks       = ["0.0.0.0/0"]
+# }
 
 ### SFTP
 resource "aws_security_group_rule" "egress_traffic_ftp_8022" {
