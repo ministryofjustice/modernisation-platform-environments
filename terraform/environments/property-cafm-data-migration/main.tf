@@ -32,13 +32,6 @@ module "endpoints" {
   }
   endpoints = {
 
-    s3 = {
-      service_type    = "Gateway" # gateway endpoint
-      service         = "s3"
-      route_table_ids = module.vpc.private_route_table_ids
-      tags            = { Name = "s3-eu-west-1-dev" }
-    }
-
     secrets_manager = {
       service             = "secretsmanager"
       service_type        = "Interface"
@@ -48,6 +41,6 @@ module "endpoints" {
     }
   }
 
-  tags = {Name = "${local.application_name}-s3-secrets-endpoint"}
+  tags = {Name = "${local.application_name}"}
 
 }
