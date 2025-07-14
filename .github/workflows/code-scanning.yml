@@ -53,7 +53,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run Trivy vulnerability scanner in repo mode
-        uses: aquasecurity/trivy-action@76071ef0d7ec797419534a183b498b4d6366cf37
+        uses: aquasecurity/trivy-action@dc5a429b52fcf669ce959baa2c2dd26090d2a6c4
         with:
           scan-type: 'fs'
           scanners: misconfig,vuln,secret
@@ -81,7 +81,7 @@ jobs:
           fetch-depth: 0
       - name: Run Checkov action
         id: checkov
-        uses: bridgecrewio/checkov-action@d1ecbbd991738bb77267c875eff09fe1f2c6e044 # v12.3036.0
+        uses: bridgecrewio/checkov-action@6375fb7a379f76cc615af7b954f0ef630037c351 # v12.3039.0
         with:
           directory: ./
           framework: terraform

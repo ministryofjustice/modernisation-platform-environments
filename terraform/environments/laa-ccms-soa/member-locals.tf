@@ -10,4 +10,5 @@ locals {
     data.aws_subnet.private_subnets_b.cidr_block,
     data.aws_subnet.private_subnets_c.cidr_block
   ]
+  aws_account_id = data.aws_caller_identity.current.account_id
 }
