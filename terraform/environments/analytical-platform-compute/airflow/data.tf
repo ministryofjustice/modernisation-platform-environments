@@ -35,7 +35,7 @@ data "aws_subnet" "apc_private_subnet_a" {
     values = [data.aws_vpc.apc_vpc.id]
   }
   tags = {
-    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.name}a"
+    Name = "${var.networking[0].application}-${local.environment}-private-${data.aws_region.current.region}a"
   }
 }
 
