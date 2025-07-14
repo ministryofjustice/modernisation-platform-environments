@@ -3,8 +3,7 @@ resource "kubernetes_manifest" "eso_secretstore_data_production" {
     "apiVersion" = "external-secrets.io/v1"
     "kind"       = "SecretStore"
     "metadata" = {
-      # "namespace" = kubernetes_namespace.mwaa.metadata[0].name
-      "namespace" = data.kubernetes_namespace.mwaa.metadata[0].name
+      "namespace" = kubernetes_namespace.mwaa.metadata[0].name
       "name"      = "analytical-platform-data-production"
     }
     "spec" = {
@@ -15,8 +14,7 @@ resource "kubernetes_manifest" "eso_secretstore_data_production" {
           "auth" = {
             "jwt" = {
               "serviceAccountRef" = {
-                # "name" = kubernetes_service_account.mwaa_external_secrets_analytical_platform_data_production.metadata[0].name
-                "name" = data.kubernetes_service_account.mwaa_external_secrets_analytical_platform_data_production_name.metadata[0].name
+                "name" = kubernetes_service_account.mwaa_external_secrets_analytical_platform_data_production.metadata[0].name
               }
             }
           }

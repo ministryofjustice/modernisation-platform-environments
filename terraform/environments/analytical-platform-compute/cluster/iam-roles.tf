@@ -90,11 +90,10 @@ module "external_dns_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "5.58.0"
 
-  role_name_prefix           = "external-dns"
-  attach_external_dns_policy = true
-  # external_dns_hosted_zone_arns = [module.route53_zones.route53_zone_zone_arn[local.environment_configuration.route53_zone]]
+  role_name_prefix              = "external-dns"
+  attach_external_dns_policy    = true
   external_dns_hosted_zone_arns = [data.aws_route53_zone.route53_zone_zone.arn]
-  # is this right ? BDE
+
 
   oidc_providers = {
     main = {
@@ -113,11 +112,9 @@ module "cert_manager_iam_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
   version = "5.58.0"
 
-  role_name_prefix           = "cert-manager"
-  attach_cert_manager_policy = true
-  # cert_manager_hosted_zone_arns = [module.route53_zones.route53_zone_zone_arn[local.environment_configuration.route53_zone]]
+  role_name_prefix              = "cert-manager"
+  attach_cert_manager_policy    = true
   cert_manager_hosted_zone_arns = [data.aws_route53_zone.route53_zone_zone.arn]
-  # is this right ? BDE
 
   oidc_providers = {
     main = {
@@ -138,8 +135,7 @@ module "external_secrets_iam_role" {
 
   role_name_prefix               = "external-secrets"
   attach_external_secrets_policy = true
-  # external_secrets_kms_key_arns  = [module.common_secrets_manager_kms.key_arn]
-  external_secrets_kms_key_arns = [data.aws_kms_key.common_secrets_manager_kms.arn]
+  external_secrets_kms_key_arns  = [module.common_secrets_manager_kms.key_arn]
 
   oidc_providers = {
     main = {
@@ -167,8 +163,7 @@ module "aws_for_fluent_bit_iam_role" {
 
   oidc_providers = {
     main = {
-      provider_arn = module.eks.oidc_provider_arn
-      # namespace_service_accounts = ["${data.kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
+      provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:aws-for-fluent-bit"]
     }
   }
@@ -189,8 +184,7 @@ module "analytical_platform_ui_service_role" {
 
   oidc_providers = {
     main = {
-      provider_arn = module.eks.oidc_provider_arn
-      # provider_arn               = data.aws_iam_openid_connect_provider.eks.arn
+      provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["${kubernetes_namespace.ui.metadata[0].name}:ui"]
     }
   }
@@ -216,10 +210,8 @@ module "amazon_prometheus_proxy_iam_role" {
 
   oidc_providers = {
     main = {
-      provider_arn = module.eks.oidc_provider_arn
-      # provider_arn = data.aws_iam_openid_connect_provider.eks.arn
+      provider_arn               = module.eks.oidc_provider_arn
       namespace_service_accounts = ["${kubernetes_namespace.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
-      # namespace_service_accounts = ["${data.kubernetes_namespace.aws_observability.metadata[0].name}:amazon-prometheus-proxy"]
     }
   }
 
