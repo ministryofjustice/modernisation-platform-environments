@@ -221,8 +221,6 @@ module "zero_etl" {
   handler                 = "zero_etl.handler"
   memory_size             = 4096
   timeout                 = 900
-  security_group_ids      = [aws_security_group.lambda_generic.id]
-  subnet_ids              = data.aws_subnets.shared-public.ids
   core_shared_services_id = local.environment_management.account_ids["core-shared-services-production"]
   production_dev          = local.is-production ? "prod" : "dev"
   environment_variables   = {
