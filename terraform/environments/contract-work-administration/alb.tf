@@ -289,7 +289,7 @@ resource "aws_ec2_managed_prefix_list" "moj_ip_allowlist" {
   }
 
   tags = {
-    Name = "moj-aws-ip-allowlist"
+    Name        = "moj-aws-ip-allowlist"
     Environment = "all"
   }
 }
@@ -394,7 +394,7 @@ resource "aws_vpc_security_group_ingress_rule" "external_lb_inbound_laa_allowlis
 
 resource "aws_vpc_security_group_ingress_rule" "external_lb_inbound_MOJ_allowlist" {
   security_group_id = aws_security_group.external_lb.id
-  prefix_list_id    = aws_ec2_managed_prefix_list.moj_ip_allowlist.id 
+  prefix_list_id    = aws_ec2_managed_prefix_list.moj_ip_allowlist.id
   from_port         = 443
   ip_protocol       = "tcp"
   to_port           = 443

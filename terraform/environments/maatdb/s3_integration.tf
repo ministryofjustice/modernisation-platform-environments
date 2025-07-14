@@ -197,8 +197,8 @@ resource "aws_secretsmanager_secret" "s3ftp_access_key_secret" {
 }
 
 resource "aws_secretsmanager_secret_version" "s3ftp_access_key_secret_version" {
-  count = local.build_s3 ? 1 : 0
-  secret_id  = aws_secretsmanager_secret.s3ftp_access_key_secret[0].id
+  count     = local.build_s3 ? 1 : 0
+  secret_id = aws_secretsmanager_secret.s3ftp_access_key_secret[0].id
   secret_string = jsonencode({
     IAM_ACCESS_KEY_ID     = aws_iam_access_key.ftp_user_key[0].id
     IAM_SECRET_ACCESS_KEY = aws_iam_access_key.ftp_user_key[0].secret
@@ -217,7 +217,7 @@ resource "aws_iam_user_policy" "ftp_user_policy" {
 
 data "aws_iam_policy_document" "ftp_user_policy" {
   statement {
-    sid   = "S3BucketAccess"
+    sid    = "S3BucketAccess"
     effect = "Allow"
     actions = [
       "s3:DeleteObject",
@@ -236,12 +236,12 @@ data "aws_iam_policy_document" "ftp_user_policy" {
     ])
   }
   statement {
-    sid   = "KMSPermissions"
+    sid    = "KMSPermissions"
     effect = "Allow"
     actions = [
       "kms:GenerateDataKey",
       "kms:Decrypt",
-      "kms:Encrypt"    
+      "kms:Encrypt"
     ]
     resources = [local.laa_general_kms_arn]
   }
