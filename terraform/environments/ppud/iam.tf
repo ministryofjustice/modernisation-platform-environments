@@ -905,7 +905,7 @@ resource "aws_iam_role_policy_attachment" "attach_lambda_policies_get_cloudwatch
   policy_arn = each.value
 }
 
-resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_prod" {
+resource "aws_iam_policy_attachment" "attach_lambda_cloudwatch_full_access_prod_2" {
   count      = local.is-production == true ? 1 : 0
   name       = "lambda-cloudwatch-full-access-iam-attachment"
   roles      = [aws_iam_role.lambda_role_get_cloudwatch_prod[0].id]
