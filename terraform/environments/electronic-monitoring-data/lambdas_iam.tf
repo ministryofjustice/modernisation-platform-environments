@@ -588,7 +588,7 @@ resource "aws_lakeformation_permissions" "servicenow" {
   catalog_resource = true
 }
 
-resource "aws_lakeformation_permissions" "servicenow" {
+resource "aws_lakeformation_permissions" "servicenow_bucket" {
   principal = aws_iam_role.zero_etl.arn
   permissions = ["DATA_LOCATION_ACCESS"]
   data_location {
