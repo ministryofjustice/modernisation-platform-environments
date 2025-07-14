@@ -538,14 +538,12 @@ data "aws_iam_policy_document" "zero_etl" {
     actions   = ["iam:ListAccountAliases"]
     resources = ["*"]
   }
+  #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   statement {
     sid    = "ListAllSecrets"
     effect = "Allow"
     actions = ["secretsmanager:ListSecrets"]
-    resources = [
-      aws_secretsmanager_secret.servicenow_credentials.arn,
-      aws_secretsmanager_secret_version.servicenow_credentials.arn
-    ]
+    resources = ["*"]
   }
 }
 
