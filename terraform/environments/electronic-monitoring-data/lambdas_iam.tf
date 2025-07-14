@@ -526,6 +526,7 @@ data "aws_iam_policy_document" "zero_etl" {
       "glue:CreateConnection",
       "glue:DeleteConnection",
       "glue:BatchDeleteConnection",
+      "glue:CreateInboundIntegration",
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
@@ -570,4 +571,10 @@ resource "aws_iam_policy" "zero_etl" {
 resource "aws_iam_role_policy_attachment" "zero_etl" {
   role       = aws_iam_role.zero_etl.name
   policy_arn = aws_iam_policy.zero_etl.arn
+}
+
+resource "aws_lakeformation_permissions" "servicenow" {
+  principal = aws_iam_role.zero_etl.arn
+  permissions = ["CREATE_DATABASE"]
+  catalog_resource = true
 }
