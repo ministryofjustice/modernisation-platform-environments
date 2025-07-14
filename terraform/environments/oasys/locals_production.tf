@@ -832,6 +832,13 @@ locals {
       # for azure, remove when migrated to aws db
       "/oracle/database/OASPROD" = local.secretsmanager_secrets.db_oasys
     }
+
+    # OASys is not supported out of hours.
+    schedule_alarms_lambda = {
+      alarm_patterns = [
+        "*-cpu-iowait-high", # disable iowait alarm as planned out-of-hours work may trigger it
+      ]
+    }
   }
 
 }
