@@ -26,7 +26,7 @@ module "mwaa_kms" {
           identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
         }
       ]
-      conditions = [
+      condition = [
         {
           test     = "ArnLike"
           variable = "kms:EncryptionContext:aws:logs:arn"
