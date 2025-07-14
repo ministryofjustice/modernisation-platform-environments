@@ -509,9 +509,7 @@ data "aws_iam_policy_document" "zero_etl" {
     sid = "AllowIntegrationDeploymentDestruction"
     effect = "Allow"
     actions = [
-      "glue:CreateIntegration*",
-      "glue:DeleteIntegration*",
-      "glue:CreateInboundIntegration",
+      "glue:*Integration*",
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:integration/*",
