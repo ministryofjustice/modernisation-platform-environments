@@ -1242,6 +1242,26 @@ resource "aws_iam_policy" "iam_policy_lambda_get_securityhub_data_prod" {
   })
 }
 
+resource "aws_iam_policy" "iam_policy_lambda_get_ssm_parameter_klayers_prod" {
+  count       = local.is-production == true ? 1 : 0
+  name        = "aws_iam_policy_for_lambda_get_ssm_parameters_klayers_${local.environment}"
+  path        = "/"
+  description = "Allows lambda functions to get ssm parameters (account ID) for the klayers account"
+  policy = jsonencode({
+    "Version" : "2012-10-17",
+    "Statement" : [
+      {
+        "Effect" : "Allow",
+        "Action" : [
+          "ssm:GetParameter"
+        ],
+        "Resource" : [
+          "arn:aws:ssm:eu-west-2:${local.environment_management.account_ids["ppud-production"]}:parameter/klayers-account"
+        ]
+      }
+    ]
+  })
+}
 
 ##########################################################################################################
 
