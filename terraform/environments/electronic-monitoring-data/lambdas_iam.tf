@@ -561,6 +561,15 @@ data "aws_iam_policy_document" "zero_etl" {
     actions = ["iam:PassRole"]
     resources = [aws_iam_role.glue_connection_snow_access.arn]
   }
+  statement {
+    sid    = "ListAllBuckets"
+    effect = "Allow"
+    actions = [
+      "s3:ListAllMyBuckets",
+      "s3:GetBucketLocation"
+    ]
+    resources = ["*"]
+  }
 }
 
 resource "aws_iam_policy" "zero_etl" {
