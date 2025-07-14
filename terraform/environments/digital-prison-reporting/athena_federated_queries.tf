@@ -29,7 +29,7 @@ locals {
   ndmis_service_name      = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["db_name"] : ""
   connection_string_ndmis = local.is_non_prod ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndmis[0].name}}@//${local.ndmis_host}:${local.ndmis_port}/${local.ndmis_service_name}" : ""
 
-  excluded_catalogs       = toset(["dps-testing", "dps-testing2"])
+  excluded_catalogs = toset(["dps-testing", "dps-testing2"])
 
   # OASys, ONR and nDelius are currently only included in Dev and Test
   # ndmis is only included in Dev, Test and PreProduction
@@ -259,9 +259,9 @@ resource "aws_athena_data_catalog" "ndmis_catalog" {
 
 # Adds an Athena data source / catalog for dps_locations
 resource "aws_athena_data_catalog" "dps_data_catalog" {
-  for_each    = toset(
+  for_each = toset(
     [
-      for item in local.dps_domains_list: item
+      for item in local.dps_domains_list : item
       if !contains(local.excluded_catalogs, item)
     ]
   )

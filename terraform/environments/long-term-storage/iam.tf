@@ -9,7 +9,7 @@ resource "aws_iam_policy" "s3_read_only_policy" {
   # checkov:skip=CKV_AWS_40:"Directly attaching the policy makes more sense here"
   name        = "S3ReadOnlyOsptBucketPolicy"
   description = "Read-only access to ospt bucket"
-  policy      = jsonencode({
+  policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
       {
