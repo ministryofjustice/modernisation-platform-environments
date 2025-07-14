@@ -511,6 +511,7 @@ data "aws_iam_policy_document" "zero_etl" {
     actions = [
       "glue:CreateIntegration*",
       "glue:DeleteIntegration*",
+      "glue:CreateInboundIntegration",
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:integration/*",
@@ -526,7 +527,6 @@ data "aws_iam_policy_document" "zero_etl" {
       "glue:CreateConnection",
       "glue:DeleteConnection",
       "glue:BatchDeleteConnection",
-      "glue:CreateInboundIntegration",
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
@@ -587,3 +587,12 @@ resource "aws_lakeformation_permissions" "servicenow" {
   permissions = ["CREATE_DATABASE"]
   catalog_resource = true
 }
+
+resource "aws_lakeformation_permissions" "servicenow" {
+  principal = aws_iam_role.zero_etl.arn
+  permissions = ["DATA_LOCATION_ACCESS"]
+  data_location {
+    arn = aws_lakeformation_resource.data_bucket.arn
+  }
+}
+
