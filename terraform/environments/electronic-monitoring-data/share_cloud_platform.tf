@@ -128,10 +128,10 @@ module "acquisitive_crime_assumable_role" {
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
-  trusted_role_arns = concat(
+  trusted_role_arns = flatten([
     data.aws_iam_roles.mod_plat_roles.arns,
     [var.cloud-platform-crime-matching-iam-dev],
-  )
+  ])
 
   create_role       = true
   role_requires_mfa = false
