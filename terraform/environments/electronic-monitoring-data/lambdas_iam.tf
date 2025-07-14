@@ -540,10 +540,16 @@ data "aws_iam_policy_document" "zero_etl" {
   }
   #checkov:skip=CKV_AWS_356: "Ensure no IAM policies documents allow "*" as a statement's resource for restrictable actions"
   statement {
-    sid    = "ListAllSecrets"
-    effect = "Allow"
-    actions = ["secretsmanager:ListSecrets"]
+    sid       = "ListAllSecrets"
+    effect    = "Allow"
+    actions   = ["secretsmanager:ListSecrets"]
     resources = ["*"]
+  }
+  statement {
+    sid = "PassRoleToConn"
+    effect = "Allow"
+    actions = ["iam:PassRole"]
+    resources = [aws_iam_role.glue_connection_snow_access.arn]
   }
 }
 
