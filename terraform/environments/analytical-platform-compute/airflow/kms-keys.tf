@@ -23,14 +23,14 @@ module "mwaa_kms" {
       principals = [
         {
           type        = "Service"
-          identifiers = ["logs.${data.aws_region.current.name}.amazonaws.com"]
+          identifiers = ["logs.${data.aws_region.current.region}.amazonaws.com"]
         }
       ]
       condition = [
         {
           test     = "ArnLike"
           variable = "kms:EncryptionContext:aws:logs:arn"
-          values   = ["arn:aws:logs:${data.aws_region.current.name}:*:*"]
+          values   = ["arn:aws:logs:${data.aws_region.current.region}:*:*"]
         }
       ]
     }

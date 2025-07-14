@@ -31,7 +31,7 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
       "logs:GetLogGroupFields",
       "logs:GetQueryResults"
     ]
-    resources = ["arn:aws:logs:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${local.environment}-*"]
+    resources = ["arn:aws:logs:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:log-group:airflow-${local.environment}-*"]
   }
   statement {
     effect    = "Allow"
@@ -58,7 +58,7 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
       "sqs:ReceiveMessage",
       "sqs:SendMessage"
     ]
-    resources = ["arn:aws:sqs:${data.aws_region.current.name}:*:airflow-celery-*"]
+    resources = ["arn:aws:sqs:${data.aws_region.current.region}:*:airflow-celery-*"]
   }
   statement {
     effect = "Allow"
@@ -73,8 +73,8 @@ data "aws_iam_policy_document" "mwaa_execution_policy" {
       test     = "StringLike"
       variable = "kms:ViaService"
       values = [
-        "s3.${data.aws_region.current.name}.amazonaws.com",
-        "sqs.${data.aws_region.current.name}.amazonaws.com"
+        "s3.${data.aws_region.current.region}.amazonaws.com",
+        "sqs.${data.aws_region.current.region}.amazonaws.com"
       ]
     }
   }
