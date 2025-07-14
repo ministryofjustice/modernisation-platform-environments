@@ -125,7 +125,7 @@ module "cmt_front_end_assumable_role" {
 module "acquisitive_crime_assumable_role" {
   #checkov:skip=CKV_TF_1:Module registry does not support commit hashes for versions
   #checkov:skip=CKV_TF_2:Module registry does not support tags for versions
-  count   = local.environment_shorthand == "dev" || local.environment_shorthand == "test" ? 1 : 0
+  count   = local.is-development || local.is-test ? 1 : 0
   source  = "terraform-aws-modules/iam/aws//modules/iam-assumable-role"
   version = "5.48.0"
 
@@ -285,6 +285,7 @@ resource "aws_iam_role_policy_attachment" "specials_role_standard_athena_access"
 }
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
+  count      = local.is-development || local.is-test ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
   role       = module.acquisitive_crime_assumable_role[0].iam_role_name
 }
