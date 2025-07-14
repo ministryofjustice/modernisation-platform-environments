@@ -60,7 +60,10 @@ resource "aws_db_instance" "soa_db" {
     "audit",
     "listener"
   ]
-
+  tags = merge(
+    local.tags,
+    { instance-scheduling = "skip-scheduling" }
+  )
   timeouts {
     create = "40m"
     delete = "40m"
