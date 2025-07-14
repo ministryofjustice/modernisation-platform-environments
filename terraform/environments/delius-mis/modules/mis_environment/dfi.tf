@@ -27,6 +27,7 @@ data "aws_security_group" "dsd_db" {
 module "dfi_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=v3.0.1"
 
+  # allow environment not to have this var set and still work
   count = var.dfi_config != null ? var.dfi_config.instance_count : 0
 
   providers = {
@@ -65,7 +66,7 @@ module "dfi_instance" {
         ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
         ad_domain_name          = var.environment_config.ad_domain_name
         ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
-        branch                  = "TM/TM-1305/MIS-auto-config"
+        branch                  = "main"
       }
     )
   )
@@ -76,11 +77,14 @@ module "dfi_instance" {
   region            = "eu-west-2"
   availability_zone = "eu-west-2a"
   subnet_id         = var.account_config.private_subnet_ids[count.index]
-  tags              = merge(
+  tags = merge(
     var.tags,
     {
-        domain-name = var.environment_config.ad_domain_name
+      domain-name = var.environment_config.ad_domain_name
+      server-type = "MISDis"
     }
   )
-  cloudwatch_metric_alarms = {}
+  cloudwatch_metric_alarms = merge(
+    local.cloudwatch_metric_alarms.ec2
+  )
 }

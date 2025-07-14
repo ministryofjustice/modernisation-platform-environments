@@ -61,7 +61,7 @@ module "auto_instance" {
         ad_password_secret_name = aws_secretsmanager_secret.ad_admin_password.name
         ad_domain_name          = var.environment_config.ad_domain_name
         ad_ip_list              = aws_directory_service_directory.mis_ad.dns_ip_addresses
-        branch                  = "TM/TM-1305/MIS-auto-config"
+        branch                  = "main"
       }
     )
   )
