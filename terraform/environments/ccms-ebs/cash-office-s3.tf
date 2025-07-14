@@ -1,4 +1,4 @@
-resource "aws_iam_user" "aw2" {
+resource "aws_iam_user" "aw1" {
   name = "andy.welsh.test1"
 }
 
