@@ -8,7 +8,7 @@ module "dis_instance" {
   source = "github.com/ministryofjustice/modernisation-platform-terraform-ec2-instance?ref=49e289239aec2845924f00fc5969f35ae76122e2"
 
   # allow environment not to have this var set and still work
-  count = var.dfi_config != null ? var.dfi_config.instance_count : 0
+  count = var.dis_config != null ? var.dis_config.instance_count : 0
 
   providers = {
     aws.core-vpc = aws.core-vpc # core-vpc-(environment) holds the networking for all accounts
