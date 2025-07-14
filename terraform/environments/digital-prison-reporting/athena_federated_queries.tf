@@ -9,20 +9,20 @@ locals {
   bodmis_service_name      = jsondecode(data.aws_secretsmanager_secret_version.bodmis.secret_string)["db_name"]
   connection_string_bodmis = "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.bodmis.name}}@//${local.bodmis_host}:${local.bodmis_port}/${local.bodmis_service_name}"
 
-  oasys_host              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["endpoint"] : ""
-  oasys_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["port"] : ""
-  oasys_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["db_name"] : ""
-  connection_string_oasys = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.oasys[0].name}}@//${local.oasys_host}:${local.oasys_port}/${local.oasys_service_name}" : ""
+  oasys_host              = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["endpoint"] : ""
+  oasys_port              = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["port"] : ""
+  oasys_service_name      = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.oasys[0].secret_string)["db_name"] : ""
+  connection_string_oasys = local.is-test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.oasys[0].name}}@//${local.oasys_host}:${local.oasys_port}/${local.oasys_service_name}" : ""
 
-  onr_host              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["endpoint"] : ""
-  onr_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["port"] : ""
-  onr_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["db_name"] : ""
-  connection_string_onr = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.onr[0].name}}@//${local.onr_host}:${local.onr_port}/${local.onr_service_name}" : ""
+  onr_host              = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["endpoint"] : ""
+  onr_port              = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["port"] : ""
+  onr_service_name      = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.onr[0].secret_string)["db_name"] : ""
+  connection_string_onr = local.is-test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.onr[0].name}}@//${local.onr_host}:${local.onr_port}/${local.onr_service_name}" : ""
 
-  ndelius_host              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["endpoint"] : ""
-  ndelius_port              = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["port"] : ""
-  ndelius_service_name      = local.is_dev_or_test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["db_name"] : ""
-  connection_string_ndelius = local.is_dev_or_test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndelius[0].name}}@//${local.ndelius_host}:${local.ndelius_port}/${local.ndelius_service_name}" : ""
+  ndelius_host              = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["endpoint"] : ""
+  ndelius_port              = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["port"] : ""
+  ndelius_service_name      = local.is-test ? jsondecode(data.aws_secretsmanager_secret_version.ndelius[0].secret_string)["db_name"] : ""
+  connection_string_ndelius = local.is-test ? "oracle://jdbc:oracle:thin:$${${aws_secretsmanager_secret.ndelius[0].name}}@//${local.ndelius_host}:${local.ndelius_port}/${local.ndelius_service_name}" : ""
 
   ndmis_host              = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["endpoint"] : ""
   ndmis_port              = local.is_non_prod ? jsondecode(data.aws_secretsmanager_secret_version.ndmis[0].secret_string)["port"] : ""
@@ -31,9 +31,14 @@ locals {
 
   excluded_catalogs = toset(["dps-testing", "dps-testing2"])
 
-  # OASys, ONR and nDelius are currently only included in Dev and Test
-  # ndmis is only included in Dev, Test and PreProduction
-  dev_and_test_federated_query_connections_oracle = {
+  # Some connections are only set up in specific environments
+  dev_federated_query_connections_oracle = {
+    nomis   = local.connection_string_nomis
+    bodmis  = local.connection_string_bodmis
+    ndmis   = local.connection_string_ndmis
+  }
+
+  test_federated_query_connections_oracle = {
     nomis   = local.connection_string_nomis
     bodmis  = local.connection_string_bodmis
     oasys   = local.connection_string_oasys
@@ -70,7 +75,13 @@ locals {
     bodmis = local.connection_string_bodmis
   }
 
-  dev_and_test_federated_query_credentials_secret_arns_oracle = local.is_dev_or_test ? [
+  dev_federated_query_credentials_secret_arns_oracle = local.is-development ? [
+    aws_secretsmanager_secret.nomis.arn,
+    aws_secretsmanager_secret.bodmis.arn,
+    aws_secretsmanager_secret.ndmis[0].arn
+  ] : []
+
+  test_federated_query_credentials_secret_arns_oracle = local.is-test ? [
     aws_secretsmanager_secret.nomis.arn,
     aws_secretsmanager_secret.bodmis.arn,
     aws_secretsmanager_secret.oasys[0].arn,
@@ -96,11 +107,16 @@ locals {
   ]
 
 
-  federated_query_connection_strings_map_oracle = (local.is_dev_or_test ? local.dev_and_test_federated_query_connections_oracle :
-  (local.is-preproduction ? local.preproduction_federated_query_connections_oracle : local.production_federated_query_connections_oracle))
+  federated_query_connection_strings_map_oracle = (local.is-development ? local.dev_federated_query_connections_oracle :
+    (local.is-test ? local.test_federated_query_connections_oracle :
+      (local.is-preproduction ? local.preproduction_federated_query_connections_oracle :
+        local.production_federated_query_connections_oracle)))
 
-  federated_query_credentials_secret_arns_oracle = (local.is_dev_or_test ? local.dev_and_test_federated_query_credentials_secret_arns_oracle :
-  (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns_oracle : local.production_federated_query_credentials_secret_arns_oracle))
+  federated_query_credentials_secret_arns_oracle = (local.is-development ?
+    local.dev_federated_query_credentials_secret_arns_oracle :
+    (local.is-test ? local.test_federated_query_credentials_secret_arns_oracle :
+      (local.is-preproduction ? local.preproduction_federated_query_credentials_secret_arns_oracle :
+        local.production_federated_query_credentials_secret_arns_oracle)))
 
   federated_query_connection_strings_map_postgresql = local.dps_full_connection_string
 }
