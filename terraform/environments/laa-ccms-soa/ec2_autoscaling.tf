@@ -12,10 +12,11 @@ resource "aws_autoscaling_group" "cluster-scaling-group-managed" {
     id      = aws_launch_template.ec2-launch-template-managed.id
     version = "$Latest"
   }
-  tags = merge(
-    local.tags,
-    { instance-scheduling = "skip-scheduling" }
-  )
+  tag {
+    key                 = "instance-scheduling"
+    value               = "skip-scheduling"
+    propagate_at_launch = true
+  }
   depends_on = [
     aws_efs_file_system.storage,
     aws_db_instance.soa_db
@@ -34,10 +35,11 @@ resource "aws_autoscaling_group" "cluster-scaling-group-admin" {
     id      = aws_launch_template.ec2-launch-template-admin.id
     version = "$Latest"
   }
-  tags = merge(
-    local.tags,
-    { instance-scheduling = "skip-scheduling" }
-  )
+  tag {
+    key                 = "instance-scheduling"
+    value               = "skip-scheduling"
+    propagate_at_launch = true
+  }
   depends_on = [
     aws_efs_file_system.storage,
     aws_db_instance.soa_db
