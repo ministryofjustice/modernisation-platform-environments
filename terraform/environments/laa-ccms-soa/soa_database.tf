@@ -54,7 +54,10 @@ resource "aws_db_instance" "soa_db" {
   deletion_protection     = local.application_data.accounts[local.environment].soa_db_deletion_protection
   db_subnet_group_name    = aws_db_subnet_group.soa.id
   option_group_name       = aws_db_option_group.soa_oracle_19.id
-
+  tags = merge(
+    local.tags,
+    { instance-scheduling = "skip-scheduling" }
+  )
   enabled_cloudwatch_logs_exports = [
     "alert",
     "audit",

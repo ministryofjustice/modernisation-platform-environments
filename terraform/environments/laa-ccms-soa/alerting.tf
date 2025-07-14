@@ -74,17 +74,17 @@ resource "aws_db_event_subscription" "rds_events" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-CPU-high-threshold-alarm"
-  alarm_description   = "${local.aws_account_id} | RDS CPU is above 75%"
+  alarm_description   = "${local.aws_account_id} | RDS CPU is above 75% for over 15 minutes"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "CPUUtilization"
   statistic           = "Average"
   namespace           = "AWS/RDS"
-  period              = "60"
-  evaluation_periods  = "5"
+  period              = "300"
+  evaluation_periods  = "3"
   threshold           = "75"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -92,17 +92,17 @@ resource "aws_cloudwatch_metric_alarm" "RDS_CPU_over_threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-DiskQueue-high-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS disk queue is above 4"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS disk queue is above 4 for over 15 minutes"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "DiskQueueDepth"
   statistic           = "Average"
   namespace           = "AWS/RDS"
-  period              = "60"
-  evaluation_periods  = "5"
+  period              = "300"
+  evaluation_periods  = "3"
   threshold           = "4"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -110,90 +110,18 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Disk_Queue_Depth_Over_Threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Free_Storage_Space_Over_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-FreeStorageSpace-low-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Free storage space is below 50"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Free storage space is below 50 for over 15 minutes"
   comparison_operator = "LessThanThreshold"
   metric_name         = "FreeStorageSpace"
   statistic           = "Average"
   namespace           = "AWS/RDS"
-  period              = "60"
-  evaluation_periods  = "5"
-  datapoints_to_alarm = "5"
+  period              = "300"
+  evaluation_periods  = "3"
+  datapoints_to_alarm = "3"
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_free_storage_threshold_gb
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
-  }
-  alarm_actions = [aws_sns_topic.alerts.arn]
-  ok_actions    = [aws_sns_topic.alerts.arn]
-}
-
-resource "aws_cloudwatch_metric_alarm" "RDS_Read_Lataency_Over_Threshold" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-ReadLatency-high-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Read Latency is above 0.5"
-  comparison_operator = "GreaterThanThreshold"
-  metric_name         = "ReadLatency"
-  statistic           = "Average"
-  namespace           = "AWS/RDS"
-  period              = "60"
-  evaluation_periods  = "5"
-  threshold           = "0.5"
-  treat_missing_data  = "missing"
-  dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
-  }
-  alarm_actions = [aws_sns_topic.alerts.arn]
-  ok_actions    = [aws_sns_topic.alerts.arn]
-}
-
-resource "aws_cloudwatch_metric_alarm" "RDS_Write_Latency_Over_Threshold" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-WriteLatency-high-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS write latency is above 0.5"
-  comparison_operator = "GreaterThanThreshold"
-  metric_name         = "WriteLatency"
-  statistic           = "Average"
-  namespace           = "AWS/RDS"
-  period              = "60"
-  evaluation_periods  = "5"
-  threshold           = "0.5"
-  treat_missing_data  = "missing"
-  dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
-  }
-  alarm_actions = [aws_sns_topic.alerts.arn]
-  ok_actions    = [aws_sns_topic.alerts.arn]
-}
-
-resource "aws_cloudwatch_metric_alarm" "RDS_Swap_Usage_Over_Threshold" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-SwapUsage-high-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS swap usage is above 0.5GB"
-  comparison_operator = "GreaterThanThreshold"
-  metric_name         = "SwapUsage"
-  statistic           = "Sum"
-  namespace           = "AWS/RDS"
-  period              = "60"
-  evaluation_periods  = "5"
-  threshold           = "500000000"
-  treat_missing_data  = "missing"
-  dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
-  }
-  alarm_actions = [aws_sns_topic.alerts.arn]
-  ok_actions    = [aws_sns_topic.alerts.arn]
-}
-
-resource "aws_cloudwatch_metric_alarm" "RDS_Freeable_Memory_Over_Threshold" {
-  alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-FreeableMemory-high-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Freeable Memory is above 500MB"
-  comparison_operator = "LessThanThreshold"
-  metric_name         = "FreeableMemory"
-  statistic           = "Sum"
-  namespace           = "AWS/RDS"
-  period              = "60"
-  evaluation_periods  = "5"
-  threshold           = "500"
-  treat_missing_data  = "missing"
-  dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -201,17 +129,17 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Freeable_Memory_Over_Threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-BurstBalance-low-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Burst balance is below 1"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Burst balance is below 1 for over 15 minutes"
   comparison_operator = "LessThanOrEqualToThreshold"
   metric_name         = "BurstBalance"
   statistic           = "Sum"
   namespace           = "AWS/RDS"
   period              = "300"
-  evaluation_periods  = "5"
+  evaluation_periods  = "3"
   threshold           = "1"
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -219,7 +147,7 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Burst_Balance_Threshold" {
 
 resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
   alarm_name          = "${local.application_data.accounts[local.environment].app_name}-RDS-WriteIOPS-high-threshold-alarm"
-  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Write IOPS is above ${local.application_data.accounts[local.environment].logging_cloudwatch_rds_write_iops_threshold}"
+  alarm_description   = "${local.environment} | ${local.aws_account_id} | RDS Write IOPS is above ${local.application_data.accounts[local.environment].logging_cloudwatch_rds_write_iops_threshold} for over 15 minutes"
   comparison_operator = "GreaterThanThreshold"
   metric_name         = "WriteIOPS"
   statistic           = "Average"
@@ -228,9 +156,9 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Write_IOPS_Threshold" {
   datapoints_to_alarm = "3"
   evaluation_periods  = "3"
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_write_iops_threshold
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
@@ -247,9 +175,9 @@ resource "aws_cloudwatch_metric_alarm" "RDS_Read_IOPS_Threshold" {
   datapoints_to_alarm = "3"
   evaluation_periods  = "3"
   threshold           = local.application_data.accounts[local.environment].logging_cloudwatch_rds_read_iops_threshold
-  treat_missing_data  = "missing"
+  treat_missing_data  = "breaching"
   dimensions = {
-    DBInstanceIdentifier = aws_db_instance.soa_db.id
+    DBInstanceIdentifier = aws_db_instance.soa_db.identifier
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
   ok_actions    = [aws_sns_topic.alerts.arn]
