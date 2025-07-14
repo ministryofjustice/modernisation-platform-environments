@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "assume_role_trust_policy" {
 
 data "aws_iam_policy_document" "s3" {
   statement {
-    sid    = "AllowLimitedS3"
+    sid    = "S3LimitedAllow"
     effect = "Allow"
 
     actions = [
@@ -77,6 +77,13 @@ data "aws_iam_policy_document" "s3" {
       "arn:aws:s3:::laa-ccms-inbound-development-mp" #--Param needed
     ]
   }
+}
+
+#--Policies
+resource "aws_iam_policy" "s3" {
+  name        = "S3LimitedAllow"
+  description = "Grants the cash office role limited S3 read/write access to S3 prefixes"
+  policy      = data.aws_iam_policy_document.s3.json
 }
 
 #--Grant users role assumption permissions, turn this in to a loop
