@@ -26,7 +26,8 @@ data "aws_iam_policy_document" "glue-policy" {
     }
     actions = [
       "glue:AuthorizeInboundIntegration",
-      "glue:CreateIntegration",
+      "glue:CreateInboundIntegration",
+      "glue:CreateIntegration"
     ]
     resources = [
       "arn:aws:glue:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:catalog",
