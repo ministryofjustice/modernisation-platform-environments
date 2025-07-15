@@ -1,24 +1,24 @@
 #!/bin/bash
-set -euxo pipefail
+set -e
 
 exec > /tmp/userdata.log 2>&1
 
 amazon-linux-extras install -y epel
-yum install -y wget unzip vsftpd jq s3fs-fuse
-yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+yum install -y wget unzip vsftpd jq s3fs-fuse amazon-cloudwatch-agent
+# yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
 
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-./aws/install
+# curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+# unzip awscliv2.zip
+# ./aws/install
 
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
-rpm -U ./amazon-cloudwatch-agent.rpm
+# wget https://s3.amazonaws.com/amazoncloudwatch-agent/oracle_linux/amd64/latest/amazon-cloudwatch-agent.rpm
+# rpm -U ./amazon-cloudwatch-agent.rpm
 
-/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
+# /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -s -c ssm:cloud-watch-config
 
-systemctl stop amazon-ssm-agent
-rm -rf /var/lib/amazon/ssm/ipc/
-systemctl start amazon-ssm-agent
+# systemctl stop amazon-ssm-agent
+# rm -rf /var/lib/amazon/ssm/ipc/
+# systemctl start amazon-ssm-agent
 
 echo "pasv_enable=YES" >> /etc/vsftpd/vsftpd.conf
 echo "pasv_min_port=3000" >> /etc/vsftpd/vsftpd.conf
@@ -26,7 +26,7 @@ echo "pasv_max_port=3010" >> /etc/vsftpd/vsftpd.conf
 systemctl enable vsftpd.service
 systemctl restart vsftpd.service
 
-cat > /etc/mount_s3.sh <<- EOM
+cat > /etc/mount_s3_new.sh <<- EOM
 #!/bin/bash
 ENV="${environment}"
 inbound_bucket="${ftp_inbound_bucket}"
@@ -152,8 +152,8 @@ else
 fi
 EOM
 
-chmod +x /etc/mount_s3.sh
+chmod +x /etc/mount_s3_new.sh
 
 chmod +x /etc/rc.d/rc.local
-echo "/etc/mount_s3.sh" >> /etc/rc.local
+echo "/etc/mount_s3_new.sh" >> /etc/rc.local
 systemctl start rc-local.service
