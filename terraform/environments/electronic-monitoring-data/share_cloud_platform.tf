@@ -259,6 +259,36 @@ data "iam_policy_document" "cmt_permissions" {
   }
 }
 
+
+
+data "iam_policy_document" "ac_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabases",
+    ]
+    resources = ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:catalog"]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetDatabase",
+      "glue:GetTables",
+    ]
+    resources = local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/*"] : [
+      "arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:database/allied_mdss_${local.environment_shorthand}",
+    ]
+  }
+  statement {
+    effect = "Allow"
+    actions = [
+      "glue:GetTable",
+    ]
+    resources = local.is-test ? ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/*/*"] : ["arn:aws:glue:${data.aws_region.current.name}:${local.env_account_id}:table/allied_mdss_${local.environment_shorthand}/*",
+    ]
+  }
+}
+
 resource "aws_iam_policy" "standard_athena_access" {
   name_prefix = "standard_athena_access"
   description = "Standard permissions for Athena"
@@ -269,6 +299,12 @@ resource "aws_iam_policy" "cmt_specific_access" {
   name_prefix = "cmt_specific_access"
   description = "Access to the Glue tables and APIs required by CMT."
   policy      = data.aws_iam_policy_document.cmt_permissions.json
+}
+
+resource "aws_iam_policy" "ac_specific_access" {
+  name_prefix = "ac_specific_access"
+  description = "Access to the Glue tables required by AC."
+  policy      = data.aws_iam_policy_document.ac_permissions.json
 }
 
 resource "aws_iam_role_policy_attachment" "standard_athena_access" {
@@ -290,5 +326,11 @@ resource "aws_iam_role_policy_attachment" "specials_role_standard_athena_access"
 resource "aws_iam_role_policy_attachment" "standard_athena_access_ac" {
   count      = local.is-development || local.is-test ? 1 : 0
   policy_arn = aws_iam_policy.standard_athena_access.arn
+  role       = module.acquisitive_crime_assumable_role[0].iam_role_name
+}
+
+resource "aws_iam_role_policy_attachment" "ac_specific_access" {
+  count      = local.is-development || local.is-test ? 1 : 0
+  policy_arn = aws_iam_policy.ac_specific_access.arn
   role       = module.acquisitive_crime_assumable_role[0].iam_role_name
 }
