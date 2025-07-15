@@ -1,10 +1,11 @@
+
 # Python 3.12 Lambda Layer Builder
 
 This folder provides a Docker-based setup for building an AWS Lambda layer zip file containing Python 3.12 dependencies.
 
 ---
 
-## 📄 Files
+## Files
 
 ### `Dockerfile`
 - Builds an Amazon Linux 2023 base image.
@@ -35,18 +36,29 @@ It handles creating a default `requirements.txt`, building the image, and runnin
 
 ---
 
-## 🚀 Usage
+## Usage
 
-### 1️⃣ Make sure these files exist in your directory
+### Step 1: Make sure these files exist in your directory
 
-Dockerfile
-entrypoint.sh
-build-layer.sh
-requirements.txt (optional — will be created if missing)
+- Dockerfile
+- entrypoint.sh
+- build-layer.sh
+- requirements.txt (optional — will be created if missing)
 
 ---
 
-### 2️⃣ Make scripts executable
+### Step 2: Make scripts executable
 
 ```bash
 chmod +x build-layer.sh entrypoint.sh
+
+---
+
+### Step 3: Upload the created ZIP file to layer S3 bucket
+
+The bucket and folder location are defined in the following parameters in application_variables.json:
+
+- ftp_layer_bucket
+- ftp_layer_folder_location
+
+Note - if amending for an existing deployment the, request for the layer resource to be “tainted” (ask the Modernisation Platform Team via the ask channel to do this) and then re-run the GitHub workflow for the environment in question. The layer will then be recreated using the updated python libs.
