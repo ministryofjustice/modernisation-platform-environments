@@ -1,5 +1,30 @@
 # AWS Transfer Service
 
+locals {
+
+  decoded_transfer_service_secret = try(
+    jsondecode(
+      length(data.aws_secretsmanager_secret_version.transfer_service_secret_version) > 0 ?
+      data.aws_secretsmanager_secret_version.transfer_service_secret_version[0].secret_string :
+      "{}"
+    ),
+    []
+  )
+
+  transfer_service_details = {
+    for pair in local.decoded_transfer_service_secret :
+    "${pair.name}.${pair.type}" => pair.value
+    if contains(keys(pair), "name") && contains(keys(pair), "type") && contains(keys(pair), "value")
+  }
+
+
+  transfer_service = {
+    job_name          = "xhibit-inbound"
+    bucket_name       = try(module.s3_bucket.inbound.bucket.bucket, "")
+    bucket_folder     = "temp/"
+  }
+
+}
 
 resource "aws_iam_role" "transfer_role" {
   count = local.build_transfer ? 1 : 0
