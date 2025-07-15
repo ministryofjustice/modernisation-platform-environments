@@ -307,8 +307,7 @@ module "cur_v2_hourly_without_kms" {
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        kms_master_key_id = module.cur_s3_kms.key_arn
-        sse_algorithm     = "AES256"
+        sse_algorithm = "AES256"
       }
     }
   }
