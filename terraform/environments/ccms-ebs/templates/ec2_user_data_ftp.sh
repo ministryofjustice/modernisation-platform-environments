@@ -19,6 +19,9 @@ systemctl stop amazon-ssm-agent
 rm -rf /var/lib/amazon/ssm/ipc/
 systemctl start amazon-ssm-agent
 
+AWS_REGION=eu-west-2
+aws configure set region $AWS_REGION
+
 ENV="${environment}"
 inbound_bucket="${ftp_inbound_bucket}"
 outbound_bucket="${ftp_outbound_bucket}"
@@ -43,7 +46,7 @@ SECRET_NAME="ftp-s3-$ENV-aws-key"
 # --- Fetch secret securely ---
 SECRET_JSON=$(aws secretsmanager get-secret-value \
   --secret-id "$SECRET_NAME" \
-  --region "$REGION" \
+  --region "eu-west-2" \
   --query SecretString \
   --output text)
 
